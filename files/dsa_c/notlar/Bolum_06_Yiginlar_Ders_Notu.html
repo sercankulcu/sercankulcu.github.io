@@ -1,0 +1,1330 @@
+---
+layout: without-sidebar
+title: "Bölüm 6: Yığınlar — Ders Notu"
+permalink: /files/dsa_c/notlar/Bolum_06_Yiginlar_Ders_Notu.html
+excerpt: "C ile Veri Yapıları ve Algoritmalar dersi Bölüm 6 ders notu: yığın ve LIFO, yığın soyut veri tipi, dizi ile yığın (top indisi, taşma ve alt taşma, ++*top ve (*top)--), struct ve opak tiple tasarım, bağlı yığın (malloc, free, sızıntı), büyüyen dizi ve amortize analiz, çağrı yığını ve yığın taşması, çoklu yığın, yığınla elde edilebilen çıkış sıraları. Bellek çizimleri, C kodları ve kod izlemeleri."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">C ile Veri Yapıları ve Algoritmalar · Ders Notu</p>
+  <h1>Bölüm 6: Yığınlar</h1>
+  <p class="nt-lead">Yığın, eklemenin ve silmenin yalnız bir uçtan yapıldığı en basit doğrusal yapıdır. Son eklenen öğe ilk çıkar. Bu kısıt ilk bakışta yapıyı zayıflatıyor gibi görünür. Oysa “en son açılan iş ilk kapanır” kuralına uyan her sorunda yığın tam aranan araçtır: fonksiyon çağrıları, parantez denetimi, geri alma komutu ve geri izleme bu kurala uyar. Not, yığını önce soyut bir veri tipi olarak tanımlar. Ardından aynı arayüzü üç farklı biçimde gerçekler: sabit bir dizi ve <code>top</code> indisiyle, gerektikçe büyüyen bir diziyle ve bağlı listeyle. Her gerçeklemede bellekte neler olduğu çizimlerle, kodun her satırı da izleme tablolarıyla verilir. Son kesimler bilgisayarın kendi yığınını, yani çağrı yığınını, tek bir bellek dizisinde birden çok yığın tutmayı ve hangi çıkış sıralarının yığınla elde edilebildiğini ele alır.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_06_Yiginlar.html">Sunum</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>LIFO'yu tanımlamak</dt>
+    <dd>Yığını <span class="m">S = {a<sub>0</sub>, …, a<sub>n−1</sub>}</span> listesi olarak tanımlamak, alt ve üst öğeyi göstermek ve bir işlem dizisinden sonra yığının durumunu bulmak.</dd>
+    <dt>Dizi ile gerçeklemek</dt>
+    <dd><code>top</code> indisiyle ekleme ve çıkarma yordamlarını yazmak; taşma (<span lang="en">overflow</span>) ve alt taşma (<span lang="en">underflow</span>) durumlarını denetlemek; <code>++*top</code> ile <code>*top--</code> arasındaki farkı açıklamak.</dd>
+    <dt>Bağlı yığın kurmak</dt>
+    <dd>Düğümü <code>malloc</code> ile ayırıp bağlamak, çıkarılan düğümü <code>free</code> ile iade etmek ve bellek sızıntısı bırakmadan yığını boşaltmak.</dd>
+    <dt>Çağrı yığınını tanımak</dt>
+    <dd>Fonksiyon çağrılarının bir yığın gibi çalıştığını, her çağrının bir çerçeve ittiğini ve çağrı yığınının neden taştığını açıklamak.</dd>
+    <dt>Tasarım kararı vermek</dt>
+    <dd>Sabit dizi, büyüyen dizi ve bağlı liste arasında zaman, bellek ve hata riskine göre seçim yapmak; amortize maliyeti gerekçelendirmek.</dd>
+    <dt>Çoklu yığını yönetmek</dt>
+    <dd>Tek bir bellek dizisinde <span class="m">n</span> yığını <code>top[i]</code> ve <code>sinir[i]</code> dizileriyle paylaştırmak ve bu düzenin sınırlarını görmek.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s6-1">6.1 Yığın: son giren ilk çıkar</a>
+      <ol>
+        <li><a href="#s6-1-1">6.1.1 Tanım</a></li>
+        <li><a href="#s6-1-2">6.1.2 Yığının büyümesi ve küçülmesi</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-2">6.2 Yığın soyut veri tipi</a>
+      <ol>
+        <li><a href="#s6-2-1">6.2.1 İşlemler ve ön koşullar</a></li>
+        <li><a href="#s6-2-2">6.2.2 Yığının kullanıldığı yerler</a></li>
+        <li><a href="#s6-2-3">6.2.3 Parantez denetimi</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-3">6.3 Dizi ile yığın</a>
+      <ol>
+        <li><a href="#s6-3-1">6.3.1 <code>top</code> indisi, taşma ve alt taşma</a></li>
+        <li><a href="#s6-3-2">6.3.2 C tanımları</a></li>
+        <li><a href="#s6-3-3">6.3.3 <code>yigit_ekle</code> ve <code>yigit_al</code></a></li>
+        <li><a href="#s6-3-4">6.3.4 Öncelik tuzağı: <code>*</code> ile <code>++</code> ve <code>--</code></a></li>
+        <li><a href="#s6-3-5">6.3.5 Kod izleme</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-4">6.4 Yığını bir nesne gibi tasarlamak</a>
+      <ol>
+        <li><a href="#s6-4-1">6.4.1 Küresel dizi yerine <code>struct</code></a></li>
+        <li><a href="#s6-4-2">6.4.2 Kod izleme: <code>bool</code> döndüren <code>push</code> ve <code>pop</code></a></li>
+        <li><a href="#s6-4-3">6.4.3 Arayüz ve gerçekleme</a></li>
+        <li><a href="#s6-4-4">6.4.4 Yığınla dizge ters çevirme</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-5">6.5 Bağlı yığın</a>
+      <ol>
+        <li><a href="#s6-5-1">6.5.1 Üst neden liste başıdır</a></li>
+        <li><a href="#s6-5-2">6.5.2 Bağlı <code>push</code></a></li>
+        <li><a href="#s6-5-3">6.5.3 Bağlı <code>pop</code></a></li>
+        <li><a href="#s6-5-4">6.5.4 Bellek sorumluluğu ve yığını boşaltma</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-6">6.6 Dizi tabanlı mı, bağlı mı?</a>
+      <ol>
+        <li><a href="#s6-6-1">6.6.1 Büyüyen dizi</a></li>
+        <li><a href="#s6-6-2">6.6.2 Amortize maliyet</a></li>
+        <li><a href="#s6-6-3">6.6.3 Karşılaştırma ve ölçüm</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-7">6.7 Çağrı yığını</a>
+      <ol>
+        <li><a href="#s6-7-1">6.7.1 Çerçeve</a></li>
+        <li><a href="#s6-7-2">6.7.2 Çağrı yığını nasıl taşar</a></li>
+        <li><a href="#s6-7-3">6.7.3 Özyinelemeyi döngüye çevirmek</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-8">6.8 Çoklu yığın</a>
+      <ol>
+        <li><a href="#s6-8-1">6.8.1 Tek dizide iki yığın</a></li>
+        <li><a href="#s6-8-2">6.8.2 Tek bellekte <span class="m">n</span> yığın</a></li>
+        <li><a href="#s6-8-3">6.8.3 Kod izleme</a></li>
+        <li><a href="#s6-8-4">6.8.4 Yer açma ve değerlendirme</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-9">6.9 Hangi çıkış sırası mümkün?</a></li>
+    <li><a href="#s6-10">6.10 Karmaşıklık özeti</a></li>
+    <li><a href="#s6-11">6.11 Sık yapılan hatalar</a></li>
+    <li><a href="#s6-12">6.12 Alıştırmalar ve çözümleri</a>
+      <ol>
+        <li><a href="#s6-12-1">6.12.1 Hata döndüren <code>yigit_ekle</code></a></li>
+        <li><a href="#s6-12-2">6.12.2 Tek dizide iki yığın</a></li>
+        <li><a href="#s6-12-3">6.12.3 Boyutunu bilen bağlı yığın</a></li>
+        <li><a href="#s6-12-4">6.12.4 Yığınla dizge ters çevirme</a></li>
+        <li><a href="#s6-12-5">6.12.5 En alttaki öğe</a></li>
+        <li><a href="#s6-12-6">6.12.6 <code>fakt(5)</code> çağrısında çerçeve sayısı</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-13">6.13 Özet</a></li>
+    <li><a href="#s6-14">6.14 Kavram listesi</a></li>
+    <li><a href="#s6-15">6.15 Kendini Dene</a></li>
+    <li><a href="#s6-16">6.16 İleri okuma</a></li>
+    <li><a href="#s6-17">6.17 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s6-1"><span class="nt-num">6.1</span>Yığın: son giren ilk çıkar</h2>
+
+<p>Dizi ve bağlı liste, öğelere her yerden erişmeye izin verir. Dizide herhangi bir indise yazılabilir; listede herhangi bir düğümün arkasına düğüm eklenebilir. Yığın bu özgürlüğü bilerek kısıtlar. Öğeler yalnız bir uçtan girer ve yalnız aynı uçtan çıkar. Bu kesim yığını tanımlar ve bir işlem dizisi boyunca nasıl büyüyüp küçüldüğünü gösterir.</p>
+
+<h3 id="s6-1-1"><span class="nt-num">6.1.1</span>Tanım</h3>
+
+<p>Gündelik hayatta yığına benzeyen pek çok düzen vardır. Mutfakta üst üste konmuş tabaklardan önce en üsttekini alırız. Masadaki kâğıt destesine yeni gelen evrak en üste konur ve ilk okunan da odur. <a href="#sekil-sokak">Şekil 6.1</a> daha öğretici bir örnek verir: tek araç genişliğinde, bir ucu duvarla kapalı bir çıkmaz sokak. Araçlar sokağa A, B, C, D sırasıyla girmiştir. Sokaktan ilk çıkabilecek araç, girişe en yakın olan D'dir. A'nın çıkabilmesi için önce D'nin, sonra C'nin, sonra B'nin çıkması gerekir. Sokağın bir ucu kapalı olduğu için girişin tersi sırada çıkış zorunludur.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sokak" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 140" role="img" aria-label="Tek araç genişliğinde çıkmaz sokak: araçlar tek uçtan girip çıkar"><defs><marker id="n6-d04-ah1-s02_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box-empty" x="20" y="30" width="520" height="70" style="stroke-dasharray:6 4"/><rect class="box" x="540" y="20" width="12" height="90"/><text class="lbl" x="560" y="70" text-anchor="start">duvar</text><text class="lbl" x="20" y="20" text-anchor="start">giriş / çıkış (tek uç)</text><path class="line" d="M140 125 L40 125" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah1-s02_00-1)"/><text class="lbl" x="150" y="129" text-anchor="start">çıkan araç önce en yakındaki</text><rect class="box" x="440" y="45" width="88" height="40" rx="10"/><text class="txt" x="484" y="71" text-anchor="middle">A</text><rect class="box" x="340" y="45" width="88" height="40" rx="10"/><text class="txt" x="384" y="71" text-anchor="middle">B</text><rect class="box" x="240" y="45" width="88" height="40" rx="10"/><text class="txt" x="284" y="71" text-anchor="middle">C</text><rect class="box" x="140" y="45" width="88" height="40" rx="10" style="fill:var(--ds-hot)"/><text class="txt" x="184" y="71" text-anchor="middle">D</text></svg></div>
+  <figcaption><b>Şekil 6.1:</b> Tek arabalık çıkmaz sokak. Araçlar tek uçtan girer ve aynı uçtan çıkar. Son giren D, girişe en yakın olduğu için ilk çıkmak zorundadır; ilk giren A en son çıkar.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--tanim" id="tanim-yigin">
+  <span class="nt-box__title">Tanım 6.1</span>
+  <p><strong>Yığın</strong> (<span lang="en">stack</span>), ekleme (<span lang="en">insertion</span>) ve silmenin (<span lang="en">deletion</span>) yalnız bir uçtan yapıldığı sıralı bir listedir. <span class="m">S = {a<sub>0</sub>, a<sub>1</sub>, …, a<sub>n−1</sub>}</span> yığınının <strong>alt</strong> (<span lang="en">bottom</span>) öğesi <span class="m">a<sub>0</sub></span>'dır. <strong>Üst</strong> (<span lang="en">top</span>) öğesi <span class="m">a<sub>n−1</sub></span>'dir. <span class="m">a<sub>i</sub></span> öğesi <span class="m">a<sub>i−1</sub></span>'in üstündedir (<span class="m">0 &lt; i &lt; n</span>). Yeni öğe her zaman <span class="m">a<sub>n−1</sub></span>'in üstüne konur; çıkarılan öğe her zaman o anki üst öğedir. Bu yüzden yığından ilk çıkan, ona son giren öğedir. Bu ilkeye <strong>son giren ilk çıkar</strong> (<span lang="en">last-in-first-out, LIFO</span>) denir.</p>
+</div>
+
+<p>Tanımdaki önemli sözcük “yalnız”dır. Yığının içinde öğeler sıralıdır, ama bu sıraya dışarıdan yalnız tek bir noktadan dokunulur. Yığına öğe eklemeye <strong>push</strong> (üste ekleme), üstteki öğeyi çıkarmaya <strong>pop</strong> (üstten çıkarma) denir. Bu iki sözcük Türkçe metinlerde de çoğunlukla İngilizce hâliyle kullanılır; not da bu kullanımı izler.</p>
+
+<p>Türkçe kaynaklarda <span lang="en">stack</span> için hem “yığın” hem “yığıt” sözcükleri geçer. Bu derste <span lang="en">stack</span> için “yığın” kullanılır. Öncelikli kuyrukların gerçeklendiği <span lang="en">heap</span> veri yapısı için ise “heap” sözcüğü korunur. C programlarında yığın fonksiyonlarının adları ders kitabı geleneğiyle <code>yigit_ekle</code>, <code>yigit_al</code> biçiminde kalmıştır. Bu adlar yalnız tanımlayıcıdır; kavramın adı yığındır.</p>
+
+<h3 id="s6-1-2"><span class="nt-num">6.1.2</span>Yığının büyümesi ve küçülmesi</h3>
+
+<p>Boş bir yığına sırasıyla A, B, C, D ve E eklensin. Yığın dizi üzerinde tutulsun ve üst öğenin indisi <code>top</code> adlı bir değişkende saklansın. Boş yığında <code>top</code> −1'dir. Her eklemede <code>top</code> bir artar ve yeni öğe bu indise yazılır. <a href="#sekil-buyume">Şekil 6.2</a> bu sürecin üç anını ve ardından yapılan ilk silmeyi gösterir.</p>
+
+<figure class="nt-fig" id="sekil-buyume" style="--w:300px">
+  <div class="nt-fig__box"><div class="nt-fig__row"><svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Yığın: A eklendi"><defs><marker id="n6-d04-ah2-s03_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box-empty" x="70" y="98" width="70" height="26"/><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box-empty" x="70" y="72" width="70" height="26"/><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box-empty" x="70" y="46" width="70" height="26"/><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box-empty" x="70" y="20" width="70" height="26"/><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 137 L146 137" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah2-s03_00-1)"/><text class="txt mono" x="190" y="142" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 0</text><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">A eklendi</text></svg> <svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Yığın: C eklendi"><defs><marker id="n6-d04-ah4-s03_02-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box" x="70" y="98" width="70" height="26"/><text class="txt mono" x="105" y="116" text-anchor="middle">B</text><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box" x="70" y="72" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="105" y="90" text-anchor="middle">C</text><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box-empty" x="70" y="46" width="70" height="26"/><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box-empty" x="70" y="20" width="70" height="26"/><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 85 L146 85" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah4-s03_02-1)"/><text class="txt mono" x="190" y="90" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 2</text><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">C eklendi</text></svg> <svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Yığın: E eklendi"><defs><marker id="n6-d04-ah6-s03_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box" x="70" y="98" width="70" height="26"/><text class="txt mono" x="105" y="116" text-anchor="middle">B</text><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box" x="70" y="72" width="70" height="26"/><text class="txt mono" x="105" y="90" text-anchor="middle">C</text><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box" x="70" y="46" width="70" height="26"/><text class="txt mono" x="105" y="64" text-anchor="middle">D</text><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box" x="70" y="20" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="105" y="38" text-anchor="middle">E</text><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 33 L146 33" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah6-s03_04-1)"/><text class="txt mono" x="190" y="38" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 4</text><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">E eklendi</text></svg> <svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Yığın: E silindi"><defs><marker id="n6-d04-ah7-s03_05-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n6-d04-ah8-s03_05-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box" x="70" y="98" width="70" height="26"/><text class="txt mono" x="105" y="116" text-anchor="middle">B</text><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box" x="70" y="72" width="70" height="26"/><text class="txt mono" x="105" y="90" text-anchor="middle">C</text><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box" x="70" y="46" width="70" height="26"/><text class="txt mono" x="105" y="64" text-anchor="middle">D</text><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box-empty" x="70" y="20" width="70" height="26"/><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 59 L146 59" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah7-s03_05-1)"/><text class="txt mono" x="190" y="64" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 3</text><rect class="box-empty" x="250" y="10" width="60" height="28" style="stroke:var(--ds-bad);stroke-dasharray:4 3"/><text class="txt" x="280" y="29" text-anchor="middle" style="fill:var(--ds-bad)">E</text><path class="line" d="M250 28 L150 60" style="stroke:var(--ds-bad);stroke-dasharray:5 4;" marker-end="url(#n6-d04-ah8-s03_05-1)"/><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">E silindi</text></svg></div></div>
+  <figcaption><b>Şekil 6.2:</b> Boş yığına A, B, C, D, E eklenirken üç an ve ilk silme. A eklenince <code>top</code> = 0, C eklenince <code>top</code> = 2, E eklenince <code>top</code> = 4 olur. Silme yalnız üstten yapılır: ilk çıkan öğe en son eklenen E'dir ve <code>top</code> yeniden 3'e iner; üst öğe artık D'dir.</figcaption>
+</figure>
+
+<p>Her eklemeden sonra üst öğe değişir: A eklenince üst A'dır, B eklenince B'dir ve bu böyle sürer. E eklendiğinde yığında beş öğe vardır ve <code>top</code> 4'tür. Öğe sayısı her zaman <code>top + 1</code>'dir. Ardından yapılan ilk silme E'yi verir, çünkü üstte E vardır. Bütün öğeler tek tek çıkarılsaydı çıkış sırası E, D, C, B, A olurdu. Bu, giriş sırasının tam tersidir.</p>
+
+<p>Yığının ortasındaki bir öğeye, örneğin B'ye, doğrudan ulaşılamaz. B'yi almak için üstündeki C, D ve E'nin önce çıkarılması gerekir. Bu kısıt bir kusur değil, bir sözleşmedir. Yığını kullanan program, “en son açılan iş ilk kapanır” kuralının geçerli olduğu bir sorunla uğraşır. Yapının bu kurala başka bir şey izin vermemesi programı yalınlaştırır ve hatayı zorlaştırır. Yığının kullanıldığı her yerde bu kural vardır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-islem-dizisi">
+  <span class="nt-box__title">Örnek 6.1</span>
+  <p>Boş bir yığına şu işlemler uygulanıyor: push(3), push(8), pop, push(5), push(1), pop, pop, push(9). Her adımdan sonra yığın (alttan üste) ve çıkan öğe şöyledir:</p>
+  <ol>
+    <li>push(3): [3]</li>
+    <li>push(8): [3, 8]</li>
+    <li>pop: 8 çıkar; [3]</li>
+    <li>push(5): [3, 5]</li>
+    <li>push(1): [3, 5, 1]</li>
+    <li>pop: 1 çıkar; [3, 5]</li>
+    <li>pop: 5 çıkar; [3]</li>
+    <li>push(9): [3, 9]</li>
+  </ol>
+  <p>Çıkan öğeler sırasıyla 8, 1, 5'tir. Sonunda yığında iki öğe vardır; alt öğe 3, üst öğe 9'dur ve dizi gerçeklemesinde <code>top</code> = 1'dir. 3 hiç çıkmamıştır, çünkü işlem dizisi boyunca hep en altta kalmıştır.</p>
+</div>
+
+<h2 class="nt-pb" id="s6-2"><span class="nt-num">6.2</span>Yığın soyut veri tipi</h2>
+
+<p>Bir veri yapısını önce “ne yapar” sorusuyla, sonra “nasıl yapar” sorusuyla ele almak, programı değiştirilebilir kılar. <strong>Soyut veri tipi</strong> (<span lang="en">abstract data type, ADT</span>), bir değerler kümesini ve bu değerler üzerinde tanımlı işlemleri, nasıl gerçeklendiklerinden bağımsız olarak tanımlar. Yığın ADT'si, yığının hangi işlemleri sunduğunu ve bu işlemlerin hangi koşullarda hata verdiğini söyler. Diziyle mi, listeyle mi gerçeklendiğini söylemez.</p>
+
+<h3 id="s6-2-1"><span class="nt-num">6.2.1</span>İşlemler ve ön koşullar</h3>
+
+<p><a href="#tab-adt">Tablo 6.1</a> yığın ADT'sinin altı işlemini Horowitz–Sahni'nin ders kitabındaki adlarla verir. İşlemlerin yanındaki <code>push</code>, <code>pop</code> ve <code>peek</code> sözcükleri aynı işlemlerin yaygın İngilizce adlarıdır.</p>
+
+<div class="nt-tablewrap" id="tab-adt">
+<table class="nt-table">
+  <caption>Tablo 6.1: Yığın soyut veri tipi.</caption>
+  <thead><tr><th scope="col">İşlem</th><th scope="col">Anlamı</th><th scope="col">Ön koşul / hata</th></tr></thead>
+  <tbody>
+    <tr><td><code>yigit_olustur(max)</code></td><td>En çok <code>max</code> öğe alan boş yığın kurar</td><td>—</td></tr>
+    <tr><td><code>yigit_dolu(S)</code></td><td>Öğe sayısı <code>max</code> ise doğru döner</td><td>—</td></tr>
+    <tr><td><code>yigit_ekle(S, x)</code> · push</td><td><code>x</code>'i üste koyar</td><td>Yığın doluysa taşma</td></tr>
+    <tr><td><code>yigit_bos(S)</code></td><td>Öğe yoksa doğru döner</td><td>—</td></tr>
+    <tr><td><code>yigit_al(S)</code> · pop</td><td>Üstteki öğeyi çıkarıp döndürür</td><td>Yığın boşsa alt taşma</td></tr>
+    <tr><td><code>yigit_ust(S)</code> · peek</td><td>Üstteki öğeyi çıkarmadan okur</td><td>Yığın boşsa hata</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki iki hata durumunun adları vardır. Dolu bir yığına öğe eklenmek istenmesine <strong>taşma</strong> (<span lang="en">overflow</span>), boş bir yığından öğe alınmak istenmesine <strong>alt taşma</strong> (<span lang="en">underflow</span>) denir. Taşma, yığının bir kapasitesi olduğu varsayımına dayanır. Kâğıt üzerindeki soyut yığın sınırsızdır; ama her gerçek bellek sonludur. Bu yüzden ADT, <code>yigit_olustur</code> işlemine bir <code>max</code> değeri verir ve <code>yigit_dolu</code> sorgusunu tanımlar.</p>
+
+<p>Alt taşma ise kapasiteden bağımsızdır. Boş bir yığının üst öğesi yoktur; ondan öğe istemek anlamsızdır. <code>yigit_al</code> ve <code>yigit_ust</code> işlemlerinin ön koşulu “yığın boş değil”dir. Bu ön koşulu kimin denetleyeceği bir tasarım kararıdır. Çağıran taraf her <code>pop</code>'tan önce <code>yigit_bos</code>'u sorabilir. İşlemin kendisi de denetleyip bir hata kodu döndürebilir. İkinci yol daha güvenlidir, çünkü denetimi unutmak mümkün olmaz.</p>
+
+<p>ADT'nin asıl değeri, kullanan kodla gerçekleyen kodu ayırmasıdır. Aynı altı işlem sabit bir diziyle, gerektikçe büyüyen bir diziyle ya da bağlı listeyle gerçeklenebilir. Yalnız ADT'deki işlemleri çağıran bir program, gerçekleme değiştiğinde değişmez. Notta bu üç gerçekleme sırayla kurulur ve aynı işlemlerin maliyetleri karşılaştırılır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>pop</code> ile <code>peek</code>'i karıştırmak. <code>pop</code> üst öğeyi yığından çıkarır ve yığın bir öğe küçülür. <code>peek</code> (<code>yigit_ust</code>) yalnız üst öğenin değerini okur, yığın değişmez. Üstteki değere bakıp karar verecek bir döngüde <code>peek</code> yerine <code>pop</code> çağrılırsa her bakışta bir öğe kaybolur.</p>
+</div>
+
+<h3 id="s6-2-2"><span class="nt-num">6.2.2</span>Yığının kullanıldığı yerler</h3>
+
+<p>Yığın, bilgisayar bilimindeki en çok kullanılan yapılardan biridir. Kullanım alanlarının ortak noktası, işlerin iç içe açılıp kapanmasıdır. İçteki iş dıştakinden önce biter. Aşağıdaki örneklerin her birinde yığının üstü “şu an açık olan en içteki işi” tutar.</p>
+
+<dl>
+  <dt>Çağrı yığını</dt>
+  <dd>Her fonksiyon çağrısı, dönüş adresi ve yerel değişkenleriyle birlikte bir çerçeveyi yığına iter. Fonksiyon dönünce çerçeve çıkarılır. En son çağrılan fonksiyon ilk biter.</dd>
+  <dt>İfade değerlendirme</dt>
+  <dd>Derleyiciler <code>a + b * c</code> gibi ara ek (<span lang="en">infix</span>) bir ifadeyi önce sonek (<span lang="en">postfix</span>) gösterime çevirir. Bu ifadenin sonek biçimi <code>a b c * +</code>'dır. Derleyici sonra bu gösterimi bir yığınla hesaplar. Sonek ifadede her sayı yığına itilir, her işleç üstteki iki değeri alıp sonucu geri iter.</dd>
+  <dt>Geri izleme</dt>
+  <dd>Labirentte yol arayan bir program her yol ayrımını yığına koyar. Çıkmaza girince yığının üstündeki, yani en son geçilen ayrıma döner ve oradan başka bir yol dener.</dd>
+  <dt>Parantez denetimi</dt>
+  <dd>Bir ifadedeki her kapanan parantez, en son açılan ve henüz kapanmamış parantezle eşleşmelidir. “En son açılan” sözü yığını doğrudan çağrıştırır.</dd>
+  <dt>Geri al</dt>
+  <dd>Bir metin düzenleyici yapılan her işlemi bir yığına koyar. Geri al komutu (Ctrl+Z) yığının üstündeki, yani en son yapılan işlemi geri alır. İkinci basış bir önceki işlemi geri alır.</dd>
+  <dt>Derinlik öncelikli arama</dt>
+  <dd>Bir çizgede derinlik öncelikli arama (<span lang="en">depth-first search, DFS</span>), ziyaret edilecek düğümleri bir yığında tutar. Böylece en son keşfedilen yoldan olabildiğince derine gidilir.</dd>
+</dl>
+
+<p>Sunumdaki etkileşimli yığın aracı bu kuralı tek düğmeyle gösterir. Dört kez push, ardından dört kez pop yapıldığında çıkan sıra, giren sıranın tersidir. Beşinci pop boş yığına yapılır ve araç bunu alt taşma olarak bildirir.</p>
+
+<h3 id="s6-2-3"><span class="nt-num">6.2.3</span>Parantez denetimi</h3>
+
+<p>Kullanım alanlarından biri, yığının neden doğal bir seçim olduğunu kısa bir kodla gösterir. Bir dizgedeki <code>(</code>, <code>[</code> ve <code>{</code> parantezlerinin dengeli olup olmadığı sorulsun. Dengeli bir dizgede her kapanan parantezin bir açanı vardır, türleri uyar ve sonunda açık parantez kalmaz. <code>{a[i] = (b + c) * d;}</code> dengelidir. <code>([)]</code> dengeli değildir: sayılar tutar, ama <code>)</code> geldiğinde en son açılan parantez <code>[</code>'dir.</p>
+
+<p>Aşağıdaki fonksiyon, bir dizi ile üst indisini aynı yapıda tutan <code>Yigit</code> tipini kullanır. <code>push</code> ve <code>pop</code> başarı durumunu <code>bool</code> olarak döndürür; <code>pop</code> çıkardığı değeri ikinci argümanın gösterdiği yere yazar.</p>
+
+<pre class="nt-code"><code>/* (, [ ve { için denge denetimi: her kapanan, en son açılanla eşleşmeli */
+<span class="kw">bool</span> dengeli(<span class="kw">const</span> <span class="kw">char</span> *s) {
+    Yigit y;  <span class="kw">int</span> ac;
+    yigit_baslat(&amp;y);
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; s[i] != '\0'; i++) {
+        <span class="kw">char</span> c = s[i];
+        <span class="kw">if</span> (c == '(' || c == '[' || c == '{') {
+            <span class="kw">if</span> (!push(&amp;y, c)) <span class="kw">return</span> <span class="kw">false</span>;       /* çok derin */
+        } <span class="kw">else</span> <span class="kw">if</span> (c == ')' || c == ']' || c == '}') {
+            <span class="kw">if</span> (!pop(&amp;y, &amp;ac)) <span class="kw">return</span> <span class="kw">false</span>;      /* açılmamış kapanış */
+            <span class="kw">if</span> ((c == ')' &amp;&amp; ac != '(') || (c == ']' &amp;&amp; ac != '[') ||
+                (c == '}' &amp;&amp; ac != '{'))
+                <span class="kw">return</span> <span class="kw">false</span>;                     /* tür uyuşmuyor */
+        }
+    }
+    <span class="kw">return</span> yigit_bos(&amp;y);                         /* açık kalan var mı? */
+}</code></pre>
+
+<p>Fonksiyon dizgeyi soldan sağa bir kez tarar. Açan bir parantez görünce onu yığına iter. Kapanan bir parantez görünce yığının üstündeki açanı çeker. Yığın o anda boşsa, kapanan parantezin açanı yoktur ve sonuç yanlıştır. Yığından çıkan açanın türü kapananınkiyle uymuyorsa sonuç yine yanlıştır. Parantez olmayan karakterler atlanır. Tarama bittiğinde yığında öğe kalmışsa bazı parantezler hiç kapanmamıştır. Bu yüzden fonksiyon en sonda yığının boş olup olmadığını döndürür.</p>
+
+<p>Fonksiyon şu girdilerle denendi: <code>{a[i] = (b + c) * d;}</code> ve <code>x = f(a[2], {1, 2});</code> için 1 (doğru), <code>([)]</code>, <code>(()</code>, <code>())</code> ve <code>]</code> için 0 (yanlış) döndü. Boş dizge dengelidir ve 1 döner. Her karakter en çok bir push ve bir pop doğurur. Push ve pop sabit sürdüğü için <span class="m">n</span> karakterlik dizgede süre <span class="m">Θ(n)</span>'dir. En kötü durumda bütün karakterler açan parantezdir ve yığın <span class="m">n</span> öğe tutar; ek bellek <span class="m">O(n)</span>'dir.</p>
+<h2 class="nt-pb" id="s6-3"><span class="nt-num">6.3</span>Dizi ile yığın</h2>
+
+<p>Yığını gerçeklemenin en kısa yolu tek boyutlu bir dizidir. Dizinin 0 numaralı hücresi yığının altıdır. Öğeler 1, 2, 3 numaralı hücrelere doğru yukarı dizilir. Üst öğenin indisi ayrı bir tamsayı değişkende, <code>top</code>'ta tutulur. Bu kesim önce <code>top</code> değişkeninin anlamını ve iki sınır durumunu, sonra Horowitz–Sahni'nin C kodunu satır satır ele alır.</p>
+
+<h3 id="s6-3-1"><span class="nt-num">6.3.1</span><code>top</code> indisi, taşma ve alt taşma</h3>
+
+<p>Dizi yığınında bütün bilgi iki şeydedir: dizinin içeriği ve <code>top</code>'un değeri. <code>top</code>, yığının üstündeki öğenin indisidir. Yığında <span class="m">k</span> öğe varsa bu öğeler <code>yigit[0]</code>'dan <code>yigit[k−1]</code>'e kadar olan hücrelerdedir ve <code>top</code> = <span class="m">k − 1</span>'dir. Yığın boşken hiçbir öğe yoktur; bu durumda <code>top</code> = −1 seçilir. −1 geçerli bir indis değildir, ama ilk eklemede <code>top</code> bir artırılınca tam olarak 0 olur. Bu seçim kodu yalınlaştırır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sinir" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 192" role="img" aria-label="Boş yığında top eksi bir; dolu yığında top MAX eksi bir"><defs><marker id="n6-d04-ah9-s07_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n6-d04-ah10-s07_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box-empty" x="60" y="142" width="70" height="28"/><text class="lbl" x="54" y="160" text-anchor="end">[0]</text><rect class="box-empty" x="60" y="114" width="70" height="28"/><text class="lbl" x="54" y="132" text-anchor="end">[1]</text><rect class="box-empty" x="60" y="86" width="70" height="28"/><text class="lbl" x="54" y="104" text-anchor="end">[2]</text><rect class="box-empty" x="60" y="58" width="70" height="28"/><text class="lbl" x="54" y="76" text-anchor="end">[3]</text><rect class="box-empty" x="60" y="30" width="70" height="28"/><text class="lbl" x="54" y="48" text-anchor="end">[4]</text><path class="line" d="M176 184 L136 184" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah9-s07_00-1)"/><text class="txt mono" x="180" y="189" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = -1</text><text class="lbl" x="95" y="188" text-anchor="middle">boş yığın</text><text class="txt" x="240" y="110" text-anchor="start" style="font-size:14px">top &lt; 0 → boş</text><text class="lbl" x="240" y="128" text-anchor="start">yigit_al → alt taşma</text><rect class="box" x="430" y="142" width="70" height="28"/><text class="txt mono" x="465" y="161" text-anchor="middle">A</text><text class="lbl" x="424" y="160" text-anchor="end">[0]</text><rect class="box" x="430" y="114" width="70" height="28"/><text class="txt mono" x="465" y="133" text-anchor="middle">B</text><text class="lbl" x="424" y="132" text-anchor="end">[1]</text><rect class="box" x="430" y="86" width="70" height="28"/><text class="txt mono" x="465" y="105" text-anchor="middle">C</text><text class="lbl" x="424" y="104" text-anchor="end">[2]</text><rect class="box" x="430" y="58" width="70" height="28"/><text class="txt mono" x="465" y="77" text-anchor="middle">D</text><text class="lbl" x="424" y="76" text-anchor="end">[3]</text><rect class="box" x="430" y="30" width="70" height="28" style="fill:var(--ds-hot)"/><text class="txt mono" x="465" y="49" text-anchor="middle">E</text><text class="lbl" x="424" y="48" text-anchor="end">[4]</text><path class="line" d="M546 44 L506 44" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah10-s07_00-1)"/><text class="txt mono" x="550" y="49" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">top = 4</text><text class="lbl" x="465" y="188" text-anchor="middle">dolu yığın</text></svg></div>
+  <figcaption><b>Şekil 6.3:</b> Beş hücrelik bir dizi yığınının iki sınır durumu. Solda boş yığın: <code>top</code> = −1, yani 0 numaralı hücrenin bile altındadır; bu durumda <code>yigit_al</code> alt taşma verir. Sağda dolu yığın: A'dan E'ye beş öğe vardır ve <code>top</code> = 4 = <code>MAX_STACK_SIZE − 1</code>'dir; bu durumda bir ekleme daha taşma olur.</figcaption>
+</figure>
+
+<p><a href="#sekil-sinir">Şekil 6.3</a> iki sınır durumunu yan yana gösterir. Yığının boş olup olmadığı <code>top &lt; 0</code> sınamasıyla anlaşılır. Dizinin <code>MAX_STACK_SIZE</code> hücresi varsa son geçerli indis <code>MAX_STACK_SIZE − 1</code>'dir. <code>top</code> bu değere ulaştığında yığın doludur ve <code>top ≥ MAX_STACK_SIZE − 1</code> sınaması doğru olur. Öğe sayısı her zaman <code>top + 1</code>'dir. <code>top</code> ile öğe sayısını karıştırmak, “bir eksik ya da bir fazla” (<span lang="en">off-by-one</span>) hatalarının en bilinen kaynağıdır. Örneğin dolu denetimini <code>top ≥ MAX_STACK_SIZE</code> diye yazan bir program, dizinin son hücresinin bir ötesine yazar.</p>
+
+<p>C, dizi sınırlarını çalışma sırasında denetlemez. <code>yigit[MAX_STACK_SIZE]</code> ifadesi derlenir ve çalışır; ama dizinin hemen arkasındaki bellek hücresine erişir. Orada başka bir değişken varsa onun değeri bozulur. Program hemen çökmeyebilir ve hata çok sonra, ilgisiz bir yerde ortaya çıkar. Bu yüzden taşma ve alt taşma denetimi yığın kodunun isteğe bağlı bir süsü değildir. Denetimsiz bir push, komşu belleğin üzerine yazar.</p>
+
+<h3 id="s6-3-2"><span class="nt-num">6.3.2</span>C tanımları</h3>
+
+<p>Horowitz–Sahni'nin ders kitabındaki ilk gerçekleme, yığını küresel bir dizi olarak tanımlar:</p>
+
+<pre class="nt-code"><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define MAX_STACK_SIZE 101
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="kw">int</span> deger;
+    /* diğer alanlar */
+} element;
+
+element yigit[MAX_STACK_SIZE];
+
+<span class="kw">void</span> yigit_dolu(<span class="kw">void</span>) {
+    printf("Yigit dolu!!!\n"); exit(-1);
+}
+<span class="kw">void</span> yigit_bos(<span class="kw">void</span>) {
+    printf("Yigit bos!!!\n"); exit(-2);
+}</code></pre>
+
+<p><code>#define MAX_STACK_SIZE 101</code> satırı yığının kapasitesini sabitler. Önişlemci, kodda geçen her <code>MAX_STACK_SIZE</code>'ı derlemeden önce 101 ile değiştirir. Kapasiteyi değiştirmek için bu satırı düzeltmek yeter.</p>
+
+<p><code>element</code> tipi, yığında saklanacak kaydı tanımlar. Şimdilik tek alanı vardır: <code>deger</code>. Yorum satırı, gerçek bir uygulamada bu kayda başka alanların da ekleneceğini hatırlatır. Örneğin bir labirent programı yığına satır, sütun ve yön bilgisini birlikte koyar. Öğeyi <code>int</code> yerine bir <code>struct</code> olarak tanımlamak, yığın kodunu öğenin içeriğinden bağımsız kılar. Kayda alan eklendiğinde yığın yordamları değişmez, çünkü onlar yalnız <code>element</code> değerlerini kopyalar.</p>
+
+<p><code>element yigit[MAX_STACK_SIZE];</code> satırı yığının kendisidir. Bu dizi her fonksiyonun dışında tanımlandığı için bir <strong>küresel değişkendir</strong> (<span lang="en">global variable</span>). Programın bütün fonksiyonları ona doğrudan erişebilir. Küresel diziler sıfırla başlatılır ve program boyunca yaşar. <code>top</code> ise küresel değildir: çağıran fonksiyonda (çoğunlukla <code>main</code>'de) yerel bir değişken olarak tanımlanır ve yığın yordamlarına adresiyle aktarılır.</p>
+
+<p>Son iki fonksiyon hata yordamlarıdır. <code>yigit_dolu</code> bir mesaj basıp programı <code>exit(-1)</code> ile, <code>yigit_bos</code> ise <code>exit(-2)</code> ile sonlandırır. <code>exit</code>, <code>&lt;stdlib.h&gt;</code>'de bildirilir ve hangi fonksiyonun içinden çağrılırsa çağrılsın bütün programı bitirir. Verilen sayı programın çıkış kodudur ve işletim sistemine iletilir. Unix türü sistemlerde kabuk −1'i 255 olarak görür; Windows'ta bu kod 4294967295 olarak raporlanır. Bu iki fonksiyonun adı ADT'deki <code>yigit_dolu</code> ve <code>yigit_bos</code> sorgularıyla aynıdır, ama işleri farklıdır: sorgu yapmaz, hata bildirir. Ad çakışması bu ilk gerçeklemenin kusurlarından biridir; daha iyi bir tasarımda bu adlar gerçek sorgulara verilir.</p>
+
+<p>Ders kitaplarında bu tanımlar tek bir dosyada, küresel dizi ve küresel <code>top</code> ile verilir. Dersin sınavlarında ve ödevlerinde ise küresel değişken yasaktır. Bunun nedeni basittir. Küresel bir değişkeni programın her fonksiyonu değiştirebilir. Bir hata çıktığında değişkeni kimin bozduğunu bulmak için bütün programı okumak gerekir. Ayrıca aynı programda iki yığın gerektiğinde küresel tek dizi işe yaramaz. Bu bölümde küresel dizi yalnız ders kitabındaki kodu tanımak için kullanılır; ödevlerde yığın, kuyruk ya da başka bir yapı neyse yerel olarak tanımlanıp parametreyle aktarılır.</p>
+
+<h3 id="s6-3-3"><span class="nt-num">6.3.3</span><code>yigit_ekle</code> ve <code>yigit_al</code></h3>
+
+<p>Ekleme ve çıkarma yordamları üçer satırdır:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> yigit_ekle(<span class="kw">int</span> *top, element item) {
+    <span class="kw">if</span> (*top &gt;= MAX_STACK_SIZE - 1)  /* yer var mı? */
+        yigit_dolu();         /* uyar ve çık */
+    yigit[++*top] = item;     /* önce işaretçiyi artır */
+}                             /* sonra öğeyi yerleştir */
+
+element yigit_al(<span class="kw">int</span> *top) {
+    <span class="kw">if</span> (*top &lt; 0)
+        yigit_bos();          /* boşsa uyar ve çık */
+    <span class="kw">return</span> yigit[(*top)--];   /* döndür, sonra azalt */
+}</code></pre>
+
+<p><code>yigit_ekle</code> iki parametre alır. <code>int *top</code>, çağırandaki <code>top</code> değişkeninin adresidir. <code>element item</code>, eklenecek öğenin bir kopyasıdır. İlk satır yer olup olmadığını sınar. <code>*top</code>, <code>top</code> işaretçisinin gösterdiği tamsayıdır, yani çağırandaki üst indisidir. Bu değer <code>MAX_STACK_SIZE − 1</code>'e ulaşmışsa yığın doludur ve <code>yigit_dolu()</code> programı bitirir. Yer varsa son satır çalışır: <code>yigit[++*top] = item;</code>. Bu satır iki iş yapar. Önce <code>*top</code> bir artar, sonra öğe yeni indise yazılır. Boş yığında <code>*top</code> −1'den 0'a çıkar ve öğe <code>yigit[0]</code>'a yazılır.</p>
+
+<p><code>yigit_al</code> yalnız <code>top</code>'un adresini alır. Yığın boşsa, yani <code>*top &lt; 0</code> ise <code>yigit_bos()</code> programı bitirir. Değilse <code>return yigit[(*top)--];</code> satırı çalışır. Bu satır da iki iş yapar, ama ters sırada. Önce eski indisteki öğe okunur, sonra <code>*top</code> bir azalır. Okunan öğe fonksiyonun dönüş değeridir. Örneğin <code>*top</code> 2 iken <code>yigit[2]</code> döner ve <code>*top</code> 1 olur.</p>
+
+<p>Çıkarılan öğe diziden silinmez. <code>yigit[2]</code> hücresinde eski değer durmaya devam eder. Ama artık yığının parçası değildir, çünkü yığının içeriğini <code>top</code> belirler: geçerli öğeler 0'dan <code>top</code>'a kadar olan hücrelerdir. Bir sonraki ekleme bu hücrenin üzerine yazar. Silmenin bir hücreyi temizlemek değil, sınırı aşağı çekmek olması, dizi yığınını hızlı yapan şeydir.</p>
+
+<p><code>top</code> neden adresle aktarılır? C'de bütün argümanlar <strong>değerle çağrı</strong> (<span lang="en">call by value</span>) kuralıyla aktarılır. <code>yigit_ekle(top, item)</code> diye bir çağrı, <code>top</code>'un değerinin bir kopyasını fonksiyona verirdi. Fonksiyon bu kopyayı artırır, ama çağırandaki <code>top</code> değişmezdi. Sonraki ekleme aynı hücreye yazardı. Çağıranın değişkenini değiştirmek isteyen bir fonksiyona o değişkenin adresi verilir: <code>yigit_ekle(&amp;top, item)</code>. Fonksiyon <code>*top</code> üzerinden çağırandaki asıl değişkene erişir.</p>
+
+<p>Bu noktada bir yazım kuralı önemlidir. Fonksiyonun parametre listesinde <code>*top</code> diye görünen bir parametre, fonksiyonun içinde de her yerde <code>*top</code> olarak kullanılmalıdır. İçeride yalnız <code>top</code> yazılırsa işaretçinin kendisi, yani bir adres kullanılmış olur. <code>if (top &gt;= MAX_STACK_SIZE - 1)</code> gibi bir sınama adresi bir tamsayıyla karşılaştırır. Derleyici en iyi durumda bir uyarı verir; program ise anlamsız bir karşılaştırma yapar. Sınavlarda bu hata çok sert değerlendirilir, çünkü işaretçi ile gösterdiği değer arasındaki farkı bilmemek, bu dersteki bütün yapıları yanlış kurmak demektir.</p>
+
+<p>İki yordamın maliyeti de <span class="m">O(1)</span>'dir. Her biri bir karşılaştırma, bir indis değişikliği ve bir dizi erişimi yapar. Bu işlerin sayısı yığındaki öğe sayısına bağlı değildir. Ek bellek de sabittir: yalnız parametreler kullanılır.</p>
+
+<h3 id="s6-3-4"><span class="nt-num">6.3.4</span>Öncelik tuzağı: <code>*</code> ile <code>++</code> ve <code>--</code></h3>
+
+<p><code>yigit[++*top]</code> ve <code>yigit[(*top)--]</code> ifadeleri kısa ama dikkat ister. İlkinde parantez yoktur, ikincisinde vardır. Bu farkın nedeni C'deki işleç önceliğidir. <a href="#tab-oncelik">Tablo 6.2</a> dört yazımı karşılaştırır.</p>
+
+<div class="nt-tablewrap" id="tab-oncelik">
+<table class="nt-table">
+  <caption>Tablo 6.2: <code>top</code> bir <code>int *</code> iken dört yazımın anlamı.</caption>
+  <thead><tr><th scope="col">İfade</th><th scope="col">C bunu nasıl okur</th><th scope="col">Sonuç</th></tr></thead>
+  <tbody>
+    <tr><td><code>++*top</code></td><td><code>++(*top)</code>: gösterilen tamsayıyı artır, yeni değeri kullan</td><td>Doğru (push)</td></tr>
+    <tr><td><code>(*top)--</code></td><td>gösterilen tamsayının değerini kullan, sonra azalt</td><td>Doğru (pop)</td></tr>
+    <tr><td><code>*top--</code></td><td><code>*(top--)</code>: işaretçiyi azalt, eski adresteki değeri oku</td><td>Hatalı: <code>*top</code> değişmez</td></tr>
+    <tr><td><code>*top++</code></td><td><code>*(top++)</code>: işaretçiyi ilerlet, eski adresteki değeri oku</td><td>Hatalı</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Kural şöyledir. Son ek <code>++</code> ve <code>--</code> işleçleri, tekli <code>*</code> işlecinden daha önceliklidir. Bu yüzden <code>*top--</code> ifadesinde <code>--</code> önce <code>top</code>'a bağlanır: azalan şey işaretçinin kendisidir. Ön ek <code>++</code> ile tekli <code>*</code> ise aynı öncelik düzeyindedir ve sağdan sola bağlanır. <code>++*top</code> ifadesinde önce sağdaki <code>*</code> uygulanır, <code>++</code> onun sonucuna, yani gösterilen tamsayıya bağlanır. Bu yüzden push'ta parantez gerekmez, pop'ta gerekir.</p>
+
+<p><code>(*top)--</code> yerine <code>*top--</code> yazılırsa ne olur? İfade <code>*(top--)</code> olarak okunur. <code>top--</code>, işaretçinin eski değerini verir ve işaretçiyi bir <code>int</code> geriye kaydırır. <code>*</code> bu eski adresi okur. Okunan değer çağırandaki üst indisidir; dizi doğru hücreden okunur. Ama azalan şey yerel <code>top</code> işaretçisidir. Fonksiyon bitince bu yerel kopya yok olur. Çağırandaki <code>top</code> hiç değişmemiştir. Bu tür bir hata bu yüzden çok sinsidir: ilk <code>pop</code> doğru değeri döndürür.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-oncelik">
+  <span class="nt-box__title">Örnek 6.2</span>
+  <p>Yığında yalnız A vardır (<code>top</code> = 0). <code>yigit_al</code>'ın son satırı yanlışlıkla <code>return yigit[*top--];</code> diye yazılmıştır. İki çağrı arka arkaya yapılıyor.</p>
+  <ol>
+    <li>Birinci çağrı: <code>*(top--)</code> çağırandaki 0'ı okur. <code>yigit[0]</code> = A döner. Azalan yerel işaretçidir; çağırandaki <code>top</code> 0 kalır.</li>
+    <li>İkinci çağrı: <code>*top &lt; 0</code> yanlıştır, alt taşma yakalanmaz. Yine <code>yigit[0]</code> = A döner, <code>top</code> yine 0'dır.</li>
+  </ol>
+  <p>Bu davranış derlenip çalıştırılarak doğrulandı: iki satır da “al: A top=0” yazdı ve derleyici <code>-Wall -Wextra</code> ile bile uyarı vermedi. Yığını boşaltmak için <code>while (!bos) al</code> biçiminde bir döngü yazan program sonsuz döngüye girer. <code>*top++</code> hatası eklemede daha kötüdür: <code>yigit[*top++] = item</code> boş yığında <code>yigit[-1]</code>'e, yani dizinin dışına yazar.</p>
+</div>
+
+<p>Bu tuzaktan kaçınmanın en sağlam yolu, işaretçi üzerinden yapılan artırma ve azaltmayı ayrı bir satıra almaktır: önce <code>(*top)++;</code>, sonra <code>yigit[*top] = item;</code>. Kod bir satır uzar, ama okuyan herkes ne olduğunu hemen anlar. Ders kitabındaki kısa yazım da doğrudur; yeter ki parantezin neden orada olduğu bilinsin.</p>
+
+<h3 id="s6-3-5"><span class="nt-num">6.3.5</span>Kod izleme</h3>
+
+<p>Yordamların davranışı küçük bir kapasiteyle daha iyi görülür. İzlemede <code>MAX_STACK_SIZE</code> = 4 alınır; dolu denetimi bu yüzden <code>*top ≥ 3</code>'tür. <code>main</code>'de <code>top</code> = −1 iken sırasıyla A, B, C eklenir, bir öğe alınır, sonra D, E ve F eklenmeye çalışılır. <a href="#tab-dizi-iz">Tablo 6.3</a> her çağrıdan sonraki durumu verir.</p>
+
+<div class="nt-tablewrap" id="tab-dizi-iz">
+<table class="nt-table">
+  <caption>Tablo 6.3: <code>MAX_STACK_SIZE</code> = 4 iken dizi yığını izlemesi.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Sınama</th><th scope="col">Yapılan</th><th scope="col"><code>top</code></th><th scope="col"><code>yigit[0..top]</code></th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>—</td><td>—</td><td>−1</td><td>(boş)</td></tr>
+    <tr><td><code>yigit_ekle(&amp;top, A)</code></td><td>−1 ≥ 3? Hayır</td><td><code>++*top</code>, <code>yigit[0] = A</code></td><td>0</td><td>A</td></tr>
+    <tr><td><code>yigit_ekle(&amp;top, B)</code></td><td>0 ≥ 3? Hayır</td><td><code>yigit[1] = B</code></td><td>1</td><td>A B</td></tr>
+    <tr><td><code>yigit_ekle(&amp;top, C)</code></td><td>1 ≥ 3? Hayır</td><td><code>yigit[2] = C</code></td><td>2</td><td>A B C</td></tr>
+    <tr><td><code>yigit_al(&amp;top)</code></td><td>2 &lt; 0? Hayır</td><td><code>yigit[2]</code> = C döner, <code>top</code> azalır</td><td>1</td><td>A B</td></tr>
+    <tr><td><code>yigit_ekle(&amp;top, D)</code></td><td>1 ≥ 3? Hayır</td><td><code>yigit[2] = D</code> (C'nin üzerine)</td><td>2</td><td>A B D</td></tr>
+    <tr><td><code>yigit_ekle(&amp;top, E)</code></td><td>2 ≥ 3? Hayır</td><td><code>yigit[3] = E</code></td><td>3</td><td>A B D E</td></tr>
+    <tr><td><code>yigit_ekle(&amp;top, F)</code></td><td>3 ≥ 3? <strong>Evet</strong></td><td><code>yigit_dolu()</code>: “Yigit dolu!!!”, <code>exit(-1)</code></td><td>3</td><td>A B D E</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-dizi-iz" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 140" role="img" aria-label="Dizi yığın, MAX_STACK_SIZE = 4, top = 2"><defs><marker id="n6-d04-ah17-s11_06-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="250" y="86" width="70" height="26"/><text class="txt mono" x="285" y="104" text-anchor="middle">A</text><text class="lbl" x="244" y="103" text-anchor="end">[0]</text><rect class="box" x="250" y="60" width="70" height="26"/><text class="txt mono" x="285" y="78" text-anchor="middle">B</text><text class="lbl" x="244" y="77" text-anchor="end">[1]</text><rect class="box" x="250" y="34" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="285" y="52" text-anchor="middle">C</text><text class="lbl" x="244" y="51" text-anchor="end">[2]</text><rect class="box-empty" x="250" y="8" width="70" height="26"/><text class="lbl" x="244" y="25" text-anchor="end">[3]</text><path class="line" d="M366 47 L326 47" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah17-s11_06-1)"/><text class="txt mono" x="370" y="52" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 2</text></svg> <svg class="ds-svg" viewBox="0 0 560 140" role="img" aria-label="Dizi yığın, MAX_STACK_SIZE = 4, top = 1"><defs><marker id="n6-d04-ah19-s11_08-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="250" y="86" width="70" height="26"/><text class="txt mono" x="285" y="104" text-anchor="middle">A</text><text class="lbl" x="244" y="103" text-anchor="end">[0]</text><rect class="box" x="250" y="60" width="70" height="26"/><text class="txt mono" x="285" y="78" text-anchor="middle">B</text><text class="lbl" x="244" y="77" text-anchor="end">[1]</text><rect class="box-empty" x="250" y="34" width="70" height="26"/><text class="lbl mono" x="285" y="52" text-anchor="middle" style="opacity:.55">C</text><text class="lbl" x="244" y="51" text-anchor="end">[2]</text><rect class="box-empty" x="250" y="8" width="70" height="26"/><text class="lbl" x="244" y="25" text-anchor="end">[3]</text><path class="line" d="M366 73 L326 73" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah19-s11_08-1)"/><text class="txt mono" x="370" y="78" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 1</text></svg> <svg class="ds-svg" viewBox="0 0 560 140" role="img" aria-label="Dizi yığın, MAX_STACK_SIZE = 4, top = 3"><defs><marker id="n6-d04-ah25-s11_14-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="250" y="86" width="70" height="26"/><text class="txt mono" x="285" y="104" text-anchor="middle">A</text><text class="lbl" x="244" y="103" text-anchor="end">[0]</text><rect class="box" x="250" y="60" width="70" height="26"/><text class="txt mono" x="285" y="78" text-anchor="middle">B</text><text class="lbl" x="244" y="77" text-anchor="end">[1]</text><rect class="box" x="250" y="34" width="70" height="26"/><text class="txt mono" x="285" y="52" text-anchor="middle">D</text><text class="lbl" x="244" y="51" text-anchor="end">[2]</text><rect class="box" x="250" y="8" width="70" height="26"/><text class="txt mono" x="285" y="26" text-anchor="middle">E</text><text class="lbl" x="244" y="25" text-anchor="end">[3]</text><path class="line" d="M366 21 L326 21" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah25-s11_14-1)"/><text class="txt mono" x="370" y="26" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">top = 3</text></svg></div>
+  <figcaption><b>Şekil 6.4:</b> İzlemenin üç anı. Üstte C eklenmiştir: <code>top</code> = 2. Ortada C alınmıştır: <code>top</code> = 1'e inmiştir; C'nin değeri hücrede durur ama artık yığının parçası değildir. Altta D ve E eklenmiştir: <code>top</code> = 3 ve dizi doludur; F eklenmek istenince <code>yigit_dolu()</code> çağrılır.</figcaption>
+</figure>
+
+<p>Tablonun beşinci satırı dizinin silmeyi nasıl yaptığını gösterir. <code>yigit_al</code> C'yi döndürür ve <code>top</code>'u 1'e indirir. 2 numaralı hücrede C hâlâ durur. Altıncı satırda D eklenince aynı hücreye D yazılır ve C'nin izi kalmaz. Son satırda yer yoktur. <code>yigit_dolu</code> mesajı basar ve <code>exit(-1)</code> ile bütün programı bitirir. Bu davranış derlenip çalıştırılarak doğrulandı: program “ekle F ... Yigit dolu!!!” yazdı ve Windows çıkış kodunu 4294967295, yani −1 olarak raporladı.</p>
+
+<p>Taşma anında bütün programı bitirmek kaba bir tepkidir. Yığın küçük bir kütüphane parçasıdır; programın geri kalanının ne yapacağını bilemez. Belki çağıran, yığın dolunca daha büyük bir yığın kuracaktı. Belki kullanıcıya bir mesaj gösterip işlemi iptal edecekti. <code>exit</code> bu kararları elinden alır. Ayrıca açık dosyaların düzgün kapatılması, ayrılmış belleklerin bırakılması gibi temizlik işleri de yapılamadan program biter. Daha iyi tasarım, hatayı çağırana bildirip kararı ona bırakmaktır.</p>
+<h2 class="nt-pb" id="s6-4"><span class="nt-num">6.4</span>Yığını bir nesne gibi tasarlamak</h2>
+
+<p>Ders kitabındaki ilk gerçeklemenin üç zayıflığı vardır. Yığın küresel bir dizidir; bu yüzden programda yalnız bir yığın olabilir. <code>top</code> diziden ayrı yaşar; çağıran onu ayrıca tanımlayıp her çağrıya ayrıca vermek zorundadır. Hata durumunda program <code>exit</code> ile biter. Bu kesim üç sorunu birlikte çözen bir tasarım kurar: dizi ve üst indisi aynı yapıda durur, yordamlar yığını parametre olarak alır ve hata bir dönüş değeriyle bildirilir.</p>
+
+<h3 id="s6-4-1"><span class="nt-num">6.4.1</span>Küresel dizi yerine <code>struct</code></h3>
+
+<pre class="nt-code"><code>#include &lt;stdbool.h&gt;
+#define KAP 100
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="kw">int</span> veri[KAP];
+    <span class="kw">int</span> ust;               /* boşken -1 */
+} Yigit;
+
+<span class="kw">void</span> yigit_baslat(Yigit *y) { y-&gt;ust = -1; }
+<span class="kw">bool</span> yigit_bos(<span class="kw">const</span> Yigit *y)  { <span class="kw">return</span> y-&gt;ust &lt; 0; }
+<span class="kw">bool</span> yigit_dolu(<span class="kw">const</span> Yigit *y) { <span class="kw">return</span> y-&gt;ust == KAP - 1; }
+<span class="kw">int</span>  yigit_boyut(<span class="kw">const</span> Yigit *y) { <span class="kw">return</span> y-&gt;ust + 1; }
+<span class="kw">bool</span> yigit_ust(<span class="kw">const</span> Yigit *y, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (yigit_bos(y)) <span class="kw">return</span> <span class="kw">false</span>;
+    *x = y-&gt;veri[y-&gt;ust];  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p><code>Yigit</code> yapısı iki alan taşır: <code>KAP</code> öğelik <code>veri</code> dizisi ve üst indisini tutan <code>ust</code>. Bir yığın artık tek bir değişkendir. <code>Yigit a, b;</code> tanımı birbirinden bağımsız iki yığın verir; her birinin kendi dizisi ve kendi üst indisi vardır. Biri dolarken öteki etkilenmez. Küresel değişken yoktur.</p>
+
+<p>Her yordam yığını <code>Yigit *y</code> parametresiyle, yani adresiyle alır. Bunun iki nedeni vardır. Birincisi, <code>push</code> ve <code>pop</code> yığını değiştirir; değerle aktarılan bir kopya değişseydi çağırandaki yığın değişmezdi. İkincisi, <code>Yigit</code> büyük bir yapıdır: <code>KAP</code> = 100 iken yaklaşık 404 bayt tutar. Değerle aktarılsaydı her çağrıda bu 404 bayt kopyalanırdı. Adres ise 8 bayttır. Yapının alanlarına adres üzerinden ok işleciyle (<code>-&gt;</code>) erişilir: <code>y-&gt;ust</code>, <code>(*y).ust</code>'un kısa yazımıdır.</p>
+
+<p>Yığını değiştirmeyen sorgular <code>const Yigit *y</code> alır. <code>const</code> niteleyicisi, fonksiyonun gösterilen yapıyı değiştirmeyeceğine söz verir. Fonksiyonun içinde <code>y-&gt;ust = 0;</code> gibi bir atama yazılırsa derleyici hata verir. Bu söz hem okuyana bilgi verir hem de yanlışlıkla yapılan değişiklikleri derleme sırasında yakalar.</p>
+
+<p>Yordamların her biri tek satırdır. <code>yigit_baslat</code>, <code>ust</code>'u −1 yaparak boş yığın kurar. Yerel bir <code>Yigit</code> değişkeninin alanları başlangıçta belirsiz değerler taşır; bu yüzden her yığın kullanılmadan önce bir kez başlatılmalıdır. <code>yigit_bos</code> ve <code>yigit_dolu</code> artık gerçek sorgulardır ve <code>bool</code> döner. <code>yigit_boyut</code> öğe sayısını, yani <code>ust + 1</code>'i verir. <code>yigit_ust</code>, ADT'deki peek işlemidir. Yığın boşsa <code>false</code> döner ve <code>*x</code>'e dokunmaz. Değilse üst öğeyi <code>*x</code>'e yazar ve <code>true</code> döner. Değerin bir çıktı parametresiyle verilmesinin nedeni, dönüş değerinin başarı bilgisine ayrılmış olmasıdır. <code>bool</code> tipi ve <code>true</code>, <code>false</code> adları <code>&lt;stdbool.h&gt;</code> başlığından gelir.</p>
+
+<p>Ekleme ve çıkarma da aynı düzenle yazılır:</p>
+
+<pre class="nt-code"><code><span class="kw">bool</span> push(Yigit *y, <span class="kw">int</span> x) {
+  <span class="kw">if</span> (y-&gt;ust == KAP - 1) <span class="kw">return</span> <span class="kw">false</span>; /* taşma */
+  y-&gt;veri[++y-&gt;ust] = x;
+  <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> pop(Yigit *y, <span class="kw">int</span> *x) {
+  <span class="kw">if</span> (y-&gt;ust &lt; 0) <span class="kw">return</span> <span class="kw">false</span>;   /* alt taşma */
+  *x = y-&gt;veri[y-&gt;ust--];
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p><code>push</code> önce taşmayı sınar. <code>ust == KAP - 1</code> ise yer yoktur ve fonksiyon <code>false</code> döner. Program sürer; taşmayı öğrenen çağıran ne yapacağına kendisi karar verir. Yer varsa <code>y-&gt;veri[++y-&gt;ust] = x;</code> satırı önce <code>ust</code>'u artırır, sonra değeri yeni indise yazar. Burada öncelik tuzağı yoktur: <code>-&gt;</code> işleci <code>++</code>'dan önce uygulanır, yani <code>++y-&gt;ust</code> ifadesi <code>++(y-&gt;ust)</code> demektir.</p>
+
+<p><code>pop</code> önce alt taşmayı sınar. Yığın boşsa <code>false</code> döner ve <code>*x</code>'e dokunmaz. Değilse <code>*x = y-&gt;veri[y-&gt;ust--];</code> satırı üst öğeyi <code>*x</code>'e kopyalar ve ardından <code>ust</code>'u bir azaltır. <code>y-&gt;ust--</code> ifadesi de <code>(y-&gt;ust)--</code> olarak okunur; azalan şey yapının alanıdır.</p>
+
+<p>Bu sürüm hata durumunu dönüş değeriyle bildirdiği için kullanımı çok rahattır. Örneğin yığını boşaltırken her çıkan öğeyi yazdıran döngü tek satırdır: <code>while (pop(&amp;y, &amp;x)) printf("%d ", x);</code>. Döngü, <code>pop</code> ilk kez <code>false</code> döndüğünde, yani yığın boşaldığında durur. İşlemlerin hepsi yine <span class="m">O(1)</span>'dir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>bool</code> döndüren bir yordamın sonucunu yok saymak. <code>push(&amp;y, x);</code> yazıp dönüş değerine bakmayan bir program, yığın dolduğunda öğeyi sessizce kaybeder. <code>pop(&amp;y, &amp;x);</code> yazıp sonucu denetlemeyen bir program, yığın boşken <code>x</code>'in eski ya da belirsiz değerini kullanmaya devam eder. Hata bildiren bir arayüz ancak bildirim okunursa işe yarar.</p>
+</div>
+
+<h3 id="s6-4-2"><span class="nt-num">6.4.2</span>Kod izleme: <code>bool</code> döndüren <code>push</code> ve <code>pop</code></h3>
+
+<p>İzlemede <code>KAP</code> = 3 alınır; dolu denetimi <code>ust == 2</code>'dir. <code>yigit_baslat(&amp;y)</code> ile boş yığın kurulur. Ardından sırasıyla 5, 8, 2 ve 9 itilir, sonra dört kez <code>pop</code> çağrılır. <a href="#tab-struct-iz">Tablo 6.4</a> her çağrıyı ve dönüş değerini verir.</p>
+
+<div class="nt-tablewrap" id="tab-struct-iz">
+<table class="nt-table">
+  <caption>Tablo 6.4: <code>KAP</code> = 3 iken <code>push</code>/<code>pop</code> izlemesi.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Sınama</th><th scope="col">Yapılan</th><th scope="col">Döner</th><th scope="col"><code>ust</code></th><th scope="col"><code>veri[0..ust]</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>yigit_baslat(&amp;y)</code></td><td>—</td><td><code>ust = -1</code></td><td>—</td><td>−1</td><td>(boş)</td></tr>
+    <tr><td><code>push(&amp;y, 5)</code></td><td>−1 == 2? Hayır</td><td><code>veri[0] = 5</code></td><td>true</td><td>0</td><td>5</td></tr>
+    <tr><td><code>push(&amp;y, 8)</code></td><td>0 == 2? Hayır</td><td><code>veri[1] = 8</code></td><td>true</td><td>1</td><td>5 8</td></tr>
+    <tr><td><code>push(&amp;y, 2)</code></td><td>1 == 2? Hayır</td><td><code>veri[2] = 2</code></td><td>true</td><td>2</td><td>5 8 2</td></tr>
+    <tr><td><code>push(&amp;y, 9)</code></td><td>2 == 2? <strong>Evet</strong></td><td>taşma, hiçbir şey yazılmaz</td><td>false</td><td>2</td><td>5 8 2</td></tr>
+    <tr><td><code>pop(&amp;y, &amp;x)</code></td><td>2 &lt; 0? Hayır</td><td><code>x = veri[2]</code></td><td>true, <code>x</code> = 2</td><td>1</td><td>5 8</td></tr>
+    <tr><td><code>pop(&amp;y, &amp;x)</code></td><td>1 &lt; 0? Hayır</td><td><code>x = veri[1]</code></td><td>true, <code>x</code> = 8</td><td>0</td><td>5</td></tr>
+    <tr><td><code>pop(&amp;y, &amp;x)</code></td><td>0 &lt; 0? Hayır</td><td><code>x = veri[0]</code></td><td>true, <code>x</code> = 5</td><td>−1</td><td>(boş)</td></tr>
+    <tr><td><code>pop(&amp;y, &amp;x)</code></td><td>−1 &lt; 0? <strong>Evet</strong></td><td>alt taşma, <code>x</code>'e dokunulmaz</td><td>false</td><td>−1</td><td>(boş)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-struct-iz" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 118" role="img" aria-label="struct yığın, KAP = 3, ust = 2"><defs><marker id="n6-d04-ah33-s13_07-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="250" y="62" width="70" height="28"/><text class="txt mono" x="285" y="81" text-anchor="middle">5</text><text class="lbl" x="244" y="80" text-anchor="end">[0]</text><rect class="box" x="250" y="34" width="70" height="28"/><text class="txt mono" x="285" y="53" text-anchor="middle">8</text><text class="lbl" x="244" y="52" text-anchor="end">[1]</text><rect class="box" x="250" y="6" width="70" height="28"/><text class="txt mono" x="285" y="25" text-anchor="middle">2</text><text class="lbl" x="244" y="24" text-anchor="end">[2]</text><path class="line" d="M366 20 L326 20" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah33-s13_07-1)"/><text class="txt mono" x="370" y="25" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">ust = 2</text><text class="txt" x="30" y="30" text-anchor="start" style="font-size:14px">KAP = 3</text><text class="lbl" x="30" y="50" text-anchor="start">boyut = ust + 1 = 3</text></svg> <svg class="ds-svg" viewBox="0 0 560 118" role="img" aria-label="struct yığın, KAP = 3, ust = -1"><defs><marker id="n6-d04-ah37-s13_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box-empty" x="250" y="62" width="70" height="28"/><text class="lbl" x="244" y="80" text-anchor="end">[0]</text><rect class="box-empty" x="250" y="34" width="70" height="28"/><text class="lbl" x="244" y="52" text-anchor="end">[1]</text><rect class="box-empty" x="250" y="6" width="70" height="28"/><text class="lbl" x="244" y="24" text-anchor="end">[2]</text><path class="line" d="M366 104 L326 104" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah37-s13_11-1)"/><text class="txt mono" x="370" y="109" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">ust = -1</text><text class="txt" x="30" y="30" text-anchor="start" style="font-size:14px">KAP = 3</text><text class="lbl" x="30" y="50" text-anchor="start">boyut = ust + 1 = 0</text></svg></div>
+  <figcaption><b>Şekil 6.5:</b> İzlemenin iki anı. Üstte üç push sonrası yığın doludur: <code>ust</code> = 2 = <code>KAP − 1</code>, boyut 3'tür; dördüncü push <code>false</code> döner. Altta dört pop sonrası yığın boştur: <code>ust</code> = −1 ve son pop <code>false</code> dönmüştür.</figcaption>
+</figure>
+
+<p>İzleme bir test programıyla doğrulandı. Her push'un dönüş değerini yazdıran program “push 5:1 8:1 2:1 9:0” çıktısını verdi; 9 eklenemedi. Pop'lar sırasıyla 2, 8, 5 döndürdü, dördüncü pop <code>false</code> oldu. Aradaki ara sorgular da beklendiği gibi çalıştı: üç push sonrası <code>yigit_boyut</code> 3, <code>yigit_dolu</code> doğru ve <code>yigit_ust</code> 2 verdi.</p>
+
+<p>İki gerçeklemenin farkı taşma satırında görülür. Küresel dizi sürümü bu noktada programı bitirirdi. <code>bool</code> sürümü ise <code>false</code> döner ve program kaldığı yerden sürer. Örnekte 9'un eklenemediğini çağıran öğrenir. İsterse kullanıcıya bir uyarı basar, isterse 9'u başka bir yere koyar. Tek bir yordamın bütün programın kaderini belirlemesi böylece önlenir.</p>
+
+<h3 id="s6-4-3"><span class="nt-num">6.4.3</span>Arayüz ve gerçekleme</h3>
+
+<p><code>struct</code> sürümü de hâlâ bir sorun taşır. <code>Yigit</code> yapısının alanları onu kullanan her koda açıktır. Kullanan bir programcı <code>y.ust = 5;</code> yazıp yığını bozabilir ya da <code>y.veri[0]</code>'a doğrudan erişip yığın kuralını delebilir. Daha büyük bir sorun da şudur: yığının gerçeklemesi değiştiğinde, örneğin dizi bağlı listeye çevrildiğinde, alanlara doğrudan erişen bütün kodlar bozulur.</p>
+
+<p>C'de bu sorun, kodu bir <strong>başlık dosyası</strong> (<span lang="en">header file</span>) ve bir kaynak dosyası olarak ikiye bölerek çözülür. Başlık dosyası <strong>arayüzü</strong> (<span lang="en">interface</span>), yani dışarıya açılan tipleri ve fonksiyon bildirimlerini taşır. Kaynak dosyası <strong>gerçeklemeyi</strong> (<span lang="en">implementation</span>), yani bu fonksiyonların gövdelerini ve yapının içini taşır.</p>
+
+<pre class="nt-code"><code>/* yigit.h: kullanıcı yalnız bunu görür */
+#ifndef YIGIT_H
+#define YIGIT_H
+#include &lt;stdbool.h&gt;
+<span class="kw">typedef</span> <span class="kw">struct</span> Yigit Yigit;  /* opak */
+Yigit *yigit_olustur(<span class="kw">int</span> kapasite);
+<span class="kw">void</span> yigit_yok_et(Yigit *y);
+<span class="kw">bool</span> yigit_ekle(Yigit *y, <span class="kw">int</span> x);
+<span class="kw">bool</span> yigit_al(Yigit *y, <span class="kw">int</span> *x);
+<span class="kw">bool</span> yigit_bos(<span class="kw">const</span> Yigit *y);
+#endif</code></pre>
+
+<p>Başlık dosyasının ilk ve son satırları <strong>çoklu ekleme korumasıdır</strong> (<span lang="en">include guard</span>). Büyük bir programda aynı başlık bir kaynak dosyasına dolaylı yollardan iki kez eklenebilir. <code>#ifndef YIGIT_H</code> sınaması, <code>YIGIT_H</code> adı henüz tanımlı değilse dosyanın içeriğini işler ve hemen ardından bu adı tanımlar. İkinci eklemede ad tanımlı olduğu için içerik atlanır. Böylece aynı tipin iki kez tanımlanması hatası önlenir.</p>
+
+<p>Asıl önemli satır <code>typedef struct Yigit Yigit;</code> satırıdır. Bu satır <code>struct Yigit</code> adında bir yapının var olduğunu söyler, ama alanlarını söylemez. Böyle yalnız adı bildirilen bir tipe <strong>eksik tip</strong> (<span lang="en">incomplete type</span>) denir. Alanları kullanıcıdan gizlenen bu tipe <strong>opak tip</strong> (<span lang="en">opaque type</span>) adı da verilir. Kullanan kod eksik bir tipin değişkenini tanımlayamaz, çünkü derleyici onun kaç bayt tuttuğunu bilmez. Alanlarına da erişemez. Yapabileceği tek şey, bu tipe bir işaretçi tutmak ve işaretçiyi başlıktaki fonksiyonlara vermektir. Yığın bu yüzden <code>yigit_olustur</code> ile oluşturulur ve <code>yigit_yok_et</code> ile yok edilir.</p>
+
+<pre class="nt-code"><code>/* yigit.c: gerçekleme */
+<span class="kw">struct</span> Yigit { <span class="kw">int</span> *veri; <span class="kw">int</span> ust, kap; };
+
+Yigit *yigit_olustur(<span class="kw">int</span> kap) {
+  Yigit *y = malloc(<span class="kw">sizeof</span> *y);
+  <span class="kw">if</span> (y == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">NULL</span>;
+  y-&gt;veri = malloc(kap * <span class="kw">sizeof</span> *y-&gt;veri);
+  <span class="kw">if</span> (y-&gt;veri == <span class="kw">NULL</span>) {
+    free(y);  <span class="kw">return</span> <span class="kw">NULL</span>;
+  }
+  y-&gt;ust = -1;  y-&gt;kap = kap;
+  <span class="kw">return</span> y;
+}
+<span class="kw">void</span> yigit_yok_et(Yigit *y) {
+  <span class="kw">if</span> (y) { free(y-&gt;veri); free(y); }
+}</code></pre>
+
+<p>Kaynak dosyasında yapının tam tanımı vardır. Bu sürümde dizi yapının içinde sabit boyutlu değildir. <code>veri</code> bir işaretçidir ve dizinin kendisi <code>yigit_olustur</code> sırasında, istenen kapasiteyle heap bellekten ayrılır. Böylece her yığının kapasitesi ayrı ayrı seçilebilir.</p>
+
+<p><code>yigit_olustur</code> iki ayırma yapar. Önce yapının kendisi için <code>malloc(sizeof *y)</code> çağrılır. <code>sizeof *y</code>, <code>y</code>'nin gösterdiği tipin, yani <code>struct Yigit</code>'in boyutudur. Bu yazım, tip adı değişse bile doğru kalır. Ayırma başarısızsa <code>NULL</code> döner. Sonra <code>kap</code> öğelik dizi için <code>malloc(kap * sizeof *y-&gt;veri)</code> çağrılır. Bu ikinci ayırma başarısızsa önemli bir ayrıntı vardır: ilk ayrılan yapı bloğu <code>free(y)</code> ile iade edilir ve ancak ondan sonra <code>NULL</code> döner. Bu satır unutulsaydı yapının bloğu hiçbir değişkenin gösteremediği bir bellek parçası olarak kalırdı; yani bir <strong>bellek sızıntısı</strong> (<span lang="en">memory leak</span>) oluşurdu. İki ayırma da başarılıysa <code>ust</code> −1, <code>kap</code> istenen kapasite yapılır ve yapının adresi döner.</p>
+
+<p><code>yigit_yok_et</code> ayırma sırasının tersini izler. Önce dizi, sonra yapı iade edilir. Sıra önemlidir: önce yapı iade edilseydi <code>y-&gt;veri</code> alanı artık geçersiz bir bellekten okunurdu. <code>if (y)</code> sınaması fonksiyonun <code>NULL</code> ile de güvenle çağrılabilmesini sağlar. C standardına göre <code>free(NULL)</code> zaten hiçbir şey yapmaz; ama <code>y-&gt;veri</code>'yi okumak için <code>y</code>'nin geçerli olması gerekir.</p>
+
+<p>Sunumdaki gerçekleme dosyası kısalık için başındaki <code>#include</code> satırlarını ve üç yordamı göstermez. Tam bir <code>yigit.c</code> şu satırlarla başlar: <code>#include &lt;stdlib.h&gt;</code> (<code>malloc</code> ve <code>free</code> için) ve <code>#include "yigit.h"</code> (bildirimlerle tanımların uyuştuğunu derleyicinin denetlemesi için). Eksik yordamlar, <code>struct</code> sürümündeki <code>push</code>, <code>pop</code> ve <code>yigit_bos</code>'un aynısıdır; tek fark, dolu denetiminin sabit <code>KAP</code> yerine yapının <code>kap</code> alanıyla yapılmasıdır: <code>if (y-&gt;ust == y-&gt;kap - 1) return false;</code>. Bu tamamlanmış hâliyle iki ayrı yığın (kapasite 2 ve 5) kuran bir test programı derlenip çalıştırıldı. Kapasitesi 2 olan yığına üçüncü ekleme <code>false</code> döndü; iki yığın da yok edildikten sonra sayaçlı bir <code>malloc</code>/<code>free</code> sarmalayıcısı dört ayırma ve dört iade saydı. Sızıntı yoktur.</p>
+
+<p>Bu bölünmenin değeri, gerçekleme değiştiğinde görülür. <code>yigit.c</code> diziden bağlı listeye çevrilsin. <code>struct Yigit</code>'in içi tamamen değişir; <code>veri</code> ve <code>kap</code> alanları kalkar, yerine bir düğüm işaretçisi gelir. Ama <code>yigit.h</code> aynı kalır. Bu yüzden yığını kullanan bütün dosyalar hiç değiştirilmeden, yalnız yeniden bağlanarak çalışmaya devam eder. Soyut veri tipinin “ne” ile “nasıl”ı ayırması C'de böyle somutlaşır.</p>
+
+<h3 id="s6-4-4"><span class="nt-num">6.4.4</span>Yığınla dizge ters çevirme</h3>
+
+<p>Yığının en basit uygulaması bir diziyi ters çevirmektir. Öğeler sırayla yığına itilir, sonra sırayla çekilir. Yığın son gireni ilk verdiği için çıkış sırası girişin tersidir. Aşağıdaki fonksiyon bir dizgeyi bu yolla yerinde ters çevirir; <code>struct</code> sürümünün <code>push</code> ve <code>pop</code> yordamlarını kullanır.</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> ters_cevir(<span class="kw">char</span> *s) {
+  Yigit y;  <span class="kw">int</span> c, i;
+  yigit_baslat(&amp;y);
+  <span class="kw">for</span> (i = 0; s[i] != '\0'; i++)
+    push(&amp;y, s[i]);     /* KAP yeterli varsayıldı */
+  <span class="kw">for</span> (i = 0; pop(&amp;y, &amp;c); i++)
+    s[i] = (<span class="kw">char</span>)c;
+}</code></pre>
+
+<p>Fonksiyonun yerel bir <code>Yigit y</code> değişkeni vardır. Yığın, fonksiyonun çerçevesinde yaşar ve fonksiyon dönünce kendiliğinden yok olur; <code>malloc</code> ve <code>free</code> gerekmez. İlk döngü, dizgenin sonundaki <code>'\0'</code> karakterine kadar her karakteri yığına iter. <code>push</code>'un dönüş değeri burada denetlenmez; yorumdaki varsayım, dizgenin <code>KAP</code> = 100 karakterden kısa olduğudur. İkinci döngü, <code>pop</code> başarılı olduğu sürece çekilen karakteri dizgenin <code>i</code>. konumuna yazar ve <code>i</code>'yi artırır. Yığın boşalınca <code>pop</code> <code>false</code> döner ve döngü biter.</p>
+
+<p><code>c</code> değişkeni <code>int</code>'tir, çünkü <code>pop</code> ikinci argüman olarak <code>int *</code> bekler. <code>push(&amp;y, s[i])</code> çağrısında <code>char</code> değeri otomatik olarak <code>int</code>'e genişler. Dizgeye geri yazarken <code>(char)c</code> dönüşümü bu değeri yeniden <code>char</code>'a indirir. Karakterler zaten <code>char</code> aralığından geldiği için bilgi kaybolmaz.</p>
+
+<p>Girdi <code>"YIGIT"</code> olsun. <a href="#tab-ters-iz">Tablo 6.5</a> iki döngünün her adımını verir.</p>
+
+<div class="nt-tablewrap" id="tab-ters-iz">
+<table class="nt-table">
+  <caption>Tablo 6.5: <code>ters_cevir</code> izlemesi, girdi <code>"YIGIT"</code>.</caption>
+  <thead><tr><th scope="col">Döngü</th><th scope="col"><code>i</code></th><th scope="col">İşlem</th><th scope="col">Yığın (alttan üste)</th><th scope="col"><code>s</code></th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>—</td><td><code>yigit_baslat</code></td><td>(boş)</td><td>YIGIT</td></tr>
+    <tr><td>1</td><td>0</td><td>push('Y')</td><td>Y</td><td>YIGIT</td></tr>
+    <tr><td>1</td><td>1</td><td>push('I')</td><td>Y I</td><td>YIGIT</td></tr>
+    <tr><td>1</td><td>2</td><td>push('G')</td><td>Y I G</td><td>YIGIT</td></tr>
+    <tr><td>1</td><td>3</td><td>push('I')</td><td>Y I G I</td><td>YIGIT</td></tr>
+    <tr><td>1</td><td>4</td><td>push('T')</td><td>Y I G I T</td><td>YIGIT</td></tr>
+    <tr><td>2</td><td>0</td><td>pop → 'T', <code>s[0] = 'T'</code></td><td>Y I G I</td><td>TIGIT</td></tr>
+    <tr><td>2</td><td>1</td><td>pop → 'I', <code>s[1] = 'I'</code></td><td>Y I G</td><td>TIGIT</td></tr>
+    <tr><td>2</td><td>2</td><td>pop → 'G', <code>s[2] = 'G'</code></td><td>Y I</td><td>TIGIT</td></tr>
+    <tr><td>2</td><td>3</td><td>pop → 'I', <code>s[3] = 'I'</code></td><td>Y</td><td>TIGIT</td></tr>
+    <tr><td>2</td><td>4</td><td>pop → 'Y', <code>s[4] = 'Y'</code></td><td>(boş)</td><td>TIGIY</td></tr>
+    <tr><td>2</td><td>5</td><td>pop → <code>false</code>, döngü biter</td><td>(boş)</td><td>TIGIY</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-ters" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 146" role="img" aria-label="Dizge ve yığın"><defs><marker id="n6-d04-ah43-s15_05-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><g><text class="lbl" x="43" y="24" text-anchor="middle">0</text><rect class="box" x="20" y="30" width="46" height="36"/><text class="txt mono" x="43" y="53" text-anchor="middle">Y</text></g><g><text class="lbl" x="89" y="24" text-anchor="middle">1</text><rect class="box" x="66" y="30" width="46" height="36"/><text class="txt mono" x="89" y="53" text-anchor="middle">I</text></g><g><text class="lbl" x="135" y="24" text-anchor="middle">2</text><rect class="box" x="112" y="30" width="46" height="36"/><text class="txt mono" x="135" y="53" text-anchor="middle">G</text></g><g><text class="lbl" x="181" y="24" text-anchor="middle">3</text><rect class="box" x="158" y="30" width="46" height="36"/><text class="txt mono" x="181" y="53" text-anchor="middle">I</text></g><g><text class="lbl" x="227" y="24" text-anchor="middle">4</text><rect class="box" x="204" y="30" width="46" height="36" style="fill:var(--ds-hot)"/><text class="txt mono" x="227" y="53" text-anchor="middle">T</text></g><text class="txt mono" x="227" y="82" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">▲ i</text><text class="lbl" x="20" y="16" text-anchor="start">s</text><rect class="box" x="420" y="104" width="56" height="22"/><text class="txt mono" x="448" y="120" text-anchor="middle">Y</text><rect class="box" x="420" y="82" width="56" height="22"/><text class="txt mono" x="448" y="98" text-anchor="middle">I</text><rect class="box" x="420" y="60" width="56" height="22"/><text class="txt mono" x="448" y="76" text-anchor="middle">G</text><rect class="box" x="420" y="38" width="56" height="22"/><text class="txt mono" x="448" y="54" text-anchor="middle">I</text><rect class="box" x="420" y="16" width="56" height="22" style="fill:var(--ds-hot)"/><text class="txt mono" x="448" y="32" text-anchor="middle">T</text><path class="line" d="M522 27 L482 27" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah43-s15_05-1)"/><text class="txt mono" x="526" y="32" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">ust = 4</text></svg> <svg class="ds-svg" viewBox="0 0 600 146" role="img" aria-label="Dizge ve yığın"><defs><marker id="n6-d04-ah49-s15_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><g><text class="lbl" x="43" y="24" text-anchor="middle">0</text><rect class="box" x="20" y="30" width="46" height="36"/><text class="txt mono" x="43" y="53" text-anchor="middle">T</text></g><g><text class="lbl" x="89" y="24" text-anchor="middle">1</text><rect class="box" x="66" y="30" width="46" height="36"/><text class="txt mono" x="89" y="53" text-anchor="middle">I</text></g><g><text class="lbl" x="135" y="24" text-anchor="middle">2</text><rect class="box" x="112" y="30" width="46" height="36"/><text class="txt mono" x="135" y="53" text-anchor="middle">G</text></g><g><text class="lbl" x="181" y="24" text-anchor="middle">3</text><rect class="box" x="158" y="30" width="46" height="36"/><text class="txt mono" x="181" y="53" text-anchor="middle">I</text></g><g><text class="lbl" x="227" y="24" text-anchor="middle">4</text><rect class="box" x="204" y="30" width="46" height="36"/><text class="txt mono" x="227" y="53" text-anchor="middle">Y</text></g><text class="lbl" x="20" y="16" text-anchor="start">s</text><rect class="box-empty" x="420" y="104" width="56" height="22"/><rect class="box-empty" x="420" y="82" width="56" height="22"/><rect class="box-empty" x="420" y="60" width="56" height="22"/><rect class="box-empty" x="420" y="38" width="56" height="22"/><rect class="box-empty" x="420" y="16" width="56" height="22"/><path class="line" d="M522 137 L482 137" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah49-s15_11-1)"/><text class="txt mono" x="526" y="142" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">ust = -1</text></svg></div>
+  <figcaption><b>Şekil 6.6:</b> Ters çevirmenin iki anı. Üstte birinci döngü bitmiştir: beş karakter yığındadır, üstte T vardır (<code>ust</code> = 4). Altta ikinci döngü bitmiştir: yığın boştur (<code>ust</code> = −1) ve dizge TIGIY olmuştur.</figcaption>
+</figure>
+
+<p>Tablodaki ara dizgeler ilk bakışta şaşırtabilir. Üç adım boyunca <code>s</code> “TIGIT” olarak görünür. Bunun nedeni, “YIGIT” kelimesinin ortadaki üç harfinin (I, G, I) kendi içinde simetrik olmasıdır. Yazılan harfler zaten orada bulunan harflerle aynıdır. Yalnız ilk ve son adım dizgeyi gerçekten değiştirir. Program çalıştırılarak doğrulandı: <code>"YIGIT"</code> için TIGIY, <code>"ab"</code> için ba verdi; boş dizge boş kaldı.</p>
+
+<p>Maliyet açıktır. <span class="m">n</span> karakterlik bir dizgede birinci döngü <span class="m">n</span> push, ikinci döngü <span class="m">n</span> pop ve bir başarısız pop yapar. Her işlem <span class="m">O(1)</span> olduğundan toplam süre <span class="m">Θ(n)</span>'dir. Yığın <span class="m">n</span> karakteri birden tuttuğu için ek bellek de <span class="m">Θ(n)</span>'dir. Aynı iş iki indisle, baştan ve sondan karakter takas ederek <span class="m">O(1)</span> ek bellekle de yapılabilir. Yığınlı sürümün değeri, yığının sırayı tersine çevirme yeteneğini açıkça göstermesidir. Aynı yöntem, sırası tersine çevrilmek istenen ama uzunluğu baştan bilinmeyen her akış için de çalışır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Kapasite varsayımını unutmak. <code>ters_cevir</code>, dizgenin <code>KAP</code> karakterden kısa olduğunu varsayar. 150 karakterlik bir dizgede ilk 100 karakter yığına girer, kalan 50 push <code>false</code> döner ve sessizce kaybolur. İkinci döngü yalnız 100 karakteri geri yazar. Sonuç, ilk 100 karakterin tersiyle kalan 50 karakterin özgün hâlinden oluşan anlamsız bir dizgedir. Güvenli bir sürüm ya push sonucunu denetleyip hata döndürür ya da kapasiteyi dizgenin uzunluğuna göre seçer.</p>
+</div>
+<h2 class="nt-pb" id="s6-5"><span class="nt-num">6.5</span>Bağlı yığın</h2>
+
+<p>Dizi yığınının kapasitesi baştan seçilir. Kapasite küçük seçilirse yığın taşar; büyük seçilirse kullanılmayan hücreler boşa yer kaplar. Bağlı liste bu ikilemi ortadan kaldırır. Her öğe için ayrı bir düğüm ayrılır ve yığın tam olarak öğe sayısı kadar düğüm tutar. Bu kesim yığını tek yönlü bir bağlı listeyle kurar.</p>
+
+<h3 id="s6-5-1"><span class="nt-num">6.5.1</span>Üst neden liste başıdır</h3>
+
+<p>Bağlı listede her öğe bir <strong>düğüm</strong>dür (<span lang="en">node</span>). Düğüm iki alan taşır: öğenin değerini tutan <code>deger</code> ve bir sonraki düğümün adresini tutan <code>bag</code>. Düğüm tipi kendi tipinden bir işaretçi içerdiği için kendine başvuran bir yapıdır:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> dugum {
+    <span class="kw">int</span> deger;
+    <span class="kw">struct</span> dugum *bag;
+} dugum;</code></pre>
+
+<p>Yığının hangi ucu listenin hangi ucuna denk gelmelidir? Tek yönlü bir listede iki uç eşit değildir. Liste başına ekleme ve liste başından silme <span class="m">O(1)</span>'dir: yalnız baş işaretçisi ve bir bağ değişir. Liste sonuna ekleme de son düğüm ayrıca tutulursa <span class="m">O(1)</span>'dir. Ama liste sonundan silmek için sondan bir önceki düğümün bağını <code>NULL</code> yapmak gerekir. Tek yönlü listede bir düğümden öncekine geri dönülemez; sondan bir önceki düğüm ancak baştan yürüyerek, <span class="m">O(n)</span> sürede bulunur.</p>
+
+<p>Yığında ekleme ve silme aynı uçtan yapıldığı için bu ucun liste başı olması gerekir. Yığının üstünü gösteren <code>top</code> işaretçisi bu yüzden listenin ilk düğümünü gösterir. Son eklenen öğe listenin başında, ilk eklenen öğe listenin sonundadır. Boş yığın, <code>top</code>'u <code>NULL</code> olan yığındır. Özetle iki seçenek vardır: ya iki işaretçi tutulup son düğüm de izlenir ve yine de silme yavaş kalır, ya da tek işaretçiyle baş tutulur ve her şey hızlı olur. Doğru seçim ikincisidir.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bagli" style="--w:540px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 540 108" role="img" aria-label="bağlı yığın"><defs><marker id="n6-d04-ah50-s16_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker></defs><text class="txt mono" x="64" y="58" text-anchor="end">top</text><rect class="box" x="70" y="40" width="34" height="26"/><circle class="ah" cx="87" cy="53" r="3.5"/><g><rect class="box" x="150" y="36" width="78" height="34" rx="3"/><line class="line" x1="198.36" y1="36" x2="198.36" y2="70" style="stroke-width:1.5"/><text class="txt mono" x="174.18" y="58" text-anchor="middle">C</text></g><path class="line" d="M87 53 L148 53" marker-end="url(#n6-d04-ah50-s16_00-1)"/><g><rect class="box" x="270" y="36" width="78" height="34" rx="3"/><line class="line" x1="318.36" y1="36" x2="318.36" y2="70" style="stroke-width:1.5"/><text class="txt mono" x="294.18" y="58" text-anchor="middle">B</text></g><path class="line" d="M213.18 53 L268 53" marker-end="url(#n6-d04-ah50-s16_00-1)"/><g><rect class="box" x="390" y="36" width="78" height="34" rx="3"/><line class="line" x1="438.36" y1="36" x2="438.36" y2="70" style="stroke-width:1.5"/><text class="txt mono" x="414.18" y="58" text-anchor="middle">A</text><text class="lbl" x="453.18" y="57" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M333.18 53 L388 53" marker-end="url(#n6-d04-ah50-s16_00-1)"/><text class="lbl" x="170" y="100" text-anchor="start">üst (son eklenen)</text><text class="lbl" x="468" y="100" text-anchor="end">alt (ilk eklenen)</text></svg></div>
+  <figcaption><b>Şekil 6.7:</b> A, B, C sırasıyla eklenmiş bağlı yığın. <code>top</code> liste başını, yani son eklenen C'yi gösterir; C B'yi, B A'yı gösterir. A'nın bağı <code>NULL</code>'dır: A yığının altıdır.</figcaption>
+</figure>
+
+<p><a href="#sekil-bagli">Şekil 6.7</a> A, B, C sırasıyla eklenmiş bir bağlı yığını gösterir. Okların yönüne dikkat etmek gerekir. Oklar üstten alta doğrudur: her düğüm kendinden önce eklenmiş düğümü gösterir. Bir pop, <code>top</code>'u bir ok ileri kaydırır ve C'yi listeden çıkarır. Kaydırma yoktur, kapasite sınırı yoktur. Yığın ancak <code>malloc</code> yeni bir düğüm için yer bulamadığında taşar.</p>
+
+<h3 id="s6-5-2"><span class="nt-num">6.5.2</span>Bağlı <code>push</code></h3>
+
+<pre class="nt-code"><code><span class="kw">bool</span> push(dugum **top, <span class="kw">int</span> x) {
+  dugum *yeni = malloc(<span class="kw">sizeof</span> *yeni);
+  <span class="kw">if</span> (yeni == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;  /* bellek yok */
+  yeni-&gt;deger = x;
+  yeni-&gt;bag = *top;      /* eski üstü göster */
+  *top = yeni;           /* yeni üst */
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Fonksiyon <code>dugum **top</code> parametresi alır. Bu bir <strong>işaretçiye işaretçidir</strong>: çağırandaki <code>top</code> değişkeninin adresidir. Push, çağırandaki <code>top</code>'u yeni düğüme çevirecektir. Değerle aktarılan bir kopya değişseydi çağıranın <code>top</code>'u eski düğümü göstermeye devam ederdi ve yeni düğüm kaybolurdu. Bu yüzden çağrı <code>push(&amp;top, 10)</code> biçiminde yapılır. Fonksiyonun içinde <code>*top</code>, çağırandaki <code>top</code> değişkeninin kendisidir.</p>
+
+<p>Gövde dört adımdan oluşur:</p>
+<ol class="nt-steps">
+  <li><code>dugum *yeni = malloc(sizeof *yeni);</code> heap bellekten bir düğümlük yer ayırır. Ayırma başarısızsa <code>malloc</code> <code>NULL</code> döner ve fonksiyon <code>false</code> ile çıkar. Yığın bu durumda hiç değişmemiştir.</li>
+  <li><code>yeni-&gt;deger = x;</code> değeri yeni düğüme yazar. <code>malloc</code>'un verdiği bellek temizlenmemiştir; alanlar bu atamaya kadar belirsiz değerler taşır.</li>
+  <li><code>yeni-&gt;bag = *top;</code> yeni düğümün bağını eski üste çevirir. Yığın boşsa eski üst <code>NULL</code>'dır ve yeni düğümün bağı da <code>NULL</code> olur.</li>
+  <li><code>*top = yeni;</code> çağırandaki <code>top</code>'u yeni düğüme çevirir. Yeni düğüm artık yığının üstüdür.</li>
+</ol>
+
+<p>Üçüncü ve dördüncü adımın sırası kritiktir. Önce bağlanır, sonra üst değiştirilir. Sıra ters olsaydı <code>*top = yeni;</code> satırı eski üstün adresini kaybettirirdi. Ardından gelen <code>yeni-&gt;bag = *top;</code> yeni düğümü kendisine bağlardı. Eski listenin bütün düğümleri hiçbir değişkenin gösteremediği bir hâlde, sızmış bellek olarak kalırdı.</p>
+
+<p>Boş bir yığına sırasıyla 10, 20, 30 itilsin. <a href="#tab-bpush-iz">Tablo 6.6</a> her satırdan sonraki durumu verir. Tabloda <code>düğüm(10)</code>, değeri 10 olan düğümün adresi anlamına gelir.</p>
+
+<div class="nt-tablewrap" id="tab-bpush-iz">
+<table class="nt-table">
+  <caption>Tablo 6.6: Boş yığına 10, 20, 30 itilirken bağlı <code>push</code> izlemesi.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Satır</th><th scope="col"><code>yeni</code></th><th scope="col"><code>yeni-&gt;bag</code></th><th scope="col"><code>*top</code></th><th scope="col">Yığın</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td><code>dugum *top = NULL;</code></td><td>—</td><td>—</td><td>NULL</td><td>(boş)</td></tr>
+    <tr><td rowspan="4"><code>push(&amp;top, 10)</code></td><td><code>malloc</code></td><td>düğüm(?)</td><td>?</td><td>NULL</td><td>(boş)</td></tr>
+    <tr><td><code>yeni-&gt;deger = x</code></td><td>düğüm(10)</td><td>?</td><td>NULL</td><td>(boş)</td></tr>
+    <tr><td><code>yeni-&gt;bag = *top</code></td><td>düğüm(10)</td><td>NULL</td><td>NULL</td><td>(boş)</td></tr>
+    <tr><td><code>*top = yeni</code></td><td>düğüm(10)</td><td>NULL</td><td>düğüm(10)</td><td>10</td></tr>
+    <tr><td rowspan="2"><code>push(&amp;top, 20)</code></td><td><code>yeni-&gt;bag = *top</code></td><td>düğüm(20)</td><td>düğüm(10)</td><td>düğüm(10)</td><td>10</td></tr>
+    <tr><td><code>*top = yeni</code></td><td>düğüm(20)</td><td>düğüm(10)</td><td>düğüm(20)</td><td>20 → 10</td></tr>
+    <tr><td rowspan="2"><code>push(&amp;top, 30)</code></td><td><code>yeni-&gt;bag = *top</code></td><td>düğüm(30)</td><td>düğüm(20)</td><td>düğüm(20)</td><td>20 → 10</td></tr>
+    <tr><td><code>*top = yeni</code></td><td>düğüm(30)</td><td>düğüm(20)</td><td>düğüm(30)</td><td>30 → 20 → 10</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bpush" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığın: boş"><text class="txt mono" x="54" y="94" text-anchor="end">*top</text><rect class="box" x="60" y="76" width="34" height="26"/><text class="lbl" x="77" y="93" text-anchor="middle" style="font-size:10px">NULL</text><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">?</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← yeni</text></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığın: boş"><defs><marker id="n6-d04-ah51-s17_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="94" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="76" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="89" r="3.5" style="fill:var(--ds-accent)"/><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">10</text><text class="lbl" x="203.18" y="31" text-anchor="middle" style="font-size:10.5px">NULL</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← yeni</text><path class="line" d="M77 76 Q73 27 138 27" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah51-s17_04-1)"/></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığın: 20 → 10"><defs><marker id="n6-d04-ah59-s17_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah60-s17_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="94" text-anchor="end">*top</text><rect class="box" x="60" y="76" width="34" height="26"/><circle class="ah" cx="77" cy="89" r="3.5"/><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">30</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← yeni</text><path class="line" d="M203.18 35 L212 70" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah60-s17_11-1)"/><g><rect class="box" x="200" y="72" width="78" height="34" rx="3"/><line class="line" x1="248.36" y1="72" x2="248.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="224.18" y="94" text-anchor="middle">20</text></g><path class="line" d="M77 89 L198 89" marker-end="url(#n6-d04-ah59-s17_11-1)"/><g><rect class="box" x="320" y="72" width="78" height="34" rx="3"/><line class="line" x1="368.36" y1="72" x2="368.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="344.18" y="94" text-anchor="middle">10</text><text class="lbl" x="383.18" y="93" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M263.18 89 L318 89" marker-end="url(#n6-d04-ah59-s17_11-1)"/></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığın: 20 → 10"><defs><marker id="n6-d04-ah61-s17_12-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah62-s17_12-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="94" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="76" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="89" r="3.5" style="fill:var(--ds-accent)"/><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">30</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← yeni</text><path class="line" d="M203.18 35 L212 70" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah62-s17_12-1)"/><path class="line" d="M77 76 Q73 27 138 27" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah62-s17_12-1)"/><g><rect class="box" x="200" y="72" width="78" height="34" rx="3"/><line class="line" x1="248.36" y1="72" x2="248.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="224.18" y="94" text-anchor="middle">20</text></g><g><rect class="box" x="320" y="72" width="78" height="34" rx="3"/><line class="line" x1="368.36" y1="72" x2="368.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="344.18" y="94" text-anchor="middle">10</text><text class="lbl" x="383.18" y="93" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M263.18 89 L318 89" marker-end="url(#n6-d04-ah61-s17_12-1)"/></svg></div>
+  <figcaption><b>Şekil 6.8:</b> Bağlı push'un dört anı. Birincide <code>malloc</code> ilk düğümü ayırmıştır; alanları belirsizdir (?) ve <code>*top</code> hâlâ <code>NULL</code>'dır. İkincide 10 yığının tek öğesidir. Üçüncüde 30'luk yeni düğüm hazırlanmış ve eski üst 20'ye bağlanmıştır, ama <code>*top</code> henüz 20'yi gösterir. Dördüncüde <code>*top = yeni</code> ile yığın 30 → 20 → 10 olmuştur.</figcaption>
+</figure>
+
+<p>Üçüncü çizimdeki ara durum öğreticidir. Yeni düğüm hazırdır ve 20'yi gösterir, ama yığın hâlâ 20 → 10'dur. Yığının yapısı tek bir atamayla, <code>*top = yeni</code> satırında değişir. Bu düzen hata durumunda da güvenlidir: <code>malloc</code> başarısız olsaydı fonksiyon ilk denetimde dönerdi ve yığına hiç dokunulmamış olurdu. Her push sabit sayıda iş yapar: bir ayırma, üç atama. Yığının uzunluğu bu sayıyı etkilemez; push <span class="m">O(1)</span>'dir. <code>malloc</code>'un kendi süresi de pratikte sabit kabul edilir, ama bir dizi hücresine yazmaktan çok daha pahalıdır.</p>
+
+<h3 id="s6-5-3"><span class="nt-num">6.5.3</span>Bağlı <code>pop</code></h3>
+
+<pre class="nt-code"><code><span class="kw">bool</span> pop(dugum **top, <span class="kw">int</span> *x) {
+  dugum *eski = *top;      /* malloc yok! */
+  <span class="kw">if</span> (eski == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;  /* boş */
+  *x = eski-&gt;deger;
+  *top = eski-&gt;bag;        /* üstü ilerlet */
+  free(eski);              /* belleği bırak */
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Pop da <code>dugum **top</code> alır, çünkü çağırandaki <code>top</code>'u bir sonraki düğüme ilerletecektir. Çıkarılan değer <code>int *x</code> çıktı parametresiyle verilir; dönüş değeri başarıyı bildirir. Gövde şu adımlardan oluşur:</p>
+<ol class="nt-steps">
+  <li><code>dugum *eski = *top;</code> üst düğümün adresini yerel bir işaretçide saklar. Bu satır yeni bellek ayırmaz; yalnız bir adresi kopyalar.</li>
+  <li><code>if (eski == NULL) return false;</code> yığın boşsa alt taşmayı bildirir.</li>
+  <li><code>*x = eski-&gt;deger;</code> değeri çağırana kopyalar. Bu satır düğüm iade edilmeden önce çalışmalıdır.</li>
+  <li><code>*top = eski-&gt;bag;</code> çağırandaki <code>top</code>'u bir sonraki düğüme ilerletir. Bu da iadeden önce yapılmalıdır, çünkü bağ alanı iade edilecek düğümün içindedir.</li>
+  <li><code>free(eski);</code> düğümün belleğini sisteme iade eder.</li>
+</ol>
+
+<p>30 → 20 → 10 yığınına dört kez pop uygulansın ve her başarılı sonuç yazdırılsın. <a href="#tab-bpop-iz">Tablo 6.7</a> çağrıları özetler.</p>
+
+<div class="nt-tablewrap" id="tab-bpop-iz">
+<table class="nt-table">
+  <caption>Tablo 6.7: 30 → 20 → 10 yığınından dört pop.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col"><code>eski</code></th><th scope="col"><code>*x</code></th><th scope="col"><code>*top</code> (sonra)</th><th scope="col"><code>free</code></th><th scope="col">Döner</th><th scope="col">Yığın</th></tr></thead>
+  <tbody>
+    <tr><td>1. pop</td><td>düğüm(30)</td><td>30</td><td>düğüm(20)</td><td>düğüm(30)</td><td>true</td><td>20 → 10</td></tr>
+    <tr><td>2. pop</td><td>düğüm(20)</td><td>20</td><td>düğüm(10)</td><td>düğüm(20)</td><td>true</td><td>10</td></tr>
+    <tr><td>3. pop</td><td>düğüm(10)</td><td>10</td><td>NULL</td><td>düğüm(10)</td><td>true</td><td>(boş)</td></tr>
+    <tr><td>4. pop</td><td>NULL</td><td>(dokunulmaz)</td><td>NULL</td><td>—</td><td>false</td><td>(boş)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bpop" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığından pop"><defs><marker id="n6-d04-ah65-s18_01-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah66-s18_01-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="52" text-anchor="end">*top</text><rect class="box" x="60" y="34" width="34" height="26"/><circle class="ah" cx="77" cy="47" r="3.5"/><g><rect class="box" x="180" y="30" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="228.36" y1="30" x2="228.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="204.18" y="52" text-anchor="middle">30</text></g><g><rect class="box" x="300" y="30" width="78" height="34" rx="3"/><line class="line" x1="348.36" y1="30" x2="348.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="324.18" y="52" text-anchor="middle">20</text></g><path class="line" d="M243.18 47 L298 47" marker-end="url(#n6-d04-ah65-s18_01-1)"/><g><rect class="box" x="420" y="30" width="78" height="34" rx="3"/><line class="line" x1="468.36" y1="30" x2="468.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="444.18" y="52" text-anchor="middle">10</text><text class="lbl" x="483.18" y="51" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M363.18 47 L418 47" marker-end="url(#n6-d04-ah65-s18_01-1)"/><path class="line" d="M77 47 L178 47" marker-end="url(#n6-d04-ah65-s18_01-1)"/><path class="line" d="M210 100 L210 68" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah66-s18_01-1)"/><text class="txt mono" x="210" y="116" text-anchor="middle" style="fill:var(--ds-accent)">eski</text></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığından pop"><defs><marker id="n6-d04-ah69-s18_03-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah70-s18_03-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="52" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="34" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="47" r="3.5" style="fill:var(--ds-accent)"/><g><rect class="box" x="180" y="30" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="228.36" y1="30" x2="228.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="204.18" y="52" text-anchor="middle">30</text></g><g><rect class="box" x="300" y="30" width="78" height="34" rx="3"/><line class="line" x1="348.36" y1="30" x2="348.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="324.18" y="52" text-anchor="middle">20</text></g><path class="line" d="M243.18 47 L298 47" marker-end="url(#n6-d04-ah69-s18_03-1)"/><g><rect class="box" x="420" y="30" width="78" height="34" rx="3"/><line class="line" x1="468.36" y1="30" x2="468.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="444.18" y="52" text-anchor="middle">10</text><text class="lbl" x="483.18" y="51" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M363.18 47 L418 47" marker-end="url(#n6-d04-ah69-s18_03-1)"/><path class="line" d="M77 60 Q250 118 318 66" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah70-s18_03-1)"/><path class="line" d="M210 100 L210 68" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah70-s18_03-1)"/><text class="txt mono" x="210" y="116" text-anchor="middle" style="fill:var(--ds-accent)">eski</text></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Bağlı yığından pop"><defs><marker id="n6-d04-ah71-s18_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah72-s18_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="52" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="34" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="47" r="3.5" style="fill:var(--ds-accent)"/><g opacity="0.35"><rect class="box-empty" x="180" y="30" width="78" height="34" rx="3"/><line class="line" x1="228.36" y1="30" x2="228.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="204.18" y="52" text-anchor="middle">30</text></g><text class="lbl" x="219" y="20" text-anchor="middle" style="fill:var(--ds-bad);font-size:12px">free edildi</text><g><rect class="box" x="300" y="30" width="78" height="34" rx="3"/><line class="line" x1="348.36" y1="30" x2="348.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="324.18" y="52" text-anchor="middle">20</text></g><g><rect class="box" x="420" y="30" width="78" height="34" rx="3"/><line class="line" x1="468.36" y1="30" x2="468.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="444.18" y="52" text-anchor="middle">10</text><text class="lbl" x="483.18" y="51" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M363.18 47 L418 47" marker-end="url(#n6-d04-ah71-s18_04-1)"/><path class="line" d="M77 60 Q250 118 318 66" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah72-s18_04-1)"/></svg></div>
+  <figcaption><b>Şekil 6.9:</b> İlk pop'un üç anı. Önce <code>eski</code> üst düğümü (30) gösterir; yeni bellek ayrılmamıştır. Sonra <code>*top = eski-&gt;bag</code> ile üst 20'ye ilerler; 30'luk düğüm artık listede değildir ama <code>eski</code> onu hâlâ gösterir. En sonda <code>free(eski)</code> ile düğüm iade edilmiştir; <code>main</code> 30 yazar.</figcaption>
+</figure>
+
+<p>Test programı 10, 20, 30 itip dört kez pop çağırdı ve “30 20 10 false” yazdı. Çıkış sırası girişin tersidir. Pop da sabit sayıda iş yapar: bir karşılaştırma, iki atama ve bir <code>free</code>. Maliyeti <span class="m">O(1)</span>'dir.</p>
+
+<p>Pop'taki adımların sırası, push'takinden de önemlidir. <code>free(eski)</code> çağrısından sonra <code>eski</code>'nin gösterdiği bellek artık programa ait değildir. <code>eski-&gt;deger</code> ya da <code>eski-&gt;bag</code> bu andan sonra okunursa davranış tanımsızdır. Program çoğu zaman doğru değeri okur, çünkü iade edilen bellek hemen başka bir işe verilmez. Bu da hatayı daha tehlikeli yapar: testlerde görünmez, ama başka bir <code>malloc</code> araya girdiğinde değer bozulur. Böyle iade edilmiş bir belleği gösteren işaretçiye <strong>sarkan işaretçi</strong> (<span lang="en">dangling pointer</span>) denir. Sağlam kural şudur: önce değeri ve bağı kurtar, en son <code>free</code> çağır.</p>
+
+<h3 id="s6-5-4"><span class="nt-num">6.5.4</span>Bellek sorumluluğu ve yığını boşaltma</h3>
+
+<p>Bağlı yığında her düğümü <code>malloc</code> ayırır ve her düğümü bir <code>free</code> geri vermelidir. C'de bu sorumluluk tamamen programcıdadır. Program bitmeden yığında kalan düğümler de iade edilmelidir. Bu iş için bir temizleme yordamı yazılır:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> dugum {
+    <span class="kw">int</span> deger;
+    <span class="kw">struct</span> dugum *bag;
+} dugum;
+
+<span class="kw">void</span> yigit_temizle(dugum **top) {
+    <span class="kw">while</span> (*top != <span class="kw">NULL</span>) {
+        dugum *eski = *top;
+        *top = eski-&gt;bag;
+        free(eski);
+    }
+}                  /* sonunda *top == <span class="kw">NULL</span> */</code></pre>
+
+<p><code>yigit_temizle</code>, yığın boşalana kadar üst düğümü çıkarır. Döngünün her turunda üç satır çalışır: üst düğümün adresi <code>eski</code>'ye alınır, <code>*top</code> bir sonraki düğüme ilerletilir, sonra <code>eski</code> iade edilir. Sıra yine aynıdır: bağ kurtarılmadan düğüm bırakılmaz. Döngü bittiğinde <code>*top</code> <code>NULL</code>'dır; çağırandaki <code>top</code> böylece boş yığını gösterir ve sarkan bir işaretçi olarak kalmaz. <span class="m">n</span> düğümlü bir yığında döngü <span class="m">n</span> tur döner; maliyet <span class="m">Θ(n)</span>'dir. Ek bellek yalnız <code>eski</code> işaretçisidir, yani <span class="m">O(1)</span>.</p>
+
+<p>Bu kodda dikkat çeken bir nokta, <code>eski</code> değişkeninin bir işaretçi değişkeni olmasıdır, yeni bir düğüm değil. Öğrenci kodlarında sık görülen bir yanlış, her işaretçiye <code>malloc</code> ile yer ayırmaktır: <code>dugum *eski = malloc(sizeof *eski); eski = *top;</code>. İlk satır bir düğümlük yer ayırır; ikinci satır <code>eski</code>'nin üzerine üst düğümün adresini yazar. Ayrılan bloğun adresi artık hiçbir yerde yoktur. Her pop'ta bir düğüm sızar. İşaretçiye <code>malloc</code> ancak işaretçinin göstereceği yeni bir nesne gerektiğinde yapılır. Var olan bir düğümü göstermek için yalnız atama yeter.</p>
+
+<p>Bağlı yığının sızıntısız çalıştığı sayaçlı bir sarmalayıcıyla doğrulandı. Sarmalayıcı, <code>malloc</code> ve <code>free</code> çağrılarını bir makro yardımıyla kendi fonksiyonlarına yönlendirir ve her başarılı çağrıyı sayar. Test programı 10, 20, 30'u itip dört kez pop yaptı, sonra 1'den 5'e beş öğe daha itip <code>yigit_temizle</code> çağırdı. Sayaç sekiz <code>malloc</code> ve sekiz <code>free</code> gösterdi; temizlemeden sonra <code>top</code> <code>NULL</code> oldu. Aynı programda <code>sizeof(dugum)</code> 16 çıktı. Düğümün alanları 4 baytlık <code>int</code> ve 8 baytlık işaretçidir; işaretçinin 8'in katı bir adreste durması için derleyici araya 4 baytlık bir dolgu (<span lang="en">padding</span>) koyar. Bu yüzden 64 bitlik bir sistemde bağlı yığın, her <code>int</code> için dizinin dört katı bellek kullanır; <code>malloc</code>'un her blok için tuttuğu kendi kayıtları da buna eklenir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Push'ta önce üstü değiştirmek: <code>*top = yeni; yeni-&gt;bag = *top;</code>. İkinci satır çalıştığında <code>*top</code> zaten <code>yeni</code>'dir; düğüm kendini gösterir ve eski yığının bütün düğümleri kaybolur. Yığının üstüne bakan her döngü bundan sonra aynı düğümde sonsuza kadar döner. Doğru sıra: önce <code>yeni-&gt;bag = *top;</code>, sonra <code>*top = yeni;</code>.</p>
+</div>
+
+<h2 class="nt-pb" id="s6-6"><span class="nt-num">6.6</span>Dizi tabanlı mı, bağlı mı?</h2>
+
+<p>Şu ana kadar iki gerçekleme kuruldu: sabit kapasiteli dizi ve bağlı liste. Arada üçüncü bir seçenek daha vardır: dolduğunda kendini büyüten dizi. Bu kesim önce bu üçüncü gerçeklemeyi kurar, sonra maliyetini amortize analizle gerekçelendirir ve üç gerçeklemeyi karşılaştırır.</p>
+
+<h3 id="s6-6-1"><span class="nt-num">6.6.1</span>Büyüyen dizi</h3>
+
+<p>Sabit dizinin sorunu kapasitenin baştan bilinmesi gerekmesidir. Çözüm, diziyi heap bellekte tutmak ve dolduğunda <code>realloc</code> ile daha büyük bir bloğa taşımaktır. Dolduğunda <code>realloc</code> ile büyütülen diziye <strong>dinamik dizi</strong> (<span lang="en">dynamic array</span>) denir. Asıl soru, ne kadar büyütüleceğidir. Her dolmada kapasite iki katına çıkarılırsa push'ların ortalama maliyeti sabit kalır. Aşağıdaki gerçekleme <code>struct</code> sürümünün düzenini izler:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="kw">int</span> *veri;
+    <span class="kw">int</span> ust, kap;           /* boşken ust = -1 */
+} DYigit;
+
+<span class="kw">bool</span> dy_baslat(DYigit *y, <span class="kw">int</span> kap) {
+    y-&gt;veri = malloc(kap * <span class="kw">sizeof</span> *y-&gt;veri);
+    <span class="kw">if</span> (y-&gt;veri == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;
+    y-&gt;ust = -1;  y-&gt;kap = kap;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> dy_push(DYigit *y, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (y-&gt;ust == y-&gt;kap - 1) {          /* dolu: kapasiteyi ikiye katla */
+        <span class="kw">int</span> *yeni = realloc(y-&gt;veri, 2 * y-&gt;kap * <span class="kw">sizeof</span> *yeni);
+        <span class="kw">if</span> (yeni == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;  /* eski blok hâlâ geçerli */
+        y-&gt;veri = yeni;
+        y-&gt;kap *= 2;
+    }
+    y-&gt;veri[++y-&gt;ust] = x;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> dy_pop(DYigit *y, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (y-&gt;ust &lt; 0) <span class="kw">return</span> <span class="kw">false</span>;
+    *x = y-&gt;veri[y-&gt;ust--];
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">void</span> dy_yok_et(DYigit *y) {
+    free(y-&gt;veri);
+    y-&gt;veri = <span class="kw">NULL</span>;  y-&gt;ust = -1;  y-&gt;kap = 0;
+}</code></pre>
+
+<p><code>DYigit</code> yapısı üç alan taşır: heap bellekteki dizinin adresi <code>veri</code>, üst indisi <code>ust</code> ve o anki kapasite <code>kap</code>. <code>dy_baslat</code> istenen başlangıç kapasitesiyle diziyi ayırır. <code>dy_pop</code>, <code>struct</code> sürümündeki <code>pop</code>'un aynısıdır.</p>
+
+<p>Fark <code>dy_push</code>'tadır. Yığın doluysa yordam hata döndürmez; kapasiteyi iki katına çıkarmayı dener. <code>realloc(y-&gt;veri, yeni_boyut)</code>, eski bloğu yeni boyuta getirir. Eski bloğun hemen arkasında yer varsa blok yerinde büyüyebilir. Yoksa <code>realloc</code> yeni bir blok ayırır, eski içeriği oraya kopyalar, eski bloğu iade eder ve yeni bloğun adresini döndürür. Kopyalanan öğe sayısı o anki kapasitedir.</p>
+
+<p><code>realloc</code>'un sonucu doğrudan <code>y-&gt;veri</code>'ye yazılmaz; önce <code>yeni</code> adlı geçici bir işaretçiye alınır. Bunun nedeni hata durumudur. <code>realloc</code> başarısız olursa <code>NULL</code> döner ve eski bloğa dokunmaz. Sonuç doğrudan <code>y-&gt;veri</code>'ye yazılsaydı eski bloğun adresi kaybolur, içindeki bütün öğeler sızardı. Geçici işaretçi sayesinde başarısızlıkta yığın eski hâliyle geçerli kalır ve fonksiyon <code>false</code> döner. Başarılıysa <code>veri</code> ve <code>kap</code> güncellenir, ardından öğe her zamanki gibi yazılır.</p>
+
+<p>Başlangıç kapasitesi 2 olan bir yığına 10, 20, 30, 40, 50 itildiğinde kapasite şöyle değişir: 10 ve 20 yer bulur (<code>kap</code> = 2). 30 itilirken yığın doludur; kapasite 4'e çıkar, 2 öğe kopyalanır. 40 yer bulur. 50 itilirken kapasite 8'e çıkar, 4 öğe kopyalanır. Bu değerler test programında yazdırılarak doğrulandı: her push'tan sonra (<code>ust</code>, <code>kap</code>) çiftleri (0, 2), (1, 2), (2, 4), (3, 4), (4, 8) oldu. Sayaçlı sarmalayıcı iki <code>malloc</code> ve iki <code>free</code> saydı.</p>
+
+<h3 id="s6-6-2"><span class="nt-num">6.6.2</span>Amortize maliyet</h3>
+
+<p>Büyüyen dizide tek bir push'un maliyeti duruma göre çok değişir. Çoğu push bir hücreye yazar ve <span class="m">O(1)</span>'dir. Ama kapasitenin dolduğu anda yapılan push bütün öğeleri kopyalar ve <span class="m">O(n)</span>'dir. En kötü durum analizi bu yüzden “push <span class="m">O(n)</span>” der. Bu doğru, ama yanıltıcıdır: pahalı push'lar çok seyrektir. Bir işlem dizisinin toplam maliyetini işlem sayısına bölerek işlem başına ortalama maliyeti bulmaya <strong>amortize analiz</strong> (<span lang="en">amortized analysis</span>) denir. Buradaki ortalama olasılığa dayanmaz; en kötü işlem dizisi için bile geçerlidir.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-amortize">
+  <span class="nt-box__title">Teorem 6.1 (İki katına büyütmenin amortize maliyeti)</span>
+  <p>Kapasitesi 1 olan boş bir büyüyen dizi yığınına art arda <span class="m">n</span> push yapılsın ve her dolmada kapasite iki katına çıkarılsın. Bütün büyütmelerde kopyalanan toplam öğe sayısı <span class="m">2n</span>'den küçüktür. Bu yüzden <span class="m">n</span> push'un toplam maliyeti <span class="m">O(n)</span>, push başına amortize maliyet <span class="m">O(1)</span>'dir.</p>
+</div>
+
+<p><em>Kanıt.</em> Büyütme, yığın dolu iken push yapıldığında olur. Kapasite 1, 2, 4, 8, … diye ilerlediği için büyütmeler kapasite 1, 2, 4, …, <span class="m">2<sup>k</sup></span> iken yapılır. Kapasite <span class="m">c</span> iken yapılan büyütme <span class="m">c</span> öğe kopyalar. Son büyütme kapasite <span class="m">2<sup>k</sup></span> iken olmuşsa, bu anda yığında <span class="m">2<sup>k</sup></span> öğe vardır ve bir öğe daha itilir; dolayısıyla <span class="m">2<sup>k</sup> &lt; n</span>'dir. Toplam kopya sayısı <span class="m">1 + 2 + 4 + … + 2<sup>k</sup> = 2<sup>k+1</sup> − 1</span>'dir. <span class="m">2<sup>k</sup> ≤ n − 1</span> olduğundan bu toplam en çok <span class="m">2n − 3</span>'tür; <span class="m">n</span>'nin bir sabit katıdır. Her push ayrıca bir yazma yapar. Toplam iş <span class="m">n + (2n − 3) &lt; 3n</span> ile sınırlıdır ve push başına <span class="m">3</span> birimden azdır. ∎</p>
+
+<p>Kanıttaki kopya sınırı daha sıkı da verilebilir. Kopya toplamı <span class="m">2<sup>k+1</sup> − 1</span> ve son kapasite <span class="m">2<sup>k+1</sup></span>'dir; yani toplam kopya, son kapasiteden bir eksiktir. Son kapasite de <span class="m">2n</span>'den küçüktür. Bu sayılar bir test programıyla doğrulandı: kapasitesi 1 olan yığına 1000 push yapıldığında 10 büyütme oldu, toplam 1023 öğe kopyalandı (<span class="m">2n</span> = 2000'den az) ve son kapasite 1024'e ulaştı.</p>
+
+<p>Büyütme oranının iki olması şart değildir; önemli olan oranın 1'den büyük sabit bir çarpan olmasıdır. Çarpan 1,5 seçilirse kopyalar biraz artar, boşa duran kapasite azalır; amortize maliyet yine <span class="m">O(1)</span> kalır. Buna karşılık kapasite her dolmada sabit bir miktar, örneğin 10 hücre artırılırsa amortize maliyet bozulur. <span class="m">n</span> push boyunca yaklaşık <span class="m">n/10</span> büyütme olur ve her biri o anki bütün öğeleri kopyalar. Toplam kopya <span class="m">10 + 20 + … + n ≈ n²/20</span>'dir; push başına maliyet <span class="m">Θ(n)</span>'ye çıkar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>y-&gt;veri = realloc(y-&gt;veri, …);</code> yazmak. <code>realloc</code> başarısız olursa <code>NULL</code> döner ve bu atama eski bloğun tek adresini siler. Hem yığının bütün içeriği kaybolur hem de eski blok sızar. Sonuç önce geçici bir işaretçiye alınmalı ve <code>NULL</code> olmadığı görüldükten sonra asıl alana yazılmalıdır.</p>
+</div>
+
+<h3 id="s6-6-3"><span class="nt-num">6.6.3</span>Karşılaştırma ve ölçüm</h3>
+
+<p><a href="#tab-secim">Tablo 6.8</a> üç gerçeklemeyi altı ölçüte göre karşılaştırır.</p>
+
+<div class="nt-tablewrap" id="tab-secim">
+<table class="nt-table nt-table--wide">
+  <caption>Tablo 6.8: Sabit dizi, büyüyen dizi ve bağlı liste ile yığın.</caption>
+  <thead><tr><th scope="col">Ölçüt</th><th scope="col">Sabit dizi</th><th scope="col">Büyüyen dizi</th><th scope="col">Bağlı liste</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Kapasite</th><td>Derleme anında sabit</td><td>Gerektikçe ×2</td><td>Bellek bitene kadar</td></tr>
+    <tr><th scope="row">push / pop</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span> amortize</td><td><span class="m">O(1)</span>, her push'ta <code>malloc</code></td></tr>
+    <tr><th scope="row">Öğe başına ek bellek</th><td>Yok</td><td>Yok (boş kapasite hariç)</td><td>Bir işaretçi (8 bayt) ve dolgu</td></tr>
+    <tr><th scope="row">Önbellek</th><td>Çok iyi</td><td>Çok iyi</td><td>Zayıf (düğümler dağınık)</td></tr>
+    <tr><th scope="row">Taşma</th><td>Mümkün</td><td>Yalnız <code>realloc</code> başarısızsa</td><td>Yalnız <code>malloc</code> başarısızsa</td></tr>
+    <tr><th scope="row">Hata riski</th><td>Sınır denetimi</td><td><code>realloc</code> sonucu</td><td><code>free</code> unutmak, sarkan işaretçi</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki “önbellek” satırı açıklama ister. İşlemci belleğe her erişimde tek bir sayıyı değil, çevresindeki 64 baytlık bir bloğu <strong>önbelleğe</strong> (<span lang="en">cache</span>) getirir. Dizi yığınında ardışık öğeler yan yana durduğu için bir bloğa birçok öğe sığar ve sonraki erişimler önbellekten karşılanır. Bağlı yığında her düğüm ayrı bir <code>malloc</code> bloğudur ve bellekte nerede duracağı belli değildir. Ardışık düğümlere erişim çoğu zaman yeni bir bloğun getirilmesini gerektirir.</p>
+
+<p>Asimptotik maliyetler aynıdır, ama sabit çarpanlar çok farklıdır. Bunu görmek için üç gerçeklemede <span class="m">10<sup>7</sup></span> push ve ardından <span class="m">10<sup>7</sup></span> pop yapan bir program <code>-O2</code> ile derlenip üç kez çalıştırıldı. Sabit dizi 25–35 ms, büyüyen dizi (başlangıç kapasitesi 16) 30–63 ms, bağlı yığın 680–806 ms sürdü. Bu değerler makineye göre değişir; ama oran tutarlıdır: bağlı yığın, dizi yığınlarından yaklaşık yirmi kat yavaştır. Farkın büyük bölümü her push'taki <code>malloc</code> ve her pop'taki <code>free</code> çağrısından, kalanı önbellek kayıplarından gelir.</p>
+
+<p>Seçim için pratik bir kural şöyledir. Yığının alabileceği en büyük boyut biliniyorsa sabit dizi en yalın ve en hızlı çözümdür. Bilinmiyorsa büyüyen dizi pratikte en hızlısıdır. Bağlı yığın, düğümlerin zaten başka yapılarda yaşadığı ya da öğelerin tek tek yaratılıp silindiği durumlar için uygundur. Örneğin her öğesi büyük bir kayıt olan ve kayıtları başka listelerle paylaşan bir programda düğümleri yığına bağlamak, onları bir diziye kopyalamaktan ucuzdur.</p>
+<h2 class="nt-pb" id="s6-7"><span class="nt-num">6.7</span>Çağrı yığını</h2>
+
+<p>Bilgisayarın en çok kullanılan yığını programcının yazdığı bir yığın değildir. Her C programı, fonksiyon çağrılarını yönetmek için derleyicinin ve işletim sisteminin kurduğu bir yığın kullanır. Buna <strong>çağrı yığını</strong> (<span lang="en">call stack</span>) denir. Bu kesim çağrı yığınının nasıl çalıştığını, nasıl taştığını ve özyinelemeli bir fonksiyonun bu yığın yerine kendi yığınımızla nasıl yazılabileceğini anlatır.</p>
+
+<h3 id="s6-7-1"><span class="nt-num">6.7.1</span>Çerçeve</h3>
+
+<p>Bir fonksiyon çağrıldığında, çağrının yaşaması için gereken bilgiler bellekte bir bloğa yazılır. Bu bloğa <strong>çerçeve</strong> (<span lang="en">stack frame, activation record</span>) denir. Çerçevenin ilk parçası <strong>dönüş adresidir</strong> (<span lang="en">return address</span>): fonksiyon bitince çağırandaki hangi komuttan devam edileceğini gösterir. Çerçeve ayrıca fonksiyonun parametrelerini, yerel değişkenlerini ve çağıranın çerçevesine geri dönmek için gereken bilgiyi tutar. Çağrı, yeni bir çerçeveyi çağrı yığınına iter. <code>return</code> bu çerçeveyi çeker ve denetim dönüş adresine geçer. En son çağrılan fonksiyon ilk biter; çağrı yığını bu yüzden gerçek bir yığındır.</p>
+
+<p>Özyinelemeli bir fonksiyon bu düzeni açıkça gösterir:</p>
+
+<pre class="nt-code"><code><span class="kw">long</span> fakt(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n &lt;= 1) <span class="kw">return</span> 1;          /* taban durum */
+    <span class="kw">return</span> n * fakt(n - 1);        /* çağrı dönünce çarpma yapılır */
+}</code></pre>
+
+<p><code>main</code>, <code>fakt(5)</code>'i çağırsın. <code>fakt(5)</code>, sonucunu hesaplamak için <code>fakt(4)</code>'ün sonucunu bekler; <code>fakt(4)</code> <code>fakt(3)</code>'ü, o da <code>fakt(2)</code>'yi, o da <code>fakt(1)</code>'i çağırır. Her çağrının kendi <code>n</code>'si vardır ve bu değerler birbirine karışmaz, çünkü her biri ayrı bir çerçevededir. <code>fakt(1)</code> taban duruma ulaşır ve 1 döndürür. O anda yığında en çok çerçeve vardır: <code>main</code> ile birlikte altı çerçeve. Sonra çerçeveler ters sırada çekilir: <code>fakt(2)</code> 2·1 = 2, <code>fakt(3)</code> 3·2 = 6, <code>fakt(4)</code> 4·6 = 24, <code>fakt(5)</code> 5·24 = 120 döndürür. <a href="#tab-cerceve">Tablo 6.9</a> bu süreci özetler.</p>
+
+<div class="nt-tablewrap" id="tab-cerceve">
+<table class="nt-table">
+  <caption>Tablo 6.9: <code>fakt(5)</code> sırasında çağrı yığını (sağdaki çerçeve üsttedir).</caption>
+  <thead><tr><th scope="col">An</th><th scope="col">Çağrı yığını</th><th scope="col">Çerçeve sayısı</th></tr></thead>
+  <tbody>
+    <tr><td><code>main</code> başlar</td><td>main</td><td>1</td></tr>
+    <tr><td><code>fakt(5)</code> çağrılır</td><td>main | fakt(5)</td><td>2</td></tr>
+    <tr><td><code>fakt(4)</code> çağrılır</td><td>main | fakt(5) | fakt(4)</td><td>3</td></tr>
+    <tr><td><code>fakt(1)</code> çağrılır</td><td>main | fakt(5) | fakt(4) | fakt(3) | fakt(2) | fakt(1)</td><td>6 (en çok)</td></tr>
+    <tr><td><code>fakt(1)</code> 1 döndürür</td><td>main | fakt(5) | fakt(4) | fakt(3) | fakt(2)</td><td>5</td></tr>
+    <tr><td><code>fakt(2)</code> 2 döndürür</td><td>main | fakt(5) | fakt(4) | fakt(3)</td><td>4</td></tr>
+    <tr><td><code>fakt(5)</code> 120 döndürür</td><td>main</td><td>1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Çerçevelerin bellekte gerçekten üst üste dizildiği bir deneyle görülebilir. <code>fakt</code>'ın her çağrısında <code>n</code> parametresinin adresi yazdırıldı (<code>-O0</code>, Windows x86-64). Her çağrıda adres bir öncekinden 96 bayt küçüktü: <code>main</code>'deki bir yerel değişkenden <code>fakt(5)</code>'in <code>n</code>'sine 80 bayt, <code>fakt(1)</code>'in <code>n</code>'sine 464 bayt vardı. Bu sayılar derleyiciye, eniyileme düzeyine ve işlemciye göre değişir. Değişmeyen gözlem şudur: x86 işlemcilerde çağrı yığını yüksek adreslerden düşük adreslere doğru büyür ve her çağrı sabit büyüklükte bir çerçeve ekler. <code>fakt(n)</code> bu yüzden <span class="m">Θ(n)</span> çerçeve, yani <span class="m">Θ(n)</span> yığın belleği kullanır.</p>
+
+<h3 id="s6-7-2"><span class="nt-num">6.7.2</span>Çağrı yığını nasıl taşar</h3>
+
+<p>Çağrı yığınının kapasitesi sınırlıdır ve programın başında sabitlenir. Tipik değerler birkaç megabayttır: Linux'ta 8 MB, Windows'ta Microsoft derleyicisiyle 1 MB. Bu çalışmadaki <code>zig cc</code> derleyicisi Windows programlarına 16 MB ayırıyordu. Yığın dolunca program <strong>yığın taşması</strong> (<span lang="en">stack overflow</span>) hatasıyla çöker. Üç tipik neden vardır.</p>
+
+<dl>
+  <dt>Sonsuz özyineleme</dt>
+  <dd>Taban durumu olmayan ya da taban durumuna hiç ulaşmayan bir özyineleme her çağrıda bir çerçeve iter ve hiçbirini çekmez. Örneğin <code>fakt</code>'taki koşul <code>n == 1</code> yazılsaydı <code>fakt(0)</code> çağrısı <span class="m">−1, −2, …</span> diye sonsuza dek inerdi. Denemede her çağrısında 64 baytlık bir yerel dizi tutan sonsuz bir özyineleme yaklaşık 104 000 çağrı derinliğinde Windows'un <code>STATUS_STACK_OVERFLOW</code> (0xC00000FD) hatasıyla durdu.</dd>
+  <dt>Büyük yerel diziler</dt>
+  <dd><code>int a[1000000];</code> gibi bir yerel dizi çerçevenin içindedir ve tek başına 4 MB tutar. 1 MB'lık bir yığını tek başına taşırır. Denemede 16 MB'lık yığında bu dizi sığdı, 5 milyon öğelik (20 MB) dizi ise programı aynı hatayla çökertti. Büyük veriler <code>malloc</code> ile heap bellekte tutulur ya da <code>static</code> tanımlanır.</dd>
+  <dt>Yerel adres döndürme</dt>
+  <dd><code>return &amp;yerel;</code> yazmak, taşma değildir ama aynı yığın düzeninden doğan bir hatadır. Fonksiyon dönünce çerçevesi çekilir. O bellek bölgesi bir sonraki çağrının çerçevesi için yeniden kullanılır. Döndürülen adres artık başka bir çağrının yerel değişkenlerini gösterir; bir sarkan işaretçidir.</dd>
+</dl>
+
+<p>Yığın taşması bu dersin konusu olan her özyinelemeli yordamda göz önünde tutulmalıdır. Örneğin bağlı bir listeyi özyinelemeli olarak serbest bırakan bir fonksiyon, her düğüm için bir çerçeve iter. Bir milyon düğümlü bir listede bu, bir milyon çerçeve demektir ve yığını taşırabilir.</p>
+
+<h3 id="s6-7-3"><span class="nt-num">6.7.3</span>Özyinelemeyi döngüye çevirmek</h3>
+
+<p>Çağrı yığını bir yığın olduğuna göre, her özyinelemeli algoritma çağrı yığınının yaptığı işi kendi yığınımızla yaparak bir döngüye çevrilebilir. Özyinelemeli bir çağrı, “şimdilik yarım bırakılan işi” bir çerçeveye koyar. Döngülü sürümde bu yarım iş açık bir yığına itilir. Faktöriyel için yarım kalan iş, “dönüşte <code>n</code> ile çarp” bilgisidir:</p>
+
+<pre class="nt-code"><code><span class="kw">long</span> fakt_dongu(<span class="kw">int</span> n) {
+    Yigit y;  <span class="kw">int</span> k;  <span class="kw">long</span> sonuc = 1;
+    yigit_baslat(&amp;y);
+    <span class="kw">while</span> (n &gt; 1)                  /* "çağrıları" kendi yığınına it */
+        push(&amp;y, n--);
+    <span class="kw">while</span> (pop(&amp;y, &amp;k))            /* "dönüşlerde" çarp */
+        sonuc *= k;
+    <span class="kw">return</span> sonuc;
+}</code></pre>
+
+<p>Birinci döngü, özyinelemeli sürümün aşağı inen çağrılarını taklit eder: <code>n</code>'yi 1'e inene kadar yığına iter. 5 için yığın alttan üste 5, 4, 3, 2 olur. İkinci döngü dönüşleri taklit eder: yığından çekilen her değerle sonucu çarpar. Çarpımlar 2, 3, 4, 5 sırasıyla yapılır; özyinelemeli sürümdeki dönüş sırasının aynısıdır. Sonuç 120'dir. <code>fakt_dongu(0)</code> ve <code>fakt_dongu(1)</code> 1, <code>fakt_dongu(10)</code> 3628800 verdi; özyinelemeli <code>fakt</code> ile aynıdır.</p>
+
+<p>Faktöriyelde bu çeviri gereksizdir; basit bir <code>for</code> döngüsü yeter. Ama ağaç gezinme, derinlik öncelikli arama ya da geri izleme gibi algoritmalarda yarım kalan iş tek bir sayı değildir. Yarım kalan iş bir durumdur ve yığına bu durum itilir. Kendi yığınımızı kullanmanın iki yararı vardır. Birincisi, kendi yığınımız heap bellekte büyüyebilir; çağrı yığınının birkaç megabaytlık sınırına takılmaz. İkincisi, yığına yalnız gereken bilgi itilir; çerçevenin dönüş adresi ve kaydedilmiş yazmaçlar gibi ek yükleri yoktur.</p>
+
+<h2 class="nt-pb" id="s6-8"><span class="nt-num">6.8</span>Çoklu yığın</h2>
+
+<p>Bir program aynı anda birden çok yığın kullanabilir. Her yığına ayrı bir dizi vermek kolaydır, ama bellek israf edilir: bir yığın dolduğunda ötekilerde boş yer olsa bile o yere erişilemez. Bu kesim birden çok yığını tek bir bellek dizisinde paylaştırmayı ele alır.</p>
+
+<h3 id="s6-8-1"><span class="nt-num">6.8.1</span>Tek dizide iki yığın</h3>
+
+<p>İki yığın için çok güzel bir çözüm vardır. <span class="m">m</span> hücrelik dizide birinci yığın 0. hücreden yukarı, ikinci yığın <span class="m">m − 1</span>. hücreden aşağı büyür. İki yığının üstleri birbirine doğru ilerler.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-iki" style="--w:570px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 570 142" role="img" aria-label="Tek dizide uçlardan büyüyen iki yığın"><defs><marker id="n6-d04-ah94-s22_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-good)"/></marker></defs><g><text class="lbl" x="53" y="24" text-anchor="middle">0</text><rect class="box" x="20" y="30" width="66" height="36"/><text class="txt mono" x="53" y="53" text-anchor="middle">3</text></g><g><text class="lbl" x="119" y="24" text-anchor="middle">1</text><rect class="box" x="86" y="30" width="66" height="36"/><text class="txt mono" x="119" y="53" text-anchor="middle">8</text></g><g><text class="lbl" x="185" y="24" text-anchor="middle">2</text><rect class="box" x="152" y="30" width="66" height="36" style="fill:var(--ds-hot)"/><text class="txt mono" x="185" y="53" text-anchor="middle">1</text></g><g><text class="lbl" x="251" y="24" text-anchor="middle">3</text><rect class="box-empty" x="218" y="30" width="66" height="36"/></g><g><text class="lbl" x="317" y="24" text-anchor="middle">4</text><rect class="box-empty" x="284" y="30" width="66" height="36"/></g><g><text class="lbl" x="383" y="24" text-anchor="middle">5</text><rect class="box-empty" x="350" y="30" width="66" height="36"/></g><g><text class="lbl" x="449" y="24" text-anchor="middle">6</text><rect class="box" x="416" y="30" width="66" height="36" style="fill:var(--ds-hot)"/><text class="txt mono" x="449" y="53" text-anchor="middle">6</text></g><g><text class="lbl" x="515" y="24" text-anchor="middle">7</text><rect class="box" x="482" y="30" width="66" height="36"/><text class="txt mono" x="515" y="53" text-anchor="middle">2</text></g><text class="txt" x="185" y="95" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">▲ top1 = 2</text><text class="txt" x="449" y="95" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">▲ top2 = 6</text><path class="line" d="M40 118 L200 118" style="stroke:var(--ds-good);" marker-end="url(#n6-d04-ah94-s22_00-1)"/><text class="lbl" x="40" y="136" text-anchor="start">yığın 1 sağa büyür</text><path class="line" d="M540 118 L380 118" style="stroke:var(--ds-good);" marker-end="url(#n6-d04-ah94-s22_00-1)"/><text class="lbl" x="540" y="136" text-anchor="end">yığın 2 sola büyür</text></svg></div>
+  <figcaption><b>Şekil 6.10:</b> Sekiz hücrelik dizide iki yığın. Yığın 1 0. hücreden sağa büyür ve üç öğe tutar (3, 8, 1; <code>top1</code> = 2). Yığın 2 7. hücreden sola büyür ve iki öğe tutar (2, 6; <code>top2</code> = 6). Aradaki üç hücre iki yığının ortak boş alanıdır.</figcaption>
+</figure>
+
+<p>Boş durumda <code>top1</code> = −1 ve <code>top2</code> = <span class="m">m</span>'dir; ikisi de dizinin dışındaki hayali bir hücreyi gösterir. Yığın 1'e ekleme <code>top1</code>'i artırır, yığın 2'ye ekleme <code>top2</code>'yi azaltır. Dizi, iki üst yan yana geldiğinde, yani <code>top1 + 1 == top2</code> olduğunda doludur. Bu düzenin yararı, hiçbir hücrenin boşa gitmemesidir. Bir yığın az, öteki çok öğe tutsa bile dizi ancak toplam <span class="m">m</span> öğe olduğunda dolar. Üç ve daha fazla yığın için bu hile işlemez, çünkü bir dizinin yalnız iki ucu vardır.</p>
+
+<h3 id="s6-8-2"><span class="nt-num">6.8.2</span>Tek bellekte <span class="m">n</span> yığın</h3>
+
+<p><span class="m">n</span> yığın için Horowitz–Sahni'nin çözümü, <span class="m">m</span> hücrelik <code>bellek</code> dizisini <span class="m">n</span> kesime (<span lang="en">segment</span>) bölmektir. Her yığın kendi kesiminde büyür. İki yardımcı dizi kullanılır. <code>top[i]</code>, <span class="m">i</span>. yığının üst öğesinin indisidir. <code>sinir[i]</code>, <span class="m">i</span>. yığının kesiminin hemen altındaki hücrenin indisidir. Yığın <span class="m">i</span>, <code>bellek[sinir[i]+1]</code>'den <code>bellek[sinir[i+1]]</code>'e kadar olan hücreleri kullanır. Son yığının üst sınırını da aynı biçimde yazabilmek için <code>sinir[n]</code> = <span class="m">m − 1</span> eklenir.</p>
+
+<p>Başlangıçta bellek eşit parçalara bölünür ve bütün yığınlar boştur: <span class="m">i = 0, …, n − 1</span> için <code>top[i] = sinir[i] = (m/n)·i − 1</code>. Bir yığının boş olması, üstünün kendi alt sınırına eşit olmasıdır: <code>top[i] == sinir[i]</code>. Dolu olması ise üstünün bir sonraki yığının alt sınırına ulaşmasıdır: <code>top[i] == sinir[i+1]</code>. Ekleme ve çıkarma bu iki sınamayla yazılır:</p>
+
+<pre class="nt-code"><code>/* yığın i: bellek[sinir[i]+1 .. sinir[i+1]] */
+<span class="kw">bool</span> ekle(<span class="kw">int</span> i, <span class="kw">int</span> x) {
+  <span class="kw">if</span> (top[i] == sinir[i + 1]) <span class="kw">return</span> <span class="kw">false</span>; /* dolu */
+  bellek[++top[i]] = x;
+  <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> al(<span class="kw">int</span> i, <span class="kw">int</span> *x) {
+  <span class="kw">if</span> (top[i] == sinir[i]) <span class="kw">return</span> <span class="kw">false</span>;     /* boş */
+  *x = bellek[top[i]--];
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Bu kod <code>bellek</code>, <code>top</code> ve <code>sinir</code> dizilerinin küresel olarak tanımlandığını varsayar; ders kitabındaki gibi kısa tutulmuştur. Gerçek bir programda bu üç dizi bir <code>struct</code>'ta toplanır ve yordamlara adresle verilir. Yordamların yapısı tek yığınınkiyle aynıdır, yalnız sabit sınırların yerini <code>sinir</code> dizisi alır. <code>ekle</code>, yığın doluysa <code>false</code> döner; değilse <code>top[i]</code>'yi artırıp değeri yazar. <code>al</code>, yığın boşsa <code>false</code> döner; değilse üst değeri <code>*x</code>'e yazıp <code>top[i]</code>'yi azaltır. İkisi de <span class="m">O(1)</span>'dir.</p>
+
+<h3 id="s6-8-3"><span class="nt-num">6.8.3</span>Kod izleme</h3>
+
+<p><span class="m">m</span> = 12 ve <span class="m">n</span> = 3 olsun. Her yığına dört hücre düşer. Başlangıçta <code>top</code> = [−1, 3, 7] ve <code>sinir</code> = [−1, 3, 7, 11]'dir. Yığın 0 hücre 0–3'ü, yığın 1 hücre 4–7'yi, yığın 2 hücre 8–11'i kullanır. Sırasıyla <code>ekle(0, 5)</code>, <code>ekle(1, 7)</code>, <code>ekle(0, 9)</code>, <code>ekle(2, 4)</code>, <code>ekle(0, 2)</code>, <code>ekle(0, 8)</code>, <code>ekle(0, 6)</code> ve <code>al(1, &amp;x)</code> çağrılıyor. <a href="#tab-coklu-iz">Tablo 6.10</a> her çağrıyı verir.</p>
+
+<div class="nt-tablewrap" id="tab-coklu-iz">
+<table class="nt-table">
+  <caption>Tablo 6.10: <span class="m">m</span> = 12, <span class="m">n</span> = 3 iken çoklu yığın izlemesi; <code>sinir</code> = [−1, 3, 7, 11] değişmez.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Sınama</th><th scope="col">Yapılan</th><th scope="col"><code>top</code></th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>—</td><td>—</td><td>[−1, 3, 7]</td></tr>
+    <tr><td><code>ekle(0, 5)</code></td><td>−1 == 3? Hayır</td><td><code>bellek[0] = 5</code></td><td>[0, 3, 7]</td></tr>
+    <tr><td><code>ekle(1, 7)</code></td><td>3 == 7? Hayır</td><td><code>bellek[4] = 7</code></td><td>[0, 4, 7]</td></tr>
+    <tr><td><code>ekle(0, 9)</code></td><td>0 == 3? Hayır</td><td><code>bellek[1] = 9</code></td><td>[1, 4, 7]</td></tr>
+    <tr><td><code>ekle(2, 4)</code></td><td>7 == 11? Hayır</td><td><code>bellek[8] = 4</code></td><td>[1, 4, 8]</td></tr>
+    <tr><td><code>ekle(0, 2)</code></td><td>1 == 3? Hayır</td><td><code>bellek[2] = 2</code></td><td>[2, 4, 8]</td></tr>
+    <tr><td><code>ekle(0, 8)</code></td><td>2 == 3? Hayır</td><td><code>bellek[3] = 8</code></td><td>[3, 4, 8]</td></tr>
+    <tr><td><code>ekle(0, 6)</code></td><td>3 == 3? <strong>Evet</strong></td><td><code>false</code>: yığın 0 dolu</td><td>[3, 4, 8]</td></tr>
+    <tr><td><code>al(1, &amp;x)</code></td><td>4 == 3? Hayır</td><td><code>x = bellek[4]</code> = 7</td><td>[3, 3, 8]</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-coklu" style="--w:570px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 570 118" role="img" aria-label="12 hücrelik bellekte 3 yığın"><g><text class="lbl" x="42" y="20" text-anchor="middle">0</text><rect class="box-empty" x="20" y="26" width="44" height="34"/></g><g><text class="lbl" x="86" y="20" text-anchor="middle">1</text><rect class="box-empty" x="64" y="26" width="44" height="34"/></g><g><text class="lbl" x="130" y="20" text-anchor="middle">2</text><rect class="box-empty" x="108" y="26" width="44" height="34"/></g><g><text class="lbl" x="174" y="20" text-anchor="middle">3</text><rect class="box-empty" x="152" y="26" width="44" height="34"/></g><g><text class="lbl" x="218" y="20" text-anchor="middle">4</text><rect class="box-empty" x="196" y="26" width="44" height="34"/></g><g><text class="lbl" x="262" y="20" text-anchor="middle">5</text><rect class="box-empty" x="240" y="26" width="44" height="34"/></g><g><text class="lbl" x="306" y="20" text-anchor="middle">6</text><rect class="box-empty" x="284" y="26" width="44" height="34"/></g><g><text class="lbl" x="350" y="20" text-anchor="middle">7</text><rect class="box-empty" x="328" y="26" width="44" height="34"/></g><g><text class="lbl" x="394" y="20" text-anchor="middle">8</text><rect class="box-empty" x="372" y="26" width="44" height="34"/></g><g><text class="lbl" x="438" y="20" text-anchor="middle">9</text><rect class="box-empty" x="416" y="26" width="44" height="34"/></g><g><text class="lbl" x="482" y="20" text-anchor="middle">10</text><rect class="box-empty" x="460" y="26" width="44" height="34"/></g><g><text class="lbl" x="526" y="20" text-anchor="middle">11</text><rect class="box-empty" x="504" y="26" width="44" height="34"/></g><path d="M22 66 L22 72 L194 72 L194 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="108" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 0: top[0] = -1</text><path d="M198 66 L198 72 L370 72 L370 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="284" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 1: top[1] = 3</text><path d="M374 66 L374 72 L546 72 L546 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="460" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 2: top[2] = 7</text><text class="lbl mono" x="20" y="112" text-anchor="start">sinir = [-1, 3, 7, 11]</text></svg> <svg class="ds-svg" viewBox="0 0 570 118" role="img" aria-label="12 hücrelik bellekte 3 yığın"><g><text class="lbl" x="42" y="20" text-anchor="middle">0</text><rect class="box" x="20" y="26" width="44" height="34"/><text class="txt mono" x="42" y="48" text-anchor="middle">5</text></g><g><text class="lbl" x="86" y="20" text-anchor="middle">1</text><rect class="box" x="64" y="26" width="44" height="34"/><text class="txt mono" x="86" y="48" text-anchor="middle">9</text></g><g><text class="lbl" x="130" y="20" text-anchor="middle">2</text><rect class="box" x="108" y="26" width="44" height="34"/><text class="txt mono" x="130" y="48" text-anchor="middle">2</text></g><g><text class="lbl" x="174" y="20" text-anchor="middle">3</text><rect class="box" x="152" y="26" width="44" height="34"/><text class="txt mono" x="174" y="48" text-anchor="middle">8</text></g><g><text class="lbl" x="218" y="20" text-anchor="middle">4</text><rect class="box" x="196" y="26" width="44" height="34"/><text class="txt mono" x="218" y="48" text-anchor="middle">7</text></g><g><text class="lbl" x="262" y="20" text-anchor="middle">5</text><rect class="box-empty" x="240" y="26" width="44" height="34"/></g><g><text class="lbl" x="306" y="20" text-anchor="middle">6</text><rect class="box-empty" x="284" y="26" width="44" height="34"/></g><g><text class="lbl" x="350" y="20" text-anchor="middle">7</text><rect class="box-empty" x="328" y="26" width="44" height="34"/></g><g><text class="lbl" x="394" y="20" text-anchor="middle">8</text><rect class="box" x="372" y="26" width="44" height="34"/><text class="txt mono" x="394" y="48" text-anchor="middle">4</text></g><g><text class="lbl" x="438" y="20" text-anchor="middle">9</text><rect class="box-empty" x="416" y="26" width="44" height="34"/></g><g><text class="lbl" x="482" y="20" text-anchor="middle">10</text><rect class="box-empty" x="460" y="26" width="44" height="34"/></g><g><text class="lbl" x="526" y="20" text-anchor="middle">11</text><rect class="box-empty" x="504" y="26" width="44" height="34"/></g><path d="M22 66 L22 72 L194 72 L194 66" style="fill:none;stroke:var(--ds-bad);stroke-width:1.5"/><text class="txt" x="108" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-bad)">yığın 0: top[0] = 3</text><path d="M198 66 L198 72 L370 72 L370 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="284" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 1: top[1] = 4</text><path d="M374 66 L374 72 L546 72 L546 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="460" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 2: top[2] = 8</text><text class="lbl mono" x="20" y="112" text-anchor="start">sinir = [-1, 3, 7, 11]</text></svg> <svg class="ds-svg" viewBox="0 0 570 118" role="img" aria-label="12 hücrelik bellekte 3 yığın"><g><text class="lbl" x="42" y="20" text-anchor="middle">0</text><rect class="box" x="20" y="26" width="44" height="34"/><text class="txt mono" x="42" y="48" text-anchor="middle">5</text></g><g><text class="lbl" x="86" y="20" text-anchor="middle">1</text><rect class="box" x="64" y="26" width="44" height="34"/><text class="txt mono" x="86" y="48" text-anchor="middle">9</text></g><g><text class="lbl" x="130" y="20" text-anchor="middle">2</text><rect class="box" x="108" y="26" width="44" height="34"/><text class="txt mono" x="130" y="48" text-anchor="middle">2</text></g><g><text class="lbl" x="174" y="20" text-anchor="middle">3</text><rect class="box" x="152" y="26" width="44" height="34"/><text class="txt mono" x="174" y="48" text-anchor="middle">8</text></g><g><text class="lbl" x="218" y="20" text-anchor="middle">4</text><rect class="box-empty" x="196" y="26" width="44" height="34"/></g><g><text class="lbl" x="262" y="20" text-anchor="middle">5</text><rect class="box-empty" x="240" y="26" width="44" height="34"/></g><g><text class="lbl" x="306" y="20" text-anchor="middle">6</text><rect class="box-empty" x="284" y="26" width="44" height="34"/></g><g><text class="lbl" x="350" y="20" text-anchor="middle">7</text><rect class="box-empty" x="328" y="26" width="44" height="34"/></g><g><text class="lbl" x="394" y="20" text-anchor="middle">8</text><rect class="box" x="372" y="26" width="44" height="34"/><text class="txt mono" x="394" y="48" text-anchor="middle">4</text></g><g><text class="lbl" x="438" y="20" text-anchor="middle">9</text><rect class="box-empty" x="416" y="26" width="44" height="34"/></g><g><text class="lbl" x="482" y="20" text-anchor="middle">10</text><rect class="box-empty" x="460" y="26" width="44" height="34"/></g><g><text class="lbl" x="526" y="20" text-anchor="middle">11</text><rect class="box-empty" x="504" y="26" width="44" height="34"/></g><path d="M22 66 L22 72 L194 72 L194 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="108" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 0: top[0] = 3</text><path d="M198 66 L198 72 L370 72 L370 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="284" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 1: top[1] = 3</text><path d="M374 66 L374 72 L546 72 L546 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="460" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">yığın 2: top[2] = 8</text><text class="lbl mono" x="20" y="112" text-anchor="start">sinir = [-1, 3, 7, 11]</text></svg></div>
+  <figcaption><b>Şekil 6.11:</b> On iki hücrelik bellekte üç yığın. Üstte başlangıç: bütün yığınlar boştur. Ortada yedinci çağrı: yığın 0'ın dört hücresi dolmuştur (5, 9, 2, 8) ve <code>ekle(0, 6)</code> reddedilir, oysa bellekte altı hücre boştur. Altta <code>al(1, &amp;x)</code> 7'yi çıkarmıştır; yığın 1 yeniden boştur.</figcaption>
+</figure>
+
+<p>İzleme bir test programıyla doğrulandı; her çağrıdan sonraki <code>top</code> dizisi tablodakiyle aynı çıktı. Yedinci çağrı düzenin zayıflığını gösterir. Yığın 0 dolmuştur, çünkü üstü bir sonraki yığının sınırına (<code>sinir[1]</code> = 3) ulaşmıştır. Oysa bellekteki 12 hücreden yalnız altısı doludur: yığın 0'da dört, yığın 1'de bir, yığın 2'de bir öğe vardır. Kalan altı hücre boştur. Yine de <code>ekle</code>, “dolu” der.</p>
+
+<h3 id="s6-8-4"><span class="nt-num">6.8.4</span>Yer açma ve değerlendirme</h3>
+
+<p>Horowitz–Sahni bu sorunu bir <code>stack_full(i)</code> yordamıyla çözer. Yordam, <span class="m">i</span>. yığın dolduğunda çağrılır. Önce sağdaki yığınlar arasında boş yeri olan ilkini arar. Bulursa arada kalan yığınları birer hücre sağa kaydırır ve böylece <span class="m">i</span>. yığına bir hücre açar. Sağda yer yoksa aynı aramayı soldaki yığınlarda yapar ve <span class="m">i</span>. yığının kendisi dahil arada kalanları birer hücre sola kaydırır. Hiçbir yerde boş hücre yoksa bellek gerçekten doludur. Aşağıda yalnız sağa kaydıran yarı, sadeleştirilerek verilmiştir:</p>
+
+<pre class="nt-code"><code>/* yığın i doluyken sağda boş yer arar; bulursa arada kalan
+   yığınları birer hücre sağa kaydırır (Horowitz'in fikri, sadeleştirilmiş) */
+<span class="kw">bool</span> yer_ac_sag(<span class="kw">int</span> i) {
+    <span class="kw">int</span> j = i + 1, k;
+    <span class="kw">while</span> (j &lt; N &amp;&amp; top[j] == sinir[j + 1])   /* boş yeri olan ilk yığın */
+        j++;
+    <span class="kw">if</span> (j == N) <span class="kw">return</span> <span class="kw">false</span>;                 /* sağda yer yok */
+    <span class="kw">for</span> (k = top[j]; k &gt; sinir[i + 1]; k--)   /* bellek[sinir[i+1]+1 .. top[j]] */
+        bellek[k + 1] = bellek[k];            /* bir sağa kayar */
+    <span class="kw">for</span> (k = i + 1; k &lt;= j; k++) {            /* sınırlar ve üstler de kayar */
+        sinir[k]++;
+        top[k]++;
+    }
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Fonksiyon <code>i</code>'nin sağındaki yığınları sırayla dener. <code>top[j] == sinir[j+1]</code> olan, yani kendisi de dolu olan yığınları atlar ve boş yeri olan ilk yığında durur. Hiçbiri bulunmazsa <code>false</code> döner. Bulunursa <code>sinir[i+1]+1</code>'den <code>top[j]</code>'ye kadar olan hücreler birer hücre sağa kopyalanır. Bu hücreler <span class="m">i + 1</span>'den <span class="m">j</span>'ye kadar bütün yığınların öğeleridir. Kopyalamanın sağdan başlaması gerekir; soldan başlansaydı her hücre bir sonrakinin üzerine yazar ve değerler kaybolurdu. Son olarak bu yığınların hem alt sınırları hem üstleri bir artırılır. Yığın <span class="m">i</span>'nin üst sınırı <code>sinir[i+1]</code> de bir artmış olur; yığın <span class="m">i</span> bir hücre kazanır.</p>
+
+<p>İzlemedeki duruma uygulanınca: yığın 0 doludur; sağındaki yığın 1'de yer vardır (<code>top[1]</code> = 4, <code>sinir[2]</code> = 7). Yığın 1'in tek öğesi olan 7, <code>bellek[4]</code>'ten <code>bellek[5]</code>'e kayar. <code>sinir[1]</code> 4'e, <code>top[1]</code> 5'e çıkar. Bundan sonra <code>ekle(0, 6)</code> başarılıdır ve 6, <code>bellek[4]</code>'e yazılır. Test programı bu adımları doğruladı: yer açmadan sonra <code>top</code> = [3, 5, 8], <code>sinir</code> = [−1, 4, 7, 11] oldu; ekleme sonrası yığın 0 “5 9 2 8 6”, yığın 1 “7”, yığın 2 “4” içeriyordu.</p>
+
+<p>Bu yaklaşımın artıları ve eksileri açıktır. Artıları: tek bir dizi ve tek bir <code>malloc</code> yeter, yönetim kolaydır; push ve pop yine <span class="m">O(1)</span>'dir; aynı fikir <span class="m">n</span> kuyruğu tek dizide tutmak için de kullanılabilir. Eksileri: bir kesim dolunca, bellekte yer olsa bile “dolu” hatası alınır; yer açmak için yığınları kaydırmak pahalıdır. Kaydırılan öğe sayısı <span class="m">m</span>'ye kadar çıkabilir. Bellek neredeyse doluyken her ekleme bir kaydırma gerektirebilir ve en kötü durumda her ekleme <span class="m">O(m)</span> olur. Kesim boyutlarını önceden iyi kestirmek de zordur. Yığınların büyüme hızları farklıysa eşit bölme sık sık kaydırmaya yol açar.</p>
+
+<h2 class="nt-pb" id="s6-9"><span class="nt-num">6.9</span>Hangi çıkış sırası mümkün?</h2>
+
+<p>Yığının giriş sırasını nasıl değiştirebildiğini anlamak için klasik bir soru sorulur. 1, 2, 3, 4 sayıları bu sırayla push edilecektir. Push'ların arasına istenen sayıda pop konabilir ve sonunda yığın boşaltılır. Pop'ların çıkardığı sayıların sırası, yani <strong>çıkış sırası</strong>, hangi permütasyonlar olabilir?</p>
+
+<p>Birkaç sıra kolayca elde edilir. 1 2 3 4 için her push'tan hemen sonra bir pop yapılır. 4 3 2 1 için dört push, ardından dört pop yapılır. 2 4 3 1 için şu dizi yeter: push 1, push 2, pop (2), push 3, push 4, pop (4), pop (3), pop (1). Peki 3 1 4 2 elde edilebilir mi? İlk çıkan 3 olacaksa 3 itilmeden önce 1 ve 2 de itilmiş olmalıdır; 3 çıktığı anda yığında alttan üste 1 ve 2 vardır. Sonraki çıkacak öğe ya üstteki 2 ya da henüz itilmemiş 4 olabilir. 1, 2'nin altında kaldığı için 2'den önce çıkamaz. 3 1 4 2 bu yüzden imkânsızdır.</p>
+
+<p>Bu akıl yürütme genel bir kurala dönüşür. Bir <span class="m">x</span> çıktığı anda, <span class="m">x</span>'ten önce itilmiş ve henüz çıkmamış bütün öğeler yığındadır ve itildikleri sıranın tersiyle çıkmak zorundadır. Kural, yasak bir desen olarak da söylenebilir.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-312">
+  <span class="nt-box__title">Teorem 6.2 (Yığınla elde edilebilen sıralar)</span>
+  <p>1, 2, …, <span class="m">n</span> sırasıyla push edilirse bir <span class="m">p<sub>1</sub> p<sub>2</sub> … p<sub>n</sub></span> çıkış sırası ancak ve ancak şu koşulla elde edilebilir: <span class="m">i &lt; j &lt; k</span> olup <span class="m">p<sub>j</sub> &lt; p<sub>k</sub> &lt; p<sub>i</sub></span> sağlayan üç konum yoktur. Başka bir deyişle sırada “büyük, küçük, orta” deseni bulunmaz.</p>
+</div>
+
+<p><em>Kanıt.</em> Önce desenin imkânsız olduğu gösterilir. <span class="m">p<sub>i</sub></span> çıktığında, ondan küçük olan <span class="m">p<sub>j</sub></span> ve <span class="m">p<sub>k</sub></span> çoktan itilmiştir, çünkü sayılar artan sırada itilir. İkisi de henüz çıkmamıştır, çünkü çıkış sırasında <span class="m">p<sub>i</sub></span>'den sonra gelirler. Demek ki ikisi de yığındadır ve <span class="m">p<sub>j</sub> &lt; p<sub>k</sub></span> olduğu için <span class="m">p<sub>k</sub></span> daha sonra itilmiş, yani <span class="m">p<sub>j</sub></span>'nin üstündedir. Bu durumda <span class="m">p<sub>j</sub></span>, <span class="m">p<sub>k</sub></span>'dan önce çıkamaz; oysa sırada önce gelir. Çelişki.</p>
+
+<p>Ters yön için açgözlü bir yöntem kullanılır: sıradaki hedef <span class="m">p</span> ise, <span class="m">p</span> itilene kadar push yapılır, sonra üst öğe çekilir. Yöntem ancak hedef o anda yığının üstünde değilse ve zaten itilmişse takılır. Bu durumda hedef <span class="m">p<sub>j</sub></span>'nin üstünde, ondan büyük ve henüz çıkmamış bir <span class="m">q</span> vardır. <span class="m">q</span>, sırada <span class="m">p<sub>j</sub></span>'den sonra bir <span class="m">k</span> konumundadır. Yığındaki öğelerin hepsi o ana dek çıkmış en büyük değerden, yani daha önceki bir konumdaki bir <span class="m">p<sub>i</sub></span>'den küçüktür. Böylece <span class="m">p<sub>j</sub> &lt; q = p<sub>k</sub> &lt; p<sub>i</sub></span> deseni bulunur. Desen yoksa yöntem hiç takılmaz ve sıra elde edilir. ∎</p>
+
+<p>3 1 4 2 sırasında 3, 1, 2 konumları bu deseni oluşturur: 3 büyük, 1 küçük, 2 orta. Bu yüzden imkânsızdır. 2 4 3 1'de böyle bir üçlü yoktur. Elde edilebilen sıraların sayısı da bilinir. <span class="m">n</span> öğe için bu sayı <span class="m">n</span>. <strong>Catalan sayısıdır</strong>: <span class="m">C<sub>n</sub> = (2n)! / ((n + 1)! · n!)</span>. İlk değerler 1, 2, 5, 14, 42, 132'dir. <span class="m">n</span> = 4 için 24 permütasyonun yalnız 14'ü elde edilebilir. <span class="m">n</span> = 3 için altı permütasyondan yalnız biri, 3 1 2, imkânsızdır. Bu sayılar, bütün permütasyonları açgözlü yöntemle deneyen bir betikle <span class="m">n</span> = 1, …, 6 için doğrulandı; aynı betik, desen koşuluyla açgözlü yöntemin <span class="m">n ≤ 7</span> için her permütasyonda aynı sonucu verdiğini de denetledi.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-sira">
+  <span class="nt-box__title">Örnek 6.3</span>
+  <p>1, 2, 3, 4, 5 sırasıyla itilecek. 3 5 4 2 1 ve 5 3 4 1 2 sıraları elde edilebilir mi?</p>
+  <p>3 5 4 2 1: push 1, push 2, push 3, pop (3); yığın [1, 2]. push 4, push 5, pop (5); yığın [1, 2, 4]. pop (4), pop (2), pop (1). Her hedef çekildiği anda üstteydi; sıra elde edilir. Desen aranırsa da “büyük, küçük, orta” üçlüsü bulunmaz.</p>
+  <p>5 3 4 1 2: 5'in çıkması için beş sayının hepsi itilmelidir; 5 çıkınca yığın alttan üste [1, 2, 3, 4] olur. Sıradaki hedef 3'tür, ama üstte 4 vardır. Sıra elde edilemez. Desen olarak 5, 3, 4 üçlüsü (büyük, küçük, orta) bulunur.</p>
+</div>
+
+<h2 class="nt-pb" id="s6-10"><span class="nt-num">6.10</span>Karmaşıklık özeti</h2>
+
+<p><a href="#tab-karmasiklik">Tablo 6.11</a> bölümdeki işlemlerin maliyetlerini üç gerçekleme için yan yana verir. Her değer, ilgili kesimde gerekçesiyle açıklanmıştır.</p>
+
+<div class="nt-tablewrap" id="tab-karmasiklik">
+<table class="nt-table nt-table--wide">
+  <caption>Tablo 6.11: Yığın gerçeklemelerinde maliyetler (<span class="m">n</span> öğe sayısı, <span class="m">m</span> çoklu yığında bellek boyu).</caption>
+  <thead><tr><th scope="col">İşlem</th><th scope="col">Sabit dizi</th><th scope="col">Büyüyen dizi</th><th scope="col">Bağlı</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">push</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span> amortize, en kötü <span class="m">O(n)</span></td><td><span class="m">O(1)</span></td></tr>
+    <tr><th scope="row">pop</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td></tr>
+    <tr><th scope="row">peek / boş / dolu</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td></tr>
+    <tr><th scope="row"><span class="m">n</span> öğelik bellek</th><td>MAX (sabit)</td><td>≤ <span class="m">2n</span> hücre</td><td><span class="m">n</span> · (öğe + işaretçi)</td></tr>
+    <tr><th scope="row">Temizleme</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span> (tek <code>free</code>)</td><td><span class="m">Θ(n)</span></td></tr>
+    <tr><th scope="row"><code>fakt(n)</code> çağrı yığını</th><td colspan="3"><span class="m">Θ(n)</span> çerçeve (gerçeklemeden bağımsız)</td></tr>
+    <tr><th scope="row">Çoklu yığın ekle</th><td><span class="m">O(1)</span>; yer açma <span class="m">O(m)</span></td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki temizleme satırı bir farkı vurgular. Dizi yığınları tek bir blokta durur; sabit dizide temizlemek için <code>ust = -1</code> yapmak, büyüyen dizide tek bir <code>free</code> yeter. Bağlı yığında ise her düğüm ayrı bir bloktur ve <span class="m">n</span> düğüm için <span class="m">n</span> kez <code>free</code> çağrılır. Bellek satırındaki “≤ <span class="m">2n</span>” sınırı, kapasite 1'den başlayıp iki katına çıkarıldığında geçerlidir; kapasite hiç küçültülmezse çok sayıda pop'tan sonra boş kapasite <span class="m">n</span>'nin çok üstünde kalabilir.</p>
+
+<h2 class="nt-pb" id="s6-11"><span class="nt-num">6.11</span>Sık yapılan hatalar</h2>
+
+<p>Yığın kodunda görülen hataların çoğu birkaç kalıba girer. Aşağıdaki liste, bölümdeki kodların her birinde karşılaşılabilecek hataları bir araya getirir.</p>
+
+<ol>
+  <li><strong>Sınır denetimini atlamak.</strong> Boş yığından pop ya da dolu yığına push, diziyi sınırlarının dışında okur ya da yazar. C bunu denetlemez; komşu bellek bozulur ve hata çok sonra, ilgisiz bir yerde görünür.</li>
+  <li><strong><code>*top--</code> yazmak.</strong> İfade <code>*(top--)</code> olarak okunur ve işaretçiyi azaltır; çağırandaki üst indisi değişmez. Doğrusu <code>(*top)--</code>'dir. Derleyici uyarı vermez.</li>
+  <li><strong><code>top</code> ile öğe sayısını karıştırmak.</strong> <code>top</code> son öğenin indisidir; öğe sayısı <code>top + 1</code>'dir. Dolu denetimi <code>top == MAX - 1</code>'dir, <code>top == MAX</code> değildir.</li>
+  <li><strong>Bağlı push'ta önce <code>*top = yeni</code> yazmak.</strong> Eski listenin adresi kaybolur, yeni düğüm kendini gösterir.</li>
+  <li><strong>Pop'ta değeri <code>free</code>'den sonra okumak ya da düğümü hiç bırakmamak.</strong> İlki sarkan işaretçiyle tanımsız davranış, ikincisi bellek sızıntısıdır.</li>
+  <li><strong>Geçici işaretçiye gereksiz <code>malloc</code> yapmak.</strong> <code>dugum *eski = malloc(…); eski = *top;</code> her çağrıda bir düğüm sızdırır. Var olan bir düğümü göstermek için atama yeter.</li>
+  <li><strong><code>realloc</code> sonucunu doğrudan asıl işaretçiye yazmak.</strong> Başarısızlıkta eski bloğun adresi kaybolur.</li>
+  <li><strong><code>bool</code> sonuçlarını yok saymak.</strong> Başarısız bir push'un öğesi sessizce kaybolur; başarısız bir pop'tan sonra eski değer kullanılmaya devam eder.</li>
+</ol>
+<h2 class="nt-pb" id="s6-12"><span class="nt-num">6.12</span>Alıştırmalar ve çözümleri</h2>
+
+<p>Sunumun alıştırma slaytındaki altı soru aşağıda çözümleriyle verilmiştir. Çözümlerin hepsi derlenip küçük test programlarıyla çalıştırıldı.</p>
+
+<h3 id="s6-12-1"><span class="nt-num">6.12.1</span>Hata döndüren <code>yigit_ekle</code></h3>
+
+<p><em>Soru.</em> Küresel dizi yığınında <code>yigit_ekle</code>'yi <code>exit</code> yerine <code>bool</code> döndürecek biçimde yeniden yazmak.</p>
+
+<pre class="nt-code"><code><span class="kw">bool</span> yigit_ekle(<span class="kw">int</span> *top, element item) {
+    <span class="kw">if</span> (*top &gt;= MAX_STACK_SIZE - 1)
+        <span class="kw">return</span> <span class="kw">false</span>;          /* taşma: karar çağıranın */
+    yigit[++*top] = item;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> yigit_al(<span class="kw">int</span> *top, element *item) {
+    <span class="kw">if</span> (*top &lt; 0)
+        <span class="kw">return</span> <span class="kw">false</span>;          /* alt taşma */
+    *item = yigit[(*top)--];
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Taşma durumunda fonksiyon <code>false</code> döner ve yığına dokunmaz. Yer varsa öğeyi yazıp <code>true</code> döner. <code>yigit_al</code>'ın da aynı biçimde yazılması gerekir; öğeyi dönüş değeri olarak vermek artık mümkün olmadığı için bir çıktı parametresiyle, <code>element *item</code> ile verir. Kapasite 3 iken 10, 20, 30, 40 eklemeye çalışan test programı “1 1 1 0” yazdı: dördüncü ekleme reddedildi. Ardından yığını boşaltan döngü 30, 20, 10 verdi ve <code>top</code> −1'e döndü. Program hiçbir noktada <code>exit</code> ile bitmedi.</p>
+
+<h3 id="s6-12-2"><span class="nt-num">6.12.2</span>Tek dizide iki yığın</h3>
+
+<p><em>Soru.</em> Tek dizide iki yığın için <code>ekle(k, x)</code> ve <code>al(k)</code> yordamlarını yazmak (<span class="m">k</span> = 1 ya da 2).</p>
+
+<pre class="nt-code"><code>#define M 10
+<span class="kw">int</span> dizi[M];
+<span class="kw">int</span> top1 = -1, top2 = M;     /* ikisi de boş */
+
+<span class="kw">bool</span> ekle(<span class="kw">int</span> k, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (top1 + 1 == top2) <span class="kw">return</span> <span class="kw">false</span>;   /* ortada buluştular: dolu */
+    <span class="kw">if</span> (k == 1) dizi[++top1] = x;         /* yığın 1 yukarı büyür */
+    <span class="kw">else</span>        dizi[--top2] = x;         /* yığın 2 aşağı büyür */
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> al(<span class="kw">int</span> k, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (k == 1) {
+        <span class="kw">if</span> (top1 == -1) <span class="kw">return</span> <span class="kw">false</span>;     /* yığın 1 boş */
+        *x = dizi[top1--];
+    } <span class="kw">else</span> {
+        <span class="kw">if</span> (top2 == M) <span class="kw">return</span> <span class="kw">false</span>;      /* yığın 2 boş */
+        *x = dizi[top2++];
+    }
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Boş durumda <code>top1</code> = −1, <code>top2</code> = <code>M</code>'dir. Dolu denetimi iki yığın için ortaktır: <code>top1 + 1 == top2</code>. Yığın 1'e ekleme <code>dizi[++top1]</code>, yığın 2'ye ekleme <code>dizi[--top2]</code> ile yapılır; yığın 2 aşağı büyüdüğü için üstü azalır. Çıkarmada boş denetimleri ayrıdır: yığın 1 için <code>top1 == -1</code>, yığın 2 için <code>top2 == M</code>. Yığın 2'den çıkarma <code>dizi[top2++]</code> ile yapılır.</p>
+
+<p><code>M</code> = 10 iken yığın 1'e yedi, yığın 2'ye beş ekleme denendi. Yığın 1'in yedisi de girdi; yığın 2'nin ilk üçü girdi, sonraki ikisi reddedildi, çünkü toplam on hücre dolmuştu (<code>top1</code> = 6, <code>top2</code> = 7). Bir yığının çok, ötekinin az öğe tutması hiçbir hücreyi boşa harcamadı. Bütün işlemler <span class="m">O(1)</span>'dir.</p>
+
+<h3 id="s6-12-3"><span class="nt-num">6.12.3</span>Boyutunu bilen bağlı yığın</h3>
+
+<p><em>Soru.</em> Bağlı yığını, <code>top</code> ile birlikte bir <code>boyut</code> alanı da tutan bir <code>struct</code> içine taşımak.</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    dugum *top;
+    <span class="kw">int</span> boyut;
+} BYigit;
+
+<span class="kw">void</span> by_baslat(BYigit *y) { y-&gt;top = <span class="kw">NULL</span>;  y-&gt;boyut = 0; }
+
+<span class="kw">bool</span> by_push(BYigit *y, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (!push(&amp;y-&gt;top, x)) <span class="kw">return</span> <span class="kw">false</span>;  /* bağlı push yeniden kullanılır */
+    ++y-&gt;boyut;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> by_pop(BYigit *y, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (!pop(&amp;y-&gt;top, x)) <span class="kw">return</span> <span class="kw">false</span>;
+    --y-&gt;boyut;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">void</span> by_temizle(BYigit *y) {
+    yigit_temizle(&amp;y-&gt;top);
+    y-&gt;boyut = 0;
+}</code></pre>
+
+<p><code>BYigit</code>, üst işaretçisiyle öğe sayısını birlikte tutar. Yordamlar bağlı yığının <code>push</code>, <code>pop</code> ve <code>yigit_temizle</code> yordamlarını yeniden kullanır; onlara <code>&amp;y-&gt;top</code>, yani yapının içindeki işaretçi alanının adresini verir. <code>boyut</code> yalnız başarılı işlemlerden sonra değişir: başarısız bir push (bellek yok) ya da başarısız bir pop (yığın boş) sayacı bozmaz. Böylece öğe sayısı, listeyi saymaya gerek kalmadan <span class="m">O(1)</span>'de bilinir. Altı push ve bir pop sonrası <code>boyut</code> 5 oldu; temizlemeden sonra 0 oldu ve sayaçlı sarmalayıcı altı <code>malloc</code>'a karşı altı <code>free</code> saydı.</p>
+
+<h3 id="s6-12-4"><span class="nt-num">6.12.4</span>Yığınla dizge ters çevirme</h3>
+
+<p><em>Soru.</em> Bir dizgeyi yığın kullanarak ters çeviren <code>void ters(char *s)</code> yordamını yazmak.</p>
+
+<p><em>Çözüm.</em> Bu yordam, <a href="#tab-ters-iz">Tablo 6.5'te</a> izlenen <code>ters_cevir</code>'in aynısıdır: karakterler sırayla push edilir, sonra pop edilerek aynı diziye geri yazılır. Süre <span class="m">Θ(n)</span>, ek bellek <span class="m">Θ(n)</span>'dir. Sağlam bir sürüm, dizgenin uzunluğunu önce <code>strlen</code> ile bulup yığını bu kapasiteyle (örneğin <code>yigit_olustur(n)</code> ile) kurar; böylece <code>KAP</code> varsayımına gerek kalmaz.</p>
+
+<h3 id="s6-12-5"><span class="nt-num">6.12.5</span>En alttaki öğe</h3>
+
+<p><em>Soru.</em> Yalnız push ve pop kullanarak bir yığının en alttaki öğesini döndüren yordamı yazmak; yardımcı bir yığın kullanılabilir.</p>
+
+<pre class="nt-code"><code>/* y boş değilse en alttaki öğeyi *x'e yazar; y'yi eski hâline getirir */
+<span class="kw">bool</span> en_alt(Yigit *y, <span class="kw">int</span> *x) {
+    Yigit yard;  <span class="kw">int</span> v;
+    <span class="kw">if</span> (yigit_bos(y)) <span class="kw">return</span> <span class="kw">false</span>;
+    yigit_baslat(&amp;yard);
+    <span class="kw">while</span> (pop(y, &amp;v))           /* hepsini yardımcı yığına aktar */
+        push(&amp;yard, v);
+    *x = v;                      /* son çıkan, en alttakiydi */
+    <span class="kw">while</span> (pop(&amp;yard, &amp;v))       /* geri aktar: sıra korunur */
+        push(y, v);
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Yordam, yığındaki bütün öğeleri yardımcı yığına aktarır. Aktarma sırasında en son çekilen öğe, asıl yığının en alttaki öğesidir; <code>v</code> değişkeni döngü bittiğinde onu tutar. Sonra öğeler yardımcı yığından asıl yığına geri aktarılır. İki aktarma da sırayı ters çevirdiği için asıl yığın ilk hâline döner. Yığın baştan boşsa <code>v</code> hiç atanmayacağı için yordam en başta <code>false</code> döner. Alttan üste 4, 7, 1, 9 tutan yığında yordam 4'ü verdi ve yığın üstten okunduğunda yine 9, 1, 7, 4 çıktı. <span class="m">n</span> öğeli yığında <span class="m">2n</span> push ve <span class="m">2n + 2</span> pop yapılır; süre <span class="m">Θ(n)</span>, ek bellek <span class="m">Θ(n)</span>'dir.</p>
+
+<h3 id="s6-12-6"><span class="nt-num">6.12.6</span><code>fakt(5)</code> çağrısında çerçeve sayısı</h3>
+
+<p><em>Soru.</em> <code>fakt(5)</code> çağrısında yığında en çok kaç çerçeve olur? <code>main</code> dahil çizmek.</p>
+
+<p><em>Çözüm.</em> Taban durum <code>n &lt;= 1</code> olduğundan çağrılar <code>fakt(5)</code>, <code>fakt(4)</code>, <code>fakt(3)</code>, <code>fakt(2)</code>, <code>fakt(1)</code>'dir. <code>fakt(1)</code> çalışırken bu beş çerçeve ile <code>main</code>'in çerçevesi birlikte yığındadır: en çok <strong>6</strong> çerçeve. Çizim, <a href="#tab-cerceve">Tablo 6.9'un</a> “<code>fakt(1)</code> çağrılır” satırıdır: alttan üste main, fakt(5), fakt(4), fakt(3), fakt(2), fakt(1). Taban durum <code>n == 0</code> olarak yazılsaydı <code>fakt(0)</code> da çağrılır ve sayı 7 olurdu.</p>
+
+<h2 class="nt-pb" id="s6-13"><span class="nt-num">6.13</span>Özet</h2>
+
+<ul>
+  <li><strong>Yığın</strong>, ekleme ve silmenin yalnız üst uçtan yapıldığı sıralı bir listedir. Son giren ilk çıkar (<strong>LIFO</strong>). Ekleme <strong>push</strong>, çıkarma <strong>pop</strong>, çıkarmadan okuma <strong>peek</strong> adını alır.</li>
+  <li>Dolu yığına ekleme <strong>taşma</strong>, boş yığından çıkarma <strong>alt taşma</strong>dır. Yığın ADT'si işlemleri ve bu hata durumlarını gerçeklemeden bağımsız tanımlar.</li>
+  <li><strong>Dizi yığınında</strong> <code>top</code> üst öğenin indisidir: <code>top</code> = −1 boş, <code>top</code> = MAX − 1 dolu; öğe sayısı <code>top + 1</code>'dir. Push <code>yigit[++*top] = item</code>, pop <code>return yigit[(*top)--]</code> ile yazılır. <code>*top--</code> işaretçiyi azaltır ve hatalıdır.</li>
+  <li><code>exit</code> ile biten yordamlar yerine <code>bool</code> döndüren yordamlar kararı çağırana bırakır. Dizi ve üst indisi bir <code>struct</code>'ta tutulur; küresel değişken kullanılmaz. Başlık dosyasındaki <strong>opak tip</strong>, gerçeklemeyi kullanan koddan gizler.</li>
+  <li><strong>Bağlı yığında</strong> <code>top</code> liste başıdır; push ve pop <span class="m">O(1)</span>'dir. Push'ta önce bağlanır, sonra üst değişir; pop'ta önce değer ve bağ kurtarılır, en son <code>free</code> çağrılır. Her <code>malloc</code>'un bir <code>free</code>'si olmalıdır; yığın <code>yigit_temizle</code> ile <span class="m">Θ(n)</span>'de boşaltılır.</li>
+  <li><strong>Büyüyen dizi</strong> dolduğunda kapasitesini <code>realloc</code> ile iki katına çıkarır. Tek bir push <span class="m">O(n)</span> olabilir, ama <span class="m">n</span> push'ta toplam kopya <span class="m">2n</span>'den azdır; push'un <strong>amortize</strong> maliyeti <span class="m">O(1)</span>'dir. Pratikte dizi yığınları, her push'ta <code>malloc</code> yapan bağlı yığından çok daha hızlıdır.</li>
+  <li><strong>Çağrı yığını</strong>, her çağrı için dönüş adresi, parametreler ve yerellerden oluşan bir <strong>çerçeve</strong> iter. Sonsuz özyineleme ve büyük yerel diziler onu taşırır; yerel bir değişkenin adresini döndürmek sarkan işaretçi doğurur. Her özyinelemeli algoritma kendi yığınını tutan bir döngüye çevrilebilir.</li>
+  <li><strong>Çoklu yığında</strong> tek bir bellek dizisi <code>top[i]</code> ve <code>sinir[i]</code> ile paylaşılır. İki yığın uçlardan büyüyerek hiç hücre harcamaz. <span class="m">n</span> yığında bir kesim dolunca yığınlar kaydırılarak yer açılır; bu <span class="m">O(m)</span> sürebilir.</li>
+  <li>1, …, <span class="m">n</span> sırasıyla itilince elde edilebilen çıkış sıraları, “büyük, küçük, orta” deseni içermeyen sıralardır; sayıları Catalan sayısıdır (<span class="m">n</span> = 4 için 14).</li>
+</ul>
+
+<h2 id="s6-14"><span class="nt-num">6.14</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">yığın <span lang="en">stack</span></a></li>
+  <li><a href="../sozluk.html">son giren ilk çıkar <span lang="en">LIFO (last in, first out)</span></a></li>
+  <li><a href="../sozluk.html">üst <span lang="en">top</span></a></li>
+  <li><a href="../sozluk.html">push (üste ekleme) <span lang="en">push</span></a></li>
+  <li><a href="../sozluk.html">pop (üstten çıkarma) <span lang="en">pop</span></a></li>
+  <li><a href="../sozluk.html">taşma <span lang="en">overflow</span></a></li>
+  <li><a href="../sozluk.html">alt taşma <span lang="en">underflow</span></a></li>
+  <li><a href="../sozluk.html">soyut veri tipi <span lang="en">abstract data type (ADT)</span></a></li>
+  <li><a href="../sozluk.html">gerçekleme <span lang="en">implementation</span></a></li>
+  <li><a href="../sozluk.html">arayüz <span lang="en">interface</span></a></li>
+  <li><a href="../sozluk.html">başlık dosyası <span lang="en">header file</span></a></li>
+  <li><a href="../sozluk.html">çoklu ekleme koruması <span lang="en">include guard</span></a></li>
+  <li><a href="../sozluk.html">opak tip <span lang="en">opaque type</span></a></li>
+  <li><a href="../sozluk.html">eksik tip <span lang="en">incomplete type</span></a></li>
+  <li><a href="../sozluk.html">küresel değişken <span lang="en">global variable</span></a></li>
+  <li><a href="../sozluk.html">değerle çağrı <span lang="en">call by value</span></a></li>
+  <li><a href="../sozluk.html">işleç önceliği <span lang="en">operator precedence</span></a></li>
+  <li><a href="../sozluk.html">birleşme yönü <span lang="en">associativity</span></a></li>
+  <li><a href="../sozluk.html">const niteleyicisi <span lang="en">const qualifier</span></a></li>
+  <li><a href="../sozluk.html">bağlı liste <span lang="en">linked list</span></a></li>
+  <li><a href="../sozluk.html">düğüm <span lang="en">node</span></a></li>
+  <li><a href="../sozluk.html">malloc <span lang="en">malloc</span></a></li>
+  <li><a href="../sozluk.html">free <span lang="en">free</span></a></li>
+  <li><a href="../sozluk.html">realloc <span lang="en">realloc</span></a></li>
+  <li><a href="../sozluk.html">bellek sızıntısı <span lang="en">memory leak</span></a></li>
+  <li><a href="../sozluk.html">sarkan işaretçi <span lang="en">dangling pointer</span></a></li>
+  <li><a href="../sozluk.html">dinamik dizi <span lang="en">dynamic array</span></a></li>
+  <li><a href="../sozluk.html">kapasite <span lang="en">capacity</span></a></li>
+  <li><a href="../sozluk.html">amortize analiz <span lang="en">amortized analysis</span></a></li>
+  <li><a href="../sozluk.html">önbellek <span lang="en">cache</span></a></li>
+  <li><a href="../sozluk.html">çağrı yığını <span lang="en">call stack</span></a></li>
+  <li><a href="../sozluk.html">çerçeve <span lang="en">stack frame (activation record)</span></a></li>
+  <li><a href="../sozluk.html">dönüş adresi <span lang="en">return address</span></a></li>
+  <li><a href="../sozluk.html">yığın taşması <span lang="en">stack overflow</span></a></li>
+  <li><a href="../sozluk.html">özyineleme <span lang="en">recursion</span></a></li>
+  <li><a href="../sozluk.html">taban durum <span lang="en">base case</span></a></li>
+  <li><a href="../sozluk.html">parantez denetimi <span lang="en">balanced parentheses</span></a></li>
+  <li><a href="../sozluk.html">ifade değerlendirme <span lang="en">expression evaluation</span></a></li>
+  <li><a href="../sozluk.html">sonek <span lang="en">postfix</span></a></li>
+  <li><a href="../sozluk.html">geri izleme <span lang="en">backtracking</span></a></li>
+  <li><a href="../sozluk.html">geri al <span lang="en">undo</span></a></li>
+  <li><a href="../sozluk.html">derinlik öncelikli arama <span lang="en">depth-first search (DFS)</span></a></li>
+</ul>
+
+<h2 id="s6-15"><span class="nt-num">6.15</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p><code>KAP</code> = 3 olan <code>struct</code> yığınına sırasıyla <code>push 4</code>, <code>push 7</code>, <code>pop</code>, <code>push 1</code>, <code>push 6</code>, <code>push 2</code> uygulanıyor; sonra yığın <code>while (pop(&amp;y, &amp;x))</code> döngüsüyle boşaltılıyor. Hangi push <code>false</code> döner ve döngü hangi değerleri çıkarır?</p>
+    <details><summary>Cevap</summary>
+      <p>4 ve 7 girer; pop 7'yi çıkarır, yığın [4] olur. 1 ve 6 girer; yığın [4, 1, 6] ile doludur (<code>ust</code> = 2). Bu yüzden <code>push 2</code> <code>false</code> döner. Döngü 6, 1, 4 çıkarır ve dördüncü pop'ta durur.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>yigit_al</code>'da <code>return yigit[(*top)--];</code> yerine <code>return yigit[*top--];</code> yazılmıştır. Yığın boşalana kadar <code>yigit_al</code> çağıran bir döngü ne yapar?</p>
+    <details><summary>Cevap</summary>
+      <p><code>*top--</code>, <code>*(top--)</code> olarak okunur: azalan şey fonksiyonun yerel işaretçisidir, çağırandaki <code>top</code> değişmez. Her çağrı aynı üst öğeyi döndürür ve yığın hiç boşalmaz; döngü sonsuza dek sürer. Derleyici bu hatayı uyarıyla bildirmez.</p>
+    </details>
+  </li>
+  <li>
+    <p>1, 2, 3, 4, 5 sırasıyla itiliyor. 3 5 4 2 1 ve 5 3 4 1 2 çıkış sıralarından hangisi elde edilebilir?</p>
+    <details><summary>Cevap</summary>
+      <p>3 5 4 2 1 elde edilebilir: push 1, 2, 3, pop (3), push 4, 5, pop (5), pop (4), pop (2), pop (1). 5 3 4 1 2 elde edilemez: 5 çıkınca yığın [1, 2, 3, 4] olur ve 3, 4'ün altında kalır. Desen olarak 5, 3, 4 üçlüsü “büyük, küçük, orta”dır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Boş bir bağlı yığına <code>push 10</code>, <code>push 20</code>, <code>push 30</code>, <code>pop</code>, <code>push 40</code> uygulanıyor. Yığın baştan sona nasıl görünür? O ana kadar kaç <code>malloc</code> ve kaç <code>free</code> yapılmıştır? <code>yigit_temizle</code>'den sonra toplam <code>free</code> sayısı kaç olur?</p>
+    <details><summary>Cevap</summary>
+      <p>Yığın 40 → 20 → 10 → NULL'dır. Dört push dört <code>malloc</code>, bir pop bir <code>free</code> yapmıştır. <code>yigit_temizle</code> kalan üç düğümü iade eder; toplam <code>free</code> 4 olur ve <code>malloc</code> sayısına eşitlenir.</p>
+    </details>
+  </li>
+  <li>
+    <p>Kapasitesi 1 olan boş bir büyüyen dizi yığınına 9 push yapılıyor; her dolmada kapasite iki katına çıkıyor. Kaç büyütme olur, toplam kaç öğe kopyalanır ve son kapasite kaçtır?</p>
+    <details><summary>Cevap</summary>
+      <p>Büyütmeler 2., 3., 5. ve 9. push'ta, kapasite 1, 2, 4 ve 8 iken olur: 4 büyütme. Kopyalanan öğe sayısı 1 + 2 + 4 + 8 = 15'tir (<span class="m">2n</span> = 18'den az). Son kapasite 16'dır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bağlı pop'ta <code>free(eski);</code> satırı <code>*x = eski-&gt;deger;</code> satırından önceye alınıyor. Program testlerde çoğu zaman doğru çalışıyor. Neden yine de hatalıdır?</p>
+    <details><summary>Cevap</summary>
+      <p><code>free</code>'den sonra <code>eski</code> sarkan bir işaretçidir ve <code>eski-&gt;deger</code>'i okumak tanımsız davranıştır. İade edilen bellek hemen başka bir işe verilmediği için eski değer çoğu zaman yerinde durur; bu yüzden testler geçer. Araya başka bir <code>malloc</code> girdiğinde ya da bellek ayırıcı bloğa kendi kayıtlarını yazdığında değer bozulur.</p>
+    </details>
+  </li>
+  <li>
+    <p><span class="m">m</span> = 12, <span class="m">n</span> = 3 olan çoklu yığın başlangıç durumundayken <code>ekle(1, ·)</code> arka arkaya kaç kez başarılı olur? Bu sırada <code>al(0, &amp;x)</code> ne döndürür?</p>
+    <details><summary>Cevap</summary>
+      <p>Yığın 1 hücre 4–7'yi kullanır; <code>top[1]</code> 3'ten 7'ye çıkana kadar dört ekleme başarılıdır, beşincisi <code>top[1] == sinir[2]</code> (7 == 7) yüzünden reddedilir. Yığın 0 boştur (<code>top[0] == sinir[0]</code> = −1); <code>al(0, &amp;x)</code> <code>false</code> döndürür.</p>
+    </details>
+  </li>
+  <li>
+    <p>Tek dizide iki yığın (<code>M</code> = 10) boşken yığın 1'e 4, yığın 2'ye 6 öğe ekleniyor. Bir sonraki <code>ekle(1, x)</code> çağrısı ne döndürür? Neden?</p>
+    <details><summary>Cevap</summary>
+      <p><code>top1</code> = 3, <code>top2</code> = 4 olur. <code>top1 + 1 == top2</code> doğru olduğu için dizi doludur ve çağrı <code>false</code> döndürür. On hücrenin hepsi doludur.</p>
+    </details>
+  </li>
+  <li>
+    <p>Kapasite her dolmada iki katına çıkarılmak yerine 10 hücre artırılsaydı <span class="m">n</span> push'un toplam maliyeti ne olurdu?</p>
+    <details><summary>Cevap</summary>
+      <p>Yaklaşık <span class="m">n/10</span> büyütme olur ve her biri o anki öğelerin hepsini kopyalar: <span class="m">10 + 20 + … ≈ n²/20</span>. Toplam maliyet <span class="m">Θ(n²)</span>, push başına amortize maliyet <span class="m">Θ(n)</span> olur. Amortize <span class="m">O(1)</span> için kapasitenin sabit bir çarpanla büyümesi gerekir.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s6-16"><span class="nt-num">6.16</span>İleri okuma</h2>
+
+<ul>
+  <li>E. Horowitz, S. Sahni ve S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em> (2. baskı), Bölüm 3.1–3.2, 3.7 ve 4.3: bu notun izlediği dizi yığını, dinamik diziyle yığın, çoklu yığın ve bağlı yığın kodlarının kaynağıdır.</li>
+  <li>T. H. Cormen, C. E. Leiserson, R. L. Rivest ve C. Stein, <em>Introduction to Algorithms</em> (3. baskı), Kesim 10.1 ve Bölüm 17: yığını sözde kodla kısaca tanımlar; dinamik tabloların amortize analizini toplama, muhasebe ve potansiyel yöntemleriyle ayrıntılı verir.</li>
+  <li>R. Sedgewick, <em>Algorithms in C, Parts 1–4</em>, Bölüm 4: yığını bir soyut veri tipi örneği olarak C'de, arayüz ve gerçekleme ayrımıyla ele alır.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming, Vol. 1: Fundamental Algorithms</em>, Kesim 2.2.1–2.2.2: yığınların ardışık bellekte gerçeklenmesini, çoklu yığınların kaydırmalı yönetimini ve yığınla elde edilebilen permütasyonları alıştırmalarıyla inceler.</li>
+</ul>
+
+<h2 id="s6-17"><span class="nt-num">6.17</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>E. Horowitz, S. Sahni, S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em>, 2. baskı, Bölüm 3.1–3.2, 3.7 ve 4.3.</li>
+  <li>T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, <em>Introduction to Algorithms</em>, 3. baskı, MIT Press, Bölüm 10.1 (yığınlar) ve 17 (amortize analiz).</li>
+  <li>R. Sedgewick, <em>Algorithms in C, Parts 1–4</em>, 3. baskı, Addison-Wesley, Bölüm 4.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming, Vol. 1: Fundamental Algorithms</em>, 3. baskı, Addison-Wesley, 1997, Kesim 2.2.1–2.2.2.</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_06_Yiginlar.html">Bölüm 6 sunumu</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

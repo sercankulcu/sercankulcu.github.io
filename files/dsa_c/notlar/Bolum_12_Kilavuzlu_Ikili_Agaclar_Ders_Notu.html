@@ -1,0 +1,1138 @@
+---
+layout: without-sidebar
+title: "Bölüm 12: Kılavuzlu İkili Ağaçlar — Ders Notu"
+permalink: /files/dsa_c/notlar/Bolum_12_Kilavuzlu_Ikili_Agaclar_Ders_Notu.html
+excerpt: "C ile Veri Yapıları ve Algoritmalar dersi Bölüm 12 ders notu: n düğümlü ikili ağaçtaki n+1 boş işaretçi, kılavuz kurma kuralları, kılavuz bayrakları ve başlık düğümü, kök ortada ardıl bulma ve yığınsız gezinme, kök önde kılavuzlu gezinme, Morris gezinmesi, saga_ekle ve sola_ekle yordamları. C kodları, kod izlemeleri ve karmaşıklık analizi."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+  /* Bölüm 12: sunumdan alınan ağaç şekillerinin sınıfları (sunumdaki kurallarla aynı) */
+  .ds-notes .ds-svg .t-n{fill:var(--ds-bg);stroke:var(--ds-link);stroke-width:1.6}
+  .ds-notes .ds-svg .t-cur{fill:var(--ds-hot);stroke:var(--ds-accent);stroke-width:3}
+  .ds-notes .ds-svg .t-hot{fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1.6}
+  .ds-notes .ds-svg .t-stk{fill:color-mix(in srgb,var(--ds-hot) 38%,var(--ds-bg));stroke:var(--ds-link);stroke-width:1.6;stroke-dasharray:4 2}
+  .ds-notes .ds-svg .t-done{fill:var(--ds-node);stroke:var(--ds-link);stroke-width:2.2}
+  .ds-notes .ds-svg .t-bad{fill:color-mix(in srgb,var(--ds-bad) 22%,var(--ds-bg));stroke:var(--ds-bad);stroke-width:2.6}
+  .ds-notes .ds-svg .t-new{fill:color-mix(in srgb,var(--ds-good) 24%,var(--ds-bg));stroke:var(--ds-good);stroke-width:2.6}
+  .ds-notes .ds-svg .t-ok{fill:color-mix(in srgb,var(--ds-good) 14%,var(--ds-bg));stroke:var(--ds-good);stroke-width:1.8}
+  .ds-notes .ds-svg .t-null{fill:var(--ds-muted);font:11.5px ui-monospace,Consolas,monospace;text-anchor:middle}
+  .ds-notes .ds-svg .t-nullon{fill:var(--ds-accent);font-weight:700}
+  .ds-notes .ds-svg .t-ptr{fill:var(--ds-accent);font:700 13px ui-monospace,Consolas,monospace}
+  .ds-notes .ds-svg .t-sub{fill:var(--ds-muted);font:12px ui-monospace,Consolas,monospace}
+  .ds-notes .ds-svg .t-thr{fill:none;stroke:var(--ds-bad);stroke-width:1.8;stroke-dasharray:5 4}
+  .ds-notes .ds-svg .t-thrh{fill:none;stroke:var(--ds-accent);stroke-width:3;stroke-dasharray:6 3}
+  .ds-notes .ds-svg .t-sm{fill:var(--ds-text);font:600 13px system-ui,sans-serif}
+  .ds-notes .ds-svg .t-bold{fill:var(--ds-accent);font:700 15px system-ui,sans-serif}
+  .ds-notes .ds-svg .t-okt{fill:var(--ds-good);font:700 14px system-ui,sans-serif}
+  .ds-notes .ds-svg .t-badt{fill:var(--ds-bad);font:700 14px system-ui,sans-serif}
+  .ds-notes .ds-svg .mono{font-family:ui-monospace,Consolas,monospace}
+  .ds-notes .ds-svg .t-reg{fill:none;stroke:var(--ds-border);stroke-dasharray:4 4}
+  .ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 300px; }
+  .ds-notes .nt-fig__row--4 > svg.ds-svg { flex: 1 1 300px; max-width: 340px; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">C ile Veri Yapıları ve Algoritmalar · Ders Notu</p>
+  <h1>Bölüm 12: Kılavuzlu İkili Ağaçlar</h1>
+  <p class="nt-lead">Bağlı gösterimle kurulan bir ikili ağaçta işaretçi alanlarının yarıdan fazlası boş kalır. Kılavuzlu ikili ağaç bu boş alanları değerlendirir. Boş bir sol işaretçi, düğümden kök ortada sırada hemen önce gelen düğümü gösterir; boş bir sağ işaretçi de hemen sonra geleni. Böylece ağaç, yığın ya da özyineleme kullanmadan, tek bir işaretçiyle baştan sona gezilebilir. Bu not önce boş işaretçilerin sayısını kanıtlar, sonra kılavuzların nasıl kurulduğunu, gerçek bağlardan nasıl ayırt edildiğini ve başlık düğümünün rolünü anlatır. Ardından ardıl bulma, yığınsız kök ortada ve kök önde gezinme, bayrak alanı gerektirmeyen Morris gezinmesi ve kılavuzları bozmadan düğüm ekleyen <code>saga_ekle</code> ile <code>sola_ekle</code> yordamları gelir. Her yordamın C kodu, satır satır anlatımı, kod izlemesi ve karmaşıklık analizi verilir.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_12_Kilavuzlu_Ikili_Agaclar.html">Sunum</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>Boş işaretçileri saymak</dt>
+    <dd>n düğümlü bir ikili ağaçta n + 1 boş işaretçi bulunduğunu kanıtlamak.</dd>
+    <dt>Kılavuz kurmak</dt>
+    <dd>Boş sol işaretçiyi kök ortada öncüle, boş sağ işaretçiyi kök ortada ardıla bağlama kuralını bir ağaca elle uygulamak.</dd>
+    <dt>Yapıyı eksiksiz tanımlamak</dt>
+    <dd><code>solKilavuz</code> ve <code>sagKilavuz</code> bayraklarıyla, başlık düğümüyle birlikte kılavuzlu ağacın C yapısını kurmak.</dd>
+    <dt>Yığınsız gezinmek</dt>
+    <dd><code>kokortada_ardil_bul</code> ile O(1) ek bellekle kök ortada ve kök önde gezinmek; Morris gezinmesini adım adım izlemek.</dd>
+    <dt>Ekleme yapmak</dt>
+    <dd><code>saga_ekle</code> yordamının iki durumunu tek yordamda birleştirmek ve <code>sola_ekle</code>'yi ondan türetmek.</dd>
+    <dt>İyi kod yazmak</dt>
+    <dd>Açık tanımlı yordam, niyeti söyleyen açıklama satırı ve NULL denetiminin doğru yeri üzerine karar vermek.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s12-1">12.1 Boş işaretçiler ve kılavuz fikri</a>
+      <ol>
+        <li><a href="#s12-1-1">12.1.1 n düğümde n + 1 boş işaretçi</a></li>
+        <li><a href="#s12-1-2">12.1.2 Perlis ve Thornton'un fikri</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-2">12.2 Kılavuzları kurmak</a>
+      <ol>
+        <li><a href="#s12-2-1">12.2.1 Kök ortada öncül ve ardıl</a></li>
+        <li><a href="#s12-2-2">12.2.2 Kılavuzları tek tek kurmak</a></li>
+        <li><a href="#s12-2-3">12.2.3 Kılavuz bayrakları</a></li>
+        <li><a href="#s12-2-4">12.2.4 Başlık düğümü</a></li>
+        <li><a href="#s12-2-5">12.2.5 Neden kök ortada sıra</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-3">12.3 Kök ortada gezinme</a>
+      <ol>
+        <li><a href="#s12-3-1">12.3.1 Ardılı bulmak</a></li>
+        <li><a href="#s12-3-2">12.3.2 Kod izleme: başlık, A ve I</a></li>
+        <li><a href="#s12-3-3">12.3.3 Yığınsız gezinme</a></li>
+        <li><a href="#s12-3-4">12.3.4 Gezinmenin maliyeti</a></li>
+        <li><a href="#s12-3-5">12.3.5 Kök önde gezinme</a></li>
+        <li><a href="#s12-3-6">12.3.6 Morris gezinmesi</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-4">12.4 Düğüm ekleme</a>
+      <ol>
+        <li><a href="#s12-4-1">12.4.1 Ekleme neden girift</a></li>
+        <li><a href="#s12-4-2">12.4.2 Durum 1: sağ alt ağacı olmayan ebeveyne ekleme</a></li>
+        <li><a href="#s12-4-3">12.4.3 Durum 2: ebeveynin sağ alt ağacı var</a></li>
+        <li><a href="#s12-4-4">12.4.4 Tek yordam: <code>saga_ekle</code></a></li>
+        <li><a href="#s12-4-5">12.4.5 Sola ekleme</a></li>
+        <li><a href="#s12-4-6">12.4.6 Ağacı geri vermek</a></li>
+        <li><a href="#s12-4-7">12.4.7 Kod kalitesi</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-5">12.5 Kazanç, bedel ve karmaşıklık özeti</a></li>
+    <li><a href="#s12-6">12.6 Sık yapılan hatalar</a></li>
+    <li><a href="#s12-7">12.7 Alıştırmalar ve çözümleri</a>
+      <ol>
+        <li><a href="#s12-7-1">12.7.1 Bir ağacın kılavuzlarını çizmek</a></li>
+        <li><a href="#s12-7-2">12.7.2 Öncül bulmak</a></li>
+        <li><a href="#s12-7-3">12.7.3 Tersten gezinme</a></li>
+        <li><a href="#s12-7-4">12.7.4 Boş ağaca ilk düğüm</a></li>
+        <li><a href="#s12-7-5">12.7.5 Kök sonda gezinmenin zorluğu</a></li>
+        <li><a href="#s12-7-6">12.7.6 Kılavuzlu ikili arama ağacına ekleme</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-8">12.8 Özet</a></li>
+    <li><a href="#s12-9">12.9 Kavram listesi</a></li>
+    <li><a href="#s12-10">12.10 Kendini Dene</a></li>
+    <li><a href="#s12-11">12.11 İleri okuma</a></li>
+    <li><a href="#s12-12">12.12 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s12-1"><span class="nt-num">12.1</span>Boş işaretçiler ve kılavuz fikri</h2>
+
+<p>Bağlı gösterimde bir ikili ağacın her düğümü üç alandan oluşur: sol alt ağacı gösteren işaretçi, veri ve sağ alt ağacı gösteren işaretçi. C'de bu düğüm kendine başvuran bir yapıyla (<span lang="en">self-referential struct</span>) tanımlanır:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> agac *agac_gost;
+<span class="kw">struct</span> agac {
+    agac_gost solcocuk;   <span class="cm">/* sol alt ağaç */</span>
+    <span class="kw">char</span>      veri;
+    agac_gost sagcocuk;   <span class="cm">/* sağ alt ağaç */</span>
+};</code></pre>
+
+<p>Çocuğu olmayan bir yöndeki işaretçiye <code>NULL</code> yazılır. <code>NULL</code>, hiçbir nesneyi göstermeyen <strong>boş işaretçidir</strong> (<span lang="en">null pointer</span>). Bir yaprağın iki işaretçisi de boştur. Tek çocuklu bir düğümün işaretçilerinden biri boştur. Bu bölümün sorusu basittir: bir ağaçta kaç işaretçi boş kalır ve bu alanlar bir işe yarayabilir mi?</p>
+
+<h3 id="s12-1-1"><span class="nt-num">12.1.1</span>n düğümde n + 1 boş işaretçi</h3>
+
+<p>Ağacın biçimi ne olursa olsun boş işaretçilerin sayısı yalnız düğüm sayısına bağlıdır. Bunu bir sayma kanıtı gösterir.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-null">
+  <span class="nt-box__title">Teorem 12.1 (Boş işaretçi sayısı)</span>
+  <p>Bağlı gösterimle saklanan, <span class="m">n ≥ 1</span> düğümlü her ikili ağaçta tam olarak <span class="m">n + 1</span> işaretçi alanı <code>NULL</code>'dır.</p>
+</div>
+
+<div class="nt-proof">
+  <p>Her düğümde iki işaretçi alanı vardır; ağaçta toplam <span class="m">2n</span> alan bulunur. Kök dışındaki her düğüme ebeveyninden tam olarak bir işaretçi gelir. Bir düğüme iki farklı alandan işaretçi gelemez, çünkü her düğümün tek bir ebeveyni vardır. Köke ise ağacın içinden hiçbir işaretçi gelmez; kök, ağacın dışındaki bir değişkenle tutulur. Öyleyse dolu alanların sayısı <span class="m">n − 1</span>'dir. Geri kalan alanların sayısı <span class="m">2n − (n − 1) = n + 1</span> olur. <span class="nt-qed">∎</span></p>
+</div>
+
+<p>Kanıt, ağacın dengeli ya da çarpık olmasına hiç bakmaz. <a href="#sekil-null">Şekil 12.1</a> bunu üç örnekle gösterir. Soldaki iki ağaç 4 düğümlüdür ve biçimleri çok farklıdır; ikisinde de 5 işaretçi boştur. Sağdaki 10 düğümlü ağaçta 11 boş işaretçi vardır.</p>
+
+<figure class="nt-fig" id="sekil-null" style="--w:690px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 690 186" role="img" aria-label="NULL işaretçi sayıları"><path class="line" d="M126.667 20 L73.3333 56"/><path class="line" d="M126.667 20 L180 56"/><path class="line" d="M73.3333 56 L20 92"/><path class="line" d="M79.9333 64.8 L87.6333 76.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M13.4 100.8 L5.7 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M26.6 100.8 L34.3 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M173.4 64.8 L165.7 76.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M186.6 64.8 L194.3 76.9" style="stroke-dasharray:3 3;opacity:.55"/><g><circle class="t-n" cx="126.667" cy="20" r="11"/><text class="txt" x="126.667" y="25" text-anchor="middle" style="font-size:12px">A</text></g><g><circle class="t-n" cx="73.3333" cy="56" r="11"/><text class="txt" x="73.3333" y="61" text-anchor="middle" style="font-size:12px">B</text></g><g><circle class="t-n" cx="20" cy="92" r="11"/><text class="txt" x="20" y="97" text-anchor="middle" style="font-size:12px">D</text></g><g><circle class="t-n" cx="180" cy="56" r="11"/><text class="txt" x="180" y="61" text-anchor="middle" style="font-size:12px">C</text></g><text class="t-sm mono" x="100" y="178" text-anchor="middle">n = 4  NULL = 5</text><path class="line" d="M330 20 L293.333 56"/><path class="line" d="M336.6 28.8 L344.3 40.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M293.333 56 L256.667 92"/><path class="line" d="M299.933 64.8 L307.633 76.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M256.667 92 L220 128"/><path class="line" d="M263.267 100.8 L270.967 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M213.4 136.8 L205.7 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M226.6 136.8 L234.3 148.9" style="stroke-dasharray:3 3;opacity:.55"/><g><circle class="t-n" cx="330" cy="20" r="11"/><text class="txt" x="330" y="25" text-anchor="middle" style="font-size:12px">A</text></g><g><circle class="t-n" cx="293.333" cy="56" r="11"/><text class="txt" x="293.333" y="61" text-anchor="middle" style="font-size:12px">B</text></g><g><circle class="t-n" cx="256.667" cy="92" r="11"/><text class="txt" x="256.667" y="97" text-anchor="middle" style="font-size:12px">C</text></g><g><circle class="t-n" cx="220" cy="128" r="11"/><text class="txt" x="220" y="133" text-anchor="middle" style="font-size:12px">D</text></g><text class="t-sm mono" x="275" y="178" text-anchor="middle">n = 4  NULL = 5</text><path class="line" d="M508.889 20 L444.444 56"/><path class="line" d="M508.889 20 L605.556 56"/><path class="line" d="M444.444 56 L412.222 92"/><path class="line" d="M444.444 56 L476.667 92"/><path class="line" d="M412.222 92 L380 128"/><path class="line" d="M418.822 100.8 L426.522 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M373.4 136.8 L365.7 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M386.6 136.8 L394.3 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M470.067 100.8 L462.367 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M483.267 100.8 L490.967 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M605.556 56 L541.111 92"/><path class="line" d="M605.556 56 L670 92"/><path class="line" d="M541.111 92 L573.333 128"/><path class="line" d="M534.511 100.8 L526.811 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M566.733 136.8 L559.033 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M579.933 136.8 L587.633 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M670 92 L637.778 128"/><path class="line" d="M676.6 100.8 L684.3 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M631.178 136.8 L623.478 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M644.378 136.8 L652.078 148.9" style="stroke-dasharray:3 3;opacity:.55"/><g><circle class="t-n" cx="508.889" cy="20" r="11"/><text class="txt" x="508.889" y="25" text-anchor="middle" style="font-size:12px">A</text></g><g><circle class="t-n" cx="444.444" cy="56" r="11"/><text class="txt" x="444.444" y="61" text-anchor="middle" style="font-size:12px">B</text></g><g><circle class="t-n" cx="412.222" cy="92" r="11"/><text class="txt" x="412.222" y="97" text-anchor="middle" style="font-size:12px">D</text></g><g><circle class="t-n" cx="380" cy="128" r="11"/><text class="txt" x="380" y="133" text-anchor="middle" style="font-size:12px">H</text></g><g><circle class="t-n" cx="476.667" cy="92" r="11"/><text class="txt" x="476.667" y="97" text-anchor="middle" style="font-size:12px">E</text></g><g><circle class="t-n" cx="605.556" cy="56" r="11"/><text class="txt" x="605.556" y="61" text-anchor="middle" style="font-size:12px">C</text></g><g><circle class="t-n" cx="541.111" cy="92" r="11"/><text class="txt" x="541.111" y="97" text-anchor="middle" style="font-size:12px">F</text></g><g><circle class="t-n" cx="573.333" cy="128" r="11"/><text class="txt" x="573.333" y="133" text-anchor="middle" style="font-size:12px">J</text></g><g><circle class="t-n" cx="670" cy="92" r="11"/><text class="txt" x="670" y="97" text-anchor="middle" style="font-size:12px">G</text></g><g><circle class="t-n" cx="637.778" cy="128" r="11"/><text class="txt" x="637.778" y="133" text-anchor="middle" style="font-size:12px">K</text></g><text class="t-sm mono" x="525" y="178" text-anchor="middle">n = 10  NULL = 11</text></svg></div>
+  <figcaption><b>Şekil 12.1:</b> Üç ikili ağaç ve boş işaretçileri. Kesikli kısa çizgiler <code>NULL</code> alanlardır. 4 düğümlü iki ağaçta 5, 10 düğümlü ağaçta 11 boş işaretçi vardır.</figcaption>
+</figure>
+
+<p>Oran dikkat çekicidir. <span class="m">2n</span> alanın <span class="m">n + 1</span>'i, yani yarıdan fazlası hiçbir bilgi taşımaz. 64 bitlik bir makinede bir işaretçi 8 bayttır; bir milyon düğümlü bir ağaçta yaklaşık 8 MB bellek boş işaretçilere gider. Bu alanları atmak mümkün değildir, çünkü hangi düğümün hangi yönde çocuğu olacağı önceden bilinmez. Ama bu alanlara anlamlı bir değer yazılabilir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-null">
+  <span class="nt-box__title">Örnek 12.1</span>
+  <p>Bu notun ana örneği dokuz düğümlü bir ağaçtır. A köktür; B ve C onun çocuklarıdır. D ve E, B'nin; F ve G, C'nin; H ve I, D'nin çocuklarıdır. Ağaçta <span class="m">2 · 9 = 18</span> işaretçi alanı vardır. Kök dışındaki sekiz düğüme sekiz işaretçi gelir. Boş alanlar <span class="m">18 − 8 = 10</span> tanedir: H, I, E, F ve G yapraklarının ikişer alanı. Bu sayı <span class="m">n + 1 = 10</span> ile örtüşür.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Kökü gösteren işaretçiyi de “dolu işaretçi” sayıp <span class="m">n</span> dolu alan bulmak. Kökü gösteren değişken (ör. <code>agac_gost kok</code>) ağacın düğümlerinden birinin alanı değildir. Düğümlerin içindeki dolu alanlar yalnız <span class="m">n − 1</span> tanedir.</p>
+</div>
+
+<h3 id="s12-1-2"><span class="nt-num">12.1.2</span>Perlis ve Thornton'un fikri</h3>
+
+<p>A. J. Perlis ve C. Thornton 1960'ta boş işaretçilerin ağaçtaki başka düğümleri göstermek için kullanılabileceğini önerdiler. Bu işaretçilere <strong>kılavuz</strong> (<span lang="en">thread</span>) adını verdiler. Kılavuz, düğümün gerçek bir çocuğu değildir; gezinmede hangi düğüme geçileceğini gösteren bir yol işaretidir.</p>
+
+<p>Fikrin değeri gezinmenin ek belleğinde görülür. Bir ikili ağacı kök ortada (<span lang="en">inorder</span>) gezmenin iki bilinen yolu vardır. Özyinelemeli yordam her düğüm için bir çağrı açar. Bir yol boyunca açık kalan çağrıların sayısı ağacın yüksekliği <span class="m">h</span> kadardır; çağrı yığını (<span lang="en">call stack</span>) bu yüzden <span class="m">O(h)</span> bellek kullanır. Özyinelemesiz (iteratif) yordam ise aynı işi açık bir yığınla yapar: sola inerken geçtiği düğümleri yığına koyar, sonra onlara geri döner. Bu yığın da <span class="m">O(h)</span> yer tutar.</p>
+
+<p>Dengeli bir ağaçta <span class="m">h</span> yaklaşık <span class="m">log<sub>2</sub> n</span>'dir ve bu bedel küçüktür. Ama <strong>çarpık ağaçta</strong> (<span lang="en">skewed tree</span>) bütün düğümler tek bir yöne dizilir ve <span class="m">h = n</span> olur. Bir milyon düğümlü sola çarpık bir ağaçta özyinelemeli gezinme bir milyon çağrıyı aynı anda açık tutar. Varsayılan çağrı yığını çoğu sistemde bu kadar derinliği kaldırmaz ve program çöker.</p>
+
+<p>Kılavuzlu ağaçta durum farklıdır. Her düğümden kök ortada sırada sonraki düğüme, yani <strong>ardıla</strong>, ya doğrudan bir kılavuzla ya da birkaç gerçek bağ izlenerek gidilir. Nereye dönüleceği ağacın içinde yazılı olduğu için hiçbir şeyi hatırlamak gerekmez. Gezinme tek bir işaretçi değişkeniyle yapılır ve ek bellek <span class="m">O(1)</span> olur. Bunun bedeli de vardır: her işaretçi alanı için onun gerçek çocuk mu yoksa kılavuz mu olduğunu söyleyen birer bitlik bilgi tutmak gerekir.</p>
+
+<div class="nt-tablewrap" id="tab-ekbellek">
+<table class="nt-table">
+  <caption>Tablo 12.1: Kök ortada gezinmenin üç yolu. <span class="m">h</span> ağacın yüksekliğidir; çarpık ağaçta <span class="m">h = n</span>.</caption>
+  <thead><tr><th scope="col">Yöntem</th><th scope="col">Zaman</th><th scope="col">Ek bellek</th><th scope="col">Ne hatırlanır</th></tr></thead>
+  <tbody>
+    <tr><td>Özyinelemeli</td><td>O(n)</td><td>O(h)</td><td>Açık çağrılar (çağrı yığını)</td></tr>
+    <tr><td>Özyinelemesiz, yığınlı</td><td>O(n)</td><td>O(h)</td><td>Sola inerken geçilen düğümler</td></tr>
+    <tr><td>Kılavuzlu</td><td>O(n)</td><td>O(1)</td><td>Hiçbir şey; dönüş yolu ağaçta yazılı</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s12-2"><span class="nt-num">12.2</span>Kılavuzları kurmak</h2>
+
+<p>Bir boş işaretçinin hangi düğümü göstereceği keyfî değildir. Kural, kök ortada gezinme sırasına göre konur. Bu yüzden önce o sıradaki “önceki” ve “sonraki” düğüm kavramları kesinleştirilmelidir.</p>
+
+<h3 id="s12-2-1"><span class="nt-num">12.2.1</span>Kök ortada öncül ve ardıl</h3>
+
+<p>Kök ortada gezinme bir düğümde önce sol alt ağacı, sonra düğümün kendisini, en son sağ alt ağacı ziyaret eder. Ana örnek ağaçta bu sıra <code>H D I B E A F C G</code>'dir. Bu dizide her düğümün bir solundaki ve bir sağındaki komşusu bellidir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-oncel-ardil">
+  <span class="nt-box__title">Tanım 12.1</span>
+  <p>Bir <span class="m">p</span> düğümünün <strong>kök ortada öncülü</strong> (<span lang="en">inorder predecessor</span>), kök ortada gezinmede <span class="m">p</span>'den hemen önce ziyaret edilen düğümdür. <span class="m">p</span>'nin <strong>kök ortada ardılı</strong> (<span lang="en">inorder successor</span>) ise <span class="m">p</span>'den hemen sonra ziyaret edilen düğümdür. Sıradaki ilk düğümün öncülü, son düğümün ardılı yoktur.</p>
+</div>
+
+<p>Örnek sırada E'nin öncülü B, ardılı A'dır. H ilk düğüm olduğu için öncülsüzdür; G son düğüm olduğu için ardılsızdır. Kılavuzların kuralı bu iki kavramla yazılır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kilavuz">
+  <span class="nt-box__title">Tanım 12.2</span>
+  <p><strong>Kılavuzlu ikili ağaç</strong> (<span lang="en">threaded binary tree</span>), boş işaretçileri şu iki kurala göre doldurulmuş ikili ağaçtır:</p>
+  <ol>
+    <li><code>p-&gt;solCocuk == NULL</code> ise <code>p-&gt;solCocuk</code>, <span class="m">p</span>'nin kök ortada öncülünü gösterir.</li>
+    <li><code>p-&gt;sagCocuk == NULL</code> ise <code>p-&gt;sagCocuk</code>, <span class="m">p</span>'nin kök ortada ardılını gösterir.</li>
+  </ol>
+  <p>Bu yolla doldurulan işaretçilere <strong>kılavuz</strong> denir.</p>
+</div>
+
+<p><a href="#sekil-kilavuzlu">Şekil 12.2</a> kuralların ana örneğe uygulanmış hâlidir. Düz mavi çizgiler gerçek çocuk bağlarıdır. Kesikli kırmızı oklar kılavuzlardır. Kılavuzlar ağacın kök ortada sırasını ağacın içine örer: her yapraktan sağa çıkan kırmızı ok, sırada bir sonraki düğüme gider.</p>
+
+<figure class="nt-fig" id="sekil-kilavuzlu" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 340 230" role="img" aria-label="kılavuzlu A..I ağacı"><defs><marker id="n12-d16-ah1-s4_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah2-s4_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M267.7 29.8 L214.5 54.8" marker-end="url(#n12-d16-ah1-s4_0-1)"/><path class="line" d="M291.5 20 C321.5 2 321.5 42 287.3 29.8" style="" marker-end="url(#n12-d16-ah1-s4_0-1)"/><path class="line" d="M207.5 66 L132.5 112"/><path class="line" d="M207.5 66 L282.5 112"/><path class="line" d="M132.5 112 L57.5 158"/><path class="line" d="M132.5 112 L170 158"/><path class="line" d="M57.5 158 L20 204"/><path class="line" d="M57.5 158 L95 204"/><path class="line" d="M282.5 112 L245 158"/><path class="line" d="M282.5 112 L320 158"/><path class="t-thr" d="M10.2 213.8 Q101.75 223.8 273.3 34" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M29.8 213.8 Q41.55 249.8 53.3 172" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M85.2 213.8 Q73.45 249.8 61.7 172" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M104.8 213.8 Q116.55 249.8 128.3 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M160.2 167.8 Q148.45 203.8 136.7 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M179.8 167.8 Q191.55 203.8 203.3 80" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M235.2 167.8 Q223.45 203.8 211.7 80" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M254.8 167.8 Q266.55 203.8 278.3 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M310.2 167.8 Q298.45 203.8 286.7 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M329.8 167.8 Q345.75 177.8 281.7 34" marker-end="url(#n12-d16-ah2-s4_0-1)"/><rect class="box" x="259.5" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="277.5" y="25" text-anchor="middle">başlık</text><circle class="t-n" cx="207.5" cy="66" r="14"/><text class="txt" x="207.5" y="71" text-anchor="middle">A</text><circle class="t-n" cx="132.5" cy="112" r="14"/><text class="txt" x="132.5" y="117" text-anchor="middle">B</text><circle class="t-n" cx="57.5" cy="158" r="14"/><text class="txt" x="57.5" y="163" text-anchor="middle">D</text><circle class="t-n" cx="20" cy="204" r="14"/><text class="txt" x="20" y="209" text-anchor="middle">H</text><circle class="t-n" cx="95" cy="204" r="14"/><text class="txt" x="95" y="209" text-anchor="middle">I</text><circle class="t-n" cx="170" cy="158" r="14"/><text class="txt" x="170" y="163" text-anchor="middle">E</text><circle class="t-n" cx="282.5" cy="112" r="14"/><text class="txt" x="282.5" y="117" text-anchor="middle">C</text><circle class="t-n" cx="245" cy="158" r="14"/><text class="txt" x="245" y="163" text-anchor="middle">F</text><circle class="t-n" cx="320" cy="158" r="14"/><text class="txt" x="320" y="163" text-anchor="middle">G</text><text class="t-sm mono" x="170" y="222" text-anchor="middle">kök ortada: H D I B E A F C G</text></svg></div>
+  <figcaption><b>Şekil 12.2:</b> Ana örneğin kılavuzlu hâli. Kesikli kırmızı oklar kılavuzlardır: sol kılavuz öncüle, sağ kılavuz ardıla gider. H'nin sol ve G'nin sağ kılavuzunun gösterecek düğümü yoktur.</figcaption>
+</figure>
+
+<p>Kılavuzların bir ortak özelliği vardır: hepsi ağaçta yukarı doğru bir düğümü gösterir. Bunun nedeni şudur. Sol alt ağacı olmayan bir düğümün öncülü, düğümün içinde bulunduğu sağ alt ağacın sahibi olan en yakın atadır. Sağ alt ağacı olmayan bir düğümün ardılı da düğümün içinde bulunduğu sol alt ağacın sahibi olan en yakın atadır. Örneğin I, B'nin sol alt ağacındadır ve I'nın sağ alt ağacı yoktur; I'nın ardılı B'dir. Aşağı doğru yolculuk gerçek bağlarla yapılır, yukarı doğru dönüşler kılavuzlarla. Yığının hatırlamak zorunda olduğu bilgi tam da bu dönüş yollarıdır.</p>
+
+<h3 id="s12-2-2"><span class="nt-num">12.2.2</span>Kılavuzları tek tek kurmak</h3>
+
+<p>Kılavuzlar elle kurulurken önce kök ortada sıra yazılır. Sonra her boş işaretçi için o sırada düğümün bir solundaki ya da bir sağındaki düğüm okunur. Ana örnekte on boş alan vardır (<a href="#ornek-null">Örnek 12.1</a>). <a href="#tab-kurma">Tablo 12.2</a> her birinin nereyi göstereceğini verir.</p>
+
+<div class="nt-tablewrap" id="tab-kurma">
+<table class="nt-table">
+  <caption>Tablo 12.2: Kök ortada sıra <code>H D I B E A F C G</code> üzerinden on kılavuzun kurulması. “Başlık” satırları için gösterilecek düğüm yoktur; bu iki kılavuz başlık düğümüne bağlanacaktır.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Boş alan</th><th scope="col">Kural</th><th scope="col">Gösterdiği düğüm</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>H'nin solu</td><td>öncül</td><td>yok (başlık)</td></tr>
+    <tr><td>2</td><td>H'nin sağı</td><td>ardıl</td><td>D</td></tr>
+    <tr><td>3</td><td>I'nın solu</td><td>öncül</td><td>D</td></tr>
+    <tr><td>4</td><td>I'nın sağı</td><td>ardıl</td><td>B</td></tr>
+    <tr><td>5</td><td>E'nin solu</td><td>öncül</td><td>B</td></tr>
+    <tr><td>6</td><td>E'nin sağı</td><td>ardıl</td><td>A</td></tr>
+    <tr><td>7</td><td>F'nin solu</td><td>öncül</td><td>A</td></tr>
+    <tr><td>8</td><td>F'nin sağı</td><td>ardıl</td><td>C</td></tr>
+    <tr><td>9</td><td>G'nin solu</td><td>öncül</td><td>C</td></tr>
+    <tr><td>10</td><td>G'nin sağı</td><td>ardıl</td><td>yok (başlık)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki her satır, sıradaki bir komşuluğa karşılık gelir. Kök ortada sırada sekiz komşu çift vardır (H–D, D–I, …, C–G). Bu çiftlerin bazıları gerçek bağlarla zaten birbirine bağlıdır; D ile H gibi. Geri kalan her komşuluk bir kılavuzla kurulur. <a href="#sekil-kurma">Şekil 12.3</a> kurmanın başını ve sonunu gösterir. Üstte sıradan ağaç ve on boş işaretçisi, altta on kılavuzun hepsi yerindedir. Alttaki şeklin altına kök ortada sıra da yazılmıştır; her kırmızı okun bu sırada bir komşuyu gösterdiği oradan okunabilir.</p>
+
+<figure class="nt-fig" id="sekil-kurma" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 224" role="img" aria-label="kılavuz kurma adım 0"><path class="line" d="M386.25 60 L243.75 100"/><path class="line" d="M386.25 60 L528.75 100"/><path class="line" d="M243.75 100 L101.25 140"/><path class="line" d="M243.75 100 L315 140"/><path class="line" d="M101.25 140 L30 180"/><path class="line" d="M101.25 140 L172.5 180"/><path class="line" d="M528.75 100 L457.5 140"/><path class="line" d="M528.75 100 L600 140"/><circle class="t-n" cx="386.25" cy="60" r="14"/><text class="txt" x="386.25" y="65" text-anchor="middle">A</text><circle class="t-n" cx="243.75" cy="100" r="14"/><text class="txt" x="243.75" y="105" text-anchor="middle">B</text><circle class="t-n" cx="101.25" cy="140" r="14"/><text class="txt" x="101.25" y="145" text-anchor="middle">D</text><circle class="t-n" cx="30" cy="180" r="14"/><text class="txt" x="30" y="185" text-anchor="middle">H</text><circle class="t-n" cx="172.5" cy="180" r="14"/><text class="txt" x="172.5" y="185" text-anchor="middle">I</text><circle class="t-n" cx="315" cy="140" r="14"/><text class="txt" x="315" y="145" text-anchor="middle">E</text><circle class="t-n" cx="528.75" cy="100" r="14"/><text class="txt" x="528.75" y="105" text-anchor="middle">C</text><circle class="t-n" cx="457.5" cy="140" r="14"/><text class="txt" x="457.5" y="145" text-anchor="middle">F</text><circle class="t-n" cx="600" cy="140" r="14"/><text class="txt" x="600" y="145" text-anchor="middle">G</text><path class="line" d="M21.6 191 L12 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M38.4 191 L48 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M164.1 191 L154.5 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M180.9 191 L190.5 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M306.6 151 L297 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M323.4 151 L333 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M449.1 151 L439.5 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M465.9 151 L475.5 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M591.6 151 L582 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M608.4 151 L618 166" style="stroke-dasharray:3 3;opacity:.55"/><text class="txt mono" x="40" y="214" text-anchor="middle">H</text><text class="txt mono" x="100" y="214" text-anchor="middle">D</text><text class="txt mono" x="160" y="214" text-anchor="middle">I</text><text class="txt mono" x="220" y="214" text-anchor="middle">B</text><text class="txt mono" x="280" y="214" text-anchor="middle">E</text><text class="txt mono" x="340" y="214" text-anchor="middle">A</text><text class="txt mono" x="400" y="214" text-anchor="middle">F</text><text class="txt mono" x="460" y="214" text-anchor="middle">C</text><text class="txt mono" x="520" y="214" text-anchor="middle">G</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 224" role="img" aria-label="kılavuz kurma adım 10"><defs><marker id="n12-d16-ah18-s5_10-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M386.25 60 L243.75 100"/><path class="line" d="M386.25 60 L528.75 100"/><path class="line" d="M243.75 100 L101.25 140"/><path class="line" d="M243.75 100 L315 140"/><path class="line" d="M101.25 140 L30 180"/><path class="line" d="M101.25 140 L172.5 180"/><path class="line" d="M528.75 100 L457.5 140"/><path class="line" d="M528.75 100 L600 140"/><path class="t-thr" d="M39.8 189.8 Q68.425 225.8 97.05 154" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M162.7 189.8 Q134.075 225.8 105.45 154" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M182.3 189.8 Q210.925 225.8 239.55 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M305.2 149.8 Q276.575 185.8 247.95 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M324.8 149.8 Q353.425 185.8 382.05 74" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M447.7 149.8 Q419.075 185.8 390.45 74" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M467.3 149.8 Q495.925 185.8 524.55 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M590.2 149.8 Q561.575 185.8 532.95 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><circle class="t-n" cx="386.25" cy="60" r="14"/><text class="txt" x="386.25" y="65" text-anchor="middle">A</text><circle class="t-n" cx="243.75" cy="100" r="14"/><text class="txt" x="243.75" y="105" text-anchor="middle">B</text><circle class="t-n" cx="101.25" cy="140" r="14"/><text class="txt" x="101.25" y="145" text-anchor="middle">D</text><circle class="t-n" cx="30" cy="180" r="14"/><text class="txt" x="30" y="185" text-anchor="middle">H</text><circle class="t-n" cx="172.5" cy="180" r="14"/><text class="txt" x="172.5" y="185" text-anchor="middle">I</text><circle class="t-n" cx="315" cy="140" r="14"/><text class="txt" x="315" y="145" text-anchor="middle">E</text><circle class="t-n" cx="528.75" cy="100" r="14"/><text class="txt" x="528.75" y="105" text-anchor="middle">C</text><circle class="t-n" cx="457.5" cy="140" r="14"/><text class="txt" x="457.5" y="145" text-anchor="middle">F</text><circle class="t-cur" cx="600" cy="140" r="14"/><text class="txt" x="600" y="145" text-anchor="middle">G</text><text class="txt mono" x="40" y="214" text-anchor="middle">H</text><text class="txt mono" x="100" y="214" text-anchor="middle">D</text><text class="txt mono" x="160" y="214" text-anchor="middle">I</text><text class="txt mono" x="220" y="214" text-anchor="middle">B</text><text class="txt mono" x="280" y="214" text-anchor="middle">E</text><text class="txt mono" x="340" y="214" text-anchor="middle">A</text><text class="txt mono" x="400" y="214" text-anchor="middle">F</text><text class="txt mono" x="460" y="214" text-anchor="middle">C</text><text class="t-bold mono" x="520" y="214" text-anchor="middle">G</text></svg></div>
+  <figcaption><b>Şekil 12.3:</b> Kılavuz kurmanın ilk ve son durumu. Üstte 9 düğümlü sıradan ağaç ve 10 boş işaretçi (kesikli kısa çizgiler). Altta bütün boş işaretçiler öncül ya da ardıla bağlanmıştır; H'nin sol ve G'nin sağ kılavuzu şimdilik havadadır.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--ornek" id="ornek-kurma">
+  <span class="nt-box__title">Örnek 12.2</span>
+  <p>A(B(D, E), C(–, F)) ağacının, yani A'nın çocukları B ve C, B'nin çocukları D ve E, C'nin yalnız sağ çocuğu F olan ağacın kılavuzları kurulsun. Kök ortada sıra <code>D B E A C F</code>'dir. Düğüm sayısı 6, boş alan sayısı <span class="m">6 + 1 = 7</span>'dir.</p>
+  <ul>
+    <li>D'nin solu: öncül yok, başlığa. D'nin sağı: ardıl B.</li>
+    <li>E'nin solu: öncül B. E'nin sağı: ardıl A.</li>
+    <li>C'nin solu: öncül A. C'nin sağ alt ağacı (F) olduğu için sağ işaretçisi gerçek bağdır.</li>
+    <li>F'nin solu: öncül C. F'nin sağı: ardıl yok, başlığa.</li>
+  </ul>
+  <p>Toplam 7 kılavuz vardır; bunların 2'si başlık düğümüne gider. C'nin sol kılavuzu dikkat ister: C'nin solu boş olduğu için C'nin öncülü A'dır. A, C'nin ebeveynidir; kılavuz bu kez ebeveyni gösterir.</p>
+</div>
+
+<h3 id="s12-2-3"><span class="nt-num">12.2.3</span>Kılavuz bayrakları</h3>
+
+<p>Kâğıt üzerinde kılavuzlar kırmızı, gerçek bağlar siyah çizilir. Derleyici için ise iki işaretçi arasında hiçbir fark yoktur: ikisi de bir düğümün adresidir. Bir gezinme yordamı <code>p-&gt;solCocuk</code>'u izlediğinde gerçek bir sol çocuğa mı inecek, yoksa yukarıdaki bir öncüle mi dönecek, bunu adresin kendisinden anlayamaz. Bu yüzden her işaretçinin yanında onun türünü söyleyen bir bilgi saklanır. Her düğüme iki ek alan eklenir:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> kilavuz_agac *kilavuz_gost;
+<span class="kw">struct</span> kilavuz_agac {
+    <span class="kw">short</span> <span class="kw">int</span>    solKilavuz; <span class="cm">/* TRUE: solCocuk kılavuz */</span>
+    kilavuz_gost solCocuk;
+    <span class="kw">char</span>         veri;
+    kilavuz_gost sagCocuk;
+    <span class="kw">short</span> <span class="kw">int</span>    sagKilavuz; <span class="cm">/* TRUE: sagCocuk kılavuz */</span>
+};</code></pre>
+
+<p>Yapı, sıradan ikili ağaç düğümüne iki alan ekler. <code>solKilavuz</code> doğru (<code>TRUE</code>) ise <code>solCocuk</code> bir kılavuzdur, yani öncül gösterir; yanlış (<code>FALSE</code>) ise gerçek bir sol çocuğu gösterir. <code>sagKilavuz</code> aynı bilgiyi sağ işaretçi için taşır. <code>TRUE</code> ve <code>FALSE</code> sabitleri bir sayım tipiyle tanımlanır:</p>
+
+<pre class="nt-code"><code><span class="kw">enum</span> { FALSE, TRUE };      <span class="cm">/* FALSE = 0, TRUE = 1 */</span></code></pre>
+
+<p>Sayım tipinde ilk ada 0, ikinciye 1 verilir. Böylece <code>FALSE</code> 0, <code>TRUE</code> 1 olur ve <code>if (p-&gt;solKilavuz)</code> gibi koşullar doğrudan çalışır. İlk satırdaki <code>typedef</code>, <code>struct kilavuz_agac *</code> tipine <code>kilavuz_gost</code> kısa adını verir. Bu satır yapının tanımından önce gelir; yapının alanları kendi tipinden işaretçi tuttuğu için önce adın bilinmesi gerekir. Yapı tanımı kapanış parantezinden sonra noktalı virgülle biter (8. satır). Bu noktalı virgül unutulursa derleyici hatayı çoğu zaman bir sonraki satırda bildirir ve hatanın yeri karışır.</p>
+
+<p>Bayraklar belleği artırmaz mı? Artırır, ama zaman açısından kazanç çok daha büyüktür. Ders anlatımında bu karar açıkça söylenir: zaman karmaşıklığı alan karmaşıklığından daha önemlidir ve iki bayrak gerçekte iki bitle tutulabilir. Ne kadar yer harcandığını ölçmek öğreticidir. Yapının boyutu yalnız alanların toplamı değildir. Derleyici her alanı kendi hizalama sınırına yerleştirir ve araya dolgu baytları (<span lang="en">padding</span>) koyar. <a href="#tab-boyut">Tablo 12.3</a> x86-64 üzerinde <code>sizeof</code> ve <code>offsetof</code> ile ölçülen değerleri verir.</p>
+
+<div class="nt-tablewrap" id="tab-boyut">
+<table class="nt-table">
+  <caption>Tablo 12.3: <code>struct kilavuz_agac</code>'ın bellekteki yerleşimi (x86-64, işaretçi 8 bayt, <code>short</code> 2 bayt). Ölçülen <code>sizeof</code> 40 bayttır.</caption>
+  <thead><tr><th scope="col">Alan</th><th scope="col">Konum (bayt)</th><th scope="col">Boyut</th><th scope="col">Arkasındaki dolgu</th></tr></thead>
+  <tbody>
+    <tr><td><code>solKilavuz</code></td><td>0</td><td>2</td><td>6</td></tr>
+    <tr><td><code>solCocuk</code></td><td>8</td><td>8</td><td>0</td></tr>
+    <tr><td><code>veri</code></td><td>16</td><td>1</td><td>7</td></tr>
+    <tr><td><code>sagCocuk</code></td><td>24</td><td>8</td><td>0</td></tr>
+    <tr><td><code>sagKilavuz</code></td><td>32</td><td>2</td><td>6</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>40 baytın 19'u dolgudur. İşaretçiler 8'in katı olan adreslere yerleşmek zorundadır; araya giren küçük alanlar her seferinde 8 baytlık bir yuvayı tek başına kaplar. Alanlar büyükten küçüğe sıralanırsa (önce iki işaretçi, sonra iki <code>short</code>, en son <code>char</code>) aynı yapı 24 bayta iner. Bayraksız sıradan düğüm de 24 bayttır. Yani alan sırası iyi seçilirse bu makinede bayraklar hiç ek bellek getirmez; iki işaretçinin arkasında zaten boş kalan dolgu baytlarına yerleşirler. Bayraklar bit alanı (<code>unsigned solKilavuz : 1</code>) olarak tanımlansa da sonuç değişmez. Sunumdaki alan sırası, düğümün kâğıttaki çizimini izler: sol bayrak, sol işaretçi, veri, sağ işaretçi, sağ bayrak. Bu sıra okumayı kolaylaştırır ama bellekte en savurgan yerleşimdir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Bayrağa bakmadan <code>solCocuk</code> ya da <code>sagCocuk</code>'u gerçek çocuk sanmak. Kılavuzlu ağaçta hiçbir işaretçi <code>NULL</code> değildir. Sıradan ağaç için yazılmış <code>while (p-&gt;solCocuk != NULL) p = p-&gt;solCocuk;</code> döngüsü kılavuzlu ağaçta durmaz. En soldaki düğümün sol kılavuzu başlığa, başlığın solu yeniden köke gider; döngü sonsuza dek döner. Kılavuzlu ağaçta her iniş bayrakla denetlenir.</p>
+</div>
+
+<h3 id="s12-2-4"><span class="nt-num">12.2.4</span>Başlık düğümü</h3>
+
+<p><a href="#tab-kurma">Tablo 12.2</a>'de iki kılavuz havada kalmıştı. H'nin sol işaretçisi öncül göstermeli, ama H sıradaki ilk düğümdür. G'nin sağ işaretçisi ardıl göstermeli, ama G son düğümdür. Bu iki alana <code>NULL</code> yazmak, “hiçbir işaretçi boş değildir” düzenini bozar ve gezinme yordamlarına özel durum ekler. Çözüm, bağlı listelerden bilinen başlık düğümüdür.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-baslik">
+  <span class="nt-box__title">Tanım 12.3</span>
+  <p>Kılavuzlu ağacın <strong>başlık düğümü</strong> (<span lang="en">header node</span>), veri taşımayan ve ağacın dışında duran ek bir düğümdür. Gerçek ağacın kökü <code>L-&gt;solCocuk</code> ile erişilir. Başlığın sağ işaretçisi her zaman kendisini gösterir ve <code>sagKilavuz</code> alanı <code>FALSE</code>'tur. Gösterecek düğümü olmayan iki kılavuz, yani ilk düğümün sol ve son düğümün sağ kılavuzu, başlığı gösterir.</p>
+</div>
+
+<p>Boş ağaçta yalnız başlık vardır. Bu durumda başlığın sol işaretçisi de kendisini gösterir ve <code>solKilavuz</code> <code>TRUE</code>'dur: gösterilen şey gerçek bir kök değil, bir kılavuzdur. Ağaca ilk düğüm eklendiğinde sol işaretçi bu düğüme çevrilir ve <code>solKilavuz</code> <code>FALSE</code> yapılır.</p>
+
+<div class="nt-tablewrap" id="tab-bos">
+<table class="nt-table">
+  <caption>Tablo 12.4: Boş kılavuzlu ağacın tek düğümü olan başlığın alanları.</caption>
+  <thead><tr><th scope="col"><code>solKilavuz</code></th><th scope="col"><code>solCocuk</code></th><th scope="col"><code>veri</code></th><th scope="col"><code>sagCocuk</code></th><th scope="col"><code>sagKilavuz</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>TRUE</code></td><td>→ başlık</td><td>–</td><td>→ başlık</td><td><code>FALSE</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bu düzen bir C yordamıyla kurulur. Sunumda yer almayan iki küçük yardımcı yazılır. <code>kilavuz_dugum</code>, yeni bir düğüm için bellek ayırır. <code>bos_kilavuzlu_agac</code> ise başlığı <a href="#tab-bos">Tablo 12.4</a>'teki gibi doldurur:</p>
+
+<pre class="nt-code"><code>kilavuz_gost kilavuz_dugum(<span class="kw">char</span> veri) {
+  kilavuz_gost d = malloc(<span class="kw">sizeof</span> *d);
+  <span class="kw">if</span> (d == <span class="kw">NULL</span>) {               <span class="cm">// bellek kalmadı</span>
+    fprintf(stderr, "bellek yok\n");
+    exit(EXIT_FAILURE);
+  }
+  d-&gt;veri = veri;
+  d-&gt;solCocuk = d-&gt;sagCocuk = <span class="kw">NULL</span>;   <span class="cm">// ekleme yordamı dolduracak</span>
+  d-&gt;solKilavuz = d-&gt;sagKilavuz = TRUE;
+  <span class="kw">return</span> d;
+}
+kilavuz_gost bos_kilavuzlu_agac(<span class="kw">void</span>) {
+  kilavuz_gost L = kilavuz_dugum('-');  <span class="cm">// başlık: verisi kullanılmaz</span>
+  L-&gt;solCocuk = L;  L-&gt;solKilavuz = TRUE;   <span class="cm">// ağaç boş</span>
+  L-&gt;sagCocuk = L;  L-&gt;sagKilavuz = FALSE;  <span class="cm">// sağı hep kendisi</span>
+  <span class="kw">return</span> L;
+}</code></pre>
+
+<p><code>malloc</code>, istenen kadar bellek bulamazsa <code>NULL</code> döndürür. Dönen değer denetlenmeden <code>d-&gt;veri</code>'ye yazmak, boş işaretçi üzerinden yazmak demektir ve tanımsız davranıştır. Yordam bu yüzden <code>NULL</code> gelince bir ileti basıp programı bitirir. <code>sizeof *d</code> ifadesi, <code>d</code>'nin gösterdiği tipin boyutunu verir. Tip adı tekrar yazılmadığı için yapı değişse bile ifade doğru kalır. Yeni düğümün işaretçileri <code>NULL</code> yapılır; düğüm ağaca eklenirken <code>saga_ekle</code> ya da <code>sola_ekle</code> bu değerlerin üzerine yazar. Bayrakların ilk değeri de aynı nedenle önemsizdir. <code>bos_kilavuzlu_agac</code>'ta başlığın verisine <code>'-'</code> yazılır; bu değer hiçbir yerde okunmaz.</p>
+
+<p><a href="#sekil-baslik">Şekil 12.4</a>'ün üst yarısı boş ağacı, alt yarısı ana örneği başlıkla birlikte gösterir. Şekildeki T ve F harfleri her düğümün iki yanındaki kılavuz bayraklarıdır. Başlığın solu köke (A) gider ve sol bayrağı F'dir. H'nin sol ve G'nin sağ kılavuzu artık başlığa bağlıdır. Başlığın sağ işaretçisi kendi üstüne kıvrılır.</p>
+
+<figure class="nt-fig" id="sekil-baslik" style="--w:660px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 660 220" role="img" aria-label="boş kılavuzlu ağaç"><defs><marker id="n12-d16-ah19-s8_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah20-s8_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="300" y="50" width="60" height="32" rx="5"/><text class="t-sub" x="330" y="71" text-anchor="middle">başlık</text><text class="t-badt" x="282" y="71" text-anchor="middle" style="font-size:12px">T</text><text class="lbl" x="378" y="71" text-anchor="middle" style="font-size:12px">F</text><path class="t-thr" d="M300 66 C250 66 260 120 322 84" marker-end="url(#n12-d16-ah20-s8_0-1)"/><path class="line" d="M360 66 C410 66 400 120 340 84" marker-end="url(#n12-d16-ah19-s8_0-1)"/><text class="t-badt" x="200" y="140" text-anchor="middle">solCocuk → kendisi (kılavuz, TRUE)</text><text class="t-sm" x="470" y="140" text-anchor="middle">sagCocuk → kendisi (FALSE)</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 660 221" role="img" aria-label="başlıklı kılavuzlu ağaç"><defs><marker id="n12-d16-ah21-s8_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah22-s8_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M425.2 29.8 L372 52.8" marker-end="url(#n12-d16-ah21-s8_1-1)"/><path class="line" d="M449 20 C479 2 479 42 444.8 29.8" style="" marker-end="url(#n12-d16-ah21-s8_1-1)"/><path class="line" d="M365 64 L235 108"/><path class="line" d="M365 64 L495 108"/><path class="line" d="M235 108 L105 152"/><path class="line" d="M235 108 L300 152"/><path class="line" d="M105 152 L40 196"/><path class="line" d="M105 152 L170 196"/><path class="line" d="M495 108 L430 152"/><path class="line" d="M495 108 L560 152"/><path class="t-thr" d="M30.2 205.8 Q190.5 215.8 430.8 34" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M49.8 205.8 Q75.3 241.8 100.8 166" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M160.2 205.8 Q134.7 241.8 109.2 166" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M179.8 205.8 Q205.3 241.8 230.8 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M290.2 161.8 Q264.7 197.8 239.2 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M309.8 161.8 Q335.3 197.8 360.8 78" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M420.2 161.8 Q394.7 197.8 369.2 78" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M439.8 161.8 Q465.3 197.8 490.8 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M550.2 161.8 Q524.7 197.8 499.2 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M569.8 161.8 Q544.5 171.8 439.2 34" marker-end="url(#n12-d16-ah22-s8_1-1)"/><rect class="box" x="417" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="435" y="25" text-anchor="middle">başlık</text><text class="lbl" x="409" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="461" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="365" cy="64" r="14"/><text class="txt" x="365" y="69" text-anchor="middle">A</text><text class="lbl" x="343" y="68" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="387" y="68" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="235" cy="108" r="14"/><text class="txt" x="235" y="113" text-anchor="middle">B</text><text class="lbl" x="213" y="112" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="257" y="112" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="105" cy="152" r="14"/><text class="txt" x="105" y="157" text-anchor="middle">D</text><text class="lbl" x="83" y="156" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="127" y="156" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="196" r="14"/><text class="txt" x="40" y="201" text-anchor="middle">H</text><text class="t-badt" x="18" y="200" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="62" y="200" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="170" cy="196" r="14"/><text class="txt" x="170" y="201" text-anchor="middle">I</text><text class="t-badt" x="148" y="200" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="192" y="200" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="300" cy="152" r="14"/><text class="txt" x="300" y="157" text-anchor="middle">E</text><text class="t-badt" x="278" y="156" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="322" y="156" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="495" cy="108" r="14"/><text class="txt" x="495" y="113" text-anchor="middle">C</text><text class="lbl" x="473" y="112" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="517" y="112" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="430" cy="152" r="14"/><text class="txt" x="430" y="157" text-anchor="middle">F</text><text class="t-badt" x="408" y="156" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="452" y="156" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="560" cy="152" r="14"/><text class="txt" x="560" y="157" text-anchor="middle">G</text><text class="t-badt" x="538" y="156" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="582" y="156" text-anchor="middle" style="font-size:11px">T</text></svg></div>
+  <figcaption><b>Şekil 12.4:</b> Başlık düğümü. Üstte boş ağaç: başlığın iki işaretçisi de kendini gösterir. Altta dolu ağaç: başlığın solu köke gider; havada kalan iki kılavuz başlığa bağlanmıştır. T ve F, düğümün o yandaki kılavuz bayrağıdır.</figcaption>
+</figure>
+
+<p>Başlıkla birlikte ağaç bir halka gibi kapanır. Kök ortada sırada son düğümden sonra başlığa, başlıktan sonra yeniden ilk düğüme gelinir. Gezinme yordamları bu halkayı kullanır: başlıktan başlar, başlığa dönünce durur. Böylece “ağaç boş mu”, “ilk düğüm hangisi”, “son düğümün ardılı yok” gibi özel durumların hiçbiri ayrı bir <code>if</code> gerektirmez.</p>
+
+<h3 id="s12-2-5"><span class="nt-num">12.2.5</span>Neden kök ortada sıra</h3>
+
+<p>Kılavuzlar kök ortada sıraya göre kurulur. Aynı ağacın üç gezinme sırası <a href="#tab-sira">Tablo 12.5</a>'te yan yanadır.</p>
+
+<div class="nt-tablewrap" id="tab-sira">
+<table class="nt-table">
+  <caption>Tablo 12.5: Ana örneğin üç gezinme sırası.</caption>
+  <thead><tr><th scope="col">Gezinme</th><th scope="col">Kural</th><th scope="col">Sıra</th></tr></thead>
+  <tbody>
+    <tr><td>kök ortada (<span lang="en">in-order</span>)</td><td>sol, kök, sağ</td><td><code>H D I B E A F C G</code></td></tr>
+    <tr><td>kök önde (<span lang="en">pre-order</span>)</td><td>kök, sol, sağ</td><td><code>A B D H I E C F G</code></td></tr>
+    <tr><td>kök sonda (<span lang="en">post-order</span>)</td><td>sol, sağ, kök</td><td><code>H I D E B F G C A</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Kök ortada sıranın ayrıcalığı kılavuzların tutarlılığından gelir. Bu sırada sol alt ağacı olmayan bir düğümün öncülü her zaman bir atasıdır; sağ alt ağacı olmayan bir düğümün ardılı da öyle. Yani boş bir sol alan tam da öncülünü, boş bir sağ alan tam da ardılını göstermeye uygundur. Dolu alanlar ise aşağıya iner ve öncül ya da ardıl, o alt ağacın en sağında ya da en solunda bulunur. İki kural birlikte her düğüm için ardılı ve öncülü kısa bir yoldan bulmayı sağlar. Kök önde sırada bu simetri yoktur. Örneğin D'nin kök önde ardılı H'dir ve D'den H'ye zaten gerçek bir sol bağ gider; bir kılavuzun eklediği bir bilgi kalmaz. Ders anlatımında bu yüzden ağacın kök ortada gezinmeye göre kurulduğu vurgulanır. Kök önde ve kök sonda gezinme de aynı kılavuzlarla yapılabilir, ama daha dolambaçlı bir yoldan.</p>
+
+<h2 class="nt-pb" id="s12-3"><span class="nt-num">12.3</span>Kök ortada gezinme</h2>
+
+<p>Kılavuzlu ağacın bütün gezinme yordamları tek bir soruya dayanır: verilen bir düğümün kök ortada ardılı hangisidir? Bu soru hızlıca yanıtlanabilirse gezinme, başlıktan başlayıp ardıldan ardıla geçmekten ibarettir.</p>
+
+<h3 id="s12-3-1"><span class="nt-num">12.3.1</span>Ardılı bulmak</h3>
+
+<p>Bir <span class="m">p</span> düğümünün ardılı için iki durum vardır.</p>
+
+<ul>
+  <li><code>p-&gt;sagKilavuz == TRUE</code> ise <code>p-&gt;sagCocuk</code> bir kılavuzdur. Kılavuzun tanımı gereği bu işaretçi zaten <span class="m">p</span>'nin ardılını gösterir. Arama gerekmez.</li>
+  <li><code>p-&gt;sagKilavuz == FALSE</code> ise <span class="m">p</span>'nin gerçek bir sağ alt ağacı vardır. Kök ortada gezinme <span class="m">p</span>'yi yazdıktan sonra bu alt ağaca girer ve orada ilk olarak en soldaki düğümü yazar. Ardıl, sağ alt ağacın en soldaki düğümüdür. Ona varmak için sağ çocuktan başlanır ve <code>solKilavuz</code> <code>TRUE</code> olana dek sol bağlar izlenir.</li>
+</ul>
+
+<p>Bu iki kural sunumdaki yordamda birkaç satıra sığar:</p>
+
+<pre class="nt-code"><code>kilavuz_gost kokortada_ardil_bul(kilavuz_gost L) {
+  <span class="cm">// L ile işaret edilen (NULL olmayan) öğenin ardılı</span>
+  kilavuz_gost p = L-&gt;sagCocuk;
+  <span class="kw">if</span> (!L-&gt;sagKilavuz)        <span class="cm">// sağ alt ağaç var mı</span>
+    <span class="kw">while</span> (!p-&gt;solKilavuz)   <span class="cm">// en soluna dek in</span>
+      p = p-&gt;solCocuk;
+  <span class="kw">return</span> p;
+}</code></pre>
+
+<p>Yordam satır satır şöyle çalışır.</p>
+
+<ul>
+  <li><b>Satır 1–2.</b> Yordam bir düğüm işaretçisi alır ve ardılın adresini döndürür. Açıklama satırı ön koşulu söyler: <code>L</code> <code>NULL</code> olmamalıdır. Kılavuzlu ağaçta hiçbir işaretçi <code>NULL</code> olmadığı için yordamın içinde böyle bir denetim gerekmez; ön koşulu sağlamak çağıranın işidir.</li>
+  <li><b>Satır 3.</b> <code>p</code>, <code>L</code>'nin sağ işaretçisini alır. Bu değer hem kılavuz durumunda doğrudan sonuçtur hem de sağ alt ağaç durumunda aramanın başlangıcıdır. İki durumun ortak ilk adımı tek atamada birleşir.</li>
+  <li><b>Satır 4.</b> <code>!L-&gt;sagKilavuz</code> doğruysa sağ işaretçi gerçek bir bağdır, yani sağ alt ağaç vardır. Açıklama satırı bayrağı değil, sorunun anlamını yazar: “sağ alt ağaç var mı”.</li>
+  <li><b>Satır 5–6.</b> Sağ alt ağaçta sola inilir. Döngü koşulu <code>p-&gt;solKilavuz</code>'a bakar, <code>p-&gt;solCocuk</code>'a değil. En soldaki düğümün sol işaretçisi de dolu bir alandır (bir kılavuz), ama bayrağı <code>TRUE</code>'dur.</li>
+  <li><b>Satır 7.</b> İki durumda da <code>p</code> ardılı gösterir ve döndürülür.</li>
+</ul>
+
+<p>Kuralların doğruluğu kök ortada gezinmenin tanımından çıkar.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-ardil">
+  <span class="nt-box__title">Teorem 12.2 (Ardıl kuralı)</span>
+  <p>Kılavuzlu bir ikili ağaçta <span class="m">p</span>'nin sağ alt ağacı varsa ardılı bu alt ağacın en soldaki düğümüdür. Sağ alt ağacı yoksa ardılı <code>p-&gt;sagCocuk</code> kılavuzunun gösterdiği düğümdür. <code>kokortada_ardil_bul</code> her iki durumda da bu düğümü döndürür.</p>
+</div>
+
+<div class="nt-proof">
+  <p>Kök ortada gezinme <span class="m">p</span>'yi yazdıktan hemen sonra <span class="m">p</span>'nin sağ alt ağacını gezmeye başlar. Bir alt ağacın gezinmesi her zaman en soldaki düğümüyle açılır: kökten sola inilir, sol çocuğu olmayan ilk düğüm yazılır. Öyleyse sağ alt ağaç varsa <span class="m">p</span>'den sonra yazılan ilk düğüm o alt ağacın en soludur. Yordamın döngüsü sol bağları, sol çocuğu olmayan, yani <code>solKilavuz</code>'u <code>TRUE</code> olan ilk düğüme dek izler; bu düğüm en soldaki düğümdür. Sağ alt ağaç yoksa <code>p-&gt;sagCocuk</code> bir kılavuzdur ve <a href="#tanim-kilavuz">Tanım 12.2</a>'nin ikinci kuralı gereği ardılı gösterir. <span class="nt-qed">∎</span></p>
+</div>
+
+<h3 id="s12-3-2"><span class="nt-num">12.3.2</span>Kod izleme: başlık, A ve I</h3>
+
+<p>Yordam üç farklı düğümle çağrılsın. <a href="#tab-ardil">Tablo 12.6</a> her çağrıda <code>p</code>'nin aldığı değerleri ve karar veren bayrakları sırayla verir. Satır numaraları yukarıdaki koda aittir.</p>
+
+<div class="nt-tablewrap" id="tab-ardil">
+<table class="nt-table">
+  <caption>Tablo 12.6: <code>kokortada_ardil_bul</code> izlemesi. Ağaç, ana örneğin başlıklı hâlidir (<a href="#sekil-baslik">Şekil 12.4</a>, alt).</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Satır</th><th scope="col">Olay</th><th scope="col"><code>p</code></th></tr></thead>
+  <tbody>
+    <tr><td rowspan="7"><code>L</code> = başlık</td><td>3</td><td><code>p = başlık-&gt;sagCocuk</code>; başlığın sağı kendisidir</td><td>başlık</td></tr>
+    <tr><td>4</td><td><code>sagKilavuz</code> <code>FALSE</code>: başlığın gerçek bir sağ alt ağacı var sayılır</td><td>başlık</td></tr>
+    <tr><td>5–6</td><td>başlık-&gt;<code>solKilavuz</code> <code>FALSE</code>, sola</td><td>A</td></tr>
+    <tr><td>5–6</td><td>A-&gt;<code>solKilavuz</code> <code>FALSE</code>, sola</td><td>B</td></tr>
+    <tr><td>5–6</td><td>B-&gt;<code>solKilavuz</code> <code>FALSE</code>, sola</td><td>D</td></tr>
+    <tr><td>5–6</td><td>D-&gt;<code>solKilavuz</code> <code>FALSE</code>, sola</td><td>H</td></tr>
+    <tr><td>7</td><td>H-&gt;<code>solKilavuz</code> <code>TRUE</code>: döngü biter, H döner</td><td>H</td></tr>
+    <tr><td rowspan="4"><code>L</code> = A</td><td>3</td><td><code>p = A-&gt;sagCocuk</code></td><td>C</td></tr>
+    <tr><td>4</td><td><code>sagKilavuz</code> <code>FALSE</code>: A'nın sağ alt ağacı var</td><td>C</td></tr>
+    <tr><td>5–6</td><td>C-&gt;<code>solKilavuz</code> <code>FALSE</code>, sola</td><td>F</td></tr>
+    <tr><td>7</td><td>F-&gt;<code>solKilavuz</code> <code>TRUE</code>: F döner</td><td>F</td></tr>
+    <tr><td rowspan="3"><code>L</code> = I</td><td>3</td><td><code>p = I-&gt;sagCocuk</code> (bir kılavuz)</td><td>B</td></tr>
+    <tr><td>4</td><td><code>sagKilavuz</code> <code>TRUE</code>: döngüye girilmez</td><td>B</td></tr>
+    <tr><td>7</td><td>B döner</td><td>B</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İlk çağrı özel bir sonuç verir: başlığın ardılı kök ortada sıradaki ilk düğümdür (H). Başlığın sağ işaretçisinin kendini göstermesi ve <code>sagKilavuz</code>'unun <code>FALSE</code> olması bunun için seçilmiştir. Yordam, başlığın sağ alt ağacının “kendisi” olduğunu düşünür, oradan sola inmeye başlar ve başlığın solundaki gerçek ağacın en soluna varır. Böylece gezinmeye başlamak için ayrı bir “en soldaki düğümü bul” yordamı gerekmez. <a href="#sekil-ardil">Şekil 12.5</a> bu çağrının ilk ve son anını gösterir.</p>
+
+<figure class="nt-fig" id="sekil-ardil" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 -22 560 210" role="img" aria-label="ardıl bulma"><defs><marker id="n12-d16-ah23-s11_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah24-s11_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah25-s11_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M383.95 27.8 L330.75 42.8" marker-end="url(#n12-d16-ah23-s11_0-1)"/><path class="line" d="M407.75 18 C437.75 0 437.75 40 403.55 27.8" style="stroke:var(--ds-accent);stroke-width:3" marker-end="url(#n12-d16-ah23-s11_0-1)"/><path class="line" d="M323.75 54 L206.25 90"/><path class="line" d="M323.75 54 L441.25 90"/><path class="line" d="M206.25 90 L88.75 126"/><path class="line" d="M206.25 90 L265 126"/><path class="line" d="M88.75 126 L30 162"/><path class="line" d="M88.75 126 L147.5 162"/><path class="line" d="M441.25 90 L382.5 126"/><path class="line" d="M441.25 90 L500 126"/><path class="t-thr" d="M20.2 171.8 Q164.875 181.8 389.55 32" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M39.8 171.8 Q62.175 207.8 84.55 140" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M137.7 171.8 Q115.325 207.8 92.95 140" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M157.3 171.8 Q179.675 207.8 202.05 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M255.2 135.8 Q232.825 171.8 210.45 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M274.8 135.8 Q297.175 171.8 319.55 68" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M372.7 135.8 Q350.325 171.8 327.95 68" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M392.3 135.8 Q414.675 171.8 437.05 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M490.2 135.8 Q467.825 171.8 445.45 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M509.8 135.8 Q493.875 145.8 397.95 32" marker-end="url(#n12-d16-ah25-s11_0-1)"/><rect class="box" x="375.75" y="5" width="36" height="26" rx="5"/><text class="t-sub" x="393.75" y="23" text-anchor="middle">başlık</text><text class="lbl" x="367.75" y="22" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="419.75" y="22" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="323.75" cy="54" r="14"/><text class="txt" x="323.75" y="59" text-anchor="middle">A</text><text class="lbl" x="301.75" y="58" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="345.75" y="58" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="206.25" cy="90" r="14"/><text class="txt" x="206.25" y="95" text-anchor="middle">B</text><text class="lbl" x="184.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="228.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="88.75" cy="126" r="14"/><text class="txt" x="88.75" y="131" text-anchor="middle">D</text><text class="lbl" x="66.75" y="130" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="110.75" y="130" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="30" cy="162" r="14"/><text class="txt" x="30" y="167" text-anchor="middle">H</text><text class="t-badt" x="8" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="52" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="147.5" cy="162" r="14"/><text class="txt" x="147.5" y="167" text-anchor="middle">I</text><text class="t-badt" x="125.5" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="169.5" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="265" cy="126" r="14"/><text class="txt" x="265" y="131" text-anchor="middle">E</text><text class="t-badt" x="243" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="287" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="441.25" cy="90" r="14"/><text class="txt" x="441.25" y="95" text-anchor="middle">C</text><text class="lbl" x="419.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="463.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="382.5" cy="126" r="14"/><text class="txt" x="382.5" y="131" text-anchor="middle">F</text><text class="t-badt" x="360.5" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="404.5" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="500" cy="126" r="14"/><text class="txt" x="500" y="131" text-anchor="middle">G</text><text class="t-badt" x="478" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="522" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="361.75" y="-6" text-anchor="end">L,p</text><path class="line" d="M363.75 -8 L383.67 7.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah24-s11_0-1)"/></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="-13 -22 573 210" role="img" aria-label="ardıl bulma"><defs><marker id="n12-d16-ah41-s11_6-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah42-s11_6-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah43-s11_6-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M383.95 27.8 L330.75 42.8" marker-end="url(#n12-d16-ah41-s11_6-1)"/><path class="line" d="M407.75 18 C437.75 0 437.75 40 403.55 27.8" style="" marker-end="url(#n12-d16-ah41-s11_6-1)"/><path class="line" d="M323.75 54 L206.25 90"/><path class="line" d="M323.75 54 L441.25 90"/><path class="line" d="M206.25 90 L88.75 126"/><path class="line" d="M206.25 90 L265 126"/><path class="line" d="M88.75 126 L30 162"/><path class="line" d="M88.75 126 L147.5 162"/><path class="line" d="M441.25 90 L382.5 126"/><path class="line" d="M441.25 90 L500 126"/><path class="t-thr" d="M20.2 171.8 Q164.875 181.8 389.55 32" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M39.8 171.8 Q62.175 207.8 84.55 140" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M137.7 171.8 Q115.325 207.8 92.95 140" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M157.3 171.8 Q179.675 207.8 202.05 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M255.2 135.8 Q232.825 171.8 210.45 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M274.8 135.8 Q297.175 171.8 319.55 68" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M372.7 135.8 Q350.325 171.8 327.95 68" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M392.3 135.8 Q414.675 171.8 437.05 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M490.2 135.8 Q467.825 171.8 445.45 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M509.8 135.8 Q493.875 145.8 397.95 32" marker-end="url(#n12-d16-ah43-s11_6-1)"/><rect class="box" x="375.75" y="5" width="36" height="26" rx="5"/><text class="t-sub" x="393.75" y="23" text-anchor="middle">başlık</text><text class="lbl" x="367.75" y="22" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="419.75" y="22" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="323.75" cy="54" r="14"/><text class="txt" x="323.75" y="59" text-anchor="middle">A</text><text class="lbl" x="301.75" y="58" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="345.75" y="58" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="206.25" cy="90" r="14"/><text class="txt" x="206.25" y="95" text-anchor="middle">B</text><text class="lbl" x="184.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="228.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="88.75" cy="126" r="14"/><text class="txt" x="88.75" y="131" text-anchor="middle">D</text><text class="lbl" x="66.75" y="130" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="110.75" y="130" text-anchor="middle" style="font-size:11px">F</text><circle class="t-cur" cx="30" cy="162" r="14"/><text class="txt" x="30" y="167" text-anchor="middle">H</text><text class="t-badt" x="8" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="52" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="147.5" cy="162" r="14"/><text class="txt" x="147.5" y="167" text-anchor="middle">I</text><text class="t-badt" x="125.5" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="169.5" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="265" cy="126" r="14"/><text class="txt" x="265" y="131" text-anchor="middle">E</text><text class="t-badt" x="243" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="287" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="441.25" cy="90" r="14"/><text class="txt" x="441.25" y="95" text-anchor="middle">C</text><text class="lbl" x="419.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="463.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="382.5" cy="126" r="14"/><text class="txt" x="382.5" y="131" text-anchor="middle">F</text><text class="t-badt" x="360.5" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="404.5" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="500" cy="126" r="14"/><text class="txt" x="500" y="131" text-anchor="middle">G</text><text class="t-badt" x="478" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="522" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="361.75" y="-6" text-anchor="end">L</text><path class="line" d="M363.75 -8 L383.67 7.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah42-s11_6-1)"/><text class="t-ptr" x="-2" y="138" text-anchor="end">p</text><path class="line" d="M0 136 L19.92 151.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah42-s11_6-1)"/></svg></div>
+  <figcaption><b>Şekil 12.5:</b> <code>kokortada_ardil_bul(başlık)</code>. Üstte başlangıç: <code>L</code> ve <code>p</code> başlığı gösterir. Altta <code>p</code>, sol bağlar izlenerek H'ye inmiştir; H'nin sol bayrağı T olduğu için arama durur.</figcaption>
+</figure>
+
+<p>A için yapılan çağrıda sağ alt ağaç C'de başlar ve tek bir sola inişle F bulunur. I için yapılan çağrıda hiç arama yoktur; sağ işaretçi bir kılavuzdur ve doğrudan B'yi gösterir. Bir yaprağın ardılı her zaman böyle tek adımda bulunur.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Döngüyü <code>while (!p-&gt;solKilavuz)</code> yerine <code>while (!L-&gt;solKilavuz)</code> yazmak. Koşul her turda aynı düğüme baktığı için ya hiç girilmez ya da hiç çıkılmaz. Döngü değişkeni <code>p</code>'dir ve koşul da onun bayrağını sınamalıdır.</p>
+</div>
+
+<h3 id="s12-3-3"><span class="nt-num">12.3.3</span>Yığınsız gezinme</h3>
+
+<p>Ardıl yordamı hazır olunca kök ortada gezinme kısa bir döngüdür. Başlıktan başlanır; her turda bir sonraki düğüme geçilir ve yazılır. Başlığa geri dönülünce bütün ağaç gezilmiş olur.</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> kilavuz_kokortada_dolas(kilavuz_gost L) {
+  kilavuz_gost p = L;        <span class="cm">// L: başlık düğümü</span>
+  <span class="kw">for</span> (;;) {
+    p = kokortada_ardil_bul(p);
+    <span class="kw">if</span> (p == L) <span class="kw">break</span>;       <span class="cm">// başlığa dönüldü mü</span>
+    printf("%c ", p-&gt;veri);
+  }
+}</code></pre>
+
+<ul>
+  <li><b>Satır 2.</b> <code>p</code> başlığı gösterir. Gezinmenin bütün durumu bu tek değişkendedir.</li>
+  <li><b>Satır 3.</b> <code>for (;;)</code> koşulsuz bir döngüdür; çıkış, gövdedeki <code>break</code> ile yapılır. Çıkış testi ardıl bulunduktan sonra yapılmak zorunda olduğu için koşul döngünün başına konamaz.</li>
+  <li><b>Satır 4.</b> <code>p</code> kendi ardılına ilerler.</li>
+  <li><b>Satır 5.</b> Ardıl başlıksa halka tamamlanmıştır. Son düğümün sağ kılavuzu başlığı gösterdiği için bu durum her zaman gerçekleşir.</li>
+  <li><b>Satır 6.</b> Düğüm yazılır.</li>
+</ul>
+
+<p>Boş ağaçta ilk çağrı başlığın kendisini döndürür. <code>p = başlık-&gt;sagCocuk</code> başlıktır. <code>sagKilavuz</code> <code>FALSE</code> olduğu için döngüye girilir, ama başlığın <code>solKilavuz</code>'u <code>TRUE</code>'dur ve hemen çıkılır. <code>p == L</code> doğrudur ve hiçbir şey yazılmadan gezinme biter. Boş ağaç için ayrı bir denetim gerekmemesi başlık düğümünün kazancıdır.</p>
+
+<p>Ana örnekte döngü on kez döner. <a href="#tab-gezinme">Tablo 12.7</a>, her turda ardılın hangi kuralla bulunduğunu ve kaç işaretçi izlendiğini verir. “İzlenen” sütunu, satır 3'teki okuma ile döngüdeki her sola inişi birer adım sayar.</p>
+
+<div class="nt-tablewrap" id="tab-gezinme">
+<table class="nt-table">
+  <caption>Tablo 12.7: <code>kilavuz_kokortada_dolas</code> izlemesi. Çıktı <code>H D I B E A F C G</code>'dir; toplam 15 işaretçi izlenir.</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col"><code>p</code> (önce)</th><th scope="col">Nasıl bulundu</th><th scope="col"><code>p</code> (sonra)</th><th scope="col">İzlenen</th><th scope="col">Çıktı</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>başlık</td><td>sağ alt ağacın en solu (A, B, D, H)</td><td>H</td><td>5</td><td><code>H</code></td></tr>
+    <tr><td>2</td><td>H</td><td>kılavuzla doğrudan</td><td>D</td><td>1</td><td><code>D</code></td></tr>
+    <tr><td>3</td><td>D</td><td>sağ alt ağacın en solu (I)</td><td>I</td><td>1</td><td><code>I</code></td></tr>
+    <tr><td>4</td><td>I</td><td>kılavuzla doğrudan</td><td>B</td><td>1</td><td><code>B</code></td></tr>
+    <tr><td>5</td><td>B</td><td>sağ alt ağacın en solu (E)</td><td>E</td><td>1</td><td><code>E</code></td></tr>
+    <tr><td>6</td><td>E</td><td>kılavuzla doğrudan</td><td>A</td><td>1</td><td><code>A</code></td></tr>
+    <tr><td>7</td><td>A</td><td>sağ alt ağacın en solu (C, F)</td><td>F</td><td>2</td><td><code>F</code></td></tr>
+    <tr><td>8</td><td>F</td><td>kılavuzla doğrudan</td><td>C</td><td>1</td><td><code>C</code></td></tr>
+    <tr><td>9</td><td>C</td><td>sağ alt ağacın en solu (G)</td><td>G</td><td>1</td><td><code>G</code></td></tr>
+    <tr><td>10</td><td>G</td><td>kılavuzla doğrudan</td><td>başlık</td><td>1</td><td>(<code>break</code>)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki iki kural sırayla birbirini izler. Bir yapraktan sonra kılavuzla yukarı çıkılır; iç düğümden sonra sağ alt ağaca girilip en sola inilir. Hiçbir turda bir düğüm iki kez yazılmaz ve hiçbir yerde bir yığına ihtiyaç duyulmaz.</p>
+
+<h3 id="s12-3-4"><span class="nt-num">12.3.4</span>Gezinmenin maliyeti</h3>
+
+<p>Tek bir <code>kokortada_ardil_bul</code> çağrısı uzun sürebilir. Başlıkla yapılan ilk çağrı kökten en soldaki düğüme kadar iner; bu yol ağacın yüksekliği kadar uzundur. Tek çağrının en kötü maliyeti bu yüzden <span class="m">O(h)</span>'dir. Sola çarpık 1000 düğümlü bir ağaçta bu ilk çağrı 1001 işaretçi izler. Ama bütün gezinmenin toplam maliyeti, çağrı sayısı ile en kötü maliyetin çarpımından çok daha küçüktür.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-gezinme">
+  <span class="nt-box__title">Teorem 12.3 (Kılavuzlu gezinmenin maliyeti)</span>
+  <p><span class="m">n</span> düğümlü kılavuzlu bir ağacın <code>kilavuz_kokortada_dolas</code> ile gezinmesi en çok <span class="m">2n + 1</span> işaretçi izler. Zaman <span class="m">Θ(n)</span>, ek bellek <span class="m">O(1)</span>'dir.</p>
+</div>
+
+<div class="nt-proof">
+  <p>Döngü <span class="m">n + 1</span> kez <code>kokortada_ardil_bul</code> çağırır: <span class="m">n</span> düğüm için birer kez ve başlığa dönüş için bir kez. Her çağrı satır 3'te tam bir işaretçi okur; bu, toplam <span class="m">n + 1</span> adım eder. Döngüdeki sola inişler yalnız gerçek sol bağlar üzerinden yapılır. Bir sol bağ, ancak bağın sahibi olan düğümün içinde bulunduğu alt ağaca soldan girilirken izlenir ve gezinme her alt ağaca bir kez girer. Öyleyse her gerçek sol bağ en çok bir kez izlenir. Gerçek sol bağların sayısı, başlıktan köke giden bağ da katılınca, en çok <span class="m">n</span>'dir. Toplam <span class="m">(n + 1) + n = 2n + 1</span> olur. Her adım sabit süredir; zaman <span class="m">O(n)</span>'dir. Her düğüm yazıldığı için zaman <span class="m">Ω(n)</span>'dir de. Yordam yalnız <code>p</code> değişkenini kullanır; ek bellek <span class="m">O(1)</span>'dir. <span class="nt-qed">∎</span></p>
+</div>
+
+<p>Ana örnekte sol çocuğu olan düğümler A, B, C ve D'dir. Başlıktan köke giden bağla birlikte beş sola iniş yapılır. Toplam <span class="m">10 + 5 = 15</span> adım, <a href="#tab-gezinme">Tablo 12.7</a>'nin son sütununun toplamıyla aynıdır. Uç durumlar da sayılarak doğrulandı. Sola çarpık 1000 düğümlü ağaçta her düğümün sol çocuğu vardır ve sınır tam olarak erişilir: 2001 adım. Sağa çarpık 1000 düğümlü ağaçta yalnız başlıktan köke bir sola iniş yapılır: <span class="m">1001 + 1 = 1002</span> adım.</p>
+
+<p>Toplam <span class="m">2n + 1</span> adım <span class="m">n + 1</span> çağrıya bölününce çağrı başına ikiden az adım düşer. Tek tek bakıldığında pahalı çağrılar olsa da bir gezinmede bunlar azdır; pahalı bir iniş, sonraki çağrıları ucuzlatır. Bu tür değerlendirmeye <strong>amortize analiz</strong> (<span lang="en">amortized analysis</span>) denir. Ardıl bulmanın amortize maliyeti gezinme içinde <span class="m">O(1)</span>'dir.</p>
+
+<p>Kılavuzların bir kazancı daha vardır. Herhangi bir düğümün adresi elde olduğunda ardılına, gezinmeye baştan başlamadan geçilebilir. Sıradan ağaçta bir düğümün ardılını bulmak için ya ebeveyn işaretçisi gerekir ya da kökten yeniden inmek gerekir. Kılavuzlu ağaç bu soruyu düğümün kendisinden başlayarak yanıtlar.</p>
+
+<p>Böyle bir iyileştirmenin değeri küçümsenmemelidir. Ders anlatımında bir örnek verilir: bir problemin <span class="m">O(n<sup>2</sup>)</span> sürede çözüldüğü bilinir ve birisi çalışıp <span class="m">O(n<sup>1,89</sup>)</span>'a indiren bir algoritma yazar. Üsteki bu küçük fark büyük bir iştir ve literatüre o algoritma geçer. Kılavuzlu gezinme zamanı değil belleği iyileştirir: <span class="m">O(h)</span>'yi <span class="m">O(1)</span>'e indirir. Çarpık ağaçlarda bu, <span class="m">O(n)</span>'den <span class="m">O(1)</span>'e inmek demektir.</p>
+
+<h3 id="s12-3-5"><span class="nt-num">12.3.5</span>Kök önde gezinme</h3>
+
+<p>Kılavuzlar kök ortada sıraya göre kurulmuştur, ama aynı kılavuzlarla kök önde (<span lang="en">preorder</span>) gezinme de yapılabilir. Bunun için kök önde ardılı bulan bir yordam yazılır.</p>
+
+<pre class="nt-code"><code>kilavuz_gost kokonde_ardil_bul(kilavuz_gost p) {
+  <span class="kw">if</span> (!p-&gt;solKilavuz)        <span class="cm">// sol çocuk varsa o</span>
+    <span class="kw">return</span> p-&gt;solCocuk;
+  <span class="kw">while</span> (p-&gt;sagKilavuz)      <span class="cm">// sağ kılavuzlarla çık</span>
+    p = p-&gt;sagCocuk;
+  <span class="kw">return</span> p-&gt;sagCocuk;        <span class="cm">// ilk gerçek sağ çocuk</span>
+}</code></pre>
+
+<p>Kök önde gezinmede bir düğüm yazıldıktan sonra varsa sol alt ağacına girilir; sol alt ağacın ilk düğümü onun köküdür. Satır 2–3 bu durumu karşılar: sol bayrak <code>FALSE</code> ise ardıl sol çocuktur. Sol çocuk yoksa ardıl, <span class="m">p</span>'den başlayarak yukarıda bulunan ve henüz gezilmemiş ilk sağ alt ağacın köküdür. Satır 4–5 bu düğümü arar. <span class="m">p</span>'nin sağ işaretçisi kılavuz olduğu sürece kılavuz izlenir. Sağ kılavuz, kök ortada ardıla, yani <span class="m">p</span>'yi sol alt ağacında taşıyan en yakın ataya gider. O atanın sol alt ağacı bitmiştir ve sırada atanın sağ alt ağacı vardır. Ata da sağ alt ağaçsızsa (bayrağı yine <code>TRUE</code>) bir kılavuz daha izlenir. Gerçek bir sağ bağa sahip ilk düğümde durulur ve satır 6 onun sağ çocuğunu döndürür.</p>
+
+<p>Bu yordamla gezinme döngüsü, kök ortada gezinmeyle aynı biçimdedir:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> kilavuz_kokonde_dolas(kilavuz_gost L) {
+  kilavuz_gost p = L;        <span class="cm">// L: başlık düğümü</span>
+  <span class="kw">for</span> (;;) {
+    p = kokonde_ardil_bul(p);
+    <span class="kw">if</span> (p == L) <span class="kw">break</span>;       <span class="cm">// başlığa dönüldü mü</span>
+    printf("%c ", p-&gt;veri);
+  }
+}</code></pre>
+
+<p>Başlıktan başlanınca başlığın sol bayrağı <code>FALSE</code> olduğu için ardıl köktür (A). Son düğümden sonra kılavuzlar başlığa çıkar; başlığın sağ bayrağı <code>FALSE</code>, sağ işaretçisi kendisidir. Yordam başlığı döndürür ve gezinme biter. <a href="#tab-kokonde">Tablo 12.8</a> bütün adımları verir.</p>
+
+<div class="nt-tablewrap" id="tab-kokonde">
+<table class="nt-table">
+  <caption>Tablo 12.8: <code>kokonde_ardil_bul</code> ile gezinme. Çıktı <code>A B D H I E C F G</code>'dir.</caption>
+  <thead><tr><th scope="col"><code>p</code></th><th scope="col">Sol bayrak</th><th scope="col">İzlenen sağ kılavuzlar</th><th scope="col">Ardıl</th></tr></thead>
+  <tbody>
+    <tr><td>başlık</td><td>F</td><td>–</td><td>A (sol çocuk)</td></tr>
+    <tr><td>A</td><td>F</td><td>–</td><td>B (sol çocuk)</td></tr>
+    <tr><td>B</td><td>F</td><td>–</td><td>D (sol çocuk)</td></tr>
+    <tr><td>D</td><td>F</td><td>–</td><td>H (sol çocuk)</td></tr>
+    <tr><td>H</td><td>T</td><td>H → D</td><td>I (D'nin sağ çocuğu)</td></tr>
+    <tr><td>I</td><td>T</td><td>I → B</td><td>E (B'nin sağ çocuğu)</td></tr>
+    <tr><td>E</td><td>T</td><td>E → A</td><td>C (A'nın sağ çocuğu)</td></tr>
+    <tr><td>C</td><td>F</td><td>–</td><td>F (sol çocuk)</td></tr>
+    <tr><td>F</td><td>T</td><td>F → C</td><td>G (C'nin sağ çocuğu)</td></tr>
+    <tr><td>G</td><td>T</td><td>G → başlık</td><td>başlık (başlığın sağı kendisi): biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bir yaprağın kök önde ardılını bulmak birden çok kılavuz izlemeyi gerektirebilir. Örneğin I'dan sonra tek kılavuzla B'ye çıkılır ve B'nin sağ çocuğu E bulunur. Daha derin bir ağaçta bir yapraktan başlayarak birkaç ata üst üste sağ alt ağaçsız olabilir; bu durumda kılavuz zinciri uzar. Yine de her sağ kılavuz bütün gezinmede en çok bir kez izlenir ve toplam zaman <span class="m">O(n)</span>, ek bellek <span class="m">O(1)</span> kalır.</p>
+
+<p>Kök sonda (<span lang="en">postorder</span>) gezinme aynı kolaylıkla yazılamaz. Kök sonda sırada bir düğümden sonra genellikle ebeveyni gelir. Düğüm ebeveyninin sağ çocuğuysa ardılı ebeveyndir; sol çocuğuysa ardılı ebeveynin sağ alt ağacındaki ilk kök sonda düğümdür. İki durumda da ebeveyni bilmek gerekir. Kılavuzlar ise ebeveyni değil, kök ortada öncül ve ardılı gösterir; bu ikisi ebeveynle her zaman örtüşmez. H'nin sağ kılavuzu ebeveyni D'yi gösterir, ama I'nın sağ kılavuzu ebeveyni D'yi değil, B'yi gösterir. Kök sonda gezinmeyi kılavuzlarla yapmak mümkündür ama dolambaçlıdır. Her düğüme bir ebeveyn işaretçisi eklemek işi kolaylaştırır.</p>
+
+<h3 id="s12-3-6"><span class="nt-num">12.3.6</span>Morris gezinmesi</h3>
+
+<p>Kılavuzlu ağaç iki bedel öder: her düğümde bayrak alanları ve ekleme yordamlarının ek karmaşıklığı. J. M. Morris 1979'da bayrak alanı gerektirmeyen bir yöntem önerdi. <strong>Morris gezinmesi</strong> (<span lang="en">Morris traversal</span>), sıradan bir ikili ağaçta kılavuzları gezinme sırasında geçici olarak kurar, işi bitince söker. Ağaç, gezinmenin sonunda başlangıçtaki hâline döner. Yordam, bölümün başında verilen sıradan <code>struct agac</code> düğümüyle çalışır:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> morris_kokortada(agac_gost L) {
+  <span class="kw">while</span> (L) {
+    <span class="kw">if</span> (!L-&gt;solcocuk) {             <span class="cm">/* sol yok: yaz, sağa */</span>
+      printf("%c", L-&gt;veri);  L = L-&gt;sagcocuk;
+    } <span class="kw">else</span> {
+      agac_gost p = L-&gt;solcocuk;    <span class="cm">/* kök ortada öncülü */</span>
+      <span class="kw">while</span> (p-&gt;sagcocuk &amp;&amp; p-&gt;sagcocuk != L)
+        p = p-&gt;sagcocuk;
+      <span class="kw">if</span> (!p-&gt;sagcocuk) {           <span class="cm">/* geçici kılavuz kur */</span>
+        p-&gt;sagcocuk = L;  L = L-&gt;solcocuk;
+      } <span class="kw">else</span> {                      <span class="cm">/* kılavuzu sök */</span>
+        p-&gt;sagcocuk = <span class="kw">NULL</span>;
+        printf("%c", L-&gt;veri);  L = L-&gt;sagcocuk;
+      }
+    }
+  }
+}</code></pre>
+
+<p>Yordamın fikri şudur. Sol alt ağacı olan bir <span class="m">L</span> düğümüne gelindiğinde, sola inmeden önce dönüş yolu hazırlanır. <span class="m">L</span>'nin kök ortada öncülü, sol alt ağacının en sağındaki düğümdür. Bu düğümün sağ işaretçisi boştur, çünkü en sağdaki düğümün sağ çocuğu olamaz. Bu boş alana <span class="m">L</span>'nin adresi yazılır: geçici bir kılavuz. Sol alt ağaç gezilip öncüle varıldığında bu kılavuz izlenerek <span class="m">L</span>'ye dönülür. <span class="m">L</span>'ye ikinci gelişte öncül yeniden aranır; bu kez öncülün sağ işaretçisinin <span class="m">L</span>'yi gösterdiği görülür. Bu, sol alt ağacın bittiğinin işaretidir. Kılavuz sökülür, <span class="m">L</span> yazılır ve sağa geçilir.</p>
+
+<ul>
+  <li><b>Satır 2.</b> <code>L</code> <code>NULL</code> olana dek döner. Son düğümün sağ işaretçisi gerçekten <code>NULL</code>'dır; döngü orada biter.</li>
+  <li><b>Satır 3–4.</b> Sol alt ağaç yoksa düğüm yazılır ve sağa geçilir. Sağ işaretçi gerçek bir çocuk da olabilir, daha önce kurulmuş geçici bir kılavuz da. Yordam ikisini ayırt etmez; ikisinde de doğru düğüme gidilir.</li>
+  <li><b>Satır 6–8.</b> Öncül aranır: sol çocuktan başlanır, sağa gidilebildiği sürece gidilir. Koşulun ikinci yarısı (<code>p-&gt;sagcocuk != L</code>) önemlidir. Kılavuz daha önce kurulmuşsa en sağdaki düğümün sağ işaretçisi <code>L</code>'yi gösterir; bu sınama olmasaydı arama kılavuzu izleyip <code>L</code>'ye, oradan yeniden sola dönerdi.</li>
+  <li><b>Satır 9–10.</b> Öncülün sağı boşsa ilk geliştir: kılavuz kurulur ve sola inilir.</li>
+  <li><b>Satır 11–13.</b> Öncülün sağı <code>L</code>'yi gösteriyorsa ikinci geliştir: kılavuz sökülür, <code>L</code> yazılır, sağa geçilir.</li>
+</ul>
+
+<p>Yordam A(B(D, E), C) ağacında, yani A'nın çocukları B ve C, B'nin çocukları D ve E olan beş düğümlü ağaçta izlensin. <a href="#tab-morris">Tablo 12.9</a> her turu, <a href="#sekil-morris">Şekil 12.6</a> dört anı gösterir.</p>
+
+<div class="nt-tablewrap" id="tab-morris">
+<table class="nt-table">
+  <caption>Tablo 12.9: <code>morris_kokortada</code> izlemesi, ağaç A(B(D, E), C). Çıktı <code>DBEAC</code>'dir.</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col"><code>L</code></th><th scope="col">Öncül <code>p</code></th><th scope="col">Olay</th><th scope="col">Geçici kılavuzlar</th><th scope="col">Çıktı</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>A</td><td>E (B'den sağa)</td><td>E'nin sağı boş: kılavuz kur, sola</td><td>E→A</td><td></td></tr>
+    <tr><td>2</td><td>B</td><td>D</td><td>D'nin sağı boş: kılavuz kur, sola</td><td>E→A, D→B</td><td></td></tr>
+    <tr><td>3</td><td>D</td><td>–</td><td>solu yok: yaz, sağa (kılavuzla B'ye)</td><td>E→A, D→B</td><td><code>D</code></td></tr>
+    <tr><td>4</td><td>B</td><td>D</td><td>D'nin sağı B: kılavuzu sök, yaz, sağa</td><td>E→A</td><td><code>DB</code></td></tr>
+    <tr><td>5</td><td>E</td><td>–</td><td>solu yok: yaz, sağa (kılavuzla A'ya)</td><td>E→A</td><td><code>DBE</code></td></tr>
+    <tr><td>6</td><td>A</td><td>E (B'den sağa)</td><td>E'nin sağı A: kılavuzu sök, yaz, sağa</td><td>–</td><td><code>DBEA</code></td></tr>
+    <tr><td>7</td><td>C</td><td>–</td><td>solu yok: yaz, sağa (<code>NULL</code>)</td><td>–</td><td><code>DBEAC</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-morris" style="--w:700px">
+  <div class="nt-fig__row nt-fig__row--4"><svg class="ds-svg" viewBox="0 -19 470 189" role="img" aria-label="Morris gezinmesi"><defs><marker id="n12-d16-ah135-s16_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah136-s16_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-cur" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-n" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-n" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-n" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-n" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-ptr" x="229.5" y="-3" text-anchor="end">L</text><path class="line" d="M231.5 -5 L251.7 13.2" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah135-s16_1-1)"/><path class="t-thrh" d="M205 126 Q268.75 146 270.5 38" marker-end="url(#n12-d16-ah136-s16_1-1)"/><text class="t-bold" x="460" y="60" text-anchor="end">çıktı: </text></svg><svg class="ds-svg" viewBox="0 0 470 170" role="img" aria-label="Morris gezinmesi"><defs><marker id="n12-d16-ah137-s16_2-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah138-s16_2-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-n" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-cur" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-n" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-n" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-n" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-ptr" x="94.5" y="43" text-anchor="end">L</text><path class="line" d="M96.5 41 L116.7 59.2" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah137-s16_2-1)"/><path class="t-thr" d="M205 126 Q268.75 146 270.5 38" marker-end="url(#n12-d16-ah138-s16_2-1)"/><path class="t-thrh" d="M70 126 Q133.75 146 135.5 84" marker-end="url(#n12-d16-ah138-s16_2-1)"/><text class="t-bold" x="460" y="60" text-anchor="end">çıktı: </text></svg><svg class="ds-svg" viewBox="0 0 470 170" role="img" aria-label="Morris gezinmesi"><defs><marker id="n12-d16-ah141-s16_4-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah142-s16_4-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-n" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-cur" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-done" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-n" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-n" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-ptr" x="94.5" y="43" text-anchor="end">L</text><path class="line" d="M96.5 41 L116.7 59.2" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah141-s16_4-1)"/><path class="t-thr" d="M205 126 Q268.75 146 270.5 38" marker-end="url(#n12-d16-ah142-s16_4-1)"/><text class="t-bold" x="460" y="60" text-anchor="end">çıktı: DB</text></svg><svg class="ds-svg" viewBox="0 0 470 170" role="img" aria-label="Morris gezinmesi"><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-done" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-done" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-done" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-done" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-done" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-bold" x="460" y="60" text-anchor="end">çıktı: DBEAC</text></svg></div>
+  <figcaption><b>Şekil 12.6:</b> Morris gezinmesinin dört anı. Birinci anda E → A kılavuzu kurulmuş, sola inilmiştir. İkincide D → B kılavuzu da kurulmuştur. Üçüncüde D'den B'ye dönülmüş, D → B sökülmüş, B yazılmıştır. Dördüncüde gezinme bitmiştir; ağaç eski hâlindedir.</figcaption>
+</figure>
+
+<p>Tablo, her geçici kılavuzun tam iki kez görüldüğünü gösterir: kurulurken ve sökülürken. Sol çocuğu olan her düğüm bir kılavuz doğurur; bu ağaçta iki tane (A ve B için). Gezinme bittiğinde D'nin ve E'nin sağ işaretçileri yeniden <code>NULL</code>'dır. Sonuç, aynı ağaçta özyinelemeli kök ortada gezinmenin çıktısıyla karşılaştırılarak doğrulandı:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> kokortada(agac_gost p) {
+  <span class="kw">if</span> (p) {
+    kokortada(p-&gt;solcocuk);
+    printf("%c", p-&gt;veri);
+    kokortada(p-&gt;sagcocuk);
+  }
+}</code></pre>
+
+<p>Morris gezinmesinin zamanı da <span class="m">O(n)</span>'dir. Sol çocuğu olan her düğüm için öncül iki kez aranır. Her arama, sol çocuktan başlayıp sağa giden bir yolu yürür. Farklı düğümlerin bu yolları ortak kenar içermez; bir kenar en çok bir düğümün öncül yolunda bulunur. Yolların toplam uzunluğu bu yüzden en çok <span class="m">n − 1</span>'dir ve iki kez yürünmeleri toplamı <span class="m">2(n − 1)</span> ile sınırlar. Buna her düğümde yapılan sabit iş eklenir. Ölçüm bunu doğrular: beş düğümlü örnekte toplam 13, yedi düğümlü tam ağaçta 18 işaretçi hareketi yapılır.</p>
+
+<p>Yöntemin bir sınırı vardır. Gezinme sürerken ağaç geçici olarak değişir: bazı <code>NULL</code> alanlar başka düğümleri gösterir. Bu sırada başka bir iş parçacığı ağacı okursa döngülerle karşılaşır ve yanlış sonuç alır. Gezinme bir hata ya da erken çıkışla yarıda kesilirse ağaç bozuk kalır. Morris gezinmesi bu yüzden ağaca tek başına erişen ve gezinmeyi sonuna dek götüren yordamlar için uygundur.</p>
+
+<h2 class="nt-pb" id="s12-4"><span class="nt-num">12.4</span>Düğüm ekleme</h2>
+
+<p>Kılavuzlu ağaçta gezinme kolaydır; bedeli eklemede ödenir. İkili arama ağacına düğüm eklemek tek bir işaretçi atamasıdır: yeni düğüm, boş bir çocuk alanına yazılır. Kılavuzlu ağaçta ise boş alan yoktur. Yeni düğüm eklendiğinde hem onun kendi kılavuzları doğru yerleri göstermeli hem de çevresindeki kılavuzlar yeni sıraya uymalıdır. Ekleme bu yüzden tek başına kolay bir yordam değildir; biraz girifttir.</p>
+
+<h3 id="s12-4-1"><span class="nt-num">12.4.1</span>Ekleme neden girift</h3>
+
+<p>Yeni bir düğüm bir ebeveynin ya sağına ya da soluna eklenir. Sol ve sağ eklemenin işaretçi atamaları birbirinin aynası olsa da birebir aynı değildir; bu yüzden iki ayrı yordam yazılır: <code>saga_ekle</code> ve <code>sola_ekle</code>. Önce <code>saga_ekle</code> ele alınır. Sağa eklemede iki durum vardır:</p>
+
+<ol>
+  <li>Ebeveynin sağ alt ağacı yoktur. Yeni düğüm bir yaprak olarak ebeveynin sağına yerleşir.</li>
+  <li>Ebeveynin sağ alt ağacı vardır. Yeni düğüm ebeveyn ile bu alt ağacın arasına girer; eski alt ağaç yeni düğümün sağ alt ağacı olur.</li>
+</ol>
+
+<p>İkinci durum sıradan ikili arama ağacına eklemede hiç ortaya çıkmaz; orada yeni düğüm hep bir yaprak olur. Kılavuzlu ağaçta ise iki durum da işe yarar: ikincisi, bir düğümü ağacın ortasına sokmanın yoludur.</p>
+
+<h3 id="s12-4-2"><span class="nt-num">12.4.2</span>Durum 1: sağ alt ağacı olmayan ebeveyne ekleme</h3>
+
+<p>Ağaç A(–, B(C, –)) olsun: başlığın solunda A; A'nın sol çocuğu yok, sağ çocuğu B; B'nin sol çocuğu C, sağ çocuğu yok. Kök ortada sıra <code>A C B</code>'dir. Yeni düğüm D, B'nin sağına eklenecektir. B'nin sağ işaretçisi bir kılavuzdur ve B sıranın son düğümü olduğu için başlığı gösterir. Ekleme altı atamayla yapılır:</p>
+
+<pre class="nt-code"><code>cocuk-&gt;sagCocuk  = baba-&gt;sagCocuk;
+cocuk-&gt;sagKilavuz = TRUE;  <span class="cm">// ebeveynin sağı yoktu</span>
+cocuk-&gt;solCocuk  = baba;
+cocuk-&gt;solKilavuz = TRUE;
+baba-&gt;sagCocuk   = cocuk;
+baba-&gt;sagKilavuz = FALSE;  <span class="cm">// TRUE idi</span></code></pre>
+
+<p>Her atamanın gerekçesi kök ortada sıradan okunur. Ekleme sonrası sıra <code>A C B D</code> olacaktır. D, B'den hemen sonra gelir; D'nin öncülü B, ardılı B'nin eski ardılıdır. <a href="#tab-durum1">Tablo 12.10</a> atamaları sırayla izler, <a href="#sekil-durum1">Şekil 12.7</a> ilk ve son durumu gösterir.</p>
+
+<div class="nt-tablewrap" id="tab-durum1">
+<table class="nt-table">
+  <caption>Tablo 12.10: Durum 1 izlemesi: <code>baba</code> = B, <code>cocuk</code> = D.</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Atama</th><th scope="col">Sonuç</th><th scope="col">Gerekçe</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>cocuk-&gt;sagCocuk = baba-&gt;sagCocuk</code></td><td>D → başlık</td><td>Ebeveynin ardılı artık çocuğun ardılıdır. Bu ardılın başlık olup olmaması önemsizdir.</td></tr>
+    <tr><td>2</td><td><code>cocuk-&gt;sagKilavuz = TRUE</code></td><td>kırmızı ok</td><td>Ebeveynin sağ alt ağacı yoktu; yaprak olan çocuğun da yoktur.</td></tr>
+    <tr><td>3</td><td><code>cocuk-&gt;solCocuk = baba</code></td><td>D → B</td><td>Çocuğun öncülü ebeveyndir.</td></tr>
+    <tr><td>4</td><td><code>cocuk-&gt;solKilavuz = TRUE</code></td><td>kırmızı ok</td><td>Bu da bir kılavuzdur.</td></tr>
+    <tr><td>5</td><td><code>baba-&gt;sagCocuk = cocuk</code></td><td>B → D</td><td>Ebeveynden çocuğa gerçek bağ.</td></tr>
+    <tr><td>6</td><td><code>baba-&gt;sagKilavuz = FALSE</code></td><td>siyah bağ</td><td>Ebeveynin sağı artık kılavuz değil, gerçek çocuktur.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-durum1" style="--w:540px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 539 210" role="img" aria-label="sağa ekleme"><defs><marker id="n12-d16-ah150-s18_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah151-s18_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah152-s18_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah150-s18_0-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah150-s18_0-1)"/><path class="line" d="M40 60 L306.667 100"/><path class="line" d="M306.667 100 L173.333 140"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah152-s18_0-1)"/><path class="t-thr" d="M316.467 109.8 Q255.333 119.8 114.2 34" marker-end="url(#n12-d16-ah152-s18_0-1)"/><path class="t-thr" d="M163.533 149.8 Q103.867 185.8 44.2 74" marker-end="url(#n12-d16-ah152-s18_0-1)"/><path class="t-thr" d="M183.133 149.8 Q242.8 185.8 302.467 114" marker-end="url(#n12-d16-ah152-s18_0-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">başlık</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="100" r="14"/><text class="txt" x="306.667" y="105" text-anchor="middle">B</text><text class="lbl" x="284.667" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="t-badt" x="328.667" y="104" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="173.333" cy="140" r="14"/><text class="txt" x="173.333" y="145" text-anchor="middle">C</text><text class="t-badt" x="151.333" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="195.333" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="274.667" y="76" text-anchor="end">baba</text><path class="line" d="M276.667 74 L296.587 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah151-s18_0-1)"/><text class="t-ptr" x="448" y="136" text-anchor="end">cocuk</text><path class="line" d="M450 134 L469.92 149.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah151-s18_0-1)"/><path class="t-thrh" d="M480 146 Q315 -4 120 8" marker-end="url(#n12-d16-ah151-s18_0-1)"/><circle class="t-new" cx="480" cy="160" r="14"/><text class="txt" x="480" y="165" text-anchor="middle">D</text><text class="t-ptr" x="498" y="182" text-anchor="start">cocuk</text><text class="lbl" x="458" y="164" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="502" y="164" text-anchor="middle" style="font-size:11px">F</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 510 210" role="img" aria-label="sağa ekleme"><defs><marker id="n12-d16-ah165-s18_5-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah166-s18_5-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah167-s18_5-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah165-s18_5-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah165-s18_5-1)"/><path class="line" d="M40 60 L306.667 100"/><path class="line" d="M306.667 100 L173.333 140"/><path class="line" d="M306.667 100 L480 160" style="stroke:var(--ds-accent);stroke-width:3"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M163.533 149.8 Q103.867 185.8 44.2 74" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M183.133 149.8 Q242.8 185.8 302.467 114" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M470.2 169.8 Q390.533 205.8 310.867 114" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M489.8 169.8 Q342 179.8 114.2 34" marker-end="url(#n12-d16-ah167-s18_5-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">başlık</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="100" r="14"/><text class="txt" x="306.667" y="105" text-anchor="middle">B</text><text class="lbl" x="284.667" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="328.667" y="104" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="173.333" cy="140" r="14"/><text class="txt" x="173.333" y="145" text-anchor="middle">C</text><text class="t-badt" x="151.333" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="195.333" y="144" text-anchor="middle" style="font-size:11px">T</text><circle class="t-new" cx="480" cy="160" r="14"/><text class="txt" x="480" y="165" text-anchor="middle">D</text><text class="t-badt" x="458" y="164" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="502" y="164" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="274.667" y="76" text-anchor="end">baba</text><path class="line" d="M276.667 74 L296.587 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah166-s18_5-1)"/><text class="t-ptr" x="448" y="136" text-anchor="end">cocuk</text><path class="line" d="M450 134 L469.92 149.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah166-s18_5-1)"/></svg></div>
+  <figcaption><b>Şekil 12.7:</b> Durum 1. Üstte ilk atamadan sonra: D henüz ağaca bağlı değildir; sağ işaretçisi B'nin ardılı olan başlığı gösterir. Altta altı atamadan sonra: D, B'nin gerçek sağ çocuğudur; D'nin sol kılavuzu B'yi, sağ kılavuzu başlığı gösterir.</figcaption>
+</figure>
+
+<p>Atamaların sırası rastgele değildir. 1. satır ebeveynin sağ işaretçisini okur, 5. satır onun üzerine yazar. Bu iki satırın yeri değişirse <code>cocuk-&gt;sagCocuk</code>'a ebeveynin eski ardılı yerine çocuğun kendi adresi yazılır ve ardıl bilgisi kaybolur. Genel kural şudur: bir alanın eski değeri gerekiyorsa önce o değer kullanılır, sonra alan değiştirilir. Atamaların hepsi sabit sürelidir; Durum 1'in maliyeti <span class="m">O(1)</span>'dir.</p>
+
+<h3 id="s12-4-3"><span class="nt-num">12.4.3</span>Durum 2: ebeveynin sağ alt ağacı var</h3>
+
+<p>Şimdi ağaç A(–, B(C, D(E, F))) olsun. B'nin sağ çocuğu D, D'nin çocukları E ve F'dir. Kök ortada sıra <code>A C B E D F</code>'dir. Yeni düğüm X, B'nin sağ çocuğu yapılacaktır. İstenen şudur: D alt ağacı kaybolmamalı ve X'in sağ alt ağacı olmalıdır. Kırmızı işaretçiler de yine doğru yerleri göstermelidir. Ekleme sonrası sıra <code>A C B X E D F</code> olacaktır.</p>
+
+<p>Bu sıradan iki gereksinim okunur. X'in öncülü B'dir; bu Durum 1'deki gibidir. Ama X'ten sonra gelen düğüm E'dir, yani D alt ağacının en soldaki düğümü. E'nin sol kılavuzu eskiden B'yi gösteriyordu, çünkü E'nin eski öncülü B idi. Ekleme sonrası E'nin öncülü X olur. Öyleyse çocuk, ebeveynin eski ardılının öncülü yapılmalıdır.</p>
+
+<p>Durum 1'in altı ataması bu ağaca olduğu gibi uygulanırsa ne olur? Deneme sonucu şudur: gezinme <code>A C B X D F</code> yazar; E kaybolur. Nedeni 2. satırdır. <code>cocuk-&gt;sagKilavuz = TRUE</code>, X'in sağ işaretçisini (D'yi gösteriyor) bir kılavuz sayar. Gezinme X'ten sonra kılavuz kuralıyla doğrudan D'ye atlar ve D'nin sol alt ağacına hiç inmez. E'nin sol kılavuzu da hâlâ B'yi gösterir. Ağaç bozulmuştur ve hiçbir derleyici uyarısı bunu haber vermez.</p>
+
+<p>Düzeltme iki parçalıdır:</p>
+
+<ul>
+  <li>2. satır <code>cocuk-&gt;sagKilavuz = baba-&gt;sagKilavuz</code> olarak yazılır. Durum 1'de ebeveynin bayrağı <code>TRUE</code>'dur ve çocuğa kırmızılık geçer; Durum 2'de <code>FALSE</code>'tur ve siyahlık korunur. Ebeveynin alt ağacı artık çocuğun alt ağacıdır.</li>
+  <li>Durum 2'de ebeveynin eski ardılının, yani yeni düzende çocuğun ardılının, sol kılavuzu çocuğa çevrilir.</li>
+</ul>
+
+<p>Bu iki değişiklikle her iki durumun da üstesinden gelen tek bir yordam yazılabilir.</p>
+
+<h3 id="s12-4-4"><span class="nt-num">12.4.4</span>Tek yordam: <code>saga_ekle</code></h3>
+
+<pre class="nt-code"><code><span class="kw">void</span> saga_ekle(kilavuz_gost baba,
+               kilavuz_gost cocuk) {
+  <span class="cm">// cocuk'u baba'nın sağ çocuğu yapar (kılavuzlu)</span>
+  kilavuz_gost p;
+  cocuk-&gt;sagCocuk   = baba-&gt;sagCocuk;
+  cocuk-&gt;sagKilavuz = baba-&gt;sagKilavuz;
+  cocuk-&gt;solCocuk   = baba;
+  cocuk-&gt;solKilavuz = TRUE;
+  baba-&gt;sagCocuk    = cocuk;
+  baba-&gt;sagKilavuz  = FALSE;
+  <span class="kw">if</span> (!cocuk-&gt;sagKilavuz) { <span class="cm">// ebeveynin alt ağacı var mı</span>
+    p = kokortada_ardil_bul(cocuk);
+    p-&gt;solCocuk = cocuk;     <span class="cm">// ardılın öncülü çocuk</span>
+  }
+}</code></pre>
+
+<p>Yordam satır satır şöyle okunur. Satır numaraları yukarıdaki koda aittir.</p>
+
+<ul>
+  <li><b>Satır 1–2, açık tanım.</b> Yordamın adı ne yaptığını söyler; giden parametreler (<code>baba</code>, <code>cocuk</code>) bellidir; dönüş değeri yoktur (<code>void</code>). Açık tanımlı bir yordam, gövdesi okunmadan kullanılabilir.</li>
+  <li><b>Satır 5–6.</b> Çocuğun sağ işaretçisi ve sağ bayrağı ebeveynden alınır. Durum 1'de kırmızılık (<code>TRUE</code>), Durum 2'de siyahlık (<code>FALSE</code>) korunur. Ortak iş, ortak biçimde yazılmıştır.</li>
+  <li><b>Satır 7–8.</b> Çocuğun öncülü ebeveyndir: sol işaretçi ebeveyne gider, sol bayrak <code>TRUE</code> olur.</li>
+  <li><b>Satır 9.</b> Ebeveynden çocuğa gerçek bağ.</li>
+  <li><b>Satır 10.</b> Ebeveynin sağ bayrağı <code>FALSE</code> yapılır. Durum 2'de bayrak zaten <code>FALSE</code>'tur ve bu atama gereksiz ama zararsızdır; Durum 1'de gereklidir. Bir <code>if</code> ile ayırmak yerine iki durumda da yazmak kodu sadeleştirir.</li>
+  <li><b>Satır 11–13.</b> Çocuğun sağ bayrağı <code>FALSE</code> ise çocuğun gerçek bir sağ alt ağacı vardır; bu Durum 2'dir. Çocuğun ardılı bulunur ve onun sol kılavuzu çocuğa çevrilir. Durum 1'de yalnız bir sınama yapılır ve yordamdan çıkılır.</li>
+</ul>
+
+<p>11. satırdaki koşul bayrağı sınar ama sorduğu soru şudur: ebeveynin sağ alt ağacı var mıydı? 5–6. satırlardan sonra ebeveynin eski sağ bilgisi çocuğa taşınmış olduğu için bu soru çocuğun bayrağına bakılarak yanıtlanır. Açıklama satırı da bayrağı değil, bu soruyu yazar.</p>
+
+<p><a href="#tab-sagaekle">Tablo 12.11</a>, <code>saga_ekle(B, X)</code> çağrısını Durum 2 ağacında satır satır izler.</p>
+
+<div class="nt-tablewrap" id="tab-sagaekle">
+<table class="nt-table">
+  <caption>Tablo 12.11: <code>saga_ekle(B, X)</code> izlemesi, ağaç A(–, B(C, D(E, F))). Sonuç sıra <code>A C B X E D F</code>'dir.</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Olay</th><th scope="col">Değişen alan</th></tr></thead>
+  <tbody>
+    <tr><td>5</td><td>X'in sağına B'nin eski sağ alt ağacı gelir</td><td>X-&gt;<code>sagCocuk</code> = D</td></tr>
+    <tr><td>6</td><td>B'nin bayrağı <code>FALSE</code> idi; siyahlık korunur</td><td>X-&gt;<code>sagKilavuz</code> = <code>FALSE</code></td></tr>
+    <tr><td>7</td><td>X'in öncülü B</td><td>X-&gt;<code>solCocuk</code> = B</td></tr>
+    <tr><td>8</td><td>kırmızı ok</td><td>X-&gt;<code>solKilavuz</code> = <code>TRUE</code></td></tr>
+    <tr><td>9</td><td>B'den X'e gerçek bağ</td><td>B-&gt;<code>sagCocuk</code> = X</td></tr>
+    <tr><td>10</td><td>zaten <code>FALSE</code> idi; zararsız</td><td>B-&gt;<code>sagKilavuz</code> = <code>FALSE</code></td></tr>
+    <tr><td>11</td><td><code>!X-&gt;sagKilavuz</code> doğru: X'in sağ alt ağacı var</td><td>–</td></tr>
+    <tr><td>12</td><td>X'in ardılı: D'den sola inilir, E'de durulur</td><td><code>p</code> = E</td></tr>
+    <tr><td>13</td><td>E'nin sol kılavuzu B yerine X'i gösterir</td><td>E-&gt;<code>solCocuk</code> = X</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-sagaekle" style="--w:480px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 480 246" role="img" aria-label="sağa ekleme"><defs><marker id="n12-d16-ah171-s20_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah172-s20_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah173-s20_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah171-s20_0-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah171-s20_0-1)"/><path class="line" d="M40 60 L173.333 100"/><path class="line" d="M173.333 100 L106.667 140"/><path class="line" d="M173.333 100 L373.333 180"/><path class="line" d="M373.333 180 L306.667 220"/><path class="line" d="M373.333 180 L440 220"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M96.8667 149.8 Q70.5333 185.8 44.2 74" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M116.467 149.8 Q142.8 185.8 169.133 114" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M296.867 229.8 Q237.2 265.8 177.533 114" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M316.467 229.8 Q342.8 265.8 369.133 194" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M430.2 229.8 Q403.867 265.8 377.533 194" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M449.8 229.8 Q322 239.8 114.2 34" marker-end="url(#n12-d16-ah173-s20_0-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">başlık</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="173.333" cy="100" r="14"/><text class="txt" x="173.333" y="105" text-anchor="middle">B</text><text class="lbl" x="151.333" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="195.333" y="104" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="106.667" cy="140" r="14"/><text class="txt" x="106.667" y="145" text-anchor="middle">C</text><text class="t-badt" x="84.6667" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="128.667" y="144" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="373.333" cy="180" r="14"/><text class="txt" x="373.333" y="185" text-anchor="middle">D</text><text class="lbl" x="351.333" y="184" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="395.333" y="184" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="220" r="14"/><text class="txt" x="306.667" y="225" text-anchor="middle">E</text><text class="t-badt" x="284.667" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="328.667" y="224" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="440" cy="220" r="14"/><text class="txt" x="440" y="225" text-anchor="middle">F</text><text class="t-badt" x="418" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="462" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="141.333" y="76" text-anchor="end">baba</text><path class="line" d="M143.333 74 L163.253 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah172-s20_0-1)"/><text class="t-ptr" x="208" y="116" text-anchor="end">cocuk</text><path class="line" d="M210 114 L229.92 129.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah172-s20_0-1)"/><path class="t-thrh" d="M240 126 Q326.667 116 383.333 168" marker-end="url(#n12-d16-ah172-s20_0-1)"/><circle class="t-new" cx="240" cy="140" r="14"/><text class="txt" x="240" y="145" text-anchor="middle">X</text><text class="t-ptr" x="258" y="162" text-anchor="start">cocuk</text><text class="lbl" x="218" y="144" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="262" y="144" text-anchor="middle" style="font-size:11px">F</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 480 246" role="img" aria-label="sağa ekleme"><defs><marker id="n12-d16-ah195-s20_8-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah196-s20_8-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah197-s20_8-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah195-s20_8-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah195-s20_8-1)"/><path class="line" d="M40 60 L173.333 100"/><path class="line" d="M173.333 100 L106.667 140"/><path class="line" d="M173.333 100 L240 140"/><path class="line" d="M240 140 L373.333 180"/><path class="line" d="M373.333 180 L306.667 220"/><path class="line" d="M373.333 180 L440 220"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M96.8667 149.8 Q70.5333 185.8 44.2 74" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M116.467 149.8 Q142.8 185.8 169.133 114" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M230.2 149.8 Q203.867 185.8 177.533 114" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thrh" d="M296.867 229.8 Q270.533 265.8 244.2 154" marker-end="url(#n12-d16-ah196-s20_8-1)"/><path class="t-thr" d="M316.467 229.8 Q342.8 265.8 369.133 194" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M430.2 229.8 Q403.867 265.8 377.533 194" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M449.8 229.8 Q322 239.8 114.2 34" marker-end="url(#n12-d16-ah197-s20_8-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">başlık</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="173.333" cy="100" r="14"/><text class="txt" x="173.333" y="105" text-anchor="middle">B</text><text class="lbl" x="151.333" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="195.333" y="104" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="106.667" cy="140" r="14"/><text class="txt" x="106.667" y="145" text-anchor="middle">C</text><text class="t-badt" x="84.6667" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="128.667" y="144" text-anchor="middle" style="font-size:11px">T</text><circle class="t-new" cx="240" cy="140" r="14"/><text class="txt" x="240" y="145" text-anchor="middle">X</text><text class="t-badt" x="218" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="262" y="144" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="373.333" cy="180" r="14"/><text class="txt" x="373.333" y="185" text-anchor="middle">D</text><text class="lbl" x="351.333" y="184" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="395.333" y="184" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="220" r="14"/><text class="txt" x="306.667" y="225" text-anchor="middle">E</text><text class="t-badt" x="284.667" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="328.667" y="224" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="440" cy="220" r="14"/><text class="txt" x="440" y="225" text-anchor="middle">F</text><text class="t-badt" x="418" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="462" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="141.333" y="76" text-anchor="end">baba</text><path class="line" d="M143.333 74 L163.253 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah196-s20_8-1)"/><text class="t-ptr" x="208" y="116" text-anchor="end">cocuk</text><path class="line" d="M210 114 L229.92 129.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah196-s20_8-1)"/></svg></div>
+  <figcaption><b>Şekil 12.8:</b> <code>saga_ekle(B, X)</code>, Durum 2. Üstte ilk atamadan sonra: X'in sağı D'yi gösterir, X henüz ağaca bağlı değildir ve E'nin sol kılavuzu B'yi gösterir. Altta yordam bittikten sonra: X, B ile D'nin arasındadır; E'nin sol kılavuzu X'i gösterir.</figcaption>
+</figure>
+
+<p>10. satırdan sonra ağaç neredeyse doğrudur; X yerindedir ve gezinme bile <code>A C B X E D F</code> yazar, çünkü gezinme sol kılavuzları kullanmaz. Ama E'nin sol kılavuzu hâlâ B'yi gösterir. Kök ortada tersten gezinen ya da öncül arayan bir yordam bu hatayı hemen ortaya çıkarır. Ders anlatımı bu noktada uyarır: kodun doğru çalıştığına hemen karar verilmemelidir; daha işletilecek bir <code>if</code> bloğu vardır.</p>
+
+<p>Aynı yordam Durum 1 ağacında da denendi. <code>saga_ekle(B, D)</code>, A(–, B(C, –)) ağacında altı atamalı kodla aynı sonucu verir: sıra <code>A C B D</code>, D'nin sol kılavuzu B'yi, sağ kılavuzu başlığı gösterir. Ebeveynin bayrağı <code>TRUE</code> olduğu için 11. satırdaki koşul yanlıştır ve <code>if</code> bloğu çalışmaz.</p>
+
+<p><b>Maliyet.</b> 5–10. satırlar sabit süredir. 12. satırdaki ardıl araması, çocuğun sağ alt ağacında sola iner; bu yol en çok ağacın yüksekliği kadardır. <code>saga_ekle</code>'nin zamanı en kötü durumda <span class="m">O(h)</span>, Durum 1'de <span class="m">O(1)</span>'dir. Ek bellek <span class="m">O(1)</span>'dir.</p>
+
+<h3 id="s12-4-5"><span class="nt-num">12.4.5</span>Sola ekleme</h3>
+
+<p><code>sola_ekle</code>, çocukla gösterilen düğümü ebeveynin sol çocuğu yapar. Yordam <code>saga_ekle</code>'nin aynasıdır: sol ile sağ ve öncül ile ardıl yer değiştirir. Ebeveynin eski öncülü, çocuğun öncülü olur. Ebeveynin sol alt ağacı varsa o alt ağacın en sağındaki düğümün, yani çocuğun yeni öncülünün, sağ kılavuzu çocuğa çevrilir. Bunun için kök ortada öncülü bulan bir yordam gerekir. Öncül kuralı ardıl kuralının aynasıdır: sol alt ağaç varsa onun en sağındaki düğüm, yoksa sol kılavuzun gösterdiği düğüm.</p>
+
+<pre class="nt-code"><code>kilavuz_gost kokortada_oncel_bul(kilavuz_gost L) {
+  kilavuz_gost p = L-&gt;solCocuk;
+  <span class="kw">if</span> (!L-&gt;solKilavuz)
+    <span class="kw">while</span> (!p-&gt;sagKilavuz) p = p-&gt;sagCocuk;
+  <span class="kw">return</span> p;
+}
+<span class="kw">void</span> sola_ekle(kilavuz_gost baba, kilavuz_gost cocuk) {
+  cocuk-&gt;solCocuk   = baba-&gt;solCocuk;
+  cocuk-&gt;solKilavuz = baba-&gt;solKilavuz;
+  cocuk-&gt;sagCocuk   = baba;
+  cocuk-&gt;sagKilavuz = TRUE;      <span class="cm">// ardılı ebeveyn</span>
+  baba-&gt;solCocuk    = cocuk;
+  baba-&gt;solKilavuz  = FALSE;
+  <span class="kw">if</span> (!cocuk-&gt;solKilavuz) {      <span class="cm">// baba'nın sol alt ağacı vardı</span>
+    kilavuz_gost p = kokortada_oncel_bul(cocuk);
+    p-&gt;sagCocuk = cocuk;         <span class="cm">// öncülün ardılı çocuk</span>
+  }
+}</code></pre>
+
+<div class="nt-tablewrap" id="tab-ayna">
+<table class="nt-table">
+  <caption>Tablo 12.12: <code>saga_ekle</code> ile <code>sola_ekle</code> arasındaki ayna ilişkisi.</caption>
+  <thead><tr><th scope="col"><code>saga_ekle</code></th><th scope="col"><code>sola_ekle</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>cocuk-&gt;sagCocuk = baba-&gt;sagCocuk</code></td><td><code>cocuk-&gt;solCocuk = baba-&gt;solCocuk</code></td></tr>
+    <tr><td><code>cocuk-&gt;sagKilavuz = baba-&gt;sagKilavuz</code></td><td><code>cocuk-&gt;solKilavuz = baba-&gt;solKilavuz</code></td></tr>
+    <tr><td><code>cocuk-&gt;solCocuk = baba</code> (öncülü ebeveyn)</td><td><code>cocuk-&gt;sagCocuk = baba</code> (ardılı ebeveyn)</td></tr>
+    <tr><td><code>baba-&gt;sagKilavuz = FALSE</code></td><td><code>baba-&gt;solKilavuz = FALSE</code></td></tr>
+    <tr><td>ardılın sol kılavuzu çocuğa</td><td>öncülün sağ kılavuzu çocuğa</td></tr>
+    <tr><td><code>kokortada_ardil_bul</code>: sağdan sonra sola sola</td><td><code>kokortada_oncel_bul</code>: soldan sonra sağa sağa</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-solaekle">
+  <span class="nt-box__title">Örnek 12.3</span>
+  <p>Ağaç A(B(D, E), C) olsun; kök ortada sıra <code>D B E A C</code>'dir. <code>sola_ekle(A, X)</code> çağrılsın. A'nın sol alt ağacı (B) vardır; bu ikinci durumdur. Kodun ikinci yordamının satırları (8–16) sırayla şunları yapar:</p>
+  <ol>
+    <li>X'in solu A'nın eski solunu alır: X-&gt;<code>solCocuk</code> = B; bayrak <code>FALSE</code> olarak taşınır.</li>
+    <li>X'in sağı A'yı gösterir ve <code>TRUE</code>'dur: X'in ardılı A.</li>
+    <li>A-&gt;<code>solCocuk</code> = X, A-&gt;<code>solKilavuz</code> = <code>FALSE</code>.</li>
+    <li>X'in sol bayrağı <code>FALSE</code>; X'in öncülü aranır. <code>p</code> = X-&gt;<code>solCocuk</code> = B. B'nin sağ bayrağı <code>FALSE</code>, sağa: <code>p</code> = E. E'nin sağ bayrağı <code>TRUE</code>, durulur.</li>
+    <li>E-&gt;<code>sagCocuk</code> = X: E'nin sağ kılavuzu A yerine X'i gösterir.</li>
+  </ol>
+  <p>Sonuç sıra <code>D B E X A C</code>'dir. X, B alt ağacı ile A'nın arasına girmiştir.</p>
+</div>
+
+<p><code>kokortada_oncel_bul</code> yordamı başka bir iş için de kullanılabilir: başlıktan başlayıp başlığa dönene dek öncülden öncüle geçmek, ağacı kök ortada tersten gezer. Bu, alıştırmalarda ele alınır. Başlığın öncülü, kök ortada sıradaki son düğümdür: başlığın sol bayrağı <code>FALSE</code>, sol işaretçisi köktür ve kökten sağa sağa inilince en sağdaki düğüme varılır.</p>
+
+<h3 id="s12-4-6"><span class="nt-num">12.4.6</span>Ağacı geri vermek</h3>
+
+<p>Bir C programında <code>malloc</code> ile alınan her blok işi bitince <code>free</code> ile geri verilmelidir. Verilmeyen bloklar program sonuna dek bellekte kalır. Buna <strong>bellek sızıntısı</strong> denir. Uzun çalışan bir programda sızıntı, belleğin yavaş yavaş tükenmesine yol açar. Kılavuzlu ağacı geri vermek de gezinme ile yapılır:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> kilavuzlu_agac_sil(kilavuz_gost L) {
+  kilavuz_gost p = kokortada_ardil_bul(L), sonraki;
+  <span class="kw">while</span> (p != L) {
+    sonraki = kokortada_ardil_bul(p);  <span class="cm">// önce ardıl bulunur</span>
+    free(p);                           <span class="cm">// sonra düğüm geri verilir</span>
+    p = sonraki;
+  }
+  free(L);                             <span class="cm">// en son başlık</span>
+}</code></pre>
+
+<p>Sıra önemlidir. Bir düğüm <code>free</code> ile geri verildikten sonra onun alanlarını okumak, serbest bırakılmış belleği okumaktır ve tanımsız davranıştır. Bu yüzden önce ardıl bulunur ve <code>sonraki</code>'ne yazılır, sonra düğüm geri verilir. Ardıl yordamı yalnız <code>p</code>'nin ve sağ alt ağacındaki düğümlerin alanlarını okur. Bu düğümler henüz geri verilmemiştir, çünkü kök ortada sırada <code>p</code>'den sonra gelirler. Başlık en son geri verilir; gezinmenin durma koşulu onun adresine bakar.</p>
+
+<p>Bu notun bütün kodları, <code>malloc</code> ve <code>free</code> çağrılarını sayan bir sarmalayıcıyla sınandı. Sunumdaki kodlar ve notun ek yordamları tek bir sürücüde çalıştırıldı: 32 <code>malloc</code> ve 32 <code>free</code> sayıldı; ayrıntılı sınamada bu sayılar 2116'şar oldu. Sızıntı yoktur.</p>
+
+<h3 id="s12-4-7"><span class="nt-num">12.4.7</span>Kod kalitesi</h3>
+
+<p>Kılavuzlu ağaç yordamları kısadır ama hataya açıktır. Bu yordamlar, iyi kod yazmanın birkaç ilkesini somut olarak gösterir.</p>
+
+<p><b>NULL denetiminin yeri.</b> <code>saga_ekle</code>, <code>baba</code>'nın ya da <code>cocuk</code>'un <code>NULL</code> olup olmadığını denetlemez. Bu bir unutkanlık değil, bir tasarım kararıdır. Ders anlatımındaki gerekçe şudur: <code>saga_ekle</code> tek başına kullanılmak için değil, başka bir yordamın içinde kullanılmak için yazılmıştır; <code>NULL</code> denetimi onu kullanan yordamda yapılmalıdır. Örneğin kılavuzlu bir ikili arama ağacına ekleme yapan yordam önce yeni değerin sağa mı sola mı ekleneceğini bulur. Sıradan ağaçtaki tek atamanın yerine <code>saga_ekle</code> ya da <code>sola_ekle</code>'yi çağırır. Bu noktada <code>baba</code> zaten gerçek bir düğümdür. Ama yordam bir kütüphanenin parçası olacak ve herkes doğrudan çağırabilecekse denetim yordama konmalıdır. Denetim yapılmıyorsa bu, açıklamada yazılmalıdır: “<code>baba</code> ve <code>cocuk</code> <code>NULL</code> olmamalı”. Genel amaçlı bir yordam için savunmacı bir sarmalayıcı şöyle yazılabilir:</p>
+
+<pre class="nt-code"><code>#include &lt;assert.h&gt;
+<span class="kw">void</span> saga_ekle_denetimli(kilavuz_gost baba, kilavuz_gost cocuk) {
+  <span class="cm">// baba ve cocuk NULL olmamalı; cocuk henüz ağaçta olmamalı</span>
+  assert(baba != <span class="kw">NULL</span> &amp;&amp; cocuk != <span class="kw">NULL</span>);
+  saga_ekle(baba, cocuk);
+}</code></pre>
+
+<p><code>assert</code>, koşulu yanlışsa programı dosya adı ve satır numarasıyla durdurur. Programcı hatalarını erken yakalar ve sınama sırasında çok değerlidir. <code>NDEBUG</code> tanımlanarak derlenen sürümde kaldırılır; bu yüzden kullanıcı girdisinden gelebilecek hatalar için değil, “bu asla olmamalı” denen durumlar için kullanılır. Kullanıcı hatasına karşı bir hata kodu döndürmek daha uygundur.</p>
+
+<p><b>Açıklama satırı.</b> Açıklama satırı kodun ne yapmak istediğini söylemeli, kodun kendisini tekrarlamamalıdır.</p>
+
+<pre class="nt-code"><code><span class="cm">/* KÖTÜ: kodu tekrarlıyor */</span>
+<span class="kw">if</span> (!cocuk-&gt;sagKilavuz)  <span class="cm">// sağ kılavuz FALSE mu</span>
+<span class="cm">/* İYİ: niyeti söylüyor */</span>
+<span class="kw">if</span> (!cocuk-&gt;sagKilavuz)  <span class="cm">// ebeveynin alt ağacı var mı</span></code></pre>
+
+<p>“Sağ kılavuz <code>FALSE</code> mu” açıklaması okura yeni bir şey söylemez; aynı bilgi kodda yazılıdır. “Ebeveynin alt ağacı var mı” ise niyeti söyler. Niyet ile kod yan yana durunca okur ikisini karşılaştırabilir: “yapmak istediği doğru, ama kodu yanlış yazmış” diyebilir. Hata ayıklama böyle kolaylaşır. Ders anlatımında bu konu açıkça vurgulanır: sonradan gelen okur “ben onu zaten biliyorum” dememeli; açıklama satırları kodda söylenenden farklı bir şey söylemelidir.</p>
+
+<p><b>Tek yordam.</b> Her durum için ayrı yordam yazmak mümkündü: <code>cocukYok_sagaEkle</code>, <code>cocukVar_sagaEkle</code>, <code>cocukYok_solaEkle</code>, <code>cocukVar_solaEkle</code>. Bu, kodu bölük pörçük eder; kullanan, hangi yordamı çağıracağına her seferinde karar vermek zorunda kalır. Karmaşıklığı artırmadan dört yordamı ikiye indirmek iyidir. Ama ters yöndeki aşırılıktan da kaçınılmalıdır. İç içe <code>if</code>'lerle bütün durumları tek bir yordama sıkıştırmak okunmaz bir kod doğurur. Öyle olacağına ayrı ayrı yordamlar daha iyidir. <code>saga_ekle</code>'nin başarısı, iki durumun ortak işini ortak biçimde tanımlamasından gelir: kılavuz bayrağını ebeveynden kopyalamak iki durumu tek atamada karşılar. Yöntem şöyle özetlenebilir: önce üç beş farklı durum analiz edilir; sonra yordamın adı, dönüş değeri ve parametreleri belirlenir; ortak işler ortak biçimde yazılır. Sonuç sade, okunabilir ve bakımı kolay bir koddur. Ders anlatımı bu ilkeleri yazılım mühendisliğinin temeli sayar ve öğrenilmelerinin yıllar aldığını hatırlatır.</p>
+
+<p><b>Teyakkuz.</b> Kılavuzlu ağaç kodu yazarken her satırda “bunu yapıyorum, ama doğru mu yapıyorum?” diye sormak gerekir. Durum 1'in kodu Durum 1 için kusursuzdur ve Durum 2'de sessizce ağacı bozar. <code>saga_ekle</code>'nin ilk altı satırından sonra ağaç doğru görünür ama bir kılavuz hâlâ yanlıştır. Bu tür hatalar ancak bütün durumların ayrı ayrı denenmesiyle ve hem ileri hem geri gezinmeyle yakalanır.</p>
+
+<h2 class="nt-pb" id="s12-5"><span class="nt-num">12.5</span>Kazanç, bedel ve karmaşıklık özeti</h2>
+
+<p>Kılavuzlu ağacın getirdiği ve götürdüğü şeyler iki listede toplanabilir. Kazançlar: gezinme yığınsız ve <span class="m">O(1)</span> ek bellekle yapılır; her düğümden ardıla ve öncüle en çok <span class="m">O(h)</span>'de, gezinme içinde amortize <span class="m">O(1)</span>'de geçilir; boş alanlar boşa gitmez. Bedeller: her düğümde iki bayrak tutulur; ekleme ve silme daha girift olur; ağaca dokunan her yordam kılavuzları gözetmek zorundadır. <a href="#tab-ozet">Tablo 12.13</a> bölümün yordamlarının maliyetlerini bir arada verir.</p>
+
+<div class="nt-tablewrap" id="tab-ozet">
+<table class="nt-table">
+  <caption>Tablo 12.13: Karmaşıklık özeti. <span class="m">n</span> düğüm sayısı, <span class="m">h</span> ağacın yüksekliğidir.</caption>
+  <thead><tr><th scope="col">İşlem</th><th scope="col">Zaman</th><th scope="col">Ek bellek</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td><code>kokortada_ardil_bul</code></td><td>O(h) en kötü</td><td>O(1)</td><td>sağ kılavuz varsa O(1)</td></tr>
+    <tr><td><code>kokortada_oncel_bul</code></td><td>O(h) en kötü</td><td>O(1)</td><td>sol kılavuz varsa O(1)</td></tr>
+    <tr><td><code>kilavuz_kokortada_dolas</code></td><td>Θ(n)</td><td>O(1)</td><td>en çok 2n + 1 işaretçi; yığın ya da özyineleme yok</td></tr>
+    <tr><td>kök önde kılavuzlu gezinme</td><td>Θ(n)</td><td>O(1)</td><td>aynı kılavuzlarla</td></tr>
+    <tr><td><code>saga_ekle</code> / <code>sola_ekle</code></td><td>O(h)</td><td>O(1)</td><td>ardıl ya da öncül araması; 1. durumda O(1)</td></tr>
+    <tr><td><code>kilavuzlu_agac_sil</code></td><td>Θ(n)</td><td>O(1)</td><td>gezinme ile geri verme</td></tr>
+    <tr><td>Morris gezinmesi (bayraksız)</td><td>Θ(n)</td><td>O(1)</td><td>geçici kılavuzlar; ağaç gezinme sırasında değişir</td></tr>
+    <tr><td>özyinelemeli kök ortada (karşılaştırma)</td><td>Θ(n)</td><td>O(h)</td><td>çağrı yığını</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s12-6"><span class="nt-num">12.6</span>Sık yapılan hatalar</h2>
+
+<ol>
+  <li><b>Bayrağa bakmadan işaretçiyi gerçek çocuk sanmak.</b> Kılavuzlu ağaçta hiçbir işaretçi <code>NULL</code> değildir. <code>NULL</code>'a dek inen bir döngü durmaz; kılavuzlar ve başlık üzerinden halkada döner. Her iniş <code>solKilavuz</code> ya da <code>sagKilavuz</code> ile denetlenir.</li>
+  <li><b>Başlık düğümünü unutmak.</b> Başlıksız bir ağaçta ilk düğümün sol ve son düğümün sağ kılavuzu havada kalır. Bunlara <code>NULL</code> yazılırsa gezinme yordamları özel durum ister; yazılmazsa çöp değerler izlenir.</li>
+  <li><b>Sağa eklemenin ikinci durumunda ardılın sol kılavuzunu güncellememek.</b> İleri gezinme yine doğru sonuç verir ve hata gizli kalır; öncül arayan ya da tersten gezinen bir yordam yanlış düğüme gider.</li>
+  <li><b><code>cocuk-&gt;sagKilavuz</code>'u sabit <code>TRUE</code> yazmak.</b> İkinci durumda ebeveynin sağ alt ağacı bir kılavuz sayılır ve o alt ağacın sol kısmı gezinmeden düşer. Örnekte E kaybolur.</li>
+  <li><b>Boş ağaçta başlığın <code>solKilavuz</code>'unu unutmak.</b> Boş ağaçta başlığın solu kendisidir ve bayrağı <code>TRUE</code>'dur. Bu bayrağa bakmadan <code>L-&gt;solCocuk</code>'u kök sanan bir arama başlığın verisini gerçek bir değer gibi okur.</li>
+  <li><b>Büyük ve küçük harfi karıştırmak.</b> C büyük ve küçük harfe duyarlıdır: <code>baba-&gt;SagCocuk</code> ya da <code>baba-&gt;SagKilavuz</code> derlenmez, çünkü yapının alanı <code>sagCocuk</code>'tur. Kılavuzlu yapıda <code>solCocuk</code>, sıradan yapıda <code>solcocuk</code> yazıldığına da dikkat edilmelidir.</li>
+  <li><b>Atama sırasını bozmak.</b> <code>baba-&gt;sagCocuk = cocuk</code> satırı <code>cocuk-&gt;sagCocuk = baba-&gt;sagCocuk</code>'tan önce yazılırsa ebeveynin eski ardılı kaybolur ve çocuk kendini gösterir.</li>
+  <li><b>Ağacı geri verirken önce <code>free</code> etmek.</b> Düğüm geri verildikten sonra ardılı aranırsa serbest bırakılmış bellek okunur. Önce ardıl bulunur, sonra düğüm geri verilir.</li>
+</ol>
+
+<h2 class="nt-pb" id="s12-7"><span class="nt-num">12.7</span>Alıştırmalar ve çözümleri</h2>
+
+<h3 id="s12-7-1"><span class="nt-num">12.7.1</span>Bir ağacın kılavuzlarını çizmek</h3>
+
+<p><b>Soru.</b> A(B(D, E), C(–, F)) ağacının kılavuzlarını çiziniz; kaç kılavuz vardır?</p>
+
+<p><b>Çözüm.</b> Kök ortada sıra <code>D B E A C F</code>'dir. Ağaçta 6 düğüm vardır; <a href="#teorem-null">Teorem 12.1</a>'e göre <span class="m">6 + 1 = 7</span> boş alan, yani 7 kılavuz olur. Kılavuzlar <a href="#ornek-kurma">Örnek 12.2</a>'de tek tek verildi: D → başlık, D → B, E → B, E → A, C → A, F → C, F → başlık. 2'si başlığa gider. Çözüm, ağacı kurup bayrakları sayan bir programla da doğrulandı.</p>
+
+<h3 id="s12-7-2"><span class="nt-num">12.7.2</span>Öncül bulmak</h3>
+
+<p><b>Soru.</b> Kök ortada öncülü bulan <code>kokortada_oncel_bul</code> yordamını yazınız.</p>
+
+<p><b>Çözüm.</b> Yordam ardıl bulmanın aynasıdır ve <a href="#s12-4-5">sola ekleme</a> kesiminde verildi. Sol bayrak <code>TRUE</code> ise sol işaretçi doğrudan öncülü gösterir. Değilse sol çocuktan başlanır ve sağ bayrak <code>TRUE</code> olana dek sağa gidilir. Ana örnekte A'nın öncülü şöyle bulunur: <code>p</code> = B; B'nin sağ bayrağı <code>FALSE</code>, <code>p</code> = E; E'nin sağ bayrağı <code>TRUE</code>; sonuç E.</p>
+
+<h3 id="s12-7-3"><span class="nt-num">12.7.3</span>Tersten gezinme</h3>
+
+<p><b>Soru.</b> Kılavuzlu ağacı kök ortada tersten (<code>G C F A …</code>) gezen yordamı yazınız.</p>
+
+<p><b>Çözüm.</b> Başlıktan başlanır ve başlığa dönene dek öncülden öncüle ilerlenir:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> kilavuz_ters_dolas(kilavuz_gost L) {
+  kilavuz_gost p = L;
+  <span class="kw">for</span> (;;) {
+    p = kokortada_oncel_bul(p);
+    <span class="kw">if</span> (p == L) <span class="kw">break</span>;
+    printf("%c ", p-&gt;veri);
+  }
+}</code></pre>
+
+<p>Başlığın öncülü son düğümdür (G); ilk düğümün (H) öncülü de başlıktır. Ana örnekte çıktı <code>G C F A E B I D H</code>'dir. Zaman <span class="m">Θ(n)</span>, ek bellek <span class="m">O(1)</span>'dir; gerekçe <a href="#teorem-gezinme">Teorem 12.3</a>'ün aynasıdır.</p>
+
+<h3 id="s12-7-4"><span class="nt-num">12.7.4</span>Boş ağaca ilk düğüm</h3>
+
+<p><b>Soru.</b> Boş ağaca (yalnız başlık) ilk düğümü <code>sola_ekle(baslik, x)</code> ile eklemek doğru mudur?</p>
+
+<p><b>Çözüm.</b> Doğrudur. Başlığın sol işaretçisi kendisini gösterir ve sol bayrağı <code>TRUE</code>'dur. <code>sola_ekle</code> bu ikisini çocuğa taşır: çocuğun solu başlığı gösterir ve bir kılavuzdur. Çocuğun sağı da ebeveyni, yani başlığı gösterir ve <code>TRUE</code>'dur. Başlığın solu çocuğa çevrilir ve sol bayrağı <code>FALSE</code> olur. Çocuğun sol bayrağı <code>TRUE</code> olduğu için <code>if</code> bloğu çalışmaz. Sonuçta tek düğümün iki kılavuzu da başlığı gösterir; bu, <a href="#tanim-baslik">Tanım 12.3</a>'teki düzenin tam kendisidir.</p>
+
+<h3 id="s12-7-5"><span class="nt-num">12.7.5</span>Kök sonda gezinmenin zorluğu</h3>
+
+<p><b>Soru.</b> Kök sonda gezinme kılavuzlarla neden zordur? Hangi ek bilgi işi kolaylaştırır?</p>
+
+<p><b>Çözüm.</b> Bir düğümün kök sonda ardılı ebeveynine bağlıdır. Düğüm ebeveyninin sağ çocuğuysa ya da ebeveynin sağ alt ağacı yoksa ardıl ebeveyndir; değilse ardıl, ebeveynin sağ alt ağacında kök sonda sırada ilk düğümdür. İki durumda da ebeveynin kim olduğu ve düğümün onun hangi çocuğu olduğu bilinmelidir. Kılavuzlar kök ortada öncül ve ardılı gösterir; bunlar ebeveynle her zaman örtüşmez. Her düğüme bir ebeveyn işaretçisi eklemek bu bilgiyi doğrudan verir ve kök sonda ardılı sabit sayıda adım ve bir iniş ile bulunur.</p>
+
+<h3 id="s12-7-6"><span class="nt-num">12.7.6</span>Kılavuzlu ikili arama ağacına ekleme</h3>
+
+<p><b>Soru.</b> Kılavuzlu bir ikili arama ağacına ekleme yordamını <code>saga_ekle</code> ve <code>sola_ekle</code> kullanarak yazınız.</p>
+
+<p><b>Çözüm.</b> Arama sıradan ikili arama ağacındaki gibidir; tek fark, inilecek yönün bayrağı <code>TRUE</code> olduğunda durulmasıdır. O noktada aranan değer düğümden küçükse <code>sola_ekle</code>, büyükse <code>saga_ekle</code> çağrılır. Yeni düğüm her zaman yaprak olur; bu yüzden iki yordam da birinci durumda çalışır ve sabit sürede biter.</p>
+
+<pre class="nt-code"><code><span class="kw">int</span> kilavuzlu_bst_ekle(kilavuz_gost L, <span class="kw">char</span> x) {
+  <span class="cm">// x yoksa ekler ve 1 döndürür; varsa 0 döndürür</span>
+  kilavuz_gost p;
+  <span class="kw">if</span> (L-&gt;solKilavuz) {                  <span class="cm">// ağaç boş</span>
+    sola_ekle(L, kilavuz_dugum(x));
+    <span class="kw">return</span> 1;
+  }
+  p = L-&gt;solCocuk;                      <span class="cm">// kökten başla</span>
+  <span class="kw">for</span> (;;) {
+    <span class="kw">if</span> (x == p-&gt;veri) <span class="kw">return</span> 0;
+    <span class="kw">if</span> (x &lt; p-&gt;veri) {
+      <span class="kw">if</span> (p-&gt;solKilavuz) <span class="kw">break</span>;         <span class="cm">// sol çocuk yok</span>
+      p = p-&gt;solCocuk;
+    } <span class="kw">else</span> {
+      <span class="kw">if</span> (p-&gt;sagKilavuz) <span class="kw">break</span>;         <span class="cm">// sağ çocuk yok</span>
+      p = p-&gt;sagCocuk;
+    }
+  }
+  <span class="kw">if</span> (x &lt; p-&gt;veri) sola_ekle(p, kilavuz_dugum(x));
+  <span class="kw">else</span>             saga_ekle(p, kilavuz_dugum(x));
+  <span class="kw">return</span> 1;
+}</code></pre>
+
+<p>Ağaç boşsa (başlığın sol bayrağı <code>TRUE</code>) ilk düğüm başlığın soluna eklenir; önceki alıştırma bunun doğru olduğunu gösterdi. Yordam <code>M F T B H P X K</code> sırasıyla çağrıldı; sonra <code>H</code> bir kez daha eklenmek istendi ve 0 döndü. Kök ortada gezinme <code>B F H K M P T X</code>, ters gezinme <code>X T P M K H F B</code> yazdı. Arama <span class="m">O(h)</span>, ekleme <span class="m">O(1)</span> sürer; toplam <span class="m">O(h)</span>'dir.</p>
+
+<h2 class="nt-pb" id="s12-8"><span class="nt-num">12.8</span>Özet</h2>
+
+<ul>
+  <li><span class="m">n</span> düğümlü ikili ağaçta <span class="m">2n</span> işaretçinin <span class="m">n − 1</span>'i doludur; kalan <span class="m">n + 1</span> alan boştur.</li>
+  <li>Kılavuzlu ikili ağaçta boş sol işaretçi kök ortada öncüle, boş sağ işaretçi kök ortada ardıla bağlanır. Bu işaretçilere kılavuz denir.</li>
+  <li><code>solKilavuz</code> ve <code>sagKilavuz</code> bayrakları gerçek bağı kılavuzdan ayırır. Alan sırası iyi seçilirse bayraklar 64 bitlik makinede dolgu baytlarına sığar.</li>
+  <li>Başlık düğümü havada kalan iki kılavuzu toplar; kök <code>L-&gt;solCocuk</code>'tadır, başlığın sağı kendisidir. Boş ağaçta başlığın sol bayrağı <code>TRUE</code>'dur.</li>
+  <li>Ardıl: sağ bayrak <code>TRUE</code> ise doğrudan sağ işaretçi; değilse sağ alt ağacın en solu. Öncül bunun aynasıdır.</li>
+  <li>Kılavuzlu kök ortada gezinme en çok <span class="m">2n + 1</span> işaretçi izler: <span class="m">Θ(n)</span> zaman, <span class="m">O(1)</span> ek bellek. Kök önde gezinme de aynı kılavuzlarla yapılır; kök sonda için ebeveyn bilgisi gerekir.</li>
+  <li>Morris gezinmesi bayrak olmadan, kılavuzları geçici kurup sökerek <span class="m">O(n)</span> zaman ve <span class="m">O(1)</span> bellekle gezinir; gezinme sırasında ağaç değiştiği için eşzamanlı okumaya uygun değildir.</li>
+  <li><code>saga_ekle</code> kılavuz bayrağını ebeveynden kopyalayarak iki durumu tek yordamda birleştirir; ikinci durumda çocuk, ebeveynin eski ardılının öncülü yapılır. <code>sola_ekle</code> onun aynasıdır.</li>
+  <li>İyi kod: açık tanımlı yordam, niyeti söyleyen açıklama, NULL denetiminin doğru yerde yapılması ve ortak işlerin ortak biçimde yazıldığı tek yordam.</li>
+</ul>
+
+<h2 id="s12-9"><span class="nt-num">12.9</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">boş işaretçi <span lang="en">null pointer</span></a></li>
+  <li><a href="../sozluk.html">kılavuz <span lang="en">thread</span></a></li>
+  <li><a href="../sozluk.html">kılavuzlu ikili ağaç <span lang="en">threaded binary tree</span></a></li>
+  <li><a href="../sozluk.html">öncül <span lang="en">predecessor</span></a></li>
+  <li><a href="../sozluk.html">ardıl <span lang="en">successor</span></a></li>
+  <li><a href="../sozluk.html">başlık düğümü <span lang="en">header node</span></a></li>
+  <li><a href="../sozluk.html">kök ortada <span lang="en">inorder</span></a></li>
+  <li><a href="../sozluk.html">kök önde <span lang="en">preorder</span></a></li>
+  <li><a href="../sozluk.html">kök sonda <span lang="en">postorder</span></a></li>
+  <li><a href="../sozluk.html">gezinme <span lang="en">traversal</span></a></li>
+  <li><a href="../sozluk.html">Morris gezinmesi <span lang="en">Morris traversal</span></a></li>
+  <li><a href="../sozluk.html">çağrı yığını <span lang="en">call stack</span></a></li>
+  <li><a href="../sozluk.html">çarpık ağaç <span lang="en">skewed tree</span></a></li>
+  <li><a href="../sozluk.html">yükseklik <span lang="en">height</span></a></li>
+  <li><a href="../sozluk.html">amortize analiz <span lang="en">amortized analysis</span></a></li>
+  <li><a href="../sozluk.html">kendine başvuran yapı <span lang="en">self-referential struct</span></a></li>
+  <li><a href="../sozluk.html">ikili arama ağacı <span lang="en">binary search tree</span></a></li>
+</ul>
+
+<h2 id="s12-10"><span class="nt-num">12.10</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>15 düğümlü bir ikili ağaç kılavuzlu hâle getiriliyor. Kaç kılavuz kurulur ve kaçı başlığa gider?</p>
+    <details><summary>Cevap</summary>
+      <p>Boş alan sayısı <span class="m">15 + 1 = 16</span>'dır; 16 kılavuz kurulur. Ağacın biçimi ne olursa olsun yalnız ikisi başlığa gider: ilk düğümün sol ve son düğümün sağ kılavuzu.</p>
+    </details>
+  </li>
+  <li>
+    <p>Ana örnekte <code>kokortada_ardil_bul(B)</code> hangi düğümü döndürür? Döngü kaç kez döner?</p>
+    <details><summary>Cevap</summary>
+      <p>E'yi döndürür. B'nin sağ bayrağı <code>FALSE</code>, <code>p</code> = E olur. E'nin sol bayrağı <code>TRUE</code> olduğu için döngüye hiç girilmez: 0 tur.</p>
+    </details>
+  </li>
+  <li>
+    <p>Ana örnekte <code>kokonde_ardil_bul(I)</code> hangi düğümü döndürür?</p>
+    <details><summary>Cevap</summary>
+      <p>E. I'nın sol bayrağı <code>TRUE</code> olduğu için sağ kılavuzlar izlenir: I → B. B'nin sağ bayrağı <code>FALSE</code>'tur; döngü biter ve B'nin sağ çocuğu E döner.</p>
+    </details>
+  </li>
+  <li>
+    <p>Ana örneğe <code>saga_ekle(E, Y)</code> uygulanıyor. Hangi durumdur? Y'nin kılavuzları nereyi gösterir ve yeni kök ortada sıra nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>E bir yapraktır; sağ alt ağacı yoktur, birinci durumdur. Y'nin sol kılavuzu E'yi, sağ kılavuzu E'nin eski ardılı A'yı gösterir. Sıra <code>H D I B E Y A F C G</code> olur.</p>
+    </details>
+  </li>
+  <li>
+    <p>Ana örneğe <code>saga_ekle(A, Y)</code> uygulanıyor. Hangi düğümün kılavuzu değişir?</p>
+    <details><summary>Cevap</summary>
+      <p>İkinci durumdur; A'nın sağ alt ağacı (C) Y'nin sağ alt ağacı olur. Y'nin ardılı C'nin en solundaki F'dir. F'nin sol kılavuzu A yerine Y'yi gösterir. Sıra <code>H D I B E A Y F C G</code> olur.</p>
+    </details>
+  </li>
+  <li>
+    <p>Sola çarpık 1000 düğümlü kılavuzlu bir ağaçta <code>kokortada_ardil_bul(başlık)</code> kaç işaretçi izler? Bütün gezinme kaç izler?</p>
+    <details><summary>Cevap</summary>
+      <p>İlk çağrı başlıktan köke, sonra 999 sol bağla en alttaki düğüme iner: satır 3'teki okumayla birlikte 1001 işaretçi. Bütün gezinme <span class="m">2n + 1 = 2001</span> işaretçi izler; bu, <a href="#teorem-gezinme">Teorem 12.3</a>'ün sınırına tam olarak erişen durumdur.</p>
+    </details>
+  </li>
+  <li>
+    <p>Morris gezinmesi A(B(D, E), C) ağacında kaç geçici kılavuz kurar? Genel olarak bu sayı neye eşittir?</p>
+    <details><summary>Cevap</summary>
+      <p>İki: E → A ve D → B. Sol çocuğu olan her düğüm için bir kılavuz kurulur ve aynı kılavuz daha sonra sökülür.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>saga_ekle</code>'de 10. satır (<code>baba-&gt;sagKilavuz = FALSE</code>) silinirse hangi durumda ağaç bozulur?</p>
+    <details><summary>Cevap</summary>
+      <p>Birinci durumda, ama sinsi biçimde. Ebeveynin bayrağı <code>TRUE</code> kalır. Kök ortada gezinme yine doğru sonuç verir, çünkü “kılavuz” sanılan sağ işaretçi zaten çocuğu, yani ebeveynin ardılını gösterir. Öteki yordamlar ise çocuğu atlar. A(B, –) ağacına C sağdan eklenince kök ortada gezinme <code>B A C</code> yazar; kök önde gezinme <code>A B</code>, tersten gezinme <code>A B</code> yazar. C kaybolmuştur. İkinci durumda bayrak zaten <code>FALSE</code> olduğu için zarar olmaz.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s12-11"><span class="nt-num">12.11</span>İleri okuma</h2>
+
+<ul>
+  <li>E. Horowitz, S. Sahni, S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em>, 2. baskı, Kesim 5.5. Bu notun yapısı, <code>insert_right</code> yordamı ve başlık düğümü düzeni oradaki biçimiyle izlenmiştir.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming</em>, Cilt 1, Kesim 2.3.1. Kılavuzlu ağaçlar, ardıl bulma ve kılavuzlu ağaca ekleme algoritmaları kanıtlarıyla ve alıştırmalarla anlatılır.</li>
+  <li>J. M. Morris, “Traversing binary trees simply and cheaply”, <em>Information Processing Letters</em> 9(5), 1979. Geçici kılavuzlarla bayraksız gezinmenin özgün kısa makalesidir.</li>
+</ul>
+
+<h2 id="s12-12"><span class="nt-num">12.12</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>E. Horowitz, S. Sahni, S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em>, 2. bs., Silicon Press, 2008. Kesim 5.5, Threaded Binary Trees.</li>
+  <li>A. J. Perlis, C. Thornton, “Symbol manipulation by threaded lists”, <em>Communications of the ACM</em> 3(4), 1960.</li>
+  <li>J. M. Morris, “Traversing binary trees simply and cheaply”, <em>Information Processing Letters</em> 9(5), 1979.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming</em>, Cilt 1: Fundamental Algorithms, 3. bs., Addison-Wesley, 1997. Kesim 2.3.1.</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_12_Kilavuzlu_Ikili_Agaclar.html">Bölüm 12 sunumu</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>
