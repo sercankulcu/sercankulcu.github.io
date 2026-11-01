@@ -29,6 +29,7 @@ Bir yazılımın gereksinimlerden doğrulamaya uzanan yaşam döngüsü, algorit
 
 - [🖼️Sunum-Giriş ve Algoritma Analizi (HTML)](../files/dsa_c/slides/Bolum_01_Giris_Algoritma_Analizi.html)
 - [📖Ders Notu - Giriş ve Algoritma Analizi (HTML)](../files/dsa_c/notlar/Bolum_01_Giris_Algoritma_Analizi_Ders_Notu.html)
+- [📝Çalışma Soruları - Giriş ve Algoritma Analizi (HTML)](../files/dsa_c/slides/Bolum_01_Giris_Algoritma_Analizi_Calisma_Sorulari.html)
 
 ---
 
@@ -38,6 +39,7 @@ Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki 
 
 - [🖼️Sunum-Diziler ve Yapılar (HTML)](../files/dsa_c/slides/Bolum_02_Diziler_ve_Yapilar.html)
 - [📖Ders Notu - Diziler ve Yapılar (HTML)](../files/dsa_c/notlar/Bolum_02_Diziler_ve_Yapilar_Ders_Notu.html)
+- [📝Çalışma Soruları - Diziler ve Yapılar (HTML)](../files/dsa_c/slides/Bolum_02_Diziler_ve_Yapilar_Calisma_Sorulari.html)
 
 ---
 
@@ -47,6 +49,7 @@ Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki 
 
 - [🖼️Sunum-Özyineleme, İkili Arama ve Geri İzleme (HTML)](../files/dsa_c/slides/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.html)
 - [📖Ders Notu - Özyineleme, İkili Arama ve Geri İzleme (HTML)](../files/dsa_c/notlar/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme_Ders_Notu.html)
+- [📝Çalışma Soruları - Özyineleme, İkili Arama ve Geri İzleme (HTML)](../files/dsa_c/slides/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme_Calisma_Sorulari.html)
 
 ---
 
@@ -58,6 +61,7 @@ Dizinin yetersiz kaldığı durumlardan yola çıkılarak düğümlerden oluşan
 
 - [🖼️Sunum-Bağlı Listeler (HTML)](../files/dsa_c/slides/Bolum_04_Bagli_Listeler.html)
 - [📖Ders Notu - Bağlı Listeler (HTML)](../files/dsa_c/notlar/Bolum_04_Bagli_Listeler_Ders_Notu.html)
+- [📝Çalışma Soruları - Bağlı Listeler (HTML)](../files/dsa_c/slides/Bolum_04_Bagli_Listeler_Calisma_Sorulari.html)
 
 ---
 
@@ -67,6 +71,7 @@ Polinom soyut veri tipi, katsayı dizisi ve terim dizisi gösterimleriyle tanıt
 
 - [🖼️Sunum-Polinomlar ve Seyrek Matrisler (HTML)](../files/dsa_c/slides/Bolum_05_Polinomlar_ve_Seyrek_Matrisler.html)
 - [📖Ders Notu - Polinomlar ve Seyrek Matrisler (HTML)](../files/dsa_c/notlar/Bolum_05_Polinomlar_ve_Seyrek_Matrisler_Ders_Notu.html)
+- [📝Çalışma Soruları - Polinomlar ve Seyrek Matrisler (HTML)](../files/dsa_c/slides/Bolum_05_Polinomlar_ve_Seyrek_Matrisler_Calisma_Sorulari.html)
 
 ---
 
@@ -76,6 +81,7 @@ Son giren ilk çıkar (LIFO) ilkesiyle çalışan yığın, soyut veri tipi ve k
 
 - [🖼️Sunum-Yığınlar (HTML)](../files/dsa_c/slides/Bolum_06_Yiginlar.html)
 - [📖Ders Notu - Yığınlar (HTML)](../files/dsa_c/notlar/Bolum_06_Yiginlar_Ders_Notu.html)
+- [📝Çalışma Soruları - Yığınlar (HTML)](../files/dsa_c/slides/Bolum_06_Yiginlar_Calisma_Sorulari.html)
 
 ---
 
@@ -85,6 +91,7 @@ Son giren ilk çıkar (LIFO) ilkesiyle çalışan yığın, soyut veri tipi ve k
 
 - [🖼️Sunum-Kuyruklar (HTML)](../files/dsa_c/slides/Bolum_07_Kuyruklar.html)
 - [📖Ders Notu - Kuyruklar (HTML)](../files/dsa_c/notlar/Bolum_07_Kuyruklar_Ders_Notu.html)
+- [📝Çalışma Soruları - Kuyruklar (HTML)](../files/dsa_c/slides/Bolum_07_Kuyruklar_Calisma_Sorulari.html)
 
 ---
 
@@ -94,6 +101,7 @@ Yığın ve kuyruğun gerçek problemlerdeki kullanımı iki büyük uygulama ü
 
 - [🖼️Sunum-Yığın ve Kuyruk Uygulamaları (HTML)](../files/dsa_c/slides/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari.html)
 - [📖Ders Notu - Yığın ve Kuyruk Uygulamaları (HTML)](../files/dsa_c/notlar/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari_Ders_Notu.html)
+- [📝Çalışma Soruları - Yığın ve Kuyruk Uygulamaları (HTML)](../files/dsa_c/slides/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari_Calisma_Sorulari.html)
 
 ---
 
@@ -103,6 +111,7 @@ Liste soyut veri tipinin sözleşmesi ile dizi ve bağlı liste gerçeklemeleri 
 
 - [🖼️Sunum-Liste ADT ve Genelleştirilmiş Listeler (HTML)](../files/dsa_c/slides/Bolum_09_Liste_ADT_ve_Genellestirilmis_Listeler.html)
 - [📖Ders Notu - Liste ADT ve Genelleştirilmiş Listeler (HTML)](../files/dsa_c/notlar/Bolum_09_Liste_ADT_ve_Genellestirilmis_Listeler_Ders_Notu.html)
+- [📝Çalışma Soruları - Liste ADT ve Genelleştirilmiş Listeler (HTML)](../files/dsa_c/slides/Bolum_09_Liste_ADT_ve_Genellestirilmis_Listeler_Calisma_Sorulari.html)
 
 ---
 
@@ -114,6 +123,7 @@ Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve tam 
 
 - [🖼️Sunum-Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_10_Agaclar.html)
 - [📖Ders Notu - Ağaçlar (HTML)](../files/dsa_c/notlar/Bolum_10_Agaclar_Ders_Notu.html)
+- [📝Çalışma Soruları - Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_10_Agaclar_Calisma_Sorulari.html)
 
 ---
 
@@ -123,6 +133,7 @@ Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve tam 
 
 - [🖼️Sunum-Arama Ağaçları (HTML)](../files/dsa_c/slides/Bolum_11_Arama_Agaclari.html)
 - [📖Ders Notu - Arama Ağaçları (HTML)](../files/dsa_c/notlar/Bolum_11_Arama_Agaclari_Ders_Notu.html)
+- [📝Çalışma Soruları - Arama Ağaçları (HTML)](../files/dsa_c/slides/Bolum_11_Arama_Agaclari_Calisma_Sorulari.html)
 
 ---
 
@@ -132,6 +143,7 @@ n düğümlü bir ikili ağaçta boş kalan n+1 NULL işaretçinin kılavuz olar
 
 - [🖼️Sunum-Kılavuzlu İkili Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_12_Kilavuzlu_Ikili_Agaclar.html)
 - [📖Ders Notu - Kılavuzlu İkili Ağaçlar (HTML)](../files/dsa_c/notlar/Bolum_12_Kilavuzlu_Ikili_Agaclar_Ders_Notu.html)
+- [📝Çalışma Soruları - Kılavuzlu İkili Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_12_Kilavuzlu_Ikili_Agaclar_Calisma_Sorulari.html)
 
 ---
 
@@ -141,6 +153,7 @@ n düğümlü bir ikili ağaçta boş kalan n+1 NULL işaretçinin kılavuz olar
 
 - [🖼️Sunum-Öncelikli Kuyruk ve Heap (HTML)](../files/dsa_c/slides/Bolum_13_Oncelikli_Kuyruk_ve_Heap.html)
 - [📖Ders Notu - Öncelikli Kuyruk ve Heap (HTML)](../files/dsa_c/notlar/Bolum_13_Oncelikli_Kuyruk_ve_Heap_Ders_Notu.html)
+- [📝Çalışma Soruları - Öncelikli Kuyruk ve Heap (HTML)](../files/dsa_c/slides/Bolum_13_Oncelikli_Kuyruk_ve_Heap_Calisma_Sorulari.html)
 
 ---
 
@@ -152,6 +165,7 @@ Doğrudan adreslemeden yola çıkılarak hash fikri ve sözlük soyut veri tipi 
 
 - [🖼️Sunum-Hash Tabloları (HTML)](../files/dsa_c/slides/Bolum_14_Hash_Tablolari.html)
 - [📖Ders Notu - Hash Tabloları (HTML)](../files/dsa_c/notlar/Bolum_14_Hash_Tablolari_Ders_Notu.html)
+- [📝Çalışma Soruları - Hash Tabloları (HTML)](../files/dsa_c/slides/Bolum_14_Hash_Tablolari_Calisma_Sorulari.html)
 
 ---
 
@@ -161,6 +175,7 @@ Königsberg köprüleri probleminden başlanarak çizge tanımı, komşuluk, yol
 
 - [🖼️Sunum-Çizgeler (HTML)](../files/dsa_c/slides/Bolum_15_Cizgeler.html)
 - [📖Ders Notu - Çizgeler (HTML)](../files/dsa_c/notlar/Bolum_15_Cizgeler_Ders_Notu.html)
+- [📝Çalışma Soruları - Çizgeler (HTML)](../files/dsa_c/slides/Bolum_15_Cizgeler_Calisma_Sorulari.html)
 
 ---
 
@@ -170,6 +185,7 @@ Ayrık kümeler ile birleşim ve küme bulma işlemleri, ata dizisine dayanan ge
 
 - [🖼️Sunum-Kümeler ve Union-Find (HTML)](../files/dsa_c/slides/Bolum_16_Kumeler_ve_Union_Find.html)
 - [📖Ders Notu - Kümeler ve Union-Find (HTML)](../files/dsa_c/notlar/Bolum_16_Kumeler_ve_Union_Find_Ders_Notu.html)
+- [📝Çalışma Soruları - Kümeler ve Union-Find (HTML)](../files/dsa_c/slides/Bolum_16_Kumeler_ve_Union_Find_Calisma_Sorulari.html)
 
 ---
 
@@ -179,6 +195,7 @@ Kapsayan ağaç kavramı, ağaç ve ağaç dışı kenarlar ile kapsayan ağaçl
 
 - [🖼️Sunum-Minimum Kapsayan Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_17_Minimum_Kapsayan_Agaclar.html)
 - [📖Ders Notu - Minimum Kapsayan Ağaçlar (HTML)](../files/dsa_c/notlar/Bolum_17_Minimum_Kapsayan_Agaclar_Ders_Notu.html)
+- [📝Çalışma Soruları - Minimum Kapsayan Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_17_Minimum_Kapsayan_Agaclar_Calisma_Sorulari.html)
 
 ---
 
@@ -188,6 +205,7 @@ Tek kaynaklı en kısa yol problemi kaba kuvvet analiziyle başlar ve açgözlü
 
 - [🖼️Sunum-En Kısa Yol ve Aktivite Ağları (HTML)](../files/dsa_c/slides/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari.html)
 - [📖Ders Notu - En Kısa Yol ve Aktivite Ağları (HTML)](../files/dsa_c/notlar/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari_Ders_Notu.html)
+- [📝Çalışma Soruları - En Kısa Yol ve Aktivite Ağları (HTML)](../files/dsa_c/slides/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari_Calisma_Sorulari.html)
 
 ---
 
@@ -199,6 +217,7 @@ Sıralama problemi, kararlılık ve yerinde sıralama kavramlarıyla birlikte or
 
 - [🖼️Sunum-Temel Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_19_Temel_Siralama_Algoritmalari.html)
 - [📖Ders Notu - Temel Sıralama Algoritmaları (HTML)](../files/dsa_c/notlar/Bolum_19_Temel_Siralama_Algoritmalari_Ders_Notu.html)
+- [📝Çalışma Soruları - Temel Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_19_Temel_Siralama_Algoritmalari_Calisma_Sorulari.html)
 
 ---
 
@@ -208,3 +227,4 @@ Hızlı sıralama bölümleme değişmezi üzerinden anlatılır; en kötü, en 
 
 - [🖼️Sunum-İleri Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_20_Ileri_Siralama_Algoritmalari.html)
 - [📖Ders Notu - İleri Sıralama Algoritmaları (HTML)](../files/dsa_c/notlar/Bolum_20_Ileri_Siralama_Algoritmalari_Ders_Notu.html)
+- [📝Çalışma Soruları - İleri Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_20_Ileri_Siralama_Algoritmalari_Calisma_Sorulari.html)
