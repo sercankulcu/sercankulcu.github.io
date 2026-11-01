@@ -1,0 +1,1523 @@
+---
+layout: without-sidebar
+title: "Bölüm 9.2: emu8086.inc Kütüphanesi — Ders Notu"
+permalink: /files/microprocessors/notlar/Bolum_09_Kutuphane_Ders_Notu.html
+excerpt: "Mikroişlemciler dersi Bölüm 9.2 ders notu: emu8086.inc kütüphanesi, INCLUDE direktifi, PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF ve CURSORON makroları, DEFINE_ ve CALL ile prosedür kullanımı, PRINT_STRING, PTHIS, GET_STRING, CLEAR_SCREEN, SCAN_NUM, PRINT_NUM ve PRINT_NUM_UNS, kod izlemeleri ve örnek programlar."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+/* sunumdaki SVG'ler genel .ds-svg sınıflarını kullanır (notlar.css); burada yalnız yerleşim ve vurgu */
+.ds-notes .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 260px; min-width: 0; max-width: calc(50% - 0.7rem); }
+.ds-notes .nt-fig__row--3 > svg.ds-svg { flex: 1 1 200px; min-width: 0; max-width: calc(33.3% - 0.95rem); }
+@media (max-width: 560px) {
+  .ds-notes .nt-fig__row--2 > svg.ds-svg, .ds-notes .nt-fig__row--3 > svg.ds-svg { max-width: 100%; }
+}
+.ds-notes .nt-code .dir { font-weight: 700; }
+.ds-notes .n92-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">Mikroişlemciler · Ders Notu</p>
+  <h1>Bölüm 9.2: emu8086.inc Kütüphanesi</h1>
+  <p class="nt-lead">Assembly ile yazılan hemen her program ekrana bir şey yazar, klavyeden bir şey okur ya da bir sayıyı onluk tabanda gösterir. Bu işlerin her biri birkaç BIOS ve DOS hizmetinin doğru sırayla çağrılmasını gerektirir. emu8086, sık kullanılan bu işleri emu8086.inc adlı hazır bir kütüphanede toplar. Not, kütüphanenin INCLUDE direktifiyle programa nasıl katıldığını ve programın boyutunu neyin belirlediğini anlatarak başlar. Ardından ekran makrolarını (PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF, CURSORON) açılımlarıyla birlikte ele alır. Sonra DEFINE_ ve CALL ile kullanılan prosedürlere geçer: dizgi yazan PRINT_STRING ve PTHIS, klavyeden dizgi okuyan GET_STRING, ekranı temizleyen CLEAR_SCREEN, sayı okuyan SCAN_NUM ve sayı yazan PRINT_NUM ile PRINT_NUM_UNS. Her prosedürün mantığı sade bir eşdeğer kodla yazmaç yazmaç izlenir. Son kesimler bütün parçaları birleştiren örnek programlara ve kütüphane kullanılırken en sık yapılan hatalara ayrılmıştır.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_09_Kutuphane.html">Sunum</a></li>
+    <li><a href="../pdf/Bolum_09_Kutuphane.pdf">Sunum (PDF)</a></li>
+    <li><a href="../slides/Bolum_09_Kutuphane_Calisma_Sorulari.html">Çalışma soruları</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Yığın, CALL ve RET</a></li>
+    <li><a href="../slides/Chapter_01_Twos-Complement-Lab.html">İkiye Tümleyen Laboratuvarı</a></li>
+    <li><a href="../slides/CPU_Simulator.html">İşlemci Simülatörü</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>INCLUDE direktifini açıklamak</dt>
+    <dd>Bir kütüphane dosyasının kaynağa derleme sırasında metin olarak eklendiğini, assembler'ın dosyayı hangi klasörlerde aradığını ve program boyutunu yalnız kullanılan makroların ve tanımlanan prosedürlerin belirlediğini açıklamak.</dd>
+    <dt>Ekran makrolarını kullanmak</dt>
+    <dd>PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF ve CURSORON makrolarının hangi BIOS hizmetine ve hangi komut dizisine genişlediğini göstermek; imleç konumunu, satır sonunu ve ekran kaymasını önceden hesaplamak.</dd>
+    <dt>Prosedürleri doğru tanımlayıp çağırmak</dt>
+    <dd>DEFINE_ makrolarıyla prosedürleri programa eklemek, CALL ile çağırmak, her prosedürün girdi ve çıktı yazmaçlarını bilmek ve hangi yazmaçların korunduğunu söylemek.</dd>
+    <dt>Dizgi ve sayı prosedürlerini izlemek</dt>
+    <dd>PRINT_STRING, PTHIS, GET_STRING, SCAN_NUM, PRINT_NUM ve PRINT_NUM_UNS'nin mantığını yazmaç, yığın ve tampon düzeyinde adım adım izlemek; işaretli ve işaretsiz yorum farkını açıklamak.</dd>
+    <dt>Örnek programlar yazmak</dt>
+    <dd>Kütüphane makro ve prosedürleriyle sayı okuyan, hesaplayan, sonucu yazan ve ekranı düzenleyen programlar yazmak; sık yapılan hataları tanımak.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s9-2-1">9.2.1 Kütüphane ve INCLUDE</a>
+      <ol>
+        <li><a href="#s9-2-1-1">9.2.1.1 Ortak işlevler kütüphanesi</a></li>
+        <li><a href="#s9-2-1-2">9.2.1.2 INCLUDE direktifi</a></li>
+        <li><a href="#s9-2-1-3">9.2.1.3 INCLUDE sonrası kaynak</a></li>
+        <li><a href="#s9-2-1-4">9.2.1.4 Kütüphanede neler var?</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-2">9.2.2 Ekran makroları</a>
+      <ol>
+        <li><a href="#s9-2-2-1">9.2.2.1 Metin ekranı, imleç ve BIOS hizmetleri</a></li>
+        <li><a href="#s9-2-2-2">9.2.2.2 PUTC ve GOTOXY neye genişler?</a></li>
+        <li><a href="#s9-2-2-3">9.2.2.3 PRINT ve PRINTN</a></li>
+        <li><a href="#s9-2-2-4">9.2.2.4 Örnek: makrolarla ekran</a></li>
+        <li><a href="#s9-2-2-5">9.2.2.5 CURSOROFF ve CURSORON</a></li>
+        <li><a href="#s9-2-2-6">9.2.2.6 Kontrol karakterleri</a></li>
+        <li><a href="#s9-2-2-7">9.2.2.7 CR ve LF ayrı ayrı: kod izleme</a></li>
+        <li><a href="#s9-2-2-8">9.2.2.8 Satır sonu ve ekran kayması</a></li>
+        <li><a href="#s9-2-2-9">9.2.2.9 GOTOXY ve video belleği</a></li>
+        <li><a href="#s9-2-2-10">9.2.2.10 İki basamak yazdırma: kod izleme</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-3">9.2.3 Prosedürleri kullanmak</a>
+      <ol>
+        <li><a href="#s9-2-3-1">9.2.3.1 DEFINE_ ve CALL</a></li>
+        <li><a href="#s9-2-3-2">9.2.3.2 Girdi ve çıktı yazmaçları</a></li>
+        <li><a href="#s9-2-3-3">9.2.3.3 PRINT_STRING ve PTHIS</a></li>
+        <li><a href="#s9-2-3-4">9.2.3.4 Dizgi yazdırma yolları</a></li>
+        <li><a href="#s9-2-3-5">9.2.3.5 PTHIS nasıl çalışır?</a></li>
+        <li><a href="#s9-2-3-6">9.2.3.6 GET_STRING ve CLEAR_SCREEN</a></li>
+        <li><a href="#s9-2-3-7">9.2.3.7 GET_STRING mantığı: kod izleme</a></li>
+        <li><a href="#s9-2-3-8">9.2.3.8 GET_STRING ayrıntıları ve geri silme</a></li>
+        <li><a href="#s9-2-3-9">9.2.3.9 Tampon boyu ve taşma</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-4">9.2.4 Sayı prosedürleri</a>
+      <ol>
+        <li><a href="#s9-2-4-1">9.2.4.1 SCAN_NUM, PRINT_NUM ve PRINT_NUM_UNS</a></li>
+        <li><a href="#s9-2-4-2">9.2.4.2 SCAN_NUM mantığı: kod izleme</a></li>
+        <li><a href="#s9-2-4-3">9.2.4.3 SCAN_NUM'ın denetimleri</a></li>
+        <li><a href="#s9-2-4-4">9.2.4.4 PRINT_NUM_UNS mantığı: kod izleme</a></li>
+        <li><a href="#s9-2-4-5">9.2.4.5 Kütüphanenin yöntemi: azalan bölen</a></li>
+        <li><a href="#s9-2-4-6">9.2.4.6 PRINT_NUM ve eksi işareti: kod izleme</a></li>
+        <li><a href="#s9-2-4-7">9.2.4.7 Basamak ayırma: iki yöntemin karşılaştırması</a></li>
+        <li><a href="#s9-2-4-8">9.2.4.8 Aynı bitler, iki yorum</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-5">9.2.5 Örnek programlar</a>
+      <ol>
+        <li><a href="#s9-2-5-1">9.2.5.1 Sayı oku ve yazdır</a></li>
+        <li><a href="#s9-2-5-2">9.2.5.2 İki sayının toplamı</a></li>
+        <li><a href="#s9-2-5-3">9.2.5.3 Çerçeveli başlık</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-6">9.2.6 Sık yapılan hatalar</a></li>
+    <li><a href="#s9-2-7">9.2.7 Alıştırmalar ve çözümleri</a></li>
+    <li><a href="#s9-2-8">9.2.8 Özet</a></li>
+    <li><a href="#s9-2-9">9.2.9 Kavram listesi</a></li>
+    <li><a href="#s9-2-10">9.2.10 Kendini Dene</a></li>
+    <li><a href="#s9-2-11">9.2.11 İleri okuma</a></li>
+    <li><a href="#s9-2-12">9.2.12 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 id="s9-2-1"><span class="nt-num">9.2.1</span>Kütüphane ve INCLUDE</h2>
+
+<h3 id="s9-2-1-1"><span class="nt-num">9.2.1.1</span>Ortak işlevler kütüphanesi</h3>
+
+<p>Ekrana tek bir karakter yazmak bile 8086'da birkaç komut ister. Karakter AL'ye, hizmet numarası AH'ye konur ve BIOS'un ekran kesmesi <code>INT 10h</code> çağrılır. Bu sırada AX'in eski değeri bozulur; değer gerekiyorsa önce yığına itilip sonra geri alınmalıdır. Bir sayıyı onluk tabanda yazmak daha da uzundur: sayı 10'a bölünür, kalanlar basamak olur, basamaklar ASCII koduna çevrilir ve doğru sırayla yazılır. Klavyeden çok basamaklı bir sayı okumak da aynı işin tersidir. Bu kalıplar hemen her programda yeniden gerekir. Her seferinde yeniden yazılmaları hem zaman kaybıdır hem de hata kaynağıdır.</p>
+
+<p>emu8086 bu sorunu bir kütüphaneyle çözer. Kurulumla gelen <code>emu8086.inc</code> dosyası ekran, klavye ve sayı işlemleri için hazır makrolar ve prosedürler içerir. Programcı bu dosyayı kaynağın başına ekler ve içindeki işlevleri adlarıyla kullanır. Kütüphane yeni bir yetenek getirmez: içindeki her şey BIOS ve DOS kesmeleriyle, yani programcının kendisinin de yazabileceği komutlarla kuruludur. Kazanç, sınanmış kodun yeniden kullanılmasıdır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kutuphane">
+  <span class="nt-box__title">Tanım 9.2.1</span>
+  <p><strong>Kütüphane</strong> (<span lang="en">library</span>), hazır makro ve prosedürleri içeren ve başka programlara eklenerek kullanılan kaynak dosyasıdır. emu8086'nın kütüphanesi <code>emu8086.inc</code> dosyasıdır; uzantısındaki <em>inc</em> ekleme (<span lang="en">include</span>) dosyası olduğunu gösterir.</p>
+</div>
+
+<p>Kütüphanenin bir sınırı da baştan bilinmelidir. emu8086.inc, emu8086 ortamına özgüdür. MASM ya da TASM gibi başka bir assembler bu dosyayı tanımaz; kütüphanenin makroları da o assembler'ların makro diliyle birebir uyumlu olmayabilir. İçerideki kod ise sıradan 8086 komutlarından oluşur. Bu yüzden kütüphanenin nasıl çalıştığını anlamak, başka ortamlarda aynı işi yapan kodu yazmayı da öğretir. Notun izleme kesimleri bu amaçla her prosedürün mantığını sade bir eşdeğer kodla gösterir.</p>
+
+<h3 id="s9-2-1-2"><span class="nt-num">9.2.1.2</span>INCLUDE direktifi</h3>
+
+<p>Başka bir dosyadaki tanımlar kaynağa <code>INCLUDE</code> direktifiyle alınır. emu8086.inc için satır şöyledir:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'</code></pre>
+
+<div class="nt-box nt-box--tanim" id="tanim-include">
+  <span class="nt-box__title">Tanım 9.2.2</span>
+  <p><strong>INCLUDE</strong>, assembler'a belirtilen dosyanın metnini bu satırın yerine koymasını söyleyen direktiftir (<span lang="en">directive</span>). Direktif işlemci komutu üretmez; işi derleme sırasında biter. Çalışan programda “INCLUDE” diye bir komut yoktur.</p>
+</div>
+
+<p>Dosya adı tırnak içinde ya da tırnaksız yazılabilir: <code>include 'emu8086.inc'</code> ve <code>include emu8086.inc</code> aynı işi görür. Büyük-küçük harf farkı da önemsizdir. Assembler dosyayı iki yerde arar (<a href="#sekil-include">Şekil 9.2.1</a>). Önce derlenen kaynak dosyanın bulunduğu klasöre bakar. Dosya orada yoksa emu8086 kurulumundaki <code>Inc</code> klasörüne bakar. emu8086.inc kurulumla birlikte bu klasöre yerleştirildiği için çoğu programda ikinci adımda bulunur. Programcı kendi kütüphanesini yazıp kaynakla aynı klasöre koyarsa ilk adımda bulunur. Aynı adla bir dosya kaynak klasöründe de varsa, kaynak klasöründeki kazanır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-include" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 150" role="img" aria-label="include satırı önce kaynak dosyanın klasöründe, bulunamazsa Inc klasöründe aranır." style="max-width:720px"><defs><marker id="n92-1-m05l-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="40" width="170" height="50" rx="3"/><text class="txt mono" x="95" y="62" text-anchor="middle">include</text><text class="txt mono" x="95" y="80" text-anchor="middle" style="font-size:13px">'emu8086.inc'</text><path class="line" d="M180 65 L236 65" marker-end="url(#n92-1-m05l-m1)"/><rect class="box" x="240" y="30" width="190" height="70" rx="3" style="fill:var(--ds-hot);"/><text class="txt" x="335" y="58" text-anchor="middle" style="font-size:14px">1. kaynak dosyanın</text><text class="txt" x="335" y="78" text-anchor="middle" style="font-size:14px">klasörü</text><path class="line" d="M430 65 L486 65" marker-end="url(#n92-1-m05l-m1)"/><text class="lbl" x="458" y="56" text-anchor="middle">yoksa</text><rect class="box" x="490" y="30" width="210" height="70" rx="3"/><text class="txt" x="595" y="58" text-anchor="middle" style="font-size:14px">2. emu8086 kurulumundaki</text><text class="txt" x="595" y="78" text-anchor="middle" style="font-size:14px">Inc klasörü</text><text class="lbl" x="335" y="128" text-anchor="middle" style="font-size:14px">bulunan dosyanın içeriği, include satırının yerine eklenir</text></svg></div>
+  <figcaption><b>Şekil 9.2.1:</b> INCLUDE satırı önce kaynak dosyanın klasöründe, bulunamazsa emu8086 kurulumundaki Inc klasöründe aranır. Bulunan dosyanın içeriği satırın yerine eklenir.</figcaption>
+</figure>
+
+<p>Direktifin yeri de önemlidir. Bir makro ancak tanımından sonra kullanılabilir; assembler kaynağı yukarıdan aşağı okur ve tanımını görmediği bir makro adını komut sanıp hata verir. Bu yüzden <code>include</code> satırı kaynağın en başına, <code>ORG 100h</code>'den önce yazılır. Satırın kendisi bayt üretmediği için başa konması programın adreslerini değiştirmez.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>include</code> satırını programın sonuna, <code>END</code>'den hemen önceye yazmak. Assembler <code>PUTC 'A'</code> gibi bir satıra geldiğinde PUTC'nin tanımını henüz görmemiştir ve bilinmeyen komut hatası verir. Makroların tanımı kullanımlarından önce gelmelidir.</p>
+</div>
+
+<h3 id="s9-2-1-3"><span class="nt-num">9.2.1.3</span>INCLUDE sonrası kaynak</h3>
+
+<p>INCLUDE'un ne yaptığını görmenin en kolay yolu, assembler'ın gördüğü kaynağı düşünmektir. Assembler include satırını siler ve yerine emu8086.inc'in bütün metnini koyar. Ardından ortaya çıkan tek parça kaynağı derler. Sadeleştirilmiş görüntü şöyledir:</p>
+
+<pre class="nt-code"><code><span class="cm">; include satırının yerine:</span>
+<span class="dir">PUTC</span> <span class="dir">MACRO</span> char     <span class="cm">; şablon: 0 bayt</span>
+  ...
+<span class="dir">ENDM</span>
+<span class="dir">GOTOXY</span> <span class="dir">MACRO</span> col, row
+  ...
+<span class="dir">ENDM</span>
+<span class="dir">DEFINE_SCAN_NUM</span> <span class="dir">MACRO</span>
+  ...               <span class="cm">; prosedür şablonu</span>
+<span class="dir">ENDM</span>
+<span class="cm">; programın kendisi:</span>
+<span class="dir">ORG</span>  100h
+<span class="dir">PUTC</span> 'A'            <span class="cm">; burada 8 bayt</span>
+<span class="kw">RET</span></code></pre>
+
+<p>Bu görüntüden üç sonuç çıkar. Birincisi, kütüphanenin büyük bölümü <code>MACRO … ENDM</code> bloklarından oluşur. Bir makro tanımı yalnız bir şablondur; assembler onu bir yere not eder ama karşılığında hiç bayt üretmez. Kullanılmayan bir makro programa tek bayt eklemez. İkincisi, kod makronun kullanıldığı yerde oluşur. Yukarıdaki programda <code>PUTC 'A'</code> satırı açılınca beş komutluk, 8 baytlık bir dizi üretir. Programın tamamı bu 8 bayt ile <code>RET</code>'in 1 baytından oluşur: 9 bayt.</p>
+
+<p>Üçüncü sonuç prosedürlerle ilgilidir. Kütüphanedeki prosedürler de doğrudan kod olarak değil, makroların içinde saklanır. Örneğin SCAN_NUM prosedürünün bütün kodu <code>DEFINE_SCAN_NUM</code> adlı bir makronun gövdesidir. Program <code>DEFINE_SCAN_NUM</code> satırını yazmazsa makro hiç açılmaz ve SCAN_NUM'ın kodu programa girmez. Böylece kütüphanenin tamamını eklemek programı büyütmez. Program boyutunu yalnız iki şey belirler: kullanılan makroların her kullanımı ve DEFINE_ ile tanımlanan prosedürler.</p>
+
+<div class="nt-tablewrap" id="tab-boyut">
+<table class="nt-table">
+  <caption>Tablo 9.2.1: emu8086.inc'ten programa ne zaman bayt girer?</caption>
+  <thead><tr><th scope="col">Kaynakta</th><th scope="col">Üretilen kod</th><th scope="col">Ne zaman?</th></tr></thead>
+  <tbody>
+    <tr><td><code>include 'emu8086.inc'</code></td><td>yok</td><td>yalnız tanımlar okunur</td></tr>
+    <tr><td>makro kullanımı (<code>PUTC 'A'</code>)</td><td>makronun gövdesi, parametreleri yerleştirilmiş olarak</td><td>her kullanımda yeniden</td></tr>
+    <tr><td><code>DEFINE_SCAN_NUM</code></td><td>prosedürün bütün kodu</td><td>bir kez, satırın bulunduğu yerde</td></tr>
+    <tr><td><code>CALL scan_num</code></td><td>3 baytlık CALL komutu</td><td>her çağrıda</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Çalışan programın içinde “emu8086.inc” diye bir şey kalmaz. Bellekte yalnız açılmış makro komutları ve tanımlanmış prosedürler bulunur. emu8086'nın bellek penceresinde ya da sökücüsünde (<span lang="en">disassembler</span>) bakıldığında PUTC'nin yerinde PUSH, MOV, INT ve POP komutları görülür. Bu durum hata ayıklamada önemlidir: tek adım çalıştırırken bir makro satırı birden çok komut adımına karşılık gelir.</p>
+
+<h3 id="s9-2-1-4"><span class="nt-num">9.2.1.4</span>Kütüphanede neler var?</h3>
+
+<p>emu8086.inc'in içeriği iki gruba ayrılır (<a href="#tab-makrolar">Tablo 9.2.2</a>, <a href="#tab-prosedurler">Tablo 9.2.3</a>). Makrolar doğrudan adlarıyla yazılır. Prosedürler önce bir DEFINE_ makrosuyla tanımlanır, sonra CALL ile çağrılır.</p>
+
+<div class="nt-tablewrap" id="tab-makrolar">
+<table class="nt-table">
+  <caption>Tablo 9.2.2: Kütüphanedeki makrolar (doğrudan kullanılır).</caption>
+  <thead><tr><th scope="col">Makro</th><th scope="col">Görev</th><th scope="col">Arka planda</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUTC char</code></td><td>imlecin bulunduğu yere tek karakter yazar</td><td>INT 10h, AH = 0Eh</td></tr>
+    <tr><td><code>GOTOXY col, row</code></td><td>imleci verilen sütun ve satıra götürür</td><td>INT 10h, AH = 02h</td></tr>
+    <tr><td><code>PRINT string</code></td><td>dizgiyi yazar</td><td>0Eh ile karakter karakter</td></tr>
+    <tr><td><code>PRINTN string</code></td><td>dizgiyi yazar, sonra yeni satıra geçer</td><td>0Eh ile karakter karakter; sona 13, 10</td></tr>
+    <tr><td><code>CURSOROFF</code></td><td>imleci gizler</td><td>INT 10h, AH = 01h</td></tr>
+    <tr><td><code>CURSORON</code></td><td>imleci gösterir</td><td>INT 10h, AH = 01h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-tablewrap" id="tab-prosedurler">
+<table class="nt-table">
+  <caption>Tablo 9.2.3: Kütüphanedeki prosedürler (DEFINE_ ile tanımlanır, CALL ile çağrılır).</caption>
+  <thead><tr><th scope="col">Prosedür</th><th scope="col">Görev</th><th scope="col">Tanım satırı</th></tr></thead>
+  <tbody>
+    <tr><td><code>PRINT_STRING</code></td><td>DS:SI'deki 0 ile biten dizgiyi yazar</td><td><code>DEFINE_PRINT_STRING</code></td></tr>
+    <tr><td><code>PTHIS</code></td><td>CALL'ın hemen ardındaki dizgiyi yazar</td><td><code>DEFINE_PTHIS</code></td></tr>
+    <tr><td><code>GET_STRING</code></td><td>klavyeden dizgi okur</td><td><code>DEFINE_GET_STRING</code></td></tr>
+    <tr><td><code>CLEAR_SCREEN</code></td><td>ekranı temizler</td><td><code>DEFINE_CLEAR_SCREEN</code></td></tr>
+    <tr><td><code>SCAN_NUM</code></td><td>klavyeden işaretli sayı okur, CX'e yazar</td><td><code>DEFINE_SCAN_NUM</code></td></tr>
+    <tr><td><code>PRINT_NUM</code></td><td>AX'i işaretli sayı olarak yazar</td><td><code>DEFINE_PRINT_NUM</code> + <code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+    <tr><td><code>PRINT_NUM_UNS</code></td><td>AX'i işaretsiz sayı olarak yazar</td><td><code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İki grubun farkı makro ile prosedür arasındaki temel farktır. Makro kullanıldığı her yere kopyalanır; kısa ve sık kullanılan işler için uygundur. Prosedürün kodu bellekte bir kez bulunur ve her kullanımda CALL ile oraya gidilir; uzun işler için uygundur. Kütüphane bu ayrımı mantıklı biçimde yapar. PUTC 8 bayttır ve bir CALL ile RET'in maliyeti işin kendisine yakın olurdu; bu yüzden makrodur. SCAN_NUM ise eksi işaretini, geri silmeyi ve taşmayı denetleyen yüzlerce baytlık bir koddur. Her kullanımda kopyalanması programı hızla büyütürdü; bu yüzden prosedürdür.</p>
+
+<p>Prosedür çağrısının süresi de hesaplanabilir. 8086'da aynı kesim içindeki doğrudan bir CALL 19, yakın RET 8 saat turu sürer. 5 MHz'lik bir 8086'da bir tur 200 ns olduğundan çağırıp dönmenin bedeli 27 × 200 ns = 5,4 µs'dir. Bir karakter yazan <code>INT 10h</code> ise BIOS'un içinde yüzlerce komut çalıştırır. Dolayısıyla ekran ve klavye işlerinde CALL/RET'in süresi önemsizdir; asıl belirleyici, bellekte kaplanan yerdir.</p>
+
+<h2 id="s9-2-2"><span class="nt-num">9.2.2</span>Ekran makroları</h2>
+
+<h3 id="s9-2-2-1"><span class="nt-num">9.2.2.1</span>Metin ekranı, imleç ve BIOS hizmetleri</h3>
+
+<p>emu8086'nın çıktı penceresi PC'nin standart metin ekranını taklit eder. Ekran 80 sütun ve 25 satırdan oluşur. Her hücrede bir karakter durur. Hücrelerin konumu (sütun, satır) çiftiyle verilir: sol üst köşe (0, 0), sağ alt köşe (79, 24)'tür. Sayma sıfırdan başlar; bu yüzden “10. sütun” soldan on birinci hücredir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-imlec">
+  <span class="nt-box__title">Tanım 9.2.3</span>
+  <p><strong>İmleç</strong> (<span lang="en">cursor</span>), ekranda bir sonraki karakterin yazılacağı konumdur. BIOS imlecin sütununu ve satırını kendi veri alanında saklar. Karakter yazan hizmetler karakteri imlecin bulunduğu hücreye koyar ve imleci bir sağa ilerletir.</p>
+</div>
+
+<p>Ekranın arkasında bir bellek bölgesi vardır. Renkli metin modunda video kartının belleği işlemcinin adres uzayında B800h kesiminden başlar. Her hücre iki bayt tutar: karakterin ASCII kodu ve rengini belirleyen öznitelik baytı. Video kartı bu belleği saniyede onlarca kez okur ve ekrana çizer. Bir karakteri ekrana koymanın en doğrudan yolu bu belleğe <code>MOV</code> ile yazmaktır. İşlemci için bu sıradan bir bellek yazma yol çevrimidir; adres yolunda B8xxxh gibi bir fiziksel adres, veri yolunda karakter kodu görünür.</p>
+
+<p>Kütüphanenin makroları bu belleğe doğrudan yazmaz; BIOS'un ekran hizmetlerini kullanır. <code>INT 10h</code> komutu işlemciyi anakarttaki ROM'da bulunan BIOS yordamına götürür. Yordam, AH'deki hizmet numarasına bakarak ne yapacağına karar verir. İmleci ilerletmek, satır sonunda alt satıra geçmek ve son satırda ekranı kaydırmak gibi ayrıntıları BIOS üstlenir. Kütüphanenin kullandığı üç hizmet <a href="#tab-int10">Tablo 9.2.4</a>'tedir.</p>
+
+<div class="nt-tablewrap" id="tab-int10">
+<table class="nt-table">
+  <caption>Tablo 9.2.4: Ekran makrolarının kullandığı INT 10h hizmetleri.</caption>
+  <thead><tr><th scope="col">AH</th><th scope="col">Hizmet</th><th scope="col">Girdiler</th><th scope="col">Kullanan</th></tr></thead>
+  <tbody>
+    <tr><td>01h</td><td>imleç şeklini ayarla</td><td>CH = başlangıç, CL = bitiş tarama satırı</td><td>CURSOROFF, CURSORON</td></tr>
+    <tr><td>02h</td><td>imleç konumunu ayarla</td><td>BH = sayfa, DH = satır, DL = sütun</td><td>GOTOXY</td></tr>
+    <tr><td>0Eh</td><td>karakter yaz ve imleci ilerlet (<span lang="en">teletype</span>)</td><td>AL = karakter</td><td>PUTC, PRINT, PRINTN</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>0Eh hizmetinin adı eski daktilo-telgraf makinelerinden gelir. Bu makineler gibi hizmet de karakteri yazar ve kağıdı, yani imleci, ilerletir. Kontrol karakterlerini de makine gibi yorumlar: 13 imleci satır başına, 10 alt satıra götürür, 8 bir sola alır, 7 ses çıkarır. Bu özellik ekran makrolarının davranışının büyük bölümünü açıklar.</p>
+
+<h3 id="s9-2-2-2"><span class="nt-num">9.2.2.2</span>PUTC ve GOTOXY neye genişler?</h3>
+
+<p>PUTC tek bir parametre alır: yazılacak karakter. Parametre bir sabit (<code>PUTC 65</code>), bir karakter sabiti (<code>PUTC 'B'</code>) ya da 8 bitlik bir yazmaç veya değişken (<code>PUTC AL</code>) olabilir. Assembler makroyu açarken parametrenin yazıldığı yere bu metni koyar. <code>PUTC 'A'</code> şu beş komuta genişler:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> AX        <span class="cm">; AX'i koru</span>
+<span class="kw">MOV</span>  AL, 'A'   <span class="cm">; parametre</span>
+<span class="kw">MOV</span>  AH, 0Eh   <span class="cm">; teletype</span>
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX        <span class="cm">; AX geri</span></code></pre>
+
+<p>Komutlar sırayla şunları yapar. <code>PUSH AX</code> SP'yi 2 azaltır ve AX'in o anki değerini yığına yazar. <code>MOV AL, 'A'</code> AL'ye 41h koyar; AH'ye dokunmaz. <code>MOV AH, 0Eh</code> hizmet numarasını AH'ye koyar; artık AX = 0E41h'dir. <code>INT 10h</code> bayrakları, CS'yi ve IP'yi yığına iter ve BIOS'a geçer. BIOS 'A'yı imlecin bulunduğu hücreye yazar, imleci bir sağa alır ve <code>IRET</code> ile döner. <code>POP AX</code> yığındaki eski değeri AX'e geri yükler ve SP'yi 2 artırır. Makrodan çıkıldığında AX, SP ve bayraklar girişteki değerlerine dönmüştür. Çağıran kod AX'in geçici olarak değiştiğini fark etmez.</p>
+
+<p>Açılımın boyutu makine kodlarından hesaplanır: <code>PUSH AX</code> 1 bayt (50h), <code>MOV AL, 41h</code> 2 bayt (B0 41), <code>MOV AH, 0Eh</code> 2 bayt (B4 0E), <code>INT 10h</code> 2 bayt (CD 10), <code>POP AX</code> 1 bayt (58h). Toplam 8 bayttır.</p>
+
+<p>GOTOXY iki parametre alır: önce sütun, sonra satır. <code>GOTOXY 10, 5</code> şöyle açılır:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> BX
+<span class="kw">PUSH</span> DX
+<span class="kw">MOV</span>  AH, 02h   <span class="cm">; imleç konumla</span>
+<span class="kw">MOV</span>  DH, 5     <span class="cm">; satır (row)</span>
+<span class="kw">MOV</span>  DL, 10    <span class="cm">; sütun (col)</span>
+<span class="kw">MOV</span>  BH, 0     <span class="cm">; sayfa 0</span>
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  DX
+<span class="kw">POP</span>  BX
+<span class="kw">POP</span>  AX</code></pre>
+
+<p>Makro AH, BH, DH ve DL'yi kullanır; bu yüzden AX, BX ve DX'i saklar. POP'lar PUSH'ların ters sırasıyla yapılır: en son itilen DX ilk geri alınır. Açılım 16 bayttır: üç PUSH ve üç POP 6 bayt, dört <code>MOV r8, sabit</code> 8 bayt, <code>INT 10h</code> 2 bayt. BH = 0, metin modunun ilk görüntü sayfasını seçer. Renkli metin kartının belleğinde birden çok ekran sayfası sığar; emu8086 programları hep 0. sayfayı kullanır.</p>
+
+<p>Parametre sırası en sık karışan noktadır. Makro matematikteki (x, y) sırasını kullanır: önce yatay konum (sütun), sonra dikey konum (satır). BIOS ise satırı DH'de, sütunu DL'de bekler. Makro bu dönüşümü kendisi yapar: ikinci parametreyi DH'ye, birinciyi DL'ye koyar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>GOTOXY 5, 10</code> yazıp imlecin 5. satıra gitmesini beklemek. Makro 5'i sütun, 10'u satır olarak alır; imleç 10. satırın 5. sütununa gider. Benzer bir tuzak, konumu AH'de tutmaktır: <code>GOTOXY AL, AH</code> açılımında önce <code>MOV AH, 02h</code> çalışır, ardından <code>MOV DH, AH</code> satıra 2 yazar. Örneğin AL = 20, AH = 7 iken imleç 7. satıra değil 2. satıra, (20, 2) konumuna gider. Konum önce makronun kullanmadığı yazmaçlara alınmalıdır.</p>
+</div>
+
+<h3 id="s9-2-2-3"><span class="nt-num">9.2.2.3</span>PRINT ve PRINTN</h3>
+
+<p>PRINT bir dizgiyi yazar. Parametresi kaynakta tırnak içinde verilen sabit bir metindir: <code>PRINT 'Hello World!'</code>. Makro bu metni koda gömer ve 0Eh hizmetiyle karakter karakter yazar. emu8086.inc'teki PRINT'in açılımı şu yapıdadır (yerel etiket adları sadeleştirildi):</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> SI
+<span class="kw">JMP</span>  atla           <span class="cm">; dizginin üstünden atla</span>
+dizgi <span class="dir">DB</span> 'Hello World!', 0
+atla:
+<span class="kw">LEA</span>  SI, dizgi
+sonraki:
+<span class="kw">MOV</span>  AL, CS:[SI]    <span class="cm">; karakteri kod kesiminden oku</span>
+<span class="kw">CMP</span>  AL, 0
+<span class="kw">JZ</span>   bitti
+<span class="kw">INC</span>  SI
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">JMP</span>  sonraki
+bitti:
+<span class="kw">POP</span>  SI
+<span class="kw">POP</span>  AX</code></pre>
+
+<p>Açılımın en ilginç yanı dizginin yeridir. Dizgi kodun ortasında durur ve işlemci onu komut sanmasın diye üstünden bir <code>JMP</code> ile atlanır. Makroya özgü etiketler <code>LOCAL</code> direktifiyle her açılımda benzersiz adlar alır; PRINT ikinci kez kullanıldığında etiket çakışması olmaz. Dizgi kodun içinde olduğu için kod kesimindedir ve karakterler <code>CS:[SI]</code> ile okunur. .COM programında CS = DS olduğu için önek fark yaratmaz; ama önek sayesinde makro DS'nin başka bir kesimi gösterdiği durumlarda da doğru çalışır.</p>
+
+<p>Açılım SI'yi ve AX'i saklar. Boyutu dizginin uzunluğuna bağlıdır: n karakterlik bir dizgi için n + 1 bayt veri ve 23 bayt kod, toplam 24 + n bayt. <code>PRINT 'Hello World!'</code> 12 karakter için 36 bayt tutar. Döngü kodu PRINT'in her kullanımında yeniden kopyalanır.</p>
+
+<p>PRINTN aynı işi yapar, yalnız dizginin sonuna 13 ve 10 baytlarını ekler. Makro dizgiyi <code>DB 'metin', 13, 10, 0</code> biçiminde tanımlar. 13 (CR, satır başı) imleci satırın 0. sütununa, 10 (LF, satır besleme) bir alt satıra götürür. İkisi birlikte yeni satıra geçişi sağlar (<a href="#sekil-printn">Şekil 9.2.2</a>). <code>PRINT 'a'</code> ardından <code>PRINT 'b'</code> ekranda <em>ab</em> bırakır. <code>PRINTN 'a'</code> ardından <code>PRINT 'b'</code> ise <em>a</em>'yı bir satıra, <em>b</em>'yi alt satırın başına yazar. PRINTN'in açılımı PRINT'inkinden 2 bayt uzundur.</p>
+
+<figure class="nt-fig" id="sekil-printn" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 280 56" role="img" aria-label="CR imleci satır başına, LF bir alt satıra götürür; a ve alt satırda b." style="max-width:280px;margin-top:4px"><rect class="box-empty" x="10" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="32" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="54" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="76" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="98" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="120" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="10" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="32" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="54" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="76" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="98" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="120" y="30" width="22" height="22" rx="3"/><text class="txt mono" x="21.0" y="24" text-anchor="middle" style="font-size:14px">a</text><text class="txt mono" x="21.0" y="46" text-anchor="middle" style="font-size:14px">b</text><path class="line" d="M43.0 17.0 L32.0 17.0"/><path class="ah" d="M25.0 17.0 L32.0 13.1 L32.0 20.9 z"/><text class="lbl" x="160" y="22" text-anchor="start" style="font-size:12px">CR (13): satır başı</text><path class="line" d="M15.0 26.0 L15.0 29.0"/><path class="ah" d="M15.0 36.0 L11.1 29.0 L18.9 29.0 z"/><text class="lbl" x="160" y="44" text-anchor="start" style="font-size:12px">LF (10): alt satır</text></svg></div>
+  <figcaption><b>Şekil 9.2.2:</b> PRINTN 'a' ardından PRINT 'b': CR imleci satır başına, LF bir alt satıra götürür; b alt satırın başına yazılır.</figcaption>
+</figure>
+
+<p>PRINT'in parametresi derleme anında bilinen sabit bir metin olmalıdır. Makro metni koda gömdüğü için çalışma sırasında oluşan bir dizgiyi, örneğin klavyeden okunan bir adı yazamaz. <code>PRINT ad</code> yazıldığında assembler <code>DB ad, 0</code> satırını üretir. Bu satır ad değişkeninin adresini bayt olarak tanımlamaya çalışır; sonuç ya bir hata ya da anlamsız bir bayttır. Çalışma sırasında oluşan dizgiler PRINT_STRING ile yazılır.</p>
+
+<h3 id="s9-2-2-4"><span class="nt-num">9.2.2.4</span>Örnek: makrolarla ekran</h3>
+
+<p>emu8086'nın kütüphane belgesindeki ilk örnek üç makroyu birlikte kullanır:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> emu8086.<span class="kw">inc</span>
+<span class="dir">ORG</span>    100h
+<span class="dir">PRINT</span> 'Hello World!'
+<span class="dir">GOTOXY</span> 10, 5
+<span class="dir">PUTC</span> 65           <span class="cm">; 65 - is an ASCII code for 'A'</span>
+<span class="dir">PUTC</span> 'B'
+<span class="kw">RET</span>               <span class="cm">; return to operating system.</span>
+<span class="dir">END</span>               <span class="cm">; directive to stop the compiler.</span></code></pre>
+
+<p>İlk iki satır kod üretmez. <code>include</code> makro tanımlarını ekler, <code>ORG 100h</code> assembler'a programın 0100h bağıl konumundan başlayacağını söyler. .COM programlarında ilk 256 bayt (0000h–00FFh) DOS'un program kesimi önekine (PSP) ayrıldığı için kod 0100h'den başlar. Program başladığında ekran boştur ve imleç (0, 0)'dadır.</p>
+
+<p><code>PRINT 'Hello World!'</code> 12 karakteri 0. satırın 0–11. sütunlarına yazar. Her karakterden sonra BIOS imleci bir sağa aldığı için imleç (12, 0)'da kalır. <code>GOTOXY 10, 5</code> imleci 10. sütun, 5. satıra taşır; ekrana bir şey yazmaz. <code>PUTC 65</code> sayıyı karakter kodu olarak kullanır: 65 = 41h, ASCII'de 'A'dır. 'A' (10, 5) hücresine yazılır ve imleç (11, 5)'e geçer. <code>PUTC 'B'</code> aynı işi karakter sabitiyle yapar; assembler <code>'B'</code>'yi 42h'ye çevirir. 'B' (11, 5)'e yazılır, imleç (12, 5)'e geçer. <code>RET</code> programı bitirir. <code>END</code> direktifi yalnız assembler'a kaynağın bittiğini söyler; kod üretmez.</p>
+
+<div class="nt-tablewrap" id="tab-iz-ekran">
+<table class="nt-table">
+  <caption>Tablo 9.2.5: Makrolarla ekran programının izlemesi (her satır çalıştıktan sonraki durum).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">İmleç (sütun, satır)</th><th scope="col">Ekrana yazılan</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td><code>include emu8086.inc</code></td><td>(0, 0)</td><td>—</td><td>makro tanımları eklenir, kod yok</td></tr>
+    <tr><td><code>ORG 100h</code></td><td>(0, 0)</td><td>—</td><td>.COM programı 0100h'den başlar</td></tr>
+    <tr><td><code>PRINT 'Hello World!'</code></td><td class="n92-chg">(12, 0)</td><td>Hello World! (0–11. sütun, 0. satır)</td><td>12 karakter</td></tr>
+    <tr><td><code>GOTOXY 10, 5</code></td><td class="n92-chg">(10, 5)</td><td>—</td><td>yalnız imleç taşınır</td></tr>
+    <tr><td><code>PUTC 65</code></td><td class="n92-chg">(11, 5)</td><td>A, (10, 5) hücresine</td><td>65 = 41h = 'A'</td></tr>
+    <tr><td><code>PUTC 'B'</code></td><td class="n92-chg">(12, 5)</td><td>B, (11, 5) hücresine</td><td>karakter sabiti</td></tr>
+    <tr><td><code>RET</code></td><td>(12, 5)</td><td>—</td><td>DOS'a dönüş</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-ekran" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="imleç 10,5" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="190" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="B yazıldı" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="222" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="txt mono" x="198.0" y="133" text-anchor="middle" style="font-size:14px">A</text><text class="txt mono" x="214.0" y="133" text-anchor="middle" style="font-size:14px">B</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg></div></div>
+  <figcaption><b>Şekil 9.2.3:</b> GOTOXY 10, 5'ten sonra (solda) imleç (10, 5)'tedir; iki PUTC'den sonra (sağda) ekranın 5. satırında AB yazılıdır.</figcaption>
+</figure>
+
+<p>Programın makine kodu 0100h'den 0144h'ye kadar uzanır. 36 baytlık PRINT açılımı 0100h–0123h'yi, 16 baytlık GOTOXY açılımı 0124h–0133h'yi, iki PUTC açılımı 0134h–0143h'yi kaplar; <code>RET</code> 0144h'dedir. Kaynakta yedi satır görünse de işlemci 40'tan fazla farklı komut çalıştırır. PRINT'in döngüsü 12 kez döndüğü için yürütülen komut sayısı yüzü aşar.</p>
+
+<h3 id="s9-2-2-5"><span class="nt-num">9.2.2.5</span>CURSOROFF ve CURSORON</h3>
+
+<p>Metin ekranındaki imleç, video kartının yanıp söndürdüğü küçük bir çizgidir. Çizginin yüksekliği karakter hücresinin tarama satırlarıyla verilir. Renkli metin modunda bir karakter hücresi 8 ya da 16 tarama satırı yüksekliğindedir; imleç normalde hücrenin alt kısmındaki bir iki satırı kaplar. INT 10h'nin 01h hizmeti imlecin şeklini ayarlar: CH başlangıç, CL bitiş tarama satırıdır.</p>
+
+<p>CH'nin 5. biti özel bir anlam taşır. Bu bit 1 yapılırsa imleç ekrana hiç çizilmez. Kütüphanedeki CURSOROFF, CH'ye 28h yazar: 28h = 0010 1000b'dir ve 5. biti 1'dir. CURSORON aynı hizmetle 5. biti 0 olan normal bir şekil yükler. İki makro da AX ile CX'i saklayıp geri yükler.</p>
+
+<pre class="nt-code"><code><span class="dir">PRINTN</span> 'Ad Soyad:'   <span class="cm">; yazıp alt satıra geç</span>
+<span class="dir">CURSOROFF</span>
+<span class="dir">GOTOXY</span> 30, 12
+<span class="dir">PRINT</span> 'Merhaba'
+<span class="dir">CURSORON</span></code></pre>
+
+<p>Bu parçada önce “Ad Soyad:” yazılır ve imleç alt satırın başına geçer. CURSOROFF imleci gizler. GOTOXY imleci (30, 12)'ye taşır ve “Merhaba” 30–36. sütunlara yazılır. Bu sırada yanıp sönen imleç ekranda dolaşmaz. CURSORON imleci yeniden görünür yapar; imleç (37, 12)'dedir. İmleci gizlemek yalnız görüntüyü değiştirir; imlecin konumu BIOS'ta tutulmaya ve yazı hizmetleri onu ilerletmeye devam eder. Oyun ve menü ekranlarında yanıp sönen imleç dikkat dağıttığı için gizlenir.</p>
+
+<h3 id="s9-2-2-6"><span class="nt-num">9.2.2.6</span>Kontrol karakterleri</h3>
+
+<p>ASCII tablosunun ilk 32 kodu yazdırılabilir bir şekle karşılık gelmez. Bu kodlara <strong>kontrol karakteri</strong> (<span lang="en">control character</span>) denir. 0Eh hizmeti bunların dördünü daktilo gibi yorumlar (<a href="#tab-kontrol">Tablo 9.2.6</a>). PUTC bu kodlarla kullanıldığında ekrana bir şekil yazmaz, imleci yönetir.</p>
+
+<div class="nt-tablewrap" id="tab-kontrol">
+<table class="nt-table">
+  <caption>Tablo 9.2.6: PUTC ile verilen kontrol karakterleri.</caption>
+  <thead><tr><th scope="col">Kod</th><th scope="col">Ad</th><th scope="col">Etkisi</th></tr></thead>
+  <tbody>
+    <tr><td>07h</td><td>BEL (zil)</td><td>hoparlörden kısa bir bip; imleç yerinden oynamaz</td></tr>
+    <tr><td>08h</td><td>BS (geri)</td><td>imleç bir sola gider; karakteri silmez; 0. sütunda etkisizdir</td></tr>
+    <tr><td>0Ah</td><td>LF (satır besleme)</td><td>imleç bir alt satıra iner, sütun değişmez; son satırda ekran bir satır yukarı kayar</td></tr>
+    <tr><td>0Dh</td><td>CR (satır başı)</td><td>imleç aynı satırın 0. sütununa döner; satırdaki yazı yerinde kalır</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Yeni satır bu yüzden iki karakterle yazılır: önce CR, sonra LF. PRINTN'in eklediği 13, 10 çifti bu iki hareketin birleşimidir. Sıra ters olsa da (10, 13) imleç aynı yere varır: önce bir alt satıra iner, sonra o satırın başına döner. DOS ve Windows metin dosyalarında satır sonu bu yüzden CR LF çiftidir.</p>
+
+<p>Ekrandan bir karakteri silmek için BS tek başına yetmez; imleci sola alır ama karakter yerinde kalır. Silme üç adımla yapılır. <code>PUTC 8</code> imleci sola alır. <code>PUTC ' '</code> karakterin üstüne boşluk yazar ve imleci yine sağa geçirir. İkinci <code>PUTC 8</code> imleci boşalan hücreye geri getirir. Kütüphanenin geri silme tuşunu işleyen prosedürleri ekranı bu üçlüyle düzeltir.</p>
+
+<h3 id="s9-2-2-7"><span class="nt-num">9.2.2.7</span>CR ve LF ayrı ayrı: kod izleme</h3>
+
+<p>CR ile LF'nin ayrı ayrı ne yaptığını görmek için aşağıdaki program INT 10h'yi makrosuz kullanır. AH = 0Eh bir kez yüklenir; BIOS 0Eh hizmetinde AH'yi değiştirmediği için sonraki çağrılar için de geçerli kalır.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AH, 0Eh     <span class="cm">; teletype</span>
+<span class="kw">MOV</span>  AL, 'a'
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 'b'
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 10      <span class="cm">; yalnız LF</span>
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 'c'
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 13      <span class="cm">; yalnız CR</span>
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 'd'
+<span class="kw">INT</span>  10h
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz-crlf">
+<table class="nt-table">
+  <caption>Tablo 9.2.7: CR ve LF'nin ayrı ayrı etkisi.</caption>
+  <thead><tr><th scope="col">Komutlar</th><th scope="col">AL</th><th scope="col">İmleç (sütun, satır)</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AH, 0Eh</code> / <code>MOV AL, 'a'</code> / <code>INT 10h</code></td><td>61h</td><td>(1, 0)</td><td>a</td></tr>
+    <tr><td><code>MOV AL, 'b'</code> / <code>INT 10h</code></td><td>62h</td><td>(2, 0)</td><td>ab</td></tr>
+    <tr><td><code>MOV AL, 10</code> / <code>INT 10h</code></td><td>0Ah</td><td class="n92-chg">(2, 1)</td><td>ab</td></tr>
+    <tr><td><code>MOV AL, 'c'</code> / <code>INT 10h</code></td><td>63h</td><td>(3, 1)</td><td>ab / ··c</td></tr>
+    <tr><td><code>MOV AL, 13</code> / <code>INT 10h</code></td><td>0Dh</td><td class="n92-chg">(0, 1)</td><td>ab / ··c</td></tr>
+    <tr><td><code>MOV AL, 'd'</code> / <code>INT 10h</code></td><td>64h</td><td>(1, 1)</td><td>ab / d·c</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki “/” satır ayrımını, “·” boş hücreyi gösterir. Yalnız LF gönderildiğinde imleç alt satıra iner ama 2. sütunda kalır; 'c' alt satırın 2. sütununa yazılır ve satırlar merdiven gibi kayar. Yalnız CR gönderildiğinde imleç aynı satırın başına döner; satırdaki 'c' silinmez. 'd' 0. sütuna yazılır ve ekranda “ab”nin altında “d c” görünür (<a href="#sekil-crlf">Şekil 9.2.4</a>). Düzgün bir yeni satır için iki kod birlikte gerekir.</p>
+
+<figure class="nt-fig" id="sekil-crlf" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 330 120" role="img" aria-label="AL, imleç konumu ve ekranın ilk iki satırı" style="max-width:330px;max-height:120px"><text class="lbl" x="38" y="16" text-anchor="middle" style="font-size:12px;">AL</text><rect class="box" x="8" y="20" width="60" height="26" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="38" y="38" text-anchor="middle" style="font-size:14px;">0Ah</text><text class="lbl" x="84" y="14" text-anchor="start" style="font-size:12px;">imleç (sütun, satır)</text><rect class="box" x="84" y="20" width="120" height="26" rx="3"/><text class="txt mono" x="144" y="38" text-anchor="middle" style="font-size:14px;">(2, 1)</text><text class="lbl" x="64" y="78" text-anchor="end" style="font-size:12px;">ekran</text><rect class="box-empty" x="70" y="64" width="184" height="54" rx="3"/><text class="txt mono" x="85" y="81" text-anchor="middle" style="font-size:14px;">a</text><text class="txt mono" x="107" y="81" text-anchor="middle" style="font-size:14px;">b</text><rect x="118" y="91" width="22" height="24" rx="2" style="fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1"/></svg><svg class="ds-svg" viewBox="0 0 330 120" role="img" aria-label="AL, imleç konumu ve ekranın ilk iki satırı" style="max-width:330px;max-height:120px"><text class="lbl" x="38" y="16" text-anchor="middle" style="font-size:12px;">AL</text><rect class="box" x="8" y="20" width="60" height="26" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="38" y="38" text-anchor="middle" style="font-size:14px;">64h</text><text class="lbl" x="84" y="14" text-anchor="start" style="font-size:12px;">imleç (sütun, satır)</text><rect class="box" x="84" y="20" width="120" height="26" rx="3"/><text class="txt mono" x="144" y="38" text-anchor="middle" style="font-size:14px;">(1, 1)</text><text class="lbl" x="64" y="78" text-anchor="end" style="font-size:12px;">ekran</text><rect class="box-empty" x="70" y="64" width="184" height="54" rx="3"/><text class="txt mono" x="85" y="81" text-anchor="middle" style="font-size:14px;">a</text><text class="txt mono" x="107" y="81" text-anchor="middle" style="font-size:14px;">b</text><text class="txt mono" x="85" y="105" text-anchor="middle" style="font-size:14px;">d</text><rect x="96" y="91" width="22" height="24" rx="2" style="fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1"/><text class="txt mono" x="129" y="105" text-anchor="middle" style="font-size:14px;">c</text></svg></div></div>
+  <figcaption><b>Şekil 9.2.4:</b> Yalnız LF'den sonra imleç (2, 1)'dedir (solda); yalnız CR ve 'd'den sonra ekranda ab ve altında d c görünür (sağda).</figcaption>
+</figure>
+
+<p>INT 10h/0Eh AX dışında yazmaç değiştirmez; bu programda AH de çağrılar boyunca 0Eh kalır. Bu davranış BIOS'un belgelenmiş özelliğidir, ama başka hizmetler için genelleştirilmemelidir. Bazı INT 10h hizmetleri AX'i, bazıları BP'yi değiştirir. Kütüphane makrolarının AX'i her kullanımda saklaması bu yüzden güvenli bir alışkanlıktır.</p>
+
+<h3 id="s9-2-2-8"><span class="nt-num">9.2.2.8</span>Satır sonu ve ekran kayması</h3>
+
+<p>0Eh hizmeti 79. sütuna bir karakter yazdıktan sonra imleci kendiliğinden alt satırın başına geçirir. PRINT uzun bir dizgiyi bu sayede kesmeden sürdürür. İmleç son satırdayken (24) alt satıra geçmek gerekirse BIOS ekranın tamamını bir satır yukarı kaydırır. En üst satır kaybolur, en alta boş bir satır gelir ve imleç bu yeni satıra geçer. Kaydırma, video belleğindeki alt 24 satırın bir satır yukarı kopyalanmasıdır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kayma">
+  <span class="nt-box__title">Örnek 9.2.1</span>
+  <p><code>GOTOXY 75, 24</code> ardından <code>PRINT 'Merhaba'</code> çalışıyor. Yazının ekranda nerede kaldığını ve imlecin son konumunu bulalım.</p>
+  <ol class="nt-steps">
+    <li>İmleç (75, 24)'tedir. “M”, “e”, “r”, “h”, “a” sırasıyla 75, 76, 77, 78 ve 79. sütunlara yazılır.</li>
+    <li>79. sütuna yazıldıktan sonra imleç alt satıra geçmelidir. İmleç son satırda olduğu için ekran bir satır yukarı kayar. “Merha” 23. satıra çıkar; 24. satır boşalır ve imleç (0, 24)'e gelir.</li>
+    <li>“b” ve “a” 24. satırın 0 ve 1. sütunlarına yazılır. İmleç (2, 24)'te kalır.</li>
+  </ol>
+  <p>Sonuçta “Merha” 23. satırın 75–79. sütunlarında, “ba” 24. satırın başında, imleç (2, 24)'tedir (<a href="#sekil-kayma">Şekil 9.2.5</a>).</p>
+</div>
+
+<figure class="nt-fig" id="sekil-kayma" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 128" role="img" aria-label="Ekranın son iki satırı: Merha 23. satırın 75 ile 79. sütunlarında, ba 24. satırın başında" style="max-width:560px;max-height:128px"><text class="lbl" x="60" y="14" text-anchor="start" style="font-size:12px;">sütun</text><text class="lbl mono" x="128" y="32" text-anchor="middle" style="font-size:11px;">0</text><text class="lbl mono" x="164" y="32" text-anchor="middle" style="font-size:11px;">1</text><text class="lbl mono" x="200" y="32" text-anchor="middle" style="font-size:11px;">2</text><text class="lbl mono" x="236" y="32" text-anchor="middle" style="font-size:11px;">3</text><text class="lbl mono" x="272" y="32" text-anchor="middle" style="font-size:11px;">4</text><text class="lbl mono" x="308" y="32" text-anchor="middle" style="font-size:11px;">…</text><text class="lbl mono" x="344" y="32" text-anchor="middle" style="font-size:11px;">75</text><text class="lbl mono" x="380" y="32" text-anchor="middle" style="font-size:11px;">76</text><text class="lbl mono" x="416" y="32" text-anchor="middle" style="font-size:11px;">77</text><text class="lbl mono" x="452" y="32" text-anchor="middle" style="font-size:11px;">78</text><text class="lbl mono" x="488" y="32" text-anchor="middle" style="font-size:11px;">79</text><text class="lbl" x="100" y="62" text-anchor="end" style="font-size:12px;">satır 23</text><rect class="box-empty" x="110" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="146" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="182" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="218" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="254" y="40" width="34" height="30" rx="3"/><text class="lbl" x="308" y="62" text-anchor="middle" style="font-size:13px;">…</text><rect class="box" x="326" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="343" y="61" text-anchor="middle" style="font-size:15px;">M</text><rect class="box" x="362" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="379" y="61" text-anchor="middle" style="font-size:15px;">e</text><rect class="box" x="398" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="415" y="61" text-anchor="middle" style="font-size:15px;">r</text><rect class="box" x="434" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="451" y="61" text-anchor="middle" style="font-size:15px;">h</text><rect class="box" x="470" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="487" y="61" text-anchor="middle" style="font-size:15px;">a</text><text class="lbl" x="100" y="100" text-anchor="end" style="font-size:12px;">satır 24</text><rect class="box" x="110" y="78" width="34" height="30" rx="3"/><text class="txt mono" x="127" y="99" text-anchor="middle" style="font-size:15px;">b</text><rect class="box" x="146" y="78" width="34" height="30" rx="3"/><text class="txt mono" x="163" y="99" text-anchor="middle" style="font-size:15px;">a</text><rect class="box-empty" x="182" y="78" width="34" height="30" rx="3" style="fill:var(--ds-hot)"/><rect class="box-empty" x="218" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="254" y="78" width="34" height="30" rx="3"/><text class="lbl" x="308" y="100" text-anchor="middle" style="font-size:13px;">…</text><rect class="box-empty" x="326" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="362" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="398" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="434" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="470" y="78" width="34" height="30" rx="3"/><text class="txt" x="199" y="124" text-anchor="middle" style="font-size:12px;fill:var(--ds-link)">imleç</text></svg></div>
+  <figcaption><b>Şekil 9.2.5:</b> Ekranın son iki satırı: “Merha” 23. satırın 75–79. sütunlarında, “ba” 24. satırın başında; imleç (2, 24)'te.</figcaption>
+</figure>
+
+<p>GOTOXY ve PUTC konumları denetlemez. <code>GOTOXY 85, 3</code> gibi bir çağrıda BIOS'un davranışı tanımlı değildir; imleç görünmeyen bir yere gidebilir ve sonraki yazılar beklenmedik yerlerde çıkar. Programcı konumları 0–79 (sütun) ve 0–24 (satır) aralığında tutmalıdır.</p>
+
+<h3 id="s9-2-2-9"><span class="nt-num">9.2.2.9</span>GOTOXY ve video belleği</h3>
+
+<p>Ekranda seçilen bir hücre üç farklı biçimde anlatılabilir: makro çağrısıyla (<code>GOTOXY 10, 5</code>), BIOS'a giden yazmaç değerleriyle (AH = 02h, DH = 5, DL = 10, BH = 0) ve hücrenin video belleğindeki adresiyle. Sonuncusu BIOS'un içinde ne olduğunu anlamak için yararlıdır.</p>
+
+<p>Video belleğinde hücreler satır satır, soldan sağa dizilir. Her hücre iki bayt kapladığı için (sütun, satır) hücresinin bağıl konumu şöyle hesaplanır:</p>
+
+<p style="text-align:center"><code>bağıl konum = (satır × 80 + sütun) × 2</code></p>
+
+<p>Çift adresteki bayt karakterin ASCII kodu, tek adresteki bayt öznitelik baytıdır. <code>GOTOXY 10, 5</code> ve ardından <code>PUTC 'A'</code> için hesap şöyledir: (5 × 80 + 10) × 2 = 410 × 2 = 820 = 0334h. 'A' (41h) B800:0334h'ye, öznitelik baytı (07h, siyah üstüne açık gri) B800:0335h'ye yazılır. Fiziksel adres B8000h + 0334h = B8334h'dir. Ekranın sağ alt köşesi (79, 24) için bağıl konum (24 × 80 + 79) × 2 = 3998 = 0F9Eh olur. 80 × 25 hücrelik bir sayfa 4000 bayt tutar.</p>
+
+<p>Bu adresleri bilmek, makroların yaptığı işi doğrudan bellek yazımıyla yapmayı da mümkün kılar. Örneğin <code>MOV AX, 0B800h</code>, <code>MOV ES, AX</code>, <code>MOV BYTE PTR ES:[0334h], 'A'</code> dizisi 'A'yı aynı hücreye yazar. Fark, imlecin ilerlememesi ve ekranın kaymamasıdır: doğrudan yazım BIOS'un üstlendiği bütün ayrıntıları programcıya bırakır. Kütüphane makroları daha yavaştır ama bu ayrıntıları düşünmeyi gerektirmez.</p>
+
+<h3 id="s9-2-2-10"><span class="nt-num">9.2.2.10</span>İki basamak yazdırma: kod izleme</h3>
+
+<p>PUTC'nin AX'i koruması küçük bir ayrıntı gibi görünür. Aşağıdaki örnek bu ayrıntının neden yararlı olduğunu gösterir. Program AL'deki 0–99 arası bir sayıyı iki onluk basamak olarak yazar. Basamakları ayırmak için <code>AAM</code> komutu kullanılır. Kodda iki PUTC'nin açılımı makro yerine açıkça yazılmıştır:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AL, 58
+<span class="kw">AAM</span>              <span class="cm">; AH = 5, AL = 8</span>
+<span class="kw">ADD</span>  AX, 3030h   <span class="cm">; '5', '8'</span>
+<span class="kw">PUSH</span> AX          <span class="cm">; PUTC AH açılımı</span>
+<span class="kw">MOV</span>  AL, AH
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX          <span class="cm">; AX geri: 3538h</span>
+<span class="kw">PUSH</span> AX          <span class="cm">; PUTC AL açılımı</span>
+<span class="kw">MOV</span>  AL, AL
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-box nt-box--tanim" id="tanim-aam">
+  <span class="nt-box__title">Tanım 9.2.4</span>
+  <p><strong>AAM</strong> (<span lang="en">ASCII adjust after multiply</span>), AL'yi 10'a böler: bölümü AH'ye, kalanı AL'ye yazar. 0–99 arası bir sayının onlar basamağı AH'de, birler basamağı AL'de kalır. SF, ZF ve PF AL'ye göre kurulur. 8086'da AAM 83 saat turu sürer.</p>
+</div>
+
+<p><code>MOV AL, 58</code> AL'ye 58 = 3Ah koyar. <code>AAM</code> 58'i 10'a böler: AH = 5, AL = 8, yani AX = 0508h. Yalnız AL bölündüğü için sayı 0–99 aralığında olmalıdır; 100 ve üstünde bölüm de tek basamak olmaz. <code>ADD AX, 3030h</code> iki bayta birden 30h ekler. Bir basamağa 30h eklemek onu ASCII rakamına çevirir: 5 + 30h = 35h = '5', 8 + 30h = 38h = '8'. Toplamada iki bayt arasında elde oluşmaz, çünkü 08h + 30h = 38h 8 bite sığar.</p>
+
+<p>İlk açılım onlar basamağını yazar. <code>PUSH AX</code> 3538h'yi yığına koyar, SP = FFFCh. <code>MOV AL, AH</code> AL'ye '5'i kopyalar ve <code>MOV AH, 0Eh</code> hizmet numarasını yükler; AX = 0E35h olur. Birler basamağı yazmaçtan silinmiştir. <code>INT 10h</code> ekrana 5 yazar. <code>POP AX</code> 3538h'yi geri getirir; '8' yeniden AL'dedir. İkinci açılım aynı kalıpla birler basamağını yazar. <code>MOV AL, AL</code> hiçbir şey değiştirmez ama zararsızdır; makro parametre AL olduğunda bu komutu üretir.</p>
+
+<div class="nt-tablewrap" id="tab-iz-aam">
+<table class="nt-table">
+  <caption>Tablo 9.2.8: AAM ve PUTC ile iki basamak yazdırmanın izlemesi.</caption>
+  <thead><tr><th scope="col">Komut(lar)</th><th scope="col">AH</th><th scope="col">AL</th><th scope="col">SP</th><th scope="col">[FFFCh]</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AL, 58</code></td><td>00h</td><td class="n92-chg">3Ah</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td><code>AAM</code></td><td class="n92-chg">05h</td><td class="n92-chg">08h</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td><code>ADD AX, 3030h</code></td><td class="n92-chg">35h</td><td class="n92-chg">38h</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td><code>PUSH AX</code></td><td>35h</td><td>38h</td><td class="n92-chg">FFFCh</td><td class="n92-chg">3538h</td><td></td></tr>
+    <tr><td><code>MOV AL, AH</code> / <code>MOV AH, 0Eh</code> / <code>INT 10h</code></td><td class="n92-chg">0Eh</td><td class="n92-chg">35h</td><td>FFFCh</td><td>3538h</td><td>5</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n92-chg">35h</td><td class="n92-chg">38h</td><td class="n92-chg">FFFEh</td><td>—</td><td>5</td></tr>
+    <tr><td>ikinci açılım (5 komut)</td><td>35h</td><td>38h</td><td>FFFEh</td><td>—</td><td>58</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Programın sonunda ekranda 58 yazılıdır ve AX yine 3538h'dir (<a href="#tab-iz-aam">Tablo 9.2.8</a>). PUTC AX'i koruduğu için iki basamak ayrı bir yazmaca kopyalanmadan art arda yazılabildi. Makro AX'i korumasaydı ilk PUTC '8'i silerdi ve programcı birler basamağını önceden başka bir yazmaca almak zorunda kalırdı. Kaynakta makrolarla yazıldığında aynı program yalnız <code>PUTC AH</code> ve <code>PUTC AL</code> satırlarını içerir.</p>
+
+<h2 id="s9-2-3"><span class="nt-num">9.2.3</span>Prosedürleri kullanmak</h2>
+
+<h3 id="s9-2-3-1"><span class="nt-num">9.2.3.1</span>DEFINE_ ve CALL</h3>
+
+<p>Kütüphanedeki bir prosedürü kullanmak iki adım ister. Önce prosedür bir kez tanımlanır: bunun için adı <code>DEFINE_</code> ile başlayan makro yazılır. Sonra programın gereken yerlerinde prosedür <code>CALL</code> ile çağrılır. Tipik bir iskelet şöyledir:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span> 100h
+    ...
+    <span class="kw">CALL</span> print_num   <span class="cm">; kullan</span>
+    ...
+<span class="kw">RET</span>
+<span class="dir">DEFINE_PRINT_NUM</span>    <span class="cm">; tanımla</span>
+<span class="dir">DEFINE_PRINT_NUM_UNS</span>
+<span class="dir">END</span></code></pre>
+
+<div class="nt-box nt-box--tanim" id="tanim-define">
+  <span class="nt-box__title">Tanım 9.2.5</span>
+  <p><strong>DEFINE_ makrosu</strong>, gövdesinde bir kütüphane prosedürünün bütün kodunu taşıyan makrodur. Makro açıldığı yere prosedürü <code>PROC … ENDP</code> bloğu olarak yerleştirir. Her prosedür programda en çok bir kez tanımlanır; iki kez tanımlanırsa aynı etiket iki kez oluşur ve assembler hata verir.</p>
+</div>
+
+<p>Makronun açıldığı yer, prosedürün bellekteki yeridir. Kaynakta DEFINE_ satırları genellikle ana programın sonundaki <code>RET</code> ile <code>END</code> direktifi arasına yazılır (<a href="#sekil-yerlesim">Şekil 9.2.6</a>). Bellekte önce ana kod, ardından RET, ardından prosedürlerin kodu gelir. İşlemci ana kodu yukarıdan aşağı çalıştırır, RET ile DOS'a döner ve prosedürlerin koduna yalnız CALL ile girer.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-yerlesim" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 80" role="img" aria-label="Bellekte önce ana kod ve RET, ardından DEFINE_ ile açılan prosedürler, en sonda END gelir; CALL prosedüre atlar." style="max-width:640px"><rect class="box" x="10" y="30" width="230" height="28" rx="3"/><text class="txt mono" x="125.0" y="49" text-anchor="middle" style="font-size:12.5px">ana kod … CALL print_num …</text><rect class="box" x="240" y="30" width="60" height="28" rx="3"/><text class="txt mono" x="270.0" y="49" text-anchor="middle" style="font-size:12.5px">RET</text><rect class="box" x="300" y="30" width="170" height="28" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="385.0" y="49" text-anchor="middle" style="font-size:12.5px">print_num</text><rect class="box" x="470" y="30" width="170" height="28" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="555.0" y="49" text-anchor="middle" style="font-size:12.5px">print_num_uns</text><rect class="box" x="640" y="30" width="50" height="28" rx="3"/><text class="txt mono" x="665.0" y="49" text-anchor="middle" style="font-size:12.5px">END</text><path class="line" d="M190 30 C 220 4, 330 4, 360 26"/><path class="line" d="M355.0 22.0 L357.1 24.1"/><path class="ah" d="M362.0 29.0 L354.3 26.8 L359.8 21.3 z"/><text class="lbl" x="275" y="12" text-anchor="middle" style="font-size:11.5px">CALL</text><text class="lbl" x="125" y="74" text-anchor="middle" style="font-size:11.5px">akış yukarıdan aşağı</text><text class="lbl" x="470" y="74" text-anchor="middle" style="font-size:11.5px">DEFINE_… makrolarının açıldığı yer</text></svg></div>
+  <figcaption><b>Şekil 9.2.6:</b> Bellekte önce ana kod ve RET, ardından DEFINE_ makrolarıyla açılan prosedürler gelir; CALL prosedüre atlar.</figcaption>
+</figure>
+
+<p>Bu yerleşim alışılmış olandır ama tek güvenli yer değildir. emu8086.inc'teki her DEFINE_ makrosu bir koruma içerir: gövdenin başında prosedürün üstünden atlayan bir <code>JMP</code> vardır. DEFINE_SCAN_NUM'ın yapısı kabaca şöyledir:</p>
+
+<pre class="nt-code"><code><span class="kw">JMP</span> skip_proc_scan_num   <span class="cm">; akış gövdeye girmesin</span>
+SCAN_NUM <span class="dir">PROC</span> NEAR
+    ...                  <span class="cm">; prosedürün kodu</span>
+    <span class="kw">RET</span>
+SCAN_NUM <span class="dir">ENDP</span>
+skip_proc_scan_num:</code></pre>
+
+<p>Bir DEFINE_ satırı yanlışlıkla <code>ORG 100h</code>'nin hemen altına yazılsa da program doğru çalışır. İşlemcinin ilk çalıştırdığı komut bu JMP'dir ve gövdenin sonrasına, ana programın başına atlar. Bedeli, programda fazladan bir JMP komutunun bulunmasıdır. Yine de DEFINE_ satırlarının RET ile END arasında toplanması programı okunur tutar ve gereksiz atlamaları önler.</p>
+
+<p>Prosedür adları kaynakta küçük harfle yazılır: <code>CALL print_num</code>, <code>CALL scan_num</code>. emu8086 etiketlerde büyük-küçük harf ayırmaz; <code>CALL PRINT_NUM</code> da aynı etikete gider. Küçük harf, belgelerdeki yazımdır ve makro adlarıyla (<code>DEFINE_PRINT_NUM</code>) prosedür adını görsel olarak ayırır.</p>
+
+<p>Bir prosedür başka bir prosedürü çağırıyorsa ikisi birlikte tanımlanmalıdır. PRINT_NUM sayının işaretini yazdıktan sonra mutlak değeri PRINT_NUM_UNS'ye yazdırır. Yalnız <code>DEFINE_PRINT_NUM</code> yazılırsa assembler PRINT_NUM'ın içindeki <code>CALL PRINT_NUM_UNS</code> satırında etiketi bulamaz ve tanımsız etiket hatası verir. Ters durum hata vermez: PRINT_NUM_UNS tek başına tanımlanabilir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>CALL scan_num</code> yazıp <code>DEFINE_SCAN_NUM</code>'ı unutmak. Kütüphanenin eklenmiş olması prosedürün tanımlı olduğu anlamına gelmez; makro açılmadıkça scan_num etiketi yoktur. emu8086 derleme sırasında bu etiket için “undefined” hatası verir.</p>
+</div>
+
+<p>Makro ile prosedürün bellekteki maliyeti somut bir örnekle karşılaştırılabilir. Bir programda on farklı ileti yazılsın. PRINT ile her ileti kendi döngü kodunu taşır: her açılımda 23 bayt kod ve iletinin baytları bulunur. PRINT_STRING ile döngü bellekte bir kez bulunur; her ileti için yalnız 3 baytlık <code>LEA SI, ileti</code> ve 3 baytlık <code>CALL print_string</code> eklenir. Yedi karakterlik on iletiyle program PRINT kullanıldığında yaklaşık 310 bayt, PRINT_STRING kullanıldığında yaklaşık 160 bayt tutar. Kazancın karşılığı süredir: her çağrıda CALL ve RET fazladan 27 saat turu harcar.</p>
+
+<h3 id="s9-2-3-2"><span class="nt-num">9.2.3.2</span>Girdi ve çıktı yazmaçları</h3>
+
+<p>Bir prosedür parametrelerini yazmaçlarda alır ve sonucunu yazmaçta döndürür. Hangi yazmacın ne anlama geldiği prosedürün belgesinde yazar ve programcı buna uymak zorundadır (<a href="#tab-yazmaclar">Tablo 9.2.9</a>).</p>
+
+<div class="nt-tablewrap" id="tab-yazmaclar">
+<table class="nt-table">
+  <caption>Tablo 9.2.9: Kütüphane prosedürlerinin girdi ve çıktı yazmaçları.</caption>
+  <thead><tr><th scope="col">Prosedür</th><th scope="col">Girdi</th><th scope="col">Çıktı</th><th scope="col">Ayrıntı</th></tr></thead>
+  <tbody>
+    <tr><td>PRINT_STRING</td><td>DS:SI = dizgi adresi</td><td>—</td><td>dizgi 0 ile bitmeli</td></tr>
+    <tr><td>PTHIS</td><td>dizgi CALL'ın hemen ardında</td><td>—</td><td>dönüş adresini kendisi ilerletir</td></tr>
+    <tr><td>GET_STRING</td><td>DS:DI = tampon, DX = boyut</td><td>tamponda 0 ile biten dizgi</td><td>en fazla DX − 1 karakter</td></tr>
+    <tr><td>CLEAR_SCREEN</td><td>—</td><td>—</td><td>imleç (0, 0)'a gider</td></tr>
+    <tr><td>SCAN_NUM</td><td>klavye</td><td>CX (işaretli)</td><td>CX'teki eski değer kaybolur</td></tr>
+    <tr><td>PRINT_NUM</td><td>AX (işaretli)</td><td>—</td><td>PRINT_NUM_UNS de tanımlı olmalı</td></tr>
+    <tr><td>PRINT_NUM_UNS</td><td>AX (işaretsiz)</td><td>—</td><td>0 … 65 535</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Kütüphanenin prosedürleri kullandıkları öteki yazmaçları girişte yığına iter ve çıkışta geri alır. Örneğin GET_STRING AX, CX, DI ve DX'i, SCAN_NUM DX, AX ve SI'yi saklar. Çağıran program için değişen tek yazmaç çıktı yazmacıdır. Bayraklar ise korunmaz: prosedürün içindeki CMP ve aritmetik komutlar bayrakları değiştirir. Bir CALL'dan önce kurulan bayrağa CALL'dan sonra güvenilmemelidir.</p>
+
+<p>Çıktı yazmacının bir sonucu da vardır. SCAN_NUM sonucu CX'e yazdığı için CX'teki eski değer kaybolur. CX'te bir döngü sayacı tutan program, SCAN_NUM'ı çağırmadan önce sayacı kendisi saklamalıdır:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  CX, 3          <span class="cm">; üç sayı okunacak</span>
+oku: <span class="kw">PUSH</span> CX        <span class="cm">; sayacı sakla</span>
+<span class="kw">CALL</span> scan_num       <span class="cm">; CX = okunan sayı</span>
+<span class="kw">MOV</span>  AX, CX
+<span class="kw">ADD</span>  BX, AX         <span class="cm">; toplama ekle</span>
+<span class="kw">POP</span>  CX             <span class="cm">; sayacı geri al</span>
+<span class="kw">LOOP</span> oku</code></pre>
+
+<p>PUSH CX olmasaydı LOOP, kullanıcının girdiği sayıyı sayaç olarak kullanırdı. Kullanıcı 0 girerse LOOP CX'i FFFFh'ye indirir ve döngü 65 535 kez daha döner.</p>
+
+<h3 id="s9-2-3-3"><span class="nt-num">9.2.3.3</span>PRINT_STRING ve PTHIS</h3>
+
+<p>Kütüphanede dizgi yazan iki prosedür vardır. İkisi de sonu 0 baytıyla işaretlenmiş dizgiyi yazar; farkları dizginin adresini nereden aldıklarıdır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-nulldizgi">
+  <span class="nt-box__title">Tanım 9.2.6</span>
+  <p><strong>Sıfırla biten dizgi</strong> (<span lang="en">null-terminated string</span>), karakterlerin ardından değeri 0 olan bir baytla biten dizgidir. Uzunluk ayrıca saklanmaz; dizgiyi okuyan kod 0 baytını görünce durur. C dilindeki dizgiler de bu biçimdedir.</p>
+</div>
+
+<p>PRINT_STRING dizginin adresini DS:SI'den alır. Kullanımı iki komuttur:</p>
+
+<pre class="nt-code"><code><span class="kw">LEA</span>  SI, msg
+<span class="kw">CALL</span> print_string
+...
+msg <span class="dir">DB</span> 'Merhaba', 0</code></pre>
+
+<p><code>LEA SI, msg</code>, msg'nin bağıl konumunu SI'ye yükler. emu8086 doğrudan adresli bu LEA'yı <code>MOV SI, OFFSET msg</code> ile aynı 3 baytlık koda (BE ll hh) derler; gerçek MASM'da aynı komut 4 bayttır. Prosedür AX ve SI'yi saklar, sonra SI'nin gösterdiği baytları sırayla okur. Her bayt 0 değilse 0Eh hizmetiyle yazılır ve SI bir artar. 0 okununca SI ve AX geri alınır ve prosedür döner. Dizgi programın veri alanında durur; aynı dizgi programın farklı yerlerinde yeniden yazdırılabilir.</p>
+
+<p>PTHIS adını İngilizce <em>print this</em> (bunu yaz) sözünden alır. Dizginin adresini bir yazmaçtan değil, yığından alır. Dizgi CALL komutunun hemen ardına yazılır:</p>
+
+<pre class="nt-code"><code><span class="kw">CALL</span> pthis
+<span class="dir">DB</span> 'Merhaba', 0
+<span class="cm">; buradan devam eder</span></code></pre>
+
+<p>PRINT makrosu her kullanımda döngü kodunu kopyalar; PRINT_STRING ve PTHIS ise tek kopya kodla istenen sayıda dizgi yazar. PTHIS'in PRINT_STRING'e üstünlüğü yazım kolaylığıdır: dizgiye ad vermek ve onu ayrı bir veri alanında tanımlamak gerekmez.</p>
+
+<h3 id="s9-2-3-4"><span class="nt-num">9.2.3.4</span>Dizgi yazdırma yolları</h3>
+
+<p>Kütüphaneyle birlikte bir dizgiyi ekrana yazmanın dört yolu vardır (<a href="#tab-dizgi">Tablo 9.2.10</a>). Dördüncüsü kütüphane dışındaki DOS hizmetidir ama karşılaştırma için tabloya alınmıştır.</p>
+
+<div class="nt-tablewrap" id="tab-dizgi">
+<table class="nt-table">
+  <caption>Tablo 9.2.10: Dizgi yazdırma yollarının karşılaştırması.</caption>
+  <thead><tr><th scope="col">Yöntem</th><th scope="col">Dizgi nerede?</th><th scope="col">Sonlandırıcı</th><th scope="col">Adres</th><th scope="col">Uygun durum</th></tr></thead>
+  <tbody>
+    <tr><td><code>PRINT 'metin'</code></td><td>kodun içinde (makro açılımı)</td><td>0 (makro ekler)</td><td>makro kendisi alır (CS:SI)</td><td>bir kez yazılan sabit ileti</td></tr>
+    <tr><td>PRINT_STRING</td><td>veri alanında</td><td>0</td><td>DS:SI</td><td>birden çok yerde yazılan ya da çalışırken oluşan dizgi</td></tr>
+    <tr><td>PTHIS</td><td>CALL'ın hemen ardında</td><td>0</td><td>yığındaki dönüş adresi</td><td>çok sayıda kısa sabit ileti</td></tr>
+    <tr><td>INT 21h, AH = 09h</td><td>veri alanında</td><td>'$'</td><td>DS:DX</td><td>kütüphanesiz DOS programı</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Sonlandırıcı kendisi yazdırılamaz. '$' ile biten bir dizgide '$' karakteri, 0 ile biten bir dizgide 0 baytı dizginin sonu sayılır. Fiyat yazan bir programda “100 $” iletisi INT 21h/09h ile yazılamaz; ileti '$'tan önce biter. Aynı ileti PRINT_STRING ile sorunsuz yazılır.</p>
+
+<p>Tampon ile yöntemin uyumu da önemlidir. GET_STRING'in doldurduğu tampon 0 ile biter ve doğrudan PRINT_STRING ile yazılır. Aynı tampon INT 21h/09h ile yazılırsa DOS '$' arar. Tamponda '$' olmadığı için DOS tamponun ötesindeki baytları da ekrana döker ve ilk '$'a rastlayana kadar sürdürür. Ekranda anlamsız karakterler belirir.</p>
+
+<h3 id="s9-2-3-5"><span class="nt-num">9.2.3.5</span>PTHIS nasıl çalışır?</h3>
+
+<p>PTHIS, CALL komutunun yığına ne ittiğini bilmeye dayanır. CALL, kendisinden sonraki komutun adresini, yani <strong>dönüş adresini</strong> (<span lang="en">return address</span>) yığına iter ve prosedüre atlar. İşlemci “sonraki komutun” orada bir komut olup olmadığını denetlemez; yalnız CALL'ın uzunluğunu IP'ye ekler. CALL'ın hemen ardında bir dizgi duruyorsa itilen adres dizginin ilk baytının adresidir. PTHIS bu adresi dizginin adresi olarak kullanır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-pthis" style="--w:720px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS bellek ve yığın" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">adres(0Dh)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS bellek ve yığın" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">adres(CALL print_num)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg></div></div>
+  <figcaption><b>Şekil 9.2.7:</b> CALL pthis'ten sonra yığında dizginin ilk baytının (0Dh) adresi durur (solda). PTHIS dizgiyi yazdıktan sonra yığındaki adresi 0 baytının bir ötesiyle, CALL print_num'un adresiyle değiştirir (sağda).</figcaption>
+</figure>
+
+<p>Prosedür dört iş yapar (<a href="#sekil-pthis">Şekil 9.2.7</a>). Önce dönüş adresini <code>POP SI</code> ile yığından SI'ye alır. Sonra SI'nin gösterdiği baytları 0'a kadar okur ve yazar; her okumadan sonra SI bir artar. 0 okunduğunda SI, 0 baytının bir ötesini gösterir: bu adres dizgiden sonraki ilk komuttur. Prosedür bu adresi <code>PUSH SI</code> ile yığına geri koyar. Son olarak <code>RET</code> yığındaki yeni adresi IP'ye alır. İşlemci dizgiyi atlayarak ondan sonraki komuttan devam eder; dizginin baytları hiçbir zaman komut sanılıp çalıştırılmaz.</p>
+
+<p>Kütüphanedeki PTHIS çağıranın SI ve AX değerlerini de korur. AX yığına itilir. SI ise yığına itilemez, çünkü yığının üstünde dönüş adresi durur ve onun önce alınması gerekir. Prosedür bu yüzden SI'nin eski değerini kod kesimindeki 2 baytlık bir değişkende (<code>CS:temp1</code>) saklar ve sonunda oradan geri yükler. Dizginin baytları da kod kesiminde olduğu için <code>CS:[SI]</code> ile okunur.</p>
+
+<p>Adreslerle izlemek düzeneği somutlaştırır. Sayı okuyup yazan örnek programda <code>CALL pthis</code> 010Bh'dedir ve 3 bayttır. Ardından 010Eh'den başlayan 21 baytlık dizgi gelir: 13, 10, “You have entered: ” ve 0. Dizgi 010Eh–0122h'yi kaplar; <code>CALL print_num</code> 0123h'dedir.</p>
+
+<div class="nt-tablewrap" id="tab-iz-pthis">
+<table class="nt-table">
+  <caption>Tablo 9.2.11: PTHIS çağrısında yığın ve SI (sayı oku ve yazdır programı).</caption>
+  <thead><tr><th scope="col">An</th><th scope="col">SP</th><th scope="col">Yığının üstü</th><th scope="col">SI</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td><code>CALL pthis</code> öncesi</td><td>FFFEh</td><td>0000h</td><td>msg1</td><td>IP = 010Bh</td></tr>
+    <tr><td><code>CALL pthis</code> sonrası</td><td class="n92-chg">FFFCh</td><td class="n92-chg">010Eh</td><td>msg1</td><td>dönüş adresi = dizginin ilk baytı</td></tr>
+    <tr><td><code>POP SI</code> sonrası</td><td class="n92-chg">FFFEh</td><td>0000h</td><td class="n92-chg">010Eh</td><td>eski SI CS:temp1'de</td></tr>
+    <tr><td>0 okununca</td><td>FFFEh</td><td>0000h</td><td class="n92-chg">0123h</td><td>21 bayt okundu, 20 karakter yazıldı</td></tr>
+    <tr><td><code>PUSH SI</code> sonrası</td><td class="n92-chg">FFFCh</td><td class="n92-chg">0123h</td><td>0123h</td><td>yeni dönüş adresi</td></tr>
+    <tr><td><code>RET</code> sonrası</td><td class="n92-chg">FFFEh</td><td>0000h</td><td>msg1</td><td>IP = 0123h: CALL print_num</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki “0000h”, DOS'un .COM programı başlarken yığına koyduğu sözcüktür (<a href="#tab-iz-pthis">Tablo 9.2.11</a>). Kütüphane sürümünde POP SI'den sonra AX de itildiği için yığının iç durumu tabloda gösterilenden bir sözcük daha derindir; tablo yalnız dönüş adresiyle ilgili adımları gösterir.</p>
+
+<p>Aynı fikir PRINT makrosunda da vardır: PRINT de veriyi kodun içine gömer. Fark, PRINT'in verinin üstünden bir JMP ile atlaması, PTHIS'in ise RET'in döneceği adresi değiştirmesidir. Dönüş adresini değiştirmek güçlü ama tehlikeli bir tekniktir. Dizgi 0 ile bitmezse PTHIS dizgiden sonraki komut baytlarını da yazar ve 0 bulduğu rastgele bir yere döner; program kilitlenebilir.</p>
+
+<h3 id="s9-2-3-6"><span class="nt-num">9.2.3.6</span>GET_STRING ve CLEAR_SCREEN</h3>
+
+<p>GET_STRING kullanıcıdan bir satır metin okur. Okunan karakterler DS:DI'nin gösterdiği bellek alanına yazılır. Bu alana <strong>tampon</strong> (<span lang="en">buffer</span>) denir; programcı onu önceden <code>DB n DUP(0)</code> gibi bir tanımla ayırır. DX tamponun bayt cinsinden boyutudur. Prosedür dizginin sonuna 0 koyduğu için en fazla DX − 1 karakter alır. Kullanıcı Enter'a basınca okuma biter.</p>
+
+<p>CLEAR_SCREEN ekranı temizler ve imleci sol üst köşeye, (0, 0)'a götürür. Girdi ve çıktı yazmacı yoktur. Prosedür önce INT 10h'nin 06h hizmetiyle (pencereyi yukarı kaydır) bütün ekranı boş satırlarla doldurur, sonra 02h hizmetiyle imleci (0, 0)'a taşır. Ekranın satır ve sütun sayısını BIOS veri alanından okur: 0040:0084h'deki bayt satır sayısının bir eksiğini, 0040:004Ah'deki sözcük sütun sayısını tutar. Bu yüzden DS'yi geçici olarak 0040h yapar; DS'yi ve kullandığı öteki yazmaçları yığında saklar.</p>
+
+<pre class="nt-code"><code><span class="kw">LEA</span>  DI, ad          <span class="cm">; tampon</span>
+<span class="kw">MOV</span>  DX, 20          <span class="cm">; boyut</span>
+<span class="kw">CALL</span> get_string
+<span class="kw">CALL</span> clear_screen
+<span class="kw">LEA</span>  SI, ad
+<span class="kw">CALL</span> print_string
+<span class="kw">RET</span>
+ad <span class="dir">DB</span> 20 <span class="dir">DUP</span>(0)</code></pre>
+
+<p>Bu program en çok 19 karakterlik bir ad okur, ekranı temizler ve adı sol üst köşeye yazar. GET_STRING'in tamponu 0 ile bitirmesi sayesinde aynı tampon hiçbir dönüşüm yapılmadan PRINT_STRING'e verilir. Programın kullandığı üç prosedür için <code>DEFINE_GET_STRING</code>, <code>DEFINE_CLEAR_SCREEN</code> ve <code>DEFINE_PRINT_STRING</code> satırları RET'ten sonra eklenmelidir.</p>
+
+<h3 id="s9-2-3-7"><span class="nt-num">9.2.3.7</span>GET_STRING mantığı: kod izleme</h3>
+
+<p>Kütüphanedeki GET_STRING geri silmeyi ve dolu tamponu da işlediği için uzundur. Okuma döngüsünün özü aşağıdaki sade eşdeğerle izlenebilir. Tampon 4 bayttır ve kullanıcı “Ece” yazacaktır.</p>
+
+<pre class="nt-code"><code><span class="kw">LEA</span>  DI, ad      <span class="cm">; tampon adresi</span>
+<span class="kw">MOV</span>  DX, 4       <span class="cm">; tampon boyutu</span>
+oku: <span class="kw">CMP</span> DX, 1   <span class="cm">; 0 için 1 bayt kalsın</span>
+<span class="kw">JBE</span>  bitti
+<span class="kw">MOV</span>  AH, 01h
+<span class="kw">INT</span>  21h         <span class="cm">; AL = tuş (yankılı)</span>
+<span class="kw">CMP</span>  AL, 13      <span class="cm">; Enter mi?</span>
+<span class="kw">JE</span>   bitti
+<span class="kw">MOV</span>  [DI], AL    <span class="cm">; tampona yaz</span>
+<span class="kw">INC</span>  DI
+<span class="kw">DEC</span>  DX
+<span class="kw">JMP</span>  oku
+bitti: <span class="kw">MOV</span> <span class="dir">BYTE</span> <span class="dir">PTR</span> [DI], 0
+<span class="kw">RET</span>
+ad   <span class="dir">DB</span> 4 <span class="dir">DUP</span>(?)</code></pre>
+
+<p>Program 0100h'den başlar. <code>LEA DI, ad</code> 3, <code>MOV DX, 4</code> 3, <code>CMP DX, 1</code> 3 bayttır; döngünün kalanı ve <code>MOV BYTE PTR [DI], 0</code> ile <code>RET</code> 011Ch'de biter. Tampon 011Dh'den başlar: ad+0 = 011Dh, ad+3 = 0120h.</p>
+
+<p>Döngünün başındaki <code>CMP DX, 1</code> / <code>JBE bitti</code> çifti kalan yeri denetler. DX kalan bayt sayısıdır. DX ≤ 1 ise yalnız sondaki 0'a yer kalmıştır ve okuma biter. JBE işaretsiz karşılaştırma yapar; DX'in 0 olduğu durumda da atlar. INT 21h'nin 01h hizmeti bir tuş bekler, tuşun ASCII kodunu AL'ye yazar ve karakteri ekrana yankılar. Enter (13) değilse karakter tampona yazılır, DI bir ilerler ve kalan yer DX bir azalır.</p>
+
+<div class="nt-tablewrap" id="tab-iz-getstr">
+<table class="nt-table">
+  <caption>Tablo 9.2.12: GET_STRING okuma döngüsünün izlemesi (DX = 4, girdi “Ece”).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">AL</th><th scope="col">DI</th><th scope="col">DX</th><th scope="col">ZF</th><th scope="col">Tampon (ad+0…3)</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>LEA DI, ad</code> / <code>MOV DX, 4</code></td><td>00h</td><td class="n92-chg">011Dh</td><td class="n92-chg">0004h</td><td>0</td><td>? ? ? ?</td><td></td></tr>
+    <tr><td><code>CMP DX, 1</code> / <code>JBE</code> (4 &gt; 1, atlamaz)</td><td>00h</td><td>011Dh</td><td>0004h</td><td>0</td><td>? ? ? ?</td><td></td></tr>
+    <tr><td><code>INT 21h</code> ('E'), <code>CMP AL, 13</code></td><td class="n92-chg">45h</td><td>011Dh</td><td>0004h</td><td>0</td><td>? ? ? ?</td><td>E</td></tr>
+    <tr><td><code>MOV [DI], AL</code> / <code>INC DI</code> / <code>DEC DX</code></td><td>45h</td><td class="n92-chg">011Eh</td><td class="n92-chg">0003h</td><td>0</td><td>E ? ? ?</td><td>E</td></tr>
+    <tr><td>2. tur ('c')</td><td class="n92-chg">63h</td><td class="n92-chg">011Fh</td><td class="n92-chg">0002h</td><td>0</td><td>E c ? ?</td><td>Ec</td></tr>
+    <tr><td>3. tur ('e')</td><td class="n92-chg">65h</td><td class="n92-chg">0120h</td><td class="n92-chg">0001h</td><td>0</td><td>E c e ?</td><td>Ece</td></tr>
+    <tr><td><code>CMP DX, 1</code> / <code>JBE bitti</code> (atlar)</td><td>65h</td><td>0120h</td><td>0001h</td><td class="n92-chg">1</td><td>E c e ?</td><td>Ece</td></tr>
+    <tr><td><code>MOV BYTE PTR [DI], 0</code></td><td>65h</td><td>0120h</td><td>0001h</td><td>1</td><td class="n92-chg">E c e 0</td><td>Ece</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Dördüncü turun başında DX = 1'dir: yalnız sondaki 0 için yer kalmıştır (<a href="#tab-iz-getstr">Tablo 9.2.12</a>). <code>CMP DX, 1</code> eşitlik bulur ve ZF = 1 olur; JBE atlar. Kullanıcı daha fazla yazsa da okunmaz; en fazla DX − 1 = 3 karakter alınmıştır. Tampon 'E', 'c', 'e', 0 olur ve PRINT_STRING ile yazdırılabilir. Sade sürüm tampon dolunca kendiliğinden biter; kütüphanedeki sürüm ise Enter'ı bekler.</p>
+
+<figure class="nt-fig" id="sekil-getstr" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 172" role="img" aria-label="Tampon, DI işaretçisi ve ekran" style="max-width:330px;max-height:172px"><text class="lbl" x="43.0" y="14" text-anchor="middle" style="font-size:12px">AL</text><rect class="box" x="8" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="43.0" y="36.0" text-anchor="middle" style="font-size:14px">65h</text><text class="lbl" x="121.0" y="14" text-anchor="middle" style="font-size:12px">DI</text><rect class="box" x="86" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="121.0" y="36.0" text-anchor="middle" style="font-size:14px">0120h</text><text class="lbl" x="199.0" y="14" text-anchor="middle" style="font-size:12px">DX</text><rect class="box" x="164" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="199.0" y="36.0" text-anchor="middle" style="font-size:14px">0001h</text><text class="lbl" x="265.0" y="14" text-anchor="middle" style="font-size:11.5px">ZF</text><rect class="box" x="252" y="18" width="26" height="24" rx="3"/><text class="txt mono" x="265.0" y="35" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="297.0" y="14" text-anchor="middle" style="font-size:11.5px">CF</text><rect class="box" x="284" y="18" width="26" height="24" rx="3"/><text class="txt mono" x="297.0" y="35" text-anchor="middle" style="font-size:14px">0</text><text class="lbl" x="8" y="86" text-anchor="start" style="font-size:12px">tampon</text><rect class="box" x="70" y="70" width="48" height="26" rx="3"/><text class="txt mono" x="94.0" y="88.0" text-anchor="middle" style="font-size:13.5px">'E'</text><text class="lbl mono" x="94.0" y="66" text-anchor="middle" style="font-size:10.5px">ad+0</text><rect class="box" x="118" y="70" width="48" height="26" rx="3"/><text class="txt mono" x="142.0" y="88.0" text-anchor="middle" style="font-size:13.5px">'c'</text><text class="lbl mono" x="142.0" y="66" text-anchor="middle" style="font-size:10.5px">ad+1</text><rect class="box" x="166" y="70" width="48" height="26" rx="3"/><text class="txt mono" x="190.0" y="88.0" text-anchor="middle" style="font-size:13.5px">'e'</text><text class="lbl mono" x="190.0" y="66" text-anchor="middle" style="font-size:10.5px">ad+2</text><rect class="box" x="214" y="70" width="48" height="26" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="238.0" y="88.0" text-anchor="middle" style="font-size:13.5px">0</text><text class="lbl mono" x="238.0" y="66" text-anchor="middle" style="font-size:10.5px">ad+3</text><path class="line" d="M238.0 120 L238.0 105"/><path class="ah" d="M238.0 98 L234.0 106 L242.0 106 z"/><text class="txt" x="238.0" y="132" text-anchor="middle" style="font-size:12px;fill:var(--ds-link)">DI</text><text class="txt" x="272" y="86" text-anchor="start" style="font-size:13.5px">DX = 1</text><text class="lbl" x="64" y="155" text-anchor="end" style="font-size:12px">ekran</text><rect class="box-empty" x="70" y="138" width="200" height="26" rx="3"/><text class="txt mono" x="78" y="156" text-anchor="start" style="font-size:14.5px">Ece▌</text></svg></div>
+  <figcaption><b>Şekil 9.2.8:</b> Döngünün sonunda tampon: 'E', 'c', 'e' ve sondaki 0; DI ad+3'ü (0120h) gösterir.</figcaption>
+</figure>
+
+<h3 id="s9-2-3-8"><span class="nt-num">9.2.3.8</span>GET_STRING ayrıntıları ve geri silme</h3>
+
+<p>Kütüphanedeki GET_STRING sade sürümden dört noktada ayrılır.</p>
+
+<ul>
+  <li><strong>Yankı denetimi.</strong> Tuş yankısız okunur: INT 16h'nin 00h hizmeti tuşu AL'ye (ASCII) ve AH'ye (tarama kodu) yazar ama ekrana bir şey basmaz. Prosedür yalnız tampona aldığı karakteri 0Eh hizmetiyle ekrana yazar. Böylece kabul edilmeyen tuşlar ekranda iz bırakmaz.</li>
+  <li><strong>Dolu tampon.</strong> DX − 1 karakter alındıktan sonra yeni harfler yok sayılır. Prosedür kendiliğinden bitmez; Enter ya da geri silme bekler. Kullanıcı yanlış yazdığı son harfi silip düzeltebilir.</li>
+  <li><strong>Geri silme (8).</strong> Tamponda harf varsa DI bir geri alınır ve ekrana 8, ' ', 8 yazılır. Tampon boşsa tuş yok sayılır; imleç girdinin başından geri gitmez ve ekrandaki istem silinmez.</li>
+  <li><strong>Enter (13).</strong> Enter tampona yazılmaz. Yerine 0 konur ve prosedür döner. DX ≤ 1 verilirse hiç okuma yapılmaz ve tampona dokunulmaz.</li>
+</ul>
+
+<p>Klavyeden okumanın donanım tarafı da bilinmelidir. Bir tuşa basıldığında klavye denetleyicisi 8259 kesme denetleyicisinin IRQ1 hattını etkinleştirir. İşlemci o anki işini bırakıp BIOS'un INT 09h yordamını çalıştırır. Yordam tuşun tarama kodunu port 60h'den okur, ASCII karşılığını bulur ve ikisini 0040h kesimindeki klavye tamponuna yazar. INT 16h/00h bu tampondan okur; tampon boşsa tuş gelene kadar bekler. GET_STRING'in “beklemesi” bu döngünün içindedir.</p>
+
+<p>GET_STRING döndüğünde imleç girilen metnin hemen sağındadır. Prosedür Enter'ı ekrana yazmaz; sonraki çıktı aynı satırda başlar. Alt satıra geçmek için çağrıdan sonra <code>PUTC 13</code> ve <code>PUTC 10</code> eklenir.</p>
+
+<p>Geri silmenin mantığı yine sade bir eşdeğerle izlenir. Aşağıdaki kod tuşları yankısız okur, harfleri tampona ekler, geri silmede son harfi tampondan ve ekrandan siler, Enter'da tamponu 0 ile bitirir. Kullanıcı sırasıyla A, b, geri silme, c ve Enter tuşlarına basacaktır.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">LEA</span>  DI, ad
+oku: <span class="kw">MOV</span> AH, 0
+<span class="kw">INT</span>  16h         <span class="cm">; AL = tuş (yankısız)</span>
+<span class="kw">CMP</span>  AL, 13      <span class="cm">; Enter mi?</span>
+<span class="kw">JE</span>   bitti
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">CMP</span>  AL, 8       <span class="cm">; geri silme mi?</span>
+<span class="kw">JNE</span>  ekle
+<span class="kw">CMP</span>  DI, <span class="dir">OFFSET</span> ad
+<span class="kw">JE</span>   oku         <span class="cm">; silinecek harf yok</span>
+<span class="kw">DEC</span>  DI
+<span class="kw">INT</span>  10h         <span class="cm">; 8: imleç sola</span>
+<span class="kw">MOV</span>  AL, ' '
+<span class="kw">INT</span>  10h         <span class="cm">; harfin yerine boşluk</span>
+<span class="kw">MOV</span>  AL, 8
+<span class="kw">INT</span>  10h         <span class="cm">; yine sola</span>
+<span class="kw">JMP</span>  oku
+ekle: <span class="kw">MOV</span> [DI], AL
+<span class="kw">INC</span>  DI
+<span class="kw">INT</span>  10h         <span class="cm">; yankı</span>
+<span class="kw">JMP</span>  oku
+bitti: <span class="kw">MOV</span> <span class="dir">BYTE</span> <span class="dir">PTR</span> [DI], 0
+<span class="kw">RET</span>
+ad   <span class="dir">DB</span> 6 <span class="dir">DUP</span>(?)</code></pre>
+
+<p>Kodun iki ayrıntısı dikkat ister. <code>MOV AH, 0Eh</code> karşılaştırmalardan önce yapılır; böylece hem yankı hem de silme üçlüsü için AH hazırdır. MOV bayrakları değiştirmediği için ardından gelen CMP'nin sonucu etkilenmez. Geri silme dalındaki <code>INT 10h</code>, AL'de hâlâ 8 bulunduğu için imleci sola alır; tuşun kodu doğrudan kontrol karakteri olarak kullanılmıştır.</p>
+
+<div class="nt-tablewrap" id="tab-iz-gerisil">
+<table class="nt-table">
+  <caption>Tablo 9.2.13: Geri silmeyi işleyen okumanın izlemesi (A, b, geri silme, c, Enter).</caption>
+  <thead><tr><th scope="col">Olay</th><th scope="col">AL</th><th scope="col">DI</th><th scope="col">İmleç sütunu</th><th scope="col">Tampon</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>LEA DI, ad</code></td><td>00h</td><td>ad+0</td><td>0</td><td>? ? ? ? ? ?</td><td></td></tr>
+    <tr><td>INT 16h: 'A'; Enter ve geri silme değil</td><td class="n92-chg">41h</td><td>ad+0</td><td>0</td><td>? ? ? ? ? ?</td><td></td></tr>
+    <tr><td><code>ekle</code>: yaz, ilerle, yankı</td><td>41h</td><td class="n92-chg">ad+1</td><td class="n92-chg">1</td><td class="n92-chg">A ? ? ? ? ?</td><td>A</td></tr>
+    <tr><td>'b' için aynı yol</td><td class="n92-chg">62h</td><td class="n92-chg">ad+2</td><td class="n92-chg">2</td><td class="n92-chg">A b ? ? ? ?</td><td>Ab</td></tr>
+    <tr><td>INT 16h: geri silme; <code>CMP AL, 8</code> → ZF = 1</td><td class="n92-chg">08h</td><td>ad+2</td><td>2</td><td>A b ? ? ? ?</td><td>Ab</td></tr>
+    <tr><td><code>CMP DI, OFFSET ad</code> (eşit değil) / <code>DEC DI</code></td><td>08h</td><td class="n92-chg">ad+1</td><td>2</td><td>A b ? ? ? ?</td><td>Ab</td></tr>
+    <tr><td>8, ' ', 8 üçlüsü</td><td>08h</td><td>ad+1</td><td class="n92-chg">1</td><td>A b ? ? ? ?</td><td>A</td></tr>
+    <tr><td>'c': b'nin baytına yazılır</td><td class="n92-chg">63h</td><td class="n92-chg">ad+2</td><td class="n92-chg">2</td><td class="n92-chg">A c ? ? ? ?</td><td>Ac</td></tr>
+    <tr><td>Enter: <code>JE bitti</code>, 0 yazılır</td><td class="n92-chg">0Dh</td><td>ad+2</td><td>2</td><td class="n92-chg">A c 0 ? ? ?</td><td>Ac</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>DEC DI</code> b'nin baytını bellekten silmez; o bayt yalnız dizginin dışında kalır ve sonraki harf onun üstüne yazılır (<a href="#tab-iz-gerisil">Tablo 9.2.13</a>). Silme işi iki yerde birden yapılır: tamponda DI'yi geri almak, ekranda üçlüyü yazmak. İkisinden biri unutulursa ekran ile tampon birbirini tutmaz. Örneğin üçlü unutulursa ekranda “Abc”, tamponda “Ac” kalır. Kütüphane sürümü aynı girdiyle de tamponu 'A', 'c', 0 yapar; ekrana 'A', 'b', 8, ' ', 8 ve 'c' gönderir ve ekranda “Ac” görünür.</p>
+
+<h3 id="s9-2-3-9"><span class="nt-num">9.2.3.9</span>Tampon boyu ve taşma</h3>
+
+<p>GET_STRING tamponun gerçek boyunu bilmez; yalnız programcının DX'te verdiği sayıya güvenir. DX tamponun gerçek boyundan büyük verilirse prosedür tamponun ardındaki değişkenlerin üstüne yazar.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-tasma">
+  <span class="nt-box__title">Örnek 9.2.2</span>
+  <p>Bellekte <code>ad DB 4 DUP(0)</code>, ardından <code>deger DW 0</code> ve <code>son DB 5</code> tanımlı. Program <code>MOV DX, 8</code> ile GET_STRING'i çağırıyor ve kullanıcı “Istanbul” yazıp Enter'a basıyor.</p>
+  <ol class="nt-steps">
+    <li>DX = 8 olduğu için prosedür en fazla 7 karakter alır: “Istanbu”. Sekizinci harf 'l' yok sayılır.</li>
+    <li>İlk dört karakter “Ista” tamponun dört baytına yazılır.</li>
+    <li>'n' (6Eh) ve 'b' (62h) deger'in iki baytına yazılır. Sözcük little-endian okunduğu için deger = 626Eh olur.</li>
+    <li>'u' (75h = 117) son'un üstüne yazılır; son = 117 olur.</li>
+    <li>Sondaki 0, son'dan sonraki bayta yazılır. O bayt da başka bir değişkene ya da koda ait olabilir.</li>
+  </ol>
+  <p>Programda hiçbir hata iletisi çıkmaz. deger ve son sessizce bozulmuştur.</p>
+</div>
+
+<p>Bu hataya <strong>tampon taşması</strong> (<span lang="en">buffer overflow</span>) denir. Assembly'de dizi sınırlarını denetleyen bir mekanizma yoktur; her bellek yazımı yalnız adrese bakar. Güvenli kural basittir: DX her zaman tamponun DUP ile ayrılan boyuna eşit verilir. Bunu kendiliğinden sağlamanın bir yolu, tamponun hemen ardına bir etiket koyup <code>MOV DX, ad_son - ad</code> yazmaktır; böylece tampon büyütüldüğünde DX de kendiliğinden değişir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>DX'i “okunacak karakter sayısı” sanmak. DX tamponun boyudur ve sondaki 0'ı da içerir. 10 karakterlik ad okumak için tampon <code>DB 11 DUP(0)</code>, DX = 11 olmalıdır. <code>DB 10 DUP(0)</code> ve DX = 10 ile ancak 9 karakter alınır.</p>
+</div>
+
+<h2 id="s9-2-4"><span class="nt-num">9.2.4</span>Sayı prosedürleri</h2>
+
+<h3 id="s9-2-4-1"><span class="nt-num">9.2.4.1</span>SCAN_NUM, PRINT_NUM ve PRINT_NUM_UNS</h3>
+
+<p>İşlemci sayıları ikili tutar; kullanıcı ise sayıları onluk rakamlarla yazar ve okur. Klavyeden gelen “307”, üç ayrı ASCII kodudur: 33h, 30h ve 37h. Programın hesap yapabilmesi için bu kodların 0133h ikili sayısına çevrilmesi gerekir. Ekrana sayı yazarken iş tersine döner: 0133h'nin basamakları bulunur ve her biri ASCII koduna çevrilir. Kütüphanenin üç sayı prosedürü bu iki dönüşümü yapar (<a href="#tab-sayi">Tablo 9.2.14</a>).</p>
+
+<div class="nt-tablewrap" id="tab-sayi">
+<table class="nt-table">
+  <caption>Tablo 9.2.14: Sayı prosedürleri.</caption>
+  <thead><tr><th scope="col">Prosedür</th><th scope="col">Ne yapar?</th><th scope="col">Girdi / çıktı</th><th scope="col">Tanım</th></tr></thead>
+  <tbody>
+    <tr><td>SCAN_NUM</td><td>klavyeden çok basamaklı, işaretli bir sayı okur; Enter ile biter</td><td>çıktı: CX</td><td><code>DEFINE_SCAN_NUM</code></td></tr>
+    <tr><td>PRINT_NUM</td><td>AX'teki işaretli sayıyı onluk yazar</td><td>girdi: AX</td><td><code>DEFINE_PRINT_NUM</code> + <code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+    <tr><td>PRINT_NUM_UNS</td><td>AX'teki işaretsiz sayıyı onluk yazar</td><td>girdi: AX</td><td><code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İki yazdırma prosedürünün farkı, AX'teki 16 bitin nasıl yorumlandığıdır. İşaretsiz yorumda 16 bit 0 … 65 535 aralığını gösterir. İşaretli yorumda ikiye tümleyen gösterimi kullanılır ve aralık −32 768 … 32 767'dir. En anlamlı bit 0 olan sayılarda iki yorum aynıdır. En anlamlı bit 1 olan sayılarda işaretli değer, işaretsiz değerden 65 536 çıkarılarak bulunur.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ikiyetumleyen">
+  <span class="nt-box__title">Tanım 9.2.7</span>
+  <p><strong>İkiye tümleyen</strong> (<span lang="en">two's complement</span>) gösteriminde −x, x'in bütün bitleri ters çevrilip 1 eklenerek yazılır. 16 bitte bu, 65 536 − x'e eşittir. 8086'nın <code>NEG</code> komutu bir sayının ikiye tümleyenini alır.</p>
+</div>
+
+<p>Örneğin FFE7h'nin işaretsiz değeri 65 511'dir. En anlamlı biti 1 olduğu için işaretli değeri 65 511 − 65 536 = −25'tir. Tersinden bakıldığında 25 = 0019h; bitleri ters çevrilince FFE6h, 1 eklenince FFE7h elde edilir. Aynı FFE7h, PRINT_NUM ile “-25”, PRINT_NUM_UNS ile “65511” olarak yazılır. Bitler değişmez, yalnız yorum değişir.</p>
+
+<h3 id="s9-2-4-2"><span class="nt-num">9.2.4.2</span>SCAN_NUM mantığı: kod izleme</h3>
+
+<p>Onluk bir sayıyı soldan sağa okurken her yeni rakam önceki sonucu bir basamak sola kaydırır. “307” için 3 okunur; 0 gelince sonuç 3 × 10 + 0 = 30 olur; 7 gelince 30 × 10 + 7 = 307 olur. Kural kısaca <em>sonuç ← sonuç × 10 + rakam</em>'dır. Bu yöntem Horner yöntemi olarak da anılır ve sayının uzunluğunu önceden bilmeyi gerektirmez. SCAN_NUM'ın özü aşağıdaki sade eşdeğerdir; eksi işareti ve taşma denetimi çıkarılmıştır.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">XOR</span>  CX, CX      <span class="cm">; sonuç = 0</span>
+oku: <span class="kw">MOV</span> AH, 01h
+<span class="kw">INT</span>  21h         <span class="cm">; AL = tuş (yankılı)</span>
+<span class="kw">CMP</span>  AL, 13      <span class="cm">; Enter mi?</span>
+<span class="kw">JE</span>   bitti
+<span class="kw">SUB</span>  AL, '0'     <span class="cm">; ASCII → rakam</span>
+<span class="kw">CBW</span>              <span class="cm">; AX = rakam</span>
+<span class="kw">XCHG</span> AX, CX      <span class="cm">; AX=sonuç, CX=rakam</span>
+<span class="kw">MOV</span>  BX, 10
+<span class="kw">MUL</span>  BX          <span class="cm">; AX = sonuç × 10</span>
+<span class="kw">ADD</span>  CX, AX      <span class="cm">; CX = sonuç×10 + rakam</span>
+<span class="kw">JMP</span>  oku
+bitti: <span class="kw">RET</span></code></pre>
+
+<p>Kodun her satırı bir amaca hizmet eder. <code>XOR CX, CX</code> CX'i sıfırlar; bir yazmacı kendisiyle XOR'lamak <code>MOV CX, 0</code>'dan kısadır (2 bayta karşı 3 bayt) ve ZF'yi 1 yapar. <code>SUB AL, '0'</code> ASCII kodundan 30h çıkararak rakamın değerini bulur. <code>CBW</code> AL'yi işaretli olarak AX'e genişletir; 0–9 arası rakamlarda AH = 0 olur. <code>XCHG AX, CX</code> iki yazmacı takas eder: sonuç çarpma için AX'e geçer, rakam CX'te bekler. Takas gereklidir, çünkü <code>MUL</code> çarpılanı her zaman AX'te bekler. <code>MUL BX</code> DX:AX ← AX × BX işlemini yapar; sonuç 16 bite sığdığı sürece DX = 0 kalır. <code>ADD CX, AX</code> çarpımı rakama ekler ve yeni sonucu yine CX'e yazar.</p>
+
+<div class="nt-tablewrap" id="tab-iz-scan">
+<table class="nt-table">
+  <caption>Tablo 9.2.15: SCAN_NUM mantığının izlemesi (girdi 307, ardından Enter).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">BX</th><th scope="col">ZF</th><th scope="col">CX (onluk)</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>XOR CX, CX</code></td><td>0000h</td><td>0000h</td><td>0000h</td><td>1</td><td>0</td><td></td></tr>
+    <tr><td><code>MOV AH, 01h</code> / <code>INT 21h</code>: '3'</td><td class="n92-chg">0133h</td><td>0000h</td><td>0000h</td><td>1</td><td>0</td><td>3</td></tr>
+    <tr><td><code>CMP</code> / <code>JE</code> / <code>SUB AL, '0'</code></td><td class="n92-chg">0103h</td><td>0000h</td><td>0000h</td><td class="n92-chg">0</td><td>0</td><td>3</td></tr>
+    <tr><td><code>CBW</code> / <code>XCHG AX, CX</code></td><td class="n92-chg">0000h</td><td class="n92-chg">0003h</td><td>0000h</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td><code>MOV BX, 10</code> / <code>MUL BX</code> / <code>ADD CX, AX</code></td><td>0000h</td><td>0003h</td><td class="n92-chg">000Ah</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td>'0' okunur, <code>SUB</code>, <code>CBW</code>, <code>XCHG</code></td><td class="n92-chg">0003h</td><td class="n92-chg">0000h</td><td>000Ah</td><td>1</td><td>0</td><td>30</td></tr>
+    <tr><td><code>MUL BX</code> / <code>ADD CX, AX</code></td><td class="n92-chg">001Eh</td><td class="n92-chg">001Eh</td><td>000Ah</td><td>0</td><td>30</td><td>30</td></tr>
+    <tr><td>'7' okunur, <code>SUB</code>, <code>CBW</code></td><td class="n92-chg">0007h</td><td>001Eh</td><td>000Ah</td><td>0</td><td>30</td><td>307</td></tr>
+    <tr><td><code>XCHG</code> / <code>MUL BX</code> / <code>ADD CX, AX</code></td><td class="n92-chg">012Ch</td><td class="n92-chg">0133h</td><td>000Ah</td><td>0</td><td>307</td><td>307</td></tr>
+    <tr><td>Enter: AL = 0Dh, <code>CMP AL, 13</code></td><td class="n92-chg">010Dh</td><td>0133h</td><td>000Ah</td><td class="n92-chg">1</td><td>307</td><td>307</td></tr>
+    <tr><td><code>JE bitti</code> / <code>RET</code></td><td>010Dh</td><td>0133h</td><td>000Ah</td><td>1</td><td>307</td><td>307</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun birkaç noktası açıklama ister (<a href="#tab-iz-scan">Tablo 9.2.15</a>). INT 21h/01h AL'ye tuşu yazar ama AH'ye dokunmaz; AH, hizmet numarası olan 01h'de kalır ve AX = 0133h görünür. '0' okunduğunda SUB'ın sonucu 0'dır ve ZF = 1 olur. 30 × 10 = 300 = 012Ch'dir; 7 eklenince CX = 307 = 0133h olur. Enter okunduğunda CMP eşitlik bulur, ZF = 1 olur ve JE döngüden çıkar. Sonuç SCAN_NUM'daki gibi CX'tedir.</p>
+
+<p>Çarpma bu döngünün en pahalı adımıdır. 8086'da <code>MUL r16</code> 118–133 saat turu sürer; 5 MHz'de yaklaşık 25 µs. Üç basamaklı bir sayı için üç çarpma yapılır. Bu süre kullanıcının tuşa basma hızı yanında önemsizdir. Yine de 10 ile çarpma kaydırmayla da yapılabilir. x × 10 = x × 8 + x × 2 olduğundan çarpım <code>SHL</code> ve <code>ADD</code> komutlarıyla çok daha az turda hesaplanır.</p>
+
+<h3 id="s9-2-4-3"><span class="nt-num">9.2.4.3</span>SCAN_NUM'ın denetimleri</h3>
+
+<p>Kütüphanedeki SCAN_NUM, sade eşdeğerin üzerine beş denetim ekler:</p>
+
+<ul>
+  <li><strong>Eksi işareti.</strong> '-' tuşu bir işaret bayrağı kurar. Enter'a basıldığında bayrak kuruluysa <code>NEG CX</code> uygulanır.</li>
+  <li><strong>Rakam olmayan tuş.</strong> Prosedür her tuşu önce ekrana yazar, sonra denetler. Tuş '0'–'9' aralığında değilse ekrandan silinir (8, ' ', 8) ve sayıya katılmaz.</li>
+  <li><strong>Geri silme.</strong> Son basamağı atar: CX ← CX / 10. Ekranda da son karakter silinir.</li>
+  <li><strong>Taşma.</strong> Sayı 16 bite sığmayacaksa son basamak kabul edilmez. Çarpmadan sonra DX ≠ 0 ise ya da toplamada CF = 1 olursa prosedür önceki değeri geri yükler ve son rakamı ekrandan siler.</li>
+  <li><strong>Enter'ın yankısı.</strong> Enter da ekrana yazılır. 13 kodu imleci satır başına döndürür ama alt satıra indirmez.</li>
+</ul>
+
+<p>Son madde uygulamada en çok şaşırtan davranıştır. SCAN_NUM döndüğünde imleç girilen sayının bulunduğu satırın başındadır. Hemen ardından yazılan her şey girilen sayının ve istemin üstüne yazılır. Örnek programlarda SCAN_NUM'dan sonra <code>PUTC 13</code>, <code>PUTC 10</code> eklenmesi ya da bir sonraki iletinin 13, 10 ile başlaması bu yüzdendir.</p>
+
+<div class="nt-tablewrap" id="tab-scan-girdi">
+<table class="nt-table">
+  <caption>Tablo 9.2.16: SCAN_NUM'a verilen girdiler, CX'teki sonuç ve PRINT_NUM'ın yazdığı değer.</caption>
+  <thead><tr><th scope="col">Girdi</th><th scope="col">CX</th><th scope="col">PRINT_NUM</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>307</td><td>0133h</td><td>307</td><td>olağan durum</td></tr>
+    <tr><td>-25</td><td>FFE7h</td><td>-25</td><td>Enter'da NEG: 0019h → FFE7h</td></tr>
+    <tr><td>12a3</td><td>007Bh</td><td>123</td><td>'a' ekrandan silinir, sayıya katılmaz</td></tr>
+    <tr><td>40000</td><td>9C40h</td><td>-25536</td><td>16 bite sığar ama işaretli aralığı aşar</td></tr>
+    <tr><td>70000</td><td>1B58h</td><td>7000</td><td>son 0 kabul edilmez: 7000 × 10 = 70 000 &gt; 65 535</td></tr>
+    <tr><td>-40000</td><td>63C0h</td><td>25536</td><td>9C40h'nin ikiye tümleyeni 63C0h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki son üç satır prosedürün bir sınırını gösterir (<a href="#tab-scan-girdi">Tablo 9.2.16</a>). Basamaklar işaretsiz 16 bit olarak biriktirilir ve işaret en sonda uygulanır. Taşma denetimi yalnız 65 535 sınırına bakar. Bu yüzden 32 768 ile 65 535 arasındaki girdiler hata vermeden kabul edilir ama işaretli yorumda negatif görünür. Örneğin 40 000 = 9C40h'dir; işaretli değeri 40 000 − 65 536 = −25 536'dır. −40 000 girildiğinde 9C40h'nin ikiye tümleyeni 63C0h = 25 536 olur ve eksi işaretli bir girdi pozitif bir sonuç verir. Doğru sonuç için kullanıcının girdisi −32 768 … 32 767 aralığında kalmalıdır.</p>
+
+<h3 id="s9-2-4-4"><span class="nt-num">9.2.4.4</span>PRINT_NUM_UNS mantığı: kod izleme</h3>
+
+<p>Bir sayının onluk basamakları 10'a art arda bölünerek bulunur. Her bölmenin kalanı bir basamaktır, bölüm bir sonraki adımın sayısıdır. Sorun, basamakların sağdan sola, yani ters sırayla çıkmasıdır: 1205'in ilk kalanı 5, son kalanı 1'dir. Ekrana ise önce 1 yazılmalıdır. Yığın bu ters çevirme için doğal bir araçtır: kalanlar sırayla itilir, sonra ters sırayla çekilir.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AX, 1205    <span class="cm">; yazdırılacak sayı</span>
+<span class="kw">MOV</span>  BX, 10
+<span class="kw">XOR</span>  CX, CX      <span class="cm">; basamak sayacı</span>
+bol: <span class="kw">XOR</span> DX, DX
+<span class="kw">DIV</span>  BX          <span class="cm">; AX=bölüm, DX=kalan</span>
+<span class="kw">PUSH</span> DX          <span class="cm">; basamak yığına</span>
+<span class="kw">INC</span>  CX
+<span class="kw">OR</span>   AX, AX      <span class="cm">; bölüm 0 mı?</span>
+<span class="kw">JNZ</span>  bol
+yaz: <span class="kw">POP</span> AX      <span class="cm">; önce en anlamlı</span>
+<span class="kw">ADD</span>  AL, '0'
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">LOOP</span> yaz
+<span class="kw">RET</span></code></pre>
+
+<p><code>DIV BX</code> 32 bitlik DX:AX'i BX'e böler: bölümü AX'e, kalanı DX'e yazar. Bölmeden önce <code>XOR DX, DX</code> zorunludur. DX'te bir önceki kalan durursa bölünen DX:AX çok büyük olur; bölüm 16 bite sığmazsa işlemci 0 tipi kesmeyi (bölme hatası) üretir. CX kaç basamak itildiğini sayar; ikinci döngüde LOOP aynı sayıda POP yapılmasını sağlar. <code>OR AX, AX</code> AX'i değiştirmez ama bayrakları kurar: bölüm 0 ise ZF = 1 olur ve döngü biter.</p>
+
+<div class="nt-tablewrap" id="tab-iz-uns">
+<table class="nt-table">
+  <caption>Tablo 9.2.17: Yığınlı basamak ayırmanın izlemesi (AX = 1205 = 04B5h).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">AX</th><th scope="col">DX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">Yığın (üstten)</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç (<code>MOV</code>, <code>MOV</code>, <code>XOR</code>)</td><td>04B5h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td>1. bölme: 1205 / 10</td><td class="n92-chg">0078h</td><td class="n92-chg">0005h</td><td class="n92-chg">0001h</td><td class="n92-chg">FFFCh</td><td>5</td><td></td></tr>
+    <tr><td>2. bölme: 120 / 10</td><td class="n92-chg">000Ch</td><td class="n92-chg">0000h</td><td class="n92-chg">0002h</td><td class="n92-chg">FFFAh</td><td>0, 5</td><td></td></tr>
+    <tr><td>3. bölme: 12 / 10</td><td class="n92-chg">0001h</td><td class="n92-chg">0002h</td><td class="n92-chg">0003h</td><td class="n92-chg">FFF8h</td><td>2, 0, 5</td><td></td></tr>
+    <tr><td>4. bölme: 1 / 10</td><td class="n92-chg">0000h</td><td class="n92-chg">0001h</td><td class="n92-chg">0004h</td><td class="n92-chg">FFF6h</td><td>1, 2, 0, 5</td><td></td></tr>
+    <tr><td><code>OR AX, AX</code> → ZF = 1, JNZ atlamaz</td><td>0000h</td><td>0001h</td><td>0004h</td><td>FFF6h</td><td>1, 2, 0, 5</td><td></td></tr>
+    <tr><td>1. yazma: POP, '0' ekle, INT 10h, LOOP</td><td class="n92-chg">0E31h</td><td>0001h</td><td class="n92-chg">0003h</td><td class="n92-chg">FFF8h</td><td>2, 0, 5</td><td>1</td></tr>
+    <tr><td>2. yazma</td><td class="n92-chg">0E32h</td><td>0001h</td><td class="n92-chg">0002h</td><td class="n92-chg">FFFAh</td><td>0, 5</td><td>12</td></tr>
+    <tr><td>3. yazma</td><td class="n92-chg">0E30h</td><td>0001h</td><td class="n92-chg">0001h</td><td class="n92-chg">FFFCh</td><td>5</td><td>120</td></tr>
+    <tr><td>4. yazma, LOOP biter</td><td class="n92-chg">0E35h</td><td>0001h</td><td class="n92-chg">0000h</td><td class="n92-chg">FFFEh</td><td>—</td><td>1205</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Dört bölmeden sonra yığının üstünde en anlamlı basamak, 1 durur (<a href="#tab-iz-uns">Tablo 9.2.17</a>). Yazma döngüsü basamakları 1, 2, 0, 5 sırasıyla çeker ve yazar. Her POP'tan sonra <code>ADD AL, '0'</code> basamağı ASCII'ye çevirir ve <code>MOV AH, 0Eh</code> hizmet numarasını yükler; AX'in 0E31h, 0E32h gibi değerleri bundandır. Döngü bittiğinde SP yeniden FFFEh'dir: dört PUSH'a dört POP karşılık gelmiştir. Yığın tablosu DOS'un FFFEh'deki 0000h sözcüğünü göstermez.</p>
+
+<figure class="nt-fig" id="sekil-uns" style="--w:440px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 146" role="img" aria-label="AX, DX, CX, yığın ve ekran" style="max-width:400px;max-height:146px"><text class="lbl" x="43.0" y="14" text-anchor="middle" style="font-size:12px">AX</text><rect class="box" x="8" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="43.0" y="36.0" text-anchor="middle" style="font-size:14px">0000h</text><text class="lbl" x="121.0" y="14" text-anchor="middle" style="font-size:12px">DX</text><rect class="box" x="86" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="121.0" y="36.0" text-anchor="middle" style="font-size:14px">0001h</text><text class="lbl" x="199.0" y="14" text-anchor="middle" style="font-size:12px">CX</text><rect class="box" x="164" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="199.0" y="36.0" text-anchor="middle" style="font-size:14px">0004h</text><text class="lbl" x="8" y="84" text-anchor="start" style="font-size:12.5px">AX onluk:</text><text class="txt mono" x="76" y="84" text-anchor="start" style="font-size:15px">0</text><text class="lbl" x="328.0" y="18" text-anchor="middle" style="font-size:12px">yığın</text><rect class="box" x="296" y="24" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="39" text-anchor="end" style="font-size:11.5px">FFF6</text><text class="txt mono" x="328.0" y="39.5" text-anchor="middle" style="font-size:13px">0001h</text><path class="line" d="M394 35.0 L368 35.0"/><path class="ah" d="M361 35.0 L369 31.0 L369 39.0 z"/><text class="txt" x="398" y="39.0" text-anchor="start" style="font-size:12.5px;fill:var(--ds-link)">SP</text><rect class="box" x="296" y="46" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="61" text-anchor="end" style="font-size:11.5px">FFF8</text><text class="txt mono" x="328.0" y="61.5" text-anchor="middle" style="font-size:13px">0002h</text><rect class="box" x="296" y="68" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="83" text-anchor="end" style="font-size:11.5px">FFFA</text><text class="txt mono" x="328.0" y="83.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="296" y="90" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="105" text-anchor="end" style="font-size:11.5px">FFFC</text><text class="txt mono" x="328.0" y="105.5" text-anchor="middle" style="font-size:13px">0005h</text><text class="lbl" x="54" y="129" text-anchor="end" style="font-size:12px">ekran</text><rect class="box-empty" x="60" y="112" width="150" height="26" rx="3"/><text class="txt mono" x="68" y="130" text-anchor="start" style="font-size:14.5px">▌</text></svg></div>
+  <figcaption><b>Şekil 9.2.9:</b> Bölmeler bittiğinde yığında FFF6h'den FFFCh'ye doğru 1, 2, 0 ve 5 basamakları durur; SP = FFF6h.</figcaption>
+</figure>
+
+<h3 id="s9-2-4-5"><span class="nt-num">9.2.4.5</span>Kütüphanenin yöntemi: azalan bölen</h3>
+
+<p>Kütüphanedeki PRINT_NUM_UNS aynı çıktıyı başka bir yöntemle üretir. Sayıyı hep 10'a bölmek yerine basamak değerlerine böler: önce 10 000'e, sonra 1000'e, 100'e, 10'a ve 1'e. Her bölmenin bölümü bir basamaktır ve hesaplandığı anda yazılır. Kalan bir sonraki turun sayısı olur. Basamaklar soldan sağa çıktığı için yığına ve ters çevirmeye gerek kalmaz.</p>
+
+<ul>
+  <li>Bölen BX 10 000 ile başlar ve her turdan sonra 10'a bölünür. BX 0 olunca yazdırma biter.</li>
+  <li>Bölüm (0–9) bir basamaktır; <code>ADD AL, 30h</code> ile ASCII'ye çevrilip PUTC ile yazılır. 65 535 ÷ 10 000 = 6 olduğu için bölüm her zaman AL'ye sığar.</li>
+  <li>CX bir bayrak olarak kullanılır. CX = 1 iken sayı bölenden küçükse tur atlanır; böylece baştaki sıfırlar yazılmaz. İlk basamak yazılınca CX = 0 olur ve aradaki sıfırlar artık yazılır.</li>
+  <li>AX = 0 için ayrı bir dal vardır ve doğrudan '0' yazılır. Bu dal olmasaydı bütün turlar atlanır ve ekrana hiçbir şey yazılmazdı.</li>
+</ul>
+
+<div class="nt-tablewrap" id="tab-azalan">
+<table class="nt-table">
+  <caption>Tablo 9.2.18: Azalan bölenle 3007'nin yazdırılması (her turun başındaki durum).</caption>
+  <thead><tr><th scope="col">Bölen (BX)</th><th scope="col">Bayrak (CX)</th><th scope="col">Sayı (AX)</th><th scope="col">İşlem</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>10 000</td><td>1</td><td>3007</td><td>sayı &lt; bölen ve henüz basamak yok: atla</td><td>—</td></tr>
+    <tr><td>1000</td><td>1</td><td>3007</td><td>3007 ÷ 1000 = 3, kalan 7; CX = 0</td><td>3</td></tr>
+    <tr><td>100</td><td>0</td><td>7</td><td>7 ÷ 100 = 0, kalan 7</td><td>30</td></tr>
+    <tr><td>10</td><td>0</td><td>7</td><td>7 ÷ 10 = 0, kalan 7</td><td>300</td></tr>
+    <tr><td>1</td><td>0</td><td>7</td><td>7 ÷ 1 = 7, kalan 0</td><td>3007</td></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>bölen 0: bitti</td><td>3007</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>3007 örneği bayrağın neden gerektiğini açıkça gösterir (<a href="#tab-azalan">Tablo 9.2.18</a>). İlk turda 3007 &lt; 10 000 olduğu için bölüm 0 olurdu; bu sıfır baştaki bir sıfırdır ve yazılmamalıdır. 100'e ve 10'a bölünen turlarda da bölüm 0'dır ama bu sıfırlar sayının içindedir ve yazılmalıdır. Aradaki fark yalnız “ilk basamak yazıldı mı?” sorusuyla ayırt edilir; CX bu bilgiyi tutar. 40 000 için ilk turda 40 000 ÷ 10 000 = 4 yazılır ve CX = 0 olur. Sonraki dört turda dört 0 yazılır; ekranda 40000 görünür.</p>
+
+<p>Böleni küçültmek de bir bölmedir: kütüphane <code>BX ← BX / 10</code> işlemini DIV ile yapar. Bu sırada AX'teki sayı yığında saklanır. Prosedür AX, BX, CX ve DX'i girişte iter ve çıkışta geri alır; çağıran için hiçbir yazmaç değişmez.</p>
+
+<h3 id="s9-2-4-6"><span class="nt-num">9.2.4.6</span>PRINT_NUM ve eksi işareti: kod izleme</h3>
+
+<p>PRINT_NUM işaretli sayıyı yazmak için PRINT_NUM_UNS'yi kullanır. Sayı negatifse önce '-' yazılır, sonra sayının mutlak değeri işaretsiz olarak yazdırılır. Aşağıdaki kod kütüphanedeki PRINT_NUM'ın eşdeğeridir:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AX, -25       <span class="cm">; AX = FFE7h</span>
+<span class="kw">CALL</span> print_num
+<span class="kw">RET</span>
+print_num <span class="dir">PROC</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">OR</span>   AX, AX        <span class="cm">; SF = işaret biti</span>
+<span class="kw">JNS</span>  pozitif
+<span class="kw">NEG</span>  AX            <span class="cm">; AX = 0019h</span>
+<span class="kw">PUSH</span> AX            <span class="cm">; PUTC '-' açılımı</span>
+<span class="kw">MOV</span>  AL, '-'
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX
+pozitif: <span class="kw">CALL</span> print_num_uns
+<span class="kw">POP</span>  AX            <span class="cm">; AX = FFE7h geri</span>
+<span class="kw">RET</span>
+print_num <span class="dir">ENDP</span></code></pre>
+
+<p><code>MOV AX, -25</code> satırında assembler −25'in ikiye tümleyenini hesaplar ve AX'e FFE7h yükleyen komutu üretir. <code>CALL print_num</code> 0103h'dedir ve 3 bayttır; yığına dönüş adresi 0106h itilir. Prosedür önce AX'i saklar, çünkü NEG AX'i değiştirecektir. <code>OR AX, AX</code> sayıyı değiştirmeden bayrakları kurar: en anlamlı bit 1 olduğu için SF = 1 olur. <code>JNS</code> (işaret yoksa atla) atlamaz. <code>NEG AX</code> 0 − FFE7h = 0019h = 25 hesaplar; sonuç pozitif olduğu için SF = 0 olur. PUTC '-' açılımı eksi işaretini yazar. <code>CALL print_num_uns</code> 25'in basamaklarını yazar. Son olarak <code>POP AX</code> AX'e FFE7h'yi geri yükler.</p>
+
+<div class="nt-tablewrap" id="tab-iz-pnum">
+<table class="nt-table">
+  <caption>Tablo 9.2.19: PRINT_NUM eşdeğerinin izlemesi (AX = −25).</caption>
+  <thead><tr><th scope="col">Komut(lar)</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">SF</th><th scope="col">Yığın (FFFAh, FFFCh)</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, -25</code></td><td class="n92-chg">FFE7h</td><td>FFFEh</td><td>0</td><td>—, —</td><td></td></tr>
+    <tr><td><code>CALL print_num</code></td><td>FFE7h</td><td class="n92-chg">FFFCh</td><td>0</td><td>—, 0106h</td><td></td></tr>
+    <tr><td><code>PUSH AX</code> / <code>OR AX, AX</code></td><td>FFE7h</td><td class="n92-chg">FFFAh</td><td class="n92-chg">1</td><td>FFE7h, 0106h</td><td></td></tr>
+    <tr><td><code>JNS</code> (atlamaz) / <code>NEG AX</code></td><td class="n92-chg">0019h</td><td>FFFAh</td><td class="n92-chg">0</td><td>FFE7h, 0106h</td><td></td></tr>
+    <tr><td>PUTC '-' açılımı (5 komut)</td><td>0019h</td><td>FFFAh</td><td>0</td><td>FFE7h, 0106h</td><td>-</td></tr>
+    <tr><td><code>CALL print_num_uns</code> (dönüşten sonra)</td><td>0019h</td><td>FFFAh</td><td>0</td><td>FFE7h, 0106h</td><td>-25</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n92-chg">FFE7h</td><td class="n92-chg">FFFCh</td><td>0</td><td>—, 0106h</td><td>-25</td></tr>
+    <tr><td><code>RET</code> (print_num'dan)</td><td>FFE7h</td><td class="n92-chg">FFFEh</td><td>0</td><td>—, —</td><td>-25</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Sayı yazdırıldıktan sonra da AX'te durur (<a href="#tab-iz-pnum">Tablo 9.2.19</a>). Çağıran program aynı sayıyı başka bir işte kullanmaya devam edebilir. PRINT_NUM_UNS kullandığı bütün yazmaçları sakladığı için onun içindeki adımlar tabloda tek satıra indirgenmiştir. Kütüphanedeki PRINT_NUM ayrıca AX = 0 için doğrudan '0' yazan bir dal içerir. İşareti de <code>OR</code> yerine <code>CMP AX, 0</code> ile sınar; iki komut SF'yi aynı biçimde kurar.</p>
+
+<p>Bu tasarımın bir sonucu dikkat çekicidir: −32 768 (8000h) için NEG yine 8000h üretir, çünkü +32 768 16 bitlik işaretli aralıkta yoktur. PRINT_NUM önce '-' yazar, sonra 8000h'yi PRINT_NUM_UNS'ye verir. PRINT_NUM_UNS 8000h'yi işaretsiz 32 768 olarak yazar ve ekranda doğru sonuç, −32768 görünür. Mutlak değerin işaretsiz yazılması bu uç durumu kendiliğinden çözer.</p>
+
+<h3 id="s9-2-4-7"><span class="nt-num">9.2.4.7</span>Basamak ayırma: iki yöntemin karşılaştırması</h3>
+
+<div class="nt-tablewrap" id="tab-yontem">
+<table class="nt-table">
+  <caption>Tablo 9.2.20: Yığınlı yöntem ile azalan bölen yönteminin karşılaştırması.</caption>
+  <thead><tr><th scope="col">Ölçüt</th><th scope="col">Yığınlı yöntem (10'a böl, it, ters sırayla çek)</th><th scope="col">Azalan bölen (10 000, 1000, …)</th></tr></thead>
+  <tbody>
+    <tr><td>Bölme sayısı</td><td>basamak sayısı kadar</td><td>beşe kadar; ayrıca böleni küçültmek için birer bölme</td></tr>
+    <tr><td>Yığın kullanımı</td><td>basamak başına 2 bayt</td><td>yalnız saklanan yazmaçlar</td></tr>
+    <tr><td>Baştaki sıfırlar</td><td>kendiliğinden oluşmaz</td><td>bayrakla atlanır</td></tr>
+    <tr><td>Sabit genişlik (00042)</td><td>ek kod gerekir</td><td>bayrak kaldırılınca kendiliğinden</td></tr>
+    <tr><td>Başka taban</td><td>bölen 2, 8 ya da 16 yapılır; 16'da 9'dan büyük basamaklar 'A'–'F' olur</td><td>bölen dizisi tabana göre değişir (16'da 4096, 256, 16, 1)</td></tr>
+    <tr><td>Çıkış sırası</td><td>önce yığına, sonra ters sırayla ekrana</td><td>soldan sağa, hesaplandığı anda</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İki yöntem aynı çıktıyı verir: 1205 için ikisi de 1, 2, 0, 5 basamaklarını yazar (<a href="#tab-yontem">Tablo 9.2.20</a>). Seçimi yığın kullanımı, sabit genişlik ve taban gereksinimi belirler. Süre açısından DIV'in maliyeti belirleyicidir. 8086'da <code>DIV r16</code> 144–162 saat turu sürer. 1205 için yığınlı yöntem 4 bölme yapar. Azalan bölen yöntemi 1000, 100, 10 ve 1'e dört bölme ile böleni beş kez küçültmek için beş bölme yapar; ilk turda bölme atlanır. Yığınlı yöntem bu yüzden yaklaşık iki kat hızlıdır. Kütüphanenin seçimi yığın kullanmama ve sabit genişliğe kolay uyarlanma yönünden yapılmıştır.</p>
+
+<h3 id="s9-2-4-8"><span class="nt-num">9.2.4.8</span>Aynı bitler, iki yorum</h3>
+
+<p>AX'e verilen bir değer için iki prosedürün ne yazacağı yan yana konduğunda yorum farkı açıkça görülür (<a href="#tab-yorum">Tablo 9.2.21</a>).</p>
+
+<div class="nt-tablewrap" id="tab-yorum">
+<table class="nt-table">
+  <caption>Tablo 9.2.21: Aynı 16 bit, iki prosedür.</caption>
+  <thead><tr><th scope="col">AX</th><th scope="col">En anlamlı bit</th><th scope="col">PRINT_NUM</th><th scope="col">PRINT_NUM_UNS</th></tr></thead>
+  <tbody>
+    <tr><td>0000h</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>7FFFh</td><td>0</td><td>32767</td><td>32767</td></tr>
+    <tr><td>8000h</td><td>1</td><td>-32768</td><td>32768</td></tr>
+    <tr><td>9C40h</td><td>1</td><td>-25536</td><td>40000</td></tr>
+    <tr><td>FFE7h</td><td>1</td><td>-25</td><td>65511</td></tr>
+    <tr><td>FFFFh</td><td>1</td><td>-1</td><td>65535</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Kural tektir: en anlamlı bit 0 ise iki prosedür aynı şeyi yazar; 1 ise PRINT_NUM işaretsiz değerin 65 536 eksiğini yazar. Program hangi yorumun doğru olduğunu bilmek zorundadır; işlemci bilmez. Toplama ve çıkarma komutları iki yorum için aynı bitleri üretir; yalnız bayrakların okunuşu değişir. İşaretsiz taşmayı CF, işaretli taşmayı OF gösterir. Bir sayaç, adres ya da uzunluk gibi negatif olamayan değerler PRINT_NUM_UNS ile, sıcaklık ya da fark gibi negatif olabilen değerler PRINT_NUM ile yazılır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>32 767'yi aşabilen işaretsiz bir değeri PRINT_NUM ile yazmak. AX = 40 000 (9C40h) PRINT_NUM ile −25536 görünür. Değerin anlamı işaretsizse PRINT_NUM_UNS kullanılmalıdır.</p>
+</div>
+
+<h2 id="s9-2-5"><span class="nt-num">9.2.5</span>Örnek programlar</h2>
+
+<h3 id="s9-2-5-1"><span class="nt-num">9.2.5.1</span>Sayı oku ve yazdır</h3>
+
+<p>emu8086'nın kütüphane belgesindeki ikinci örnek dört prosedürü birlikte kullanır. Program kullanıcıdan bir sayı ister, sayıyı okur ve geri yazar:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span>    100h
+<span class="kw">LEA</span>    SI, msg1       <span class="cm">; ask for the number</span>
+<span class="kw">CALL</span>   print_string   <span class="cm">;</span>
+<span class="kw">CALL</span>   scan_num       <span class="cm">; get number in CX.</span>
+<span class="kw">MOV</span>    AX, CX         <span class="cm">; copy the number to AX.</span>
+<span class="kw">CALL</span>   pthis          <span class="cm">; print the following string:</span>
+<span class="dir">DB</span>  13, 10, 'You have entered: ', 0
+<span class="kw">CALL</span>   print_num      <span class="cm">; print number in AX.</span>
+<span class="kw">RET</span>                   <span class="cm">; return to operating system.</span>
+msg1   <span class="dir">DB</span>  'Enter the number: ', 0
+<span class="dir">DEFINE_SCAN_NUM</span>
+<span class="dir">DEFINE_PRINT_STRING</span>
+<span class="dir">DEFINE_PRINT_NUM</span>
+<span class="dir">DEFINE_PRINT_NUM_UNS</span>  <span class="cm">; required for print_num.</span>
+<span class="dir">DEFINE_PTHIS</span>
+<span class="dir">END</span>                   <span class="cm">; directive to stop the compiler.</span></code></pre>
+
+<p>Programın akışı kısadır. <code>LEA SI, msg1</code> istem dizgisinin adresini SI'ye yükler ve PRINT_STRING onu yazar. SCAN_NUM sayıyı okuyup CX'e koyar. <code>MOV AX, CX</code> sayıyı PRINT_NUM'ın beklediği yazmaca taşır. PTHIS, CALL'ın ardındaki dizgiyi yazar: dizgi 13, 10 ile başladığı için önce alt satıra geçilir. PRINT_NUM sayıyı işaretli olarak yazar ve RET programı bitirir. msg1'den sonraki satırlar veri ve prosedür tanımlarıdır; akış onlara RET'ten sonra hiç ulaşmaz.</p>
+
+<p>Ana programın bellekteki yerleşimi <a href="#tab-yerlesim">Tablo 9.2.22</a>'dedir. Bütün CALL'lar 3 baytlık yakın çağrılardır (E8 ve 16 bitlik uzaklık). Dizginin kod alanının ortasında durduğuna dikkat edilmelidir: 010Eh–0122h arası komut değil veridir.</p>
+
+<div class="nt-tablewrap" id="tab-yerlesim">
+<table class="nt-table">
+  <caption>Tablo 9.2.22: Sayı oku ve yazdır programının ana bölümünün yerleşimi.</caption>
+  <thead><tr><th scope="col">Adres</th><th scope="col">Bayt</th><th scope="col">Satır</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td>3</td><td><code>LEA SI, msg1</code> (BE 27 01)</td></tr>
+    <tr><td>0103h</td><td>3</td><td><code>CALL print_string</code></td></tr>
+    <tr><td>0106h</td><td>3</td><td><code>CALL scan_num</code></td></tr>
+    <tr><td>0109h</td><td>2</td><td><code>MOV AX, CX</code> (8B C1)</td></tr>
+    <tr><td>010Bh</td><td>3</td><td><code>CALL pthis</code></td></tr>
+    <tr><td>010Eh</td><td>21</td><td><code>DB 13, 10, 'You have entered: ', 0</code></td></tr>
+    <tr><td>0123h</td><td>3</td><td><code>CALL print_num</code></td></tr>
+    <tr><td>0126h</td><td>1</td><td><code>RET</code> (C3)</td></tr>
+    <tr><td>0127h</td><td>19</td><td><code>msg1 DB 'Enter the number: ', 0</code></td></tr>
+    <tr><td>013Ah</td><td>…</td><td>DEFINE_ makrolarıyla açılan prosedürler</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Kullanıcının -25 yazıp Enter'a bastığını varsayalım. İzleme tablosunda CALL satırları için iki an gösterilir: prosedürün içi (yığında dönüş adresi varken) ve dönüş (<a href="#tab-iz-sayi">Tablo 9.2.23</a>).</p>
+
+<div class="nt-tablewrap" id="tab-iz-sayi">
+<table class="nt-table">
+  <caption>Tablo 9.2.23: Sayı oku ve yazdır programının izlemesi (girdi −25).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">SI</th><th scope="col">CX</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td><code>LEA SI, msg1</code></td><td class="n92-chg">0127h</td><td>(boyut)</td><td>0000h</td><td>FFFEh</td><td></td></tr>
+    <tr><td><code>CALL print_string</code> (içinde)</td><td>0127h</td><td>(boyut)</td><td>0000h</td><td class="n92-chg">FFFCh</td><td>Enter the number:␣</td></tr>
+    <tr><td><code>CALL scan_num</code> (içinde)</td><td>0127h</td><td>…</td><td>0000h</td><td>FFFCh</td><td>Enter the number: -25</td></tr>
+    <tr><td><code>CALL scan_num</code> (dönüş)</td><td>0127h</td><td class="n92-chg">FFE7h</td><td>0000h</td><td class="n92-chg">FFFEh</td><td>Enter the number: -25</td></tr>
+    <tr><td><code>MOV AX, CX</code></td><td>0127h</td><td>FFE7h</td><td class="n92-chg">FFE7h</td><td>FFFEh</td><td>Enter the number: -25</td></tr>
+    <tr><td><code>CALL pthis</code></td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td class="n92-chg">FFFCh</td><td>…</td></tr>
+    <tr><td>dizgi yazılır</td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td>FFFCh</td><td>… / You have entered:␣</td></tr>
+    <tr><td><code>CALL print_num</code> (içinde)</td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td>FFFCh</td><td>… / You have entered: -25</td></tr>
+    <tr><td><code>RET</code></td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td class="n92-chg">0000h</td><td>… / You have entered: -25</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun birkaç ayrıntısı açıklama ister. SI program boyunca 0127h'de kalır, çünkü PRINT_STRING ve PTHIS SI'yi saklayıp geri yükler. AX de SCAN_NUM'dan sonra 0000h'dir; SCAN_NUM AX'i saklar. Değişen tek yazmaç çıktı yazmacı CX'tir: −25'in ikiye tümleyeni FFE7h. CX'in ilk değeri “(boyut)” olarak gösterilmiştir. emu8086 bir .COM programını yüklerken CX'e programın bayt cinsinden boyutunu koyar. Bu değer SCAN_NUM CX'i sıfırladığında kaybolur ve sonucu etkilemez. Son RET yığından DOS'un koyduğu 0000h'yi IP'ye alır; SP = FFFEh + 2 = 0000h olur. İşlemci PSP'nin başındaki <code>INT 20h</code>'ye gider ve program biter.</p>
+
+<p>Ekranın son durumu iki satırdır. Birinci satırda “Enter the number: -25”, ikincisinde “You have entered: -25” yazar. SCAN_NUM Enter'ı yalnız CR olarak yankıladığı için imleç birinci satırın başına dönmüştü. PTHIS dizgisinin başındaki 13 ve 10 imleci ikinci satırın başına götürür. Dizgi 13, 10 ile başlamasaydı “You have entered: ” birinci satırın üstüne yazılır ve istem silinirdi.</p>
+
+<h3 id="s9-2-5-2"><span class="nt-num">9.2.5.2</span>İki sayının toplamı</h3>
+
+<p>İkinci örnek iki sayı okur ve toplamlarını yazar. İşaretli taşma da denetlenir.</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span>  100h
+<span class="kw">CALL</span> scan_num     <span class="cm">; 1. sayı → CX</span>
+<span class="kw">MOV</span>  BX, CX       <span class="cm">; sakla</span>
+<span class="dir">PUTC</span> 13
+<span class="dir">PUTC</span> 10           <span class="cm">; alt satır</span>
+<span class="kw">CALL</span> scan_num     <span class="cm">; 2. sayı → CX</span>
+<span class="dir">PUTC</span> 13
+<span class="dir">PUTC</span> 10
+<span class="kw">MOV</span>  AX, BX
+<span class="kw">ADD</span>  AX, CX       <span class="cm">; işaretli toplam</span>
+<span class="kw">JO</span>   tasma
+<span class="kw">CALL</span> print_num
+<span class="kw">RET</span>
+tasma: <span class="dir">PUTC</span> '?'
+<span class="kw">RET</span>
+<span class="dir">DEFINE_SCAN_NUM</span>
+<span class="dir">DEFINE_PRINT_NUM</span>
+<span class="dir">DEFINE_PRINT_NUM_UNS</span>
+<span class="dir">END</span></code></pre>
+
+<p>Programın üç ayrıntısı önemlidir. Birincisi, ikinci SCAN_NUM da sonucu CX'e yazar; birinci sayı kaybolmasın diye önce BX'e alınır. BX'in seçilmesi rastgele değildir: SCAN_NUM BX'i kullanmaz, PUTC yalnız AX'e dokunur. İkincisi, Enter yalnız satır başına döndürdüğü için her SCAN_NUM'dan sonra <code>PUTC 13</code> ve <code>PUTC 10</code> gelir; ikinci sayı ve sonuç ayrı satırlara yazılır. Üçüncüsü, <code>JO</code> işaretli taşmayı yakalar.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-of">
+  <span class="nt-box__title">Tanım 9.2.8</span>
+  <p><strong>Taşma bayrağı</strong> (OF, <span lang="en">overflow flag</span>), işaretli bir işlemin sonucu 16 bitlik işaretli aralığa (−32 768 … 32 767) sığmadığında 1 olur. Toplamada iki işlenen aynı işaretli, sonuç ise ters işaretliyse OF = 1'dir. <code>JO</code> komutu OF = 1 ise atlar.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-toplam">
+<table class="nt-table">
+  <caption>Tablo 9.2.24: İki sayının toplamı programı farklı girdilerle.</caption>
+  <thead><tr><th scope="col">Girdiler</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">AX = BX + CX</th><th scope="col">OF</th><th scope="col">Son satır</th></tr></thead>
+  <tbody>
+    <tr><td>120, −45</td><td>0078h</td><td>FFD3h</td><td>004Bh</td><td>0</td><td>75</td></tr>
+    <tr><td>−7, −8</td><td>FFF9h</td><td>FFF8h</td><td>FFF1h</td><td>0</td><td>-15</td></tr>
+    <tr><td>30000, 5000</td><td>7530h</td><td>1388h</td><td>88B8h</td><td class="n92-chg">1</td><td>?</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İlk iki satırda sonuç işaretli aralıktadır (<a href="#tab-toplam">Tablo 9.2.24</a>). 120 + (−45) toplamasında CF = 1 olur, çünkü işaretsiz olarak 0078h + FFD3h 16 biti aşar. Bu elde işaretli hesapta anlamsızdır ve OF = 0 kalır. Üçüncü satırda iki pozitif sayının toplamı 35 000'dir ve 32 767'yi aşar. Sonuç 88B8h'nin en anlamlı biti 1'dir; iki pozitif sayının toplamı negatif görünür ve OF = 1 olur. JO atlar ve ekrana '?' yazılır. JO olmasaydı PRINT_NUM 88B8h'yi −30536 olarak yazardı.</p>
+
+<h3 id="s9-2-5-3"><span class="nt-num">9.2.5.3</span>Çerçeveli başlık</h3>
+
+<p>Üçüncü örnek ekranı temizler ve 10. sütundan başlayan çerçeveli bir başlık çizer. Kütüphane makroları programcının kendi prosedürüyle birlikte kullanılır.</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span>  100h
+<span class="kw">CALL</span> clear_screen
+<span class="dir">GOTOXY</span> 10, 2
+<span class="kw">CALL</span> cizgi
+<span class="dir">GOTOXY</span> 10, 3
+<span class="dir">PRINT</span> '|  BASLIK  |'
+<span class="dir">GOTOXY</span> 10, 4
+<span class="kw">CALL</span> cizgi
+<span class="dir">GOTOXY</span> 0, 6       <span class="cm">; imleç alta</span>
+<span class="kw">RET</span>
+cizgi <span class="dir">PROC</span>        <span class="cm">; +----------+</span>
+<span class="dir">PUTC</span> '+'
+<span class="kw">MOV</span>  CX, 10
+tire: <span class="dir">PUTC</span> '-'
+<span class="kw">LOOP</span> tire
+<span class="dir">PUTC</span> '+'
+<span class="kw">RET</span>
+cizgi <span class="dir">ENDP</span>
+<span class="dir">DEFINE_CLEAR_SCREEN</span>
+<span class="dir">END</span></code></pre>
+
+<p>cizgi prosedürü bir '+' yazar, on kez '-' yazar ve bir '+' ile biter: 12 karakterlik “+----------+”. Başlık satırındaki dizgi de 12 karakterdir; iki kenar çizgisi, iki boşluk, “BASLIK” ve iki boşluk. Bu yüzden üç satır 10–21. sütunlarda üst üste hizalanır (<a href="#sekil-cerceve">Şekil 9.2.10</a>). Son <code>GOTOXY 0, 6</code> imleci çerçevenin altına alır; program bittiğinde emu8086'nın yazacağı bir şey başlığın üstüne binmez.</p>
+
+<figure class="nt-fig" id="sekil-cerceve" style="--w:360px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 190" role="img" aria-label="Ekranın sol üst bölümü: 2 ile 4. satırlarda, 10. sütundan başlayan çerçeveli BASLIK yazısı" style="max-width:330px;max-height:190px"><text class="lbl mono" x="22" y="34" text-anchor="end" style="font-size:11px;">0</text><text class="lbl mono" x="22" y="56" text-anchor="end" style="font-size:11px;">1</text><text class="lbl mono" x="22" y="78" text-anchor="end" style="font-size:11px;">2</text><text class="lbl mono" x="22" y="100" text-anchor="end" style="font-size:11px;">3</text><text class="lbl mono" x="22" y="122" text-anchor="end" style="font-size:11px;">4</text><text class="lbl mono" x="22" y="144" text-anchor="end" style="font-size:11px;">5</text><text class="lbl mono" x="22" y="166" text-anchor="end" style="font-size:11px;">6</text><rect class="box-empty" x="28" y="14" width="296" height="160" rx="3"/><text class="txt mono" x="160" y="78" text-anchor="middle" style="font-size:13px;">+</text><text class="txt mono" x="172" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="184" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="196" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="208" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="220" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="232" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="244" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="256" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="268" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="280" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="292" y="78" text-anchor="middle" style="font-size:13px;">+</text><text class="txt mono" x="160" y="100" text-anchor="middle" style="font-size:13px;">|</text><text class="txt mono" x="196" y="100" text-anchor="middle" style="font-size:13px;">B</text><text class="txt mono" x="208" y="100" text-anchor="middle" style="font-size:13px;">A</text><text class="txt mono" x="220" y="100" text-anchor="middle" style="font-size:13px;">S</text><text class="txt mono" x="232" y="100" text-anchor="middle" style="font-size:13px;">L</text><text class="txt mono" x="244" y="100" text-anchor="middle" style="font-size:13px;">I</text><text class="txt mono" x="256" y="100" text-anchor="middle" style="font-size:13px;">K</text><text class="txt mono" x="292" y="100" text-anchor="middle" style="font-size:13px;">|</text><text class="txt mono" x="160" y="122" text-anchor="middle" style="font-size:13px;">+</text><text class="txt mono" x="172" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="184" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="196" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="208" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="220" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="232" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="244" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="256" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="268" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="280" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="292" y="122" text-anchor="middle" style="font-size:13px;">+</text><rect x="34" y="150" width="12" height="18" rx="2" style="fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1"/><text class="lbl" x="176" y="184" text-anchor="middle" style="font-size:12px;">sütun 10 … 21</text></svg></div>
+  <figcaption><b>Şekil 9.2.10:</b> Ekranın sol üst bölümü: 2–4. satırlarda, 10. sütundan başlayan çerçeveli BASLIK yazısı; imleç (0, 6)'da.</figcaption>
+</figure>
+
+<p>Programın iki noktası makro ile döngünün ilişkisini gösterir. Döngüdeki <code>PUTC '-'</code> kaynakta bir kez yazıldığı için bir kez açılır; 8 baytlık açılım 10 kez çalışır ama 10 kez kopyalanmaz. Makronun kopyalanması derleme anında, döngünün yinelenmesi çalışma anında olur. İkinci nokta yazmaçlarla ilgilidir. LOOP sayacı CX'tedir. PUTC yalnız AX'i kullanıp geri yüklediği için CX'e dokunmaz ve sayaç güvendedir. Döngüde CX'i bozan bir prosedür, örneğin SCAN_NUM çağrılsaydı sayacın PUSH CX / POP CX ile korunması gerekirdi. cizgi'nin tanımı da kütüphane prosedürleri gibi RET'ten sonradır.</p>
+
+<h2 id="s9-2-6"><span class="nt-num">9.2.6</span>Sık yapılan hatalar</h2>
+
+<p>Kütüphane kullanılırken yapılan hatalar çoğu zaman derleme sırasında fark edilmez; program çalışır ama yanlış sonuç verir. Aşağıdaki hatalar emu8086 ile çalışan öğrencilerin en sık karşılaştıklarıdır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>DEFINE_ satırını unutmak.</strong> <code>CALL scan_num</code> var ama <code>DEFINE_SCAN_NUM</code> yoksa derleyici etiketi bulamaz ve “undefined” hatası verir. PRINT_NUM için <code>DEFINE_PRINT_NUM_UNS</code> da gerekir.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Dizgiyi 0 ile bitirmemek.</strong> PRINT_STRING ve PTHIS 0 görene kadar yazar. <code>msg DB 'Sayi: '</code> gibi 0'sız bir tanımda, dizgiden sonra gelen baytlar da ekrana dökülür. Bunlar çoğu zaman prosedür kodlarıdır ve ekranda anlamsız karakterler görünür. PTHIS'te ayrıca dönüş adresi yanlış yere kayar ve program kilitlenebilir.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Sonucu AX'te aramak.</strong> SCAN_NUM sonucu CX'e yazar. PRINT_NUM'dan önce <code>MOV AX, CX</code> unutulursa AX'teki eski değer yazılır. Genel kural: bir prosedürün hangi yazmacı koruduğu belgesinde yazmıyorsa korunduğu varsayılmamalıdır.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Enter'dan sonra alt satır beklemek.</strong> SCAN_NUM'dan sonra imleç girdinin bulunduğu satırın başındadır. Sonraki çıktı girilen sayının ve istemin üstüne yazılır. “Sayi: ” istemiyle 42 okunup hemen PRINT_NUM çağrılırsa ekranda “42yi: 42” kalır. Araya <code>PUTC 13</code>, <code>PUTC 10</code> eklenmelidir.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Tampon boyunu büyük vermek.</strong> DX, tamponun gerçek boyundan büyük verilirse GET_STRING tamponun ardındaki değişkenlerin üstüne yazar. Hata ancak o değişkenler kullanıldığında ortaya çıkar.</p>
+</div>
+
+<p>DEFINE_ satırlarının yeri ise bir hata kaynağı değildir. Her DEFINE_ makrosu prosedür gövdesinin üstünden atlayan bir JMP ile başladığı için satır programın başına konsa da işlemci gövdeye girmez (<a href="#sekil-yer">Şekil 9.2.11</a>). Bedeli fazladan bir atlama komutudur. Alışılmış yer RET ile END arasıdır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-yer" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 760 148" role="img" aria-label="DEFINE_ satırı ORG 100h altına konsa da makronun ilk komutu JMP, prosedür gövdesini atlar; alışılmış yeri RET ile END arasıdır." style="max-width:700px"><text class="txt" x="130" y="14" text-anchor="middle" style="font-size:14px;fill:var(--ds-muted)">Başta: gereksiz JMP</text><rect class="box" x="20" y="24" width="220" height="24" rx="3"/><text class="txt mono" x="130" y="41" text-anchor="middle" style="font-size:12.5px">ORG 100h</text><rect class="box" x="20" y="48" width="220" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="130" y="65" text-anchor="middle" style="font-size:12.5px">DEFINE_SCAN_NUM</text><rect class="box" x="20" y="72" width="220" height="24" rx="3"/><text class="txt mono" x="130" y="89" text-anchor="middle" style="font-size:12.5px">ana program</text><rect class="box" x="20" y="96" width="220" height="24" rx="3"/><text class="txt mono" x="130" y="113" text-anchor="middle" style="font-size:12.5px">RET</text><text class="txt" x="510" y="14" text-anchor="middle" style="font-size:14px;fill:var(--ds-good)">Alışılmış yer</text><rect class="box" x="400" y="24" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="41" text-anchor="middle" style="font-size:12.5px">ORG 100h</text><rect class="box" x="400" y="48" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="65" text-anchor="middle" style="font-size:12.5px">ana program</text><rect class="box" x="400" y="72" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="89" text-anchor="middle" style="font-size:12.5px">RET</text><rect class="box" x="400" y="96" width="220" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="510" y="113" text-anchor="middle" style="font-size:12.5px">DEFINE_SCAN_NUM</text><rect class="box" x="400" y="120" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="137" text-anchor="middle" style="font-size:12.5px">END</text><text class="lbl" x="248" y="58" text-anchor="start" style="font-size:12.5px">← JMP ile atlanır</text><text class="lbl" x="628" y="106" text-anchor="start" style="font-size:12.5px">← yalnız CALL ile</text></svg></div>
+  <figcaption><b>Şekil 9.2.11:</b> DEFINE_SCAN_NUM ORG 100h'nin altına konsa da makronun ilk komutu JMP, prosedür gövdesini atlar (solda). Alışılmış yer RET ile END arasıdır; prosedüre yalnız CALL ile girilir (sağda).</figcaption>
+</figure>
+
+<h2 id="s9-2-7"><span class="nt-num">9.2.7</span>Alıştırmalar ve çözümleri</h2>
+
+<p><strong>Alıştırma 1.</strong> Ekranın ortasına (sütun 35, satır 12) “MERKEZ” yazan programı makrolarla yazınız.</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span> 100h
+<span class="dir">GOTOXY</span> 35, 12
+<span class="dir">PRINT</span> 'MERKEZ'
+<span class="kw">RET</span></code></pre>
+
+<p>“MERKEZ” 12. satırın 35–40. sütunlarına yazılır ve imleç (41, 12)'de kalır. Altı karakterlik bir metnin tam ortada durması için başlangıç sütunu (80 − 6) / 2 = 37 olmalıdır; 35 yaklaşık bir orta noktadır. Ortalamak için genel kural: başlangıç sütunu = (80 − uzunluk) / 2.</p>
+
+<p><strong>Alıştırma 2.</strong> Kullanıcıdan iki sayı okuyup toplamını yazdıran programı yazınız.</p>
+
+<p>Çözüm, iki sayının toplamı örneğidir. Gereken parçalar: <code>CALL scan_num</code> → <code>MOV BX, CX</code> → <code>PUTC 13</code>, <code>PUTC 10</code> → <code>CALL scan_num</code> → <code>MOV AX, BX</code> → <code>ADD AX, CX</code> → <code>CALL print_num</code>; tanımlar <code>DEFINE_SCAN_NUM</code>, <code>DEFINE_PRINT_NUM</code> ve <code>DEFINE_PRINT_NUM_UNS</code>. PUTC 13 ve PUTC 10 unutulursa ikinci sayı birincinin üstüne yazılır ve ekranda yalnız son yazılanlar okunur.</p>
+
+<p><strong>Alıştırma 3.</strong> PRINT makrosu 10 kez kullanılırsa dizgiler ve döngü kodu kaç kez bulunur? PRINT_STRING ile karşılaştırınız.</p>
+
+<p>PRINT ile 10 kopya oluşur: her açılım kendi dizgisini ve kendi 23 baytlık döngü kodunu taşır. PRINT_STRING ile döngü kodu bir kez bulunur; bellekte 10 dizgi ve her dizgi için bir <code>LEA SI</code> ile bir <code>CALL</code> (3 + 3 bayt) yer alır. Yedi karakterlik on iletiyle PRINT'li program yaklaşık 310, PRINT_STRING'li program yaklaşık 160 bayttır. İleti sayısı arttıkça fark büyür; buna karşılık her CALL/RET çifti 27 saat turu ekler.</p>
+
+<p><strong>Alıştırma 4.</strong> AX = 8000h iken PRINT_NUM ve PRINT_NUM_UNS ne yazar?</p>
+
+<p>8000h'nin işaretsiz değeri 32 768'dir; PRINT_NUM_UNS “32768” yazar. En anlamlı biti 1 olduğu için işaretli değeri 32 768 − 65 536 = −32 768'dir; PRINT_NUM “-32768” yazar. Bu, 16 bitlik işaretli aralığın en küçük sayısıdır ve NEG onu değiştirmez; PRINT_NUM yine de doğru yazar, çünkü mutlak değeri işaretsiz yazdırır.</p>
+
+<p><strong>Alıştırma 5.</strong> <code>DEFINE_PTHIS</code>, <code>ORG 100h</code>'nin hemen altına yazılırsa ne olur?</p>
+
+<p>Program yine doğru çalışır. Makronun ilk komutu <code>JMP skip_proc_pthis</code>'tir; işlemci PTHIS'in gövdesinin üstünden atlar ve ana programın ilk komutuna gelir. Bedeli fazladan bir JMP'dir ve ana programın adresleri gövdenin boyu kadar ileri kayar. Koruyucu JMP olmasaydı işlemci doğrudan PTHIS'in koduna girerdi: <code>POP SI</code> yığından DOS'un 0000h sözcüğünü alır, PSP'nin baytlarını dizgi diye yazar ve geçersiz bir adrese dönerdi.</p>
+
+<p><strong>Alıştırma 6.</strong> Kullanıcının adını GET_STRING ile alıp “Merhaba, ad!” yazdırınız.</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span> 100h
+<span class="kw">LEA</span>  DI, ad
+<span class="kw">MOV</span>  DX, 20
+<span class="kw">CALL</span> get_string
+<span class="dir">PUTC</span> 13
+<span class="dir">PUTC</span> 10
+<span class="dir">PRINT</span> 'Merhaba, '
+<span class="kw">LEA</span>  SI, ad
+<span class="kw">CALL</span> print_string
+<span class="dir">PUTC</span> '!'
+<span class="kw">RET</span>
+ad <span class="dir">DB</span> 20 <span class="dir">DUP</span>(0)
+<span class="dir">DEFINE_GET_STRING</span>
+<span class="dir">DEFINE_PRINT_STRING</span>
+<span class="dir">END</span></code></pre>
+
+<p>Kullanıcı “Ece” yazıp Enter'a basarsa ekranın ilk satırında “Ece”, ikincisinde “Merhaba, Ece!” görünür. PUTC 13 ve PUTC 10 olmasaydı GET_STRING'den sonra imleç “Ece”nin hemen sağında kalır ve ekranda tek satırda “EceMerhaba, Ece!” görünürdü. Tampon 20 bayttır ve DX = 20; en çok 19 karakterlik bir ad alınır.</p>
+
+<h2 class="nt-pb" id="s9-2-8"><span class="nt-num">9.2.8</span>Özet</h2>
+
+<ul>
+  <li><strong>emu8086.inc</strong>, ekran, klavye ve sayı işleri için hazır makrolar ve prosedürler içeren kütüphanedir. İçindeki her şey BIOS ve DOS kesmeleri üzerine kurulu sıradan 8086 kodudur.</li>
+  <li><strong>INCLUDE</strong> bir direktiftir: dosyanın metnini derleme sırasında satırın yerine koyar, kod üretmez. Dosya önce kaynak klasöründe, sonra emu8086'nın Inc klasöründe aranır. Satır kaynağın başına yazılır.</li>
+  <li>Makro tanımı ve DEFINE_ yazılmamış prosedür programa bayt eklemez. Program boyutunu kullanılan makroların her kullanımı ve DEFINE_ ile tanımlanan prosedürler belirler.</li>
+  <li><strong>Ekran makroları</strong> INT 10h üzerine kuruludur: PUTC ve PRINT 0Eh, GOTOXY 02h, CURSOROFF ve CURSORON 01h hizmetini kullanır. Makrolar kullandıkları yazmaçları saklar; PUTC 8 bayt, GOTOXY 16 bayttır.</li>
+  <li><strong>GOTOXY sütun, satır</strong> sırasını kullanır; BIOS satırı DH'de, sütunu DL'de bekler. Sol üst (0, 0), sağ alt (79, 24)'tür. Hücrenin video belleğindeki adresi B800h:(satır × 80 + sütun) × 2'dir.</li>
+  <li><strong>PRINT</strong> dizgiyi koda gömer ve üstünden JMP ile atlar; her kullanımda döngü kodu kopyalanır. <strong>PRINTN</strong> sona 13, 10 ekler. Yeni satır için CR (13) ve LF (10) birlikte gerekir. 79. sütundan sonra imleç alt satıra geçer, son satırda ekran kayar.</li>
+  <li><strong>Prosedürler</strong> DEFINE_ ile bir kez tanımlanır, CALL ile çağrılır. Her DEFINE_ makrosu gövdenin üstünden atlayan bir JMP ile başlar; alışılmış yer RET ile END arasıdır. PRINT_NUM, PRINT_NUM_UNS'yi de gerektirir.</li>
+  <li>Girdi ve çıktı yazmaçları: PRINT_STRING DS:SI, GET_STRING DS:DI ve DX, SCAN_NUM → CX, PRINT_NUM ve PRINT_NUM_UNS ← AX. Öteki yazmaçlar korunur, bayraklar korunmaz.</li>
+  <li><strong>PTHIS</strong>, CALL'ın yığına ittiği dönüş adresini dizginin adresi olarak kullanır; dizgiyi yazdıktan sonra adresi 0'ın ötesine taşır ve RET dizgiden sonraki komuta döner.</li>
+  <li><strong>GET_STRING</strong> en fazla DX − 1 karakter okur, tamponu 0 ile bitirir, geri silmeyi işler ve Enter'ı yazmaz. DX tamponun gerçek boyundan büyük verilirse tamponun ardındaki değişkenler ezilir.</li>
+  <li><strong>SCAN_NUM</strong> rakamları sonuç ← sonuç × 10 + rakam kuralıyla biriktirir; eksi işaretini en sonda NEG ile uygular, rakam olmayan tuşları ve 65 535'i aşan basamakları reddeder. Enter yalnız satır başına döndürür.</li>
+  <li><strong>PRINT_NUM_UNS</strong> basamakları azalan bölenle (10 000, 1000, …) soldan sağa yazar; baştaki sıfırları bir bayrakla atlar. Yığınlı yöntem aynı sonucu 10'a bölüp basamakları yığından ters sırayla çekerek verir. <strong>PRINT_NUM</strong> negatif sayıda '-' yazıp mutlak değeri işaretsiz yazdırır.</li>
+  <li>Aynı 16 bit iki biçimde okunur: en anlamlı bit 1 ise işaretli değer = işaretsiz değer − 65 536 (FFE7h = −25 = 65 511).</li>
+</ul>
+
+<h2 id="s9-2-9"><span class="nt-num">9.2.9</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">kütüphane <span lang="en">library</span></a></li>
+  <li><a href="../sozluk.html">direktif <span lang="en">directive</span></a></li>
+  <li><a href="../sozluk.html">makro <span lang="en">macro</span></a></li>
+  <li><a href="../sozluk.html">makro genişletme <span lang="en">macro expansion</span></a></li>
+  <li><a href="../sozluk.html">prosedür <span lang="en">procedure</span></a></li>
+  <li><a href="../sozluk.html">prosedür çağrısı <span lang="en">procedure call</span></a></li>
+  <li><a href="../sozluk.html">dönüş adresi <span lang="en">return address</span></a></li>
+  <li><a href="../sozluk.html">parametre geçirme <span lang="en">parameter passing</span></a></li>
+  <li><a href="../sozluk.html">yazmaçların korunması <span lang="en">register preservation</span></a></li>
+  <li><a href="../sozluk.html">imleç <span lang="en">cursor</span></a></li>
+  <li><a href="../sozluk.html">dizgi <span lang="en">string</span></a></li>
+  <li><a href="../sozluk.html">kontrol karakteri <span lang="en">control character</span></a></li>
+  <li><a href="../sozluk.html">ASCII</a></li>
+  <li><a href="../sozluk.html">BIOS</a></li>
+  <li><a href="../sozluk.html">hizmet <span lang="en">service</span></a></li>
+  <li><a href="../sozluk.html">video belleği (metin modu) <span lang="en">video memory</span></a></li>
+  <li><a href="../sozluk.html">klavye tamponu <span lang="en">keyboard buffer</span></a></li>
+  <li><a href="../sozluk.html">işaretli / işaretsiz sayı <span lang="en">signed / unsigned number</span></a></li>
+  <li><a href="../sozluk.html">ikiye tümleyen <span lang="en">two's complement</span></a></li>
+  <li><a href="../sozluk.html">etiket <span lang="en">label</span></a></li>
+</ul>
+
+<h2 id="s9-2-10"><span class="nt-num">9.2.10</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p><code>GOTOXY 3, 7</code> açılımında INT 10h çağrılmadan hemen önce AH, BH, DH ve DL nedir? Açılım kaç bayttır ve hangi yazmaçları saklar?</p>
+    <details><summary>Cevap</summary>
+      <p>AH = 02h, BH = 0, DH = 7 (satır), DL = 3 (sütun). Açılım 16 bayttır: üç PUSH ve üç POP 6 bayt, dört <code>MOV r8, sabit</code> 8 bayt, <code>INT 10h</code> 2 bayt. AX, BX ve DX yığında saklanıp ters sırayla geri alınır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Renkli metin modunda (35, 12) hücresindeki karakter video belleğinin hangi bağıl konumunda durur? Fiziksel adresi nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>(12 × 80 + 35) × 2 = 995 × 2 = 1990 = 07C6h. Karakter B800:07C6h'de, öznitelik baytı B800:07C7h'dedir. Fiziksel adres B8000h + 07C6h = B87C6h'dir.</p>
+    </details>
+  </li>
+  <li>
+    <p>Boş bir ekranda imleç (0, 0)'da iken <code>PRINTN 'Selam'</code> ve ardından <code>PUTC 'X'</code> çalışıyor. X hangi hücreye yazılır? İmleç sonunda nerededir?</p>
+    <details><summary>Cevap</summary>
+      <p>“Selam” 0. satırın 0–4. sütunlarına yazılır. PRINTN'in eklediği 13 imleci (0, 0)'a, 10 ise (0, 1)'e götürür. X (0, 1)'e yazılır ve imleç (1, 1)'e geçer.</p>
+    </details>
+  </li>
+  <li>
+    <p>Kullanıcı SCAN_NUM çalışırken sırasıyla 5, b, 0 tuşlarına ve Enter'a basıyor. Prosedür döndüğünde CX nedir? Ekranda ne kalır?</p>
+    <details><summary>Cevap</summary>
+      <p>'b' rakam olmadığı için ekrana yazılır, sonra 8, ' ', 8 ile silinir ve sayıya katılmaz. Sayı 5 × 10 + 0 = 50 olur: CX = 0032h. Ekranda “50” kalır; Enter imleci satırın başına döndürür.</p>
+    </details>
+  </li>
+  <li>
+    <p>Yığınlı basamak ayırma kodu (10'a böl, it, LOOP ile çek) AX = 0 için ne yazar? Kütüphanedeki azalan bölen yöntemi neden AX = 0 için ayrı bir dal ister?</p>
+    <details><summary>Cevap</summary>
+      <p>Yığınlı kod döngüye en az bir kez girer: 0 / 10 = 0, kalan 0 yığına itilir ve CX = 1 olur. OR AX, AX ZF'yi 1 yapar, yazma döngüsü bir kez döner ve “0” yazılır. Azalan bölen yönteminde bayrak CX = 1 iken sayı bölenden küçükse tur atlanır. AX = 0 her bölenden küçük olduğu için bütün turlar atlanır ve hiçbir şey yazılmaz; ayrı dal bu yüzden '0' yazar.</p>
+    </details>
+  </li>
+  <li>
+    <p>GET_STRING, <code>MOV DX, 1</code> ile çağrılıyor ve kullanıcı “abc” yazıp Enter'a basıyor. Tampona ne yazılır?</p>
+    <details><summary>Cevap</summary>
+      <p>Hiçbir şey. DX ≤ 1 iken tamponda yalnız sondaki 0'a yer vardır ve prosedür hiç okuma yapmadan döner; tampona 0 da yazılmaz, eski içerik olduğu gibi kalır. Basılan tuşlar klavye tamponunda bekler ve sonraki okuma hizmeti onları alır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir .COM programında <code>CALL pthis</code> 0100h'de, hemen ardında <code>DB 'Tamam', 13, 10, 0</code> var. CALL yığına hangi adresi iter? PTHIS'in RET'i hangi adrese döner?</p>
+    <details><summary>Cevap</summary>
+      <p>CALL 3 bayttır; yığına 0103h itilir, bu dizginin ilk baytı 'T'nin adresidir. Dizgi 5 + 2 + 1 = 8 bayttır ve 0103h–010Ah'yi kaplar. PTHIS 0'ı 010Ah'de okuduğunda SI = 010Bh olur; bu değer yığına konur ve RET 010Bh'ye döner.</p>
+    </details>
+  </li>
+  <li>
+    <p>AX = C350h iken PRINT_NUM ve PRINT_NUM_UNS ne yazar?</p>
+    <details><summary>Cevap</summary>
+      <p>C350h = 50 000'dir; PRINT_NUM_UNS “50000” yazar. En anlamlı bit 1 olduğu için işaretli değer 50 000 − 65 536 = −15 536'dır; PRINT_NUM “-15536” yazar.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s9-2-11"><span class="nt-num">9.2.11</span>İleri okuma</h2>
+
+<ul>
+  <li>emu8086 kurulumundaki <code>Inc/emu8086.inc</code> dosyası: kütüphanedeki bütün makroların ve prosedürlerin kaynak kodu. SCAN_NUM'ın taşma denetimi ve PRINT_NUM_UNS'nin azalan bölen döngüsü burada satır satır okunabilir.</li>
+  <li>emu8086 yardım belgeleri, “emu8086.inc — library of common functions” ve “Macros” sayfaları: kütüphanenin kullanım örnekleri ve makroların genel kuralları.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8. baskı): prosedürler, makrolar ve BIOS video hizmetleri; onluk sayıların ikiliye ve ikiliden onluğa dönüştürülmesi.</li>
+  <li>R. Brown, “Ralf Brown's Interrupt List”: INT 10h, INT 16h ve INT 21h hizmetlerinin girdi ve çıktı yazmaçlarıyla ayrıntılı listesi.</li>
+</ul>
+
+<h2 id="s9-2-12"><span class="nt-num">9.2.12</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 yardım belgeleri: “emu8086.inc — library of common functions” ve “Macros” sayfaları.</li>
+  <li>emu8086 kurulumundaki Inc/emu8086.inc dosyası (makro ve prosedürlerin kaynak kodu).</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009 — prosedürler ve makrolar.</li>
+  <li>A. S. Tanenbaum, <em>Modern Operating Systems</em>, 3. baskı, Pearson, 2008.</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979 — CALL, RET, MUL, DIV, AAM komutlarının tanımları ve saat turu sayıları.</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_09_Kutuphane.html">Bölüm 9.2 sunumu</a> · <a href="../slides/Bolum_09_Kutuphane_Calisma_Sorulari.html">Çalışma soruları</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

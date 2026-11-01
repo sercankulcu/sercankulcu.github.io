@@ -1,0 +1,1187 @@
+---
+layout: without-sidebar
+title: "Bölüm 8.1: Yığın — Ders Notu"
+permalink: /files/microprocessors/notlar/Bolum_08_Yigin_Ders_Notu.html
+excerpt: "Mikroişlemciler dersi Bölüm 8.1 ders notu: 8086 yığını, yığın kesimi ve SS:SP, yığının aşağı doğru büyümesi, PUSH ve POP komutları, little-endian bayt sırası, yazmaç saklama, takas ve dizi ters çevirme örnekleri, PUSHF ve POPF, yığın taşması ve yığın güvenliği."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+/* sunumdaki SVG'ler genel .ds-svg sınıflarını kullanır (notlar.css); burada yalnız yerleşim ve vurgu */
+.ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 260px; min-width: 0; max-width: calc(50% - 0.7rem); }
+.ds-notes .nt-fig__row--3 > svg.ds-svg { flex: 1 1 200px; min-width: 0; max-width: calc(33.3% - 0.95rem); }
+@media (max-width: 560px) {
+  .ds-notes .nt-fig__row--2 > svg.ds-svg, .ds-notes .nt-fig__row--3 > svg.ds-svg { max-width: 100%; }
+}
+.ds-notes .n81-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">Mikroişlemciler · Ders Notu</p>
+  <h1>Bölüm 8.1: Yığın</h1>
+  <p class="nt-lead">Bir program çalışırken pek çok değerin kısa bir süre için bir kenara konması gerekir. Bir yazmacın eski değeri, bir prosedürün dönüş adresi, kesilen programın bayrakları bunların başında gelir. 8086 bu işler için belleğin bir bölümünü yığın olarak kullanır. Yığına en son konan değer ilk geri alınır. Not, yığın kavramıyla ve son giren ilk çıkar düzeniyle başlar. Ardından yığının SS ve SP yazmaçlarıyla nasıl adreslendiğini, neden aşağı doğru büyüdüğünü ve 8086'nın yığına hangi yol çevrimleriyle eriştiğini anlatır. Sonra PUSH, POP, PUSHF ve POPF komutlarının yazmaçlara, bayraklara ve belleğe etkisini tek tek ele alır. Sunumdaki bütün örnekler yazmaçlar ve yığınla birlikte adım adım izlenir: değer saklama, takas, üç yazmacın döndürülmesi ve bir dizinin yığınla ters çevrilmesi. Son kesim dengesiz PUSH ve POP, yığın taşması ve alt taşma gibi hatalara ve bunlardan korunma yollarına ayrılmıştır.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_08_Yigin.html">Sunum</a></li>
+    <li><a href="../pdf/Bolum_08_Yigin.pdf">Sunum (PDF)</a></li>
+    <li><a href="../slides/Bolum_08_Yigin_Calisma_Sorulari.html">Çalışma soruları</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Yığın, CALL ve RET</a></li>
+    <li><a href="../slides/CPU_Simulator.html">İşlemci Simülatörü</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>Yığın modelini açıklamak</dt>
+    <dd>Yığının son giren ilk çıkar (LIFO) düzenini, 8086 yığınının SS:SP ile nasıl adreslendiğini ve neden aşağı doğru büyüdüğünü açıklamak; yığının üstünün fiziksel adresini hesaplamak.</dd>
+    <dt>PUSH ve POP'u izlemek</dt>
+    <dd>PUSH ve POP için geçerli işlenen türlerini bilmek, her komutta SP'nin ve yığın belleğinin nasıl değiştiğini bayt düzeyinde adım adım göstermek.</dd>
+    <dt>Yazmaçları saklamak ve takas etmek</dt>
+    <dd>Yığını bir yazmacın değerini korumak, geri yüklemek, iki yazmacı takas etmek ve bir diziyi ters çevirmek için doğru sırayla kullanmak.</dd>
+    <dt>Bayrakları korumak</dt>
+    <dd>PUSHF ve POPF ile bayrak yazmacını yığında saklamak, bir işlemin bozduğu bayrakları geri yüklemek ve bayrak sözcüğünü bit bit yorumlamak.</dd>
+    <dt>Yığın hatalarını tanımak</dt>
+    <dd>Dengesiz PUSH ve POP, yanlış sıralama, yığın taşması ve alt taşma hatalarının belirtilerini tanımak ve bunları önleyen yazım kurallarını uygulamak.</dd>
+    <dt>emu8086 ile yığını izlemek</dt>
+    <dd>Bir programı tek adım çalıştırırken yazmaç panelini, yığın penceresini ve bellek görünümünü yorumlamak.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s8-1-1">8.1.1 Yığın kavramı</a>
+      <ol>
+        <li><a href="#s8-1-1-1">8.1.1.1 Yığın nedir?</a></li>
+        <li><a href="#s8-1-1-2">8.1.1.2 Son giren ilk çıkar (LIFO)</a></li>
+        <li><a href="#s8-1-1-3">8.1.1.3 Yığın kesimi: SS ve SP</a></li>
+        <li><a href="#s8-1-1-4">8.1.1.4 Yığın aşağı doğru büyür</a></li>
+        <li><a href="#s8-1-1-5">8.1.1.5 Yığın erişimi donanımda</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-2">8.1.2 PUSH ve POP</a>
+      <ol>
+        <li><a href="#s8-1-2-1">8.1.2.1 PUSH komutu</a></li>
+        <li><a href="#s8-1-2-2">8.1.2.2 POP komutu</a></li>
+        <li><a href="#s8-1-2-3">8.1.2.3 PUSH ve POP nasıl çalışır?</a></li>
+        <li><a href="#s8-1-2-4">8.1.2.4 Yığında bayt sırası</a></li>
+        <li><a href="#s8-1-2-5">8.1.2.5 Ne değişir, ne değişmez?</a></li>
+        <li><a href="#s8-1-2-6">8.1.2.6 Makine kodları ve saat turları</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-3">8.1.3 Örnekler: kod izleme</a>
+      <ol>
+        <li><a href="#s8-1-3-1">8.1.3.1 İlk örnek: PUSH AX / POP BX</a></li>
+        <li><a href="#s8-1-3-2">8.1.3.2 LIFO sırası: 1, 2, 3 girer, 3, 2, 1 çıkar</a></li>
+        <li><a href="#s8-1-3-3">8.1.3.3 Bir yazmacın değerini saklamak</a></li>
+        <li><a href="#s8-1-3-4">8.1.3.4 Yığınla iki yazmacı takas etmek</a></li>
+        <li><a href="#s8-1-3-5">8.1.3.5 Üç yazmaç: aynı sırayla POP</a></li>
+        <li><a href="#s8-1-3-6">8.1.3.6 Yığınla diziyi ters çevirmek</a></li>
+        <li><a href="#s8-1-3-7">8.1.3.7 Yazmaçlar ne olur?</a></li>
+        <li><a href="#s8-1-3-8">8.1.3.8 Takas yöntemlerinin karşılaştırması</a></li>
+        <li><a href="#s8-1-3-9">8.1.3.9 Etkileşimli yığın simülatörü</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-4">8.1.4 Bayrakları saklamak: PUSHF ve POPF</a>
+      <ol>
+        <li><a href="#s8-1-4-1">8.1.4.1 Bayrak sözcüğü</a></li>
+        <li><a href="#s8-1-4-2">8.1.4.2 PUSHF ve POPF: kod izleme</a></li>
+        <li><a href="#s8-1-4-3">8.1.4.3 Bayrak sözcüğünü değiştirmek</a></li>
+        <li><a href="#s8-1-4-4">8.1.4.4 Yığını otomatik kullanan komutlar</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-5">8.1.5 Yığın güvenliği</a>
+      <ol>
+        <li><a href="#s8-1-5-1">8.1.5.1 Denge kuralı ve .COM programının sonu</a></li>
+        <li><a href="#s8-1-5-2">8.1.5.2 Hata örneği: dengesiz PUSH</a></li>
+        <li><a href="#s8-1-5-3">8.1.5.3 Fazla POP ve yanlış sıra</a></li>
+        <li><a href="#s8-1-5-4">8.1.5.4 Yığın taşması ve alt taşma</a></li>
+        <li><a href="#s8-1-5-5">8.1.5.5 İyi uygulamalar</a></li>
+        <li><a href="#s8-1-5-6">8.1.5.6 emu8086 ile yığını izlemek</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-6">8.1.6 Alıştırmalar ve çözümleri</a></li>
+    <li><a href="#s8-1-7">8.1.7 Özet</a></li>
+    <li><a href="#s8-1-8">8.1.8 Kavram listesi</a></li>
+    <li><a href="#s8-1-9">8.1.9 Kendini Dene</a></li>
+    <li><a href="#s8-1-10">8.1.10 İleri okuma</a></li>
+    <li><a href="#s8-1-11">8.1.11 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 id="s8-1-1"><span class="nt-num">8.1.1</span>Yığın kavramı</h2>
+
+<h3 id="s8-1-1-1"><span class="nt-num">8.1.1.1</span>Yığın nedir?</h3>
+
+<p>8086'nın sekiz genel amaçlı yazmacı vardır. Bir program çoğu zaman bu yazmaçların hepsini kullanır ve bir noktada yer darlığı başlar. Örneğin AX bir toplamı tutarken AX'e başka bir iş için de gerek duyulur. Toplamı bir değişkene yazıp sonra geri okumak bir çözümdür. Ama her ara değer için ayrı bir değişken tanımlamak programı kalabalıklaştırır. Ayrıca kaç değerin saklanacağı her zaman önceden bilinmez. Bir prosedür başka bir prosedürü, o da bir başkasını çağırabilir. Her çağrının dönüş adresi bir yerde durmalıdır ve çağrı derinliği programın akışına bağlıdır.</p>
+
+<p>Bu ihtiyaçların ortak bir özelliği vardır: en son saklanan değer ilk geri istenir. En içteki prosedür önce biter, dönüş adresi en son saklanmış olan adrestir. Bir yazmaç geçici olarak kullanıldığında da en son saklanan değer ilk geri yüklenir. 8086 bu düzene uyan bir bellek bölgesini donanım düzeyinde destekler.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-yigin">
+  <span class="nt-box__title">Tanım 8.1.1</span>
+  <p><strong>Yığın</strong> (<span lang="en">stack</span>), geçici verileri saklamak için ayrılmış ve son giren ilk çıkar düzeninde kullanılan bir bellek alanıdır. 8086'da yığının yeri SS (yığın kesimi) ve SP (yığın işaretçisi) yazmaçlarıyla belirlenir. Yığına değer koymaya <strong>itme</strong> (<span lang="en">push</span>), yığından değer almaya <strong>çekme</strong> ya da <strong>alma</strong> (<span lang="en">pop</span>) denir.</p>
+</div>
+
+<p>Programcı yığına iki komutla erişir. <code>PUSH</code> 16 bitlik bir değeri yığına koyar. <code>POP</code> 16 bitlik bir değeri yığından alır ve bir hedefe yazar. Yığın yalnız programcının değil, işlemcinin de kullandığı bir alandır. <code>CALL</code> komutu bir prosedürü çağırırken dönüş adresini yığına koyar. Prosedürün sonundaki <code>RET</code> bu adresi yığından alır ve oraya döner. <code>INT</code> bir kesmeyi çağırdığında benzer bir iş yapılır. Bayrak yazmacı, kod kesimi (CS) ve komut işaretçisi (IP) yığına saklanır; <code>IRET</code> ile kesmeden dönülür ve üç değer geri yüklenir. İşletim sisteminin ve BIOS'un kesme yordamları da yazmaçları korumak için aynı yığını kullanır.</p>
+
+<p>Yığının bu kadar çok kullanıcısı olması bir sorumluluk da getirir. Programcının yığına koyduğu her değer, işlemcinin dönüş adresleriyle aynı alanda durur. Programcı bir değeri yığında unutursa ya da fazladan bir değer alırsa, işlemcinin dönüş adresi kayar ve program yanlış bir adrese döner. Yığın güvenliği bu yüzden ayrı bir kesimde ele alınır.</p>
+
+<p>8086'da yığının birimi sözcüktür. Yığına her zaman 2 bayt yazılır ve yığından her zaman 2 bayt okunur. Bu yüzden <code>PUSH AL</code> gibi 8 bitlik bir işlenen geçersizdir. Bir baytı saklamak gerekirse onu içeren 16 bitlik yazmaç itilir; <code>PUSH AX</code> hem AL'yi hem de AH'yi yığına koyar. Yığının bir yönü de vardır. Yığın yüksek adresten düşük adrese doğru, yani aşağı doğru büyür. Bu iki kural, PUSH ve POP komutlarının bütün ayrıntısını belirler.</p>
+
+<div class="nt-tablewrap" id="tab-kullanicilar">
+<table class="nt-table">
+  <caption>Tablo 8.1.1: 8086'da yığını kullananlar ve yığına koydukları.</caption>
+  <thead><tr><th scope="col">Kullanan</th><th scope="col">Komut</th><th scope="col">Yığına konan</th><th scope="col">Geri alan</th></tr></thead>
+  <tbody>
+    <tr><td>programcı</td><td><code>PUSH</code>, <code>PUSHF</code></td><td>yazmaç, kesim yazmacı, bellek sözcüğü, bayraklar</td><td><code>POP</code>, <code>POPF</code></td></tr>
+    <tr><td>işlemci (prosedür)</td><td><code>CALL</code></td><td>dönüş adresi (yakın çağrıda IP, uzak çağrıda CS ve IP)</td><td><code>RET</code>, <code>RETF</code></td></tr>
+    <tr><td>işlemci (kesme)</td><td><code>INT n</code>, donanım kesmesi</td><td>FLAGS, CS ve IP</td><td><code>IRET</code></td></tr>
+    <tr><td>işletim sistemi, BIOS</td><td>kesme yordamları</td><td>yordamın kullandığı yazmaçlar</td><td>yordamın sonundaki POP'lar</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-kullanicilar">Tablo 8.1.1</a> yığının dört kullanıcısını özetler. Bu notun konusu ilk satırdır: programcının PUSH, POP, PUSHF ve POPF ile yığını kullanması. CALL ve RET'in yığına etkisi yalnız yığının bakış açısından, kısa olarak anılır. Prosedürlerin tanımı, parametre geçirme ve yığın çerçevesi Prosedürler notunun konusudur.</p>
+
+<h3 id="s8-1-1-2"><span class="nt-num">8.1.1.2</span>Son giren ilk çıkar (LIFO)</h3>
+
+<p>Yığın kelimesi günlük hayattaki anlamıyla da bu düzeni iyi anlatır. Masaya üst üste konan tabaklar düşünülebilir. Yeni bir tabak her zaman en üste konur. Bir tabak alınacağı zaman da en üstteki alınır. Ortadaki bir tabağa ulaşmak için önce üstündekilerin hepsi kaldırılmalıdır. En son konan tabak ilk alınır, ilk konan tabak en son alınır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-lifo">
+  <span class="nt-box__title">Tanım 8.1.2</span>
+  <p><strong>LIFO</strong> (<span lang="en">last in, first out</span>), “son giren ilk çıkar” düzenidir. Bir yapıya eklenen son öğe, yapıdan çıkan ilk öğe olur. Yığın LIFO düzeninde çalışır; yalnız en üstteki öğeye erişilir. En üstteki öğeye <strong>yığının üstü</strong> (<span lang="en">top of stack</span>) denir.</p>
+</div>
+
+<p>LIFO'nun tersi FIFO'dur (<span lang="en">first in, first out</span>): ilk giren ilk çıkar. Bir bankadaki sıra ya da klavye tamponu FIFO düzeninde çalışır. İki düzenin farkı en kolay bir sayı dizisiyle görülür. Yığına sırasıyla 1, 2, 3, 4 ve 5 konsun. İlk alınan değer 5 olur. Ardından 4, 3, 2 alınır ve en son 1 alınır. Aynı değerler bir FIFO kuyruğuna konsaydı 1, 2, 3, 4, 5 sırasıyla çıkardı.</p>
+
+<figure class="nt-fig" id="sekil-lifo" style="--w:640px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--3"><svg class="ds-svg" viewBox="0 0 420 280" role="img" aria-label="Yığın: 1, 2, 3, 4, 5"><defs><marker id="n81-1-m8ah6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><path class="axis" d="M120 40 V250 H220 V40"/><rect class="box" x="126" y="210" width="88" height="36" rx="3"/><text class="txt" x="170" y="233" text-anchor="middle">1</text><rect class="box" x="126" y="170" width="88" height="36" rx="3"/><text class="txt" x="170" y="193" text-anchor="middle">2</text><rect class="box" x="126" y="130" width="88" height="36" rx="3"/><text class="txt" x="170" y="153" text-anchor="middle">3</text><rect class="box" x="126" y="90" width="88" height="36" rx="3"/><text class="txt" x="170" y="113" text-anchor="middle">4</text><rect class="box" x="126" y="50" width="88" height="36" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="170" y="73" text-anchor="middle">5</text><text class="lbl" x="170" y="270" text-anchor="middle">yığın</text><path class="line" d="M60 40 V100" marker-end="url(#n81-1-m8ah6)"/><text class="txt" x="60" y="30" text-anchor="middle">PUSH</text><path class="line" d="M280 100 V40" marker-end="url(#n81-1-m8ah6)"/><text class="txt" x="280" y="120" text-anchor="middle">POP</text></svg><svg class="ds-svg" viewBox="0 0 420 280" role="img" aria-label="Yığın: 1, 2, 3"><defs><marker id="n81-2-m8ah8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><path class="axis" d="M120 40 V250 H220 V40"/><rect class="box" x="126" y="210" width="88" height="36" rx="3"/><text class="txt" x="170" y="233" text-anchor="middle">1</text><rect class="box" x="126" y="170" width="88" height="36" rx="3"/><text class="txt" x="170" y="193" text-anchor="middle">2</text><rect class="box" x="126" y="130" width="88" height="36" rx="3"/><text class="txt" x="170" y="153" text-anchor="middle">3</text><text class="lbl" x="170" y="270" text-anchor="middle">yığın</text><path class="line" d="M60 40 V100" marker-end="url(#n81-2-m8ah8)"/><text class="txt" x="60" y="30" text-anchor="middle">PUSH</text><path class="line" d="M280 100 V40" marker-end="url(#n81-2-m8ah8)"/><text class="txt" x="280" y="120" text-anchor="middle">POP</text><rect class="box-empty" x="320" y="30" width="60" height="32" rx="3"/><text class="txt" x="350" y="52" text-anchor="middle">4</text><text class="lbl" x="350" y="80" text-anchor="middle">çıkan</text></svg><svg class="ds-svg" viewBox="0 0 420 280" role="img" aria-label="Yığın: "><defs><marker id="n81-3-m8ah11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><path class="axis" d="M120 40 V250 H220 V40"/><text class="lbl" x="170" y="270" text-anchor="middle">yığın</text><path class="line" d="M60 40 V100" marker-end="url(#n81-3-m8ah11)"/><text class="txt" x="60" y="30" text-anchor="middle">PUSH</text><path class="line" d="M280 100 V40" marker-end="url(#n81-3-m8ah11)"/><text class="txt" x="280" y="120" text-anchor="middle">POP</text><rect class="box-empty" x="320" y="30" width="60" height="32" rx="3"/><text class="txt" x="350" y="52" text-anchor="middle">1</text><text class="lbl" x="350" y="80" text-anchor="middle">çıkan</text></svg></div></div>
+  <figcaption><b>Şekil 8.1.1:</b> LIFO düzeni. Solda 1'den 5'e kadar beş değer itilmiş, 5 yığının üstündedir. Ortada iki POP'tan sonra 5 ve 4 çıkmış, 3 üste gelmiştir. Sağda beş POP'tan sonra yığın boştur; çıkış sırası 5, 4, 3, 2, 1 olmuştur.</figcaption>
+</figure>
+
+<p><a href="#sekil-lifo">Şekil 8.1.1</a> bu süreci üç anda gösterir. Şekildeki yığın kavramsal bir çizimdir; bellekteki adresler henüz yoktur. Önemli olan, her POP'un o anda en üstte duran değeri almasıdır. Üçüncü POP 3'ü alır, çünkü 5 ile 4 daha önce alınmıştır ve yığında 2 ile 1 kalır.</p>
+
+<p>LIFO düzeninin programlamadaki iki sonucu vardır. Birincisi, yığın değerleri ters sırada geri verir. Bu özellik bilerek kullanılabilir: bir diziyi yığına sırayla itip sonra çekmek, diziyi ters çevirir. İkincisi, birkaç yazmaç saklanıp sonra eski yerlerine geri yüklenecekse POP sırası PUSH sırasının tersi olmalıdır. AX, BX ve CX bu sırayla itildiyse geri yükleme sırası CX, BX, AX'tir. Bu kurala <strong>ayna sırası</strong> denir. Kod alt alta yazıldığında PUSH'lar ile POP'lar bir aynadaki görüntü gibi durur.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Yazmaçları <code>PUSH AX</code>, <code>PUSH BX</code> sırasıyla itip <code>POP AX</code>, <code>POP BX</code> sırasıyla geri almak. Bu dizi yazmaçları korumaz, değerlerini takas eder: BX en son itildiği için ilk POP onu AX'e yazar. Hata derleme sırasında fark edilmez, çünkü dört komut da geçerlidir. Program yalnız yanlış sonuç üretir.</p>
+</div>
+
+<h3 id="s8-1-1-3"><span class="nt-num">8.1.1.3</span>Yığın kesimi: SS ve SP</h3>
+
+<p>8086'nın belleği kesimlere ayrılmıştır. Her bellek erişiminde 16 bitlik bir kesim değeri ile 16 bitlik bir bağıl konum birleştirilir. Kod için CS ve IP, veri için çoğu zaman DS ve bir adresleme ifadesi kullanılır. Yığın için de ayrılmış bir yazmaç çifti vardır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-sssp">
+  <span class="nt-box__title">Tanım 8.1.3</span>
+  <p><strong>SS</strong> (<span lang="en">stack segment</span>, yığın kesimi), yığının bulunduğu 64 KB'lık kesimin başlangıcını tutan kesim yazmacıdır. <strong>SP</strong> (<span lang="en">stack pointer</span>, yığın işaretçisi), yığının üstündeki sözcüğün bu kesim içindeki bağıl konumunu tutan 16 bitlik yazmaçtır. SS:SP her zaman yığının üstünü, yani en son konan sözcüğü gösterir. Yığının üstünün fiziksel adresi SS × 10h + SP'dir.</p>
+</div>
+
+<p>Fiziksel adres hesabı, kod ve veri erişimindeki hesapla aynıdır. Kesim değeri 16 ile çarpılır; onaltılık tabanda bu, sayının sağına bir 0 eklemek demektir. Sonra bağıl konum eklenir ve 20 bitlik adres bulunur.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-fiziksel">
+  <span class="nt-box__title">Örnek 8.1.1</span>
+  <p>emu8086 bir .COM programını yüklediğinde bütün kesim yazmaçlarını 0700h yapar ve SP'yi FFFEh'ye ayarlar. Yığının üstünün fiziksel adresi şöyle bulunur:</p>
+  <ol class="nt-steps">
+    <li>Yığın kesimi: SS = 0700h.</li>
+    <li>Kesim değeri 16 ile çarpılır: 0700h × 10h = 07000h.</li>
+    <li>Bağıl konum eklenir: 07000h + FFFEh = 16FFEh.</li>
+  </ol>
+  <p>Yığının üstü 16FFEh fiziksel adresindedir. Toplamada elde oluşur: 7000h + FFFEh = 16FFEh, yani sonuç 16 biti aşar. Adres yolu 20 bit olduğu için bu taşma kaybolmaz; 20 bitlik adreste bit 16 olarak yer alır.</p>
+</div>
+
+<figure class="nt-fig" id="sekil-fiziksel" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 210" role="img" aria-label="Fiziksel yığın adresi hesabı"><defs><marker id="n81-4-m8ah15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="150" y="51" text-anchor="end">SS</text><rect class="box" x="170" y="30" width="150" height="32" rx="4"/><text class="txt mono" x="245" y="51" text-anchor="middle">0700h</text><text class="txt" x="150" y="95" text-anchor="end">SS × 16</text><rect class="box" x="170" y="74" width="150" height="32" rx="4"/><text class="txt mono" x="245" y="95" text-anchor="middle">07000h</text><text class="txt" x="150" y="139" text-anchor="end">+ SP</text><rect class="box" x="170" y="118" width="150" height="32" rx="4"/><text class="txt mono" x="245" y="139" text-anchor="middle">FFFEh</text><text class="txt" x="150" y="183" text-anchor="end">Fiziksel adres</text><rect class="box" x="170" y="162" width="150" height="32" rx="4" style="fill:var(--ds-hot)"/><text class="txt mono" x="245" y="183" text-anchor="middle">16FFEh</text><path class="axis" d="M170 158 H320"/></svg></div>
+  <figcaption><b>Şekil 8.1.2:</b> Yığının üstünün fiziksel adresi. SS = 0700h 16 ile çarpılır (07000h), SP = FFFEh eklenir ve 20 bitlik 16FFEh adresi bulunur.</figcaption>
+</figure>
+
+<p>SS ve SP'nin başlangıç değerlerini çoğu zaman programcı değil, programı belleğe yükleyen işletim sistemi belirler (<a href="#sekil-fiziksel">Şekil 8.1.2</a>). Bir .COM programında kod, veri ve yığın tek bir 64 KB'lık kesimi paylaşır. Yükleyici SS'yi CS ile aynı yapar ve SP'yi kesimin sonuna, FFFEh'ye ayarlar. Bir .EXE programında ise yığın ayrı bir kesimdir. Kesimin yeri ve SP'nin başlangıç değeri .EXE dosyasının başlığında yazılıdır; yükleyici bu değerleri SS ve SP'ye koyar. Kaynak kodda <code>.STACK 100h</code> gibi bir yönerge 256 baytlık bir yığın kesimi ayırır. emu8086'da <code>.stack 100h</code>, <code>.data</code> ve <code>.code</code> sırasıyla yazılmış bir .EXE programı SS = 0710h ve SP = 0100h ile başlar. Yığının üstü bu durumda 07100h + 0100h = 07200h fiziksel adresidir; ilk PUSH 071FEh'ye yazar.</p>
+
+<p>Yığına yalnız SP ile erişilmez. BP (taban işaretçisi) de varsayılan olarak SS kesimini kullanır. <code>MOV AX, [BP+4]</code> gibi bir komut, kesim öneki yazılmadığı hâlde SS:BP+4 adresini okur. Bu yüzden BP yığının içindeki verilere, örneğin bir prosedüre yığından geçirilen parametrelere erişmek için uygun yazmaçtır. SP ise 8086'da adresleme ifadesinde kullanılamaz: <code>MOV AX, [SP]</code> geçersizdir. Yığının üstündeki değeri silmeden okumak için SP önce BX ya da BP'ye kopyalanır.</p>
+
+<p>Programın yığını kendisi taşıması da mümkündür. Bunun için SS ve SP'ye yeni değerler yüklenir. Bu iki yükleme arasında bir kesme gelirse, işlemci FLAGS, CS ve IP'yi yarı eski, yarı yeni bir adrese yazar. 8086 bu tehlikeye karşı bir önlem içerir. Bir kesim yazmacına <code>MOV</code> ya da <code>POP</code> ile yazan komuttan sonra, bir sonraki komut bitene kadar kesme kabul edilmez. Bu yüzden yığın değiştirilirken önce SS, hemen ardından SP yüklenir:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 2000h
+<span class="kw">MOV</span>  SS, AX        <span class="cm">; kesme bir komut ertelenir</span>
+<span class="kw">MOV</span>  SP, 0100h     <span class="cm">; SS:SP = 2000:0100, tutarlı</span></pre>
+
+<p>İki satırın sırası değiştirilirse koruma işe yaramaz. Erteleme yalnız kesim yazmacına yazan komuttan sonraki komutu kapsar.</p>
+
+<h3 id="s8-1-1-4"><span class="nt-num">8.1.1.4</span>Yığın aşağı doğru büyür</h3>
+
+<p>Bir .COM programında 64 KB'lık tek kesimin içinde üç bölge bulunur. Kesimin ilk 256 baytı (0000h–00FFh) program kesim önekidir (<span lang="en">program segment prefix</span>, PSP). DOS bu alanı programı yüklerken doldurur; komut satırı ve dönüş bilgileri buradadır. Program, <code>ORG 100h</code> yönergesinin istediği gibi 0100h adresinden başlar; kod ve veri yukarı doğru yerleşir. Yığın ise kesimin en üstünden, FFFEh'den başlar ve aşağı doğru büyür.</p>
+
+<figure class="nt-fig" id="sekil-yerlesim" style="--w:470px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 470 330" role="img" aria-label="64 KB kesimde PSP, kod ve yığının yerleşimi"><defs><marker id="n81-5-m8ah16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="120" y="20" width="200" height="300" rx="4"/><rect class="box" x="120" y="270" width="200" height="50" rx="2"/><text class="txt" x="220" y="300" text-anchor="middle">PSP (0000–00FFh)</text><rect class="box" x="120" y="215" width="200" height="55" rx="2"/><text class="txt" x="220" y="240" text-anchor="middle">Kod + veri</text><text class="lbl" x="220" y="258" text-anchor="middle">ORG 100h’den başlar</text><path class="line" d="M220 212 V180" marker-end="url(#n81-5-m8ah16)"/><text class="lbl" x="232" y="196">program büyür</text><rect class="box" x="120" y="20" width="200" height="60" rx="2" style="fill:var(--ds-hot)"/><text class="txt" x="220" y="46" text-anchor="middle">Yığın</text><text class="lbl" x="220" y="66" text-anchor="middle">SP = FFFEh’den başlar</text><path class="line" d="M220 84 V120" marker-end="url(#n81-5-m8ah16)"/><text class="lbl" x="232" y="108">yığın büyür (SP azalır)</text><text class="lbl" x="220" y="152" text-anchor="middle">boş alan</text><text class="lbl mono" x="110" y="28" text-anchor="end">FFFFh</text><text class="lbl mono" x="110" y="324" text-anchor="end">0000h</text><text class="lbl mono" x="110" y="274" text-anchor="end">0100h</text><text class="lbl" x="330" y="160">CS = DS = SS = ES</text><text class="lbl" x="330" y="178">= 0700h</text><text class="lbl" x="330" y="196">(tek 64 KB kesim)</text></svg></div>
+  <figcaption><b>Şekil 8.1.3:</b> .COM programında 64 KB'lık kesimin yerleşimi. PSP en altta, kod ve veri 0100h'den yukarı, yığın FFFEh'den aşağı doğru yerleşir. Aradaki boş alanı ikisi de kullanır.</figcaption>
+</figure>
+
+<p>Bu yerleşimin mantığı <a href="#sekil-yerlesim">Şekil 8.1.3</a>'te açıkça görülür. Program ile yığın kesimin iki ucundan birbirine doğru büyür. Programın ne kadar yer kaplayacağı derleme anında bellidir. Yığının ne kadar derinleşeceği ise çalışma anında, çağrıların ve PUSH'ların sayısına göre belirlenir. İki bölgeyi karşılıklı uçlara koymak, aradaki boş alanın tamamını hangisi gerekirse onun kullanmasını sağlar. Yığın yukarı doğru büyüseydi, programın sonuna sabit bir boyut ayırmak gerekirdi ve bu boyut ya fazla ya da yetersiz kalırdı.</p>
+
+<p>Yığının aşağı doğru büyümesinin komutlara yansıması basittir. Her PUSH, SP'yi 2 azaltır. Her POP, SP'yi 2 artırır. SP'nin değeri küçüldükçe yığın derinleşir. Yığındaki sözcük sayısı da SP'den hesaplanır. Örneğin başlangıçta SP = FFFEh, şu anda SP = FFF8h ise yığına (FFFEh − FFF8h) / 2 = 3 sözcük itilmiştir.</p>
+
+<p>Bir .COM programında yığının ne kadar derinleşebileceği de hesaplanabilir. Yığınla diziyi ters çeviren örnek program 26 bayttır ve 0100h–0119h adreslerini kaplar. Programdan sonraki ilk boş bayt 011Ah'dir. Yığın FFFEh'den başlar; n PUSH'tan sonra SP = FFFEh − 2n olur. Yığının programın üzerine yazmaması için SP ≥ 011Ah kalmalıdır. Buradan n ≤ (FFFEh − 011Ah) / 2 = (65 534 − 282) / 2 = 32 626 bulunur. Bu programda yığına 32 626 sözcüğe kadar değer konabilir. Pratikte sınır bundan çok önce gelmez, ama sonsuz bir döngü ya da sonsuz özyineleme bu sınırı kısa sürede aşar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>“Yığının üstü” ifadesini “en yüksek adres” olarak anlamak. Yığının üstü, en son konan sözcüğün bulunduğu ve SP'nin gösterdiği yerdir. Yığın aşağı doğru büyüdüğü için bu yer, yığındaki öğelerin <em>en düşük</em> adreslisidir. Şekillerde küçük adresler yukarıya çizildiğinde üst kelimesi görsel olarak da doğru olur; bu notun yığın şekilleri bu düzeni kullanır.</p>
+</div>
+
+<h3 id="s8-1-1-5"><span class="nt-num">8.1.1.5</span>Yığın erişimi donanımda</h3>
+
+<p>PUSH ve POP, yazılım açısından tek bir komuttur. Donanım açısından ise 8086'nın iki birimi birlikte çalışır. Yürütme birimi (<span lang="en">execution unit</span>, EU) komutu çözer ve SP'yi kendi aritmetik-mantık biriminde 2 azaltır ya da artırır. Veri yolu arabirim birimi (<span lang="en">bus interface unit</span>, BIU) ise fiziksel adresi hesaplar ve belleğe erişir. BIU'daki adres toplayıcı SS'yi 4 bit sola kaydırıp SP'yi ekler. Bulunan 20 bitlik adres, bir bellek yazma (PUSH) ya da okuma (POP) yol çevrimiyle adres/veri hatlarına çıkarılır.</p>
+
+<p>8086'nın veri yolu 16 bittir. Bir sözcük çift bir adreste duruyorsa tek yol çevrimiyle, yani dört saat turunda (T1–T4) taşınır. Bu çevrimde A0 = 0 ve BHE = 0 olur; düşük bayt D0–D7, yüksek bayt D8–D15 hatlarından geçer. SP çift olduğu sürece her PUSH tek bir yazma çevrimi, her POP tek bir okuma çevrimidir. SP tek bir değere düşerse sözcük iki ayrı çevrimle taşınır ve her erişim dört saat turu uzar. Yükleyiciler bu yüzden SP'yi hep çift bir değerle başlatır ve programlar SP'yi tek sayı kadar değiştirmez.</p>
+
+<p>Yığın erişimini dış devreye bildiren bir ayrıntı daha vardır. 8086, her yol çevriminin T2–T4 aralığında A16/S3–A19/S6 hatlarına durum bitleri çıkarır. S4 ve S3 bitleri o çevrimde hangi kesim yazmacının kullanıldığını söyler. S4 = 0 ve S3 = 1 ise o çevrim SS kesimine, yani yığına yapılan bir erişimdir. Bir tasarımcı bu bitleri çözerek yığın erişimlerini ayrı bir bellek bankasına yönlendirebilir ve böylece 1 MB'tan geniş bir bellek alanı kullanabilir. Sıradan PC'lerde bu bitler kullanılmaz, ama mantık analizöründe bir programın yığına ne zaman eriştiğini görmek için işe yararlar.</p>
+
+<div class="nt-tablewrap" id="tab-s4s3">
+<table class="nt-table">
+  <caption>Tablo 8.1.2: 8086'nın S4 ve S3 durum bitleri (yol çevriminin T2–T4 aralığında).</caption>
+  <thead><tr><th scope="col">S4</th><th scope="col">S3</th><th scope="col">Kullanılan kesim</th><th scope="col">Örnek erişim</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>ES (ek kesim)</td><td>dizgi komutlarının hedefi, ES önekli erişim</td></tr>
+    <tr><td>0</td><td>1</td><td>SS (yığın kesimi)</td><td>PUSH, POP, CALL, RET, BP tabanlı erişim</td></tr>
+    <tr><td>1</td><td>0</td><td>CS ya da kesim yok</td><td>komut getirme, G/Ç ve kesme onayı çevrimleri</td></tr>
+    <tr><td>1</td><td>1</td><td>DS (veri kesimi)</td><td>sıradan değişken erişimi</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>8088'de durum farklıdır. 8088'in dış veri yolu 8 bittir; her sözcük iki ayrı bayt çevrimiyle taşınır. Bu yüzden 8088'de her PUSH ve POP, SP çift olsa bile iki bellek çevrimi sürer. Programlama açısından iki işlemci aynıdır; yalnız süreler değişir. Bu notun bütün örnekleri 8086 içindir.</p>
+
+<h2 class="nt-pb" id="s8-1-2"><span class="nt-num">8.1.2</span>PUSH ve POP</h2>
+
+<h3 id="s8-1-2-1"><span class="nt-num">8.1.2.1</span>PUSH komutu</h3>
+
+<p><code>PUSH kaynak</code> komutu 16 bitlik kaynağın bir kopyasını yığının üstüne koyar. Kaynak değişmez; yığında onun bir kopyası oluşur. Kaynak dört türden olabilir: genel amaçlı ya da işaretçi yazmacı, kesim yazmacı, bellekteki bir sözcük ve 80186'dan itibaren anlık değer. <a href="#tab-push">Tablo 8.1.3</a> bu türleri örnekleriyle verir.</p>
+
+<div class="nt-tablewrap" id="tab-push">
+<table class="nt-table">
+  <caption>Tablo 8.1.3: PUSH komutunun işlenen türleri.</caption>
+  <thead><tr><th scope="col">Biçim</th><th scope="col">Geçerli işlenenler</th><th scope="col">Örnek</th></tr></thead>
+  <tbody>
+    <tr><td>PUSH yazmaç</td><td>AX, BX, CX, DX, SI, DI, BP, SP</td><td><code>PUSH AX</code></td></tr>
+    <tr><td>PUSH kesim yazmacı</td><td>CS, DS, SS, ES</td><td><code>PUSH DS</code></td></tr>
+    <tr><td>PUSH bellek</td><td><code>[BX]</code>, <code>[BX+SI+7]</code>, 16 bitlik değişken</td><td><code>PUSH [BX]</code>, <code>PUSH sayi</code></td></tr>
+    <tr><td>PUSH anlık değer</td><td>5, −24, 3Fh, 10001101b</td><td><code>PUSH 3Fh</code> (8086'da yok)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun son satırı bir uyarı taşır. Anlık değerle PUSH, 8086 ve 8088'in komut kümesinde yoktur; 80186 ile gelmiştir. emu8086 bu komutu kabul eder ve çalıştırır. Ama gerçek bir 8086 için yazılan programda bir sabit önce bir yazmaca yüklenir, sonra yazmaç itilir:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 5
+<span class="kw">PUSH</span> AX          <span class="cm">; 8086 için PUSH 5 yerine</span></pre>
+
+<p>Bellek işlenenli PUSH'ta işlenenin boyutu sözcük olmalıdır. <code>sayi DW 0BEEFh</code> olarak tanımlanmış bir değişken için <code>PUSH sayi</code> geçerlidir; değişkenin iki baytı yığına kopyalanır. <code>DB</code> ile tanımlanmış bir bayt değişkeni ise itilemez. Aynı kural yazmaçlar için de geçerlidir: <code>PUSH AL</code> ve <code>PUSH byte_degisken</code> derleme hatası verir. Bayrak yazmacı ise sıradan bir işlenen olarak yazılamaz; onun için ayrı bir komut, <code>PUSHF</code> vardır.</p>
+
+<p>SP'nin kendisini itmek ilginç bir ayrıntı taşır. <code>PUSH SP</code> komutu SP'yi hem azaltır hem de yığına yazar; hangisinin önce olduğu sonucu değiştirir. 8086 önce SP'yi azaltır, sonra <em>azaltılmış</em> değeri yazar. SP = FFFEh iken <code>PUSH SP</code> yığına FFFCh koyar. 80286 ve sonraki işlemciler ise azaltmadan önceki değeri, FFFEh'yi yazar. Bu fark, eski programlarda işlemcinin 8086 mı yoksa 80286 mı olduğunu anlamak için kullanılmıştır. Taşınabilir bir programda <code>PUSH SP</code>'ye güvenilmez; SP'nin değeri gerekiyorsa önce başka bir yazmaca kopyalanır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>emu8086'da <code>PUSH 5</code> çalıştı diye bu komutu 8086 komutu sanmak. emu8086 bazı 80186 komutlarını kabul eder ve yalnız uyarı verir. Aynı kod gerçek bir 8086 ya da 8088 üzerinde çalıştırıldığında işlemci bu baytları başka bir komut gibi yorumlar ve program beklenmedik biçimde davranır.</p>
+</div>
+
+<h3 id="s8-1-2-2"><span class="nt-num">8.1.2.2</span>POP komutu</h3>
+
+<p><code>POP hedef</code> komutu yığının üstündeki sözcüğü okur, hedefe yazar ve yığının üstünü bir sözcük yukarı taşır. Hedef türleri PUSH'un kaynak türlerine benzer, ama iki eksik vardır (<a href="#tab-pop">Tablo 8.1.4</a>).</p>
+
+<div class="nt-tablewrap" id="tab-pop">
+<table class="nt-table">
+  <caption>Tablo 8.1.4: POP komutunun işlenen türleri.</caption>
+  <thead><tr><th scope="col">Biçim</th><th scope="col">Geçerli işlenenler</th><th scope="col">Örnek</th></tr></thead>
+  <tbody>
+    <tr><td>POP yazmaç</td><td>AX, BX, CX, DX, SI, DI, BP, SP</td><td><code>POP BX</code></td></tr>
+    <tr><td>POP kesim yazmacı</td><td>DS, SS, ES (CS hariç)</td><td><code>POP DS</code></td></tr>
+    <tr><td>POP bellek</td><td><code>[BX]</code>, <code>[BX+SI+7]</code>, 16 bitlik değişken</td><td><code>POP sonuc</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Neden POP CS yok?</strong> CS, komutların getirildiği kesimi belirler. <code>POP CS</code> CS'yi değiştirip IP'yi olduğu gibi bıraksaydı, bir sonraki komut bambaşka bir kesimin aynı bağıl konumundan getirilirdi. Program akışı rastgele bir yere atlardı. Bu yüzden CS yalnız IP ile birlikte değişir: uzak <code>JMP</code> ve <code>CALL</code>, <code>RETF</code>, <code>INT</code> ve <code>IRET</code> CS'yi ve IP'yi aynı komutta yükler. Assembler'lar <code>POP CS</code> yazımını kabul etmez. İlk 8086'larda bu komutun kodu (0Fh) belgelenmemiş biçimde çalışıyordu; Intel bu kodu 80286'da iki baytlık yeni komutların öneki olarak kullandı.</p>
+
+<p><strong>Neden POP sabit yok?</strong> <code>POP 5</code> anlamsızdır. POP yığından bir değer alır ve bu değerin yazılacağı bir yer gerekir. Bir sabit, değer yazılabilecek bir yer değildir. Yığının üstündeki değer gerekmiyorsa ve yalnız atılmak isteniyorsa iki yol vardır. Değer kullanılmayan bir yazmaca alınır ya da SP'ye doğrudan 2 eklenir (<code>ADD SP, 2</code>). İkinci yol bayrakları değiştirir; birincisi değiştirmez.</p>
+
+<p><strong>Bayraklar.</strong> PUSH ve POP bayraklara dokunmaz. <code>POP AX</code> ile AX'e 0000h gelse bile ZF değişmez; ZF'yi değiştiren bir aritmetik ya da mantık işlemidir, veri taşıma değil. Bu kuralın tek istisnası <code>POPF</code>'tir. POPF yığından aldığı sözcüğü bayrak yazmacının tamamına yükler.</p>
+
+<p><strong>Kesim yazmaçları arasında kopyalama.</strong> 8086'da bir kesim yazmacından diğerine doğrudan <code>MOV</code> yoktur; <code>MOV DS, CS</code> geçersizdir. Bu kopyalama iki yolla yapılır. Ya değer genel amaçlı bir yazmaç üzerinden aktarılır (<code>MOV AX, CS</code> ve <code>MOV DS, AX</code>) ya da yığın kullanılır:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> CS          <span class="cm">; CS'nin değeri yığına</span>
+<span class="kw">POP</span>  DS          <span class="cm">; DS ← CS</span>
+<span class="kw">PUSH</span> DS          <span class="cm">; DS'nin değeri yığına</span>
+<span class="kw">POP</span>  ES          <span class="cm">; ES ← DS</span></pre>
+
+<p>Yığınla kopyalamanın üstünlüğü, hiçbir genel amaçlı yazmacı bozmamasıdır. AX'in değeri korunmak isteniyorsa ilk yol AX'i ayrıca saklamayı gerektirir; ikinci yol gerektirmez. <code>PUSH CS</code> ile <code>POP DS</code> deyimi, verisi kod kesiminde duran programlarda ve kesme yordamlarının başında sık görülür. emu8086'da DS = 1234h yapılıp bu dört komut çalıştırıldığında ES = 1234h ve DS = 0700h olur; SP yeniden FFFEh'ye döner.</p>
+
+<h3 id="s8-1-2-3"><span class="nt-num">8.1.2.3</span>PUSH ve POP nasıl çalışır?</h3>
+
+<p>Her iki komut da iki adımdan oluşur. Adımların sırası, SP'nin her an neyi gösterdiğini belirler.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-pushpop">
+  <span class="nt-box__title">Tanım 8.1.4</span>
+  <p><strong>PUSH kaynak</strong>: (1) SP ← SP − 2; (2) [SS:SP] ← kaynak. <strong>POP hedef</strong>: (1) hedef ← [SS:SP]; (2) SP ← SP + 2. PUSH önce azaltır sonra yazar; POP önce okur sonra artırır. Böylece SP her an dolu olan en üst hücreyi gösterir.</p>
+</div>
+
+<p>Bu sıralamaya “dolu yığın” düzeni denir. SP'nin gösterdiği hücrede her zaman geçerli bir değer vardır. Bazı işlemciler ters düzeni kullanır: SP bir sonraki boş hücreyi gösterir, PUSH önce yazar sonra azaltır. Hangi düzen seçilirse seçilsin, PUSH ile POP birbirinin tam tersi olmalıdır. 8086'da PUSH “azalt, yaz”, POP ise “oku, artır” biçimindedir.</p>
+
+<figure class="nt-fig" id="sekil-pushpop" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFEh"><defs><marker id="n81-6-m8ah17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><path class="line" d="M256 97 L216 97" marker-end="url(#n81-6-m8ah17)"/><text class="txt" x="260" y="102" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text><text class="txt" x="10" y="138"></text></svg><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFCh"><defs><marker id="n81-7-m8ah18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">····</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><path class="line" d="M256 72 L216 72" marker-end="url(#n81-7-m8ah18)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text><text class="txt" x="10" y="138">PUSH AX · 1</text></svg><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFCh"><defs><marker id="n81-8-m8ah19" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">1234h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><path class="line" d="M256 72 L216 72" marker-end="url(#n81-8-m8ah19)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text><text class="txt" x="10" y="138">PUSH AX · 2</text></svg><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFEh"><defs><marker id="n81-9-m8ah21" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle" style="opacity:.45">1234h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><rect class="box" x="92" y="85" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><path class="line" d="M256 97 L216 97" marker-end="url(#n81-9-m8ah21)"/><text class="txt" x="260" y="102" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text><text class="txt" x="10" y="138">POP BX · 2</text></svg></div></div>
+  <figcaption><b>Şekil 8.1.4:</b> AX = 1234h iken PUSH AX ve POP BX. Sol üstte başlangıç: SP = FFFEh, orada DOS'un koyduğu 0000h vardır. Sağ üstte PUSH'un birinci adımı: SP = FFFCh, yeni hücre henüz yazılmamıştır. Sol altta ikinci adım: [FFFCh] ← 1234h. Sağ altta POP BX bitmiştir: BX = 1234h, SP = FFFEh; FFFCh'deki 1234h silinmemiş, yalnız yığının dışında kalmıştır.</figcaption>
+</figure>
+
+<p><a href="#sekil-pushpop">Şekil 8.1.4</a> iki komutu dört anda gösterir. Başlangıçta SP = FFFEh'dir ve AX = 1234h'dir. FFFEh adresinde DOS'un .COM programı için koyduğu 0000h sözcüğü durur; bu sözcüğün görevi program sonunda anlatılır.</p>
+
+<ol>
+  <li><strong>PUSH AX, adım 1.</strong> SP ← FFFEh − 2 = FFFCh. Yığının üstü bir sözcük aşağı iner. FFFCh'deki hücrede şimdilik eski, anlamsız bir değer vardır.</li>
+  <li><strong>PUSH AX, adım 2.</strong> [SS:FFFCh] ← 1234h. Yeni üst hücreye AX'in kopyası yazılır. AX değişmez.</li>
+  <li><strong>POP BX, adım 1.</strong> BX ← [SS:FFFCh] = 1234h. Değer yığının üstünden okunur.</li>
+  <li><strong>POP BX, adım 2.</strong> SP ← FFFCh + 2 = FFFEh. Yığının üstü bir sözcük yukarı çıkar.</li>
+</ol>
+
+<p>Son adımın önemli bir sonucu vardır. POP, okuduğu değeri bellekten silmez. FFFCh'deki 1234h orada durmaya devam eder; yalnız artık SP'nin üstünde, yani yığının dışında kalmıştır. Şekilde bu hücre soluk çizilmiştir. Bir sonraki PUSH aynı hücrenin üzerine yazar. Bu yüzden yığından alınmış bir değere bellekten yeniden erişmeye çalışmak güvenilir değildir. Arada bir kesme gelirse, işlemci FLAGS, CS ve IP'yi tam o hücrelere yazar ve eski değer kaybolur.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>POP'tan sonra değerin bellekten silindiğini, yerine 0 yazıldığını düşünmek. POP yalnız okur ve SP'yi artırır. emu8086'nın bellek penceresinde eski değerler görünmeye devam eder. Bu değerler “yığında” değildir; yığın yalnız SP'den FFFEh'ye kadar olan bölgedir.</p>
+</div>
+
+<h3 id="s8-1-2-4"><span class="nt-num">8.1.2.4</span>Yığında bayt sırası</h3>
+
+<p>Yığın sözcüklerle çalışır, bellek ise baytlarla adreslenir. Bir sözcük belleğe yazılırken iki baytına iki ayrı adres verilir. 8086 bu işte little-endian (<span lang="en">little-endian</span>) düzeni kullanır: sözcüğün düşük baytı düşük adrese, yüksek baytı bir sonraki adrese yazılır. Kural yığın için de aynıdır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bayt" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 172" role="img" aria-label="1234h değerinin yığında baytlara ayrılması"><defs><marker id="n81-10-m8ah22" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="20" y="22">Sözcük görünümü</text><rect class="box" x="20" y="32" width="140" height="34" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="90" y="55" text-anchor="middle">1234h</text><text class="lbl mono" x="170" y="55">SS:FFFC</text><text class="lbl" x="300" y="22">Bayt görünümü (bellek)</text><rect class="box" x="300" y="32" width="80" height="30" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="340" y="52" text-anchor="middle">34h</text><text class="lbl mono" x="390" y="52">FFFC</text><rect class="box" x="300" y="66" width="80" height="30" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="340" y="86" text-anchor="middle">12h</text><text class="lbl mono" x="390" y="86">FFFD</text><rect class="box" x="300" y="100" width="80" height="30" rx="2"/><text class="txt mono" x="340" y="120" text-anchor="middle">00h</text><text class="lbl mono" x="390" y="120">FFFE</text><rect class="box" x="300" y="134" width="80" height="30" rx="2"/><text class="txt mono" x="340" y="154" text-anchor="middle">00h</text><text class="lbl mono" x="390" y="154">FFFF</text><text class="lbl" x="440" y="52">← düşük bayt (AL)</text><text class="lbl" x="440" y="86">← yüksek bayt (AH)</text><text class="lbl" x="440" y="136">DOS’un 0000h sözcüğü</text></svg></div>
+  <figcaption><b>Şekil 8.1.5:</b> PUSH AX (AX = 1234h) sonrasında yığın. Solda sözcük görünümü: SS:FFFC'de 1234h. Sağda bayt görünümü: [FFFCh] = 34h (AL), [FFFDh] = 12h (AH); FFFEh ve FFFFh'de DOS'un 0000h sözcüğü.</figcaption>
+</figure>
+
+<p>AX = 1234h iken <code>PUSH AX</code> çalıştığında SP = FFFCh olur. Sözcüğün düşük baytı 34h (AL) FFFCh adresine, yüksek baytı 12h (AH) FFFDh adresine yazılır (<a href="#sekil-bayt">Şekil 8.1.5</a>). SP her zaman sözcüğün düşük baytını, yani daha küçük adresi gösterir. emu8086'nın yığın penceresi sözcükleri gösterir ve bu satırda 1234h yazar. Bellek penceresi ise baytları sırayla gösterir: önce 34, sonra 12. İki pencere aynı veriyi farklı biçimde sunar. Bellek penceresinde değerin “ters” görünmesi bir hata değil, little-endian düzenin doğal sonucudur.</p>
+
+<p>Bu düzen bir programla da sınanabilir. Yığının üstündeki baytları okumak için SP bir taban yazmacına kopyalanır, çünkü 8086'da <code>[SP]</code> adresleme ifadesi yoktur:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 1234h
+<span class="kw">PUSH</span> AX
+<span class="kw">MOV</span>  BX, SP        <span class="cm">; BX = FFFCh</span>
+<span class="kw">MOV</span>  CL, [BX]      <span class="cm">; CL = 34h, düşük bayt</span>
+<span class="kw">MOV</span>  CH, [BX+1]    <span class="cm">; CH = 12h, yüksek bayt</span>
+<span class="kw">POP</span>  DX            <span class="cm">; DX = 1234h</span></pre>
+
+<p>Program şöyle çalışır. <code>PUSH AX</code> SP'yi FFFCh yapar ve 34h ile 12h baytlarını FFFCh ve FFFDh'ye yazar. <code>MOV BX, SP</code> BX'i FFFCh yapar. <code>[BX]</code> varsayılan olarak DS kesimini kullanır. .COM programında DS = SS olduğu için DS:FFFCh, yığının üstüyle aynı fiziksel adrestir: 07000h + FFFCh = 16FFCh. <code>MOV CL, [BX]</code> buradan 34h'yi, <code>MOV CH, [BX+1]</code> 16FFDh'den 12h'yi okur. CX = 1234h olur. Son olarak <code>POP DX</code> iki baytı yeniden sözcük olarak okur: DX = 1234h. Bir .EXE programında DS ile SS farklı olabilir. O zaman <code>[BX]</code> yığını değil veri kesimini okur; bu durumda <code>SS:[BX]</code> yazmak ya da BX yerine BP kullanmak gerekir.</p>
+
+<p>SP'nin çift kalması da bayt düzeyindeki bu yapıyla ilgilidir. SP çift olduğu sürece her yığın sözcüğü çift bir adreste başlar ve 8086 onu tek yol çevrimiyle taşır. SP tek olsaydı sözcüğün düşük baytı tek, yüksek baytı çift adrese düşer ve iki ayrı çevrim gerekirdi. Program yine doğru çalışır, yalnız yavaşlar.</p>
+
+<h3 id="s8-1-2-5"><span class="nt-num">8.1.2.5</span>Ne değişir, ne değişmez?</h3>
+
+<p>Yığını kullanan bütün komutlar SP'yi değiştirir. Belleğe yazıp yazmadıkları, bir hedefi değiştirip değiştirmedikleri ve bayraklara etkileri ise farklıdır. <a href="#tab-degisir">Tablo 8.1.5</a> bu etkileri yan yana verir.</p>
+
+<div class="nt-tablewrap" id="tab-degisir">
+<table class="nt-table">
+  <caption>Tablo 8.1.5: Yığın komutlarının SP'ye, belleğe, hedefe ve bayraklara etkisi.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">SP</th><th scope="col">Bellek</th><th scope="col">Hedef</th><th scope="col">Bayraklar</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSH kaynak</code></td><td>−2</td><td>[SS:SP] ← kaynak</td><td>—</td><td>değişmez</td></tr>
+    <tr><td><code>POP hedef</code></td><td>+2</td><td>okunur, silinmez</td><td>hedef ← [SS:SP]</td><td>değişmez</td></tr>
+    <tr><td><code>PUSHF</code></td><td>−2</td><td>[SS:SP] ← FLAGS</td><td>—</td><td>değişmez</td></tr>
+    <tr><td><code>POPF</code></td><td>+2</td><td>okunur</td><td>FLAGS ← [SS:SP]</td><td>hepsi yüklenir</td></tr>
+    <tr><td><code>CALL</code> (yakın)</td><td>−2</td><td>[SS:SP] ← dönüş IP'si</td><td>IP ← hedef</td><td>değişmez</td></tr>
+    <tr><td><code>RET</code> (yakın)</td><td>+2</td><td>okunur</td><td>IP ← [SS:SP]</td><td>değişmez</td></tr>
+    <tr><td><code>INT n</code></td><td>−6</td><td>FLAGS, CS, IP</td><td>CS:IP ← vektör</td><td>IF = TF = 0</td></tr>
+    <tr><td><code>IRET</code></td><td>+6</td><td>okunur</td><td>IP, CS, FLAGS</td><td>hepsi yüklenir</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun en önemli sütunu sonuncusudur. PUSH, POP ve PUSHF bayraklara dokunmaz. Bu sayede bir karşılaştırmanın sonucu, yani bayraklar, PUSH ve POP arasında güvenle taşınabilir. Aşağıdaki kodda <code>CMP</code> ZF'yi 1 yapar. Ardından AX yığına konur, değiştirilir ve geri alınır. Bu üç komut ZF'ye dokunmadığı için <code>JE</code> yine atlar:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 5
+<span class="kw">CMP</span>  AX, 5         <span class="cm">; ZF = 1</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">MOV</span>  AX, 7         <span class="cm">; MOV bayrakları değiştirmez</span>
+<span class="kw">POP</span>  AX            <span class="cm">; AX = 5, ZF hâlâ 1</span>
+<span class="kw">JE</span>   esit          <span class="cm">; atlar</span></pre>
+
+<p>Arada bayrakları değiştiren bir komut, örneğin bir <code>ADD</code> olsaydı, karşılaştırmanın sonucu kaybolurdu. O durumda bayrakları saklamak için <code>PUSHF</code> ve <code>POPF</code> kullanılır. CALL ve RET'in yığın etkisi PUSH ve POP'unkine çok benzer: CALL dönüş adresini iter, RET onu çeker. Fark, hedefin bir yazmaç değil IP olmasıdır. INT ise üç sözcük, yani 6 bayt iter ve bu komutlar arasında bayrakları değiştiren tek itme komutudur: kesme yordamına girerken IF ve TF sıfırlanır.</p>
+
+<h3 id="s8-1-2-6"><span class="nt-num">8.1.2.6</span>Makine kodları ve saat turları</h3>
+
+<p>Yığın komutları 8086'nın en kısa komutları arasındadır. Bir yazmacı itmek ya da çekmek tek bayt tutar. İşlem kodunun beş biti komutu, kalan üç biti yazmacı belirler. <code>PUSH</code> için kod 50h + r, <code>POP</code> için 58h + r biçimindedir. Yazmaç numaraları 8086'nın genel sırasını izler: AX = 0, CX = 1, DX = 2, BX = 3, SP = 4, BP = 5, SI = 6, DI = 7. Bu yüzden <code>PUSH AX</code> = 50h, <code>PUSH BX</code> = 53h, <code>POP BX</code> = 5Bh ve <code>POP DI</code> = 5Fh'dir.</p>
+
+<p>Kesim yazmaçları da tek bayttır. İtme kodu 06h + 8 × s, çekme kodu 07h + 8 × s biçimindedir; s, ES = 0, CS = 1, SS = 2, DS = 3 numarasıdır. <code>PUSH ES</code> = 06h, <code>PUSH CS</code> = 0Eh, <code>PUSH SS</code> = 16h, <code>PUSH DS</code> = 1Eh; <code>POP ES</code> = 07h, <code>POP SS</code> = 17h, <code>POP DS</code> = 1Fh'dir. Bu düzende <code>POP CS</code>'nin kodu 0Fh olurdu; bu kod POP CS ile birlikte kullanım dışı kaldı. Bellek işlenenli biçimler ModR/M baytı kullanır: <code>PUSH bellek</code> = FFh /6, <code>POP bellek</code> = 8Fh /0. Örneğin 0109h adresindeki bir değişken için <code>PUSH sayi</code> = FF 36 09 01, dört bayttır. <code>PUSHF</code> = 9Ch ve <code>POPF</code> = 9Dh'dir.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Tablo 8.1.6: Yığın komutlarının kodları ve 8086 saat turları (Intel 8086 kılavuzu; EA = etkin adres hesabının süresi).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">Bayt</th><th scope="col">Saat turu</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSH yazmaç</code></td><td>50h + r</td><td>1</td><td>11</td></tr>
+    <tr><td><code>PUSH kesim</code></td><td>06h + 8s</td><td>1</td><td>10</td></tr>
+    <tr><td><code>PUSH bellek</code></td><td>FFh /6</td><td>2–4</td><td>16 + EA</td></tr>
+    <tr><td><code>POP yazmaç</code></td><td>58h + r</td><td>1</td><td>8</td></tr>
+    <tr><td><code>POP kesim</code></td><td>07h + 8s</td><td>1</td><td>8</td></tr>
+    <tr><td><code>POP bellek</code></td><td>8Fh /0</td><td>2–4</td><td>17 + EA</td></tr>
+    <tr><td><code>PUSHF</code></td><td>9Ch</td><td>1</td><td>10</td></tr>
+    <tr><td><code>POPF</code></td><td>9Dh</td><td>1</td><td>8</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-tur">Tablo 8.1.6</a>'daki süreler sözcüklerin çift adreste durduğu durum içindir. Bir PUSH 11 saat turu sürer; 5 MHz'lik bir 8086'da bir saat turu 200 ns olduğundan bu 2,2 µs eder. Bu sürenin dört turu bellek yazma çevrimidir; geri kalanı komutun çözülmesi ve SP'nin azaltılmasıdır. Bellek işlenenli biçimlerde iki bellek erişimi vardır: biri değişkene, biri yığına. Süre bu yüzden daha uzundur ve etkin adres hesabının süresi de eklenir. 8088'de her sözcük erişimine dört tur daha eklenir.</p>
+
+<h2 class="nt-pb" id="s8-1-3"><span class="nt-num">8.1.3</span>Örnekler: kod izleme</h2>
+
+<p>Bu kesimdeki programların hepsi emu8086'da .COM programı olarak çalıştırılmıştır. Başlangıçta CS = DS = SS = ES = 0700h, IP = 0100h ve SP = FFFEh'dir; aksi belirtilmedikçe diğer yazmaçlar 0000h'dir. İzleme tablolarında her satır, o komut yürütüldükten <em>sonraki</em> durumu verir. O satırda değişen değerler vurgulanmıştır. Yığın sütunu yalnız SP'nin gösterdiği ve onun altındaki dolu hücreleri gösterir; FFFEh'deki 0000h, DOS'un .COM programı için koyduğu sözcüktür.</p>
+
+<h3 id="s8-1-3-1"><span class="nt-num">8.1.3.1</span>İlk örnek: PUSH AX / POP BX</h3>
+
+<p>İlk program bir değeri AX'ten BX'e yığın üzerinden kopyalar. Bu iş bir <code>MOV BX, AX</code> ile de yapılabilirdi; amaç yığının işleyişini en sade biçimde görmektir.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>    100h
+<span class="kw">MOV</span>    AX, 42     <span class="cm">; AX'e 42 ata</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; AX'i yığına koy</span>
+<span class="kw">POP</span>    BX         <span class="cm">; yığından BX'e al</span>
+<span class="kw">RET</span>               <span class="cm">; işletim sistemine dön</span>
+<span class="dir">END</span></code></pre>
+
+<p>Program dört komuttan ve 6 bayttan oluşur: <code>MOV AX, 42</code> 3 bayt (B8 2A 00, 0100h–0102h), <code>PUSH AX</code> 1 bayt (50, 0103h), <code>POP BX</code> 1 bayt (5B, 0104h) ve <code>RET</code> 1 bayttır (C3, 0105h).</p>
+
+<p><code>MOV AX, 42</code> satırında sayının sonunda h yoktur. Assembler onu onluk sayı olarak okur: 42 = 2 × 16 + 10 = 2Ah. AX = 002Ah olur, 0042h değil. Bu küçük ayrıntı emu8086'da yeni başlayanların en sık şaşırdığı noktalardan biridir. <code>PUSH AX</code> SP'yi FFFEh − 2 = FFFCh yapar ve [FFFCh] ← 002Ah yazar; bayt düzeyinde [FFFCh] = 2Ah, [FFFDh] = 00h olur. <code>POP BX</code> FFFCh'deki 002Ah'yi BX'e alır ve SP'yi FFFEh'ye geri getirir. Değer AX'ten BX'e yığın üzerinden kopyalanmıştır; AX de değerini korur.</p>
+
+<div class="nt-tablewrap" id="tab-iz1">
+<table class="nt-table">
+  <caption>Tablo 8.1.7: PUSH AX / POP BX programının izlemesi.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">IP (sonraki)</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Yığın (üstten)</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>0100h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV AX, 42</code></td><td>0103h</td><td class="n81-chg">002Ah</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0104h</td><td>002Ah</td><td>0000h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">002Ah, 0000h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0105h</td><td>002Ah</td><td class="n81-chg">002Ah</td><td class="n81-chg">FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>RET</code></td><td class="n81-chg">0000h</td><td>002Ah</td><td>002Ah</td><td class="n81-chg">0000h</td><td>(boş)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Son satır yığının programın sonundaki rolünü gösterir (<a href="#tab-iz1">Tablo 8.1.7</a>). <code>RET</code> yığının üstündeki sözcüğü dönüş adresi olarak alır. Yığında yalnız DOS'un koyduğu 0000h vardır; IP = 0000h ve SP = FFFEh + 2 = 0000h olur. SP 16 bitte sarar. İşlemci 0700:0000 adresine, yani PSP'nin başına gider. PSP'nin ilk iki baytı CD 20'dir; bu, programı sonlandıran <code>INT 20h</code> komutudur. Program böylece düzgün biter. Bu düzenek ancak yığın dengeliyse çalışır: RET'e gelindiğinde yığının üstünde DOS'un 0000h'si durmalıdır.</p>
+
+<h3 id="s8-1-3-2"><span class="nt-num">8.1.3.2</span>LIFO sırası: 1, 2, 3 girer, 3, 2, 1 çıkar</h3>
+
+<p>İkinci program LIFO düzenini gerçek yazmaçlarla gösterir. AX'e sırayla 1, 2 ve 3 yüklenir ve her değer yığına itilir. Ardından üç kez <code>POP BX</code> yapılır.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>    AX, 1      <span class="cm">; AX'e 1 ata</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; 1'i yığına koy</span>
+<span class="kw">MOV</span>    AX, 2      <span class="cm">; AX'e 2 ata</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; 2'yi yığına koy</span>
+<span class="kw">MOV</span>    AX, 3      <span class="cm">; AX'e 3 ata</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; 3'ü yığına koy</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← 3</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← 2</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← 1</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz2">
+<table class="nt-table">
+  <caption>Tablo 8.1.8: LIFO sırası programının izlemesi.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Yığın (üstten, DOS sözcüğü hariç)</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td><code>MOV AX, 1</code></td><td class="n81-chg">0001h</td><td>0000h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0001h</td><td>0000h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">0001h</td></tr>
+    <tr><td><code>MOV AX, 2</code></td><td class="n81-chg">0002h</td><td>0000h</td><td>FFFCh</td><td>0001h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0002h</td><td>0000h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">0002h, 0001h</td></tr>
+    <tr><td><code>MOV AX, 3</code></td><td class="n81-chg">0003h</td><td>0000h</td><td>FFFAh</td><td>0002h, 0001h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0003h</td><td>0000h</td><td class="n81-chg">FFF8h</td><td class="n81-chg">0003h, 0002h, 0001h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0003h</td><td class="n81-chg">0003h</td><td class="n81-chg">FFFAh</td><td>0002h, 0001h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0003h</td><td class="n81-chg">0002h</td><td class="n81-chg">FFFCh</td><td>0001h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0003h</td><td class="n81-chg">0001h</td><td class="n81-chg">FFFEh</td><td>(boş)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İzlemede iki nokta dikkat çeker (<a href="#tab-iz2">Tablo 8.1.8</a>). Birincisi, AX'e yeni bir değer yüklendiğinde eski değer kaybolmaz; bir önceki PUSH onu yığına kopyalamıştır. AX = 0002h olduğunda 0001h yığında güvendedir. İkincisi, BX'e gelen değerler giriş sırasının tersidir: önce 3, sonra 2, sonra 1. Üç PUSH ve üç POP yapıldığı için SP başladığı yere, FFFEh'ye döner. Programın sonunda AX = 0003h kalır, çünkü AX'e son yüklenen değer 3'tür ve POP'lar yalnız BX'i değiştirir.</p>
+
+<h3 id="s8-1-3-3"><span class="nt-num">8.1.3.3</span>Bir yazmacın değerini saklamak</h3>
+
+<p>Yığının en yaygın kullanımı bir yazmacı geçici olarak başka bir iş için kullanıp sonra eski değerine döndürmektir. Program önce AX'e 1234h yükler. Sonra AX'i saklar, AX'e başka bir değer yazar ve saklanan değeri geri yükler.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>    100h
+<span class="kw">MOV</span>    AX, 1234h
+<span class="kw">PUSH</span>   AX         <span class="cm">; AX'in değerini sakla</span>
+<span class="kw">MOV</span>    AX, 5678h  <span class="cm">; AX'i değiştir</span>
+<span class="kw">POP</span>    AX         <span class="cm">; eski değeri geri yükle</span>
+<span class="kw">RET</span>
+<span class="dir">END</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz3">
+<table class="nt-table">
+  <caption>Tablo 8.1.9: Değer saklama programının izlemesi.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">[FFFCh]</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 1234h</code></td><td class="n81-chg">1234h</td><td>FFFEh</td><td>—</td><td>korunacak değer</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>1234h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">1234h</td><td>AX'in kopyası yığında</td></tr>
+    <tr><td><code>MOV AX, 5678h</code></td><td class="n81-chg">5678h</td><td>FFFCh</td><td>1234h</td><td>AX başka bir iş için kullanılıyor</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n81-chg">1234h</td><td class="n81-chg">FFFEh</td><td>1234h</td><td>eski değer geri geldi; hücre silinmedi</td></tr>
+    <tr><td><code>RET</code></td><td>1234h</td><td class="n81-chg">0000h</td><td>1234h</td><td>IP ← 0000h, PSP'deki INT 20h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Program 9 bayttır: iki üç baytlık MOV, birer baytlık PUSH, POP ve RET. <a href="#tab-iz3">Tablo 8.1.9</a>'un dördüncü sütunu POP'un belleği silmediğini bir kez daha gösterir: POP'tan sonra da [FFFCh] = 1234h'dir. Bu desen, prosedürlerin girişinde kullandıkları yazmaçları PUSH ve çıkışta POP etmesinin aynısıdır. Bir prosedür AX'i bozacaksa girişte <code>PUSH AX</code>, çıkışta <code>POP AX</code> yazar. Prosedürü çağıran program AX'in değiştiğini fark etmez. Bu yönteme yazmaçların korunması denir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-hesap">
+  <span class="nt-box__title">Örnek 8.1.2</span>
+  <p>AX'te bir döngünün sayacı, BX'te bir dizinin adresi duruyor. Döngünün ortasında ekrana bir karakter yazmak için AH = 02h ve DL = karakter yüklenip <code>INT 21h</code> çağrılacaktır. INT 21h'nin 02h işlevi AL'yi de değiştirir: işlev bittiğinde AL, yazılan karakterdir. AX'in iki yarısı da bozulacağı için yazdırma şöyle sarılır:</p>
+  <pre class="nt-code"><code><span class="kw">PUSH</span> AX          <span class="cm">; sayacı sakla</span>
+<span class="kw">PUSH</span> DX          <span class="cm">; DX de bozulacak</span>
+<span class="kw">MOV</span>  AH, 2
+<span class="kw">MOV</span>  DL, '*'
+<span class="kw">INT</span>  21h         <span class="cm">; AL = '*' olur</span>
+<span class="kw">POP</span>  DX          <span class="cm">; ayna sırası: önce DX</span>
+<span class="kw">POP</span>  AX          <span class="cm">; sayaç geri geldi</span></code></pre>
+  <p>PUSH sırası AX, DX olduğu için POP sırası DX, AX'tir. BX'e dokunulmadığı için saklanmaz. Saklanan her yazmaç iki komut ve 19 saat turu (11 + 8) tutar; yalnız gerçekten bozulan yazmaçlar saklanır.</p>
+</div>
+
+<h3 id="s8-1-3-4"><span class="nt-num">8.1.3.4</span>Yığınla iki yazmacı takas etmek</h3>
+
+<p>Ayna sırasının tersi, yani aynı sırayla POP, değerleri takas eder. Bu bazen bir hata, bazen de bilerek kullanılan bir yöntemdir.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>    100h
+<span class="kw">MOV</span>    AX, 1212h  <span class="cm">; AX ← 1212h</span>
+<span class="kw">MOV</span>    BX, 3434h  <span class="cm">; BX ← 3434h</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; AX'i yığına koy</span>
+<span class="kw">PUSH</span>   BX         <span class="cm">; BX'i yığına koy</span>
+<span class="kw">POP</span>    AX         <span class="cm">; AX ← BX'in eski değeri</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← AX'in eski değeri</span>
+<span class="kw">RET</span>
+<span class="dir">END</span></code></pre>
+
+<p>emu8086 bu programı yüklediğinde CX'te 000Bh görülür. Bu değer programın bayt sayısıdır: iki MOV 3'er bayt, dört yığın komutu ve RET birer bayt, toplam 3 + 3 + 1 + 1 + 1 + 1 + 1 = 11 bayt. emu8086 yükleme sonrasında CX'e .COM programının boyutunu yazar; DOS'un DEBUG programı da yüklediği dosyanın uzunluğunu BX:CX'e yazar. Bu bir gelenektir, bir kural değildir. Program CX'in başlangıç değerine güvenmemeli, CX'i kullanmadan önce kendisi yüklemelidir. Bu notun diğer izlemelerinde CX'in başlangıç değeri 0000h alınmıştır; takas programı CX'i kullanmadığı için sonuç değişmez.</p>
+
+<div class="nt-tablewrap" id="tab-iz4">
+<table class="nt-table">
+  <caption>Tablo 8.1.10: Takas programının izlemesi (CX = 000Bh baştan sona değişmez).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Yığın (üstten)</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV AX, 1212h</code></td><td class="n81-chg">1212h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV BX, 3434h</code></td><td>1212h</td><td class="n81-chg">3434h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>1212h</td><td>3434h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">1212h, 0000h</td></tr>
+    <tr><td><code>PUSH BX</code></td><td>1212h</td><td>3434h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">3434h, 1212h, 0000h</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n81-chg">3434h</td><td>3434h</td><td class="n81-chg">FFFCh</td><td>1212h, 0000h</td></tr>
+    <tr><td><code>POP BX</code></td><td>3434h</td><td class="n81-chg">1212h</td><td class="n81-chg">FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>RET</code></td><td>3434h</td><td>1212h</td><td class="n81-chg">0000h</td><td>(boş); IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Takasın sırrı LIFO'dur (<a href="#tab-iz4">Tablo 8.1.10</a>). BX en son itildiği için yığının üstündedir ve ilk <code>POP AX</code> onu alır. Ardından <code>POP BX</code> sıradaki değeri, yani AX'in eski değeri 1212h'yi alır. Bir an için AX ile BX'in ikisi de 3434h olur; yığın bu sırada 1212h'yi güvenle tutar. Aynı sırayla POP edilseydi, yani önce <code>POP BX</code> sonra <code>POP AX</code> yazılsaydı, değerler yerinde kalırdı.</p>
+
+<h3 id="s8-1-3-5"><span class="nt-num">8.1.3.5</span>Üç yazmaç: aynı sırayla POP</h3>
+
+<p>Üç yazmaçla aynı deney yapıldığında sonuç daha ilginçtir. Bu program sunumda bir .BIN dosyası olarak yüklenmiştir. emu8086 .BIN dosyasını CS = SS = 0100h ve IP = 0000h ile başlatır; SP yine FFFEh'dir. Kesim değeri farklı olduğu için fiziksel adresler değişir, ama bağıl konumlar ve SP değerleri .COM programıyla aynıdır.</p>
+
+<pre class="nt-code"><code><span class="kw">mov</span> ax, 2
+<span class="kw">mov</span> bx, 4
+<span class="kw">mov</span> cx, 8
+<span class="kw">push</span> ax
+<span class="kw">push</span> bx
+<span class="kw">push</span> cx
+<span class="kw">pop</span>  ax
+<span class="kw">pop</span>  bx
+<span class="kw">pop</span>  cx</code></pre>
+
+<div class="nt-tablewrap" id="tab-iz5">
+<table class="nt-table">
+  <caption>Tablo 8.1.11: Üç yazmaçlı yığın programının izlemesi.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">Yığın (üstten)</th></tr></thead>
+  <tbody>
+    <tr><td><code>mov ax, 2</code></td><td class="n81-chg">0002h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td><code>mov bx, 4</code></td><td>0002h</td><td class="n81-chg">0004h</td><td>0000h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td><code>mov cx, 8</code></td><td>0002h</td><td>0004h</td><td class="n81-chg">0008h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td><code>push ax</code></td><td>0002h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">0002h</td></tr>
+    <tr><td><code>push bx</code></td><td>0002h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">0004h, 0002h</td></tr>
+    <tr><td><code>push cx</code></td><td>0002h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFF8h</td><td class="n81-chg">0008h, 0004h, 0002h</td></tr>
+    <tr><td><code>pop ax</code></td><td class="n81-chg">0008h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFAh</td><td>0004h, 0002h</td></tr>
+    <tr><td><code>pop bx</code></td><td>0008h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFCh</td><td>0002h</td></tr>
+    <tr><td><code>pop cx</code></td><td>0008h</td><td>0004h</td><td class="n81-chg">0002h</td><td class="n81-chg">FFFEh</td><td>(boş)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Sonuçta AX = 0008h, BX = 0004h ve CX = 0002h olur (<a href="#tab-iz5">Tablo 8.1.11</a>). AX ile CX yer değiştirmiş, BX yerinde kalmıştır. Bunun nedeni, ortadaki değerin hem itme hem de çekme sırasında ortada olmasıdır. Genel olarak n yazmaç aynı sırayla itilip aynı sırayla çekilirse yazmaç dizisi ters çevrilir: birinci yazmaç sonuncunun değerini, sonuncu birincinin değerini alır. Üç yazmaçta ortadaki, sabit noktadır. <code>pop bx</code> satırında BX'e yine 0004h yazılır; değer değişmediği için tabloda vurgulanmamıştır, ama komut yürütülmüş ve SP artmıştır.</p>
+
+<h3 id="s8-1-3-6"><span class="nt-num">8.1.3.6</span>Yığınla diziyi ters çevirmek</h3>
+
+<p>LIFO'nun ters çevirme özelliği bir dizgiye de uygulanabilir. Program 'ABC' dizgisinin karakterlerini sırayla yığına iter, sonra yığından çekerek ekrana yazar. Ekranda CBA görünür.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  SI, <span class="dir">OFFSET</span> metin
+<span class="kw">MOV</span>  CX, 3
+koy: <span class="kw">MOV</span>  AL, [SI]
+     <span class="kw">PUSH</span> AX       <span class="cm">; karakteri sakla</span>
+     <span class="kw">INC</span>  SI
+     <span class="kw">LOOP</span> koy
+<span class="kw">MOV</span>  CX, 3
+yaz: <span class="kw">POP</span>  DX       <span class="cm">; DL = karakter</span>
+     <span class="kw">MOV</span>  AH, 2
+     <span class="kw">INT</span>  21h      <span class="cm">; DL'yi ekrana yaz</span>
+     <span class="kw">LOOP</span> yaz
+<span class="kw">RET</span>
+metin <span class="dir">DB</span> 'ABC'   <span class="cm">; 0117h</span></code></pre>
+
+<p>Önce programın bellekteki yerleşimi çıkarılır, çünkü <code>metin</code> değişkeninin adresi koddan sonra gelir. <a href="#tab-ters-kod">Tablo 8.1.12</a> her komutun adresini ve makine kodunu verir. Kod 0100h'den 0116h'ye kadar 23 bayt tutar. Ardından gelen <code>metin</code> 0117h–0119h adreslerindedir; 41h, 42h ve 43h baytları 'A', 'B' ve 'C' karakterlerinin ASCII kodlarıdır. Program toplam 26 bayttır.</p>
+
+<div class="nt-tablewrap" id="tab-ters-kod">
+<table class="nt-table">
+  <caption>Tablo 8.1.12: Ters çevirme programının adresleri ve makine kodları.</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Adres</th><th scope="col">Kod</th><th scope="col">Komut</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td>0100h</td><td>BE 17 01</td><td><code>MOV SI, OFFSET metin</code></td></tr>
+    <tr><td>3</td><td>0103h</td><td>B9 03 00</td><td><code>MOV CX, 3</code></td></tr>
+    <tr><td>4</td><td>0106h</td><td>8A 04</td><td><code>koy: MOV AL, [SI]</code></td></tr>
+    <tr><td>5</td><td>0108h</td><td>50</td><td><code>PUSH AX</code></td></tr>
+    <tr><td>6</td><td>0109h</td><td>46</td><td><code>INC SI</code></td></tr>
+    <tr><td>7</td><td>010Ah</td><td>E2 FA</td><td><code>LOOP koy</code></td></tr>
+    <tr><td>8</td><td>010Ch</td><td>B9 03 00</td><td><code>MOV CX, 3</code></td></tr>
+    <tr><td>9</td><td>010Fh</td><td>5A</td><td><code>yaz: POP DX</code></td></tr>
+    <tr><td>10</td><td>0110h</td><td>B4 02</td><td><code>MOV AH, 2</code></td></tr>
+    <tr><td>11</td><td>0112h</td><td>CD 21</td><td><code>INT 21h</code></td></tr>
+    <tr><td>12</td><td>0114h</td><td>E2 F9</td><td><code>LOOP yaz</code></td></tr>
+    <tr><td>13</td><td>0116h</td><td>C3</td><td><code>RET</code></td></tr>
+    <tr><td>14</td><td>0117h</td><td>41 42 43</td><td><code>metin DB 'ABC'</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>LOOP komutlarının ikinci baytı bağıl atlama uzaklığıdır. <code>LOOP koy</code> 010Ah'dedir ve iki bayttır; sonraki komut 010Ch'dedir. 0106h'ye dönmek için uzaklık 0106h − 010Ch = −6 olmalıdır; −6'nın 8 bitlik ikiye tümleyeni FAh'dir. <code>LOOP yaz</code> için uzaklık 010Fh − 0116h = −7 = F9h'dir.</p>
+
+<p><strong>Birinci döngü: karakterleri yığına itmek.</strong> SI dizgiyi, CX döngü sayacını tutar. Her turda <code>MOV AL, [SI]</code> bir karakteri AL'ye okur. Yığına bayt itilemediği için <code>PUSH AX</code> AL'yi AH ile birlikte sözcük olarak iter. Programın başında AH = 00h olduğu için yığına 0041h, 0042h ve 0043h gider. <code>INC SI</code> sonraki karakteri gösterir; <code>LOOP koy</code> CX'i 1 azaltır ve CX ≠ 0 ise başa döner. Üç tur sonunda SI = 011Ah ve SP = FFF8h olur. Yığının üstünde son itilen 'C' vardır.</p>
+
+<div class="nt-tablewrap" id="tab-ters-1">
+<table class="nt-table">
+  <caption>Tablo 8.1.13: Birinci döngünün izlemesi (DX = 0000h).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">SI</th><th scope="col">SP</th><th scope="col">Yığın (üstten, DOS sözcüğü hariç)</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>MOV SI, OFFSET metin</code></td><td>0000h</td><td>0000h</td><td class="n81-chg">0117h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td>3</td><td><code>MOV CX, 3</code></td><td>0000h</td><td class="n81-chg">0003h</td><td>0117h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td>4</td><td><code>MOV AL, [SI]</code></td><td class="n81-chg">0041h</td><td>0003h</td><td>0117h</td><td>FFFEh</td><td>(boş)</td></tr>
+    <tr><td>5</td><td><code>PUSH AX</code></td><td>0041h</td><td>0003h</td><td>0117h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">0041h</td></tr>
+    <tr><td>6</td><td><code>INC SI</code></td><td>0041h</td><td>0003h</td><td class="n81-chg">0118h</td><td>FFFCh</td><td>0041h</td></tr>
+    <tr><td>7</td><td><code>LOOP koy</code></td><td>0041h</td><td class="n81-chg">0002h</td><td>0118h</td><td>FFFCh</td><td>0041h</td></tr>
+    <tr><td>4</td><td><code>MOV AL, [SI]</code></td><td class="n81-chg">0042h</td><td>0002h</td><td>0118h</td><td>FFFCh</td><td>0041h</td></tr>
+    <tr><td>5</td><td><code>PUSH AX</code></td><td>0042h</td><td>0002h</td><td>0118h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">0042h, 0041h</td></tr>
+    <tr><td>6</td><td><code>INC SI</code></td><td>0042h</td><td>0002h</td><td class="n81-chg">0119h</td><td>FFFAh</td><td>0042h, 0041h</td></tr>
+    <tr><td>7</td><td><code>LOOP koy</code></td><td>0042h</td><td class="n81-chg">0001h</td><td>0119h</td><td>FFFAh</td><td>0042h, 0041h</td></tr>
+    <tr><td>4</td><td><code>MOV AL, [SI]</code></td><td class="n81-chg">0043h</td><td>0001h</td><td>0119h</td><td>FFFAh</td><td>0042h, 0041h</td></tr>
+    <tr><td>5</td><td><code>PUSH AX</code></td><td>0043h</td><td>0001h</td><td>0119h</td><td class="n81-chg">FFF8h</td><td class="n81-chg">0043h, 0042h, 0041h</td></tr>
+    <tr><td>6</td><td><code>INC SI</code></td><td>0043h</td><td>0001h</td><td class="n81-chg">011Ah</td><td>FFF8h</td><td>0043h, 0042h, 0041h</td></tr>
+    <tr><td>7</td><td><code>LOOP koy</code></td><td>0043h</td><td class="n81-chg">0000h</td><td>011Ah</td><td>FFF8h</td><td>0043h, 0042h, 0041h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Birinci döngüde bayraklarla ilgili küçük bir ayrıntı da vardır. <code>INC SI</code> CF dışındaki aritmetik bayrakları günceller. SI = 0118h olduğunda düşük bayt 18h = 0001 1000b iki tane 1 biti içerir; PF = 1 olur. SI = 0119h ve 011Ah'de düşük baytlardaki 1 sayısı tektir ve PF = 0'dır. Bu bayraklar programın sonucunu etkilemez, çünkü <code>LOOP</code> bayraklara bakmaz; yalnız CX'i sınar.</p>
+
+<figure class="nt-fig" id="sekil-ters" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 330 155" role="img" aria-label="Yığın belleği, SP=FFF8h"><defs><marker id="n81-11-m8ah76" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF6</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0043h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFF8</text><path class="line" d="M256 47 L216 47" marker-end="url(#n81-11-m8ah76)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0042h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFA</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0041h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFC</text><rect class="box" x="92" y="110" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="127" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="127" text-anchor="end">FFFE</text><text class="lbl" x="151" y="151" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text></svg><svg class="ds-svg" viewBox="0 0 330 155" role="img" aria-label="Yığın belleği, SP=FFFAh"><defs><marker id="n81-12-m8ah78" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF6</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">0043h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFF8</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">0042h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFA</text><path class="line" d="M256 72 L216 72" marker-end="url(#n81-12-m8ah78)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0041h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFC</text><rect class="box" x="92" y="110" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="127" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="127" text-anchor="end">FFFE</text><text class="lbl" x="151" y="151" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text></svg></div></div>
+  <figcaption><b>Şekil 8.1.6:</b> Solda birinci döngü bitince yığın: 0043h ('C') üstte, SP = FFF8h. Sağda ikinci döngünün ilk POP DX'inden sonra: 'C' DX'e alınmış, SP = FFFAh; FFF8h'deki 0043h artık yığının dışındadır.</figcaption>
+</figure>
+
+<p><strong>İkinci döngü: yığından çekip yazmak.</strong> CX yeniden 3 yapılır. Her turda <code>POP DX</code> yığının üstündeki sözcüğü DX'e alır; DL karakteri, DH ise 00h'dir. <code>MOV AH, 2</code> DOS'un karakter yazma işlevini seçer ve <code>INT 21h</code> DL'deki karakteri ekrana yazar (<a href="#sekil-ters">Şekil 8.1.6</a>). INT 21h'nin 02h işlevi bir yan etki taşır: işlev bittiğinde AL, yazılan karakterdir. Bu yüzden AX her INT 21h'den sonra değişir. İlk turda AL zaten 43h olduğu için fark görünmez, sonraki turlarda AL = 42h ve AL = 41h olur. Yığından ilk çıkan 'C', sonra 'B', en son 'A''dır.</p>
+
+<div class="nt-tablewrap" id="tab-ters-2">
+<table class="nt-table">
+  <caption>Tablo 8.1.14: İkinci döngünün izlemesi (SI = 011Ah).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">SP</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>8</td><td><code>MOV CX, 3</code></td><td>0043h</td><td class="n81-chg">0003h</td><td>0000h</td><td>FFF8h</td><td></td></tr>
+    <tr><td>9</td><td><code>POP DX</code></td><td>0043h</td><td>0003h</td><td class="n81-chg">0043h</td><td class="n81-chg">FFFAh</td><td></td></tr>
+    <tr><td>10</td><td><code>MOV AH, 2</code></td><td class="n81-chg">0243h</td><td>0003h</td><td>0043h</td><td>FFFAh</td><td></td></tr>
+    <tr><td>11</td><td><code>INT 21h</code></td><td>0243h</td><td>0003h</td><td>0043h</td><td>FFFAh</td><td class="n81-chg">C</td></tr>
+    <tr><td>12</td><td><code>LOOP yaz</code></td><td>0243h</td><td class="n81-chg">0002h</td><td>0043h</td><td>FFFAh</td><td>C</td></tr>
+    <tr><td>9</td><td><code>POP DX</code></td><td>0243h</td><td>0002h</td><td class="n81-chg">0042h</td><td class="n81-chg">FFFCh</td><td>C</td></tr>
+    <tr><td>10</td><td><code>MOV AH, 2</code></td><td>0243h</td><td>0002h</td><td>0042h</td><td>FFFCh</td><td>C</td></tr>
+    <tr><td>11</td><td><code>INT 21h</code></td><td class="n81-chg">0242h</td><td>0002h</td><td>0042h</td><td>FFFCh</td><td class="n81-chg">CB</td></tr>
+    <tr><td>12</td><td><code>LOOP yaz</code></td><td>0242h</td><td class="n81-chg">0001h</td><td>0042h</td><td>FFFCh</td><td>CB</td></tr>
+    <tr><td>9</td><td><code>POP DX</code></td><td>0242h</td><td>0001h</td><td class="n81-chg">0041h</td><td class="n81-chg">FFFEh</td><td>CB</td></tr>
+    <tr><td>10</td><td><code>MOV AH, 2</code></td><td>0242h</td><td>0001h</td><td>0041h</td><td>FFFEh</td><td>CB</td></tr>
+    <tr><td>11</td><td><code>INT 21h</code></td><td class="n81-chg">0241h</td><td>0001h</td><td>0041h</td><td>FFFEh</td><td class="n81-chg">CBA</td></tr>
+    <tr><td>12</td><td><code>LOOP yaz</code></td><td>0241h</td><td class="n81-chg">0000h</td><td>0041h</td><td>FFFEh</td><td>CBA</td></tr>
+    <tr><td>13</td><td><code>RET</code></td><td>0241h</td><td>0000h</td><td>0041h</td><td class="n81-chg">0000h</td><td>CBA</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-ters-2">Tablo 8.1.14</a>'ün son satırında SP = 0000h ve IP = 0000h olur; RET, DOS'un 0000h sözcüğünü almıştır. Program toplam 28 komut yürütür ve PSP'deki INT 20h ile biter. İki döngü aynı sayıda tur döndüğü için üç PUSH'a üç POP karşılık gelir ve yığın dengelidir. Döngü sayıları farklı olsaydı, örneğin ikinci döngü yanlışlıkla CX = 2 ile başlasaydı, 'A' yığında kalır ve RET onu dönüş adresi sanardı: IP = 0041h. Program PSP'nin ortasına atlar ve düzgün sonlanmazdı.</p>
+
+<p>Aynı yöntem dizgiyi ekrana yazmadan, bellekte yerinde ters çevirmek için de kullanılabilir. İkinci döngüde karakter <code>POP AX</code> ile alınır ve <code>MOV [SI], AL</code> ile dizgiye baştan itibaren yeniden yazılır; bunun için SI önce dizginin başına geri getirilir. Yığın burada bir ara bellek görevi görür. Ayrı bir tampon dizi tanımlamak gerekmez, ama her karakter yığında 2 bayt yer kaplar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>INT 21h çağrısından sonra AX'in değişmediğini varsaymak. AH = 02h işlevi AL'yi yazılan karaktere eşitler; AH = 09h işlevi AL'ye 24h ('$') bırakır. Döngü sayacı ya da ara sonuç AL'de tutuluyorsa çağrıdan önce <code>PUSH AX</code>, sonra <code>POP AX</code> yazılır.</p>
+</div>
+
+<h3 id="s8-1-3-7"><span class="nt-num">8.1.3.7</span>Yazmaçlar ne olur?</h3>
+
+<p>Sunumdaki tahmin sorusu, PUSH ve POP'ların karışık bir sırayla kullanıldığı bir koddur. Başlangıçta SP = FFFEh'dir.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 1111h
+<span class="kw">MOV</span> BX, 2222h
+<span class="kw">MOV</span> CX, 3333h
+<span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> BX
+<span class="kw">PUSH</span> CX
+<span class="kw">POP</span> AX
+<span class="kw">POP</span> CX
+<span class="kw">PUSH</span> AX
+<span class="kw">POP</span> BX
+<span class="kw">POP</span> BX</code></pre>
+
+<p>Çözüm yığının içeriğini adım adım yazarak bulunur. Üç PUSH'tan sonra yığın üstten alta 3333h, 2222h, 1111h'dir ve SP = FFF8h'dir. <code>POP AX</code> üstteki 3333h'yi alır: AX = 3333h. <code>POP CX</code> sıradaki 2222h'yi alır: CX = 2222h, SP = FFFCh. Yığında yalnız 1111h kalmıştır. <code>PUSH AX</code> 3333h'yi yeniden iter ve <code>POP BX</code> onu hemen alır: BX = 3333h. Son <code>POP BX</code> yığındaki 1111h'yi alır ve BX'in az önceki değerinin üzerine yazar: BX = 1111h.</p>
+
+<p>Sonuç AX = 3333h, BX = 1111h, CX = 2222h ve SP = FFFEh'dir. Dört PUSH ve dört POP yapıldığı için yığın dengelidir. Değerler yazmaçlar arasında bir tur dönmüştür: AX, CX'in; CX, BX'in; BX de AX'in eski değerini almıştır. Bu tür sorularda en güvenilir yöntem, yığını bir kâğıt üzerinde sütun olarak çizmek ve her komutta üstteki hücreyi işaretlemektir.</p>
+
+<h3 id="s8-1-3-8"><span class="nt-num">8.1.3.8</span>Takas yöntemlerinin karşılaştırması</h3>
+
+<p>İki yazmacı takas etmenin üç yolu vardır. Yığınla takas dört komut tutar: <code>PUSH AX</code>, <code>PUSH BX</code>, <code>POP AX</code>, <code>POP BX</code>. Geçici bir yazmaçla takas üç <code>MOV</code> tutar: <code>MOV CX, AX</code>, <code>MOV AX, BX</code>, <code>MOV BX, CX</code>. Üçüncü yol 8086'nın takas komutudur: <code>XCHG AX, BX</code>.</p>
+
+<figure class="nt-fig" id="sekil-takas" style="--w:460px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 460 90" role="img" aria-label="Kod boyutu: yığınla takas 4 bayt, geçici yazmaçla 6 bayt, XCHG ile 1 bayt."><text class="lbl" x="120" y="23" text-anchor="end" style="font-size:12.5px">yığın</text><rect class="box" x="130" y="6" width="32" height="22" rx="3"/><rect class="box" x="164" y="6" width="32" height="22" rx="3"/><rect class="box" x="198" y="6" width="32" height="22" rx="3"/><rect class="box" x="232" y="6" width="32" height="22" rx="3"/><text class="txt" x="274" y="23" text-anchor="start" style="font-size:12.5px">4 bayt</text><text class="lbl" x="120" y="51" text-anchor="end" style="font-size:12.5px">geçici yazmaç</text><rect class="box" x="130" y="34" width="32" height="22" rx="3"/><rect class="box" x="164" y="34" width="32" height="22" rx="3"/><rect class="box" x="198" y="34" width="32" height="22" rx="3"/><rect class="box" x="232" y="34" width="32" height="22" rx="3"/><rect class="box" x="266" y="34" width="32" height="22" rx="3"/><rect class="box" x="300" y="34" width="32" height="22" rx="3"/><text class="txt" x="342" y="51" text-anchor="start" style="font-size:12.5px">6 bayt</text><text class="lbl" x="120" y="79" text-anchor="end" style="font-size:12.5px">XCHG</text><rect class="box" x="130" y="62" width="32" height="22" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="172" y="79" text-anchor="start" style="font-size:12.5px">1 bayt</text></svg></div>
+  <figcaption><b>Şekil 8.1.7:</b> Üç takas yönteminin kod boyutu: yığınla 4 bayt, geçici yazmaçla 6 bayt, XCHG ile 1 bayt.</figcaption>
+</figure>
+
+<div class="nt-tablewrap" id="tab-takas">
+<table class="nt-table">
+  <caption>Tablo 8.1.15: Takas yöntemlerinin karşılaştırması (8086 saat turları).</caption>
+  <thead><tr><th scope="col">Yöntem</th><th scope="col">Bayt</th><th scope="col">Bellek erişimi</th><th scope="col">Saat turu</th><th scope="col">Yan etki ve kapsam</th></tr></thead>
+  <tbody>
+    <tr><td>yığınla</td><td>4</td><td>4</td><td>2 × 11 + 2 × 8 = 38</td><td>hiçbir yazmaç bozulmaz; kesim yazmaçları için de çalışır</td></tr>
+    <tr><td>geçici yazmaçla</td><td>6</td><td>0</td><td>3 × 2 = 6</td><td>CX'in değeri bozulur</td></tr>
+    <tr><td><code>XCHG AX, BX</code></td><td>1 (93h)</td><td>0</td><td>3</td><td>en kısa ve en hızlı; kesim yazmaçlarıyla kullanılamaz</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-takas">Tablo 8.1.15</a> açık bir sonuç verir: iki genel amaçlı yazmacı takas etmenin en iyi yolu <code>XCHG</code>'dir. Komut tek bayttır. AX ile başka bir 16 bitlik yazmacı takas eden <code>XCHG</code> için 90h + r biçiminde kısa kodlar vardır; BX'in numarası 3 olduğundan kod 93h'dir. 5 MHz'de yığınla takas 38 × 200 ns = 7,6 µs, XCHG ise 0,6 µs sürer. Yığın yönteminin asıl değeri takas değil, saklamadır. Yazmaçları bir prosedür ya da kesme süresince korumak, ara sonuçları geçici olarak tutmak ve kesim yazmaçlarını kopyalamak (<code>PUSH DS</code>, <code>POP ES</code>) yığının asıl görevleridir. Kesim yazmaçları <code>XCHG</code> ile takas edilemediği için onların takası da yığınla yapılır: <code>PUSH DS</code>, <code>PUSH ES</code>, <code>POP DS</code>, <code>POP ES</code>.</p>
+
+<h3 id="s8-1-3-9"><span class="nt-num">8.1.3.9</span>Etkileşimli yığın simülatörü</h3>
+
+<p>Sunumdaki etkileşimli simülatör AX, BX, CX ve SP yazmaçlarını ve SS:SP çevresindeki yığın hücrelerini gösterir. Yazmaç değerleri onaltılık olarak düzenlenebilir. Altı düğme <code>PUSH AX</code>, <code>PUSH BX</code>, <code>PUSH CX</code>, <code>POP AX</code>, <code>POP BX</code> ve <code>POP CX</code> komutlarını çalıştırır ve çalıştırılan komutlar bir listede birikir. Simülatörle bu notun bütün sıralama örnekleri yeniden denenebilir: ayna sırası, takas, üç yazmacın döndürülmesi.</p>
+
+<p>Simülatörün gösterdiği önemli bir durum boş yığından POP'tur. Gerçek 8086 bunu engellemez. Yığın boşken POP yapılırsa SP yine 2 artar ve kesimde o adreste ne varsa okunur. İşlemcinin yığının boş ya da dolu olduğunu bilmesinin bir yolu yoktur; SP yalnız bir sayıdır. Yığının sınırlarını izlemek tamamen programcının işidir.</p>
+
+<h2 class="nt-pb" id="s8-1-4"><span class="nt-num">8.1.4</span>Bayrakları saklamak: PUSHF ve POPF</h2>
+
+<h3 id="s8-1-4-1"><span class="nt-num">8.1.4.1</span>Bayrak sözcüğü</h3>
+
+<p>8086'nın bayrak yazmacı (FLAGS) 16 bitlik bir yazmaçtır, ama bitlerinin yalnız dokuzu kullanılır. Altı durum bayrağı son aritmetik ya da mantık işleminin sonucunu anlatır: CF (elde, bit 0), PF (eşlik, bit 2), AF (yardımcı elde, bit 4), ZF (sıfır, bit 6), SF (işaret, bit 7) ve OF (taşma, bit 11). Üç denetim bayrağı işlemcinin davranışını belirler: TF (tuzak, bit 8), IF (kesme, bit 9) ve DF (yön, bit 10). Kalan bitler kullanılmaz. 8086'da bit 1 ve bit 12–15 her zaman 1 okunur; bit 3 ve bit 5 ise 0'dır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-pushf">
+  <span class="nt-box__title">Tanım 8.1.5</span>
+  <p><strong>PUSHF</strong>, bayrak yazmacının 16 bitlik sözcüğünü yığına iter: SP ← SP − 2, [SS:SP] ← FLAGS. <strong>POPF</strong>, yığının üstündeki sözcüğü bayrak yazmacına yükler: FLAGS ← [SS:SP], SP ← SP + 2. PUSHF bayrakları değiştirmez; POPF ise bütün bayrakları birden değiştirebilir.</p>
+</div>
+
+<p>Bayraklar programda tek tek okunur: <code>JC</code> CF'ye, <code>JZ</code> ZF'ye bakar. Bayrak yazmacının tamamına doğrudan erişen bir <code>MOV</code> ise yoktur. <code>LAHF</code> yalnız düşük baytı (SF, ZF, AF, PF, CF) AH'ye kopyalar; OF, DF, IF ve TF'ye ulaşmaz. Bayrak yazmacının tamamını saklamanın ve geri yüklemenin tek yolu yığındır. Bayrak sözcüğünü bir yazmaca almak için de yığın kullanılır: <code>PUSHF</code> ve ardından <code>POP AX</code>. Bir .COM programının başında bu iki komut AX'e F202h getirir. F000h dört sabit 1 bitidir, 0200h IF = 1'dir, 0002h ise sabit 1 olan bit 1'dir. <code>STC</code>'den sonra aynı iki komut F203h verir; fark CF'nin bit 0'ıdır.</p>
+
+<h3 id="s8-1-4-2"><span class="nt-num">8.1.4.2</span>PUSHF ve POPF: kod izleme</h3>
+
+<p>Aşağıdaki program bir toplamanın bayraklarını saklar, araya bayrakları bozan başka bir toplama koyar ve saklanan bayrakları geri yükler.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>   100h
+<span class="kw">MOV</span>   AX, 0FFFFh
+<span class="kw">ADD</span>   AX, 1      <span class="cm">; CF=1, ZF=1</span>
+<span class="kw">PUSHF</span>            <span class="cm">; bayrakları sakla</span>
+<span class="kw">MOV</span>   BX, 5
+<span class="kw">ADD</span>   BX, 3      <span class="cm">; CF=0, ZF=0</span>
+<span class="kw">POPF</span>             <span class="cm">; bayraklar geri</span>
+<span class="kw">RET</span></code></pre>
+
+<p>İlk satırdaki sayı 0FFFFh biçiminde yazılmıştır. Onaltılık sayı bir harfle başlıyorsa assembler onu bir ad sanmasın diye başına 0 eklenir; FFFFh yazmak hata verir. <code>ADD AX, 1</code> FFFFh + 1 = 1 0000h hesaplar. Sonuç 17 bittir; AX'e düşük 16 bit, 0000h yazılır ve dışarı taşan 1 CF'ye gider. Sonuç sıfır olduğu için ZF = 1'dir. 0000h'nin düşük baytında 1 biti yoktur, yani çift sayıda 1 vardır ve PF = 1 olur. Düşük dörtlüde F + 1 = 10h elde ürettiği için AF = 1'dir. SF = 0 ve OF = 0'dır: −1 + 1 = 0 işaretli olarak da doğrudur.</p>
+
+<p><code>PUSHF</code> bu anda bayrak sözcüğünü iter. Sözcüğün değeri bitlerden hesaplanır: sabit bitler F000h + 0002h, IF için 0200h, ZF için 0040h, AF için 0010h, PF için 0004h ve CF için 0001h. Toplam F257h'dir. [FFFCh] = 57h ve [FFFDh] = F2h olur. <code>MOV BX, 5</code> bayrakları değiştirmez. <code>ADD BX, 3</code> 5 + 3 = 8 hesaplar: elde yok, sonuç sıfır değil. CF, ZF, PF ve AF'nin dördü de 0 olur. 8 = 0000 1000b'de tek bir 1 biti vardır, bu yüzden PF = 0'dır. İlk toplamanın bayrakları kaybolmuştur. <code>POPF</code> F257h'yi bayrak yazmacına yükler ve CF = 1, ZF = 1, PF = 1, AF = 1 geri gelir. AX ve BX'e dokunulmaz; AX = 0000h, BX = 0008h kalır.</p>
+
+<div class="nt-tablewrap" id="tab-iz-pushf">
+<table class="nt-table">
+  <caption>Tablo 8.1.16: PUSHF/POPF programının izlemesi (IF = 1 baştan sona; bayraklar ODITSZAPC sırasıyla, büyük harf = 1).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Bayraklar</th><th scope="col">Yığın (üstten)</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 0FFFFh</code></td><td class="n81-chg">FFFFh</td><td>0000h</td><td>FFFEh</td><td>odItszapc</td><td>0000h</td></tr>
+    <tr><td><code>ADD AX, 1</code></td><td class="n81-chg">0000h</td><td>0000h</td><td>FFFEh</td><td class="n81-chg">odItsZAPC</td><td>0000h</td></tr>
+    <tr><td><code>PUSHF</code></td><td>0000h</td><td>0000h</td><td class="n81-chg">FFFCh</td><td>odItsZAPC</td><td class="n81-chg">F257h, 0000h</td></tr>
+    <tr><td><code>MOV BX, 5</code></td><td>0000h</td><td class="n81-chg">0005h</td><td>FFFCh</td><td>odItsZAPC</td><td>F257h, 0000h</td></tr>
+    <tr><td><code>ADD BX, 3</code></td><td>0000h</td><td class="n81-chg">0008h</td><td>FFFCh</td><td class="n81-chg">odItszapc</td><td>F257h, 0000h</td></tr>
+    <tr><td><code>POPF</code></td><td>0000h</td><td>0008h</td><td class="n81-chg">FFFEh</td><td class="n81-chg">odItsZAPC</td><td>0000h</td></tr>
+    <tr><td><code>RET</code></td><td>0000h</td><td>0008h</td><td class="n81-chg">0000h</td><td>odItsZAPC</td><td>(boş); IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Programın son durumu <a href="#tab-iz-pushf">Tablo 8.1.16</a>'da görülür. POPF yerine <code>POP BX</code> yazılsaydı ne olurdu? Yığından yine F257h alınırdı, ama bu kez BX'e yazılırdı: BX = F257h. Bayraklar ikinci toplamadaki gibi CF = 0 ve ZF = 0 kalırdı. Bu deney POPF ile POP arasındaki farkı açıkça gösterir. İki komut yığından aynı sözcüğü alır; yalnız hedefleri farklıdır.</p>
+
+<p>Program 15 bayttır. <code>ADD BX, 3</code> üç baytla kodlanır (83 C3 03): 83h işlem kodu, 8 bitlik anlık değerin işaret genişletilerek 16 bite tamamlandığını söyler. <code>ADD AX, 1</code> ise AX'e özel kısa biçimle 05 01 00 olarak kodlanır. PUSHF (9Ch) ve POPF (9Dh) birer bayttır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>PUSHF ile saklanan bayrakları geri yüklemeden önce yığına başka bir değer itip POPF ile o değeri bayrak yazmacına almak. <code>PUSHF</code>, <code>PUSH AX</code>, …, <code>POPF</code>, <code>POP AX</code> dizisinde POPF, AX'in değerini bayrak olarak yükler ve AX'e eski bayrak sözcüğü gelir. Bayraklar ve yazmaçlar da ayna sırasına uyar: <code>PUSH AX</code>, <code>PUSHF</code>, …, <code>POPF</code>, <code>POP AX</code>.</p>
+</div>
+
+<h3 id="s8-1-4-3"><span class="nt-num">8.1.4.3</span>Bayrak sözcüğünü değiştirmek</h3>
+
+<p>CF, DF ve IF için doğrudan komutlar vardır: <code>STC</code>/<code>CLC</code>/<code>CMC</code>, <code>STD</code>/<code>CLD</code>, <code>STI</code>/<code>CLI</code>. TF'yi değiştiren bir komut ise yoktur. TF'yi 1 yapmanın tek yolu yığından geçer. Bayrak sözcüğü yığına itilir, bir yazmaca alınır, bit 8 değiştirilir, sözcük yeniden itilir ve POPF ile bayrak yazmacına yüklenir:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSHF</span>
+<span class="kw">POP</span>  AX
+<span class="kw">OR</span>   AX, 0100h     <span class="cm">; bit 8 = TF</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">POPF</span>               <span class="cm">; TF = 1</span></code></pre>
+
+<p>Hata ayıklayıcılar programı tek adım çalıştırmak için bu kalıbı kullanır. TF = 1 olduğunda işlemci her komuttan sonra bir tip 1 kesmesi üretir. Aynı yöntemle OF de değiştirilebilir; OF'yi doğrudan kuran bir komut da yoktur. Bu kalıpta AX bozulur; AX korunacaksa kalıp <code>PUSH AX</code> ile <code>POP AX</code> arasına alınır.</p>
+
+<p>Bayrak sözcüğünü yığında değiştirmenin bir başka kullanımı da kesme yordamlarıdır. Bir kesme yordamı çağıran programa CF ile bir hata bilgisi döndürmek isterse, yığındaki FLAGS kopyasının bit 0'ını değiştirir. IRET bu kopyayı geri yüklediğinde çağıran program CF'yi görür. DOS işlevlerinin çoğu hatayı bu yolla, CF = 1 olarak bildirir.</p>
+
+<h3 id="s8-1-4-4"><span class="nt-num">8.1.4.4</span>Yığını otomatik kullanan komutlar</h3>
+
+<p>PUSHF ve POPF'in yaptığını bazı komutlar kendiliğinden yapar. <code>INT n</code> önce bayrak sözcüğünü, sonra CS'yi ve IP'yi iter; ardından IF ve TF'yi sıfırlar. <code>IRET</code> IP'yi, CS'yi ve bayrak sözcüğünü geri yükler. Kesme yordamları bu yüzden bayrakları kendileri saklamaz; INT bu işi otomatik yapar. Normal kodda ise bir sonucu korumak için PUSHF ve POPF gerekir, çünkü CALL bayrakları saklamaz.</p>
+
+<p><code>CALL</code> ve <code>RET</code> de yığını otomatik kullanır. Yakın bir CALL, kendisinden sonraki komutun bağıl konumunu, yani dönüş adresini iter ve SP'yi 2 azaltır. RET bu adresi IP'ye çeker ve SP'yi 2 artırır. Uzak bir CALL önce CS'yi, sonra IP'yi iter; RETF ikisini ters sırada geri alır. Bu komutlar, yığın açısından bakıldığında, hedefi IP olan PUSH ve POP'lardır. Prosedürün içindeki her PUSH'a bir POP karşılık gelmezse RET dönüş adresini değil, unutulan değeri alır. Yığın güvenliği kurallarının hepsi bu basit gözleme dayanır.</p>
+
+<div class="nt-tablewrap" id="tab-otomatik">
+<table class="nt-table">
+  <caption>Tablo 8.1.17: Yığını kendiliğinden kullanan komutların ittiği ve çektiği sözcükler.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">İttiği (sırayla)</th><th scope="col">Çeken komut</th><th scope="col">SP farkı</th></tr></thead>
+  <tbody>
+    <tr><td><code>CALL</code> (yakın)</td><td>IP</td><td><code>RET</code></td><td>2 bayt</td></tr>
+    <tr><td><code>CALL</code> (uzak)</td><td>CS, IP</td><td><code>RETF</code></td><td>4 bayt</td></tr>
+    <tr><td><code>INT n</code>, donanım kesmesi</td><td>FLAGS, CS, IP</td><td><code>IRET</code></td><td>6 bayt</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s8-1-5"><span class="nt-num">8.1.5</span>Yığın güvenliği</h2>
+
+<h3 id="s8-1-5-1"><span class="nt-num">8.1.5.1</span>Denge kuralı ve .COM programının sonu</h3>
+
+<p>PUSH ve POP komutları programın çalışması boyunca geçici verileri saklar. Yığının bütünlüğü, eşit sayıda PUSH ve POP ile korunur. Bu kural programın yalnız bir yolunda değil, her yolunda, her dalında sağlanmalıdır. Eşit sayıda PUSH ve POP yapılmazsa yığın bozulur ve işletim sistemine geri dönülemeyebilir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-denge">
+  <span class="nt-box__title">Tanım 8.1.6</span>
+  <p>Bir kod parçası, girişindeki SP değeri ile çıkışındaki SP değeri aynıysa <strong>yığın açısından dengelidir</strong>. Dengeli bir parçada her PUSH'a (ve PUSHF'e) bir POP (ya da POPF) karşılık gelir. Parçanın birden çok çıkışı varsa denge her çıkış için ayrı ayrı sağlanmalıdır.</p>
+</div>
+
+<p>Dengenin neden bu kadar önemli olduğu .COM programının sonunda görülür. RET yığının üstünde bir dönüş adresi bekler. DOS bir .COM programını başlatırken yığına 0000h koyar. Program dengeliyse son RET bu sözcüğü alır ve CS:0000h'ye, yani PSP'nin başına gider. Orada duran <code>INT 20h</code> programı sonlandırır. Program dengeli değilse RET başka bir sözcüğü alır.</p>
+
+<figure class="nt-fig" id="sekil-guvenlik" style="--w:440px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 84" role="img" aria-label="Fazla PUSH: yığının üstünde dönüş adresi yerine AX değeri kalır, RET onu IP'ye alır."><rect class="box" x="60" y="8" width="110" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="lbl mono" x="54" y="24" text-anchor="end" style="font-size:11.5px">FFFA</text><text class="txt" x="115" y="24" text-anchor="middle" style="font-size:12.5px">AX değeri</text><rect class="box" x="60" y="32" width="110" height="24" rx="3"/><text class="lbl mono" x="54" y="48" text-anchor="end" style="font-size:11.5px">FFFC</text><text class="txt" x="115" y="48" text-anchor="middle" style="font-size:12.5px">dönüş IP</text><rect class="box" x="60" y="56" width="110" height="24" rx="3"/><text class="lbl mono" x="54" y="72" text-anchor="end" style="font-size:11.5px">FFFE</text><text class="txt" x="115" y="72" text-anchor="middle" style="font-size:12.5px">0000h</text><path class="line" d="M214.0 20.0 L181.0 20.0"/><path class="ah" d="M174.0 20.0 L181.0 16.1 L181.0 23.9 z"/><text class="txt" x="220" y="24" text-anchor="start" style="font-size:12.5px;fill:var(--ds-bad)">RET bunu IP'ye alır</text><text class="lbl" x="220" y="46" text-anchor="start" style="font-size:12px">PUSH AX'in POP'u unutuldu</text></svg></div>
+  <figcaption><b>Şekil 8.1.8:</b> Fazla PUSH: yığının üstünde dönüş adresi yerine AX'in değeri kalır ve RET onu IP'ye alır.</figcaption>
+</figure>
+
+<p>Dengesizliğin üç biçimi vardır ve üçü de farklı belirtiler verir (<a href="#sekil-guvenlik">Şekil 8.1.8</a>). <strong>Fazla PUSH</strong>'ta RET, dönüş adresi yerine son konan veriyi alır ve rastgele bir adrese atlar. <strong>Fazla POP</strong>'ta dönüş adresi bir yazmaca “yenir”; RET ondan sonraki sözcüğü alır ve yine yanlış yere döner. <strong>Yanlış sıra</strong>da ise yığın dengelidir ve program doğru yere döner, ama değerler karışır. Program sessizce yanlış çalışır. Üçüncüsü bulunması en zor olanıdır, çünkü program çökmez.</p>
+
+<h3 id="s8-1-5-2"><span class="nt-num">8.1.5.2</span>Hata örneği: dengesiz PUSH</h3>
+
+<p>Aşağıdaki programda AX yığına konur, ama hiç geri alınmaz.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>   100h
+<span class="kw">MOV</span>   AX, 1234h
+<span class="kw">PUSH</span>  AX         <span class="cm">; POP unutuldu!</span>
+<span class="kw">RET</span>              <span class="cm">; IP ← ?</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz-deng">
+<table class="nt-table">
+  <caption>Tablo 8.1.18: Dengesiz PUSH programının izlemesi.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">IP (sonraki)</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">Yığın (üstten)</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>0100h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV AX, 1234h</code></td><td>0103h</td><td class="n81-chg">1234h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0104h</td><td>1234h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">1234h, 0000h</td></tr>
+    <tr><td><code>RET</code></td><td class="n81-chg">1234h</td><td>1234h</td><td class="n81-chg">FFFEh</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>RET yığının üstündeki sözcüğü dönüş adresi sanar (<a href="#tab-iz-deng">Tablo 8.1.18</a>). IP = 1234h olur ve SP FFFEh'ye çıkar. İşlemci 0700:1234h adresindeki baytları komut olarak çalıştırmaya başlar. Bu program yalnız 5 bayttır; 1234h adresinde program yoktur, belleğin o bölgesinde ne kaldıysa o vardır. Program çöker ya da donar. Garip olan, DOS'un 0000h sözcüğünün hâlâ yığında durmasıdır. Dönüş için gereken bilgi kaybolmamış, yalnız bir sözcük altta kalmıştır.</p>
+
+<p>Düzeltme kolaydır: RET'ten önce <code>POP AX</code> eklenir ya da PUSH hiç yazılmaz. Asıl zorluk, dengesizliğin çoğu zaman bir dalda gizlenmesidir. Aşağıdaki kodda AX iki dalda da itilir, ama yalnız bir dalda geri alınır:</p>
+
+<pre class="nt-code"><code>       <span class="kw">PUSH</span> AX
+       <span class="kw">CMP</span>  BX, 0
+       <span class="kw">JE</span>   bitti        <span class="cm">; bu dalda POP yok!</span>
+       <span class="cm">; … AX'i kullanan işlem …</span>
+       <span class="kw">POP</span>  AX
+bitti: <span class="kw">RET</span></code></pre>
+
+<p>BX ≠ 0 olduğu sürece program doğru çalışır. BX = 0 olduğu ilk anda RET, AX'in değerine atlar. Bu tür hatalar testte kolay yakalanmaz. Kural şudur: her dalın (JMP, Jcc) PUSH ve POP sayısı ayrı ayrı sayılır. En güvenli çözüm, POP'u tek bir çıkış etiketinin altına koyup bütün dalları oraya yönlendirmektir. Örnekte <code>JE bitti</code> yerine POP'tan önceki bir etikete atlanır.</p>
+
+<h3 id="s8-1-5-3"><span class="nt-num">8.1.5.3</span>Fazla POP ve yanlış sıra</h3>
+
+<p>Fazla POP'un etkisi de bir izlemeyle görülebilir:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AX, 5
+<span class="kw">PUSH</span> AX
+<span class="kw">POP</span>  BX
+<span class="kw">POP</span>  CX            <span class="cm">; fazladan POP</span>
+<span class="kw">RET</span></code></pre>
+
+<p><code>PUSH AX</code> ile <code>POP BX</code> dengelidir; BX = 0005h ve SP = FFFEh olur. Fazladan <code>POP CX</code>, DOS'un 0000h sözcüğünü CX'e alır ve SP'yi FFFEh + 2 = 0000h yapar. SP 16 bitte sarmıştır. RET şimdi SS:0000h'deki sözcüğü okur. Bu adres PSP'nin başıdır ve ilk iki baytı CD 20'dir. Little-endian düzende bu sözcük 20CDh'dir. IP = 20CDh olur ve işlemci programla ilgisi olmayan bir adrese atlar. Dönüş adresi, yani 0000h, CX'e “yenmiştir”.</p>
+
+<p>Yanlış sıra ise farklı bir belirti verir. <code>PUSH AX</code>, <code>PUSH BX</code>, …, <code>POP AX</code>, <code>POP BX</code> dizisi dengelidir; RET doğru yere döner. Ama AX ile BX'in değerleri takas olmuştur. Prosedürü çağıran program, AX'te kendi bıraktığı değeri bulacağını sanar ve yanlış bir değerle devam eder. Hata, ancak bu değer kullanıldığında ve çoğu zaman prosedürden çok uzakta ortaya çıkar.</p>
+
+<h3 id="s8-1-5-4"><span class="nt-num">8.1.5.4</span>Yığın taşması ve alt taşma</h3>
+
+<p>Dengesizlik bir kez değil de sürekli tekrarlanırsa yığın sınırlarını aşar. 8086 bu sınırları denetlemez; ortada bir hata kesmesi yoktur, yalnız bozulma vardır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-tasma">
+  <span class="nt-box__title">Tanım 8.1.7</span>
+  <p><strong>Yığın taşması</strong> (<span lang="en">stack overflow</span>), yığına ayrılan alandan fazla değer itilmesi ve SP'nin yığın alanının altına inmesidir. <strong>Yığın alt taşması</strong> (<span lang="en">stack underflow</span>), yığına itilmemiş bir değerin çekilmesi ve SP'nin yığın alanının üstüne çıkmasıdır.</p>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-tasma" style="--w:690px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 690 118" role="img" aria-label=".COM programında PSP, kod ve veri kesimin altında; yığın FFFEh'den aşağı büyür. Taşmada koda iner, alt taşmada SP 0000h'ye sarar."><rect class="box" x="10" y="26" width="70" height="30" rx="3"/><text class="txt" x="45.0" y="46" text-anchor="middle" style="font-size:13px">PSP</text><text class="lbl mono" x="10" y="18" text-anchor="start" style="font-size:11.5px">0000h</text><rect class="box" x="80" y="26" width="170" height="30" rx="3"/><text class="txt" x="165.0" y="46" text-anchor="middle" style="font-size:13px">kod + veri</text><text class="lbl mono" x="80" y="18" text-anchor="start" style="font-size:11.5px">0100h</text><rect class="box-empty" x="250" y="26" width="250" height="30" rx="3"/><text class="lbl" x="375.0" y="46" text-anchor="middle" style="font-size:13px">boş alan</text><rect class="box" x="500" y="26" width="170" height="30" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="585.0" y="46" text-anchor="middle" style="font-size:13px">yığın ↓</text><text class="lbl mono" x="670" y="18" text-anchor="end" style="font-size:11.5px">FFFEh</text><path class="line" d="M500.0 72.0 L337.0 72.0"/><path class="ah" d="M330.0 72.0 L337.0 68.2 L337.0 75.8 z"/><text class="lbl" x="415" y="88" text-anchor="middle" style="font-size:12px">taşma: SP küçülür, koda iner</text><path class="line" style="stroke-dasharray:4 3" d="M670 58 C 690 110, 10 110, 12 60"/><text class="lbl" x="340" y="112" text-anchor="middle" style="font-size:12px">alt taşma: SP = FFFEh + 2 → 0000h (sarar)</text></svg></div>
+  <figcaption><b>Şekil 8.1.9:</b> .COM programında PSP, kod ve veri kesimin altında; yığın FFFEh'den aşağı büyür. Taşmada SP küçülerek koda iner; alt taşmada SP FFFEh'den 0000h'ye sarar.</figcaption>
+</figure>
+
+<p><strong>Taşmanın</strong> tipik nedenleri sonsuz özyineleme ve döngü içinde POP'suz PUSH'tur. SP küçüldükçe yığın aşağı iner ve .COM programında aynı kesimdeki veriyi, sonra kodu ezer (<a href="#sekil-tasma">Şekil 8.1.9</a>). Kod ezildikten sonra işlemci bir sonraki turda yığın verisini komut diye çalıştırır. Belirti, çoğu zaman taşmanın başladığı yerden çok uzakta görülür.</p>
+
+<p>Döngüde POP'suz PUSH'un küçük bir örneği şöyledir:</p>
+
+<pre class="nt-code"><code>        <span class="dir">ORG</span>  100h
+        <span class="kw">MOV</span>  CX, 3
+        <span class="kw">MOV</span>  AX, 0100h
+tekrar: <span class="kw">PUSH</span> AX
+        <span class="kw">INC</span>  AX
+        <span class="kw">LOOP</span> tekrar
+        <span class="kw">RET</span></code></pre>
+
+<p>Döngü üç tur döner ve yığına 0100h, 0101h ve 0102h'yi iter. SP = FFF8h olur. RET yığının üstündeki 0102h'yi alır ve IP = 0102h olur. Bu adres programın içindedir, ama bir komutun başı değildir: <code>MOV CX, 3</code> 0100h–0102h'yi kaplar ve 0102h onun son baytıdır. İşlemci 00h baytını yeni bir komutun başı sayar ve anlamsız bir komut dizisini yürütmeye başlar. Üç tur yerine CX = 0 ile başlayan bir döngü 65 536 tur döner. Bu durumda yığın 128 KB kadar değer iter. 64 KB'lık kesim bu kadarını tutamaz: SP sarar ve yığın programın kodunun üzerine yazar.</p>
+
+<p><strong>Alt taşma</strong> PUSH edilmemiş bir değeri POP etmektir. SP = FFFEh iken POP yapılırsa SP = 0000h olur; 16 bitlik toplama sarar. Okunan değer çöptür ya da .COM programında DOS'un 0000h'sidir. Bundan sonraki PUSH, SP'yi FFFEh'ye indirir ve DOS'un sözcüğünün üzerine yazar. Program bu durumda RET ile düzgün sonlanamaz, çünkü dönüş için gereken 0000h ezilmiştir.</p>
+
+<p>Taşmayı önlemenin yolu yığın alanını yeterli büyüklükte seçmektir. Yığın alanının boyutu programın en derin çağrı zincirine ve en çok PUSH sayısına göre seçilir. Her CALL 2 bayt (uzak çağrıda 4 bayt), her PUSH 2 bayt ve her kesme 6 bayt tutar. Kesmeler programın herhangi bir anında gelebilir; donanım kesmesi yordamları da aynı yığını kullanır ve kendi kaydettikleri yazmaçlar için yer ister. .EXE programlarında <code>.STACK 100h</code> gibi bir yönergeyle ayrı ve yeterli bir yığın kesimi ayrılır. Ayrı kesimin bir üstünlüğü de vardır: yığın taşsa bile kodun üzerine yazmaz, yalnız kendi kesiminin altındaki belleği bozar.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-boyut">
+  <span class="nt-box__title">Örnek 8.1.3</span>
+  <p>Bir program en çok dört düzey iç içe yakın CALL yapar. Her prosedür girişte üç yazmacı iter. Programın her anında bir donanım kesmesi gelebilir ve kesme yordamı dört yazmaç iter. Yığının en çok kaç bayt derinleşeceği şöyle bulunur:</p>
+  <ol class="nt-steps">
+    <li>Çağrılar: 4 düzey × (2 bayt dönüş adresi + 3 × 2 bayt yazmaç) = 4 × 8 = 32 bayt.</li>
+    <li>Kesme: 6 bayt (FLAGS, CS, IP) + 4 × 2 bayt yazmaç = 14 bayt.</li>
+    <li>Toplam: 32 + 14 = 46 bayt.</li>
+  </ol>
+  <p>Yığın en çok 46 bayt derinleşir. <code>.STACK 100h</code> ile ayrılan 256 bayt bu program için fazlasıyla yeterlidir; aradaki pay sonradan eklenecek prosedürlere ve BIOS yordamlarının kendi kullanımına kalır.</p>
+</div>
+
+<h3 id="s8-1-5-5"><span class="nt-num">8.1.5.5</span>İyi uygulamalar</h3>
+
+<p>Yığın hatalarının çoğu birkaç yazım alışkanlığıyla önlenir. Sunumdaki altı kural şunlardır:</p>
+
+<ol>
+  <li><strong>Ayna sırası.</strong> <code>PUSH AX</code>, <code>PUSH BX</code>, <code>PUSH CX</code> sırasının tersi <code>POP CX</code>, <code>POP BX</code>, <code>POP AX</code>'tir. Kod alt alta yazıldığında ayna görüntüsü gibi görünmelidir.</li>
+  <li><strong>Tek çıkış.</strong> Prosedürde birden çok RET yerine tek bir çıkış etiketi kullanılır. POP'lar bir kez yazılır ve bütün dallar oradan geçer.</li>
+  <li><strong>SP'ye dokunmamak.</strong> SP'yi doğrudan değiştirmek yalnız iki iş için yapılır: yığından geçirilen parametreleri temizlemek (<code>ADD SP, n</code>) ve yerel değişkenlere yer ayırmak (<code>SUB SP, n</code>). n her zaman çift olmalıdır.</li>
+  <li><strong>BP çerçevesi.</strong> Yığındaki verilere <code>[SP+n]</code> ile erişilemez, çünkü 8086'da SP taban yazmacı değildir. <code>MOV BP, SP</code> yapılır ve <code>[BP+n]</code> kullanılır; BP varsayılan olarak SS kesimini adresler.</li>
+  <li><strong>Kesimleri korumak.</strong> DS ya da ES'yi değiştiren yordamlar onları da PUSH ve POP etmelidir. Çağıran program kendi veri kesiminin değiştiğini bilemez.</li>
+  <li><strong>emu8086 ile denetlemek.</strong> Yığın penceresi açılır ve RET'ten önce SP'nin girişteki değerine döndüğü denetlenir.</li>
+</ol>
+
+<figure class="nt-fig" id="sekil-ayna" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 380 98" role="img" aria-label="PUSH AX, BX, CX sırasının tersi POP CX, BX, AX: çizgiler aynı yazmacı birleştirir."><rect class="box" x="10" y="8" width="110" height="22" rx="3"/><text class="txt mono" x="65" y="24" text-anchor="middle" style="font-size:12.5px">PUSH AX</text><rect class="box" x="260" y="8" width="110" height="22" rx="3"/><text class="txt mono" x="315" y="24" text-anchor="middle" style="font-size:12.5px">POP  CX</text><path class="line" style="stroke-dasharray:3 3" d="M122 19 L258 67"/><rect class="box" x="10" y="32" width="110" height="22" rx="3"/><text class="txt mono" x="65" y="48" text-anchor="middle" style="font-size:12.5px">PUSH BX</text><rect class="box" x="260" y="32" width="110" height="22" rx="3"/><text class="txt mono" x="315" y="48" text-anchor="middle" style="font-size:12.5px">POP  BX</text><path class="line" style="stroke-dasharray:3 3" d="M122 43 L258 43"/><rect class="box" x="10" y="56" width="110" height="22" rx="3"/><text class="txt mono" x="65" y="72" text-anchor="middle" style="font-size:12.5px">PUSH CX</text><rect class="box" x="260" y="56" width="110" height="22" rx="3"/><text class="txt mono" x="315" y="72" text-anchor="middle" style="font-size:12.5px">POP  AX</text><path class="line" style="stroke-dasharray:3 3" d="M122 67 L258 19"/><text class="lbl" x="190" y="92" text-anchor="middle" style="font-size:12px">ayna görüntüsü</text></svg></div>
+  <figcaption><b>Şekil 8.1.10:</b> Ayna sırası. PUSH AX, BX, CX sırasının tersi POP CX, BX, AX'tir; çizgiler aynı yazmacı birleştirir ve birbirini kesmez.</figcaption>
+</figure>
+
+<p><a href="#sekil-ayna">Şekil 8.1.10</a> ayna sırasını görsel olarak verir. PUSH'lar ile POP'lar arasındaki çizgiler iç içe geçmiş yaylar oluşturur. Çizgiler birbirini kesiyorsa sıra yanlıştır. Bu görüntü, açılış ve kapanış parantezlerinin iç içe dizilişine benzer: en son açılan parantez ilk kapanır.</p>
+
+<p>Aşağıdaki iskelet bu kuralların hepsini bir arada gösterir:</p>
+
+<pre class="nt-code"><code>yordam <span class="dir">PROC</span>
+       <span class="kw">PUSH</span> AX          <span class="cm">; kullanılan yazmaçlar</span>
+       <span class="kw">PUSH</span> BX
+       <span class="kw">PUSH</span> DS          <span class="cm">; kesim de değişecek</span>
+       <span class="cm">; … iş …</span>
+       <span class="kw">JC</span>   cikis         <span class="cm">; hata dalı da çıkıştan geçer</span>
+       <span class="cm">; … iş …</span>
+cikis: <span class="kw">POP</span>  DS            <span class="cm">; ayna sırası</span>
+       <span class="kw">POP</span>  BX
+       <span class="kw">POP</span>  AX
+       <span class="kw">RET</span>
+yordam <span class="dir">ENDP</span></code></pre>
+
+<h3 id="s8-1-5-6"><span class="nt-num">8.1.5.6</span>emu8086 ile yığını izlemek</h3>
+
+<p>Bu notun izleme tablolarının hepsi emu8086'da adım adım elde edilebilir. Yöntem dört adımdan oluşur.</p>
+
+<ol>
+  <li><strong>Derle ve yükle.</strong> Program <span lang="en">compile</span> ile derlenir, <span lang="en">emulate</span> ile öykünücüye yüklenir. Yazmaç panelinde CS, IP, SS ve SP'nin başlangıç değerleri görülür: .COM programı için 0700h, 0100h, 0700h ve FFFEh.</li>
+  <li><strong>Tek adım.</strong> <span lang="en">single step</span> düğmesi her basışta bir komut çalıştırır ve değişen yazmaçlar vurgulanır. <span lang="en">step back</span> son adımı geri alır; bir PUSH'un etkisini tekrar görmek için kullanışlıdır.</li>
+  <li><strong>Yığın penceresi.</strong> Alttaki <span lang="en">stack</span> düğmesi SS:SP çevresindeki sözcükleri gösteren pencereyi açar. SP'nin gösterdiği satır işaretlidir. Her PUSH'ta işaret bir satır yukarı (daha küçük adrese), her POP'ta bir satır aşağı kayar.</li>
+  <li><strong>Bellek görünümü.</strong> Öykünücünün ortasındaki liste baytları onaltılık, onluk ve ASCII olarak gösterir. <code>B8 12 12</code> baytları <code>MOV AX, 1212h</code> komutudur. Little-endian düzen burada görülür: <code>MOV AX, 1234h</code> B8 34 12 olarak kodlanır.</li>
+</ol>
+
+<p>Yüklemeden sonra CX programın bayt sayısını gösterir; takas örneğinde bu değer 000Bh, yani 11 bayttır. Bir program bu değere güvenmemeli, CX'i kullanmadan önce kendisi yüklemelidir. emu8086'nın yığın penceresinde FFFEh satırında görülen 0000h da bir rastlantı değildir; program sonundaki RET'in dönüş adresidir. Programın her RET'inden önce bu satıra bakmak, yığın dengesini denetlemenin en kısa yoludur.</p>
+
+<h2 class="nt-pb" id="s8-1-6"><span class="nt-num">8.1.6</span>Alıştırmalar ve çözümleri</h2>
+
+<p>Sunumdaki beş alıştırma burada ara adımlarıyla çözülmüştür.</p>
+
+<p><strong>1. SS = 2000h, SP = 0100h iken PUSH AX sonrası yazılan baytların fiziksel adresleri nedir?</strong></p>
+<p>PUSH önce SP'yi azaltır: SP = 0100h − 2 = 00FEh. Yığının yeni üstü 2000h × 10h + 00FEh = 20000h + 00FEh = 200FEh'dir. Little-endian düzende AL 200FEh'ye, AH 200FFh'ye yazılır. AX = 1234h olsaydı [200FEh] = 34h ve [200FFh] = 12h olurdu.</p>
+
+<p><strong>2. MOV AX,1 / MOV BX,2 / MOV CX,3 / PUSH AX / PUSH BX / PUSH CX / POP BX / POP CX / POP AX sonunda AX, BX, CX nedir?</strong></p>
+<p>Üç PUSH'tan sonra yığın üstten alta 3, 2, 1'dir. <code>POP BX</code> 3'ü, <code>POP CX</code> 2'yi, <code>POP AX</code> 1'i alır. Sonuç AX = 1, BX = 3, CX = 2'dir. AX yerinde kalır, BX ile CX takas edilir. AX hem ilk itilen hem de son çekilen yazmaç olduğu için sabit kalmıştır.</p>
+
+<p><strong>3. Yalnız PUSH ve POP ile DS'nin değerini ES'ye kopyalayın.</strong></p>
+<p><code>PUSH DS</code> ve ardından <code>POP ES</code>. İki komut iki bayttır (1Eh, 07h) ve hiçbir genel amaçlı yazmacı bozmaz. Yığın dengeli kalır.</p>
+
+<p><strong>4. SP = FFFEh iken PUSH AX / PUSH BX / PUSHF / POP CX yürütülüyor. SP kaç olur, CX'e ne gelir?</strong></p>
+<p>Üç itme SP'yi 6 azaltır, bir çekme 2 artırır: FFFEh − 6 + 2 = FFFAh. CX'e en son itilen sözcük, yani PUSHF anındaki bayrak sözcüğü gelir. Bir .COM programının başında bu değer F202h'dir. Yığında AX ve BX'in kopyaları kalır; program bu hâliyle RET ile bitirilirse BX'in değerine döner.</p>
+
+<p><strong>5. AX'i ve bayrakları bir işlem boyunca koruyan PUSH/POP dizisini yazın.</strong></p>
+<p><code>PUSH AX</code>, <code>PUSHF</code>, … işlem …, <code>POPF</code>, <code>POP AX</code>. Bayraklar en son itildiği için ilk çekilir; dizi ayna sırasına uyar. Örneğin AX = 0000h, CF = ZF = 1 iken sarmalın içinde <code>MOV AX, 7</code> ve <code>ADD AX, 1</code> çalıştırılsın. Sarmalın sonunda AX = 0000h, CF = 1, ZF = 1 ve SP = FFFEh olur.</p>
+
+<h2 class="nt-pb" id="s8-1-7"><span class="nt-num">8.1.7</span>Özet</h2>
+
+<ul>
+  <li><strong>Yığın</strong>, geçici verileri saklamak için ayrılmış ve son giren ilk çıkar (<strong>LIFO</strong>) düzeninde çalışan bir bellek alanıdır. Programcı (PUSH, POP), işlemci (CALL, INT) ve işletim sistemi aynı yığını kullanır.</li>
+  <li>Yığının üstü <strong>SS:SP</strong>'dir; fiziksel adresi SS × 10h + SP'dir. .COM programında SS = CS ve SP = FFFEh, .EXE programında başlıktaki değerler kullanılır. BP de varsayılan olarak SS kesimini adresler; SP adresleme ifadesinde kullanılamaz.</li>
+  <li>Yığın <strong>aşağı doğru büyür</strong>: PUSH SP'yi 2 azaltır, POP 2 artırır. Birim her zaman sözcüktür; <code>PUSH AL</code> geçersizdir. .COM programında kod yukarı, yığın aşağı büyür ve aradaki boş alanı paylaşır.</li>
+  <li><strong>PUSH</strong>: önce SP ← SP − 2, sonra [SS:SP] ← kaynak. <strong>POP</strong>: önce hedef ← [SS:SP], sonra SP ← SP + 2. POP belleği silmez. SP her an dolu olan en üst hücreyi gösterir.</li>
+  <li>PUSH yazmaç, kesim yazmacı ve bellek sözcüğü alır; anlık değerli PUSH yalnız 80186 ve sonrasında vardır. POP CS ve POP sabit yoktur. 8086'da <code>PUSH SP</code> azaltılmış değeri yazar.</li>
+  <li>Sözcük yığına <strong>little-endian</strong> yazılır: düşük bayt SP'nin gösterdiği adrese, yüksek bayt bir üstüne. SP çift tutulur; tek SP her erişimi iki yol çevrimine çıkarır.</li>
+  <li>PUSH, POP ve PUSHF <strong>bayrakları değiştirmez</strong>; POPF bütün bayrakları yükler. Bir CMP sonucu PUSH ve POP arasında güvenle taşınır.</li>
+  <li>Yazmaç saklarken POP sırası PUSH sırasının tersidir (<strong>ayna sırası</strong>); aynı sırayla POP değerleri takas eder ya da ters çevirir. Yığınla bir dizi ters çevrilebilir. İki yazmacın takası için en iyi yol XCHG'dir; yığının asıl görevi saklamadır.</li>
+  <li><strong>PUSHF/POPF</strong> bayrak yazmacının tamamını saklar ve geri yükler. Bayrak sözcüğü bir yazmaca PUSHF ve POP ile alınır; TF bu yolla değiştirilir. INT bayrakları kendiliğinden iter, CALL itmez.</li>
+  <li>Her yolda ve her dalda <strong>eşit sayıda PUSH ve POP</strong> yapılır. .COM programında son RET, DOS'un koyduğu 0000h'yi alır ve PSP'deki INT 20h programı bitirir. Fazla PUSH'ta RET veriye, fazla POP'ta yığının ötesine döner.</li>
+  <li>8086 <strong>taşmayı ve alt taşmayı</strong> denetlemez: SP 16 bitte sarar ve yığın kodu ezebilir. Yığın alanı en derin çağrı zinciri, en çok PUSH ve kesmeler hesaba katılarak seçilir.</li>
+</ul>
+
+<h2 id="s8-1-8"><span class="nt-num">8.1.8</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">yığın <span lang="en">stack</span></a></li>
+  <li><a href="../sozluk.html">LIFO (son giren ilk çıkar) <span lang="en">last in, first out</span></a></li>
+  <li><a href="../sozluk.html">yığına itme / yığından alma (PUSH / POP) <span lang="en">push / pop</span></a></li>
+  <li><a href="../sozluk.html">yığın kesimi (SS) <span lang="en">stack segment</span></a></li>
+  <li><a href="../sozluk.html">işaretçi yazmacı (SP, BP) <span lang="en">pointer register</span></a></li>
+  <li><a href="../sozluk.html">taban işaretçisi (BP) <span lang="en">base pointer</span></a></li>
+  <li><a href="../sozluk.html">bayrak yazmacı (FLAGS) <span lang="en">flags register</span></a></li>
+  <li><a href="../sozluk.html">yığın taşması / alt taşması <span lang="en">stack overflow / underflow</span></a></li>
+  <li><a href="../sozluk.html">little-endian / big-endian</a></li>
+  <li><a href="../sozluk.html">kesim:bağıl konum (mantıksal adres) <span lang="en">segment:offset</span></a></li>
+  <li><a href="../sozluk.html">fiziksel adres <span lang="en">physical address</span></a></li>
+  <li><a href="../sozluk.html">varsayılan kesim <span lang="en">default segment</span></a></li>
+  <li><a href="../sozluk.html">dönüş adresi <span lang="en">return address</span></a></li>
+  <li><a href="../sozluk.html">yazmaçların korunması <span lang="en">register preservation</span></a></li>
+  <li><a href="../sozluk.html">veri taşıma komutu <span lang="en">data transfer instruction</span></a></li>
+</ul>
+
+<h2 id="s8-1-9"><span class="nt-num">8.1.9</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>SS = 3000h ve SP = 0000h iken <code>PUSH AX</code> çalışıyor. SP kaç olur? AX'in iki baytı hangi fiziksel adreslere yazılır?</p>
+    <details><summary>Cevap</summary>
+      <p>SP = 0000h − 2 = FFFEh; 16 bitlik çıkarma sarar. Yığının üstü 30000h + FFFEh = 3FFFEh'dir. AL 3FFFEh'ye, AH 3FFFFh'ye yazılır. SP = 0000h başlangıç değeri, yığının kesimin en üstünden başlaması için kullanılabilir; ilk PUSH kesimin son sözcüğüne yazar.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV AX, 1A2Bh</code>, <code>PUSH AX</code>, <code>MOV BX, SP</code>, <code>MOV DL, [BX+1]</code>, <code>MOV DH, [BX]</code>, <code>POP AX</code> dizisinden sonra (.COM programı, SP = FFFEh ile başlıyor) BX ve DX nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>BX = FFFCh. [FFFCh] = 2Bh (düşük bayt), [FFFDh] = 1Ah (yüksek bayt). DL = 1Ah, DH = 2Bh; DX = 2B1Ah olur. Baytlar ters yerlere okunduğu için DX, AX'in baytları yer değiştirmiş hâlidir.</p>
+    </details>
+  </li>
+  <li>
+    <p>AX = AAAAh, BX = BBBBh, CX = CCCCh iken <code>PUSH AX</code>, <code>PUSH BX</code>, <code>PUSH CX</code>, <code>POP BX</code>, <code>POP AX</code>, <code>POP CX</code> çalışıyor. Sonuçta üç yazmaç nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>Yığın üstten alta CCCCh, BBBBh, AAAAh'dir. BX = CCCCh, AX = BBBBh, CX = AAAAh olur. Her yazmaç bir başkasının değerini almıştır; yığın dengelidir.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>STC</code>, <code>PUSHF</code>, <code>CLC</code>, <code>POPF</code> dizisinden sonra CF kaçtır? <code>POPF</code> yerine <code>POP AX</code> yazılsaydı CF ve AX ne olurdu (programın başında IF = 1, diğer bayraklar 0)?</p>
+    <details><summary>Cevap</summary>
+      <p>POPF, STC sonrası saklanan sözcüğü geri yükler: CF = 1. POP AX ile CF, CLC'nin bıraktığı gibi 0 kalır ve AX = F203h olur (sabit bitler F002h, IF 0200h, CF 0001h).</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir .COM programı <code>MOV AX, 5</code>, <code>PUSH AX</code>, <code>PUSH AX</code>, <code>POP BX</code>, <code>RET</code> ile bitiyor. RET'ten sonra IP kaçtır? Program düzgün sonlanır mı?</p>
+    <details><summary>Cevap</summary>
+      <p>İki PUSH'a bir POP karşılık gelir; yığının üstünde ikinci 0005h kalır. RET bu değeri alır: IP = 0005h. İşlemci PSP'nin içindeki bir adrese atlar; program INT 20h'ye ulaşmaz ve düzgün sonlanmaz.</p>
+    </details>
+  </li>
+  <li>
+    <p>Yığınla diziyi ters çeviren 26 baytlık program 0100h–0119h'yi kaplıyor. SP = FFFEh'den başlayan yığına, programın üzerine yazmadan en çok kaç sözcük itilebilir?</p>
+    <details><summary>Cevap</summary>
+      <p>n itmeden sonra SP = FFFEh − 2n olur ve SP ≥ 011Ah kalmalıdır. n ≤ (FFFEh − 011Ah) / 2 = (65 534 − 282) / 2 = 32 626. En çok 32 626 sözcük itilebilir.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir öğrenci <code>CMP AX, BX</code> ile <code>JE</code> arasına <code>PUSH CX</code>, <code>INC CX</code>, <code>POP CX</code> koyuyor. JE karşılaştırmanın sonucuna göre mi atlar?</p>
+    <details><summary>Cevap</summary>
+      <p>Hayır. PUSH ve POP bayrakları değiştirmez, ama <code>INC CX</code> ZF'yi CX'in yeni değerine göre yeniden kurar. JE artık CMP'nin değil INC'in sonucuna bakar. Çözüm, araya PUSHF/POPF koymak ya da INC'i karşılaştırmadan önceye almaktır.</p>
+    </details>
+  </li>
+  <li>
+    <p>8086'da yığınla takas (iki PUSH, iki POP) ile <code>XCHG AX, BX</code> kaç saat turu sürer? 5 MHz'de fark kaç µs'dir?</p>
+    <details><summary>Cevap</summary>
+      <p>Yığınla: 2 × 11 + 2 × 8 = 38 tur. XCHG AX, BX: 3 tur. Fark 35 tur; 5 MHz'de bir tur 200 ns olduğundan 35 × 200 ns = 7 µs'dir.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s8-1-10"><span class="nt-num">8.1.10</span>İleri okuma</h2>
+
+<ul>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979): PUSH, POP, PUSHF, POPF, CALL, RET, INT ve IRET'in kesin tanımları, kodlamaları ve saat turu sayıları; S3–S6 durum bitlerinin anlamı. Tablo 8.1.2 ve 8.1.6'daki değerler bu kaynaktandır.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8. baskı), Bölüm 4: veri taşıma komutları arasında yığın komutları, yığının başlatılması ve PUSH/POP'un ayrıntılı örnekleri.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em> (7. baskı), yığın işlemleri bölümü: çalışma anı yığını, yazmaçların korunması ve yığınla dizgi ters çevirme örneği.</li>
+</ul>
+
+<h2 id="s8-1-11"><span class="nt-num">8.1.11</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979 — PUSH, POP, CALL, RET, INT, IRET komut tanımları.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009 — Bölüm 4 ve 6.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, 7. baskı, Pearson, 2014 — yığın işlemleri ve prosedürler.</li>
+  <li>emu8086 yardım belgeleri: 8086 Assembler Tutorial, Part 9 (The Stack).</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_08_Yigin.html">Bölüm 8.1 sunumu</a> · <a href="../slides/Bolum_08_Yigin_Calisma_Sorulari.html">Çalışma soruları</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

@@ -1,0 +1,1367 @@
+---
+layout: without-sidebar
+title: "Bölüm 5.1: Kesmeler — Ders Notu"
+permalink: /files/microprocessors/notlar/Bolum_05_Kesmeler_Ders_Notu.html
+excerpt: "Mikroişlemciler dersi Bölüm 5.1 ders notu: kesme kavramı, yoklama ile kesmenin karşılaştırılması, yazılım, donanım ve iç kesmeler, kesme vektör tablosu, INT ve IRET'in yığına etkisi, bölme hatası, INTO, tek adım ve kesme noktası, INTR ve NMI, kesme önceliği, 8259A ve IMR ile maskeleme, kesme gecikmesi ve kendi kesme hizmet yordamını yazmak; her kod parçası adım adım izlenir."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+/* sunumdaki SVG'lerin bölüme özgü sınıfları (Bolum_05_Kesmeler.html ile aynı; kapsam .ds-notes) */
+.ds-notes .ds-svg .mono, .ds-notes .ds-svg .mt-mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-fig { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-wire { stroke: var(--ds-link); stroke-width: 2.4; fill: none; }
+.ds-notes .ds-svg .mt-wire0 { stroke: var(--ds-muted); stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+.ds-notes .ds-svg .mt-sig { stroke: var(--ds-text); stroke-width: 2; fill: none; }
+.ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 290px; min-width: 0; max-width: calc(50% - 0.7rem); }
+@media (max-width: 560px) { .ds-notes .nt-fig__row--2 > svg.ds-svg { max-width: 100%; } }
+.ds-notes .n51-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">Mikroişlemciler · Ders Notu</p>
+  <h1>Bölüm 5.1: Kesmeler</h1>
+  <p class="nt-lead">Bir işlemci yalnız kendi programını yürütseydi dış dünyadan haberi olmazdı. Klavyeye basılır, zamanlayıcı bir darbe üretir, disk sürücüsü veriyi hazırlar; işlemcinin bu olaylara zamanında cevap vermesi gerekir. Kesme, işlemcinin o anki işini bir komut sınırında bırakıp olaya ait yordamı çalıştırması ve sonra kaldığı yerden devam etmesidir. Not, kesmenin ne olduğunu ve yoklamadan farkını anlatarak başlar. Ardından 8086'nın kesme vektör tablosunu ve INT ile IRET komutlarının yığına etkisini ele alır. Sonra işlemcinin kendi ürettiği istisnalara, INTR ve NMI pinlerinden gelen donanım kesmelerine, 8259A kesme denetleyicisine ve kesme gecikmesine geçer. Son kesimde bir kesme hizmet yordamı baştan yazılır, vektörü kurulur ve program biterken eski vektör geri yüklenir. Her kod parçası yazmaçlar, bayraklar, vektör tablosu ve yığınla birlikte adım adım izlenir.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_05_Kesmeler.html">Sunum</a></li>
+    <li><a href="../pdf/Bolum_05_Kesmeler.pdf">Sunum (PDF)</a></li>
+    <li><a href="../slides/Bolum_05_Kesmeler_Calisma_Sorulari.html">Çalışma soruları</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+    <li><a href="../slides/Chapter_05_Interrupt-Vector.html">Kesme Vektör Tablosu</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Yığın, CALL ve RET</a></li>
+    <li><a href="../slides/CPU_Simulator.html">İşlemci Simülatörü</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>Kesme kavramını açıklamak</dt>
+    <dd>Kesmenin ne olduğunu, yoklamadan (<span lang="en">polling</span>) farkını ve yazılım, donanım ve iç kesmelerin nereden geldiğini açıklamak.</dd>
+    <dt>Vektör adresini hesaplamak</dt>
+    <dd>Kesme vektör tablosunu kullanarak tip n için vektörün adresini (n × 4), oradaki baytlardan ISR'nin CS:IP değerini ve fiziksel adresini bulmak.</dd>
+    <dt>INT ve IRET'i yığında izlemek</dt>
+    <dd>INT n ve IRET sırasında FLAGS, CS ve IP'nin yığına hangi sırayla yazıldığını, SP'nin nasıl değiştiğini ve IF ile TF'nin neden sıfırlandığını adım adım göstermek.</dd>
+    <dt>İstisnaları tanımak</dt>
+    <dd>Bölme hatasının (INT 0) iki nedenini, INTO'nun (INT 4) çalışma koşulunu, tek adım (INT 1) ve kesme noktası (INT 3) düzeneklerini açıklamak.</dd>
+    <dt>Donanım kesmelerini izlemek</dt>
+    <dd>INTR kabul sürecini, kesme önceliklerini, 8259A'nın IRR, IMR ve ISR yazmaçlarını ve IMR ile tek bir IRQ'yu maskelemeyi izlemek; kesme gecikmesini saat turu olarak hesaplamak.</dd>
+    <dt>Kesme hizmet yordamı yazmak</dt>
+    <dd>Kendi ISR'sini yazmak, vektörünü güvenle kurmak, eski vektörü saklayıp geri yüklemek ve ISR yazım kurallarına uymak.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s5-1-1">5.1.1 Kesme kavramı</a>
+      <ol>
+        <li><a href="#s5-1-1-1">5.1.1.1 Kesme nedir?</a></li>
+        <li><a href="#s5-1-1-2">5.1.1.2 Yoklama mı, kesme mi?</a></li>
+        <li><a href="#s5-1-1-3">5.1.1.3 Kesme türleri ve tip numaraları</a></li>
+        <li><a href="#s5-1-1-4">5.1.1.4 Üç kaynağın karşılaştırması</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-2">5.1.2 Kesme vektör tablosu</a>
+      <ol>
+        <li><a href="#s5-1-2-1">5.1.2.1 Tablonun yapısı</a></li>
+        <li><a href="#s5-1-2-2">5.1.2.2 Vektör adresi adım adım</a></li>
+        <li><a href="#s5-1-2-3">5.1.2.3 Tablodan yordama, yordamdan tabloya</a></li>
+        <li><a href="#s5-1-2-4">5.1.2.4 PC'de tip numaralarının paylaşımı</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-3">5.1.3 INT ve IRET</a>
+      <ol>
+        <li><a href="#s5-1-3-1">5.1.3.1 INT n'in adımları</a></li>
+        <li><a href="#s5-1-3-2">5.1.3.2 Yığın adım adım: INT 10h</a></li>
+        <li><a href="#s5-1-3-3">5.1.3.3 INT/IRET ile CALL/RET</a></li>
+        <li><a href="#s5-1-3-4">5.1.3.4 RET ile biten ISR: kod izleme</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-4">5.1.4 İstisnalar</a>
+      <ol>
+        <li><a href="#s5-1-4-1">5.1.4.1 Bölme hatası (INT 0)</a></li>
+        <li><a href="#s5-1-4-2">5.1.4.2 Kendi INT 0 yordamımız: kod izleme</a></li>
+        <li><a href="#s5-1-4-3">5.1.4.3 INTO ve taşma kesmesi (INT 4)</a></li>
+        <li><a href="#s5-1-4-4">5.1.4.4 Tek adım (INT 1)</a></li>
+        <li><a href="#s5-1-4-5">5.1.4.5 Kesme noktası (INT 3)</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-5">5.1.5 Donanım kesmeleri</a>
+      <ol>
+        <li><a href="#s5-1-5-1">5.1.5.1 INTR ve NMI pinleri</a></li>
+        <li><a href="#s5-1-5-2">5.1.5.2 INTR kabul süreci</a></li>
+        <li><a href="#s5-1-5-3">5.1.5.3 Öncelik ve PC kesme haritası</a></li>
+        <li><a href="#s5-1-5-4">5.1.5.4 8259A kesme denetleyicisi</a></li>
+        <li><a href="#s5-1-5-5">5.1.5.5 IMR ile maskeleme: kod izleme</a></li>
+        <li><a href="#s5-1-5-6">5.1.5.6 Kesmenin bekletildiği anlar</a></li>
+        <li><a href="#s5-1-5-7">5.1.5.7 Kesme gecikmesi</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-6">5.1.6 Kendi kesme hizmet yordamımız</a>
+      <ol>
+        <li><a href="#s5-1-6-1">5.1.6.1 Vektörü kurmak: INT 90h</a></li>
+        <li><a href="#s5-1-6-2">5.1.6.2 INT 60h ile kendi ISR'miz: kod izleme</a></li>
+        <li><a href="#s5-1-6-3">5.1.6.3 Vektörü sakla, değiştir, geri yükle: kod izleme</a></li>
+        <li><a href="#s5-1-6-4">5.1.6.4 ISR yazım kuralları</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-7">5.1.7 Alıştırmalar ve çözümleri</a></li>
+    <li><a href="#s5-1-8">5.1.8 Özet</a></li>
+    <li><a href="#s5-1-9">5.1.9 Kavram listesi</a></li>
+    <li><a href="#s5-1-10">5.1.10 Kendini Dene</a></li>
+    <li><a href="#s5-1-11">5.1.11 İleri okuma</a></li>
+    <li><a href="#s5-1-12">5.1.12 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 id="s5-1-1"><span class="nt-num">5.1.1</span>Kesme kavramı</h2>
+
+<h3 id="s5-1-1-1"><span class="nt-num">5.1.1.1</span>Kesme nedir?</h3>
+
+<p>Bir program çalışırken işlemci komutları sırayla getirir, çözer ve yürütür. IP her komuttan sonra bir sonraki komutu gösterir; atlama ve çağrı komutları dışında bu sıra bozulmaz. Oysa bilgisayarın çevresinde programdan bağımsız olaylar olur. Kullanıcı bir tuşa basar, zamanlayıcı yongası belirli aralıklarla darbe üretir, seri porta bir karakter ulaşır. İşlemcinin bu olayları kaçırmaması ve onlara kısa sürede cevap vermesi gerekir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kesme">
+  <span class="nt-box__title">Tanım 5.1.1</span>
+  <p><strong>Kesme</strong> (<span lang="en">interrupt</span>), işlemcinin o anki işini geçici olarak bırakıp özel bir yordamı çalıştırmasını sağlayan olaydır. Bu yordama <strong>kesme hizmet yordamı</strong> (<span lang="en">interrupt service routine</span>, ISR) denir. ISR bitince işlemci, kesildiği komuttan sonraki komutla programa devam eder.</p>
+</div>
+
+<p>Tanımdaki en önemli nokta son cümledir. Kesilen program kesildiğini fark etmez. Yazmaçları, bayrakları ve belleği, kesme olmasaydı alacakları değerlerle devam eder. Bunu sağlamak hem işlemcinin hem de ISR'yi yazan programcının görevidir. İşlemci dönüş adresini ve bayrakları kendiliğinden saklar. ISR ise kullandığı yazmaçları saklayıp çıkarken geri yükler.</p>
+
+<p>Günlük hayattan bir benzetme kesmenin adımlarını iyi anlatır. Kitap okurken telefon çalar. Okuyucu önce okuduğu sayfayı işaretler, sonra telefonu açar ve konuşur. Konuşma bitince işaretli sayfaya döner ve okumayı sürdürür. Sayfayı işaretlemek dönüş adresini saklamaktır; telefon konuşması ISR'dir; işaretli sayfaya dönmek IRET komutudur. Okuyucu sayfayı işaretlemeyi unutursa nereden devam edeceğini bilemez. İşlemci de dönüş adresini yığına yazmadan ISR'ye geçseydi aynı duruma düşerdi.</p>
+
+<figure class="nt-fig" id="sekil-kesme" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 96" role="img" aria-label="Ana program kesilir, ISR çalışır, IRET ile kalınan yere dönülür"><defs><marker id="n51-1-mt2-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-acc" x="4" y="30" width="230" height="30" rx="4"/><text class="mt-s" x="119" y="50" text-anchor="middle">ana program</text><rect class="mt-acc" x="366" y="30" width="230" height="30" rx="4"/><text class="mt-s" x="481" y="50" text-anchor="middle">ana program (devam)</text><path class="mt-wire" d="M234 45 Q250 8 270 8 H330 Q350 8 362 40" marker-end="url(#n51-1-mt2-5)"/><rect class="mt-hot" x="262" y="62" width="76" height="28" rx="4"/><text class="mt-v" x="300" y="81" text-anchor="middle">ISR</text><path class="line" d="M236 52 L262 72" marker-end="url(#n51-1-mt2-5)"/><path class="line" d="M338 72 L364 54" marker-end="url(#n51-1-mt2-5)"/><text class="lbl" x="232" y="92" text-anchor="end" style="font-size:11px">INT / istek</text><text class="lbl" x="368" y="92" text-anchor="start" style="font-size:11px">IRET</text><text class="lbl" x="300" y="30" text-anchor="middle" style="font-size:11px">dönüş adresi yığında</text></svg></div>
+  <figcaption><b>Şekil 5.1.1:</b> Ana program bir istek ya da INT komutuyla kesilir, ISR çalışır ve IRET ile kalınan yere dönülür. Dönüş adresi bu süre boyunca yığında durur.</figcaption>
+</figure>
+
+<p><a href="#sekil-kesme">Şekil 5.1.1</a> bu akışı zaman ekseninde gösterir. Ana program bir noktada durur, denetim ISR'ye geçer, ISR'nin son komutu IRET denetimi ana programa geri verir. Kesmeyi başlatan şey iki türlü olabilir. Program bir INT komutu yürütür ya da işlemcinin dışından bir istek gelir. İki durumda da işlemcinin sonrasında yaptıkları aynıdır.</p>
+
+<p>Kesmelerin ikinci, daha gündelik bir kullanımı da vardır. 8086 tabanlı bir PC'de ekrana karakter yazmak, klavyeden tuş okumak, diske erişmek ya da programı bitirmek için hazır yordamlar bulunur. Bunlar anakarttaki ROM'da duran BIOS'un ve işletim sistemi DOS'un yordamlarıdır. Program bu yordamları adreslerini bilmeden, bir INT komutuyla çağırır. Örneğin ekrana karakter yazmak için video donanımını süren onlarca komut yazmak gerekmez; <code>INT 10h</code> bu işi yapar. Bu yüzden yazılım kesmeleri, programlamayı kolaylaştıran hazır hizmetler olarak da görülür. Ekran, klavye, disk sürücüsü ve bellek yönetimi gibi donanımlarla çalışan kesme işlevlerinin ayrıntısı 5.2 Kesme Fonksiyonları notunun konusudur. Bu not kesmenin kendisini, yani işlemcinin bir kesmeyi nasıl kabul edip nasıl geri döndüğünü anlatır.</p>
+
+<h3 id="s5-1-1-2"><span class="nt-num">5.1.1.2</span>Yoklama mı, kesme mi?</h3>
+
+<p>İşlemcinin bir aygıtın durumunu öğrenmesinin iki yolu vardır. Birincisi aygıta sürekli sormaktır: “Veri hazır mı?” Bu yönteme <strong>yoklama</strong> (<span lang="en">polling</span>) denir. İşlemci bir döngü içinde aygıtın durum portunu okur, hazır bitine bakar, hazır değilse yeniden okur. İkincisi aygıtın kendisinin haber vermesidir. Aygıt verisi hazır olduğunda işlemcinin bir pinini sürer; işlemci o anki komutu bitirir ve ISR'ye geçer. Bu da kesme yöntemidir.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-yoklama" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 210" role="img" aria-label="Yoklamada CPU aygıtı sürekli sorar; kesmede aygıt hazır olunca CPU&#x27;yu uyarır, ISR çalışır ve ana programa dönülür."><defs><marker id="n51-2-m05k-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="10" y="22" text-anchor="start">Yoklama (polling)</text><rect class="box" x="10" y="34" width="60" height="30" rx="3"/><text class="lbl" x="40" y="54" text-anchor="middle">hazır?</text><rect class="box" x="80" y="34" width="60" height="30" rx="3"/><text class="lbl" x="110" y="54" text-anchor="middle">hazır?</text><rect class="box" x="150" y="34" width="60" height="30" rx="3"/><text class="lbl" x="180" y="54" text-anchor="middle">hazır?</text><rect class="box" x="220" y="34" width="60" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="lbl" x="250" y="54" text-anchor="middle">hazır?</text><rect class="box" x="290" y="34" width="60" height="30" rx="3"/><text class="lbl" x="320" y="54" text-anchor="middle">hazır?</text><rect class="box" x="360" y="34" width="60" height="30" rx="3"/><text class="lbl" x="390" y="54" text-anchor="middle">hazır?</text><rect class="box" x="430" y="34" width="60" height="30" rx="3"/><text class="lbl" x="460" y="54" text-anchor="middle">hazır?</text><rect class="box" x="500" y="34" width="60" height="30" rx="3"/><text class="lbl" x="530" y="54" text-anchor="middle">hazır?</text><rect class="box" x="570" y="34" width="60" height="30" rx="3"/><text class="lbl" x="600" y="54" text-anchor="middle">hazır?</text><rect class="box" x="640" y="34" width="60" height="30" rx="3"/><text class="lbl" x="670" y="54" text-anchor="middle">hazır?</text><text class="lbl" x="10" y="86" text-anchor="start">CPU sürekli aygıtı sorar; çoğu soru boşa gider, veri geç fark edilebilir.</text><text class="txt" x="10" y="122" text-anchor="start">Kesme (interrupt)</text><rect class="box" x="10" y="134" width="250" height="30" rx="3"/><text class="lbl" x="135" y="154" text-anchor="middle">ana program</text><rect class="box" x="270" y="134" width="120" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt" x="330" y="154" text-anchor="middle">ISR</text><rect class="box" x="400" y="134" width="310" height="30" rx="3"/><text class="lbl" x="555" y="154" text-anchor="middle">ana program (kaldığı yerden)</text><path class="line" d="M265 106 L265 130" marker-end="url(#n51-2-m05k-m1)"/><text class="lbl" x="270" y="104" text-anchor="start">aygıt: “veri hazır”</text><path class="line" d="M330 168 C330 196 400 196 400 170" marker-end="url(#n51-2-m05k-m1)"/><text class="lbl" x="410" y="196" text-anchor="start">IRET ile dönüş</text></svg></div>
+  <figcaption><b>Şekil 5.1.2:</b> Üstte yoklama: işlemci aygıta sürekli “hazır mı?” diye sorar, soruların çoğu boşa gider. Altta kesme: işlemci ana programı yürütür, aygıt veri hazır olunca haber verir, ISR çalışır ve IRET ile dönülür.</figcaption>
+</figure>
+
+<p><a href="#sekil-yoklama">Şekil 5.1.2</a> iki yöntemi aynı zaman ekseninde karşılaştırır. Yoklamanın bedelini bir sayıyla görmek mümkündür. Klavyenin durumunu soran en kısa yoklama döngüsü üç komuttan oluşur: portu okuyan bir <code>IN</code>, hazır bitini sınayan bir <code>TEST</code> ve hazır değilse başa dönen bir koşullu atlama.</p>
+
+<pre class="nt-code"><code><span class="cm">; yoklama döngüsü (port numarası ve bit örnek)</span>
+bekle: <span class="kw">IN</span>   AL, 64h      <span class="cm">; durum portunu oku (10 tur)</span>
+       <span class="kw">TEST</span> AL, 01h      <span class="cm">; veri hazır biti (4 tur)</span>
+       <span class="kw">JZ</span>   bekle         <span class="cm">; hazır değilse yeniden sor (16 tur)</span></pre>
+
+<p>Intel'in 8086 kılavuzuna göre sabit portlu <code>IN</code> 10, yazmaç ile sabiti sınayan <code>TEST</code> 4, atlayan bir <code>JZ</code> 16 saat turu sürer. Bir tur 30 saat turudur; 5 MHz'lik bir 8086'da bir saat turu 200 ns olduğundan döngü 6 µs'de bir döner. İşlemci bir saniyede aygıta yaklaşık 166 000 kez sorar. Hızlı yazan bir kullanıcı saniyede on tuşa basar. Bu durumda 166 000 sorudan yalnız on tanesi “evet” cevabı alır, geri kalanı boşa gider. Daha kötüsü, işlemci bu süre içinde başka bir iş yapamaz.</p>
+
+<p>Yoklamayı daha seyrek yapmak işlemciye zaman kazandırır, ama bu kez olay geç fark edilir. Program her 10 ms'de bir sorarsa bir tuşa basıldıktan sonra cevap 10 ms'ye kadar gecikebilir. Aralık uzadıkça kaybolan veri riski de artar. Örneğin seri porttan 9600 bit/s hızla gelen karakterler arasında yaklaşık 1 ms vardır. Aygıtın tek karakterlik bir tamponu varsa, 1 ms içinde okunmayan karakterin üzerine bir sonraki yazılır.</p>
+
+<p>Kesmede bu ikilem ortadan kalkar. İşlemci olay olmadıkça ana programı yürütür; olay olduğu anda, en geç o anki komut bitince ISR'ye geçer. Bedeli ise düzenektir. Her olay için bir yordam yazılır, yordamın adresi bir tabloya konur, dönüş adresi için yığın kullanılır ve donanımda isteği işlemciye ileten hatlar gerekir. <a href="#tab-yoklama">Tablo 5.1.1</a> iki yöntemi karşılaştırır.</p>
+
+<div class="nt-tablewrap" id="tab-yoklama">
+<table class="nt-table">
+  <caption>Tablo 5.1.1: Yoklama ile kesmenin karşılaştırılması.</caption>
+  <thead><tr><th scope="col">Ölçüt</th><th scope="col">Yoklama</th><th scope="col">Kesme</th></tr></thead>
+  <tbody>
+    <tr><td>Donanım</td><td>basit; ek hat gerekmez</td><td>istek hattı, gerekirse kesme denetleyicisi</td></tr>
+    <tr><td>İşlemci zamanı</td><td>boşa harcanır; sorguların çoğu “hayır” döner</td><td>yalnız olay olduğunda harcanır</td></tr>
+    <tr><td>Tepki süresi</td><td>sorgu aralığına bağlı; olay geç algılanabilir</td><td>kısa; en geç yürüyen komut bitince</td></tr>
+    <tr><td>Yazılım düzeni</td><td>tek bir döngü</td><td>vektör tablosu, yığın ve ISR</td></tr>
+    <tr><td>Uygun olduğu yer</td><td>tek işli, basit sistemler; çok hızlı ve sürekli veri</td><td>seyrek ve zamanı belirsiz olaylar; çok görevli sistemler</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Yoklama her zaman kötü değildir. Mikrodenetleyicili küçük bir devre yalnız bir düğmeyi bekliyorsa yoklama en sade çözümdür. Çok hızlı bir aygıt her birkaç mikrosaniyede veri üretiyorsa, her veri için kesme düzeneğinin yüküne katlanmak yerine sıkı bir yoklama döngüsü daha hızlı olabilir. Genel amaçlı bir bilgisayarda ise klavye, zamanlayıcı, disk ve seri port gibi birbirinden bağımsız ve zamanı önceden bilinmeyen olaylar vardır. Bunların hepsini tek bir döngüde yoklamak hem işlemciyi meşgul eder hem de tepkiyi yavaşlatır. PC mimarisi bu yüzden kesmelere dayanır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>“Kesmede işlemci aygıtı hiç beklemez” sonucunu “kesme her zaman yoklamadan hızlıdır” biçiminde genellemek. Kesme düzeneğinin kendisi de zaman alır: 8086'da bir donanım kesmesinin kabulü 61, IRET 24 saat turudur. Saniyede binlerce kez gelen bir olayda bu ek yük yoklamanın maliyetini aşabilir. Kesmenin üstünlüğü, seyrek olaylarda işlemcinin boşa beklememesidir.</p>
+</div>
+
+<h3 id="s5-1-1-3"><span class="nt-num">5.1.1.3</span>Kesme türleri ve tip numaraları</h3>
+
+<p>8086 en çok 256 farklı kesmeyi ayırt eder. Her kesmenin 0 ile 255 (00h–FFh) arasında bir <strong>tip numarası</strong> vardır. İşlemci kesmeyi kabul ettiğinde ilk iş bu numarayı belirler, sonra numaraya göre hangi yordama gideceğini bir tablodan okur. Kesmeler, tip numarasının nereden geldiğine ve kesmeyi neyin başlattığına göre üç gruba ayrılır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-turler">
+  <span class="nt-box__title">Tanım 5.1.2</span>
+  <p><strong>Yazılım kesmesi</strong> (<span lang="en">software interrupt</span>), program içindeki <code>INT n</code> komutuyla bilerek çağrılan kesmedir; tip numarası n komutun içindedir. <strong>Donanım kesmesi</strong> (<span lang="en">hardware interrupt</span>), bir dış aygıtın işlemcinin INTR ya da NMI pinini sürmesiyle başlayan kesmedir. <strong>İç kesme</strong> ya da <strong>istisna</strong> (<span lang="en">exception</span>), işlemcinin bir komutu yürütürken kendisinin ürettiği kesmedir; sıfıra bölme bunun en bilinen örneğidir.</p>
+</div>
+
+<p><strong>Yazılım kesmeleri.</strong> BIOS ve DOS hizmetleri bu yolla kullanılır: <code>INT 10h</code> ekran, <code>INT 16h</code> klavye, <code>INT 21h</code> DOS hizmetleridir. Bu grupta iki özel komut daha vardır. <code>INT 3</code> hata ayıklayıcıların kullandığı kesme noktası komutudur ve tek baytla kodlanır. <code>INTO</code> ise taşma bayrağı OF = 1 olduğunda INT 4'ü çağırır, OF = 0 ise hiçbir şey yapmaz. Bu iki komut, hata ayıklama ve hata yakalama amacıyla kullanıldıkları için sık sık istisnalarla birlikte anılır.</p>
+
+<p><strong>Donanım kesmeleri.</strong> 8086'nın kesme isteği için iki giriş pini vardır. <strong>INTR</strong> (<span lang="en">interrupt request</span>) maskelenebilir girişidir: IF = 0 iken işlemci bu pini dikkate almaz. Klavye, zamanlayıcı, disk ve seri port istekleri bu pinden gelir. <strong>NMI</strong> (<span lang="en">non-maskable interrupt</span>) ise maskelenemez girişidir; IF ne olursa olsun kabul edilir. Bellek eşlik hatası ya da güç kaybı gibi, programın kapatıp geçiştiremeyeceği acil olaylar için ayrılmıştır.</p>
+
+<p><strong>İç kesmeler.</strong> İşlemci bazı durumları kendisi kesmeye dönüştürür. DIV ya da IDIV sıfıra böldüğünde veya bölüm hedef yazmaca sığmadığında INT 0 üretilir. Tuzak bayrağı TF = 1 iken her komuttan sonra INT 1 üretilir; bu, hata ayıklayıcıların programı tek adım yürütmesini sağlar.</p>
+
+<p><a href="#tab-tipler">Tablo 5.1.2</a>, ilk beş tip numarasının görevini verir. Bu beş tipi 8086'nın kendisi kullanır; numaraları sabittir ve programcı bunları başka bir iş için kullanmamalıdır.</p>
+
+<div class="nt-tablewrap" id="tab-tipler">
+<table class="nt-table">
+  <caption>Tablo 5.1.2: 8086'nın ayrılmış kesme tipleri.</caption>
+  <thead><tr><th scope="col">Tip</th><th scope="col">Kaynak</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>00h</td><td>iç</td><td>Bölme hatası: DIV/IDIV sıfıra bölme ya da bölüm sığmıyor</td></tr>
+    <tr><td>01h</td><td>iç</td><td>Tek adım (TF = 1); hata ayıklayıcılar kullanır</td></tr>
+    <tr><td>02h</td><td>donanım</td><td>NMI pini (maskelenemez)</td></tr>
+    <tr><td>03h</td><td>yazılım</td><td>Kesme noktası; tek baytlık INT 3 (CCh)</td></tr>
+    <tr><td>04h</td><td>yazılım</td><td>INTO: OF = 1 ise taşma kesmesi</td></tr>
+    <tr><td>05h–FFh</td><td>—</td><td>Intel 05h–1Fh'yi ileriki işlemciler için ayırmıştır; PC'de BIOS, DOS ve kullanıcı programları kullanır</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Intel, 05h–1Fh aralığını ileriki işlemcileri için ayırdığını belgelerinde açıkça yazmıştı. IBM PC'nin tasarımcıları ise bu uyarıya uymadı ve BIOS hizmetlerini 05h, 08h–1Fh aralığına yerleştirdi. Örneğin ekranı yazıcıya basan BIOS yordamı tip 05h'yi kullanır. 80186 ve 80286 ile birlikte tip 05h, BOUND komutunun sınır aşımı kesmesi oldu. Böylece aynı numara iki farklı anlam kazandı ve PC yazılımı yıllarca bu çakışmayla uğraştı. Bu öykü, ayrılmış numaraların neden ayrılmış kalması gerektiğini iyi gösterir.</p>
+
+<h3 id="s5-1-1-4"><span class="nt-num">5.1.1.4</span>Üç kaynağın karşılaştırması</h3>
+
+<p>Üç kesme türü birbirinden ilk bakışta çok farklı görünür: biri bir komut, biri bir pin, biri bir hata durumudur. Aralarındaki fark ise yalnız iki noktadadır: tip numarasının nereden geldiği ve kesmenin ne zaman oluştuğu. <a href="#tab-kaynak">Tablo 5.1.3</a> bu farkları yan yana koyar.</p>
+
+<div class="nt-tablewrap" id="tab-kaynak">
+<table class="nt-table">
+  <caption>Tablo 5.1.3: Yazılım, donanım ve iç kesmelerin karşılaştırılması.</caption>
+  <thead><tr><th scope="col"></th><th scope="col">Yazılım (INT n)</th><th scope="col">Donanım (INTR / NMI)</th><th scope="col">İç (istisna)</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Tetikleyen</th><td>programdaki komut</td><td>dış aygıt, pin</td><td>işlemcinin kendisi</td></tr>
+    <tr><th scope="row">Zamanlama</th><td>eş zamanlı: hep aynı yerde</td><td>eş zamansız: herhangi bir komuttan sonra</td><td>eş zamanlı: hatalı komutta</td></tr>
+    <tr><th scope="row">Tip numarası</th><td>komutun içinde</td><td>INTR: 8259A, INTA ile; NMI: hep 2</td><td>sabit: 0, 1</td></tr>
+    <tr><th scope="row">IF = 0 iken</th><td>yine çalışır</td><td>INTR bekler, NMI çalışır</td><td>yine çalışır</td></tr>
+    <tr><th scope="row">Tipik kullanım</th><td>BIOS/DOS hizmeti, INT 3, INTO</td><td>klavye, zamanlayıcı, disk</td><td>bölme hatası, tek adım</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Eş zamanlı</strong> ve <strong>eş zamansız</strong> sözcükleri burada program akışına göre kullanılır. Bir yazılım kesmesi programın aynı noktasında, her çalıştırmada aynı biçimde oluşur. Bir istisna da öyledir: aynı veriyle aynı DIV komutu her seferinde aynı hatayı verir. Donanım kesmesi ise programın hangi komutunda geleceği bilinemeyen bir olaydır. Kullanıcı tuşa bir kez döngünün başında, bir kez ortasında basar. Bu yüzden donanım kesmesinin ISR'si, programın herhangi bir noktasında çalışabilecekmiş gibi yazılmalıdır. ISR'lerin yazmaçları saklama zorunluluğu buradan gelir.</p>
+
+<p>Tablonun altında önemli bir ortak nokta yatar. Tip numarası bir kez belirlendikten sonra üç tür de aynı adımları izler: FLAGS, CS ve IP yığına itilir, IF ve TF sıfırlanır, CS:IP vektör tablosundaki değerle yüklenir. Yani işlemcinin içinde tek bir kesme düzeneği vardır; kaynaklar yalnız bu düzeneğe hangi numarayla ve hangi anda girildiğini belirler.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><code>CLI</code> komutunun bütün kesmeleri kapattığını sanmak. CLI yalnız IF'yi sıfırlar ve yalnız INTR girişini etkiler. <code>INT 21h</code> gibi yazılım kesmeleri, sıfıra bölme gibi istisnalar ve NMI, IF = 0 iken de çalışır. Kritik bir kod parçasını “kesmelerden korumak” için CLI kullanıldığında NMI'ın yine gelebileceği unutulmamalıdır.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-2"><span class="nt-num">5.1.2</span>Kesme vektör tablosu</h2>
+
+<h3 id="s5-1-2-1"><span class="nt-num">5.1.2.1</span>Tablonun yapısı</h3>
+
+<p>İşlemci bir kesmenin tip numarasını öğrendikten sonra o kesmeye ait ISR'nin nerede olduğunu bulmalıdır. 8086'da bu bilgi belleğin en başındaki bir tabloda durur. Tablonun yeri sabittir; donanım her kesmede aynı adrese bakar.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ivt">
+  <span class="nt-box__title">Tanım 5.1.3</span>
+  <p><strong>Kesme vektörü</strong> (<span lang="en">interrupt vector</span>), bir kesme tipinin hizmet yordamının 4 baytlık uzak adresidir: 2 bayt IP (bağıl konum) ve 2 bayt CS (kesim). <strong>Kesme vektör tablosu</strong> (<span lang="en">interrupt vector table</span>, IVT), 256 kesme tipinin vektörlerini sırayla tutan ve fiziksel 00000h–003FFh adreslerini kaplayan 1 KB'lık tablodur.</p>
+</div>
+
+<p>Tablonun boyu kolayca hesaplanır: 256 tip × 4 bayt = 1024 bayt = 1 KB. Tip 0'ın vektörü 00000h'de, tip 1'inki 00004h'te, tip 2'ninki 00008h'de başlar ve böyle sürer. Son tip FFh'nin vektörü 003FCh–003FFh baytlarındadır. Tip n'in vektörünün başladığı adres bu yüzden basit bir çarpımdır:</p>
+
+<p class="nt-math nt-math--c">vektör adresi = n × 4 &nbsp;&nbsp; (kesim 0000h içinde)</p>
+
+<p>Vektörün dört baytının dizilişi de sabittir. <a href="#sekil-ivt">Şekil 5.1.3</a> tabloyu gösterir. Düşük adresli sözcük (n × 4 ve n × 4 + 1) IP değerini tutar. Yüksek adresli sözcük (n × 4 + 2 ve n × 4 + 3) ise CS değeridir. İki sözcük de 8086'nın bütün sözcükleri gibi küçük uçlu (<span lang="en">little-endian</span>) yazılır: önce düşük bayt, sonra yüksek bayt.</p>
+
+<figure class="nt-fig" id="sekil-ivt" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 310" role="img" aria-label="Kesme vektör tablosu"><text class="lbl" x="70" y="16" text-anchor="middle">adres (0000:…)</text><text class="lbl" x="260" y="16" text-anchor="middle">+0, +1</text><text class="lbl" x="400" y="16" text-anchor="middle">+2, +3</text><text class="txt mono" x="70" y="44" text-anchor="middle" style="font-size:14px">0000h</text><rect class="box" x="190" y="24" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="43" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="24" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="43" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="43" text-anchor="start">INT 00h</text><text class="txt mono" x="70" y="72" text-anchor="middle" style="font-size:14px">0004h</text><rect class="box" x="190" y="52" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="71" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="52" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="71" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="71" text-anchor="start">INT 01h</text><text class="txt mono" x="70" y="100" text-anchor="middle" style="font-size:14px">0008h</text><rect class="box" x="190" y="80" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="99" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="80" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="99" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="99" text-anchor="start">INT 02h</text><text class="txt mono" x="70" y="128" text-anchor="middle" style="font-size:14px">000Ch</text><rect class="box" x="190" y="108" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="127" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="108" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="127" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="127" text-anchor="start">INT 03h</text><text class="lbl" x="330" y="150" text-anchor="middle">⋮</text><text class="txt mono" x="70" y="176" text-anchor="middle" style="font-size:14px">0040h</text><rect class="box" x="190" y="156" width="140" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="260" y="175" text-anchor="middle" style="font-size:13.5px">IP = F065h</text><rect class="box" x="330" y="156" width="140" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="400" y="175" text-anchor="middle" style="font-size:13.5px">CS = F000h</text><text class="lbl" x="482" y="175" text-anchor="start">INT 10h</text><text class="lbl" x="330" y="198" text-anchor="middle">⋮</text><text class="txt mono" x="70" y="224" text-anchor="middle" style="font-size:14px">0084h</text><rect class="box" x="190" y="204" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="223" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="204" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="223" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="223" text-anchor="start">INT 21h</text><text class="lbl" x="330" y="246" text-anchor="middle">⋮</text><text class="txt mono" x="70" y="272" text-anchor="middle" style="font-size:14px">03FCh</text><rect class="box" x="190" y="252" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="271" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="252" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="271" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="271" text-anchor="start">INT FFh</text><text class="lbl" x="10" y="302" text-anchor="start">256 giriş × 4 bayt = 1024 bayt (0000:0000 – 0000:03FF)</text></svg></div>
+  <figcaption><b>Şekil 5.1.3:</b> Kesme vektör tablosu. Her satır bir kesme tipinin 4 baytlık vektörüdür: önce IP, sonra CS. INT 10h satırındaki F000:F065 değeri, orijinal IBM PC BIOS'undaki video yordamının adresidir ve örnek olarak verilmiştir.</figcaption>
+</figure>
+
+<p>Tablonun neden belleğin en başında olduğu sorusunun cevabı 8086'nın tasarımındadır. Donanımın tabloyu bulmak için hiçbir yazmaca bakması gerekmez; adres yalnız tip numarasından üretilir. n × 4 işlemi devrede iki bitlik bir kaydırmadır. Tip numarasının 8 biti adres hatlarının A2–A9 bitlerine konur; A0, A1 ve A10–A19 sıfırdır. Bu yüzden vektör okuma ek bir toplayıcı ya da yazmaç gerektirmez. Bedeli, belleğin ilk 1 KB'ının her zaman RAM olması zorunluluğudur. Programlar tabloyu değiştirebilmelidir; ROM'da olsaydı hiçbir program kendi ISR'sini kuramazdı.</p>
+
+<p>Tablo, işlemcinin sıradan bir bellek bölgesidir. Özel bir koruması yoktur. Kesim yazmacı 0000h yapılan her program tablonun herhangi bir baytını okuyup yazabilir. Bu esneklik, programların kendi ISR'lerini kurabilmesini sağlar; aynı zamanda hatalı bir programın tabloyu bozarak bütün sistemi çökertebilmesi anlamına gelir. Korumalı kipteki sonraki işlemciler bu sorunu tabloyu korumalı bir yapıya taşıyarak çözer. 8086'nın gerçek kipinde ise tablonun güvenliği tamamen programcıya kalmıştır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Vektörün dört baytını “CS önce, IP sonra” sırasıyla düşünmek. CS:IP yazılışı kesim önce yazıldığı için bu yanılgıyı doğurur. Bellekte ise sıra terstir: n × 4 adresinde IP'nin düşük baytı, n × 4 + 2 adresinde CS'nin düşük baytı vardır.</p>
+</div>
+
+<h3 id="s5-1-2-2"><span class="nt-num">5.1.2.2</span>Vektör adresi adım adım</h3>
+
+<p>Kuralın uygulanışını bir örnek üzerinden izlemek yararlıdır. Program <code>INT 10h</code> komutunu yürütüyor olsun. İşlemcinin vektörü bulup ISR'ye geçmesi dört adımda gerçekleşir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-int10">
+  <span class="nt-box__title">Örnek 5.1.1</span>
+  <p>INT 10h için vektörün adresini, ISR'nin CS:IP değerini ve fiziksel adresini bulalım. Tablonun 0000:0040h adresinden başlayan dört baytı sırasıyla <code>65 F0 00 F0</code> olsun.</p>
+  <ol class="nt-steps">
+    <li><strong>Tip numarası.</strong> Komutun ikinci baytı tip numarasıdır: n = 10h = 16.</li>
+    <li><strong>Vektör adresi.</strong> n × 4 = 10h × 4 = 40h (onlu: 16 × 4 = 64). Vektör 0000:0040h–0000:0043h baytlarındadır. İkili sayıda 0001 0000b iki bit sola kaydırılınca 0100 0000b = 40h olur.</li>
+    <li><strong>Baytları okuma.</strong> 0040h'te 65h, 0041h'te F0h vardır; düşük sözcük IP = F065h'dir. 0042h'te 00h, 0043h'te F0h vardır; yüksek sözcük CS = F000h'dir.</li>
+    <li><strong>Fiziksel adres.</strong> CS × 16 + IP = F0000h + F065h = FF065h. ISR, belleğin en üst 64 KB'ındaki BIOS ROM'unun içinde başlar.</li>
+  </ol>
+</div>
+
+<figure class="nt-fig" id="sekil-vadim" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 140" role="img" aria-label="0040h–0043h baytları: 65 F0 00 F0"><text class="txt mono" x="150" y="34" text-anchor="end" style="font-size:14px">0040h</text><rect class="box" x="160" y="14" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="34" text-anchor="middle">65h</text><text class="txt mono" x="150" y="64" text-anchor="end" style="font-size:14px">0041h</text><rect class="box" x="160" y="44" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="64" text-anchor="middle">F0h</text><text class="txt mono" x="150" y="94" text-anchor="end" style="font-size:14px">0042h</text><rect class="box" x="160" y="74" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="94" text-anchor="middle">00h</text><text class="txt mono" x="150" y="124" text-anchor="end" style="font-size:14px">0043h</text><rect class="box" x="160" y="104" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="124" text-anchor="middle">F0h</text><text class="txt mono" x="250" y="49" text-anchor="start">} IP = F065h</text><text class="txt mono" x="250" y="109" text-anchor="start">} CS = F000h</text></svg><svg class="ds-svg" viewBox="0 0 720 130" role="img" aria-label="Fiziksel adres FF065h"><text class="txt" x="360" y="40" text-anchor="middle" style="font-size:20px">fiziksel adres = CS × 16 + IP</text><text class="txt mono" x="360" y="80" text-anchor="middle" style="font-size:26px;fill:var(--ds-accent)">F0000h + F065h = FF065h</text></svg></div>
+  <figcaption><b>Şekil 5.1.4:</b> Üstte 0040h–0043h baytları: düşük sözcük IP = F065h, yüksek sözcük CS = F000h. Altta fiziksel adres hesabı: F0000h + F065h = FF065h.</figcaption>
+</figure>
+
+<p>Örnekte okunan baytlar <a href="#sekil-vadim">Şekil 5.1.4</a>'te görülür. İşlemci bu iki sözcüğü iki ayrı bellek okumasıyla alır. 8086 çift adresteki bir sözcüğü tek yol çevrimiyle okur. n × 4 ve n × 4 + 2 adreslerinin ikisi de çift olduğundan her sözcük tek çevrimde gelir. Vektör tablosunun 4 baytlık hizalanması bu açıdan da yerindedir.</p>
+
+<p>Dördüncü adımdaki fiziksel adres hesabı, 8086'nın bütün bellek erişimlerinde kullandığı kesimleme kuralıdır: 16 bitlik kesim değeri dört bit sola kaydırılır (16 ile çarpılır) ve bağıl konum eklenir. CS = F000h kesimi F0000h'de başlar. IP = F065h bu kesimin içinde bir konumdur. Sonuç 20 bitlik FF065h adresidir.</p>
+
+<p>Burada sıranın önemli bir ayrıntısı vardır. İşlemci vektörü okuyup CS:IP'yi yüklemeden önce dönüş bilgisini yığına yazar. Yani ISR'nin ilk komutu FF065h'den getirilirken eski CS, IP ve FLAGS çoktan yığındadır. Bu sıra bozulsaydı, yani CS:IP önce yüklenseydi, dönüş adresi kaybolurdu. Adımların tam sırası <a href="#tab-int">Tablo 5.1.5</a>'tedir.</p>
+
+<h3 id="s5-1-2-3"><span class="nt-num">5.1.2.3</span>Tablodan yordama, yordamdan tabloya</h3>
+
+<p>Vektör tablosu üzerinde iki yönlü hesap yapılır. Birinci yönde tip numarasından vektörün adresine gidilir; bu, n × 4 çarpımıdır. İkinci yönde tablonun bir adresinden hangi tipin vektörü olduğu bulunur; bu da adresi 4'e bölmektir. İkinci yön, bellek dökümünde bir bayt dizisine bakıp ne olduğunu anlamak için gerekir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-ters">
+  <span class="nt-box__title">Örnek 5.1.2</span>
+  <p>Bir bellek dökümünde 0000:0058h adresinden başlayarak <code>2E E8 00 F0</code> baytları görülüyor. a) Hangi kesmenin vektörüdür? b) ISR'nin CS:IP değeri ve fiziksel adresi nedir? c) Aynı tablodaki tip 1Ch'nin vektörü hangi adreslerdedir?</p>
+  <ol class="nt-steps">
+    <li>a) 58h / 4 = 16h. Adres 4'ün katı olduğu için bir vektörün başıdır: tip 16h, yani BIOS klavye hizmeti INT 16h.</li>
+    <li>b) Düşük sözcük: 2Eh, E8h → IP = E82Eh. Yüksek sözcük: 00h, F0h → CS = F000h. Fiziksel adres F0000h + E82Eh = FE82Eh.</li>
+    <li>c) 1Ch × 4 = 70h. IP 00070h–00071h, CS 00072h–00073h baytlarındadır.</li>
+  </ol>
+  <p>Adres 4'e tam bölünmeseydi, örneğin 005Ah, bu bir vektörün başı değil, tip 16h vektörünün CS yarısı olurdu (5Ah = 4 × 16h + 2).</p>
+</div>
+
+<p>Hesap bütün tipler için aynıdır: IP n × 4 ve n × 4 + 1'de, CS n × 4 + 2 ve n × 4 + 3'tedir. Tip 00h için adres 0000h, tip FFh için 03FCh çıkar; aradaki bütün adresler 4'ün katıdır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Tip numarasını doğrudan adres sanmak (INT 21h → 00021h) ya da 4 yerine 2 ile çarpmak (INT 21h → 00042h). Doğrusu 21h × 4 = 84h'dir. Onaltılık çarpımda yanılmamak için sayıyı önce onluya çevirmek de bir yoldur: 21h = 33, 33 × 4 = 132 = 84h.</p>
+</div>
+
+<h3 id="s5-1-2-4"><span class="nt-num">5.1.2.4</span>PC'de tip numaralarının paylaşımı</h3>
+
+<p>256 tip numarasının ilk beşi 8086'ya aittir. Geri kalanı, işlemciyi kullanan sistemin tasarımcılarına bırakılmıştır. IBM PC ve DOS'ta numaralar kabaca şöyle paylaşılmıştır (<a href="#tab-pc">Tablo 5.1.4</a>).</p>
+
+<div class="nt-tablewrap" id="tab-pc">
+<table class="nt-table">
+  <caption>Tablo 5.1.4: IBM PC ve DOS'ta sık kullanılan kesme tipleri.</caption>
+  <thead><tr><th scope="col">Tip</th><th scope="col">Vektör adresi</th><th scope="col">Görev</th></tr></thead>
+  <tbody>
+    <tr><td>00h–04h</td><td>000h–013h</td><td>8086'nın kendi tipleri (bölme hatası, tek adım, NMI, kesme noktası, taşma)</td></tr>
+    <tr><td>05h</td><td>014h</td><td>BIOS: ekranı yazıcıya bas</td></tr>
+    <tr><td>08h–0Fh</td><td>020h–03Fh</td><td>donanım kesmeleri IRQ0–IRQ7 (08h zamanlayıcı, 09h klavye)</td></tr>
+    <tr><td>10h</td><td>040h</td><td>BIOS: video / ekran hizmetleri</td></tr>
+    <tr><td>13h</td><td>04Ch</td><td>BIOS: disk hizmetleri</td></tr>
+    <tr><td>16h</td><td>058h</td><td>BIOS: klavye hizmetleri</td></tr>
+    <tr><td>1Ah</td><td>068h</td><td>BIOS: saat / tarih</td></tr>
+    <tr><td>20h</td><td>080h</td><td>DOS: programı sonlandır</td></tr>
+    <tr><td>21h</td><td>084h</td><td>DOS: genel hizmetler (AH ile seçilir)</td></tr>
+    <tr><td>33h</td><td>0CCh</td><td>fare sürücüsü</td></tr>
+    <tr><td>60h–67h</td><td>180h–19Fh</td><td>kullanıcı programlarına ayrılmış</td></tr>
+    <tr><td>70h–77h</td><td>1C0h–1DFh</td><td>PC/AT'de ikinci 8259A'nın IRQ8–IRQ15 kesmeleri</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bu tablodan çıkan pratik sonuç şudur: kendi ISR'sini kuracak bir program, kullanılmayan bir tip seçmelidir. 60h–67h aralığı bu amaçla ayrılmıştır. Notun son kesimindeki örnekler bu yüzden tip 60h, 61h ve 90h'yi kullanır. Kullanılan bir tipin, örneğin INT 21h'nin vektörünü değiştiren bir program, DOS'un bütün hizmetlerini kendi yordamına yönlendirmiş olur. Bu bazen bilerek yapılır. Örneğin bir program, DOS'un bölme hatası yordamı yerine kendi yordamını çalıştırmak için tip 0'ın vektörünü değiştirir. O zaman program biterken eski vektörü geri yüklemek zorunludur.</p>
+
+<h2 class="nt-pb" id="s5-1-3"><span class="nt-num">5.1.3</span>INT ve IRET</h2>
+
+<h3 id="s5-1-3-1"><span class="nt-num">5.1.3.1</span>INT n'in adımları</h3>
+
+<p><code>INT n</code> komutu iki bayttır: işlem kodu CDh ve tip numarası n. Örneğin <code>INT 21h</code> bellekte <code>CD 21</code> olarak durur. İşlemci bu komutu yürütürken programcının göremediği bir dizi iş yapar. Bu işler bir yordam çağrısına benzer, ama ondan daha fazlasını kapsar. <a href="#tab-int">Tablo 5.1.5</a> adımları sırasıyla verir.</p>
+
+<div class="nt-tablewrap" id="tab-int">
+<table class="nt-table">
+  <caption>Tablo 5.1.5: INT n komutunun adımları ve her adımın yığına, yazmaçlara ve yola etkisi.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">İş</th><th scope="col">Etkisi</th><th scope="col">Yol çevrimi</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>FLAGS yığına itilir</td><td>SP ← SP − 2, [SS:SP] ← FLAGS</td><td>bellek yazma</td></tr>
+    <tr><td>2</td><td>IF ve TF sıfırlanır</td><td>IF = 0, TF = 0</td><td>—</td></tr>
+    <tr><td>3</td><td>CS yığına itilir</td><td>SP ← SP − 2, [SS:SP] ← CS</td><td>bellek yazma</td></tr>
+    <tr><td>4</td><td>IP yığına itilir (INT'ten sonraki komutun adresi)</td><td>SP ← SP − 2, [SS:SP] ← IP</td><td>bellek yazma</td></tr>
+    <tr><td>5</td><td>vektör okunur</td><td>IP ← [0000:n×4], CS ← [0000:n×4+2]</td><td>iki bellek okuma</td></tr>
+    <tr><td>6</td><td>ISR çalışır, sonunda IRET</td><td>IP, CS, FLAGS sırasıyla yığından alınır</td><td>üç bellek okuma</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun her satırının bir gerekçesi vardır. <strong>Adım 1</strong> bayrakları saklar. Kesilen programın son karşılaştırmasının sonucu, örneğin ZF, ISR boyunca değişebilir. Program bir <code>CMP</code> ile bir <code>JE</code> arasında kesilirse ve bayraklar saklanmazsa, JE yanlış yöne atlar. Bayrakların otomatik saklanması bu yüzden zorunludur. CALL komutu bayrakları saklamaz, çünkü bir yordamın ne zaman çağrılacağını program bilir.</p>
+
+<p><strong>Adım 2</strong> IF ve TF'yi sıfırlar. IF = 0, ISR'nin daha ilk komutunda başka bir maskelenebilir kesmeyle kesilmesini önler. TF = 0 ise ISR'nin tek adım kesmesiyle adım adım durdurulmasını engeller. Bu sıfırlamanın FLAGS yığına itildikten <em>sonra</em> yapılması önemlidir. Yığındaki kopya eski IF ve TF değerlerini taşır. IRET bu kopyayı geri yüklediğinde IF ve TF de kesmeden önceki değerlerine döner.</p>
+
+<p><strong>Adım 3 ve 4</strong> dönüş adresini saklar. ISR başka bir kesimde olabileceği için yalnız IP yetmez, CS de saklanır. Yığına yazılan IP, INT komutunun kendi adresi değil, INT'ten <em>sonraki</em> komutun adresidir. İşlemci INT'i getirirken IP'yi zaten iki bayt ilerletmiştir.</p>
+
+<p><strong>Adım 5</strong> vektörü okur ve CS:IP'ye yükler. Bu andan sonra işlemcinin getireceği ilk komut ISR'nin ilk komutudur. BIU'nun önden getirme kuyruğu da boşaltılır; kuyruktaki baytlar INT'ten sonraki komutlara aitti ve artık geçersizdir.</p>
+
+<p>Yığına toplam 6 bayt, yani 3 sözcük yazılır. INT n'in tamamı 8086'da 51 saat turu sürer. Bu turların önemli bir kısmı beş bellek erişimine harcanır: yığına üç yazma ve vektör tablosundan iki okuma. Kuyruğun boşaltılıp ISR'nin ilk baytlarının yeniden getirilmesi de ayrıca zaman alır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-iret">
+  <span class="nt-box__title">Tanım 5.1.4</span>
+  <p><strong>IRET</strong> (<span lang="en">interrupt return</span>), kesme hizmet yordamından dönüş komutudur. Yığından sırasıyla IP'yi, CS'yi ve FLAGS'i alır; her alışta SP 2 artar. Tek bayttır (CFh) ve 8086'da 24 saat turu sürer.</p>
+</div>
+
+<p>IRET, INT'in yığına yazdıklarını ters sırada geri okur. Yığın son giren ilk çıkar düzeninde çalıştığı için bu doğaldır: en son itilen IP ilk alınır, en önce itilen FLAGS en son alınır. FLAGS'in geri gelmesiyle IF ve TF de eski değerlerini alır. Böylece kesmeden önce IF = 1 olan bir program, IRET'ten sonra yine IF = 1 ile devam eder.</p>
+
+<p><a href="#tab-kodlama">Tablo 5.1.6</a> bu notta geçen kesme komutlarının kodlamasını ve süresini toplu olarak verir.</p>
+
+<div class="nt-tablewrap" id="tab-kodlama">
+<table class="nt-table">
+  <caption>Tablo 5.1.6: 8086 kesme komutlarının makine kodu, uzunluğu ve saat turu (8086 kılavuzu).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Makine kodu</th><th scope="col">Uzunluk</th><th scope="col">Saat turu</th></tr></thead>
+  <tbody>
+    <tr><td><code>INT n</code></td><td>CD n</td><td>2 bayt</td><td>51</td></tr>
+    <tr><td><code>INT 3</code></td><td>CC</td><td>1 bayt</td><td>52</td></tr>
+    <tr><td><code>INTO</code></td><td>CE</td><td>1 bayt</td><td>53 (OF = 1) / 4 (OF = 0)</td></tr>
+    <tr><td><code>IRET</code></td><td>CF</td><td>1 bayt</td><td>24</td></tr>
+    <tr><td><code>CLI</code> / <code>STI</code></td><td>FA / FB</td><td>1 bayt</td><td>2</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="s5-1-3-2"><span class="nt-num">5.1.3.2</span>Yığın adım adım: INT 10h</h3>
+
+<p>Adımların yığına etkisini somut sayılarla izleyelim. Bir .COM programında <code>INT 10h</code> komutu 0700:0104 adresinde olsun. emu8086'nın .COM yüklemesinde CS = DS = SS = 0700h ve SP = FFFEh'dir. Başlangıçta yalnız IF = 1'dir; 8086'nın FLAGS yazmacında bit 1 ve bit 12–15 her zaman 1 okunduğu için FLAGS = F202h'dir. INT 10h'nin vektörü <a href="#ornek-int10">Örnek 5.1.1</a>'deki gibi F000:F065 olsun.</p>
+
+<div class="nt-tablewrap" id="tab-yigin">
+<table class="nt-table">
+  <caption>Tablo 5.1.7: 0700:0104'teki INT 10h ve ISR sonundaki IRET sırasında yığın ve yazmaçlar (SS = 0700h).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">İş</th><th scope="col">SP</th><th scope="col">[FFF8h]</th><th scope="col">[FFFAh]</th><th scope="col">[FFFCh]</th><th scope="col">CS:IP</th><th scope="col">FLAGS</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>başlangıç</td><td>FFFEh</td><td>—</td><td>—</td><td>—</td><td>0700:0104</td><td>F202h</td></tr>
+    <tr><td>1</td><td>FLAGS itilir</td><td class="n51-chg">FFFCh</td><td>—</td><td>—</td><td class="n51-chg">F202h</td><td>0700:0104</td><td>F202h</td></tr>
+    <tr><td>2</td><td>IF = TF = 0</td><td>FFFCh</td><td>—</td><td>—</td><td>F202h</td><td>0700:0104</td><td class="n51-chg">F002h</td></tr>
+    <tr><td>3</td><td>CS itilir</td><td class="n51-chg">FFFAh</td><td>—</td><td class="n51-chg">0700h</td><td>F202h</td><td>0700:0104</td><td>F002h</td></tr>
+    <tr><td>4</td><td>IP itilir</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0106h</td><td>0700h</td><td>F202h</td><td>0700:0104</td><td>F002h</td></tr>
+    <tr><td>5</td><td>CS:IP ← vektör</td><td>FFF8h</td><td>0106h</td><td>0700h</td><td>F202h</td><td class="n51-chg">F000:F065</td><td>F002h</td></tr>
+    <tr><td>6</td><td>IRET: IP, CS alınır</td><td class="n51-chg">FFFCh</td><td>0106h</td><td>0700h</td><td>F202h</td><td class="n51-chg">0700:0106</td><td>F002h</td></tr>
+    <tr><td>7</td><td>IRET: FLAGS alınır</td><td class="n51-chg">FFFEh</td><td>0106h</td><td>0700h</td><td>F202h</td><td>0700:0106</td><td class="n51-chg">F202h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-yigin">Tablo 5.1.7</a>'nin satırları şöyle okunur. <strong>Adım 1'de</strong> SP önce 2 azalır ve FFFCh olur, FLAGS'in o anki değeri F202h bu adrese yazılır. <strong>Adım 2'de</strong> yazmaçtaki IF ve TF sıfırlanır; F202h'deki bit 9 (IF) silinince FLAGS = F002h olur. Yığındaki kopya ise F202h olarak kalır. <strong>Adım 3'te</strong> SP = FFFAh olur ve CS = 0700h yazılır. <strong>Adım 4'te</strong> SP = FFF8h olur ve dönüş adresi yazılır. INT 10h iki bayt olduğundan dönüş adresi 0104h + 2 = 0106h'dir. <strong>Adım 5'te</strong> CS:IP vektörden yüklenir ve ISR çalışmaya başlar. Bu örnekte ISR ekrana bir karakter yazar.</p>
+
+<figure class="nt-fig" id="sekil-yigin1" style="--w:620px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Yığın ve yazmaçlar"><text class="lbl" x="450" y="16" text-anchor="middle">yığın (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt" x="520" y="142" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">0700h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">0104h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFFCh</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F202h</text></svg> <svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Yığın ve yazmaçlar"><text class="lbl" x="450" y="16" text-anchor="middle">yığın (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px">0106h</text><text class="txt" x="520" y="78" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px">0700h</text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">0700h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">0104h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFF8h</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F002h</text></svg></div></div>
+  <figcaption><b>Şekil 5.1.5:</b> Solda FLAGS itildikten sonra (SP = FFFCh), sağda dönüş adresi 0106h itildikten sonra (SP = FFF8h). Üç sözcük, yığının tepesine doğru FLAGS, CS, IP sırasıyla dizilir.</figcaption>
+</figure>
+
+<p>ISR bitip IRET çalışınca yığın ters yönde boşalır. <strong>Adım 6'da</strong> [FFF8h]'deki 0106h IP'ye, [FFFAh]'daki 0700h CS'ye alınır ve SP = FFFCh olur. <strong>Adım 7'de</strong> [FFFCh]'deki F202h FLAGS'e alınır ve SP = FFFEh'ye döner. IF yeniden 1'dir. Program 0700:0106'dan, yani INT 10h'den sonraki komuttan devam eder.</p>
+
+<figure class="nt-fig" id="sekil-yigin2" style="--w:620px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Yığın ve yazmaçlar"><text class="lbl" x="450" y="16" text-anchor="middle">yığın (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px">0106h</text><text class="txt" x="520" y="78" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px">0700h</text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">F000h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">F065h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFF8h</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F002h</text></svg> <svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Yığın ve yazmaçlar"><text class="lbl" x="450" y="16" text-anchor="middle">yığın (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px">0106h</text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px">0700h</text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt" x="520" y="174" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">0700h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">0106h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFFEh</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F202h</text></svg></div></div>
+  <figcaption><b>Şekil 5.1.6:</b> Solda ISR çalışırken: CS:IP = F000:F065, FLAGS = F002h. Sağda IRET'ten sonra: CS:IP = 0700:0106, SP = FFFEh, FLAGS = F202h. Yığındaki üç sözcük silinmez; yalnız SP geri çekilir.</figcaption>
+</figure>
+
+<p>Son satırdaki bir ayrıntı dikkat ister: IRET'ten sonra yığındaki üç sözcük bellekte durmaya devam eder (<a href="#sekil-yigin2">Şekil 5.1.6</a>). POP ve IRET belleği silmez, yalnız SP'yi artırır. SP'nin üstündeki bölge artık “boş” sayılır ve bir sonraki PUSH ya da kesme bu değerlerin üzerine yazar. Bir hata ayıklayıcıda yığın penceresine bakarken eski değerlerin görünmesi bu yüzdendir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-yigin">
+  <span class="nt-box__title">Örnek 5.1.3</span>
+  <p>Aynı program kendi ISR'sini INT 10h vektörüne koyarak emu8086'da çalıştırıldığında yığına yazılan sözcükler okunabilir. Kod şudur:</p>
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ah, 0Eh      <span class="cm">; 0100h, 2 bayt</span>
+<span class="kw">mov</span> al, <span class="str">'A'</span>      <span class="cm">; 0102h, 2 bayt</span>
+<span class="kw">int</span> 10h         <span class="cm">; 0104h, 2 bayt (CD 10)</span>
+<span class="kw">ret</span>             <span class="cm">; 0106h: dönüş adresi</span></pre>
+  <p>INT 10h yürütüldükten hemen sonra SP = FFF8h'dir ve yığında [FFF8h] = 0106h, [FFFAh] = 0700h, [FFFCh] = F202h sözcükleri bulunur. IRET'ten sonra SP = FFFEh'dir. Değerler Tablo 5.1.7 ile birebir aynıdır.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Yığına itilen IP'yi INT komutunun kendi adresi sanmak (bu örnekte 0104h). İtilen değer bir sonraki komutun adresidir (0106h). Aksi hâlde IRET işlemciyi yeniden INT'e götürür ve program sonsuz bir döngüye girer.</p>
+</div>
+
+<h3 id="s5-1-3-3"><span class="nt-num">5.1.3.3</span>INT/IRET ile CALL/RET</h3>
+
+<p>INT ile bir yordam çağrısı arasındaki benzerlik açıktır: ikisi de dönüş adresini yığına yazar ve başka bir yere atlar. Farklar ise ISR'lerin neden ayrı bir dönüş komutu gerektirdiğini gösterir. <a href="#tab-call">Tablo 5.1.8</a> iki çifti karşılaştırır.</p>
+
+<div class="nt-tablewrap" id="tab-call">
+<table class="nt-table">
+  <caption>Tablo 5.1.8: CALL/RET ile INT n/IRET'in karşılaştırılması.</caption>
+  <thead><tr><th scope="col"></th><th scope="col">CALL / RET</th><th scope="col">INT n / IRET</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Hedef adres</th><td>komutun içinde (etiket)</td><td>vektör tablosundan (n × 4)</td></tr>
+    <tr><th scope="row">Yığına yazılan</th><td>IP (yakın) ya da CS + IP (uzak)</td><td>FLAGS + CS + IP (6 bayt)</td></tr>
+    <tr><th scope="row">Bayraklar</th><td>değişmez</td><td>IF = 0, TF = 0 yapılır</td></tr>
+    <tr><th scope="row">Dönüş</th><td>RET: IP (ve CS) geri alınır</td><td>IRET: IP, CS, FLAGS geri alınır</td></tr>
+    <tr><th scope="row">Komut boyu</th><td>3 bayt (yakın CALL)</td><td>2 bayt (INT 3: 1 bayt)</td></tr>
+    <tr><th scope="row">Kim çağırır?</th><td>yalnız program</td><td>program, işlemci (istisna) ya da donanım</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>En önemli satır sonuncusudur. Bir yordamı yalnız program çağırır; program o noktada bayrakların durumunu bilir ve gerekiyorsa kendisi saklar. ISR ise bir donanım olayıyla, programın haberi olmadan çağrılabilir. Bu yüzden bayrakları saklama işi işlemciye verilmiştir.</p>
+
+<p>Hedef adres satırı da önemli bir esneklik sağlar. Assembler CALL'un hedefini komutun içine yazar ve bu değer değişmez. INT'in hedefi ise tablodan çalışma anında okunur. Vektörü değiştirmek, kodu hiç değiştirmeden bütün INT çağrılarını başka bir yordama yönlendirir. DOS'un, sürücülerin ve yerleşik programların BIOS hizmetlerine kendi işlevlerini ekleyebilmesi bu sayededir. Kesme zincirleme (<span lang="en">interrupt chaining</span>) tekniği bu esnekliğe dayanır. Yeni yordam kendi işini yapar, sonra eski vektöre atlayarak eski yordamı da çalıştırır.</p>
+
+<p>Komut boyu satırında INT'in 2 bayt olması da bir üstünlüktür. Uzak bir CALL 5 bayttır; BIOS'un bir yordamını uzak CALL ile çağırmak hem daha uzun kod hem de BIOS'un sürümüne bağlı sabit bir adres demektir. INT 10h ise her BIOS'ta aynı iki bayttır.</p>
+
+<h3 id="s5-1-3-4"><span class="nt-num">5.1.3.4</span>RET ile biten ISR: kod izleme</h3>
+
+<p>Tablo 5.1.8'deki farkın pratik sonucunu görmek için bilerek hatalı bir program izlenir. Program tip 61h'ye kendi ISR'sini kurar, INT 61h ile çağırır, ama ISR'yi IRET yerine yakın RET ile bitirir.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[61h*4], <span class="dir">offset</span> isr
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[61h*4+2], cs
+<span class="kw">int</span> 61h
+<span class="kw">hlt</span>              <span class="cm">; SP = ?</span>
+isr:
+<span class="kw">ret</span>              <span class="cm">; HATA!</span></pre>
+
+<p>Kod satır satır şöyle çalışır. <code>mov ax, 0</code> ve <code>mov es, ax</code> ES'yi 0000h yapar. Kesim yazmacına sabit doğrudan yüklenemediği için 0 önce AX'e konur. Bundan sonra <code>es:[…]</code> ile yazılan her adres vektör tablosunun içindedir. Üçüncü satır tip 61h'nin vektörünün IP yarısına, 61h × 4 = 184h adresine, <code>isr</code> etiketinin bağıl konumunu yazar. Assembler <code>61h*4</code> ifadesini kendisi hesaplar ve komuta 0184h olarak koyar. Dördüncü satır 186h adresine CS'nin değerini yazar. CS ile ISR aynı kesimdedir; böylece vektör 0700:0114'ü gösterir.</p>
+
+<p>Programın baytlarını saymak, izleme tablosundaki IP değerlerini anlamayı kolaylaştırır. Komutların uzunlukları ve adresleri şöyledir: <code>mov ax, 0</code> 3 bayt (0100h–0102h), <code>mov es, ax</code> 2 bayt (0103h–0104h), ES önekli sözcük yazması 7 bayt (0105h–010Bh), CS yazması 5 bayt (010Ch–0110h), <code>int 61h</code> 2 bayt (0111h–0112h), <code>hlt</code> 1 bayt (0113h) ve <code>ret</code> 1 bayttır (0114h). Bu yüzden <code>isr</code> etiketi 0114h'dir ve INT 61h'nin dönüş adresi 0113h'dir.</p>
+
+<div class="nt-tablewrap" id="tab-retisr">
+<table class="nt-table">
+  <caption>Tablo 5.1.9: RET ile biten ISR programının izlemesi (her satır yürütüldükten sonraki durum; SS = 0700h).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">CS:IP (sonraki)</th><th scope="col">SP</th><th scope="col">IF</th><th scope="col">Yığın / bellek</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov ax, 0</code></td><td>0700:0103</td><td>FFFEh</td><td>1</td><td>[FFFEh] = 0000h</td></tr>
+    <tr><td>3</td><td><code>mov es, ax</code></td><td>0700:0105</td><td>FFFEh</td><td>1</td><td>ES = 0000h</td></tr>
+    <tr><td>4</td><td><code>mov … [61h*4], offset isr</code></td><td>0700:010C</td><td>FFFEh</td><td>1</td><td>[0000:0184h] = 0114h</td></tr>
+    <tr><td>5</td><td><code>mov … [61h*4+2], cs</code></td><td>0700:0111</td><td>FFFEh</td><td>1</td><td>[0000:0186h] = 0700h</td></tr>
+    <tr><td>6</td><td><code>int 61h</code></td><td class="n51-chg">0700:0114</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0</td><td>[FFF8h] = 0113h, [FFFAh] = 0700h, [FFFCh] = F202h</td></tr>
+    <tr><td>9</td><td><code>ret</code> (hatalı)</td><td class="n51-chg">0700:0113</td><td class="n51-chg">FFFAh</td><td>0</td><td>[FFFAh] = 0700h, [FFFCh] = F202h yığında kaldı</td></tr>
+    <tr><td>7</td><td><code>hlt</code></td><td>0700:0114</td><td>FFFAh</td><td>0</td><td>işlemci durdu, IF = 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İzlemenin kritik iki satırı vardır (<a href="#tab-retisr">Tablo 5.1.9</a>). <strong>Satır 6'da</strong> <code>int 61h</code> yığına FLAGS (F202h), CS (0700h) ve dönüş IP'si (0113h) olmak üzere 6 bayt yazar. SP = FFF8h ve IF = 0 olur, CS:IP vektörden 0700:0114 olarak yüklenir. <strong>Satır 9'da</strong> ISR'deki yakın <code>ret</code> yalnız yığının tepesindeki sözcüğü alır: IP = 0113h. CS değişmez; ISR ile program aynı kesimde olduğu için bu sefer tesadüfen doğru kesime dönülür. SP ise yalnız 2 artar ve FFFAh olur. Beklenen değer FFFEh'dir; yığın 4 bayt kaymıştır. FLAGS yığından geri alınmadığı için IF = 0 kalmıştır.</p>
+
+<figure class="nt-fig" id="sekil-retisr" style="--w:620px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="ISR&#x27;yi RET ile bitirmek, adım 5: yığın, SP ve IF"><text class="lbl" x="103" y="16" text-anchor="middle" style="font-size:11px">yığın (SS = 0700h)</text><rect class="mt-hot" x="60" y="22" width="86" height="24" rx="2"/><text class="lbl" x="56" y="38" text-anchor="end" style="font-size:10.5px">FFF8</text><text class="mt-m" x="103" y="39" text-anchor="middle" style="font-size:12.5px">0113h</text><text class="mt-l" x="150" y="38" text-anchor="start" style="font-size:12px">← SP</text><rect class="mt-hot" x="60" y="48" width="86" height="24" rx="2"/><text class="lbl" x="56" y="64" text-anchor="end" style="font-size:10.5px">FFFA</text><text class="mt-m" x="103" y="65" text-anchor="middle" style="font-size:12.5px">0700h</text><rect class="mt-hot" x="60" y="74" width="86" height="24" rx="2"/><text class="lbl" x="56" y="90" text-anchor="end" style="font-size:10.5px">FFFC</text><text class="mt-m" x="103" y="91" text-anchor="middle" style="font-size:12.5px">F202h</text><rect class="box" x="60" y="100" width="86" height="24" rx="2"/><text class="lbl" x="56" y="116" text-anchor="end" style="font-size:10.5px">FFFE</text><text class="mt-m" x="103" y="117" text-anchor="middle" style="font-size:12.5px">0000h</text><rect class="mt-hot" x="210" y="98" width="110" height="28" rx="4"/><text class="lbl" x="265" y="93" text-anchor="middle">CS:IP (sonraki)</text><text class="mt-v" x="265" y="117.5" text-anchor="middle" style="font-size:13px">0700:0114</text><rect class="mt-hot" x="330" y="98" width="62" height="28" rx="4"/><text class="lbl" x="361" y="93" text-anchor="middle">SP</text><text class="mt-v" x="361" y="117.5" text-anchor="middle" style="font-size:13px">FFF8h</text><text class="mt-a" x="8" y="148" text-anchor="start">IF = 0</text><text class="mt-m" x="80" y="148" text-anchor="start">FLAGS = F002h</text></svg> <svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="ISR&#x27;yi RET ile bitirmek, adım 6: yığın, SP ve IF"><text class="lbl" x="103" y="16" text-anchor="middle" style="font-size:11px">yığın (SS = 0700h)</text><rect class="mt-dim" x="60" y="22" width="86" height="24" rx="2"/><text class="lbl" x="56" y="38" text-anchor="end" style="font-size:10.5px">FFF8</text><rect class="mt-hot" x="60" y="48" width="86" height="24" rx="2"/><text class="lbl" x="56" y="64" text-anchor="end" style="font-size:10.5px">FFFA</text><text class="mt-m" x="103" y="65" text-anchor="middle" style="font-size:12.5px">0700h</text><text class="mt-l" x="150" y="64" text-anchor="start" style="font-size:12px">← SP</text><rect class="mt-hot" x="60" y="74" width="86" height="24" rx="2"/><text class="lbl" x="56" y="90" text-anchor="end" style="font-size:10.5px">FFFC</text><text class="mt-m" x="103" y="91" text-anchor="middle" style="font-size:12.5px">F202h</text><rect class="box" x="60" y="100" width="86" height="24" rx="2"/><text class="lbl" x="56" y="116" text-anchor="end" style="font-size:10.5px">FFFE</text><text class="mt-m" x="103" y="117" text-anchor="middle" style="font-size:12.5px">0000h</text><text class="mt-a" x="196" y="64" text-anchor="start">artık veri: CS, FLAGS</text><rect class="mt-hot" x="210" y="98" width="110" height="28" rx="4"/><text class="lbl" x="265" y="93" text-anchor="middle">CS:IP (sonraki)</text><text class="mt-v" x="265" y="117.5" text-anchor="middle" style="font-size:13px">0700:0113</text><rect class="mt-hot" x="330" y="98" width="62" height="28" rx="4"/><text class="lbl" x="361" y="93" text-anchor="middle">SP</text><text class="mt-v" x="361" y="117.5" text-anchor="middle" style="font-size:13px">FFFAh</text><text class="mt-a" x="8" y="148" text-anchor="start">IF = 0</text><text class="mt-m" x="80" y="148" text-anchor="start">FLAGS = F002h</text></svg></div></div>
+  <figcaption><b>Şekil 5.1.7:</b> Solda <code>int 61h</code>'den sonra: yığında üç sözcük, SP = FFF8h, IF = 0. Sağda hatalı <code>ret</code>'ten sonra: yalnız IP alınmış, CS ve FLAGS artık veri olarak yığında kalmış, SP = FFFAh, IF hâlâ 0.</figcaption>
+</figure>
+
+<p>Program <code>hlt</code>'e ulaştığında iki sorun birden vardır (<a href="#sekil-retisr">Şekil 5.1.7</a>). Birincisi, kesmeler kapalıdır. HLT işlemciyi bir kesme gelene kadar durdurur. IF = 0 olduğu için INTR'den gelen hiçbir istek işlemciyi uyandıramaz; yalnız NMI ya da RESET bunu yapabilir. Bu küçük programda işlemci sonsuza kadar bekler. İkincisi, yığın kaymıştır. HLT yerine bir <code>ret</code> olsaydı yığının tepesindeki 0700h'yi dönüş adresi sanır ve 0700:0700 adresine atlardı. Orada çalıştırılacak anlamlı bir kod yoktur.</p>
+
+<p>Sorunu RETF ile çözmeye çalışmak da yetmez. Uzak dönüş komutu IP ve CS'yi alır, SP'yi 4 artırır. FLAGS'in 2 baytı yine yığında kalır ve IF eski hâline dönmez. Bu yüzden kural kesindir: ISR'ler her zaman IRET ile biter.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>ISR'yi PROC/ENDP içinde yazıp sonuna alışkanlıkla <code>RET</code> koymak. Assembler buna itiraz etmez, çünkü RET geçerli bir komuttur. Hata ancak çalışma anında, çoğu zaman ISR'den çok sonra, yanlış bir dönüş adresi ya da bir daha gelmeyen kesmeler biçiminde ortaya çıkar. Belirtinin nedenden uzak olması bu hatayı bulmayı zorlaştırır.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-4"><span class="nt-num">5.1.4</span>İstisnalar</h2>
+
+<p>İstisnalar işlemcinin bir komutu yürütürken karşılaştığı özel durumları programa bildirme yoludur. 8086'nın iki gerçek istisnası vardır: bölme hatası (INT 0) ve tek adım (INT 1). Kesme noktası (INT 3) ve taşma kesmesi (INTO ile INT 4) aslında komutla çağrılan yazılım kesmeleridir. Ancak bu ikisi de hata ayıklama ve hata yakalama işinde kullanıldığı için istisnalarla birlikte ele alınır. Intel'in 8086 kılavuzu bu dört kesmeyi INT n ile birlikte “iç kesmeler” başlığı altında toplar.</p>
+
+<h3 id="s5-1-4-1"><span class="nt-num">5.1.4.1</span>Bölme hatası (INT 0)</h3>
+
+<p>DIV ve IDIV komutları bölümü sabit boyutlu bir yazmaca yazar. 8 bitlik bölmede bölünen AX'tedir, bölüm AL'ye, kalan AH'ye yazılır. 16 bitlik bölmede bölünen DX:AX'tedir, bölüm AX'e, kalan DX'e yazılır. Bölüm hedef yazmaca sığmazsa doğru bir sonuç üretmenin yolu yoktur. İşlemci bu durumda sonucu yazmaz ve tip 0 kesmesini üretir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-bolme">
+  <span class="nt-box__title">Tanım 5.1.5</span>
+  <p><strong>Bölme hatası</strong> (<span lang="en">divide error</span>), DIV ya da IDIV komutunda bölen sıfır olduğunda ya da bölüm hedef yazmaca sığmadığında işlemcinin ürettiği tip 0 kesmesidir. Hedef 8 bitlik bölmede AL, 16 bitlik bölmede AX'tir.</p>
+</div>
+
+<p>Tanımdaki ikinci koşul çoğu zaman gözden kaçar. Sıfıra bölme olmadan da bölme hatası oluşabilir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-tasma">
+  <span class="nt-box__title">Örnek 5.1.4</span>
+  <p>AX = 1000 (03E8h) ve BL = 2 iken <code>DIV BL</code> çalışıyor. Ne olur? Aynı bölme nasıl hatasız yapılır?</p>
+  <ol class="nt-steps">
+    <li>8 bitlik bölme: AX / BL = 1000 / 2 = 500. Bölüm AL'ye yazılacaktır.</li>
+    <li>AL en çok 255 tutar. 500 > 255 olduğu için bölüm sığmaz. Bölen sıfır olmadığı hâlde işlemci INT 0 üretir.</li>
+    <li>Çözüm 16 bitlik bölmedir: DX = 0, AX = 1000, BX = 2 ve <code>DIV BX</code>. Bölünen DX:AX = 0000:03E8h = 1000'dir. Bölüm 500 = 01F4h AX'e, kalan 0 DX'e yazılır. AX en çok 65 535 tutar ve 500 rahatça sığar.</li>
+  </ol>
+  <p>Daha küçük bir sınır örneği: AX = 01FEh (510) / 2 = 255 = FFh sığar; AX = 0200h (512) / 2 = 256 sığmaz ve INT 0 üretir. Bu değerler emu8086'da çalıştırılarak sağlanmıştır.</p>
+</div>
+
+<p>Kural kısaca şöyle söylenebilir: 8 bitlik DIV'de AH ≥ BL ise, yani bölünenin yüksek yarısı bölenden küçük değilse, bölüm 255'i aşar ve hata oluşur. Örnekte AH = 03h, BL = 02h'dir ve 03h ≥ 02h olduğu için hata kaçınılmazdır. 16 bitlik DIV için koşul DX ≥ bölendir. Bu sınama bölmeden önce bir CMP ile yapılabilir.</p>
+
+<p>İşaretli bölme IDIV'de sınırlar işaretli aralıktır. 8086'da 8 bitlik IDIV bölümü −127 ile +127 arasında olmalıdır; 16 bitlik IDIV'de aralık −32 767 ile +32 767'dir. Bu sınır, ikiye tümleyen gösterimde mümkün olan en küçük değeri (−128 ya da −32 768) dışarıda bırakır. Örneğin AX = −128 (FF80h) ve BL = 1 iken <code>IDIV BL</code> bölümü −128 bulur ve 8086'da yine INT 0 üretir. Sonraki işlemciler bu en küçük değeri kabul eder.</p>
+
+<p><strong>Dönüş adresi.</strong> 8086'nın bölme hatasında yığına ittiği IP, DIV'den <em>sonraki</em> komutun adresidir. Yani IRET programı bölmeyi atlayarak sürdürür. Bölme hiç yapılmamış gibi devam edilir; hedef yazmaçlar eski değerlerini korur. 80286 ve sonraki işlemcilerde bu davranış değiştirilmiş ve hatalı komutun kendi adresi itilir hâle gelmiştir. Böylece hata yordamı nedeni ortadan kaldırıp komutu yeniden deneyebilir. 8086 için yazılmış bir hata yordamı ise bu imkâna sahip değildir; ancak sonucun geçersiz olduğunu bir yolla programa bildirebilir.</p>
+
+<p><strong>DOS ne yapar?</strong> Bir program başlarken INT 0'ın vektörü DOS'un kendi yordamını gösterir. Bu yordam ekrana “Divide overflow” yazar ve programı sonlandırır. Program kendi yordamını kurarak bu davranışı değiştirebilir. Bunun en sade biçimi aşağıdaki izlemede görülür.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Bölme hatasını yalnız “sıfıra bölme” olarak düşünmek ve yalnız bölenin sıfır olup olmadığını sınamak. Bölünen büyük, bölen küçük olduğunda bölüm hedefe sığmaz ve aynı kesme oluşur. Bölmeden önce hem bölenin sıfır olmadığını hem de bölümün sığacağını (8 bitte AH &lt; bölen, 16 bitte DX &lt; bölen) denetlemek INT 0'ı baştan önler.</p>
+</div>
+
+<h3 id="s5-1-4-2"><span class="nt-num">5.1.4.2</span>Kendi INT 0 yordamımız: kod izleme</h3>
+
+<p>Aşağıdaki program tip 0'ın vektörünü kendi yordamına yönlendirir ve bilerek sıfıra böler. Yordam AX'e FFFFh yazarak programa “sonuç geçersiz” işareti bırakır.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax           <span class="cm">; ES = 0: IVT</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[0*4], <span class="dir">offset</span> hata
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[0*4+2], cs
+<span class="kw">mov</span> ax, 100
+<span class="kw">mov</span> bl, 0
+<span class="kw">div</span> bl               <span class="cm">; INT 0!</span>
+<span class="kw">mov</span> dl, al           <span class="cm">; dönüş buraya</span>
+<span class="kw">ret</span>
+hata:
+<span class="kw">mov</span> ax, 0FFFFh       <span class="cm">; hata işareti</span>
+<span class="kw">iret</span></pre>
+
+<p>İlk iki satır ES'yi 0000h yapar. <code>es:[0*4]</code> tip 0'ın vektörünün IP yarısıdır, yani tablonun en başıdır. Üçüncü satır buraya <code>hata</code> etiketinin bağıl konumunu, dördüncü satır 0000:0002h'ye CS'yi yazar. Programdan önce vektör, öykünücünün varsayılan yordamını gösteriyordu; bu izlemede eski değer F000:1000h olarak alınmıştır. Bu kısa örnekte eski vektör saklanmaz. Gerçek bir programda saklanır ve çıkıştan önce geri yüklenir.</p>
+
+<p>Bağıl konumları sayalım: <code>mov ax, 0</code> 3, <code>mov es, ax</code> 2, iki vektör yazması 7 ve 5, <code>mov ax, 100</code> 3, <code>mov bl, 0</code> 2, <code>div bl</code> 2, <code>mov dl, al</code> 2 ve <code>ret</code> 1 bayttır. Böylece <code>div bl</code> 0116h'de, <code>mov dl, al</code> 0118h'de ve <code>hata</code> etiketi 011Bh'dedir.</p>
+
+<div class="nt-tablewrap" id="tab-bolme">
+<table class="nt-table">
+  <caption>Tablo 5.1.10: Kendi INT 0 yordamımız programının izlemesi (her satır yürütüldükten sonraki durum).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BL</th><th scope="col">DL</th><th scope="col">CS:IP (sonraki)</th><th scope="col">SP</th><th scope="col">IF</th><th scope="col">Vektör 0 / yığın</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov ax, 0</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:0103</td><td>FFFEh</td><td>1</td><td>F000:1000</td></tr>
+    <tr><td>3</td><td><code>mov es, ax</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:0105</td><td>FFFEh</td><td>1</td><td>F000:1000</td></tr>
+    <tr><td>4</td><td><code>mov … [0*4], offset hata</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:010C</td><td>FFFEh</td><td>1</td><td class="n51-chg">F000:011B</td></tr>
+    <tr><td>5</td><td><code>mov … [0*4+2], cs</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:0111</td><td>FFFEh</td><td>1</td><td class="n51-chg">0700:011B</td></tr>
+    <tr><td>6</td><td><code>mov ax, 100</code></td><td class="n51-chg">0064h</td><td>00h</td><td>00h</td><td>0700:0114</td><td>FFFEh</td><td>1</td><td>0700:011B</td></tr>
+    <tr><td>7</td><td><code>mov bl, 0</code></td><td>0064h</td><td>00h</td><td>00h</td><td>0700:0116</td><td>FFFEh</td><td>1</td><td>0700:011B</td></tr>
+    <tr><td>8</td><td><code>div bl</code> → INT 0</td><td>0064h</td><td>00h</td><td>00h</td><td class="n51-chg">0700:011B</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0</td><td>[FFF8h] = 0118h, [FFFAh] = 0700h, [FFFCh] = F202h</td></tr>
+    <tr><td>12</td><td><code>mov ax, 0FFFFh</code></td><td class="n51-chg">FFFFh</td><td>00h</td><td>00h</td><td>0700:011E</td><td>FFF8h</td><td>0</td><td>yığın aynı</td></tr>
+    <tr><td>13</td><td><code>iret</code></td><td>FFFFh</td><td>00h</td><td>00h</td><td class="n51-chg">0700:0118</td><td class="n51-chg">FFFEh</td><td class="n51-chg">1</td><td>yığın boşaldı</td></tr>
+    <tr><td>9</td><td><code>mov dl, al</code></td><td>FFFFh</td><td>00h</td><td class="n51-chg">FFh</td><td>0700:011A</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>10</td><td><code>ret</code></td><td>FFFFh</td><td>00h</td><td>FFh</td><td class="n51-chg">0700:0000</td><td class="n51-chg">0000h</td><td>1</td><td>DOS'a dönüş</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-bolme">Tablo 5.1.10</a>'un satırları üç evrede okunur. <strong>Satır 4–5</strong> vektörü iki parçada değiştirir. Satır 4'ten sonra vektörün yarısı yeni, yarısı eskidir: F000:011B. Bu ara durum hiçbir yordamı göstermez. Bu programda tip 0'ı yalnız programın kendi DIV'i tetikleyebildiği için ara durum zararsızdır. Donanım kesmelerinin vektörleri değiştirilirken ise bu ara durum ciddi bir tehlikedir.</p>
+
+<p><strong>Satır 8'de</strong> <code>div bl</code> sıfıra böler. İşlemci bölümü yazmaz ve tip 0 kesmesini başlatır. Yığına FLAGS (F202h), CS (0700h) ve dönüş IP'si itilir. İtilen IP, DIV'in adresi 0116h değil, DIV'den sonraki komutun adresi 0118h'dir. SP = FFF8h ve IF = 0 olur, CS:IP ← 0700:011B. AX değişmemiştir; bölünen 0064h olduğu gibi durur.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bolme" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 420 186" role="img" aria-label="Vektör tablosu, yığın ve yazmaçlar"><text class="mt-s" x="8" y="14" text-anchor="start" style="font-size:12px;">IVT 0000:0000h (tip 00h)</text><rect class="box" x="8" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="27" y="40" text-anchor="middle" style="font-size:13.5px;">1B</text><rect class="box" x="46" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="65" y="40" text-anchor="middle" style="font-size:13.5px;">01</text><rect class="box" x="84" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="103" y="40" text-anchor="middle" style="font-size:13.5px;">00</text><rect class="box" x="122" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="141" y="40" text-anchor="middle" style="font-size:13.5px;">07</text><text class="lbl" x="46" y="62" text-anchor="middle" style="font-size:11px;">IP</text><text class="lbl" x="122" y="62" text-anchor="middle" style="font-size:11px;">CS</text><text class="mt-m" x="8" y="80" text-anchor="start" style="font-size:12px;">vektör = 0700:011Bh</text><text class="lbl" x="348" y="14" text-anchor="middle" style="font-size:11px;">yığın (SS = 0700)</text><rect class="mt-dim" x="310" y="20" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="36" text-anchor="end" style="font-size:10.5px;">FFF6</text><text class="lbl" x="348" y="36" text-anchor="middle" style="font-size:12.5px;">····</text><rect class="box" x="310" y="45" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="61" text-anchor="end" style="font-size:10.5px;">FFF8</text><text class="txt mono" x="348" y="61" text-anchor="middle" style="font-size:12.5px;">0118</text><text class="mt-l" x="389" y="61" text-anchor="start" style="font-size:11.5px;">← SP</text><rect class="box" x="310" y="70" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="86" text-anchor="end" style="font-size:10.5px;">FFFA</text><text class="txt mono" x="348" y="86" text-anchor="middle" style="font-size:12.5px;">0700</text><rect class="box" x="310" y="95" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="111" text-anchor="end" style="font-size:10.5px;">FFFC</text><text class="txt mono" x="348" y="111" text-anchor="middle" style="font-size:12.5px;">F202</text><rect class="box" x="310" y="120" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="136" text-anchor="end" style="font-size:10.5px;">FFFE</text><text class="txt mono" x="348" y="136" text-anchor="middle" style="font-size:12.5px;">0000</text><text class="lbl" x="33" y="109" text-anchor="middle" style="font-size:12px;">AX</text><rect class="mt-hot" x="8" y="114" width="50" height="26" rx="3"/><text class="txt mono" x="33" y="132" text-anchor="middle" style="font-size:13px;">FFFF</text><text class="lbl" x="82" y="109" text-anchor="middle" style="font-size:12px;">BL</text><rect class="box" x="65" y="114" width="34" height="26" rx="3"/><text class="txt mono" x="82" y="132" text-anchor="middle" style="font-size:13px;">00</text><text class="lbl" x="123" y="109" text-anchor="middle" style="font-size:12px;">DL</text><rect class="box" x="106" y="114" width="34" height="26" rx="3"/><text class="txt mono" x="123" y="132" text-anchor="middle" style="font-size:13px;">00</text><text class="lbl" x="189" y="109" text-anchor="middle" style="font-size:12px;">CS:IP</text><rect class="mt-hot" x="147" y="114" width="84" height="26" rx="3"/><text class="txt mono" x="189" y="132" text-anchor="middle" style="font-size:13px;">0700:011E</text><text class="lbl" x="253" y="109" text-anchor="middle" style="font-size:12px;">IF</text><rect class="box" x="238" y="114" width="30" height="26" rx="3"/><text class="txt mono" x="253" y="132" text-anchor="middle" style="font-size:13px;">0</text></svg></div>
+  <figcaption><b>Şekil 5.1.8:</b> <code>div bl</code> INT 0'ı tetikledikten sonra: tip 0'ın vektörü 0700:011Bh, yığında dönüş IP'si 0118h, CS ve FLAGS; IF = 0 ve CS:IP yordamın ilk komutunda.</figcaption>
+</figure>
+
+<p><strong>Satır 12–13</strong> yordamdır. <code>mov ax, 0FFFFh</code> sonuç yazmacına geçersiz bir işaret koyar. <code>iret</code> IP = 0118h, CS = 0700h ve FLAGS = F202h'yi geri alır; SP = FFFEh ve IF = 1 olur. DIV yeniden çalışmaz. <strong>Satır 9'da</strong> ana program <code>mov dl, al</code> ile AL'yi DL'ye alır ve DL = FFh'den hatayı anlar. Son satırdaki <code>ret</code>, .COM programlarında yığının tepesindeki 0000h'yi alır ve PSP'nin başındaki INT 20h ile DOS'a döner.</p>
+
+<p>Bu programdaki işaretleme yönteminin bir zayıflığı vardır. FFh, gerçek bir bölmenin de sonucu olabilir: 255 / 1 = 255. Gerçek programlarda hata bilgisi bunun yerine ayrı bir değişkende ya da bir bayrakta, örneğin CF'de döndürülür. CF'yi değiştirmek için ISR'nin yığındaki FLAGS kopyasını değiştirmesi gerekir; çünkü IRET o kopyayı geri yükler.</p>
+
+<h3 id="s5-1-4-3"><span class="nt-num">5.1.4.3</span>INTO ve taşma kesmesi (INT 4)</h3>
+
+<p>İşaretli toplama ve çıkarmada sonuç işaretli aralığa sığmazsa OF = 1 olur. İşlemci bu durumda kendiliğinden bir kesme üretmez; OF'yi sınamak programın işidir. <code>INTO</code> (<span lang="en">interrupt on overflow</span>) bu sınamayı tek baytta yapar.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-into">
+  <span class="nt-box__title">Tanım 5.1.6</span>
+  <p><strong>INTO</strong>, OF = 1 ise tip 4 kesmesini çağıran, OF = 0 ise hiçbir şey yapmayan tek baytlık (CEh) komuttur. İşaretli bir toplama ya da çıkarmanın hemen ardından yazılır.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-into">
+  <span class="nt-box__title">Örnek 5.1.5</span>
+  <p>AL = 64h, BL = 32h iken <code>ADD AL, BL</code> ve ardından <code>INTO</code> çalışıyor. Sonra aynı işlem BL = F6h ile tekrarlanıyor. Her iki durumda AL, OF, CF nedir ve INT 4 çağrılır mı?</p>
+  <ol class="nt-steps">
+    <li>64h + 32h = 96h. İşaretsiz yorumda 100 + 50 = 150 ≤ 255; elde yok, CF = 0. İşaretli yorumda iki pozitif sayının toplamı +150'dir ve +127'yi aşar. 96h'nin en yüksek biti 1'dir; sonuç −106 gibi görünür. OF = 1 olur ve INTO, INT 4'ü çağırır. AL = 96h olarak kalır; INTO sonucu düzeltmez.</li>
+    <li>64h + F6h = 15Ah; AL = 5Ah ve CF = 1. İşaretli yorumda +100 + (−10) = +90 doğrudur; farklı işaretli iki sayının toplamı taşamaz: OF = 0. INTO hiçbir şey yapmaz. CF = 1 olması INTO'yu etkilemez.</li>
+  </ol>
+  <p>İki durum emu8086'da çalıştırıldığında da aynı sonuç alınır: birincide INT 4 yordamı çalışır, ikincide çalışmaz.</p>
+</div>
+
+<p>INTO'nun maliyeti küçüktür: OF = 0 iken yalnız 4 saat turu sürer. Bu yüzden işaretli aritmetik yapan bir program her önemli işlemden sonra bir INTO koyarak taşmaları merkezî bir yordamda yakalayabilir. Pratikte ise DOS, INT 4 için anlamlı bir yordam kurmaz. Varsayılan vektör çoğu zaman yalnız IRET'ten oluşan boş bir yordamı gösterir. INTO'yu kullanacak program kendi INT 4 yordamını kurmalıdır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>INTO'nun CF'ye baktığını sanmak. INTO yalnız OF'ye bakar; işaretsiz taşma (CF = 1) INTO'yu tetiklemez. İşaretsiz sayılarla çalışan bir program taşmayı <code>JC</code> ile yakalar, INTO ile değil.</p>
+</div>
+
+<h3 id="s5-1-4-4"><span class="nt-num">5.1.4.4</span>Tek adım (INT 1)</h3>
+
+<p>Bir programdaki hatayı bulmanın en etkili yolu onu komut komut yürütüp her komuttan sonra yazmaçlara bakmaktır. 8086 bu işi donanımla destekler. FLAGS yazmacının bit 8'i olan tuzak bayrağı TF = 1 iken işlemci her komuttan sonra tip 1 kesmesini üretir. INT 1 yordamı, yani hata ayıklayıcının bir parçası, yazmaçları ekrana yazar ve kullanıcının bir tuşa basmasını bekler. Sonra IRET ile programa döner, program bir komut daha yürütür ve aynı döngü sürer.</p>
+
+<p>TF'yi doğrudan değiştiren bir komut yoktur. CLC/STC'nin, CLD/STD'nin ve CLI/STI'nin TF için karşılığı bulunmaz. TF yığın üzerinden değiştirilir: FLAGS yığına itilir, bir yazmaca alınır, bit 8 kurulur ve değer yeniden FLAGS'e yüklenir.</p>
+
+<pre class="nt-code"><code><span class="kw">PUSHF</span>
+<span class="kw">POP</span>  AX
+<span class="kw">OR</span>   AH, 01h      <span class="cm">; bit 8 = TF</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">POPF</span>              <span class="cm">; TF = 1</span></pre>
+
+<p>Başlangıçta FLAGS = F202h ise <code>PUSHF</code> ve <code>POP AX</code> sonrasında AX = F202h olur. AH'nin bit 0'ı FLAGS'in bit 8'idir; <code>OR AH, 01h</code> AX'i F302h yapar. <code>POPF</code> bu değeri FLAGS'e yükler ve TF = 1 olur. TF'yi sıfırlamak için aynı dizi <code>AND AH, 0FEh</code> ile yazılır.</p>
+
+<p>Burada ince ama önemli bir nokta vardır. INT 1 yordamı da bir komut dizisidir. TF = 1 iken bu yordamın her komutu da INT 1 üretseydi, yordam kendini sonsuza kadar keserdi. Bunu önleyen, INT n adımlarının ikincisidir: işlemci kesmeye girerken FLAGS'i yığına itip TF'yi sıfırlar. INT 1 yordamı TF = 0 ile çalışır ve kendi komutları adım adım kesilmez. Yordam IRET ile döndüğünde yığındaki FLAGS kopyası TF = 1'i geri yükler ve izleme sürer.</p>
+
+<p>Tek adım kesmesinin önceliği bütün kesmelerin en düşüğüdür (<a href="#tab-oncelik">Tablo 5.1.12</a>). Aynı komut sınırında başka bir istek de bekliyorsa önce o hizmet görür.</p>
+
+<h3 id="s5-1-4-5"><span class="nt-num">5.1.4.5</span>Kesme noktası (INT 3)</h3>
+
+<p>Tek adım, uzun bir programın her komutunda durmak için yavaştır. Çoğu zaman program belirli bir noktaya kadar tam hızda çalışsın, orada dursun istenir. Bu noktaya <strong>kesme noktası</strong> (<span lang="en">breakpoint</span>) denir. 8086'da kesme noktaları INT 3 ile kurulur.</p>
+
+<p>INT 3'ün tek baytlık özel bir kodlaması vardır: CCh. Genel <code>INT n</code> biçimiyle yazılsaydı iki baytlık <code>CD 03</code> olurdu. Hata ayıklayıcı bir kesme noktasını dört adımda kurar ve kaldırır:</p>
+
+<ol class="nt-steps">
+  <li>Durulacak komutun ilk baytını saklar ve yerine CCh yazar.</li>
+  <li>Program tam hızda çalışır. O adrese gelindiğinde CCh, yani INT 3 yürütülür. Yığına FLAGS, CS ve INT 3'ten sonraki adres itilir; hata ayıklayıcının INT 3 yordamı yazmaçları gösterir.</li>
+  <li>Hata ayıklayıcı saklanan baytı geri yazar ve yığındaki dönüş IP'sini 1 azaltır. Böylece dönüş adresi, CCh'nin bulunduğu, yani asıl komutun başladığı adres olur.</li>
+  <li>IRET ile asıl komut baştan, bozulmamış hâliyle yürütülür.</li>
+</ol>
+
+<p>Tek baytlık kodlamanın nedeni üçüncü adımdadır. 8086'nın en kısa komutları tek bayttır: <code>INC AX</code>, <code>PUSH BX</code>, <code>CLC</code> gibi. İki baytlık <code>CD 03</code> böyle bir komutun yerine yazılsaydı, ikinci bayt bir sonraki komutun ilk baytını bozardı. Program o sonraki komuta bir atlamayla ulaşırsa, artık bozuk bir komut yürütülürdü. CCh ise her komutun ilk baytının yerine sığar ve yalnız o komutu etkiler. Dönüş IP'sinin 1 azaltılması da yine INT 3'ün tek bayt olmasına dayanır.</p>
+
+<p>emu8086'nın “single step” düğmesi aynı işi öykünücünün içinde yapar. Gerçek bir 8086 sisteminde ise DOS'un DEBUG programı ve benzeri araçlar INT 1 ve INT 3 vektörlerine kendi yordamlarını kurarak çalışır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Hata ayıklayıcı altında çalışan bir programın kodu belleğe döküldüğünde CCh baytlarını programın kendi komutları sanmak. Kesme noktası kurulu adreslerde bellekte geçici olarak CCh durur. Program kendi kodunu okuyor ya da sağlama toplamı hesaplıyorsa, hata ayıklayıcı altında farklı sonuç bulabilir.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-5"><span class="nt-num">5.1.5</span>Donanım kesmeleri</h2>
+
+<h3 id="s5-1-5-1"><span class="nt-num">5.1.5.1</span>INTR ve NMI pinleri</h3>
+
+<p>Dış aygıtlar 8086'ya kesme isteğini iki pin üzerinden iletir. İki pinin davranışı, tetiklenme biçiminden tip numarasının belirlenmesine kadar farklıdır.</p>
+
+<p><strong>INTR</strong> (pin 18) maskelenebilir kesme isteği girişidir. Düzey tetiklemelidir: işlemci pini her komutun son saat turunda yoklar ve pin o anda 1 ise isteği görür. IF = 0 ise istek dikkate alınmaz; pin 1'de kalmaya devam ederse IF = 1 olduğu anda görülür. Tip numarası işlemcinin içinde sabit değildir. İşlemci isteği kabul edince INTA̅ (pin 24, kesme onayı) çıkışından iki darbe üretir ve tip numarasını veri yolundan okur. Bu düzen, tek bir INTR pininin arkasına birçok aygıt bağlamayı mümkün kılar; her aygıta farklı bir tip numarası verilebilir.</p>
+
+<p><strong>NMI</strong> (pin 17) maskelenemez kesme girişidir. Yükselen kenarla tetiklenir: pinin 0'dan 1'e geçişi işlemcinin içindeki bir tutucuya kaydedilir ve istek kaybolmaz. IF'ye bakılmaz; CLI ile kapatılamaz. Tip numarası her zaman 2'dir, bu yüzden INTA döngüsü gerekmez ve vektör doğrudan 00008h'den okunur. IBM PC'de NMI bellek eşlik hatasını bildirmek için kullanılır. Güç kaybını sezen devreler de NMI ile işlemciye, kaynak tamamen kesilmeden önce önemli verileri saklaması için birkaç milisaniyelik süre tanır.</p>
+
+<div class="nt-tablewrap" id="tab-pin">
+<table class="nt-table">
+  <caption>Tablo 5.1.11: INTR ile NMI'ın karşılaştırılması.</caption>
+  <thead><tr><th scope="col"></th><th scope="col">INTR</th><th scope="col">NMI</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Pin</th><td>18</td><td>17</td></tr>
+    <tr><th scope="row">Tetiklenme</th><td>düzey (komut sonunda yoklanır)</td><td>yükselen kenar (içeride tutulur)</td></tr>
+    <tr><th scope="row">IF = 0 iken</th><td>bekletilir</td><td>kabul edilir</td></tr>
+    <tr><th scope="row">Tip numarası</th><td>INTA ile veri yolundan (PC'de 08h–0Fh)</td><td>sabit 2</td></tr>
+    <tr><th scope="row">Kullanım</th><td>klavye, zamanlayıcı, disk, seri port</td><td>eşlik hatası, güç kaybı</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Düzey tetiklemenin bir sonucu vardır. Aygıt, işlemci isteği kabul edene kadar INTR'yi 1'de tutmalıdır. İstek çok kısa bir darbe olarak gelir ve işlemci o anda IF = 0 ile çalışıyorsa, istek kaybolur. PC'de bu sorunu aygıtlarla işlemci arasındaki 8259A çözer. 8259A gelen istekleri kendi yazmacında saklar ve INTR'yi istek hizmet görene kadar tutar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>NMI'ın vektörünün de INTA ile okunduğunu düşünmek. INTA döngüsü yalnız INTR içindir. NMI'ın tipi sabittir (2) ve işlemci bunu dışarıya sormaz. Aynı biçimde INT 0, INT 1, INT 3 ve INT 4'ün tipleri de sabittir; dış donanımla ilgisi yoktur.</p>
+</div>
+
+<h3 id="s5-1-5-2"><span class="nt-num">5.1.5.2</span>INTR kabul süreci</h3>
+
+<p>Bir tuşa basıldığı andan klavye ISR'sinin ilk komutunun yürütülmesine kadar geçen olaylar zincirini adım adım izleyelim. PC'de klavye denetleyicisi 8259A'nın IRQ1 girişine bağlıdır.</p>
+
+<ol class="nt-steps">
+  <li>Klavye denetleyicisi IRQ1 hattını etkinleştirir. 8259A isteği kaydeder ve maske izin veriyorsa INTR pinini 1 yapar.</li>
+  <li>8086 o anda yürüttüğü komutu bitirir. Kesmeler komut ortasında kabul edilmez; işlemci INTR'yi yalnız komut sınırlarında yoklar.</li>
+  <li>IF = 0 ise istek bekletilir; INTR 1'de kalır. IF = 1 ise istek kabul edilir.</li>
+  <li>İşlemci iki INTA̅ darbesi üretir. Birinci darbe 8259A'ya “hazırlan” der. İkinci darbede 8259A tip numarasını veri yolunun D0–D7 hatlarına koyar; PC'de klavye için bu 09h'dir.</li>
+  <li>Bundan sonrası INT n ile aynıdır: FLAGS, CS, IP yığına itilir; IF = TF = 0 yapılır; CS:IP ← [n × 4], yani [0000:0024h].</li>
+  <li>ISR tuşu okuyup işini bitirince 8259A'ya EOI (kesme sonu) gönderir ve IRET ile döner.</li>
+</ol>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-intr" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 84" role="img" aria-label="INTR isteğinden ISR&#x27;ye geçiş zaman çizelgesi"><defs><marker id="n51-13-mt2-8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-dim" x="4" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="52" y="40" text-anchor="middle" style="font-size:11.5px">INTR = 1</text><text class="lbl" x="52" y="12" text-anchor="middle" style="font-size:10.5px">1</text><rect class="box" x="103" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="151" y="40" text-anchor="middle" style="font-size:11.5px">komut biter</text><text class="lbl" x="151" y="12" text-anchor="middle" style="font-size:10.5px">2</text><rect class="mt-acc" x="202" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="250" y="40" text-anchor="middle" style="font-size:11.5px">IF = 1?</text><text class="lbl" x="250" y="12" text-anchor="middle" style="font-size:10.5px">3</text><rect class="mt-hot" x="301" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="349" y="40" text-anchor="middle" style="font-size:11.5px">INTA̅ ×2 → 09h</text><text class="lbl" x="349" y="12" text-anchor="middle" style="font-size:10.5px">4</text><rect class="box" x="400" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="448" y="40" text-anchor="middle" style="font-size:11.5px">yığına itilir</text><text class="lbl" x="448" y="12" text-anchor="middle" style="font-size:10.5px">5</text><rect class="mt-good" x="499" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="547" y="40" text-anchor="middle" style="font-size:11.5px">ISR … IRET</text><text class="lbl" x="547" y="12" text-anchor="middle" style="font-size:10.5px">6</text><path class="axis" d="M4 66 H592" marker-end="url(#n51-13-mt2-8)"/><text class="lbl" x="596" y="80" text-anchor="end" style="font-size:11px">zaman</text></svg></div>
+  <figcaption><b>Şekil 5.1.9:</b> INTR isteğinden ISR'ye geçişin zaman çizelgesi: istek gelir, yürüyen komut biter, IF sınanır, iki INTA darbesiyle tip numarası okunur, dönüş bilgisi yığına itilir ve ISR IRET ile biter.</figcaption>
+</figure>
+
+<p><a href="#sekil-intr">Şekil 5.1.9</a>'daki dördüncü adım, donanım kesmesini yazılım kesmesinden ayıran tek adımdır. INTA döngüsü bir okuma yol çevrimine benzer: işlemci adres yoluna anlamlı bir adres koymaz, RD̅ yerine INTA̅'yı etkinleştirir ve veri yolundaki baytı alır. İki darbe arasında maksimum kipte LOCK̅ sinyali de etkin tutulur; böylece başka bir yol yöneticisi bu sırada yola giremez. Tip numarası alındıktan sonra işlemci, sanki programda bir <code>INT 09h</code> komutu varmış gibi davranır.</p>
+
+<p>İkinci adımdaki kural, yani kesmenin yalnız komut sınırında kabul edilmesi, ISR tasarımının temelidir. Bir komut yarım kalmaz. Örneğin <code>ADD [BX], AX</code> belleği okuyup yazarken araya kesme girmez; ISR belleği her zaman ya komuttan önceki ya da komuttan sonraki hâliyle görür. Ancak iki ayrı komutla yapılan bir iş, iki komut arasında kesilebilir. ISR'nin ve ana programın paylaştığı veriler için bu durum dikkate alınmalıdır.</p>
+
+<h3 id="s5-1-5-3"><span class="nt-num">5.1.5.3</span>Öncelik ve PC kesme haritası</h3>
+
+<p>Birden çok kesme isteği aynı komut sınırında bekliyorsa işlemci hangisine önce bakacağına sabit bir sırayla karar verir. <a href="#tab-oncelik">Tablo 5.1.12</a> 8086'nın öncelik sırasını verir.</p>
+
+<div class="nt-tablewrap" id="tab-oncelik">
+<table class="nt-table">
+  <caption>Tablo 5.1.12: 8086'nın kesme öncelik sırası.</caption>
+  <thead><tr><th scope="col">Sıra</th><th scope="col">Kaynak</th><th scope="col">Gerekçe</th></tr></thead>
+  <tbody>
+    <tr><td>1 (en yüksek)</td><td>bölme hatası, INT n, INTO</td><td>yürütülen komutun kendisinden doğar; o komutun parçasıdır</td></tr>
+    <tr><td>2</td><td>NMI</td><td>acil donanım olayı; maskelenemez</td></tr>
+    <tr><td>3</td><td>INTR</td><td>sıradan donanım isteği; IF ile bekletilebilir</td></tr>
+    <tr><td>4 (en düşük)</td><td>tek adım (TF)</td><td>hata ayıklama; beklemesi bir şey kaybettirmez</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Sıralamanın mantığı açıktır. Bir komutun kendi ürettiği kesme, o komutun yürütülmesinin parçasıdır ve önce ele alınır. Dış istekler arasında NMI, programın kapatamayacağı acil bir olay olduğu için INTR'nin önündedir. Tek adım ise insanın yazmaçlara bakması içindir; birkaç mikrosaniye beklemesi hiçbir şey kaybettirmez.</p>
+
+<p>Bu öncelik, işlemcinin <em>kendi</em> girişleri arasındadır. INTR'nin arkasındaki sekiz aygıtın birbirine göre önceliğini ise 8259A belirler. PC'nin standart ayarında IRQ0 en yüksek, IRQ7 en düşük önceliklidir. <a href="#tab-irq">Tablo 5.1.13</a> IBM PC'nin donanım kesmelerini verir. BIOS açılışta 8259A'yı IRQ0'a tip 08h verecek biçimde programlar; böylece IRQ n'in tipi 08h + n olur.</p>
+
+<div class="nt-tablewrap" id="tab-irq">
+<table class="nt-table">
+  <caption>Tablo 5.1.13: IBM PC donanım kesmeleri (tip = 08h + IRQ numarası).</caption>
+  <thead><tr><th scope="col">IRQ</th><th scope="col">Aygıt</th><th scope="col">Tip</th><th scope="col">Vektör adresi</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>zamanlayıcı (18,2 Hz)</td><td>08h</td><td>00020h</td></tr>
+    <tr><td>1</td><td>klavye</td><td>09h</td><td>00024h</td></tr>
+    <tr><td>3 / 4</td><td>seri portlar (COM2 / COM1)</td><td>0Bh / 0Ch</td><td>0002Ch / 00030h</td></tr>
+    <tr><td>6</td><td>disket</td><td>0Eh</td><td>00038h</td></tr>
+    <tr><td>7</td><td>yazıcı</td><td>0Fh</td><td>0003Ch</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Zamanlayıcının 18,2 Hz'lik frekansı ilginç bir hesaptan gelir. PC'nin 8253 zamanlayıcı yongası 1 193 182 Hz'lik bir saatle beslenir. Sayaç en büyük bölme değeri olan 65 536 ile çalıştırıldığında çıkış frekansı 1 193 182 / 65 536 ≈ 18,2 Hz olur. Bu da yaklaşık her 55 ms'de bir INT 08h demektir. BIOS bu kesmeyi günün saatini saymak için kullanır.</p>
+
+<p>Klavye örneği, donanım kesmesi ile yazılım kesmesi arasındaki iş bölümünü de gösterir. Bir tuşa basılınca önce donanım kesmesi INT 09h çalışır. Bu ISR klavye denetleyicisinden tuşun kodunu okur ve BIOS'un klavye tamponuna koyar. Program ise tuşu okumak istediğinde yazılım kesmesi INT 16h'yi çağırır; INT 16h bu tampondan okur. Böylece kullanıcı program meşgulken de tuşlara basabilir. Tuşlar tamponda bekler ve program hazır olduğunda sırayla alınır. Tamponun ve INT 16h hizmetlerinin ayrıntısı 5.2 Kesme Fonksiyonları notunun konusudur.</p>
+
+<h3 id="s5-1-5-4"><span class="nt-num">5.1.5.4</span>8259A kesme denetleyicisi</h3>
+
+<p>8086'nın tek bir INTR pini vardır, PC'nin ise en az altı kesme kaynağı. Bu kaynakları tek pine toplayan, aralarında öncelik sıralaması yapan ve işlemciye doğru tip numarasını veren yonga 8259A'dır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-8259">
+  <span class="nt-box__title">Tanım 5.1.7</span>
+  <p><strong>Programlanabilir kesme denetleyicisi</strong> (<span lang="en">programmable interrupt controller</span>, 8259A), sekiz kesme isteği girişini (IRQ0–IRQ7) öncelik sırasına koyan, maskeleyen ve işlemcinin INTA döngüsünde ilgili tip numarasını veri yoluna koyan yongadır. PC'de port 20h ve 21h adreslerindedir.</p>
+</div>
+
+<p>8259A'nın içinde, her biri sekiz bitlik ve her biti bir IRQ'ya karşılık gelen üç yazmaç vardır (<a href="#sekil-8259">Şekil 5.1.10</a>).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-8259" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 128" role="img" aria-label="8259A yazmaçları ve INTR hattı"><defs><marker id="n51-14-m05s7-a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="mt-s" x="40" y="18" text-anchor="middle">IRQ0–7</text><path class="line" d="M40 26 L40 56 L92 56" marker-end="url(#n51-14-m05s7-a1)"/><rect class="mt-acc" x="96" y="38" width="120" height="36" rx="4"/><text class="mt-s" x="156" y="61" text-anchor="middle">IRR (istek)</text><path class="line" d="M216 56 L254 56" marker-end="url(#n51-14-m05s7-a1)"/><rect class="mt-bad" x="258" y="38" width="120" height="36" rx="4"/><text class="mt-s" x="318" y="61" text-anchor="middle">IMR (maske)</text><path class="line" d="M378 56 L416 56" marker-end="url(#n51-14-m05s7-a1)"/><rect class="mt-good" x="420" y="38" width="120" height="36" rx="4"/><text class="mt-s" x="480" y="54" text-anchor="middle">öncelik +</text><text class="mt-s" x="480" y="68" text-anchor="middle">ISR (hizmette)</text><path class="line" d="M540 56 L600 56" marker-end="url(#n51-14-m05s7-a1)"/><text class="mt-a" x="608" y="60" text-anchor="start">INTR</text><text class="lbl" x="318" y="96" text-anchor="middle" style="font-size:12px">port 21h: bit = 1 → o IRQ engelli</text><text class="lbl" x="480" y="96" text-anchor="middle" style="font-size:12px">EOI: port 20h ← 20h</text><text class="lbl" x="156" y="96" text-anchor="middle" style="font-size:12px">bekleyen istekler</text><text class="lbl" x="320" y="120" text-anchor="middle" style="font-size:12px">INTA: 8259A tip numarasını (taban + IRQ no) veri yoluna koyar</text></svg></div>
+  <figcaption><b>Şekil 5.1.10:</b> 8259A'nın içi. IRQ0–7 istekleri IRR'ye yazılır, IMR'de maskeli olanlar elenir, öncelik çözücü en yüksek öncelikli isteği seçer ve INTR'yi sürer. INTA sırasında tip numarası (taban + IRQ no) veri yoluna konur ve isteğin biti ISR yazmacına geçer.</figcaption>
+</figure>
+
+<ul>
+  <li><strong>IRR</strong> (<span lang="en">interrupt request register</span>, kesme istek yazmacı): gelmiş ama henüz hizmet görmemiş istekleri tutar. Bir IRQ hattı etkinleşince ilgili bit 1 olur.</li>
+  <li><strong>IMR</strong> (<span lang="en">interrupt mask register</span>, kesme maske yazmacı): her IRQ için bir maske biti tutar. Bit 1 ise o hattın isteği işlemciye iletilmez. IF bütün INTR girişini kapatırken IMR tek tek hatları kapatır. PC'de port 21h'den okunur ve yazılır.</li>
+  <li><strong>ISR</strong> (<span lang="en">in-service register</span>, hizmette yazmacı): o an hizmet görmekte olan IRQ'yu işaretler. INTA sırasında seçilen isteğin biti IRR'den ISR'ye geçer. EOI gelene kadar bu bit 1 kalır ve aynı ya da daha düşük öncelikli IRQ'lar bekletilir.</li>
+</ul>
+
+<p>Üçüncü yazmacın adı ISR'dir ve kesme hizmet yordamının kısaltmasıyla aynıdır. Karışıklığı önlemek için bu notta yazmaçtan söz edilirken “ISR yazmacı” denir.</p>
+
+<p><strong>EOI.</strong> ISR yazmacındaki bit kendiliğinden silinmez. Hizmet yordamı işini bitirince 8259A'ya bunu bildirmelidir. Bu bildirime <strong>kesme sonu</strong> (<span lang="en">end of interrupt</span>, EOI) denir. PC'de iki komutla yapılır:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AL, 20h     <span class="cm">; özel olmayan EOI komutu</span>
+<span class="kw">OUT</span> 20h, AL     <span class="cm">; 8259A'nın komut portuna</span></pre>
+
+<p>Bu komut, ISR yazmacındaki en yüksek öncelikli 1 bitini siler. Port numarası ile komut değerinin ikisinin de 20h olması tesadüftür. EOI unutulursa 8259A o IRQ'nun hâlâ hizmette olduğunu sanır. Aynı ve daha düşük öncelikli IRQ'lar bir daha işlemciye ulaşmaz. Örneğin zamanlayıcı ISR'sinde EOI unutulursa, IRQ0 en yüksek öncelikli olduğu için klavye, disk ve seri port kesmelerinin hepsi durur. Sistem donmuş gibi görünür.</p>
+
+<p><strong>Basamaklama.</strong> Sekiz giriş bazen yetmez. 8259A'lar basamaklanabilir (<span lang="en">cascade</span>): bir ana 8259A'nın her girişine bir yardımcı 8259A bağlanırsa 8 × 8 = 64 IRQ'ya çıkılır. IBM PC/AT ikinci bir 8259A'yı ana yonganın IRQ2 girişine bağlamıştır. İkinci yonganın girişleri IRQ8–IRQ15 adını alır ve tip 70h–77h'ye eşlenir. AT'de IRQ8 gerçek zamanlı saat, IRQ14 sabit diskin kesmesidir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>IMR'de bir bitin 1 olmasını “kesmeye izin var” diye okumak. IMR bir maske yazmacıdır: 1 engeller, 0 izin verir. IF'de ise durum tersidir: IF = 1 izin verir. İki kuralı karıştırmamak için IMR'deki 1'i “maskeli”, IF'deki 1'i “açık” diye okumak yararlıdır.</p>
+</div>
+
+<h3 id="s5-1-5-5"><span class="nt-num">5.1.5.5</span>IMR ile maskeleme: kod izleme</h3>
+
+<p>Bazen bir programın yalnız tek bir aygıtın kesmesini kısa bir süre engellemesi gerekir. Örneğin klavye tamponunu doğrudan değiştiren bir kod parçası, o sırada klavye ISR'sinin çalışmasını istemez; ama zamanlayıcının saymaya devam etmesini ister. CLI burada fazla kabadır, çünkü bütün INTR girişini kapatır. Doğru araç IMR'dir.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">in</span>  al, 21h        <span class="cm">; IMR'yi oku</span>
+<span class="kw">or</span>  al, 00000010b  <span class="cm">; IRQ1 maskele</span>
+<span class="kw">out</span> 21h, al
+<span class="kw">mov</span> cx, 3          <span class="cm">; kritik iş</span>
+<span class="kw">in</span>  al, 21h
+<span class="kw">and</span> al, 11111101b  <span class="cm">; IRQ1 aç</span>
+<span class="kw">out</span> 21h, al
+<span class="kw">ret</span></pre>
+
+<p>Program <strong>oku–değiştir–yaz</strong> kalıbını iki kez uygular. IMR'nin yalnız bir biti değiştirilmek istenir; öbür yedi bit başka programların, BIOS'un ya da işletim sisteminin ayarıdır. Bu yüzden IMR önce okunur, istenen bit OR ile kurulur ya da AND ile silinir ve sonuç geri yazılır. Doğrudan <code>MOV AL, 02h / OUT 21h, AL</code> yazmak IRQ1'i maskelerdi; ama öbür bütün IRQ'ların maskesini kaldırırdı.</p>
+
+<p>İzlemede IMR'nin başlangıç değeri örnek olarak B8h alınmıştır: 1011 1000b. Bu değerde IRQ3, 4, 5 ve 7 maskelidir; IRQ0 (zamanlayıcı), IRQ1 (klavye), IRQ2 ve IRQ6 (disket) açıktır.</p>
+
+<div class="nt-tablewrap" id="tab-imr">
+<table class="nt-table">
+  <caption>Tablo 5.1.14: IMR ile IRQ1'i maskeleme programının izlemesi (IMR başlangıçta B8h).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">AL (ikili)</th><th scope="col">AL</th><th scope="col">CX</th><th scope="col">IMR</th><th scope="col">IRQ1</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>in al, 21h</code></td><td>1011 1000</td><td class="n51-chg">B8h</td><td>0000h</td><td>B8h</td><td>açık</td></tr>
+    <tr><td>3</td><td><code>or al, 00000010b</code></td><td>1011 10<b>1</b>0</td><td class="n51-chg">BAh</td><td>0000h</td><td>B8h</td><td>açık</td></tr>
+    <tr><td>4</td><td><code>out 21h, al</code></td><td>1011 1010</td><td>BAh</td><td>0000h</td><td class="n51-chg">BAh</td><td class="n51-chg">maskeli</td></tr>
+    <tr><td>5</td><td><code>mov cx, 3</code></td><td>1011 1010</td><td>BAh</td><td class="n51-chg">0003h</td><td>BAh</td><td>maskeli</td></tr>
+    <tr><td>6</td><td><code>in al, 21h</code></td><td>1011 1010</td><td>BAh</td><td>0003h</td><td>BAh</td><td>maskeli</td></tr>
+    <tr><td>7</td><td><code>and al, 11111101b</code></td><td>1011 10<b>0</b>0</td><td class="n51-chg">B8h</td><td>0003h</td><td>BAh</td><td>maskeli</td></tr>
+    <tr><td>8</td><td><code>out 21h, al</code></td><td>1011 1000</td><td>B8h</td><td>0003h</td><td class="n51-chg">B8h</td><td class="n51-chg">açık</td></tr>
+    <tr><td>9</td><td><code>ret</code></td><td>1011 1000</td><td>B8h</td><td>0003h</td><td>B8h</td><td>açık</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-imr">Tablo 5.1.14</a>'ün okunuşu şöyledir. <strong>Satır 2'de</strong> IMR okunur: AL = B8h. <strong>Satır 3'te</strong> <code>or al, 02h</code> yalnız bit 1'i kurar: 1011 1000 OR 0000 0010 = 1011 1010 = BAh. Diğer bitler korunur. IMR henüz değişmemiştir; değişen yalnız AL'dir. <strong>Satır 4'te</strong> <code>out</code> değeri 8259A'ya yazar ve IMR = BAh olur. Bu andan sonra IRQ1 isteği INTR'ye ulaşmaz; IF ve öbür IRQ'lar etkilenmez.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-imr" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 168" role="img" aria-label="AL ve IMR bitleri"><text class="mt-s" x="36" y="44" text-anchor="end" style="font-size:13px;">AL</text><rect class="box" x="44" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="64" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="64" y="20" text-anchor="middle" style="font-size:10px;">IRQ7</text><rect class="box" x="84" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="104" y="44" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl mono" x="104" y="20" text-anchor="middle" style="font-size:10px;">IRQ6</text><rect class="box" x="124" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="144" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="144" y="20" text-anchor="middle" style="font-size:10px;">IRQ5</text><rect class="box" x="164" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="184" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="184" y="20" text-anchor="middle" style="font-size:10px;">IRQ4</text><rect class="box" x="204" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="224" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="224" y="20" text-anchor="middle" style="font-size:10px;">IRQ3</text><rect class="box" x="244" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="264" y="44" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl mono" x="264" y="20" text-anchor="middle" style="font-size:10px;">IRQ2</text><rect class="box" x="284" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="304" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="304" y="20" text-anchor="middle" style="font-size:10px;">IRQ1</text><rect class="box" x="324" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="344" y="44" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl mono" x="344" y="20" text-anchor="middle" style="font-size:10px;">IRQ0</text><text class="mt-m" x="372" y="44" text-anchor="start" style="font-size:12.5px;">BAh</text><text class="mt-s" x="36" y="100" text-anchor="end" style="font-size:13px;">IMR</text><rect class="mt-bad" x="44" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="64" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="84" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="104" y="100" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-bad" x="124" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="144" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-bad" x="164" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="184" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-bad" x="204" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="224" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="244" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="264" y="100" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="284" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="304" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="324" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="344" y="100" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="372" y="100" text-anchor="start" style="font-size:12.5px;">BAh</text><text class="lbl" x="344" y="128" text-anchor="middle" style="font-size:9.5px;">zaman.</text><text class="lbl" x="304" y="128" text-anchor="middle" style="font-size:9.5px;">klavye</text><text class="lbl" x="224" y="128" text-anchor="middle" style="font-size:9.5px;">COM2</text><text class="lbl" x="184" y="128" text-anchor="middle" style="font-size:9.5px;">COM1</text><text class="lbl" x="104" y="128" text-anchor="middle" style="font-size:9.5px;">disket</text><text class="lbl" x="64" y="128" text-anchor="middle" style="font-size:9.5px;">yazıcı</text><text class="lbl" x="8" y="156" text-anchor="start" style="font-size:11.5px;">kırmızı = maskeli (1) · port 21h = IMR</text></svg></div>
+  <figcaption><b>Şekil 5.1.11:</b> <code>out 21h, al</code> sonrasında AL ve IMR bitleri: ikisi de BAh. Maskeli bitler (1) IRQ3, 4, 5, 7 ve yeni maskelenen IRQ1'dir; IRQ0, IRQ2 ve IRQ6 açıktır.</figcaption>
+</figure>
+
+<p><strong>Satır 5</strong> kesilmemesi gereken işin yerini tutar. Bu sırada klavyeye basılırsa istek kaybolmaz: 8259A isteği IRR'de saklar. <strong>Satır 6–8</strong> maskeyi aynı kalıpla kaldırır. <code>and al, 0FDh</code> ile 1111 1101b maskesi yalnız bit 1'i siler: 1011 1010 AND 1111 1101 = 1011 1000 = B8h. <code>out</code> ile IMR yeniden B8h olur. IRR'de bekleyen klavye isteği varsa şimdi INTR'ye ulaşır ve hizmet görür. <strong>Satır 9'da</strong> program döner; maske ilk hâline gelmiştir ve başkasının bitlerine dokunulmamıştır.</p>
+
+<p>IMR'nin CLI'dan farkı bu izlemede açıkça görülür. CLI bütün maskelenebilir kesmeleri bekletir; zamanlayıcının darbeleri de beklerken saat geri kalabilir. IMR ise yalnız seçilen aygıtı bekletir. Bedeli, IMR'ye erişimin iki IN/OUT komutu gerektirmesi ve bir G/Ç portuna yazmak olduğu için CLI'dan daha yavaş olmasıdır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>IMR'ye okumadan yazmak: <code>MOV AL, 02h</code> ve <code>OUT 21h, AL</code>. Bu iki satır IRQ1'i maskeler ama IRQ3, 4, 5 ve 7'nin maskesini kaldırır. O hatlara ISR'si kurulmamış bir aygıt bağlıysa, gelen ilk istek işlemciyi anlamsız bir vektöre gönderir.</p>
+</div>
+
+<h3 id="s5-1-5-6"><span class="nt-num">5.1.5.6</span>Kesmenin bekletildiği anlar</h3>
+
+<p>8086 kesmeyi yalnız komut sınırlarında kabul eder. Bazı durumlarda bu sınır bilerek bir komut ileri kaydırılır. <a href="#tab-bekle">Tablo 5.1.15</a> bu durumları toplar.</p>
+
+<div class="nt-tablewrap" id="tab-bekle">
+<table class="nt-table">
+  <caption>Tablo 5.1.15: INTR'nin hemen kabul edilmediği durumlar.</caption>
+  <thead><tr><th scope="col">Durum</th><th scope="col">Davranış</th><th scope="col">Neden</th></tr></thead>
+  <tbody>
+    <tr><td>komut ortası</td><td>istek, yürüyen komut bitene kadar bekler</td><td>komut yarım kalmasın</td></tr>
+    <tr><td>önekler (LOCK, REP, kesim öneki)</td><td>önekle komut arasında kesme kabul edilmez</td><td>önek komutun parçasıdır</td></tr>
+    <tr><td><code>MOV SS, …</code> ya da <code>POP SS</code> sonrası</td><td>bir sonraki komut da bitene kadar kesme gelmez</td><td>ardından gelen <code>MOV SP, …</code> güvenle tamamlansın</td></tr>
+    <tr><td><code>STI</code> sonrası</td><td>bir komut daha yürütülür, sonra kesme kabul edilir</td><td><code>STI</code> / <code>IRET</code> ya da <code>STI</code> / <code>HLT</code> arasına kesme girmesin</td></tr>
+    <tr><td>REP'li dizgi komutu</td><td>turlar arasında kesilebilir; IRET'ten sonra kalan CX kadar sürer</td><td>uzun bir kopyalama gecikmeyi büyütmesin</td></tr>
+    <tr><td><code>HLT</code> ve <code>WAIT</code></td><td>INTR ya da NMI işlemciyi uyandırır</td><td>bekleme kesmeyle biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>SS yüklendikten sonra.</strong> Yığını taşımak için iki komut gerekir: <code>MOV SS, AX</code> ve <code>MOV SP, 0FFFEh</code>. İki komut arasında bir kesme gelseydi, işlemci FLAGS, CS ve IP'yi yeni SS ile eski SP'nin gösterdiği yere iterdi. Bu adres büyük olasılıkla başka bir verinin üzerindedir. 8086 bu yüzden bir kesim yazmacına yazan her komuttan sonra kesmeyi bir komut erteler. Bunun güvenli çalışması için <code>MOV SP</code>, <code>MOV SS</code>'nin hemen ardından yazılmalıdır.</p>
+
+<p><strong>STI'den sonra.</strong> STI kesmeleri hemen değil, kendisinden sonraki komut bittikten sonra açar. Bu küçük gecikme iki yaygın kalıbı güvenli kılar. Birincisi bir ISR'nin sonundaki <code>STI</code> / <code>IRET</code> dizisidir: yeni kesme, IRET bitmeden ve yığın boşalmadan gelemez. İkincisi <code>STI</code> / <code>HLT</code> dizisidir. Program “kesmeleri aç ve bir kesme gelene kadar bekle” demek ister. Kesme STI ile HLT arasına girseydi, ISR çalışıp dönerdi ve HLT bir sonraki kesmeye kadar gereksiz yere beklerdi.</p>
+
+<p><strong>REP'li dizgi komutları.</strong> <code>REP MOVSB</code> ile 60 000 baytlık bir kopyalama yüz binlerce saat turu sürer. Bütün bu süre boyunca kesmelerin beklemesi kabul edilemez. 8086 bu yüzden REP'li komutu turlar arasında kesebilir. Yığına itilen dönüş adresi, REP önekinin adresidir; SI, DI ve CX o ana kadarki ilerlemeyi tutar. IRET'ten sonra komut yeniden başlar ve kalan CX kadar tur atar. Bu düzenin 8086'ya özgü bir kusuru vardır: işlemci kesmeden dönüşte yalnız bir öneki hatırlar. <code>REP ES: MOVSB</code> gibi iki önekli bir komut kesilirse dönüşte kesim öneki kaybolur ve kopyalama yanlış kesimden sürer. Bu yüzden böyle bir satır CLI ile STI arasına alınır ya da kesim öneki gerektirmeyecek biçimde yazılır.</p>
+
+<p><strong>HLT ve WAIT.</strong> HLT işlemciyi durdurur. INTR (IF = 1 iken) ya da NMI işlemciyi uyandırır; ISR çalışır ve IRET, HLT'den sonraki komuta döner. Ana programı “bir şey olana kadar uyu” diye yazmanın en ekonomik yolu budur. WAIT, 8087 eş işlemcisinin işini bitirmesini bekler; bu bekleme sırasında gelen kesme de kabul edilir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Yığını taşırken önce SP'yi, sonra SS'yi yüklemek ya da iki komut arasına başka bir komut koymak. Erteleme yalnız kesim yazmacına yazan komuttan sonraki <em>tek</em> komutu korur. Doğru sıra <code>MOV SS, AX</code> ve hemen ardından <code>MOV SP, …</code>'dur; en güvenlisi bu iki satırı ayrıca CLI/STI arasına almaktır.</p>
+</div>
+
+<h3 id="s5-1-5-7"><span class="nt-num">5.1.5.7</span>Kesme gecikmesi</h3>
+
+<p>Bir aygıt kesme istediğinde ISR'nin hemen çalışmaya başlaması beklenir. Gerçekte bu süre sıfır değildir ve bazı aygıtlar için sınırlıdır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-gecikme">
+  <span class="nt-box__title">Tanım 5.1.8</span>
+  <p><strong>Kesme gecikmesi</strong> (<span lang="en">interrupt latency</span>), kesme isteğinin gelmesiyle ISR'nin ilk komutunun başlaması arasında geçen süredir.</p>
+</div>
+
+<p>Gecikme iki parçadan oluşur. Birincisi, istek geldiğinde yürümekte olan komutun bitmesini beklemektir. İkincisi kabul sürecinin kendisidir: INTA döngüleri, üç yığın yazması, iki vektör okuması ve kuyruğun yeniden doldurulması. <a href="#tab-tur">Tablo 5.1.16</a> ilgili süreleri verir.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Tablo 5.1.16: Kesmeyle ilgili işlemlerin 8086'daki saat turu sayıları (8086 kılavuzu).</caption>
+  <thead><tr><th scope="col">İşlem</th><th scope="col">Saat turu</th><th scope="col">5 MHz'de süre</th></tr></thead>
+  <tbody>
+    <tr><td>INT n</td><td>51</td><td>10,2 µs</td></tr>
+    <tr><td>INT 3</td><td>52</td><td>10,4 µs</td></tr>
+    <tr><td>INTO (OF = 1 / OF = 0)</td><td>53 / 4</td><td>10,6 / 0,8 µs</td></tr>
+    <tr><td>INTR kabulü (iki INTA dahil)</td><td>61</td><td>12,2 µs</td></tr>
+    <tr><td>IRET</td><td>24</td><td>4,8 µs</td></tr>
+    <tr><td>16 bitlik IDIV (yazmaç)</td><td>165–184</td><td>33–36,8 µs</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-gecikme">
+  <span class="nt-box__title">Örnek 5.1.6</span>
+  <p>5 MHz'lik bir 8086'da INTR geldiğinde 16 bitlik bir IDIV yeni başlamıştır. En kötü kesme gecikmesi kaç saat turu ve kaç µs'dir? İşlemci 8 MHz'de çalışsaydı ne olurdu?</p>
+  <ol class="nt-steps">
+    <li>En kötü durumda yürüyen komut bitmelidir: IDIV en çok 184 tur.</li>
+    <li>Ardından kabul süreci: 61 tur. Toplam 184 + 61 = 245 tur.</li>
+    <li>5 MHz'de bir saat turu 1 / 5 MHz = 200 ns'dir. 245 × 200 ns = 49 µs.</li>
+    <li>8 MHz'de bir tur 125 ns'dir: 245 × 125 ns ≈ 30,6 µs.</li>
+  </ol>
+  <p>Program o sırada kesmeleri CLI ile kapatmışsa, kapalı geçen süre bu gecikmeye doğrudan eklenir. 100 µs'lik bir CLI–STI aralığı en kötü gecikmeyi 5 MHz'de yaklaşık 149 µs'ye çıkarır.</p>
+</div>
+
+<p>Bu sayıların anlamı aygıta göre değişir. Saniyede 18,2 kez gelen zamanlayıcı kesmesi için 49 µs önemsizdir; iki kesme arasında 55 ms vardır. Seri port ise farklıdır. 9600 bit/s hızla gelen karakterler arasında yaklaşık 1,04 ms, 115 200 bit/s hızda ise yaklaşık 87 µs vardır. Tek karakterlik tamponu olan bir seri port denetleyicisinde ISR, bir sonraki karakter gelmeden önceki karakteri okumalıdır. Gecikme ile ISR'nin süresinin toplamı bu aralığı aşarsa karakter kaybolur.</p>
+
+<p>Bu hesap, ISR yazımının iki temel kuralını doğrudan verir. Birincisi, CLI–STI arası kısa tutulmalıdır; çünkü bu süre bütün aygıtların gecikmesine eklenir. İkincisi, ISR'nin kendisi de kısa tutulmalıdır. ISR çalışırken IF = 0'dır ve aynı ya da daha düşük öncelikli IRQ'lar EOI'ye kadar bekler. Uzun bir ISR, öbür bütün aygıtlar için uzun bir CLI ile aynı etkiyi yapar.</p>
+
+<p>ISR'nin işlemciden aldığı pay da hesaplanabilir. Zamanlayıcı ISR'si 200 saat turu sürsün. Saniyede 18,2 kez çalıştığında 200 × 18,2 = 3640 tur harcar. 5 MHz'lik işlemcinin saniyedeki 5 000 000 turunun bu yalnız %0,07'sidir. Kesmenin yoklamaya göre üstünlüğü bu sayıda açıkça görülür.</p>
+
+<h2 class="nt-pb" id="s5-1-6"><span class="nt-num">5.1.6</span>Kendi kesme hizmet yordamımız</h2>
+
+<h3 id="s5-1-6-1"><span class="nt-num">5.1.6.1</span>Vektörü kurmak: INT 90h</h3>
+
+<p>Bir kesme hizmet yordamı kurmak üç iş gerektirir: yordamı yazmak, kullanılmayan bir tip seçmek ve o tipin vektörüne yordamın adresini yazmak. Aşağıdaki program bu üç işi en sade biçimde yapar ve kendi kesmesini bir kez çağırır.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax                         <span class="cm">; ES = 0: IVT kesimi</span>
+<span class="kw">cli</span>                               <span class="cm">; kesmeleri kapat</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[90h*4], <span class="dir">offset</span> isr <span class="cm">; IP</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[90h*4+2], cs        <span class="cm">; CS</span>
+<span class="kw">sti</span>                               <span class="cm">; kesmeleri aç</span>
+<span class="kw">int</span> 90h                           <span class="cm">; kendi kesmemiz</span>
+<span class="kw">ret</span>
+isr:
+<span class="kw">mov</span> ah, 0Eh
+<span class="kw">mov</span> al, <span class="str">'*'</span>
+<span class="kw">int</span> 10h
+<span class="kw">iret</span>                              <span class="cm">; RET değil!</span></pre>
+
+<p>Programdaki her kararın bir gerekçesi vardır.</p>
+
+<ul>
+  <li><strong>Tip seçimi.</strong> 90h, PC'de BIOS'un ve DOS'un kullanmadığı bir tiptir. Vektörü 90h × 4 = 240h adresindedir; IP 0000:0240h–0241h'de, CS 0000:0242h–0243h'dedir.</li>
+  <li><strong>ES = 0.</strong> Vektör tablosu 0000h kesimindedir. DS programın kendi verisini gösterdiği için tabloya ES üzerinden, <code>es:</code> önekiyle erişilir. Kesim yazmacına sabit yüklenemediğinden 0 önce AX'e konur.</li>
+  <li><strong>CLI / STI.</strong> Vektör iki ayrı MOV ile, iki sözcük olarak yazılır. İlk MOV'dan sonra vektörün IP yarısı yeni, CS yarısı eskidir. O anda bu tipte bir kesme gelseydi, işlemci anlamsız bir adrese atlardı. CLI bu kısa aralıkta maskelenebilir kesmeleri bekletir. Tip 90h'yi yalnız programın kendisi çağırdığı için bu örnekte tehlike yoktur; ama donanım tiplerinde aynı kalıp zorunludur ve her vektör yazılışında uygulanması iyi bir alışkanlıktır.</li>
+  <li><strong>ISR'nin sonu.</strong> ISR, BIOS'un INT 10h teletype hizmetiyle ekrana bir yıldız yazar ve IRET ile döner. Bir ISR'nin içinden başka bir yazılım kesmesi çağrılabilir; iç içe kesmelerde yığına her seviye için 6 bayt daha eklenir.</li>
+</ul>
+
+<p>Program çalıştırıldığında ekrana <code>*</code> yazılır ve program DOS'a döner. Bu kısa örnek eski vektörü saklamaz ve geri yüklemez. Program bittikten sonra tip 90h'nin vektörü, artık başka bir programın yükleneceği bir belleği göstermeye devam eder. Başka bir program INT 90h çağırırsa oradaki rastgele baytlar komut olarak yürütülür. Eski vektörü saklayıp geri yükleyen doğru biçim aşağıda ayrıca izlenir.</p>
+
+<p>DOS altında vektörleri doğrudan bellekten yazmak yerine DOS'un iki hizmeti kullanılabilir: <code>INT 21h</code>, AH = 25h vektör atar, AH = 35h vektör okur. Bu hizmetler vektör yazılırken kesmeleri kendileri yönetir ve işletim sisteminin vektörlerden haberdar olmasını sağlar. Bu yüzden daha güvenli yoldur. Hizmetlerin yazmaç düzeni 5.2 Kesme Fonksiyonları notunda verilir; burada vektör tablosunun nasıl çalıştığını görmek için doğrudan yazma yöntemi kullanılmıştır.</p>
+
+<h3 id="s5-1-6-2"><span class="nt-num">5.1.6.2</span>INT 60h ile kendi ISR'miz: kod izleme</h3>
+
+<p>Aynı düzenin biraz farklı bir biçimi, ISR'ye yazmaç üzerinden parametre geçirir. Ana program yazılacak karakteri AL'ye koyar; ISR yalnız AH'yi hazırlar ve INT 10h'yi çağırır. Kullanıcı programlarına ayrılmış 60h tipi kullanılır.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax           <span class="cm">; ES = 0: IVT</span>
+<span class="kw">cli</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[60h*4], <span class="dir">offset</span> isr
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[60h*4+2], cs
+<span class="kw">sti</span>
+<span class="kw">mov</span> al, <span class="str">'#'</span>
+<span class="kw">int</span> 60h              <span class="cm">; kendi kesmemiz</span>
+<span class="kw">ret</span>
+isr:
+<span class="kw">mov</span> ah, 0Eh
+<span class="kw">int</span> 10h
+<span class="kw">iret</span></pre>
+
+<p>Bağıl konumlar şöyledir: <code>mov ax, 0</code> 0100h, <code>mov es, ax</code> 0103h, <code>cli</code> 0105h, iki vektör yazması 0106h ve 010Dh, <code>sti</code> 0112h, <code>mov al, '#'</code> 0113h, <code>int 60h</code> 0115h, <code>ret</code> 0117h ve <code>isr</code> 0118h. Vektör 60h × 4 = 180h adresindedir.</p>
+
+<div class="nt-tablewrap" id="tab-isr60">
+<table class="nt-table">
+  <caption>Tablo 5.1.17: INT 60h programının izlemesi (her satır yürütüldükten sonraki durum; SS = 0700h).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">ES</th><th scope="col">CS:IP (sonraki)</th><th scope="col">SP</th><th scope="col">FLAGS</th><th scope="col">IVT 0180h–0183h / yığın</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov ax, 0</code></td><td>0000h</td><td>0700h</td><td>0700:0103</td><td>FFFEh</td><td>F202h</td><td>?? ?? ?? ??</td><td></td></tr>
+    <tr><td>3</td><td><code>mov es, ax</code></td><td>0000h</td><td class="n51-chg">0000h</td><td>0700:0105</td><td>FFFEh</td><td>F202h</td><td>?? ?? ?? ??</td><td></td></tr>
+    <tr><td>4</td><td><code>cli</code></td><td>0000h</td><td>0000h</td><td>0700:0106</td><td>FFFEh</td><td class="n51-chg">F002h</td><td>?? ?? ?? ??</td><td></td></tr>
+    <tr><td>5</td><td><code>mov … [60h*4], offset isr</code></td><td>0000h</td><td>0000h</td><td>0700:010D</td><td>FFFEh</td><td>F002h</td><td class="n51-chg">18 01 ?? ??</td><td></td></tr>
+    <tr><td>6</td><td><code>mov … [60h*4+2], cs</code></td><td>0000h</td><td>0000h</td><td>0700:0112</td><td>FFFEh</td><td>F002h</td><td class="n51-chg">18 01 00 07</td><td></td></tr>
+    <tr><td>7</td><td><code>sti</code></td><td>0000h</td><td>0000h</td><td>0700:0113</td><td>FFFEh</td><td class="n51-chg">F202h</td><td>18 01 00 07</td><td></td></tr>
+    <tr><td>8</td><td><code>mov al, '#'</code></td><td class="n51-chg">0023h</td><td>0000h</td><td>0700:0115</td><td>FFFEh</td><td>F202h</td><td>18 01 00 07</td><td></td></tr>
+    <tr><td>9</td><td><code>int 60h</code></td><td>0023h</td><td>0000h</td><td class="n51-chg">0700:0118</td><td class="n51-chg">FFF8h</td><td class="n51-chg">F002h</td><td>[FFF8h] = 0117h, [FFFAh] = 0700h, [FFFCh] = F202h</td><td></td></tr>
+    <tr><td>12</td><td><code>mov ah, 0Eh</code></td><td class="n51-chg">0E23h</td><td>0000h</td><td>0700:011A</td><td>FFF8h</td><td>F002h</td><td>yığın aynı</td><td></td></tr>
+    <tr><td>13</td><td><code>int 10h</code></td><td>0E23h</td><td>0000h</td><td>0700:011C</td><td>FFF8h</td><td>F002h</td><td>yığın aynı</td><td class="n51-chg">#</td></tr>
+    <tr><td>14</td><td><code>iret</code></td><td>0E23h</td><td>0000h</td><td class="n51-chg">0700:0117</td><td class="n51-chg">FFFEh</td><td class="n51-chg">F202h</td><td>yığın boşaldı</td><td>#</td></tr>
+    <tr><td>10</td><td><code>ret</code></td><td>0E23h</td><td>0000h</td><td class="n51-chg">0700:0000</td><td class="n51-chg">0000h</td><td>F202h</td><td>DOS'a dönüş</td><td>#</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-isr60">Tablo 5.1.17</a> dört evreye ayrılır. <strong>Hazırlık (satır 2–3).</strong> ES başlangıçta, .COM programının öbür kesim yazmaçları gibi 0700h'dir. <code>mov es, ax</code> sonrasında ES = 0000h olur ve <code>es:[180h]</code> artık vektör tablosundaki 0000:0180h baytını gösterir. Tablonun bu dört baytının program öncesindeki değeri bilinmez; izlemede “??” ile gösterilmiştir.</p>
+
+<p><strong>Vektörü yazma (satır 4–7).</strong> <code>cli</code> IF'yi sıfırlar ve FLAGS F202h'den F002h'ye iner. Satır 5 IP yarısına offset isr = 0118h'yi yazar; bellekte küçük uçlu düzende <code>18 01</code> görülür. Satır 6 CS yarısına 0700h'yi yazar: <code>00 07</code>. Vektör artık 0700:0118'dir. <code>sti</code> ile IF = 1 ve FLAGS = F202h olur. 8086'da FLAGS'in bit 1 ve 12–15 bitleri hep 1 olduğu için IF'nin tek başına değeri 0200h fark yaratır.</p>
+
+<p><strong>Kesme (satır 8–9).</strong> <code>mov al, '#'</code> AL'ye 23h koyar. Bu değer ISR'ye yazmaçla geçirilen parametredir. <code>int 60h</code> yığına FLAGS (F202h), CS (0700h) ve dönüş IP'si 0117h'yi iter. INT 60h 0115h'te başlar ve iki bayttır; dönüş adresi 0117h'dir. IF = 0 olur ve CS:IP, 0000:0180h'deki vektörden 0700:0118 olarak yüklenir.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-isr60" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 180" role="img" aria-label="Kendi kesme yordamı, adım 8: vektör tablosu, yığın ve CS:IP"><text class="lbl" x="8" y="14" text-anchor="start">IVT 0000:0180h (tip 60h)</text><rect class="box" x="8" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="28" y="38" text-anchor="middle" style="font-size:13px">18</text><rect class="box" x="52" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="72" y="38" text-anchor="middle" style="font-size:13px">01</text><rect class="box" x="96" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="116" y="38" text-anchor="middle" style="font-size:13px">00</text><rect class="box" x="140" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="160" y="38" text-anchor="middle" style="font-size:13px">07</text><text class="lbl" x="50" y="60" text-anchor="middle">IP</text><text class="lbl" x="138" y="60" text-anchor="middle">CS</text><text class="mt-m" x="8" y="80" text-anchor="start">vektör = 0700:0118h</text><text class="lbl" x="311" y="16" text-anchor="middle" style="font-size:11px">yığın (SS = 0700h)</text><rect class="mt-hot" x="268" y="22" width="86" height="24" rx="2"/><text class="lbl" x="264" y="38" text-anchor="end" style="font-size:10.5px">FFF8</text><text class="mt-m" x="311" y="39" text-anchor="middle" style="font-size:12.5px">0117h</text><text class="mt-l" x="358" y="38" text-anchor="start" style="font-size:12px">← SP</text><rect class="mt-hot" x="268" y="48" width="86" height="24" rx="2"/><text class="lbl" x="264" y="64" text-anchor="end" style="font-size:10.5px">FFFA</text><text class="mt-m" x="311" y="65" text-anchor="middle" style="font-size:12.5px">0700h</text><rect class="mt-hot" x="268" y="74" width="86" height="24" rx="2"/><text class="lbl" x="264" y="90" text-anchor="end" style="font-size:10.5px">FFFC</text><text class="mt-m" x="311" y="91" text-anchor="middle" style="font-size:12.5px">F202h</text><rect class="box" x="268" y="100" width="86" height="24" rx="2"/><text class="lbl" x="264" y="116" text-anchor="end" style="font-size:10.5px">FFFE</text><text class="mt-m" x="311" y="117" text-anchor="middle" style="font-size:12.5px">0000h</text><rect class="mt-hot" x="8" y="112" width="118" height="28" rx="4"/><text class="lbl" x="67" y="107" text-anchor="middle">CS:IP (sonraki)</text><text class="mt-v" x="67" y="131.5" text-anchor="middle" style="font-size:13px">0700:0118</text><rect class="mt-hot" x="136" y="112" width="70" height="28" rx="4"/><text class="lbl" x="171" y="107" text-anchor="middle">FLAGS</text><text class="mt-v" x="171" y="131.5" text-anchor="middle" style="font-size:13px">F002h</text><text class="mt-a" x="8" y="166" text-anchor="start">IF = 0</text><text class="mt-m" x="80" y="166" text-anchor="start">ekran: </text></svg></div>
+  <figcaption><b>Şekil 5.1.12:</b> <code>int 60h</code> yürütüldükten sonra: tip 60h'nin vektörü 0700:0118h, yığında dönüş IP'si 0117h, CS ve FLAGS; SP = FFF8h, IF = 0 ve CS:IP ISR'nin ilk komutunda.</figcaption>
+</figure>
+
+<p><strong>ISR ve dönüş (satır 12–14 ve 10).</strong> ISR'de <code>mov ah, 0Eh</code> AX'i 0E23h yapar. AH = 0Eh, BIOS'un teletype hizmetini seçer; AL'deki karakter yazılacaktır. <code>int 10h</code> ekrana <code>#</code> yazar. Bu, kesmenin içinden çağrılan ikinci bir kesmedir. BIOS kendi yığın kullanımını geri bırakır ve döndüğünde SP yine FFF8h'dir. <code>iret</code> IP = 0117h, CS = 0700h ve FLAGS = F202h'yi geri alır; SP = FFFEh ve IF = 1 olur. Ana programdaki <code>ret</code> DOS'a döner.</p>
+
+<p>ISR'nin AX'i değiştirdiğine dikkat edilmelidir. Ana program kesmeden sonra AX = 0E23h ile devam eder. Bu programda AL bilerek ISR'ye parametre olarak verildiği için AX'in değişmesi bir sorun yaratmaz. Ama ISR bir donanım kesmesine bağlı olsaydı, ana program AH'nin aniden 0Eh olduğunu görürdü. Bu tür bir ISR kullandığı her yazmacı saklamalıdır.</p>
+
+<h3 id="s5-1-6-3"><span class="nt-num">5.1.6.3</span>Vektörü sakla, değiştir, geri yükle: kod izleme</h3>
+
+<p>Önceki iki programın eksiği, tabloyu değiştirip öyle bırakmalarıdır. Doğru bir program önce eski vektörü saklar, işini bitirince geri yükler. Aşağıdaki program bunu tip 3 için yapar ve ISR'nin ana programın yazmaçlarını nasıl koruduğunu da gösterir.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">xor</span> ax, ax
+<span class="kw">mov</span> es, ax          <span class="cm">; ES = 0: IVT</span>
+<span class="kw">mov</span> ax, <span class="dir">offset</span> isr3
+<span class="kw">xchg</span> ax, es:[3*4]   <span class="cm">; yeni IP ↔ eski</span>
+<span class="kw">mov</span> eski, ax
+<span class="kw">mov</span> ax, cs
+<span class="kw">xchg</span> ax, es:[3*4+2] <span class="cm">; yeni CS ↔ eski</span>
+<span class="kw">mov</span> eski+2, ax
+<span class="kw">mov</span> ax, 1234h
+<span class="kw">int</span> 3               <span class="cm">; bizim ISR</span>
+<span class="kw">mov</span> bx, eski
+<span class="kw">mov</span> es:[3*4], bx    <span class="cm">; geri yükle</span>
+<span class="kw">mov</span> bx, eski+2
+<span class="kw">mov</span> es:[3*4+2], bx
+<span class="kw">ret</span>
+isr3: <span class="kw">push</span> ax
+<span class="kw">mov</span> ax, 0E21h       <span class="cm">; AH=0Eh, AL='!'</span>
+<span class="kw">int</span> 10h
+<span class="kw">pop</span> ax
+<span class="kw">iret</span>
+eski <span class="dir">dw</span> ?, ?</pre>
+
+<p>Programın yeni öğesi <code>XCHG</code> komutudur. <code>xchg ax, es:[3*4]</code>, AX ile bellekteki sözcüğü tek komutta değiş tokuş eder: yeni IP belleğe yazılırken eski IP AX'e gelir. Okuma ve yazma iki ayrı MOV ile yapılsaydı, arada iki komutluk bir aralık kalırdı. XCHG ile eski değer okunmadan yeni değerin yazılması da, yazılmadan önce okunan değerin kaybolması da mümkün değildir. Eski vektör <code>eski</code> adlı iki sözcüklük değişkene saklanır. <code>xor ax, ax</code> AX'i sıfırlar; MOV'dan bir bayt kısadır ama bayrakları değiştirir: ZF = 1 ve PF = 1 olur. Bu yüzden FLAGS bu programda F246h'dir.</p>
+
+<p>Programdan önceki tip 3 vektörü F000:1003h'dir: emu8086 her n tipi için varsayılan vektörü F000:(1000h + n) adresine kurar (tip 0 için F000:1000h). Gerçek bir PC'de bu değer BIOS'a ve yüklü hata ayıklayıcıya göre değişir; programın doğruluğu bu değere bağlı değildir. Bağıl konumlar: <code>int 3</code> 011Ch'de ve tek bayttır, <code>isr3</code> 0130h'de, <code>eski</code> 0138h'dedir.</p>
+
+<div class="nt-tablewrap" id="tab-sakla">
+<table class="nt-table">
+  <caption>Tablo 5.1.18: Vektörü sakla, değiştir, geri yükle programının izlemesi (SS = 0700h).</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">Tip 3 vektörü</th><th scope="col">CS:IP (sonraki)</th><th scope="col">SP</th><th scope="col">IF</th><th scope="col">Yığın / çıktı</th></tr></thead>
+  <tbody>
+    <tr><td>2–3</td><td><code>xor ax, ax</code> / <code>mov es, ax</code></td><td>0000h</td><td>0000h</td><td>F000:1003</td><td>0700:0104</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>4</td><td><code>mov ax, offset isr3</code></td><td class="n51-chg">0130h</td><td>0000h</td><td>F000:1003</td><td>0700:0107</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>5</td><td><code>xchg ax, es:[3*4]</code></td><td class="n51-chg">1003h</td><td>0000h</td><td class="n51-chg">F000:0130</td><td>0700:010C</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>6</td><td><code>mov eski, ax</code></td><td>1003h</td><td>0000h</td><td>F000:0130</td><td>0700:010F</td><td>FFFEh</td><td>1</td><td>eski = 1003h</td></tr>
+    <tr><td>7</td><td><code>mov ax, cs</code></td><td class="n51-chg">0700h</td><td>0000h</td><td>F000:0130</td><td>0700:0111</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>8</td><td><code>xchg ax, es:[3*4+2]</code></td><td class="n51-chg">F000h</td><td>0000h</td><td class="n51-chg">0700:0130</td><td>0700:0116</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>9</td><td><code>mov eski+2, ax</code></td><td>F000h</td><td>0000h</td><td>0700:0130</td><td>0700:0119</td><td>FFFEh</td><td>1</td><td>eski+2 = F000h</td></tr>
+    <tr><td>10</td><td><code>mov ax, 1234h</code></td><td class="n51-chg">1234h</td><td>0000h</td><td>0700:0130</td><td>0700:011C</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>11</td><td><code>int 3</code></td><td>1234h</td><td>0000h</td><td>0700:0130</td><td class="n51-chg">0700:0130</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0</td><td>[FFF8h] = 011Dh, [FFFAh] = 0700h, [FFFCh] = F246h</td></tr>
+    <tr><td>17</td><td><code>push ax</code></td><td>1234h</td><td>0000h</td><td>0700:0130</td><td>0700:0131</td><td class="n51-chg">FFF6h</td><td>0</td><td>[FFF6h] = 1234h</td></tr>
+    <tr><td>18</td><td><code>mov ax, 0E21h</code></td><td class="n51-chg">0E21h</td><td>0000h</td><td>0700:0130</td><td>0700:0134</td><td>FFF6h</td><td>0</td><td>—</td></tr>
+    <tr><td>19</td><td><code>int 10h</code></td><td>0E21h</td><td>0000h</td><td>0700:0130</td><td>0700:0136</td><td>FFF6h</td><td>0</td><td class="n51-chg">çıktı: !</td></tr>
+    <tr><td>20</td><td><code>pop ax</code></td><td class="n51-chg">1234h</td><td>0000h</td><td>0700:0130</td><td>0700:0137</td><td class="n51-chg">FFF8h</td><td>0</td><td>—</td></tr>
+    <tr><td>21</td><td><code>iret</code></td><td>1234h</td><td>0000h</td><td>0700:0130</td><td class="n51-chg">0700:011D</td><td class="n51-chg">FFFEh</td><td class="n51-chg">1</td><td>yığın boşaldı</td></tr>
+    <tr><td>12–13</td><td><code>mov bx, eski</code> / <code>mov es:[3*4], bx</code></td><td>1234h</td><td class="n51-chg">1003h</td><td class="n51-chg">0700:1003</td><td>0700:0126</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>14–15</td><td><code>mov bx, eski+2</code> / <code>mov es:[3*4+2], bx</code></td><td>1234h</td><td class="n51-chg">F000h</td><td class="n51-chg">F000:1003</td><td>0700:012F</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>16</td><td><code>ret</code></td><td>1234h</td><td>F000h</td><td>F000:1003</td><td class="n51-chg">0700:0000</td><td class="n51-chg">0000h</td><td>1</td><td>DOS'a dönüş</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-sakla">Tablo 5.1.18</a>'in ilk evresi vektörün değiştirilmesidir. <strong>Satır 5'te</strong> XCHG yeni IP'yi (0130h) tabloya yazar ve eski IP'yi (1003h) AX'e getirir. Vektör o an F000:0130'dur: yarısı yeni, yarısı eski. <strong>Satır 8'de</strong> ikinci XCHG yeni CS'yi (0700h) yazar, eski CS'yi (F000h) AX'e getirir. Vektör artık 0700:0130'dur ve eski vektör F000:1003, <code>eski</code> değişkeninde saklıdır. Tip 3'ü yalnız program çağırdığı için bu örnekte CLI gerekmemiştir. Bir donanım tipinin vektörü değiştirilirken bu satırlar CLI ile STI arasına alınır.</p>
+
+<p>İkinci evre kesmedir. <strong>Satır 10'da</strong> AX = 1234h olur; bu, ana programın korunması gereken değeridir. <strong>Satır 11'de</strong> <code>int 3</code> tek bayttır (CCh). Yığına FLAGS (F246h), CS (0700h) ve dönüş IP'si 011Dh itilir. Dönüş adresi 011Ch + 1 = 011Dh'dir; INT 3'ün tek baytlığı burada da görülür. CS:IP ← 0700:0130 olur.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sakla" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 420 186" role="img" aria-label="Vektör tablosu, yığın ve yazmaçlar"><text class="mt-s" x="8" y="14" text-anchor="start" style="font-size:12px;">IVT 0000:000Ch (tip 03h)</text><rect class="box" x="8" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="27" y="40" text-anchor="middle" style="font-size:13.5px;">30</text><rect class="box" x="46" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="65" y="40" text-anchor="middle" style="font-size:13.5px;">01</text><rect class="box" x="84" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="103" y="40" text-anchor="middle" style="font-size:13.5px;">00</text><rect class="box" x="122" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="141" y="40" text-anchor="middle" style="font-size:13.5px;">07</text><text class="lbl" x="46" y="62" text-anchor="middle" style="font-size:11px;">IP</text><text class="lbl" x="122" y="62" text-anchor="middle" style="font-size:11px;">CS</text><text class="mt-m" x="8" y="80" text-anchor="start" style="font-size:12px;">vektör = 0700:0130h</text><text class="lbl" x="348" y="14" text-anchor="middle" style="font-size:11px;">yığın (SS = 0700)</text><rect class="mt-hot" x="310" y="20" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="36" text-anchor="end" style="font-size:10.5px;">FFF6</text><text class="txt mono" x="348" y="36" text-anchor="middle" style="font-size:12.5px;">1234</text><text class="mt-l" x="389" y="36" text-anchor="start" style="font-size:11.5px;">← SP</text><rect class="box" x="310" y="45" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="61" text-anchor="end" style="font-size:10.5px;">FFF8</text><text class="txt mono" x="348" y="61" text-anchor="middle" style="font-size:12.5px;">011D</text><rect class="box" x="310" y="70" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="86" text-anchor="end" style="font-size:10.5px;">FFFA</text><text class="txt mono" x="348" y="86" text-anchor="middle" style="font-size:12.5px;">0700</text><rect class="box" x="310" y="95" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="111" text-anchor="end" style="font-size:10.5px;">FFFC</text><text class="txt mono" x="348" y="111" text-anchor="middle" style="font-size:12.5px;">F246</text><rect class="box" x="310" y="120" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="136" text-anchor="end" style="font-size:10.5px;">FFFE</text><text class="txt mono" x="348" y="136" text-anchor="middle" style="font-size:12.5px;">0000</text><text class="lbl" x="33" y="109" text-anchor="middle" style="font-size:12px;">AX</text><rect class="box" x="8" y="114" width="50" height="26" rx="3"/><text class="txt mono" x="33" y="132" text-anchor="middle" style="font-size:13px;">1234</text><text class="lbl" x="90" y="109" text-anchor="middle" style="font-size:12px;">BX</text><rect class="box" x="65" y="114" width="50" height="26" rx="3"/><text class="txt mono" x="90" y="132" text-anchor="middle" style="font-size:13px;">0000</text><text class="lbl" x="164" y="109" text-anchor="middle" style="font-size:12px;">CS:IP</text><rect class="mt-hot" x="122" y="114" width="84" height="26" rx="3"/><text class="txt mono" x="164" y="132" text-anchor="middle" style="font-size:13px;">0700:0131</text><text class="lbl" x="228" y="109" text-anchor="middle" style="font-size:12px;">IF</text><rect class="box" x="213" y="114" width="30" height="26" rx="3"/><text class="txt mono" x="228" y="132" text-anchor="middle" style="font-size:13px;">0</text><text class="mt-m" x="8" y="172" text-anchor="start" style="font-size:12px;">çıktı: </text></svg></div>
+  <figcaption><b>Şekil 5.1.13:</b> ISR'nin ilk komutu <code>push ax</code>'ten sonra: yığında dört sözcük vardır. Altta kesmenin ittiği FLAGS, CS ve IP, üstte ISR'nin sakladığı AX = 1234h; SP = FFF6h.</figcaption>
+</figure>
+
+<p>Üçüncü evre ISR'dir. <strong>Satır 17'de</strong> ISR kullanacağı AX'i önce yığına iter: SP = FFF6h ve [FFF6h] = 1234h (<a href="#sekil-sakla">Şekil 5.1.13</a>). <strong>Satır 18–19</strong> AX = 0E21h ile ekrana <code>!</code> yazar. <strong>Satır 20'de</strong> <code>pop ax</code> 1234h'yi geri alır; SP = FFF8h olur ve yığının tepesi yeniden kesmenin ittiği IP'dir. Bu noktada PUSH ile POP'un sayısı eşit olmalıdır. Eşit olmasaydı IRET yanlış sözcükleri dönüş adresi diye alırdı. <strong>Satır 21'de</strong> <code>iret</code> IP = 011Dh, CS = 0700h ve FLAGS = F246h'yi geri alır; SP = FFFEh ve IF = 1 olur.</p>
+
+<p>Son evre geri yüklemedir. <strong>Satır 12–15</strong> <code>eski</code> değişkenindeki iki sözcüğü tabloya geri yazar. Burada da vektör bir an 0700:1003 gibi anlamsız bir ara değerden geçer. <strong>Satır 16'da</strong> program döndüğünde AX = 1234h korunmuştur ve vektör tablosu programdan önceki hâlindedir. Bir programın vektör tablosunda iz bırakmadan çıkması budur.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Programın her çıkış yolunda vektörü geri yüklemeyi unutmak. Program yalnız normal sonunda geri yükleme yapar, ama bir hata durumunda erkenden DOS'a dönerse, vektör artık yüklü olmayan bir kodu gösterir. Bir sonraki INT 3 ya da donanım kesmesi sistemi çökertir. Geri yükleme kodu, programın bütün çıkışlarının geçtiği tek bir yere konmalıdır.</p>
+</div>
+
+<h3 id="s5-1-6-4"><span class="nt-num">5.1.6.4</span>ISR yazım kuralları</h3>
+
+<p>Önceki izlemeler ISR yazımının kurallarını tek tek ortaya koydu. <a href="#tab-kural">Tablo 5.1.19</a> bu kuralları ve uyulmadığında ortaya çıkan belirtileri toplar.</p>
+
+<div class="nt-tablewrap" id="tab-kural">
+<table class="nt-table">
+  <caption>Tablo 5.1.19: ISR yazım kuralları ve uyulmadığında ortaya çıkan sorunlar.</caption>
+  <thead><tr><th scope="col">Kural</th><th scope="col">Uyulmazsa</th></tr></thead>
+  <tbody>
+    <tr><td>Kullanılan her yazmaç PUSH/POP ile korunur (FLAGS'i işlemci korur).</td><td>Ana program, değeri kendiliğinden değişmiş bir yazmaçla devam eder; hata rastgele anlarda görülür.</td></tr>
+    <tr><td>Donanım ISR'si 8259A'ya EOI gönderir: <code>MOV AL, 20h</code> · <code>OUT 20h, AL</code>.</td><td>8259A ISR yazmacındaki biti silmez; aynı ve daha düşük öncelikli IRQ'lar bir daha gelmez.</td></tr>
+    <tr><td>ISR kısa tutulur; uzun iş bir bayrak değişkeniyle ana programa bırakılır.</td><td>Kesme gecikmesi büyür, hızlı aygıtların verisi kaybolur.</td></tr>
+    <tr><td>Donanım ISR'sinden INT 21h çağrılmaz.</td><td>DOS yeniden girişli değildir; kesilen DOS çağrısının verileri bozulur.</td></tr>
+    <tr><td>Vektör CLI ile ya da AH = 25h ile yazılır, çıkışta eskisi geri yüklenir.</td><td>Program bittikten sonra kesme, artık başka bir şeyin bulunduğu belleğe atlar.</td></tr>
+    <tr><td>ISR IRET ile biter.</td><td>Yığın 4 bayt kayar, IF kapalı kalır.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Yazmaçları korumak.</strong> Bir donanım ISR'si programın herhangi bir komutundan sonra çalışabilir. Programın o anda hangi yazmacı kullandığı bilinemez. Bu yüzden ISR, kullandığı her yazmacı girişte iter ve çıkışta ters sırayla geri alır. Bayrakları saklamaya gerek yoktur; INT ve IRET bunu kendisi yapar. Kesim yazmaçları da unutulmamalıdır. ISR kendi verisine erişmek için DS'yi değiştirirse, DS'yi de saklamalıdır.</p>
+
+<p><strong>Kısa ISR ve bayrak değişkeni.</strong> Uzun süren bir iş ISR'nin içinde yapılmaz. ISR yalnız acil kısmı yapar: aygıttan veriyi okur, bir tampona koyar ve bir değişkeni 1 yapar. Ana program bu değişkene döngüsünde bakar ve uzun işi kesmeler açıkken yapar. Bu kalıp yoklamaya benzer görünür, ama yoklanan şey yavaş bir aygıt değil bellekteki bir değişkendir ve veri kaybolma tehlikesini ISR ortadan kaldırmıştır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-reentrant">
+  <span class="nt-box__title">Tanım 5.1.9</span>
+  <p><strong>Yeniden girişli</strong> (<span lang="en">reentrant</span>) yordam, bir çağrısı henüz bitmeden, örneğin bir kesme yüzünden, yeniden çağrıldığında da doğru çalışan yordamdır. Bunun için yordam kalıcı durumunu sabit bellek hücrelerinde değil, yığında ya da yazmaçlarda tutar.</p>
+</div>
+
+<p><strong>DOS'u çağırmamak.</strong> DOS, çalışırken kendi iç değişkenlerini ve kendi yığınını sabit bellek alanlarında tutar. Program bir INT 21h çağrısının ortasındayken bir donanım kesmesi gelir ve ISR yeniden INT 21h çağırırsa, ikinci çağrı birincinin değişkenlerinin ve yığınının üzerine yazar. Birinci çağrıya dönüldüğünde veriler bozulmuştur. DOS yeniden girişli olmadığı için donanım ISR'leri DOS hizmetlerini kullanmaz. BIOS'un INT 10h gibi hizmetleri ise çoğu zaman bu açıdan daha güvenlidir; yukarıdaki örnek ISR'ler bu yüzden INT 10h'yi kullanır ve yazılım kesmesiyle çağrılır.</p>
+
+<p><strong>ISR içinde STI.</strong> ISR, IF = 0 ile başlar. Uzun bir ISR, işinin başında STI ile daha öncelikli donanım kesmelerine izin verebilir; 8259A aynı ve daha düşük öncelikli IRQ'ları EOI'ye kadar zaten bekletir. Bu durumda ISR'nin kendisi de yeniden girişli yazılmalıdır. Çünkü başka bir aygıtın kesmesi, ISR'nin ortasında başka bir yordam çalıştırabilir ve ISR'nin paylaştığı değişkenlere dokunabilir.</p>
+
+<p>Bu kuralları uygulayan tipik bir donanım ISR'sinin iskeleti şöyledir. Kod, kuralların sırasını göstermek için yazılmıştır; aygıtın ne olduğuna göre ortadaki satırlar değişir.</p>
+
+<pre class="nt-code"><code>isr_irq:
+    <span class="kw">push</span> ax              <span class="cm">; kullanılan yazmaçları sakla</span>
+    <span class="kw">push</span> ds
+    <span class="kw">mov</span>  ax, <span class="dir">seg</span> veri    <span class="cm">; ISR'nin kendi veri kesimi</span>
+    <span class="kw">mov</span>  ds, ax
+    <span class="kw">in</span>   al, 60h          <span class="cm">; aygıttan veriyi al (örnek port)</span>
+    <span class="kw">mov</span>  son_kod, al      <span class="cm">; tampona / değişkene koy</span>
+    <span class="kw">mov</span>  hazir, 1         <span class="cm">; ana programa bayrak</span>
+    <span class="kw">mov</span>  al, 20h          <span class="cm">; EOI</span>
+    <span class="kw">out</span>  20h, al
+    <span class="kw">pop</span>  ds               <span class="cm">; ters sırayla geri al</span>
+    <span class="kw">pop</span>  ax
+    <span class="kw">iret</span>                  <span class="cm">; RET değil</span></pre>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Yazılım kesmesiyle çağrılan bir ISR'ye EOI koymak. EOI yalnız 8259A'dan gelen donanım kesmeleri içindir. INT 60h gibi bir yazılım kesmesinin ISR'si EOI gönderirse, 8259A o sırada hizmette olan başka bir IRQ'nun bitini siler ve o aygıtın kesme düzeni bozulur.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-7"><span class="nt-num">5.1.7</span>Alıştırmalar ve çözümleri</h2>
+
+<p>Sunumdaki altı alıştırma burada ara adımlarıyla çözülmüştür.</p>
+
+<p><strong>1. INT 13h vektörü hangi fiziksel adreslerde bulunur?</strong></p>
+<p>13h × 4 = 4Ch (onlu: 19 × 4 = 76). Vektör 0004Ch–0004Fh baytlarındadır. IP 0004Ch–0004Dh'de, CS 0004Eh–0004Fh'dedir.</p>
+
+<p><strong>2. INT 21h çalışmadan önce SP = FFFEh ise ISR içindeyken SP kaçtır? Yığında ne vardır?</strong></p>
+<p>INT üç sözcük, 6 bayt iter: FFFEh − 6 = FFF8h. Yığının tepesinde, [FFF8h]'de dönüş IP'si; [FFFAh]'da CS; [FFFCh]'de FLAGS vardır. FLAGS'in yığındaki kopyası IF = 1'i taşır; yazmaçtaki FLAGS ise IF = TF = 0'dır.</p>
+
+<p><strong>3. IMR = B8h iken yalnız IRQ0'ı (zamanlayıcı) da maskeleyen komutları yazın. IMR kaç olur?</strong></p>
+<p>Oku–değiştir–yaz kalıbı kullanılır: <code>IN AL, 21h</code> · <code>OR AL, 01h</code> · <code>OUT 21h, AL</code>. 1011 1000 OR 0000 0001 = 1011 1001 = B9h. IRQ3, 4, 5 ve 7 maskeli kalır, IRQ0 da maskelenir. Zamanlayıcı maskeli kaldıkça günün saati ilerlemez; bu yüzden böyle bir maske çok kısa tutulur.</p>
+
+<p><strong>4. Tip 61h'nin vektörü 0700:0120h yapılacak. Hangi fiziksel adreslere hangi baytlar yazılır?</strong></p>
+<p>61h × 4 = 184h. Önce IP, sonra CS yazılır; ikisi de küçük uçludur. 00184h ← 20h, 00185h ← 01h, 00186h ← 00h, 00187h ← 07h. Bu ISR'nin fiziksel adresi 07000h + 0120h = 07120h'dir.</p>
+
+<p><strong>5. 5 MHz'lik 8086'da INTR geldiğinde MUL BX (en çok 133 tur) yeni başlamışsa kesme gecikmesi en çok ne kadardır?</strong></p>
+<p>Önce MUL bitmelidir: 133 tur. Ardından kabul: 61 tur. Toplam 194 tur. 194 × 200 ns = 38,8 µs ≈ 39 µs.</p>
+
+<p><strong>6. ISR'nin IRET yerine RET ile bitmesi ne gibi sorunlara yol açar?</strong></p>
+<p>Yakın RET yalnız IP'yi alır. CS ve FLAGS yığında kalır, SP 4 bayt kayar. FLAGS geri gelmediği için IF = 0 kalır ve maskelenebilir kesmeler bir daha kabul edilmez. ISR başka kesimdeyse CS de yanlış kalır ve program yanlış kesimde devam eder. İlk RET ya da POP, yığında kalan CS'yi veri ya da dönüş adresi diye alır. RET ile biten ISR izlemesinde bu durumların hepsi görülür.</p>
+
+<h2 class="nt-pb" id="s5-1-8"><span class="nt-num">5.1.8</span>Özet</h2>
+
+<ul>
+  <li><strong>Kesme</strong>, işlemcinin o anki işini bir komut sınırında bırakıp bir kesme hizmet yordamını (ISR) çalıştırması ve IRET ile kaldığı yere dönmesidir. Kesilen program kesildiğini fark etmez.</li>
+  <li><strong>Yoklamada</strong> işlemci aygıta sürekli sorar ve zamanının çoğunu boşa harcar; <strong>kesmede</strong> aygıt hazır olunca işlemciyi uyarır. Kesmenin bedeli vektör tablosu, yığın ve ISR düzenidir.</li>
+  <li>Kesmeler üç kaynaktan gelir: <strong>yazılım</strong> (INT n, INT 3, INTO), <strong>donanım</strong> (INTR, NMI) ve <strong>iç</strong> (bölme hatası INT 0, tek adım INT 1). Tip numarası belirlendikten sonra üçü de aynı adımları izler.</li>
+  <li><strong>Kesme vektör tablosu</strong> 00000h–003FFh'dedir: 256 tip × 4 bayt. Tip n'in vektörü n × 4 adresindedir; düşük sözcük IP, yüksek sözcük CS'dir, ikisi de küçük uçludur.</li>
+  <li><strong>INT n</strong>: FLAGS itilir, IF = TF = 0 yapılır, CS ve IP itilir (SP − 6), CS:IP ← vektör. İtilen IP, INT'ten sonraki komutun adresidir. <strong>IRET</strong> IP, CS ve FLAGS'i geri alır; IF ve TF eski değerlerine döner.</li>
+  <li>ISR'yi RET ile bitirmek yığını 4 bayt kaydırır ve IF'yi kapalı bırakır; RETF de FLAGS'i geri almaz. ISR'ler her zaman IRET ile biter.</li>
+  <li><strong>Bölme hatası</strong> hem bölen sıfırken hem de bölüm hedefe sığmadığında oluşur. 8086 DIV'den sonraki komutun adresini iter. <strong>INTO</strong> yalnız OF = 1 iken INT 4'ü çağırır. <strong>TF</strong> = 1 iken her komuttan sonra INT 1 üretilir; TF yığın üzerinden değiştirilir. <strong>INT 3</strong> tek bayttır (CCh) ve kesme noktası için kullanılır.</li>
+  <li><strong>INTR</strong> düzey tetiklemelidir, yalnız IF = 1 iken ve komut sınırında kabul edilir; tip numarası ikinci INTA darbesinde 8259A'dan okunur. <strong>NMI</strong> yükselen kenarla tetiklenir, maskelenemez ve hep tip 2'dir.</li>
+  <li><strong>Öncelik</strong>: bölme hatası / INT n / INTO, sonra NMI, sonra INTR, en son tek adım. PC'de IRQ n'in tipi 08h + n'dir; zamanlayıcı 08h, klavye 09h.</li>
+  <li><strong>8259A</strong>'da IRR bekleyen istekleri, IMR maskeleri (port 21h, bit 1 = engelli), ISR yazmacı hizmetteki IRQ'yu tutar. Donanım ISR'si sonunda EOI gönderir: <code>MOV AL, 20h</code> · <code>OUT 20h, AL</code>. IMR oku–değiştir–yaz kalıbıyla değiştirilir.</li>
+  <li>SS yüklendikten ve STI'den sonra kesme bir komut ertelenir; REP'li dizgi komutları turlar arasında kesilebilir.</li>
+  <li><strong>Kesme gecikmesi</strong> = yürüyen komutun kalan süresi + kabul süresi (INTR için 61 tur). CLI ile kapalı geçen süre gecikmeye eklenir; CLI–STI arası ve ISR kısa tutulur.</li>
+  <li>Kendi ISR'si kurulurken kullanılmayan bir tip seçilir ve vektör CLI/STI arasında (ya da INT 21h, AH = 25h ile) yazılır. Eski vektör saklanır ve çıkışta geri yüklenir. ISR kullandığı yazmaçları korur ve IRET ile biter.</li>
+</ul>
+
+<h2 id="s5-1-9"><span class="nt-num">5.1.9</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">kesme <span lang="en">interrupt</span></a></li>
+  <li><a href="../sozluk.html">kesme hizmet yordamı (ISR) <span lang="en">interrupt service routine</span></a></li>
+  <li><a href="../sozluk.html">yoklama <span lang="en">polling</span></a></li>
+  <li><a href="../sozluk.html">donanım / yazılım kesmesi <span lang="en">hardware / software interrupt</span></a></li>
+  <li><a href="../sozluk.html">istisna <span lang="en">exception</span></a></li>
+  <li><a href="../sozluk.html">kesme vektörü <span lang="en">interrupt vector</span></a></li>
+  <li><a href="../sozluk.html">kesme vektör tablosu (IVT) <span lang="en">interrupt vector table</span></a></li>
+  <li><a href="../sozluk.html">kesme bayrağı (IF) <span lang="en">interrupt flag</span></a></li>
+  <li><a href="../sozluk.html">tuzak bayrağı (TF) <span lang="en">trap flag</span></a></li>
+  <li><a href="../sozluk.html">tek adım <span lang="en">single-step</span></a></li>
+  <li><a href="../sozluk.html">kesme noktası (INT 3) <span lang="en">breakpoint</span></a></li>
+  <li><a href="../sozluk.html">maskelenebilir / maskelenemez kesme <span lang="en">maskable / non-maskable interrupt</span></a></li>
+  <li><a href="../sozluk.html">kesme onayı (INTA) <span lang="en">interrupt acknowledge</span></a></li>
+  <li><a href="../sozluk.html">programlanabilir kesme denetleyicisi (8259A) <span lang="en">programmable interrupt controller</span></a></li>
+  <li><a href="../sozluk.html">kesme maske yazmacı (IMR) <span lang="en">interrupt mask register</span></a></li>
+  <li><a href="../sozluk.html">kesme sonu (EOI) <span lang="en">end of interrupt</span></a></li>
+  <li><a href="../sozluk.html">kesme gecikmesi <span lang="en">interrupt latency</span></a></li>
+  <li><a href="../sozluk.html">yeniden girişli <span lang="en">reentrant</span></a></li>
+  <li><a href="../sozluk.html">yığın <span lang="en">stack</span></a></li>
+  <li><a href="../sozluk.html">bağıl konum <span lang="en">offset</span></a></li>
+  <li><a href="../sozluk.html">fiziksel adres <span lang="en">physical address</span></a></li>
+</ul>
+
+<h2 id="s5-1-10"><span class="nt-num">5.1.10</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>Bir bellek dökümünde 0000:0020h adresinden başlayarak <code>A5 FE 00 F0</code> baytları görülüyor. Hangi tipin vektörüdür, PC'de hangi aygıta aittir? ISR'nin fiziksel adresi nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>20h / 4 = 08h: tip 08h, yani IRQ0'a bağlı zamanlayıcı kesmesi. IP = FEA5h, CS = F000h. Fiziksel adres F0000h + FEA5h = FFEA5h'dir.</p>
+    </details>
+  </li>
+  <li>
+    <p>0700:0200 adresindeki <code>INT 21h</code> çalışmadan önce SP = FFF0h ve FLAGS = F246h'dir. ISR'nin ilk komutunda SP, yığındaki üç sözcük ve FLAGS nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>SP = FFF0h − 6 = FFEAh. [FFEAh] = 0202h (INT 21h iki bayt), [FFECh] = 0700h, [FFEEh] = F246h. Yazmaçtaki FLAGS'te IF (bit 9) silinir: F246h − 0200h = F046h. TF zaten 0'dır.</p>
+    </details>
+  </li>
+  <li>
+    <p>BL = 2 iken <code>DIV BL</code>, AX = 01FEh için ve AX = 0200h için ne sonuç verir?</p>
+    <details><summary>Cevap</summary>
+      <p>510 / 2 = 255 = FFh AL'ye sığar: AL = FFh, AH = 00h. 512 / 2 = 256 sığmaz; bölen sıfır olmadığı hâlde INT 0 üretilir. Kısa sınama: ikinci durumda AH = 02h ≥ BL = 02h'dir.</p>
+    </details>
+  </li>
+  <li>
+    <p>IMR = 00h iken zamanlayıcı ve klavye kesmelerini birlikte maskeleyen komut dizisi nedir? Yeni IMR kaçtır? Bu sırada bir tuşa basılırsa ne olur?</p>
+    <details><summary>Cevap</summary>
+      <p><code>IN AL, 21h</code> · <code>OR AL, 03h</code> · <code>OUT 21h, AL</code>; IMR = 03h olur. Basılan tuşun isteği 8259A'nın IRR'sinde bekler; maske kaldırılınca hizmet görür.</p>
+    </details>
+  </li>
+  <li>
+    <p>8 MHz'lik bir 8086'da INTR geldiğinde en çok 184 turluk bir IDIV yeni başlamışsa en kötü kesme gecikmesi kaç µs'dir?</p>
+    <details><summary>Cevap</summary>
+      <p>184 + 61 = 245 tur. 8 MHz'de bir tur 125 ns'dir: 245 × 125 ns ≈ 30,6 µs.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir program yığını taşımak için önce <code>MOV SP, 0FFFEh</code>, sonra <code>MOV SS, AX</code> yazıyor. Bu sıra neden güvenli değildir?</p>
+    <details><summary>Cevap</summary>
+      <p>Erteleme yalnız kesim yazmacına yazan komuttan sonraki komutu korur. İki komut arasında, yani MOV SP'den sonra kesme gelebilir. O anda SP yeni, SS eskidir ve FLAGS, CS, IP yanlış bir yere itilir. Doğru sıra önce <code>MOV SS</code>, hemen ardından <code>MOV SP</code>'dir.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir donanım ISR'si BX ve DX'i kullanıyor ama yalnız BX'i yığına itip geri alıyor. Ana programda ne gibi bir belirti görülür?</p>
+    <details><summary>Cevap</summary>
+      <p>Kesme programın herhangi bir komutundan sonra gelebildiği için DX, ana programın bilmediği anlarda değişir. Program çoğu zaman doğru çalışır, ama kesmenin tam DX kullanılırken geldiği seyrek anlarda yanlış sonuç verir. Hata tekrarlanması zor, rastgele görünen bir hatadır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Hata ayıklayıcı 0150h adresindeki tek baytlık bir komutun yerine CCh yazmıştır. INT 3 yığına hangi IP'yi iter? Hata ayıklayıcı bu değeri neden değiştirir?</p>
+    <details><summary>Cevap</summary>
+      <p>INT 3 tek bayt olduğu için itilen IP 0151h'dir. Hata ayıklayıcı saklanan asıl baytı 0150h'ye geri yazar ve yığındaki IP'yi 1 azaltarak 0150h yapar. IRET sonrasında asıl komut baştan, bozulmamış hâliyle yürütülür.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir program CLI ile kesmeleri kapatmışken bellek eşlik hatası oluşuyor. Kesme kabul edilir mi? Vektör hangi adresten okunur?</p>
+    <details><summary>Cevap</summary>
+      <p>Eşlik hatası PC'de NMI ile bildirilir. NMI maskelenemez; IF = 0 iken de kabul edilir. Tipi sabit 2'dir ve vektör 2 × 4 = 00008h–0000Bh baytlarından okunur. INTA döngüsü yapılmaz.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s5-1-11"><span class="nt-num">5.1.11</span>İleri okuma</h2>
+
+<ul>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979), Interrupts kesimi: kesme türleri, öncelik sırası, INTR ve NMI zamanlaması ve komutların saat turu sayıları bu kaynaktadır. Tablo 5.1.6 ve 5.1.16'daki değerler buradan alınmıştır.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8. baskı), Bölüm 12: gerçek kipte kesmeler, 8259A'nın programlanması ve basamaklanması, PC'deki kesme düzeni.</li>
+  <li>A. S. Tanenbaum, <em>Modern Operating Systems</em> (3. baskı): kesmelerin işletim sistemindeki yeri, aygıt sürücüleri ve kesme ile yoklamanın karşılaştırılması.</li>
+  <li>R. Brown, <em>Ralf Brown's Interrupt List</em>: PC'deki bütün BIOS, DOS ve sürücü kesmelerinin numara numara başvuru listesi.</li>
+</ul>
+
+<h2 id="s5-1-12"><span class="nt-num">5.1.12</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>A. S. Tanenbaum, <em>Modern Operating Systems</em>, 3. baskı, Pearson, 2008.</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979 — Interrupts bölümü.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009 — Bölüm 6 ve 12.</li>
+  <li>emu8086 yardım belgeleri: “Interrupts” ve “Supported interrupts” sayfaları.</li>
+  <li>R. Brown, <em>Ralf Brown's Interrupt List</em> (BIOS/DOS kesme başvurusu).</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_05_Kesmeler.html">Bölüm 5.1 sunumu</a> · <a href="../slides/Bolum_05_Kesmeler_Calisma_Sorulari.html">Çalışma soruları</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

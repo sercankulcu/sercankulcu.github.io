@@ -1,0 +1,1677 @@
+---
+layout: without-sidebar
+title: "Bölüm 9.1: Makrolar — Ders Notu"
+permalink: /files/microprocessors/notlar/Bolum_09_Makrolar_Ders_Notu.html
+excerpt: "Mikroişlemciler dersi Bölüm 9.1 ders notu: makro tanımı ve genişletme, parametrelerin metin olarak yerine konması, parametre tuzakları ve işlem önceliği, makro ile prosedürün boyut ve hız karşılaştırması, makroda RET, LOCAL ile benzersiz etiketler, PUTC ve yazmaç koruma, POWER makrosu ve sınır durumları, iç içe makrolar, makro kütüphanesi, makro işleçleri, REPT, IRP ve IRPC tekrar blokları, koşullu derleme, makroda hata ayıklama."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+/* sunumdaki SVG'lerin bölüme özgü sınıfları (Bolum_09_Makrolar.html ile aynı; kapsam .ds-notes) */
+.ds-notes .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+/* izleme tabloları: sayı hücreleri bölünmesin, açıklama sütunu sarılsın */
+.ds-notes .nt-trace td { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ds-notes .nt-trace td:last-child { white-space: normal; min-width: 12em; }
+.ds-notes .nt-trace td small { color: var(--ds-muted); }
+.ds-notes .nt-trace caption { white-space: normal; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">Mikroişlemciler · Ders Notu</p>
+  <h1>Bölüm 9.1: Makrolar</h1>
+  <p class="nt-lead">Assembly programlarında aynı birkaç komut sık sık yan yana yazılır: bir karakteri ekrana basmak, birkaç yazmacı yığına saklamak, iki sayıyı toplayıp belleğe yazmak. Prosedür bu tekrarı çalışma anında, CALL ve RET ile çözer. Makro ise aynı işi derleme anında yapar: assembler makronun adını gördüğü her yere gövdesini yeniden yazar. İşlemci makroyu hiç görmez; yalnız ortaya çıkan komutları yürütür. Not önce makronun nasıl tanımlandığını ve açıldığını, parametrelerin neden metin gibi davrandığını anlatır. Ardından makro ile prosedür arasındaki boyut ve hız dengesini ve LOCAL direktifinin çözdüğü sorunu ele alır. PUTC ve POWER makroları üzerinden yazmaç koruma ve sınır durumları işlenir. Son kesimler tekrar bloklarını ve koşullu derlemeyi, yani assembler'ın kaynak üzerinde yaptığı daha ileri metin işlemlerini ele alır. Her örnek, açılmış kodun adım adım izlemesiyle yazmaç ve bellek düzeyinde gösterilir.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_09_Makrolar.html">Sunum</a></li>
+    <li><a href="../pdf/Bolum_09_Makrolar.pdf">Sunum (PDF)</a></li>
+    <li><a href="../slides/Bolum_09_Makrolar_Calisma_Sorulari.html">Çalışma soruları</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Yığın, CALL ve RET</a></li>
+    <li><a href="../slides/Chapter_11_Instruction-Encoding.html">Komut Kodlama</a></li>
+    <li><a href="../slides/Chapter_07_Jump-Conditions.html">Koşullu Atlamalar</a></li>
+    <li><a href="../slides/CPU_Simulator.html">İşlemci Simülatörü</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>Makro tanımı</dt>
+    <dd>MACRO ve ENDM ile parametreli makro yazmak; makronun kullanıldığı satırdan önce tanımlanması gerektiğini açıklamak.</dd>
+    <dt>Genişletme</dt>
+    <dd>Bir makro çağrısının hangi komutlara açılacağını, parametreleri metin olarak yerine koyarak elle bulmak.</dd>
+    <dt>Makro mu, prosedür mü?</dt>
+    <dd>Kod boyutunu bayt bayt, ek süreyi saat turu olarak hesaplayıp verilen bir iş için makroyu ya da prosedürü gerekçesiyle seçmek.</dd>
+    <dt>LOCAL</dt>
+    <dd>Etiket içeren makrolarda <i>Duplicate declaration</i> hatasının nedenini açıklamak ve LOCAL ile her açılıma benzersiz etiket vermek.</dd>
+    <dt>Yan etkiler ve sınır durumları</dt>
+    <dd>Makronun bozduğu yazmaçları PUSH ve POP ile korumak; parametre tuzaklarını, işlem önceliği hatalarını ve LOOP'un CX = 0 tuzağını fark etmek.</dd>
+    <dt>İleri makro özellikleri</dt>
+    <dd>REPT, IRP ve IRPC ile derleme anında kod ve tablo üretmek; IF, IFB ve IFIDN ile koşullu derleme yapmak.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s9-1-1">9.1.1 Makro kavramı</a>
+      <ol>
+        <li><a href="#s9-1-1-1">9.1.1.1 Assembler'ın yaptığı metin işi</a></li>
+        <li><a href="#s9-1-1-2">9.1.1.2 Makro tanımlama</a></li>
+        <li><a href="#s9-1-1-3">9.1.1.3 Genişletme adım adım</a></li>
+        <li><a href="#s9-1-1-4">9.1.1.4 Kod izleme: açılmış kodu çalıştırmak</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-2">9.1.2 Parametreler</a>
+      <ol>
+        <li><a href="#s9-1-2-1">9.1.2.1 Parametre bir metindir: takas tuzağı</a></li>
+        <li><a href="#s9-1-2-2">9.1.2.2 Parametre türleri ve geçerlilik</a></li>
+        <li><a href="#s9-1-2-3">9.1.2.3 Kod izleme: TOPLA ile iki açılım</a></li>
+        <li><a href="#s9-1-2-4">9.1.2.4 İfadeler ve işlem önceliği</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-3">9.1.3 Makro ve prosedür</a>
+      <ol>
+        <li><a href="#s9-1-3-1">9.1.3.1 Prosedürün özellikleri</a></li>
+        <li><a href="#s9-1-3-2">9.1.3.2 Makronun özellikleri</a></li>
+        <li><a href="#s9-1-3-3">9.1.3.3 Boyut hesabı ve başa baş noktası</a></li>
+        <li><a href="#s9-1-3-4">9.1.3.4 Hız: CALL, RET ve önden getirme kuyruğu</a></li>
+        <li><a href="#s9-1-3-5">9.1.3.5 Seçim ölçütleri</a></li>
+        <li><a href="#s9-1-3-6">9.1.3.6 Kod izleme: makro hazırlar, prosedür yapar</a></li>
+        <li><a href="#s9-1-3-7">9.1.3.7 Kod izleme: makronun içindeki RET</a></li>
+        <li><a href="#s9-1-3-8">9.1.3.8 EQU, makro ve prosedür</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-4">9.1.4 Etiketler ve LOCAL</a>
+      <ol>
+        <li><a href="#s9-1-4-1">9.1.4.1 Aynı etiket iki kez</a></li>
+        <li><a href="#s9-1-4-2">9.1.4.2 LOCAL direktifi</a></li>
+        <li><a href="#s9-1-4-3">9.1.4.3 Kod izleme: MyMacro2</a></li>
+        <li><a href="#s9-1-4-4">9.1.4.4 Kod izleme: BEKLE'nin iki kopyası</a></li>
+        <li><a href="#s9-1-4-5">9.1.4.5 Kod izleme: BUYUK ve işaretli karşılaştırma</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-5">9.1.5 PUTC ve yazmaçların korunması</a>
+      <ol>
+        <li><a href="#s9-1-5-1">9.1.5.1 PUTC makrosu</a></li>
+        <li><a href="#s9-1-5-2">9.1.5.2 Kod izleme: PUTC 'A' ve PUTC 'B'</a></li>
+        <li><a href="#s9-1-5-3">9.1.5.3 Yazmaç saklama makroları</a></li>
+        <li><a href="#s9-1-5-4">9.1.5.4 İç içe makrolar</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-6">9.1.6 POWER makrosu</a>
+      <ol>
+        <li><a href="#s9-1-6-1">9.1.6.1 Üs alma: MUL ve LOOP</a></li>
+        <li><a href="#s9-1-6-2">9.1.6.2 Kod izleme: POWER 2, 3</a></li>
+        <li><a href="#s9-1-6-3">9.1.6.3 Dört tuzak</a></li>
+        <li><a href="#s9-1-6-4">9.1.6.4 Kod izleme: düzeltilmiş POWER</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-7">9.1.7 Makro kütüphaneleri</a>
+      <ol>
+        <li><a href="#s9-1-7-1">9.1.7.1 INCLUDE ve emu8086.inc</a></li>
+        <li><a href="#s9-1-7-2">9.1.7.2 Kod izleme: PRINT 'OK' açılımı</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-8">9.1.8 Makro işleçleri</a></li>
+    <li><a href="#s9-1-9">9.1.9 Tekrar blokları</a>
+      <ol>
+        <li><a href="#s9-1-9-1">9.1.9.1 REPT, IRP ve IRPC</a></li>
+        <li><a href="#s9-1-9-2">9.1.9.2 Kod izleme: REPT ile kare tablosu</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-10">9.1.10 Koşullu derleme</a>
+      <ol>
+        <li><a href="#s9-1-10-1">9.1.10.1 IF ailesi</a></li>
+        <li><a href="#s9-1-10-2">9.1.10.2 Kod izleme: KAYDIR</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-11">9.1.11 Hata ayıklama ve sık yapılan hatalar</a></li>
+    <li><a href="#s9-1-12">9.1.12 Alıştırmalar ve çözümleri</a></li>
+    <li><a href="#s9-1-13">9.1.13 Özet</a></li>
+    <li><a href="#s9-1-14">9.1.14 Kavram listesi</a></li>
+    <li><a href="#s9-1-15">9.1.15 Kendini Dene</a></li>
+    <li><a href="#s9-1-16">9.1.16 İleri okuma</a></li>
+    <li><a href="#s9-1-17">9.1.17 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s9-1-1"><span class="nt-num">9.1.1</span>Makro kavramı</h2>
+
+<h3 id="s9-1-1-1"><span class="nt-num">9.1.1.1</span>Assembler'ın yaptığı metin işi</h3>
+
+<p>Bir assembly programı iki ayrı aşamadan geçer. Önce assembler (<span lang="en">assembler</span>) kaynak dosyayı okur ve makine koduna çevirir. Sonra işlemci bu makine kodunu bellekten getirip yürütür. Kaynakta yazılan her şey birinci aşamada bir karşılık bulur, ama her satır makine koduna dönüşmez. <code>ORG 100h</code>, <code>DB</code>, <code>EQU</code> gibi direktifler (<span lang="en">directive</span>) assembler'a bilgi verir; bunlardan bazıları bayt üretir, bazıları hiç üretmez. Makro da bu birinci aşamanın aracıdır.</p>
+
+<p>Makro, tekrar eden bir kod parçasına ad verir. Bu yönüyle prosedüre benzer. Fark, adın nerede işlendiğindedir. Prosedürün adı makine kodunda bir adrese dönüşür; işlemci çalışma anında <code>CALL</code> ile o adrese gider ve <code>RET</code> ile geri döner. Makronun adı ise makine koduna hiç girmez. Assembler, makronun kullanıldığı her satırı silip yerine makronun gövdesini yazar. Bu işleme makro genişletme ya da açılım (<span lang="en">macro expansion</span>) denir. Genişletme bittikten sonra kaynakta artık makro yoktur; yalnız sıradan komutlar vardır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-makro">
+  <span class="nt-box__title">Tanım 9.1.1</span>
+  <p><strong>Makro</strong> (<span lang="en">macro</span>), <code>MACRO</code> ve <code>ENDM</code> direktifleri arasına yazılan, bir adı ve isteğe bağlı parametreleri olan kod kalıbıdır. Assembler, makronun adını bir komut gibi kullanan her satırı, gövdenin parametreleri yerine konmuş bir kopyasıyla değiştirir. Bu değiştirmeye <strong>makro genişletme</strong> (açılım) denir ve derleme anında, program çalışmadan önce yapılır.</p>
+</div>
+
+<p><a href="#sekil-makro">Şekil 9.1.1</a> bu süreci özetler. Kaynakta tek satır olarak duran <code>PUTC 'A'</code>, assembler'dan geçtikten sonra beş komuta dönüşür. Makine kodunda bir çağrı, bir dönüş adresi ya da bir atlama yoktur. İşlemci açısından bu beş komut, programcının elle yazdığı beş komuttan farksızdır.</p>
+
+<figure class="nt-fig" id="sekil-makro" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 226" role="img" aria-label="Makro çağrısı derleyicide gerçek komutlara açılır"><defs><marker id="n91-1-m8ah130" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="20" width="130" height="60" rx="6"/><text class="txt" x="75" y="46" text-anchor="middle">Kaynak kod</text><text class="lbl mono" x="75" y="66" text-anchor="middle">PUTC 'A'</text><path class="line" d="M144 50 H186" marker-end="url(#n91-1-m8ah130)"/><rect class="box" x="190" y="20" width="130" height="60" rx="6" style="fill:var(--ds-hot)"/><text class="txt" x="255" y="46" text-anchor="middle">Derleyici</text><text class="lbl" x="255" y="66" text-anchor="middle">makroyu açar</text><path class="line" d="M255 84 V116" marker-end="url(#n91-1-m8ah130)"/><rect class="box" x="160" y="120" width="190" height="96" rx="6"/><text class="lbl mono" x="172" y="142">push ax</text><text class="lbl mono" x="172" y="160">mov al, 'A'</text><text class="lbl mono" x="172" y="178">mov ah, 0Eh</text><text class="lbl mono" x="172" y="196">int 10h / pop ax</text><text class="lbl" x="10" y="160">makine kodu</text><text class="lbl" x="10" y="178">(çağrı yok)</text></svg></div>
+  <figcaption><b>Şekil 9.1.1:</b> Makro çağrısı derleme anında açılır. Kaynaktaki <code>PUTC 'A'</code> satırının yerine assembler gövdeyi yazar; makine kodunda çağrı yoktur.</figcaption>
+</figure>
+
+<p>Bu bakış açısından üç önemli sonuç çıkar. Birincisi, hiç kullanılmayan bir makro makine koduna tek bayt eklemez. Assembler tanımı okur, adını ve gövdesini bir tabloya yazar, ama gövdeden kod üretmez. Kod ancak makro kullanıldığında, kullanıldığı yerde üretilir. Bu yüzden yüzlerce makro içeren bir kütüphane dosyasını programa eklemek, programı büyütmez.</p>
+
+<p>İkincisi, makro kullanıldığı satırdan önce tanımlanmış olmalıdır. Assembler kaynak dosyayı yukarıdan aşağıya okur. <code>PUTC 'A'</code> satırına geldiğinde PUTC'yi henüz tanımıyorsa bu satırı bilinmeyen bir komut sayar ve hata verir. Prosedürde böyle bir sıra kısıtı yoktur. Assembler iki geçişli çalıştığı için bir prosedürün adresini, prosedür dosyanın sonunda yazılmış olsa da ikinci geçişte bulur. Makro ise bir adres değil, bir metindir. Metni bilmeden yerine koyamaz.</p>
+
+<p>Üçüncüsü, makronun her kullanımı programı büyütür. Aynı makro on yerde kullanılırsa gövde on kez yazılır. Prosedürün gövdesi ise bellekte bir kez durur. Bu fark, makro ile prosedür arasındaki seçimin temelidir.</p>
+
+<h3 id="s9-1-1-2"><span class="nt-num">9.1.1.2</span>Makro tanımlama</h3>
+
+<p>Bir makronun tanımı üç parçadan oluşur: başlık satırı, gövde ve bitiş satırı. Genel biçim şöyledir:</p>
+
+<pre class="nt-code"><code>ad      <span class="kw">MACRO</span>  [parametre1, parametre2, ...]
+        &lt;komutlar&gt;
+        <span class="kw">ENDM</span></code></pre>
+
+<p><code>ad</code> makronun adıdır. Makro kullanılırken bu ad, bir komutun yerine yazılır: <code>MOV</code> yazılan yere <code>PUTC</code> yazılır. Adın ardından virgülle ayrılmış parametre adları gelir. Bunlar biçimsel adlardır; tanımda yalnız birer yer tutucudur. Çağrıda verilen değerler bu adların yerine metin olarak konur. Parametre hiç olmayabilir: yalnız bir kalıbı adlandıran makrolar da vardır.</p>
+
+<p>Gövde, makro her kullanıldığında yeniden yazılacak satırlardır. Komut, direktif, başka bir makronun çağrısı, hatta veri tanımı olabilir. <code>ENDM</code> (<span lang="en">end macro</span>) gövdeyi bitirir. Prosedürdeki <code>ad ENDP</code> kalıbından farklı olarak <code>ENDM</code>'in önüne makronun adı yazılmaz.</p>
+
+<p>Parametre adları gövdede yerine konacak metni işaretler. Assembler, gövdedeki her sözcüğü parametre adlarıyla karşılaştırır. Eşleşen sözcüğün yerine çağrıdaki ilgili metni yazar. <a href="#sekil-param">Şekil 9.1.2</a> bu eşlemeyi <code>MyMacro 4, 5, DX</code> çağrısı için gösterir: birinci parametre p1 4'e, ikinci p2 5'e, üçüncü p3 ise DX'e eşlenir. Gövdedeki <code>MOV CX, p3</code> satırı böylece <code>MOV CX, DX</code> olur.</p>
+
+<figure class="nt-fig" id="sekil-param" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 86" role="img" aria-label="Çağrıdaki değerler parametrelerin yerine metin olarak konur: p1 = 4, p2 = 5, p3 = DX" style="display:block;margin:8px auto 0;max-width:560px"><defs><marker id="n91-2-m4t8-33" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="mt-m" x="10" y="22" text-anchor="start" style="font-size:15px">MyMacro</text><text class="mt-m" x="10" y="78" text-anchor="start" style="font-size:15px">MyMacro</text><text class="mt-m" x="96" y="22" text-anchor="start" style="font-size:15px">p1,</text><text class="mt-m" x="96" y="78" text-anchor="start" style="font-size:15px">4,</text><path class="line" d="M105 29 V58" marker-end="url(#n91-2-m4t8-33)"/><text class="mt-m" x="142" y="22" text-anchor="start" style="font-size:15px">p2,</text><text class="mt-m" x="142" y="78" text-anchor="start" style="font-size:15px">5,</text><path class="line" d="M151 29 V58" marker-end="url(#n91-2-m4t8-33)"/><text class="mt-m" x="188" y="22" text-anchor="start" style="font-size:15px">p3</text><text class="mt-m" x="188" y="78" text-anchor="start" style="font-size:15px">DX</text><path class="line" d="M197 29 V58" marker-end="url(#n91-2-m4t8-33)"/><text class="lbl" x="250" y="22" text-anchor="start">tanım: biçimsel adlar</text><text class="lbl" x="250" y="78" text-anchor="start">çağrı: yerine konan metin</text><text class="mt-m" x="250" y="52" text-anchor="start" style="font-size:13px">MOV CX, p3  →</text><rect class="mt-acc" x="380" y="34" width="130" height="28" rx="5"/><text class="mt-m" x="445" y="53" text-anchor="middle">MOV CX, DX</text></svg></div>
+  <figcaption><b>Şekil 9.1.2:</b> Parametre eşlemesi. Tanımdaki biçimsel adlar sırayla çağrıdaki metinlerle eşlenir; <code>MOV CX, p3</code> satırı <code>MOV CX, DX</code> olur.</figcaption>
+</figure>
+
+<p>Burada kritik bir nokta vardır. Assembler parametrenin yazmaç mı, bellek mi, sabit mi olduğuyla ilgilenmez. Yalnız metni değiştirir. Ortaya çıkan satırın geçerli bir 8086 komutu olup olmadığına genişletmeden <em>sonra</em>, sıradan bir satır gibi bakılır. Bu yüzden makro tanımında hata yoktur ama belirli bir çağrıda hata çıkabilir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Makroyu programın sonuna, prosedürlerin yanına yazmak. Prosedür için doğru olan bu yerleşim makroda hataya yol açar: assembler çağrı satırına geldiğinde makroyu tanımadığı için satırı bilinmeyen komut sayar. Makro tanımları dosyanın başına ya da INCLUDE ile eklenen bir kütüphane dosyasına yazılır.</p>
+</div>
+
+<h3 id="s9-1-1-3"><span class="nt-num">9.1.1.3</span>Genişletme adım adım</h3>
+
+<p>Genişletme en iyi somut bir örnekle anlaşılır. Üç parametreli MyMacro makrosu üç yazmaca birer değer yükler:</p>
+
+<pre class="nt-code"><code>MyMacro  <span class="kw">MACRO</span>  p1, p2, p3
+         <span class="kw">MOV</span> AX, p1
+         <span class="kw">MOV</span> BX, p2
+         <span class="kw">MOV</span> CX, p3
+<span class="kw">ENDM</span>
+
+<span class="kw">ORG</span> 100h
+         MyMacro 1, 2, 3
+         MyMacro 4, 5, DX
+         <span class="kw">RET</span></code></pre>
+
+<p>Assembler ilk dört satırı okuduğunda kod üretmez. MyMacro adını, üç parametre adını ve üç gövde satırını bir makro tablosuna kaydeder. <code>ORG 100h</code> konum sayacını 0100h'ye kurar. Ardından <code>MyMacro 1, 2, 3</code> satırı gelir. Assembler MyMacro'yu tablosunda bulur ve parametreleri eşler: p1 = 1, p2 = 2, p3 = 3. Sonra gövdeyi satır satır kopyalar:</p>
+
+<ol>
+  <li><code>MOV AX, p1</code> satırında p1 sözcüğü 1 ile değişir: <code>MOV AX, 1</code>.</li>
+  <li><code>MOV BX, p2</code> satırı <code>MOV BX, 2</code> olur.</li>
+  <li><code>MOV CX, p3</code> satırı <code>MOV CX, 3</code> olur.</li>
+</ol>
+
+<p>Bu üç satır, çağrı satırının yerini alır ve sıradan komutlar gibi makine koduna çevrilir. İkinci çağrı <code>MyMacro 4, 5, DX</code> için aynı işlem yeni bir eşlemeyle yinelenir: p1 = 4, p2 = 5, p3 = DX. Ortaya <code>MOV AX, 4</code>, <code>MOV BX, 5</code> ve <code>MOV CX, DX</code> çıkar. Son satırdaki DX bir sayı değil, bir yazmaç adıdır. Assembler bunu fark etmez, yalnız "DX" metnini yerine koyar. Sonuçta oluşan <code>MOV CX, DX</code> geçerli bir yazmaçtan yazmaca kopyadır.</p>
+
+<p>emu8086 genişletilmiş kodu öykünücü penceresinde şöyle gösterir:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 00001h
+<span class="kw">MOV</span> BX, 00002h
+<span class="kw">MOV</span> CX, 00003h
+<span class="kw">MOV</span> AX, 00004h
+<span class="kw">MOV</span> BX, 00005h
+<span class="kw">MOV</span> CX, DX
+<span class="kw">RET</span></code></pre>
+
+<p>Sabitler onaltılık olarak, beş haneyle yazılmıştır; bu yalnız bir gösterim alışkanlığıdır. Önemli olan, iki makro çağrısının altı komuta açılması ve makro adının listede hiç görünmemesidir. Öykünücüde tek adım çalıştırma da bu altı komut üzerinde ilerler. Programcı kaynakta iki satır yazmış, işlemci altı komut yürütmüştür.</p>
+
+<p>Bu komutların makine kodu da hesaplanabilir. Bir 16 bitlik yazmaca anında değer yükleyen <code>MOV r16, imm16</code> komutu 3 bayttır: işlem kodu B8h + yazmaç numarası ve iki bayt veri. <code>MOV AX, 1</code> = <code>B8 01 00</code>, <code>MOV BX, 2</code> = <code>BB 02 00</code>, <code>MOV CX, 3</code> = <code>B9 03 00</code>. Yazmaçtan yazmaca <code>MOV CX, DX</code> ise 2 bayttır (<code>8B CA</code>). <code>RET</code> tek bayttır (<code>C3</code>). Programın toplam boyutu 5 × 3 + 2 + 1 = 18 bayt, yani 12h bayttır.</p>
+
+<h3 id="s9-1-1-4"><span class="nt-num">9.1.1.4</span>Kod izleme: açılmış kodu çalıştırmak</h3>
+
+<p>Açılmış kodun çalışması, sıradan bir programın çalışmasından farksızdır. Yine de bir ayrıntı izleme tablosunu anlamak için önemlidir. emu8086, bir .COM programını belleğe yüklediğinde CX yazmacına programın bayt cinsinden boyutunu yazar. Bu davranış DOS'un program yükleyicisinden gelir. Bu programda boyut 18 bayt olduğu için yükleme anında CX = 0012h'dir. Öteki genel amaçlı yazmaçlar sıfır, SP ise FFFEh'dir. SP'nin gösterdiği FFFEh adresinde 0000h sözcüğü durur; programın sonundaki RET bu sözcüğü alacaktır.</p>
+
+<p><a href="#tab-mymacro">Tablo 9.1.1</a> açılmış kodun izlemesini verir. İlk üç adım birinci çağrının, sonraki üç adım ikinci çağrının ürettiği komutlardır. Komut sütununun altındaki küçük yazı, komutun hangi makronun açılımından geldiğini gösterir.</p>
+
+<div class="nt-tablewrap" id="tab-mymacro">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.1: İki MyMacro çağrısının açılmış kodunun izlemesi. Her satır, komut yürütüldükten sonraki durumdur; yükleme anında CX = 0012h (program boyutu).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">SP</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, 1</code><br><small>MyMacro açılımı</small></td><td>0001h</td><td>0000h</td><td>0012h</td><td>0000h</td><td>FFFEh</td><td>1. açılım, p1 = 1: AX = 0001h</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>MOV BX, 2</code><br><small>MyMacro açılımı</small></td><td>0001h</td><td>0002h</td><td>0012h</td><td>0000h</td><td>FFFEh</td><td>p2 = 2: BX = 0002h</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>MOV CX, 3</code><br><small>MyMacro açılımı</small></td><td>0001h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>FFFEh</td><td>p3 = 3: CX = 0003h; yükleme değeri 0012h silindi</td></tr>
+    <tr><td>4</td><td>0109h</td><td><code>MOV AX, 4</code><br><small>MyMacro açılımı</small></td><td>0004h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>FFFEh</td><td>2. açılım, p1 = 4</td></tr>
+    <tr><td>5</td><td>010Ch</td><td><code>MOV BX, 5</code><br><small>MyMacro açılımı</small></td><td>0004h</td><td>0005h</td><td>0003h</td><td>0000h</td><td>FFFEh</td><td>p2 = 5</td></tr>
+    <tr><td>6</td><td>010Fh</td><td><code>MOV CX, DX</code><br><small>MyMacro açılımı</small></td><td>0004h</td><td>0005h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>p3 = DX: yazmaçtan yazmaca kopya, CX = DX = 0000h</td></tr>
+    <tr><td>7</td><td>0111h</td><td><code>RET</code><br><small>ana program</small></td><td>0004h</td><td>0005h</td><td>0000h</td><td>0000h</td><td>0000h</td><td>yığının tepesindeki 0000h → IP; SP = 0000h</td></tr>
+    <tr><td>8</td><td>0000h</td><td><code>INT 20h (PSP:0000h)</code><br><small>PSP</small></td><td>0004h</td><td>0005h</td><td>0000h</td><td>0000h</td><td>0000h</td><td>PSP:0000h'daki INT 20h programı bitirir</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>Tabloda dikkat çeken birkaç nokta vardır. CX'in yükleme değeri 0012h, ilk iki adımda değişmeden durur ve üçüncü adımda 0003h ile silinir. İkinci çağrının son komutu CX'e DX'i kopyalar; DX başlangıçta sıfır olduğundan CX = 0000h olur. Adımların hiçbirinde SP değişmez. Makronun gövdesinde PUSH ya da POP olmadığı sürece makro yığına dokunmaz. Aynı iş bir prosedürle yapılsaydı her CALL, SP'yi 2 azaltır ve dönüş adresini yığına yazardı. Son RET ise makroya ait değildir; ana programın RET'idir. Yığının tepesindeki 0000h sözcüğünü IP'ye alır ve program kesimi önekindeki (PSP) <code>INT 20h</code> komutuna gider.</p>
+
+<p>Bu programın süresi de saat turu (<span lang="en">clock cycle</span>) olarak hesaplanabilir. 8086'da <code>MOV r16, imm16</code> 4 tur, <code>MOV r16, r16</code> 2 tur sürer. Altı komut 5 × 4 + 2 = 22 tur tutar. Prosedürle yazılmış bir sürümde bu süreye her çağrı için CALL ve RET süreleri eklenirdi.</p>
+
+<h2 class="nt-pb" id="s9-1-2"><span class="nt-num">9.1.2</span>Parametreler</h2>
+
+<h3 id="s9-1-2-1"><span class="nt-num">9.1.2.1</span>Parametre bir metindir: takas tuzağı</h3>
+
+<p>Yüksek düzeyli bir dilde fonksiyona verilen parametrenin değeri çağrı anında hesaplanır. Fonksiyona bu değer gider. Makroda böyle bir şey olmaz. Makro parametresi bir değer taşımaz, bir metin taşır. Assembler bu metni gövdedeki her geçtiği yere yazar. Metnin işaret ettiği yazmacın ya da değişkenin değeri ise ancak çalışma anında, o satır yürütüldüğünde okunur. Bu ayrım küçük görünür ama makrolardaki hataların önemli bir kısmı buradan çıkar.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-param">
+  <span class="nt-box__title">Tanım 9.1.2</span>
+  <p><strong>Makro parametresi</strong>, makro tanımında bir yer tutucu olarak yazılan biçimsel addır. Çağrıdaki karşılığı bir değer değil, bir metindir. Assembler bu metni gövdede parametrenin geçtiği her yere yazar. Metin bir yazmaç ya da değişken adıysa onun değeri, açılmış satır çalışma anında yürütüldüğünde okunur.</p>
+</div>
+
+<p>Bir programcının MyMacro'yu AX ile BX'i takas etmek için kullanmak istediğini düşünelim. Makronun ilk satırı AX'e p1'i, ikinci satırı BX'e p2'yi yazdığına göre <code>MyMacro BX, AX, 0</code> çağrısı "AX ← BX, BX ← AX" yapıyor gibi görünür. Programcı bu çağrıdan sonra AX = 2222h, BX = 1111h bekler. Açılımı yazınca durum değişir:</p>
+
+<pre class="nt-code"><code><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 1111h
+<span class="kw">MOV</span>  BX, 2222h
+<span class="kw">MOV</span>  AX, BX      <span class="cm">; MyMacro BX, AX, 0</span>
+<span class="kw">MOV</span>  BX, AX      <span class="cm">; p2 = AX (bozuk!)</span>
+<span class="kw">MOV</span>  CX, 0
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-tuzak">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.2: <code>MyMacro BX, AX, 0</code> ile takas denemesinin izlemesi.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, 1111h</code><br><small>ana program</small></td><td>1111h</td><td>0000h</td><td>0000h</td><td>AX = 1111h</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>MOV BX, 2222h</code><br><small>ana program</small></td><td>1111h</td><td>2222h</td><td>0000h</td><td>BX = 2222h</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>MOV AX, BX</code><br><small>MyMacro açılımı</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>p1 = BX: AX ← BX; 1111h burada kayboldu</td></tr>
+    <tr><td>4</td><td>0108h</td><td><code>MOV BX, AX</code><br><small>MyMacro açılımı</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>p2 = AX: AX'in <b>şimdiki</b> değeri okunur, BX = 2222h</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>MOV CX, 0</code><br><small>MyMacro açılımı</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>p3 = 0</td></tr>
+    <tr><td>6</td><td>010Dh</td><td><code>RET</code><br><small>ana program</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>sonuç AX = BX = 2222h</td></tr>
+    <tr><td>7</td><td>0000h</td><td><code>INT 20h (PSP:0000h)</code><br><small>PSP</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>Üçüncü adımda AX, BX'in değeriyle, yani 2222h ile dolar. AX'in eski değeri 1111h artık hiçbir yerde yoktur. Dördüncü adımdaki <code>MOV BX, AX</code>, programcının düşündüğü "eski AX"i değil, AX'in o anki değerini okur. Sonuç olarak iki yazmaç da 2222h olur. Bir yüksek düzeyli dilde parametreler çağrı anında hesaplandığı için bu hata oluşmazdı. Makroda ise p2 = AX, "çağrı anındaki AX'in değeri" demek değildir; yalnız "AX" yazısıdır.</p>
+
+<p>Bu tuzağın genel kuralı şudur: makro gövdesinin değiştirdiği bir yazmaç, gövdede o değişiklikten sonra okunan bir parametreye verilmemelidir. MyMacro önce AX'i yazar, sonra p2'yi okur; p2'ye AX vermek bu yüzden yanlıştır. Gerçek bir takas için 8086'nın tek komutluk <code>XCHG AX, BX</code> komutu vardır. Bir makro takas yapacaksa ya XCHG kullanır ya da değerlerden birini önce yığına saklar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Makro parametresini yüksek düzeyli dildeki değer parametresi gibi düşünmek. <code>TOPLA2 CX, AX</code> gibi bir çağrıda gövde önce AX'e CX'i yazıp sonra <code>ADD AX, AX</code> yaparsa, beklenen CX + AX değil 2 × CX bulunur. Makronun kendisi için kullandığı yazmaçlar belgelenir ve bu yazmaçlar parametre olarak verilmez.</p>
+</div>
+
+<h3 id="s9-1-2-2"><span class="nt-num">9.1.2.2</span>Parametre türleri ve geçerlilik</h3>
+
+<p>Assembler parametreye bir tür vermediği için aynı makro çok farklı biçimlerde çağrılabilir. Hangi çağrının geçerli olduğuna makronun kendisi değil, açılımda oluşan komut karar verir. Aşağıdaki TOPLA makrosu bunu iyi gösterir:</p>
+
+<pre class="nt-code"><code>TOPLA <span class="kw">MACRO</span> x, y, z
+  <span class="kw">MOV</span> AX, x
+  <span class="kw">ADD</span> AX, y
+  <span class="kw">MOV</span> z, AX
+<span class="kw">ENDM</span></code></pre>
+
+<p>Makro x ile y'yi toplar ve sonucu z'ye yazar. Neden doğrudan <code>ADD z, x</code> gibi bir şey yazılmadığı sorulabilir. 8086'nın komut kümesi, iki bellek işlenenini tek komutta birleştirmez. <code>ADD</code>, <code>MOV</code>, <code>CMP</code> gibi komutların en çok bir işleneni bellekte olabilir. Bu kısıt donanımdan gelir: komutun ModR/M baytı yalnız bir bellek adresini tanımlayabilir. Bu yüzden makro, toplamayı AX üzerinden yapar. AX burada bir ara yazmaçtır ve makro onu bozar.</p>
+
+<div class="nt-tablewrap" id="tab-param-tur">
+<table class="nt-table">
+  <caption>Tablo 9.1.3: TOPLA makrosunun farklı çağrılarının açılımı ve geçerliliği.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Açılım (sorunlu satır)</th><th scope="col">Durum</th></tr></thead>
+  <tbody>
+    <tr><td><code>TOPLA a, b, c</code></td><td><code>MOV AX, a</code> · <code>ADD AX, b</code> · <code>MOV c, AX</code></td><td>geçerli; üç değişken</td></tr>
+    <tr><td><code>TOPLA BX, 5, CX</code></td><td><code>MOV AX, BX</code> · <code>ADD AX, 5</code> · <code>MOV CX, AX</code></td><td>geçerli; yazmaç, sabit, yazmaç</td></tr>
+    <tr><td><code>TOPLA a, b, 7</code></td><td><code>MOV 7, AX</code></td><td>hata: hedef sabit olamaz</td></tr>
+    <tr><td><code>TOPLA k, b, c</code> (k DB)</td><td><code>MOV AX, k</code></td><td>hata: boyut uyuşmazlığı (16 bit ← 8 bit)</td></tr>
+    <tr><td><code>TOPLA a, b</code></td><td><code>MOV , AX</code></td><td>hata: eksik işlenen</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-param-tur">Tablo 9.1.3</a> beş çağrıyı karşılaştırır. İlk iki çağrıda parametreler farklı türdedir ama açılım geçerli komutlar üretir. Üçüncü çağrıda z = 7 olduğu için son satır <code>MOV 7, AX</code> olur. Bir sabite yazılamaz; sabit, komutun içinde gömülü bir sayıdır, yazılabilecek bir bellek hücresi ya da yazmaç değildir. Dördüncü çağrıda k bir bayt değişkendir. <code>MOV AX, k</code> 16 bitlik bir yazmaca 8 bitlik bir bellek hücresini kopyalamaya çalışır. Assembler, değişkenin tanımından boyutunu bildiği için bu uyuşmazlığı yakalar. Beşinci çağrıda üçüncü parametre verilmemiştir. Assembler eksik parametreyi boş metinle değiştirir ve son satır <code>MOV , AX</code> gibi anlamsız bir satıra dönüşür.</p>
+
+<p>Bu hataların hepsi makronun kullanıldığı satırda bildirilir. Oysa nedeni gövdedeki bir satırdır. Hata iletisini anlamanın yolu açılımı zihinde ya da kâğıt üzerinde yazmaktır. Aynı hata iletisi programın birkaç farklı satırında görünüyorsa neden çoğunlukla bu satırların hepsinde kullanılan makronun gövdesindedir.</p>
+
+<p>MASM, eksik parametre sorununu tanım düzeyinde yakalamak için iki olanak sunar. Parametre adının ardına <code>:REQ</code> yazılırsa (ör. <code>z:REQ</code>) o parametre zorunlu olur ve verilmediğinde açık bir hata iletisi üretilir. <code>y:=&lt;1&gt;</code> biçimi ise parametreye bir varsayılan değer verir; çağrıda y yazılmazsa 1 kullanılır. Bu olanaklar MASM'a özgüdür; daha basit assembler'larda eksik parametre her zaman boş metin olarak kalır.</p>
+
+<h3 id="s9-1-2-3"><span class="nt-num">9.1.2.3</span>Kod izleme: TOPLA ile iki açılım</h3>
+
+<p>Aşağıdaki programda TOPLA makrosu iki farklı biçimde çağrılır. Birinci çağrıda üç parametre de değişkendir. İkinci çağrıda y yerine bir sabit verilir ve birinci çağrının sonucu girdi olarak kullanılır:</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+TOPLA a, b, c       <span class="cm">; c = a + b</span>
+TOPLA c, 5, d       <span class="cm">; d = c + 5</span>
+<span class="kw">ret</span>
+a <span class="kw">dw</span> 1200h
+b <span class="kw">dw</span> 0345h
+c <span class="kw">dw</span> ?
+d <span class="kw">dw</span> ?</code></pre>
+
+<p>Açılmış kod altı komut ve bir RET'tir. Değişkenlerin adresleri, kodun boyutuna bağlıdır; bu yüzden önce bayt sayısı hesaplanmalıdır. <code>MOV AX, a</code> komutu AX'e özel kısa bir biçimle kodlanır: <code>A1</code> işlem kodu ve iki baytlık adres, toplam 3 bayt. <code>ADD AX, b</code> bellek işlenenli genel biçimi kullanır: <code>03 06</code> ve iki baytlık adres, toplam 4 bayt. <code>MOV c, AX</code> yine kısa biçimdir (<code>A3</code> + adres), 3 bayt. Birinci açılım 3 + 4 + 3 = 10 bayttır.</p>
+
+<p>İkinci açılımda ortadaki satır <code>ADD AX, 5</code>'tir. 8086'nın AX'e anında değer ekleyen kısa bir biçimi vardır: <code>05</code> işlem kodu ve iki bayt veri, toplam 3 bayt. Bu yüzden ikinci açılım 3 + 3 + 3 = 9 bayttır. Aynı makro, parametreye göre farklı uzunlukta kod üretmiştir. Kod 10 + 9 = 19 bayt, RET ile 20 bayttır. Program 0100h'de başladığına göre a, 0100h + 14h = 0114h adresindedir. b 0116h'de, c 0118h'de, d 011Ah'dedir.</p>
+
+<figure class="nt-fig" id="sekil-topla" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="a, b, c, d değişkenleri ve AX; adım sonrası"><rect class="box" x="30" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="68" y="46" text-anchor="middle" style="font-size:13.5px;">1200h</text><text class="lbl" x="68" y="22" text-anchor="middle" style="font-size:10px;">a · 0114</text><rect class="box" x="106" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="144" y="46" text-anchor="middle" style="font-size:13.5px;">0345h</text><text class="lbl" x="144" y="22" text-anchor="middle" style="font-size:10px;">b · 0116</text><rect class="box" x="182" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="220" y="46" text-anchor="middle" style="font-size:13.5px;">1545h</text><text class="lbl" x="220" y="22" text-anchor="middle" style="font-size:10px;">c · 0118</text><rect class="mt-hot" x="258" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="296" y="46" text-anchor="middle" style="font-size:13.5px;">154Ah</text><text class="lbl" x="296" y="22" text-anchor="middle" style="font-size:10px;">d · 011A</text><text class="lbl" x="70" y="81" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="box" x="30" y="86" width="80" height="30" rx="4"/><text class="mt-v" x="70" y="106" text-anchor="middle" style="font-size:14px;">154Ah</text></svg></div>
+  <figcaption><b>Şekil 9.1.3:</b> İkinci açılımın son komutundan sonra bellek ve AX. a, b, c, d sözcükleri 0114h'den başlayarak art arda durur; d'ye 154Ah yazılmıştır.</figcaption>
+</figure>
+
+<div class="nt-tablewrap" id="tab-topla">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.4: <code>TOPLA a, b, c</code> ve <code>TOPLA c, 5, d</code> açılımlarının izlemesi (a = 0114h, b = 0116h, c = 0118h, d = 011Ah).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">a</th><th scope="col">b</th><th scope="col">c</th><th scope="col">d</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, a</code><br><small>TOPLA açılımı</small></td><td>1200h</td><td>1200h</td><td>0345h</td><td>0000h</td><td>0000h</td><td>x = a: AX ← [0114h]</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>ADD AX, b</code><br><small>TOPLA açılımı</small></td><td>1545h</td><td>1200h</td><td>0345h</td><td>0000h</td><td>0000h</td><td>y = b: 1200h + 0345h = 1545h</td></tr>
+    <tr><td>3</td><td>0107h</td><td><code>MOV c, AX</code><br><small>TOPLA açılımı</small></td><td>1545h</td><td>1200h</td><td>0345h</td><td>1545h</td><td>0000h</td><td>z = c: [0118h] ← 1545h</td></tr>
+    <tr><td>4</td><td>010Ah</td><td><code>MOV AX, c</code><br><small>TOPLA açılımı</small></td><td>1545h</td><td>1200h</td><td>0345h</td><td>1545h</td><td>0000h</td><td>2. açılım, x = c: AX ← [0118h]</td></tr>
+    <tr><td>5</td><td>010Dh</td><td><code>ADD AX, 5</code><br><small>TOPLA açılımı</small></td><td>154Ah</td><td>1200h</td><td>0345h</td><td>1545h</td><td>0000h</td><td>y = 5 bir sabit: kısa AX biçimi <code>05 05 00</code></td></tr>
+    <tr><td>6</td><td>0110h</td><td><code>MOV d, AX</code><br><small>TOPLA açılımı</small></td><td>154Ah</td><td>1200h</td><td>0345h</td><td>1545h</td><td>154Ah</td><td>z = d: [011Ah] ← 154Ah</td></tr>
+    <tr><td>7</td><td>0113h</td><td><code>ret</code><br><small>ana program</small></td><td>154Ah</td><td>1200h</td><td>0345h</td><td>1545h</td><td>154Ah</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p><a href="#tab-topla">Tablo 9.1.4</a> izlemenin ayrıntısını verir. Birinci adımda AX, a'nın değeri 1200h ile dolar. İkinci adımda 0345h eklenir: 1200h + 0345h = 1545h. Üçüncü adımda bu toplam c'ye yazılır. İkinci açılım c'yi okur, 5 ekler ve sonucu d'ye yazar: 1545h + 5 = 154Ah. İki açılım aynı gövdeden üretilmiş olsa da birinde y bir bellek adresi, ötekinde bir sabittir. Assembler bu farkı yalnız metinden çıkarır ve uygun makine kodunu seçer.</p>
+
+<p>Bellek erişimleri donanım açısından da incelenebilir. <code>MOV AX, a</code> komutu yürütülürken BIU, DS:0114h, yani fiziksel 07114h adresinden bir sözcük okur. a çift adreste olduğu için okuma tek bir yol döngüsünde (<span lang="en">bus cycle</span>) biter. Adres tek olsaydı 8086 sözcüğü iki ayrı bayt okumasıyla getirmek zorunda kalırdı. Makro bu ayrıntıyı değiştirmez. Açılımdaki her komut, elle yazılmış eşinin yaptığı bellek erişimlerini aynen yapar.</p>
+
+<p>Bu örnekten çıkan bir başka ders, makronun AX'i bozmasıdır. Çağıran program, TOPLA'dan sonra AX'te eski bir değer bekliyorsa yanılır. Makronun hangi yazmaçları değiştirdiği, makronun belgesinde açıkça yazılmalıdır. Yazmaç koruma, PUTC makrosunda ayrıca ele alınır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-topla-elde">
+  <span class="nt-box__title">Örnek 9.1.1</span>
+  <p><code>s1 dw 1234h</code>, <code>s2 dw 0F00Fh</code> için <code>TOPLA s1, s2, s3</code> çağrısından sonra s3 ve CF ne olur?</p>
+  <p>Açılım <code>MOV AX, s1</code>, <code>ADD AX, s2</code>, <code>MOV s3, AX</code>'tir. 1234h + F00Fh = 10243h; bu 17 bitlik bir sonuçtur. AX'e alt 16 bit, 0243h sığar ve en yüksek bit CF'ye gider: CF = 1. MOV bayrakları değiştirmediği için CF makrodan sonra da 1 kalır. s3 = 0243h olur. Makro eldeyi hiçbir yere yazmadığı için işaretsiz toplamın doğru sonucu kaybolmuştur. Çağıran program bu durumu makrodan hemen sonra <code>JC</code> ile yakalayabilir.</p>
+</div>
+
+<h3 id="s9-1-2-4"><span class="nt-num">9.1.2.4</span>İfadeler ve işlem önceliği</h3>
+
+<p>Parametre bir metin olduğuna göre çağrıda bir ifade de verilebilir: <code>ALAN 2+3, 4</code> gibi. Assembler bu ifadeyi önce hesaplamaz; olduğu gibi yerine koyar. İşlem önceliği, ifadenin yerine konduğu satırda yeniden uygulanır. Bu da beklenmedik sonuçlara yol açar:</p>
+
+<pre class="nt-code"><code>ALAN <span class="kw">MACRO</span> en, boy
+  <span class="kw">MOV</span> AX, en*boy
+<span class="kw">ENDM</span>
+
+FARK <span class="kw">MACRO</span> p, q
+  <span class="kw">MOV</span> CX, p-q
+<span class="kw">ENDM</span></code></pre>
+
+<p><code>ALAN 2+3, 4</code> çağrısında en = "2+3", boy = "4" olur. Açılım <code>MOV AX, 2+3*4</code> satırıdır. Assembler bu ifadeyi derleme anında hesaplar ve çarpma toplamadan önce yapıldığı için 2 + 12 = 14 bulur. Programcının beklediği (2 + 3) × 4 = 20 değeri ortaya çıkmaz. FARK makrosunda da aynı sorun vardır: <code>FARK 10, 4+1</code> çağrısı <code>MOV CX, 10-4+1</code> olur ve soldan sağa hesaplanınca CX = 7 bulunur, beklenen 5 değil.</p>
+
+<div class="nt-tablewrap" id="tab-oncelik">
+<table class="nt-table">
+  <caption>Tablo 9.1.5: İfade parametrelerinin açılımı ve derleme anındaki değeri.</caption>
+  <thead><tr><th scope="col">Çağrı</th><th scope="col">Açılım</th><th scope="col">Makine kodu</th><th scope="col">Sonuç</th></tr></thead>
+  <tbody>
+    <tr><td><code>ALAN 2+3, 4</code></td><td><code>MOV AX, 2+3*4</code></td><td><code>B8 0E 00</code></td><td>AX = 000Eh (14)</td></tr>
+    <tr><td>düzeltilmiş <code>ALAN 2+3, 4</code></td><td><code>MOV AX, (2+3)*(4)</code></td><td><code>B8 14 00</code></td><td>AX = 0014h (20)</td></tr>
+    <tr><td><code>FARK 10, 4+1</code></td><td><code>MOV CX, 10-4+1</code></td><td><code>B9 07 00</code></td><td>CX = 0007h</td></tr>
+    <tr><td>düzeltilmiş <code>FARK 10, 4+1</code></td><td><code>MOV CX, (10)-(4+1)</code></td><td><code>B9 05 00</code></td><td>CX = 0005h</td></tr>
+    <tr><td><code>ALAN BX, 2</code></td><td><code>MOV AX, BX*2</code></td><td>–</td><td>hata: * yalnız sabitlerle</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Çözüm, gövdede her parametreyi paranteze almaktır: <code>MOV AX, (en)*(boy)</code> ve <code>MOV CX, (p)-(q)</code>. Böylece hangi metin gelirse gelsin, önce kendi içinde hesaplanır. <a href="#tab-oncelik">Tablo 9.1.5</a> iki biçimi makine kodlarıyla karşılaştırır. Dikkat edilirse makine kodunda çarpma ya da toplama komutu yoktur. İfade derleme anında hesaplanmış, sonucu <code>MOV</code> komutunun içine anında değer olarak gömülmüştür. İşlemci yalnız 000Eh ya da 0014h sayısını AX'e yükler.</p>
+
+<p>Son satır bu noktanın sınırını gösterir. <code>ALAN BX, 2</code> çağrısı <code>MOV AX, BX*2</code> satırını üretir. BX'in değeri derleme anında bilinmez; yalnız çalışma anında bellidir. Assembler bir yazmacı çarpamaz, bu yüzden hata verir. Bir yazmacın değerini çarpmak için çalışma anında yürüyen bir komut gerekir: <code>MUL</code> ya da 2'nin kuvvetleri için <code>SHL</code>. Derleme anında hesaplanan ifade ile çalışma anında yürüyen komut arasındaki bu ayrım, makroları anlamanın anahtarıdır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Gövdede parametreleri parantezsiz kullanmak: <code>en*boy</code> yerine <code>(en)*(boy)</code> yazılmalıdır. Makro yalnız tek sayılarla denendiğinde hata görünmez; ifade içeren ilk çağrıda sonuç sessizce yanlış çıkar. Assembler bir uyarı vermez, çünkü <code>2+3*4</code> geçerli bir ifadedir.</p>
+</div>
+
+<h2 class="nt-pb" id="s9-1-3"><span class="nt-num">9.1.3</span>Makro ve prosedür</h2>
+
+<p>Makro ile prosedür aynı soruna iki farklı çözümdür: tekrar eden kodu bir ad altında toplamak. Biri işi derleme anında, öteki çalışma anında yapar. Bu fark kod boyutuna, hıza, yığın kullanımına ve etiketlerin davranışına yansır. Bu kesim önce iki yöntemi ayrı ayrı tanımlar, sonra bayt ve saat turu hesabıyla karşılaştırır.</p>
+
+<h3 id="s9-1-3-1"><span class="nt-num">9.1.3.1</span>Prosedürün özellikleri</h3>
+
+<p>Prosedür (<span lang="en">procedure</span>), <code>PROC</code> ve <code>ENDP</code> direktifleri arasına yazılan, <code>CALL</code> ile çağrılıp <code>RET</code> ile dönen kod bloğudur. Gövdesi belleğin belirli bir adresinde tek kopya olarak durur. Aşağıdaki YAZ_A prosedürü ekrana 'A' yazar:</p>
+
+<pre class="nt-code"><code>YAZ_A <span class="kw">PROC</span>
+      <span class="kw">PUSH</span> AX
+      <span class="kw">MOV</span>  AL, 'A'
+      <span class="kw">MOV</span>  AH, 0Eh
+      <span class="kw">INT</span>  10h
+      <span class="kw">POP</span>  AX
+      <span class="kw">RET</span>
+YAZ_A <span class="kw">ENDP</span>
+
+      <span class="kw">CALL</span> YAZ_A  <span class="cm">; 3 bayt</span>
+      <span class="kw">CALL</span> YAZ_A  <span class="cm">; 3 bayt</span></code></pre>
+
+<p>Yakın (<span lang="en">near</span>) bir <code>CALL</code> komutu yürütüldüğünde işlemci üç iş yapar. Önce SP'yi 2 azaltır. Sonra CALL'dan sonraki komutun adresini, yani dönüş adresini SS:SP'ye yazar. Son olarak IP'ye prosedürün adresini yükler. <code>RET</code> bunun tersini yapar: SS:SP'deki sözcüğü IP'ye alır ve SP'yi 2 artırır. Dönüş adresinin yığında saklanması sayesinde aynı prosedür programın farklı yerlerinden çağrılabilir; her seferinde doğru yere döner.</p>
+
+<figure class="nt-fig" id="sekil-proc" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 104" role="img" aria-label="Prosedür bellekte tek kopya: iki CALL aynı yordama gider, RET her seferinde çağırana döner" style="display:block;margin:8px auto 0;max-width:620px"><defs><marker id="n91-4-m4t8-30" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="8" width="170" height="88" rx="6"/><text class="lbl" x="95" y="26" text-anchor="middle">ana program</text><rect class="mt-acc" x="24" y="36" width="142" height="22" rx="4"/><text class="mt-m" x="95" y="52" text-anchor="middle">CALL YAZ_A</text><rect class="mt-acc" x="24" y="64" width="142" height="22" rx="4"/><text class="mt-m" x="95" y="80" text-anchor="middle">CALL YAZ_A</text><rect class="mt-good" x="380" y="14" width="200" height="76" rx="6"/><text class="mt-s" x="480" y="34" text-anchor="middle">YAZ_A (tek kopya)</text><text class="mt-m" x="480" y="56" text-anchor="middle" style="font-size:12px">PUSH AX … POP AX</text><text class="mt-m" x="480" y="78" text-anchor="middle">RET</text><path class="line" d="M166 47 C260 47 290 36 378 36" marker-end="url(#n91-4-m4t8-30)"/><path class="line" d="M166 75 C260 75 290 58 378 58" marker-end="url(#n91-4-m4t8-30)"/><path class="axis" d="M380 80 C300 98 240 96 168 88" marker-end="url(#n91-4-m4t8-30)"/><text class="lbl" x="272" y="30" text-anchor="middle" style="font-size:11px">3 bayt, dönüş adresi yığına</text><text class="lbl" x="272" y="104" text-anchor="middle" style="font-size:11px">RET: yığındaki adrese dön</text></svg></div>
+  <figcaption><b>Şekil 9.1.4:</b> Prosedür bellekte tek kopyadır. İki CALL aynı gövdeye gider; RET her seferinde yığındaki dönüş adresine, yani çağırana döner.</figcaption>
+</figure>
+
+<p>Yakın CALL komutu 3 bayttır: <code>E8</code> işlem kodu ve iki baytlık bağıl uzaklık. Bağıl uzaklık, prosedürün adresinden CALL'dan sonraki komutun adresi çıkarılarak bulunur. Aynı prosedür yüz kez çağrılsa da gövde bir kez yazılır; her çağrı yalnız 3 bayt ekler. Parametreler yazmaçlarla, bellekle ya da yığınla geçirilir. Prosedürün adı makine kodunda bir adrese dönüştüğü için prosedür dosyanın herhangi bir yerinde, çağrıdan sonra da tanımlanabilir.</p>
+
+<h3 id="s9-1-3-2"><span class="nt-num">9.1.3.2</span>Makronun özellikleri</h3>
+
+<p>Aynı işi yapan PUTC makrosu ise şöyle yazılır:</p>
+
+<pre class="nt-code"><code>PUTC <span class="kw">MACRO</span> char
+     <span class="kw">PUSH</span> AX
+     <span class="kw">MOV</span>  AL, char
+     <span class="kw">MOV</span>  AH, 0Eh
+     <span class="kw">INT</span>  10h
+     <span class="kw">POP</span>  AX
+<span class="kw">ENDM</span>
+
+     PUTC 'A'  <span class="cm">; 8 bayt</span>
+     PUTC 'B'  <span class="cm">; 8 bayt</span></code></pre>
+
+<p>Makro yalnız adı yazılarak kullanılır; CALL yoktur. Parametre, makro adının ardından yazılır. Assembler her kullanımda gövdeyi yeniden yazdığı için iki PUTC, programda iki ayrı 8 baytlık kopya üretir (<a href="#sekil-makro-kopya">Şekil 9.1.5</a>). Gövdenin baytları şunlardır: <code>PUSH AX</code> 1 bayt (<code>50</code>), <code>MOV AL, 'A'</code> 2 bayt (<code>B0 41</code>), <code>MOV AH, 0Eh</code> 2 bayt (<code>B4 0E</code>), <code>INT 10h</code> 2 bayt (<code>CD 10</code>), <code>POP AX</code> 1 bayt (<code>58</code>). Toplam 8 bayttır. Makroda RET olmadığına dikkat edilmelidir; makro, çağrılan değil, yerine yazılan bir koddur.</p>
+
+<figure class="nt-fig" id="sekil-makro-kopya" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 108" role="img" aria-label="Makro her kullanımda kodun içine açılır: iki PUTC kullanımı iki ayrı 8 baytlık kopya üretir" style="display:block;margin:8px auto 0;max-width:620px"><defs><marker id="n91-5-m4t8-31" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="mt-m" x="10" y="30" text-anchor="start">PUTC 'A'</text><text class="mt-m" x="10" y="76" text-anchor="start">PUTC 'B'</text><path class="line" d="M86 25 H120" marker-end="url(#n91-5-m4t8-31)"/><path class="line" d="M86 71 H120" marker-end="url(#n91-5-m4t8-31)"/><rect class="box" x="126" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="146" y="30" text-anchor="middle" style="font-size:13px">50</text><rect class="box" x="170" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="190" y="30" text-anchor="middle" style="font-size:13px">B0</text><rect class="mt-hot" x="214" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="234" y="30" text-anchor="middle" style="font-size:13px">41</text><rect class="box" x="258" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="278" y="30" text-anchor="middle" style="font-size:13px">B4</text><rect class="box" x="302" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="322" y="30" text-anchor="middle" style="font-size:13px">0E</text><rect class="box" x="346" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="366" y="30" text-anchor="middle" style="font-size:13px">CD</text><rect class="box" x="390" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="410" y="30" text-anchor="middle" style="font-size:13px">10</text><rect class="box" x="434" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="454" y="30" text-anchor="middle" style="font-size:13px">58</text><text class="lbl" x="484" y="30" text-anchor="start" style="font-size:11.5px">8 bayt</text><rect class="box" x="126" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="146" y="76" text-anchor="middle" style="font-size:13px">50</text><rect class="box" x="170" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="190" y="76" text-anchor="middle" style="font-size:13px">B0</text><rect class="mt-hot" x="214" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="234" y="76" text-anchor="middle" style="font-size:13px">42</text><rect class="box" x="258" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="278" y="76" text-anchor="middle" style="font-size:13px">B4</text><rect class="box" x="302" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="322" y="76" text-anchor="middle" style="font-size:13px">0E</text><rect class="box" x="346" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="366" y="76" text-anchor="middle" style="font-size:13px">CD</text><rect class="box" x="390" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="410" y="76" text-anchor="middle" style="font-size:13px">10</text><rect class="box" x="434" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="454" y="76" text-anchor="middle" style="font-size:13px">58</text><text class="lbl" x="484" y="76" text-anchor="start" style="font-size:11.5px">8 bayt</text><text class="lbl" x="126" y="104" text-anchor="start" style="font-size:11px">push ax · mov al, char · mov ah, 0Eh · int 10h · pop ax  (vurgulu: parametre)</text></svg></div>
+  <figcaption><b>Şekil 9.1.5:</b> Makro her kullanımda kodun içine açılır. İki PUTC kullanımı, art arda iki ayrı 8 baytlık kopya üretir; yığın kullanılmaz.</figcaption>
+</figure>
+
+<p>Etiketler konusunda da önemli bir fark vardır. Prosedürün gövdesi tek kopya olduğu için içindeki etiketler de bir kez tanımlanır. Makronun gövdesi ise her kullanımda yeniden yazılır. Gövdede bir etiket varsa ve makro iki kez kullanılırsa aynı etiket iki kez tanımlanmış olur ve assembler <i>Duplicate declaration</i> hatası verir. Bu sorunun çözümü olan LOCAL direktifi kendi kesiminde işlenir.</p>
+
+<div class="nt-tablewrap" id="tab-karsilastirma">
+<table class="nt-table">
+  <caption>Tablo 9.1.6: Makro ile prosedürün karşılaştırması.</caption>
+  <thead><tr><th scope="col">Ölçüt</th><th scope="col">Makro</th><th scope="col">Prosedür</th></tr></thead>
+  <tbody>
+    <tr><td>Ne zaman işlenir?</td><td>derleme anında (metin değiştirme)</td><td>çalışma anında (CALL/RET)</td></tr>
+    <tr><td>Kullanım</td><td><code>PUTC 'A'</code></td><td><code>CALL YAZ_A</code></td></tr>
+    <tr><td>Kod boyutu</td><td>her kullanımda gövde kadar artar</td><td>gövde bir kez + her çağrı 3 bayt</td></tr>
+    <tr><td>Hız</td><td>CALL/RET ve yığın erişimi yok</td><td>her çağrıda CALL + RET süresi</td></tr>
+    <tr><td>Parametre</td><td>ad sonrası metin</td><td>yazmaç, bellek ya da yığın</td></tr>
+    <tr><td>Yığın</td><td>kullanmaz (gövde kullanmadıkça)</td><td>dönüş adresi için kullanır</td></tr>
+    <tr><td>Tanım yeri</td><td>kullanımdan önce</td><td>herhangi bir yerde</td></tr>
+    <tr><td>Bitiş</td><td><code>ENDM</code></td><td><code>ad ENDP</code></td></tr>
+    <tr><td>Etiketler</td><td>LOCAL gerekir</td><td>sorun yok (tek kopya)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-karsilastirma">Tablo 9.1.6</a> iki yöntemi dokuz ölçütle yan yana koyar. Tablonun ilk satırı ötekilerin nedenidir. Makro derleme anında işlendiği için çalışma anına bir maliyet bırakmaz, ama her kullanımda yer kaplar. Prosedür çalışma anında işlendiği için yer kazandırır, ama her çağrıda zaman harcar.</p>
+
+<h3 id="s9-1-3-3"><span class="nt-num">9.1.3.3</span>Boyut hesabı ve başa baş noktası</h3>
+
+<p>Kod boyutunu kullanım sayısına göre hesaplamak için iki basit formül yeter. Gövdesi n bayt olan bir iş k yerde kullanılsın. Makroda gövde k kez yazılır: boyut k · n bayttır. Prosedürde gövde bir kez yazılır, sonuna 1 baytlık RET eklenir ve her kullanım 3 baytlık bir CALL'dır: boyut (n + 1) + 3k bayttır.</p>
+
+<p class="nt-math nt-math--c">makro = k · n &nbsp;&nbsp;&nbsp;&nbsp; prosedür = (n + 1) + 3k</p>
+
+<p>PUTC'nin gövdesi n = 8 bayttır. Tek kullanımda makro 8 bayt, prosedür 8 + 1 + 3 = 12 bayt tutar; makro daha küçüktür. On kullanımda makro 80 bayta, prosedür 9 + 30 = 39 bayta çıkar. Yüz kullanımda fark büyür: makro 800 bayt, prosedür 9 + 300 = 309 bayttır. <a href="#sekil-boyut">Şekil 9.1.6</a> bu üç durumu çubuklarla gösterir. Makronun çubuğu kullanım sayısıyla doğru orantılı büyür; prosedürün çubuğu 9 baytlık sabit bir parçanın üstüne her kullanımda yalnız 3 bayt ekler.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-boyut" style="--w:680px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 680 190" role="img" aria-label="Makro ve prosedür kod boyutu"><defs><marker id="n91-6-m8ah133" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="10" y="16">Kod boyutu (bayt) · PUTC gövdesi 8 bayt; prosedür = aynı 8 bayt + RET (1 bayt)</text><text class="txt" x="10" y="56">1 kullanım</text><rect class="box" x="110" y="30" width="4" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="120" y="45">makro: 1 × 8 = 8</text><rect class="box" x="110" y="54" width="6" height="20" rx="2"/><text class="lbl" x="122" y="69">prosedür: 9 + 1 × 3 = 12</text><text class="txt" x="10" y="108">10 kullanım</text><rect class="box" x="110" y="82" width="40" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="156" y="97">makro: 10 × 8 = 80</text><rect class="box" x="110" y="106" width="20" height="20" rx="2"/><text class="lbl" x="136" y="121">prosedür: 9 + 10 × 3 = 39</text><text class="txt" x="10" y="160">100 kullanım</text><rect class="box" x="110" y="134" width="400" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="516" y="149">makro: 100 × 8 = 800</text><rect class="box" x="110" y="158" width="154" height="20" rx="2"/><text class="lbl" x="270" y="173">prosedür: 9 + 100 × 3 = 309</text></svg></div>
+  <figcaption><b>Şekil 9.1.6:</b> PUTC gövdesi için kod boyutu: 1, 10 ve 100 kullanımda makro (8k bayt) ile prosedür (9 + 3k bayt). Fark kullanım sayısıyla büyür.</figcaption>
+</figure>
+
+<p>Makronun prosedürden büyük olmaya başladığı kullanım sayısına başa baş noktası denebilir. Prosedürün daha küçük olması için k · n &gt; (n + 1) + 3k olmalıdır. Terimler toplanınca k · (n − 3) &gt; n + 1 bulunur. Bu eşitsizlikten iki sonuç çıkar.</p>
+
+<ul>
+  <li>n ≤ 3 ise sol taraf sıfır ya da negatiftir ve eşitsizlik hiçbir k için sağlanmaz. Gövde bir CALL kadar kısaysa makro her zaman daha küçüktür. Bu durumda prosedür kod boyutunu azaltmaz, yalnız RET ve çağrı süresini ekler.</li>
+  <li>n &gt; 3 ise başa baş noktası k &gt; (n + 1) / (n − 3)'tür. n = 8 için k &gt; 9/5 = 1,8, yani iki kullanımdan itibaren prosedür daha küçüktür: 16 bayta karşı 15 bayt. n = 5 için k &gt; 3, yani dört kullanımdan itibaren. n = 4 için k &gt; 5; beş kullanımda ikisi de 20 bayttır, altı kullanımda prosedür 23 bayta karşı 24 bayt ile öne geçer.</li>
+</ul>
+
+<div class="nt-box nt-box--ornek" id="ornek-boyut">
+  <span class="nt-box__title">Örnek 9.1.2</span>
+  <p>PUTC makrosu 50 kez kullanılıyor. Aynı iş prosedürle yapılsaydı kod boyutları ne olurdu?</p>
+  <p>Makro: 50 × 8 = 400 bayt. Prosedür: gövde ve RET bir kez (8 + 1 = 9 bayt), CALL'lar 50 × 3 = 150 bayt; toplam 159 bayt. Prosedür 241 bayt daha küçüktür. Sık yapılan bir hesap hatası, prosedür için yalnız CALL'ları (150 bayt) saymak ya da makro kopyasını RET ile 9 bayt saymaktır. Makroda RET yoktur.</p>
+</div>
+
+<p>Bu hesap neden önemlidir? Bir .COM programının kodu, verisi ve yığını tek bir 64 KB'lık kesime sığmak zorundadır. Gömülü bir sistemde program küçük bir ROM'a yazılır ve her bayt bir maliyettir. Gövdesi uzun bir makronun yüzlerce yerde kullanılması bu sınırları hızla zorlar.</p>
+
+<h3 id="s9-1-3-4"><span class="nt-num">9.1.3.4</span>Hız: CALL, RET ve önden getirme kuyruğu</h3>
+
+<p>Hız tarafında tablo tersine döner. Prosedürün her çağrısı, işin kendisine ek olarak bir CALL ve bir RET yürütür. Intel'in 8086 veri sayfasına göre yakın, doğrudan bir CALL 19 saat turu, yakın bir RET 8 saat turu sürer. Her çağrı böylece 27 tur ekler. 4,77 MHz'lik bir 8086'da bir tur yaklaşık 209,6 ns'dir; 27 tur yaklaşık 5,66 µs eder. 5 MHz'de bir tur 200 ns, 27 tur 5,4 µs'dir.</p>
+
+<p>Bu sayının arkasında donanımda olan biten vardır. CALL komutu dönüş adresini yığına yazar; bu bir bellek yazma yol döngüsüdür. Bir yol döngüsü en az dört saat turu (T1–T4) sürer. RET de yığından bir sözcük okur; bu da bir okuma yol döngüsüdür. Daha önemlisi, her iki komut da programın akışını değiştirir. 8086'da yürütme birimi (EU) bir komutu yürütürken veri yolu arabirim birimi (BIU) sonraki komut baytlarını önceden getirir. Bu baytlar altı baytlık önden getirme kuyruğunda (<span lang="en">prefetch queue</span>) bekler. Akış bir atlamayla değiştiğinde kuyruktaki baytlar işe yaramaz hâle gelir. BIU kuyruğu boşaltır ve yeni adresten getirmeye baştan başlar. EU, ilk komut baytı gelene kadar bekler. CALL ve RET'in uzun sürmesinin bir nedeni budur.</p>
+
+<p>Makronun açılımında ise akış düz bir çizgidir. Komutlar bellekte art arda durur, BIU onları sırayla getirir ve kuyruk hiç boşaltılmaz. Yığına dönüş adresi yazılmaz, yığından okunmaz. PUTC'nin gövdesi kendi başına yaklaşık 78 tur sürer: PUSH 11, iki MOV 4'er, INT 51, POP 8 tur. Bu süreye BIOS'un kendi yordamı ve onun IRET'i eklenir. Prosedür sürümünde aynı işe her çağrıda 27 tur daha eklenir.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Tablo 9.1.7: PUTC gövdesinin ve CALL/RET ekinin saat turu olarak süresi (8086 veri sayfası; BIOS yordamının kendi süresi hariç).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Bayt</th><th scope="col">Saat turu</th><th scope="col">Bellek/yığın erişimi</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSH AX</code></td><td>1</td><td>11</td><td>1 yazma (yığın)</td></tr>
+    <tr><td><code>MOV AL, 'A'</code></td><td>2</td><td>4</td><td>yok</td></tr>
+    <tr><td><code>MOV AH, 0Eh</code></td><td>2</td><td>4</td><td>yok</td></tr>
+    <tr><td><code>INT 10h</code></td><td>2</td><td>51</td><td>3 yazma (FLAGS, CS, IP) + vektör okuma</td></tr>
+    <tr><td><code>POP AX</code></td><td>1</td><td>8</td><td>1 okuma (yığın)</td></tr>
+    <tr><td><b>makro kopyası toplam</b></td><td><b>8</b></td><td><b>78</b></td><td></td></tr>
+    <tr><td><code>CALL</code> (yakın, doğrudan)</td><td>3</td><td>19</td><td>1 yazma (dönüş adresi)</td></tr>
+    <tr><td><code>RET</code> (yakın)</td><td>1</td><td>8</td><td>1 okuma (dönüş adresi)</td></tr>
+    <tr><td><b>prosedür çağrısı toplam</b></td><td><b>3 (+ 9 bir kez)</b></td><td><b>105</b></td><td></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-tur">Tablo 9.1.7</a> iki sürümü bayt ve tur olarak karşılaştırır. Ek süre çağrı başına küçüktür ama birikir. Bir döngüde 10 000 kez çağrılan bir prosedür, 4,77 MHz'de 10 000 × 27 = 270 000 tur, yani yaklaşık 56,6 ms ek süre getirir. Kısa bir işte bu ek süre işin kendisinden bile uzun olabilir. Örneğin iki komutluk, toplam 6–8 tur süren bir iş prosedüre konursa, her çağrı süreyi dört beş katına çıkarır.</p>
+
+<h3 id="s9-1-3-5"><span class="nt-num">9.1.3.5</span>Seçim ölçütleri</h3>
+
+<p>Boyut ve hız birlikte tartılınca genel kural ortaya çıkar. Kısa, sık çalışan ve hız gerektiren kod makroya; uzun ve çok yerde kullanılan kod prosedüre uygundur. Beş tipik durum bu kuralı somutlaştırır:</p>
+
+<ol>
+  <li><b>Ekrana tek karakter yazmak, 200 yerde.</b> Gövde kısadır (8 bayt) ama 200 kopya 1600 bayt eder. Prosedür 9 + 600 = 609 bayt tutar. Boyut önemliyse prosedür, hız önemliyse makro seçilir. Ekrana yazma zaten BIOS çağrısı içerdiği için 27 turluk ek çoğu zaman önemsizdir; burada prosedür daha akıllıca bir seçimdir.</li>
+  <li><b>İki yazmacı takas eden tek satırlık iş.</b> <code>XCHG</code> zaten tek komuttur. Bir makro okunabilirliği artırabilir; prosedür ise tek komutluk işe 27 turluk ve 4 baytlık yük ekler. Makro seçilir.</li>
+  <li><b>300 baytlık bir sıralama algoritması, 3 yerde.</b> Makro 900 bayt, prosedür yaklaşık 300 + 9 bayt tutar. Sıralamanın süresi yanında 27 tur önemsizdir. Açıkça prosedür.</li>
+  <li><b>Sıkı bir döngüde her turda yapılan iki komutluk iş.</b> CALL/RET süresi işin kendisinden büyüktür. Döngü binlerce kez döndüğünde fark ölçülebilir hâle gelir. Makro.</li>
+  <li><b>Parametreleri yazmaçlara koyup ortak bir kodu çağırmak.</b> İki yöntem birlikte kullanılır: makro parametreleri yazmaçlara yerleştirir ve prosedürü çağırır. Kullanım makro kadar rahat, boyut prosedür kadar küçük olur. emu8086.inc kütüphanesi de bu düzeni kullanır.</li>
+</ol>
+
+<h3 id="s9-1-3-6"><span class="nt-num">9.1.3.6</span>Kod izleme: makro hazırlar, prosedür yapar</h3>
+
+<p>Beşinci durumu küçük bir programla izleyelim. YAZ_RAKAM makrosu bir rakamı AL'ye koyar ve rakam_yaz prosedürünü çağırır. Prosedür rakamı ASCII koduna çevirip ekrana yazar:</p>
+
+<pre class="nt-code"><code>YAZ_RAKAM <span class="kw">MACRO</span> d
+    <span class="kw">mov</span>  al, d
+    <span class="kw">call</span> rakam_yaz
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    YAZ_RAKAM 4
+    YAZ_RAKAM 7
+    <span class="kw">ret</span>
+rakam_yaz:
+    <span class="kw">add</span>  al, '0'     <span class="cm">; rakam → ASCII</span>
+    <span class="kw">mov</span>  ah, 0Eh
+    <span class="kw">int</span>  10h
+    <span class="kw">ret</span></code></pre>
+
+<p>Her makro kopyası yalnız 5 bayttır: 2 baytlık <code>MOV AL, imm8</code> ve 3 baytlık <code>CALL</code>. Birinci kopya 0100h–0104h'de, ikincisi 0105h–0109h'da durur. Ana programın RET'i 010Ah'dedir ve prosedür 010Bh'de başlar. Prosedürün gövdesi 2 + 2 + 2 + 1 = 7 bayttır. Makro on yerde kullanılsaydı kod 10 × 5 + 7 = 57 bayt tutardı. Gövdenin tamamı (<code>MOV AL</code>, <code>ADD AL</code>, <code>MOV AH</code>, <code>INT</code>) makroda olsaydı her kopya 8 bayt, on kopya 80 bayt olurdu.</p>
+
+<div class="nt-tablewrap" id="tab-rakam">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.8: YAZ_RAKAM makrosu ile rakam_yaz prosedürünün birlikte izlenmesi. [SS:SP] sütunu yığının tepesindeki sözcüğü gösterir.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AL</th><th scope="col">AH</th><th scope="col">SP</th><th scope="col">[SS:SP]</th><th scope="col">Sonraki IP</th><th scope="col">Ekran</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov al, 4</code><br><small>YAZ_RAKAM açılımı</small></td><td>04h</td><td>00h</td><td>FFFEh</td><td>0000h</td><td>0102h</td><td>–</td><td>1. açılım: AL ← 4</td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>call rakam_yaz</code><br><small>YAZ_RAKAM açılımı</small></td><td>04h</td><td>00h</td><td>FFFCh</td><td>0105h</td><td>010Bh</td><td>–</td><td>dönüş adresi 0105h yığına; IP ← 010Bh</td></tr>
+    <tr><td>3</td><td>010Bh</td><td><code>add al, &#x27;0&#x27;</code><br><small>rakam_yaz prosedürü</small></td><td>34h</td><td>00h</td><td>FFFCh</td><td>0105h</td><td>010Dh</td><td>–</td><td>4 + 30h = 34h ('4')</td></tr>
+    <tr><td>4</td><td>010Dh</td><td><code>mov ah, 0Eh</code><br><small>rakam_yaz prosedürü</small></td><td>34h</td><td>0Eh</td><td>FFFCh</td><td>0105h</td><td>010Fh</td><td>–</td><td>AH = 0Eh: teletype</td></tr>
+    <tr><td>5</td><td>010Fh</td><td><code>int 10h</code><br><small>rakam_yaz prosedürü</small></td><td>34h</td><td>0Eh</td><td>FFFCh</td><td>0105h</td><td>0111h</td><td><code>4</code></td><td>ekrana 4</td></tr>
+    <tr><td>6</td><td>0111h</td><td><code>ret</code><br><small>rakam_yaz prosedürü</small></td><td>34h</td><td>0Eh</td><td>FFFEh</td><td>0000h</td><td>0105h</td><td><code>4</code></td><td>0105h yığından IP'ye</td></tr>
+    <tr><td>7</td><td>0105h</td><td><code>mov al, 7</code><br><small>YAZ_RAKAM açılımı</small></td><td>07h</td><td>0Eh</td><td>FFFEh</td><td>0000h</td><td>0107h</td><td><code>4</code></td><td>2. açılım: AL ← 7</td></tr>
+    <tr><td>8</td><td>0107h</td><td><code>call rakam_yaz</code><br><small>YAZ_RAKAM açılımı</small></td><td>07h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>010Bh</td><td><code>4</code></td><td>dönüş adresi bu kez 010Ah</td></tr>
+    <tr><td>9</td><td>010Bh</td><td><code>add al, &#x27;0&#x27;</code><br><small>rakam_yaz prosedürü</small></td><td>37h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>010Dh</td><td><code>4</code></td><td>37h ('7')</td></tr>
+    <tr><td>10</td><td>010Dh</td><td><code>mov ah, 0Eh</code><br><small>rakam_yaz prosedürü</small></td><td>37h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>010Fh</td><td><code>4</code></td><td></td></tr>
+    <tr><td>11</td><td>010Fh</td><td><code>int 10h</code><br><small>rakam_yaz prosedürü</small></td><td>37h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>0111h</td><td><code>47</code></td><td>ekranda 47</td></tr>
+    <tr><td>12</td><td>0111h</td><td><code>ret</code><br><small>rakam_yaz prosedürü</small></td><td>37h</td><td>0Eh</td><td>FFFEh</td><td>0000h</td><td>010Ah</td><td><code>47</code></td><td>010Ah'ye dönüş</td></tr>
+    <tr><td>13</td><td>010Ah</td><td><code>ret</code><br><small>ana program</small></td><td>37h</td><td>0Eh</td><td>0000h</td><td>–</td><td>0000h</td><td><code>47</code></td><td>ana programın RET'i</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-rakam" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="Makro ve prosedür, adım 2: AL, AH, yığın ve ekran"><defs><marker id="n91-7-m4t8-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="8" y="20" width="70" height="34" rx="4"/><text class="lbl" x="43" y="16" text-anchor="middle" style="font-size:11.5px">AL</text><text class="mt-v" x="43" y="42" text-anchor="middle" style="font-size:14px">04h</text><rect class="box" x="84" y="20" width="70" height="34" rx="4"/><text class="lbl" x="119" y="16" text-anchor="middle" style="font-size:11.5px">AH</text><text class="mt-v" x="119" y="42" text-anchor="middle" style="font-size:14px">00h</text><rect class="mt-hot" x="160" y="20" width="70" height="34" rx="4"/><text class="lbl" x="195" y="16" text-anchor="middle" style="font-size:11.5px">SP</text><text class="mt-v" x="195" y="42" text-anchor="middle" style="font-size:14px">FFFCh</text><text class="mt-m" x="8" y="84" text-anchor="start">IP sonra: 010Bh</text><text class="mt-s" x="8" y="106" text-anchor="start">şu an: makro kopyası 1</text><rect class="mt-dim" x="8" y="124" width="200" height="30" rx="4"/><text class="lbl" x="14" y="120" text-anchor="start" style="font-size:11px">ekran</text><text class="mt-m" x="16" y="144" text-anchor="start" style="font-size:14px">▌</text><text class="lbl" x="300" y="14" text-anchor="middle" style="font-size:11px">yığın (SS:bağıl konum)</text><rect class="mt-dim" x="268" y="22" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="38.5" text-anchor="middle" style="opacity:.45">····</text><text class="lbl" x="263" y="38.5" text-anchor="end" style="font-size:11px">FFF8</text><rect class="mt-dim" x="268" y="48" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="64.5" text-anchor="middle" style="opacity:.45">····</text><text class="lbl" x="263" y="64.5" text-anchor="end" style="font-size:11px">FFFA</text><rect class="mt-hot" x="268" y="74" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="90.5" text-anchor="middle">0105h</text><text class="lbl" x="263" y="90.5" text-anchor="end" style="font-size:11px">FFFC</text><text class="mt-a" x="228" y="90.5" text-anchor="end" style="font-size:11px">dönüş</text><path class="line" d="M382 86 H342" marker-end="url(#n91-7-m4t8-2)"/><text class="mt-l" x="386" y="90.5" text-anchor="start">SP</text><rect class="box" x="268" y="100" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="116.5" text-anchor="middle">0000h</text><text class="lbl" x="263" y="116.5" text-anchor="end" style="font-size:11px">FFFE</text></svg></div>
+  <figcaption><b>Şekil 9.1.7:</b> Birinci CALL'dan hemen sonra: dönüş adresi 0105h yığına yazılmış, SP = FFFCh olmuş, IP prosedürün başı 010Bh'ye gelmiştir.</figcaption>
+</figure>
+
+<p><a href="#tab-rakam">Tablo 9.1.8</a> ve <a href="#sekil-rakam">Şekil 9.1.7</a> birlikte okunmalıdır. İkinci adımda CALL yürütülür. Dönüş adresi, CALL'dan sonraki komutun adresi olan 0105h'dir. Bu sözcük SS:FFFCh'ye yazılır; SS = 0700h olduğundan fiziksel adres 07000h + FFFCh = 16FFCh'dir. SP = FFFCh olur ve IP 010Bh'ye atlar. Prosedür 4'e 30h ekleyip ASCII '4' (34h) elde eder ve INT 10h ile yazar. Altıncı adımdaki RET, yığının tepesindeki 0105h'yi IP'ye alır ve SP'yi FFFEh'ye geri getirir.</p>
+
+<p>İkinci kopya aynı prosedürü çağırır ama dönüş adresi bu kez 010Ah'dir. Aynı tek gövde, iki farklı yerden çağrılmış ve her seferinde doğru yere dönmüştür. Ekranda 47 görünür. Son RET ana programındır ve yığının tepesindeki 0000h'yi alarak programı bitirir. Makro bu düzende parametreyi hazırlayan ince bir kılıf görevi görür; işin kendisi prosedürde, tek kopyadır.</p>
+
+<h3 id="s9-1-3-7"><span class="nt-num">9.1.3.7</span>Kod izleme: makronun içindeki RET</h3>
+
+<p>Prosedür alışkanlığıyla makronun sonuna RET yazmak, makrolarla ilgili en öğretici hatalardan biridir. Aşağıdaki YAZ makrosu bir karakter yazar ve RET ile biter:</p>
+
+<pre class="nt-code"><code>YAZ <span class="kw">MACRO</span> c
+    <span class="kw">MOV</span> AL, c
+    <span class="kw">MOV</span> AH, 0Eh
+    <span class="kw">INT</span> 10h
+    <span class="kw">RET</span>              <span class="cm">; hatalı</span>
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    YAZ 'A'
+    YAZ 'B'
+    <span class="kw">ret</span></code></pre>
+
+<p>Program derlenir; assembler açısından RET de sıradan bir komuttur. Açılmış kodda iki YAZ kopyası ve her birinin sonunda bir RET vardır. Programcı ekranda AB bekler.</p>
+
+<div class="nt-tablewrap" id="tab-makroret">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.9: Gövdesinde RET bulunan YAZ makrosunun iki kez kullanıldığı programın izlemesi.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">Sonraki IP</th><th scope="col">Ekran</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AL, &#x27;A&#x27;</code><br><small>YAZ açılımı</small></td><td>0041h</td><td>FFFEh</td><td>0102h</td><td>–</td><td>1. açılım: AL ← 'A'</td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>MOV AH, 0Eh</code><br><small>YAZ açılımı</small></td><td>0E41h</td><td>FFFEh</td><td>0104h</td><td>–</td><td>AX = 0E41h</td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>INT 10h</code><br><small>YAZ açılımı</small></td><td>0E41h</td><td>FFFEh</td><td>0106h</td><td><code>A</code></td><td>ekrana A</td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>RET</code><br><small>YAZ açılımı</small></td><td>0E41h</td><td>0000h</td><td>0000h</td><td><code>A</code></td><td>makronun RET'i yığının tepesindeki 0000h'yi alır</td></tr>
+    <tr><td>5</td><td>0000h</td><td><code>INT 20h (PSP:0000h)</code><br><small>PSP</small></td><td>0E41h</td><td>0000h</td><td>–</td><td><code>A</code></td><td>PSP'deki INT 20h programı bitirir; 0107h'den sonrası hiç çalışmaz</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p><a href="#tab-makroret">Tablo 9.1.9</a> beklenenin olmadığını gösterir. Birinci kopya 'A'yı yazar. Dördüncü adımdaki RET, makronun RET'idir. Makroya CALL ile gelinmediği için yığında bir dönüş adresi yoktur. RET yine de yığının tepesinde ne bulursa onu IP'ye alır. Bu .COM programında tepede, DOS'un yerleştirdiği 0000h sözcüğü durur. IP = 0000h olur ve işlemci PSP'nin başındaki <code>INT 20h</code> komutuna gider. Program biter. YAZ 'B'nin kopyası ve ana programın RET'i hiç çalışmaz; ekranda yalnız A vardır.</p>
+
+<p>Bu programın şanslı bir sonu vardır: yığının tepesinde tesadüfen programı bitiren bir adres durur. Makro bir prosedürün içinde ya da yığına bir şey itildikten sonra kullanılsaydı RET, yığındaki rastgele bir sözcüğe atlardı ve program kilitlenebilirdi. RET yalnız CALL ile girilen bir prosedürde anlamlıdır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Makro gövdesinin sonuna RET yazmak. Makro CALL ile çağrılmaz; gövdedeki RET, makroyu kullanan kodun dönüş adresini (ya da yığında ne varsa onu) alır. Makro, ENDM'e gelindiğinde kendiliğinden "biter": açılımın son komutundan sonra, çağrı satırını izleyen komut yürütülür.</p>
+</div>
+
+<h3 id="s9-1-3-8"><span class="nt-num">9.1.3.8</span>EQU, makro ve prosedür</h3>
+
+<p>Assembler'ın metin üzerinde çalışan bir başka aracı EQU direktifidir. <code>SATIR EQU 80</code> yazıldığında assembler, SATIR adını gördüğü her yere 80 yazar. Bu, tek satırlık ve parametresiz bir makroya benzer. Üç aracın karşılaştırması <a href="#tab-equ">Tablo 9.1.10</a>'de verilmiştir.</p>
+
+<div class="nt-tablewrap" id="tab-equ">
+<table class="nt-table">
+  <caption>Tablo 9.1.10: EQU, makro ve prosedür.</caption>
+  <thead><tr><th scope="col">Ölçüt</th><th scope="col">EQU</th><th scope="col">Makro</th><th scope="col">Prosedür</th></tr></thead>
+  <tbody>
+    <tr><td>Ne yerine konur?</td><td>tek bir değer ya da ifade</td><td>bir ya da daha çok satır</td><td>hiçbir şey; CALL ile gidilir</td></tr>
+    <tr><td>Parametre</td><td>yok</td><td>var (metin)</td><td>yazmaç, yığın ya da bellek</td></tr>
+    <tr><td>Ne zaman?</td><td>derleme</td><td>derleme</td><td>çalışma</td></tr>
+    <tr><td>Bellekte</td><td>yer kaplamaz</td><td>her kullanımda gövde kadar</td><td>tek kopya + her çağrıda 3 bayt</td></tr>
+    <tr><td>Örnek</td><td><code>SATIR EQU 80</code></td><td><code>PUTC 'A'</code></td><td><code>CALL PRINT_NUM</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>EQU ile makronun ortak noktası, ikisinin de assembler'ın kaynak üzerinde yaptığı metin işlemleri olmasıdır. İşlemci ikisini de hiç görmez; yalnız ürettikleri komutları yürütür. Bir EQU sabiti tek başına bayt bile üretmez; ancak bir komutun içinde kullanıldığında o komutun anında değeri olur. Seçim kuralı basittir. Tek bir sayıya ad vermek için EQU, birkaç komutluk kısa kalıp için makro, uzun ya da yaygın bir iş için prosedür kullanılır.</p>
+
+<h2 class="nt-pb" id="s9-1-4"><span class="nt-num">9.1.4</span>Etiketler ve LOCAL</h2>
+
+<h3 id="s9-1-4-1"><span class="nt-num">9.1.4.1</span>Aynı etiket iki kez</h3>
+
+<p>Döngü ya da koşullu atlama içeren her makronun gövdesinde bir etiket (<span lang="en">label</span>) bulunur. Etiket, assembler'ın bir adrese verdiği addır. Bir programda her etiket yalnız bir kez tanımlanabilir; aksi hâlde aynı ad iki farklı adresi gösterir ve atlamanın hedefi belirsizleşir. Makronun gövdesi her kullanımda yeniden yazıldığı için bu kural makrolarda kolayca çiğnenir. Basit bir bekleme döngüsü bunu gösterir:</p>
+
+<pre class="nt-code"><code>BEKLE <span class="kw">MACRO</span>
+ilk:  <span class="kw">DEC</span> CX
+      <span class="kw">JNZ</span> ilk
+<span class="kw">ENDM</span>
+
+<span class="kw">MOV</span> CX, 5
+BEKLE
+<span class="kw">MOV</span> CX, 9
+BEKLE</code></pre>
+
+<p>Makro bir kez kullanılsaydı sorun olmazdı. İki kullanımdan sonra assembler'ın gördüğü kod şudur:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> CX, 5
+ilk:  <span class="kw">DEC</span> CX    <span class="cm">; 1. kopya</span>
+      <span class="kw">JNZ</span> ilk
+<span class="kw">MOV</span> CX, 9
+ilk:  <span class="kw">DEC</span> CX    <span class="cm">; 2. kopya !</span>
+      <span class="kw">JNZ</span> ilk</code></pre>
+
+<figure class="nt-fig" id="sekil-etiket" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 98" role="img" aria-label="İki açılımda aynı ilk etiketi: JNZ ilk iki adresten hangisine gideceğini bilemez" style="display:block;margin:8px auto 0;max-width:620px"><defs><marker id="n91-8-m4t8-32" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="20" y="8" width="220" height="62" rx="6"/><text class="lbl" x="30" y="24" text-anchor="start" style="font-size:11px">1. kopya</text><rect class="mt-bad" x="28" y="30" width="44" height="20" rx="3"/><text class="mt-m" x="50" y="44" text-anchor="middle">ilk:</text><text class="mt-m" x="82" y="44" text-anchor="start">DEC CX</text><text class="mt-m" x="82" y="63" text-anchor="start">JNZ ilk</text><rect class="box" x="330" y="8" width="220" height="62" rx="6"/><text class="lbl" x="340" y="24" text-anchor="start" style="font-size:11px">2. kopya</text><rect class="mt-bad" x="338" y="30" width="44" height="20" rx="3"/><text class="mt-m" x="360" y="44" text-anchor="middle">ilk:</text><text class="mt-m" x="392" y="44" text-anchor="start">DEC CX</text><text class="mt-m" x="392" y="63" text-anchor="start">JNZ ilk</text><path class="axis" d="M144 70 C190 96 300 96 356 54" marker-end="url(#n91-8-m4t8-32)"/><path class="axis" d="M90 70 C80 84 40 78 46 54" marker-end="url(#n91-8-m4t8-32)"/><text class="mt-a" x="250" y="92" text-anchor="middle" style="font-size:16px">?</text><text class="mt-a" x="600" y="92" text-anchor="end" style="font-size:12px">aynı ad iki kez → Duplicate declaration</text></svg></div>
+  <figcaption><b>Şekil 9.1.8:</b> İki açılımda aynı <code>ilk</code> etiketi. <code>JNZ ilk</code> iki adresten hangisine gideceğini bilemez; assembler <i>Duplicate declaration</i> hatası verir.</figcaption>
+</figure>
+
+<p>İkinci <code>ilk:</code> satırına gelindiğinde assembler bu adı sembol tablosunda zaten bulur. emu8086 <i>Duplicate declaration</i> (yinelenen bildirim) hatası verir ve program derlenmez. Hata iletisi ikinci BEKLE satırını gösterir; programcı o satıra baktığında yalnız makronun adını görür. Hatanın nedenini anlamak için yine açılımı düşünmek gerekir.</p>
+
+<h3 id="s9-1-4-2"><span class="nt-num">9.1.4.2</span>LOCAL direktifi</h3>
+
+<p>Sorunun çözümü, her açılımda etikete farklı bir ad vermektir. Bunu programcı elle yapamaz, çünkü gövde tek bir yerde yazılıdır. Assembler bu işi LOCAL direktifiyle üstlenir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-local">
+  <span class="nt-box__title">Tanım 9.1.3</span>
+  <p><strong>LOCAL direktifi</strong> (<span lang="en">LOCAL directive</span>), makro gövdesinin ilk satırına yazılır ve ardından gelen adları makroya yerel kılar. Assembler her genişletmede bu adların yerine o ana kadar kullanılmamış, benzersiz bir ad koyar. MASM ve emu8086 bu adları <code>??0000</code>, <code>??0001</code>, <code>??0002</code>… biçiminde, programdaki bütün açılımlar boyunca artan bir sayaçla üretir.</p>
+</div>
+
+<pre class="nt-code"><code>MyMacro2 <span class="kw">MACRO</span>
+    <span class="kw">LOCAL</span> label1, label2
+    <span class="kw">CMP</span>  AX, 2
+    <span class="kw">JE</span>   label1
+    <span class="kw">CMP</span>  AX, 3
+    <span class="kw">JE</span>   label2
+label1:
+    <span class="kw">INC</span>  AX
+label2:
+    <span class="kw">ADD</span>  AX, 2
+<span class="kw">ENDM</span></code></pre>
+
+<p>MyMacro2 iki yerel etiket bildirir. İlk kullanımda label1 <code>??0000</code>, label2 <code>??0001</code> olur. İkinci kullanımda sayaç kaldığı yerden sürer: label1 <code>??0002</code>, label2 <code>??0003</code> olur. Sayaç makroya değil programa aittir; başka bir makronun yerel etiketleri de aynı diziden numara alır. <code>??</code> ile başlayan adlar bilerek seçilmiştir: programcının kendi etiketiyle çakışma olasılığı yoktur.</p>
+
+<p>LOCAL'ın gövdenin ilk satırı olması gerekir; MACRO satırından hemen sonra gelmelidir. Assembler, yerel adları gövdenin geri kalanına uygulamadan önce bilmek ister. LOCAL yalnız etiketler için değil, makronun içinde tanımlanan değişken ve prosedür adları için de kullanılır. Makro bir dizgiyi kendi içinde tanımlıyorsa (PRINT makrosunda olduğu gibi), dizginin adı da yerel olmalıdır.</p>
+
+<p>İki kullanımlı bir programın listesi bu adlandırmayı ve adresleri birlikte gösterir:</p>
+
+<pre class="nt-code"><code>0100  3D 02 00   CMP AX, 2     <span class="cm">; 1. MyMacro2</span>
+0103  74 05      JE  ??0000
+0105  3D 03 00   CMP AX, 3
+0108  74 01      JE  ??0001
+010A  40         ??0000: INC AX
+010B  05 02 00   ??0001: ADD AX, 2
+010E  3D 02 00   CMP AX, 2     <span class="cm">; 2. MyMacro2</span>
+0111  74 05      JE  ??0002
+0113  3D 03 00   CMP AX, 3
+0116  74 01      JE  ??0003
+0118  40         ??0002: INC AX
+0119  05 02 00   ??0003: ADD AX, 2
+011C  C3         RET</code></pre>
+
+<p>Koşullu atlamaların makine kodu da öğreticidir. <code>JE ??0000</code> = <code>74 05</code>: 74h işlem kodu, 05h ise bağıl uzaklıktır. Atlama, JE'den sonraki komutun adresine (0105h) 5 eklenerek bulunur: 0105h + 5 = 010Ah. İkinci kopyadaki <code>JE ??0002</code> de <code>74 05</code>'tir: 0113h + 5 = 0118h. İki kopyanın makine kodu baytı baytına aynıdır, çünkü 8086'nın kısa atlamaları adresi değil uzaklığı saklar. Farklı olan, etiketlerin adları ve gösterdikleri mutlak adreslerdir.</p>
+
+<h3 id="s9-1-4-3"><span class="nt-num">9.1.4.3</span>Kod izleme: MyMacro2</h3>
+
+<p>MyMacro2'nin işi AX'in değerine göre değişir. AX = 2 ise label1'e atlar, INC ve ADD çalışır, AX 2 artı 1 artı 2 = 5 olur. AX = 3 ise label2'ye atlar, yalnız ADD çalışır, yine 5 olur. Başka her değerde iki atlama da gerçekleşmez ve akış label1'e düşer; AX 3 artar. <code>MOV AX, 2</code> ile başlayan programın izlemesi <a href="#tab-mymacro2">Tablo 9.1.11</a>'dedir.</p>
+
+<pre class="nt-code"><code><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 2       <span class="cm">; MyMacro2 öncesi</span>
+<span class="kw">CMP</span>  AX, 2       <span class="cm">; MyMacro2 başlar</span>
+<span class="kw">JE</span>   ??0000
+<span class="kw">CMP</span>  AX, 3
+<span class="kw">JE</span>   ??0001
+??0000:
+<span class="kw">INC</span>  AX
+??0001:
+<span class="kw">ADD</span>  AX, 2       <span class="cm">; MyMacro2 biter</span>
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-mymacro2">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.11: MyMacro2'nin AX = 2 ile izlenmesi; LOCAL etiketleri ??0000 (010Dh) ve ??0001 (010Eh) oldu.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">ZF</th><th scope="col">SF</th><th scope="col">CF</th><th scope="col">Sonraki IP</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, 2</code><br><small>ana program</small></td><td>0002h</td><td>0</td><td>0</td><td>0</td><td>0103h</td><td>AX = 2</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>CMP AX, 2</code><br><small>MyMacro2 açılımı</small></td><td>0002h</td><td>1</td><td>0</td><td>0</td><td>0106h</td><td>2 − 2 = 0: ZF = 1</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>JE ??0000</code><br><small>MyMacro2 açılımı</small></td><td>0002h</td><td>1</td><td>0</td><td>0</td><td>010Dh</td><td>ZF = 1: ??0000'a (label1) atlanır</td></tr>
+    <tr><td>4</td><td>010Dh</td><td><code>INC AX</code><br><small>MyMacro2 açılımı</small></td><td>0003h</td><td>0</td><td>0</td><td>0</td><td>010Eh</td><td>AX = 3</td></tr>
+    <tr><td>5</td><td>010Eh</td><td><code>ADD AX, 2</code><br><small>MyMacro2 açılımı</small></td><td>0005h</td><td>0</td><td>0</td><td>0</td><td>0111h</td><td>AX = 5</td></tr>
+    <tr><td>6</td><td>0111h</td><td><code>RET</code><br><small>ana program</small></td><td>0005h</td><td>0</td><td>0</td><td>0</td><td>0000h</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>İkinci adımda <code>CMP AX, 2</code>, AX'ten 2 çıkarır ama sonucu bir yere yazmaz; yalnız bayrakları kurar. 2 − 2 = 0 olduğundan ZF = 1 olur. Üçüncü adımdaki <code>JE</code> ZF'ye bakar ve ??0000'a, yani 010Dh'ye atlar. Sonraki IP sütunu bu atlamayı gösterir: 0108h yerine 010Dh. <code>CMP AX, 3</code> ve ikinci <code>JE</code> hiç yürütülmez. INC AX 3'ü, ADD AX, 2 ise 5'i verir. Programın başında AX = 3 olsaydı ilk JE atlamaz, ikinci JE label2'ye atlar ve sonuç yine 5 olurdu. AX = 7 olsaydı iki atlama da gerçekleşmez, INC ve ADD çalışır ve AX = 10 olurdu. AX = 0 ile başlayan bir program ise 3 bulurdu.</p>
+
+<h3 id="s9-1-4-4"><span class="nt-num">9.1.4.4</span>Kod izleme: BEKLE'nin iki kopyası</h3>
+
+<p>BEKLE makrosuna <code>LOCAL ilk</code> eklendiğinde hata ortadan kalkar:</p>
+
+<pre class="nt-code"><code>BEKLE <span class="kw">MACRO</span>
+      <span class="kw">LOCAL</span> ilk
+ilk:  <span class="kw">DEC</span> CX
+      <span class="kw">JNZ</span> ilk
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    <span class="kw">mov</span> cx, 3
+    BEKLE
+    <span class="kw">mov</span> cx, 2
+    BEKLE
+    <span class="kw">ret</span></code></pre>
+
+<p>Birinci kopyada ilk etiketi <code>??0000</code> adını alır ve 0103h'dedir. İkinci kopyada <code>??0001</code> olur ve 0109h'dedir. Her kopya kendi etiketine döner.</p>
+
+<div class="nt-tablewrap" id="tab-bekle">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.12: LOCAL ilk etiketli BEKLE makrosunun iki kopyasının izlemesi.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">CX</th><th scope="col">ZF</th><th scope="col">Sonraki IP</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov cx, 3</code><br><small>ana program</small></td><td>0003h</td><td>0</td><td>0103h</td><td>1. kopyanın sayacı</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>??0000: DEC CX</code><br><small>BEKLE açılımı</small></td><td>0002h</td><td>0</td><td>0104h</td><td>1. tur: CX = 2</td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>JNZ ??0000</code><br><small>BEKLE açılımı</small></td><td>0002h</td><td>0</td><td>0103h</td><td>ZF = 0: ??0000'a (0103h) dön</td></tr>
+    <tr><td>4</td><td>0103h</td><td><code>??0000: DEC CX</code><br><small>BEKLE açılımı</small></td><td>0001h</td><td>0</td><td>0104h</td><td>2. tur</td></tr>
+    <tr><td>5</td><td>0104h</td><td><code>JNZ ??0000</code><br><small>BEKLE açılımı</small></td><td>0001h</td><td>0</td><td>0103h</td><td>yine 0103h</td></tr>
+    <tr><td>6</td><td>0103h</td><td><code>??0000: DEC CX</code><br><small>BEKLE açılımı</small></td><td>0000h</td><td>1</td><td>0104h</td><td>3. tur: CX = 0, ZF = 1</td></tr>
+    <tr><td>7</td><td>0104h</td><td><code>JNZ ??0000</code><br><small>BEKLE açılımı</small></td><td>0000h</td><td>1</td><td>0106h</td><td>atlamaz; 1. kopya bitti</td></tr>
+    <tr><td>8</td><td>0106h</td><td><code>mov cx, 2</code><br><small>ana program</small></td><td>0002h</td><td>1</td><td>0109h</td><td>2. kopyanın sayacı</td></tr>
+    <tr><td>9</td><td>0109h</td><td><code>??0001: DEC CX</code><br><small>BEKLE açılımı</small></td><td>0001h</td><td>0</td><td>010Ah</td><td>1. tur: CX = 1</td></tr>
+    <tr><td>10</td><td>010Ah</td><td><code>JNZ ??0001</code><br><small>BEKLE açılımı</small></td><td>0001h</td><td>0</td><td>0109h</td><td>??0001'e (0109h) dön, 0103h'ye değil</td></tr>
+    <tr><td>11</td><td>0109h</td><td><code>??0001: DEC CX</code><br><small>BEKLE açılımı</small></td><td>0000h</td><td>1</td><td>010Ah</td><td>CX = 0, ZF = 1</td></tr>
+    <tr><td>12</td><td>010Ah</td><td><code>JNZ ??0001</code><br><small>BEKLE açılımı</small></td><td>0000h</td><td>1</td><td>010Ch</td><td>atlamaz</td></tr>
+    <tr><td>13</td><td>010Ch</td><td><code>ret</code><br><small>ana program</small></td><td>0000h</td><td>1</td><td>0000h</td><td>program biter; toplam 5 DEC</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-bekle" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="LOCAL etiketleri, adım 6: CX, ZF ve atlama hedefleri"><defs><marker id="n91-9-m4t8-11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-hot" x="8" y="20" width="78" height="34" rx="4"/><text class="lbl" x="47" y="16" text-anchor="middle" style="font-size:11.5px">CX</text><text class="mt-v" x="47" y="42" text-anchor="middle" style="font-size:14px">0001h</text><rect class="box" x="100" y="22" width="38" height="32" rx="4"/><text class="lbl" x="119" y="34" text-anchor="middle" style="font-size:10.5px">ZF</text><text class="mt-v" x="119" y="49" text-anchor="middle" style="font-size:13px">0</text><rect class="box" x="8" y="70" width="250" height="36" rx="5"/><text class="mt-s" x="18" y="85" text-anchor="start">1. kopya · ilk → ??0000</text><text class="lbl" x="18" y="100" text-anchor="start" style="font-size:11.5px">etiket adresi 0103h</text><rect class="mt-hot" x="8" y="116" width="250" height="36" rx="5"/><text class="mt-s" x="18" y="131" text-anchor="start">2. kopya · ilk → ??0001</text><text class="lbl" x="18" y="146" text-anchor="start" style="font-size:11.5px">etiket adresi 0109h</text><path class="line" d="M258 144 C300 144 300 122 262 124" marker-end="url(#n91-9-m4t8-11)"/><text class="mt-a" x="304" y="138" text-anchor="start">JNZ: atla</text><text class="mt-m" x="200" y="36" text-anchor="start">IP sonra: 0109h</text></svg></div>
+  <figcaption><b>Şekil 9.1.9:</b> İkinci kopyanın ilk turu: <code>JNZ ??0001</code> 0109h'ye döner; birinci kopyanın 0103h'deki etiketine değil.</figcaption>
+</figure>
+
+<p><a href="#tab-bekle">Tablo 9.1.12</a>'de birinci kopya üç tur döner. DEC CX her turda CX'i bir azaltır ve sonuca göre ZF'yi kurar. CX sıfırdan farklı kaldıkça ZF = 0'dır ve JNZ 0103h'ye döner. Üçüncü turda CX = 0 olur, ZF = 1 olur ve JNZ atlamaz. İkinci kopya CX = 2 ile iki tur döner ve her seferinde 0109h'ye döner (<a href="#sekil-bekle">Şekil 9.1.9</a>). Toplam beş DEC yürütülür. DEC'in CF'ye dokunmadığı, yalnız ZF, SF, OF, AF ve PF'yi değiştirdiği de anımsanmalıdır.</p>
+
+<p>Bekleme süresi saat turu olarak hesaplanabilir. <code>DEC r16</code> 2 tur sürer. <code>JNZ</code> atladığında 16, atlamadığında 4 tur sürer; atlamada önden getirme kuyruğu boşaltıldığı için fark büyüktür. CX = 3 ile birinci kopya 2 × (2 + 16) + (2 + 4) = 42 tur sürer. Böyle bir döngü, işlemci saatine bağlı kaba bir gecikme üretir.</p>
+
+<h3 id="s9-1-4-5"><span class="nt-num">9.1.4.5</span>Kod izleme: BUYUK ve işaretli karşılaştırma</h3>
+
+<p>Son örnek, LOCAL'ı işaretli karşılaştırmayla birleştirir. BUYUK makrosu p ile q'dan büyük olanı r'ye yazar:</p>
+
+<pre class="nt-code"><code>BUYUK <span class="kw">MACRO</span> p, q, r
+    <span class="kw">LOCAL</span> ok
+    <span class="kw">MOV</span> AX, p
+    <span class="kw">CMP</span> AX, q
+    <span class="kw">JGE</span> ok
+    <span class="kw">MOV</span> AX, q
+ok: <span class="kw">MOV</span> r, AX
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    BUYUK x, y, m1
+    BUYUK y, 4, m2
+    <span class="kw">ret</span>
+x  <span class="kw">dw</span> 7
+y  <span class="kw">dw</span> -3
+m1 <span class="kw">dw</span> ?
+m2 <span class="kw">dw</span> ?</code></pre>
+
+<p>Birinci çağrıda üç parametre de değişkendir. İkincisinde q bir sabittir; bu yüzden <code>CMP AX, 4</code> ve <code>MOV AX, 4</code> anında değer biçimini kullanır. y = −3, ikiye tümleyen gösterimde FFFDh olarak saklanır.</p>
+
+<div class="nt-tablewrap" id="tab-buyuk">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.13: <code>BUYUK x, y, m1</code> ve <code>BUYUK y, 4, m2</code> açılımlarının izlemesi (x = 7, y = −3).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">m1</th><th scope="col">m2</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, x</code><br><small>BUYUK açılımı</small></td><td>0007h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0000h</td><td>0000h</td><td>p = x: AX = 7</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>CMP AX, y</code><br><small>BUYUK açılımı</small></td><td>0007h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0000h</td><td>0000h</td><td>7 − (−3) = 10: SF = 0, OF = 0</td></tr>
+    <tr><td>3</td><td>0107h</td><td><code>JGE ??0000</code><br><small>BUYUK açılımı</small></td><td>0007h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0000h</td><td>0000h</td><td>SF = OF: ??0000'a atla</td></tr>
+    <tr><td>4</td><td>010Ch</td><td><code>??0000: MOV m1, AX</code><br><small>BUYUK açılımı</small></td><td>0007h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0007h</td><td>0000h</td><td>m1 = 7</td></tr>
+    <tr><td>5</td><td>010Fh</td><td><code>MOV AX, y</code><br><small>BUYUK açılımı</small></td><td>FFFDh</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0007h</td><td>0000h</td><td>p = y: AX = FFFDh (−3)</td></tr>
+    <tr><td>6</td><td>0112h</td><td><code>CMP AX, 4</code><br><small>BUYUK açılımı</small></td><td>FFFDh</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0000h</td><td>−3 − 4 = −7: SF = 1, OF = 0</td></tr>
+    <tr><td>7</td><td>0115h</td><td><code>JGE ??0001</code><br><small>BUYUK açılımı</small></td><td>FFFDh</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0000h</td><td>SF ≠ OF: atlamaz</td></tr>
+    <tr><td>8</td><td>0117h</td><td><code>MOV AX, 4</code><br><small>BUYUK açılımı</small></td><td>0004h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0000h</td><td>q = 4 büyük olan</td></tr>
+    <tr><td>9</td><td>011Ah</td><td><code>??0001: MOV m2, AX</code><br><small>BUYUK açılımı</small></td><td>0004h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0004h</td><td>m2 = 4</td></tr>
+    <tr><td>10</td><td>011Dh</td><td><code>ret</code><br><small>ana program</small></td><td>0004h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0004h</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>İkinci adımdaki <code>CMP AX, y</code>, 7 − (−3) işlemini yapar. İşaretli yorumla sonuç 10'dur: pozitiftir (SF = 0) ve taşma yoktur (OF = 0). <code>JGE</code> (büyük ya da eşitse atla) işaretli karşılaştırmanın sonucuna SF = OF koşuluyla bakar. Koşul sağlandığından ??0000'a atlanır ve m1 = 7 olur. İşaretsiz yorumla aynı çıkarma 0007h − FFFDh'dir; küçükten büyük çıkarıldığı için ödünç doğar ve CF = 1 olur. JGE CF'ye bakmadığı için bu bayrak burada önemsizdir.</p>
+
+<p>İkinci açılımda AX = FFFDh (−3) ve <code>CMP AX, 4</code> −3 − 4 = −7 sonucunu verir: SF = 1, OF = 0. SF ≠ OF olduğu için JGE atlamaz. Akış <code>MOV AX, 4</code> ile sürer ve m2 = 4 olur. İkinci kopyanın etiketi ??0001'dir; birincisiyle çakışmaz.</p>
+
+<p>Bu örnekte koşullu atlamanın seçimi önemlidir. JGE yerine işaretsiz karşılaştıran <code>JAE</code> kullanılsaydı ikinci karşılaştırma FFFDh ile 4'ü işaretsiz sayılar olarak ele alırdı. FFFDh = 65 533, 4'ten büyüktür; ödünç yoktur (CF = 0) ve JAE atlar. m2'ye 4 yerine FFFDh, yani −3 yazılırdı. Makro aynı kalsa da tek bir koşullu atlama komutu sonucun doğruluğunu belirler. İşaretli sayılarla JG, JGE, JL, JLE; işaretsiz sayılarla JA, JAE, JB, JBE kullanılır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Etiket içeren bir makroyu bir kez deneyip doğru çalıştığını görünce LOCAL'ı unutmak. Hata ancak makro ikinci kez kullanıldığında ortaya çıkar; o zaman da hata iletisi gövdeyi değil kullanım satırını gösterir. Etiketi olan her makroya, kaç kez kullanılacağından bağımsız olarak LOCAL yazılır.</p>
+</div>
+
+<h2 class="nt-pb" id="s9-1-5"><span class="nt-num">9.1.5</span>PUTC ve yazmaçların korunması</h2>
+
+<h3 id="s9-1-5-1"><span class="nt-num">9.1.5.1</span>PUTC makrosu</h3>
+
+<p>PUTC, ekrana tek bir karakter yazan kısa bir makrodur. emu8086.inc kütüphanesindeki PUTC makrosunun aynısıdır:</p>
+
+<pre class="nt-code"><code><span class="cm">; karakter yazar, imleci ilerletir</span>
+PUTC  <span class="kw">MACRO</span>  char
+      <span class="kw">push</span>  ax
+      <span class="kw">mov</span>   al, char
+      <span class="kw">mov</span>   ah, 0eh
+      <span class="kw">int</span>   10h
+      <span class="kw">pop</span>   ax
+<span class="kw">ENDM</span>
+
+<span class="kw">ORG</span>  100h
+START:
+      PUTC  'A'
+      PUTC  'B'
+      <span class="kw">RET</span></code></pre>
+
+<p>Makronun asıl işini <code>INT 10h</code> yapar. AH = 0Eh, BIOS'un teletype (daktilo benzeri) çıkış hizmetidir. AL'deki karakter imlecin bulunduğu yere yazılır ve imleç bir sağa ilerler. Satır sonunda imleç alt satıra geçer; ekranın sonunda ekran bir satır kaydırılır. 0Dh (satır başı), 0Ah (alt satır), 07h (zil) ve 08h (geri silme) gibi denetim karakterleri yazılmaz, yorumlanır.</p>
+
+<p>Hizmet AH ve AL'yi kullandığı için makro AX'i değiştirmek zorundadır. Makronun başındaki <code>push ax</code> ve sonundaki <code>pop ax</code> bu değişikliği çağırandan gizler. Makrodan çıkıldığında AX, makroya girilmeden önceki değerine döner. Makronun görünmez bir yan etkisi kalmaz. Bu ilke bütün kütüphane makroları için geçerlidir: makro kendi işi için yazmaç kullanabilir ama çıkarken onları eski hâline getirir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-koruma">
+  <span class="nt-box__title">Tanım 9.1.4</span>
+  <p><strong>Yazmaçların korunması</strong> (<span lang="en">register preservation</span>), bir makronun ya da prosedürün değiştirdiği yazmaçları başta PUSH ile saklayıp sonda ters sırada POP ile geri yüklemesidir. Böylece çağıranın yazmaçlarındaki değerler kullanım boyunca bozulmaz; yalnız sonuç döndürmek için açıkça belirtilen yazmaçlar değişir.</p>
+</div>
+
+<p>Programın sonundaki RET de önemlidir. İki PUTC kopyasından sonra bellekte programın kodu biter. RET olmasaydı işlemci son POP AX'ten sonraki baytları da komut sanıp yürütmeye devam ederdi. İşlemci kod ile veriyi ayırt etmez; IP'nin gösterdiği her baytı bir işlem kodu olarak çözer. Bellekte ne kaldıysa rastgele komutlar olarak çalışır ve sistem kilitlenebilir. Makro genişletme bu RET'i kendiliğinden eklemez.</p>
+
+<h3 id="s9-1-5-2"><span class="nt-num">9.1.5.2</span>Kod izleme: PUTC 'A' ve PUTC 'B'</h3>
+
+<p>Açılmış kod iki 8 baytlık kopya ve bir RET'tir; toplam 17 bayt. emu8086 yükleme anında CX'e program boyutunu yazdığı için izlemenin başında CX = 0011h'dir. Bu değer program boyunca değişmez, çünkü PUTC CX'e dokunmaz. AX ise başlangıçta 0000h'dir. Her kopyanın makine kodu aynıdır, yalnız karakter baytı farklıdır: <code>50 B0 41 B4 0E CD 10 58</code> ve <code>50 B0 42 B4 0E CD 10 58</code>.</p>
+
+<div class="nt-tablewrap" id="tab-putc">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.14: <code>PUTC 'A'</code> ve <code>PUTC 'B'</code> açılımlarının izlemesi; yükleme anında CX = 0011h (17 bayt).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">[SS:SP]</th><th scope="col">Ekran</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>push ax</code><br><small>PUTC açılımı</small></td><td>0000h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td>–</td><td>çağıranın AX'i (0000h) yığına; SP = FFFCh</td></tr>
+    <tr><td>2</td><td>0101h</td><td><code>mov al, &#x27;A&#x27;</code><br><small>PUTC açılımı</small></td><td>0041h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td>–</td><td>AL ← 41h</td></tr>
+    <tr><td>3</td><td>0103h</td><td><code>mov ah, 0eh</code><br><small>PUTC açılımı</small></td><td>0E41h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td>–</td><td>AX = 0E41h</td></tr>
+    <tr><td>4</td><td>0105h</td><td><code>int 10h</code><br><small>PUTC açılımı</small></td><td>0E41h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>ekrana A; imleç bir sağa</td></tr>
+    <tr><td>5</td><td>0107h</td><td><code>pop ax</code><br><small>PUTC açılımı</small></td><td>0000h</td><td>0011h</td><td>FFFEh</td><td>0000h</td><td><code>A</code></td><td>AX eski değerine döndü; SP = FFFEh</td></tr>
+    <tr><td>6</td><td>0108h</td><td><code>push ax</code><br><small>PUTC açılımı</small></td><td>0000h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>2. kopya: AX yine saklanır</td></tr>
+    <tr><td>7</td><td>0109h</td><td><code>mov al, &#x27;B&#x27;</code><br><small>PUTC açılımı</small></td><td>0042h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>AL ← 42h</td></tr>
+    <tr><td>8</td><td>010Bh</td><td><code>mov ah, 0eh</code><br><small>PUTC açılımı</small></td><td>0E42h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>AX = 0E42h</td></tr>
+    <tr><td>9</td><td>010Dh</td><td><code>int 10h</code><br><small>PUTC açılımı</small></td><td>0E42h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>AB</code></td><td>ekranda AB</td></tr>
+    <tr><td>10</td><td>010Fh</td><td><code>pop ax</code><br><small>PUTC açılımı</small></td><td>0000h</td><td>0011h</td><td>FFFEh</td><td>0000h</td><td><code>AB</code></td><td>AX = 0000h: çağıranın AX'i bozulmadı</td></tr>
+    <tr><td>11</td><td>0110h</td><td><code>RET</code><br><small>ana program</small></td><td>0000h</td><td>0011h</td><td>0000h</td><td>–</td><td><code>AB</code></td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-putc" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh"><defs><marker id="n91-10-m8ah135" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#n91-10-m8ah135)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:bağıl konum · küçük adres yukarıda</text></svg></div>
+  <figcaption><b>Şekil 9.1.10:</b> <code>push ax</code>'ten sonra yığın: çağıranın AX'i (0000h) FFFCh adresine saklanmış, SP = FFFCh olmuştur.</figcaption>
+</figure>
+
+<p><a href="#tab-putc">Tablo 9.1.14</a>'de birinci adım AX'i yığına iter. SP 2 azalarak FFFCh olur ve SS:FFFCh'deki sözcüğe 0000h yazılır (<a href="#sekil-putc">Şekil 9.1.10</a>). İkinci ve üçüncü adımlar AL'ye 'A' (41h), AH'ye 0Eh yükler; AX = 0E41h olur. Dördüncü adımda INT 10h ekrana A yazar ve imleci ilerletir. INT komutu kendi içinde FLAGS, CS ve IP'yi yığına iter, BIOS yordamına gider ve IRET ile döner; bu iç ayrıntı izlemede tek adım olarak görünür. Beşinci adımdaki POP AX yığındaki 0000h'yi AX'e alır ve SP'yi FFFEh'ye geri getirir. İkinci kopya aynı yolu 'B' ile izler ve ekranda AB oluşur. Son durumda AX = 0000h'dir: makro çağıranın AX'ini bozmamıştır.</p>
+
+<p>Bu izlemede yığın her kopyada bir sözcük büyüyüp küçülür. PUSH ile POP aynı makronun içinde eşleştiği sürece yığın dengelidir: makroya girildiğindeki SP, makrodan çıkıldığında aynıdır. Bu denge bozulursa, örneğin gövdede bir koşullu atlama POP'u atlarsa, yığında fazladan bir sözcük kalır. Ana programın RET'i bu sözcüğü dönüş adresi sanır ve program yanlış bir yere gider.</p>
+
+<h3 id="s9-1-5-3"><span class="nt-num">9.1.5.3</span>Yazmaç saklama makroları</h3>
+
+<p>PUTC'deki <code>push ax</code> / <code>pop ax</code> kalıbı, büyük makrolarda dört yazmaca çıkar. Bu kalıp da bir makro olabilir:</p>
+
+<pre class="nt-code"><code>SAKLA <span class="kw">MACRO</span>
+  <span class="kw">PUSH</span> AX
+  <span class="kw">PUSH</span> BX
+  <span class="kw">PUSH</span> CX
+  <span class="kw">PUSH</span> DX
+<span class="kw">ENDM</span>
+
+GERI_AL <span class="kw">MACRO</span>
+  <span class="kw">POP</span> DX
+  <span class="kw">POP</span> CX
+  <span class="kw">POP</span> BX
+  <span class="kw">POP</span> AX
+<span class="kw">ENDM</span></code></pre>
+
+<p>GERI_AL, SAKLA'nın tersi sırasıyla çeker. Yığın son giren ilk çıkar (<span lang="en">LIFO</span>) ilkesiyle çalışır: en son itilen DX, ilk çekilen olmalıdır. AX = 1111h, BX = 2222h, CX = 3333h, DX = 4444h iken SAKLA kullanılıp yazmaçlar sıfırlansın. GERI_AL'dan sonra dört yazmaç da eski değerine döner. Çekme sırası itme sırasıyla aynı yazılırsa (<code>POP AX</code>, <code>POP BX</code>, <code>POP CX</code>, <code>POP DX</code>) AX = 4444h, BX = 3333h, CX = 2222h, DX = 1111h olur: AX ile DX, BX ile CX yer değiştirir. Bu hata derleme anında yakalanmaz, çünkü her satır kendi başına geçerlidir.</p>
+
+<p>Her SAKLA ve GERI_AL çifti 8 bayt ekler; her PUSH ve POP tek bayttır. Süre olarak 8086'da <code>PUSH r16</code> 11 tur, <code>POP r16</code> 8 tur sürer: 4 × 11 + 4 × 8 = 76 tur. Bu süre içinde sekiz yığın erişimi, yani sekiz yol döngüsü yapılır. Kısa bir makroda bu süre gövdenin kendisini aşabilir; bu yüzden makro yalnız gerçekten değiştirdiği yazmaçları saklamalıdır.</p>
+
+<p>İki makro aynı gövdede birlikte kullanılmalıdır. Arada koşullu bir çıkış (örneğin bir hata durumunda gövdenin sonuna atlama) varsa bu çıkış da GERI_AL'dan geçmelidir; yoksa yığın dengesiz kalır. 80186 ve sonraki işlemcilerde tek komutluk <code>PUSHA</code> ve <code>POPA</code> bütün genel amaçlı yazmaçları saklar ve geri yükler. 8086'da bu komutlar yoktur; bu yüzden aynı iş makroyla yazılır.</p>
+
+<h3 id="s9-1-5-4"><span class="nt-num">9.1.5.4</span>İç içe makrolar</h3>
+
+<p>Bir makronun gövdesi başka bir makronun çağrısını içerebilir. Aşağıdaki PRINT2 iki karakter yazmak için PUTC'yi iki kez kullanır:</p>
+
+<pre class="nt-code"><code>PRINT2 <span class="kw">MACRO</span> c1, c2
+       PUTC c1
+       PUTC c2
+<span class="kw">ENDM</span>
+
+PRINT2 'O', 'K'</code></pre>
+
+<p>Assembler genişletmeyi iki düzeyde yapar. Önce dıştaki makroyu açar: <code>PRINT2 'O', 'K'</code> satırı <code>PUTC 'O'</code> ve <code>PUTC 'K'</code> satırlarına dönüşür. Bu iki satır da birer makro çağrısıdır; assembler onları da açar. Sonuçta tek satırlık çağrı on komuta ve 16 bayta dönüşür (<a href="#sekil-icice">Şekil 9.1.11</a>). Ekranda OK görünür.</p>
+
+<figure class="nt-fig" id="sekil-icice" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 118" role="img" aria-label="İç içe makro açılımı: PRINT2 iki PUTC çağrısına, her PUTC beş komuta açılır" style="display:block;margin:8px auto 0;max-width:330px"><defs><marker id="n91-11-m4t8-34" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-acc" x="65" y="4" width="200" height="24" rx="5"/><text class="mt-m" x="165" y="21" text-anchor="middle">PRINT2 'O', 'K'</text><rect class="box" x="4" y="44" width="156" height="24" rx="5"/><text class="mt-m" x="82" y="61" text-anchor="middle">PUTC 'O'</text><path class="line" d="M165 28 L82 43" marker-end="url(#n91-11-m4t8-34)"/><rect class="mt-good" x="7" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="38" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="69" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="100" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="131" y="76" width="27" height="16" rx="3"/><text class="lbl" x="82" y="108" text-anchor="middle" style="font-size:11px">5 komut · 8 bayt</text><rect class="box" x="170" y="44" width="156" height="24" rx="5"/><text class="mt-m" x="248" y="61" text-anchor="middle">PUTC 'K'</text><path class="line" d="M165 28 L248 43" marker-end="url(#n91-11-m4t8-34)"/><rect class="mt-good" x="173" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="204" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="235" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="266" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="297" y="76" width="27" height="16" rx="3"/><text class="lbl" x="248" y="108" text-anchor="middle" style="font-size:11px">5 komut · 8 bayt</text></svg></div>
+  <figcaption><b>Şekil 9.1.11:</b> İç içe açılım: PRINT2 iki PUTC çağrısına, her PUTC beş komuta açılır.</figcaption>
+</figure>
+
+<p>İç içe kullanımda tanım sırası yine önemlidir. PUTC, PRINT2'nin kullanıldığı satırdan önce tanımlanmış olmalıdır. Bir makronun kendini çağırması (özyineleme) ise bir sınır durumudur. Prosedürde özyinelemeyi yığın sınırlar ve bir koşul durdurur. Makroda durdurma koşulu çalışma anında değil, derleme anında olmalıdır; aksi hâlde genişletme hiç bitmez. Koşullu derleme direktifleri bu tür bir durdurmayı mümkün kılar.</p>
+
+<h2 class="nt-pb" id="s9-1-6"><span class="nt-num">9.1.6</span>POWER makrosu</h2>
+
+<h3 id="s9-1-6-1"><span class="nt-num">9.1.6.1</span>Üs alma: MUL ve LOOP</h3>
+
+<p>POWER makrosu bir tabanın üssünü hesaplar: r = b<sup>e</sup>. Yöntem en basit olanıdır. Geçici sonuç 1 ile başlatılır ve e kez tabanla çarpılır:</p>
+
+<pre class="nt-code"><code>POWER <span class="kw">macro</span> b, e, r
+    <span class="kw">mov</span> ax, 1        <span class="cm">; geçici sonuç = 1</span>
+    <span class="kw">mov</span> cx, e        <span class="cm">; üs → CX</span>
+    <span class="kw">mov</span> bx, b        <span class="cm">; taban → BX</span>
+powerloop:
+    <span class="kw">mul</span> bx           <span class="cm">; DX:AX = AX * BX</span>
+    <span class="kw">loop</span> powerloop   <span class="cm">; e kez tekrarla</span>
+    <span class="kw">mov</span> r, ax        <span class="cm">; sonucu yaz</span>
+<span class="kw">endm</span>
+
+<span class="kw">ORG</span> 100h
+start:
+    POWER base, exponent, result
+    <span class="kw">ret</span>
+base     <span class="kw">dw</span> 2     <span class="cm">; taban</span>
+exponent <span class="kw">dw</span> 3     <span class="cm">; üs</span>
+result   <span class="kw">dw</span> ?     <span class="cm">; sonuç</span></code></pre>
+
+<p>Makro iki önemli komut kullanır. <code>MUL BX</code> işaretsiz çarpmadır: AX'i BX ile çarpar ve 32 bitlik sonucu DX:AX yazmaç çiftine yazar. Yüksek 16 bit DX'e, düşük 16 bit AX'e gider. Bu yüzden MUL, işlenen olarak adı geçmese de DX'i her zaman değiştirir. Sonucun yüksek yarısı sıfır değilse CF ve OF 1 olur; sıfırsa ikisi de 0 olur. SF, ZF, AF ve PF ise MUL'dan sonra tanımsızdır.</p>
+
+<p><code>LOOP etiket</code>, CX'i 1 azaltır ve CX sıfırdan farklıysa etikete atlar. Bayrakları değiştirmez. CX burada döngü sayacıdır; makro ona üssü yükler. 8086'da LOOP atladığında 17, atlamadığında 5 tur sürer. 16 bitlik MUL ise işlenenlerin değerine göre 118 ile 133 tur arasında sürer; bu, komut kümesindeki en yavaş komutlardan biridir.</p>
+
+<p>Açılımın boyutu da hesaplanabilir. <code>mov ax, 1</code> 3 bayt, <code>mov cx, exponent</code> ve <code>mov bx, base</code> bellek işlenenli genel biçimle 4'er bayt, <code>mul bx</code> 2 bayt, <code>loop</code> 2 bayt, <code>mov result, ax</code> AX'e özel kısa biçimle 3 bayttır. Toplam 18 bayttır; RET ile 19 bayt (13h) eder. Değişkenler kodun hemen arkasından başlar: base 0113h'de, exponent 0115h'de, result 0117h'dedir.</p>
+
+<h3 id="s9-1-6-2"><span class="nt-num">9.1.6.2</span>Kod izleme: POWER 2, 3</h3>
+
+<p>Açılmış kod şudur:</p>
+
+<pre class="nt-code"><code><span class="kw">ORG</span> 100h
+<span class="kw">mov</span> ax, 1        <span class="cm">; POWER açılımı</span>
+<span class="kw">mov</span> cx, exponent
+<span class="kw">mov</span> bx, base
+powerloop:
+<span class="kw">mul</span> bx
+<span class="kw">loop</span> powerloop
+<span class="kw">mov</span> result, ax
+<span class="kw">ret</span>
+base     <span class="kw">dw</span> 2    <span class="cm">; 0113h</span>
+exponent <span class="kw">dw</span> 3    <span class="cm">; 0115h</span>
+result   <span class="kw">dw</span> ?    <span class="cm">; 0117h</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-power">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.15: <code>POWER base, exponent, result</code> açılımının izlemesi (base = 0113h, exponent = 0115h, result = 0117h).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">CF</th><th scope="col">result</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov ax, 1</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>0000h</td><td>geçici sonuç 1</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov cx, exponent</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0000h</td><td>0003h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX ← [0115h] = 3</td></tr>
+    <tr><td>3</td><td>0107h</td><td><code>mov bx, base</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>0</td><td>0000h</td><td>BX ← [0113h] = 2</td></tr>
+    <tr><td>4</td><td>010Bh</td><td><code>mul bx</code><br><small>POWER açılımı</small></td><td>0002h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>0</td><td>0000h</td><td>1. tur: DX:AX = 1 × 2</td></tr>
+    <tr><td>5</td><td>010Dh</td><td><code>loop powerloop</code><br><small>POWER açılımı</small></td><td>0002h</td><td>0002h</td><td>0002h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX = 2 ≠ 0: powerloop</td></tr>
+    <tr><td>6</td><td>010Bh</td><td><code>mul bx</code><br><small>POWER açılımı</small></td><td>0004h</td><td>0002h</td><td>0002h</td><td>0000h</td><td>0</td><td>0000h</td><td>2. tur: 2 × 2</td></tr>
+    <tr><td>7</td><td>010Dh</td><td><code>loop powerloop</code><br><small>POWER açılımı</small></td><td>0004h</td><td>0002h</td><td>0001h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX = 1</td></tr>
+    <tr><td>8</td><td>010Bh</td><td><code>mul bx</code><br><small>POWER açılımı</small></td><td>0008h</td><td>0002h</td><td>0001h</td><td>0000h</td><td>0</td><td>0000h</td><td>3. tur: 4 × 2</td></tr>
+    <tr><td>9</td><td>010Dh</td><td><code>loop powerloop</code><br><small>POWER açılımı</small></td><td>0008h</td><td>0002h</td><td>0000h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX = 0: döngüden çık</td></tr>
+    <tr><td>10</td><td>010Fh</td><td><code>mov result, ax</code><br><small>POWER açılımı</small></td><td>0008h</td><td>0002h</td><td>0000h</td><td>0000h</td><td>0</td><td>0008h</td><td>[0117h] ← 0008h</td></tr>
+    <tr><td>11</td><td>0112h</td><td><code>ret</code><br><small>ana program</small></td><td>0008h</td><td>0002h</td><td>0000h</td><td>0000h</td><td>0</td><td>0008h</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p><a href="#tab-power">Tablo 9.1.15</a> döngünün üç turunu gösterir. Birinci turda MUL, 1 × 2 = 2 hesaplar: DX:AX = 0000:0002h. Yüksek yarı sıfır olduğundan CF = 0'dır. LOOP, CX'i 3'ten 2'ye indirir ve powerloop'a döner. İkinci turda AX = 4, üçüncü turda AX = 8 olur. Üçüncü LOOP CX'i 0 yapar ve atlamaz. <code>mov result, ax</code> 0117h'deki sözcüğe 0008h yazar; 2<sup>3</sup> = 8.</p>
+
+<p>Tabloda DX'in her MUL'dan sonra 0000h olduğu görülür. Sonuç 16 bite sığdığı sürece bu böyledir. Sonuç 16 biti aşsaydı, örneğin 2<sup>16</sup> hesaplansaydı, son MUL'dan sonra DX = 0001h, AX = 0000h ve CF = OF = 1 olurdu. Makro yalnız AX'i result'a yazdığı için result = 0 olurdu; doğru sonucun yüksek kısmı DX'te kalır ve kaybolur.</p>
+
+<h3 id="s9-1-6-3"><span class="nt-num">9.1.6.3</span>Dört tuzak</h3>
+
+<p>POWER makrosu küçük ama dört ayrı hata barındırır. Her biri makro yazarken sık görülen bir sorun türünü temsil eder.</p>
+
+<p><b>1. Üs sıfır.</b> Matematikte b<sup>0</sup> = 1'dir; makronun AX = 1 ile başlaması bu sonucu verecek gibi görünür. Ama MUL en az bir kez çalışır, çünkü döngünün koşulu sonda denetlenir. Daha kötüsü, LOOP önce CX'i azaltır, sonra sıfırla karşılaştırır. CX = 0 iken azaltma CX'i FFFFh yapar; bu sıfır değildir ve döngü sürer. Döngü ancak CX yeniden 0 olduğunda, yani 65 536 tur sonra biter. base = 2 için 2<sup>16</sup>'dan sonra AX'in düşük 16 biti sıfırdır ve öyle kalır; result = 0000h olur. base = 1 için result = 1 çıkar. Bu tesadüfen doğrudur; 65 536 gereksiz MUL yine de çalışmıştır. Her MUL yaklaşık 120 tur sürdüğünden bu boşa giden zaman 4,77 MHz'de bir buçuk saniyeyi aşar.</p>
+
+<p><b>2. Etiket.</b> <code>powerloop</code> LOCAL ile bildirilmemiştir. Makro ikinci kez kullanıldığında etiket iki kez tanımlanır ve <i>Duplicate declaration</i> hatası alınır.</p>
+
+<p><b>3. Yazmaç bozulması.</b> Makro AX'e sonucu koyar; bu beklenen bir değişikliktir. Ama BX'e tabanı, CX'e sayacı yükler ve MUL yüzünden DX'i de değiştirir. Çağıranın bu üç yazmaçtaki değerleri kaybolur.</p>
+
+<p><b>4. Taşma.</b> Sonuç 65 535'i aşarsa yüksek kısım DX'te kalır ve yazılmaz. Makro, CF ile bu durumu çağırana bildirmez de; son MUL'un CF değeri makrodan sonra durur ama sonraki herhangi bir komut onu silebilir.</p>
+
+<p>Düzeltilmiş sürüm ilk üç sorunu giderir:</p>
+
+<pre class="nt-code"><code>POWER <span class="kw">MACRO</span> b, e, r
+      <span class="kw">LOCAL</span> p_loop, p_end
+      <span class="kw">PUSH</span> BX
+      <span class="kw">PUSH</span> CX
+      <span class="kw">PUSH</span> DX
+      <span class="kw">MOV</span>  AX, 1
+      <span class="kw">MOV</span>  CX, e
+      <span class="kw">MOV</span>  BX, b
+      <span class="kw">JCXZ</span> p_end   <span class="cm">; e = 0 → 1</span>
+p_loop: <span class="kw">MUL</span> BX
+      <span class="kw">LOOP</span> p_loop
+p_end: <span class="kw">MOV</span> r, AX
+      <span class="kw">POP</span>  DX
+      <span class="kw">POP</span>  CX
+      <span class="kw">POP</span>  BX
+<span class="kw">ENDM</span></code></pre>
+
+<p><code>JCXZ</code> (CX sıfırsa atla), LOOP'tan önce sayacı denetler. CX = 0 ise döngünün tamamını atlar ve AX'teki 1 doğrudan sonuca yazılır. LOCAL iki etiketi her açılımda benzersiz yapar. PUSH ve POP, BX, CX ve DX'i korur; makro artık yalnız AX'i değiştirir. Taşma sorunu ise bu sürümde de durur. Onu çözmek için ya sonuç 32 bit (DX:AX) olarak yazılmalı ya da taşma CF ile çağırana bildirilmelidir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>LOOP'lu bir döngüyü sayaç sıfır olabilecekken başlatmak. LOOP önce azaltır, sonra denetler; CX = 0 ile 65 536 kez döner. Sayacı bir değişkenden ya da parametreden alan her döngünün önüne <code>JCXZ</code> konur.</p>
+</div>
+
+<h3 id="s9-1-6-4"><span class="nt-num">9.1.6.4</span>Kod izleme: düzeltilmiş POWER</h3>
+
+<p>Düzeltilmiş makronun <code>POWER taban, us, sonuc</code> açılımı, taban = 7 ve us = 2 için izlenir. Yazmaç korumanın etkisini görmek için çağıranın yazmaçlarında BX = 0AAAh, CX = 0BBBh, DX = 0CCCh olsun:</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">push</span> bx          <span class="cm">; POWER açılımı</span>
+<span class="kw">push</span> cx
+<span class="kw">push</span> dx
+<span class="kw">mov</span>  ax, 1
+<span class="kw">mov</span>  cx, us
+<span class="kw">mov</span>  bx, taban
+<span class="kw">jcxz</span> ??0001      <span class="cm">; us = 0 → 1</span>
+??0000: <span class="kw">mul</span> bx
+<span class="kw">loop</span> ??0000
+??0001: <span class="kw">mov</span> sonuc, ax
+<span class="kw">pop</span>  dx
+<span class="kw">pop</span>  cx
+<span class="kw">pop</span>  bx
+<span class="kw">ret</span>
+taban <span class="kw">dw</span> 7
+us    <span class="kw">dw</span> 2
+sonuc <span class="kw">dw</span> ?</code></pre>
+
+<p>Açılım 26 bayttır (011Ah'ye kadar); RET 011Ah'de, taban 011Bh'de, us 011Dh'de, sonuc 011Fh'dedir. LOCAL adları p_loop için ??0000, p_end için ??0001'dir.</p>
+
+<div class="nt-tablewrap" id="tab-powerfix">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.16: Düzeltilmiş POWER makrosunun <code>POWER taban, us, sonuc</code> açılımı (taban = 7, us = 2); çağıranın yazmaçları BX = 0AAAh, CX = 0BBBh, DX = 0CCCh.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">SP</th><th scope="col">sonuc</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>PUSH BX</code><br><small>POWER açılımı</small></td><td>0000h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFFCh</td><td>0000h</td><td>BX saklandı</td></tr>
+    <tr><td>2</td><td>0101h</td><td><code>PUSH CX</code><br><small>POWER açılımı</small></td><td>0000h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFFAh</td><td>0000h</td><td>CX saklandı</td></tr>
+    <tr><td>3</td><td>0102h</td><td><code>PUSH DX</code><br><small>POWER açılımı</small></td><td>0000h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>DX saklandı; SP = FFF8h</td></tr>
+    <tr><td>4</td><td>0103h</td><td><code>MOV AX, 1</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>geçici sonuç 1</td></tr>
+    <tr><td>5</td><td>0106h</td><td><code>MOV CX, us</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0AAAh</td><td>0002h</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>CX ← us = 2</td></tr>
+    <tr><td>6</td><td>010Ah</td><td><code>MOV BX, taban</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0007h</td><td>0002h</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>BX ← taban = 7</td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>JCXZ ??0001</code><br><small>POWER açılımı</small></td><td>0001h</td><td>0007h</td><td>0002h</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>CX ≠ 0: atlama yok</td></tr>
+    <tr><td>8</td><td>0110h</td><td><code>??0000: MUL BX</code><br><small>POWER açılımı</small></td><td>0007h</td><td>0007h</td><td>0002h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>1 × 7; MUL DX'i de yazar</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>LOOP ??0000</code><br><small>POWER açılımı</small></td><td>0007h</td><td>0007h</td><td>0001h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>CX = 1</td></tr>
+    <tr><td>10</td><td>0110h</td><td><code>??0000: MUL BX</code><br><small>POWER açılımı</small></td><td>0031h</td><td>0007h</td><td>0001h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>7 × 7 = 49 = 0031h</td></tr>
+    <tr><td>11</td><td>0112h</td><td><code>LOOP ??0000</code><br><small>POWER açılımı</small></td><td>0031h</td><td>0007h</td><td>0000h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>CX = 0: döngü biter</td></tr>
+    <tr><td>12</td><td>0114h</td><td><code>??0001: MOV sonuc, AX</code><br><small>POWER açılımı</small></td><td>0031h</td><td>0007h</td><td>0000h</td><td>0000h</td><td>FFF8h</td><td>0031h</td><td>[011Fh] ← 0031h</td></tr>
+    <tr><td>13</td><td>0117h</td><td><code>POP DX</code><br><small>POWER açılımı</small></td><td>0031h</td><td>0007h</td><td>0000h</td><td>0CCCh</td><td>FFFAh</td><td>0031h</td><td>DX = 0CCCh</td></tr>
+    <tr><td>14</td><td>0118h</td><td><code>POP CX</code><br><small>POWER açılımı</small></td><td>0031h</td><td>0007h</td><td>0BBBh</td><td>0CCCh</td><td>FFFCh</td><td>0031h</td><td>CX = 0BBBh</td></tr>
+    <tr><td>15</td><td>0119h</td><td><code>POP BX</code><br><small>POWER açılımı</small></td><td>0031h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFFEh</td><td>0031h</td><td>BX = 0AAAh; SP = FFFEh</td></tr>
+    <tr><td>16</td><td>011Ah</td><td><code>ret</code><br><small>ana program</small></td><td>0031h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>0000h</td><td>0031h</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-powerfix" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="Düzeltilmiş POWER, adım 1: yazmaçlar, sonuc ve yığın"><defs><marker id="n91-12-m4t8-12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="8" y="20" width="70" height="34" rx="4"/><text class="lbl" x="43" y="16" text-anchor="middle" style="font-size:11.5px">AX</text><text class="mt-v" x="43" y="42" text-anchor="middle" style="font-size:14px">0000h</text><rect class="box" x="84" y="20" width="70" height="34" rx="4"/><text class="lbl" x="119" y="16" text-anchor="middle" style="font-size:11.5px">BX</text><text class="mt-v" x="119" y="42" text-anchor="middle" style="font-size:14px">0AAAh</text><rect class="box" x="8" y="74" width="70" height="34" rx="4"/><text class="lbl" x="43" y="70" text-anchor="middle" style="font-size:11.5px">CX</text><text class="mt-v" x="43" y="96" text-anchor="middle" style="font-size:14px">0BBBh</text><rect class="box" x="84" y="74" width="70" height="34" rx="4"/><text class="lbl" x="119" y="70" text-anchor="middle" style="font-size:11.5px">DX</text><text class="mt-v" x="119" y="96" text-anchor="middle" style="font-size:14px">0CCCh</text><text class="lbl" x="8" y="136" text-anchor="start" style="font-size:11.5px">sonuc</text><rect class="box" x="50" y="122" width="70" height="24" rx="3"/><text class="mt-m" x="85" y="139" text-anchor="middle">????</text><text class="lbl" x="300" y="14" text-anchor="middle" style="font-size:11px">yığın</text><rect class="mt-hot" x="262" y="22" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="38.5" text-anchor="middle">0CCCh</text><text class="lbl" x="257" y="38.5" text-anchor="end" style="font-size:11px">FFF8</text><text class="mt-a" x="222" y="38.5" text-anchor="end" style="font-size:11px">DX</text><path class="line" d="M376 34 H336" marker-end="url(#n91-12-m4t8-12)"/><text class="mt-l" x="380" y="38.5" text-anchor="start">SP</text><rect class="box" x="262" y="48" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="64.5" text-anchor="middle">0BBBh</text><text class="lbl" x="257" y="64.5" text-anchor="end" style="font-size:11px">FFFA</text><text class="mt-a" x="222" y="64.5" text-anchor="end" style="font-size:11px">CX</text><rect class="box" x="262" y="74" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="90.5" text-anchor="middle">0AAAh</text><text class="lbl" x="257" y="90.5" text-anchor="end" style="font-size:11px">FFFC</text><text class="mt-a" x="222" y="90.5" text-anchor="end" style="font-size:11px">BX</text><rect class="box" x="262" y="100" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="116.5" text-anchor="middle">0000h</text><text class="lbl" x="257" y="116.5" text-anchor="end" style="font-size:11px">FFFE</text></svg></div>
+  <figcaption><b>Şekil 9.1.12:</b> Üç PUSH'tan sonra: çağıranın BX, CX ve DX değerleri yığında, SP = FFF8h.</figcaption>
+</figure>
+
+<p><a href="#tab-powerfix">Tablo 9.1.16</a>'de ilk üç adım çağıranın yazmaçlarını yığına saklar (<a href="#sekil-powerfix">Şekil 9.1.12</a>). Yığın aşağı doğru büyür: 0AAAh FFFCh'ye, 0BBBh FFFAh'ya, 0CCCh FFF8h'ye yazılır. Sonraki üç adımda yazmaçlar makronun kullanımına geçer: AX = 1, CX = 2, BX = 7. JCXZ, CX ≠ 0 olduğu için atlamaz. Birinci MUL 1 × 7 = 7 verir ve DX'i 0000h yapar. İkinci MUL 7 × 7 = 49 = 0031h verir. LOOP CX'i 0'a indirince döngü biter ve sonuc'a 0031h yazılır.</p>
+
+<p>Son üç adım yığını ters sırada boşaltır. POP DX 0CCCh'yi, POP CX 0BBBh'yi, POP BX 0AAAh'yı geri getirir; SP yeniden FFFEh olur. Makrodan çıkıldığında BX, CX ve DX'in değerleri girişteki değerlerin aynısıdır. Yalnız AX değişmiştir ve AX zaten sonucu taşır. us = 0 ile çalıştırılsaydı JCXZ doğrudan ??0001'e atlar, sonuc = 1 olur ve tek bir MUL bile çalışmazdı.</p>
+
+<h2 class="nt-pb" id="s9-1-7"><span class="nt-num">9.1.7</span>Makro kütüphaneleri</h2>
+
+<h3 id="s9-1-7-1"><span class="nt-num">9.1.7.1</span>INCLUDE ve emu8086.inc</h3>
+
+<p>Sık kullanılan makrolar her programa yeniden yazılmaz; ayrı bir dosyada toplanır. Bu dosyaya makro kütüphanesi (<span lang="en">library</span>) denir. <code>INCLUDE</code> direktifi, derleme anında kütüphane dosyasının metnini kaynağa, direktifin bulunduğu yere ekler. Assembler için bu, makroların programın başına elle yazılmasından farksızdır. Kullanılmayan makrolar kod üretmediği için büyük bir kütüphaneyi eklemek programı büyütmez; yalnız kullanılan makrolar açılır.</p>
+
+<pre class="nt-code"><code>include 'emu8086.inc'
+<span class="kw">ORG</span> 100h
+    GOTOXY 10, 5
+    PRINT 'Merhaba'
+    PUTC  '!'
+    <span class="kw">RET</span></code></pre>
+
+<p>emu8086 ile gelen emu8086.inc dosyası bu düzenin hazır bir örneğidir. İçinde ekrana karakter ve metin yazan (PUTC, PRINT, PRINTN), imleci taşıyan (GOTOXY) ve gizleyen (CURSOROFF) makrolar bulunur. Sayı okuma ve yazdırma gibi uzun işler için kütüphane prosedür de sunar. Bu prosedürler <code>DEFINE_SCAN_NUM</code> gibi özel makrolarla programa bir kez eklenir ve CALL ile çağrılır. Böylece kütüphane, makro ile prosedürün birlikte kullanıldığı düzeni izler: kısa işler makro, uzun işler tek kopya prosedürdür. Kütüphanenin makroları ve prosedürleri ayrıntısıyla emu8086.inc kütüphanesini anlatan notta ele alınır.</p>
+
+<h3 id="s9-1-7-2"><span class="nt-num">9.1.7.2</span>Kod izleme: PRINT 'OK' açılımı</h3>
+
+<p>Kütüphanedeki PRINT makrosu, buraya kadarki teknikleri bir arada kullanır: yazmaç koruma, LOCAL etiketler ve makro içinde tanımlanan veri. <code>PRINT 'OK'</code> çağrısı şu koda açılır (LOCAL adları assembler'ın ürettiği biçimde):</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">push</span> ax          <span class="cm">; PRINT 'OK'</span>
+<span class="kw">push</span> si
+<span class="kw">jmp</span>  ??0003      <span class="cm">; veriyi atla</span>
+??0001 <span class="kw">db</span> 'OK', 0
+??0003: <span class="kw">lea</span> si, ??0001
+??0000: <span class="kw">mov</span> al, cs:[si]
+<span class="kw">cmp</span>  al, 0
+<span class="kw">jz</span>   ??0002
+<span class="kw">inc</span>  si
+<span class="kw">mov</span>  ah, 0Eh
+<span class="kw">int</span>  10h
+<span class="kw">jmp</span>  ??0000
+??0002: <span class="kw">pop</span> si
+<span class="kw">pop</span>  ax
+<span class="kw">ret</span></code></pre>
+
+<p>Dizgi 'OK' ve sonundaki 0 baytı, makronun açıldığı yere, kodun içine gömülür: 0104h'den başlayarak 4Fh, 4Bh, 00h. İşlemci kod ile veriyi ayırt etmediği için bu üç baytı komut sanabilir. Bunu önlemek için makro önce <code>JMP</code> ile dizginin üzerinden atlar. Dizginin adı da LOCAL'dır (<code>??0001</code>); aynı programda ikinci bir PRINT kendi dizgisini başka bir adla tanımlar.</p>
+
+<p>Dizgi kod kesiminde durduğu için onu okuyan komut CS: kesim önekini kullanır: <code>MOV AL, CS:[SI]</code>. Önek olmasaydı okuma varsayılan kesim olan DS'den yapılırdı. Bir .COM programında CS = DS olduğundan sonuç aynı çıkardı, ama makro DS'nin başka bir kesimi gösterdiği .EXE programlarında da çalışmak zorundadır. Önek, makine kodunda 2Eh baytıdır ve komutu bir bayt uzatır.</p>
+
+<p><code>LEA SI, ??0001</code> komutu emu8086'da <code>MOV SI, OFFSET ??0001</code> ile aynı 3 baytlık koda derlenir: <code>BE 04 01</code>. Gerçek MASM'da doğrudan adresli LEA 4 bayt (<code>8D 36</code> + adres) tutar ve açılım bir bayt uzun olurdu. Açılımın toplam boyutu 27 bayttır (0100h–011Ah); bunun 3 baytı veridir. Genel olarak n karakterlik bir metin için PRINT açılımı 25 + n bayt tutar.</p>
+
+<div class="nt-tablewrap" id="tab-printok">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.17: <code>PRINT 'OK'</code> açılımının izlemesi; dizgi 0104h'de, kodun içinde.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AL</th><th scope="col">SI</th><th scope="col">SP</th><th scope="col">ZF</th><th scope="col">Ekran</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>push ax</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0000h</td><td>FFFCh</td><td>0</td><td>–</td><td>AX saklandı</td></tr>
+    <tr><td>2</td><td>0101h</td><td><code>push si</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0000h</td><td>FFFAh</td><td>0</td><td>–</td><td>SI saklandı; SP = FFFAh</td></tr>
+    <tr><td>3</td><td>0102h</td><td><code>jmp ??0003</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0000h</td><td>FFFAh</td><td>0</td><td>–</td><td>dizginin baytlarının üzerinden atla</td></tr>
+    <tr><td>4</td><td>0107h</td><td><code>??0003: lea si, ??0001</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>SI ← 0104h</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>??0000: mov al, cs:[si]</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>AL ← CS:[0104h] = 'O'</td></tr>
+    <tr><td>6</td><td>010Dh</td><td><code>cmp al, 0</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>4Fh ≠ 0: ZF = 0</td></tr>
+    <tr><td>7</td><td>010Fh</td><td><code>jz ??0002</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>atlamaz</td></tr>
+    <tr><td>8</td><td>0111h</td><td><code>inc si</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td>–</td><td>SI = 0105h</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>mov ah, 0Eh</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td>–</td><td></td></tr>
+    <tr><td>10</td><td>0114h</td><td><code>int 10h</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>ekrana O</td></tr>
+    <tr><td>11</td><td>0116h</td><td><code>jmp ??0000</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>döngü başına</td></tr>
+    <tr><td>12</td><td>010Ah</td><td><code>??0000: mov al, cs:[si]</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Bh</td><td>0105h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>AL = 'K'</td></tr>
+    <tr><td>15</td><td>0111h</td><td><code>inc si</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Bh</td><td>0106h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>SI = 0106h</td></tr>
+    <tr><td>17</td><td>0114h</td><td><code>int 10h</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>4Bh</td><td>0106h</td><td>FFFAh</td><td>0</td><td><code>OK</code></td><td>ekranda OK</td></tr>
+    <tr><td>19</td><td>010Ah</td><td><code>??0000: mov al, cs:[si]</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0106h</td><td>FFFAh</td><td>0</td><td><code>OK</code></td><td>AL = 00h</td></tr>
+    <tr><td>20</td><td>010Dh</td><td><code>cmp al, 0</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0106h</td><td>FFFAh</td><td>1</td><td><code>OK</code></td><td>sonlandırıcı: ZF = 1</td></tr>
+    <tr><td>21</td><td>010Fh</td><td><code>jz ??0002</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0106h</td><td>FFFAh</td><td>1</td><td><code>OK</code></td><td>çıkışa atla</td></tr>
+    <tr><td>22</td><td>0118h</td><td><code>??0002: pop si</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0000h</td><td>FFFCh</td><td>1</td><td><code>OK</code></td><td>SI = 0000h</td></tr>
+    <tr><td>23</td><td>0119h</td><td><code>pop ax</code><br><small>PRINT &#x27;OK&#x27; açılımı</small></td><td>00h</td><td>0000h</td><td>FFFEh</td><td>1</td><td><code>OK</code></td><td>AX geri; SP = FFFEh</td></tr>
+    <tr><td>24</td><td>011Ah</td><td><code>ret</code><br><small>ana program</small></td><td>00h</td><td>0000h</td><td>0000h</td><td>1</td><td><code>OK</code></td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-print" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="PRINT açılımı, adım 2: gömülü dizgi, SI, AL ve yığın"><defs><marker id="n91-13-m4t8-22" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="8" y="14" text-anchor="start" style="font-size:11px">kod kesimindeki dizgi</text><rect class="box" x="8" y="20" width="50" height="28" rx="3"/><text class="mt-m" x="33" y="39" text-anchor="middle">'O'</text><text class="lbl" x="33" y="62" text-anchor="middle" style="font-size:10.5px">0104h</text><rect class="box" x="62" y="20" width="50" height="28" rx="3"/><text class="mt-m" x="87" y="39" text-anchor="middle">'K'</text><text class="lbl" x="87" y="62" text-anchor="middle" style="font-size:10.5px">0105h</text><rect class="box" x="116" y="20" width="50" height="28" rx="3"/><text class="mt-m" x="141" y="39" text-anchor="middle">00h</text><text class="lbl" x="141" y="62" text-anchor="middle" style="font-size:10.5px">0106h</text><rect class="box" x="8" y="112" width="66" height="34" rx="4"/><text class="lbl" x="41" y="108" text-anchor="middle" style="font-size:11.5px">AL</text><text class="mt-v" x="41" y="134" text-anchor="middle" style="font-size:14px">00h</text><rect class="box" x="80" y="112" width="66" height="34" rx="4"/><text class="lbl" x="113" y="108" text-anchor="middle" style="font-size:11.5px">SI</text><text class="mt-v" x="113" y="134" text-anchor="middle" style="font-size:14px">0000h</text><rect class="mt-dim" x="172" y="112" width="80" height="34" rx="4"/><text class="lbl" x="178" y="108" text-anchor="start" style="font-size:11px">ekran</text><text class="mt-m" x="180" y="132" text-anchor="start" style="font-size:14px">▌</text><text class="lbl" x="310" y="14" text-anchor="middle" style="font-size:11px">yığın</text><rect class="mt-hot" x="280" y="22" width="66" height="24" rx="3"/><text class="mt-m" x="313" y="38.5" text-anchor="middle">0000h</text><text class="lbl" x="275" y="38.5" text-anchor="end" style="font-size:11px">FFFA</text><path class="line" d="M390 34 H350" marker-end="url(#n91-13-m4t8-22)"/><text class="mt-l" x="394" y="38.5" text-anchor="start">SP</text><rect class="box" x="280" y="48" width="66" height="24" rx="3"/><text class="mt-m" x="313" y="64.5" text-anchor="middle">0000h</text><text class="lbl" x="275" y="64.5" text-anchor="end" style="font-size:11px">FFFC</text><rect class="box" x="280" y="74" width="66" height="24" rx="3"/><text class="mt-m" x="313" y="90.5" text-anchor="middle">0000h</text><text class="lbl" x="275" y="90.5" text-anchor="end" style="font-size:11px">FFFE</text></svg></div>
+  <figcaption><b>Şekil 9.1.13:</b> Kodun içine gömülü dizgi: 0104h'den başlayarak 'O', 'K' ve sonlandırıcı 0. JMP bu baytların üzerinden atlar.</figcaption>
+</figure>
+
+<p><a href="#tab-printok">Tablo 9.1.17</a> döngünün üç turunu gösterir; tekrar eden MOV AH ve INT adımları kısaltılmıştır. Birinci turda AL = 4Fh ('O') okunur. <code>CMP AL, 0</code> ZF = 0 verir ve JZ atlamaz. SI bir ilerler, INT 10h 'O'yu yazar ve JMP döngü başına döner. İkinci tur 'K'yı yazar. Üçüncü turda AL = 00h okunur; CMP ZF = 1 verir ve JZ çıkışa (??0002) atlar. Sondaki 0 baytı, dizginin bittiğini gösteren sonlandırıcıdır. İki POP, SI'yı ve AX'i eski değerlerine döndürür; SP yeniden FFFEh olur. Ekranda OK yazmıştır ve çağıranın yazmaçları bozulmamıştır.</p>
+
+<p>Bu açılım makronun gücünü ve maliyetini birlikte gösterir. Kaynakta tek satır olan <code>PRINT 'OK'</code>, 27 bayt üretmiştir. Program boyunca yirmi farklı metin PRINT ile yazılırsa her biri kendi döngüsünü taşır. Aynı iş, dizgileri ayrı bir yerde tutan ve tek bir yazdırma prosedürü çağıran bir düzenle çok daha az yer tutar. Kütüphanenin PRINT_STRING gibi prosedürleri tam bu amaçla vardır.</p>
+
+<h2 class="nt-pb" id="s9-1-8"><span class="nt-num">9.1.8</span>Makro işleçleri</h2>
+
+<p>Makro genişletme metin işlemi olduğuna göre, metni parçalamak ve birleştirmek için özel işaretlere ihtiyaç vardır. MASM ve TASM bu amaçla beş makro işleci tanımlar. Bu işleçler yalnız makro tanımı ve çağrısı içinde anlam taşır.</p>
+
+<div class="nt-tablewrap" id="tab-islecler">
+<table class="nt-table">
+  <caption>Tablo 9.1.18: Makro işleçleri.</caption>
+  <thead><tr><th scope="col">İşleç</th><th scope="col">Görevi</th><th scope="col">Örnek ve açılım</th></tr></thead>
+  <tbody>
+    <tr><td><code>&amp;</code></td><td>parametreyi bitişik metne ekler</td><td><code>SIFIRLA MACRO r</code> · <code>XOR r&amp;X, r&amp;X</code> → <code>SIFIRLA B</code>: <code>XOR BX, BX</code></td></tr>
+    <tr><td><code>&lt; &gt;</code></td><td>virgül ya da boşluk içeren metni tek parametre yapar</td><td><code>YAZ &lt;'A', 'B'&gt;</code> → tek parametre: <code>'A', 'B'</code></td></tr>
+    <tr><td><code>!</code></td><td>sonraki karakteri sıradan karakter yapar</td><td><code>&lt;5 !&gt; 3&gt;</code> → metin: <code>5 &gt; 3</code></td></tr>
+    <tr><td><code>%</code></td><td>ifadeyi hesaplar, sonucu metin olarak koyar</td><td><code>GOSTER %(4*8)</code> → parametre <code>32</code></td></tr>
+    <tr><td><code>;;</code></td><td>makro açıklaması; açılıma kopyalanmaz</td><td><code>;; yalnız tanımda görünür</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>&amp;</code> (birleştirme) işleci en sık kullanılanıdır. Assembler gövdede parametre adlarını bütün sözcükler olarak arar. <code>XOR rX, rX</code> yazılsaydı "rX" tek bir sözcük sayılır ve r parametresiyle eşleşmezdi; açılım <code>XOR rX, rX</code> olarak kalır ve bilinmeyen bir ad hatası verirdi. <code>r&amp;X</code> yazımı, r'nin bir parametre adı olduğunu ve ardından gelen X'in ona yapıştırılacağını belirtir. <code>SIFIRLA B</code> çağrısında r = B olur ve açılım <code>XOR BX, BX</code> olur. Bir yazmacı kendisiyle XOR'lamak onu sıfırlar ve 2 baytlık, 3 turluk bir komuttur; <code>MOV BX, 0</code> ise 3 bayt tutar ve 4 tur sürer.</p>
+
+<p>Açı ayraçları <code>&lt; &gt;</code>, virgül içeren bir metni tek parametre olarak geçirmeyi sağlar. Ayraçlar olmadan <code>YAZ 'A', 'B'</code> iki ayrı parametre sayılırdı. <code>!</code> işleci, kendisinden sonraki karakterin özel anlamını kaldırır; <code>&lt;5 !&gt; 3&gt;</code> içindeki ilk <code>&gt;</code> ayracı kapatmaz, metnin bir parçası olur. <code>%</code> işleci ise parametreyi metin olarak değil, değer olarak geçirir: <code>%(4*8)</code> önce 32'ye hesaplanır, makroya "32" metni gider. Bu, işlem önceliği tuzağına karşı paranteze alternatif bir korumadır.</p>
+
+<p>Son işleç açıklamalarla ilgilidir. Tek <code>;</code> ile yazılan açıklama gövdenin bir parçasıdır ve her açılımda liste dosyasına yeniden yazılır. Çift <code>;;</code> ile yazılan açıklama yalnız tanımda kalır, açılıma kopyalanmaz. Yüz kez kullanılan bir makroda bu, liste dosyasını yüzlerce gereksiz satırdan kurtarır.</p>
+
+<h2 class="nt-pb" id="s9-1-9"><span class="nt-num">9.1.9</span>Tekrar blokları</h2>
+
+<h3 id="s9-1-9-1"><span class="nt-num">9.1.9.1</span>REPT, IRP ve IRPC</h3>
+
+<p>Bazen bir kod parçasının, makro tanımlamaya gerek kalmadan, olduğu yerde birkaç kez yazılması istenir. Tekrar blokları bu işi yapar.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-tekrar">
+  <span class="nt-box__title">Tanım 9.1.5</span>
+  <p><strong>Tekrar bloğu</strong> (<span lang="en">repeat block</span>), adı olmayan ve tanımlandığı yerde hemen açılan bir makrodur. <code>REPT n</code> gövdeyi n kez, <code>IRP p, &lt;liste&gt;</code> listedeki her öğe için bir kez (p o öğeyle değiştirilerek), <code>IRPC p, metin</code> metindeki her karakter için bir kez yazar. Blok <code>ENDM</code> ile biter. MASM 6'da IRP ve IRPC, FOR ve FORC adlarıyla da yazılır.</p>
+</div>
+
+<pre class="nt-code"><code><span class="kw">REPT</span> 3
+  <span class="kw">SHL</span> AX, 1
+<span class="kw">ENDM</span>                 <span class="cm">; → SHL AX, 1 · SHL AX, 1 · SHL AX, 1</span>
+
+<span class="kw">IRP</span> r, &lt;AX,BX,CX&gt;
+  <span class="kw">PUSH</span> r
+<span class="kw">ENDM</span>                 <span class="cm">; → PUSH AX · PUSH BX · PUSH CX</span>
+
+<span class="kw">IRPC</span> c, OK
+  PUTC '&amp;c'
+<span class="kw">ENDM</span>                 <span class="cm">; → PUTC 'O' · PUTC 'K'</span></code></pre>
+
+<p>REPT örneği AX'i üç kez bir bit sola kaydırır, yani 8 ile çarpar: AX = 5 iken sonuç 40 (0028h) olur. IRP örneği üç yazmacı yığına iter; SAKLA makrosunun kısa bir yazımıdır. IRPC örneğinde c, sırayla O ve K karakterleri olur. Tırnak içinde c'nin parametre olarak tanınması için <code>&amp;c</code> yazılır; tırnak içindeki metin aksi hâlde olduğu gibi kalırdı. Açılımdaki iki PUTC de birer makro olduğu için iç içe genişletme olur ve ekranda OK yazılır.</p>
+
+<p>Tekrar bloğu bir döngü değildir. Döngü sayacına gerek kalmaz ama kod büyür: <code>REPT 100</code> gövdeyi yüz kez kopyalar. REPT örneğinin üç SHL'si 6 bayt tutar ve 3 × 2 = 6 turda çalışır. Aynı kaydırma <code>MOV CL, 3</code> ve <code>SHL AX, CL</code> ile 4 baytta yazılabilir. Ama 8086'da CL'li kaydırma her bit için 4 tur ekler ve iş 4 + (8 + 4 × 3) = 24 tur sürer. Kısa tekrarlarda REPT hem hızlı hem de makul boyuttadır; <code>REPT 100</code> ise 200 bayt tutar ve aynı iş sayaçlı bir LOOP ile tek kopyada yapılır.</p>
+
+<p>Tekrar bloklarının en yaygın kullanımı derleme anında tablo üretmektir. Bunun için değeri değiştirilebilen bir assembler sembolü gerekir. <code>EQU</code> ile tanımlanan bir sabit yeniden tanımlanamaz. <code>=</code> ile tanımlanan sembol ise her atamada yeni bir değer alabilir. Aşağıdaki blok 0'dan 7'ye kadar sayıların karelerini üretir:</p>
+
+<pre class="nt-code"><code>n = 0
+kare <span class="kw">LABEL BYTE</span>
+<span class="kw">REPT</span> 8
+    <span class="kw">DB</span> n*n
+    n = n + 1
+<span class="kw">ENDM</span></code></pre>
+
+<p><code>kare LABEL BYTE</code>, o anki adrese bayt türünde bir ad verir ama yer ayırmaz. REPT gövdesi sekiz kez açılır. Her açılımda <code>DB n*n</code> o anki n'nin karesini bir bayt olarak yazar ve <code>n = n + 1</code> sembolü bir artırır. Sonuçta bellekte 0, 1, 4, 9, 16, 25, 36, 49 baytları art arda durur. n bir değişken değildir; bellekte yeri yoktur. Yalnız derleme anında, assembler'ın tablosunda yaşayan bir sayıdır. Aynı yöntemle maskeler, 2'nin kuvvetleri ya da önceden hesaplanmış sinüs değerleri gibi tablolar üretilir.</p>
+
+<h3 id="s9-1-9-2"><span class="nt-num">9.1.9.2</span>Kod izleme: REPT ile kare tablosu</h3>
+
+<p>Üretilen tablo, XLAT komutuyla bir sayının karesini çarpma yapmadan bulmak için kullanılabilir:</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">lea</span>  bx, kare
+<span class="kw">mov</span>  al, 5
+<span class="kw">xlat</span>           <span class="cm">; AL = kare[5]</span>
+<span class="kw">mov</span>  dl, al
+<span class="kw">mov</span>  al, 7
+<span class="kw">xlat</span>           <span class="cm">; AL = kare[7]</span>
+<span class="kw">add</span>  al, dl
+<span class="kw">ret</span>
+kare <span class="kw">db</span> 0, 1, 4, 9, 16, 25, 36, 49   <span class="cm">; REPT bloğunun ürettiği baytlar</span></code></pre>
+
+<p><code>XLAT</code> (tablodan çevir), AL'yi BX'in gösterdiği tablonun indisi olarak kullanır: AL ← DS:[BX + AL]. Tablonun adresi önce BX'e yüklenmelidir. Kodun boyutu 3 + 2 + 1 + 2 + 2 + 1 + 2 + 1 = 14 bayttır; LEA emu8086'da 3 bayt tuttuğu için tablo 0100h + 0Eh = 010Eh'de başlar.</p>
+
+<div class="nt-tablewrap" id="tab-kare">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.19: REPT ile üretilen kare tablosundan XLAT ile okuma; tablo 010Eh'de başlar.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">BX</th><th scope="col">AL</th><th scope="col">DL</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>lea bx, kare</code><br><small>ana program</small></td><td>010Eh</td><td>00h</td><td>00h</td><td>BX ← 010Eh (kare'nin bağıl konumu)</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov al, 5</code><br><small>ana program</small></td><td>010Eh</td><td>05h</td><td>00h</td><td>aranan sayı ve indis 5</td></tr>
+    <tr><td>3</td><td>0105h</td><td><code>xlat</code><br><small>ana program</small></td><td>010Eh</td><td>19h</td><td>00h</td><td>AL ← [BX + AL] = [0113h] = 25</td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>mov dl, al</code><br><small>ana program</small></td><td>010Eh</td><td>19h</td><td>19h</td><td>ilk sonuç DL'de</td></tr>
+    <tr><td>5</td><td>0108h</td><td><code>mov al, 7</code><br><small>ana program</small></td><td>010Eh</td><td>07h</td><td>19h</td><td>indis 7</td></tr>
+    <tr><td>6</td><td>010Ah</td><td><code>xlat</code><br><small>ana program</small></td><td>010Eh</td><td>31h</td><td>19h</td><td>AL ← [0115h] = 49</td></tr>
+    <tr><td>7</td><td>010Bh</td><td><code>add al, dl</code><br><small>ana program</small></td><td>010Eh</td><td>4Ah</td><td>19h</td><td>25 + 49 = 74 = 4Ah</td></tr>
+    <tr><td>8</td><td>010Dh</td><td><code>ret</code><br><small>ana program</small></td><td>010Eh</td><td>4Ah</td><td>19h</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-xlat" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="kare tablosu, BX, AL ve DL; adım sonrası"><rect class="box" x="12" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="35" y="46" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl" x="35" y="22" text-anchor="middle" style="font-size:10px;">kare+0</text><rect class="box" x="58" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="81" y="46" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl" x="81" y="22" text-anchor="middle" style="font-size:10px;">kare+1</text><rect class="box" x="104" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="127" y="46" text-anchor="middle" style="font-size:14px;">4</text><text class="lbl" x="127" y="22" text-anchor="middle" style="font-size:10px;">kare+2</text><rect class="box" x="150" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="173" y="46" text-anchor="middle" style="font-size:14px;">9</text><text class="lbl" x="173" y="22" text-anchor="middle" style="font-size:10px;">kare+3</text><rect class="box" x="196" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="219" y="46" text-anchor="middle" style="font-size:14px;">16</text><text class="lbl" x="219" y="22" text-anchor="middle" style="font-size:10px;">kare+4</text><rect class="mt-hot" x="242" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="265" y="46" text-anchor="middle" style="font-size:14px;">25</text><text class="lbl" x="265" y="22" text-anchor="middle" style="font-size:10px;">kare+5</text><rect class="box" x="288" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="311" y="46" text-anchor="middle" style="font-size:14px;">36</text><text class="lbl" x="311" y="22" text-anchor="middle" style="font-size:10px;">kare+6</text><rect class="box" x="334" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="357" y="46" text-anchor="middle" style="font-size:14px;">49</text><text class="lbl" x="357" y="22" text-anchor="middle" style="font-size:10px;">kare+7</text><text class="lbl" x="49" y="85" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="12" y="90" width="74" height="30" rx="4"/><text class="mt-v" x="49" y="110" text-anchor="middle" style="font-size:14px;">010Eh</text><text class="lbl" x="124" y="85" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="94" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="124" y="110" text-anchor="middle" style="font-size:14px;">19h</text><text class="lbl" x="192" y="85" text-anchor="middle" style="font-size:11.5px;">DL</text><rect class="box" x="162" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="192" y="110" text-anchor="middle" style="font-size:14px;">00h</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">[BX + AL]</text></svg></div>
+  <figcaption><b>Şekil 9.1.14:</b> Birinci XLAT: AL = 5 indisiyle kare + 5 = 0113h adresindeki 25 (19h) okunur.</figcaption>
+</figure>
+
+<p><a href="#tab-kare">Tablo 9.1.19</a>'de birinci XLAT, 010Eh + 5 = 0113h adresindeki baytı okur: 25 = 19h (<a href="#sekil-xlat">Şekil 9.1.14</a>). Bu değer DL'ye saklanır. İkinci XLAT 010Eh + 7 = 0115h adresinden 49 = 31h okur. ADD AL, DL ikisini toplar: 25 + 49 = 74 = 4Ah, yani 5² + 7². Program boyunca hiçbir çarpma komutu çalışmamıştır.</p>
+
+<p>Hız farkı belirgindir. XLAT 11 turda biter. 8086'da 8 bitlik bir MUL ise 70–77 tur sürer. Tablonun bedeli bellektir: sekiz bayt. Bu, bellek ile zaman arasındaki klasik bir takastır ve REPT bu takası kaynakta tek bir satır gibi kısa tutar. Tablo derleme anında üretildiği için çalışma anında onu hesaplamak için de zaman harcanmaz.</p>
+
+<h2 class="nt-pb" id="s9-1-10"><span class="nt-num">9.1.10</span>Koşullu derleme</h2>
+
+<h3 id="s9-1-10-1"><span class="nt-num">9.1.10.1</span>IF ailesi</h3>
+
+<p>Koşullu derleme, kaynak kodun bir bölümünün derleme anında programa alınıp alınmayacağını seçer. C dilindeki <code>#if</code> ve <code>#ifdef</code> önişlemci direktiflerinin assembly karşılığıdır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kosullu">
+  <span class="nt-box__title">Tanım 9.1.6</span>
+  <p><strong>Koşullu derleme</strong> (<span lang="en">conditional assembly</span>), <code>IF</code>, <code>IFB</code>, <code>ELSE</code>, <code>ENDIF</code> gibi direktiflerle bir kaynak bölümünün derleme anında koda katılıp katılmayacağının seçilmesidir. Koşul derleme anında değerlendirilir; seçilmeyen dal makine koduna hiç girmez.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-if">
+<table class="nt-table">
+  <caption>Tablo 9.1.20: Koşullu derleme direktifleri.</caption>
+  <thead><tr><th scope="col">Direktif</th><th scope="col">Dal ne zaman alınır?</th><th scope="col">Tipik kullanım</th></tr></thead>
+  <tbody>
+    <tr><td><code>IF ifade</code></td><td>ifade ≠ 0</td><td>deneme sürümü, seçenekler</td></tr>
+    <tr><td><code>IFE ifade</code></td><td>ifade = 0</td><td>IF'in tersi</td></tr>
+    <tr><td><code>IFB &lt;p&gt;</code></td><td>parametre boş</td><td>isteğe bağlı parametre</td></tr>
+    <tr><td><code>IFNB &lt;p&gt;</code></td><td>parametre dolu</td><td>isteğe bağlı parametre</td></tr>
+    <tr><td><code>IFIDN &lt;a&gt;,&lt;b&gt;</code></td><td>iki metin aynı</td><td>yazmaç adını denetleme</td></tr>
+    <tr><td><code>IFDIF &lt;a&gt;,&lt;b&gt;</code></td><td>iki metin farklı</td><td>yazmaç adını denetleme</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Her koşullu blok <code>ENDIF</code> ile biter ve isteğe bağlı bir <code>ELSE</code> dalı taşıyabilir. Koşul, çalışma anındaki bir bayrağa ya da yazmaca bakmaz. Assembler'ın derleme anında bildiği şeylere bakar: sembollerin değerleri ve makro parametrelerinin metni. Bu yüzden koşullu derleme çalışma anında hiçbir komut, karşılaştırma ya da atlama üretmez.</p>
+
+<p>İlk kullanım alanı programın farklı sürümlerini aynı kaynaktan üretmektir:</p>
+
+<pre class="nt-code"><code>HATA_AYIKLA = 1
+<span class="kw">IF</span> HATA_AYIKLA
+  PUTC '*'         <span class="cm">; yalnız deneme sürümünde</span>
+<span class="kw">ENDIF</span></code></pre>
+
+<p>HATA_AYIKLA = 1 iken PUTC açılır ve program 8 bayt büyür; ekrana önce bir yıldız yazılır. Sembol 0 yapıldığında bu satırlar hiç derlenmez ve programda iz bırakmaz. Deneme amaçlı ekran çıktıları ya da denetimler böylece kaynaktan silinmeden son sürümden çıkarılır.</p>
+
+<p>İkinci kullanım alanı makroların içidir. <code>IFB</code> ve <code>IFNB</code> (boş, boş değil) isteğe bağlı parametreleri mümkün kılar. Aşağıdaki KAYDIR makrosu bir yazmacı sola kaydırır; kaydırma sayısı verilmezse 1 kabul edilir:</p>
+
+<pre class="nt-code"><code>KAYDIR <span class="kw">MACRO</span> r, n
+  <span class="kw">IFB</span> &lt;n&gt;          <span class="cm">;; n verilmedi mi?</span>
+    <span class="kw">SHL</span> r, 1
+  <span class="kw">ELSE</span>
+    <span class="kw">MOV</span> CL, n
+    <span class="kw">SHL</span> r, CL
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDM</span></code></pre>
+
+<p>8086'da kaydırma sayısı ya 1'dir ya da CL'de verilir. <code>SHL AX, 3</code> gibi bir anında sayı 80186 ile gelmiştir. Makro bu kuralı kullanıcıdan gizler: n boşsa tek bitlik kaydırma, doluysa CL'li kaydırma üretir. Parametrenin açı ayraçları içinde yazılması (<code>&lt;n&gt;</code>), boş metnin de bir metin olarak karşılaştırılabilmesini sağlar.</p>
+
+<p><code>IFIDN</code> ve <code>IFDIF</code>, parametre tuzaklarına karşı bir güvenlik ağı kurar. KAYDIR CL'yi bozar; <code>KAYDIR CX, 2</code> çağrısı bu yüzden yanlış sonuç verir. <code>MOV CL, 2</code> CX'in düşük baytını ezer ve kaydırılan değer artık programcının CX'i değildir. Gövdeye <code>IFIDN &lt;r&gt;, &lt;CX&gt;</code> ile başlayan bir blok eklenip bu durumda bir hata iletisi üretilebilir. <code>EXITM</code> direktifi ise açılımı o noktada bitirir; kalan gövde satırları yazılmaz. Koşullu derlemeyle birlikte kullanıldığında özyinelemeli bir makronun durma koşulunu da sağlar.</p>
+
+<h3 id="s9-1-10-2"><span class="nt-num">9.1.10.2</span>Kod izleme: KAYDIR</h3>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">mov</span> ax, 5
+<span class="kw">mov</span> bx, 3
+KAYDIR AX          <span class="cm">; → shl ax, 1</span>
+KAYDIR BX, 3       <span class="cm">; → mov cl, 3 · shl bx, cl</span>
+<span class="kw">ret</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-kaydir">
+<table class="nt-table nt-trace">
+  <caption>Tablo 9.1.21: <code>KAYDIR AX</code> ve <code>KAYDIR BX, 3</code> çağrılarının açılmış kodu.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CL</th><th scope="col">CF</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov ax, 5</code><br><small>ana program</small></td><td>0005h</td><td>0000h</td><td>00h</td><td>0</td><td>AX = 5</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov bx, 3</code><br><small>ana program</small></td><td>0005h</td><td>0003h</td><td>00h</td><td>0</td><td>BX = 3</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>SHL AX, 1</code><br><small>KAYDIR açılımı</small></td><td>000Ah</td><td>0003h</td><td>00h</td><td>0</td><td>n boş, IFB dalı: AX = 5 × 2</td></tr>
+    <tr><td>4</td><td>0108h</td><td><code>MOV CL, 3</code><br><small>KAYDIR açılımı</small></td><td>000Ah</td><td>0003h</td><td>03h</td><td>0</td><td>n = 3, ELSE dalı: sayı CL'ye</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>SHL BX, CL</code><br><small>KAYDIR açılımı</small></td><td>000Ah</td><td>0018h</td><td>03h</td><td>0</td><td>3 × 2³ = 24 = 0018h</td></tr>
+    <tr><td>6</td><td>010Ch</td><td><code>ret</code><br><small>ana program</small></td><td>000Ah</td><td>0018h</td><td>03h</td><td>0</td><td>program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>Birinci çağrıda n boştur; assembler IFB dalını seçer ve tek bir <code>SHL AX, 1</code> yazar (2 bayt, <code>D1 E0</code>). AX = 5 × 2 = 000Ah olur. İkinci çağrıda n = 3'tür; ELSE dalı seçilir ve iki komut yazılır: <code>MOV CL, 3</code> (<code>B1 03</code>) ve <code>SHL BX, CL</code> (<code>D3 E3</code>), toplam 4 bayt. BX = 3 × 2³ = 24 = 0018h olur. Aynı makro iki farklı uzunlukta kod üretmiştir. Birinci açılım CL'ye dokunmaz; yalnız ikinci açılım CL'yi değiştirir.</p>
+
+<p>İzlemede bir karşılaştırma ya da atlama yoktur. Hangi dalın yazılacağına assembler karar vermiş, işlemci yalnız sonucu yürütmüştür. Aynı seçim çalışma anında yapılsaydı her çağrıda bir CMP ve bir koşullu atlama gerekirdi; hem kod büyür hem de önden getirme kuyruğu boşaltılırdı.</p>
+
+<h2 class="nt-pb" id="s9-1-11"><span class="nt-num">9.1.11</span>Hata ayıklama ve sık yapılan hatalar</h2>
+
+<p>Makrolar kaynakta kodu kısaltır ama hata ayıklamayı zorlaştırır, çünkü yürüyen kod kaynakta yazılı değildir. Dört alışkanlık bu zorluğu azaltır.</p>
+
+<p><b>Açılımı görmek.</b> emu8086'nın öykünücü penceresindeki komut listesi makro adlarını değil, açılmış komutları gösterir; tek adım çalıştırma da bu komutlar üzerinde ilerler. Makro etiketleri LOCAL ile <code>??0000</code> gibi adlar aldığı için atlama hedefleri kaynaktaki adlarla görünmez. Hangi kopyanın çalıştığını bu numaralar gösterir.</p>
+
+<p><b>Liste dosyası.</b> MASM'da <code>.LISTMACROALL</code> açılımın bütün satırlarını liste dosyasına yazar. <code>.LISTMACRO</code> yalnız kod üreten satırları yazar, <code>.NOLISTMACRO</code> açılımı tamamen gizler. Liste dosyası her satırın adresini ve makine kodunu yan yana verdiği için bayt hesabı ve adres denetimi için en güvenilir kaynaktır.</p>
+
+<p><b>Hata satırını doğru okumak.</b> Gövdedeki bir hata, makronun kullanıldığı her satırda ayrı ayrı bildirilir. Aynı hata iletisi birkaç kez görülüyorsa neden çoğunlukla gövdededir.</p>
+
+<p><b>Önce elle açmak.</b> Yeni bir makro, gövdesi önce düz kod olarak yazılıp denenerek geliştirilir. Kod bir parametre değeriyle doğru çalıştıktan sonra parametreli makroya dönüştürülür. Sonra farklı türde parametrelerle (yazmaç, değişken, sabit, ifade) ayrı ayrı denenir.</p>
+
+<div class="nt-tablewrap" id="tab-hatalar">
+<table class="nt-table">
+  <caption>Tablo 9.1.22: Sık yapılan makro hataları ve sonuçları.</caption>
+  <thead><tr><th scope="col">Hata</th><th scope="col">Sonuç</th><th scope="col">Çözüm</th></tr></thead>
+  <tbody>
+    <tr><td>kullanımdan sonra tanımlamak</td><td>çağrı bilinmeyen komut sayılır</td><td>tanımlar dosyanın başına ya da INCLUDE dosyasına</td></tr>
+    <tr><td>ENDM'i unutmak</td><td>dosyanın geri kalanı gövde sayılır; hata çok aşağıda görünür</td><td>her MACRO'nun ENDM'ini denetlemek</td></tr>
+    <tr><td>etiketi LOCAL yapmamak</td><td>ikinci kullanımda <i>Duplicate declaration</i></td><td><code>LOCAL</code> gövdenin ilk satırı</td></tr>
+    <tr><td>gövdede RET</td><td>RET çağıranın dönüş adresini ya da rastgele bir sözcüğü alır</td><td>makroda RET yazmamak</td></tr>
+    <tr><td>gövdenin bozduğu yazmacı parametre vermek</td><td><code>TOPLA AX, BX, CX</code> gibi çağrılarda parametre okunmadan değişir</td><td>kullanılan yazmaçları belgelemek, IFIDN ile denetlemek</td></tr>
+    <tr><td>parantezsiz ifade</td><td>işlem önceliği değişir</td><td><code>(en)*(boy)</code></td></tr>
+    <tr><td>makroyu döngü sanmak</td><td><code>REPT 1000</code> 1000 kopya üretir</td><td>çalışma anında tekrar için LOOP</td></tr>
+    <tr><td>uzun gövdeyi çok kullanmak</td><td>kod boyutu kullanım sayısıyla büyür</td><td>işi prosedüre taşımak, makroyu kılıf yapmak</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-hatalar">Tablo 9.1.22</a> sık görülen sekiz hatayı toplar. Hepsinin ortak kökü aynıdır: makro bir metin kalıbıdır, çağrılan bir birim değildir. Bir makronun ne yapacağını anlamanın en güvenilir yolu, onu açıp ortaya çıkan komutları sıradan bir program gibi okumaktır.</p>
+
+<h2 class="nt-pb" id="s9-1-12"><span class="nt-num">9.1.12</span>Alıştırmalar ve çözümleri</h2>
+
+<p><b>Alıştırma 1.</b> <code>MyMacro AX, BX, CX</code> çağrısının genişletilmiş hâli nedir? Hangi satır gereksizdir?</p>
+
+<p><i>Çözüm.</i> p1 = AX, p2 = BX, p3 = CX olur. Açılım <code>MOV AX, AX</code>, <code>MOV BX, BX</code>, <code>MOV CX, CX</code> satırlarıdır. Üçü de geçerli komutlardır ve 2'şer bayta derlenir (<code>8B C0</code>, <code>8B DB</code>, <code>8B C9</code>). Ama hiçbiri bir yazmacı değiştirmez; MOV bayrakları da etkilemez. Üç satırın üçü de gereksizdir: 6 bayt ve 6 tur boşa gider. AX = 1, BX = 2, CX = 3 ile başlayan bir program makrodan sonra da aynı değerleri taşır. Makro hatasız derlenir ama hiçbir iş yapmaz; assembler bu tür etkisiz açılımlar için uyarı vermez.</p>
+
+<p><b>Alıştırma 2.</b> İki sözcük değişkenini toplayıp üçüncüsüne yazan <code>TOPLA a, b, c</code> makrosunu yazın.</p>
+
+<p><i>Çözüm.</i></p>
+<pre class="nt-code"><code>TOPLA <span class="kw">MACRO</span> a, b, c
+    <span class="kw">MOV</span> AX, a
+    <span class="kw">ADD</span> AX, b
+    <span class="kw">MOV</span> c, AX
+<span class="kw">ENDM</span></code></pre>
+<p>8086'da bellekten belleğe toplama olmadığı için AX ara yazmaçtır. Makro AX'i değiştirir; bu, makronun belgesinde belirtilmelidir. s1 = 1234h, s2 = F00Fh ile <code>TOPLA s1, s2, s3</code> çağrısı s3 = 0243h ve CF = 1 verir; işaretsiz toplamın 17. biti eldededir.</p>
+
+<p><b>Alıştırma 3.</b> PUTC makrosu 50 kez kullanılırsa, aynı işi yapan prosedür 50 kez çağrılırsa kod boyutları ne olur?</p>
+
+<p><i>Çözüm.</i> Makro: 50 × 8 = 400 bayt. Prosedür: gövde 8 bayt + RET 1 bayt = 9 bayt bir kez, artı 50 × 3 = 150 bayt CALL; toplam 159 bayt. Süre açısından prosedür 50 × 27 = 1350 tur ek getirir.</p>
+
+<p><b>Alıştırma 4.</b> İlk POWER makrosu <code>POWER base, exponent, result</code> ve ikinci bir çağrıyla iki kez kullanıldığında hangi hata alınır? Nasıl düzeltilir?</p>
+
+<p><i>Çözüm.</i> İkinci açılım <code>powerloop:</code> etiketini yeniden tanımlar; assembler <i>Duplicate declaration</i> (powerloop) hatası verir ve program derlenmez. Düzeltme, makronun ilk satırına <code>LOCAL powerloop</code> eklemektir. Böylece birinci açılımda etiket ??0000, ikincide ??0001 olur ve her LOOP kendi kopyasının etiketine döner.</p>
+
+<p><b>Alıştırma 5.</b> exponent = 0 iken ilk POWER makrosu kaç kez MUL çalıştırır?</p>
+
+<p><i>Çözüm.</i> 65 536 kez. MUL döngünün başında olduğu için önce bir kez çalışır. LOOP CX'i 0'dan FFFFh'ye indirir ve atlar. Döngü CX yeniden 0 olana kadar sürer: CX = 0 → FFFFh → … → 1 → 0. base = 2 ise result = 0000h, base = 1 ise result = 0001h çıkar. JCXZ ile sayaç önceden denetlenirse hiç MUL çalışmaz ve result = 1 olur.</p>
+
+<p><b>Alıştırma 6.</b> Bir makronun AX dışında hiçbir yazmacı bozmaması için hangi komutlar eklenmelidir?</p>
+
+<p><i>Çözüm.</i> Gövdenin başına, makronun değiştirdiği her yazmaç (AX hariç) için bir PUSH; sonuna aynı yazmaçlar için ters sırada POP eklenir. Düzeltilmiş POWER'da bu <code>PUSH BX</code>, <code>PUSH CX</code>, <code>PUSH DX</code> ve <code>POP DX</code>, <code>POP CX</code>, <code>POP BX</code>'tir. MUL gibi örtük olarak yazmaç değiştiren komutlar (MUL DX'i, LOOP CX'i, INT hizmetleri dönüş yazmaçlarını değiştirir) özellikle dikkate alınmalıdır. Bayrakların da korunması gerekiyorsa PUSHF ve POPF kullanılır.</p>
+
+<h2 id="s9-1-13"><span class="nt-num">9.1.13</span>Özet</h2>
+
+<ul>
+  <li>Makro, <code>ad MACRO p1, p2 … ENDM</code> ile tanımlanan bir kod kalıbıdır. Assembler, makronun kullanıldığı her satırın yerine gövdeyi yazar; buna genişletme denir. İşlemci makroyu hiç görmez.</li>
+  <li>Makro, kullanıldığı satırdan önce tanımlanmalıdır. Kullanılmayan makro kod üretmez.</li>
+  <li>Parametreler değer değil metindir. Değerleri, açılmış satır yürütüldüğünde okunur. Gövdenin değiştirdiği yazmaç parametre olarak verilmemelidir; ifade parametreleri gövdede paranteze alınmalıdır.</li>
+  <li>Hangi çağrının geçerli olduğuna açılımda oluşan komut karar verir; hata kullanım satırında bildirilir ama nedeni gövdededir.</li>
+  <li>Boyut: makro k · n bayt, prosedür (n + 1) + 3k bayt. Gövde 3 bayttan uzunsa prosedür, başa baş noktasından sonra daha küçüktür.</li>
+  <li>Hız: her prosedür çağrısı CALL + RET ile 19 + 8 = 27 tur, iki yığın erişimi ve iki kuyruk boşaltma ekler. Makroda bu maliyet yoktur.</li>
+  <li>Makroda RET yazılmaz; RET çağıranın dönüş adresini ya da yığında ne varsa onu alır.</li>
+  <li>Etiketli makrolar LOCAL ile yazılır; assembler her açılımda ??0000, ??0001 … gibi benzersiz adlar üretir.</li>
+  <li>Makronun değiştirdiği yazmaçlar PUSH ile saklanıp ters sırada POP ile geri yüklenir (PUTC, düzeltilmiş POWER).</li>
+  <li>LOOP CX = 0 ile 65 536 kez döner; sayacı değişken olan döngülerin önüne JCXZ konur. MUL, DX'i de değiştirir.</li>
+  <li>INCLUDE kütüphane metnini kaynağa ekler; emu8086.inc kısa işleri makro, uzun işleri prosedür olarak sunar.</li>
+  <li>&amp;, &lt;&gt;, !, % ve ;; makro işleçleri metni birleştirir, gruplar ve hesaplar.</li>
+  <li>REPT, IRP ve IRPC adsız, yerinde açılan tekrar bloklarıdır; <code>=</code> sembolüyle derleme anında tablo üretirler.</li>
+  <li>IF, IFE, IFB, IFNB, IFIDN, IFDIF koşulu derleme anında değerlendirir; seçilmeyen dal makine koduna girmez.</li>
+</ul>
+
+<h2 id="s9-1-14"><span class="nt-num">9.1.14</span>Kavram listesi</h2>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">makro <span lang="en">macro</span></a></li>
+  <li><a href="../sozluk.html">makro genişletme <span lang="en">macro expansion</span></a></li>
+  <li><a href="../sozluk.html">LOCAL direktifi <span lang="en">LOCAL directive</span></a></li>
+  <li><a href="../sozluk.html">koşullu derleme <span lang="en">conditional assembly</span></a></li>
+  <li><a href="../sozluk.html">tekrar bloğu (REPT / IRP / IRPC) <span lang="en">repeat block</span></a></li>
+  <li><a href="../sozluk.html">direktif <span lang="en">directive</span></a></li>
+  <li><a href="../sozluk.html">assembler <span lang="en">assembler</span></a></li>
+  <li><a href="../sozluk.html">prosedür <span lang="en">procedure</span></a></li>
+  <li><a href="../sozluk.html">prosedür çağrısı <span lang="en">procedure call</span></a></li>
+  <li><a href="../sozluk.html">dönüş adresi <span lang="en">return address</span></a></li>
+  <li><a href="../sozluk.html">yazmaçların korunması <span lang="en">register preservation</span></a></li>
+  <li><a href="../sozluk.html">etiket <span lang="en">label</span></a></li>
+  <li><a href="../sozluk.html">kütüphane <span lang="en">library</span></a></li>
+  <li><a href="../sozluk.html">saat turu <span lang="en">clock cycle</span></a></li>
+  <li><a href="../sozluk.html">önden getirme kuyruğu <span lang="en">prefetch queue</span></a></li>
+  <li><a href="../sozluk.html">yol döngüsü <span lang="en">bus cycle</span></a></li>
+  <li><a href="../sozluk.html">liste çıktısı <span lang="en">listing file</span></a></li>
+  <li><a href="../sozluk.html">öykünücü <span lang="en">emulator</span></a></li>
+</ul>
+
+<h2 id="s9-1-15"><span class="nt-num">9.1.15</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>TOPLA makrosu (<code>MOV AX, x</code> · <code>ADD AX, y</code> · <code>MOV z, AX</code>) AX = 5, BX = 7 iken <code>TOPLA BX, AX, CX</code> ile çağrılıyor. CX ne olur?</p>
+    <details><summary>Cevap</summary>
+      <p>Açılım <code>MOV AX, BX</code> · <code>ADD AX, AX</code> · <code>MOV CX, AX</code>'tir. Birinci satır AX'i 7 yapar; y = AX metni artık 7'yi gösterir. ADD 7 + 7 = 14 verir: CX = <strong>000Eh</strong>, beklenen 12 değil.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>ALAN MACRO en, boy</code> / <code>MOV AX, en*boy</code> / <code>ENDM</code> makrosunun <code>ALAN 10-2, 3</code> çağrısı AX'e ne yükler? Parantezli sürüm ne yükler?</p>
+    <details><summary>Cevap</summary>
+      <p>Açılım <code>MOV AX, 10-2*3</code>'tür; çarpma önce yapılır: 10 − 6 = <strong>4</strong>. Parantezli <code>(10-2)*(3)</code> = <strong>24</strong> (0018h) verir. İki durumda da çarpma derleme anında yapılır ve makine kodunda yalnız bir MOV vardır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Gövdesi 4 bayt olan bir iş kaç kullanımdan itibaren prosedürle daha az yer tutar?</p>
+    <details><summary>Cevap</summary>
+      <p>Makro 4k, prosedür 5 + 3k bayt. 4k &gt; 5 + 3k için k &gt; 5. Beş kullanımda ikisi de 20 bayttır; <strong>altı</strong> kullanımdan itibaren prosedür küçüktür (24'e karşı 23 bayt).</p>
+    </details>
+  </li>
+  <li>
+    <p>Etiket içeren ama LOCAL kullanmayan bir makro programda yalnız bir kez kullanılırsa derleme hatası olur mu?</p>
+    <details><summary>Cevap</summary>
+      <p>Hayır. Tek açılımda etiket bir kez tanımlanır ve program derlenir. Hata, makro ikinci kez kullanıldığı anda <i>Duplicate declaration</i> olarak çıkar. Bu yüzden makro bir kez kullanılacak olsa da LOCAL yazılır.</p>
+    </details>
+  </li>
+  <li>
+    <p>MyMacro2 (AX = 2 ise label1'e, AX = 3 ise label2'ye atlar; label1: INC AX, label2: ADD AX, 2) AX = 0 ile çalıştırılırsa AX ne olur?</p>
+    <details><summary>Cevap</summary>
+      <p>İki JE de atlamaz ve akış label1'e düşer. INC AX 1'i, ADD AX, 2 ise <strong>3</strong>'ü verir.</p>
+    </details>
+  </li>
+  <li>
+    <p>KAYDIR makrosu (n doluysa <code>MOV CL, n</code> · <code>SHL r, CL</code>) CX = 5 iken <code>KAYDIR CX, 2</code> ile çağrılıyor. Programcı 5 × 4 = 20 bekliyor. CX ne olur?</p>
+    <details><summary>Cevap</summary>
+      <p><code>MOV CL, 2</code>, CX'in düşük baytını ezer: CX = 0002h. <code>SHL CX, CL</code> 2'yi 2 bit kaydırır: CX = <strong>0008h</strong>. Gövdenin bozduğu yazmaç (CL, dolayısıyla CX) parametre olarak verilmiştir; IFIDN ile bu çağrı yakalanabilir.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>n = 1</code> · <code>tablo LABEL BYTE</code> · <code>REPT 4</code> · <code>DB n</code> · <code>n = n * 2</code> · <code>ENDM</code> bloğu belleğe hangi baytları yazar? Bu blok çalışma anında kaç komut yürütür?</p>
+    <details><summary>Cevap</summary>
+      <p>01h, 02h, 04h, 08h. Blok yalnız veri üretir; n derleme anında yaşayan bir semboldür. Çalışma anında <strong>hiç</strong> komut yürütülmez.</p>
+    </details>
+  </li>
+  <li>
+    <p>5 MHz'lik bir 8086'da bir prosedür 1000 kez çağrılıyor. CALL ve RET'in getirdiği ek süre ne kadardır?</p>
+    <details><summary>Cevap</summary>
+      <p>1000 × (19 + 8) = 27 000 tur. Bir tur 200 ns olduğundan 27 000 × 200 ns = <strong>5,4 ms</strong>. Makro kullanılsaydı bu süre olmazdı ama kod 1000 kopya kadar büyürdü.</p>
+    </details>
+  </li>
+  <li>
+    <p>emu8086.inc'deki PRINT makrosu <code>PRINT 'Merhaba'</code> için kaç bayt üretir? Dizgi neden kodun içinde olduğu hâlde işlemci onu komut olarak yürütmez?</p>
+    <details><summary>Cevap</summary>
+      <p>'OK' için 27 bayt; her ek karakter bir bayt ekler. 7 karakterlik metin için 25 + 7 = <strong>32 bayt</strong>. Makro dizginin önüne bir JMP koyar ve işlemci dizginin baytlarının üzerinden atlar; dizgiye yalnız <code>MOV AL, CS:[SI]</code> ile veri olarak erişilir.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s9-1-16"><span class="nt-num">9.1.16</span>İleri okuma</h2>
+
+<ul>
+  <li>Microsoft, <em>MASM Programmer's Guide</em>: makro tanımı, LOCAL, makro işleçleri, tekrar blokları ve koşullu derleme direktiflerinin başvuru anlatımı.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, Bölüm 10: makroları, koşullu derlemeyi ve tekrar bloklarını çok sayıda örnekle işler.</li>
+  <li>emu8086 yardım belgeleri, <em>8086 Assembler Tutorial, Part 10 (Macros)</em>: emu8086'daki makro yazımı ve emu8086.inc kütüphanesi.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>: makro ve prosedür seçimini 8086 komut süreleri ve donanım yapısıyla birlikte ele alır.</li>
+</ul>
+
+<h2 id="s9-1-17"><span class="nt-num">9.1.17</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 yardım belgeleri: <em>8086 Assembler Tutorial, Part 10 (Macros)</em> ve <code>emu8086.inc</code>.</li>
+  <li>Microsoft, <em>MASM Programmer's Guide</em> — MACRO, ENDM, LOCAL direktifleri.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, 7. baskı, Pearson, 2014 — Bölüm 10 (Makrolar).</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009.</li>
+  <li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> veri sayfası (komut süreleri).</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_09_Makrolar.html">Bölüm 9.1 sunumu</a> · <a href="../slides/Bolum_09_Makrolar_Calisma_Sorulari.html">Çalışma soruları</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

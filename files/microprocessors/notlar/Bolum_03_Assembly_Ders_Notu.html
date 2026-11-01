@@ -1,0 +1,1210 @@
+---
+layout: without-sidebar
+title: "Bölüm 3.2: Assembly — Ders Notu"
+permalink: /files/microprocessors/notlar/Bolum_03_Assembly_Ders_Notu.html
+excerpt: "Mikroişlemciler dersi Bölüm 3.2 ders notu: assembly dili ve makine komutu, emu8086, komut satırının yapısı, komut, direktif ve makro, etiket ve ad kuralları, yazmaç, anlık değer ve bellek işlenenleri, örtük işlenenler, komut süreleri ve yol döngüsü, IP'nin ilerleyişi, bayrakları değiştiren ve değiştirmeyen komutlar, .COM program şablonu, programın bellekteki baytları, emu8086 öykünücü penceresi, yazım kuralları, söz dizimi ve mantık hataları."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+/* sunumdaki SVG'lerin bölüme özgü sınıfları (Bolum_03_Assembly.html ile aynı; kapsam .ds-notes) */
+.ds-notes .ds-svg .ptr { fill: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.5; }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-wire { stroke: var(--ds-link); stroke-width: 2.4; fill: none; }
+.ds-notes .ds-svg .mt-wire0 { stroke: var(--ds-muted); stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+.ds-notes .ds-svg .mt-sig { stroke: var(--ds-text); stroke-width: 2; fill: none; }
+.ds-notes .n32-ok { color: var(--ds-good); font-weight: 700; }
+.ds-notes .n32-bad { color: var(--ds-bad); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">Mikroişlemciler · Ders Notu</p>
+  <h1>Bölüm 3.2: Assembly</h1>
+  <p class="nt-lead">Assembly dili, işlemcinin makine komutlarını insanın okuyabileceği kısaltmalarla yazar. Her satırı tek bir makine komutuna karşılık gelir. Bu yüzden assembly ile yazan kişi yazmaçları, belleği ve bayrakları doğrudan yönetir; derleyicinin gizlediği her ayrıntı görünür olur. Not, 8086 assembly dilini emu8086 ortamında ele alır. Önce bir satırın alanları, komut ile direktif arasındaki fark ve ad kuralları verilir. Ardından işlenen türleri, komutların yazılmayan örtük işlenenleri ve bellek erişiminin saat turu cinsinden bedeli incelenir. IP'nin her komutta nasıl ilerlediği ve bayrakları hangi komutların değiştirdiği adım adım izlenir. Son kesimlerde ilk .COM programı yazılır, belleğe yerleşen baytları tek tek okunur, emu8086 penceresinde çalıştırılır ve en sık karşılaşılan hatalar nedenleriyle birlikte sınıflandırılır.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_03_Assembly.html">Sunum</a></li>
+    <li><a href="../pdf/Bolum_03_Assembly.pdf">Sunum (PDF)</a></li>
+    <li><a href="../slides/Bolum_03_Assembly_Calisma_Sorulari.html">Çalışma soruları</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+    <li><a href="../slides/CPU_Simulator.html">İşlemci Simülatörü</a></li>
+    <li><a href="../slides/Chapter_02_Register-Explorer.html">Yazmaç Gezgini</a></li>
+    <li><a href="../slides/Chapter_06_Flags-Lab.html">Bayrak Laboratuvarı</a></li>
+    <li><a href="../slides/Chapter_11_Instruction-Encoding.html">Komut Kodlama</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>Assembly'nin yerini açıklamak</dt>
+    <dd>Assembly dilinin makine diliyle birebir ilişkisini ve yüksek seviyeli dillerden farkını bir komutun üç görünümü üzerinden göstermek.</dd>
+    <dt>Satır yapısını okumak</dt>
+    <dd>Etiket, komut, işlenen ve açıklama alanlarını ayırmak; komutu direktiften ve makrodan ayırt etmek; geçerli ve geçersiz adları tanımak.</dd>
+    <dt>İşlenenleri tanımak</dt>
+    <dd>Yazmaç, anlık değer ve bellek işlenenlerini ve MUL, DIV, LOOP, CBW, PUSH, XLAT gibi komutların örtük işlenenlerini belirlemek.</dd>
+    <dt>Komut süresini hesaplamak</dt>
+    <dd>Yazmaç ve bellek işlenenli komutların süre farkını saat turu ve etkin adres hesabıyla bulmak; farkı yol döngüsüyle açıklamak.</dd>
+    <dt>IP ve bayrakları izlemek</dt>
+    <dd>IP'nin komut uzunluğu kadar ilerleyişini ve bayrakları değiştiren ya da değiştirmeyen komutların etkisini adım adım izlemek.</dd>
+    <dt>İlk programı yazmak</dt>
+    <dd>emu8086 ile bir .COM programı yazmak, baytlarını okumak, tek adımla çalıştırmak; söz dizimi hatasını mantık hatasından ayırmak.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s3-2-1">3.2.1 Assembly dili</a>
+      <ol>
+        <li><a href="#s3-2-1-1">3.2.1.1 Komut kısaltmaları ve makine komutu</a></li>
+        <li><a href="#s3-2-1-2">3.2.1.2 Assembler ve emu8086</a></li>
+        <li><a href="#s3-2-1-3">3.2.1.3 Assembly ne zaman kullanılır?</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-2">3.2.2 Komut satırının yapısı</a>
+      <ol>
+        <li><a href="#s3-2-2-1">3.2.2.1 Satırın alanları</a></li>
+        <li><a href="#s3-2-2-2">3.2.2.2 Komut, direktif ve makro</a></li>
+        <li><a href="#s3-2-2-3">3.2.2.3 Etiketler ve adlar</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-3">3.2.3 İşlenenler</a>
+      <ol>
+        <li><a href="#s3-2-3-1">3.2.3.1 Yazmaç, anlık değer ve bellek</a></li>
+        <li><a href="#s3-2-3-2">3.2.3.2 Örtük işlenenler</a></li>
+        <li><a href="#s3-2-3-3">3.2.3.3 Kod izleme: MUL, SHR ve LOOP</a></li>
+        <li><a href="#s3-2-3-4">3.2.3.4 Yazmaç mı, bellek mi?</a></li>
+        <li><a href="#s3-2-3-5">3.2.3.5 Komut süreleri</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-4">3.2.4 IP ve bayraklar</a>
+      <ol>
+        <li><a href="#s3-2-4-1">3.2.4.1 IP nasıl ilerler?</a></li>
+        <li><a href="#s3-2-4-2">3.2.4.2 Bayrakları hangi komutlar değiştirir?</a></li>
+        <li><a href="#s3-2-4-3">3.2.4.3 Kod izleme: bayraklar</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-5">3.2.5 İlk program</a>
+      <ol>
+        <li><a href="#s3-2-5-1">3.2.5.1 .COM program şablonu</a></li>
+        <li><a href="#s3-2-5-2">3.2.5.2 Kod izleme: .COM programı bellekte</a></li>
+        <li><a href="#s3-2-5-3">3.2.5.3 Program bellekte: bayt bayt</a></li>
+        <li><a href="#s3-2-5-4">3.2.5.4 emu8086 öykünücü penceresi</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-6">3.2.6 Yazım kuralları</a></li>
+    <li><a href="#s3-2-7">3.2.7 Hatalar</a>
+      <ol>
+        <li><a href="#s3-2-7-1">3.2.7.1 MOV'un işlenen kısıtları</a></li>
+        <li><a href="#s3-2-7-2">3.2.7.2 Öteki söz dizimi hataları</a></li>
+        <li><a href="#s3-2-7-3">3.2.7.3 Derleme hatası ve mantık hatası</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-8">3.2.8 Alıştırmalar ve çözümleri</a></li>
+    <li><a href="#s3-2-9">3.2.9 Özet</a></li>
+    <li><a href="#s3-2-10">3.2.10 Kavram listesi</a></li>
+    <li><a href="#s3-2-11">3.2.11 Kendini Dene</a></li>
+    <li><a href="#s3-2-12">3.2.12 İleri okuma</a></li>
+    <li><a href="#s3-2-13">3.2.13 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s3-2-1"><span class="nt-num">3.2.1</span>Assembly dili</h2>
+
+<h3 id="s3-2-1-1"><span class="nt-num">3.2.1.1</span>Komut kısaltmaları ve makine komutu</h3>
+
+<p>Bir mikroişlemci bellekten okuduğu baytları çözer ve her bayt dizisini bir işleme dönüştürür. Bu baytların oluşturduğu dile <strong>makine dili</strong> denir. Makine dili işlemcinin doğrudan anladığı tek dildir, ama insan için okunması zordur. <code>B8 05 00</code> baytlarına bakan biri, bunun “AX yazmacına 5 yükle” anlamına geldiğini ancak bir tabloya bakarak çıkarabilir. Program yüzlerce komuta ulaştığında bu yöntem çalışmaz.</p>
+
+<p><strong>Assembly dili</strong> (<span lang="en">assembly language</span>) bu sorunu çözmek için doğdu. Her makine komutuna akılda kalan kısa bir ad verilir: taşıma için <code>MOV</code>, toplama için <code>ADD</code>, atlama için <code>JMP</code>. Bu kısa adlara <strong>anımsatıcı</strong> ya da <strong>komut kısaltması</strong> (<span lang="en">mnemonic</span>) denir. İşlenenler de sayı yerine adlarıyla yazılır: yazmaçlar AX, BX gibi; bellek konumları ise programcının verdiği adlarla.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-assembly">
+  <span class="nt-box__title">Tanım 3.2.1</span>
+  <p><strong>Assembly dili</strong>, bir işlemcinin makine komutlarını anımsatıcılar ve simgesel adlarla yazan düşük seviyeli programlama dilidir. Assembly kaynağındaki her komut satırı, işlemcinin tek bir makine komutuna karşılık gelir. Bu birebir ilişki dili işlemciye bağımlı kılar: her işlemci ailesinin kendi assembly dili vardır.</p>
+</div>
+
+<p>Birebir ilişkiyi görmenin en kolay yolu tek bir satırı üç ayrı biçimde yazmaktır. <a href="#tab-uc-gorunum">Tablo 3.2.1</a> <code>MOV AX, 5</code> satırının programcının, assembler'ın ve işlemcinin gözündeki hâlini yan yana verir.</p>
+
+<div class="nt-tablewrap" id="tab-uc-gorunum">
+<table class="nt-table">
+  <caption>Tablo 3.2.1: Tek satır, üç görünüm.</caption>
+  <thead><tr><th scope="col">Görünüm</th><th scope="col">Yazılış</th><th scope="col">Kim kullanır?</th></tr></thead>
+  <tbody>
+    <tr><td>Assembly</td><td><code>MOV AX, 5</code></td><td>programcı</td></tr>
+    <tr><td>Onaltılık makine kodu</td><td><code>B8 05 00</code></td><td>liste çıktısı, öykünücü, hata ayıklayıcı</td></tr>
+    <tr><td>İkili makine kodu</td><td><code>10111000 00000101 00000000</code></td><td>işlemci (veri yolundaki gerilim düzeyleri)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Birinci bayt <code>B8</code>, “16 bitlik bir yazmaca anlık değer yükle” işleminin <strong>işlem kodudur</strong> (<span lang="en">opcode</span>). Bu komut ailesinde hedef yazmacın numarası işlem koduna eklenir. AX'in numarası 0 olduğu için kod B8h + 0 = B8h olur. BX'in numarası 3'tür; <code>MOV BX, 3</code> komutunun ilk baytı bu yüzden BBh'dir. Komutun geri kalan iki baytı 16 bitlik sabiti taşır. 0005h değeri bellekte <strong>düşük bayt önce</strong> saklanır: önce 05, sonra 00. 8086'nın bu düzenine <span lang="en">little-endian</span> denir.</p>
+
+<p>İkili satır, işlemcinin gerçekte gördüğü şeydir. 8086 komut baytlarını adres/veri hatları (AD0–AD15) üzerinden okur. Her bit bir hattaki yüksek ya da düşük gerilimdir. Bir elektronik devre gözüyle bakıldığında <code>MOV AX, 5</code>, komut çözücünün girişine gelen 24 bitlik bir desenden başka bir şey değildir. Çözücü bu deseni ALU'yu, yazmaç dosyasının yazma girişini ve iç yolları süren kontrol sinyallerine çevirir.</p>
+
+<p>Assembly'yi yüksek seviyeli dillerden ayıran özellik de bu yakınlıktır. C'de <code>x = a * b;</code> yazan programcı çarpmanın hangi yazmaçta yapılacağını bilmez; bunu derleyici seçer. Assembly'de ise çarpılanın AL'de durması, sonucun AX'e yazılması, AH'deki eski değerin silinmesi programcının sorumluluğundadır. Dilin gücü de zorluğu da buradan gelir. Assembly ile yazmak, yazmaçları, belleği ve sistem yolunu bilmeyi gerektirir. Karşılığında bir programın donanımda nasıl çalıştığı bütün ayrıntısıyla görülür.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-mov-bx">
+  <span class="nt-box__title">Örnek 3.2.1</span>
+  <p><code>MOV BX, 1234h</code> komutunun makine kodu nedir? Bellekte kaç bayt yer kaplar?</p>
+  <p>Komut ailesi aynıdır: 16 bitlik yazmaca anlık değer. İşlem kodu B8h + yazmaç numarası olur. BX'in numarası 3 olduğundan ilk bayt BBh'dir. Sabit 1234h, düşük bayt önce yazılır: 34h, sonra 12h. Komut <code>BB 34 12</code> olarak üç bayt yer kaplar. 8 bitlik yazmaçlar için ayrı bir aile vardır: <code>MOV AL, 5</code> komutu <code>B0 05</code> diye iki bayta kodlanır, çünkü sabit tek bayttır.</p>
+</div>
+
+<h3 id="s3-2-1-2"><span class="nt-num">3.2.1.2</span>Assembler ve emu8086</h3>
+
+<p>Assembly kaynağı düz bir metin dosyasıdır. İşlemci bu metni çalıştıramaz; önce makine koduna çevrilmesi gerekir. Bu çeviriyi yapan programa <strong>assembler</strong> denir. Assembler komut kısaltmalarını işlem kodlarına, etiketleri adreslere, değişken adlarını da bağıl konumlara çevirir. Çeviri birebirdir: bir komut satırı bir makine komutu verir. MASM, TASM ve NASM 8086 ailesi için yaygın assembler'lardır.</p>
+
+<p>Çevrilen kod bir dosyaya yazılır. Basit programlar için bu dosya doğrudan çalıştırılabilir bir <strong>.COM</strong> dosyasıdır. Çok kesimli programlar önce bir <strong>nesne dosyasına</strong> (.obj) çevrilir; ardından <strong>bağlayıcı</strong> (<span lang="en">linker</span>) nesne dosyalarını birleştirip bir <strong>.EXE</strong> dosyası üretir. Programı çalıştırmak için işletim sisteminin <strong>yükleyicisi</strong> dosyayı RAM'e kopyalar, kesim yazmaçlarını ayarlar ve denetimi programın ilk komutuna verir. <a href="#sekil-zincir">Şekil 3.2.1</a> bu zinciri gösterir.</p>
+
+<figure class="nt-fig" id="sekil-zincir" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 126" role="img" aria-label="Kaynak dosya assembler ile makine koduna çevrilir, yükleyici belleğe yükler"><defs><marker id="n32-1-m03p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="150" height="60" rx="8"/><text class="txt" x="85" y="56" text-anchor="middle">kaynak.asm</text><text class="lbl" x="85" y="76" text-anchor="middle">metin</text><path class="line" d="M162 60 L196 60" marker-end="url(#n32-1-m03p1)"/><rect class="ptr" x="190" y="30" width="150" height="60" rx="8"/><text class="txt" x="265" y="56" text-anchor="middle">Assembler</text><text class="lbl" x="265" y="76" text-anchor="middle">birebir çevirir</text><path class="line" d="M342 60 L376 60" marker-end="url(#n32-1-m03p1)"/><rect class="box" x="370" y="30" width="150" height="60" rx="8"/><text class="txt" x="445" y="56" text-anchor="middle">nesne / .COM</text><text class="lbl" x="445" y="76" text-anchor="middle">makine kodu</text><path class="line" d="M522 60 L556 60" marker-end="url(#n32-1-m03p1)"/><rect class="ptr" x="550" y="30" width="150" height="60" rx="8"/><text class="txt" x="625" y="56" text-anchor="middle">Yükleyici</text><text class="lbl" x="625" y="76" text-anchor="middle">RAM'e yükler</text><text class="lbl" x="445" y="118" text-anchor="middle">EXE için araya bağlayıcı (linker) girer: .obj → .exe</text><text class="lbl" x="625" y="118" text-anchor="middle"></text></svg></div>
+  <figcaption><b>Şekil 3.2.1:</b> Kaynak dosyadan belleğe. Assembler metni birebir makine koduna çevirir, yükleyici sonucu RAM'e yerleştirir. .EXE dosyalarında araya bağlayıcı girer.</figcaption>
+</figure>
+
+<p>Bu derste kullanılan <strong>emu8086</strong>, zincirin bütün halkalarını tek pencerede toplar. İçinde bir metin düzenleyicisi, bir assembler ve bir 8086 <strong>öykünücüsü</strong> (<span lang="en">emulator</span>) bulunur. Öykünücü, 8086'yı yazılımla taklit eden bir programdır. Gerçek bir işlemcide yazmaçların içi dışarıdan görünmez; öykünücü ise her komuttan sonra yazmaçları, belleği ve bayrakları ekranda gösterir. Program tek komut ilerletilebilir, geri alınabilir, istenen yerde durdurulabilir. Assembly öğrenirken en değerli araç budur, çünkü her komutun etkisi tahmin edilip hemen sınanabilir.</p>
+
+<p>.COM ve .EXE biçimleri arasındaki fark programın yapısını da belirler. <a href="#tab-com-exe">Tablo 3.2.2</a> iki biçimi karşılaştırır.</p>
+
+<div class="nt-tablewrap" id="tab-com-exe">
+<table class="nt-table">
+  <caption>Tablo 3.2.2: .COM ve .EXE programları.</caption>
+  <thead><tr><th scope="col">Özellik</th><th scope="col">.COM</th><th scope="col">.EXE</th></tr></thead>
+  <tbody>
+    <tr><td>Kesim sayısı</td><td>tek kesim; kod, veri ve yığın aynı 64 KB içinde</td><td>birden çok kesim (kod, veri, yığın ayrı)</td></tr>
+    <tr><td>Boyut sınırı</td><td>64 KB'tan 256 bayt (PSP) ve yığın payı eksik</td><td>64 KB sınırı her kesim için ayrı</td></tr>
+    <tr><td>Dosya başlığı</td><td>yok; dosya belleğe olduğu gibi kopyalanır</td><td>var; yer değiştirme tablosu ve başlangıç değerleri içerir</td></tr>
+    <tr><td>Başlangıç adresi</td><td><code>ORG 100h</code>, IP = 0100h</td><td><code>END</code> direktifinde verilen etiket</td></tr>
+    <tr><td>Kesim yazmaçları</td><td>CS = DS = ES = SS</td><td>DS'yi program kendisi yükler</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bu notun bütün örnekleri .COM biçimindedir ve emu8086 söz dizimiyle yazılmıştır. Örneklerin çoğu MASM ve TASM ile de aynen derlenir. Komutların bayt değerleri, IP ve yazmaç izlemeleri bir 8086 öykünücüsünde çalıştırılarak elde edilmiştir.</p>
+
+<h3 id="s3-2-1-3"><span class="nt-num">3.2.1.3</span>Assembly ne zaman kullanılır?</h3>
+
+<p>Assembly ile yazılan bir program genellikle aynı işi yapan yüksek seviyeli bir programdan küçük ve hızlıdır. Bunun nedeni basittir: programda yalnız programcının yazdığı komutlar bulunur. Derleyicinin eklediği başlatma kodu, kütüphane çağrıları, genel amaçlı yardımcı yordamlar yoktur. Her komutun neden orada olduğu bilinir.</p>
+
+<p>Hızdan daha önemli bir üstünlük, donanıma doğrudan erişimdir. 8086'nın bazı komutlarının standart C'de karşılığı yoktur. <code>OUT</code> bir G/Ç portuna bayt yazar, <code>CLI</code> kesmeleri yasaklar, <code>PUSHF</code> bayrak yazmacını yığına iter. Önyükleyiciler, aygıt sürücüleri, kesme hizmet yordamları ve küçük gömülü sistemler bu yüzden tamamen ya da kısmen assembly ile yazılır. Bilgisayar açıldığında çalışan ilk kod, henüz yığın ve bellek düzeni kurulmadığı için zaten assembly'dir.</p>
+
+<p>Dilin bedeli de ağırdır. <a href="#tab-arti-eksi">Tablo 3.2.3</a> iki tarafı özetler.</p>
+
+<div class="nt-tablewrap" id="tab-arti-eksi">
+<table class="nt-table">
+  <caption>Tablo 3.2.3: Assembly ile programlamanın artıları ve eksileri.</caption>
+  <thead><tr><th scope="col">Artılar</th><th scope="col">Eksiler</th></tr></thead>
+  <tbody>
+    <tr><td>Daha az yer kaplar; gereksiz kod yoktur.</td><td>Taşınabilir değildir: 8086 kodu ARM işlemcide çalışmaz.</td></tr>
+    <tr><td>Yalnız gereken işlemleri yaptığı için hızlıdır.</td><td>Yazması, okuması ve hata ayıklaması zahmetlidir.</td></tr>
+    <tr><td>Port G/Ç, kesme işleme, bayraklara doğrudan erişim sağlar.</td><td>Büyük projelerde verim düşüktür.</td></tr>
+    <tr><td>Önyükleyici, sürücü ve gömülü sistemlerde vazgeçilmezdir.</td><td>Modern derleyiciler çoğu zaman yeterince hızlı kod üretir.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Uygulamada bu iki taraf bir arada kullanılır. Programın büyük bölümü C gibi bir dilde yazılır. Zamanlaması kritik küçük parçalar, örneğin bir kesme yordamının girişi ya da sık çağrılan bir döngünün içi, assembly ile yazılır. Bu <strong>karma</strong> yaklaşım hem geliştirme hızını hem çalışma hızını korur. Assembly bilgisinin bir başka getirisi de yüksek seviyeli kodu okumaktır. Derleyicinin ürettiği assembly çıktısına bakabilen bir mühendis, kodunun neden yavaş çalıştığını ya da bir değişkenin neden beklenmedik bir değer aldığını bulabilir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>“Assembly her zaman daha hızlıdır” sanmak.</strong> Elle yazılmış assembly, ancak programcı işlemciyi derleyiciden iyi tanıyorsa hızlıdır. Bellekte tutulan bir döngü sayacı, gereksiz yere yinelenen bellek okumaları ya da yanlış seçilmiş bir komut, iyi bir derleyicinin ürettiği koddan yavaş bir program verir. Hız, dilden çok yazmaç ve bellek kullanımının doğru seçilmesinden gelir.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-2"><span class="nt-num">3.2.2</span>Komut satırının yapısı</h2>
+
+<h3 id="s3-2-2-1"><span class="nt-num">3.2.2.1</span>Satırın alanları</h3>
+
+<p>Assembly kaynağı satır satır okunur. Her satır en çok bir komut ya da bir direktif taşır. Bir komut satırının genel biçimi şöyledir; köşeli ayraç içindeki alanlar isteğe bağlıdır:</p>
+
+<div class="nt-math nt-math--c"><code>[etiket:]&nbsp;&nbsp;komut&nbsp;&nbsp;[hedef], [kaynak]&nbsp;&nbsp;[; açıklama]</code></div>
+
+<p><a href="#sekil-satir">Şekil 3.2.2</a> bu alanları <code>basla: MOV AX, 5 ; AX ← 5</code> satırı üzerinde gösterir. <strong>Etiket</strong> satırın adresine verilen addır. <strong>Komut</strong> alanı anımsatıcıyı taşır. Komuttan sonra virgülle ayrılmış en çok iki <strong>işlenen</strong> gelir. Noktalı virgülden satır sonuna kadar olan kısım <strong>açıklamadır</strong>.</p>
+
+<figure class="nt-fig" id="sekil-satir" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 70" role="img" aria-label="Komut satırının alanları: etiket, komut, hedef, kaynak, açıklama"><rect class="mt-dim" x="60" y="6" width="70" height="30" rx="4"/><text class="mt-m" x="95" y="26" text-anchor="middle">basla:</text><text class="lbl" x="95" y="56" text-anchor="middle">etiket</text><rect class="mt-hot" x="144" y="6" width="56" height="30" rx="4"/><text class="mt-m" x="172" y="26" text-anchor="middle">MOV</text><text class="lbl" x="172" y="56" text-anchor="middle">komut</text><rect class="mt-acc" x="214" y="6" width="44" height="30" rx="4"/><text class="mt-m" x="236" y="26" text-anchor="middle">AX</text><text class="lbl" x="236" y="56" text-anchor="middle">hedef</text><text class="mt-v" x="268" y="28" text-anchor="middle">,</text><rect class="mt-good" x="280" y="6" width="34" height="30" rx="4"/><text class="mt-m" x="297" y="26" text-anchor="middle">5</text><text class="lbl" x="297" y="56" text-anchor="middle">kaynak</text><rect class="mt-dim" x="328" y="6" width="96" height="30" rx="4"/><text class="mt-m" x="376" y="26" text-anchor="middle">; AX ← 5</text><text class="lbl" x="376" y="56" text-anchor="middle">açıklama</text><text class="mt-a" x="470" y="26" text-anchor="start">→ AX ← 5</text></svg></div>
+  <figcaption><b>Şekil 3.2.2:</b> Komut satırının alanları. <code>basla</code> etiketi, <code>MOV</code> komutu, <code>AX</code> hedef işlenen, <code>5</code> kaynak işlenen, noktalı virgülden sonrası açıklamadır. Satırın etkisi AX ← 5 atamasıdır.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--tanim" id="tanim-islenen">
+  <span class="nt-box__title">Tanım 3.2.2</span>
+  <p><strong>İşlenen</strong> (<span lang="en">operand</span>), bir komutun üzerinde işlem yaptığı değer, yazmaç ya da bellek konumudur. İki işlenenli komutlarda Intel söz diziminde soldaki işlenen <strong>hedef</strong>, sağdaki <strong>kaynaktır</strong>. Komut kaynağı okur, sonucu hedefe yazar. Kaynak değişmez; hedefin eski değeri kaybolur.</p>
+</div>
+
+<p>Hedef–kaynak sırası, assembly öğrenen herkesin ilk takıldığı yerdir. <code>MOV AX, BX</code> “AX'i BX'e taşı” diye değil, “AX ← BX” diye okunur. Bu sıra C'deki atama ile aynıdır: <code>ax = bx;</code>. İki işlenenli aritmetik komutlar da aynı kuralı izler. <code>SUB CX, AX</code> çalışınca CX ← CX − AX olur; AX değişmez. Böylece hedef işlenen hem birinci girdi hem de sonucun yazıldığı yerdir.</p>
+
+<p>Her komut iki işlenen almaz. <a href="#tab-satirlar">Tablo 3.2.4</a> farklı sayıda işlenen alan üç satırı alanlarına ayırır.</p>
+
+<div class="nt-tablewrap" id="tab-satirlar">
+<table class="nt-table">
+  <caption>Tablo 3.2.4: Üç satırın alanları.</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Etiket</th><th scope="col">Komut</th><th scope="col">İşlenenler</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td><code>basla: MOV AX, 5 ; AX ← 5</code></td><td><code>basla</code></td><td><code>MOV</code></td><td><code>AX</code>, <code>5</code></td><td><code>; AX ← 5</code></td></tr>
+    <tr><td><code>INC AX</code></td><td>—</td><td><code>INC</code></td><td><code>AX</code></td><td>—</td></tr>
+    <tr><td><code>RET</code></td><td>—</td><td><code>RET</code></td><td>yok</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>INC AX</code> tek işlenenlidir: AX hem kaynak hem hedeftir ve AX ← AX + 1 olur. <code>RET</code> hiç işlenen yazmaz, ama yine de iş yapar: yığından bir sözcük okuyup IP'ye koyar. Yazılmayan bu işlenenler <a href="#s3-2-3-2">örtük işlenenler</a> başlığında ayrıntılı ele alınır.</p>
+
+<p>Assembler büyük-küçük harfe duyarsızdır. <code>mov ax, bx</code>, <code>MOV AX, BX</code> ve <code>Mov Ax, Bx</code> aynı makine kodunu verir. Boşluk ve sekme sayısı da önemsizdir; alanları alt alta hizalamak yalnız okunabilirlik içindir. Açıklamalar ise makine koduna hiç girmez. Assembler noktalı virgülü görünce satırın geri kalanını atlar. Bu yüzden açıklama, programın boyutunu ya da hızını etkilemeden istenildiği kadar uzun yazılabilir.</p>
+
+<p>Assembly'de açıklamanın önemi yüksek seviyeli dillerden fazladır. <code>ADD AX, BX</code> satırı ne yaptığını zaten söyler; neden yapıldığını söylemez. AX'te bir dizi toplamı mı, bir adres mi, bir sayaç mı durduğu koddan anlaşılmaz. İyi bir açıklama “AX ← AX + BX” diye komutu yinelemez, “toplama bu öğrencinin notunu ekle” gibi amacı yazar.</p>
+
+<h3 id="s3-2-2-2"><span class="nt-num">3.2.2.2</span>Komut, direktif ve makro</h3>
+
+<p>Bir assembly kaynağındaki her satır makine kodu üretmez. Satırlar üç türe ayrılır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-direktif">
+  <span class="nt-box__title">Tanım 3.2.3</span>
+  <p><strong>Komut</strong> (<span lang="en">instruction</span>), işlemcinin çalışma anında yürüttüğü bir işlemdir ve tek bir makine komutuna çevrilir. <strong>Direktif</strong> (<span lang="en">directive</span>), assembler'a verilen bir bilgidir: kodun nereye yerleşeceğini, ne kadar yer ayrılacağını, bir adın neyi göstereceğini bildirir. Direktif makine komutu üretmez; veri tanımı direktifleri yalnız veri baytı üretir. <strong>Makro</strong> (<span lang="en">macro</span>) ise derleme anında yerine birkaç satır yazılan, adı olan bir metin kalıbıdır.</p>
+</div>
+
+<p>Komut ile direktif arasındaki fark zamanlamadadır. Komutu, program çalışırken işlemci yürütür. Direktif ise yalnız derleme anında anlam taşır; program çalışmaya başladığında ondan geriye hiçbir iz kalmaz. <a href="#tab-direktif">Tablo 3.2.5</a> sık kullanılan satırları türleri ve bellekte ürettikleriyle verir.</p>
+
+<div class="nt-tablewrap" id="tab-direktif">
+<table class="nt-table">
+  <caption>Tablo 3.2.5: Satır türleri ve bellekte ürettikleri.</caption>
+  <thead><tr><th scope="col">Satır</th><th scope="col">Türü</th><th scope="col">Bellekte ne üretir?</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 5</code></td><td>komut</td><td>makine kodu: <code>B8 05 00</code></td></tr>
+    <tr><td><code>ORG 100h</code></td><td>direktif</td><td>hiçbir şey; konum sayacını 0100h yapar</td></tr>
+    <tr><td><code>sayi DB 0</code></td><td>direktif (veri tanımı)</td><td>1 bayt veri: <code>00</code></td></tr>
+    <tr><td><code>k EQU 5</code></td><td>direktif</td><td>hiçbir şey; <code>k</code> adı 5 değerini alır</td></tr>
+    <tr><td><code>END</code></td><td>direktif</td><td>hiçbir şey; kaynak burada biter</td></tr>
+    <tr><td><code>PUTC 'A'</code></td><td>makro çağrısı</td><td>makro gövdesindeki komutların kodu</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Direktiflerin işleyişini anlamak için assembler'ın <strong>konum sayacını</strong> (<span lang="en">location counter</span>) bilmek gerekir. Assembler kaynağı yukarıdan aşağı okurken bir sonraki baytın yerleşeceği bağıl konumu bir sayaçta tutar. Her komut ya da veri tanımı, ürettiği bayt sayısı kadar sayacı ilerletir. <code>ORG 100h</code> sayacı doğrudan 0100h'ye kurar; kendisi bayt üretmez. <code>EQU</code> ise sayaca hiç dokunmaz: yalnız bir adı bir sabite bağlar. Assembler <code>k</code> adını gördüğü her yerde 5 yazar. <code>sayi DB 0</code> satırı sayacın o anki değerini <code>sayi</code> adına bağlar, bir bayt ayırır ve içine 0 koyar.</p>
+
+<p>Aşağıdaki küçük program bu farkı somutlaştırır. Sağdaki açıklamalar assembler'ın liste çıktısındaki adresleri ve baytları gösterir.</p>
+
+<pre class="nt-code"><code>ORG 100h            <span class="cm">; bayt yok; konum sayacı = 0100h</span>
+k EQU 5             <span class="cm">; bayt yok; k = 5</span>
+MOV AX, 5           <span class="cm">; 0100h: B8 05 00</span>
+MOV BX, k           <span class="cm">; 0103h: BB 05 00  (k yerine 5)</span>
+MOV AL, sayi        <span class="cm">; 0106h: A0 0A 01  (sayi = 010Ah)</span>
+RET                 <span class="cm">; 0109h: C3</span>
+sayi DB 0           <span class="cm">; 010Ah: 00</span>
+END                 <span class="cm">; bayt yok</span></code></pre>
+
+<p>Yedi satırdan yalnız beşi bayt üretir ve program 11 bayttır. <code>MOV AX, 5</code> ile <code>MOV BX, k</code> satırlarının kodları yazmaç numarası dışında aynıdır, çünkü assembler <code>k</code> yerine 5 koymuştur. <code>EQU</code> ile tanımlanan bir sabit bellekte yer kaplamaz. <code>MOV AL, sayi</code> satırında ise durum farklıdır. <code>sayi</code> bir bellek konumudur; komut o konumdaki baytı okur. Assembler komutun içine konumun adresini yazar: 010Ah, düşük bayt önce <code>0A 01</code>. Bu adres, assembler <code>sayi</code> satırına gelene kadar bilinmez. Assembler'ın ileriye yapılan bu başvuruyu nasıl çözdüğü iki geçişli çeviriyle açıklanır; burada önemli olan, adresin derleme anında hesaplanıp komutun içine gömülmesidir.</p>
+
+<p>Makro üçüncü türdür. emu8086 ile gelen <code>emu8086.inc</code> kütüphanesindeki <code>PUTC 'A'</code>, ekrana bir karakter yazan birkaç komutluk bir kalıbın adıdır. Assembler bu satırı gördüğünde makronun gövdesini satırın yerine kopyalar ve kopyayı çevirir. Makro çağrısı bir altprogram çağrısı değildir: her kullanımda gövde yeniden yazılır ve program o kadar büyür. Makrolar ayrı bir konudur; burada yalnız bir satırın birden çok makine komutu üretebildiği durumu göstermek için anılır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>EQU sabitini değişken sanmak.</strong> <code>k EQU 5</code> tanımından sonra <code>MOV k, 7</code> yazmak, “5 ← 7” anlamına gelir ve assembler hata verir. EQU adı bellekte yer kaplamaz; değeri derleme anında sabitlenir ve çalışma anında değiştirilemez. Değeri değişecek bir büyüklük <code>DB</code> ya da <code>DW</code> ile tanımlanır.</p>
+</div>
+
+<h3 id="s3-2-2-3"><span class="nt-num">3.2.2.3</span>Etiketler ve adlar</h3>
+
+<p>Assembly programında adresler sayı yerine adlarla yazılır. Bir komutun adresine verilen ada <strong>kod etiketi</strong>, bir veri alanına verilen ada <strong>değişken adı</strong> denir. İkisi de assembler'ın sembol tablosunda bir adrese bağlanır; ama kullanılışları farklıdır.</p>
+
+<pre class="nt-code"><code>basla:  MOV CX, 3   <span class="cm">; kod etiketi</span>
+don:    INC AX
+        LOOP don    <span class="cm">; don = adres</span>
+        RET
+sayi    DB 7        <span class="cm">; veri adı</span></code></pre>
+
+<p>Kod etiketi iki nokta üst üste ile biter. Etiket kendisi makine kodu üretmez; yalnız kendisinden sonra gelen komutun adresini, yani CS içindeki bağıl konumunu temsil eder. Bu programın <code>ORG 100h</code> ile başladığı varsayılırsa <code>basla</code> = 0100h olur. <code>MOV CX, 3</code> üç bayttır (<code>B9 03 00</code>); <code>don</code> = 0103h olur. <code>INC AX</code> tek bayttır (<code>40</code>), <code>LOOP don</code> iki bayttır (<code>E2 FD</code>). <code>RET</code> 0106h'de, <code>sayi</code> ise 0107h'dedir.</p>
+
+<p><code>LOOP don</code> komutunun ikinci baytı FDh dikkat çekicidir. Komut adresi değil, <strong>uzaklığı</strong> saklar. LOOP yürütülürken IP zaten sonraki komutu, yani 0106h'yi gösterir. Hedef 0103h olduğundan uzaklık 0103h − 0106h = −3'tür. −3, 8 bitlik ikiye tümleyende FDh olarak yazılır. Etiket programcıyı bu hesaptan kurtarır: programcı <code>don</code> yazar, assembler uzaklığı hesaplar. Programa yeni bir komut eklenip adresler kaydığında da hesap kendiliğinden yenilenir.</p>
+
+<p>Değişken adı iki nokta üst üste olmadan yazılır. Assembler bir değişken adı için üç bilgi saklar: adresi, kesimi ve <strong>türü</strong>. <code>DB</code> ile tanımlanan bir adın türü bayt, <code>DW</code> ile tanımlananın türü sözcüktür. Tür bilgisi assembler'ın boyut denetimi yapmasını sağlar. <code>sayi DB 7</code> tanımından sonra <code>MOV AX, sayi</code> yazılırsa assembler, 8 bitlik bir değişkenin 16 bitlik bir yazmaca taşınmak istendiğini fark eder ve hata verir.</p>
+
+<p>Adlar için kurallar şunlardır:</p>
+<ul>
+  <li>Ad bir harfle ya da alt çizgiyle başlar; rakamla başlayamaz. Rakamla başlayan her dizi assembler için bir sayıdır.</li>
+  <li>Adın devamında harf, rakam ve alt çizgi bulunabilir.</li>
+  <li>Komut, yazmaç ve direktif adları (MOV, AX, DB, END …) ad olarak kullanılamaz; bunlar <strong>ayrılmış sözcüklerdir</strong>.</li>
+  <li>Büyük-küçük harf ayrılmaz. <code>don</code> ile <code>DON</code> aynı etikettir; ikisini birden tanımlamak “iki kez tanımlı” hatası verir.</li>
+</ul>
+
+<div class="nt-tablewrap" id="tab-adlar">
+<table class="nt-table">
+  <caption>Tablo 3.2.6: Ad örnekleri.</caption>
+  <thead><tr><th scope="col">Ad</th><th scope="col">Geçerli mi?</th><th scope="col">Neden?</th></tr></thead>
+  <tbody>
+    <tr><td><code>_sayac</code></td><td><span class="n32-ok">evet</span></td><td>alt çizgiyle başlar</td></tr>
+    <tr><td><code>toplam2</code></td><td><span class="n32-ok">evet</span></td><td>harfle başlar, rakam sonra gelir</td></tr>
+    <tr><td><code>2toplam</code></td><td><span class="n32-bad">hayır</span></td><td>rakamla başlar; assembler geçersiz bir sayı sanar</td></tr>
+    <tr><td><code>cx</code></td><td><span class="n32-bad">hayır</span></td><td>yazmaç adıdır (CX ile aynı)</td></tr>
+    <tr><td><code>son-deger</code></td><td><span class="n32-bad">hayır</span></td><td>− bir işleçtir; assembler <code>son</code> eksi <code>deger</code> diye okur</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Son satırdaki durum öğreticidir. <code>son-deger</code> bir ifade olarak çözümlenir. Programda <code>son</code> ve <code>deger</code> adları yoksa assembler “tanımsız sembol” hatası verir; varsa iki adresin farkını hesaplar ve programcının hiç istemediği bir sayı üretir. Birden çok sözcükten oluşan adlarda bu yüzden alt çizgi kullanılır: <code>son_deger</code>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong><code>Sayi</code> ile <code>sayi</code>'yı iki ayrı değişken sanmak.</strong> C ve Java büyük-küçük harfi ayırır; 8086 assembler'ları ayırmaz. <code>sayi DB 7</code> tanımından sonra <code>MOV Sayi, 3</code> yazan programcı yeni bir değişken yarattığını düşünebilir, ama komut aynı bayta 3 yazar ve 7 kaybolur. Assembler bunu hata saymaz, çünkü satır geçerlidir. Farklı büyüklükler farklı adlarla adlandırılır.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-3"><span class="nt-num">3.2.3</span>İşlenenler</h2>
+
+<h3 id="s3-2-3-1"><span class="nt-num">3.2.3.1</span>Yazmaç, anlık değer ve bellek</h3>
+
+<p>Bir komutun işleneni üç yerden gelebilir: işlemcinin içindeki bir yazmaçtan, komutun kendi baytlarından ya da bellekten. Bu üç tür hem söz diziminde hem donanımda farklı davranır.</p>
+
+<div class="nt-tablewrap" id="tab-islenen">
+<table class="nt-table">
+  <caption>Tablo 3.2.7: Üç işlenen türü.</caption>
+  <thead><tr><th scope="col">Tür</th><th scope="col">Örnek</th><th scope="col">Değer nereden gelir?</th><th scope="col">Kısıt</th></tr></thead>
+  <tbody>
+    <tr><td>Yazmaç</td><td><code>MOV AX, BX</code></td><td>işlemcinin içindeki yazmaç dosyasından</td><td>en hızlı tür</td></tr>
+    <tr><td>Anlık değer</td><td><code>MOV AX, 5</code></td><td>komutun baytlarının içinden</td><td>yalnız kaynak olabilir</td></tr>
+    <tr><td>Bellek</td><td><code>MOV AX, [BX]</code></td><td>bellekten, bir yol döngüsüyle</td><td>bir komutta en çok bir tane</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Yazmaç işleneni</strong> işlemcinin içindedir. 8086'nın yürütme biriminde (EU) sekiz genel amaçlı 16 bitlik yazmaç bulunur: AX, BX, CX, DX, SP, BP, SI ve DI. İlk dördü ayrıca 8 bitlik yarılarıyla kullanılabilir: AH ile AL, BH ile BL, CH ile CL, DH ile DL. Yazmaç işlenenli bir komut dış yola hiç çıkmaz. Değer iç yoldan ALU'ya gider, sonuç yine iç yoldan yazmaca döner.</p>
+
+<p><strong>Anlık değer</strong> (<span lang="en">immediate value</span>) komutun içine gömülü bir sabittir. <code>MOV AX, 5</code> komutunun <code>05 00</code> baytları bu sabittir. Değer komutla birlikte getirildiği için ayrıca okunması gerekmez; komut kuyruğunda zaten hazırdır. Anlık değer yalnız kaynak olabilir, çünkü bir sabite yazmak anlamsızdır: <code>ADD 5, AX</code> yazımı “5'in yeni değeri 5 + AX olsun” demektir.</p>
+
+<p><strong>Bellek işleneni</strong> bir adresle verilir. <code>MOV AX, [BX]</code> komutunda köşeli ayraç “BX'in içindeki sayı bir adrestir; o adresteki sözcüğü al” anlamına gelir. İşlemci önce adresi hesaplar, sonra yol arayüz birimine (BIU) bir okuma isteği verir. BIU adresi adres yoluna koyar, bellekten veriyi okur ve yürütme birimine iletir. Bu dış erişim, yazmaç işlenenine göre en az dört saat turu ek süre getirir.</p>
+
+<p>Üç tür arasındaki temel kurallar şunlardır. İki işlenen aynı boyutta olmalıdır: 8 bitlik bir yazmaca 16 bitlik bir yazmaç taşınamaz. Bir komutta en çok bir bellek işleneni bulunabilir; <code>MOV [BX], [SI]</code> geçersizdir. Kesim yazmaçlarına (CS, DS, ES, SS) anlık değer yüklenemez. Bu kuralların hepsi 8086'nın komut kodlamasından gelir. Komut biçiminde bellek adresini tanımlayan alan bir tanedir; ikinci bir bellek işlenenini kodlayacak yer yoktur. Kesim yazmacına sabit yükleyen bir işlem kodu da tasarlanmamıştır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-islenen">
+  <span class="nt-box__title">Örnek 3.2.2</span>
+  <p>Aşağıdaki komutların işlenen türlerini belirleyin: <code>ADD CL, 10</code>, <code>MOV [BX], AX</code>, <code>SUB DX, sayac</code>.</p>
+  <p><code>ADD CL, 10</code>: hedef yazmaç (CL), kaynak anlık değer (10). CL ← CL + 10. Bellek erişimi yoktur.</p>
+  <p><code>MOV [BX], AX</code>: hedef bellek, kaynak yazmaç. AX'in iki baytı, BX'in gösterdiği adrese düşük bayt önce yazılır. Bir yol döngüsü (yazma) gerekir.</p>
+  <p><code>SUB DX, sayac</code>: hedef yazmaç, kaynak bellek (<code>sayac</code> bir değişken adıdır, assembler onu doğrudan adrese çevirir). <code>sayac</code> bir <code>DW</code> değişkeniyse DX ← DX − [sayac] olur; <code>DB</code> değişkeniyse boyut uyuşmazlığı hatası çıkar.</p>
+</div>
+
+<h3 id="s3-2-3-2"><span class="nt-num">3.2.3.2</span>Örtük işlenenler</h3>
+
+<p>Bazı komutlar yazılan işlenenlerin yanında, komut satırında hiç görünmeyen yazmaçları da kullanır ya da değiştirir. Bu yazmaçların hangileri olduğu komutun tanımına gömülüdür.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ortuk">
+  <span class="nt-box__title">Tanım 3.2.4</span>
+  <p><strong>Örtük işlenen</strong> (<span lang="en">implicit operand</span>), komut satırında yazılmadığı hâlde komutun okuduğu ya da değiştirdiği yazmaç veya bellek konumudur. Örtük işlenenler komutun işlem kodunda sabittir; programcı onları seçemez, yalnız bilmek zorundadır.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-ortuk">
+<table class="nt-table">
+  <caption>Tablo 3.2.8: Bazı komutların örtük işlenenleri.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Yazılan işlenen</th><th scope="col">Örtük işlenen(ler)</th><th scope="col">İşlem</th></tr></thead>
+  <tbody>
+    <tr><td><code>MUL BL</code></td><td>BL</td><td>AL (çarpılan), AX (sonuç)</td><td>AX ← AL × BL</td></tr>
+    <tr><td><code>DIV BL</code></td><td>BL</td><td>AX (bölünen), AL (bölüm), AH (kalan)</td><td>AL ← AX ÷ BL, AH ← AX mod BL</td></tr>
+    <tr><td><code>LOOP don</code></td><td>don</td><td>CX (sayaç)</td><td>CX ← CX − 1; CX ≠ 0 ise atla</td></tr>
+    <tr><td><code>CBW</code></td><td>—</td><td>AL → AX</td><td>AL'nin işaret biti AH'nin bütün bitlerine kopyalanır</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>AX</td><td>SS:SP (yığın tepesi)</td><td>SP ← SP − 2; [SS:SP] ← AX</td></tr>
+    <tr><td><code>XLAT</code></td><td>—</td><td>AL (indis ve sonuç), BX (tablo adresi)</td><td>AL ← [DS:BX + AL]</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki örtük kullanımlar 8086 yazmaçlarının adlarının da kaynağıdır. AX <strong>akümülatördür</strong>: çarpma ve bölmenin sonucu her zaman oraya yazılır. CX <strong>sayaç</strong> yazmacıdır: LOOP onu kendiliğinden azaltır, çok bitli kaydırmalar sayıyı onun alt yarısı CL'den okur. BX <strong>taban</strong> yazmacıdır: XLAT tablonun başını orada arar. SP yığının tepesini gösterir ve her PUSH ile POP'ta kendiliğinden değişir. Yazmaçların “özel görevleri” aslında bu komutların donanımda sabit bağlantılarıdır. Çarpma devresinin bir girişi doğrudan AL'ye, çıkışı doğrudan AX'e bağlıdır.</p>
+
+<p>Örtük işlenen bilgisinin pratik sonucu şudur: bir komut yazılmayan bir yazmacı da değiştirebilir. <code>MUL BL</code> satırında AH hiç geçmez, ama komut AH'yi siler, çünkü 16 bitlik sonuç AX'in tamamına yazılır. AH'de saklanan bir değer bu satırdan sonra kaybolur. Bir yazmacın değerini korumak isteyen program, kullandığı komutların örtük işlenenlerini bilmek zorundadır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-div">
+  <span class="nt-box__title">Örnek 3.2.3</span>
+  <p>AX = 100 (0064h) ve BL = 7 iken <code>DIV BL</code> çalışıyor. AL, AH ve AX ne olur?</p>
+  <p>8 bitlik bölmede bölünen örtük olarak AX'in tamamıdır, bölen yazılan BL'dir. 100 ÷ 7 işleminin bölümü 14, kalanı 2'dir (7 × 14 = 98, 100 − 98 = 2). Bölüm AL'ye, kalan AH'ye yazılır: AL = 0Eh, AH = 02h. İki yarı birlikte okunduğunda AX = <strong>020Eh</strong> olur. AX'in bölmeden önceki değeri kaybolmuştur. Bölüm 8 bite sığmasaydı, örneğin AX = 1000 ve BL = 2 olsaydı, işlemci bir bölme hatası kesmesi (INT 0) üretirdi.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-cbw">
+  <span class="nt-box__title">Örnek 3.2.4</span>
+  <p>AL = F6h iken <code>CBW</code> çalışıyor. AX ne olur? Aynı işi <code>MOV AH, 0</code> yapsaydı fark ne olurdu?</p>
+  <p>F6h ikiye tümleyende −10'dur; işaret biti (bit 7) 1'dir. CBW bu biti AH'nin sekiz bitine kopyalar: AH = FFh, AX = <strong>FFF6h</strong>. FFF6h de 16 bitte −10'dur; işaretli değer korunmuştur. <code>MOV AH, 0</code> ise AX = 00F6h = 246 verir. Bu sonuç, AL işaretsiz bir sayıysa doğrudur, işaretliyse yanlıştır. CBW'nin tek yazılan işleneni yoktur; hem kaynağı (AL) hem hedefi (AX) örtüktür.</p>
+</div>
+
+<h3 id="s3-2-3-3"><span class="nt-num">3.2.3.3</span>Kod izleme: MUL, SHR ve LOOP</h3>
+
+<p>Aşağıdaki program üç örtük işlenenli komutu art arda kullanır. Programda CX yalnız bir kez yazılır, AX ise hiç yazılmaz gibi görünür. İzleme, bu yazmaçların gerçekte kaç kez değiştiğini gösterir.</p>
+
+<pre class="nt-code"><code>ORG 100h
+MOV AL, 12
+MOV BL, 10
+MUL BL         <span class="cm">; AX = AL × BL</span>
+MOV CL, 2
+SHR AX, CL     <span class="cm">; sayı CL'de</span>
+MOV CX, 3      <span class="cm">; LOOP sayacı</span>
+don:
+ADD AX, 1
+LOOP don       <span class="cm">; CX azalır</span>
+RET</code></pre>
+
+<p>Programın başında .COM programlarının başlangıç durumu geçerlidir: genel yazmaçlar 0, bayraklar 0'dır. <a href="#tab-ortuk-iz">Tablo 3.2.9</a> her komuttan sonraki durumu verir. Adres sütunu komutun bağıl konumu, bayt sütunu makine kodudur.</p>
+
+<div class="nt-tablewrap" id="tab-ortuk-iz">
+<table class="nt-table">
+  <caption>Tablo 3.2.9: Örtük işlenen programının izlemesi (her satır, komut yürütüldükten sonraki durum).</caption>
+  <thead><tr><th scope="col">Adres</th><th scope="col">Baytlar</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>B0 0C</code></td><td><code>MOV AL, 12</code></td><td>000Ch</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>AL = 12</td></tr>
+    <tr><td>0102h</td><td><code>B3 0A</code></td><td><code>MOV BL, 10</code></td><td>000Ch</td><td>000Ah</td><td>0000h</td><td>0</td><td>0</td><td>BL = 10</td></tr>
+    <tr><td>0104h</td><td><code>F6 E3</code></td><td><code>MUL BL</code></td><td>0078h</td><td>000Ah</td><td>0000h</td><td>0</td><td>?</td><td>AX ← AL × BL = 120</td></tr>
+    <tr><td>0106h</td><td><code>B1 02</code></td><td><code>MOV CL, 2</code></td><td>0078h</td><td>000Ah</td><td>0002h</td><td>0</td><td>?</td><td>kaydırma sayısı</td></tr>
+    <tr><td>0108h</td><td><code>D3 E8</code></td><td><code>SHR AX, CL</code></td><td>001Eh</td><td>000Ah</td><td>0002h</td><td>0</td><td>0</td><td>120 ÷ 4 = 30</td></tr>
+    <tr><td>010Ah</td><td><code>B9 03 00</code></td><td><code>MOV CX, 3</code></td><td>001Eh</td><td>000Ah</td><td>0003h</td><td>0</td><td>0</td><td>CL'deki 2 silindi</td></tr>
+    <tr><td>010Dh</td><td><code>05 01 00</code></td><td><code>ADD AX, 1</code></td><td>001Fh</td><td>000Ah</td><td>0003h</td><td>0</td><td>0</td><td>1. tur</td></tr>
+    <tr><td>0110h</td><td><code>E2 FB</code></td><td><code>LOOP don</code></td><td>001Fh</td><td>000Ah</td><td>0002h</td><td>0</td><td>0</td><td>CX ≠ 0 → don</td></tr>
+    <tr><td>010Dh</td><td></td><td><code>ADD AX, 1</code></td><td>0020h</td><td>000Ah</td><td>0002h</td><td>0</td><td>0</td><td>2. tur</td></tr>
+    <tr><td>0110h</td><td></td><td><code>LOOP don</code></td><td>0020h</td><td>000Ah</td><td>0001h</td><td>0</td><td>0</td><td>CX ≠ 0 → don</td></tr>
+    <tr><td>010Dh</td><td></td><td><code>ADD AX, 1</code></td><td>0021h</td><td>000Ah</td><td>0001h</td><td>0</td><td>0</td><td>3. tur</td></tr>
+    <tr><td>0110h</td><td></td><td><code>LOOP don</code></td><td>0021h</td><td>000Ah</td><td>0000h</td><td>0</td><td>0</td><td>CX = 0 → düşer</td></tr>
+    <tr><td>0112h</td><td><code>C3</code></td><td><code>RET</code></td><td>0021h</td><td>000Ah</td><td>0000h</td><td>0</td><td>0</td><td>sonuç 33</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>MUL adımı.</strong> <code>MUL BL</code> satırında yalnız BL yazılıdır. Çarpılan örtük olarak AL'dir (12), sonuç örtük olarak AX'tir. 12 × 10 = 120 = 0078h. Sonuç 8 bite sığdığı için AH = 00h olur ve CF = OF = 0 kalır. 8086'da MUL bu iki bayrağı “sonucun üst yarısı anlamlı mı” sorusuna göre kurar. SF, ZF, AF ve PF ise MUL'den sonra <strong>tanımsızdır</strong>: işlemci onlara bir değer yazar, ama Intel bu değeri belgelemez. Tabloda ZF için soru işareti bu yüzden konmuştur. Programın ZF'ye güvenmesi için ardından bayrağı tanımlı biçimde kuran bir komut gelmesi gerekir.</p>
+
+<p><strong>SHR adımı.</strong> 8086'da bir yazmacı birden fazla bit kaydırmak için kaydırma sayısı yalnız CL'de verilebilir. <code>SHR AX, 2</code> biçimi 80186 ile geldi. Program bu yüzden önce <code>MOV CL, 2</code> yazar. Sağa kaydırma her bitte değeri ikiye böler: 0078h = 0111 1000b iki bit sağa kayınca 0001 1110b = 001Eh = 30 olur. Kaydırmada son dışarı çıkan bit CF'ye yazılır. Çıkan iki bit 0 ve 0 olduğu için CF = 0'dır. Sonuç sıfır olmadığından ZF = 0 olur. Bu komutla ZF yeniden tanımlı hâle gelmiştir.</p>
+
+<p><strong>MOV CX, 3 adımı.</strong> Bu satır CX'e 3 yazar. CL, CX'in alt yarısıdır; bir önceki adımda CL'ye yazılan 2 böylece silinir. Kaydırma bittiği için kayıp önemsizdir, ama sıra ters olsaydı, yani CX önce kurulup sonra CL'ye 2 yazılsaydı, döngü 3 kez değil 2 kez dönerdi. Aynı fiziksel yazmacın iki adla anılması, örtük işlenenlerle birleşince sık hata kaynağı olur.</p>
+
+<p><strong>LOOP adımları.</strong> <code>LOOP don</code> komutu iki işi tek komutta yapar: CX'i 1 azaltır ve CX sıfır değilse <code>don</code> etiketine atlar. Programda CX'i azaltan hiçbir satır yoktur, ama izleme CX'in 3 → 2 → 1 → 0 diye üç kez değiştiğini gösterir. LOOP'un azaltması bayrakları etkilemez; LOOP bayrak değiştirmeyen bir komuttur. Her turda <code>ADD AX, 1</code> AX'i bir artırır: 30 → 31 → 32 → 33. Üçüncü LOOP'ta CX sıfıra iner, atlama yapılmaz ve akış RET'e düşer.</p>
+
+<p>Programın sonunda AX = 0021h = 33'tür. Sonuç satır satır okununca şaşırtıcı değildir, ama programda AX'in yalnız ADD satırında yazıldığını düşünen biri MUL ve SHR'nin AX'i değiştirdiğini kaçırır. <a href="#sekil-ortuk">Şekil 3.2.3</a> izlemenin üç anını sunumdaki çizimlerle gösterir.</p>
+
+<figure class="nt-fig" id="sekil-ortuk" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX yazmaçları ve bayraklar; adım sonrası"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0078h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">?</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 120 (onluk)</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">örtük: AL, AX</text></svg><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX yazmaçları ve bayraklar; adım sonrası"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">001Eh</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0002h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 30 (onluk)</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">sayı CL'de</text></svg><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX yazmaçları ve bayraklar; adım sonrası"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="box" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0021h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 33 (onluk)</text></svg></div>
+  <figcaption><b>Şekil 3.2.3:</b> Örtük işlenen izlemesinin üç anı. Üstte <code>MUL BL</code> sonrası: AX = 0078h, ZF tanımsız. Ortada <code>SHR AX, CL</code> sonrası: AX = 001Eh, CX = 0002h. Altta RET'te: AX = 0021h, CX = 0000h. Vurgulu kutular o adımda değişen yazmaçlardır.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>MUL'ün AH'yi koruduğunu sanmak.</strong> AH'de bir sayaç ya da ara sonuç tutan bir program <code>MUL BL</code> çalıştırınca bu değeri kaybeder. 16 bitlik <code>MUL BX</code> ise daha da geniş bir alanı değiştirir: sonuç DX:AX çiftine yazılır ve DX'in eski değeri de silinir. Saklanması gereken yazmaç MUL'den önce başka bir yazmaca ya da yığına alınır.</p>
+</div>
+
+<h3 id="s3-2-3-4"><span class="nt-num">3.2.3.4</span>Yazmaç mı, bellek mi?</h3>
+
+<p>Bir değer ya yazmaçta ya bellekte tutulur. İkisi arasındaki seçim, programın hızını en çok etkileyen karardır. <a href="#sekil-yazmac-bellek">Şekil 3.2.4</a> iki yerin işlemciye uzaklığını gösterir.</p>
+
+<figure class="nt-fig" id="sekil-yazmac-bellek" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 92" role="img" aria-label="Yazmaç CPU içinde, bellek sistem yolunun öbür ucunda"><defs><marker id="n32-6-mt2-12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-dim" x="6" y="6" width="200" height="80" rx="8"/><text class="lbl" x="20" y="24" text-anchor="start">CPU</text><rect class="mt-hot" x="20" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="40" y="54" text-anchor="middle">AX</text><rect class="mt-hot" x="65" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="85" y="54" text-anchor="middle">BX</text><rect class="mt-hot" x="110" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="130" y="54" text-anchor="middle">CX</text><rect class="mt-hot" x="155" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="175" y="54" text-anchor="middle">DX</text><text class="mt-g" x="106" y="80" text-anchor="middle" style="font-size:12px">0 yol döngüsü</text><path class="mt-wire" d="M210 46 H370" marker-end="url(#n32-6-mt2-12)" marker-start="url(#n32-6-mt2-12)"/><text class="lbl" x="290" y="38" text-anchor="middle">sistem yolu</text><text class="mt-a" x="290" y="68" text-anchor="middle" style="font-size:12px">her erişim ≥ 4 saat periyodu</text><rect class="box" x="376" y="6" width="178" height="80" rx="8"/><text class="mt-s" x="465" y="28" text-anchor="middle">Bellek (1 MB)</text><text class="lbl" x="465" y="50" text-anchor="middle">kod · değişkenler</text><text class="lbl" x="465" y="68" text-anchor="middle">diziler · yığın</text></svg></div>
+  <figcaption><b>Şekil 3.2.4:</b> Yazmaçlar CPU'nun içinde, bellek sistem yolunun öbür ucundadır. Yazmaca erişim yol döngüsü gerektirmez; her bellek erişimi en az dört saat turu süren bir yol döngüsüdür.</figcaption>
+</figure>
+
+<p>8086'nın programcıya görünen <strong>14 yazmacı</strong> vardır: 8 genel amaçlı yazmaç (AX, BX, CX, DX, SP, BP, SI, DI), 4 kesim yazmacı (CS, DS, ES, SS), komut işaretçisi IP ve bayrak yazmacı FLAGS. Hepsi 16 bittir. Yazmaçlar flip-flop'lardan yapılmış küçük ve çok hızlı bellek hücreleridir. Bir yazmacın değeri iç yoldan doğrudan ALU'ya ulaşır; dış hatlara hiç çıkmaz.</p>
+
+<p>Bellek ise CPU'nun dışındadır ve 8086'da 1 MB'a kadar büyüyebilir. Program kodu, değişkenler, diziler ve yığın burada durur. Bellekten bir sözcük okumak için işlemcinin bir <strong>yol döngüsü</strong> (<span lang="en">bus cycle</span>) yürütmesi gerekir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-yol-dongusu">
+  <span class="nt-box__title">Tanım 3.2.5</span>
+  <p><strong>Yol döngüsü</strong>, işlemcinin sistem yolu üzerinden bir bellek ya da G/Ç konumunu okuduğu veya yazdığı işlemdir. 8086'da bir yol döngüsü en az dört <strong>T durumundan</strong> (T1–T4) oluşur; her T durumu bir saat turudur. Bellek yavaşsa T3 ile T4 arasına bekleme durumları (Tw) eklenir.</p>
+</div>
+
+<p>Bir okuma döngüsünde T1'de işlemci 20 bitlik adresi AD0–AD15 ve A16–A19 hatlarına koyar ve ALE sinyaliyle adresin dış kilitlere yakalanmasını sağlar. T2'de aynı hatlar veri için serbest bırakılır ve RD sinyali etkin olur. T3'te bellek veriyi veri yoluna koyar. T4'te işlemci veriyi alır ve sinyaller geri çekilir. Yazmaç işleneninde bu dört adımın hiçbiri yoktur. Bellek erişimi bu yüzden yazmaç erişiminden kat kat uzundur.</p>
+
+<p>Bellek erişiminin bir bedeli daha vardır. 8086'nın veri yolu 16 bittir ve bir yol döngüsünde çift adresten başlayan bir sözcüğü bütün olarak okuyabilir. Sözcük tek adreste başlıyorsa iki ayrı yol döngüsü gerekir: biri düşük bayt, biri yüksek bayt için. Bu durumda erişim dört saat turu daha uzar.</p>
+
+<p>Bu fark iyi assembly kodunun kuralını belirler: sık kullanılan değerler yazmaçlarda tutulur, belleğe yalnız gerektiğinde gidilir. Bir döngü sayacını bellekte değil CX'te tutmak döngüyü hızlandırır. Bir dizinin elemanları bellekte durmak zorundadır, ama elemanların toplamı döngü boyunca bir yazmaçta biriktirilip en sonda belleğe bir kez yazılabilir.</p>
+
+<h3 id="s3-2-3-5"><span class="nt-num">3.2.3.5</span>Komut süreleri</h3>
+
+<p>Intel 8086 veri sayfası her komutun kaç saat turu sürdüğünü verir. Bellek işlenenli komutlarda bu süreye, adresin hesaplanması için bir <strong>etkin adres</strong> (EA) süresi eklenir. Etkin adres, bellek işleneninin kesim içindeki bağıl konumudur; doğrudan bir sabit, bir yazmaç ya da yazmaç ve sabit toplamı olabilir.</p>
+
+<div class="nt-tablewrap" id="tab-sure">
+<table class="nt-table">
+  <caption>Tablo 3.2.10: Bazı 8086 komutlarının süreleri (en iyi durum, saat turu).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">İşlenenler</th><th scope="col">Saat turu</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, BX</code></td><td>yazmaç, yazmaç</td><td>2</td></tr>
+    <tr><td><code>MOV AX, 5</code></td><td>yazmaç, anlık</td><td>4</td></tr>
+    <tr><td><code>MOV AX, sayi</code></td><td>akümülatör, doğrudan bellek</td><td>10</td></tr>
+    <tr><td><code>MOV CX, [BX]</code></td><td>yazmaç, bellek</td><td>8 + 5 = 13</td></tr>
+    <tr><td><code>ADD AX, BX</code></td><td>yazmaç, yazmaç</td><td>3</td></tr>
+    <tr><td><code>ADD AX, sayi</code></td><td>yazmaç, bellek</td><td>9 + 6 = 15</td></tr>
+    <tr><td><code>INC CX</code></td><td>16 bitlik yazmaç</td><td>2</td></tr>
+    <tr><td><code>INC sayac</code></td><td>bellek (sözcük)</td><td>15 + 6 = 21</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-tablewrap" id="tab-ea">
+<table class="nt-table">
+  <caption>Tablo 3.2.11: Etkin adres hesabının süresi.</caption>
+  <thead><tr><th scope="col">Adres biçimi</th><th scope="col">Örnek</th><th scope="col">EA süresi (tur)</th></tr></thead>
+  <tbody>
+    <tr><td>yalnız taban ya da indis</td><td><code>[BX]</code>, <code>[SI]</code></td><td>5</td></tr>
+    <tr><td>doğrudan adres</td><td><code>sayi</code>, <code>[0200h]</code></td><td>6</td></tr>
+    <tr><td>taban + indis</td><td><code>[BX+SI]</code>, <code>[BP+DI]</code></td><td>7</td></tr>
+    <tr><td>taban + indis</td><td><code>[BX+DI]</code>, <code>[BP+SI]</code></td><td>8</td></tr>
+    <tr><td>taban ya da indis + sabit</td><td><code>[BX+4]</code></td><td>9</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki farkların nedeni donanımdır. <code>MOV AX, BX</code> bir iç aktarımdır: 2 tur. <code>MOV AX, 5</code> 4 tur sürer, çünkü 16 bitlik sabit komut kuyruğundan çekilmelidir. <code>MOV CX, [BX]</code> önce etkin adresi hesaplar (5 tur), sonra bir yol döngüsü yürütür. <code>MOV AX, sayi</code> özel bir durumdur. AX'e doğrudan adresten yükleme, adresi komutun içinde taşıyan kısa <strong>akümülatör biçimini</strong> (<code>A1</code> işlem kodu) kullanır ve EA hesabı gerektirmez: 10 tur. Belleğe yazan komutlar en uzunlarıdır. <code>INC sayac</code> önce sözcüğü okur, ALU'da artırır, sonra geri yazar; iki yol döngüsü içerir ve 21 tur sürer.</p>
+
+<p>Tablodaki değerler en iyi durum süreleridir. Tek adresteki sözcük erişimi her erişime 4 tur ekler. Bir atlamadan sonra komut kuyruğu boşalmışsa işlemci baytların gelmesini bekler. Kesim öneki kullanılırsa 2 tur daha eklenir. Gerçek süre bu yüzden tablodakinden uzun olabilir. Oran ise değişmez: bellek işlenenli bir komut, yazmaç işlenenli eşinden birkaç kat yavaştır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-sure">
+  <span class="nt-box__title">Örnek 3.2.5</span>
+  <p>5 MHz'lik bir 8086'da 1000 kez dönen bir döngüde sayaç her turda bir kez artırılıyor. Sayaç CX'te ve bellekte tutulduğunda artırma işlemleri toplam ne kadar sürer?</p>
+  <p>5 MHz'de bir saat turu 1 / (5 × 10<sup>6</sup>) s = 0,2 µs'dir. Sayaç CX'teyse her artırma <code>INC CX</code> ile 2 tur sürer: 1000 × 2 = 2000 tur = 2000 × 0,2 µs = <strong>0,4 ms</strong>. Sayaç bellekteyse her artırma <code>INC sayac</code> ile 21 tur sürer: 1000 × 21 = 21 000 tur = <strong>4,2 ms</strong>. Yalnız sayacın yeri değişmiş, süre on kattan fazla artmıştır. Döngünün öteki komutları aynı kaldığı için toplam süredeki fark da 3,8 ms'dir.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-com-sure">
+  <span class="nt-box__title">Örnek 3.2.6</span>
+  <p><code>MOV AX, 5</code>, <code>MOV BX, 3</code>, <code>ADD AX, BX</code>, <code>MOV CL, AL</code> dizisi kaç saat turu sürer? İkinci satır <code>MOV BX, sayi</code> (doğrudan adres, sözcük) olsaydı ne değişirdi?</p>
+  <p>Yazmaça anlık değer 4, yazmaçtan yazmaca toplama 3, 8 bitlik yazmaçtan yazmaca MOV 2 tur sürer: 4 + 4 + 3 + 2 = <strong>13 tur</strong>; 5 MHz'de 2,6 µs. İkinci satır bellekten okursa ve hedef AX değil BX olduğu için akümülatör biçimi kullanılamaz; süre 8 + 6 = 14 tur olur. Toplam 4 + 14 + 3 + 2 = <strong>23 tur</strong>, yani 4,6 µs çıkar. Tek bir bellek işleneni dizinin süresini yaklaşık iki katına çıkarmıştır.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Komut uzunluğu ile süresini karıştırmak.</strong> Kısa komut hızlı komut demek değildir. <code>MUL BL</code> yalnız iki bayttır (<code>F6 E3</code>), ama 70–77 saat turu sürer; üç baytlık <code>ADD AX, 1234h</code> (<code>05 34 12</code>) ise 4 turdur. Bayt sayısı komutun bellekte kapladığı yeri ve IP'nin ne kadar ilerleyeceğini belirler. Süreyi ise komutun iç işlemi ve yol döngüsü sayısı belirler.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-4"><span class="nt-num">3.2.4</span>IP ve bayraklar</h2>
+
+<h3 id="s3-2-4-1"><span class="nt-num">3.2.4.1</span>IP nasıl ilerler?</h3>
+
+<p>Programlarda IP hiç yazılmaz, ama her komut onu değiştirir. <strong>Komut işaretçisi</strong> (IP, <span lang="en">instruction pointer</span>), sıradaki komutun kod kesimi içindeki bağıl konumunu tutar. Fiziksel adres CS ile IP'den hesaplanır: CS × 10h + IP. Bu çifte <strong>CS:IP</strong> denir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ip">
+  <span class="nt-box__title">Tanım 3.2.6</span>
+  <p>Sıradan (atlama yapmayan) bir komut yürütüldükten sonra IP, komutun bayt uzunluğu kadar ilerler: IP<sub>yeni</sub> = IP<sub>eski</sub> + komut uzunluğu. Atlama, çağrı, dönüş ve kesme komutları ise IP'ye yeni bir değer yazar. IP'ye <code>MOV</code> ile yazılamaz.</p>
+</div>
+
+<p>8086 komutları 1 ile 6 bayt arasında değişen uzunluktadır. IP'nin ne kadar ilerleyeceğini bilmek için her komutun uzunluğunu bilmek gerekir. Aşağıdaki programda uzunluklar açıklama olarak yazılmıştır.</p>
+
+<pre class="nt-code"><code>ORG 100h
+MOV AX, 5     <span class="cm">; 3 bayt</span>
+MOV BX, 2     <span class="cm">; 3 bayt</span>
+INC AX        <span class="cm">; 1 bayt</span>
+ADD AX, BX    <span class="cm">; 2 bayt</span>
+RET           <span class="cm">; 1 bayt</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-ip-iz">
+<table class="nt-table">
+  <caption>Tablo 3.2.12: IP izlemesi (her satır, komut yürütüldükten sonraki durum).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Komutun adresi</th><th scope="col">Baytlar</th><th scope="col">Komut</th><th scope="col">IP</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>—</td><td>—</td><td>(yüklendi)</td><td>0100h</td><td>0000h</td><td>0000h</td><td>FFFEh</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>B8 05 00</code></td><td><code>MOV AX, 5</code></td><td>0103h</td><td>0005h</td><td>0000h</td><td>FFFEh</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>BB 02 00</code></td><td><code>MOV BX, 2</code></td><td>0106h</td><td>0005h</td><td>0002h</td><td>FFFEh</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>40</code></td><td><code>INC AX</code></td><td>0107h</td><td>0006h</td><td>0002h</td><td>FFFEh</td></tr>
+    <tr><td>4</td><td>0107h</td><td><code>03 C3</code></td><td><code>ADD AX, BX</code></td><td>0109h</td><td>0008h</td><td>0002h</td><td>FFFEh</td></tr>
+    <tr><td>5</td><td>0109h</td><td><code>C3</code></td><td><code>RET</code></td><td>0000h</td><td>0008h</td><td>0002h</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Adım 0'da program kesimin 0100h konumuna yüklenmiştir ve IP = 0100h ilk komutu gösterir. Adım 1'de işlemci <code>B8</code> baytını okur, bu işlem kodunun arkasından iki baytlık bir sabit geleceğini anlar ve üç baytı birlikte alır. IP 0103h'ye ilerler; komut yürütülünce AX = 0005h olur. Adım 2'de aynı şey BX için olur: 3 bayt daha, IP = 0106h.</p>
+
+<p>Adım 3'teki <code>INC AX</code> tek bayttır. 16 bitlik yazmacı artırma komutlarının kodu 40h + yazmaç numarasıdır; AX için 40h. IP yalnız 1 artar: 0107h. Adım 4'te <code>ADD AX, BX</code> iki bayttır: işlem kodu 03h ve işlenenleri tanımlayan bir bayt (C3h). IP = 0109h, AX = 0006h + 0002h = 0008h olur.</p>
+
+<p>Adım 5 sıradan bir komut değildir. <code>RET</code> yığının tepesindeki sözcüğü IP'ye alır. .COM programı başladığında yığının tepesinde (SS:FFFEh) DOS'un koyduğu 0000h vardır. RET bu değeri IP'ye yazar ve SP'yi 2 artırır: FFFEh + 2 = 10000h, 16 bite sığmadığı için SP = 0000h olur. IP = 0000h artık programın değil, kesimin başındaki PSP'nin ilk baytını gösterir. Orada <code>INT 20h</code> komutu (<code>CD 20</code>) durur ve programı bitirir.</p>
+
+<figure class="nt-fig" id="sekil-ip" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Kod baytları ve IP"><defs><marker id="n32-7-m03i12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><path class="line" d="M10 118 L10 70" marker-end="url(#n32-7-m03i12)"/><text class="txt mono" x="10" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0100h</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Kod baytları ve IP"><defs><marker id="n32-8-m03i15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><path class="line" d="M276 118 L276 70" marker-end="url(#n32-8-m03i15)"/><text class="txt mono" x="276" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0107h</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Kod baytları ve IP"><defs><marker id="n32-9-m03i17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text><text class="txt mono" x="200" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0000h (PSP'ye dönüş)</text></svg></div>
+  <figcaption><b>Şekil 3.2.5:</b> Komut baytları bellekte ve IP. Üstte program yüklenmiştir, IP = 0100h. Ortada üç komut yürütülmüştür, IP = 0107h. Altta RET yığından 0000h'yi almış ve IP PSP'nin başına dönmüştür. Her kutunun genişliği komutun bayt sayısını gösterir.</figcaption>
+</figure>
+
+<p>IP ile donanım arasındaki ilişki burada bir inceliği gizler. 8086'nın yol arayüz birimi komut baytlarını önceden getirir ve 6 baytlık bir kuyrukta bekletir. BIU'nun bellekten okuduğu adres, yürütülen komutun adresinden birkaç bayt ileridedir. Programcının gördüğü IP ise her zaman <strong>yürütülecek</strong> sıradaki komutun adresidir. Bir atlama olduğunda kuyruk boşaltılır ve BIU yeni IP'den getirmeye başlar. Kuyruk programcıya görünmez; yalnız sürelere yansır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-ip">
+  <span class="nt-box__title">Örnek 3.2.7</span>
+  <p>Bir program 0100h'de başlıyor ve uzunlukları 3, 2, 1 ve 4 bayt olan dört komutu sırayla yürütüyor. Komutların hiçbiri atlama değildir. Dördüncü komuttan sonra IP kaçtır? Üçüncü komutun adresi nedir?</p>
+  <p>IP her komutta uzunluğu kadar ilerler: 0100h → 0103h → 0105h → 0106h → 010Ah. Dört komut toplam 3 + 2 + 1 + 4 = 10 bayttır ve IP = 0100h + 0Ah = <strong>010Ah</strong> olur. Üçüncü komut, ilk iki komutun bittiği yerde, <strong>0105h</strong> adresinde başlar.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>IP'yi komut sayısıyla ilerletmek.</strong> “Üç komut yürütüldü, IP 0103h olur” düşüncesi yanlıştır. IP baytları sayar, komutları değil. 8086'da komut uzunlukları değişken olduğu için IP'yi hesaplamak, her komutun uzunluğunu bilmeyi gerektirir. Uzunluklar emu8086'nın bellek görünümünden ya da assembler'ın liste çıktısından okunabilir.</p>
+</div>
+
+<h3 id="s3-2-4-2"><span class="nt-num">3.2.4.2</span>Bayrakları hangi komutlar değiştirir?</h3>
+
+<p>Bayrak yazmacı (FLAGS), son aritmetik ya da mantık işleminin sonucu hakkında bilgi taşır. Durum bayrakları şunlardır: CF (elde), ZF (sıfır), SF (işaret), OF (taşma), AF (yardımcı elde) ve PF (eşlik). Koşullu atlama komutları bu bayraklara bakarak karar verir. Hangi komutun hangi bayrağı değiştirdiği bu yüzden programın akışını doğrudan belirler.</p>
+
+<p>Temel kural, bayrakların yalnız sonuç <em>hesaplayan</em> komutlarca yazılmasıdır. Veri taşıyan komutlar sonuç hesaplamaz; bayraklara dokunmaz. <a href="#tab-bayrak-kural">Tablo 3.2.13</a> komutları bayraklara etkilerine göre gruplar.</p>
+
+<div class="nt-tablewrap" id="tab-bayrak-kural">
+<table class="nt-table">
+  <caption>Tablo 3.2.13: Komutların durum bayraklarına etkisi.</caption>
+  <thead><tr><th scope="col">Grup</th><th scope="col">Komutlar</th><th scope="col">Etki</th></tr></thead>
+  <tbody>
+    <tr><td>Veri taşıma</td><td><code>MOV</code>, <code>XCHG</code>, <code>LEA</code>, <code>PUSH</code>, <code>POP</code>, <code>CBW</code></td><td>hiçbir bayrak değişmez</td></tr>
+    <tr><td>Döngü ve atlama</td><td><code>JMP</code>, <code>Jcc</code>, <code>LOOP</code>, <code>CALL</code>, <code>RET</code></td><td>hiçbir bayrak değişmez</td></tr>
+    <tr><td>Değil</td><td><code>NOT</code></td><td>hiçbir bayrak değişmez</td></tr>
+    <tr><td>Artırma, azaltma</td><td><code>INC</code>, <code>DEC</code></td><td>ZF, SF, OF, AF, PF yeniden yazılır; <strong>CF değişmez</strong></td></tr>
+    <tr><td>Toplama, çıkarma, karşılaştırma</td><td><code>ADD</code>, <code>ADC</code>, <code>SUB</code>, <code>SBB</code>, <code>CMP</code>, <code>NEG</code></td><td>altı durum bayrağı yeniden yazılır</td></tr>
+    <tr><td>Mantık</td><td><code>AND</code>, <code>OR</code>, <code>XOR</code>, <code>TEST</code></td><td>CF = OF = 0; ZF, SF, PF sonuca göre</td></tr>
+    <tr><td>Çarpma</td><td><code>MUL</code>, <code>IMUL</code></td><td>CF, OF tanımlı; ZF, SF, AF, PF tanımsız</td></tr>
+    <tr><td>Doğrudan kurma</td><td><code>STC</code>, <code>CLC</code>, <code>CMC</code></td><td>yalnız CF</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun iki satırı şaşırtıcıdır. Birincisi NOT'tur. NOT bir mantık işlemidir ve yeni bir değer hesaplar, ama 8086'da hiçbir bayrağı değiştirmez. NOT sonrası sonucu sınamak isteyen program ardından <code>TEST AL, AL</code> ya da <code>CMP</code> yazmalıdır. İkincisi INC ve DEC'tir. Bu iki komut CF'ye dokunmaz. Tasarımın amacı çok baytlı sayılar üzerinde çalışan döngülerdir: döngü sayacı ya da indis INC/DEC ile değiştirilirken ADC'nin taşıdığı elde kaybolmaz. INC'in bir sayıyı FFFFh'den 0000h'ye geçirdiğini anlamak için CF'ye değil ZF'ye bakılır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-bayrak">
+  <span class="nt-box__title">Tanım 3.2.7</span>
+  <p>Bir koşullu atlamanın baktığı bayrak, ondan önce yürütülen ve o bayrağı <strong>yazan son komutun</strong> sonucunu gösterir. Aradaki MOV, NOT, LOOP gibi bayrak değiştirmeyen komutlar bu ilişkiyi bozmaz; ama aradaki bir INC, ADD ya da CMP bozar.</p>
+</div>
+
+<h3 id="s3-2-4-3"><span class="nt-num">3.2.4.3</span>Kod izleme: bayraklar</h3>
+
+<p>Aşağıdaki program bayrak kurallarını tek tek sınar. Her satırdaki açıklama o satırın bayraklara etkisini önceden söyler; izleme bu tahminleri doğrular.</p>
+
+<pre class="nt-code"><code>ORG 100h
+STC              <span class="cm">; CF = 1</span>
+MOV AL, 0FFh     <span class="cm">; bayraklar aynı</span>
+INC AL           <span class="cm">; CF'ye dokunmaz</span>
+MOV CX, 0        <span class="cm">; ZF aynı kalır</span>
+DEC AL
+ADD AL, 1        <span class="cm">; CF yeni</span>
+CLC
+NOT AL           <span class="cm">; bayraklar aynı</span>
+RET</code></pre>
+
+<div class="nt-tablewrap" id="tab-bayrak-iz">
+<table class="nt-table">
+  <caption>Tablo 3.2.14: Bayrak izlemesi (her satır, komut yürütüldükten sonraki durum).</caption>
+  <thead><tr><th scope="col">Adres</th><th scope="col">Baytlar</th><th scope="col">Komut</th><th scope="col">AL</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">AF</th><th scope="col">PF</th><th scope="col">Hangi bayraklar yazıldı?</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>F9</code></td><td><code>STC</code></td><td>00h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>yalnız CF</td></tr>
+    <tr><td>0101h</td><td><code>B0 FF</code></td><td><code>MOV AL, 0FFh</code></td><td>FFh</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>hiçbiri</td></tr>
+    <tr><td>0103h</td><td><code>FE C0</code></td><td><code>INC AL</code></td><td>00h</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>CF dışındakiler</td></tr>
+    <tr><td>0105h</td><td><code>B9 00 00</code></td><td><code>MOV CX, 0</code></td><td>00h</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>hiçbiri</td></tr>
+    <tr><td>0108h</td><td><code>FE C8</code></td><td><code>DEC AL</code></td><td>FFh</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>CF dışındakiler</td></tr>
+    <tr><td>010Ah</td><td><code>04 01</code></td><td><code>ADD AL, 1</code></td><td>00h</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>hepsi</td></tr>
+    <tr><td>010Ch</td><td><code>F8</code></td><td><code>CLC</code></td><td>00h</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>yalnız CF</td></tr>
+    <tr><td>010Dh</td><td><code>F6 D0</code></td><td><code>NOT AL</code></td><td>FFh</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>hiçbiri</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>STC ve MOV.</strong> <code>STC</code> (<span lang="en">set carry</span>) CF'yi doğrudan 1 yapar. Bayrağı bir işlem sonucu olmadan değiştiren az sayıdaki komuttan biridir. <code>MOV AL, 0FFh</code> AL'ye 255 yazar; bayrakların hiçbiri değişmez. MOV bir sonuç hesaplamaz, yalnız kopyalar.</p>
+
+<p><strong>INC AL.</strong> FFh + 1 = 100h, 8 bite sığmaz ve AL = 00h olur. Toplama bir ADD ile yapılsaydı bu elde CF'ye yazılırdı. INC ise CF'ye dokunmaz; CF, STC'den kalan 1'dir. Sonuç sıfır olduğu için ZF = 1, bit 3'ten bit 4'e elde geçtiği için AF = 1 olur. 00h'nin bir bitlerinin sayısı sıfırdır, yani çifttir; PF = 1. İşaretli yorumda −1 + 1 = 0 doğru bir sonuçtur, taşma yoktur: OF = 0.</p>
+
+<p><strong>MOV CX, 0.</strong> CX'e sıfır yazılır. Sonuç sıfır olduğu hâlde ZF yeniden hesaplanmaz; ZF'deki 1 bir önceki INC'ten kalmıştır. Bu satırdan sonra bir <code>JZ</code> gelseydi atlama yapılırdı, ama nedeni CX değil AL olurdu.</p>
+
+<p><strong>DEC AL.</strong> 00h − 1 = FFh. En üst bit 1 olduğu için SF = 1, sonuç sıfır olmadığı için ZF = 0 olur. Bit 4'ten ödünç alındığı için AF = 1, FFh'nin sekiz bir biti çift sayıda olduğu için PF = 1'dir. İşaretsiz yorumda 0'dan 1 çıkarmak bir ödünç doğurur. SUB bunu CF'ye yazardı; DEC yazmaz ve CF yine 1 kalır.</p>
+
+<p><strong>ADD AL, 1.</strong> FFh + 1 = 100h, AL = 00h. Bu kez toplamayı ADD yapar ve ADD altı durum bayrağının hepsini yeniden yazar. CF = 1 olur; tablodaki değer önceki satırla aynı görünür, ama artık STC'den kalan 1 değil, ADD'in ürettiği eldedir. ZF = 1, SF = 0, AF = 1, PF = 1, OF = 0.</p>
+
+<p><strong>CLC ve NOT.</strong> <code>CLC</code> CF'yi 0 yapar. <code>NOT AL</code> AL'nin bütün bitlerini ters çevirir: 00h → FFh. AL sıfır olmaktan çıktığı hâlde ZF hâlâ 1'dir, çünkü NOT bayrak yazmaz. Bu satırdan sonra AL'nin sıfır olup olmadığını sınamak için <code>TEST AL, AL</code> gerekir.</p>
+
+<figure class="nt-fig" id="sekil-bayrak" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL ve bayraklar; adım sonrası"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF korunur</text></svg><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL ve bayraklar; adım sonrası"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF korunur</text></svg><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL ve bayraklar; adım sonrası"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">bayrak yok</text></svg></div>
+  <figcaption><b>Şekil 3.2.6:</b> Bayrak izlemesinin üç anı. Üstte <code>INC AL</code> sonrası: AL = 00h, ZF = 1, CF korunmuştur. Ortada <code>DEC AL</code> sonrası: AL = FFh, SF = 1, CF yine korunmuştur. Altta <code>NOT AL</code> sonrası: AL = FFh olduğu hâlde ZF = 1 kalmıştır.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Koşullu atlamadan önce bayrağı kimin kurduğuna bakmamak.</strong> <code>DEC CX</code> ile <code>JZ son</code> arasına bir <code>MOV AX, [BX]</code> eklemek akışı bozmaz; MOV bayrak yazmaz. Araya bir <code>ADD SI, 2</code> eklemek ise bozar: JZ artık CX'e değil SI'nin toplamına bakar. Atlamadan önce “bu bayrağı en son hangi komut yazdı?” sorusu sorulmalıdır.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-5"><span class="nt-num">3.2.5</span>İlk program</h2>
+
+<h3 id="s3-2-5-1"><span class="nt-num">3.2.5.1</span>.COM program şablonu</h3>
+
+<p>emu8086'da yeni bir dosya açılırken <strong>COM template</strong> seçilirse düzenleyici boş bir .COM şablonuyla açılır. Bir .COM programının iskeleti yalnız üç parçadan oluşur: başlangıç konumunu bildiren <code>ORG 100h</code>, komutlar ve programı bitiren <code>RET</code>. Değişkenler, varsa, RET'ten sonra gelir.</p>
+
+<pre class="nt-code"><code>ORG 100h          <span class="cm">; .COM: kod 0100h'den başlar</span>
+
+MOV AX, 5         <span class="cm">; AX = 5</span>
+MOV BX, 3         <span class="cm">; BX = 3</span>
+ADD AX, BX        <span class="cm">; AX = AX + BX = 8</span>
+MOV CL, AL        <span class="cm">; CL = 08h</span>
+
+RET               <span class="cm">; DOS'a dön</span>
+
+sayi DB 0         <span class="cm">; değişkenler RET'ten sonra</span></code></pre>
+
+<p><strong>ORG 100h.</strong> DOS bir .COM programını yüklerken önce bir kesim seçer ve bu kesimin ilk 256 baytına (0000h–00FFh) <strong>PSP</strong> (<span lang="en">program segment prefix</span>, program kesimi öneki) adlı bir başlık yazar. PSP'de programın komut satırı, bitiş adresi ve DOS'un kullandığı başka bilgiler bulunur. Programın baytları PSP'nin hemen arkasına, 0100h'den başlayarak kopyalanır. <code>ORG 100h</code> assembler'a bu gerçeği bildirir. Direktif olmasaydı assembler ilk baytı 0000h'de sanar ve bütün değişken adreslerini 256 bayt eksik hesaplardı.</p>
+
+<p><strong>Sıralı yürütme.</strong> Komutlar yukarıdan aşağı sırayla yürütülür. Bir atlama komutu yoksa işlemci her komuttan sonra bellekte hemen arkasındaki baytlara geçer. Boş satırlar ve açıklamalar bu sıraya hiçbir şey eklemez.</p>
+
+<p><strong>RET.</strong> Program bitince denetimin işletim sistemine dönmesi gerekir. RET bu işi dolaylı yoldan yapar: yığından 0000h'yi IP'ye alır, işlemci PSP'nin başındaki <code>INT 20h</code> komutunu yürütür ve DOS programı sonlandırır. RET unutulursa işlemci programın bittiğini bilemez. Komutların arkasındaki baytları, yani değişkenleri ve onların arkasındaki rastgele bellek içeriğini, komut gibi çözmeye devam eder.</p>
+
+<p><strong>Değişkenlerin yeri.</strong> Bu yüzden değişkenler kodun sonuna, RET'in arkasına konur. RET'e gelen işlemci geri döner ve değişkenlerin baytlarına hiç ulaşmaz. Değişkenler kodun önüne konmak istenirse ilk komut, verinin üstünden atlayan bir <code>JMP</code> olmalıdır.</p>
+
+<p><strong>Başlangıç durumu.</strong> .COM programı tek kesimlidir: kod, veri ve yığın aynı 64 KB'tadır. Yükleyici bu yüzden dört kesim yazmacına aynı değeri koyar: CS = DS = ES = SS. emu8086 bu değer olarak 0700h kullanır. IP = 0100h, SP = FFFEh olur; yığın kesimin en sonundan başlayıp aşağı doğru büyür. Yığının tepesinde, FFFEh adresinde, RET'in dönüşünü sağlayan 0000h sözcüğü durur. Genel yazmaçlar sıfırdır.</p>
+
+<div class="nt-tablewrap" id="tab-baslangic">
+<table class="nt-table">
+  <caption>Tablo 3.2.15: emu8086'da .COM programının başlangıç durumu.</caption>
+  <thead><tr><th scope="col">Yazmaç</th><th scope="col">Değer</th><th scope="col">Anlamı</th></tr></thead>
+  <tbody>
+    <tr><td>CS, DS, ES, SS</td><td>0700h</td><td>tek kesim; kesim 07000h fiziksel adresinde başlar</td></tr>
+    <tr><td>IP</td><td>0100h</td><td>PSP'nin arkasındaki ilk komut</td></tr>
+    <tr><td>SP</td><td>FFFEh</td><td>yığının tepesi; [FFFEh] = 0000h</td></tr>
+    <tr><td>AX, BX, CX, DX, SI, DI, BP</td><td>0000h</td><td>—</td></tr>
+    <tr><td>FLAGS</td><td>IF = 1, ötekiler 0</td><td>kesmeler açık</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Şablondaki dört komutun işi basittir: AX'e 5, BX'e 3 yazılır, ikisi toplanır ve sonucun alt baytı CL'ye kopyalanır. Programın amacı bir hesap değil, bir .COM programının bellekte nasıl durduğunu ve nasıl çalıştığını göstermektir.</p>
+
+<h3 id="s3-2-5-2"><span class="nt-num">3.2.5.2</span>Kod izleme: .COM programı bellekte</h3>
+
+<p><a href="#tab-com-iz">Tablo 3.2.16</a> şablon programın her komuttan sonraki durumunu verir. Fiziksel adres sütunu, kesim 0700h için 07000h + bağıl konumdur.</p>
+
+<div class="nt-tablewrap" id="tab-com-iz">
+<table class="nt-table">
+  <caption>Tablo 3.2.16: .COM programının izlemesi (her satır, komut yürütüldükten sonraki durum).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Komut (adres)</th><th scope="col">Fiziksel adres</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CL</th><th scope="col">IP</th><th scope="col">SP</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>(yüklendi)</td><td>—</td><td>0000h</td><td>0000h</td><td>00h</td><td>0100h</td><td>FFFEh</td></tr>
+    <tr><td>1</td><td><code>MOV AX, 5</code> (0100h)</td><td>07100h</td><td>0005h</td><td>0000h</td><td>00h</td><td>0103h</td><td>FFFEh</td></tr>
+    <tr><td>2</td><td><code>MOV BX, 3</code> (0103h)</td><td>07103h</td><td>0005h</td><td>0003h</td><td>00h</td><td>0106h</td><td>FFFEh</td></tr>
+    <tr><td>3</td><td><code>ADD AX, BX</code> (0106h)</td><td>07106h</td><td>0008h</td><td>0003h</td><td>00h</td><td>0108h</td><td>FFFEh</td></tr>
+    <tr><td>4</td><td><code>MOV CL, AL</code> (0108h)</td><td>07108h</td><td>0008h</td><td>0003h</td><td>08h</td><td>010Ah</td><td>FFFEh</td></tr>
+    <tr><td>5</td><td><code>RET</code> (010Ah)</td><td>0710Ah</td><td>0008h</td><td>0003h</td><td>08h</td><td>0000h</td><td>0000h</td></tr>
+    <tr><td>6</td><td><code>INT 20h</code> (PSP, 0000h)</td><td>07000h</td><td colspan="5">program biter</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Adım 1–4 sıradan komutlardır ve IP her birinde komut uzunluğu kadar ilerler: 3, 3, 2 ve 2 bayt. Adım 3'teki toplama bayrakları da yazar: 5 + 3 = 8, sonuç sıfır değil (ZF = 0), işaret biti 0 (SF = 0), elde ve taşma yok (CF = OF = 0). 08h'de tek bir 1 biti olduğu için eşlik tektir ve PF = 0'dır. Adım 4'teki <code>MOV CL, AL</code> AX'in alt baytını CL'ye kopyalar; CH değişmez ve CX = 0008h olur.</p>
+
+<p>Adım 5'te RET yığından sözcük okur. SS:SP = 0700:FFFEh, yani fiziksel 16FFEh adresindeki sözcük 0000h'dir. Bu değer IP'ye yazılır, SP 2 artarak 0000h'ye döner. Adım 6'da işlemci 0700:0000'daki iki baytı, <code>CD 20</code>'yi, yani <code>INT 20h</code>'yi yürütür. DOS'un sonlandırma hizmeti programı bellekten kaldırır. 010Bh'deki <code>sayi</code> baytı hiçbir adımda yürütülmemiştir; yalnız veridir.</p>
+
+<figure class="nt-fig" id="sekil-com" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label=".COM programının bellek düzeni, adım 1: kesim 0700h, IP ve SP"><defs><marker id="n32-13-mt2-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">kesim 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bayt)</text><rect class="mt-hot" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">sayi = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">yığın: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0100h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 41.5 H200" marker-end="url(#n32-13-mt2-6)"/><text class="mt-l" x="136" y="45.5" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#n32-13-mt2-6)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">00h</text></svg><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label=".COM programının bellek düzeni, adım 6: kesim 0700h, IP ve SP"><defs><marker id="n32-14-mt2-11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">kesim 0700h</text><rect class="mt-hot" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bayt)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">sayi = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">yığın: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0000h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = 0000h</text><path class="line" d="M140 24 H200" marker-end="url(#n32-14-mt2-11)"/><text class="mt-l" x="136" y="28" text-anchor="end" style="font-size:11.5px">CS:IP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0008h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0003h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">08h</text></svg></div>
+  <figcaption><b>Şekil 3.2.7:</b> .COM programının kesim içindeki yerleşimi. Üstte program yüklenmiştir: PSP 0000h–00FFh, kod 0100h'den, <code>sayi</code> 010Bh'de, yığının tepesi FFFEh'dedir; CS:IP ilk komutu, SS:SP yığının tepesini gösterir. Altta RET yürütülmüş, IP = 0000h ile PSP'ye dönülmüştür.</figcaption>
+</figure>
+
+<p>Bu izleme, sistem yolu açısından da okunabilir. Her komutun baytlarını BIU kod kesiminden getirir. Getirme için kullanılan fiziksel adres CS × 10h + IP'dir: 07000h + 0100h = 07100h ilk bayt için. Programın dört aritmetik komutu bellekten veri okumaz; işlenenlerin hepsi yazmaç ya da anlık değerdir. Veri için yol döngüsü yalnız RET'te yapılır: yığından bir sözcük okunur. RET aynı zamanda bir atlamadır; komut kuyruğu boşaltılır ve BIU getirmeye 07000h'den yeniden başlar.</p>
+
+<h3 id="s3-2-5-3"><span class="nt-num">3.2.5.3</span>Program bellekte: bayt bayt</h3>
+
+<p>Assembler'ın şablon programdan ürettiği baytlar <a href="#tab-baytlar">Tablo 3.2.17</a>'deki gibidir. Bir .COM dosyası tam olarak bu baytlardan oluşur.</p>
+
+<div class="nt-tablewrap" id="tab-baytlar">
+<table class="nt-table">
+  <caption>Tablo 3.2.17: Şablon programın makine kodu.</caption>
+  <thead><tr><th scope="col">Bağıl konum</th><th scope="col">Baytlar</th><th scope="col">Kaynak satırı</th><th scope="col">Çözümleme</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>B8 05 00</code></td><td><code>MOV AX, 5</code></td><td>B8 + yazmaç no (AX = 0); sabit düşük bayt önce</td></tr>
+    <tr><td>0103h</td><td><code>BB 03 00</code></td><td><code>MOV BX, 3</code></td><td>B8 + 3 (BX)</td></tr>
+    <tr><td>0106h</td><td><code>03 C3</code></td><td><code>ADD AX, BX</code></td><td>C3 = 11 000 011: yazmaç–yazmaç, AX, BX</td></tr>
+    <tr><td>0108h</td><td><code>8A C8</code></td><td><code>MOV CL, AL</code></td><td>C8 = 11 001 000: CL, AL</td></tr>
+    <tr><td>010Ah</td><td><code>C3</code></td><td><code>RET</code></td><td>tek baytlık komut</td></tr>
+    <tr><td>010Bh</td><td><code>00</code></td><td><code>sayi DB 0</code></td><td>veri; komut değil</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İlk iki komut “yazmaca anlık değer” ailesindendir ve işlem kodu yazmaç numarasını içerir. 8086'nın 16 bitlik yazmaç numaraları şöyledir: AX = 0, CX = 1, DX = 2, BX = 3, SP = 4, BP = 5, SI = 6, DI = 7. Sıranın alfabetik olmadığına dikkat edilmelidir; BX'in numarası 3'tür. 8 bitlik yazmaçlarda aynı numaralar AL, CL, DL, BL, AH, CH, DH, BH sırasıyla kullanılır.</p>
+
+<p>Üçüncü ve dördüncü komut iki yazmaç arasında çalışır. Bu komutlarda ilk bayt işlemi, ikinci bayt işlenenleri tanımlar. İkinci bayta <strong>ModR/M baytı</strong> denir ve üç alana bölünür: 2 bitlik <strong>MOD</strong>, 3 bitlik <strong>REG</strong> ve 3 bitlik <strong>R/M</strong>. MOD = 11 “iki işlenen de yazmaç” demektir. <code>ADD AX, BX</code> için işlem kodu 03h “REG ← REG + R/M” biçimindedir. REG = 000 (AX) hedefi, R/M = 011 (BX) kaynağı verir. Bitler birleşince 11 000 011 = C3h olur. <code>MOV CL, AL</code> için işlem kodu 8Ah “8 bitlik REG ← R/M” biçimidir. REG = 001 (CL), R/M = 000 (AL) olur ve 11 001 000 = C8h çıkar.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kodla">
+  <span class="nt-box__title">Örnek 3.2.8</span>
+  <p><code>ADD DX, CX</code> ve <code>MOV BL, AH</code> komutlarının makine kodları nedir?</p>
+  <p><code>ADD DX, CX</code>: işlem kodu 03h (REG ← REG + R/M), MOD = 11, REG = DX = 010, R/M = CX = 001. ModR/M = 11 010 001 = D1h. Komut <code>03 D1</code> olur.</p>
+  <p><code>MOV BL, AH</code>: işlem kodu 8Ah, MOD = 11, REG = BL = 011, R/M = AH = 100. ModR/M = 11 011 100 = DCh. Komut <code>8A DC</code> olur. İki komut da iki bayttır; IP her birinde 2 ilerler.</p>
+</div>
+
+<p>Tablodan çıkan dört sonuç önemlidir. Birincisi, .COM dosyası tam olarak bu 12 bayttır. Başlık yoktur; DOS dosyanın baytlarını olduğu gibi 0100h'den itibaren belleğe kopyalar. İkincisi, <code>ORG 100h</code> satırının karşılığında hiçbir bayt yoktur; direktif yalnız ilk baytın konumunu belirler.</p>
+
+<p>Üçüncüsü, aynı komutun birden çok kodlaması olabilir. 8086'nın yazmaç–yazmaç komutlarında yön biti vardır: 03h “REG hedeftir”, 01h “R/M hedeftir” anlamına gelir. <code>ADD AX, BX</code> 01h ile de yazılabilir; bu durumda REG = BX, R/M = AX olur ve kod <code>01 D8</code> çıkar. MASM 03 C3'ü seçer, başka bir assembler 01 D8'i seçebilir. İkisi de aynı işi aynı sürede yapar. Liste çıktısı farklı assembler'larda bu yüzden farklı baytlar gösterebilir.</p>
+
+<p>Dördüncüsü ve en önemlisi, bellekte komut ile veri arasında hiçbir işaret yoktur. 010Bh'deki <code>00</code> baytı bir değişkendir, ama işlemci IP = 010Bh ile oraya gelseydi onu bir komut olarak çözerdi. 8086'da 00h, bir <code>ADD</code> komutunun işlem kodudur ve arkasından gelen bayt ModR/M olarak okunurdu. Bir baytın komut mu veri mi olduğunu yalnız programın akışı belirler. Değişkenlerin RET'ten sonra konmasının nedeni budur.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Değişkenleri <code>ORG 100h</code>'ın hemen altına yazmak.</strong> Yüksek seviyeli dillerde değişkenler programın başında tanımlanır; bu alışkanlık assembly'ye taşınınca program çalışmaz. <code>sayi DB 0</code> 0100h'ye yerleşir ve işlemci ilk komut olarak 00h baytını, yani bir ADD'in başını yürütür. Sonuç rastgele bir bellek yazması ve kaymış komut sınırlarıdır. Veri ya RET'ten sonra konur ya da kodun başında bir JMP ile üstünden atlanır.</p>
+</div>
+
+<h3 id="s3-2-5-4"><span class="nt-num">3.2.5.4</span>emu8086 öykünücü penceresi</h3>
+
+<p>Kaynak yazıldıktan sonra emu8086'da <strong>emulate</strong> düğmesi programı derler ve öykünücü penceresine yükler. <a href="#sekil-emu">Şekil 3.2.8</a> bu pencerenin ana bölümlerini sade bir çizimle gösterir.</p>
+
+<figure class="nt-fig" id="sekil-emu" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 236" role="img" aria-label="emu8086 öykünücü penceresinin sade çizimi: üstte düğmeler, solda yazmaçlar, ortada bellek, sağda komut listesi"><rect class="mt-dim" x="4" y="4" width="552" height="228" rx="6"/><rect class="box" x="14" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="62" y="30" text-anchor="middle" style="font-size:12.5px;">Load</text><rect class="box" x="118" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="166" y="30" text-anchor="middle" style="font-size:12.5px;">reload</text><rect class="box" x="222" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="270" y="30" text-anchor="middle" style="font-size:12.5px;">step back</text><rect class="mt-hot" x="326" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="374" y="30" text-anchor="middle" style="font-size:12.5px;">single step</text><rect class="box" x="430" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="478" y="30" text-anchor="middle" style="font-size:12.5px;">run</text><rect class="box" x="14" y="48" width="150" height="140" rx="4"/><text class="mt-s" x="89" y="64" text-anchor="middle" style="font-size:12px;">yazmaçlar (H / L)</text><text class="mt-m" x="26" y="86" text-anchor="start" style="font-size:12.5px;">AX</text><text class="mt-m" x="150" y="86" text-anchor="end" style="font-size:12.5px;">00 05</text><text class="mt-m" x="26" y="106" text-anchor="start" style="font-size:12.5px;">BX</text><text class="mt-m" x="150" y="106" text-anchor="end" style="font-size:12.5px;">00 00</text><text class="mt-m" x="26" y="126" text-anchor="start" style="font-size:12.5px;">CX</text><text class="mt-m" x="150" y="126" text-anchor="end" style="font-size:12.5px;">00 00</text><text class="mt-m" x="26" y="146" text-anchor="start" style="font-size:12.5px;">IP</text><text class="mt-m" x="150" y="146" text-anchor="end" style="font-size:12.5px;">0103</text><text class="mt-m" x="26" y="166" text-anchor="start" style="font-size:12.5px;">SP</text><text class="mt-m" x="150" y="166" text-anchor="end" style="font-size:12.5px;">FFFE</text><rect class="box" x="174" y="48" width="180" height="140" rx="4"/><text class="mt-s" x="264" y="64" text-anchor="middle" style="font-size:12px;">bellek</text><text class="mt-m" x="184" y="86" text-anchor="start" style="font-size:12px;">07100</text><text class="mt-m" x="260" y="86" text-anchor="start" style="font-size:12px;">B8</text><text class="mt-m" x="184" y="106" text-anchor="start" style="font-size:12px;">07101</text><text class="mt-m" x="260" y="106" text-anchor="start" style="font-size:12px;">05</text><text class="mt-m" x="184" y="126" text-anchor="start" style="font-size:12px;">07102</text><text class="mt-m" x="260" y="126" text-anchor="start" style="font-size:12px;">00</text><text class="mt-m" x="184" y="146" text-anchor="start" style="font-size:12px;">07103</text><text class="mt-m" x="260" y="146" text-anchor="start" style="font-size:12px;">BB</text><text class="mt-m" x="184" y="166" text-anchor="start" style="font-size:12px;">07104</text><text class="mt-m" x="260" y="166" text-anchor="start" style="font-size:12px;">03</text><rect class="box" x="364" y="48" width="182" height="140" rx="4"/><text class="mt-s" x="455" y="64" text-anchor="middle" style="font-size:12px;">komut listesi</text><text class="mt-m" x="374" y="86" text-anchor="start" style="font-size:12px;">MOV AX, 00005h</text><rect class="mt-hot" x="368" y="92" width="174" height="19" rx="2"/><text class="mt-m" x="374" y="106" text-anchor="start" style="font-size:12px;">MOV BX, 00003h</text><text class="mt-m" x="374" y="126" text-anchor="start" style="font-size:12px;">ADD AX, BX</text><text class="mt-m" x="374" y="146" text-anchor="start" style="font-size:12px;">MOV CL, AL</text><text class="mt-m" x="374" y="166" text-anchor="start" style="font-size:12px;">RET</text><rect class="box" x="14" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="62" y="216" text-anchor="middle" style="font-size:12.5px;">screen</text><rect class="box" x="118" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="166" y="216" text-anchor="middle" style="font-size:12.5px;">vars</text><rect class="box" x="222" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="270" y="216" text-anchor="middle" style="font-size:12.5px;">stack</text><rect class="box" x="326" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="374" y="216" text-anchor="middle" style="font-size:12.5px;">flags</text></svg></div>
+  <figcaption><b>Şekil 3.2.8:</b> emu8086 öykünücü penceresinin sade çizimi. Üstte denetim düğmeleri; solda yazmaçlar yüksek ve düşük baytlarıyla; ortada fiziksel adresleriyle bellek; sağda komut listesi. Çizim, şablon programın ilk komutu yürütüldükten sonraki anı gösterir: AX = 0005h, IP = 0103h ve vurgulu satır sıradaki komut olan <code>MOV BX, 00003h</code>'tür.</figcaption>
+</figure>
+
+<p>Pencerenin bölümleri şunlardır:</p>
+<ul>
+  <li><strong>Denetim düğmeleri.</strong> <span lang="en">single step</span> bir komut yürütür ve durur; değişen yazmaçlar ve bellek hemen görünür. <span lang="en">step back</span> son adımı geri alır; bir hatanın nedenine geri dönmeyi kolaylaştırır. <span lang="en">run</span> programı sonuna kadar çalıştırır, <span lang="en">reload</span> programı baştan yükler.</li>
+  <li><strong>Yazmaçlar.</strong> Her yazmaç yüksek (H) ve düşük (L) baytı ayrı ayrı gösterilir: AX = 0005h, “00 05” diye görünür. Bu düzen AH ve AL'nin aynı yazmacın iki yarısı olduğunu açıkça gösterir.</li>
+  <li><strong>Bellek.</strong> Adres sütunu fiziksel adresleri gösterir: 0700:0100 = 07000h + 0100h = 07100h. Program baytları bu adresten başlar: B8, 05, 00, BB, 03 …</li>
+  <li><strong>Komut listesi.</strong> Bellekteki baytların komutlara geri çevrilmiş hâlidir. Vurgulu satır <strong>sıradaki</strong> komuttur, yani CS:IP'nin gösterdiği komut; az önce yürütülen değil. Liste sabitleri onaltılık ve 5 basamakla gösterir: <code>MOV AX, 00005h</code>.</li>
+  <li><strong>Ek pencereler.</strong> <span lang="en">screen</span> ekran çıktısını, <span lang="en">vars</span> değişkenleri, <span lang="en">stack</span> yığını, <span lang="en">flags</span> bayrakları ayrı pencerelerde gösterir.</li>
+</ul>
+
+<p>Komut listesindeki vurgunun anlamı yeni başlayanları sık yanıltır. Şekildeki durumda vurgulu satır <code>MOV BX, 00003h</code>'tür, ama BX hâlâ 0000h'dir. Bu bir hata değildir: vurgulu komut henüz yürütülmemiştir. Bir sonraki single step onu yürütür; BX = 0003h olur ve vurgu <code>ADD AX, BX</code> satırına geçer. Yazmaç değerleri her zaman vurgulu satırdan <em>önceki</em> komutların sonucudur.</p>
+
+<p>Öykünücüde bir programı incelemenin yöntemi basittir. Her single step'ten önce sıradaki komutun hangi yazmacı ve bayrağı nasıl değiştireceği tahmin edilir. Adım atılır ve tahmin pencerenin gösterdiği değerle karşılaştırılır. Bu notun izleme tabloları tam olarak bu tahminlerin yazılı hâlidir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Bellek sütunundaki adresi bağıl konumla karıştırmak.</strong> Öykünücünün bellek sütunu 07100h gösterirken program 0100h'yi kullanır. 07100h fiziksel adrestir; 0100h ise CS = 0700h kesimi içindeki bağıl konumdur. <code>MOV AL, [0100h]</code> komutu 07100h'deki baytı okur, 00100h'dekini değil. Aradaki ilişki her zaman kesim × 10h + bağıl konumdur.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-6"><span class="nt-num">3.2.6</span>Yazım kuralları</h2>
+
+<p>Assembler sayıları, karakterleri ve adları yazılışlarından tanır. Kurallar azdır, ama birinin unutulması ya bir derleme hatası ya da fark edilmesi zor bir yanlış değer üretir.</p>
+
+<p><strong>Sayı tabanları.</strong> Bir sayının tabanı sonuna eklenen harfle belirtilir. Harf yoksa sayı onluktur. <a href="#tab-taban">Tablo 3.2.18</a> aynı değeri, 25'i, dört tabanda verir. Assembler hepsini aynı bayta, 19h'ye çevirir; <code>MOV AL, …</code> satırlarının hepsi <code>B0 19</code> olur.</p>
+
+<div class="nt-tablewrap" id="tab-taban">
+<table class="nt-table">
+  <caption>Tablo 3.2.18: Sayı tabanlarının yazılışı (hepsi 25).</caption>
+  <thead><tr><th scope="col">Taban</th><th scope="col">Sonek</th><th scope="col">Yazılış</th><th scope="col"><code>MOV AL, …</code> kodu</th></tr></thead>
+  <tbody>
+    <tr><td>onluk</td><td>yok ya da <code>d</code></td><td><code>25</code>, <code>25d</code></td><td><code>B0 19</code></td></tr>
+    <tr><td>onaltılık</td><td><code>h</code></td><td><code>19h</code></td><td><code>B0 19</code></td></tr>
+    <tr><td>ikili</td><td><code>b</code></td><td><code>00011001b</code></td><td><code>B0 19</code></td></tr>
+    <tr><td>sekizli</td><td><code>o</code></td><td><code>31o</code></td><td><code>B0 19</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Taban seçimi yalnız okunabilirlik içindir; işlemci farkı görmez. Bir port maskesi ya da bayrak deseni ikili yazıldığında hangi bitin kurulduğu hemen anlaşılır: <code>00100000b</code> bit 5'tir. Bir adres ise onaltılık yazılır, çünkü kesim ve bağıl konum hesapları onaltılıkta yapılır. Döngü sayıları ve günlük büyüklükler onluk yazılır.</p>
+
+<p><strong>Harfle başlayan onaltılık sayılar.</strong> Onaltılık rakamlar A–F harflerini içerir. <code>FFh</code> yazıldığında assembler bunun bir sayı mı yoksa <code>FFh</code> adlı bir etiket mi olduğunu ayırt edemez; kurala göre harfle başlayan her dizi bir addır. Bu yüzden harfle başlayan onaltılık sayıların önüne <code>0</code> konur: <code>0FFh</code>, <code>0B800h</code>. Baştaki sıfır değeri değiştirmez, yalnız dizinin bir sayı olduğunu bildirir. <code>MOV AX, 0B800h</code> komutu <code>B8 00 B8</code> olarak kodlanır.</p>
+
+<p><strong>Karakterler.</strong> Tırnak içindeki bir karakter, ASCII kodunun yerine geçer. <code>'A'</code> = 41h olduğundan <code>MOV CL, 'A'</code> ile <code>MOV CL, 41h</code> aynı makine kodunu üretir: <code>B1 41</code>. Karakter yazımı, kodu ezberleme yükünü kaldırır ve programın ne yaptığını açıkça gösterir. Ekrana bir rakam yazdıran program <code>ADD DL, '0'</code> yazdığında 0–9 arası bir değeri '0'–'9' karakterine çevirdiği hemen anlaşılır.</p>
+
+<p><strong>İşaretli sayılar.</strong> Eksi işaretli bir sabit ikiye tümleyen olarak saklanır. <code>-1</code> 8 bitte FFh, 16 bitte FFFFh olur: <code>MOV AL, -1</code> = <code>B0 FF</code>, <code>MOV AX, -1</code> = <code>B8 FF FF</code>. 8 bitlik bir yazmaca yazılabilecek sabitler −128 ile 255 arasındadır: negatif değerler işaretli, büyük pozitif değerler işaretsiz yorumla sığar. <code>MOV AL, 256</code> ya da <code>MOV AL, -129</code> hata verir.</p>
+
+<p><strong>Büyük-küçük harf.</strong> Assembler duyarsızdır: <code>mov</code>, <code>MOV</code>, <code>Mov</code> aynıdır; <code>var1</code> ile <code>VAR1</code> aynı addır. Okunabilirlik için tutarlı bir düzen seçilir. Bu notta komutlar ve yazmaçlar büyük, değişken ve etiket adları küçük harfle yazılmıştır.</p>
+
+<p><strong>Açıklamalar.</strong> <code>;</code> işaretinden sonrası açıklamadır. Assembly'de neredeyse her satıra açıklama yazılır, çünkü komutların kendisi amacı anlatmaz. İyi alışkanlık, açıklamaya komutun “ne” yaptığını değil “neden” yapıldığını yazmaktır. <code>INC SI ; SI = SI + 1</code> bilgi vermez; <code>INC SI ; dizinin sonraki elemanı</code> verir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Sonek unutmak.</strong> <code>MOV AL, 10</code> ile <code>MOV AL, 10h</code> farklı değerlerdir: 10 ve 16. Onaltılık bir değeri soneksiz yazmak assembler'ın hata vermeyeceği, ama programın yanlış çalışacağı bir hatadır. Ekran belleğinin kesimi B800h'yi <code>MOV AX, B800</code> diye yazan programcı ise hem soneki hem baştaki sıfırı unutmuş olur; assembler <code>B800</code>'ü tanımsız bir ad sayar.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-7"><span class="nt-num">3.2.7</span>Hatalar</h2>
+
+<h3 id="s3-2-7-1"><span class="nt-num">3.2.7.1</span>MOV'un işlenen kısıtları</h3>
+
+<p>MOV en sık kullanılan komuttur ve en sık hata da onunla yapılır. Hataların neredeyse hepsi, 8086'nın komut kodlamasında var olmayan bir işlenen birleşimini yazmaktan gelir. <a href="#tab-hata1">Tablo 3.2.19</a> en yaygın altısını verir.</p>
+
+<div class="nt-tablewrap" id="tab-hata1">
+<table class="nt-table">
+  <caption>Tablo 3.2.19: Sık yapılan MOV hataları.</caption>
+  <thead><tr><th scope="col">Hatalı</th><th scope="col">Neden?</th><th scope="col">Doğrusu</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AL, BX</code></td><td>boyutlar farklı (8 ↔ 16 bit)</td><td><code>MOV AL, BL</code> ya da <code>MOV AX, BX</code></td></tr>
+    <tr><td><code>MOV DS, 1234h</code></td><td>kesim yazmacına sabit atanamaz</td><td><code>MOV AX, 1234h</code> · <code>MOV DS, AX</code></td></tr>
+    <tr><td><code>MOV AL, [AX]</code></td><td>adreslemede yalnız BX, SI, DI, BP</td><td><code>MOV BX, AX</code> · <code>MOV AL, [BX]</code></td></tr>
+    <tr><td><code>MOV AL, FFh</code></td><td><code>FFh</code> bir ad sanılır</td><td><code>MOV AL, 0FFh</code></td></tr>
+    <tr><td><code>MOV IP, 200h</code></td><td>IP'ye MOV ile yazılamaz</td><td><code>JMP</code> ile atlamak</td></tr>
+    <tr><td><code>MOV AL, 300</code></td><td>300 &gt; 255, 8 bite sığmaz</td><td><code>MOV AX, 300</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Boyut uyuşmazlığı.</strong> MOV'un iki işleneni aynı genişlikte olmalıdır, çünkü işlem kodu tek bir genişlik biti taşır: ya 8 bit ya 16 bit. <code>MOV AL, BX</code> komutunda 16 bitlik bir değerin hangi yarısının alınacağı belirsizdir. Programcı alt baytı istiyorsa <code>MOV AL, BL</code> yazar. Tersi yöndeki <code>MOV CX, AL</code> de aynı nedenle hatalıdır; 8 bitlik bir değeri 16 bite genişletmek için üst yarı ayrıca kurulur: <code>MOV CL, AL</code> ve <code>MOV CH, 0</code>.</p>
+
+<p><strong>Kesim yazmacına sabit.</strong> 8086'da kesim yazmacına yazan MOV yalnız genel yazmaçtan ya da bellekten okur. Anlık değer yükleyen bir biçimi yoktur. Bu yüzden ekran belleğine erişmek için kesim kurmak iki satır ister: <code>MOV AX, 0B800h</code> ve <code>MOV DS, AX</code>.</p>
+
+<p><strong>Adres yazmacı.</strong> 8086'da köşeli ayraç içinde yalnız BX, BP, SI ve DI kullanılabilir. Bunun nedeni ModR/M baytının R/M alanıdır: bellek modlarında bu üç bit yalnız bu dört yazmacın belirli birleşimlerini kodlar. AX'i adres olarak kullanmanın bir kodu yoktur.</p>
+
+<p><strong>IP'ye yazmak.</strong> IP hiçbir veri komutunun işleneni olamaz. IP'yi değiştirmenin tek yolu akış komutlarıdır: JMP, Jcc, CALL, RET, INT ve IRET. Assembler <code>IP</code>'yi yazmaç adı olarak tanımaz; satırı “hedef sabit olamaz” ya da “tanımsız ad” hatasıyla reddeder.</p>
+
+<p><strong>Sığmayan sabit.</strong> 8 bitlik bir yazmaç en çok 255'i (işaretli yorumda −128'i) tutar. 300 dokuz bit ister. Assembler satırı reddeder; değer 16 bitlik bir yazmaca yazılır.</p>
+
+<h3 id="s3-2-7-2"><span class="nt-num">3.2.7.2</span>Öteki söz dizimi hataları</h3>
+
+<div class="nt-tablewrap" id="tab-hata2">
+<table class="nt-table">
+  <caption>Tablo 3.2.20: Öteki söz dizimi hataları.</caption>
+  <thead><tr><th scope="col">Hatalı</th><th scope="col">Neden?</th><th scope="col">Doğrusu</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV CS, AX</code></td><td>CS yalnız JMP, CALL, RET, INT ile değişir</td><td>uzak atlama</td></tr>
+    <tr><td><code>MOV ES, DS</code></td><td>kesimden kesime MOV yok</td><td><code>MOV AX, DS</code> · <code>MOV ES, AX</code></td></tr>
+    <tr><td><code>MOV [BX], [SI]</code></td><td>iki bellek işleneni</td><td><code>MOV AL, [SI]</code> · <code>MOV [BX], AL</code></td></tr>
+    <tr><td><code>INC [BX]</code></td><td>boyut belirsiz</td><td><code>INC BYTE PTR [BX]</code></td></tr>
+    <tr><td><code>MOV AL, [BX+BP]</code></td><td>iki taban yazmacı birlikte olmaz</td><td><code>[BX+SI]</code> ya da <code>[BP+DI]</code></td></tr>
+    <tr><td><code>ADD 5, AX</code></td><td>hedef sabit olamaz</td><td><code>ADD AX, 5</code></td></tr>
+    <tr><td><code>PUSH 5</code></td><td>80186'dan önce yok</td><td><code>MOV AX, 5</code> · <code>PUSH AX</code></td></tr>
+    <tr><td><code>SHL AX, 2</code></td><td>8086'da sayı yalnız 1 ya da CL</td><td><code>MOV CL, 2</code> · <code>SHL AX, CL</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>CS'ye yazmak.</strong> CS'yi MOV ile değiştirmek, kodun ortasında başka bir kesime geçmek demektir; ama IP aynı kalır ve işlemci rastgele bir adresten devam eder. CS ile IP'nin birlikte değişmesi gerekir. Bunu uzak JMP, uzak CALL, uzak RET, INT ve IRET yapar.</p>
+
+<p><strong>Kesimden kesime.</strong> İki kesim yazmacı arasında doğrudan aktarım yoktur. Değer bir genel yazmaç üzerinden iki adımda taşınır. Bellekten belleğe aktarım da aynı biçimde yapılır: bir komutta en çok bir bellek işleneni bulunur, değer önce bir yazmaca alınır.</p>
+
+<p><strong>Boyut belirsizliği.</strong> <code>INC [BX]</code> satırında işlenenin bir bayt mı bir sözcük mü olduğu belli değildir; hiçbir işlenen bir yazmaç değildir ki boyut ondan çıkarılsın. Assembler bu yüzden boyutun açıkça yazılmasını ister: <code>INC BYTE PTR [BX]</code> ya da <code>INC WORD PTR [BX]</code>. Aynı kural <code>MOV [BX], 5</code> için de geçerlidir. emu8086 <code>b.[bx]</code> ve <code>w.[bx]</code> kısaltmalarını da kabul eder.</p>
+
+<p><strong>Adres birleşimleri.</strong> 8086'nın kabul ettiği adres biçimleri bir taban yazmacı (BX ya da BP), bir indis yazmacı (SI ya da DI) ve bir sabitin birleşimidir. İki taban (<code>[BX+BP]</code>) ya da iki indis (<code>[SI+DI]</code>) birlikte kullanılamaz; ModR/M baytında bunların kodu yoktur.</p>
+
+<p><strong>Sonraki işlemcilerin komutları.</strong> <code>PUSH 5</code> ve <code>SHL AX, 2</code> 80186 ile geldi. MASM 8086 için derlerken bu satırlarda hata verir. emu8086 ise bu biçimleri kabul eder; derlenen kod öykünücüde çalışır, ama gerçek bir 8086'da işlemci bu baytları tanımaz. 8086 için yazılan bir programda sabit yığına bir yazmaç üzerinden itilir, çok bitli kaydırmada sayı CL'ye konur.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-hata">
+  <span class="nt-box__title">Örnek 3.2.9</span>
+  <p><code>sozcuk DW 1234h</code> ve <code>bayt DB 5</code> tanımlı. <code>MOV sozcuk, bayt</code> satırı neden hatalıdır ve nasıl düzeltilir?</p>
+  <p>Satırda iki hata birden vardır. İki işlenen de bellektir ve boyutları farklıdır (16 ↔ 8 bit). Değer bir yazmaç üzerinden taşınır ve üst bayt ayrıca sıfırlanır:</p>
+<pre class="nt-code"><code>MOV AL, bayt      <span class="cm">; AL = 05h</span>
+MOV AH, 0         <span class="cm">; AX = 0005h</span>
+MOV sozcuk, AX    <span class="cm">; sozcuk = 0005h</span></code></pre>
+  <p><code>bayt</code> işaretli bir sayı olsaydı ikinci satır yerine <code>CBW</code> kullanılırdı.</p>
+</div>
+
+<h3 id="s3-2-7-3"><span class="nt-num">3.2.7.3</span>Derleme hatası ve mantık hatası</h3>
+
+<p>Bir assembly programında iki tür hata bulunur. Ayrımı bilmek, hatanın nasıl aranacağını belirler.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-hata">
+  <span class="nt-box__title">Tanım 3.2.8</span>
+  <p><strong>Derleme hatası</strong> (söz dizimi hatası), assembler'ın kaynağı çevirirken bulduğu hatadır. Assembler satır numarasını ve nedeni bildirir; program hiç oluşmaz. <strong>Mantık hatası</strong> ise programın derlenip çalıştığı, ama yanlış sonuç verdiği durumdur. Assembler bunu bilemez, çünkü her satır kendi başına geçerlidir.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-hata-tur">
+<table class="nt-table">
+  <caption>Tablo 3.2.21: Derleme ve mantık hatası örnekleri.</caption>
+  <thead><tr><th scope="col">Derleme hatası</th><th scope="col">Mantık hatası</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AL, BX</code>: boyut uyuşmazlığı</td><td><code>RET</code>'i unutmak: veri komut sanılır</td></tr>
+    <tr><td><code>JMP bsla</code>: tanımsız etiket</td><td>işaretli sayı için <code>JA</code> kullanmak</td></tr>
+    <tr><td><code>MOV AL, 300</code>: sığmayan sabit</td><td><code>ADC</code> yerine <code>ADD</code>: elde kaybolur</td></tr>
+    <tr><td><code>MOV DS, 1234h</code>: kesime sabit</td><td>.EXE programında DS'yi yüklememek</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Derleme hatası kolay hatadır: assembler yerini gösterir, düzeltme çoğunlukla tek satırdır. Mantık hatası ise sessizdir. Program çalışır, belki çoğu girdi için doğru sonuç verir, yalnız bazı durumlarda yanılır. Tablodaki örnekler bu türün tipik hâlleridir. <code>JA</code> işaretsiz karşılaştırmanın atlamasıdır; −1 ile 1 karşılaştırılırken −1'i FFFFh, yani büyük bir sayı sayar. <code>ADD</code> ile yapılan çok baytlı toplama, düşük baytlardan gelen eldeyi yüksek baytlara aktarmaz. .EXE programında DS yüklenmezse değişkenler PSP'nin bulunduğu kesimde aranır ve bambaşka baytlar okunur.</p>
+
+<p>Mantık hatasını bulmanın yolu tek adım çalıştırmadır. Program öykünücüde komut komut ilerletilir. Her adımdan önce beklenen yazmaç ve bayrak değerleri hesaplanır, adımdan sonra pencerede görünenle karşılaştırılır. Değerlerin ilk ayrıldığı komut, hatanın bulunduğu yerdir. Hata bu komutun kendisinde olabilir. Komut doğru da olabilir; o zaman daha önceki bir satır ona yanlış bir değer bırakmıştır. emu8086'nın <span lang="en">step back</span> düğmesi bu aramayı kolaylaştırır: hatalı değer görülünce birkaç adım geri gidilip değerin nereden geldiği izlenir.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-mantik">
+  <span class="nt-box__title">Örnek 3.2.10</span>
+  <p>Bir öğrenci AL'deki sayıyı 3 ile çarpıp sonucu AX'te istiyor ve şu kodu yazıyor: <code>MOV BL, 3</code> · <code>MUL BL</code>. Program AL = 7 için AX = 0015h, yani 21 veriyor. Aynı kod bir başka yerde AH = 12h iken çalışınca öğrenci AH'nin neden silindiğini soruyor. Bu bir hata mı?</p>
+  <p>Kod doğrudur; yanılgı beklentidedir. MUL'ün sonucu örtük olarak AX'in tamamına yazılır: 7 × 3 = 21 = 0015h, AH = 00h. AH'deki 12h'nin korunması beklentisi bir mantık hatasıdır, ama hata kodda değil, programın AH'yi saklayacağı varsayımındadır. AH'deki değer gerekiyorsa MUL'den önce başka bir yazmaca alınır. Tek adım çalıştırma bu durumu hemen gösterir: MUL adımından sonra AH sütunu 12'den 00'a döner.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Programı bir bütün olarak çalıştırıp yalnız sonuca bakmak.</strong> Yanlış sonuç veren bir programı <span lang="en">run</span> ile çalıştırıp yeniden yazmaya başlamak, hatayı başka bir yere taşır. Önce tek adımla ilerlenir ve ilk sapma bulunur. Uzun bir döngüde tek adım sıkıcıysa döngüden önceki ve sonraki durum karşılaştırılarak hata önce bir bölgeye, sonra bir satıra daraltılır.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-8"><span class="nt-num">3.2.8</span>Alıştırmalar ve çözümleri</h2>
+
+<p>Sunumdaki altı alıştırma aşağıda ara adımlarıyla çözülmüştür. Bütün yazmaç ve bayrak değerleri öykünücüde çalıştırılarak denetlenmiştir.</p>
+
+<div class="nt-box nt-box--ornek" id="alistirma-1">
+  <span class="nt-box__title">Alıştırma 1</span>
+  <p>AX = 0ABCDh iken <code>MOV AH, 0</code> sonrası AX, AL ve BX değerleri nedir?</p>
+  <p>AX = ABCDh'nin yüksek yarısı AH = ABh, düşük yarısı AL = CDh'dir. <code>MOV AH, 0</code> yalnız AH'ye yazar: AH = 00h. AL dokunulmadan kalır. Sonuç AX = <strong>00CDh</strong>, AL = <strong>CDh</strong> olur. BX komutta ne yazılı ne örtük olarak geçer; değeri ne ise o kalır. Bu komut, işaretsiz bir 8 bitlik değeri 16 bite genişletmenin en kısa yoludur.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-2">
+  <span class="nt-box__title">Alıştırma 2</span>
+  <p>AX = 1234h, BL = 03h iken <code>MUL BL</code> sonrası AX kaçtır? AH'deki 12h'ye ne olur?</p>
+  <p>8 bitlik MUL'de çarpılan AX değil, örtük olarak AL'dir: AL = 34h = 52. 52 × 3 = 156 = <strong>009Ch</strong>. Sonuç örtük olarak AX'in tamamına yazılır; AH = 00h, AL = 9Ch olur. AH'deki 12h silinir. Üst yarı sıfır olduğu için CF = OF = 0'dır. AX'in tamamının 3 ile çarpıldığını düşünen biri 1234h × 3 = 369Ch bulur; bu sonuç için <code>MUL BX</code> gerekir ve sonuç DX:AX'e yazılır.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-3">
+  <span class="nt-box__title">Alıştırma 3</span>
+  <p>8 MHz'lik bir 8086'da 2000 kez dönen bir döngüde sayaç <code>INC sayac</code> (21 tur) yerine <code>INC CX</code> (2 tur) ile artırılırsa kaç saat turu ve kaç milisaniye kazanılır?</p>
+  <p>Her turda kazanç 21 − 2 = 19 saat turudur. 2000 turda 2000 × 19 = <strong>38 000</strong> saat turu kazanılır. 8 MHz'de bir saat turu 1 / (8 × 10<sup>6</sup>) s = 0,125 µs'dir. Kazanç 38 000 × 0,125 µs = 4750 µs = <strong>4,75 ms</strong> olur.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-4">
+  <span class="nt-box__title">Alıştırma 4</span>
+  <p>AL = 80h iken <code>ADD AL, 80h</code> sonrası AL, CF, ZF, SF ve OF ne olur?</p>
+  <p>80h + 80h = 100h. Sonuç dokuz bit ister; AL'ye alt sekiz bit yazılır: AL = <strong>00h</strong>. Dokuzuncu bit CF'ye gider: CF = 1. Sonuç sıfırdır: ZF = 1. En üst bit 0'dır: SF = 0. İşaretli yorumda 80h = −128'dir ve −128 + (−128) = −256 sekiz bitlik aralığa (−128 … 127) sığmaz: OF = 1. Ayrıca 00h'nin bir bitleri çift sayıda olduğu için PF = 1, bit 3'ten elde olmadığı için AF = 0'dır.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-5">
+  <span class="nt-box__title">Alıştırma 5</span>
+  <p>Program 0100h'de başlıyor: 3 + 2 + 1 + 4 baytlık dört komut yürütülünce IP ne olur?</p>
+  <p>Atlama olmadığı için IP her komutta uzunluğu kadar ilerler: 0100h → 0103h → 0105h → 0106h → 010Ah. Toplam 10 bayt = 0Ah olduğundan IP = 0100h + 0Ah = <strong>010Ah</strong> olur.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-6">
+  <span class="nt-box__title">Alıştırma 6</span>
+  <p><code>MOV CX, AL</code> ve <code>MOV ES, 0B800h</code> neden hatalıdır? Doğru yazılışları nedir?</p>
+  <p><code>MOV CX, AL</code>: işlenenler farklı boyuttadır (16 ↔ 8 bit). Amaç yalnız alt baytı kopyalamaksa <code>MOV CL, AL</code> yazılır. AL'nin değeri CX'in tamamında işaretsiz olarak istenirse üst yarı da sıfırlanır: <code>MOV CL, AL</code> · <code>MOV CH, 0</code>.</p>
+  <p><code>MOV ES, 0B800h</code>: kesim yazmacına anlık değer yüklenemez. Değer bir genel yazmaç üzerinden taşınır: <code>MOV AX, 0B800h</code> · <code>MOV ES, AX</code>.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-9"><span class="nt-num">3.2.9</span>Özet</h2>
+
+<ul>
+  <li><strong>Assembly dili</strong> makine koduyla birebir eşleşen düşük seviyeli bir dildir. Her komut satırı tek bir makine komutuna çevrilir: <code>MOV AX, 5</code> = <code>B8 05 00</code>. Küçük ve hızlı kod üretir, donanıma doğrudan erişir, ama taşınabilir değildir.</li>
+  <li><strong>Assembler</strong> anımsatıcıları işlem kodlarına, adları adreslere çevirir. emu8086 düzenleyici, assembler ve öykünücüyü birleştirir; yazmaçları, belleği ve bayrakları adım adım gösterir.</li>
+  <li>Satır yapısı <code>[etiket:] komut hedef, kaynak ; açıklama</code> biçimindedir. Hedef soldadır; kaynak değişmez. Assembler büyük-küçük harfe duyarsızdır; açıklamalar makine koduna girmez.</li>
+  <li><strong>Direktifler</strong> (ORG, EQU, END) makine komutu üretmez; assembler'a bilgi verir. DB ve DW yalnız veri baytı üretir. Makro çağrısı birden çok komutun yerine geçer.</li>
+  <li>Ad harfle ya da alt çizgiyle başlar; ayrılmış sözcükler ad olamaz. Kod etiketi iki nokta ile biter ve bir adresi gösterir; değişken adı adres ile türü birlikte taşır.</li>
+  <li>İşlenen türleri: <strong>yazmaç</strong> (en hızlı), <strong>anlık değer</strong> (yalnız kaynak), <strong>bellek</strong> (yol döngüsü ister, komutta en çok bir tane). İki işlenen aynı boyutta olmalıdır.</li>
+  <li><strong>Örtük işlenenler</strong> komutta yazılmaz ama değişir: MUL AX'e, DIV AL ile AH'ye yazar; LOOP CX'i azaltır; CBW AH'yi doldurur; PUSH SP'yi değiştirir.</li>
+  <li>Bellek erişimi en az dört T durumluk bir yol döngüsüdür. Bellek işlenenli komutlar etkin adres süresiyle birlikte yazmaç eşlerinden birkaç kat uzundur: <code>INC CX</code> 2, <code>INC sayac</code> 21 tur.</li>
+  <li><strong>IP</strong> sıradaki komutun bağıl konumudur ve komut uzunluğu kadar ilerler. Yalnız akış komutları IP'ye yeni değer yazar.</li>
+  <li>MOV, XCHG, LEA, PUSH, POP, NOT ve LOOP bayrakları değiştirmez. INC ve DEC CF'ye dokunmaz. ADD, SUB ve CMP altı durum bayrağını yeniden yazar. MUL sonrası ZF, SF, AF, PF tanımsızdır.</li>
+  <li>.COM programı <code>ORG 100h</code> ile 0100h'den başlar; ilk 256 bayt PSP'dir. Başlangıçta CS = DS = ES = SS, IP = 0100h, SP = FFFEh'dir. RET yığındaki 0000h ile PSP'deki <code>INT 20h</code>'ye döner. Veriler RET'ten sonra durur.</li>
+  <li>Bellekte komut ile veri arasında işaret yoktur; bir baytın anlamını programın akışı belirler. Aynı komutun birden çok geçerli kodlaması olabilir.</li>
+  <li><strong>Derleme hatasını</strong> assembler bulur; <strong>mantık hatası</strong> ancak tek adım çalıştırıp beklenen değerleri öykünücüdekiyle karşılaştırarak bulunur.</li>
+</ul>
+
+<h2 id="s3-2-10"><span class="nt-num">3.2.10</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">assembly (assembly dili) <span lang="en">assembly language</span></a></li>
+  <li><a href="../sozluk.html">anımsatıcı <span lang="en">mnemonic</span></a></li>
+  <li><a href="../sozluk.html">komut <span lang="en">instruction</span></a></li>
+  <li><a href="../sozluk.html">işlem kodu <span lang="en">opcode</span></a></li>
+  <li><a href="../sozluk.html">işlenen <span lang="en">operand</span></a></li>
+  <li><a href="../sozluk.html">örtük işlenen <span lang="en">implicit operand</span></a></li>
+  <li><a href="../sozluk.html">anlık değer <span lang="en">immediate value</span></a></li>
+  <li><a href="../sozluk.html">açıklama <span lang="en">comment</span></a></li>
+  <li><a href="../sozluk.html">etiket <span lang="en">label</span></a></li>
+  <li><a href="../sozluk.html">değişken <span lang="en">variable</span></a></li>
+  <li><a href="../sozluk.html">direktif <span lang="en">directive</span></a></li>
+  <li><a href="../sozluk.html">sabit (EQU) <span lang="en">constant</span></a></li>
+  <li><a href="../sozluk.html">konum sayacı ($) <span lang="en">location counter</span></a></li>
+  <li><a href="../sozluk.html">makro <span lang="en">macro</span></a></li>
+  <li><a href="../sozluk.html">assembler <span lang="en">assembler</span></a></li>
+  <li><a href="../sozluk.html">öykünücü <span lang="en">emulator</span></a></li>
+  <li><a href="../sozluk.html">.COM programı <span lang="en">.COM program</span></a></li>
+  <li><a href="../sozluk.html">PSP (program kesimi öneki) <span lang="en">program segment prefix</span></a></li>
+  <li><a href="../sozluk.html">akümülatör <span lang="en">accumulator</span></a></li>
+  <li><a href="../sozluk.html">sayaç yazmacı <span lang="en">counter register</span></a></li>
+  <li><a href="../sozluk.html">yol döngüsü <span lang="en">bus cycle</span></a></li>
+  <li><a href="../sozluk.html">T durumu <span lang="en">T state</span></a></li>
+  <li><a href="../sozluk.html">saat turu (tur) <span lang="en">clock cycle</span></a></li>
+  <li><a href="../sozluk.html">etkin adres (EA) <span lang="en">effective address</span></a></li>
+  <li><a href="../sozluk.html">komut işaretçisi (IP) <span lang="en">instruction pointer</span></a></li>
+  <li><a href="../sozluk.html">bayrak yazmacı (FLAGS) <span lang="en">flags register</span></a></li>
+  <li><a href="../sozluk.html">ModR/M baytı <span lang="en">ModR/M byte</span></a></li>
+  <li><a href="../sozluk.html">little-endian <span lang="en">little-endian</span></a></li>
+  <li><a href="../sozluk.html">tek adım <span lang="en">single-step</span></a></li>
+  <li><a href="../sozluk.html">derleme hatası / mantık hatası <span lang="en">syntax error / logic error</span></a></li>
+</ul>
+
+<h2 id="s3-2-11"><span class="nt-num">3.2.11</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p><code>STC</code>, <code>MOV AX, 0FFFFh</code>, <code>INC AX</code> komutları sırayla çalışıyor. Sonunda AX, CF ve ZF kaçtır?</p>
+    <details><summary>Cevap</summary>
+      <p>FFFFh + 1 = 10000h, 16 bite sığmaz ve AX = 0000h olur. Sonuç sıfırdır: ZF = 1. INC CF'ye dokunmaz; CF, STC'den kalan 1'dir. MOV da bayrak değiştirmediği için CF = 1 hiç bozulmamıştır. Aynı toplama <code>ADD AX, 1</code> ile yapılsaydı CF yine 1 olurdu, ama bu kez taşan eldeden dolayı.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>ORG 100h</code> ile başlayan bir programda sırayla <code>MOV AL, 5</code>, <code>MOV BX, 1234h</code>, <code>INC BX</code>, <code>RET</code> ve <code>veri DB 9</code> satırları var. Programın baytları nelerdir, <code>veri</code>'nin bağıl konumu nedir?</p>
+    <details><summary>Cevap</summary>
+      <p><code>MOV AL, 5</code> = <code>B0 05</code> (0100h), <code>MOV BX, 1234h</code> = <code>BB 34 12</code> (0102h), <code>INC BX</code> = <code>43</code> (0105h; 40h + 3), <code>RET</code> = <code>C3</code> (0106h), <code>veri</code> = <code>09</code> (0107h). Komutlar 2 + 3 + 1 + 1 = 7 bayttır; <code>veri</code> 0100h + 7 = <strong>0107h</strong>'dedir. Program toplam 8 bayttır ve sonunda BX = 1235h olur.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV AX, [BX+SI]</code> ve <code>ADD [BX], AX</code> komutları 5 MHz'lik bir 8086'da en iyi durumda kaç saat turu ve kaç mikrosaniye sürer? (Yazmaçtan belleğe okuma 8 + EA, belleğe toplama 16 + EA tur.)</p>
+    <details><summary>Cevap</summary>
+      <p><code>[BX+SI]</code> için EA = 7 tur: MOV 8 + 7 = 15 tur. <code>[BX]</code> için EA = 5 tur: ADD 16 + 5 = 21 tur. Toplam 36 tur; 5 MHz'de 36 × 0,2 µs = <strong>7,2 µs</strong>. ADD'in uzun sürmesinin nedeni belleğe hem okuma hem yazma yapmasıdır: iki yol döngüsü.</p>
+    </details>
+  </li>
+  <li>
+    <p>AX = 25 iken <code>MOV BL, 4</code> ve <code>DIV BL</code> çalışıyor. AL, AH ve AX kaçtır?</p>
+    <details><summary>Cevap</summary>
+      <p>Bölünen örtük olarak AX = 25'tir. 25 ÷ 4 = 6, kalan 1. Bölüm AL'ye, kalan AH'ye yazılır: AL = 06h, AH = 01h, AX = <strong>0106h</strong>. AX'i bir sayı olarak okuyan biri 262 görür; DIV'den sonra AX'in iki yarısı ayrı anlam taşır.</p>
+    </details>
+  </li>
+  <li>
+    <p>Şu programın kaç satırı bayt üretir, program kaç bayttır? <code>ORG 100h</code> · <code>k EQU 5</code> · <code>MOV AX, 5</code> · <code>MOV BX, k</code> · <code>MOV AL, sayi</code> · <code>RET</code> · <code>sayi DB 0</code> · <code>END</code>. <code>MOV AL, sayi</code> satırının baytları nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>ORG, EQU ve END bayt üretmez. Üç MOV 3'er bayt, RET 1 bayt, DB 1 bayt: beş satır, <strong>11 bayt</strong>. <code>sayi</code> 0100h + 10 = 010Ah'dedir. <code>MOV AL, sayi</code> AL'ye doğrudan adresten okuyan akümülatör biçimidir: <code>A0 0A 01</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV AL, 0F0h</code>, <code>ADD AL, 20h</code>, <code>MOV BL, AL</code>, <code>NOT BL</code> çalışıyor. Sonunda AL, BL, CF ve ZF kaçtır?</p>
+    <details><summary>Cevap</summary>
+      <p>F0h + 20h = 110h: AL = 10h, CF = 1, ZF = 0. MOV ile BL = 10h olur; bayraklar değişmez. NOT BL = EFh; NOT da bayrak değiştirmez. Sonuç AL = 10h, BL = EFh, CF = 1, ZF = 0. Bayraklar ADD'in bıraktığı gibidir.</p>
+    </details>
+  </li>
+  <li>
+    <p>emu8086'da şablon programda (<code>MOV AX, 5</code>, <code>MOV BX, 3</code>, <code>ADD AX, BX</code>, <code>MOV CL, AL</code>, <code>RET</code>) üç kez single step'e basılıyor. Komut listesinde hangi satır vurgulu, IP ve AX kaçtır? Bellek sütununda bu komutun ilk baytı hangi fiziksel adreste görünür?</p>
+    <details><summary>Cevap</summary>
+      <p>Üç komut yürütülmüştür: AX = 0008h, BX = 0003h. IP = 0100h + 3 + 3 + 2 = <strong>0108h</strong>. Vurgulu satır sıradaki komut olan <code>MOV CL, AL</code>'dir; CL henüz 00h'dir. Fiziksel adres 07000h + 0108h = <strong>07108h</strong>; orada <code>8A</code> baytı görünür.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV DX, 0Ah</code> ve <code>INC CX</code> komutlarının makine kodları nedir? İkisi ardışık olarak 0103h'den başlıyorsa sonraki komut hangi adresten başlar?</p>
+    <details><summary>Cevap</summary>
+      <p>DX'in yazmaç numarası 2'dir. <code>MOV DX, 0Ah</code> = B8h + 2 = BAh ve sabit düşük bayt önce: <code>BA 0A 00</code> (3 bayt). <code>INC CX</code> = 40h + 1 = <code>41</code> (1 bayt). İki komut 4 bayttır; sonraki komut 0103h + 4 = <strong>0107h</strong>'den başlar.</p>
+    </details>
+  </li>
+  <li>
+    <p>Bir program <code>MOV CL, 3</code> ile kaydırma sayısını kuruyor, ardından <code>MOV CX, 10</code> ile bir döngü sayacı kuruyor ve en sonda <code>SHL AX, CL</code> yazıyor. Program derlenir mi? AX kaç bit kayar?</p>
+    <details><summary>Cevap</summary>
+      <p>Program derlenir; her satır geçerlidir. Ancak CL, CX'in alt yarısıdır. <code>MOV CX, 10</code> CL'yi 0Ah yapar ve kaydırma 3 değil <strong>10 bit</strong> olur. Bu bir mantık hatasıdır. Kaydırma sayısı CL'ye, kaydırmadan hemen önce yazılmalıdır.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s3-2-12"><span class="nt-num">3.2.12</span>İleri okuma</h2>
+
+<ul>
+  <li>emu8086 belgeleri, <em>8086 assembler tutorial for beginners</em>: sayı sistemleri, bellek erişimi, değişkenler ve komut kümesi başvurusu; emu8086 söz dizimine en yakın kaynaktır.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8. baskı), Bölüm 4 ve 6: veri taşıma komutları, ModR/M kodlaması, .COM ve .EXE programlarının yapısı.</li>
+  <li>M. A. Mazidi, J. G. Mazidi, <em>The 80x86 IBM PC and Compatible Computers</em>, Bölüm 1–2: assembly programının yapısı, direktifler, örnek programlar ve hata ayıklayıcıyla çalışma.</li>
+  <li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> veri sayfası: yol döngüsünün T durumları ve komut süreleri tablosu.</li>
+</ul>
+
+<h2 id="s3-2-13"><span class="nt-num">3.2.13</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 belgeleri, <em>8086 assembler tutorial for beginners</em> (bölüm 1: <span lang="en">numbering systems</span>, bölüm 2: <span lang="en">memory access</span>).</li>
+  <li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> veri sayfası.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson.</li>
+  <li>M. A. Mazidi, J. G. Mazidi, <em>The 80x86 IBM PC and Compatible Computers</em>, Pearson.</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_03_Assembly.html">Bölüm 3.2 sunumu</a> · <a href="../slides/Bolum_03_Assembly_Calisma_Sorulari.html">Çalışma soruları</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

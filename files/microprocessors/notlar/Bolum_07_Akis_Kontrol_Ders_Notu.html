@@ -1,0 +1,1651 @@
+---
+layout: without-sidebar
+title: "Bölüm 7: Akış Kontrolü — Ders Notu"
+permalink: /files/microprocessors/notlar/Bolum_07_Akis_Kontrol_Ders_Notu.html
+excerpt: "Mikroişlemciler dersi Bölüm 7 ders notu: IP ve sıralı yürütme, önden getirme kuyruğu, koşulsuz atlama JMP'nin kısa, yakın, uzak ve dolaylı biçimleri, etiketler, atlama uzaklığının hesabı, tek bayrağı sınayan koşullu atlamalar, eş anlamlı komutlar ve işlem kodları, CMP ve bayraklar, işaretli ve işaretsiz karşılaştırma aileleri, SF = OF kuralı, if/else ve while kalıpları, menzil dışı koşullu atlama, LOOP, LOOPE, LOOPNE ve JCXZ, iç içe döngüler, saat turu karşılaştırmaları ve adım adım izlenen örnek programlar."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+<style>
+/* sunumdaki SVG'lerin bölüme özgü sınıfları (Bolum_07_Akis_Kontrol.html ile aynı; kapsam .ds-notes) */
+.ds-notes .ds-svg .hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.5; }
+.ds-notes .ds-svg .acc { fill: var(--ds-accent); }
+.ds-notes .ds-svg .good { fill: var(--ds-good); }
+.ds-notes .ds-svg .bad { fill: var(--ds-bad); }
+.ds-notes .ds-svg .lnk { fill: var(--ds-link); }
+.ds-notes .ds-svg .acc-line { stroke: var(--ds-accent); stroke-width: 2; fill: none; }
+.ds-notes .nt-code .dir { color: var(--ds-accent); font-weight: 700; }
+.ds-notes .nt-code .str { color: var(--ds-good); }
+.ds-notes .nt-ops { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 1rem 0 1.4rem; font-size: 0.92em; }
+.ds-notes .nt-ops div { padding: 4px 8px; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-surface); }
+.ds-notes .nt-ops b { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; color: var(--ds-link); margin-right: 6px; }
+@media (max-width: 520px) { .ds-notes .nt-ops { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="tr">
+<header class="nt-head">
+  <p class="nt-kicker">Mikroişlemciler · Ders Notu</p>
+  <h1>Bölüm 7: Akış Kontrolü</h1>
+  <p class="nt-lead">İşlemci, kendi hâline bırakıldığında komutları bellekteki sırasıyla yürütür. Her komuttan sonra komut işaretçisi IP, komutun uzunluğu kadar artar ve bir sonraki komutu gösterir. Karar veren, bir işi tekrarlayan ya da bir hata durumunda başka yola sapan her program bu düz çizgiyi kırmak zorundadır. Akış kontrol komutları bunu IP'ye yeni bir değer yükleyerek yapar. Bu not önce koşulsuz atlamayı (JMP) ve atlama uzaklığının makine koduna nasıl yazıldığını anlatır. Ardından bayraklara bakan koşullu atlamalar, CMP komutu ve işaretli ile işaretsiz sayıların neden ayrı atlama ailelerine ihtiyaç duyduğu gelir. Yüksek düzeyli dillerdeki if/else ve while yapılarının assembly karşılıkları kurulur. Son olarak CX yazmacını sayaç olarak kullanan LOOP ailesi ve JCXZ incelenir. Her örnek program yazmaç, bayrak ve bellek düzeyinde adım adım izlenir; atlamanın önden getirme kuyruğu ve saat turları üzerindeki etkisi de ayrıca açıklanır.</p>
+  <ul class="nt-links" aria-label="İlgili bağlantılar">
+    <li><a href="../slides/Bolum_07_Akis_Kontrol.html">Sunum</a></li>
+    <li><a href="../pdf/Bolum_07_Akis_Kontrol.pdf">Sunum (PDF)</a></li>
+    <li><a href="../slides/Bolum_07_Akis_Kontrol_Calisma_Sorulari.html">Çalışma soruları</a></li>
+    <li><a href="../sozluk.html">Terim sözlüğü</a></li>
+    <li><a href="../slides/Chapter_07_Jump-Conditions.html">Koşullu Atlamalar</a></li>
+    <li><a href="../slides/Chapter_06_Flags-Lab.html">Bayrak Laboratuvarı</a></li>
+    <li><a href="../slides/Chapter_11_Instruction-Encoding.html">Komut Kodlama</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Öğrenme çıktıları</h2>
+  <dl>
+    <dt>Atlama mekanizması</dt>
+    <dd>JMP ve etiketlerle programın akışını yönlendirmek; IP'nin nasıl değiştiğini ve atlama uzaklığının (bağıl konumun) nasıl hesaplandığını açıklamak; kısa, yakın, uzak ve dolaylı atlamayı ayırt etmek.</dd>
+    <dt>Koşullu atlamalar</dt>
+    <dd>Her koşullu atlamanın hangi bayrağa (ZF, CF, SF, OF, PF) baktığını söylemek, zıt komutunu ve eş anlamlılarını bulmak, makine kodunu hesaplamak.</dd>
+    <dt>Doğru karşılaştırma</dt>
+    <dd>CMP sonrasında işaretsiz sayılar için JA/JB, işaretli sayılar için JG/JL ailesini doğru seçmek; SF = OF kuralının nedenini taşma üzerinden açıklamak.</dd>
+    <dt>Yüksek düzey yapılar</dt>
+    <dd>if/else, while ve for yapılarını koşulun tersiyle atlayan kalıplarla yazmak; menzil dışı koşullu atlamayı ters koşul ve JMP ile çözmek.</dd>
+    <dt>Döngüler</dt>
+    <dd>LOOP, LOOPE/LOOPZ, LOOPNE/LOOPNZ ve JCXZ ile sayaçlı döngüler yazmak; CX = 0 tuzağını ve iç içe döngüde sayacı saklama gereğini açıklamak; örnek programları adım adım izlemek.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">İçindekiler</h2>
+  <ol>
+    <li><a href="#s7-1">7.1 Sıralı yürütme ve akış kontrolü</a>
+      <ol>
+        <li><a href="#s7-1-1">7.1.1 IP ve önden getirme kuyruğu</a></li>
+        <li><a href="#s7-1-2">7.1.2 Akış kontrol komutlarının türleri</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-2">7.2 Koşulsuz atlama: JMP</a>
+      <ol>
+        <li><a href="#s7-2-1">7.2.1 JMP ve biçimleri</a></li>
+        <li><a href="#s7-2-2">7.2.2 Etiketler</a></li>
+        <li><a href="#s7-2-3">7.2.3 Kod izleme: JMP ile ileri ve geri</a></li>
+        <li><a href="#s7-2-4">7.2.4 Atlama uzaklığının hesabı</a></li>
+        <li><a href="#s7-2-5">7.2.5 Atlamanın donanımdaki bedeli</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-3">7.3 Koşullu atlamalar</a>
+      <ol>
+        <li><a href="#s7-3-1">7.3.1 Koşullu atlama fikri</a></li>
+        <li><a href="#s7-3-2">7.3.2 Tek bayrağı sınayan atlamalar</a></li>
+        <li><a href="#s7-3-3">7.3.3 Kodlama ve eş anlamlılar</a></li>
+        <li><a href="#s7-3-4">7.3.4 Kod izleme: JNC = JNB = JAE</a></li>
+        <li><a href="#s7-3-5">7.3.5 Atlama kodunu elle hesaplamak</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-4">7.4 Karşılaştırma: CMP</a>
+      <ol>
+        <li><a href="#s7-4-1">7.4.1 CMP komutu</a></li>
+        <li><a href="#s7-4-2">7.4.2 CMP bayrakları adım adım</a></li>
+        <li><a href="#s7-4-3">7.4.3 İşaretli sayılar için atlamalar</a></li>
+        <li><a href="#s7-4-4">7.4.4 Neden SF = OF?</a></li>
+        <li><a href="#s7-4-5">7.4.5 İşaretsiz sayılar için atlamalar</a></li>
+        <li><a href="#s7-4-6">7.4.6 Above/Below mı, Greater/Less mi?</a></li>
+        <li><a href="#s7-4-7">7.4.7 Kod izleme: aynı bitler, JA ve JG</a></li>
+        <li><a href="#s7-4-8">7.4.8 Kod izleme: CMP + JE ve CMP + JA</a></li>
+        <li><a href="#s7-4-9">7.4.9 Kod izleme: karşılaştır ve yaz</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-5">7.5 Yüksek düzey yapıların karşılıkları</a>
+      <ol>
+        <li><a href="#s7-5-1">7.5.1 if/else kalıbı</a></li>
+        <li><a href="#s7-5-2">7.5.2 while, do-while ve for kalıpları</a></li>
+        <li><a href="#s7-5-3">7.5.3 Kod izleme: if/else ve while</a></li>
+        <li><a href="#s7-5-4">7.5.4 Menzil dışı koşullu atlama</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-6">7.6 Döngü komutları</a>
+      <ol>
+        <li><a href="#s7-6-1">7.6.1 LOOP ailesi</a></li>
+        <li><a href="#s7-6-2">7.6.2 LOOP nasıl çalışır?</a></li>
+        <li><a href="#s7-6-3">7.6.3 Kod izleme: LOOP</a></li>
+        <li><a href="#s7-6-4">7.6.4 Kod izleme: iç içe döngüler</a></li>
+        <li><a href="#s7-6-5">7.6.5 Kod izleme: LOOPNE ile arama</a></li>
+        <li><a href="#s7-6-6">7.6.6 JCXZ; LOOP mu, DEC–JNZ mi?</a></li>
+        <li><a href="#s7-6-7">7.6.7 Kod izleme: JCXZ koruması ve DEC–JNZ</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-7">7.7 Örnek programlar</a>
+      <ol>
+        <li><a href="#s7-7-1">7.7.1 Dizi elemanlarının toplamı</a></li>
+        <li><a href="#s7-7-2">7.7.2 Ekrana Hello yazdırma</a></li>
+        <li><a href="#s7-7-3">7.7.3 Palindrom kontrolü: fikir</a></li>
+        <li><a href="#s7-7-4">7.7.4 Palindrom: hazırlık</a></li>
+        <li><a href="#s7-7-5">7.7.5 Palindrom: karşılaştırma döngüsü</a></li>
+        <li><a href="#s7-7-6">7.7.6 Palindrom: farklı girişler</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-8">7.8 Sık yapılan hatalar</a></li>
+    <li><a href="#s7-9">7.9 Alıştırmalar ve çözümleri</a></li>
+    <li><a href="#s7-10">7.10 Özet</a></li>
+    <li><a href="#s7-11">7.11 Kavram listesi</a></li>
+    <li><a href="#s7-12">7.12 Kendini Dene</a></li>
+    <li><a href="#s7-13">7.13 İleri okuma</a></li>
+    <li><a href="#s7-14">7.14 Kaynaklar</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s7-1"><span class="nt-num">7.1</span>Sıralı yürütme ve akış kontrolü</h2>
+
+<h3 id="s7-1-1"><span class="nt-num">7.1.1</span>IP ve önden getirme kuyruğu</h3>
+
+<p>8086'nın yürüteceği komutlar bellekte, kod kesiminde art arda dizilmiş baytlardır. İşlemci bu baytların hangisinin sıradaki komut olduğunu iki yazmaçla bilir: <strong>CS</strong> (kod kesimi) ve <strong>IP</strong> (komut işaretçisi, <span lang="en">instruction pointer</span>). CS kesimin başlangıcını, IP ise sıradaki komutun bu kesim içindeki bağıl konumunu tutar. Komutun fiziksel adresi, öteki bellek erişimlerinde olduğu gibi CS × 10h + IP ile bulunur. Bir .COM programında CS = 0700h ve ilk komut 0100h'de ise işlemci ilk komutu 07000h + 0100h = 07100h adresinden okur.</p>
+
+<p>Programcı IP'ye MOV ile değer yazamaz; <code>MOV IP, AX</code> diye bir komut yoktur. IP'yi yalnız işlemcinin kendisi değiştirir. Olağan durumda değişiklik basittir: bir komut çözülünce IP o komutun bayt sayısı kadar artar. Üç baytlık <code>MOV AX, 5</code> (<code>B8 05 00</code>) 0100h'deyse komut bitince IP = 0103h olur. İki baytlık <code>MOV AL, 25</code> (<code>B0 19</code>) IP'yi iki artırır. Bu düzene <strong>sıralı yürütme</strong> denir.</p>
+
+<p>Sıralı yürütmenin 8086'da bir donanım karşılığı vardır. İşlemci iki birimden oluşur. <strong>Yol arayüz birimi</strong> (BIU, <span lang="en">bus interface unit</span>) adres ve veri yollarını yönetir; komut baytlarını bellekten okur. <strong>Yürütme birimi</strong> (EU, <span lang="en">execution unit</span>) bu baytları çözer ve işlemi yapar. BIU, EU'nun işini bitirmesini beklemez. Yol boş kaldığında CS:IP'nin ilerisindeki baytları önceden okur ve altı baytlık <strong>önden getirme kuyruğuna</strong> (<span lang="en">prefetch queue</span>) koyar. EU sıradaki komuta geçtiğinde baytlar çoğu zaman kuyrukta hazırdır. Böylece bellekten okuma ile komut yürütme aynı anda yapılır. Bu düzen basit bir iş hattıdır (<span lang="en">pipeline</span>).</p>
+
+<p>Kuyruğun bir varsayımı vardır: sıradaki komut bellekte hemen arkadan gelir. Akış kontrol komutları bu varsayımı bozar. Bir atlama yürütüldüğünde IP başka bir adrese gider. Kuyruktaki baytlar artık yanlış komutlara aittir. EU kuyruğu boşaltır ve BIU yeni CS:IP'den okumaya baştan başlar. Atlamanın saat turu bedeli büyük ölçüde bu yeniden doldurma işinden gelir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ip">
+  <span class="nt-box__title">Tanım 7.1</span>
+  <p><strong>Komut işaretçisi</strong> (IP), yürütülecek sıradaki komutun kod kesimindeki bağıl konumunu tutan 16 bitlik yazmaçtır. Komutun fiziksel adresi CS × 10h + IP'dir. <strong>Akış kontrol komutu</strong> (<span lang="en">flow control instruction</span>), IP'ye (uzak atlamada CS'ye de) komut uzunluğundan farklı bir değer yükleyen komuttur.</p>
+</div>
+
+<h3 id="s7-1-2"><span class="nt-num">7.1.2</span>Akış kontrol komutlarının türleri</h3>
+
+<p>8086'nın akış kontrol komutları üç gruba ayrılır. Birinci grup <strong>koşulsuz atlamadır</strong>: <code>JMP etiket</code> her durumda atlar. İkinci grup <strong>koşullu atlamalardır</strong> (<code>Jcc</code>). Bunlar bayrak yazmacındaki bir ya da birkaç bayrağa bakar; koşul doğruysa atlar, değilse sıradaki komuta geçer. Koşullu atlamalar da kendi içinde üçe bölünür. Bunlar tek bayrağı sınayanlar (JZ, JC, JS, JO, JP ve tersleri), işaretli sayılar için olanlar (JG, JL ailesi) ve işaretsiz sayılar için olanlardır (JA, JB ailesi). Üçüncü grup <strong>döngü komutlarıdır</strong>: <code>LOOP</code>, <code>LOOPE/LOOPZ</code>, <code>LOOPNE/LOOPNZ</code> ve <code>JCXZ</code>. Bunlar sayaç olarak CX'i kullanır.</p>
+
+<p>Akışı değiştiren başka komutlar da vardır. <code>CALL</code> ile <code>RET</code> bir alt programa gidip geri dönmeyi sağlar; dönüş adresini yığında saklar. <code>INT</code> ile <code>IRET</code> kesme hizmetine gidip dönmeyi sağlar. Bu notta her programın sonunda görülen <code>RET</code> de bir akış kontrol komutudur. Bir .COM programı başladığında yığının tepesinde 0000h vardır. <code>RET</code> bu değeri IP'ye yükler. 0000h bağıl konumunda DOS'un programın başına koyduğu PSP (program kesimi öneki) bulunur. PSP'nin ilk iki baytı <code>INT 20h</code>'dir ve program böylece sona erer. İzleme tablolarındaki son satırda IP = 0000h ve SP = 0000h görülmesinin nedeni budur.</p>
+
+<p>Akış kontrolünün yüksek düzeyli dillerdeki karşılığı karar yapıları (if/else, switch) ve döngülerdir (for, while, do-while). Derleyici bunların hepsini karşılaştırma, koşullu atlama ve koşulsuz atlama komutlarına çevirir. Assembly ile çalışan programcı bu çeviriyi elle yapar. Şekil 7.1, aynı program parçasının sıralı yürütmede ve atlamalı yürütmede nasıl gezildiğini karşılaştırır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sirali" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 430 245" role="img" aria-label="Solda komutlar sırayla yürütülür; sağda jmp komutları IP değerini değiştirerek akışı calc, back ve stop etiketlerine yönlendirir." style="max-width:430px"><defs><marker id="n7-0-c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="93" y="18" text-anchor="middle" style="font-size:13.5px">Sıralı (IP += uzunluk)</text><text class="txt" x="275" y="18" text-anchor="middle" style="font-size:13.5px">Atlama (IP ← hedef)</text><rect class="box" x="18" y="30" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="48" style="font-size:13px">mov ax, 5</text><rect class="box" x="200" y="30" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="48" style="font-size:13px">mov ax, 5</text><rect class="box" x="18" y="60" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="78" style="font-size:13px">mov bx, 2</text><rect class="box" x="200" y="60" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="78" style="font-size:13px">mov bx, 2</text><rect class="box" x="18" y="90" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="108" style="font-size:13px">jmp calc</text><rect class="hot" x="200" y="90" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="108" style="font-size:13px">jmp calc</text><rect class="box" x="18" y="120" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="138" style="font-size:13px">back: jmp stop</text><rect class="hot" x="200" y="120" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="138" style="font-size:13px">back: jmp stop</text><rect class="box" x="18" y="150" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="168" style="font-size:13px">calc: add ax, bx</text><rect class="box" x="200" y="150" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="168" style="font-size:13px">calc: add ax, bx</text><rect class="box" x="18" y="180" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="198" style="font-size:13px">jmp back</text><rect class="hot" x="200" y="180" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="198" style="font-size:13px">jmp back</text><rect class="box" x="18" y="210" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="228" style="font-size:13px">stop: ret</text><rect class="box" x="200" y="210" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="228" style="font-size:13px">stop: ret</text><path class="line" d="M8 38 L8 62" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 68 L8 92" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 98 L8 122" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 128 L8 152" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 158 L8 182" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 188 L8 212" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="acc-line" d="M350 103 C380 103 380 163 354 163" marker-end="url(#n7-0-c1)"/><path class="acc-line" d="M350 193 C395 193 395 133 354 133" marker-end="url(#n7-0-c1)"/><path class="acc-line" d="M350 133 C420 133 420 223 354 223" marker-end="url(#n7-0-c1)"/></svg></div>
+  <figcaption><b>Şekil 7.1:</b> Solda komutlar bellekteki sırasıyla yürütülür ve IP her adımda komut uzunluğu kadar artar. Sağda <code>jmp</code> komutları IP'ye yeni değer yükler; akış calc, back ve stop etiketlerine sıçrar.</figcaption>
+</figure>
+
+<h2 class="nt-pb" id="s7-2"><span class="nt-num">7.2</span>Koşulsuz atlama: JMP</h2>
+
+<h3 id="s7-2-1"><span class="nt-num">7.2.1</span>JMP ve biçimleri</h3>
+
+<p><code>JMP etiket</code> komutu denetimi programın başka bir noktasına her koşulda aktarır. İleri de atlayabilir, geri de. Komut hiçbir bayrağı değiştirmez; atlamadan önceki bayrak durumu atlamadan sonra da aynen geçerlidir. Bu özellik önemlidir: bir CMP'nin ayarladığı bayraklar araya giren bir JMP'den sonra hâlâ okunabilir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-jmp">
+  <span class="nt-box__title">Tanım 7.2</span>
+  <p><strong>Koşulsuz atlama</strong> (<span lang="en">unconditional jump</span>), yürütmenin bayraklara bakılmaksızın belirtilen hedef adresten sürmesidir. 8086'da <code>JMP</code> komutuyla yapılır. Hedef komutun içinde ya bir <strong>uzaklık</strong> (<span lang="en">jump displacement</span>) olarak, ya mutlak bir CS:IP çifti olarak ya da bir yazmaç veya bellek sözcüğünde dolaylı olarak verilir.</p>
+</div>
+
+<p>8086 JMP komutunun dört biçimini tanır. Hangisinin kullanılacağı hedefin ne kadar uzakta olduğuna ve nerede yazılı olduğuna bağlıdır. Tablo 7.1 bu biçimleri özetler.</p>
+
+<div class="nt-tablewrap" id="tab-jmp">
+<table class="nt-table">
+  <caption>Tablo 7.1: JMP komutunun biçimleri, makine kodları ve 8086'daki süreleri.</caption>
+  <thead><tr><th scope="col">Biçim</th><th scope="col">Kod</th><th scope="col">Bayt</th><th scope="col">Menzil</th><th scope="col">Değişen</th><th scope="col">Saat turu</th></tr></thead>
+  <tbody>
+    <tr><td>kısa (<code>JMP SHORT</code>)</td><td><code>EB rel8</code></td><td>2</td><td>−128…+127</td><td>IP</td><td>15</td></tr>
+    <tr><td>yakın (<code>JMP NEAR</code>)</td><td><code>E9 rel16</code></td><td>3</td><td>kesim içi her yer</td><td>IP</td><td>15</td></tr>
+    <tr><td>uzak (<code>JMP FAR</code>)</td><td><code>EA ofs seg</code></td><td>5</td><td>1 MB'ın her yeri</td><td>CS ve IP</td><td>15</td></tr>
+    <tr><td>dolaylı, yazmaç (<code>JMP BX</code>)</td><td><code>FF E3</code></td><td>2</td><td>kesim içi</td><td>IP</td><td>11</td></tr>
+    <tr><td>dolaylı, bellek (<code>JMP [BX]</code>)</td><td><code>FF 27</code></td><td>2–4</td><td>kesim içi</td><td>IP</td><td>18 + EA</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Kısa atlama</strong> (<span lang="en">short jump</span>) iki bayttır: işlem kodu EBh ve 8 bitlik işaretli uzaklık (rel8). Uzaklık −128 ile +127 arasında olabilir. Bu aralık, atlama komutundan hemen sonraki komutun adresine göre sayılır. Döngülerin ve kısa if bloklarının çoğu bu aralığa sığar, bu yüzden kısa atlama en sık görülen biçimdir.</p>
+
+<p><strong>Yakın atlama</strong> (<span lang="en">near jump</span>) üç bayttır: E9h ve 16 bitlik uzaklık (rel16). 16 bitlik toplama sarmalı olduğundan rel16 ile kod kesiminin 64 KB'lık alanındaki her bağıl konuma (0000h–FFFFh) ulaşılır. Uzaklık işaretli yorumlandığında bu ±32 KB demektir; ama sarma sayesinde kesimin öbür ucuna da gidilebilir. Kısa ve yakın atlamada yalnız IP değişir, CS aynı kalır. Bu yüzden ikisi de <strong>kesim içi</strong> (<span lang="en">intrasegment</span>) atlamadır.</p>
+
+<p><strong>Uzak atlama</strong> (<span lang="en">far jump</span>) beş bayttır: EAh, ardından hedefin 16 bitlik bağıl konumu ve 16 bitlik kesim değeri. Bayt sırası little-endian'dır; önce bağıl konumun düşük baytı gelir. Örneğin 0800h:0000h adresine uzak atlama <code>EA 00 00 00 08</code> olarak kodlanır. Komut IP'ye 0000h, CS'ye 0800h yükler ve yürütme 08000h fiziksel adresinden sürer. Bu, başka bir kesime geçmenin tek yoludur ve <strong>kesimler arası</strong> (<span lang="en">intersegment</span>) atlama diye anılır.</p>
+
+<p><strong>Dolaylı atlamada</strong> hedef komutun içinde yazılı değildir. <code>JMP BX</code> IP'ye BX'in değerini yükler. <code>JMP [BX]</code> ise DS:BX adresindeki sözcüğü okur ve onu IP'ye yükler. Dolaylı atlama, hedefin çalışma anında hesaplandığı durumlar için uygundur. Bir menüde seçilen numaraya göre farklı bir işleve gitmek bunun tipik örneğidir. Programcı bir <strong>atlama tablosu</strong> kurar: <code>tablo dw is0, is1, is2</code>. Seçim numarası 2 ile çarpılıp SI'ya konur ve <code>JMP tablo[SI]</code> doğru adrese gider. Bu komutun makine kodu <code>FF A4</code> ile tablonun 16 bitlik adresinden oluşur ve dört bayttır.</p>
+
+<p>Programcının çoğu zaman biçim seçmesi gerekmez. Assembler hedefi biliyorsa ve hedef kısa menzildeyse 2 baytlık kısa biçimi kendisi seçer. Hedef kodda daha aşağıda ve henüz tanımlanmamışsa bazı assembler'lar önce 3 bayt yer ayırır. Çok geçişli assembler'lar (emu8086 bunlardan biridir) adresleri kesinleştirdikten sonra kısa biçime iner. <code>JMP SHORT etiket</code> yazımı kısa biçimi zorlar; hedef menzil dışındaysa assembler hata verir. <code>JMP NEAR PTR etiket</code> yazımı ise hedef yakında olsa bile 3 baytlık biçimi seçtirir.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>“JMP en çok 127 bayt ileri gidebilir” yargısı yanlıştır. Bu sınır yalnız kısa biçim içindir. Yakın JMP kod kesiminin her yerine, uzak JMP ise 1 MB'lık adres alanının her yerine ulaşır. 127 baytlık sınır asıl olarak 8086'nın <em>koşullu</em> atlamaları için önemlidir, çünkü onların 16 bitlik biçimi yoktur.</p>
+</div>
+
+<h3 id="s7-2-2"><span class="nt-num">7.2.2</span>Etiketler</h3>
+
+<p>Assembly programcısı atlama hedefini adresle değil <strong>etiketle</strong> (<span lang="en">label</span>) yazar. Etiket, bir adrese verilmiş addır. Tanımlamak için ad yazılır ve sonuna iki nokta konur: <code>dongu:</code>. Etiket ayrı bir satırda durabilir ya da bir komutun önüne yazılabilir: <code>back: jmp stop</code>. İki yazımda da etiket, kendisinden sonra gelen ilk komutun adresini alır.</p>
+
+<p>Etiket bellekte yer kaplamaz. Assembler kaynak kodu okurken bir <strong>konum sayacı</strong> tutar. Her komutun bayt sayısını bu sayaca ekler ve bir etiketle karşılaşınca sayacın o anki değerini etiketin adresi olarak kaydeder. Sonra <code>jmp dongu</code> gibi bir satırı kodlarken bu adresi kullanır. Şekil 7.2'de <code>dongu</code> etiketi, kendisini izleyen <code>DEC CX</code> komutunun adresine, 0103h'ye dönüşür. Makine kodunda <code>dongu</code> diye bir şey yoktur; yalnız <code>JNZ</code> komutunun uzaklık baytında bu adrese giden bir sayı vardır.</p>
+
+<figure class="nt-fig" id="sekil-etiket" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 88" role="img" aria-label="dongu etiketi, ardından gelen DEC CX komutunun adresine (0103h) dönüşür; JNZ dongu bu adrese atlar." style="max-width:560px"><text class="lbl mono" x="60" y="25" text-anchor="end" style="font-size:12px">0100h</text><rect class="box" x="66" y="8" width="170" height="24" rx="3"/><text class="txt mono" x="76" y="25" text-anchor="start" style="font-size:13px">MOV CX, 3</text><text class="lbl mono" x="60" y="51" text-anchor="end" style="font-size:12px">0103h</text><rect class="box" x="66" y="34" width="170" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="76" y="51" text-anchor="start" style="font-size:13px">dongu: DEC CX</text><text class="lbl mono" x="60" y="77" text-anchor="end" style="font-size:12px">0104h</text><rect class="box" x="66" y="60" width="170" height="24" rx="3"/><text class="txt mono" x="76" y="77" text-anchor="start" style="font-size:13px">JNZ dongu</text><path class="line" d="M246.0 59.0 L323.0 59.0"/><path class="ah" d="M330.0 59.0 L323.0 62.9 L323.0 55.1 z"/><text class="txt" x="340" y="52" text-anchor="start" style="font-size:13px">assembler: dongu = 0103h</text><text class="lbl" x="340" y="72" text-anchor="start" style="font-size:12px">etiket bayt kaplamaz, bir adrestir</text></svg></div>
+  <figcaption><b>Şekil 7.2:</b> <code>dongu</code> etiketi, ardından gelen <code>DEC CX</code> komutunun adresine (0103h) dönüşür; <code>JNZ dongu</code> bu adrese atlar. Etiket bellekte bayt kaplamaz.</figcaption>
+</figure>
+
+<p>Etiket adları için birkaç kural vardır. Ad harf, rakam ve alt çizgi gibi karakterlerden oluşur, ama rakamla başlayamaz. Ad boşluk içeremez. Komut adları (<code>mov</code>, <code>loop</code>) ve yazmaç adları (<code>ax</code>, <code>cx</code>) etiket olamaz, çünkü assembler bir satırın başındaki sözcüğü önce komut ya da yazmaç olarak tanımaya çalışır. Aynı etiket bir programda bir kez tanımlanır; ikinci tanım hangi adresin kastedildiğini belirsizleştirir ve hataya yol açar.</p>
+
+<div class="nt-tablewrap" id="tab-etiket">
+<table class="nt-table">
+  <caption>Tablo 7.2: Geçerli ve geçersiz etiket örnekleri.</caption>
+  <thead><tr><th scope="col">Etiket</th><th scope="col">Durum</th><th scope="col">Neden</th></tr></thead>
+  <tbody>
+    <tr><td><code>dongu:</code></td><td>geçerli</td><td>harflerden oluşur</td></tr>
+    <tr><td><code>next_char:</code></td><td>geçerli</td><td>alt çizgi kullanılabilir</td></tr>
+    <tr><td><code>k1:</code>, <code>calc:</code></td><td>geçerli</td><td>rakam ilk karakter değil</td></tr>
+    <tr><td><code>1basla:</code></td><td>geçersiz</td><td>rakamla başlıyor</td></tr>
+    <tr><td><code>mov:</code></td><td>geçersiz</td><td>komut adı</td></tr>
+    <tr><td><code>iki kelime:</code></td><td>geçersiz</td><td>boşluk içeriyor</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Etiketin bir türü de vardır. Kod içindeki etiketler yakın türdedir: yalnız bağıl konumu taşırlar ve bu yüzden kesim içi atlamalarda kullanılır. Veri tanımlarının adları (<code>msg db 'Hello', 0</code>) da birer adrestir, ama bunlara değişken denir ve veri türleri (bayt, sözcük) vardır. Bu fark JMP'de önem kazanır. <code>jmp calc</code> yazıldığında assembler calc'ın adresine giden bir uzaklık üretir. <code>tablo dw 0103h</code> gibi bir değişkenin adı yazıldığında ise <code>jmp tablo</code>, dolaylı atlama olarak kodlanır (<code>FF 26</code> ve tablonun adresi). İşlemci tablonun içindeki sözcüğü okur ve onu IP'ye yükler. Yazım birbirine benzese de biri etikete, öbürü değişkenin içeriğine gider.</p>
+
+<h3 id="s7-2-3"><span class="nt-num">7.2.3</span>Kod izleme: JMP ile ileri ve geri</h3>
+
+<p>Aşağıdaki program JMP'nin hem ileri hem geri atlayabildiğini gösterir. Program iki sayı yükler, toplamayı yapan <code>calc</code> bloğuna ileri atlar, oradan geriye <code>back</code> satırına döner ve son olarak yeniden ileri, <code>stop</code> satırına gider. Kaynakta satırların sırası ile yürütülme sırası aynı değildir.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span>    100h
+<span class="kw">mov</span>    ax, 5          <span class="cm">; ax = 5</span>
+<span class="kw">mov</span>    bx, 2          <span class="cm">; bx = 2</span>
+<span class="kw">jmp</span>    calc           <span class="cm">; 'calc' etiketine git</span>
+back:  <span class="kw">jmp</span> stop       <span class="cm">; 'stop' etiketine git</span>
+calc:
+<span class="kw">add</span>    ax, bx         <span class="cm">; ax = ax + bx</span>
+<span class="kw">jmp</span>    back           <span class="cm">; 'back' etiketine dön</span>
+stop:
+<span class="kw">ret</span>                   <span class="cm">; işletim sistemine dön</span></code></pre>
+
+<p><code>org 100h</code> yönergesi bir komut değildir. Assembler'a konum sayacını 0100h'den başlatmasını söyler, çünkü DOS bir .COM programını kesimin 0100h bağıl konumuna yükler. İlk komut <code>mov ax, 5</code> bu yüzden 0100h'dedir. İşlemci programa başlarken IP = 0100h'dir.</p>
+
+<p>Tablo 7.3 programın her komutunu, adresini, makine kodunu ve komut bittikten sonraki durumu verir. Son sütundaki IP, sıradaki komutun adresidir.</p>
+
+<div class="nt-tablewrap" id="tab-jmp-iz">
+<table class="nt-table">
+  <caption>Tablo 7.3: JMP örneğinin izlemesi (CS = 0700h; değerler komut yürütüldükten sonraki durumdur).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">IP (sonra)</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>—</td><td>başlangıç</td><td>—</td><td>0000h</td><td>0000h</td><td>0100h</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>mov ax, 5</code></td><td><code>B8 05 00</code></td><td>0005h</td><td>0000h</td><td>0103h</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov bx, 2</code></td><td><code>BB 02 00</code></td><td>0005h</td><td>0002h</td><td>0106h</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>jmp calc</code></td><td><code>EB 02</code></td><td>0005h</td><td>0002h</td><td>010Ah</td></tr>
+    <tr><td>4</td><td>010Ah</td><td><code>add ax, bx</code></td><td><code>01 D8</code></td><td>0007h</td><td>0002h</td><td>010Ch</td></tr>
+    <tr><td>5</td><td>010Ch</td><td><code>jmp back</code></td><td><code>EB FA</code></td><td>0007h</td><td>0002h</td><td>0108h</td></tr>
+    <tr><td>6</td><td>0108h</td><td><code>jmp stop</code></td><td><code>EB 04</code></td><td>0007h</td><td>0002h</td><td>010Eh</td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>ret</code></td><td><code>C3</code></td><td>0007h</td><td>0002h</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İlk iki adım sıralı yürütmedir: IP önce 3, sonra yine 3 artar. Üçüncü adımda <code>jmp calc</code> yürütülür. Sıralı yürütmede IP 0108h olurdu. Atlama IP'ye calc'ın adresini, 010Ah'yi yükler. Arada kalan 0108h'deki <code>back: jmp stop</code> komutu bu turda yürütülmez. Dördüncü adımda <code>add ax, bx</code> AX'i 5 + 2 = 7 yapar. ADD bayrakları da etkiler. Sonuç sıfır değildir (ZF = 0), işaret biti 0'dır (SF = 0), elde ve taşma yoktur (CF = OF = 0). 07h = 0000 0111b üç tane 1 içerdiği için eşlik tek (PF = 0).</p>
+
+<p>Beşinci adım geriye atlamadır. <code>jmp back</code> 010Ch'dedir ve IP'yi 0108h'ye, yani kendinden önceki bir adrese çeker. Altıncı adımda 0108h'deki <code>jmp stop</code> nihayet yürütülür ve IP 010Eh olur. Yedinci adımda <code>ret</code> yığından 0000h değerini alır; IP = 0000h, SP = FFFEh + 2 = 0000h olur. PSP'deki <code>INT 20h</code> programı bitirir. Sonuç AX = 0007h'dir. Yürütme sırası kaynak satırlarına göre 2 → 3 → 4 → 7 → 8 → 5 → 10'dur. Üç JMP de bayraklara dokunmadığından ADD'in ayarladığı bayraklar programın sonuna kadar aynı kalır.</p>
+
+<p>Tablodaki <code>add ax, bx</code> için verilen <code>01 D8</code>, ADD'in “yazmaç/bellek ← yazmaç” biçimidir. Aynı komut “yazmaç ← yazmaç/bellek” biçimiyle <code>03 C3</code> olarak da kodlanabilir ve bazı assembler'lar bunu üretir. İki kodlama da iki bayttır ve aynı işi yapar; adresler ve atlama uzaklıkları değişmez.</p>
+
+<h3 id="s7-2-4"><span class="nt-num">7.2.4</span>Atlama uzaklığının hesabı</h3>
+
+<p>Kısa ve yakın atlamanın makine kodunda hedefin adresi yazılı değildir. Onun yerine hedefin, <em>atlama komutundan sonraki komutun</em> adresine göre işaretli uzaklığı yazılıdır. Bu yaklaşıma <strong>göreceli adresleme</strong> (<span lang="en">relative addressing</span>) denir. Hesap şöyledir:</p>
+
+<p class="nt-math nt-math--c">uzaklık = hedef − (atlama komutunun adresi + atlama komutunun uzunluğu)</p>
+
+<p>Parantez içindeki toplam, işlemcinin atlama komutunu okuyup bitirdiği andaki IP'dir. İşlemci atlamayı yürütürken bu IP'ye uzaklığı ekler: IP ← IP + uzaklık. Uzaklık negatifse ikiye tümleyen gösterimle saklanır ve toplama yine aynı devreyle yapılır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-uzaklik">
+  <span class="nt-box__title">Tanım 7.3</span>
+  <p><strong>Atlama uzaklığı</strong> (<span lang="en">jump displacement</span>), atlama hedefinin, atlama komutundan sonraki komutun adresine göre işaretli farkıdır. Kısa atlamada ve 8086'nın bütün koşullu atlamalarında 8 bitlik (rel8, −128…+127), yakın atlamada 16 bitliktir (rel16). İşlemci yürütürken IP ← IP + işaret genişletilmiş uzaklık hesabını yapar.</p>
+</div>
+
+<p>Şekil 7.3, JMP örneğindeki ilk atlamanın, <code>jmp calc</code> komutunun kodunu çıkarır. Komut 0106h'dedir ve iki bayttır. İşlemci komutu bitirdiğinde IP = 0108h'dir. Hedef calc = 010Ah'dir. Uzaklık 010Ah − 0108h = +2'dir ve makine kodu <code>EB 02</code> olur. Bu iki bayt, 0108h'deki iki baytlık <code>jmp stop</code> komutunun üzerinden atlamak demektir.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-rel-ileri" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 256" role="img" aria-label="Makine kodu listesi ve bağıl konum hesabı" style="max-width:720px"><defs><marker id="n7-2-d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="20" y="18">adres</text><text class="lbl" x="92" y="18">makine kodu</text><text class="lbl" x="208" y="18">komut</text><rect class="box" x="12" y="26" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="45" style="font-size:14px">0100h</text><text class="txt mono" x="92" y="45" style="font-size:14px">B8 05 00</text><text class="txt mono" x="208" y="45" style="font-size:14px">mov ax, 5</text><rect class="box" x="12" y="58" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="77" style="font-size:14px">0103h</text><text class="txt mono" x="92" y="77" style="font-size:14px">BB 02 00</text><text class="txt mono" x="208" y="77" style="font-size:14px">mov bx, 2</text><rect class="hot" x="12" y="90" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="109" style="font-size:14px">0106h</text><text class="txt mono" x="92" y="109" style="font-size:14px">EB 02</text><text class="txt mono" x="208" y="109" style="font-size:14px">jmp calc</text><rect class="box" x="12" y="122" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="141" style="font-size:14px">0108h</text><text class="txt mono" x="92" y="141" style="font-size:14px">EB 04</text><text class="txt mono" x="208" y="141" style="font-size:14px">back: jmp stop</text><rect class="box" style="stroke:var(--ds-accent);stroke-width:2.5" x="12" y="154" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="173" style="font-size:14px">010Ah</text><text class="txt mono" x="92" y="173" style="font-size:14px">01 D8</text><text class="txt mono" x="208" y="173" style="font-size:14px">calc: add ax, bx</text><rect class="box" x="12" y="186" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="205" style="font-size:14px">010Ch</text><text class="txt mono" x="92" y="205" style="font-size:14px">EB FA</text><text class="txt mono" x="208" y="205" style="font-size:14px">jmp back</text><rect class="box" x="12" y="218" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="237" style="font-size:14px">010Eh</text><text class="txt mono" x="92" y="237" style="font-size:14px">C3</text><text class="txt mono" x="208" y="237" style="font-size:14px">stop: ret</text><path class="acc-line" d="M392 104 C440 104 440 168 396 168" marker-end="url(#n7-2-d1)"/><text class="txt mono" x="470" y="60" style="font-size:14.5px">jmp calc @ 0106h (2 bayt)</text><text class="txt mono" x="470" y="90" style="font-size:14.5px">sonraki IP = 0108h</text><text class="txt mono" x="470" y="120" style="font-size:14.5px">hedef calc = 010Ah</text><text class="txt mono" x="470" y="150" style="font-size:14.5px">rel8 = 010A − 0108 = +2</text><text class="txt mono" x="470" y="180" style="font-size:14.5px">kod: EB 02</text></svg></div>
+  <figcaption><b>Şekil 7.3:</b> İleri atlama: <code>jmp calc</code> 0106h'de, sonraki komut 0108h'de, hedef 010Ah'de. Uzaklık 010Ah − 0108h = +2, kod <code>EB 02</code>.</figcaption>
+</figure>
+
+<p>0108h'deki <code>jmp stop</code> için hesap aynıdır. Sonraki komut 010Ah'dedir, hedef stop = 010Eh'dir. Uzaklık 010Eh − 010Ah = +4, kod <code>EB 04</code>'tür. İşlemci yürütürken IP ← 010Ah + 4 = 010Eh hesabını yapar.</p>
+
+<p>Geri atlamada uzaklık negatiftir. 010Ch'deki <code>jmp back</code> komutundan sonra IP = 010Eh'dir; hedef back = 0108h'dir. Uzaklık 0108h − 010Eh = −6'dır. −6'nın 8 bitlik ikiye tümleyeni şöyle bulunur: 6 = 0000 0110b; bitler ters çevrilince 1111 1001b; 1 eklenince 1111 1010b = FAh. Makine kodu <code>EB FA</code>'dır (Şekil 7.4).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-rel-geri" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 256" role="img" aria-label="Makine kodu listesi ve bağıl konum hesabı" style="max-width:720px"><defs><marker id="n7-4-d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="20" y="18">adres</text><text class="lbl" x="92" y="18">makine kodu</text><text class="lbl" x="208" y="18">komut</text><rect class="box" x="12" y="26" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="45" style="font-size:14px">0100h</text><text class="txt mono" x="92" y="45" style="font-size:14px">B8 05 00</text><text class="txt mono" x="208" y="45" style="font-size:14px">mov ax, 5</text><rect class="box" x="12" y="58" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="77" style="font-size:14px">0103h</text><text class="txt mono" x="92" y="77" style="font-size:14px">BB 02 00</text><text class="txt mono" x="208" y="77" style="font-size:14px">mov bx, 2</text><rect class="box" x="12" y="90" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="109" style="font-size:14px">0106h</text><text class="txt mono" x="92" y="109" style="font-size:14px">EB 02</text><text class="txt mono" x="208" y="109" style="font-size:14px">jmp calc</text><rect class="box" style="stroke:var(--ds-accent);stroke-width:2.5" x="12" y="122" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="141" style="font-size:14px">0108h</text><text class="txt mono" x="92" y="141" style="font-size:14px">EB 04</text><text class="txt mono" x="208" y="141" style="font-size:14px">back: jmp stop</text><rect class="box" x="12" y="154" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="173" style="font-size:14px">010Ah</text><text class="txt mono" x="92" y="173" style="font-size:14px">01 D8</text><text class="txt mono" x="208" y="173" style="font-size:14px">calc: add ax, bx</text><rect class="hot" x="12" y="186" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="205" style="font-size:14px">010Ch</text><text class="txt mono" x="92" y="205" style="font-size:14px">EB FA</text><text class="txt mono" x="208" y="205" style="font-size:14px">jmp back</text><rect class="box" x="12" y="218" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="237" style="font-size:14px">010Eh</text><text class="txt mono" x="92" y="237" style="font-size:14px">C3</text><text class="txt mono" x="208" y="237" style="font-size:14px">stop: ret</text><path class="acc-line" d="M392 200 C440 200 440 136 396 136" marker-end="url(#n7-4-d3)"/><text class="txt mono" x="470" y="60" style="font-size:14.5px">jmp back @ 010Ch</text><text class="txt mono" x="470" y="90" style="font-size:14.5px">sonraki IP = 010Eh</text><text class="txt mono" x="470" y="120" style="font-size:14.5px">hedef back = 0108h</text><text class="txt mono" x="470" y="150" style="font-size:14.5px">rel8 = 0108 − 010E = −6</text><text class="txt mono" x="470" y="180" style="font-size:14.5px">−6 = FAh (ikiye tümleyen)</text><text class="txt mono" x="470" y="210" style="font-size:14.5px">kod: EB FA</text></svg></div>
+  <figcaption><b>Şekil 7.4:</b> Geri atlama: <code>jmp back</code> 010Ch'de, sonraki IP 010Eh, hedef 0108h. Uzaklık −6, ikiye tümleyenle FAh; kod <code>EB FA</code>.</figcaption>
+</figure>
+
+<p>İşlemci bu sekiz bitlik sayıyı IP'ye eklemeden önce <strong>işaret genişletme</strong> yapar: en anlamlı bit 1 olduğundan üst sekiz bit 1'lerle doldurulur ve FAh, FFFAh olur. Toplama 16 bitliktir: 010Eh + FFFAh = 1 0108h. On yedinci bit yazmaca sığmaz ve atılır; IP = 0108h olur. Pozitif uzaklıkta da aynı işlem yapılır, yalnız üst bitler 0'larla dolar: 02h → 0002h.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-uzaklik">
+  <span class="nt-box__title">Örnek 7.1</span>
+  <p>0150h adresindeki kısa JMP 0140h'ye atlamak istiyor. Makine kodu nedir?</p>
+  <p>Komut iki bayttır, sonraki IP = 0152h. Uzaklık = 0140h − 0152h = −12h = −18. 18 = 0001 0010b; tersi 1110 1101b; 1 eklenince 1110 1110b = EEh. Kod <code>EB EE</code>'dir. Sağlama: 0152h + FFEEh = 1 0140h → IP = 0140h.</p>
+  <p>Aynı hedefe 0100h'den gidilseydi uzaklık 0140h − 0102h = +3Eh olurdu; kod <code>EB 3E</code>. 0300h'den gidilseydi uzaklık 0140h − 0302h = −1C2h = −450 olurdu. Bu sayı −128'den küçüktür; kısa biçim kullanılamaz. Assembler yakın biçimi seçer: komut 3 bayt, sonraki IP = 0303h, uzaklık 0140h − 0303h = −1C3h = FE3Dh; kod <code>E9 3D FE</code>.</p>
+</div>
+
+<p>Göreceli adreslemenin önemli bir yararı vardır. Kod bellekte başka bir yere taşındığında uzaklıklar değişmez, çünkü hem atlama komutu hem hedefi aynı miktarda kayar. Böyle koda <strong>konumdan bağımsız kod</strong> denir. Bir .COM programını DOS hangi kesime yüklerse yüklesin, kesim içindeki kısa ve yakın atlamalar doğru çalışır. Uzak atlamada ise hedef mutlak bir kesim değeri içerir; program taşınırsa bu değerin düzeltilmesi gerekir.</p>
+
+<h3 id="s7-2-5"><span class="nt-num">7.2.5</span>Atlamanın donanımdaki bedeli</h3>
+
+<p>Tablo 7.1'de JMP'nin 15 saat turu sürdüğü görülür. Bu, iki baytlık bir komut için uzun bir süredir; iki yazmacı toplayan <code>ADD AX, BX</code> yalnız 3 tur sürer. Farkın nedeni önden getirme kuyruğudur. Atlama yürütüldüğünde EU, BIU'ya kuyruğu boşaltmasını ve yeni adresten okumaya başlamasını söyler. BIU yeni CS:IP'yi adres yoluna çıkarır ve bir yol döngüsüyle (dört saat turu) iki bayt okur. EU, yeni komutun ilk baytı kuyruğa gelene kadar bekler. 15 turun önemli bir kısmı bu bekleyişten oluşur.</p>
+
+<p>Koşullu atlamalarda bu bedel daha açık görülür. Koşul sağlanır ve atlama yapılırsa komut 16 tur sürer. Koşul sağlanmazsa yalnız 4 tur sürer, çünkü IP sıradaki komutu gösterir ve kuyruktaki baytlar geçerliliğini korur. Aynı komutun iki durumu arasında dört kat fark vardır. Bu yüzden sık yürütülen döngülerde atlamanın “çoğunlukla atlanmayan” tarafa düşecek biçimde yazılması 8086'da bile hız kazandırır.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Tablo 7.4: Akış kontrol komutlarının 8086'daki saat turu sayıları (Intel 8086 kılavuzu).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Atlarsa</th><th scope="col">Atlamazsa</th></tr></thead>
+  <tbody>
+    <tr><td><code>JMP</code> kısa / yakın / uzak</td><td>15</td><td>—</td></tr>
+    <tr><td><code>JMP</code> yazmaç / bellek</td><td>11 / 18 + EA</td><td>—</td></tr>
+    <tr><td><code>Jcc</code> (bütün koşullu atlamalar)</td><td>16</td><td>4</td></tr>
+    <tr><td><code>LOOP</code></td><td>17</td><td>5</td></tr>
+    <tr><td><code>LOOPE</code> / <code>LOOPZ</code></td><td>18</td><td>6</td></tr>
+    <tr><td><code>LOOPNE</code> / <code>LOOPNZ</code></td><td>19</td><td>5</td></tr>
+    <tr><td><code>JCXZ</code></td><td>18</td><td>6</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bu sayılar 5 MHz'lik bir 8086'da somut bir anlam kazanır. Bir saat turu 1 / 5 MHz = 200 ns'dir. 15 turluk bir JMP 3 µs sürer. Atlanmayan bir koşullu atlama 0,8 µs, atlanan bir koşullu atlama 3,2 µs sürer. Bin turluk bir döngünün yalnız döngü komutu bu yüzden milisaniyeler mertebesinde zaman tutabilir.</p>
+
+<p>Atlamanın bir yan etkisi daha vardır. Hedef adres tek bir sayıysa BIU ilk yol döngüsünde yalnız bir bayt getirebilir. 8086'nın veri yolu 16 bittir ve bir sözcüğü tek yol döngüsünde ancak çift adresten okuyabilir. Sık kullanılan döngü başlarını çift adrese hizalamak (<code>EVEN</code> yönergesi) bu yüzden küçük bir kazanç sağlar. 8 bitlik veri yolu olan 8088'de bu fark yoktur, ama her bayt için ayrı yol döngüsü gerektiğinden kuyruğu doldurmak daha da uzun sürer.</p>
+
+<h2 class="nt-pb" id="s7-3"><span class="nt-num">7.3</span>Koşullu atlamalar</h2>
+
+<h3 id="s7-3-1"><span class="nt-num">7.3.1</span>Koşullu atlama fikri</h3>
+
+<p>Koşulsuz atlama tek başına karar veremez; her seferinde aynı yere gider. Karar için atlamanın bir koşula bağlanması gerekir. 8086'da bu koşul her zaman <strong>bayrak yazmacındaki</strong> bayraklardan okunur. Koşullu atlama komutlarının genel adı <code>Jcc</code>'dir; cc yerine koşulun kısaltması gelir (Z, NZ, C, A, G …). <code>Jcc etiket</code> komutunun anlamı şudur: koşul doğruysa IP ← etiket, değilse IP sıradaki komutu göstermeye devam eder.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-jcc">
+  <span class="nt-box__title">Tanım 7.4</span>
+  <p><strong>Koşullu atlama</strong> (<span lang="en">conditional jump</span>), bayrak yazmacındaki bir ya da birkaç bayrağın durumuna göre ya hedefe atlayan ya da sıradaki komuta geçen komuttur. Koşullu atlama bayrakları yalnız okur; hiçbirini değiştirmez.</p>
+</div>
+
+<p>Bayrakları koşullu atlamadan önce gelen bir komut ayarlar. Bu komut çoğunlukla <code>CMP</code>'dir, ama <code>SUB</code>, <code>ADD</code>, <code>TEST</code>, <code>AND</code>, <code>INC</code>, <code>DEC</code> gibi aritmetik ve mantık komutları da bayrakları ayarlar. Bayrakları ayarlayan komut ile onları okuyan atlama arasına bayrağa dokunmayan komutlar (<code>MOV</code>, <code>JMP</code>, <code>LOOP</code>, <code>PUSH</code>, <code>POP</code>) girebilir; karar yine ilk komutun sonucuna göre verilir. Araya bayrağı değiştiren bir komut girerse karar o komuta göre verilir. Bu, akış kontrolündeki hataların başlıca kaynaklarından biridir.</p>
+
+<p>Atlamalarda kullanılan durum bayrakları şunlardır:</p>
+
+<ul>
+  <li><strong>ZF</strong> (sıfır bayrağı): sonuç sıfırsa 1.</li>
+  <li><strong>CF</strong> (elde bayrağı): toplamada en anlamlı bitten elde çıkarsa, çıkarmada ödünç alınırsa 1.</li>
+  <li><strong>SF</strong> (işaret bayrağı): sonucun en anlamlı biti; işaretli yorumda sonuç negatifse 1.</li>
+  <li><strong>OF</strong> (taşma bayrağı): işaretli yorumda sonuç hedefin bit sayısına sığmıyorsa 1.</li>
+  <li><strong>PF</strong> (eşlik bayrağı): sonucun düşük baytında çift sayıda 1 varsa 1.</li>
+  <li><strong>AF</strong> (yardımcı elde bayrağı): bit 3'ten elde ya da ödünç varsa 1. Bu bayrağı sınayan bir atlama yoktur; AF yalnız BCD düzeltme komutlarında (DAA, DAS, AAA, AAS) kullanılır.</li>
+</ul>
+
+<p>Şekil 7.5 koşullu atlamanın akışını özetler. Bayrakları ayarlayan komuttan sonra işlemci bir yol ayrımına gelir. Koşul sağlanıyorsa etikete, sağlanmıyorsa sıradaki komuta gider. Yüksek düzeyli dillerdeki her if bu yol ayrımının bir örneğidir.</p>
+
+<figure class="nt-fig" id="sekil-jcc" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 250" role="img" aria-label="Koşullu atlama akış şeması: koşul doğruysa etikete atlanır, değilse sonraki komutla devam edilir." style="max-width:330px"><defs><marker id="n7-5-f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="85" y="6" width="160" height="34" rx="6"/><text class="txt mono" x="165" y="28" text-anchor="middle">cmp / sub / …</text><path class="line" d="M165 40 L165 62" marker-end="url(#n7-5-f1)"/><path class="hot" d="M165 66 L250 110 L165 154 L80 110 Z"/><text class="txt" x="165" y="106" text-anchor="middle">bayraklar</text><text class="txt" x="165" y="124" text-anchor="middle">koşulu sağlıyor mu?</text><path class="line" d="M250 110 L282 110 L282 196" marker-end="url(#n7-5-f1)"/><text class="lbl" x="258" y="102">evet</text><rect class="box" x="230" y="200" width="96" height="34" rx="6"/><text class="txt mono" x="278" y="222" text-anchor="middle">etiket:</text><path class="line" d="M165 154 L165 196" marker-end="url(#n7-5-f1)"/><text class="lbl" x="172" y="180">hayır</text><rect class="box" x="70" y="200" width="150" height="34" rx="6"/><text class="txt" x="145" y="222" text-anchor="middle">sonraki komut</text></svg></div>
+  <figcaption><b>Şekil 7.5:</b> Koşullu atlamanın akış şeması: bayrakları ayarlayan komuttan sonra koşul doğruysa etikete atlanır, değilse sıradaki komutla devam edilir.</figcaption>
+</figure>
+
+<h3 id="s7-3-2"><span class="nt-num">7.3.2</span>Tek bayrağı sınayan atlamalar</h3>
+
+<p>En basit koşullu atlamalar tek bir bayrağa bakar. Her bayrak için iki komut vardır: biri bayrak 1 iken, öbürü bayrak 0 iken atlar. Komut adındaki N harfi “not” (değil) anlamına gelir: <code>JZ</code> sıfırsa, <code>JNZ</code> sıfır değilse atlar. Tablo 7.5 bu komutları, koşullarını ve zıtlarını verir.</p>
+
+<div class="nt-tablewrap" id="tab-tek">
+<table class="nt-table">
+  <caption>Tablo 7.5: Tek bayrağı sınayan koşullu atlamalar.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Anlamı</th><th scope="col">Koşul</th><th scope="col">Zıt komut</th></tr></thead>
+  <tbody>
+    <tr><td><code>JZ</code>, <code>JE</code></td><td>sıfırsa / eşitse (<span lang="en">Jump if Zero / Equal</span>)</td><td>ZF = 1</td><td><code>JNZ</code>, <code>JNE</code></td></tr>
+    <tr><td><code>JC</code>, <code>JB</code>, <code>JNAE</code></td><td>elde varsa / aşağıdaysa</td><td>CF = 1</td><td><code>JNC</code>, <code>JNB</code>, <code>JAE</code></td></tr>
+    <tr><td><code>JS</code></td><td>sonuç negatifse</td><td>SF = 1</td><td><code>JNS</code></td></tr>
+    <tr><td><code>JO</code></td><td>işaretli taşma varsa</td><td>OF = 1</td><td><code>JNO</code></td></tr>
+    <tr><td><code>JPE</code>, <code>JP</code></td><td>eşlik çiftse</td><td>PF = 1</td><td><code>JPO</code>, <code>JNP</code></td></tr>
+    <tr><td><code>JNZ</code>, <code>JNE</code></td><td>sıfır değilse / eşit değilse</td><td>ZF = 0</td><td><code>JZ</code>, <code>JE</code></td></tr>
+    <tr><td><code>JNC</code>, <code>JNB</code>, <code>JAE</code></td><td>elde yoksa / aşağıda değilse</td><td>CF = 0</td><td><code>JC</code>, <code>JB</code>, <code>JNAE</code></td></tr>
+    <tr><td><code>JNS</code></td><td>sonuç negatif değilse</td><td>SF = 0</td><td><code>JS</code></td></tr>
+    <tr><td><code>JNO</code></td><td>taşma yoksa</td><td>OF = 0</td><td><code>JO</code></td></tr>
+    <tr><td><code>JPO</code>, <code>JNP</code></td><td>eşlik tekse</td><td>PF = 0</td><td><code>JPE</code>, <code>JP</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bu komutların kullanım alanları farklıdır. <code>JZ/JNZ</code> en sık kullanılanlardır: bir sayacın sıfıra inip inmediği, iki değerin eşit olup olmadığı, bir dizginin sonundaki 0 baytına gelinip gelinmediği bunlarla sınanır. <code>JC/JNC</code> işaretsiz toplamada taşmayı, çıkarmada ödünç almayı yakalar. DOS ve BIOS hizmetlerinin bazıları da hata durumunu CF ile bildirir; hizmet çağrısından sonra <code>JC hata</code> yazılır. <code>JS/JNS</code> bir sonucun işaretine bakar. <code>JO/JNO</code> işaretli aritmetikte taşmayı yakalar. <code>JP/JNP</code> seyrek kullanılır; seri iletişimde eşlik denetimi gibi işlerde işe yarar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>JC adındaki C, elde (<span lang="en">carry</span>) bayrağıdır; taşma (<span lang="en">overflow</span>) ise OF'dir. İkisi farklı kavramlardır. CF işaretsiz yorumdaki sığmama durumunu, OF işaretli yorumdaki sığmama durumunu bildirir. 7Fh + 01h = 80h toplamasında CF = 0'dır (127 + 1 = 128 bir bayta sığar), ama OF = 1'dir (işaretli +127 + 1 = +128, −128…127 aralığına sığmaz).</p>
+</div>
+
+<h3 id="s7-3-3"><span class="nt-num">7.3.3</span>Kodlama ve eş anlamlılar</h3>
+
+<p>8086'da bütün koşullu atlamalar sabit uzunluktadır: <strong>2 bayt</strong>. İlk bayt işlem kodu, ikinci bayt 8 bitlik işaretli uzaklıktır (rel8). Bu yüzden bir koşullu atlama, kendisinden sonraki komuta göre en çok 128 bayt geriye ya da 127 bayt ileriye gidebilir. 16 bitlik uzaklıklı koşullu atlamalar (<code>0F 8x</code> işlem kodları) ancak 80386 ile gelmiştir; 8086'da yoktur.</p>
+
+<p>Aynı koşulun birden çok adı olabilir. Örneğin CF = 1 koşulu “elde var” (JC), “aşağıda” (JB, işaretsiz küçük) ve “yukarıda ya da eşit değil” (JNAE) diye üç biçimde okunabilir. Bu adlara <strong>eş anlamlı</strong> komutlar denir. Assembler hepsini aynı makine koduna çevirir; işlemci hangi adın yazıldığını bilmez. Programcı, koşulun o programdaki anlamına en uygun adı seçer. İki sayının eşitliği sınanıyorsa <code>JE</code>, bir sayacın sıfırlanması sınanıyorsa <code>JZ</code> yazmak kodu okunur kılar.</p>
+
+<div class="nt-ops" id="tab-opkod" role="list" aria-label="Koşullu atlama ve döngü komutlarının işlem kodları">
+  <div role="listitem"><b>70</b>JO</div><div role="listitem"><b>71</b>JNO</div><div role="listitem"><b>72</b>JB / JC / JNAE</div><div role="listitem"><b>73</b>JAE / JNB / JNC</div>
+  <div role="listitem"><b>74</b>JE / JZ</div><div role="listitem"><b>75</b>JNE / JNZ</div><div role="listitem"><b>76</b>JBE / JNA</div><div role="listitem"><b>77</b>JA / JNBE</div>
+  <div role="listitem"><b>78</b>JS</div><div role="listitem"><b>79</b>JNS</div><div role="listitem"><b>7A</b>JP / JPE</div><div role="listitem"><b>7B</b>JNP / JPO</div>
+  <div role="listitem"><b>7C</b>JL / JNGE</div><div role="listitem"><b>7D</b>JGE / JNL</div><div role="listitem"><b>7E</b>JLE / JNG</div><div role="listitem"><b>7F</b>JG / JNLE</div>
+  <div role="listitem"><b>E0</b>LOOPNE / LOOPNZ</div><div role="listitem"><b>E1</b>LOOPE / LOOPZ</div><div role="listitem"><b>E2</b>LOOP</div><div role="listitem"><b>E3</b>JCXZ</div>
+</div>
+
+<p>Yukarıdaki işlem kodu dizisinde bir düzen vardır. Koşullu atlamaların hepsi 70h–7Fh aralığındadır ve ikişer ikişer eşlenir. Her çiftte işlem kodunun en düşük biti koşulu tersine çevirir: 74h JE iken 75h JNE, 72h JB iken 73h JAE, 7Ch JL iken 7Dh JGE. Üst bitler hangi bayrağın ya da bayrak birleşiminin sınanacağını seçer. İşlemcinin koşul devresi önce bu birleşimi hesaplar, sonra en düşük bit 1 ise sonucu tersler. Bu düzen, bir koşulun tersini bulmayı kolaylaştırır: işlem kodunun son bitini değiştirmek yeterlidir. Döngü komutları da E0h–E3h aralığında yan yana durur. Kısa JMP'nin kodu ise EBh'dir.</p>
+
+<h3 id="s7-3-4"><span class="nt-num">7.3.4</span>Kod izleme: JNC = JNB = JAE</h3>
+
+<p>Eş anlamlı komutların gerçekten aynı makine kodunu ürettiği küçük bir programla görülebilir. Program art arda üç eş anlamlı atlama içerir; üçü de aynı <code>a</code> etiketine gider.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">jnc</span> a          <span class="cm">; 0100h: 73 07</span>
+<span class="kw">jnb</span> a          <span class="cm">; 0102h: 73 05</span>
+<span class="kw">jae</span> a          <span class="cm">; 0104h: 73 03</span>
+<span class="kw">mov</span> ax, 4      <span class="cm">; 0106h: B8 04 00</span>
+a: <span class="kw">mov</span> ax, 5   <span class="cm">; 0109h: B8 05 00</span>
+<span class="kw">ret</span>            <span class="cm">; 010Ch: C3</span></code></pre>
+
+<p>Üç atlamanın işlem kodu da 73h'dir; üçü de CF = 0 koşulunu sınar. Yalnız ikinci baytları farklıdır, çünkü her biri farklı adreste durur ve hedefe olan uzaklıkları farklıdır. <code>jnc a</code> 0100h'dedir: sonraki adres 0102h, uzaklık 0109h − 0102h = 7. <code>jnb a</code> 0102h'dedir: uzaklık 0109h − 0104h = 5. <code>jae a</code> 0104h'dedir: uzaklık 0109h − 0106h = 3.</p>
+
+<div class="nt-tablewrap" id="tab-es-iz">
+<table class="nt-table">
+  <caption>Tablo 7.6: Eş anlamlı atlamalar programının izlemesi (başlangıçta CF = 0).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">CF</th><th scope="col">AX</th><th scope="col">IP (sonra)</th><th scope="col">Açıklama</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>—</td><td>başlangıç</td><td>0</td><td>0000h</td><td>0100h</td><td>.COM başlangıcı</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>jnc a</code></td><td>0</td><td>0000h</td><td>0109h</td><td>CF = 0 → atlar: 0102h + 07h</td></tr>
+    <tr><td>2</td><td>0109h</td><td><code>mov ax, 5</code></td><td>0</td><td>0005h</td><td>010Ch</td><td>aradaki üç komut yürütülmedi</td></tr>
+    <tr><td>3</td><td>010Ch</td><td><code>ret</code></td><td>0</td><td>0005h</td><td>0000h</td><td>PSP'ye dönüş</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Program başladığında bütün durum bayrakları 0'dır, CF de 0'dır. İlk komut <code>jnc a</code> bu yüzden atlar ve IP = 0109h olur. <code>jnb</code>, <code>jae</code> ve <code>mov ax, 4</code> hiç yürütülmez. AX = 0005h olur ve program biter. Başlangıçta CF = 1 olsaydı (örneğin programın başına <code>STC</code> eklenseydi) üç atlama da atlamazdı. İşlemci üç komutu sırayla geçer, AX önce 4, sonra 5 olurdu. İki durumda da son değer aynıdır, ama yürütülen komut sayısı farklıdır: CF = 0 iken 3, CF = 1 iken 6 komut.</p>
+
+<h3 id="s7-3-5"><span class="nt-num">7.3.5</span>Atlama kodunu elle hesaplamak</h3>
+
+<p>Sunumdaki atlama kodu hesaplayıcısı, bir atlama komutunun adresinden ve hedefinden makine kodunu bulur. Aynı hesap elle üç adımda yapılır. Önce komutun uzunluğu belirlenir: JMP SHORT, bütün Jcc'ler ve LOOP ailesi 2 bayt, JMP NEAR 3 bayttır. Sonra uzaklık hesaplanır: uzaklık = hedef − (adres + uzunluk). Son olarak uzaklık menzile sığıyor mu diye bakılır ve ikiye tümleyenle yazılır.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kod">
+  <span class="nt-box__title">Örnek 7.2</span>
+  <p>(a) 0120h'deki <code>JNE</code> 0100h'ye atlayacak. Sonraki IP = 0122h; uzaklık = 0100h − 0122h = −22h. 22h = 0010 0010b; tersi 1101 1101b; artı 1: 1101 1110b = DEh. Kod <code>75 DE</code>. İşlemci 0122h + FFDEh = 1 0100h → IP = 0100h hesaplar.</p>
+  <p>(b) 0105h'deki <code>LOOP</code> 0100h'ye dönecek. Uzaklık = 0100h − 0107h = −7 = F9h. Kod <code>E2 F9</code>.</p>
+  <p>(c) 0100h'deki <code>JE</code> 0190h'ye atlayacak. Uzaklık = 0190h − 0102h = 8Eh = 142. Bu sayı +127'den büyüktür; 8 bitlik işaretli sayı olarak 8Eh, −114 diye okunurdu. Kısa biçim kullanılamaz ve 8086'da koşullu atlamanın uzun biçimi yoktur. Çözüm, koşulu ters çevirip yakın JMP kullanmaktır.</p>
+  <p>(d) 0100h'deki <code>JMP NEAR</code> 0190h'ye atlayacak. Komut 3 bayt, sonraki IP = 0103h, uzaklık = 008Dh. Kod <code>E9 8D 00</code> (little-endian: önce düşük bayt).</p>
+</div>
+
+<p>Kısa biçimde sonuç −128…+127 aralığına sığmıyorsa klasik assembler'lar “<span lang="en">relative jump out of range</span>” hatası verir. Bu hata, uzaklığın bir bayta sığmadığını söyler; çözümü komutu değiştirmek ya da kodu yeniden düzenlemektir.</p>
+
+<h2 class="nt-pb" id="s7-4"><span class="nt-num">7.4</span>Karşılaştırma: CMP</h2>
+
+<h3 id="s7-4-1"><span class="nt-num">7.4.1</span>CMP komutu</h3>
+
+<p>Bir program çoğunlukla iki değeri karşılaştırıp sonuca göre karar verir: sayı 100'den büyük mü, karakter 'A' mı, sayaç sona geldi mi. Bunun için <code>CMP hedef, kaynak</code> komutu kullanılır. CMP, SUB komutunun yaptığı çıkarmayı yapar: hedef − kaynak. Ancak sonucu hiçbir yere yazmaz. Yalnız bayrakları (CF, ZF, SF, OF, PF, AF) çıkarmanın sonucuna göre ayarlar. İki işlenen de değişmeden kalır.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-cmp">
+  <span class="nt-box__title">Tanım 7.5</span>
+  <p><strong>Karşılaştırma</strong> (CMP, <span lang="en">compare</span>), hedef − kaynak çıkarmasını yapıp sonucu atan, yalnız bayrakları ayarlayan komuttur. Bayraklar SUB'daki kurallarla ayarlanır. CMP'den sonra gelen koşullu atlama bu bayraklara bakarak karar verir.</p>
+</div>
+
+<p>CMP'nin işlenen kuralları SUB ile aynıdır. Yazmaç–yazmaç, yazmaç–bellek, bellek–yazmaç ve yazmaç ya da bellek–sabit birleşimleri geçerlidir. İki bellek işleneni olamaz; <code>CMP [SI], [DI]</code> yazılamaz. İki işlenen aynı boyutta olmalıdır. Bellek ile sabit karşılaştırılırken boyut belirtilmelidir: <code>CMP BYTE PTR [SI], 3</code>. Değişken adı kullanılıyorsa boyut değişkenin türünden anlaşılır: <code>cmp dizi[si], 3</code> bir bayt karşılaştırmasıdır, çünkü dizi DB ile tanımlıdır.</p>
+
+<p>CMP'nin yürütme süresi işlenenlere göre değişir. Yazmaç–yazmaç 3, yazmaç–sabit 4 saat turu sürer. Bellek işleneni varsa önce etkin adres hesaplanır ve bir yol döngüsüyle bellek okunur: yazmaç–bellek 9 + EA, bellek–sabit 10 + EA tur. Karşılaştırma ile ardındaki koşullu atlama birlikte bir kararın bedelidir: <code>CMP AL, BL</code> + atlanmayan <code>JE</code> 3 + 4 = 7 tur, atlanan <code>JE</code> 3 + 16 = 19 tur.</p>
+
+<div class="nt-tablewrap" id="tab-cmp-ornek">
+<table class="nt-table">
+  <caption>Tablo 7.7: İki basit CMP örneği.</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Çıkarma</th><th scope="col">ZF</th><th scope="col">CF</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">JE / JZ</th></tr></thead>
+  <tbody>
+    <tr><td><code>CMP 05h, 02h</code></td><td>5 − 2 = 3 → 03h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>atlamaz</td></tr>
+    <tr><td><code>CMP 07h, 07h</code></td><td>7 − 7 = 0 → 00h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>atlar</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablodaki yazım kavramsaldır; 8086'da iki sabiti karşılaştıran komut yoktur, işlenenlerden biri yazmaç ya da bellek olmalıdır. Birinci örnekte fark sıfır değildir ve ZF = 0 olur. İkinci örnekte fark sıfırdır: ZF = 1 olur ve <code>JE</code> ya da <code>JZ</code> atlar. Eşitlik denetiminin tamamı bu kadardır: iki sayı eşitse farkları sıfırdır.</p>
+
+<h3 id="s7-4-2"><span class="nt-num">7.4.2</span>CMP bayrakları adım adım</h3>
+
+<p>Eşitlik yalnız ZF'ye bakar. “Büyük” ve “küçük” kararları ise sayıların nasıl yorumlandığına bağlıdır. Aynı sekiz bit işaretsiz bir sayı olarak 0–255, işaretli bir sayı olarak −128…127 aralığında bir değer taşır. CMP bu ayrımı yapmaz; bitleri çıkarır ve her iki yorum için gereken bilgiyi bayraklara yazar. İşaretsiz yorumun cevabı CF'de ve ZF'de, işaretli yorumun cevabı SF'de, OF'de ve ZF'de durur. Tablo 7.8, <code>CMP AL, BL</code> komutunun beş farklı girişte bayrakları nasıl ayarladığını gösterir.</p>
+
+<div class="nt-tablewrap" id="tab-cmp5">
+<table class="nt-table">
+  <caption>Tablo 7.8: <code>CMP AL, BL</code> komutunun beş girişte ayarladığı bayraklar ve atlama kararları.</caption>
+  <thead><tr><th scope="col">AL</th><th scope="col">BL</th><th scope="col">AL − BL</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">PF</th><th scope="col">AF</th><th scope="col">İşaretsiz</th><th scope="col">İşaretli</th></tr></thead>
+  <tbody>
+    <tr><td>05h (5)</td><td>02h (2)</td><td>03h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>5 &gt; 2: JA</td><td>5 &gt; 2: JG</td></tr>
+    <tr><td>07h (7)</td><td>07h (7)</td><td>00h</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>eşit: JE</td><td>eşit: JE</td></tr>
+    <tr><td>05h (5)</td><td>07h (7)</td><td>FEh</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>5 &lt; 7: JB</td><td>5 &lt; 7: JL</td></tr>
+    <tr><td>7Fh (127)</td><td>80h (128 / −128)</td><td>FFh</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>127 &lt; 128: JB</td><td>127 &gt; −128: JG</td></tr>
+    <tr><td>FBh (251 / −5)</td><td>03h (3)</td><td>F8h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>251 &gt; 3: JA</td><td>−5 &lt; 3: JL</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Birinci satırda fark pozitiftir ve hiçbir bayrak kalkmaz; yalnız PF = 1 olur, çünkü 03h = 0000 0011b iki tane 1 içerir. İkinci satırda fark sıfırdır ve ZF = 1 olur. Hem işaretli hem işaretsiz bakışta sayılar eşittir.</p>
+
+<p>Üçüncü satırda küçük sayıdan büyük sayı çıkarılır. 5 − 7 işlemi bir ödünç gerektirir; CF = 1 olur. Sonuç FEh'dir: işaretsiz 254, işaretli −2. Sonucun en anlamlı biti 1 olduğu için SF = 1'dir. −2 sekiz bite sığdığı için taşma yoktur: OF = 0. Düşük dörtlükte de 5 − 7 için ödünç alındığından AF = 1'dir. FEh = 1111 1110b yedi tane 1 içerir; PF = 0'dır.</p>
+
+<p>Dördüncü ve beşinci satırlar asıl ilginç durumlardır. Bu iki satırda işaretli ve işaretsiz yorum farklı cevap verir (Şekil 7.6 ve 7.7).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-cmp-7f80" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 196" role="img" aria-label="CMP 7Fh, 80h sonucunda bayraklar" style="max-width:720px"><text class="lbl" x="20" y="22">AL</text><text class="txt mono" x="70" y="22">0111 1111</text><text class="txt mono" x="170" y="22">7Fh</text><text class="lbl" x="300" y="22">işaretsiz 127 · işaretli 127</text><text class="lbl" x="20" y="50">BL</text><text class="txt mono" x="70" y="50">1000 0000</text><text class="txt mono" x="170" y="50">80h</text><text class="lbl" x="300" y="50">işaretsiz 128 · işaretli -128</text><path class="axis" d="M20 60 L230 60"/><text class="lbl" x="20" y="82">AL−BL</text><text class="txt mono" x="70" y="82">1111 1111</text><text class="txt mono" x="170" y="82">FFh</text><text class="lbl" x="300" y="82">sonuç saklanmaz, yalnız bayraklar</text><rect class="hot" x="20" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="53" y="120" text-anchor="middle">CF=1</text><rect class="box" x="96" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="129" y="120" text-anchor="middle">ZF=0</text><rect class="hot" x="172" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="205" y="120" text-anchor="middle">SF=1</text><rect class="hot" x="248" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="281" y="120" text-anchor="middle">OF=1</text><rect class="hot" x="324" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="357" y="120" text-anchor="middle">PF=1</text><rect class="box" x="400" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="433" y="120" text-anchor="middle">AF=0</text><text class="txt" x="20" y="162">işaretsiz: AL < BL</text><text class="txt" x="300" y="162">işaretli: AL > BL</text><text class="lbl" x="20" y="184">CF=1, ZF=0 → JB atlar</text><text class="lbl" x="300" y="184">SF=1, OF=1, ZF=0 → JG atlar</text></svg></div>
+  <figcaption><b>Şekil 7.6:</b> <code>CMP 7Fh, 80h</code>: işaretsiz bakışta 127 &lt; 128 (CF = 1, JB atlar); işaretli bakışta 127 − (−128) = 255 sekiz bite sığmaz, OF = 1 olur ve SF = OF olduğundan JG atlar.</figcaption>
+</figure>
+
+<p>7Fh − 80h işleminde işaretsiz yorum 127 − 128'dir; ödünç alınır ve CF = 1 olur. İşaretli yorum ise 127 − (−128) = +255'tir. Bu değer −128…127 aralığına sığmaz; OF = 1 olur. Sekiz bitlik sonuç FFh'dir ve en anlamlı biti 1 olduğundan SF = 1'dir. SF tek başına “sonuç negatif, yani AL küçük” derdi; bu yanlıştır. Doğru karar SF ile OF birlikte okunarak verilir.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-cmp-fb03" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 196" role="img" aria-label="CMP FBh, 03h sonucunda bayraklar" style="max-width:720px"><text class="lbl" x="20" y="22">AL</text><text class="txt mono" x="70" y="22">1111 1011</text><text class="txt mono" x="170" y="22">FBh</text><text class="lbl" x="300" y="22">işaretsiz 251 · işaretli -5</text><text class="lbl" x="20" y="50">BL</text><text class="txt mono" x="70" y="50">0000 0011</text><text class="txt mono" x="170" y="50">03h</text><text class="lbl" x="300" y="50">işaretsiz 3 · işaretli 3</text><path class="axis" d="M20 60 L230 60"/><text class="lbl" x="20" y="82">AL−BL</text><text class="txt mono" x="70" y="82">1111 1000</text><text class="txt mono" x="170" y="82">F8h</text><text class="lbl" x="300" y="82">sonuç saklanmaz, yalnız bayraklar</text><rect class="box" x="20" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="53" y="120" text-anchor="middle">CF=0</text><rect class="box" x="96" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="129" y="120" text-anchor="middle">ZF=0</text><rect class="hot" x="172" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="205" y="120" text-anchor="middle">SF=1</text><rect class="box" x="248" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="281" y="120" text-anchor="middle">OF=0</text><rect class="box" x="324" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="357" y="120" text-anchor="middle">PF=0</text><rect class="box" x="400" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="433" y="120" text-anchor="middle">AF=0</text><text class="txt" x="20" y="162">işaretsiz: AL > BL</text><text class="txt" x="300" y="162">işaretli: AL < BL</text><text class="lbl" x="20" y="184">CF=0, ZF=0 → JA atlar</text><text class="lbl" x="300" y="184">SF=1, OF=0, ZF=0 → JL atlar</text></svg></div>
+  <figcaption><b>Şekil 7.7:</b> <code>CMP FBh, 03h</code>: FBh işaretsiz 251, işaretli −5'tir. İşaretsiz bakışta 251 &gt; 3 (CF = 0, JA atlar); işaretli bakışta −5 &lt; 3 (SF ≠ OF, JL atlar). Aynı bitler farklı karar verir.</figcaption>
+</figure>
+
+<p>FBh − 03h = F8h işleminde ödünç yoktur; CF = 0 olur. İşaretsiz yorumda 251 &gt; 3'tür. İşaretli yorumda −5 − 3 = −8'dir. −8 sekiz bite sığar (F8h), taşma yoktur: OF = 0. Sonuç negatiftir: SF = 1. SF ≠ OF olduğundan işaretli yorumda AL küçüktür. Aynı CMP, verinin türüne göre iki zıt karar verir. Hangi kararın doğru olduğunu işlemci bilemez; bunu programcı, uygun atlama komutunu seçerek belirtir.</p>
+
+<h3 id="s7-4-3"><span class="nt-num">7.4.3</span>İşaretli sayılar için atlamalar</h3>
+
+<p>İşaretli karşılaştırma için kullanılan atlamalar “büyük” ve “küçük” sözcüklerinin İngilizcesiyle adlandırılır: <strong>G</strong>reater (büyük) ve <strong>L</strong>ess (küçük). Bu adlar, sayıların ikiye tümleyen gösterimde işaretli olduğu varsayımıyla kullanılır. Tablo 7.9 bu aileyi koşullarıyla verir.</p>
+
+<div class="nt-tablewrap" id="tab-isaretli">
+<table class="nt-table">
+  <caption>Tablo 7.9: İşaretli sayılar için koşullu atlamalar (<code>CMP A, B</code> sonrası).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Anlamı</th><th scope="col">Koşul</th><th scope="col">Zıt komut</th></tr></thead>
+  <tbody>
+    <tr><td><code>JE</code>, <code>JZ</code></td><td>A = B</td><td>ZF = 1</td><td><code>JNE</code>, <code>JNZ</code></td></tr>
+    <tr><td><code>JNE</code>, <code>JNZ</code></td><td>A ≠ B</td><td>ZF = 0</td><td><code>JE</code>, <code>JZ</code></td></tr>
+    <tr><td><code>JG</code>, <code>JNLE</code></td><td>A &gt; B (<span lang="en">greater</span>)</td><td>ZF = 0 ve SF = OF</td><td><code>JNG</code>, <code>JLE</code></td></tr>
+    <tr><td><code>JL</code>, <code>JNGE</code></td><td>A &lt; B (<span lang="en">less</span>)</td><td>SF ≠ OF</td><td><code>JNL</code>, <code>JGE</code></td></tr>
+    <tr><td><code>JGE</code>, <code>JNL</code></td><td>A ≥ B</td><td>SF = OF</td><td><code>JNGE</code>, <code>JL</code></td></tr>
+    <tr><td><code>JLE</code>, <code>JNG</code></td><td>A ≤ B</td><td>ZF = 1 veya SF ≠ OF</td><td><code>JNLE</code>, <code>JG</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Koşullar bir bakışta karışık görünür, ama tek bir ilkeden türer: işaretli yorumda “A &lt; B” bilgisi SF ≠ OF ile verilir. Geri kalanlar buradan çıkar. A ≥ B, A &lt; B'nin değilidir: SF = OF. A &gt; B, “A ≥ B ve A ≠ B” demektir: SF = OF ve ZF = 0. A ≤ B, A &gt; B'nin değilidir: ZF = 1 veya SF ≠ OF. Eş anlamlılar da aynı mantıkla kurulur. JG, “küçük ya da eşit değil” anlamında JNLE diye de yazılır.</p>
+
+<h3 id="s7-4-4"><span class="nt-num">7.4.4</span>Neden SF = OF?</h3>
+
+<p><code>CMP A, B</code> işlemcide A − B olarak hesaplanır. Taşma olmazsa sonucun işareti doğrudur: A &lt; B ise fark negatiftir ve SF = 1 olur. Taşma varsa (OF = 1) fark sekiz ya da on altı bite sığmamıştır. Sığmayan bir sonucun işaret biti ters çıkar. Bunun nedeni işaretli sayıların bir çember üzerinde dizilmesidir (Şekil 7.8): aralığın bir ucunu aşan değer öbür uçtan girer. 127'ye 1 eklenince −128 olur; −128'den 1 çıkarılınca 127 olur.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-cember" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 96" role="img" aria-label="İşaretli bayt aralığı −128 ile 127 arasıdır; taşma olunca değer diğer uca sarar ve işaret biti ters çıkar." style="max-width:620px"><rect class="box" x="20" y="26" width="320" height="28" rx="3"/><text class="txt" x="180" y="45" text-anchor="middle" style="font-size:13px">negatif: 80h … FFh</text><rect class="box" x="340" y="26" width="320" height="28" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="500" y="45" text-anchor="middle" style="font-size:13px">pozitif: 00h … 7Fh</text><text class="lbl" x="20" y="18" text-anchor="middle" style="font-size:12px">−128</text><text class="lbl" x="340" y="18" text-anchor="middle" style="font-size:12px">0</text><text class="lbl" x="660" y="18" text-anchor="middle" style="font-size:12px">127</text><path class="line" style="stroke-dasharray:4 3" d="M660 56 C 640 84, 40 84, 22 60"/><path class="line" d="M30.0 70.0 L25.9 63.8"/><path class="ah" d="M22.0 58.0 L29.1 61.7 L22.7 66.0 z"/><text class="lbl" x="340" y="90" text-anchor="middle" style="font-size:12px">127 + 1 → −128: aralığın ucunda değer öbür uca sarar, işaret biti ters çıkar (OF = 1)</text></svg></div>
+  <figcaption><b>Şekil 7.8:</b> İşaretli bayt aralığı −128 ile 127 arasıdır. Taşma olunca değer aralığın öbür ucuna sarar ve işaret biti ters çıkar (OF = 1).</figcaption>
+</figure>
+
+<p>Gerçek işaret bu yüzden SF ile OF'nin dışlayıcı veyasıdır: gerçek işaret = SF XOR OF. Taşma yoksa (OF = 0) gerçek işaret SF'nin kendisidir. Taşma varsa (OF = 1) gerçek işaret SF'nin tersidir. SF ≠ OF olduğunda XOR 1 verir: gerçek fark negatiftir ve A &lt; B'dir. SF = OF olduğunda XOR 0 verir: gerçek fark negatif değildir ve A ≥ B'dir.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-sfof">
+  <span class="nt-box__title">Teorem 7.1 (İşaretli karşılaştırma)</span>
+  <p><code>CMP A, B</code> komutundan sonra, A ve B ikiye tümleyen gösterimde işaretli sayılar olarak yorumlanırsa A &lt; B ⇔ SF ≠ OF ve A ≥ B ⇔ SF = OF'dir.</p>
+  <p><em>Gerekçe.</em> Gerçek fark d = A − B, sekiz bitte −255…+255 aralığındadır. d −128…127 aralığındaysa sonuç doğru gösterilir, OF = 0 ve SF = (d &lt; 0) olur. d &gt; 127 ise sonuç d − 256 olarak görünür, negatiftir: SF = 1, OF = 1; gerçek fark pozitiftir. d &lt; −128 ise sonuç d + 256 olarak görünür, pozitif ya da sıfırdır: SF = 0, OF = 1; gerçek fark negatiftir. Üç durumda da (d &lt; 0) = SF XOR OF'dir.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-sfof">
+<table class="nt-table">
+  <caption>Tablo 7.10: SF ve OF birlikte doğru kararı verir (8 bit).</caption>
+  <thead><tr><th scope="col">A</th><th scope="col">B</th><th scope="col">A − B (8 bit)</th><th scope="col">Gerçek fark</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">Karar</th></tr></thead>
+  <tbody>
+    <tr><td>5</td><td>7</td><td>FEh (−2)</td><td>−2</td><td>1</td><td>0</td><td>SF ≠ OF → 5 &lt; 7</td></tr>
+    <tr><td>127 (7Fh)</td><td>−128 (80h)</td><td>FFh (−1)</td><td>+255, sığmaz</td><td>1</td><td>1</td><td>SF = OF → 127 &gt; −128</td></tr>
+    <tr><td>−128 (80h)</td><td>1</td><td>7Fh (+127)</td><td>−129, sığmaz</td><td>0</td><td>1</td><td>SF ≠ OF → −128 &lt; 1</td></tr>
+    <tr><td>−5 (FBh)</td><td>3</td><td>F8h (−8)</td><td>−8</td><td>1</td><td>0</td><td>SF ≠ OF → −5 &lt; 3</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tablonun ikinci ve üçüncü satırları taşmalıdır. İkisinde de SF tek başına yanlış cevap verirdi: ikinci satırda “negatif, A küçük” derdi, üçüncü satırda “pozitif, A büyük” derdi. OF ile birlikte değerlendirildiğinde karar doğrudur. Donanım açısından bu iş çok ucuzdur: JL'nin koşul devresi tek bir XOR kapısıdır. JLE için bu XOR'un çıkışı ZF ile VEYA'lanır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>İşaretli karşılaştırmadan sonra <code>JS</code> ile “küçükse atla” yazmak. JS yalnız SF'ye bakar ve taşma olduğunda yanlış karar verir: <code>MOV AL, 80h</code> / <code>CMP AL, 1</code> sonrasında SF = 0'dır ve JS atlamaz, oysa −128 &lt; 1'dir. Doğru komut <code>JL</code>'dir; SF ≠ OF (0 ≠ 1) olduğundan atlar.</p>
+</div>
+
+<h3 id="s7-4-5"><span class="nt-num">7.4.5</span>İşaretsiz sayılar için atlamalar</h3>
+
+<p>İşaretsiz karşılaştırma için kullanılan atlamalar “yukarıda” ve “aşağıda” sözcüklerinin İngilizcesiyle adlandırılır: <strong>A</strong>bove ve <strong>B</strong>elow. İşaretsiz yorumda karar çok daha basittir, çünkü taşma kavramı yoktur. A − B çıkarmasında A &lt; B ise ödünç alınır ve CF = 1 olur. Demek ki “aşağıda” testi doğrudan elde bayrağıdır: JB ≡ JC.</p>
+
+<div class="nt-tablewrap" id="tab-isaretsiz">
+<table class="nt-table">
+  <caption>Tablo 7.11: İşaretsiz sayılar için koşullu atlamalar (<code>CMP A, B</code> sonrası).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Anlamı</th><th scope="col">Koşul</th><th scope="col">Zıt komut</th></tr></thead>
+  <tbody>
+    <tr><td><code>JE</code>, <code>JZ</code></td><td>A = B</td><td>ZF = 1</td><td><code>JNE</code>, <code>JNZ</code></td></tr>
+    <tr><td><code>JNE</code>, <code>JNZ</code></td><td>A ≠ B</td><td>ZF = 0</td><td><code>JE</code>, <code>JZ</code></td></tr>
+    <tr><td><code>JA</code>, <code>JNBE</code></td><td>A &gt; B (<span lang="en">above</span>)</td><td>CF = 0 ve ZF = 0</td><td><code>JNA</code>, <code>JBE</code></td></tr>
+    <tr><td><code>JB</code>, <code>JNAE</code>, <code>JC</code></td><td>A &lt; B (<span lang="en">below</span>)</td><td>CF = 1</td><td><code>JNB</code>, <code>JAE</code>, <code>JNC</code></td></tr>
+    <tr><td><code>JAE</code>, <code>JNB</code>, <code>JNC</code></td><td>A ≥ B</td><td>CF = 0</td><td><code>JNAE</code>, <code>JB</code>, <code>JC</code></td></tr>
+    <tr><td><code>JBE</code>, <code>JNA</code></td><td>A ≤ B</td><td>CF = 1 veya ZF = 1</td><td><code>JNBE</code>, <code>JA</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>JA'nın koşulu “ödünç yok ve fark sıfır değil” demektir; A hem B'den küçük değildir hem de ona eşit değildir. JBE bunun tersidir. JAE yalnız CF = 0'a bakar; eşitlikte de ödünç alınmadığı için “büyük ya da eşit” kendiliğinden karşılanır.</p>
+
+<h3 id="s7-4-6"><span class="nt-num">7.4.6</span>Above/Below mı, Greater/Less mi?</h3>
+
+<p>Altı karşılaştırma ilişkisinin her biri için iki komut vardır: biri işaretsiz, biri işaretli. Eşitlik ve eşitsizlikte iki aile aynı komutu kullanır, çünkü eşitlik bitlerin aynı olmasıdır ve yoruma bağlı değildir. Tablo 7.12 bu eşlemeyi tek bakışta verir.</p>
+
+<div class="nt-tablewrap" id="tab-ab-gl">
+<table class="nt-table">
+  <caption>Tablo 7.12: İlişkiye ve veri türüne göre atlama seçimi.</caption>
+  <thead><tr><th scope="col">Karşılaştırma</th><th scope="col">İşaretsiz (A/B)</th><th scope="col">İşaretli (G/L)</th></tr></thead>
+  <tbody>
+    <tr><td>A = B</td><td><code>JE</code> / <code>JZ</code></td><td><code>JE</code> / <code>JZ</code></td></tr>
+    <tr><td>A ≠ B</td><td><code>JNE</code> / <code>JNZ</code></td><td><code>JNE</code> / <code>JNZ</code></td></tr>
+    <tr><td>A &gt; B</td><td><code>JA</code> / <code>JNBE</code></td><td><code>JG</code> / <code>JNLE</code></td></tr>
+    <tr><td>A ≥ B</td><td><code>JAE</code> / <code>JNB</code></td><td><code>JGE</code> / <code>JNL</code></td></tr>
+    <tr><td>A &lt; B</td><td><code>JB</code> / <code>JNAE</code></td><td><code>JL</code> / <code>JNGE</code></td></tr>
+    <tr><td>A ≤ B</td><td><code>JBE</code> / <code>JNA</code></td><td><code>JLE</code> / <code>JNG</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Seçimi verinin türü belirler. Adresler, sayaçlar, dizi indisleri, uzunluklar ve ASCII kodları işaretsizdir; bunlarla A/B ailesi kullanılır. Sıcaklık, iki ölçüm arasındaki fark, bir konum değişimi gibi negatif olabilen değerler işaretlidir; bunlarla G/L ailesi kullanılır. Kolay bir hatırlatıcı şudur: <strong>A</strong>bove / <strong>B</strong>elow işaretsiz, <strong>G</strong>reater / <strong>L</strong>ess işaretli. Değerler 0–127 aralığında kaldığı sürece iki aile aynı sonucu verir; fark ancak en anlamlı biti 1 olan değerlerde ortaya çıkar. Bu yüzden yanlış aile seçimi küçük deneme verileriyle çoğu zaman fark edilmez.</p>
+
+<h3 id="s7-4-7"><span class="nt-num">7.4.7</span>Kod izleme: aynı bitler, JA ve JG</h3>
+
+<p>Aşağıdaki program aynı CMP'nin ardından JA ile JG'nin farklı karar verdiğini gösterir. Programın ikinci yarısı da taşmalı bir karşılaştırmada JG'nin doğru çalıştığını sınar. CL, CH ve DL yazmaçları işaret olarak kullanılır: bir atlama atlamazsa ilgili yazmaç 1 olur.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AL, 0FBh    <span class="cm">; 251 ya da -5</span>
+<span class="kw">MOV</span>  BL, 03h
+<span class="kw">CMP</span>  AL, BL      <span class="cm">; FBh - 03h</span>
+<span class="kw">JA</span>   a1          <span class="cm">; işaretsiz: 251 &gt; 3 ?</span>
+<span class="kw">MOV</span>  CL, 1       <span class="cm">; JA atlamasaydı</span>
+a1:  <span class="kw">JG</span>  g1      <span class="cm">; işaretli: -5 &gt; 3 ?</span>
+<span class="kw">MOV</span>  CH, 1       <span class="cm">; JG atlamadı</span>
+g1:  <span class="kw">MOV</span> AL, 7Fh <span class="cm">; 127</span>
+<span class="kw">CMP</span>  AL, 80h     <span class="cm">; 127 - (-128)</span>
+<span class="kw">JG</span>   g2          <span class="cm">; SF = OF ?</span>
+<span class="kw">MOV</span>  DL, 1       <span class="cm">; JG atlamasaydı</span>
+g2:  <span class="kw">RET</span></code></pre>
+
+<p>Kaynakta <code>0FBh</code> yazımına dikkat edilmelidir. Onaltılık sayı bir harfle başlıyorsa önüne 0 konur. <code>FBh</code> yazılırsa assembler onu bir ad sanar ve hata verir.</p>
+
+<div class="nt-tablewrap" id="tab-jajg-iz">
+<table class="nt-table">
+  <caption>Tablo 7.13: JA ve JG programının izlemesi (CX ve DX başlangıçta 0000h).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">AL</th><th scope="col">CF ZF SF OF</th><th scope="col">Sonuç</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AL, 0FBh</code></td><td><code>B0 FB</code></td><td>FBh</td><td>0 0 0 0</td><td>—</td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>MOV BL, 03h</code></td><td><code>B3 03</code></td><td>FBh</td><td>0 0 0 0</td><td>BL = 03h</td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>CMP AL, BL</code></td><td><code>3A C3</code></td><td>FBh</td><td>0 0 1 0</td><td>F8h, saklanmaz</td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>JA a1</code></td><td><code>77 02</code></td><td>FBh</td><td>0 0 1 0</td><td>atlar → 010Ah</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>JG g1</code></td><td><code>7F 02</code></td><td>FBh</td><td>0 0 1 0</td><td>atlamaz → 010Ch</td></tr>
+    <tr><td>6</td><td>010Ch</td><td><code>MOV CH, 1</code></td><td><code>B5 01</code></td><td>FBh</td><td>0 0 1 0</td><td>CX = 0100h</td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>MOV AL, 7Fh</code></td><td><code>B0 7F</code></td><td>7Fh</td><td>0 0 1 0</td><td>—</td></tr>
+    <tr><td>8</td><td>0110h</td><td><code>CMP AL, 80h</code></td><td><code>3C 80</code></td><td>7Fh</td><td>1 0 1 1</td><td>FFh, saklanmaz</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>JG g2</code></td><td><code>7F 02</code></td><td>7Fh</td><td>1 0 1 1</td><td>atlar → 0116h</td></tr>
+    <tr><td>10</td><td>0116h</td><td><code>RET</code></td><td><code>C3</code></td><td>7Fh</td><td>1 0 1 1</td><td>IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Üçüncü adımda CMP, FBh − 03h = F8h hesaplar. Ödünç yoktur (CF = 0), sonuç sıfır değildir (ZF = 0), en anlamlı bit 1'dir (SF = 1), taşma yoktur (OF = 0). Dördüncü adımda <code>JA</code> CF = 0 ve ZF = 0 koşulunu sağlanmış bulur ve atlar; işaretsiz yorumda 251 &gt; 3'tür. <code>MOV CL, 1</code> satırı atlanır ve CL = 0 kalır. Beşinci adımda <code>JG</code> aynı bayraklara bakar. ZF = 0'dır ama SF = 1, OF = 0'dır; SF ≠ OF olduğundan atlamaz. İşaretli yorumda −5 &gt; 3 yanlıştır. Altıncı adımda CH = 1 olur ve CX = 0100h'dir. Aynı CMP iki farklı karar vermiştir.</p>
+
+<p>Programın ikinci yarısında AL = 7Fh = 127 yapılır ve 80h ile karşılaştırılır. 7Fh − 80h = FFh'dir. İşaretsiz yorumda 127 &lt; 128'dir ve ödünç alınır: CF = 1. İşaretli yorumda 127 − (−128) = 255 sığmaz: OF = 1. Sonucun işaret biti SF = 1'dir. PF = 1'dir, çünkü FFh sekiz tane 1 içerir. Dokuzuncu adımda <code>JG</code>, ZF = 0 ve SF = OF (1 = 1) koşulunu sağlanmış bulur ve atlar. 127 &gt; −128 doğrudur. SF tek başına “küçük” derdi. DL = 0 kalır. Program bitince CL = 0, CH = 1, DL = 0'dır: işaretli yorumda −5, 3'ten büyük değildir; 127 ise −128'den büyüktür.</p>
+
+<figure class="nt-fig" id="sekil-jajg" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 286 126" role="img" aria-label="Yazmaçlar, bayraklar ve atlama kararı" style="max-width:286px;max-height:126px"><text class="lbl" x="35.0" y="14" text-anchor="middle" style="font-size:12px">AL</text><rect class="box" x="4" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="35.0" y="36.0" text-anchor="middle" style="font-size:14px">7Fh</text><text class="lbl" x="105.0" y="14" text-anchor="middle" style="font-size:12px">BL</text><rect class="box" x="74" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="105.0" y="36.0" text-anchor="middle" style="font-size:14px">03h</text><text class="lbl" x="175.0" y="14" text-anchor="middle" style="font-size:12px">CH</text><rect class="box" x="144" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="175.0" y="36.0" text-anchor="middle" style="font-size:14px">01h</text><text class="lbl" x="245.0" y="14" text-anchor="middle" style="font-size:12px">DL</text><rect class="box" x="214" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="245.0" y="36.0" text-anchor="middle" style="font-size:14px">00h</text><text class="lbl" x="18.0" y="62" text-anchor="middle" style="font-size:11.5px">CF</text><rect class="box" x="4" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="18.0" y="83" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="52.0" y="62" text-anchor="middle" style="font-size:11.5px">ZF</text><rect class="box" x="38" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="52.0" y="83" text-anchor="middle" style="font-size:14px">0</text><text class="lbl" x="86.0" y="62" text-anchor="middle" style="font-size:11.5px">SF</text><rect class="box" x="72" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="86.0" y="83" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="120.0" y="62" text-anchor="middle" style="font-size:11.5px">OF</text><rect class="box" x="106" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="120.0" y="83" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="150" y="76" text-anchor="start" style="font-size:13px">AL = 127</text><text class="lbl" x="150" y="94" text-anchor="start" style="font-size:13px">işaretli 127</text><text class="txt" x="4" y="118" text-anchor="start" style="font-size:14px;fill:var(--ds-good)">JG → atlar</text></svg></div>
+  <figcaption><b>Şekil 7.9:</b> JA ve JG izlemesinin dokuzuncu adımı: <code>CMP AL, 80h</code> sonrasında CF = 1, SF = 1, OF = 1. ZF = 0 ve SF = OF olduğundan JG atlar.</figcaption>
+</figure>
+
+<h3 id="s7-4-8"><span class="nt-num">7.4.8</span>Kod izleme: CMP + JE ve CMP + JA</h3>
+
+<p>Gerçek programlarda karşılaştırmanın iki sonucu için iki ayrı blok bulunur. Aşağıdaki iki kısa parça bu kalıbın en basit hâlidir. Parçalar <code>RET</code> içermez, çünkü bir programın içine yerleştirilmek üzere yazılmıştır. Bloklardaki işlemler yerine yalnız açıklama yazılıdır.</p>
+
+<pre class="nt-code"><code><span class="kw">mov</span> ax, 5
+<span class="kw">mov</span> bx, 5
+<span class="kw">cmp</span> ax, bx
+<span class="kw">je</span>  equal_message
+<span class="kw">jmp</span> not_equal_message
+equal_message:          <span class="cm">; eşitse</span>
+  <span class="kw">jmp</span> end_program
+not_equal_message:      <span class="cm">; eşit değilse</span>
+end_program:</code></pre>
+
+<p>Assembler bu parçayı 0100h'den yerleştirdiğinde <code>cmp ax, bx</code> 0106h'de (<code>3B C3</code>), <code>je</code> 0108h'de (<code>74 02</code>), <code>jmp not_equal_message</code> 010Ah'de (<code>EB 02</code>), <code>jmp end_program</code> 010Ch'de (<code>EB 00</code>) durur. İzleme kısadır:</p>
+
+<ol>
+  <li><code>mov ax, 5</code> ve <code>mov bx, 5</code>: AX = BX = 0005h.</li>
+  <li><code>cmp ax, bx</code>: 5 − 5 = 0 → ZF = 1, CF = 0, SF = 0, OF = 0. PF = 1 olur (00h'de sıfır tane 1 vardır ve sıfır çifttir). AX değişmez.</li>
+  <li><code>je equal_message</code>: ZF = 1 olduğundan atlar; IP = 010Ch.</li>
+  <li><code>equal_message</code> bloğundaki işlemler yapılır, ardından <code>jmp end_program</code> öbür bloğun üzerinden atlar.</li>
+</ol>
+
+<p>Son adımdaki JMP kritik önemdedir. Assembly'de bloklar yalnız etiketlerle ayrılır; bir bloğun bittiğini işlemciye söyleyen bir yapı yoktur. <code>jmp end_program</code> olmasaydı işlemci eşitlik bloğunu bitirince sıradaki satıra, yani eşitsizlik bloğuna geçerdi ve iki blok da yürütülürdü. Bu örnekte iki blok boş olduğundan <code>jmp end_program</code> kendinden hemen sonraki adrese gider ve kodu <code>EB 00</code> olur: uzaklık sıfırdır. Bloklar dolu olduğunda uzaklık blok uzunluğu kadar büyür. Sayılar eşit olmasaydı <code>je</code> atlamazdı; <code>jmp not_equal_message</code> akışı eşitsizlik bloğuna götürürdü.</p>
+
+<p>İkinci parça aynı kalıbı işaretsiz “büyük mü” sorusuyla kurar:</p>
+
+<pre class="nt-code"><code><span class="kw">mov</span> ax, 5
+<span class="kw">mov</span> bx, 7
+<span class="kw">cmp</span> ax, bx
+<span class="kw">ja</span>  jump_above
+<span class="kw">jmp</span> not_jump_above
+jump_above:             <span class="cm">; ax büyükse yapılacaklar</span>
+  <span class="kw">jmp</span> end_program
+not_jump_above:         <span class="cm">; ax küçük veya eşitse</span>
+end_program:</code></pre>
+
+<p>Burada <code>cmp ax, bx</code> 5 − 7 = FFFEh hesaplar; işaretli yorumda −2'dir. Ödünç alındığından CF = 1, sonuç sıfır olmadığından ZF = 0, en anlamlı bit 1 olduğundan SF = 1'dir. Taşma yoktur: OF = 0. Düşük dörtlükte 5 − 7 için ödünç alındığından AF = 1 olur. <code>ja</code> için CF = 0 ve ZF = 0 gerekir; CF = 1 olduğundan atlamaz. <code>jmp not_jump_above</code> akışı “küçük veya eşit” bloğuna götürür. Aynı kodda <code>ja</code> yerine <code>jg</code> yazılsaydı da sonuç değişmezdi: SF = 1, OF = 0, SF ≠ OF olduğundan JG de atlamazdı. İki değer de pozitif ve küçük olduğu için iki aile aynı cevabı verir.</p>
+
+<h3 id="s7-4-9"><span class="nt-num">7.4.9</span>Kod izleme: karşılaştır ve yaz</h3>
+
+<p>Aşağıdaki program iki sayıyı karşılaştırır. Sayılar eşitse ekrana <code>y</code>, değilse <code>n</code> yazar. Karakteri DOS'un <code>INT 21h</code> hizmetiyle yazar: AH = 02h iken DOS, DL'deki karakteri ekrana basar. Programın yapısı önemlidir: iki dal yalnız DL'ye farklı bir değer koyar ve sonra ortak <code>yaz</code> etiketinde birleşir. Yazma kodu iki kez yazılmaz.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span>    100h
+<span class="kw">mov</span>    al, 25         <span class="cm">; al = 25</span>
+<span class="kw">mov</span>    bl, 10         <span class="cm">; bl = 10</span>
+<span class="kw">cmp</span>    al, bl         <span class="cm">; al - bl karşılaştır</span>
+<span class="kw">je</span>     equal          <span class="cm">; al = bl ise (zf = 1) atla</span>
+<span class="kw">mov</span>    dl, <span class="str">'n'</span>        <span class="cm">; al &lt;&gt; bl: 'n' yazılacak</span>
+<span class="kw">jmp</span>    yaz            <span class="cm">; ortak yazma satırına git</span>
+equal:
+<span class="kw">mov</span>    dl, <span class="str">'y'</span>        <span class="cm">; al = bl: 'y' yazılacak</span>
+yaz:
+<span class="kw">mov</span>    ah, 2          <span class="cm">; DOS: DL'deki karakteri yaz</span>
+<span class="kw">int</span>    21h
+<span class="kw">ret</span>                   <span class="cm">; DOS'a dön</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-yaz-iz">
+<table class="nt-table">
+  <caption>Tablo 7.14: Karşılaştır ve yaz programının izlemesi.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">AX</th><th scope="col">DL</th><th scope="col">ZF CF</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov al, 25</code></td><td><code>B0 19</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>mov bl, 10</code></td><td><code>B3 0A</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>cmp al, bl</code></td><td><code>3A C3</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>je equal</code></td><td><code>74 04</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>5</td><td>0108h</td><td><code>mov dl, 'n'</code></td><td><code>B2 6E</code></td><td>0019h</td><td>6Eh</td><td>0 0</td><td></td></tr>
+    <tr><td>6</td><td>010Ah</td><td><code>jmp yaz</code></td><td><code>EB 02</code></td><td>0019h</td><td>6Eh</td><td>0 0</td><td></td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>mov ah, 2</code></td><td><code>B4 02</code></td><td>0219h</td><td>6Eh</td><td>0 0</td><td></td></tr>
+    <tr><td>8</td><td>0110h</td><td><code>int 21h</code></td><td><code>CD 21</code></td><td>026Eh</td><td>6Eh</td><td>0 0</td><td>n</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>ret</code></td><td><code>C3</code></td><td>026Eh</td><td>6Eh</td><td>0 0</td><td>n</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>AL = 25 = 19h ve BL = 10 = 0Ah yüklenir. <code>cmp al, bl</code> 25 − 10 = 15 = 0Fh hesaplar; ZF = 0 olur. Düşük dörtlükte 9 − A için ödünç alındığından AF = 1, 0Fh dört tane 1 içerdiğinden PF = 1'dir. <code>je equal</code> atlamaz. <code>mov dl, 'n'</code> DL'ye 'n' karakterinin ASCII kodunu, 6Eh'yi koyar. <code>jmp yaz</code> 'y' satırını atlar; uzaklığı 2'dir, çünkü atlanan <code>mov dl, 'y'</code> iki bayttır. İki dal <code>yaz</code> etiketinde birleşir.</p>
+
+<p><code>mov ah, 2</code> AH'yi 02h yapar; AX = 0219h olur. <code>int 21h</code> ekrana <code>n</code> yazar. DOS bu hizmetten dönerken yazdığı karakteri AL'ye de koyar: AL = 6Eh, AX = 026Eh. Programın sonundaki <code>ret</code> zorunludur. O olmasaydı işlemci <code>int 21h</code>'den sonraki baytları komut sanıp yürütmeye devam ederdi; bu baytlar ne olduğu belli olmayan bellek içeriğidir.</p>
+
+<p>Programda <code>mov dl, 'y'</code> hiç yürütülmez, ama yine bellekte yer kaplar. Sayılar eşit olsaydı (örneğin <code>mov bl, 25</code>) <code>je equal</code> atlar, DL = 79h ('y') olur, <code>jmp yaz</code> ise hiç yürütülmezdi. Karşılaştırma bloklarında her zaman bir dal “sıradan düşen” daldır, öbürü atlamayla gidilen daldır.</p>
+
+<h2 class="nt-pb" id="s7-5"><span class="nt-num">7.5</span>Yüksek düzey yapıların karşılıkları</h2>
+
+<h3 id="s7-5-1"><span class="nt-num">7.5.1</span>if/else kalıbı</h3>
+
+<p>Yüksek düzeyli bir dildeki <code>if (koşul) A else B</code> yapısı assembly'de iki atlamayla kurulur. Akla ilk gelen yol koşulun kendisiyle atlamaktır: koşul doğruysa A bloğuna git. Ama bu yolda kodun sırası ters döner; koşul sağlanmadığında yürütülecek B bloğu, atlama komutunun hemen altına yazılmak zorunda kalır. Daha düzenli olan yol <strong>koşulun tersiyle</strong> atlamaktır. Koşul sağlanmıyorsa A bloğunun üzerinden B bloğuna atlanır. Koşul sağlanıyorsa atlama yapılmaz ve işlemci sıradan düşerek A bloğuna girer. Böylece assembly kodu, yüksek düzeyli koddaki A–B sırasını korur.</p>
+
+<pre class="nt-code"><code><span class="kw">if</span> (ax == bx) {
+    <span class="cm">; A bloğu</span>
+} <span class="kw">else</span> {
+    <span class="cm">; B bloğu</span>
+}</code></pre>
+
+<pre class="nt-code"><code>    <span class="kw">cmp</span>  ax, bx
+    <span class="kw">jne</span>  degil       <span class="cm">; koşulun TERSİ</span>
+    <span class="cm">; A bloğu</span>
+    <span class="kw">jmp</span>  son
+degil:
+    <span class="cm">; B bloğu</span>
+son:</code></pre>
+
+<p>Kalıbın iki parçası vardır. Birincisi koşulun tersiyle yapılan atlamadır: <code>==</code> için <code>JNE</code>, <code>&lt;</code> için <code>JGE</code> ya da <code>JAE</code>, <code>&gt;</code> için <code>JLE</code> ya da <code>JBE</code>. İkincisi A bloğunun sonundaki <code>jmp son</code>'dur. Bu atlama unutulursa A bloğu bittiğinde işlemci B bloğuna da girer. Else kısmı olmayan bir if yapısında ikinci atlamaya gerek yoktur; ters koşulla doğrudan blok sonuna atlanır.</p>
+
+<div class="nt-tablewrap" id="tab-ters">
+<table class="nt-table">
+  <caption>Tablo 7.15: if koşulları ve blok atlama için kullanılan ters atlamalar.</caption>
+  <thead><tr><th scope="col">Yüksek düzey koşul</th><th scope="col">İşaretsiz veride atla</th><th scope="col">İşaretli veride atla</th></tr></thead>
+  <tbody>
+    <tr><td><code>a == b</code></td><td><code>JNE</code></td><td><code>JNE</code></td></tr>
+    <tr><td><code>a != b</code></td><td><code>JE</code></td><td><code>JE</code></td></tr>
+    <tr><td><code>a &lt; b</code></td><td><code>JAE</code></td><td><code>JGE</code></td></tr>
+    <tr><td><code>a &lt;= b</code></td><td><code>JA</code></td><td><code>JG</code></td></tr>
+    <tr><td><code>a &gt; b</code></td><td><code>JBE</code></td><td><code>JLE</code></td></tr>
+    <tr><td><code>a &gt;= b</code></td><td><code>JB</code></td><td><code>JL</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bileşik koşullar da aynı yolla kurulur. <code>if (a &gt;= -10 &amp;&amp; a &lt;= 10)</code> gibi bir VE koşulunda her alt koşul ayrı bir CMP ve ters atlamayla sınanır. Alt koşullardan biri sağlanmadığında doğrudan blok dışına atlanır. VEYA koşulunda ise alt koşullardan biri sağlandığında doğrudan bloğun içine atlanır. Bu, yüksek düzeyli dillerdeki “kısa devre” değerlendirmesinin makine düzeyindeki karşılığıdır: sonucu belli olan bir koşulun geri kalanı hiç sınanmaz.</p>
+
+<h3 id="s7-5-2"><span class="nt-num">7.5.2</span>while, do-while ve for kalıpları</h3>
+
+<p>Döngü, bir atlamanın geriye doğru yapılmasıdır. <code>while (koşul) gövde</code> yapısında koşul gövdeden önce sınanır; koşul baştan yanlışsa gövde hiç çalışmaz. Assembly karşılığında döngünün başına bir etiket konur, koşul ters atlamayla sınanır, gövdenin sonunda başa dönülür:</p>
+
+<pre class="nt-code"><code><span class="kw">while</span> (cx &gt; 0) {     <span class="cm">; işaretsiz</span>
+    <span class="cm">; gövde</span>
+}</code></pre>
+
+<pre class="nt-code"><code>bas:  <span class="kw">cmp</span>  cx, 0
+      <span class="kw">jbe</span>  bitti     <span class="cm">; cx &lt;= 0 ise çık</span>
+      <span class="cm">; gövde</span>
+      <span class="kw">jmp</span>  bas
+bitti:</code></pre>
+
+<p><code>do { gövde } while (koşul)</code> yapısında koşul gövdeden sonra sınanır; gövde en az bir kez çalışır. Karşılığı daha kısadır, çünkü tek bir koşullu atlama hem sınamayı hem geri dönüşü yapar:</p>
+
+<pre class="nt-code"><code>bas:  <span class="cm">; gövde</span>
+      <span class="kw">cmp</span>  cx, 0
+      <span class="kw">ja</span>   bas       <span class="cm">; koşul doğruysa başa dön</span></code></pre>
+
+<p>Bu ikinci biçim her turda bir atlama daha az yürütür. while biçiminde her tur bir koşullu atlama (atlamaz, 4 tur) ve bir JMP (15 tur) içerir. do-while biçiminde her tur yalnız bir koşullu atlama (atlar, 16 tur) içerir. Bu yüzden derleyiciler while döngüsünü çoğunlukla “önce bir kez sına, sonra do-while olarak dön” biçimine çevirir.</p>
+
+<p><code>for (i = n; i &gt; 0; i--)</code> gibi bir sayaçlı döngü, 8086'da en doğal biçimde CX ve <code>LOOP</code> komutuyla yazılır. LOOP, CX'i azaltma, sıfırla karşılaştırma ve geri atlama işlerini tek komutta yapar. Sayaç yukarı doğru sayılıyorsa (<code>for (i = 0; i &lt; n; i++)</code>) sayaç başka bir yazmaçta tutulur. Her turda <code>INC</code> ile artırılır; <code>CMP</code> ve ardından <code>JB</code> ya da <code>JNE</code> ile sınanır.</p>
+
+<h3 id="s7-5-3"><span class="nt-num">7.5.3</span>Kod izleme: if/else ve while</h3>
+
+<p>Aşağıdaki program iki kalıbı arka arkaya kullanır. Önce <code>if (AX == BX) DX = 1; else DX = 2;</code> yapısı yürütülür. Ardından CX = 2 ile <code>while (CX &gt; 0) { DX += CX; CX--; }</code> döngüsü çalışır.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 12
+<span class="kw">MOV</span>  BX, 30
+<span class="kw">CMP</span>  AX, BX
+<span class="kw">JNE</span>  degil       <span class="cm">; koşulun TERSİ</span>
+<span class="kw">MOV</span>  DX, 1       <span class="cm">; A bloğu: AX = BX</span>
+<span class="kw">JMP</span>  son
+degil: <span class="kw">MOV</span> DX, 2 <span class="cm">; B bloğu: AX ≠ BX</span>
+son: <span class="kw">MOV</span> CX, 2   <span class="cm">; while (CX &gt; 0)</span>
+bas: <span class="kw">CMP</span> CX, 0
+<span class="kw">JBE</span>  bitti       <span class="cm">; CX ≤ 0 → çık</span>
+<span class="kw">ADD</span>  DX, CX      <span class="cm">; gövde</span>
+<span class="kw">DEC</span>  CX
+<span class="kw">JMP</span>  bas
+bitti: <span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-ifw-iz">
+<table class="nt-table">
+  <caption>Tablo 7.16: if/else ve while programının izlemesi (AX = 000Ch, BX = 001Eh boyunca değişmez).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">ZF CF</th><th scope="col">Karar</th></tr></thead>
+  <tbody>
+    <tr><td>1–2</td><td>0100h</td><td><code>MOV AX, 12</code> / <code>MOV BX, 30</code></td><td><code>B8 0C 00</code> / <code>BB 1E 00</code></td><td>0000h</td><td>0000h</td><td>0 0</td><td>—</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>CMP AX, BX</code></td><td><code>3B C3</code></td><td>0000h</td><td>0000h</td><td>0 1</td><td>12 − 30: eşit değil, ödünç</td></tr>
+    <tr><td>4</td><td>0108h</td><td><code>JNE degil</code></td><td><code>75 05</code></td><td>0000h</td><td>0000h</td><td>0 1</td><td>atlar → 010Fh</td></tr>
+    <tr><td>5</td><td>010Fh</td><td><code>MOV DX, 2</code></td><td><code>BA 02 00</code></td><td>0000h</td><td>0002h</td><td>0 1</td><td>B bloğu</td></tr>
+    <tr><td>6</td><td>0112h</td><td><code>MOV CX, 2</code></td><td><code>B9 02 00</code></td><td>0002h</td><td>0002h</td><td>0 1</td><td>—</td></tr>
+    <tr><td>7–8</td><td>0115h</td><td><code>CMP CX, 0</code> / <code>JBE bitti</code></td><td><code>83 F9 00</code> / <code>76 05</code></td><td>0002h</td><td>0002h</td><td>0 0</td><td>2 &gt; 0: atlamaz</td></tr>
+    <tr><td>9–10</td><td>011Ah</td><td><code>ADD DX, CX</code> / <code>DEC CX</code></td><td><code>03 D1</code> / <code>49</code></td><td>0001h</td><td>0004h</td><td>0 0</td><td>gövde, tur 1</td></tr>
+    <tr><td>11–13</td><td>011Dh</td><td><code>JMP bas</code> / <code>CMP</code> / <code>JBE</code></td><td><code>EB F6</code></td><td>0001h</td><td>0004h</td><td>0 0</td><td>1 &gt; 0: atlamaz</td></tr>
+    <tr><td>14–15</td><td>011Ah</td><td><code>ADD DX, CX</code> / <code>DEC CX</code></td><td>—</td><td>0000h</td><td>0005h</td><td>1 0</td><td>gövde, tur 2</td></tr>
+    <tr><td>16–18</td><td>011Dh</td><td><code>JMP bas</code> / <code>CMP</code> / <code>JBE</code></td><td>—</td><td>0000h</td><td>0005h</td><td>1 0</td><td>0 = 0: atlar → 011Fh</td></tr>
+    <tr><td>19</td><td>011Fh</td><td><code>RET</code></td><td><code>C3</code></td><td>0000h</td><td>0005h</td><td>1 0</td><td>IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Üçüncü adımda <code>CMP AX, BX</code> 12 − 30 = −18 hesaplar; 16 bitlik sonuç FFEEh'dir. Sonuç sıfır değildir (ZF = 0), ödünç alınmıştır (CF = 1), işaret biti 1'dir (SF = 1). Dördüncü adımda <code>JNE degil</code> koşulun tersini sağlanmış bulur ve A bloğunun üzerinden atlar. <code>MOV DX, 1</code> ve <code>JMP son</code> yürütülmez. Beşinci adımda B bloğu DX = 2 yapar. B bloğu son bloktur ve doğrudan <code>son</code> etiketine düşer; bu yolda JMP gerekmez.</p>
+
+<p>Altıncı adımda CX = 2 olur ve döngü başlar. <code>CMP CX, 0</code> 2 − 0 = 2 hesaplar: CF = 0, ZF = 0. <code>JBE bitti</code> için CF = 1 ya da ZF = 1 gerekir; atlamaz ve gövdeye girilir. Gövde DX = 2 + 2 = 4, CX = 1 yapar. <code>JMP bas</code> başa döner ve koşul yeniden sınanır: 1 &gt; 0, atlamaz. İkinci turda DX = 4 + 1 = 5, CX = 0 olur. Bu turda <code>DEC CX</code> sonucu sıfırladığı için ZF = 1'dir, ama karar yine başta verilir. <code>CMP CX, 0</code> 0 − 0 = 0 hesaplar: ZF = 1, CF = 0. <code>JBE bitti</code> atlar. Sonuç DX = 5'tir: B bloğunun 2'si, artı 2, artı 1.</p>
+
+<p><code>CMP CX, 0</code> komutunun kodu <code>83 F9 00</code>'dır. 83h işlem kodu, 16 bitlik bir işleneni işaret genişletilmiş 8 bitlik bir sabitle karşılaştırır; böylece sabit 2 yerine 1 bayt tutar. Döngünün sonundaki <code>JMP bas</code> 011Dh'dedir ve iki bayttır: uzaklık 0115h − 011Fh = −0Ah = F6h, kod <code>EB F6</code>.</p>
+
+<p>Bu döngü bir while döngüsüdür; koşul gövdeden önce sınanır. CX = 0 ile başlansaydı gövde hiç çalışmazdı. LOOP komutu ise koşulu gövdeden sonra sınar; iki yapı arasındaki önemli fark budur.</p>
+
+<p>Tablo 7.16'daki ilk satırlarda CX = 0000h gösterilmiştir. Sunumdaki izleme de bu varsayımla yapılmıştır. Gerçekte emu8086, bir .COM programını yüklerken CX'e programın bayt sayısını yükler. Bu program 32 bayttır (0100h–011Fh), dolayısıyla emu8086'da program CX = 0020h ile başlar. Sonuç etkilenmez, çünkü CX ilk kez okunmadan önce <code>MOV CX, 2</code> ile yazılır. Genel kural şudur: başlangıçtaki yazmaç değerlerine güvenilmez; kullanılacak her yazmaç önce bir değerle yüklenir.</p>
+
+<h3 id="s7-5-4"><span class="nt-num">7.5.4</span>Menzil dışı koşullu atlama</h3>
+
+<p>8086'da koşullu atlamalar yalnız kısa biçimdedir: sonraki komuta göre −128…+127 bayt. Uzun bir if bloğunun üzerinden atlamak ya da uzun bir döngünün başına dönmek gerektiğinde bu menzil yetmeyebilir (Şekil 7.10).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-menzil" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 78" role="img" aria-label="Koşullu atlama sonraki IP etrafında −128 ile +127 bayt arasına ulaşır; 200 bayt ötedeki hedef bu pencerenin dışındadır." style="max-width:640px"><path class="axis" d="M10 40 L690 40"/><rect class="box" x="200" y="28" width="256" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="328" y="45" text-anchor="middle" style="font-size:12.5px">Jcc menzili: −128 … +127</text><text class="lbl" x="328" y="18" text-anchor="middle" style="font-size:11.5px">sonraki IP</text><path class="line" d="M328 22 L328 28"/><rect class="box-empty" x="600" y="28" width="80" height="24" rx="3"/><text class="txt mono" x="640" y="45" text-anchor="middle" style="font-size:12px;fill:var(--ds-bad)">cok_uzak</text><text class="lbl" x="640" y="70" text-anchor="middle" style="font-size:11.5px">+200 bayt</text><text class="lbl" x="10" y="70" text-anchor="start" style="font-size:12px">JMP near: kesim içi her yer (±32 KB)</text></svg></div>
+  <figcaption><b>Şekil 7.10:</b> Koşullu atlama sonraki IP etrafında −128 ile +127 bayt arasına ulaşır. 200 bayt ötedeki hedef bu pencerenin dışındadır; yakın JMP ise kesim içinde her yere gider.</figcaption>
+</figure>
+
+<p>Çözüm, koşulu ters çevirip kısa bir atlamayla hemen sonraki komutun üzerinden geçmek, uzak hedefe ise yakın JMP ile gitmektir:</p>
+
+<pre class="nt-code"><code><span class="cm">; hatalı: hedef çok uzak</span>
+<span class="kw">cmp</span> al, 0
+<span class="kw">je</span>  cok_uzak        <span class="cm">; out of range!</span>
+<span class="cm">; ... 200 baytlık kod ...</span>
+cok_uzak:</code></pre>
+
+<pre class="nt-code"><code><span class="cm">; doğru: ters koşul + yakın JMP</span>
+<span class="kw">cmp</span> al, 0
+<span class="kw">jne</span> devam           <span class="cm">; ters koşul, kısa</span>
+<span class="kw">jmp</span> cok_uzak        <span class="cm">; near JMP (E9)</span>
+devam:
+<span class="cm">; ... 200 baytlık kod ...</span>
+cok_uzak:</code></pre>
+
+<p>İkinci yazımda <code>jne devam</code> yalnız 3 bayt ileri atlar ve kısa menzile rahatça sığar. AL = 0 ise JNE atlamaz ve işlemci yakın JMP'ye düşer; o da kesim içinde her yere ulaşır. AL ≠ 0 ise JNE, JMP'nin üzerinden <code>devam</code> etiketine geçer. Davranış ilk yazımla aynıdır, yalnız komut çifti 2 yerine 5 bayttır.</p>
+
+<p>Bu dönüşüm her koşullu atlamaya uygulanabilir, çünkü her koşulun bir tersi vardır ve işlem kodunun son biti değiştirilerek bulunur. Klasik assembler'lar (örneğin 8086 kipindeki MASM) menzil dışı bir Jcc görünce “<span lang="en">relative jump out of range</span>” hatası verir ve dönüşümü programcıya bırakır. emu8086'nın assembler'ı ise aynı dönüşümü kendisi yapar ve bir uyarıyla bildirir. Örneğin 0102h'deki <code>je uzak</code>, hedef 01CFh'de iken <code>75 03 E9 C8 00</code> olarak kodlanır: <code>JNE +3</code> (JMP'nin üç baytının üzerinden geçiş) ve <code>JMP 01CFh</code> (0107h + 00C8h = 01CFh). Hangi assembler kullanılırsa kullanılsın makine düzeyinde olan aynıdır. Programın uzunluğu da bu yüzden kaynakta göründüğünden 3 bayt fazla olur.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>Menzil hatasını <code>JE</code> yerine eş anlamlısı <code>JZ</code> yazarak ya da <code>JE SHORT</code> ile düzeltmeye çalışmak. Eş anlamlı komut aynı makine koduna çevrilir ve menzili aynıdır. SHORT ise menzili büyütmez, yalnız kısa biçimi zorlar. <code>LOOPE</code> gibi bir döngü komutu da çözüm değildir: o da 2 bayt ve rel8'dir, üstelik CX'i değiştirir.</p>
+</div>
+
+<h2 class="nt-pb" id="s7-6"><span class="nt-num">7.6</span>Döngü komutları</h2>
+
+<h3 id="s7-6-1"><span class="nt-num">7.6.1</span>LOOP ailesi</h3>
+
+<p>Sayaçlı döngüler o kadar sık yazılır ki 8086 bunlar için ayrı komutlar sunar. Bu komutların hepsi sayaç olarak <strong>CX</strong> yazmacını kullanır. CX'in “sayaç yazmacı” (<span lang="en">count register</span>) diye anılmasının nedeni budur. Tablo 7.17 aileyi özetler.</p>
+
+<div class="nt-tablewrap" id="tab-loop">
+<table class="nt-table">
+  <caption>Tablo 7.17: Döngü komutları (hepsi 2 bayt: işlem kodu + rel8).</caption>
+  <thead><tr><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">İşlem ve atlama koşulu</th></tr></thead>
+  <tbody>
+    <tr><td><code>LOOP</code></td><td><code>E2</code></td><td>CX'i 1 azalt; CX ≠ 0 ise etikete atla.</td></tr>
+    <tr><td><code>LOOPE</code></td><td><code>E1</code></td><td>CX'i 1 azalt; CX ≠ 0 ve eşitse (ZF = 1) atla.</td></tr>
+    <tr><td><code>LOOPZ</code></td><td><code>E1</code></td><td>LOOPE ile aynı: CX ≠ 0 ve ZF = 1 ise atla.</td></tr>
+    <tr><td><code>LOOPNE</code></td><td><code>E0</code></td><td>CX'i 1 azalt; CX ≠ 0 ve eşit değilse (ZF = 0) atla.</td></tr>
+    <tr><td><code>LOOPNZ</code></td><td><code>E0</code></td><td>LOOPNE ile aynı: CX ≠ 0 ve ZF = 0 ise atla.</td></tr>
+    <tr><td><code>JCXZ</code></td><td><code>E3</code></td><td>CX = 0 ise etikete atla (CX azaltılmaz).</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Aile üç ortak özellik taşır. Birincisi, sayaç her zaman CX'tir; başka yazmaç seçilemez. İkincisi, LOOP ailesi CX'i azaltırken <strong>bayrakları değiştirmez</strong>. CX sıfıra inse bile ZF kalkmaz. Bu, aynı işi yapan <code>DEC CX</code> komutundan önemli bir farktır. Üçüncüsü, hepsi 2 bayttır ve rel8 kullanır; döngü gövdesi en çok 128 bayt geriye uzanabilir. Gövde daha uzunsa döngü <code>DEC CX</code>, <code>JZ</code> ve yakın <code>JMP</code> ile yazılır.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-loop-akis" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 94" role="img" aria-label="LOOP ailesi önce CX’i bir azaltır; CX sıfır değilse (LOOPE/LOOPNE’de ZF koşulu da sağlanırsa) etikete atlar, değilse sonraki komuta geçer." style="max-width:640px"><rect class="box" x="10" y="20" width="130" height="30" rx="3"/><text class="txt mono" x="75" y="40" text-anchor="middle" style="font-size:13px">CX ← CX − 1</text><path class="line" d="M140.0 35.0 L173.0 35.0"/><path class="ah" d="M180.0 35.0 L173.0 38.9 L173.0 31.1 z"/><rect class="box" x="182" y="20" width="200" height="30" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="282" y="40" text-anchor="middle" style="font-size:13px">CX ≠ 0 (+ ZF koşulu)?</text><path class="line" d="M382.0 35.0 L423.0 35.0"/><path class="ah" d="M430.0 35.0 L423.0 38.9 L423.0 31.1 z"/><text class="lbl" x="406" y="28" text-anchor="middle" style="font-size:11.5px">evet</text><rect class="box" x="432" y="20" width="120" height="30" rx="3"/><text class="txt" x="492" y="40" text-anchor="middle" style="font-size:13px">etikete atla</text><path class="line" d="M282.0 50.0 L282.0 63.0"/><path class="ah" d="M282.0 70.0 L278.1 63.0 L285.9 63.0 z"/><text class="lbl" x="292" y="66" text-anchor="start" style="font-size:11.5px">hayır</text><text class="txt" x="282" y="86" text-anchor="middle" style="font-size:13px">sonraki komut</text><text class="lbl" x="600" y="40" text-anchor="start" style="font-size:12px">bayraklar değişmez</text></svg></div>
+  <figcaption><b>Şekil 7.11:</b> LOOP ailesi önce CX'i bir azaltır. CX sıfır değilse (LOOPE/LOOPNE'de ZF koşulu da sağlanırsa) etikete atlar, değilse sıradaki komuta geçer. Bayraklar değişmez.</figcaption>
+</figure>
+
+<h3 id="s7-6-2"><span class="nt-num">7.6.2</span>LOOP nasıl çalışır?</h3>
+
+<p><code>LOOP etiket</code> komutunda işlem sırası önemlidir: önce CX azaltılır, <em>sonra</em> sıfır olup olmadığına bakılır. Bu yüzden LOOP bir do-while döngüsü kurar. Gövde, LOOP'a ulaşmadan önce en az bir kez yürütülür. CX = n ile başlayan bir döngüde gövde tam n kez çalışır: CX n − 1, n − 2, …, 1 değerlerinde geri atlanır, 0'da döngüden çıkılır.</p>
+
+<pre class="nt-code"><code>      <span class="kw">mov</span>  cx, n
+etiket:
+      <span class="cm">; döngü gövdesi</span>
+      <span class="kw">loop</span> etiket</code></pre>
+
+<p>Etkisi bakımından LOOP, <code>DEC CX</code> ve <code>JNZ etiket</code> çiftine benzer; ama bayrakları korur. LOOPE ve LOOPNE ise döngüyü bir koşul daha sağlandığı sürece sürdürür. LOOPE (LOOPZ), CX ≠ 0 ve ZF = 1 olduğu sürece atlar; eşit öğeler bulundukça sürer, ilk farklılıkta durur. LOOPNE (LOOPNZ), CX ≠ 0 ve ZF = 0 olduğu sürece atlar; eşit olmayan öğeler oldukça sürer, aranan değer bulununca durur. Bu iki komut, “en çok n kez, ama koşul değişirse daha önce” biçimindeki arama döngüleri için tasarlanmıştır. ZF'yi döngü gövdesindeki bir CMP ayarlar.</p>
+
+<figure class="nt-fig" id="sekil-loop-sema" style="--w:360px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 300" role="img" aria-label="LOOP akış şeması: gövde, CX bir azaltılır, CX sıfır değilse gövdeye dönülür, sıfırsa devam edilir." style="max-width:360px"><defs><marker id="n7-33-l1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="90" y="6" width="190" height="34" rx="6"/><text class="txt mono" x="185" y="28" text-anchor="middle">mov cx, n</text><path class="line" d="M185 40 L185 60" marker-end="url(#n7-33-l1)"/><rect class="box" x="90" y="64" width="190" height="40" rx="6"/><text class="txt mono" x="185" y="82" text-anchor="middle">etiket:</text><text class="lbl" x="185" y="98" text-anchor="middle">döngü gövdesi</text><path class="line" d="M185 104 L185 124" marker-end="url(#n7-33-l1)"/><rect class="hot" x="90" y="128" width="190" height="34" rx="6"/><text class="txt mono" x="185" y="150" text-anchor="middle">CX ← CX − 1</text><path class="line" d="M185 162 L185 180" marker-end="url(#n7-33-l1)"/><path class="box" d="M185 184 L265 220 L185 256 L105 220 Z"/><text class="txt mono" x="185" y="225" text-anchor="middle">CX ≠ 0 ?</text><path class="line" d="M105 220 L40 220 L40 84 L86 84" marker-end="url(#n7-33-l1)"/><text class="lbl" x="46" y="212">evet</text><path class="line" d="M185 256 L185 290" marker-end="url(#n7-33-l1)"/><text class="lbl" x="193" y="280">hayır → sonraki komut</text><text class="lbl" x="270" y="196">LOOPE: ve ZF=1</text><text class="lbl" x="270" y="250">LOOPNE: ve ZF=0</text></svg></div>
+  <figcaption><b>Şekil 7.12:</b> LOOP akış şeması: gövde yürütülür, CX bir azaltılır, CX sıfır değilse gövdeye dönülür, sıfırsa sıradaki komutla devam edilir. LOOPE ve LOOPNE'de dönüş için ZF koşulu da gerekir.</figcaption>
+</figure>
+
+<p>Bu sıranın bir tuzağı vardır. CX = 0 iken döngüye girilirse gövde bir kez çalışır, sonra LOOP CX'i azaltır. 0 − 1 = FFFFh'dir. CX sıfır olmadığı için geri atlanır. Döngü CX yeniden sıfıra inene kadar sürer ve gövde toplam 65 536 kez çalışır. Döngü sayısı çalışma anında hesaplanıyorsa ve sıfır olabiliyorsa bu durum özel olarak önlenmelidir. Önlemin adı JCXZ'dir.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-dongu">
+  <span class="nt-box__title">Tanım 7.6</span>
+  <p><strong>Döngü</strong> (<span lang="en">loop</span>), bir komut grubunun bir koşul sağlanana kadar yinelenmesidir. <strong>Sayaçlı döngüde</strong> yineleme sayısı bir sayaç yazmacında tutulur; 8086'nın LOOP ailesi sayaç olarak CX'i kullanır, CX'i her turda bir azaltır ve CX sıfırlandığında döngüden çıkar.</p>
+</div>
+
+<h3 id="s7-6-3"><span class="nt-num">7.6.3</span>Kod izleme: LOOP</h3>
+
+<p>En basit LOOP örneği gövdesi boş bir döngüdür. Program yalnız LOOP'un CX üzerindeki etkisini gösterir.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> cx, 5      <span class="cm">; CX = tekrar sayısı (5)</span>
+dongu:
+<span class="cm">; döngü içeriği</span>
+<span class="kw">loop</span> dongu     <span class="cm">; CX ≠ 0 ise dongu'ya atla</span>
+<span class="kw">jmp</span> dur        <span class="cm">; döngü bitince dur'a atla</span>
+dur:
+<span class="kw">ret</span></code></pre>
+
+<p><code>mov cx, 5</code> 0100h'de üç bayttır (<code>B9 05 00</code>). <code>dongu</code> etiketi 0103h'yi gösterir. Gövde boş olduğundan <code>loop dongu</code> da 0103h'dedir; kodu <code>E2 FE</code>'dir. Uzaklık FEh = −2'dir: LOOP komutu kendi başına atlar. <code>jmp dur</code> 0105h'dedir ve kodu <code>EB 00</code>'dır, çünkü <code>dur</code> zaten sonraki satırdır.</p>
+
+<div class="nt-tablewrap" id="tab-loop-iz">
+<table class="nt-table">
+  <caption>Tablo 7.18: LOOP örneğinin izlemesi.</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col">Komut</th><th scope="col">CX (sonra)</th><th scope="col">Karar</th><th scope="col">IP (sonra)</th></tr></thead>
+  <tbody>
+    <tr><td>—</td><td><code>mov cx, 5</code></td><td>0005h</td><td>—</td><td>0103h</td></tr>
+    <tr><td>1</td><td><code>loop dongu</code></td><td>0004h</td><td>≠ 0, atlar</td><td>0103h</td></tr>
+    <tr><td>2</td><td><code>loop dongu</code></td><td>0003h</td><td>≠ 0, atlar</td><td>0103h</td></tr>
+    <tr><td>3</td><td><code>loop dongu</code></td><td>0002h</td><td>≠ 0, atlar</td><td>0103h</td></tr>
+    <tr><td>4</td><td><code>loop dongu</code></td><td>0001h</td><td>≠ 0, atlar</td><td>0103h</td></tr>
+    <tr><td>5</td><td><code>loop dongu</code></td><td>0000h</td><td>= 0, çıkar</td><td>0105h</td></tr>
+    <tr><td>—</td><td><code>jmp dur</code></td><td>0000h</td><td>—</td><td>0107h</td></tr>
+    <tr><td>—</td><td><code>ret</code></td><td>0000h</td><td>—</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Gövde (burada boş) beş kez çalışır ve LOOP beş kez yürütülür. İlk dört LOOP atlar, beşincisi atlamaz. Döngünün süresi Tablo 7.4'ten hesaplanabilir: 4 × 17 + 5 = 73 saat turu. Program bitince CX = 0000h'dir. Döngüden çıkışın ardından gelen <code>jmp dur</code> gereksizdir ama zararsızdır; uzaklığı 0 olan bir atlama yalnız 15 tur harcar ve kuyruğu boşaltır.</p>
+
+<h3 id="s7-6-4"><span class="nt-num">7.6.4</span>Kod izleme: iç içe döngüler</h3>
+
+<p>LOOP ailesinin sayacı tek bir yazmaç olduğundan iç içe iki LOOP aynı CX'i paylaşır. İç döngü CX'e kendi sayısını yüklediği anda dış döngünün sayacı kaybolur. Çözüm, dış sayacı iç döngüden önce yığına itmek ve iç döngüden sonra geri almaktır. Aşağıdaki program bu yöntemi kullanır. Dış döngü 5 kez döner; her dış turda ekrana bir <code>1</code>, ardından iç döngüde beş tane <code>2</code> yazılır. BX toplam adım sayısını tutar.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> bx, 0      <span class="cm">; toplam adım</span>
+<span class="kw">mov</span> cx, 5      <span class="cm">; dış döngü sayacı</span>
+k1:
+ <span class="kw">add</span> bx, 1
+ <span class="kw">mov</span> al, <span class="str">'1'</span>
+ <span class="kw">mov</span> ah, 0eh
+ <span class="kw">int</span> 10h       <span class="cm">; '1' yaz</span>
+ <span class="kw">push</span> cx       <span class="cm">; dış sayacı sakla</span>
+ <span class="kw">mov</span> cx, 5     <span class="cm">; iç döngü sayacı</span>
+k2:
+  <span class="kw">add</span> bx, 1
+  <span class="kw">mov</span> al, <span class="str">'2'</span>
+  <span class="kw">mov</span> ah, 0eh
+  <span class="kw">int</span> 10h      <span class="cm">; '2' yaz</span>
+  <span class="kw">loop</span> k2      <span class="cm">; iç döngü</span>
+ <span class="kw">pop</span> cx        <span class="cm">; dış sayacı geri al</span>
+<span class="kw">loop</span> k1        <span class="cm">; dış döngü</span>
+<span class="kw">ret</span></code></pre>
+
+<p>Karakterler BIOS'un <code>INT 10h</code> hizmetiyle yazılır. AH = 0Eh iken BIOS, AL'deki karakteri imlecin bulunduğu yere yazar ve imleci bir ilerletir; bu hizmete daktilo biçimli yazım (<span lang="en">teletype</span>) denir. Hizmet BH'yi sayfa numarası olarak kullanır. BX bu programda 256'yı aşmadığından BH hep 0'dır ve yazım 0 numaralı sayfaya yapılır.</p>
+
+<div class="nt-tablewrap" id="tab-icice-iz">
+<table class="nt-table">
+  <caption>Tablo 7.19: İç içe döngülerin izlemesi (seçilmiş adımlar).</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Komut</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">Yığın</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td><code>mov bx, 0</code> / <code>mov cx, 5</code></td><td>0000h</td><td>0005h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td></td></tr>
+    <tr><td>dış 1</td><td><code>add bx, 1</code> … <code>int 10h</code></td><td>0001h</td><td>0005h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>1</td></tr>
+    <tr><td>dış 1</td><td><code>push cx</code></td><td>0001h</td><td>0005h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>1</td></tr>
+    <tr><td>iç 1</td><td><code>mov cx, 5</code> … <code>int 10h</code></td><td>0002h</td><td>0005h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>12</td></tr>
+    <tr><td>iç 1</td><td><code>loop k2</code></td><td>0002h</td><td>0004h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>12</td></tr>
+    <tr><td>iç 5</td><td><code>loop k2</code> (çıkar)</td><td>0006h</td><td>0000h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>122222</td></tr>
+    <tr><td>dış 1</td><td><code>pop cx</code></td><td>0006h</td><td>0005h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222</td></tr>
+    <tr><td>dış 1</td><td><code>loop k1</code></td><td>0006h</td><td>0004h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222</td></tr>
+    <tr><td>dış 2 sonu</td><td><code>loop k1</code></td><td>000Ch</td><td>0003h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×2</td></tr>
+    <tr><td>dış 3 sonu</td><td><code>loop k1</code></td><td>0012h</td><td>0002h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×3</td></tr>
+    <tr><td>dış 4 sonu</td><td><code>loop k1</code></td><td>0018h</td><td>0001h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×4</td></tr>
+    <tr><td>dış 5 sonu</td><td><code>loop k1</code> (çıkar)</td><td>001Eh</td><td>0000h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×5</td></tr>
+    <tr><td>son</td><td><code>ret</code></td><td>001Eh</td><td>0000h</td><td>0000h</td><td>boş</td><td>122222 ×5</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Program başladığında SP = FFFEh'dir ve yığının tepesinde, DOS'un koyduğu dönüş adresi 0000h durur. İlk dış turda BX = 1 olur ve ekrana <code>1</code> yazılır. AL = '1' = 31h, AH = 0Eh'dir. <code>push cx</code> dış sayacın değerini, 5'i, yığına iter. SP iki azalır ve FFFCh olur; [FFFCh] = 0005h'dir. Little-endian düzende FFFCh'de 05h, FFFDh'de 00h baytı durur.</p>
+
+<p>İç döngü CX'i yeniden 5 yapar. Dış sayacın değeri artık yalnız yığındadır. İç döngü beş kez döner, her turda BX'i artırır ve bir <code>2</code> yazar. Beşinci iç turun LOOP'u CX'i sıfırlar ve döngüden çıkar. Bu noktada BX = 6, CX = 0'dır. <code>pop cx</code> yığındaki 0005h'yi CX'e geri yükler ve SP = FFFEh olur. <code>loop k1</code> CX'i 4 yapar ve dış döngünün başına döner.</p>
+
+<p>Her dış tur BX'e 1 + 5 = 6 ekler. Beş turdan sonra BX = 30 = 001Eh olur. Ekranda beş kez <code>122222</code> yazılıdır, yani 30 karakter. Son LOOP CX'i sıfırlar ve döngüden çıkılır. <code>push</code> ile <code>pop</code> sayısı eşit olduğu için yığın başlangıçtaki hâline dönmüştür. <code>ret</code> yığının tepesindeki 0000h'yi IP'ye alır, SP = 0000h olur ve program biter.</p>
+
+<p>İç döngünün <code>loop k2</code> komutu 011Ch'dedir ve kodu <code>E2 F5</code>'tir: sonraki adres 011Eh, hedef k2 = 0113h, uzaklık −0Bh = F5h. Dış döngünün <code>loop k1</code> komutu 011Fh'dedir ve kodu <code>E2 E5</code>'tir: sonraki adres 0121h, hedef k1 = 0106h, uzaklık −1Bh = E5h. Dış döngünün gövdesi 27 bayttır ve rel8'in sınırına (128) daha çok uzaktır.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p>İç içe döngüde <code>push cx</code> / <code>pop cx</code> çiftini unutmak. İç döngü bitince CX = 0 olur. Dış döngünün LOOP'u bu sıfırı azaltır ve FFFFh yapar; dış döngü 5 yerine on binlerce kez döner. Çiftin yalnız birini yazmak daha da kötüdür. Yığın dengesi bozulur ve programın sonundaki <code>ret</code> yanlış bir değeri dönüş adresi sanır.</p>
+</div>
+
+<h3 id="s7-6-5"><span class="nt-num">7.6.5</span>Kod izleme: LOOPNE ile arama</h3>
+
+<p>LOOPNE, bir dizide bir değeri aramak için biçilmiş kaftandır. Döngü iki durumdan birinde biter: değer bulunduğunda (ZF = 1) ya da bütün elemanlar incelendiğinde (CX = 0). Aşağıdaki program beş elemanlı bir dizide 3 değerini arar.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> cx, 5          <span class="cm">; eleman sayısı</span>
+<span class="kw">mov</span> si, -1         <span class="cm">; ilk inc ile 0 olur</span>
+ara:
+<span class="kw">inc</span> si             <span class="cm">; sonraki eleman</span>
+<span class="kw">cmp</span> dizi[si], 3    <span class="cm">; aranan değer 3 mü?</span>
+<span class="kw">loopne</span> ara         <span class="cm">; CX≠0 ve ZF=0 ise sürdür</span>
+<span class="kw">jne</span> yok            <span class="cm">; ZF=0 → bulunamadı</span>
+<span class="kw">mov</span> al, 1          <span class="cm">; bulundu, konum SI'da</span>
+<span class="kw">ret</span>
+yok:
+<span class="kw">mov</span> al, 0          <span class="cm">; bulunamadı</span>
+<span class="kw">ret</span>
+dizi <span class="dir">db</span> 7, 1, 3, 9, 4</code></pre>
+
+<p>SI'nın −1 (FFFFh) ile başlatılması bir inceliktir. Döngünün ilk komutu <code>inc si</code>'dir ve SI'yı 0 yapar. Böylece SI her turda incelenen elemanın indisini gösterir ve döngüden çıkıldığında bulunan elemanın konumunu taşır. <code>cmp dizi[si], 3</code> komutu 5 bayttır (<code>80 BC 16 01 03</code>): işlem kodu, ModR/M, dizinin 16 bitlik adresi (0116h) ve sabit. Dizi DB ile tanımlandığından karşılaştırma bayt boyutundadır.</p>
+
+<div class="nt-tablewrap" id="tab-loopne-iz">
+<table class="nt-table">
+  <caption>Tablo 7.20: LOOPNE ile aramanın izlemesi (dizi = 7, 1, 3, 9, 4; aranan 3).</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col">SI</th><th scope="col">dizi[SI]</th><th scope="col">CMP sonrası ZF CF SF</th><th scope="col">LOOPNE sonrası CX</th><th scope="col">Karar</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0000h</td><td>7</td><td>0 0 0</td><td>0004h</td><td>CX ≠ 0, ZF = 0 → sürdür</td></tr>
+    <tr><td>2</td><td>0001h</td><td>1</td><td>0 1 1</td><td>0003h</td><td>CX ≠ 0, ZF = 0 → sürdür</td></tr>
+    <tr><td>3</td><td>0002h</td><td>3</td><td>1 0 0</td><td>0002h</td><td>ZF = 1 → çık</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-loopne" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 270 120" role="img" aria-label="Dizi ve indis" style="max-width:270px;max-height:120px"><defs><marker id="n7-42-a16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="35" y="55" text-anchor="middle">7</text><text class="lbl mono" x="35" y="22" text-anchor="middle">[0]</text><rect class="box" x="60" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="85" y="55" text-anchor="middle">1</text><text class="lbl mono" x="85" y="22" text-anchor="middle">[1]</text><rect class="hot" x="110" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="135" y="55" text-anchor="middle">3</text><text class="lbl mono" x="135" y="22" text-anchor="middle">[2]</text><rect class="box" x="160" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="185" y="55" text-anchor="middle">9</text><text class="lbl mono" x="185" y="22" text-anchor="middle">[3]</text><rect class="box" x="210" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="235" y="55" text-anchor="middle">4</text><text class="lbl mono" x="235" y="22" text-anchor="middle">[4]</text><path class="line" d="M135 100 L135 74" marker-end="url(#n7-42-a16)"/><text class="txt mono lnk" x="135" y="116" text-anchor="middle">SI</text></svg></div>
+  <figcaption><b>Şekil 7.13:</b> Üçüncü turda SI = 2 ve dizi[2] = 3: karşılaştırma ZF = 1 yapar, LOOPNE döngüden çıkar.</figcaption>
+</figure>
+
+<p>Birinci turda <code>inc si</code> SI'yı FFFFh'den 0000h'ye getirir. Bu artırma sıfır sonuç verdiği için ZF = 1 yapar, ama hemen ardından gelen CMP bayrakları yeniden ayarlar. 7 − 3 = 4 sıfır değildir: ZF = 0. LOOPNE CX'i 4 yapar; CX ≠ 0 ve ZF = 0 olduğundan aramaya devam eder. İkinci turda dizi[1] = 1'dir. 1 − 3 = −2 (FEh) için ödünç alınır; CF = 1, SF = 1 olur. ZF yine 0'dır ve döngü sürer.</p>
+
+<p>Üçüncü turda dizi[2] = 3'tür ve 3 − 3 = 0 ZF = 1 yapar. LOOPNE CX'i yine azaltır ve 2 yapar. CX sıfır değildir ama ZF = 1 olduğundan atlamaz; döngüden çıkılır. LOOPNE bayrakları değiştirmediği için ZF = 1 korunur. Döngüden sonraki <code>jne yok</code> tam bu bayrağa bakar. ZF = 1 olduğundan atlamaz ve <code>mov al, 1</code> “bulundu” sonucunu yazar. SI = 2, bulunan elemanın konumudur. Döngü beş yerine üç turda bitmiştir.</p>
+
+<p>Döngüden sonra neden ZF'ye bakıldığı önemlidir. Döngü iki nedenle bitebilir ve CX'e bakmak bu nedenleri ayırt etmez: değer son elemanda bulunursa CX de sıfıra iner. Son karşılaştırmanın sonucu ise ZF'de durur ve LOOPNE onu bozmaz. Dizi 3 içermeseydi beş tur sonunda CX = 0, ZF = 0 olurdu; <code>jne yok</code> atlar ve AL = 0 olurdu. Bu yapı, LOOP ailesinin bayrakları korumasının doğrudan bir yararıdır.</p>
+
+<h3 id="s7-6-6"><span class="nt-num">7.6.6</span>JCXZ; LOOP mu, DEC–JNZ mi?</h3>
+
+<p><code>JCXZ etiket</code> komutu CX = 0 ise atlar; CX'i azaltmaz ve bayraklara bakmaz. Başlıca kullanımı sıfır turlu döngüye karşı korumadır. Döngü sayısı çalışma anında hesaplanıyorsa döngünün önüne bir JCXZ konur:</p>
+
+<pre class="nt-code"><code>      <span class="kw">mov</span>  cx, n      <span class="cm">; n çalışma anında</span>
+      <span class="kw">jcxz</span> atla       <span class="cm">; CX = 0 ise girme</span>
+tekrar:
+      <span class="cm">; gövde</span>
+      <span class="kw">loop</span> tekrar
+atla:</code></pre>
+
+<p>JCXZ olmadan CX = 0 iken LOOP önce CX'i FFFFh yapar ve gövde 65 536 kez çalışır. JCXZ ile bu durumda döngünün üzerinden atlanır. Komut, CX'e başka bir komutla bakmadan CX'in sıfır olup olmadığını sınar; CX'i sıfırla karşılaştıran bir <code>CMP CX, 0</code> bayrakları bozardı, JCXZ bozmaz.</p>
+
+<p>Bir sayaçlı döngü LOOP yerine <code>DEC</code> ile <code>JNZ</code> çiftiyle de yazılabilir. İki yazımın farkları Tablo 7.21'de toplanmıştır.</p>
+
+<div class="nt-tablewrap" id="tab-loop-dec">
+<table class="nt-table">
+  <caption>Tablo 7.21: LOOP ile DEC CX + JNZ yazımlarının karşılaştırması.</caption>
+  <thead><tr><th scope="col">Özellik</th><th scope="col"><code>LOOP</code></th><th scope="col"><code>DEC CX</code> + <code>JNZ</code></th></tr></thead>
+  <tbody>
+    <tr><td>Boyut</td><td>2 bayt</td><td>1 + 2 = 3 bayt</td></tr>
+    <tr><td>Bayraklar</td><td>değişmez</td><td>ZF, SF, OF, PF, AF değişir (CF korunur)</td></tr>
+    <tr><td>Sayaç</td><td>yalnız CX</td><td>herhangi bir yazmaç</td></tr>
+    <tr><td>Ek koşul</td><td>LOOPE / LOOPNE</td><td>farklı Jcc seçilebilir</td></tr>
+    <tr><td>8086'da süre (atlarsa / atlamazsa)</td><td>17 / 5 tur</td><td>2 + 16 = 18 / 2 + 4 = 6 tur</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>8086'da LOOP hem daha kısa hem biraz daha hızlıdır. On turluk bir döngüde LOOP, dokuz atlama ve bir çıkışla 9 × 17 + 5 = 158 tur harcar. DEC–JNZ çifti 10 × 2 + 9 × 16 + 4 = 168 tur harcar. Öte yandan DEC–JNZ daha esnektir: sayaç olarak CX'ten başka bir yazmaç kullanılabilir. Bu, CX'i başka bir iş için (örneğin bir kaydırma sayısı ya da dizgi komutunun sayacı olarak) kullanan döngülerde önemlidir. Sonraki x86 işlemcilerde LOOP komutu yavaşladı ve derleyiciler onu kullanmaz oldu; ama 8086 için durum tersidir.</p>
+
+<p>Bayrak farkı da önemlidir. <code>DEC</code>, CF dışındaki durum bayraklarını sonuca göre ayarlar. Döngü boyunca CF'de saklanan bir bilgi (örneğin çok sözcüklü bir toplamanın eldesi) DEC'ten etkilenmez. Ama ZF ya da SF'de saklanan bir bilgi bozulur. LOOP hiçbir bayrağa dokunmaz. Çok sözcüklü toplama gibi eldenin turdan tura taşındığı döngülerde iki yazım da CF'yi korur; bu yüzden ikisi de kullanılabilir.</p>
+
+<h3 id="s7-6-7"><span class="nt-num">7.6.7</span>Kod izleme: JCXZ koruması ve DEC–JNZ</h3>
+
+<p>Aşağıdaki program iki döngü içerir. Birinci döngü n = 0 ile çalıştırılır ve JCXZ onu korur. İkinci döngü n = 3 ile DEC–JNZ yazımıyla çalışır ve sayaç olarak BX'i kullanır. İkinci döngüden önce CF = 1 yapılır; döngü boyunca CF'nin korunduğu gözlenir.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  CX, 0       <span class="cm">; n = 0</span>
+<span class="kw">MOV</span>  AX, 0
+<span class="kw">JCXZ</span> atla        <span class="cm">; CX = 0 → girme</span>
+tekrar: <span class="kw">INC</span> AX
+<span class="kw">LOOP</span> tekrar
+atla: <span class="kw">MOV</span> BX, 3  <span class="cm">; n = 3, sayaç BX</span>
+<span class="kw">STC</span>              <span class="cm">; CF = 1</span>
+tekrar2: <span class="kw">INC</span> AX
+<span class="kw">DEC</span>  BX          <span class="cm">; CF korunur</span>
+<span class="kw">JNZ</span>  tekrar2
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-jcxz-iz">
+<table class="nt-table">
+  <caption>Tablo 7.22: JCXZ ve DEC–JNZ programının izlemesi.</caption>
+  <thead><tr><th scope="col">Adım</th><th scope="col">Komut</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">ZF</th><th scope="col">CF</th><th scope="col">Karar</th></tr></thead>
+  <tbody>
+    <tr><td>1–2</td><td><code>MOV CX, 0</code> / <code>MOV AX, 0</code></td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>—</td></tr>
+    <tr><td>3</td><td><code>JCXZ atla</code> (<code>E3 03</code>)</td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>CX = 0 → atlar, 010Bh</td></tr>
+    <tr><td>4</td><td><code>MOV BX, 3</code></td><td>0000h</td><td>0003h</td><td>0000h</td><td>0</td><td>0</td><td>—</td></tr>
+    <tr><td>5</td><td><code>STC</code></td><td>0000h</td><td>0003h</td><td>0000h</td><td>0</td><td>1</td><td>—</td></tr>
+    <tr><td>6–8</td><td><code>INC AX</code> / <code>DEC BX</code> / <code>JNZ</code></td><td>0001h</td><td>0002h</td><td>0000h</td><td>0</td><td>1</td><td>atlar (tur 1)</td></tr>
+    <tr><td>9–11</td><td><code>INC AX</code> / <code>DEC BX</code> / <code>JNZ</code></td><td>0002h</td><td>0001h</td><td>0000h</td><td>0</td><td>1</td><td>atlar (tur 2)</td></tr>
+    <tr><td>12–14</td><td><code>INC AX</code> / <code>DEC BX</code> / <code>JNZ</code></td><td>0003h</td><td>0000h</td><td>0000h</td><td>1</td><td>1</td><td>atlamaz (tur 3)</td></tr>
+    <tr><td>15</td><td><code>RET</code></td><td>0003h</td><td>0000h</td><td>0000h</td><td>1</td><td>1</td><td>IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Üçüncü adımda JCXZ, CX = 0 olduğunu görür ve döngünün üzerinden atlar. <code>INC AX</code> ve <code>LOOP tekrar</code> hiç yürütülmez; AX = 0 kalır. Koruma olmasaydı gövde 65 536 kez çalışır ve AX sonunda yeniden 0000h olurdu (65 536 = 1 0000h, 16 bite sığmaz). Sonuç aynı görünürdü, ama işlemci boşuna 65 536 tur dönerdi. Gövde AX'i değil bir bellek dizisini değiştirseydi sonuç felaket olurdu.</p>
+
+<p>İkinci döngüde sayaç BX'tir; LOOP bunu yapamazdı. <code>STC</code> CF'yi 1 yapar. Her turda <code>INC AX</code> ve <code>DEC BX</code> bayrakları ayarlar, ama ikisi de CF'ye dokunmaz. Birinci turda BX = 2, ZF = 0 olur ve <code>JNZ</code> geri atlar. İkinci turda BX = 1'dir. Üçüncü turda <code>DEC BX</code> BX'i 0 yapar ve ZF = 1 olur. <code>JNZ</code> atlamaz ve döngü biter. Sonuçta AX = 3'tür ve CF = 1 korunmuştur. Üçüncü turda <code>INC AX</code> AX'i 3 yaptığında PF = 1 olur (0000 0011b iki tane 1 içerir); bu da DEC ile yeniden ayarlanır. LOOP da bayrak değiştirmez, ama yalnız CX ile çalışır.</p>
+
+<h2 class="nt-pb" id="s7-7"><span class="nt-num">7.7</span>Örnek programlar</h2>
+
+<h3 id="s7-7-1"><span class="nt-num">7.7.1</span>Dizi elemanlarının toplamı</h3>
+
+<p>Bir dizinin elemanlarını toplamak, sayaçlı döngünün en tipik kullanımıdır. Aşağıdaki program beş baytlık bir diziyi toplar ve sonucu <code>m</code> değişkenine yazar. CX eleman sayısını, BX indisi, AL toplamı tutar.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> cx, 5             <span class="cm">; eleman sayısı</span>
+<span class="kw">mov</span> al, 0             <span class="cm">; toplam (AL) = 0</span>
+<span class="kw">mov</span> bx, 0             <span class="cm">; BX = indis</span>
+next:
+<span class="kw">add</span> al, vector[bx]    <span class="cm">; elemanı topla</span>
+<span class="kw">inc</span> bx                <span class="cm">; sonraki eleman</span>
+<span class="kw">loop</span> next             <span class="cm">; CX = 0 olana kadar dön</span>
+<span class="kw">mov</span> m, al             <span class="cm">; sonucu m'ye yaz</span>
+<span class="kw">ret</span>
+vector <span class="dir">db</span> 5, 4, 5, 2, 1
+m <span class="dir">db</span> 0</code></pre>
+
+<p>Veriler <code>ret</code>'ten sonra tanımlanmıştır. Program <code>ret</code> ile bittiği için işlemci veri baytlarına hiç ulaşmaz ve onları komut sanmaz. Assembler kodu yerleştirdiğinde vector 0113h'de, m 0118h'de durur. <code>add al, vector[bx]</code> komutu 4 bayttır (<code>02 87 13 01</code>): ModR/M baytı 87h, “[BX] + 16 bitlik yer değiştirme” biçimini seçer ve yer değiştirme vector'ün adresidir. <code>loop next</code> 010Dh'dedir; kodu <code>E2 F9</code>, uzaklık 0108h − 010Fh = −7'dir.</p>
+
+<div class="nt-tablewrap" id="tab-toplam-iz">
+<table class="nt-table">
+  <caption>Tablo 7.23: Dizi toplamının izlemesi (her satır bir turun sonu).</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col">Eklenen</th><th scope="col">AL (onluk)</th><th scope="col">AL</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">LOOP</th></tr></thead>
+  <tbody>
+    <tr><td>başlangıç</td><td>—</td><td>0</td><td>00h</td><td>0000h</td><td>0005h</td><td>—</td></tr>
+    <tr><td>1</td><td>vector[0] = 5</td><td>5</td><td>05h</td><td>0001h</td><td>0004h</td><td>atlar</td></tr>
+    <tr><td>2</td><td>vector[1] = 4</td><td>9</td><td>09h</td><td>0002h</td><td>0003h</td><td>atlar</td></tr>
+    <tr><td>3</td><td>vector[2] = 5</td><td>14</td><td>0Eh</td><td>0003h</td><td>0002h</td><td>atlar</td></tr>
+    <tr><td>4</td><td>vector[3] = 2</td><td>16</td><td>10h</td><td>0004h</td><td>0001h</td><td>atlar</td></tr>
+    <tr><td>5</td><td>vector[4] = 1</td><td>17</td><td>11h</td><td>0005h</td><td>0000h</td><td>çıkar</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-toplam" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 270 120" role="img" aria-label="Dizi ve indis" style="max-width:270px;max-height:120px"><defs><marker id="n7-65-a49" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="35" y="55" text-anchor="middle">5</text><text class="lbl mono" x="35" y="22" text-anchor="middle">[0]</text><rect class="box" x="60" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="85" y="55" text-anchor="middle">4</text><text class="lbl mono" x="85" y="22" text-anchor="middle">[1]</text><rect class="box" x="110" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="135" y="55" text-anchor="middle">5</text><text class="lbl mono" x="135" y="22" text-anchor="middle">[2]</text><rect class="box" x="160" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="185" y="55" text-anchor="middle">2</text><text class="lbl mono" x="185" y="22" text-anchor="middle">[3]</text><rect class="hot" x="210" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="235" y="55" text-anchor="middle">1</text><text class="lbl mono" x="235" y="22" text-anchor="middle">[4]</text><path class="line" d="M235 100 L235 74" marker-end="url(#n7-65-a49)"/><text class="txt mono lnk" x="235" y="116" text-anchor="middle">BX</text></svg></div>
+  <figcaption><b>Şekil 7.14:</b> Dizi toplamının son turu: BX = 4 iken vector[4] = 1 eklenir ve AL = 11h olur.</figcaption>
+</figure>
+
+<p>Her turda üç komut yürütülür. <code>add al, vector[bx]</code> elemanı AL'ye ekler; etkin adres 0113h + BX'tir ve kesim DS'dir. <code>inc bx</code> indisi bir artırır, çünkü elemanlar birer bayttır. Sözcük dizisinde indis ikişer artırılırdı. <code>loop next</code> CX'i azaltır ve sıfır değilse başa döner. Beşinci turdan sonra CX = 0 olur ve döngüden çıkılır. <code>mov m, al</code> sonucu 0118h adresine yazar: m = 11h = 17 = 5 + 4 + 5 + 2 + 1.</p>
+
+<p>Döngü gövdesindeki ADD bayrakları her turda yeniden ayarlar, ama LOOP onları hiç okumaz ve değiştirmez. Örneğin dördüncü turda 0Eh + 02h = 10h toplamasında düşük dörtlükten elde çıkar ve AF = 1 olur. Bu bilgiyi hiçbir komut kullanmaz. Toplamın bir bayta sığmadığı durumu ise CF bildirir. Bu dizide toplam 17'dir ve hiçbir turda CF = 1 olmaz. Elemanlar daha büyük olsaydı AL taşabilirdi; bu durum alıştırmalardan birinde incelenir.</p>
+
+<h3 id="s7-7-2"><span class="nt-num">7.7.2</span>Ekrana Hello yazdırma</h3>
+
+<p>Aşağıdaki program, sonu 0 baytıyla işaretlenmiş bir dizgiyi karakter karakter ekrana yazar. Döngü sayısı önceden bilinmez; döngü 0 baytına rastlayınca biter. Bu yüzden LOOP yerine CMP, JE ve JMP kullanılır. Bu yapı bir while döngüsüdür: koşul her turun başında sınanır.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span>     100h
+<span class="kw">jmp</span>     start
+msg     <span class="dir">db</span> <span class="str">'Hello'</span>, 0
+start:
+<span class="kw">mov</span>     si, 0          <span class="cm">; kaynak indisi = 0</span>
+next_char:
+<span class="kw">mov</span>     al, msg[si]    <span class="cm">; karakteri al</span>
+<span class="kw">cmp</span>     al, 0          <span class="cm">; 0 ile karşılaştır</span>
+<span class="kw">je</span>      stop           <span class="cm">; 0 ise yazmayı durdur</span>
+<span class="kw">mov</span>     ah, 0eh        <span class="cm">; teletype işlevi</span>
+<span class="kw">int</span>     10h            <span class="cm">; AL'deki karakteri yaz</span>
+<span class="kw">inc</span>     si             <span class="cm">; sonraki karakter</span>
+<span class="kw">jmp</span>     next_char      <span class="cm">; başa dön</span>
+stop:
+<span class="kw">ret</span></code></pre>
+
+<p>Bu programda veri kodun arasındadır. msg, programın ilk komutunun hemen arkasında, 0102h'den başlayarak 48h 65h 6Ch 6Ch 6Fh 00h baytlarını tutar. İlk komut <code>jmp start</code> (<code>EB 06</code>) bu altı baytın üzerinden 0108h'ye atlar. JMP olmasaydı işlemci 0102h'deki 48h baytını bir komut olarak çözerdi. 48h, <code>DEC AX</code> komutunun kodudur; arkasından gelen baytlar da başka komutlar gibi çözülür ve programın ne yapacağı öngörülemez.</p>
+
+<div class="nt-tablewrap" id="tab-hello-iz">
+<table class="nt-table">
+  <caption>Tablo 7.24: Hello programının izlemesi (her satır bir turun sonu).</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col">SI (başta)</th><th scope="col">AL = msg[SI]</th><th scope="col">ZF</th><th scope="col">je stop</th><th scope="col">Ekran</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0000h</td><td>48h 'H'</td><td>0</td><td>atlamaz</td><td>H</td></tr>
+    <tr><td>2</td><td>0001h</td><td>65h 'e'</td><td>0</td><td>atlamaz</td><td>He</td></tr>
+    <tr><td>3</td><td>0002h</td><td>6Ch 'l'</td><td>0</td><td>atlamaz</td><td>Hel</td></tr>
+    <tr><td>4</td><td>0003h</td><td>6Ch 'l'</td><td>0</td><td>atlamaz</td><td>Hell</td></tr>
+    <tr><td>5</td><td>0004h</td><td>6Fh 'o'</td><td>0</td><td>atlamaz</td><td>Hello</td></tr>
+    <tr><td>6</td><td>0005h</td><td>00h</td><td>1</td><td>atlar</td><td>Hello</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Her turda <code>mov al, msg[si]</code> (<code>8A 84 02 01</code>) sıradaki karakteri AL'ye alır. <code>cmp al, 0</code> (<code>3C 00</code>) onu sıfırla karşılaştırır. Karakter sıfır değilse ZF = 0 olur ve <code>je stop</code> atlamaz. AH = 0Eh ve <code>INT 10h</code> ile karakter ekrana yazılır. <code>inc si</code> indisi artırır ve <code>jmp next_char</code> (<code>EB F1</code>) başa döner. Bu JMP 0118h'dedir; uzaklık 010Bh − 011Ah = −0Fh = F1h'dir.</p>
+
+<p>Altıncı turda msg[5] = 0 okunur. 0 − 0 = 0 olduğundan ZF = 1 olur ve <code>je stop</code> atlar. Ekranda <code>Hello</code> yazılıdır, SI = 5'tir. <code>ret</code> programı bitirir. Program sonunda AX = 0E00h'dir: AH, son turdaki 0Eh değerini korur, AL ise son okunan 00h'dir.</p>
+
+<figure class="nt-fig" id="sekil-hello" style="--w:340px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 320 120" role="img" aria-label="Dizi ve indis" style="max-width:320px;max-height:120px"><defs><marker id="n7-79-a82" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="35" y="55" text-anchor="middle">'H'</text><text class="lbl mono" x="35" y="22" text-anchor="middle">48h</text><rect class="box" x="60" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="85" y="55" text-anchor="middle">'e'</text><text class="lbl mono" x="85" y="22" text-anchor="middle">65h</text><rect class="box" x="110" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="135" y="55" text-anchor="middle">'l'</text><text class="lbl mono" x="135" y="22" text-anchor="middle">6Ch</text><rect class="box" x="160" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="185" y="55" text-anchor="middle">'l'</text><text class="lbl mono" x="185" y="22" text-anchor="middle">6Ch</text><rect class="box" x="210" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="235" y="55" text-anchor="middle">'o'</text><text class="lbl mono" x="235" y="22" text-anchor="middle">6Fh</text><rect class="hot" x="260" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="285" y="55" text-anchor="middle">0</text><text class="lbl mono" x="285" y="22" text-anchor="middle">00h</text><path class="line" d="M285 100 L285 74" marker-end="url(#n7-79-a82)"/><text class="txt mono lnk" x="285" y="116" text-anchor="middle">SI</text></svg></div>
+  <figcaption><b>Şekil 7.15:</b> Hello dizgisi bellekte: altı bayt, sonuncusu 00h. SI = 5 iken okunan 0 baytı döngüyü bitirir.</figcaption>
+</figure>
+
+<p>Sonu sıfırla işaretlenen dizgilere <strong>sıfır sonlu dizgi</strong> denir. Bu düzende uzunluk ayrıca saklanmaz; dizgi 0 baytına kadar sürer. Aynı düzeni C dili de kullanır. DOS'un <code>INT 21h</code>/09h hizmeti ise farklı bir işaret kullanır: dizginin sonu '$' karakteridir. İki düzenin ortak yanı, döngünün sayaçla değil bir koşulla bitmesidir.</p>
+
+<p>Programdaki her tur yedi komut yürütür; bunların iki tanesi akış kontrol komutudur. Atlanmayan <code>je</code> 4, atlanan <code>jmp</code> 15 saat turu harcar. Döngü do-while biçiminde yeniden yazılsaydı (karşılaştırma ve koşullu geri atlama sonda) her turda bir JMP eksik olurdu. Kısa bir dizgide fark önemsizdir; çok uzun bir metinde ise toplam sürenin önemli bir kısmını oluşturur.</p>
+
+<h3 id="s7-7-3"><span class="nt-num">7.7.3</span>Palindrom kontrolü: fikir</h3>
+
+<p>Palindrom, baştan ve sondan okunuşu aynı olan dizidir: <code>123321</code>, <code>kayak</code>, <code>ey edip adanada pide ye</code> (boşluklar sayılmazsa). Bir dizinin palindrom olup olmadığını anlamak için iki işaretçi kullanılır. DI dizinin başını, SI sonunu gösterir. Her adımda iki karakter karşılaştırılır; sonra DI bir ileri, SI bir geri gider. Karakterlerden biri farklıysa dizi palindrom değildir. Bütün çiftler eşleşirse palindromdur.</p>
+
+<p>Uzunluğun yarısı kadar karşılaştırma yeterlidir. Altı karakterlik bir dizide 3 çift vardır: (1., 6.), (2., 5.), (3., 4.). Daha fazla karşılaştırma aynı çiftleri ters sırayla yeniden sınar. Tek uzunlukta ortadaki karakterin bir eşi yoktur ve karşılaştırılmaz; 5 karakterde 2 çift sınanır. Yarıya bölme işlemi <code>shr cx, 1</code> ile yapılır: bir bit sağa kaydırma, işaretsiz bir sayıyı 2'ye böler ve kalanı atar.</p>
+
+<figure class="nt-fig" id="sekil-pal" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 368 120" role="img" aria-label="str dizisi bellekte; DI baştan, SI sondan ilerler" style="max-width:420px;max-height:130px"><defs><marker id="n7-82-p0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="hot" x="4" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="24" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="24" y="22" text-anchor="middle" style="font-size:10px">0102h</text><rect class="box" x="44" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="64" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="64" y="22" text-anchor="middle" style="font-size:10px">0103h</text><rect class="box" x="84" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="104" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="104" y="22" text-anchor="middle" style="font-size:10px">0104h</text><rect class="box" x="124" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="144" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="144" y="22" text-anchor="middle" style="font-size:10px">0105h</text><rect class="box" x="164" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="184" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="184" y="22" text-anchor="middle" style="font-size:10px">0106h</text><rect class="hot" x="204" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="224" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="224" y="22" text-anchor="middle" style="font-size:10px">0107h</text><rect class="box" x="244" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="264" y="55" text-anchor="middle">0Dh</text><text class="lbl mono" x="264" y="22" text-anchor="middle" style="font-size:10px">0108h</text><rect class="box" x="284" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="304" y="55" text-anchor="middle">0Ah</text><text class="lbl mono" x="304" y="22" text-anchor="middle" style="font-size:10px">0109h</text><rect class="box" x="324" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="344" y="55" text-anchor="middle">'$'</text><text class="lbl mono" x="344" y="22" text-anchor="middle" style="font-size:10px">010Ah</text><path class="line" d="M24 98 L24 74" marker-end="url(#n7-82-p0)"/><text class="txt mono lnk" x="24" y="114" text-anchor="middle">DI</text><path class="line" d="M224 98 L224 74" marker-end="url(#n7-82-p0)"/><text class="txt mono lnk" x="224" y="114" text-anchor="middle">SI</text><text class="lbl" x="248" y="90" style="font-size:11px">str_size = 6</text></svg></div>
+  <figcaption><b>Şekil 7.16:</b> <code>str</code> dizisi bellekte 0102h'den başlar; DI baştan, SI sondan ilerler. Dizinin ardında satır sonu (0Dh, 0Ah) ve '$' durur.</figcaption>
+</figure>
+
+<p>Programda dizinin uzunluğu bir sabittir: <code>str_size = $ - msg</code>. Burada <code>$</code>, assembler'ın o satırdaki konum sayacıdır, yani dizinin hemen arkasındaki adrestir. msg etiketi ile str aynı adresi gösterir; fark dizinin uzunluğu olan 6'dır. <code>=</code> yönergesi EQU gibi bir sabit tanımlar ve bellekte yer kaplamaz. Dizi değişirse uzunluk kendiliğinden güncellenir.</p>
+
+<p>Program dizinin kendisini ve sonucu DOS'un <code>INT 21h</code>/09h hizmetiyle yazar. Bu hizmet DS:DX adresindeki dizgiyi '$' karakterine kadar ekrana basar; '$' yazılmaz. Dizinin ardındaki 0Dh ve 0Ah baytları satır başı ve yeni satır karakterleridir. Sonuç mesajı bu sayede bir alt satıra yazılır. Şekildeki adresler <code>org 100h</code> ve iki baytlık kısa <code>jmp start</code> (0100h) varsayımıyla verilmiştir: str 0102h'den başlar.</p>
+
+<h3 id="s7-7-4"><span class="nt-num">7.7.4</span>Palindrom: hazırlık</h3>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">jmp</span> start
+msg:
+str <span class="dir">db</span> <span class="str">'123321'</span>
+str_size = $ - msg     <span class="cm">; = 6</span>
+<span class="dir">db</span> 0Dh,0Ah,<span class="str">'$'</span>
+start:
+<span class="kw">mov</span> ah, 9              <span class="cm">; '$'e kadar yaz</span>
+<span class="kw">mov</span> dx, <span class="dir">offset</span> str
+<span class="kw">int</span> 21h
+<span class="kw">lea</span> di, str            <span class="cm">; DI = str adresi</span>
+<span class="kw">mov</span> si, di
+<span class="kw">add</span> si, str_size       <span class="cm">; SI = son + 1</span>
+<span class="kw">dec</span> si                 <span class="cm">; SI = son karakter</span>
+<span class="kw">mov</span> cx, str_size
+<span class="kw">cmp</span> cx, 1              <span class="cm">; tek karakter mi?</span>
+<span class="kw">je</span> is_palindrome       <span class="cm">; tek karakter palindromdur</span>
+<span class="kw">shr</span> cx, 1              <span class="cm">; CX = uzunluk / 2</span></code></pre>
+
+<p>Programın başındaki <code>jmp start</code> (<code>EB 09</code>) dokuz baytlık veriyi (altı karakter, 0Dh, 0Ah, '$') atlar ve 010Bh'ye gider. <code>mov ah, 9</code> ve <code>mov dx, offset str</code> DOS'un dizgi yazma hizmetini hazırlar: DX = 0102h. <code>int 21h</code> ekrana <code>123321</code> ve satır sonunu yazar. DOS bu hizmetten AL = 24h ('$') ile döner; AX = 0924h olur.</p>
+
+<p><code>lea di, str</code> DI'ya str'nin adresini, 0102h'yi yükler. Burada etkin adres doğrudan bir sabittir; emu8086 bu komutu <code>mov di, offset str</code> ile aynı 3 baytlık koda (<code>BF 02 01</code>) çevirir. <code>mov si, di</code> SI'yı da 0102h yapar. <code>add si, str_size</code> 6 ekler: SI = 0108h. Bu, dizinin son karakterinin bir sonrasıdır (0Dh baytı). <code>dec si</code> SI'yı 0107h'ye, son karakter '1''e getirir. <code>mov cx, str_size</code> CX'e 6 yükler.</p>
+
+<p><code>cmp cx, 1</code> ve <code>je is_palindrome</code> tek karakterlik dizi için bir kısa yoldur. Tek karakterli dizi her zaman palindromdur; ama asıl neden başkadır. Uzunluk 1 iken <code>shr cx, 1</code> CX'i 0 yapar ve LOOP'lu döngüye CX = 0 ile girilirse karşılaştırma 65 536 kez çalışırdı. Burada CX = 6'dır: 6 − 1 ≠ 0, ZF = 0, CF = 0; JE atlamaz. <code>shr cx, 1</code> CX'i 0110b'den 0011b'ye kaydırır: CX = 3. Dışarı kayan bit 0'dır, bu yüzden CF = 0 olur.</p>
+
+<div class="nt-tablewrap" id="tab-pal1-iz">
+<table class="nt-table">
+  <caption>Tablo 7.25: Palindrom programının hazırlık kısmının izlemesi.</caption>
+  <thead><tr><th scope="col">Adres</th><th scope="col">Komut</th><th scope="col">Kod</th><th scope="col">Sonuç</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>jmp start</code></td><td><code>EB 09</code></td><td>IP = 010Bh</td></tr>
+    <tr><td>010Bh</td><td><code>mov ah, 9</code></td><td><code>B4 09</code></td><td>AH = 09h</td></tr>
+    <tr><td>010Dh</td><td><code>mov dx, offset str</code></td><td><code>BA 02 01</code></td><td>DX = 0102h</td></tr>
+    <tr><td>0110h</td><td><code>int 21h</code></td><td><code>CD 21</code></td><td>ekran: 123321 ↵; AL = 24h</td></tr>
+    <tr><td>0112h</td><td><code>lea di, str</code></td><td><code>BF 02 01</code></td><td>DI = 0102h</td></tr>
+    <tr><td>0115h</td><td><code>mov si, di</code></td><td><code>8B F7</code></td><td>SI = 0102h</td></tr>
+    <tr><td>0117h</td><td><code>add si, str_size</code></td><td><code>83 C6 06</code></td><td>SI = 0108h</td></tr>
+    <tr><td>011Ah</td><td><code>dec si</code></td><td><code>4E</code></td><td>SI = 0107h</td></tr>
+    <tr><td>011Bh</td><td><code>mov cx, str_size</code></td><td><code>B9 06 00</code></td><td>CX = 0006h</td></tr>
+    <tr><td>011Eh</td><td><code>cmp cx, 1</code></td><td><code>83 F9 01</code></td><td>ZF = 0, CF = 0</td></tr>
+    <tr><td>0121h</td><td><code>je is_palindrome</code></td><td><code>74 0E</code></td><td>atlamaz</td></tr>
+    <tr><td>0123h</td><td><code>shr cx, 1</code></td><td><code>D1 E9</code></td><td>CX = 0003h, CF = 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="s7-7-5"><span class="nt-num">7.7.5</span>Palindrom: karşılaştırma döngüsü</h3>
+
+<pre class="nt-code"><code>next_char:
+<span class="kw">mov</span> al, [di]          <span class="cm">; baştaki karakter</span>
+<span class="kw">mov</span> bl, [si]          <span class="cm">; sondaki karakter</span>
+<span class="kw">cmp</span> al, bl
+<span class="kw">jne</span> not_palindrome    <span class="cm">; farklıysa değil</span>
+<span class="kw">inc</span> di                <span class="cm">; baştan bir ileri</span>
+<span class="kw">dec</span> si                <span class="cm">; sondan bir geri</span>
+<span class="kw">loop</span> next_char
+is_palindrome:
+<span class="kw">mov</span> ah, 9             <span class="cm">; "palindrome!" yaz</span>
+<span class="kw">mov</span> dx, <span class="dir">offset</span> msg1
+<span class="kw">int</span> 21h
+<span class="kw">jmp</span> stop
+not_palindrome:
+<span class="kw">mov</span> ah, 9             <span class="cm">; "not palindrome!" yaz</span>
+<span class="kw">mov</span> dx, <span class="dir">offset</span> msg2
+<span class="kw">int</span> 21h
+stop:
+<span class="kw">ret</span>
+msg1 <span class="dir">db</span> <span class="str">"palindrome!$"</span>
+msg2 <span class="dir">db</span> <span class="str">"not palindrome!$"</span></code></pre>
+
+<p>Döngü <code>next_char</code> etiketiyle 0125h'den başlar. Her turda <code>mov al, [di]</code> baştaki, <code>mov bl, [si]</code> sondaki karakteri okur. <code>cmp al, bl</code> ikisini karşılaştırır. Farklılarsa <code>jne not_palindrome</code> döngüden hemen çıkar. Eşitlerse <code>inc di</code> ve <code>dec si</code> işaretçileri birbirine yaklaştırır; <code>loop next_char</code> CX'i azaltır ve başa döner.</p>
+
+<div class="nt-tablewrap" id="tab-pal2-iz">
+<table class="nt-table">
+  <caption>Tablo 7.26: Palindrom karşılaştırma döngüsünün izlemesi ('123321').</caption>
+  <thead><tr><th scope="col">Tur</th><th scope="col">DI</th><th scope="col">SI</th><th scope="col">AL</th><th scope="col">BL</th><th scope="col">CMP sonrası ZF</th><th scope="col">INC/DEC sonrası DI, SI, ZF</th><th scope="col">LOOP sonrası CX</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0102h</td><td>0107h</td><td>31h '1'</td><td>31h '1'</td><td>1</td><td>0103h, 0106h, 0</td><td>0002h</td></tr>
+    <tr><td>2</td><td>0103h</td><td>0106h</td><td>32h '2'</td><td>32h '2'</td><td>1</td><td>0104h, 0105h, 0</td><td>0001h</td></tr>
+    <tr><td>3</td><td>0104h</td><td>0105h</td><td>33h '3'</td><td>33h '3'</td><td>1</td><td>0105h, 0104h, 0</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Her turda CMP eşitliği bulur ve ZF = 1 yapar; JNE atlamaz. Ardından gelen <code>inc di</code> ve <code>dec si</code> de bayrakları ayarlar. Sonuçları sıfır olmadığından ZF yeniden 0 olur. Bu, döngünün doğruluğunu etkilemez, çünkü karar CMP'nin hemen arkasındaki JNE'de verilmiştir. Döngü kararı ise LOOP'a aittir ve LOOP yalnız CX'e bakar. Üçüncü turdan sonra CX = 0 olur ve döngüden çıkılır: üç çiftin hepsi eşleşmiştir. Bu noktada DI = 0105h, SI = 0104h'dir; işaretçiler birbirini geçmiştir.</p>
+
+<p>Döngüden çıkan işlemci sıradan düşerek <code>is_palindrome</code> bloğuna girer. AH = 09h ve DX = offset msg1 ile DOS'un dizgi yazma hizmeti çağrılır. msg1, kodun hemen ardından 0142h'de durur; DX = 0142h olur. Ekrana <code>palindrome!</code> yazılır ve AL yine 24h ile döner. <code>jmp stop</code> (<code>EB 07</code>) <code>not_palindrome</code> bloğunun üzerinden atlar ve <code>ret</code> programı bitirir.</p>
+
+<p>Veriler <code>stop:</code> etiketinin hemen ardından gelir. <code>ret</code> olmasaydı işlemci <code>palindrome!$</code> baytlarını komut sanıp yürütmeye başlardı. Programın uzunluğu 94 bayttır (0100h–015Dh): msg1 12, msg2 16 bayt tutar.</p>
+
+<figure class="nt-fig" id="sekil-pal-son" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 368 120" role="img" aria-label="str dizisi bellekte; DI baştan, SI sondan ilerler" style="max-width:420px;max-height:130px"><defs><marker id="n7-101-p27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="4" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="24" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="24" y="22" text-anchor="middle" style="font-size:10px">0102h</text><rect class="box" x="44" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="64" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="64" y="22" text-anchor="middle" style="font-size:10px">0103h</text><rect class="hot" x="84" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="104" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="104" y="22" text-anchor="middle" style="font-size:10px">0104h</text><rect class="hot" x="124" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="144" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="144" y="22" text-anchor="middle" style="font-size:10px">0105h</text><rect class="box" x="164" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="184" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="184" y="22" text-anchor="middle" style="font-size:10px">0106h</text><rect class="box" x="204" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="224" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="224" y="22" text-anchor="middle" style="font-size:10px">0107h</text><rect class="box" x="244" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="264" y="55" text-anchor="middle">0Dh</text><text class="lbl mono" x="264" y="22" text-anchor="middle" style="font-size:10px">0108h</text><rect class="box" x="284" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="304" y="55" text-anchor="middle">0Ah</text><text class="lbl mono" x="304" y="22" text-anchor="middle" style="font-size:10px">0109h</text><rect class="box" x="324" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="344" y="55" text-anchor="middle">'$'</text><text class="lbl mono" x="344" y="22" text-anchor="middle" style="font-size:10px">010Ah</text><path class="line" d="M104 98 L104 74" marker-end="url(#n7-101-p27)"/><text class="txt mono lnk" x="104" y="114" text-anchor="middle">DI</text><path class="line" d="M144 98 L144 74" marker-end="url(#n7-101-p27)"/><text class="txt mono lnk" x="144" y="114" text-anchor="middle">SI</text><text class="lbl" x="248" y="90" style="font-size:11px">str_size = 6</text></svg></div>
+  <figcaption><b>Şekil 7.17:</b> Üçüncü turun karşılaştırması: DI = 0104h ve SI = 0105h ortadaki iki '3' karakterini gösterir.</figcaption>
+</figure>
+
+<h3 id="s7-7-6"><span class="nt-num">7.7.6</span>Palindrom: farklı girişler</h3>
+
+<p>Programın farklı girişlerde nasıl davrandığını görmek, yazılan koşulların gerekli olup olmadığını anlamanın en iyi yoludur. Tablo 7.27 beş girişi karşılaştırır.</p>
+
+<div class="nt-tablewrap" id="tab-pal-giris">
+<table class="nt-table">
+  <caption>Tablo 7.27: Palindrom programının farklı girişlerdeki davranışı.</caption>
+  <thead><tr><th scope="col">str</th><th scope="col">Uzunluk</th><th scope="col">CX (shr sonrası)</th><th scope="col">Karşılaştırmalar</th><th scope="col">Çıktı</th></tr></thead>
+  <tbody>
+    <tr><td><code>'123321'</code></td><td>6</td><td>3</td><td>1=1, 2=2, 3=3</td><td>palindrome!</td></tr>
+    <tr><td><code>'123421'</code></td><td>6</td><td>3</td><td>1=1, 2=2, 3≠4 → jne</td><td>not palindrome!</td></tr>
+    <tr><td><code>'12321'</code></td><td>5</td><td>2</td><td>1=1, 2=2 (ortadaki 3 atlanır)</td><td>palindrome!</td></tr>
+    <tr><td><code>'7'</code></td><td>1</td><td>—</td><td>cmp cx,1 → je is_palindrome</td><td>palindrome!</td></tr>
+    <tr><td><code>'ab'</code></td><td>2</td><td>1</td><td>a≠b → jne</td><td>not palindrome!</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>İkinci girişte üçüncü turda '3' ile '4' karşılaştırılır; ZF = 0 olur ve <code>jne not_palindrome</code> döngüden çıkar. LOOP'a hiç ulaşılmaz ve CX = 1'de kalır. Üçüncü girişte uzunluk 5'tir; <code>shr</code> 5'i 2'ye böler, kalan 1 atılır (CF = 1 olur). İki çift karşılaştırılır, ortadaki karakter tek başına kalır. Dördüncü girişte <code>cmp cx, 1</code> denetimi işe yarar: uzunluk 1 iken <code>shr cx, 1</code> CX'i 0 yapardı ve LOOP'lu döngü 65 536 kez çalışırdı. Uzunluk 0 da aynı tehlikeyi taşır. Boş bir dizi için CX = 0'dır, <code>cmp cx, 1</code> eşit bulmaz, <code>shr</code> 0'ı yine 0 yapar. Bu durum döngüden önce bir <code>jcxz is_palindrome</code> ile önlenebilir.</p>
+
+<h2 class="nt-pb" id="s7-8"><span class="nt-num">7.8</span>Sık yapılan hatalar</h2>
+
+<p>Akış kontrolündeki hataların çoğu birkaç kalıba indirgenebilir. Aşağıdaki liste bu kalıpları ve önlemlerini toplar.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Yanlış atlama ailesi.</strong> İşaretli veride JA/JB, işaretsiz veride JG/JL kullanmak. AL = FBh, BL = 03h için JA atlar (251 &gt; 3), JG atlamaz (−5 &lt; 3). Hata yalnız en anlamlı biti 1 olan değerlerde ortaya çıkar ve küçük deneme verileriyle gizli kalır. Önlem: her karşılaştırmada verinin türü belirlenir ve aile buna göre seçilir.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Unutulan JMP.</strong> if/else kalıbında A bloğunun sonundaki <code>JMP son</code> yazılmazsa A bloğu bittiğinde işlemci B bloğuna da girer. Bloklar etiketlerle ayrılır; etiket bir duvar değildir, yalnız bir adrestir.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>CMP ile atlama arasına bayrak değiştiren komut girmesi.</strong> <code>CMP AL, BL</code> / <code>INC SI</code> / <code>JE eşit</code> yazımında JE, CMP'nin değil INC'in sonucuna bakar. Araya girmesi gereken bir komut varsa bayrak değiştirmeyen bir komut (MOV, LEA, PUSH, POP) seçilir ya da CMP atlamanın hemen önüne taşınır.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>CX = 0 ile LOOP.</strong> LOOP önce azaltır, sonra sınar. CX = 0 iken girilen döngü 65 536 kez döner. Önlem: döngü sayısı çalışma anında belirleniyorsa döngünün önüne <code>JCXZ</code> konur.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>İç içe döngüde CX'i saklamamak.</strong> İç döngünün <code>MOV CX, n</code> komutu dış sayacı siler. Önlem: iç döngüden önce <code>PUSH CX</code>, sonra <code>POP CX</code>; ya da dış döngüde DEC–JNZ ile başka bir sayaç yazmacı.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Veriyi kod gibi yürütmek.</strong> Veriler kodun önündeyse <code>JMP start</code> unutulur, kodun arkasındaysa son <code>RET</code> unutulur. İki durumda da işlemci veri baytlarını komut sanar. 'H' karakteri (48h) <code>DEC AX</code> olarak yürütülür; ardından gelen baytlar rastgele komutlara dönüşür.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Menzil dışı Jcc'yi eş anlamlıyla düzeltmek.</strong> JE yerine JZ yazmak ya da SHORT eklemek menzili değiştirmez. Doğru çözüm ters koşulla kısa atlama ve yakın JMP'dir.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Sık yapılan hata</span>
+  <p><strong>Döngü gövdesinde sayacı değiştirmek.</strong> LOOP'lu bir döngünün gövdesinde CX'i değiştiren bir komut (örneğin <code>DEC CX</code>) döngü sayısını bozar. CX = 3 ile başlayan ve gövdesinde <code>DEC CX</code> bulunan bir döngüde CX her turda iki azalır. LOOP sonrasında CX tek değerlerden geçer: 1, FFFFh, FFFDh, … CX sıfırı hiç LOOP'tan sonra görmediği için döngü hiç bitmez.</p>
+</div>
+
+<h2 class="nt-pb" id="s7-9"><span class="nt-num">7.9</span>Alıştırmalar ve çözümleri</h2>
+
+<p>Sunumun alıştırmaları ve çözümleri aşağıdadır. Çözümler ara adımlarıyla verilmiştir.</p>
+
+<ol>
+  <li>
+    <p><strong>0120h adresindeki JNE komutu 0100h adresine atlamak istiyor. Makine kodu nedir?</strong></p>
+    <p>JNE'nin işlem kodu 75h'dir ve komut 2 bayttır. Sonraki IP = 0122h. Uzaklık = 0100h − 0122h = −22h. −22h'nin ikiye tümleyeni: 22h = 0010 0010b, tersi 1101 1101b, artı 1: 1101 1110b = DEh. Kod <code>75 DE</code>'dir. Sağlama: 0122h + FFDEh = 1 0100h → IP = 0100h.</p>
+  </li>
+  <li>
+    <p><strong><code>mov al, 80h</code> / <code>cmp al, 1</code> sonrasında JA ve JG atlar mı?</strong></p>
+    <p>80h − 01h = 7Fh. Ödünç yoktur (CF = 0), sonuç sıfır değildir (ZF = 0): JA atlar; işaretsiz yorumda 128 &gt; 1'dir. İşaretli yorumda −128 − 1 = −129 sekiz bite sığmaz: OF = 1. Sonucun işaret biti 0'dır: SF = 0. SF ≠ OF olduğundan JG atlamaz; −128 &lt; 1'dir. Düşük dörtlükte 0 − 1 ödünç gerektirdiği için AF = 1, 7Fh yedi tane 1 içerdiği için PF = 0 olur.</p>
+  </li>
+  <li>
+    <p><strong><code>mov cx, 0</code> / <code>d: loop d</code> kaç kez döner? Nasıl önlenir?</strong></p>
+    <p>LOOP önce CX'i azaltır: 0 − 1 = FFFFh ≠ 0, geri atlar. CX FFFFh'den 1'e kadar her değerde atlar, 0'da çıkar. LOOP toplam 65 536 kez yürütülür. Önlemek için döngüden önce <code>jcxz</code> ile CX = 0 durumu atlanır.</p>
+  </li>
+  <li>
+    <p><strong>AX'teki işaretsiz sayı 100'den büyükse BX = 1, değilse BX = 0 yapan kod.</strong></p>
+<pre class="nt-code"><code>    <span class="kw">mov</span>  bx, 0
+    <span class="kw">cmp</span>  ax, 100
+    <span class="kw">jbe</span>  son        <span class="cm">; AX &lt;= 100 ise atla (işaretsiz)</span>
+    <span class="kw">mov</span>  bx, 1
+son:</code></pre>
+    <p>Koşulun tersi (≤) işaretsiz aileden seçilir: JBE. Denendiğinde AX = 0, 99 ve 100 için BX = 0; AX = 101 ve FFFFh (65 535) için BX = 1 bulunur. JLE kullanılsaydı FFFFh işaretli −1 sayılır ve BX = 0 kalırdı.</p>
+  </li>
+  <li>
+    <p><strong>Dizi toplamı örneğinde elemanlar 200 ve 100 olsaydı AL ve CF ne olurdu? Çözüm önerin.</strong></p>
+    <p>200 + 100 = 300 = 12Ch. AL'ye yalnız düşük bayt sığar: AL = 2Ch = 44. Dokuzuncu bit CF'ye düşer: CF = 1 (elde). Sonuç yanlıştır. Çözüm toplamı 16 bitte tutmaktır. Döngüde <code>add al, vector[bx]</code> komutunun arkasına <code>adc ah, 0</code> eklenir ve döngüden önce AX sıfırlanır. ADC, AH'ye 0 ile birlikte CF'yi de ekler; her elde AH'ye taşınır. Bu çözümle AX = 012Ch = 300 bulunur. LOOP bayrak değiştirmediği için eldeyi bozmaz; ama ADD her turda CF'yi yeniden ayarladığı için ADC hemen ADD'in arkasında durmalıdır.</p>
+  </li>
+  <li>
+    <p><strong>Hello örneğinde <code>jmp start</code> satırı silinirse ne olur?</strong></p>
+    <p>Program 0100h'den başlar ve orada msg'nin ilk baytı, 48h ('H') durur. İşlemci bu baytı <code>DEC AX</code> komutu olarak yürütür. Arkasından gelen 65h, 6Ch, 6Ch, 6Fh, 00h baytları da komut olarak çözülür ve yürütülür. Programın davranışı öngörülemez olur; ekrana Hello yazılmaz. Assembler bu hatayı yakalamaz, çünkü veri ile kod arasındaki ayrım yalnız programcının kafasındadır.</p>
+  </li>
+</ol>
+
+<h2 class="nt-pb" id="s7-10"><span class="nt-num">7.10</span>Özet</h2>
+
+<ul>
+  <li><strong>IP ve kuyruk</strong>: işlemci komutları CS:IP'den sırayla yürütür; IP her komuttan sonra komutun uzunluğu kadar artar. BIU, sıradaki baytları altı baytlık önden getirme kuyruğuna önceden alır. Atlama kuyruğu boşaltır; bu yüzden atlanan bir atlama 15–19 saat turu sürer.</li>
+  <li><strong>JMP</strong> koşulsuzdur ve bayrakları değiştirmez. Kısa (EB rel8, ±128), yakın (E9 rel16, kesim içi), uzak (EA ofs seg, CS:IP) ve dolaylı (FF /4, yazmaç ya da bellek) biçimleri vardır.</li>
+  <li><strong>Uzaklık</strong> = hedef − (komut adresi + komut uzunluğu). Negatif uzaklık ikiye tümleyenle saklanır; işlemci onu işaret genişletip IP'ye ekler.</li>
+  <li><strong>Etiket</strong> bellekte yer kaplamaz; assembler onu bir bağıl konuma çevirir. Rakamla başlayamaz, boşluk içeremez, komut ya da yazmaç adı olamaz.</li>
+  <li><strong>Jcc</strong> bayraklara bakar, bayrakları değiştirmez. 8086'da hepsi 2 bayttır (70h–7Fh + rel8); işlem kodunun son biti koşulu tersler. Eş anlamlılar aynı koda derlenir.</li>
+  <li><strong>CMP</strong> sonucu saklamayan bir SUB'dır; ardından gelen Jcc kararı verir.</li>
+  <li><strong>İşaretsiz</strong> karşılaştırma: JA, JAE, JB, JBE → CF ve ZF. JB ≡ JC.</li>
+  <li><strong>İşaretli</strong> karşılaştırma: JG, JGE, JL, JLE → ZF, SF ve OF. A &lt; B ⇔ SF ≠ OF; taşmada işaret biti ters çıktığı için SF tek başına yetmez.</li>
+  <li><strong>if/else</strong>: koşulun tersiyle A bloğu atlanır, A bloğunun sonunda JMP ile B bloğu atlanır. <strong>while</strong>: koşul başta sınanır, gövde sonunda JMP ile başa dönülür.</li>
+  <li><strong>Menzil dışı Jcc</strong>: ters koşulla kısa atlama + yakın JMP. emu8086 bu dönüşümü kendisi yapar.</li>
+  <li><strong>LOOP ailesi</strong>: CX azalır, bayraklar korunur; LOOPE/LOOPNE ZF'ye de bakar; JCXZ CX = 0 ise atlar. Hepsi 2 bayt ve rel8'dir.</li>
+  <li><strong>Tuzaklar</strong>: CX = 0 ile LOOP (65 536 tur), iç içe döngüde CX'i saklamamak, unutulan JMP, CMP ile Jcc arasına bayrak değiştiren komut, veriyi kod gibi yürütmek.</li>
+</ul>
+
+<h2 id="s7-11"><span class="nt-num">7.11</span>Kavram listesi</h2>
+
+<p>Terimlerin İngilizce karşılıkları ve öteki bölümlerdeki kullanımları <a href="../sozluk.html">terim sözlüğünde</a> bulunur.</p>
+
+<ul class="nt-concepts">
+  <li><a href="../sozluk.html">akış kontrolü <span lang="en">flow control</span></a></li>
+  <li><a href="../sozluk.html">komut işaretçisi (IP) <span lang="en">instruction pointer</span></a></li>
+  <li><a href="../sozluk.html">önden getirme kuyruğu <span lang="en">prefetch queue</span></a></li>
+  <li><a href="../sozluk.html">yol arayüz birimi (BIU) <span lang="en">bus interface unit</span></a></li>
+  <li><a href="../sozluk.html">yürütme birimi (EU) <span lang="en">execution unit</span></a></li>
+  <li><a href="../sozluk.html">atlama <span lang="en">jump</span></a></li>
+  <li><a href="../sozluk.html">koşulsuz / koşullu atlama <span lang="en">unconditional / conditional jump</span></a></li>
+  <li><a href="../sozluk.html">kısa / yakın / uzak atlama <span lang="en">short / near / far jump</span></a></li>
+  <li><a href="../sozluk.html">uzaklık <span lang="en">jump displacement</span></a></li>
+  <li><a href="../sozluk.html">göreceli adresleme <span lang="en">relative addressing</span></a></li>
+  <li><a href="../sozluk.html">etiket <span lang="en">label</span></a></li>
+  <li><a href="../sozluk.html">bağıl konum <span lang="en">offset</span></a></li>
+  <li><a href="../sozluk.html">işlem kodu <span lang="en">opcode</span></a></li>
+  <li><a href="../sozluk.html">ikiye tümleyen <span lang="en">two's complement</span></a></li>
+  <li><a href="../sozluk.html">işaret genişletme <span lang="en">sign extension</span></a></li>
+  <li><a href="../sozluk.html">bayrak <span lang="en">flag</span></a></li>
+  <li><a href="../sozluk.html">sıfır bayrağı (ZF) <span lang="en">zero flag</span></a></li>
+  <li><a href="../sozluk.html">elde bayrağı (CF) <span lang="en">carry flag</span></a></li>
+  <li><a href="../sozluk.html">işaret bayrağı (SF) <span lang="en">sign flag</span></a></li>
+  <li><a href="../sozluk.html">taşma bayrağı (OF) <span lang="en">overflow flag</span></a></li>
+  <li><a href="../sozluk.html">eşlik bayrağı (PF) <span lang="en">parity flag</span></a></li>
+  <li><a href="../sozluk.html">ödünç <span lang="en">borrow</span></a></li>
+  <li><a href="../sozluk.html">karşılaştırma (CMP) <span lang="en">comparison</span></a></li>
+  <li><a href="../sozluk.html">işaretli / işaretsiz sayı <span lang="en">signed / unsigned number</span></a></li>
+  <li><a href="../sozluk.html">büyük / küçük, işaretsiz <span lang="en">above / below</span></a></li>
+  <li><a href="../sozluk.html">büyük / küçük, işaretli <span lang="en">greater / less</span></a></li>
+  <li><a href="../sozluk.html">döngü <span lang="en">loop</span></a></li>
+  <li><a href="../sozluk.html">iç içe döngü <span lang="en">nested loop</span></a></li>
+  <li><a href="../sozluk.html">sayaç yazmacı <span lang="en">counter register</span></a></li>
+  <li><a href="../sozluk.html">dallanma <span lang="en">branch</span></a></li>
+  <li><a href="../sozluk.html">yığın <span lang="en">stack</span></a></li>
+  <li><a href="../sozluk.html">dizgi <span lang="en">string</span></a></li>
+  <li><a href="../sozluk.html">saat turu <span lang="en">clock cycle</span></a></li>
+  <li><a href="../sozluk.html">PSP (program kesimi öneki) <span lang="en">program segment prefix</span></a></li>
+</ul>
+
+<h2 id="s7-12"><span class="nt-num">7.12</span>Kendini Dene</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>0150h adresindeki kısa JMP komutu 0140h'ye atlıyor. Makine kodu nedir? Komut 0300h'de olsaydı hangi biçim kullanılırdı?</p>
+    <details><summary>Cevap</summary>
+      <p>Sonraki IP = 0152h; uzaklık 0140h − 0152h = −12h → EEh. Kod <code>EB EE</code>. 0300h'den uzaklık −1C2h (−450) olurdu ve kısa menzile sığmazdı. Yakın biçim seçilir: sonraki IP 0303h, uzaklık FE3Dh, kod <code>E9 3D FE</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>AX = 8000h ve BX = 0001h iken <code>CMP AX, BX</code> hangi bayrakları ayarlar? JB ve JL atlar mı?</p>
+    <details><summary>Cevap</summary>
+      <p>8000h − 0001h = 7FFFh. CF = 0 (ödünç yok), ZF = 0, SF = 0 (sonucun en anlamlı biti 0), OF = 1 (işaretli −32 768 − 1 sığmaz). JB atlamaz: işaretsiz yorumda 32 768 &gt; 1. JL atlar: SF ≠ OF, işaretli yorumda −32 768 &lt; 1.</p>
+    </details>
+  </li>
+  <li>
+    <p>JL'nin işlem kodu 7Ch'dir. Tersi olan komutun işlem kodu nedir? 0108h'deki bir JL'yi 0100h'ye geri atlatmak için gereken kod nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>Son bit değişir: 7Dh, yani JGE (JNL). Geri atlama: sonraki IP = 010Ah, uzaklık 0100h − 010Ah = −0Ah = F6h; kod <code>7C F6</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>Aşağıdaki döngünün gövdesinde yanlışlıkla <code>dec cx</code> bırakılmıştır. CX = 4 ile başlarsa program bittiğinde AX nedir? CX = 3 ile başlarsa ne olur?</p>
+<pre class="nt-code"><code>    <span class="kw">mov</span>  cx, 4
+    <span class="kw">mov</span>  ax, 0
+d:  <span class="kw">inc</span>  ax
+    <span class="kw">dec</span>  cx
+    <span class="kw">loop</span> d</code></pre>
+    <details><summary>Cevap</summary>
+      <p>CX = 4: tur 1'de DEC 3, LOOP 2 (atlar); tur 2'de DEC 1, LOOP 0 (çıkar). AX = 2. CX = 3: tur 1'de DEC 2, LOOP 1 (atlar); tur 2'de DEC 0, LOOP FFFFh (atlar); sonra CX hep tek değerlerden geçer ve LOOP'tan sonra hiç 0 olmaz. Döngü sonsuzdur.</p>
+    </details>
+  </li>
+  <li>
+    <p>AL'deki işaretli sayı negatifse BL = 1, değilse BL = 0 yapan kod CMP ve tek bir koşullu atlamayla nasıl yazılır? Hangi atlama seçilmelidir?</p>
+    <details><summary>Cevap</summary>
+<pre class="nt-code"><code>    <span class="kw">mov</span>  bl, 0
+    <span class="kw">cmp</span>  al, 0
+    <span class="kw">jge</span>  son        <span class="cm">; AL &gt;= 0 ise atla</span>
+    <span class="kw">mov</span>  bl, 1
+son:</code></pre>
+      <p>Koşulun tersi (AL ≥ 0) işaretli aileden seçilir: JGE. AL = 80h ve FFh için BL = 1; 00h, 05h ve 7Fh için BL = 0 olur. Sıfırla karşılaştırmada taşma olamayacağı için <code>JNS</code> da doğru çalışır.</p>
+    </details>
+  </li>
+  <li>
+    <p>On turluk bir döngü LOOP ile ve DEC CX + JNZ ile yazılıyor. 8086'da yalnız döngü denetimi kaç saat turu sürer?</p>
+    <details><summary>Cevap</summary>
+      <p>LOOP: 9 atlama × 17 + 1 çıkış × 5 = 158 tur. DEC CX + JNZ: 10 × 2 (DEC) + 9 × 16 + 1 × 4 = 168 tur. 8086'da LOOP hem 1 bayt kısa hem 10 tur hızlıdır.</p>
+    </details>
+  </li>
+  <li>
+    <p>0102h'deki <code>je uzak</code> komutunun hedefi 01CFh'dedir. emu8086 bu komutu nasıl kodlar? Toplam kaç bayt olur?</p>
+    <details><summary>Cevap</summary>
+      <p>Uzaklık 01CFh − 0104h = CBh = 203 &gt; 127; kısa biçim yetmez. Koşul terslenir: <code>75 03</code> (JNE; koşul sağlanırsa JMP'nin üç baytının üzerinden geçer) ve <code>E9 C8 00</code> (yakın JMP; sonraki IP 0107h, 01CFh − 0107h = 00C8h). Toplam 5 bayt.</p>
+    </details>
+  </li>
+  <li>
+    <p>LOOPNE ile arama örneğinde dizi <code>7, 1, 8, 9, 3</code> olsaydı döngü kaç turda biter? Döngüden sonra CX, ZF ve AL nedir?</p>
+    <details><summary>Cevap</summary>
+      <p>3 son elemandadır. Beşinci turda CMP ZF = 1 yapar; LOOPNE CX'i 1'den 0'a indirir ve iki nedenle de çıkar. CX = 0, ZF = 1 olur. <code>jne yok</code> ZF'ye baktığı için atlamaz ve AL = 1, SI = 4 bulunur. CX'e bakılsaydı “bulunamadı” sanılırdı.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s7-13"><span class="nt-num">7.13</span>İleri okuma</h2>
+
+<ul>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8. baskı), Bölüm 6 (Program Control Instructions): JMP biçimleri, koşullu atlamalar, LOOP ailesi ve yüksek düzey yapıların assembly karşılıkları; bu notun en yakın kaynağıdır.</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979): komut kodlama tabloları ve saat turu sayıları birinci elden buradadır; önden getirme kuyruğunun işleyişi de anlatılır.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em> (7. baskı), Bölüm 6 (Conditional Processing): CMP, işaretli ve işaretsiz atlamalar, bileşik koşullar ve döngü örnekleri.</li>
+  <li>emu8086 belgeleri, <em>8086 assembler tutorial for beginners</em>, Part 7 (Program Flow Control): sunumdaki örneklerin kaynağı; menzil dışı koşullu atlama hilesi de burada anlatılır.</li>
+</ul>
+
+<h2 id="s7-14"><span class="nt-num">7.14</span>Kaynaklar</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 belgeleri: <em>8086 Assembler Tutorial for Beginners</em> (Part 7: Program Flow Control).</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979: komut kümesi ve kodlama tabloları.</li>
+  <li>Barry B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009: Bölüm 6 “Program Control Instructions”.</li>
+  <li>Kip R. Irvine, <em>Assembly Language for x86 Processors</em>, 7. baskı, Pearson, 2014: koşullu işlem ve döngüler.</li>
+</ol>
+
+<p class="nt-foot">İlgili sayfalar: <a href="../slides/Bolum_07_Akis_Kontrol.html">Bölüm 7 sunumu</a> · <a href="../slides/Bolum_07_Akis_Kontrol_Calisma_Sorulari.html">Çalışma soruları</a> · <a href="../sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>
