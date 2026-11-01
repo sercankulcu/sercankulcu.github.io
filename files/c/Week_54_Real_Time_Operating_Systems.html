@@ -406,29 +406,34 @@ in 2000 ticks:
       <tr><td>Sensor samples</td><td>37</td><td><strong>199</strong></td></tr>
       <tr><td>Worst sensor gap</td><td>54 ticks</td><td><strong>10 ticks</strong></td></tr>
       <tr><td>Log writes</td><td>37</td><td>38</td></tr>
-      <tr><td>RAM overhead</td><td>0</td><td>~4 KB of stacks and kernel</td></tr>
-      <tr><td>Flash overhead</td><td>0</td><td>~6 KB</td></tr>
+      <tr><td>RAM overhead</td><td>0</td><td>~6 KB of stacks and kernel objects</td></tr>
+      <tr><td>Flash overhead</td><td>0</td><td>~13 KB</td></tr>
     </tbody>
   </table>
 
-  <p>The sensor now meets its deadline every time, and the log does the same amount of work — it simply does it in the gaps. That is the whole value proposition, and it costs about ten kilobytes.</p>
+  <p>The sensor now meets its deadline every time, and the log does the same amount of work — it simply does it in the gaps. That is the whole value proposition, and it costs a dozen or so kilobytes of flash and a few of RAM. Measured on this example: <code>rtos.elf</code> has about 14 KB of <code>.text</code> against the superloop's 1 KB, built at <code>-Os</code> with FreeRTOS V11.3.3 and with <code>configASSERT</code> and stack checking switched on; the four task stacks alone are 4 KB of the 16 KB heap. A build without the checks is smaller.</p>
 
   <h3>Build and run under QEMU</h3>
 
-<pre><code>git clone --depth 1 https://github.com/FreeRTOS/FreeRTOS-Kernel
-arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -ffreestanding -O2 -g \
+<pre><code>git clone --depth 1 --branch V11.3.3 https://github.com/FreeRTOS/FreeRTOS-Kernel
+make rtos.elf FREERTOS=$PWD/FreeRTOS-Kernel
+make run-rtos FREERTOS=$PWD/FreeRTOS-Kernel</code></pre>
+
+  <p>The Makefile links <code>rtos.c</code> with the kernel, the Cortex-M3 port and the <code>heap_4.c</code> allocator, plus this week's <code>startup.c</code>, <code>firmware.ld</code> and <code>rtos_hooks.c</code>. Spelled out, the build is:</p>
+
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -std=c17 -Wall -Wextra -g -Os -ffreestanding \
     -I. -IFreeRTOS-Kernel/include \
     -IFreeRTOS-Kernel/portable/GCC/ARM_CM3 \
-    -T firmware.ld -o rtos.elf \
-    startup.c rtos.c board.c \
+    -nostdlib -T firmware.ld -o rtos.elf \
+    startup.c rtos.c board.c rtos_hooks.c \
     FreeRTOS-Kernel/tasks.c FreeRTOS-Kernel/queue.c \
     FreeRTOS-Kernel/list.c  FreeRTOS-Kernel/timers.c \
     FreeRTOS-Kernel/portable/GCC/ARM_CM3/port.c \
-    FreeRTOS-Kernel/portable/MemMang/heap_4.c
+    FreeRTOS-Kernel/portable/MemMang/heap_4.c -lgcc
 
 qemu-system-arm -M lm3s6965evb -nographic -kernel rtos.elf</code></pre>
 
-  <p>A <code>FreeRTOSConfig.h</code> is required; the kernel repository ships an example for this exact machine.</p>
+  <p>The kernel also needs a <code>FreeRTOSConfig.h</code>, and the one next to <code>rtos.c</code> is written for this machine: a 1 ms tick from QEMU's 12.5 MHz clock, mutexes and <code>vTaskDelayUntil</code> switched on, and the port's SVCall, PendSV and SysTick handlers renamed to the names in <code>startup.c</code>'s vector table. The kernel repository itself carries only a generic template, <code>examples/template_configuration</code>; the ready-made QEMU demos live in the separate FreeRTOS/FreeRTOS repository. The superloop has no kernel, so it brings its own SysTick handler in <code>tick.c</code>, and plain <code>make</code> builds it from <code>startup.c</code>, <code>superloop.c</code>, <code>board.c</code> and <code>tick.c</code>.</p>
 
   <h3>Cause priority inversion</h3>
 
@@ -454,7 +459,7 @@ xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
 
   <p>Run the worst-case workload and check each task. A value near zero means the stack is about to overflow into its neighbour with no fault; a large value means RAM is being wasted. This is week 52's painting, provided by the kernel.</p>
 
-  <p>Enable <code>configCHECK_FOR_STACK_OVERFLOW 2</code> in the configuration and provide <code>vApplicationStackOverflowHook</code> — the kernel then checks the pattern on every switch and calls you rather than corrupting memory silently.</p>
+  <p>The configuration here sets <code>configCHECK_FOR_STACK_OVERFLOW 2</code>, and <code>rtos_hooks.c</code> provides <code>vApplicationStackOverflowHook</code> — the kernel then checks the pattern on every switch and calls you rather than corrupting memory silently. The hook prints the task's name on the UART and stops, which on a device with no debugger attached is the difference between a diagnosis and a mystery.</p>
 </section>
 
 <section>
@@ -465,7 +470,7 @@ xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
     <tbody>
       <tr><td>Everything is short</td><td>Mixed deadlines, some long work</td><td>Many I/O sources, one core</td></tr>
       <tr><td>No concurrency bugs possible</td><td>Every week-41 hazard returns</td><td>No locking; state machines</td></tr>
-      <tr><td>Zero overhead</td><td>~10 KB and a stack per task</td><td>Small</td></tr>
+      <tr><td>Zero overhead</td><td>~10–15 KB and a stack per task</td><td>Small</td></tr>
       <tr><td>Trivial to reason about</td><td>Needs priority analysis</td><td>Needs explicit state</td></tr>
       <tr><td>Most small devices</td><td>Motor control, protocol stacks</td><td>Network servers — week 47</td></tr>
     </tbody>
@@ -487,7 +492,7 @@ xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
       <tr><td>Taking two mutexes in different orders</td><td>Deadlock — week 41</td><td>A consistent lock order.</td></tr>
       <tr><td><code>vTaskDelay</code> for a periodic task</td><td>Period drifts by the execution time</td><td><code>vTaskDelayUntil</code>.</td></tr>
       <tr><td>Priorities assigned by importance</td><td>Deadlines missed</td><td>By deadline: shortest gets highest.</td></tr>
-      <tr><td>Reaching for an RTOS by default</td><td>10 KB and a class of bugs, for nothing</td><td>Measure the superloop first.</td></tr>
+      <tr><td>Reaching for an RTOS by default</td><td>10–15 KB and a class of bugs, for nothing</td><td>Measure the superloop first.</td></tr>
     </tbody>
   </table>
 </section>
@@ -517,7 +522,7 @@ xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
 
   <details>
     <summary>When should you not use an RTOS?</summary>
-    <p>When a superloop meets every deadline. The kernel costs roughly ten kilobytes plus a stack per task, and it reintroduces races, deadlock, priority inversion, and stack overflow on a machine with no memory protection and no thread sanitizer. Adopt it when you can point at a measured deadline that the simpler design misses.</p>
+    <p>When a superloop meets every deadline. The kernel costs ten to fifteen kilobytes of flash plus a stack per task, and it reintroduces races, deadlock, priority inversion, and stack overflow on a machine with no memory protection and no thread sanitizer. Adopt it when you can point at a measured deadline that the simpler design misses.</p>
   </details>
 </section>
 

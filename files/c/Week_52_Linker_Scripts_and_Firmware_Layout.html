@@ -247,13 +247,17 @@ extern uint32_t _stack_bottom[], _stack_top[];
 static const char banner[]      = "firmware layout demo";
 static const uint32_t table[16] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
 
+/* volatile on all four: never written, they would otherwise be folded into
+   constants and vanish from the image, and the checks at the end of main
+   would test the compiler instead of the startup code. */
+
 /* .data — initial values in flash, variable in RAM */
-static uint32_t marker   = 0xA5A5A5A5u;
-static uint16_t revision = 42;
+static volatile uint32_t marker   = 0xA5A5A5A5u;
+static volatile uint16_t revision = 42;
 
 /* .bss — no flash cost at all */
-static uint32_t counter;
-static uint8_t  scratch[1024];
+static volatile uint32_t counter;
+static volatile uint8_t  scratch[1024];
 
 /* ---------- UART, from week 50 ---------- */
 
@@ -331,6 +335,8 @@ int main(void)
     puts_raw("   &lt;-- VMA, in RAM\n");
     puts_raw("  .bss   "); put_hex((uint32_t)(uintptr_t)_bss_start);
     puts_raw(" .. ");      put_hex((uint32_t)(uintptr_t)_bss_end);
+    puts_raw("\n  scratch "); put_hex((uint32_t)(uintptr_t)scratch);
+    puts_raw("   &lt;-- 1 KB of it, no FLASH");
     puts_raw("\n  stack  "); put_hex((uint32_t)(uintptr_t)_stack_bottom);
     puts_raw(" .. ");        put_hex((uint32_t)(uintptr_t)_stack_top);
     puts_raw("\n");
@@ -381,7 +387,7 @@ int main(void)
 <pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
     -ffreestanding -nostdlib -O2 -Wall -Wextra -g \
     -T firmware.ld -Wl,-Map=firmware.map \
-    -o firmware.elf startup.c layout.c
+    -o firmware.elf startup.c layout.c -lgcc
 
 qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
 

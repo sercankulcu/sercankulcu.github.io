@@ -71,18 +71,25 @@ void (* const vector_table[])(void) = {
     reset_handler,                 /*  1 reset             */
     default_handler,               /*  2 NMI               */
     hard_fault_handler,            /*  3 hard fault        */
-    0, 0, 0, 0, 0, 0, 0,           /*  4-10 reserved       */
+    default_handler,               /*  4 memory management */
+    default_handler,               /*  5 bus fault         */
+    default_handler,               /*  6 usage fault       */
+    0, 0, 0, 0,                    /*  7-10 reserved       */
     default_handler,               /* 11 SVCall            */
-    0, 0,
+    default_handler,               /* 12 debug monitor     */
+    0,                             /* 13 reserved          */
     default_handler,               /* 14 PendSV            */
     systick_handler,               /* 15 SysTick           */
-    /* 16 onwards: device peripherals */
-    gpio_a_handler,                /* IRQ 0                */
-    default_handler,               /* IRQ 1                */
-    uart0_handler,                 /* IRQ 5 on this part   */
+    /* 16 onwards: device peripherals, IRQ n at 16 + n */
+    gpio_a_handler,                /* 16 IRQ 0  GPIO A     */
+    default_handler,               /* 17 IRQ 1  GPIO B     */
+    default_handler,               /* 18 IRQ 2  GPIO C     */
+    default_handler,               /* 19 IRQ 3  GPIO D     */
+    default_handler,               /* 20 IRQ 4  GPIO E     */
+    uart0_handler,                 /* 21 IRQ 5  UART0      */
 };</code></pre>
 
-  <p>Because the processor branches through this table, an entry left at zero means an unhandled interrupt jumps to address 0 — which on Cortex-M is the stack pointer value, and produces an immediate hard fault. Fill every slot with a default handler rather than leaving gaps.</p>
+  <p>Because the processor branches through this table, an entry left at zero means an unhandled interrupt jumps to address 0 — which on Cortex-M is the stack pointer value, and produces an immediate hard fault. Fill every slot with a default handler rather than leaving gaps; only the architecturally reserved entries stay zero, because nothing can ever be delivered through them. The table must also be long enough: an interrupt whose entry lies past its end is dispatched through whatever code the linker placed there.</p>
 
   <p>On Cortex-M an ISR is an ordinary C function taking no arguments and returning <code>void</code>; the hardware handles saving and restoring. On other architectures a compiler attribute such as <code>__attribute__((interrupt))</code> is required to generate the correct prologue and return instruction.</p>
 </section>
@@ -408,7 +415,7 @@ int main(void)
     puts_raw("' after "); put_uint(spins); puts_raw(" wasted iterations\n");
 
     /* --- 2. interrupts: the loop does other work --- */
-    systick_init(18000);               /* about 1 kHz */
+    systick_init(12500);               /* 1 kHz at QEMU's 12.5 MHz */
     uart_irq_init();
     puts_raw("\ninterrupts enabled; type freely, 'q' ends\n");
 
@@ -459,11 +466,11 @@ int main(void)
     for (;;) { }
 }</code></pre>
 
-  <p>Add <code>systick_handler</code> and <code>uart0_handler</code> to the vector table from week 49, at indices 15 and 16 + 5.</p>
+  <p>The handlers only run if the vector table points at them. This week's <code>startup.c</code> is week 49's with the table grown to 22 entries, as in the first section: <code>systick_handler</code> at index 15 and <code>uart0_handler</code> at 16 + 5. Left at week 49's four entries, the first SysTick would be dispatched through whatever code follows the table, and the program would stop dead after enabling interrupts.</p>
 
 <pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
     -ffreestanding -nostdlib -O2 -Wall -Wextra -g \
-    -T firmware.ld -o firmware.elf startup.c interrupts.c
+    -T firmware.ld -o firmware.elf startup.c interrupts.c -lgcc
 
 qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
 
