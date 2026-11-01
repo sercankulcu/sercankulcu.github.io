@@ -145,6 +145,26 @@ MEASURE_JS = r"""async () => {
 NOISE = ('ervice', 'google', 'bad HTTP response code (404) was received when fetching the script')
 
 
+def site_permalinks():
+    """Jekyll sayfalarinin yayimdaki adresleri (on bilgideki permalink), ornegin /teaching/programming-with-c."""
+    out = set()
+    for d, dirs, fs in os.walk(REPO):
+        dirs[:] = [x for x in dirs if x not in ('_site', '.git', 'node_modules', 'files')]
+        for f in fs:
+            if not f.endswith(('.md', '.html')):
+                continue
+            try:
+                with open(os.path.join(d, f), encoding='utf-8') as h:
+                    head = h.read(2000)
+            except (OSError, UnicodeDecodeError):
+                continue
+            mm = re.match(r'---\r?\n(.*?)\r?\n---', head, re.S)
+            pm = mm and re.search(r'^permalink:\s*["\']?([^"\'\s]+)', mm.group(1), re.M)
+            if pm:
+                out.add(pm.group(1).rstrip('/') or '/')
+    return out
+
+
 def browser_checks(courses):
     import make_slide_pdf as m
     from playwright.sync_api import sync_playwright
@@ -155,7 +175,10 @@ def browser_checks(courses):
     with sync_playwright() as pw:
         b = m.launch(pw)
         ctx = b.new_context(viewport={'width': 1280, 'height': 900})
-        m.serve(ctx, FILES, m.fetch_shell())
+        # depo kokunden sun ve sayfayi yayimdaki /files/... adresinden ac; boylece mutlak
+        # (/files/c/week.css) ve goreli (../../teaching/...) adresler canli sitedeki gibi cozulur
+        m.serve(ctx, REPO, m.fetch_shell())
+        permalinks = site_permalinks()
         ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.createElement('style');"
                             "s.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';"
                             "document.head.appendChild(s)})")
@@ -171,7 +194,7 @@ def browser_checks(courses):
                   if q.status >= 400 and not any(n in q.url for n in NOISE) else None)
             for attempt in range(3):
                 try:
-                    pg.goto(m.BASE + '/' + rel, wait_until='networkidle'); break
+                    pg.goto(m.BASE + '/files/' + rel, wait_until='networkidle'); break
                 except Exception as e:
                     if attempt == 2:
                         err(where, 'acilamadi: ' + str(e).splitlines()[0][:120])
@@ -188,7 +211,9 @@ def browser_checks(courses):
                     continue
                 target = (os.path.join(REPO, path.lstrip('/')) if path.startswith('/')
                           else os.path.normpath(os.path.join(os.path.dirname(os.path.join(FILES, rel)), path)))
-                if not os.path.exists(target) and not os.path.exists(target + '.md'):
+                url = '/' + os.path.relpath(target, REPO).replace(os.sep, '/').rstrip('/')
+                if (not os.path.exists(target) and not os.path.exists(target + '.md')
+                        and url not in permalinks):
                     err(where, 'kirik baglanti: ' + h)
             if pg.evaluate("!!document.getElementById('ds-deck-next')"):
                 res = pg.evaluate(MEASURE_JS)
