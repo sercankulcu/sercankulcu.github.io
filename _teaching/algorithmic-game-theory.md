@@ -64,6 +64,7 @@ Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançla
 - [📝Çalışma Soruları - Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller_Calisma_Sorulari.html)
 - [🖼️Sunum-Minimaks ve Alfa-Beta Budaması (HTML)](../files/agt/slides/Bolum_02_Minimaks_ve_Budama.html)
 - [📄Sunum-Minimaks ve Alfa-Beta Budaması (PDF)](../files/agt/pdf/Bolum_02_Minimaks_ve_Budama.pdf)
+- [📝Çalışma Soruları - Minimaks ve Alfa-Beta Budaması (HTML)](../files/agt/slides/Bolum_02_Minimaks_ve_Budama_Calisma_Sorulari.html)
 
 - [🕹️2/3 Ortalaması Oyunu (HTML)](../files/agt/slides/Chapter_01_Guess_Average.html)
 - [🕹️Minimaks XOX (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
