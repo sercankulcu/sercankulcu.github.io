@@ -1046,6 +1046,7 @@
     this.undef = {};
     this.out = ""; this.stepOut = ""; this.memlog = null;
     this.portLast = {}; this.cursor = [0, 0]; this.halted = null; this.steps = 0; this.cur = null;
+    this.repStep = !!opts.repStep;
     var i;
     for (i = 0; i < 256; i++) { this.w16(i * 4, BIOS_OFF + i); this.w16(i * 4 + 2, BIOS_SEG); }
     this.w16(0x44A, 80); this.mem[0x484] = 24;
@@ -1082,7 +1083,9 @@
         var mm = init[key];
         for (var ak in mm) {
           var addr, size = 1, val = mm[ak];
+          var sk = /^(ES|CS|SS|DS)\s*:\s*([0-9A-F]+)H?$/i.exec(ak);
           if (/^\d+$/.test(ak)) addr = parseInt(ak, 10);
+          else if (sk) addr = this.phys(this.s[SREG[sk[1].toUpperCase()]], parseInt(sk[2], 16));
           else {
             var parts = ak.split("+"), sym = prog.syms[parts[0].trim().toUpperCase()];
             if (!sym || (sym.kind !== "var" && sym.kind !== "label")) throw new EmuError("init mem: tanımsız değişken " + parts[0]);
@@ -1091,6 +1094,7 @@
             size = sym.size || 1;
           }
           if (typeof val === "string") val = val.split("").map(function (c) { return c.charCodeAt(0) & 0xFF; });
+          if (Array.isArray(val)) val = val.map(function (x) { return typeof x === "string" ? parseNumber(x) : x; });
           if (Array.isArray(val)) for (var q = 0; q < val.length; q++) this.mem[(addr + q) & 0xFFFFF] = val[q] & 0xFF;
           else if (size === 2) this.w16(addr, val);
           else this.mem[addr & 0xFFFFF] = val & 0xFF;
@@ -1429,6 +1433,11 @@
       n++;
       if (cmp && rep === "E" && this.f.ZF === 0) break;
       if (cmp && rep === "NE" && this.f.ZF === 1) break;
+      if (this.repStep) {
+        /* emu8086.py rep_step=True: her tur ayrı adım; sürecekse IP aynı komutta kalır */
+        if (this.get("CX") !== 0 && !(cmp && ((rep === "E") !== !!this.f.ZF))) { this.jumped = true; this.info.again = true; }
+        break;
+      }
       if (n > 0x10000) break;
     }
     this.info.n = n;
@@ -1732,13 +1741,17 @@
     }
     if (mn === "JCXZ") return s + (B.CX === 0 ? "CX = 0 olduğu için " + targetText(m, st.target) + " atlanır." : "CX sıfır olmadığı için atlanmaz.");
     if (mn === "CALL") return s + "dönüş adresi " + hx((rec.before.ip + st.size) & 0xFFFF) + " yığına itilir (SP = " + hx(R.SP) + ") ve " + targetText(m, R.IP) + " gidilir.";
+    var depth = (m.initSp - B.SP) & 0xFFFF;   /* yığındaki bayt sayısı; 8000h üstü: SP başlangıcın üstünde (alt taşma) */
     if (mn === "RET" || mn === "RETN" || mn === "RETF") {
       if (R.IP === 0 && R.CS === PSP_SEG && m.prog.com) return s + "yığından 0000h alınır; IP = 0000h olur ve PSP'deki INT 20h komutuna gidilir.";
       if (st.far) return s + "yığından önce IP = " + hx(R.IP) + ", sonra CS = " + hx(R.CS) + " alınır (SP = " + hx(R.SP) + ")" + (ops.length ? ", ayrıca SP " + ops[0].val + " bayt artırılır" : "") + "; uzak dönüş yapılır.";
-      return s + "yığından dönüş adresi " + hx(R.IP) + " alınır (SP = " + hx(R.SP) + ")" + (ops.length ? ", ayrıca SP " + ops[0].val + " bayt artırılır" : "") + " ve oraya dönülür.";
+      return s + "yığından dönüş adresi " + hx(R.IP) + " alınır (SP = " + hx(R.SP) + ")" + (ops.length ? ", ayrıca SP " + ops[0].val + " bayt artırılır" : "") + " ve oraya dönülür." +
+        (depth >= 0x8000 ? " SP yığın alanının dışındaydı: okunan sözcük bir dönüş adresi değildir (alt taşma)." : "");
     }
     if (mn === "PUSH") return s + "SP 2 azaltılır (" + hx(R.SP) + ") ve " + (a.kind === "imm" ? hx(pre[0].v) + " değeri" : a.kind === "mem" ? where(0) + "ndeki sözcük (" + hx(pre[0].v) + ")" : an + " değeri (" + hx(pre[0].v) + ")") + " SS:" + hx(R.SP) + " adresine yazılır.";
-    if (mn === "POP") return s + "SS:" + hx(B.SP) + " adresindeki sözcük (" + hx(m.rd16(rec.regs.SS, B.SP)) + ") " + (a.kind === "mem" ? where(0) + "ne" : an + " yazmacına") + " alınır ve SP 2 artırılır (" + hx(R.SP) + ").";
+    if (mn === "POP") return s + "SS:" + hx(B.SP) + " adresindeki sözcük (" + hx(m.rd16(rec.regs.SS, B.SP)) + ") " + (a.kind === "mem" ? where(0) + "ne" : an + " yazmacına") + " alınır ve SP 2 artırılır (" + hx(R.SP) + ")." +
+      (depth === 0 && m.prog.com ? " Yığında programın ittiği değer kalmamıştı: DOS'un dönüş adresi (0000h) alındı ve SP sarmaladı (alt taşma)." :
+        depth >= 0x8000 ? " SP yığın alanının dışındaydı: okunan sözcük yığına itilmiş bir değer değildir (alt taşma)." : "");
     if (mn === "PUSHF") return s + "FLAGS sözcüğü (" + hx(m.rd16(R.SS, R.SP)) + ") yığına itilir; SP = " + hx(R.SP) + ".";
     if (mn === "POPF") return s + "yığındaki sözcük (" + hx(m.rd16(R.SS, B.SP)) + ") FLAGS yazmacına alınır; bütün bayraklar geri gelir, SP = " + hx(R.SP) + ".";
     if (mn === "LAHF") return s + "SF, ZF, AF, PF ve CF bayraklarını içeren FLAGS alt baytı AH yazmacına kopyalanır: AH = " + hx(R.AX >> 8, 1) + ".";
@@ -1758,6 +1771,20 @@
     if (has(EXEC, mn) && EXEC[mn] === strop) {
       var base = mn.slice(0, -1), wd = /B$/.test(mn) ? 1 : 2, inf = rec.info || { n: 1 }, adim = (bf.DF ? "azalır" : "artar");
       var u = birim(wd), dd = wd + " " + adim;
+      if (inf.rep && m.repStep) {
+        if (!inf.n) return s + "CX = 0 olduğu için komut hiç yürütülmez.";
+        var moved = wd === 1 ? m.rd8(R.ES, B.DI) : m.rd16(R.ES, B.DI);
+        var one = { MOVS: "DS:" + hx(B.SI) + " adresindeki " + u + " (" + hx(moved, wd) + ") ES:" + hx(B.DI) + " adresine kopyalanır",
+          STOS: (wd === 1 ? "AL" : "AX") + " değeri ES:" + hx(B.DI) + " adresine yazılır",
+          LODS: "DS:" + hx(B.SI) + " adresindeki " + u + " " + (wd === 1 ? "AL" : "AX") + " yazmacına okunur",
+          CMPS: "DS:" + hx(B.SI) + " ile ES:" + hx(B.DI) + " adreslerindeki " + u + " değerleri karşılaştırılır (ZF = " + fl.ZF + ")",
+          SCAS: (wd === 1 ? "AL" : "AX") + " ile ES:" + hx(B.DI) + " adresindeki " + u + " karşılaştırılır (ZF = " + fl.ZF + ")" }[base];
+        var fin;
+        if (inf.again) fin = "koşul sürdüğü için aynı komut bir tur daha yürütülecek";
+        else if (R.CX === 0 && !((base === "CMPS" || base === "SCAS") && ((inf.rep === "E") !== !!fl.ZF))) fin = "CX sıfırlandığı için yineleme biter";
+        else fin = inf.rep === "E" ? "farklı " + u + " bulunduğu (ZF = 0) için yineleme biter" : "aranan " + u + " bulunduğu (ZF = 1) için yineleme biter";
+        return s + "bir tur: " + one + "; CX bir azalır (CX = " + hx(R.CX) + "); " + fin + ".";
+      }
       if (inf.rep) {
         var n = inf.n, stop = "";
         if (base === "CMPS" || base === "SCAS") stop = R.CX === 0 && !((inf.rep === "E") !== !!fl.ZF) ? "CX sıfırlandığı için durulur" :
@@ -1841,7 +1868,7 @@
     return res;
   }
 
-  var API = { assemble: assemble, Machine: Machine, run: run, AsmError: AsmError, EmuError: EmuError, hx: hx,
+  var API = { parseNumber: parseNumber, assemble: assemble, Machine: Machine, run: run, AsmError: AsmError, EmuError: EmuError, hx: hx,
     FLAGORDER: FLAGORDER, PSP_SEG: PSP_SEG };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.Mini8086 = API;

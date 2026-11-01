@@ -2,6 +2,8 @@
 /* 8086 laboratuvarı: sunuma gömülü adım adım 8086 yürütücüsü (deck.js ve mini8086.js'ten sonra yüklenir).
    <div class="ds-deck__demo m-lab" data-demo="m-lab">
      <script type="text/x-asm" data-name="Örnek adı">ORG 100h …</script>  (bir ya da daha çok hazır örnek)
+     isteğe bağlı başlangıç belleği: data-init='{"mem": {"DS:0500h": ["25h", "17h"]}}' ya da '{"mem": {"DS:0200h": "ABC"}}'
+     REP önekli dizgi komutları tur tur yürütülür (her tur bir adım; emu8086.py rep_step=True ile aynı).
    </div>
    Arayüz bu betikte kurulur: solda kod (o anki satır vurgulu; Düzenle ile textarea), ortada yazmaçlar ve bayraklar,
    sağda DS bellek dökümü, SS:SP çevresi ve çıktı; altta her adımın Türkçe açıklaması.
@@ -29,7 +31,9 @@
 
   document.querySelectorAll('.ds-deck [data-demo="m-lab"]').forEach(function (demo) {
     var examples = Array.from(demo.querySelectorAll('script[type="text/x-asm"]')).map(function (s) {
-      return { name: s.dataset.name || "Örnek", src: s.textContent.replace(/^\n/, "").replace(/\s+$/, "") + "\n" };
+      var init = null;
+      try { if (s.dataset.init) init = JSON.parse(s.dataset.init); } catch (e) { init = null; }
+      return { name: s.dataset.name || "Örnek", init: init, src:s.textContent.replace(/^\n/, "").replace(/\s+$/, "") + "\n" };
     });
     if (!examples.length) return;
     var slide = demo.closest(".ds-deck__slide");
@@ -101,9 +105,24 @@
 
     /* ---------- durum ---------- */
     var text = "", prog = null, mach = null, n = 0, rec = null, done = null, err = null, timer = null, editing = false;
-    var memBase = 0, lineEls = [], varAt = {};
+    var memBase = 0, lineEls = [], varAt = {}, init = null;
 
-    function load(source) {
+    /* örnek etiketindeki data-init: {"mem": {"DS:0500h": ["25h", "17h"]}} ya da {"mem": {"DS:0200h": "ABC"}} */
+    function initNote() {
+      if (!init || !init.mem) return "";
+      return Object.keys(init.mem).map(function (k) {
+        var v = init.mem[k], bytes = typeof v === "string" ? v.split("").map(function (c) { return c.charCodeAt(0); }) :
+          (Array.isArray(v) ? v : [v]).map(function (x) { return typeof x === "string" ? M.parseNumber(x) : x; });
+        return esc(k) + " = " + bytes.map(function (x) { return h2(x) + "h"; }).join(", ") + (typeof v === "string" ? " ('" + esc(v) + "')" : "");
+      }).join("; ");
+    }
+    function initBase() {
+      if (!init || !init.mem) return null;
+      var mm = /:\s*([0-9A-F]+)h?$/i.exec(Object.keys(init.mem)[0]);
+      return mm ? parseInt(mm[1], 16) : null;
+    }
+    function load(source, newInit) {
+      if (newInit !== undefined) init = newInit;
       text = source;
       stop();
       prog = null; err = null;
@@ -134,8 +153,10 @@
       n = 0; rec = null; done = null;
       if (err && err.asm) { mach = null; render(); return; }
       err = null;
-      mach = new M.Machine(prog, { cxSize: true });
-      memBase = Math.max(0, (firstVar() & ~7));
+      try { mach = new M.Machine(prog, { cxSize: true, repStep: true, init: init || undefined }); }
+      catch (e) { if (!(e instanceof M.EmuError)) throw e; mach = new M.Machine(prog, { cxSize: true, repStep: true }); }
+      var ib = initBase();
+      memBase = Math.max(0, ((ib != null ? ib : firstVar()) & ~7));
       render();
     }
     /* bir adım; false: ilerlenemedi */
@@ -315,8 +336,9 @@
       }
       if (rec) return s;
       var size = prog.image.reduce(function (a, im) { return a + im[1].length; }, 0);
+      var note = initNote();
       return "Program yüklendi: " + size + " bayt, CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + "h. " +
-        (prog.com ? "emu8086'daki gibi CX başlangıçta program boyutunu (" + hx(size) + ") gösterir. " : "") +
+        (note ? "Başlangıç belleği slayttaki varsayımla doldurulur: <b>" + note + "</b>. " : prog.com ?"emu8086'daki gibi CX başlangıçta program boyutunu (" + hx(size) + ") gösterir. " : "") +
         "Adım düğmesiyle komutlar tek tek yürütülür; vurgulu satır sıradaki komuttur.";
     }
 
@@ -332,7 +354,7 @@
       if (act === "play") { play(); return; }
       if (act === "reset") { reset(); }
     });
-    pick.addEventListener("change", function () { load(examples[+pick.value].src); });
-    load(examples[0].src);
+    pick.addEventListener("change", function () { var ex = examples[+pick.value]; load(ex.src, ex.init); });
+    load(examples[0].src, examples[0].init);
   });
 })();
