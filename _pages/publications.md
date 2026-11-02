@@ -82,7 +82,7 @@ This study compares bounding boxes, convex hulls, and concave hulls for estimati
 
 **How to cite:** Külcü, S. (2026). Comparative Analysis of Target Localization Accuracy in Radar PPI Images Using Geometric Enclosures. *Konya Journal of Engineering Sciences, 14*(2), 901–916.
 
-[Paper](https://doi.org/10.36306/konjes.1812754) · [Presentation](/files/presentations/Comparative_Analysis_of_Presentation.pdf)
+[Paper](https://doi.org/10.36306/konjes.1812754) · [Presentation](/files/presentations/slides/Comparative_Analysis_of_Presentation.html)
 
 </details>
 
