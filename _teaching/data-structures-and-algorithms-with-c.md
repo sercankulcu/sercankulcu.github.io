@@ -128,7 +128,7 @@ Liste soyut veri tipinin sözleşmesi ile dizi ve bağlı liste gerçeklemeleri 
 
 ### Bölüm 10: Ağaçlar
 
-Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve tam dolu ağaç kavramları ile düğüm sayısı ilişkileri ele alınır. İkili ağacın dizi ve bağlı gösterimleri karşılaştırılır; genel ağacın ikili ağaca dönüştürülmesi gösterilir. Kök önde, kök ortada ve kök sonda gezinmeler özyinelemeli yordamlarla ve ifade ağacı örneğiyle işlenir, ardından yığın kullanan yinelemeli sürümlere geçilir. Kuyrukla düzey düzey gezinme, ağaç kopyalama, eşitlik denetimi ve çocukların yer değiştirmesi de incelenir.
+Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve mükemmel ağaç kavramları ile düğüm sayısı ilişkileri ele alınır. İkili ağacın dizi ve bağlı gösterimleri karşılaştırılır; genel ağacın ikili ağaca dönüştürülmesi gösterilir. Kök önde, kök ortada ve kök sonda gezinmeler özyinelemeli yordamlarla ve ifade ağacı örneğiyle işlenir, ardından yığın kullanan yinelemeli sürümlere geçilir. Kuyrukla düzey düzey gezinme, ağaç kopyalama, eşitlik denetimi ve çocukların yer değiştirmesi de incelenir.
 
 - [🖼️Sunum-Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_10_Agaclar.html)
 - [📄Sunum-Ağaçlar (PDF)](../files/dsa_c/pdf/Bolum_10_Agaclar.pdf)

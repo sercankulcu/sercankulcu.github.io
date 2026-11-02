@@ -165,7 +165,7 @@ Sosyal seçim, bireysel tercihlerin ortak bir karara nasıl dönüştürüldüğ
 
 ### Bölüm 8: Ağ Tasarımı ve Yönlendirme
 
-Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merkezi bir planlayıcının seçeceğinden farklı olabilir. Yönlendirmenin temelleri, bencil yönlendirme, Wardrop dengesi ile sistem optimumunun karşılaştırılması, Braess paradoksu, tıkanıklık oyunları ve Rosenthal potansiyeli, ağ oluşturma oyunları.
+Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merkezî bir planlayıcının seçeceğinden farklı olabilir. Yönlendirmenin temelleri, bencil yönlendirme, Wardrop dengesi ile sistem optimumunun karşılaştırılması, Braess paradoksu, tıkanıklık oyunları ve Rosenthal potansiyeli, ağ oluşturma oyunları.
 
 - [🖼️Sunum-Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi.html)
 - [📄Sunum-Ağ Tasarımı ve Yönlendirme (PDF)](../files/agt/pdf/Bolum_08_Ag_Tasarimi.pdf)
