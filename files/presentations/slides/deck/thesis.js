@@ -187,48 +187,62 @@
     }
     let mode = "omni", nch = 1, tr = 1, S = [];
     const CH = ["var(--pv-s1)", "var(--pv-s2)", "#1baf7a", "#9b59b6"];
+    const SC = 1.3, O = 21;
+    const px = function (a) { return [O + a.x * SC, O + a.y * SC]; };
+    /* area in which a sender disturbs a receiver listening omnidirectionally: RSS ≥ -90 dBm, i.e. 100 m × 10^(G/25) */
+    function footprint(a, p) {
+      const th0 = ang(a, p), pts = [];
+      for (let i = 0; i <= 72; i++) {
+        const th = th0 + i * Math.PI / 36, gn = g(mode, a, { x: a.x + Math.cos(th), y: a.y + Math.sin(th) }, p);
+        const r = gn === -Infinity ? 0 : 100 * Math.pow(10, gn / 25) * SC, c = px(a);
+        pts.push((i ? "L" : "M") + (c[0] + r * Math.cos(th)).toFixed(1) + " " + (c[1] + r * Math.sin(th)).toFixed(1));
+      }
+      return pts.join(" ") + " Z";
+    }
+    const CAP = {
+      omni: T("Omni: every sender disturbs all nodes within 100 m (shaded), so neighbouring links must take turns or other channels.",
+        "Tüm yönlü: her gönderici 100 m içindeki tüm düğümleri etkiler (gölgeli alan); komşu bağlantılar sırayla ya da farklı kanallarda iletmek zorundadır."),
+      sw2: T("2 switched beams: only the 180° antenna facing the parent transmits, so the other half of the neighbourhood stays free.",
+        "2 anahtarlanabilir huzme: yalnızca ataya bakan 180° anten yayın yapar, komşuluğun diğer yarısı serbest kalır."),
+      sw3: T("3 switched beams: a 120° sector transmits; links that point away from each other share the slot and the channel.",
+        "3 anahtarlanabilir huzme: 120° dilim yayın yapar; birbirinden uzağa bakan bağlantılar dilimi ve kanalı paylaşır."),
+      steer: T("Steerable: the beam reaches further ahead (+5 dBi) but much less sideways and behind (−5 / −15 dBi).",
+        "Döner yönlü: huzme önde daha uzağa (+5 dBi), yanlara ve arkaya çok daha az (−5 / −15 dBi) ulaşır.")
+    };
     function drawTopo(k) {
-      const W = 210, H = 210, o = 15, f = 1.8;
+      const W = 250, H = 250;
       const c = PV.svg(host, W, H, T("Grid network and the links active in the selected slot", "Izgara ağ ve seçili zaman dilimindeki etkin bağlantılar"));
       const gg = c.svg;
-      N.forEach(function (a) { if (a.parent >= 0) { const p = N[a.parent]; PV.el(gg, "line", { x1: o + a.x * f * 0.625, y1: o + a.y * f * 0.625, x2: o + p.x * f * 0.625, y2: o + p.y * f * 0.625, stroke: "var(--ds-border-base)", "stroke-width": 1 }); } });
+      N.forEach(function (a) { if (a.parent >= 0) { const q = px(a), r = px(N[a.parent]); PV.el(gg, "line", { x1: q[0], y1: q[1], x2: r[0], y2: r[1], stroke: "var(--ds-border-base)", "stroke-width": 1 }); } });
       const act = S[k] || [];
+      act.forEach(function (l) { PV.el(gg, "path", { d: footprint(N[l.s], N[l.p]), fill: CH[l.c], "fill-opacity": 0.16, stroke: CH[l.c], "stroke-opacity": 0.7, "stroke-width": 1.2, "stroke-dasharray": "4 3" }); });
       act.forEach(function (l) {
-        const a = N[l.s], p = N[l.p];
-        const x1 = o + a.x * f * 0.625, y1 = o + a.y * f * 0.625, x2 = o + p.x * f * 0.625, y2 = o + p.y * f * 0.625;
-        if (mode !== "omni") {
-          const th = Math.atan2(y2 - y1, x2 - x1), w = mode === "steer" ? 0.55 : (mode === "sw2" ? Math.PI / 2 : Math.PI / 3), R = 60;
-          if (mode === "steer") {
-            PV.el(gg, "path", { d: "M" + x1 + " " + y1 + " L" + (x1 + R * Math.cos(th - w)) + " " + (y1 + R * Math.sin(th - w)) + " A" + R + " " + R + " 0 0 1 " + (x1 + R * Math.cos(th + w)) + " " + (y1 + R * Math.sin(th + w)) + " Z", fill: CH[l.c], "fill-opacity": 0.12 });
-          } else {
-            const k2 = mode === "sw2" ? 2 : 3, s = sec(Math.atan2(p.y - a.y, p.x - a.x), k2, OFF[mode]), w2 = Math.PI * 2 / k2, a0 = OFF[mode] + s * w2, a1 = a0 + w2;
-            PV.el(gg, "path", { d: "M" + x1 + " " + y1 + " L" + (x1 + R * Math.cos(a0)) + " " + (y1 + R * Math.sin(a0)) + " A" + R + " " + R + " 0 " + (w2 > Math.PI ? 1 : 0) + " 1 " + (x1 + R * Math.cos(a1)) + " " + (y1 + R * Math.sin(a1)) + " Z", fill: CH[l.c], "fill-opacity": 0.12 });
-          }
-        } else {
-          PV.el(gg, "circle", { cx: x1, cy: y1, r: 100 * f * 0.625, fill: CH[l.c], "fill-opacity": 0.05, stroke: CH[l.c], "stroke-opacity": 0.3, "stroke-dasharray": "3 3" });
-        }
-        PV.el(gg, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: CH[l.c], "stroke-width": 3.5, "stroke-linecap": "round" });
+        const q = px(N[l.s]), r = px(N[l.p]);
+        PV.el(gg, "line", { x1: q[0], y1: q[1], x2: r[0], y2: r[1], stroke: CH[l.c], "stroke-width": 5, "stroke-linecap": "round" });
       });
+      const tx = new Map(act.map(function (l) { return [l.s, l.c]; }));
       N.forEach(function (a, i) {
-        PV.el(gg, "circle", { cx: o + a.x * f * 0.625, cy: o + a.y * f * 0.625, r: i === root ? 8 : 5.5, fill: i === root ? "var(--ds-text)" : "var(--ds-bg)", stroke: "var(--ds-text)", "stroke-width": 1.5 });
+        const q = px(a);
+        PV.el(gg, "circle", { cx: q[0], cy: q[1], r: i === root ? 8 : 6, fill: tx.has(i) ? CH[tx.get(i)] : (i === root ? "var(--ds-text)" : "var(--ds-bg)"), stroke: "var(--ds-text)", "stroke-width": 1.5 });
       });
+      $("th-lab-cap").innerHTML = CAP[mode] + " " + T("Slot ", "Dilim ") + (k + 1) + ": <b>" + act.length + "</b> " + T(act.length === 1 ? "parallel link." : "parallel links.", "paralel bağlantı.");
     }
     function drawGrid() {
-      const len = S.length, cw = Math.max(3, Math.min(9, Math.floor(420 / Math.max(len, 1)))), rh = 6, L = 30, W = L + cw * len + 6, H = rh * (N.length - 1) + 30;
-      const c = PV.svg(grid, Math.max(W, 300), H, T("Schedule: rows are nodes, columns are slots", "Çizelge: satırlar düğümler, sütunlar zaman dilimleri"));
+      const len = S.length, L = 40, W = 400, cw = (W - L - 6) / Math.max(len, 1), rh = 6, H = rh * (N.length - 1) + 28;
+      const c = PV.svg(grid, W, H, T("Schedule: rows are nodes, columns are slots", "Çizelge: satırlar düğümler, sütunlar zaman dilimleri"));
       const gg = c.svg;
       const rows = N.map(function (_, i) { return i; }).filter(function (i) { return i !== root; }).sort(function (a, b) { return N[a].hop - N[b].hop || a - b; });
-      rows.forEach(function (id, r) { if (!r || N[rows[r - 1]].hop !== N[id].hop) PV.el(gg, "text", { x: L - 4, y: 8 + r * rh + 7, "text-anchor": "end", class: "tk", style: "font-size:9px" }, T("hop ", "hop ") + N[id].hop); });
+      rows.forEach(function (id, r) { if (!r || N[rows[r - 1]].hop !== N[id].hop) PV.el(gg, "text", { x: L - 4, y: 8 + r * rh + 6, "text-anchor": "end", class: "tk", style: "font-size:12px" }, "hop " + N[id].hop); });
       S.forEach(function (sel, k) {
         sel.forEach(function (l) {
           const r = rows.indexOf(l.s);
-          PV.el(gg, "rect", { x: L + k * cw, y: 8 + r * rh, width: cw - 0.5, height: rh - 1, fill: CH[l.c] });
+          PV.el(gg, "rect", { x: L + k * cw, y: 8 + r * rh, width: Math.max(1, cw - 0.6), height: rh - 1, fill: CH[l.c] });
         });
       });
       const k = +slot.value;
-      PV.el(gg, "rect", { x: L + k * cw - 0.5, y: 4, width: cw + 0.5, height: rh * rows.length + 6, fill: "none", stroke: "var(--ds-text)", "stroke-width": 1 });
-      PV.el(gg, "text", { x: L, y: H - 4, class: "tk" }, T("slot 1", "dilim 1"));
-      PV.el(gg, "text", { x: L + cw * len, y: H - 4, "text-anchor": "end", class: "tk" }, T("slot ", "dilim ") + len);
+      PV.el(gg, "rect", { x: L + k * cw - 0.5, y: 4, width: cw + 1, height: rh * rows.length + 6, fill: "none", stroke: "var(--ds-text)", "stroke-width": 1.2 });
+      PV.el(gg, "text", { x: L, y: H - 3, class: "tk", style: "font-size:12px" }, T("slot 1", "dilim 1"));
+      PV.el(gg, "text", { x: L + cw * len, y: H - 3, "text-anchor": "end", class: "tk", style: "font-size:12px" }, T("slot ", "dilim ") + len);
       const hit = PV.el(gg, "rect", { x: L, y: 0, width: cw * len, height: H, class: "hit" });
       hit.addEventListener("click", function (e) {
         const box = gg.getBoundingClientRect(), vb = gg.viewBox.baseVal, sx = vb && vb.width ? vb.width / box.width : 1;
