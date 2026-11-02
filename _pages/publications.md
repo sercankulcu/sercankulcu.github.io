@@ -114,7 +114,7 @@ This study integrates tiled training, SAHI inference, and YOLOv11 oriented bound
 
 **How to cite:** Külcü, S. (2026). High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB. *Sensors, 26*(3), 942.
 
-[Paper](https://doi.org/10.3390/s26030942) · [Presentation](/files/presentations/High_Precision_Marine_Radar_Presentation.pdf)
+[Paper](https://doi.org/10.3390/s26030942) · [Presentation](/files/presentations/slides/High_Precision_Marine_Radar_Presentation.html)
 
 </details>
 

@@ -1,0 +1,398 @@
+---
+layout: without-sidebar
+title: "High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB"
+permalink: /files/presentations/slides/High_Precision_Marine_Radar_Presentation.html
+excerpt: "Interactive presentation of the Sensors paper: tiled training, SAHI sliced inference and oriented bounding boxes with lightweight YOLOv11 models for detecting and localizing vessels in real X-band radar PPI images from the DLR DAAN dataset."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/paper.css">
+<style>
+.ds-deck .obb-side { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
+.ds-deck .obb-side .ds-deck__table { font-size: 13.5px; }
+.ds-deck .obb-side .ds-deck__table td { padding: 4px 8px; }
+.ds-deck .obb-lab canvas { display: block; width: 300px; height: auto; border-radius: 10px; background: #000; }
+.ds-deck .obb-checks { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13.5px; }
+.ds-deck .obb-checks label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.ds-deck .obb-checks i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; }
+.ds-deck .obb-view img { display: block; width: 300px; height: auto; border-radius: 8px; }
+.ds-deck .obb-view .pv-seg { flex-direction: column; align-items: stretch; }
+.ds-deck .obb-view .pv-seg button { text-align: left; }
+.ds-deck .obb-pics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 540px; margin: 0 auto; }
+.ds-deck .obb-pics img { display: block; width: 100%; height: auto; border-radius: 6px; background: #fff; }
+.ds-deck .obb-eq { margin: 6px 0; padding: 8px 12px; border-radius: 10px; background: var(--ds-surface-strong); font: 15px "Cambria Math", "STIX Two Math", "Times New Roman", serif; text-align: center; }
+.ds-deck.is-fluid .obb-side,
+.ds-deck.is-fluid .obb-pics { grid-template-columns: minmax(0, 1fr); }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="en">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="presentation" aria-label="High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Title" data-section="">
+  <p class="pv-venue">Article · Sensors · Vol. 26 · 942 · 2026 · MDPI</p>
+  <h1 class="pv-title">High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB</h1>
+  <div class="pv-authors">Sercan Külcü</div>
+  <div class="pv-affil">Computer Engineering Department, Giresun University, Türkiye</div>
+  <div class="ds-deck__agenda" aria-label="Contents">
+    <span>DAAN radar data</span><span>Annotation lab</span><span>AABB vs OBB</span><span>Tiled training</span>
+    <span>SAHI slicing</span><span>Detect · OBB · Segment</span><span>Centroid error</span><span>Failure cases</span>
+  </div>
+  <small>doi: <a href="https://doi.org/10.3390/s26030942">10.3390/s26030942</a> · Use ← → or Space to navigate, F for full screen</small>
+</section>
+
+<section class="ds-deck__slide" data-title="At a Glance" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>At a Glance</h2>
+  <p>Small, distant vessels shrink to a few pixels when a full PPI frame is resized for a detector, and axis-aligned boxes fit tilted echoes poorly. This study tackles <b>scale</b> with tiled training and SAHI, and <b>orientation</b> with YOLOv11-OBB.</p>
+  <div class="pv-kpis">
+    <div class="pv-kpi is-best"><span>Tiled OBB mAP@0.5</span><b>0.989</b><small>vs 0.955 resized</small></div>
+    <div class="pv-kpi"><span>Full frames + SAHI</span><b>&gt; 0.95</b><small>mAP@0.5, all tasks</small></div>
+    <div class="pv-kpi"><span>Centroid error</span><b>&lt; 10 px</b><small>mean 5.06–6.75 px vs AIS</small></div>
+    <div class="pv-kpi"><span>Speed with SAHI</span><b>4–6 FPS</b><small>RTX 3050 Laptop, ~6 MB models</small></div>
+  </div>
+  <div class="ds-deck__grid ds-deck__grid--3" style="margin-top:14px">
+    <div class="ds-deck__card"><strong>Multi-format labels</strong><p>A contour-based pipeline makes boxes, oriented boxes and masks from the radar echoes.</p></div>
+    <div class="ds-deck__card"><strong>Scale-aware</strong><p>640 px tiles for training, 640 px slices for inference keep small echoes at native resolution.</p></div>
+    <div class="ds-deck__card"><strong>Orientation-aware</strong><p>Oriented boxes follow each vessel's heading and give the lowest centroid error.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Motivation" data-section="Introduction">
+  <p class="ds-deck__kicker">1 · Introduction</p>
+  <h2>Why Marine Radar Detection Is Still Hard</h2>
+  <div class="ds-deck__grid ds-deck__grid--3 ds-deck__small">
+    <div class="ds-deck__card"><strong>Classical</strong><p>CFAR detectors (superpixel CFAR, generalized-symbol CFAR), anti-interference imaging, 3D-FFT clutter filtering.</p></div>
+    <div class="ds-deck__card"><strong>Deep learning</strong><p>Radar-PPInet, Radar-YOLONet, Marine-Faster R-CNN, YOLO-SWFormer, YOSMR; GAN-based clutter suppression; radar–camera fusion.</p></div>
+    <div class="ds-deck__card"><strong>Tracking</strong><p>Fuzzy C-means plots, particle-Kalman filters, Gaussian YOLOv3 + EKF, DPSE-Net + DeepSORT, ShipMOT.</p></div>
+  </div>
+  <div class="ds-deck__callout ds-deck__small"><b>Two gaps.</b> (1) <b>Resolution mismatch</b>: PPI frames are far larger than the 640 × 640 network input, so small targets vanish when resized. (2) <b>Orientation</b>: prior work uses axis-aligned boxes, which inflate around tilted, elongated echoes and wakes.</div>
+  <ul class="ds-deck__small" style="margin-top:8px">
+    <li>First unified study of tiled training + SAHI + oriented boxes on shipborne marine radar, validated against AIS.</li>
+    <li>Contributions: the pipeline, evidence that OBBs localize better, a semi-automatic multi-format annotation strategy, and a sub-10-pixel benchmark.</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="DAAN Dataset" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">2 · Materials and Methods · Figs. 1–2</p>
+  <h2>The DLR DAAN Dataset</h2>
+  <div class="obb-pics">
+    <figure style="margin:0"><img src="img/obb/traj_abs.webp" alt="Absolute AIS trajectories of the four vessels" width="640" height="483" loading="lazy"><figcaption class="ds-deck__caption">Absolute AIS tracks (North-East)</figcaption></figure>
+    <figure style="margin:0"><img src="img/obb/traj_rel.webp" alt="Trajectories relative to the own ship" width="640" height="488" loading="lazy"><figcaption class="ds-deck__caption">Relative to Vessel 1 (own ship, radar)</figcaption></figure>
+  </div>
+  <ul class="ds-deck__small" style="margin-top:6px">
+    <li>Baltic Sea campaign: shipborne X-band navigation radar, non-coherent, <b>no Doppler / MTI</b>, 3 NM range, screen-grabbed at ~1 Hz.</li>
+    <li><b>760</b> full-resolution PPI frames (1050 × 1024), 13 minutes; four vessels, moving own ship, wake trails, fixed aids to navigation.</li>
+    <li>Synchronous AIS gives North-East positions for evaluation; crossings and overtaking make echo orientations vary.</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Semi-Automatic Annotation" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">2 · Materials and Methods · Algorithm 1</p>
+  <h2>Semi-Automatic, Multi-Format Annotation</h2>
+  <div class="obb-side">
+    <figure style="margin:0"><img src="img/obb/ppi.webp" alt="Full-resolution PPI radar frame 760.png" width="1050" height="1024" loading="lazy" style="display:block;width:300px;height:auto;border-radius:8px"><figcaption class="ds-deck__caption">Fig. 3 · frame 760, North Up, 3 NM</figcaption></figure>
+    <div class="ds-deck__small">
+      <ol>
+        <li><b>Candidates:</b> RGB → HSV, keep the yellow echo band
+          <div class="obb-eq">h ∈ [20, 40] ∧ s ∈ [100, 255] ∧ v ∈ [100, 255] &nbsp;(OpenCV scale)</div>
+          then contours; drop areas under τ = 8 px.</li>
+        <li><b>Labels per contour:</b> axis-aligned box (AABB); polygon mask via Douglas–Peucker, ε = 1% of the perimeter; minimum-area rotated rectangle (OBB, four corners).</li>
+        <li><b>Human check:</b> ~15% of frames corrected once, offline: split merged vessels, join fragments, remove aids to navigation.</li>
+      </ol>
+      <p>Single class "target"; temporal 80 / 20 train / test split so consecutive frames of one track do not leak across sets.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Annotation Lab" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">2 · Materials and Methods · Interactive</p>
+  <h2>Annotation Lab: Algorithm 1 in Your Browser</h2>
+  <div class="obb-side obb-lab">
+    <canvas id="obb-lab" width="600" height="585" data-src="img/obb/ppi.webp" aria-label="PPI frame with automatically generated boxes"></canvas>
+    <div>
+      <div class="pv-ctrl" style="margin:0 0 6px"><span>View</span><div class="pv-seg" id="obb-lab-view"><button type="button" data-v="full" class="is-on">Full frame</button><button type="button" data-v="zoom">Zoom on largest echo</button></div></div>
+      <div class="obb-checks">
+        <label><input type="checkbox" id="obb-show-a" checked><i style="background:#ff3b3b"></i>AABB</label>
+        <label><input type="checkbox" id="obb-show-o" checked><i style="background:#39ff88"></i>OBB</label>
+      </div>
+      <div class="pv-range" style="margin-top:6px"><span style="color:var(--ds-muted);font-weight:700;min-width:84px">Min area τ</span><input type="range" id="obb-lab-tau" min="1" max="60" value="8" aria-label="Minimum contour area in pixels"><output id="obb-lab-tau-out"></output></div>
+      <table class="ds-deck__table" style="margin-top:6px"><tbody id="obb-lab-out"></tbody></table>
+      <p class="ds-deck__foot">HSV mask, 8-connected contours, AABB and minimum-area rectangle (rotating over hull edges), computed live on the full 1050 × 1024 frame. The human correction step is not included.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Why Oriented Boxes" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">2 · Materials and Methods · Interactive</p>
+  <h2>Why Oriented Boxes? Tilt an Echo</h2>
+  <div class="obb-side" style="grid-template-columns:220px minmax(0,1fr)">
+    <div class="pv-chart" id="obb-geom"></div>
+    <div>
+      <div class="pv-range"><span style="color:var(--ds-muted);font-weight:700;min-width:80px">Heading</span><input type="range" id="obb-geom-a" min="0" max="90" value="35" aria-label="Echo heading in degrees"><output id="obb-geom-a-out"></output></div>
+      <div class="pv-range"><span style="color:var(--ds-muted);font-weight:700;min-width:80px">Elongation</span><input type="range" id="obb-geom-r" min="1" max="6" step="0.1" value="3.5" aria-label="Length to width ratio"><output id="obb-geom-r-out"></output></div>
+      <div class="obb-checks" style="margin:6px 0"><span><i style="background:#ff3b3b"></i>axis-aligned box</span><span><i style="background:#39ff88"></i>oriented box</span></div>
+      <table class="ds-deck__table"><tbody id="obb-geom-out"></tbody></table>
+      <p class="ds-deck__small" style="margin-top:8px">An idealized elliptical echo. The oriented box always covers the same share (π/4 ≈ 79%); the axis-aligned box swells as the vessel turns toward 45°, pulling in clutter, wake and neighbouring echoes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Tiled Training and SAHI" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">2 · Materials and Methods</p>
+  <h2>Tiled Training and SAHI Inference</h2>
+  <div class="pv-flow">
+    <div><b>Tile</b>1050 × 1024 frame → 640 × 640 tiles, 20% overlap, stride 512</div><i>→</i>
+    <div><b>Keep</b>tiles holding a polygon centroid; re-normalize labels</div><i>→</i>
+    <div><b>Train</b>YOLOv11n detect / OBB / seg, COCO-pretrained</div><i>→</i>
+    <div><b>Slice</b>SAHI: 640 px slices, 20% overlap, conf 0.5</div><i>→</i>
+    <div><b>Merge</b>class-agnostic NMS, match 0.5</div>
+  </div>
+  <div class="ds-deck__two" style="margin-top:12px">
+    <div class="pv-kpis" style="grid-template-columns:1fr 1fr">
+      <div class="pv-kpi"><span>Full-image set</span><b>760</b><small>images · 4,457 instances</small></div>
+      <div class="pv-kpi is-best"><span>Tiled set</span><b>3,040</b><small>images · 11,893 instances</small></div>
+    </div>
+    <table class="ds-deck__table" style="font-size:13px">
+      <tbody>
+        <tr><th>Framework</th><td>Ultralytics 8.3.235, PyTorch 2.7.1</td></tr>
+        <tr><th>GPU</th><td>RTX 3050 Laptop, 6 GB</td></tr>
+        <tr><th>Epochs / batch</th><td>50 / 16, AdamW (auto)</td></tr>
+        <tr><th>LR</th><td>0.01, cosine</td></tr>
+        <tr><th>Loss gains</th><td>box 7.5, cls 0.5, dfl 1.5</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Choosing the Backbone" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Table 1</p>
+  <h2>Choosing a Lightweight Backbone (Tiled Training)</h2>
+  <table class="ds-deck__table pv-sort">
+    <thead><tr><th>Model</th><th class="num" data-first="asc">Params (M)</th><th class="num" data-first="asc">GFLOPs</th><th class="num">mAP@0.5</th><th class="num">mAP@0.5:0.95</th><th class="num" data-first="asc">Inference (ms)</th></tr></thead>
+    <tbody>
+      <tr><td>YOLOv5n</td><td class="num">2.5</td><td class="num">7.1</td><td class="num">0.981</td><td class="num">0.787</td><td class="num">2.7</td></tr>
+      <tr><td>YOLOv8n</td><td class="num">3.0</td><td class="num">8.1</td><td class="num">0.987</td><td class="num">0.797</td><td class="num">2.7</td></tr>
+      <tr class="is-ours"><td>YOLO11n</td><td class="num">2.6</td><td class="num">6.3</td><td class="num">0.984</td><td class="num">0.816</td><td class="num">2.9</td></tr>
+      <tr><td>YOLO26n</td><td class="num">2.4</td><td class="num">5.2</td><td class="num">0.987</td><td class="num">0.807</td><td class="num">2.8</td></tr>
+    </tbody>
+  </table>
+  <div class="ds-deck__callout ds-deck__small" style="margin-top:12px">All four exceed 0.98 mAP@0.5. <b>YOLO11n</b> has the best mAP@0.5:0.95 (0.816), the stricter box-quality test that matters for small, oriented targets, so it is used for detect, OBB and segment in the rest of the study. YOLO26n is the lightest.</div>
+  <p class="ds-deck__foot">Click a header to sort.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Resized vs Tiled" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Table 2</p>
+  <h2>Resized vs Tiled Training</h2>
+  <div class="pv-ctrl"><span>Metric</span><div class="pv-seg" id="obb-train-m"><button type="button" data-v="m50">mAP@0.5</button><button type="button" data-v="m95" class="is-on">mAP@0.5:0.95</button></div>
+    <span class="pv-legend" style="margin:0"><span><i style="background:var(--pv-base)"></i>resized to 640</span><span><i style="background:var(--pv-s1)"></i>tiled</span></span></div>
+  <div class="pv-chart" id="obb-train"></div>
+  <div class="ds-deck__callout ds-deck__small">Tiling helps every task. <b>Tiled YOLOv11-OBB</b> is best: 0.989 mAP@0.5 and 0.882 mAP@0.5:0.95. Resizing loses detail of small echoes; orientation-aware learning gives the tightest boxes.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="SAHI Settings" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Tables 3–4</p>
+  <h2>SAHI Settings: Overlap and Slice Size</h2>
+  <div class="pv-ctrl">
+    <span>Vary</span><div class="pv-seg" id="obb-sahi-set"><button type="button" data-v="size" class="is-on">Slice size</button><button type="button" data-v="overlap">Overlap</button></div>
+    <span>Metric</span><div class="pv-seg" id="obb-sahi-m"><button type="button" data-v="0">mAP@0.5</button><button type="button" data-v="1">mAP@0.5:0.95</button><button type="button" data-v="2" class="is-on">mAP@0.75</button></div>
+  </div>
+  <div class="ds-deck__two" style="grid-template-columns:470px 230px;gap:10px">
+    <div class="pv-chart" id="obb-sahi"></div>
+    <div class="pv-chart" id="obb-sahi-n"></div>
+  </div>
+  <p class="ds-deck__small">Tiled YOLOv11-detect on full frames. Smaller slices sharpen localization up to <b>320 px</b> (mAP@0.75 0.381 → 0.486) and decline at 240 px; more overlap gives a small, steady gain. The right chart counts slices per frame (computed for a 1050 × 1024 frame): halving the slice size roughly quadruples the work.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Three Tasks after SAHI" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Tables 5–6</p>
+  <h2>Detect, OBB and Segment after SAHI</h2>
+  <div class="ds-deck__two" style="align-items:start">
+    <div>
+      <table class="ds-deck__table" style="font-size:13.5px">
+        <thead><tr><th>Model</th><th class="num">mAP@0.5</th><th class="num">@0.5:0.95</th><th class="num">@0.75</th></tr></thead>
+        <tbody>
+          <tr><td>YOLOv11-detect</td><td class="num"><b>0.9623</b></td><td class="num">0.4877</td><td class="num">0.3811</td></tr>
+          <tr><td>YOLOv11-obb</td><td class="num">0.9539</td><td class="num">0.3743</td><td class="num">0.4281</td></tr>
+          <tr><td>YOLOv11-seg</td><td class="num">0.9476</td><td class="num"><b>0.4937</b></td><td class="num"><b>0.4411</b></td></tr>
+        </tbody>
+      </table>
+      <p class="ds-deck__small" style="margin-top:8px">All three find the targets (mAP@0.5 &gt; 0.94). At the strict IoU 0.75, detect drops to 0.381 while OBB and segment hold 0.428 and 0.441: their boxes and masks fit tighter.</p>
+    </div>
+    <div>
+      <div class="pv-legend"><span><i style="background:var(--pv-s2)"></i>false positives</span><span><i style="background:var(--pv-s1)"></i>false negatives</span></div>
+      <div class="pv-chart" id="obb-pr"></div>
+      <p class="ds-deck__foot">Precision 0.929 / 0.912 / 0.873, recall 0.958 / 0.955 / 0.955. Extra OBB detections are filtered against AIS in the localization analysis.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Centroid Error" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Table 7</p>
+  <h2>Centroid Localization Against AIS</h2>
+  <div class="pv-ctrl"><span>Statistic</span><div class="pv-seg" id="obb-cen-m"><button type="button" data-v="mean" class="is-on">Mean</button><button type="button" data-v="median">Median</button><button type="button" data-v="max">Max</button><button type="button" data-v="std">Std. dev.</button></div>
+    <span class="pv-legend" style="margin:0"><span><i style="background:var(--pv-base)"></i>detect</span><span><i style="background:var(--pv-s2)"></i>OBB</span><span><i style="background:var(--pv-s1)"></i>segment</span></span></div>
+  <div class="pv-chart" id="obb-cen"></div>
+  <div class="ds-deck__callout ds-deck__small">Tiled YOLOv11 + SAHI, matched detections of Vessels 2 and 4 (Vessel 3 is seen only intermittently). Every model stays <b>below 10 px</b> on average; <b>OBB</b> has the lowest mean and median error for both vessels (6.30 / 6.00 px and 5.06 / 5.10 px).</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Qualitative Comparison" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Fig. 4</p>
+  <h2>Ground Truth vs Detect, OBB and Segment</h2>
+  <div class="obb-side obb-view" style="grid-template-columns:300px 300px minmax(0,1fr)">
+    <figure style="margin:0"><img src="img/obb/f4_gt.webp" alt="Ground-truth axis-aligned boxes" width="520" height="521"><figcaption class="ds-deck__caption">Ground truth</figcaption></figure>
+    <figure style="margin:0"><img id="obb-f4-img" src="img/obb/f4_obb.webp" alt="" width="520" height="520"><figcaption class="ds-deck__caption" id="obb-f4-cap"></figcaption></figure>
+    <div>
+      <div class="pv-seg" id="obb-f4-v"><button type="button" data-v="detect">Detect</button><button type="button" data-v="obb" class="is-on">OBB</button><button type="button" data-v="seg">Segment</button></div>
+      <p class="pv-note" id="obb-f4-note" style="margin-top:8px"></p>
+    </div>
+  </div>
+  <p class="ds-deck__foot">Tiled models with SAHI (640 px slices, 20% overlap), confidence 0.5; a frame with several small, distant targets, all detected.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="True and False Detections" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Fig. 5</p>
+  <h2>True Positives, False Positives, Misses</h2>
+  <div class="obb-side obb-view" style="grid-template-columns:240px minmax(0,1fr)">
+    <figure style="margin:0"><img id="obb-f5-img" src="img/obb/f5_obb.webp" alt="" width="360" height="491" style="width:240px"><figcaption class="ds-deck__caption" id="obb-f5-cap"></figcaption></figure>
+    <div>
+      <div class="pv-seg" id="obb-f5-v" style="max-width:240px"><button type="button" data-v="gt">Ground truth</button><button type="button" data-v="detect">Detect</button><button type="button" data-v="obb" class="is-on">OBB</button><button type="button" data-v="seg">Segment</button></div>
+      <p class="pv-note" id="obb-f5-note" style="margin-top:8px"></p>
+      <div class="obb-checks" style="margin-top:6px"><span><i style="background:#22c55e"></i>true positive</span><span><i style="background:#eab308"></i>false positive</span><span><i style="background:#ef4444"></i>false negative</span></div>
+    </div>
+  </div>
+  <p class="ds-deck__foot">Frame 069 of the test set, cropped to the upper half of the display.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Failure Cases" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Fig. 6</p>
+  <h2>Where the Pipeline Still Fails</h2>
+  <div class="obb-side obb-view">
+    <figure style="margin:0"><img id="obb-f6-img" src="img/obb/fail_a.webp" alt="" width="420" height="420"></figure>
+    <div>
+      <div class="pv-seg" id="obb-f6-v" style="flex-direction:row;flex-wrap:wrap"><button type="button" data-v="a" class="is-on">(a) weak echo</button><button type="button" data-v="b">(b) wave clutter</button><button type="button" data-v="c">(c) slicing</button><button type="button" data-v="d">(d) manoeuvre</button><button type="button" data-v="e">(e) split echo</button><button type="button" data-v="f">(f) merged</button></div>
+      <p class="pv-note" id="obb-f6-note" style="margin-top:10px"></p>
+      <div class="ds-deck__callout ds-deck__small">Most remaining errors come from the signal (low SNR, sea state), the geometry (manoeuvres, merging) or the slicing itself, which points to clutter suppression, adaptive slicing and multi-sensor fusion as next steps.</div>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Efficiency and Discussion" data-section="Discussion">
+  <p class="ds-deck__kicker">4 · Discussion · Section 3.5</p>
+  <h2>Efficiency and Discussion</h2>
+  <div class="pv-kpis">
+    <div class="pv-kpi"><span>Model size</span><b>5.5–6.0 MB</b><small>detect · OBB · seg</small></div>
+    <div class="pv-kpi"><span>Peak memory</span><b>&lt; 4.2 GB</b><small>all configurations</small></div>
+    <div class="pv-kpi"><span>Full image</span><b>18–22 FPS</b><small>1050 × 1024 frames</small></div>
+    <div class="pv-kpi is-best"><span>Tiled OBB + SAHI</span><b>4–6 FPS</b><small>3–4× slower, more precise</small></div>
+  </div>
+  <div class="ds-deck__grid ds-deck__grid--2 ds-deck__small" style="margin-top:12px">
+    <div class="ds-deck__card"><strong>Two problems, one pipeline</strong><p>Tiling and SAHI remove the resolution mismatch; the OBB head adds boxes aligned with each vessel's extent and heading.</p></div>
+    <div class="ds-deck__card"><strong>Speed is adequate</strong><p>4–6 FPS suits collision avoidance and AIS-linked tracking at typical vessel speeds, where precise boxes matter more than frame rate.</p></div>
+    <div class="ds-deck__card"><strong>Masks have uses too</strong><p>Segmentation helps with wake suppression and separating overlapping echoes.</p></div>
+    <div class="ds-deck__card"><strong>Limits</strong><p>One radar dataset and display; fixed HSV thresholds for labelling; no sea-state labels yet.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Conclusion" data-section="Conclusion">
+  <p class="ds-deck__kicker">5 · Conclusion</p>
+  <h2>Conclusion and Future Work</h2>
+  <ul>
+    <li>Tiled training + SAHI + YOLOv11-OBB detects vessels in real X-band PPI images with <b>mAP@0.5 &gt; 0.95</b> and <b>sub-10-pixel</b> centroid error.</li>
+    <li>Tiling beats resizing for every task; tiled OBB reaches 0.989 mAP@0.5 and 0.882 mAP@0.5:0.95.</li>
+    <li>Oriented boxes give the tightest fits and the lowest centroid error against AIS.</li>
+    <li>~6 MB models at 4–6 FPS: practical on edge hardware for small and medium vessels.</li>
+  </ul>
+  <h3 style="margin-top:12px">Next steps</h3>
+  <ul class="ds-deck__small">
+    <li>Faster pipeline: pruning, lighter backbones</li>
+    <li>Sea-state labels to study error versus wave height and clutter</li>
+    <li>Cross-dataset evaluation as more public marine radar data appear</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Check Questions" data-section="Conclusion">
+  <p class="ds-deck__kicker">5 · Conclusion</p>
+  <h2>Check Questions</h2>
+  <ol class="ds-deck__small">
+    <li>Why do small, distant vessels suffer most when a 1050 × 1024 frame is resized to 640 × 640?</li>
+    <li>At what heading does an axis-aligned box fit an elongated echo worst, and why?</li>
+    <li>Why can the OBB model have more false positives than detect yet a lower centroid error?</li>
+    <li>Halving the SAHI slice size from 640 px to 320 px: what happens to accuracy and to cost?</li>
+    <li>Why is the train / test split temporal rather than random?</li>
+  </ol>
+  <details class="ds-deck__answers">
+    <summary>Show answers</summary>
+    <ol>
+      <li>The resize shrinks every echo by about 0.6×; a few-pixel target can drop below what the feature maps resolve. Tiles keep the native pixels.</li>
+      <li>Near 45°: the box must cover both the length and the width projections, so it includes the most empty space and clutter.</li>
+      <li>Extra detections are filtered against AIS; for the matched vessels, the oriented box follows the hull, so its centre sits closer to the true position.</li>
+      <li>mAP@0.75 rises (0.381 → 0.486), but the number of slices roughly quadruples, so inference becomes slower.</li>
+      <li>Consecutive frames of one track are nearly identical; a random split would put near-duplicates in both sets.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Selected References" data-section="References">
+  <p class="ds-deck__kicker">References</p>
+  <h2>Selected References</h2>
+  <ul class="ds-deck__small">
+    <li>F. C. Akyon, S. O. Altınuç, A. Temizel, "Slicing aided hyper inference and fine-tuning for small object detection," <em>IEEE ICIP</em>, pp. 966–970, 2022.</li>
+    <li>J. S. Fowdur, M. Baum, F. Heymann, "Real-world marine radar datasets for evaluating target tracking methods," <em>Sensors</em>, vol. 21, 4641, 2021; data: <a href="https://doi.org/10.26090/rwmr">doi:10.26090/rwmr</a>.</li>
+    <li>X. Chen et al., "Multi-Dimensional Automatic Detection of Scanning Radar Images of Marine Targets Based on Radar PPInet," <em>Remote Sensing</em>, vol. 13, 3856, 2021.</li>
+    <li>G. Jocher, J. Qiu, Ultralytics YOLO11 (2024) and YOLO26 (2026), github.com/ultralytics/ultralytics.</li>
+  </ul>
+  <p class="ds-deck__foot">See the full article for the complete reference list. Figures are reproduced from the article (CC BY 4.0); some are cropped or stacked for interaction.</p>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="How to Cite" data-section="">
+  <h1 style="font-size:40px">Thank You</h1>
+  <div class="ds-deck__subtitle">High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB</div>
+  <div class="ds-deck__callout" style="max-width:640px;text-align:left;margin-top:22px">
+    <b>How to cite:</b> Külcü, S. (2026). High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB. <em>Sensors, 26</em>(3), 942. <a href="https://doi.org/10.3390/s26030942">doi:10.3390/s26030942</a>
+  </div>
+  <small>sercan.kulcu@giresun.edu.tr · <a href="/publications/">All publications</a></small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Previous slide">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Next slide">→</button>
+        <span class="ds-deck__section" id="ds-deck-section"></span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Go to slide"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/pv.js"></script>
+<script src="deck/obb.js"></script>
+<script src="deck/deck.js"></script>
