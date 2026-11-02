@@ -131,7 +131,10 @@
         PV.el(g, "rect", { x: xr - 14, y: ya, width: 28, height: yb - ya, rx: 6, fill: "none", stroke: "var(--ds-border-base)" });
         PV.el(g, "text", { x: xr + 20, y: (ya + yb) / 2 + 4, class: "tk" }, "→ group " + (q + 1));
       }
-      $(prefix + "-shuf-note").textContent = "Each of the " + G + " next groups now receives one channel from every previous group, so information flows between groups at no extra cost (" + C + " channels, reshape → transpose → flatten).";
+      $(prefix + "-shuf-note").textContent = (n >= G
+        ? "Each of the " + G + " next groups now receives " + (n === G ? "one channel" : "channels") + " from every previous group, so information flows between groups at no extra cost"
+        : "With fewer channels per group than groups, each next group receives channels from only " + n + " of the " + G + " previous groups; full mixing needs at least as many channels per group as groups") +
+        " (" + C + " channels, reshape → transpose → flatten).";
     }
     [gs, ns].forEach(function (e) { e.addEventListener("input", draw); });
     draw();

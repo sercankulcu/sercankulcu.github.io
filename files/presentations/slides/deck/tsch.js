@@ -132,8 +132,9 @@
       LINKS.forEach(function (l) {
         [[l[0], l[1]], [l[1], l[0]]].forEach(function (p) {
           const own = p[0], nb = p[1];
-          const slot = hash(nb, own) % L, ch = hash(own, nb) % LHOP;
-          /* the receiver computes slotRX = hash(IDo, IDn) with its own and the sender's id: the same cell */
+          const slot = hash(nb, own) % L, ch = hash(Math.min(own, nb), Math.max(own, nb)) % LHOP;
+          /* the receiver computes slotRX = hash(IDo, IDn) with its own and the sender's id: the same slot;
+             the channel hash is taken over the unordered id pair so both ends also pick the same channel */
           rows.push({ tx: own, rx: nb, slot: slot, ch: ch });
           const k = slot + "_" + ch;
           (cellsMap[k] = cellsMap[k] || []).push(own + "→" + nb);
@@ -198,9 +199,9 @@
     const N = {
       a: "<b>Synchronization latency.</b> Time until the whole network is synchronized grows with size. Pure steerable antennas are much slower (narrow coverage during discovery); SAA6 stays close to omni by repeating control frames in autonomous cells.",
       b: "<b>Shared-cell collisions.</b> Denser networks (shorter distance) collide more. Steerable antennas cut shared-cell collisions by more than 20% without tuning the EB interval.",
-      c: "<b>PDR vs transmission interval</b> (4 channels). Short intervals run out of cells; SAA6 delivers up to 30% more packets thanks to spatial separation.",
-      d: "<b>PDR vs channels</b> (3 s interval). With few channels, cells reuse channel offsets and interfere; direction acts as a third scheduling dimension.",
-      e: "<b>Energy.</b> Lower receive probability means more retransmissions; the longer range of SAA6 saves up to 20% energy."
+      c: "<b>PDR vs transmission interval</b> (4 channels). Short intervals run out of cells; SAA6 delivers up to about 30 percentage points more packets (≈ 95% vs 65% at 3 s) thanks to spatial separation.",
+      d: "<b>PDR vs channels</b> (3 s interval). With few channels, cells reuse channel offsets and interfere; direction acts as a third scheduling dimension. With a single channel SAA6 still delivers about 76% vs 33% for omni.",
+      e: "<b>Energy.</b> Lower receive probability means more retransmissions; the longer range of SAA6 lowers energy by about 8% at 100% and about 13% at 70% receive probability in Fig. 6(e)."
     };
     PV.seg($("tsch-f6-v"), function (v) { img.src = "img/tsch/f6" + v + ".webp"; img.alt = "Figure 6(" + v + ")"; note.innerHTML = N[v]; });
     ["a", "b", "c", "d", "e"].forEach(function (k) { new Image().src = "img/tsch/f6" + k + ".webp"; });

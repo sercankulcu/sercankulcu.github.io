@@ -124,7 +124,7 @@
       const reach = Math.pow(10, both / 25);
       out.innerHTML = mode === "steer" ?
         T("Steerable antenna, Eq. (3): G(θ) = 10(1 + cos θ) − 15 dBi, so +5 dBi on boresight, −5 dBi at 90° and −15 dBi behind. Two aligned antennas reach about <b>",
-          "Döner yönlü anten, Denklem (3): G(θ) = 10(1 + cos θ) − 15 dBi; tam karşıda +5 dBi, 90°'de −5 dBi, arkada −15 dBi. Birbirine bakan iki anten yaklaşık <b>") + num(reach) + T(" m</b>; facing away they hear each other only within a few metres.", " m</b> uzağa ulaşır; sırt sırta durduklarında yalnızca birkaç metreden duyulurlar.") :
+          "Döner yönlü anten, Denklem (3): G(θ) = 10(1 + cos θ) − 15 dBi; tam karşıda +5 dBi, 90°'de −5 dBi, arkada −15 dBi. Birbirine bakan iki anten yaklaşık <b>") + num(reach) + T(" m</b> under this threshold (the thesis reports up to 80 m); facing away they hear each other only within a few metres.", " m</b> uzağa ulaşır (tezde en çok 80 m); sırt sırta durduklarında yalnızca birkaç metreden duyulurlar.") :
         mode === "omni" ? T("Omnidirectional: 0 dBi in every direction, 50 m range, and every neighbour within 100 m is disturbed.", "Tüm yönlü: her yönde 0 dBi, 50 m menzil; 100 m içindeki her komşu girişimden etkilenir.") :
           T("Switched beams: each antenna covers a fixed sector (", "Anahtarlanabilir huzme: her anten sabit bir dilimi kapsar (") + (360 / K[mode]) + T("°). Only the antenna that faces the neighbour is used for unicast, so the other sectors stay quiet.", "°). Tekil gönderimde yalnızca komşuya bakan anten kullanılır, diğer dilimler sessiz kalır.");
     }
@@ -330,7 +330,7 @@
         "<tr><th></th><th class='num'>TX</th><th class='num'>RX</th><th class='num'>" + T("channel", "kanal") + "</th></tr>" +
         "<tr><td>" + o + " → " + k + "</td><td class='num'><b>" + a.tx + "</b></td><td class='num'>" + a.rx + "</td><td class='num'>" + a.ch + "</td></tr>" +
         "<tr><td>" + k + " → " + o + "</td><td class='num'>" + b.tx + "</td><td class='num'><b>" + b.rx + "</b></td><td class='num'>" + b.ch + "</td></tr>";
-      $("th-hash-note").innerHTML = (a.tx === b.rx && a.rx === b.tx ?
+      $("th-hash-note").innerHTML = (o !== k && a.tx === b.rx && a.rx === b.tx ?
         T("One node's TX slot is the other's RX slot on the same channel: no 6P negotiation needed. ",
           "Bir düğümün TX dilimi diğerinin aynı kanaldaki RX dilimidir: 6P anlaşması gerekmez. ") : "") +
         (o === k ? T("Pick two different IDs.", "İki farklı kimlik seçin.") :
@@ -374,10 +374,10 @@
       bars(host, [1, 2, 3].map(function (c) { return c + T(" channel", " kanal") + (c > 1 && !TR ? "s" : ""); }), S, D[v],
         T("Schedule length by antenna and number of channels", "Anten ve kanal sayısına göre çizelge uzunluğu"), T("slots", "dilim"), 180);
       $("th-t5-note").textContent = v === "30" ?
-        T("With nodes 30 m apart (more neighbours, more interference) and a single channel, the steerable antenna needs 131 slots instead of 173 (−24%).",
-          "Düğümler 30 m aralıklıyken (daha çok komşu, daha çok girişim) ve tek kanalda döner yönlü anten 173 yerine 131 dilim kullanır (−%24).") :
-        T("At 40 m spacing: 113 instead of 146 slots with one channel (−23%). From two channels on, both reach 80 slots: frequency diversity is then enough.",
-          "40 m aralıkta tek kanalda 146 yerine 113 dilim (−%23). İki kanaldan itibaren ikisi de 80 dilime iner: frekans çeşitliliği artık yeterlidir.");
+        T("81-node grid, data packets only. With nodes 30 m apart (more neighbours, more interference) and a single channel, the steerable antenna needs 131 slots instead of 173 (−24%).",
+          "81 düğümlü ızgara, yalnızca veri paketleri. Düğümler 30 m aralıklıyken (daha çok komşu, daha çok girişim) ve tek kanalda döner yönlü anten 173 yerine 131 dilim kullanır (−%24).") :
+        T("81-node grid, data packets only. At 40 m spacing: 113 instead of 146 slots with one channel (−23%). From two channels on, both reach 80 slots: frequency diversity is then enough.",
+          "81 düğümlü ızgara, yalnızca veri paketleri. 40 m aralıkta tek kanalda 146 yerine 113 dilim (−%23). İki kanaldan itibaren ikisi de 80 dilime iner: frekans çeşitliliği artık yeterlidir.");
     });
   })();
 

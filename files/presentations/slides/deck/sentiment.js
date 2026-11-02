@@ -150,7 +150,7 @@
       alg: { rows: [{ k: "Complement NB", a: 79.38, p: .977, f: .880 }, { k: "Naive Bayes", a: 78.61, p: .972, f: .873 }, { k: "Logistic Regression", a: 63.12, p: .615, f: .620 }], best: 0,
         n: "Table 4: both Bayes variants are far ahead of logistic regression; Complement NB is best on all three metrics." },
       ngram: { rows: [{ k: "Unigrams", a: 79.38, p: .977, f: .880 }, { k: "Bigrams", a: 77.91, p: .974, f: .864 }, { k: "Trigrams", a: 76.37, p: .932, f: .855 }], best: 0,
-        n: "Table 6 (Complement NB, 2 classes): single words work best; longer n-grams add sparse features that overfit a small dataset, as in Pang et al." },
+        n: "Table 6 (Complement NB, 2 classes): single words work best, as in Pang et al.; longer n-grams add features that overfit a small dataset." },
       cls: { rows: [{ k: "Neg / Pos", a: 79.38, p: .977, f: .880 }, { k: "Neg / Pos+Neu", a: 79.42, p: .985, f: .880 }, { k: "Neg / Neu / Pos", a: 67.62, p: .667, f: .794 }, { k: "SentiStrength", k2: "(3 classes)", a: 67.47, p: .562, f: .593 }], best: 1,
         n: "Table 7: two-class settings reach about 79%; adding a neutral class costs about 12 points. The public SentiStrength Twitter set behaves similarly." },
       lr: { rows: [{ k: "rate 0.7", a: 56.3, p: .565, f: .570 }, { k: "rate 0.8", a: 62.7, p: .667, f: .671 }, { k: "rate 0.9", a: 63.1, p: .641, f: .675 }, { k: "rate 1.0", a: 62.9, p: .635, f: .670 }], best: 2,
@@ -190,7 +190,7 @@
       });
       $("tw-size-note").textContent = pct ? "Accuracy rises steadily from 68% to 79.4% and flattens after 5,500 tweets." :
         k === "p" ? "Precision jumps around (0.79 to 0.99): with small test sets a few tweets change it a lot." :
-          "F1 climbs from 0.80 to 0.88 overall, with a dip at 2,000 tweets.";
+          "F1 dips from 0.855 to 0.800 at 2,000 tweets, then climbs to 0.880 at 6,000.";
     });
   })();
 

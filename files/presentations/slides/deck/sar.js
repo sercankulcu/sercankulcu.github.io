@@ -17,7 +17,7 @@
     ["YOLOv7-tiny", 90.7, 82.4, 81.9, 54.7, 6.2]
   ].map(function (r) { return { name: r[0], p: r[1], r: r[2], m50: r[3], m95: r[4], params: r[5] }; });
 
-  /* Tables II and III: YOLOv8n at six input sizes (Table III measured on 250 random test images) */
+  /* Tables II and III: YOLOv8n at six input sizes (Table III measured on 250 randomly selected images) */
   const RES = [
     { px: 640, p: 90.4, r: 84.1, m50: 90.5, m95: 66.6, ms: 4.71, fps: 212.30, mem: 211 },
     { px: 800, p: 91.9, r: 84.2, m50: 92.6, m95: 67.5, ms: 6.82, fps: 146.55, mem: 271 },
@@ -258,7 +258,7 @@
         1024: ["miss", "Two ships fewer than the ground truth: the largest loss in recall on this sample."],
         1280: ["miss", "One ship fewer than the ground truth."],
         1344: ["extra", "One detection more than the ground truth: an over-detection (false positive)."],
-        1600: ["ok", "Closest to the ground truth: small targets are kept and no extra target appears."]
+        1600: ["ok", "Best result on this sample: small target details are preserved and the detections are the most consistent with the ground truth."]
       }
     };
     const LABEL = { ok: "consistent", miss: "missed", extra: "extra" };

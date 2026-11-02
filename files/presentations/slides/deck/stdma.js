@@ -128,18 +128,19 @@
     const D = {
       25: [[94.87, 1267, 3.21], [97.94, 595, 1.55], [100, 536, 1.26]],
       49: [[83.55, 1560, 3.65], [87.61, 1174, 1.82], [88.77, 1094, 1.49]],
-      73: [[61.04, 2254, 4.09], [63.49, 1594, 1.89], [66.74, 1544, 1.65]]
+      73: [[61.04, 2254, 4.09], [63.49, 1594, 1.89], [66.74, 1544, 1.65]],
+      101: [[39.13, 3145, 5.08], [42.17, 2324, 2.31], [44.06, 1793, 1.77]]
     };
-    const M = { prr: [0, "PRR (%)", 100, 20, 2], delay: [1, "Delay (ms)", 2500, 500, 0], energy: [2, "Energy (mWh)", 5, 1, 2] };
+    const M = { prr: [0, "PRR (%)", 100, 20, 2], delay: [1, "Delay (ms)", 3500, 500, 0], energy: [2, "Energy (mWh)", 6, 1, 2] };
     const COL = ["var(--pv-base)", "var(--pv-s1)", "var(--pv-s2)"];
     PV.seg($("st-size-m"), function (k) {
-      const m = M[k], cats = ["25", "49", "73"];
+      const m = M[k], cats = ["25", "49", "73", "101"];
       const W = 720, H = 236, L = 56, R = 700, T = 30, B = 200;
       const c = PV.svg(host, W, H, m[1] + " by network size and antenna count"), g = c.svg;
       const y = PV.linear(0, m[2], B, T);
       for (let v = 0; v <= m[2] + 1e-9; v += m[3]) { PV.el(g, "line", { x1: L, x2: R, y1: y(v), y2: y(v), class: v ? "gl" : "ax" }); PV.el(g, "text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", class: "tk" }, v); }
       PV.el(g, "text", { x: L, y: 12, class: "tk" }, m[1] + " · 4 channels, 1 packet/s, 100% link success");
-      const band = (R - L) / 3, bw = 58;
+      const band = (R - L) / cats.length, bw = 44;
       cats.forEach(function (n, i) {
         [0, 1, 2].forEach(function (a) {
           const v = D[n][a][m[0]], bx = L + band * i + band / 2 - 1.5 * bw - 2 + a * (bw + 2);
@@ -162,7 +163,7 @@
     Object.keys(notes).forEach(function (k) { new Image().src = "img/stdma/" + k + ".webp"; });
   }
   viewer("st-f6-v", "st-f6-img", "st-f6-note", {
-    fig6a: ["PRR under 100% link success", "<b>100% link success.</b> With 1 channel the single antenna collapses to under 20% PRR at 2 packets/s, while 2–3 antennas keep far more. With 4 channels the antennas still help at high rates."],
+    fig6a: ["PRR under 100% link success", "<b>100% link success.</b> With 1 channel the single antenna collapses to about 12% PRR at 2 packets/s, while 2–3 antennas keep about 68–78%. With 4 channels the antennas still help at high rates."],
     fig6b: ["PRR under 80% link success", "<b>80% link success.</b> Retransmissions add traffic and collisions, so directional antennas matter even more; the gain reaches up to 100% PRR improvement."],
     fig7a: ["Delay of SF-DA", "<b>Delay.</b> More antennas mean more parallel transmissions and shorter queues, so the mean delay drops at every traffic level."],
     fig7b: ["Energy of SF-DA", "<b>Energy.</b> A 180° antenna needs half the transmit power of omni for the same range; fewer collisions mean fewer retransmissions. The saving grows as links get worse."]
