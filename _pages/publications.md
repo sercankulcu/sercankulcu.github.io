@@ -66,7 +66,7 @@ This study addresses the loss of small bacterial colonies caused by resizing hig
 
 **How to cite:** Külcü, S., & Balpetek Külcü, D. (2026). Overcoming resolution constraints in automated colony counting via a high-performance deep learning framework using SAHI. *Scientific Reports, 16*, 24516.
 
-[Paper](https://doi.org/10.1038/s41598-026-55724-1) · [Presentation](/files/presentations/Overcoming_Resolution_Constraints_Presentation.pdf)
+[Paper](https://doi.org/10.1038/s41598-026-55724-1) · [Presentation](/files/presentations/slides/Overcoming_Resolution_Constraints_Presentation.html)
 
 </details>
 

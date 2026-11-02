@@ -129,6 +129,29 @@ window.PV = (function () {
     });
   }
 
+  /* before / after comparison: .pv-wipe holds two stacked images; the top one is clipped at the divider */
+  function wipe(box) {
+    const top = box.querySelector(".pv-wipe__top"), range = box.querySelector("input"), bar = box.querySelector(".pv-wipe__bar");
+    function set(v) {
+      top.style.clipPath = "inset(0 0 0 " + v + "%)";
+      bar.style.left = v + "%";
+      range.value = v;
+    }
+    function fromPointer(e) {
+      const r = box.getBoundingClientRect();
+      set(Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100)));
+    }
+    let drag = false;
+    box.addEventListener("pointerdown", function (e) { drag = true; box.setPointerCapture(e.pointerId); fromPointer(e); e.stopPropagation(); });
+    box.addEventListener("pointermove", function (e) { if (drag) fromPointer(e); });
+    box.addEventListener("pointerup", function () { drag = false; });
+    box.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+    box.addEventListener("touchend", function (e) { e.stopPropagation(); });
+    range.addEventListener("input", function () { set(+range.value); });
+    set(50);
+  }
+  document.querySelectorAll("#ds-deck .pv-wipe").forEach(wipe);
+
   function fmt(v, d) { return v === null || v === undefined ? "–" : Number(v).toFixed(d === undefined ? 1 : d); }
 
   const allowed = ["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) >= 0;

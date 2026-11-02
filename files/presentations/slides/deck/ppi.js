@@ -61,29 +61,7 @@
     });
   })();
 
-  /* ---------- 2. before / after wipe ---------- */
-  document.querySelectorAll("#ds-deck .ppi-wipe").forEach(function (box) {
-    const top = box.querySelector(".ppi-wipe__top"), range = box.querySelector("input"), bar = box.querySelector(".ppi-wipe__bar");
-    function set(v) {
-      top.style.clipPath = "inset(0 0 0 " + v + "%)";
-      bar.style.left = v + "%";
-      range.value = v;
-    }
-    function fromPointer(e) {
-      const r = box.getBoundingClientRect();
-      set(Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100)));
-    }
-    let drag = false;
-    box.addEventListener("pointerdown", function (e) { drag = true; box.setPointerCapture(e.pointerId); fromPointer(e); e.stopPropagation(); });
-    box.addEventListener("pointermove", function (e) { if (drag) fromPointer(e); });
-    box.addEventListener("pointerup", function () { drag = false; });
-    box.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
-    box.addEventListener("touchend", function (e) { e.stopPropagation(); });
-    range.addEventListener("input", function () { set(+range.value); });
-    set(50);
-  });
-
-  /* ---------- 3. preprocessing lab on the raw PPI frame ---------- */
+  /* ---------- 2. preprocessing lab on the raw PPI frame ---------- */
   (function lab() {
     const canvas = $("ppi-lab");
     if (!canvas) return;
@@ -207,7 +185,7 @@
     ksl.addEventListener("input", draw);
   })();
 
-  /* ---------- 4. kernel size viewer (Fig. 2) ---------- */
+  /* ---------- 3. kernel size viewer (Fig. 2) ---------- */
   (function kernels() {
     const img = $("ppi-k-img");
     if (!img) return;
@@ -238,7 +216,7 @@
     draw();
   })();
 
-  /* ---------- 5. P2 layer: how many feature cells does a small object cover? ---------- */
+  /* ---------- 4. P2 layer: how many feature cells does a small object cover? ---------- */
   (function strides() {
     const host = $("ppi-p2");
     if (!host) return;
@@ -268,7 +246,7 @@
     draw();
   })();
 
-  /* ---------- 6. area-aware loss: box checker and loss share ---------- */
+  /* ---------- 5. area-aware loss: box checker and loss share ---------- */
   (function loss() {
     const host = $("ppi-loss-box");
     if (!host) return;
@@ -299,7 +277,7 @@
     draw();
   })();
 
-  /* ---------- 7. results explorer (Tables 3–5) ---------- */
+  /* ---------- 6. results explorer (Tables 3–5) ---------- */
   (function explorer() {
     const host = $("ppi-ex");
     if (!host) return;
@@ -341,7 +319,7 @@
     draw();
   })();
 
-  /* ---------- 8. the fixed-object journey ---------- */
+  /* ---------- 7. the fixed-object journey ---------- */
   (function journey() {
     const host = $("ppi-jr");
     if (!host) return;
@@ -352,7 +330,7 @@
         { n: "YOLOv8s", col: "var(--pv-s1)", v: [RESULTS.raw.YOLOv8s[1][mi], RESULTS.prep.YOLOv8s[1][mi], RESULTS.enh["YOLOv8s + P2"][1][mi], RESULTS.enh["YOLOv8s + P2 + Loss"][1][mi]] },
         { n: "YOLOv12s", col: "var(--pv-s2)", v: [RESULTS.raw.YOLOv12s[1][mi], RESULTS.prep.YOLOv12s[1][mi], RESULTS.enh["YOLOv12s + P2"][1][mi], RESULTS.enh["YOLOv12s + P2 + Loss"][1][mi]] }
       ];
-      const W = 720, H = 270, L = 50, R = 600, T = 16, B = 236;
+      const W = 720, H = 226, L = 50, R = 600, T = 16, B = 192;
       const c = PV.svg(host, W, H, METRICS[metric] + " of the fixed class across the four stages");
       const g = c.svg;
       const lo = 0.2, hi = 1.0;
@@ -375,7 +353,7 @@
     });
   })();
 
-  /* ---------- 9. inference latency (Tables 6–7) ---------- */
+  /* ---------- 8. inference latency (Tables 6–7) ---------- */
   (function latency() {
     const host = $("ppi-lat");
     if (!host) return;
@@ -408,7 +386,7 @@
     });
   })();
 
-  /* ---------- 10. Table 9: accuracy vs computational cost ---------- */
+  /* ---------- 9. Table 9: accuracy vs computational cost ---------- */
   (function backbones() {
     const host = $("ppi-bb");
     if (!host) return;
@@ -449,12 +427,12 @@
     });
   })();
 
-  /* ---------- 11. DAAN external validation (Table 10) ---------- */
+  /* ---------- 10. DAAN external validation (Table 10) ---------- */
   (function daan() {
     const host = $("ppi-daan");
     if (!host) return;
     const D = [["Raw", 3301, 41, 1339, .6983, .6750], ["Preproc.", 4296, 230, 344, .9149, .7243], ["Preproc. + P2", 4306, 315, 334, .9169, .7406], ["Preproc. + P2 + Loss", 4329, 315, 311, .9218, .7451]];
-    const W = 720, H = 230, L = 56, R = 700, T = 14, B = 196;
+    const W = 720, H = 196, L = 56, R = 700, T = 14, B = 162;
     const c = PV.svg(host, W, H, "Missed detections and false alarms on DAAN");
     const g = c.svg;
     const y = PV.linear(0, 1400, B, T);
