@@ -24,6 +24,22 @@ details a:hover {
 
 ## Journal Articles
 
+<div class="publication-title">2026 - Impact of Temporal Resampling Interval on Deep Learning-Based Vessel Trajectory Prediction Using AIS Data</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+This study treats the temporal resampling interval of AIS trajectories as an experimental variable, building 1, 5, 10, and 20 min datasets from NOAA AIS data and comparing LSTM, GRU, BiLSTM, Transformer, Transformer-LSTM, Transformer-GRU, and a constant speed-course baseline on three dates. Prediction error rises with coarser sampling and the model ranking changes with the interval: GRU leads at 1 min, Transformer-GRU at 20 min, and the simple baseline remains competitive for smooth motion.
+
+**How to cite:** Külcü, S., & Kondiloğlu, A. (2026). Impact of temporal resampling interval on deep learning-based vessel trajectory prediction using AIS data. *Gümüşhane University Journal of Science, 16*(4), 1160–1178.
+
+[Paper](https://doi.org/10.17714/gumusfenbil.1943803) · [Presentation](/files/presentations/slides/Impact_of_Temporal_Resampling_Presentation.html)
+
+</details>
+
+---
+
 <div class="publication-title">2026 - Enhancing Radar PPI-Based Maritime Object Detection Using Hybrid Preprocessing and Deep Learning Approach</div>
 
 <details markdown="1">
@@ -169,6 +185,22 @@ This review examines the use of computer vision for food quality assessment, inc
 ---
 
 ## Conference Proceedings
+
+<div class="publication-title">2026 - Impact of Input Resolution on Lightweight Small Ship Detection in SAR Imagery</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+This study compares 15 YOLO-based detectors on the HRSID SAR dataset and then trains YOLOv8n at six input sizes from 640 to 1600 px to isolate the effect of resolution on small ship detection. The 1600 px configuration reaches 94.8% mAP50 and 74.6% mAP50:95 with only 3.2 million parameters, while latency, throughput, and GPU memory measurements show the accuracy–cost trade-off of each operating point.
+
+**How to cite:** Külcü, S. (2026). Impact of Input Resolution on Lightweight Small Ship Detection in SAR Imagery. In *2026 10th International Artificial Intelligence and Data Processing Symposium (IDAP)*. IEEE.
+
+[Paper](https://doi.org/10.1109/IDAP71869.2026.11727884) · [Presentation](/files/presentations/slides/Impact_of_Input_Resolution_Presentation.html)
+
+</details>
+
+---
 
 <div class="publication-title">2025 - Nucleus Segmentation in Heterogeneous Microscopy Images on the Data Science Bowl 2018 Dataset</div>
 

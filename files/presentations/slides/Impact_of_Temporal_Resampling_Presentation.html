@@ -1,0 +1,487 @@
+---
+layout: without-sidebar
+title: "Impact of Temporal Resampling Interval on Deep Learning-Based Vessel Trajectory Prediction Using AIS Data"
+permalink: /files/presentations/slides/Impact_of_Temporal_Resampling_Presentation.html
+excerpt: "Interactive presentation of the GUJS paper: how resampling AIS trajectories at 1, 5, 10 and 20 minutes changes the error and the ranking of LSTM, GRU, BiLSTM, Transformer, hybrid Transformer models and a constant speed-course baseline."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/paper.css">
+<style>
+.ds-deck .ais-side { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 16px; align-items: start; }
+.ds-deck .ais-side--wide { grid-template-columns: 472px minmax(0, 1fr); }
+.ds-deck .ais-side .ds-deck__table { font-size: 13px; line-height: 1.25; }
+.ds-deck .ais-side .ds-deck__table td { padding: 4px 8px; }
+.ds-deck .ais-miss { display: grid; grid-template-columns: 70px minmax(0, 1fr) 54px; gap: 4px 8px; align-items: center; font-size: 13.5px; }
+.ds-deck .ais-miss > i { display: block; height: 14px; border-radius: 0 4px 4px 0; background: var(--pv-s1); }
+.ds-deck .ais-miss > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.ds-deck .ais-eq { margin: 6px 0; padding: 8px 12px; border-radius: 10px; background: var(--ds-surface-strong); font: 15px "Cambria Math", "STIX Two Math", "Times New Roman", serif; text-align: center; }
+.ds-deck .ais-eq sub, .ds-deck .ais-eq sup { font-size: .7em; }
+.ds-deck .ais-pics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ds-deck .ais-pics img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.ds-deck .ais-win th, .ds-deck .ais-win td { font-size: 13px; text-align: center; padding: 4px 5px; }
+.ds-deck .ais-win tbody th { text-align: left; white-space: nowrap; }
+.ds-deck .ais-win small { color: var(--ds-muted); font-size: 11.5px; }
+.ds-deck .ais-arch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ds-deck .ais-arch .ds-deck__card { font-size: 14px; }
+.ds-deck .ais-arch .ds-deck__card ul { padding-left: 16px; font-size: 13.5px; }
+.ds-deck .ais-arch .ds-deck__card li { margin: 2px 0; }
+.ds-deck.is-fluid .ais-side,
+.ds-deck.is-fluid .ais-side--wide,
+.ds-deck.is-fluid .ais-pics,
+.ds-deck.is-fluid .ais-arch { grid-template-columns: minmax(0, 1fr); }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="en">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="presentation" aria-label="Impact of Temporal Resampling Interval on Deep Learning-Based Vessel Trajectory Prediction Using AIS Data">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Title" data-section="">
+  <p class="pv-venue">Research Article · Gümüşhane University Journal of Science (GUJS) · Vol. 16, No. 4 · 2026</p>
+  <h1 class="pv-title">Impact of Temporal Resampling Interval on Deep Learning-Based Vessel Trajectory Prediction Using AIS Data</h1>
+  <div class="pv-authors">Sercan Külcü · Adil Kondiloğlu</div>
+  <div class="pv-affil">Giresun University, Türkiye</div>
+  <div class="ds-deck__agenda" aria-label="Contents">
+    <span>AIS data</span><span>Validation</span><span>Multi-resolution pipeline</span><span>1 · 5 · 10 · 20 min</span>
+    <span>Six models + baseline</span><span>ADE and RMSE</span><span>Rank changes</span><span>Confidence intervals</span><span>Interpolation</span>
+  </div>
+  <small>doi: <a href="https://doi.org/10.17714/gumusfenbil.1943803">10.17714/gumusfenbil.1943803</a> · Use ← → or Space to navigate, F for full screen</small>
+</section>
+
+<section class="ds-deck__slide" data-title="At a Glance" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>At a Glance</h2>
+  <p>AIS messages arrive at irregular times, so trajectories are resampled onto a fixed grid before training. The grid spacing is usually chosen once and never questioned. <b>This study treats it as the experimental variable.</b></p>
+  <div class="pv-kpis">
+    <div class="pv-kpi"><span>Intervals</span><b>4</b><small>1, 5, 10, 20 min</small></div>
+    <div class="pv-kpi"><span>Methods</span><b>6 + 1</b><small>deep models + baseline</small></div>
+    <div class="pv-kpi"><span>Evaluation dates</span><b>3</b><small>Apr, Aug, Dec 2025</small></div>
+    <div class="pv-kpi"><span>Runs per setting</span><b>5</b><small>different seeds, 95% CI</small></div>
+  </div>
+  <div class="ds-deck__grid ds-deck__grid--3" style="margin-top:14px">
+    <div class="ds-deck__card"><strong>Error grows</strong><p>ADE, RMSE and training loss rise for every model as the interval gets longer.</p></div>
+    <div class="ds-deck__card"><strong>Rankings change</strong><p>GRU leads at 1 min; Transformer-GRU leads at 20 min on all three dates.</p></div>
+    <div class="ds-deck__card"><strong>Simple can win</strong><p>A constant speed-course baseline beats every network at some 5 and 10 min settings.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Motivation" data-section="Introduction">
+  <p class="ds-deck__kicker">1 · Introduction</p>
+  <h2>Why Vessel Trajectory Prediction, and Why AIS?</h2>
+  <div class="ds-deck__two ds-deck__two--wide-left">
+    <div>
+      <p>The Automatic Identification System broadcasts time-stamped <b>LAT, LON, SOG, COG, heading</b> and vessel identity. It feeds traffic monitoring, collision avoidance, port management and autonomous navigation.</p>
+      <p>But AIS trajectories are <b>irregular, noisy and incomplete</b>, and depend on vessel type, manoeuvres and traffic density. Every preprocessing decision shapes what a model can learn.</p>
+    </div>
+    <div class="ds-deck__card">
+      <strong>The literature so far</strong>
+      <ul class="ds-deck__small">
+        <li>Recurrent: LSTM, GRU, BiLSTM, Seq2Seq</li>
+        <li>Attention and Transformer models</li>
+        <li>Hybrid: CNN-LSTM-SE, TCN-GRU, U-Net</li>
+        <li>Graph models: GAT-LSTM, ST-MGT, VTP-STGMAN</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ds-deck__callout"><b>Gap.</b> Studies resample AIS at different intervals, but treat the interval as a fixed preprocessing decision. When two papers disagree, is it the architecture or the temporal representation?</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Contributions" data-section="Introduction">
+  <p class="ds-deck__kicker">1 · Introduction</p>
+  <h2>Contributions</h2>
+  <div class="ds-deck__grid ds-deck__grid--2 ds-deck__grid--roomy">
+    <div class="ds-deck__card"><strong>Controlled framework</strong><p>Same preprocessing rules, model configurations, prediction structure and evaluation protocol; only the resampling interval changes.</p></div>
+    <div class="ds-deck__card"><strong>Beyond accuracy</strong><p>Shows that resampling changes model <b>ranking</b>, robustness, and the balance between learned and deterministic methods.</p></div>
+    <div class="ds-deck__card"><strong>Benchmark</strong><p>Recurrent, Transformer, hybrid and physics-based predictors under identical conditions, five seeds each, on three dates.</p></div>
+    <div class="ds-deck__card"><strong>Practical guidance</strong><p>How to choose a predictor for a given AIS sampling rate and computational budget.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="NOAA AIS Dataset" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>NOAA AIS Data Handler Archive</h2>
+  <div class="ds-deck__two">
+    <div>
+      <p class="ds-deck__small">Three 24-hour datasets: <b>30 April</b>, <b>31 August</b> and <b>31 December 2025</b>. The December file illustrates the pipeline:</p>
+      <div class="pv-kpis" style="grid-template-columns:1fr 1fr">
+        <div class="pv-kpi"><span>AIS records</span><b>8,518,667</b><small>17 attributes</small></div>
+        <div class="pv-kpi"><span>Unique MMSI</span><b>17,357</b><small>15,101 vessel names</small></div>
+      </div>
+      <ul class="ds-deck__small" style="margin-top:8px">
+        <li>LAT 1.09° to 85.02°, LON −161.91° to 145.98°: very wide coverage</li>
+        <li>SOG 0–99.5 kn, mean <b>1.77 kn</b>: many anchored, moored or slow vessels</li>
+        <li>MMSI, time, LAT, LON: <b>no missing values</b></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Missing values by field (31 Dec)</h3>
+      <div class="ais-miss" role="img" aria-label="Missing rates: IMO 63.25, Heading 48.93, Draft 43.47, Status 33.15, Cargo 31.01, SOG 0.20 percent">
+        <span>IMO</span><i style="width:63.25%"></i><b>63.25%</b>
+        <span>Heading</span><i style="width:48.93%"></i><b>48.93%</b>
+        <span>Draft</span><i style="width:43.47%"></i><b>43.47%</b>
+        <span>Status</span><i style="width:33.15%"></i><b>33.15%</b>
+        <span>Cargo</span><i style="width:31.01%"></i><b>31.01%</b>
+        <span>SOG</span><i style="width:0.6%"></i><b>0.20%</b>
+      </div>
+      <div class="ds-deck__callout ds-deck__small">The models rely on LAT, LON, SOG and COG, which are complete or almost complete. The gaps are in static and auxiliary fields.</div>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Data Validation" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>Validation: Replay and Heatmap</h2>
+  <div class="ais-pics">
+    <figure style="margin:0"><img src="img/ais/opencpn.webp" alt="AIS targets replayed in OpenCPN along US coasts" loading="lazy" width="1000" height="608"><figcaption class="ds-deck__caption">Fig. 1 · Custom replay simulator → OpenCPN</figcaption></figure>
+    <figure style="margin:0"><img src="img/ais/heatmap.webp" alt="Heatmap of AIS position density" loading="lazy" width="1000" height="605"><figcaption class="ds-deck__caption">Fig. 2 · Spatial density of AIS positions</figcaption></figure>
+  </div>
+  <ul class="ds-deck__small" style="margin-top:10px">
+    <li>Valid records are encoded as <b>NMEA 0183</b> AIS Message Type 1 (AIVDM) sentences and sent over UDP to OpenCPN.</li>
+    <li>Targets appear on the Pacific and Atlantic coasts, the Gulf of Mexico, the Great Lakes and the Caribbean; the heatmap shows the same corridors.</li>
+    <li>This checks message format and spatial consistency only, not prediction accuracy.</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Filtering" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>Filtering: Keep the Vessels That Really Move</h2>
+  <div class="ds-deck__steps" data-mode="build">
+    <div class="ds-deck__step"><p><b>1. Required fields.</b> MMSI, BaseDateTime, LAT, LON found case-insensitively; rows missing any of them dropped. Sort by MMSI and time.</p></div>
+    <div class="ds-deck__step"><p><b>2. Consecutive distances</b> with the Haversine great-circle formula:</p>
+      <div class="ais-eq">d = 2R · arcsin √( sin²(Δφ/2) + cos φ<sub>1</sub> · cos φ<sub>2</sub> · sin²(Δλ/2) ) &nbsp;&nbsp;(1)</div></div>
+    <div class="ds-deck__step"><p><b>3. Noise and outliers.</b> Steps shorter than <b>20 m</b> ignored (GPS jitter); transitions faster than <b>60 kn</b> removed.</p></div>
+    <div class="ds-deck__step"><p><b>4. Rank by movement.</b> Valid step lengths summed per vessel; the <b>top 1,000 vessels</b> by cumulative distance are kept, balancing trajectory richness and computing cost.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Multi-Resolution Datasets" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>Building the Multi-Resolution Datasets</h2>
+  <div class="pv-flow">
+    <div><b>Segment</b>split tracks at unrealistic jumps and gaps</div><i>→</i>
+    <div><b>Resample</b>mean LAT, LON, SOG, COG<sub>sin</sub>, COG<sub>cos</sub> per bin</div><i>→</i>
+    <div><b>Fill</b>linear interpolation, then forward / backward fill</div><i>→</i>
+    <div><b>Differences</b>ΔLAT, ΔLON from the previous step</div><i>→</i>
+    <div><b>Windows</b>10 steps in → 1 step out</div>
+  </div>
+  <table class="ds-deck__table" style="margin-top:12px;font-size:14px">
+    <tbody>
+      <tr><th>Input features</th><td>ΔLAT, ΔLON, SOG, COG_sin, COG_cos</td><th>Target</th><td>ΔLAT, ΔLON</td></tr>
+      <tr><th>Intervals</th><td>1, 5, 10, 20 min</td><th>Sequence</th><td>10 in, 1 out, stride 1</td></tr>
+      <tr><th>Valid SOG / COG</th><td>0–60 kn / 0°–360°</td><th>Split</th><td>70 / 15 / 15% by segment</td></tr>
+      <tr><th>Normalization</th><td colspan="3">z-score with training statistics only</td></tr>
+    </tbody>
+  </table>
+  <p class="ds-deck__small" style="margin-top:8px">Models learn <b>movement increments</b>, not absolute coordinates. Segments (MMSI + segment_id) are split <b>before</b> windowing, so no segment contributes to two subsets: no leakage.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Encoding the Course" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>Why COG Becomes (sin, cos)</h2>
+  <div class="ais-side" style="grid-template-columns:230px minmax(0,1fr)">
+    <div class="pv-chart" id="ais-cog"></div>
+    <div>
+      <div class="pv-range"><span style="color:var(--pv-s1);font-weight:700;min-width:70px">Course A</span><input type="range" id="ais-cog-a" min="0" max="359" value="359" aria-label="Course A in degrees"><output id="ais-cog-a-out"></output></div>
+      <div class="pv-range"><span style="color:var(--pv-s2);font-weight:700;min-width:70px">Course B</span><input type="range" id="ais-cog-b" min="0" max="359" value="1" aria-label="Course B in degrees"><output id="ais-cog-b-out"></output></div>
+      <table class="ds-deck__table" style="margin-top:8px;font-size:14px"><tbody id="ais-cog-out"></tbody></table>
+      <p class="ds-deck__small" style="margin-top:8px">Course is circular: 359° and 1° are 2° apart, not 358°. Averaging raw degrees inside a resampling bin, or feeding them to a network, breaks at the 0°/360° boundary. Sine and cosine components are continuous everywhere, so they are averaged and used as inputs instead.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="What Resampling Does" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods · Illustration</p>
+  <h2>What the Resampling Interval Does to a Track</h2>
+  <div class="pv-ctrl"><span>Interval</span><div class="pv-seg" id="ais-rs-iv"><button type="button" data-v="1">1 min</button><button type="button" data-v="5">5 min</button><button type="button" data-v="10" class="is-on">10 min</button><button type="button" data-v="20">20 min</button></div></div>
+  <div class="ais-side ais-side--wide">
+    <div class="pv-chart" id="ais-rs"></div>
+    <div>
+      <div class="pv-legend" style="flex-direction:column;gap:3px">
+        <span><i style="background:var(--pv-dim);height:6px"></i>true path (synthetic)</span>
+        <span><i class="dot" style="background:var(--pv-s1)"></i>10 input steps</span>
+        <span><i class="dot" style="background:var(--pv-s2)"></i>next point = target</span>
+        <span><i style="background:var(--pv-base)"></i>constant speed-course step</span>
+      </div>
+      <table class="ds-deck__table" style="margin-top:6px"><tbody id="ais-rs-info"></tbody></table>
+    </div>
+  </div>
+  <p class="ds-deck__foot">A synthetic 12 kn track drawn for intuition, not data from the paper. Note how one "step" means more real time and more history as the interval grows.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Sample Sizes" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods · Table 2</p>
+  <h2>Sample Sizes per Interval (31 December)</h2>
+  <table class="ds-deck__table">
+    <thead><tr><th>Interval</th><th class="num">Vessels</th><th class="num">Segments</th><th class="num">Train windows</th><th class="num">Validation</th><th class="num">Test</th></tr></thead>
+    <tbody>
+      <tr><td>1 min</td><td class="num">998</td><td class="num">2,271</td><td class="num">578,042</td><td class="num">121,675</td><td class="num">122,014</td></tr>
+      <tr><td>5 min</td><td class="num">998</td><td class="num">1,749</td><td class="num">105,186</td><td class="num">22,867</td><td class="num">20,077</td></tr>
+      <tr><td>10 min</td><td class="num">998</td><td class="num">1,387</td><td class="num">45,989</td><td class="num">10,180</td><td class="num">9,991</td></tr>
+      <tr><td>20 min</td><td class="num">996</td><td class="num">1,110</td><td class="num">18,711</td><td class="num">3,998</td><td class="num">4,007</td></tr>
+    </tbody>
+  </table>
+  <div class="ds-deck__grid ds-deck__grid--2" style="margin-top:12px">
+    <div class="ds-deck__card"><strong>Fewer windows</strong><p>From 1 to 20 min the training set shrinks about <b>31×</b> (578,042 → 18,711 windows).</p></div>
+    <div class="ds-deck__card"><strong>Fewer segments</strong><p>Short segments cannot fill 10 + 1 coarse steps, so they drop out: 2,271 → 1,110.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Evaluated Models" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>Six Learned Models and One Physics Baseline</h2>
+  <div class="ais-arch">
+    <div class="ds-deck__card"><strong>Recurrent</strong>
+      <ul><li><b>LSTM</b>, <b>GRU</b> (fewer gates), <b>BiLSTM</b> (both directions)</li><li>hidden 128, 2 layers, dropout 0.1</li><li>last hidden state → linear head → (ΔLAT, ΔLON)</li></ul></div>
+    <div class="ds-deck__card"><strong>Transformer</strong>
+      <ul><li>input projection + sinusoidal positions</li><li>encoder–decoder, causal mask in the decoder</li><li>d = 128, 8 heads, feed-forward 256, dropout 0.1</li></ul></div>
+    <div class="ds-deck__card"><strong>Hybrid</strong>
+      <ul><li><b>Transformer-LSTM</b> / <b>Transformer-GRU</b></li><li>recurrent branch: hidden 32, 3 layers, projected to d = 128</li><li>concatenated with encoder output → fusion layer → decoder memory</li></ul></div>
+  </div>
+  <svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="Hybrid model: projected input goes to a Transformer encoder and a recurrent branch, their outputs are fused and passed to the decoder" style="margin-top:10px">
+    <rect class="box" x="10" y="44" width="110" height="34" rx="8"/><text class="txt" x="65" y="66" text-anchor="middle" style="font-size:13px">input × 10</text>
+    <rect class="box" x="160" y="10" width="160" height="34" rx="8"/><text class="txt" x="240" y="32" text-anchor="middle" style="font-size:13px">Transformer encoder</text>
+    <rect class="box" x="160" y="78" width="160" height="34" rx="8"/><text class="txt" x="240" y="100" text-anchor="middle" style="font-size:13px">GRU / LSTM branch</text>
+    <rect class="box" x="370" y="44" width="110" height="34" rx="8"/><text class="txt" x="425" y="66" text-anchor="middle" style="font-size:13px">concat + fuse</text>
+    <rect class="box" x="530" y="44" width="180" height="34" rx="8"/><text class="txt" x="620" y="66" text-anchor="middle" style="font-size:13px">decoder → ΔLAT, ΔLON</text>
+    <path class="line" d="M120 61 L160 27 M120 61 L160 95 M320 27 L370 61 M320 95 L370 61 M480 61 H530"/>
+  </svg>
+  <p class="ds-deck__small"><b>Constant speed-course baseline:</b> no parameters; moves the last position one step with the last SOG and COG.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Training and Complexity" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods · Table 3</p>
+  <h2>Training Protocol and Model Complexity</h2>
+  <div class="ds-deck__two ds-deck__two--wide-right">
+    <ul class="ds-deck__small">
+      <li>Adam, learning rate 0.001, MSE loss</li>
+      <li>Batch 1024, 100 epochs</li>
+      <li><b>5 independent runs</b> per date and interval, different seeds</li>
+      <li>Checkpoint with the lowest validation MSE goes to the test set</li>
+      <li>Split, normalization and hyperparameters fixed across runs</li>
+      <li>Laptop: i5-12450H, 16 GB, RTX 3050 6 GB, Windows 11</li>
+    </ul>
+    <table class="ds-deck__table pv-sort" style="font-size:14px">
+      <thead><tr><th>Model</th><th class="num" data-first="asc">Parameters</th><th class="num" data-first="asc">Train (min)</th><th class="num" data-first="asc">Inference (ms)</th></tr></thead>
+      <tbody>
+        <tr><td>GRU</td><td class="num">167,298</td><td class="num">12.67</td><td class="num">0.3819</td></tr>
+        <tr><td>LSTM</td><td class="num">217,474</td><td class="num">15.21</td><td class="num">0.3969</td></tr>
+        <tr><td>BiLSTM</td><td class="num">565,634</td><td class="num">22.32</td><td class="num">0.4293</td></tr>
+        <tr><td>Transformer</td><td class="num">1,988,866</td><td class="num">151.81</td><td class="num">8.8105</td></tr>
+        <tr><td>Transformer-GRU</td><td class="num">2,054,210</td><td class="num">152.07</td><td class="num">9.1378</td></tr>
+        <tr><td>Transformer-LSTM</td><td class="num">2,063,618</td><td class="num">151.27</td><td class="num">9.1580</td></tr>
+        <tr><td>CS-C baseline</td><td class="num">0</td><td class="num">–</td><td class="num">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ds-deck__callout ds-deck__small">Transformer-based models carry about 12× the parameters of GRU, train about 12× longer and infer about 24× slower. Accuracy has to justify that.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Evaluation Metrics" data-section="Material and Methods">
+  <p class="ds-deck__kicker">2 · Material and Methods</p>
+  <h2>Evaluation Metrics</h2>
+  <p class="ds-deck__small">Predicted ΔLAT, ΔLON are de-normalized and added to the last observed position; the error d<sub>i</sub> is the Haversine distance (R = 6,371,000 m) to the true position.</p>
+  <div class="ds-deck__grid ds-deck__grid--3">
+    <div class="ds-deck__card"><strong>ADE</strong><div class="ais-eq">ADE = (1/N) Σ d<sub>i</sub></div><p class="ds-deck__small">Mean spatial error. With a one-step horizon it equals the Haversine MAE.</p></div>
+    <div class="ds-deck__card"><strong>RMSE</strong><div class="ais-eq">RMSE = √( (1/N) Σ d<sub>i</sub>² )</div><p class="ds-deck__small">Squares the errors first, so large misses weigh more.</p></div>
+    <div class="ds-deck__card"><strong>95% CI</strong><div class="ais-eq">x̄ ± t<sub>0.975, n−1</sub> · s / √n</div><p class="ds-deck__small">n = 5 runs, t ≈ 2.776. Only for learned models: the baseline has no seed variation.</p></div>
+  </div>
+  <p class="ds-deck__foot">Training loss (normalized MSE) describes optimization; ADE and RMSE in metres are the main comparison.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Training Loss" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Fig. 3</p>
+  <h2>Training Loss Rises with the Interval</h2>
+  <figure class="ds-deck__pic" style="margin:0"><img src="img/ais/loss.webp" alt="Grouped bar chart of training loss per model for 1, 5, 10 and 20 min intervals" loading="lazy" width="1000" height="471" style="max-height:270px;width:auto;margin:0 auto"></figure>
+  <ul class="ds-deck__small">
+    <li>Coarser sampling breaks motion continuity: the 10 and 20 min losses are clearly higher.</li>
+    <li>At 20 min: <b>Transformer-GRU</b> lowest, then Transformer-LSTM and Transformer; LSTM highest.</li>
+    <li>BiLSTM is lowest at 1 min but degrades noticeably at 10 and 20 min.</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Results Explorer" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Tables 4–8</p>
+  <h2>Results Explorer: ADE and RMSE</h2>
+  <div class="pv-ctrl">
+    <span>Metric</span><div class="pv-seg" id="ais-ex-metric"><button type="button" data-v="ade" class="is-on">ADE</button><button type="button" data-v="rmse">RMSE</button></div>
+    <span>Date</span><div class="pv-seg" id="ais-ex-date"><button type="button" data-v="dec" class="is-on">31 Dec</button><button type="button" data-v="apr">30 Apr</button><button type="button" data-v="aug">31 Aug</button><button type="button" data-v="avg">3-date mean</button></div>
+  </div>
+  <div class="pv-ctrl"><span>Interval</span><div class="pv-seg" id="ais-ex-iv"><button type="button" data-v="1">1 min</button><button type="button" data-v="5">5 min</button><button type="button" data-v="10">10 min</button><button type="button" data-v="20" class="is-on">20 min</button></div>
+    <span class="pv-legend" style="margin:0"><span><i style="background:var(--pv-s1)"></i>learned model</span><span><i style="background:var(--pv-base)"></i>constant speed-course</span></span></div>
+  <div class="pv-chart" id="ais-ex"></div>
+  <p class="pv-note" id="ais-ex-note"></p>
+</section>
+
+<section class="ds-deck__slide" data-title="Rankings Change" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Tables 4, 6, 7</p>
+  <h2>The Interval Changes Who Wins</h2>
+  <div class="pv-ctrl"><span>Date</span><div class="pv-seg" id="ais-bump-date"><button type="button" data-v="dec" class="is-on">31 Dec</button><button type="button" data-v="apr">30 Apr</button><button type="button" data-v="aug">31 Aug</button><button type="button" data-v="avg">3-date mean</button></div><span style="font-weight:400">Rank by mean ADE; hover a line.</span></div>
+  <div class="pv-chart" id="ais-bump"></div>
+  <div class="ds-deck__callout ds-deck__small">Rank #1 moves between GRU, BiLSTM, Transformer-GRU and the baseline depending on the interval and date. Comparing models trained at different sampling rates is therefore not a fair comparison.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="When the Baseline Wins" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results</p>
+  <h2>Best Learned Model vs Constant Speed-Course (ADE, m)</h2>
+  <table class="ds-deck__table ais-win">
+    <thead><tr><th>Date</th><th>1 min</th><th>5 min</th><th>10 min</th><th>20 min</th></tr></thead>
+    <tbody id="ais-win"></tbody>
+  </table>
+  <div class="ds-deck__grid ds-deck__grid--2" style="margin-top:12px">
+    <div class="ds-deck__card"><strong>Where it wins</strong><p>At 5 and 10 min, if motion is smooth and nearly linear, extrapolating speed and course is enough, with no training and negligible cost.</p></div>
+    <div class="ds-deck__card"><strong>Where it breaks</strong><p>At 20 min its error jumps (775.8–915.3 m) because the fixed-motion assumption fails over long gaps.</p></div>
+  </div>
+  <p class="ds-deck__foot">On 30 April at 5 min Transformer-GRU is ahead by only 0.10 m (195.10 vs 195.20).</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Confidence Intervals" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Table 9</p>
+  <h2>Are the Differences Real? 95% Confidence Intervals</h2>
+  <div class="pv-ctrl">
+    <span>Date</span><div class="pv-seg" id="ais-ci-date"><button type="button" data-v="dec" class="is-on">31 Dec</button><button type="button" data-v="apr">30 Apr</button><button type="button" data-v="aug">31 Aug</button></div>
+    <span>Interval</span><div class="pv-seg" id="ais-ci-iv"><button type="button" data-v="1">1 min</button><button type="button" data-v="5">5 min</button><button type="button" data-v="10">10 min</button><button type="button" data-v="20" class="is-on">20 min</button></div>
+  </div>
+  <div class="pv-chart" id="ais-ci"></div>
+  <p class="pv-note" id="ais-ci-note"></p>
+  <p class="ds-deck__foot">Orange band: the best model's interval. Dashed line: the deterministic baseline. Overlap means a lower mean is not automatically a significant win.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Interpolation Robustness" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Table 10</p>
+  <h2>Interpolation: Frequent but Small vs Rare but Large</h2>
+  <p class="ds-deck__small">10% of observed interior points were masked and rebuilt by the same linear interpolation, five times per interval; the error is the Haversine distance to the true point.</p>
+  <div class="ds-deck__two">
+    <div class="pv-chart" id="ais-int-a"></div>
+    <div>
+      <div class="pv-ctrl" style="margin:0"><div class="pv-seg" id="ais-int-stat"><button type="button" data-v="mean" class="is-on">Mean</button><button type="button" data-v="med">Median</button><button type="button" data-v="p95">95th pct</button></div></div>
+      <div class="pv-chart" id="ais-int-b"></div>
+    </div>
+  </div>
+  <div class="ds-deck__callout ds-deck__small">At 1 min, 19.18% of bins are interpolated, yet the mean error is only 22.96 m. At 20 min just 0.45% are, but the mean error reaches 644.78 m and the 95th percentile 3.4 km. Interpolation and sampling interval must be judged together.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Rolling Predictions" data-section="Results">
+  <p class="ds-deck__kicker">3 · Results · Figs. 6–7</p>
+  <h2>Rolling One-Step Predictions on Real Tracks</h2>
+  <div class="pv-ctrl"><span>Interval</span><div class="pv-seg" id="ais-roll-iv"><button type="button" data-v="10" class="is-on">10 min</button><button type="button" data-v="20">20 min</button></div></div>
+  <figure class="ds-deck__pic" style="margin:0;padding:0"><img id="ais-roll-img" src="img/ais/rolling_10min.webp" alt="Rolling predictions" width="1000" height="583" style="max-height:290px;width:auto;margin:0 auto"></figure>
+  <p class="pv-note" id="ais-roll-note"></p>
+  <p class="ds-deck__foot">One example each, not statistically representative. Similar ADE can hide different behaviour: lateral offset, directional bias or over-extension.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Discussion" data-section="Discussion">
+  <p class="ds-deck__kicker">4 · Discussion</p>
+  <h2>Why Transformer-GRU Holds Up at Coarse Intervals</h2>
+  <div class="ds-deck__grid ds-deck__grid--2">
+    <div class="ds-deck__card"><strong>Attention for long gaps</strong><p>Self-attention weights the most informative past steps even when observations are far apart.</p></div>
+    <div class="ds-deck__card"><strong>A compact recurrent branch</strong><p>The small GRU branch stabilizes local motion. LSTM's extra gates bring no benefit when the coarse data carry little detail.</p></div>
+    <div class="ds-deck__card"><strong>Recurrent models need continuity</strong><p>Standalone LSTM, GRU and BiLSTM rely on step-to-step state; large displacements per step weaken it.</p></div>
+    <div class="ds-deck__card"><strong>No universal winner</strong><p>Dense, smooth data favour simple recurrent models or even the baseline; sparsity favours the hybrid.</p></div>
+  </div>
+  <div class="ds-deck__callout ds-deck__small"><b>Limitation.</b> With 10 inputs and one step ahead, the interval also changes the horizon (1, 5, 10, 20 min) and the history (10, 50, 100, 200 min). Cross-interval differences are the combined effect of representation, horizon and context, so rankings are read <b>within</b> each interval.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Conclusions" data-section="Conclusion">
+  <p class="ds-deck__kicker">5 · Conclusions</p>
+  <h2>Conclusions and Future Work</h2>
+  <ul>
+    <li>The resampling interval is a <b>critical experimental factor</b>: error rises consistently from 1 to 20 min.</li>
+    <li>It changes not only the error but the <b>ranking</b> of models. GRU leads at 1 min (49.98 ± 6.61 m across dates); Transformer-GRU leads at 20 min on every date (681.87 ± 45.00 m).</li>
+    <li>Overlapping confidence intervals mean a lower mean is not automatically a significant win.</li>
+    <li>The constant speed-course baseline is a real option for smooth motion and tight compute budgets.</li>
+    <li>A model validated at one AIS sampling rate should not be assumed to perform the same at another.</li>
+  </ul>
+  <h3 style="margin-top:12px">Next steps</h3>
+  <ul class="ds-deck__small">
+    <li>Multi-day and multi-region datasets; vessel-type-specific behaviour</li>
+    <li>Adaptive temporal representations driven by speed, manoeuvres and traffic density</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Check Questions" data-section="Conclusion">
+  <p class="ds-deck__kicker">5 · Conclusions</p>
+  <h2>Check Questions</h2>
+  <ol class="ds-deck__small">
+    <li>Why is COG encoded as sine and cosine before resampling?</li>
+    <li>Why are trajectory segments split into train / validation / test before the sliding windows are built?</li>
+    <li>Comparing a 1 min model with a 20 min model is not only about sampling density. What else changes?</li>
+    <li>The baseline wins at 10 min on 31 December but is far behind at 20 min. Why?</li>
+    <li>Interpolation is needed in 19% of bins at 1 min but only 0.45% at 20 min. Why is the 20 min data still less reliable?</li>
+  </ol>
+  <details class="ds-deck__answers">
+    <summary>Show answers</summary>
+    <ol>
+      <li>Course is circular; averaging or comparing raw degrees fails across 0°/360°. (sin, cos) is continuous everywhere.</li>
+      <li>Overlapping windows from one segment would otherwise appear in both training and test sets and leak information.</li>
+      <li>The real prediction horizon (1 vs 20 min) and the history covered by 10 steps (10 vs 200 min).</li>
+      <li>Over 10 minutes the smooth tracks are nearly linear; over 20 minutes course and speed changes accumulate and the fixed-motion assumption fails.</li>
+      <li>Each interpolated point bridges a much longer temporal and spatial gap: mean error 644.78 m vs 22.96 m.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Selected References" data-section="References">
+  <p class="ds-deck__kicker">References</p>
+  <h2>Selected References</h2>
+  <ul class="ds-deck__small">
+    <li>Li, H., Jiao, H., &amp; Yang, Z. (2023). AIS data-driven ship trajectory prediction modelling and analysis based on machine learning and deep learning methods. <em>Transportation Research Part E</em>, 175, 103152.</li>
+    <li>Park, J., Jeong, J., &amp; Park, Y. (2021). Ship trajectory prediction based on Bi-LSTM using spectral-clustered AIS data. <em>JMSE</em>, 9(9), 1037.</li>
+    <li>Nguyen, D., &amp; Fablet, R. (2024). A transformer network with sparse augmented data representation and cross entropy loss for AIS-based vessel trajectory prediction. <em>IEEE Access</em>, 12, 21596–21609.</li>
+    <li>Bao, K. et al. (2022). An improved ship trajectory prediction based on AIS data using MHA-BiGRU. <em>JMSE</em>, 10(6), 804.</li>
+    <li>Liu, R. W., Zheng, W., &amp; Liang, M. (2024). Spatio-temporal multi-graph transformer network for joint prediction of multiple vessel trajectories. <em>EAAI</em>, 129, 107625.</li>
+    <li>NOAA Office for Coastal Management. AIS Data Handler archive.</li>
+  </ul>
+  <p class="ds-deck__foot">See the full text for the complete reference list.</p>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="How to Cite" data-section="">
+  <h1 style="font-size:40px">Thank You</h1>
+  <div class="ds-deck__subtitle">Impact of Temporal Resampling Interval on Deep Learning-Based Vessel Trajectory Prediction Using AIS Data</div>
+  <div class="ds-deck__callout" style="max-width:640px;text-align:left;margin-top:22px">
+    <b>How to cite:</b> Külcü, S., &amp; Kondiloğlu, A. (2026). Impact of temporal resampling interval on deep learning-based vessel trajectory prediction using AIS data. <em>Gümüşhane University Journal of Science, 16</em>(4), 1160–1178. <a href="https://doi.org/10.17714/gumusfenbil.1943803">doi:10.17714/gumusfenbil.1943803</a>
+  </div>
+  <small>sercan.kulcu@giresun.edu.tr · <a href="/publications/">All publications</a></small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Previous slide">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Next slide">→</button>
+        <span class="ds-deck__section" id="ds-deck-section"></span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Go to slide"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/pv.js"></script>
+<script src="deck/ais.js"></script>
+<script src="deck/deck.js"></script>
