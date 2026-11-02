@@ -137,14 +137,14 @@ Java programı düz metin kaynak kod olarak yazılır, bytecode'a derlenir ve JV
 
 ## Kısım III: Java ile Programlama
 
-### Bölüm 6: Değişkenler, Veri Tipleri ve Operatörler
+### Bölüm 6: Değişkenler, Veri Tipleri ve İşleçler
 
-Değişkenler programın kullandığı ve değiştirdiği değerleri saklar. Bölümde Java'nın ilkel veri tipleri, bildirim ve atama, taşma, tip dönüşümü, aritmetik, karşılaştırma ve mantıksal operatörler, işlem önceliği ve kısa devre değerlendirme anlatılır. Scanner ile girdi okuma ve printf ile biçimli çıktı küçük örneklerle gösterilir.
+Değişkenler programın kullandığı ve değiştirdiği değerleri saklar. Bölümde Java'nın ilkel veri tipleri, bildirim ve atama, taşma, tip dönüşümü, aritmetik, karşılaştırma ve mantıksal işleçler, işleç önceliği ve kısa devre değerlendirme anlatılır. Scanner ile girdi okuma ve printf ile biçimli çıktı küçük örneklerle gösterilir.
 
-- [🖼️Sunum-Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler.html)
-- [📄Sunum-Değişkenler, Veri Tipleri ve Operatörler (PDF)](../files/computer/pdf/Bolum_06_Degiskenler_ve_Operatorler.pdf)
-- [📖Ders Notu - Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/notlar/Bolum_06_Degiskenler_ve_Operatorler_Ders_Notu.html)
-- [📝Çalışma Soruları - Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
+- [🖼️Sunum-Değişkenler, Veri Tipleri ve İşleçler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler.html)
+- [📄Sunum-Değişkenler, Veri Tipleri ve İşleçler (PDF)](../files/computer/pdf/Bolum_06_Degiskenler_ve_Operatorler.pdf)
+- [📖Ders Notu - Değişkenler, Veri Tipleri ve İşleçler (HTML)](../files/computer/notlar/Bolum_06_Degiskenler_ve_Operatorler_Ders_Notu.html)
+- [📝Çalışma Soruları - Değişkenler, Veri Tipleri ve İşleçler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders06/src)
 
 - [🕹️İfade Değerlendirici (HTML)](../files/computer/slides/Chapter_06_Expression-Evaluator.html)
@@ -153,7 +153,7 @@ Değişkenler programın kullandığı ve değiştirdiği değerleri saklar. Bö
 
 ### Bölüm 7: Koşullu İfadeler
 
-Koşullu ifadeler programın farklı eylemler arasında seçim yapmasını sağlar. Bölüm boolean koşulları, if, else if ve else yapılarını, iç içe kararları ve sarkan else sorununu, mantıksal operatörleri ve De Morgan kurallarını, koşul operatörünü, String karşılaştırmasını ve switch ifadesini kısa örneklerle anlatır.
+Koşullu ifadeler programın farklı eylemler arasında seçim yapmasını sağlar. Bölüm boolean koşulları, if, else if ve else yapılarını, iç içe kararları ve sarkan else sorununu, mantıksal işleçleri ve De Morgan kurallarını, koşul işlecini, String karşılaştırmasını ve switch ifadesini kısa örneklerle anlatır.
 
 - [🖼️Sunum-Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler.html)
 - [📄Sunum-Koşullu İfadeler (PDF)](../files/computer/pdf/Bolum_07_Kosullu_Ifadeler.pdf)

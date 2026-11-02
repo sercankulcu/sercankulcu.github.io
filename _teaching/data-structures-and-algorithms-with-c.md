@@ -36,7 +36,7 @@ Bir yazılımın gereksinimlerden doğrulamaya uzanan yaşam döngüsü, algorit
 
 ### Bölüm 2: Diziler ve Yapılar
 
-Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki konunun başlangıç noktasıdır. malloc ile dinamik diziler ve büyüyen dizilerin amortize maliyeti, iki ve daha çok boyutlu dizilerde satır ve sütun öncelikli adres hesabı işlenir. Alt üçgen ve kuşak matrislerin tek boyutlu dizilerde yer kazandıran biçimde saklanması gösterilir. Konu struct, union ve hizalama, karakter dizisi olarak dizgeler ve matris çarpımıyla tamamlanır.
+Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki konunun başlangıç noktasıdır. malloc ile dinamik diziler ve büyüyen dizilerin amortize maliyeti, iki ve daha çok boyutlu dizilerde satır ve sütun öncelikli adres hesabı işlenir. Alt üçgen ve kuşak matrislerin tek boyutlu dizilerde yer kazandıran biçimde saklanması gösterilir. Konu struct, union ve hizalama, karakter dizisi olarak dizgiler ve matris çarpımıyla tamamlanır.
 
 - [🖼️Sunum-Diziler ve Yapılar (HTML)](../files/dsa_c/slides/Bolum_02_Diziler_ve_Yapilar.html)
 - [📄Sunum-Diziler ve Yapılar (PDF)](../files/dsa_c/pdf/Bolum_02_Diziler_ve_Yapilar.pdf)
@@ -47,7 +47,7 @@ Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki 
 
 ### Bölüm 3: Özyineleme, İkili Arama ve Geri İzleme
 
-Özyinelemeli algoritmalar yığın çerçeveleri üzerinden izlenir; özyineleme ile döngü arasındaki ilişki ve kuyruk özyinelemesi açıklanır. İkili aramanın döngüsel ve özyinelemeli sürümleri ile logaritmik karmaşıklığı adım adım gösterilir. Hanoi kuleleri ve permütasyon üretimi özyinelemeli düşünmenin klasik örnekleri olarak çözümlenir. Geri izleme ise satisfiability, n-vezir, alt küme üretimi ve Warnsdorff kuralıyla at gezisi problemleri üzerinde işlenir.
+Özyinelemeli algoritmalar yığın çerçeveleri üzerinden izlenir; özyineleme ile döngü arasındaki ilişki ve kuyruk özyinelemesi açıklanır. İkili aramanın yinelemeli ve özyinelemeli sürümleri ile logaritmik karmaşıklığı adım adım gösterilir. Hanoi kuleleri ve permütasyon üretimi özyinelemeli düşünmenin klasik örnekleri olarak çözümlenir. Geri izleme ise satisfiability, n-vezir, alt küme üretimi ve Warnsdorff kuralıyla at gezisi problemleri üzerinde işlenir.
 
 - [🖼️Sunum-Özyineleme, İkili Arama ve Geri İzleme (HTML)](../files/dsa_c/slides/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.html)
 - [📄Sunum-Özyineleme, İkili Arama ve Geri İzleme (PDF)](../files/dsa_c/pdf/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.pdf)
@@ -104,7 +104,7 @@ Son giren ilk çıkar (LIFO) ilkesiyle çalışan yığın, soyut veri tipi ve k
 
 ### Bölüm 8: Yığın ve Kuyruk Uygulamaları
 
-Yığın ve kuyruğun gerçek problemlerdeki kullanımı iki büyük uygulama üzerinden incelenir. Labirent problemi hareket tablosu ve yığın yardımıyla geri izlenerek çözülür ve karmaşıklığı değerlendirilir. İşlem önceliği ve birleşme kuralları ışığında infix, postfix ve prefix gösterimler tanıtılır; postfix ifadelerin hesaplanması ve isp ile icp öncelikleri kullanılarak infix ifadelerin postfix biçime çevrilmesi adım adım gösterilir. Prefix hesaplama, parantez denetimi ve diğer uygulamalar da ele alınır.
+Yığın ve kuyruğun gerçek problemlerdeki kullanımı iki büyük uygulama üzerinden incelenir. Labirent problemi hareket tablosu ve yığın yardımıyla geri izlenerek çözülür ve karmaşıklığı değerlendirilir. İşleç önceliği ve birleşme kuralları ışığında infix, postfix ve prefix gösterimler tanıtılır; postfix ifadelerin hesaplanması ve isp ile icp öncelikleri kullanılarak infix ifadelerin postfix biçime çevrilmesi adım adım gösterilir. Prefix hesaplama, parantez denetimi ve diğer uygulamalar da ele alınır.
 
 - [🖼️Sunum-Yığın ve Kuyruk Uygulamaları (HTML)](../files/dsa_c/slides/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari.html)
 - [📄Sunum-Yığın ve Kuyruk Uygulamaları (PDF)](../files/dsa_c/pdf/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari.pdf)
@@ -128,7 +128,7 @@ Liste soyut veri tipinin sözleşmesi ile dizi ve bağlı liste gerçeklemeleri 
 
 ### Bölüm 10: Ağaçlar
 
-Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve tam dolu ağaç kavramları ile düğüm sayısı ilişkileri ele alınır. İkili ağacın dizi ve bağlı gösterimleri karşılaştırılır; genel ağacın ikili ağaca dönüştürülmesi gösterilir. Kök önde, kök ortada ve kök sonda gezinmeler özyinelemeli yordamlarla ve ifade ağacı örneğiyle işlenir, ardından yığın kullanan iteratif sürümlere geçilir. Kuyrukla seviye seviye gezinme, ağaç kopyalama, eşitlik denetimi ve çocukların yer değiştirmesi de incelenir.
+Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve tam dolu ağaç kavramları ile düğüm sayısı ilişkileri ele alınır. İkili ağacın dizi ve bağlı gösterimleri karşılaştırılır; genel ağacın ikili ağaca dönüştürülmesi gösterilir. Kök önde, kök ortada ve kök sonda gezinmeler özyinelemeli yordamlarla ve ifade ağacı örneğiyle işlenir, ardından yığın kullanan yinelemeli sürümlere geçilir. Kuyrukla düzey düzey gezinme, ağaç kopyalama, eşitlik denetimi ve çocukların yer değiştirmesi de incelenir.
 
 - [🖼️Sunum-Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_10_Agaclar.html)
 - [📄Sunum-Ağaçlar (PDF)](../files/dsa_c/pdf/Bolum_10_Agaclar.pdf)
@@ -139,7 +139,7 @@ Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve tam 
 
 ### Bölüm 11: Arama Ağaçları
 
-İkili arama ağacının tanımı ve ekleme sırasının ağacın biçimine etkisi örneklerle gösterilir. Ekleme, döngüsel ve özyinelemeli arama ile derinlik hesaplama yordamları C koduyla yazılır; özyinelemeli aramadaki tuzaklar ve ek parametre kullanımı tartışılır. Silme işleminin durumları ve farklı silme yöntemleri adım adım işlenir. Dengesizliğin maliyeti AVL ağaçları, tek ve çift döndürmelerle giderilir; kırmızı-siyah ağaçlar ve B-ağaçları da kısaca tanıtılır.
+İkili arama ağacının tanımı ve ekleme sırasının ağacın biçimine etkisi örneklerle gösterilir. Ekleme, yinelemeli ve özyinelemeli arama ile derinlik hesaplama yordamları C koduyla yazılır; özyinelemeli aramadaki tuzaklar ve ek parametre kullanımı tartışılır. Silme işleminin durumları ve farklı silme yöntemleri adım adım işlenir. Dengesizliğin maliyeti AVL ağaçları, tek ve çift döndürmelerle giderilir; kırmızı-siyah ağaçlar ve B-ağaçları da kısaca tanıtılır.
 
 - [🖼️Sunum-Arama Ağaçları (HTML)](../files/dsa_c/slides/Bolum_11_Arama_Agaclari.html)
 - [📄Sunum-Arama Ağaçları (PDF)](../files/dsa_c/pdf/Bolum_11_Arama_Agaclari.pdf)
@@ -231,7 +231,7 @@ Tek kaynaklı en kısa yol problemi kaba kuvvet analiziyle başlar ve açgözlü
 
 ### Bölüm 19: Temel Sıralama Algoritmaları
 
-Sıralama problemi, kararlılık ve yerinde sıralama kavramlarıyla birlikte ortak C makroları üzerinden tanıtılır. Seçimli, eklemeli ve kabarcık sıralaması adım adım izlenir ve analiz edilir; eklemeli sıralamanın ortalama durumu evrik sayısıyla hesaplanır. Doğrusal zamanlı sayarak sıralama, Shell sıralaması ve kova sıralaması da işlenir. Karar ağacı yardımıyla karşılaştırmaya dayalı sıralamanın alt sınırı kanıtlanır ve algoritmaların hangi durumda uygun olduğu tartışılır.
+Sıralama problemi, kararlılık ve yerinde sıralama kavramlarıyla birlikte ortak C makroları üzerinden tanıtılır. Seçimli, eklemeli ve kabarcık sıralaması adım adım izlenir ve analiz edilir; eklemeli sıralamanın ortalama durumu ters çift sayısıyla hesaplanır. Doğrusal zamanlı saymalı sıralama, Shell sıralaması ve kova sıralaması da işlenir. Karar ağacı yardımıyla karşılaştırmaya dayalı sıralamanın alt sınırı kanıtlanır ve algoritmaların hangi durumda uygun olduğu tartışılır.
 
 - [🖼️Sunum-Temel Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_19_Temel_Siralama_Algoritmalari.html)
 - [📄Sunum-Temel Sıralama Algoritmaları (PDF)](../files/dsa_c/pdf/Bolum_19_Temel_Siralama_Algoritmalari.pdf)

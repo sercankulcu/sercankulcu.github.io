@@ -1,4 +1,4 @@
-/* Bölüm 9: Çevrimiçi Algoritmalar deneme alanları (sayfalama, kayak kiralama) */
+/* Bölüm 9: Çevrim İçi Algoritmalar deneme alanları (sayfalama, kayak kiralama) */
 (function () {
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
@@ -122,8 +122,8 @@
       var opt = Math.min(d, B);
       var worst = (k - 1 + B) / Math.min(k, B);
       var max = Math.max(alg, opt, 1) * 1.25;
-      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 680 150" role="img" aria-label="Çevrimiçi maliyet ' + alg + ", en iyi maliyet " + opt + '">' +
-        bar(20, "çevrimiçi (ALG)", alg, max, "a09-hot") + bar(80, "geleceği bilen (OPT)", opt, max, "box") + "</svg>";
+      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 680 150" role="img" aria-label="Çevrim içi maliyet ' + alg + ", en iyi maliyet " + opt + '">' +
+        bar(20, "çevrim içi (ALG)", alg, max, "a09-hot") + bar(80, "geleceği bilen (OPT)", opt, max, "box") + "</svg>";
       var ratio = (alg / opt).toFixed(2).replace(".", ",");
       status.innerHTML = (d < k ? d + " gün kiralandı, satın alma günü gelmedi." : (k - 1) + " gün kira + " + B + " TL satın alma.") +
         " Oran ALG / OPT = <b>" + ratio + "</b> · bu k için en kötü oran (d = k) = <b>" + worst.toFixed(2).replace(".", ",") +

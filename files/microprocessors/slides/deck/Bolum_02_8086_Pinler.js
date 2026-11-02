@@ -7,7 +7,7 @@
     20: ["GND", "—", "Toprak (ikinci toprak pini)."],
     40: ["VCC", "—", "+5 V DC besleme (± %10)."],
     17: ["NMI", "giriş", "Maskelenemeyen kesme. Kenar tetiklemeli (0 → 1); her zaman tip 2 kesmeye yol açar, IF ile kapatılamaz."],
-    18: ["INTR", "giriş", "Kesme isteği. Seviye tetiklemeli, aktif yüksek; her komutun sonunda örneklenir, IF = 1 ise kabul edilir."],
+    18: ["INTR", "giriş", "Kesme isteği. Düzey tetiklemeli, aktif yüksek; her komutun sonunda örneklenir, IF = 1 ise kabul edilir."],
     19: ["CLK", "giriş", "Saat girişi. 8284A'dan gelir; %33 görev çevrimli asimetrik kare dalga (5 / 8 / 10 MHz)."],
     21: ["RESET", "giriş", "Aktif yüksek; en az 4 saat çevrimi 1 olmalı. Sonrasında CS = FFFFh, IP = 0000h → ilk komut FFFF0h'de."],
     22: ["READY", "giriş", "Aktif yüksek. Bellek/G-Ç aktarımı tamamlayabildiğini bildirir; 0 ise T3 ile T4 arasına bekleme (Tw) eklenir. 8284A ile senkronlanır."],

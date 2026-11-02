@@ -25,7 +25,7 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 ### Bölüm 1: Giriş ve Algoritma Karmaşıklığı
 
-Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yöntemdir. Bölümün ilk kısmında algoritma kavramı gündelik örneklerle tanıtılır; sabit, doğrusal, karekök, kübik, faktöriyel ve üstel zaman alan örnekler üzerinden çalışma süresinin girdi boyutuyla nasıl büyüdüğü gösterilir ve Öklid algoritmasının neden hızlı olduğu açıklanır. İkinci kısımda adım sayma, en iyi, en kötü ve ortalama durum, alan karmaşıklığı ile Büyük O, Omega ve Teta gösterimleri ele alınır. Döngülerin toplam formülleriyle çözümlenmesi, özyineleme bağıntılarının kurulup Ana Teorem ile çözülmesi örnek fonksiyonlar üzerinde işlenir; amortize analize de kısaca değinilir.
+Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yöntemdir. Bölümün ilk kısmında algoritma kavramı gündelik örneklerle tanıtılır; sabit, doğrusal, karekök, kübik, faktöriyel ve üstel zaman alan örnekler üzerinden çalışma süresinin girdi boyutuyla nasıl büyüdüğü gösterilir ve Öklid algoritmasının neden hızlı olduğu açıklanır. İkinci kısımda adım sayma, en iyi, en kötü ve ortalama durum, alan karmaşıklığı ile Büyük O, Omega ve Teta gösterimleri ele alınır. Döngülerin toplam formülleriyle çözümlenmesi, yineleme bağıntılarının kurulup Ana Teorem ile çözülmesi örnek fonksiyonlar üzerinde işlenir; amortize analize de kısaca değinilir.
 
 - [🖼️Sunum-Giriş (HTML)](../files/algorithms/slides/Bolum_01_01_Giris.html)
 - [📄Sunum-Giriş (PDF)](../files/algorithms/pdf/Bolum_01_01_Giris.pdf)
@@ -44,7 +44,7 @@ Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yön
 
 ### Bölüm 2: Sıralama Algoritmaları
 
-Sıralama, verinin belirli bir düzene sokulmasıdır ve pek çok algoritmanın ön adımını oluşturur. Bölümde kabarcık, eklemeli, seçimli ve kabuk sıralaması gibi temel yöntemler ile birleştirme sıralaması, hızlı sıralama ve yığın sıralaması adım adım izlenir ve Java kodlarıyla çözümlenir. Karşılaştırmaya dayalı sıralamanın Ω(n log n) alt sınırı gösterilir; saymalı, basamak ve kova sıralaması gibi doğrusal zamanlı yöntemlerle gerçek kütüphanelerde kullanılan Timsort tanıtılır. Algoritmalar kararlılık, ek bellek ve karmaşıklık bakımından karşılaştırılır.
+Sıralama, verinin belirli bir düzene sokulmasıdır ve pek çok algoritmanın ön adımını oluşturur. Bölümde kabarcık, eklemeli, seçimli ve Shell sıralaması gibi temel yöntemler ile birleştirme sıralaması, hızlı sıralama ve heap sort adım adım izlenir ve Java kodlarıyla çözümlenir. Karşılaştırmaya dayalı sıralamanın Ω(n log n) alt sınırı gösterilir; saymalı, basamak ve kova sıralaması gibi doğrusal zamanlı yöntemlerle gerçek kütüphanelerde kullanılan Timsort tanıtılır. Algoritmalar kararlılık, ek bellek ve karmaşıklık bakımından karşılaştırılır.
 
 - [🖼️Sunum-Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama.html)
 - [📄Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_02_Siralama.pdf)
@@ -139,7 +139,7 @@ Dizgi algoritmaları metin arama, veri sıkıştırma ve biyolojik dizi çözüm
 
 ### Bölüm 6: Böl ve Fethet Yaklaşımı
 
-Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt problemlere böler, bunları özyinelemeli olarak çözer ve sonuçları birleştirir. Bölümde genel şablon ile buna karşılık gelen özyineleme bağıntısı, Ana Teorem ile çözümleme, birleştirme sıralaması, hızlı sıralama ve hızlı üs alma örnekleri ele alınır; alt problemler örtüştüğünde yaklaşımın neden verimsizleştiği gösterilir. Geometriden Quickhull ile dışbükey örtü ve en yakın nokta çifti, aritmetikten Karatsuba tam sayı çarpımı ve Strassen matris çarpımı ayrıntılı biçimde incelenir.
+Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt problemlere böler, bunları özyinelemeli olarak çözer ve sonuçları birleştirir. Bölümde genel şablon ile buna karşılık gelen yineleme bağıntısı, Ana Teorem ile çözümleme, birleştirme sıralaması, hızlı sıralama ve hızlı üs alma örnekleri ele alınır; alt problemler örtüştüğünde yaklaşımın neden verimsizleştiği gösterilir. Geometriden Quickhull ile dışbükey örtü ve en yakın nokta çifti, aritmetikten Karatsuba tam sayı çarpımı ve Strassen matris çarpımı ayrıntılı biçimde incelenir.
 
 - [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet.html)
 - [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_06_Bol_Fethet.pdf)
@@ -237,14 +237,14 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 
 ---
 
-### Bölüm 13: Çevrimiçi Algoritmalar
+### Bölüm 13: Çevrim İçi Algoritmalar
 
-Çevrimiçi algoritmalar girdiyi parça parça alır ve geleceği bilmeden geri alınamaz kararlar verir. Bu algoritmaların başarısı, tüm girdiyi önceden bilen en iyi çevrimdışı algoritmayla kıyaslayan rekabetçi analiz ve düşman modeliyle ölçülür. Bölümde kayak kiralama problemi ve alt sınırı, FIFO, LRU ve OPT politikalarıyla sayfalama, Belady anomalisi ve rastgele işaretleme algoritması, liste güncellemede öne taşı (MTF) kuralı ele alınır. Veri akışı modelinde hareketli ortalama, çevrimiçi ortanca, rezervuar örnekleme ve kayan hash ile örüntü arama, son olarak da artımlı öğrenme incelenir.
+Çevrim içi algoritmalar girdiyi parça parça alır ve geleceği bilmeden geri alınamaz kararlar verir. Bu algoritmaların başarısı, tüm girdiyi önceden bilen en iyi çevrim dışı algoritmayla kıyaslayan rekabetçi analiz ve düşman modeliyle ölçülür. Bölümde kayak kiralama problemi ve alt sınırı, FIFO, LRU ve OPT politikalarıyla sayfalama, Belady anomalisi ve rastgele işaretleme algoritması, liste güncellemede öne taşı (MTF) kuralı ele alınır. Veri akışı modelinde hareketli ortalama, çevrim içi ortanca, rezervuar örnekleme ve kayan hash ile örüntü arama, son olarak da artımlı öğrenme incelenir.
 
-- [🖼️Sunum-Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici.html)
-- [📄Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Cevrimici.pdf)
-- [📖Ders Notu - Çevrimiçi Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_13_Cevrimici_Ders_Notu.html)
-- [📝Çalışma Soruları - Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici_Calisma_Sorulari.html)
+- [🖼️Sunum-Çevrim İçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici.html)
+- [📄Sunum-Çevrim İçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Cevrimici.pdf)
+- [📖Ders Notu - Çevrim İçi Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_13_Cevrimici_Ders_Notu.html)
+- [📝Çalışma Soruları - Çevrim İçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
 
 ---

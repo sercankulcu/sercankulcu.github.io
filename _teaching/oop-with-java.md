@@ -50,7 +50,7 @@ Programlamanın zemini, bilgisayarın bilgiyi nasıl temsil ettiği ve işlediğ
 
 ### Bölüm 2: Programlama ve Java Söz Dizimi
 
-Bir programlama dili, belirli söz dizimi ve anlam kurallarına uyan ifadelerden oluşur. Bölümde programlama dillerinin gelişimi, söz dizimi ile anlam arasındaki fark, ifadeler, değişkenler ve tipler genel bir çerçevede tanıtılır. Java tarafında kaynak kodun derlenip çalıştırılması, ilkel veri tipleri, tanımlayıcılar ve anahtar kelimeler, atama, sabitler ve tip dönüşümleri ile operatörler ayrıntılı olarak işlenir. Kontrol akışına kısa bir girişle bölüm tamamlanır.
+Bir programlama dili, belirli söz dizimi ve anlam kurallarına uyan ifadelerden oluşur. Bölümde programlama dillerinin gelişimi, söz dizimi ile anlam arasındaki fark, ifadeler, değişkenler ve tipler genel bir çerçevede tanıtılır. Java tarafında kaynak kodun derlenip çalıştırılması, ilkel veri tipleri, tanımlayıcılar ve anahtar sözcükler, atama, sabitler ve tip dönüşümleri ile işleçler ayrıntılı olarak işlenir. Kontrol akışına kısa bir girişle bölüm tamamlanır.
 
 - [🖼️Sunum-Programlama (HTML)](../files/java/slides/Bolum_02_Programlama.html)
 - [📄Sunum-Programlama (PDF)](../files/java/pdf/Bolum_02_Programlama.pdf)
@@ -147,7 +147,7 @@ Java koleksiyon çerçevesi, nesne gruplarını saklamak ve işlemek için ortak
 
 ### Bölüm 6: İstisnalar
 
-İstisnalar, program çalışırken ortaya çıkan olağan dışı durumları normal akıştan ayırarak ele almayı sağlar. Bölümde try, catch ve finally blokları, istisna hiyerarşisi, kontrol edilen ve kontrol edilmeyen istisnalar ile Error sınıfları anlatılır. İstisna fırlatma, sık karşılaşılan çalışma zamanı istisnaları ve özel istisna sınıflarının tanımlanması örneklerle işlenir. Bir istisnanın çağrı yığını boyunca nasıl yayıldığı izleme listesi üzerinden gösterilir.
+İstisnalar, program çalışırken ortaya çıkan olağan dışı durumları normal akıştan ayırarak ele almayı sağlar. Bölümde try, catch ve finally blokları, istisna hiyerarşisi, kontrol edilen ve kontrol edilmeyen istisnalar ile Error sınıfları anlatılır. İstisna fırlatma, sık karşılaşılan çalışma zamanı istisnaları ve özel istisna sınıflarının tanımlanması örneklerle işlenir. Bir istisnanın çağrı yığını boyunca nasıl yayıldığı yığın izi üzerinden gösterilir.
 
 - [🖼️Sunum-İstisnalar (HTML)](../files/java/slides/Bolum_06_Istisnalar.html)
 - [📄Sunum-İstisnalar (PDF)](../files/java/pdf/Bolum_06_Istisnalar.pdf)
@@ -161,7 +161,7 @@ Java koleksiyon çerçevesi, nesne gruplarını saklamak ve işlemek için ortak
 
 ### Bölüm 7: Test ve Hata Ayıklama
 
-Test, bir programın beklenen biçimde çalıştığını sınamak; hata ayıklama ise ortaya çıkan kusurun kaynağını bulmaktır. Bölümde test türleri ve seviyeleri, JUnit 5 ile birim testleri, doğrulama metotları, parametreli testler, sınır değerleri ve iyi bir testin özellikleri ele alınır. Regresyon testi, otomatik testler ve test güdümlü geliştirme tanıtılır; hata ayıklayıcıda kesme noktaları ve adım komutlarının kullanımı gösterilir. Profil oluşturucu, kod kapsamı, statik analiz ve bellek çözümleme araçlarıyla bölüm tamamlanır.
+Test, bir programın beklenen biçimde çalıştığını sınamak; hata ayıklama ise ortaya çıkan kusurun kaynağını bulmaktır. Bölümde test türleri ve düzeyleri, JUnit 5 ile birim testleri, doğrulama metotları, parametreli testler, sınır değerleri ve iyi bir testin özellikleri ele alınır. Regresyon testi, otomatik testler ve test güdümlü geliştirme tanıtılır; hata ayıklayıcıda kesme noktaları ve adım komutlarının kullanımı gösterilir. Profil oluşturucu, kod kapsamı, statik analiz ve bellek çözümleme araçlarıyla bölüm tamamlanır.
 
 - [🖼️Sunum-Test ve Hata Ayıklama (HTML)](../files/java/slides/Bolum_07_Test.html)
 - [📄Sunum-Test ve Hata Ayıklama (PDF)](../files/java/pdf/Bolum_07_Test.pdf)

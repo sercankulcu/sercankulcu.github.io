@@ -65,7 +65,7 @@ Intel 8086, 1978'de tanıtılan ve x86 ailesini başlatan 16 bitlik bir mikroiş
 
 ### Bölüm 3: Assembly Dili
 
-Yazılım, makine dilinden yüksek seviyeli dillere uzanan farklı soyutlama seviyelerinde yazılabilir. Bölümde makine dili ve komut biçimi, assembler ile bağlayıcının rolü, farklı platformlardaki assembly dilleri ile derlenen ve yorumlanan diller karşılaştırılır. Assembly kısmında komut satırının etiket, komut, işlenen ve açıklamadan oluşan yapısı, komut ile direktif ayrımı, işlenen türleri ve örtük işlenenler işlenir. Komut süreleri, IP'nin ilerleyişi, bayraklar ve emu8086 ile yazılan ilk programla bölüm tamamlanır.
+Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama düzeylerinde yazılabilir. Bölümde makine dili ve komut biçimi, assembler ile bağlayıcının rolü, farklı platformlardaki assembly dilleri ile derlenen ve yorumlanan diller karşılaştırılır. Assembly kısmında komut satırının etiket, komut, işlenen ve açıklamadan oluşan yapısı, komut ile direktif ayrımı, işlenen türleri ve örtük işlenenler işlenir. Komut süreleri, IP'nin ilerleyişi, bayraklar ve emu8086 ile yazılan ilk programla bölüm tamamlanır.
 
 - [🖼️Sunum-Programlama Dilleri (HTML)](../files/microprocessors/slides/Bolum_03_Programlama_Dilleri.html)
 - [📄Sunum-Programlama Dilleri (PDF)](../files/microprocessors/pdf/Bolum_03_Programlama_Dilleri.pdf)

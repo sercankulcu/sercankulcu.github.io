@@ -132,14 +132,14 @@ Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde 
 
 ---
 
-### Bölüm 6: Çevrimiçi Platformlar
+### Bölüm 6: Çevrim İçi Platformlar
 
-Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getirir ve aralarındaki oyunun kurallarını koyar. İki taraflı pazarlar, ağ etkisi ve kritik kitle, iki taraflı fiyatlandırma, sponsorlu arama açık artırmaları (GSP ve VCG), bütçe kısıtlı çevrimiçi tahsis, itibar sistemleri ve platformlar arası rekabet.
+Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getirir ve aralarındaki oyunun kurallarını koyar. İki taraflı pazarlar, ağ etkisi ve kritik kitle, iki taraflı fiyatlandırma, sponsorlu arama açık artırmaları (GSP ve VCG), bütçe kısıtlı çevrim içi tahsis, itibar sistemleri ve platformlar arası rekabet.
 
-- [🖼️Sunum-Çevrimiçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform.html)
-- [📄Sunum-Çevrimiçi Platformlar (PDF)](../files/agt/pdf/Bolum_06_Cevrimici_Platform.pdf)
-- [📖Ders Notu - Çevrimiçi Platformlar (HTML)](../files/agt/notlar/Bolum_06_Cevrimici_Platform_Ders_Notu.html)
-- [📝Çalışma Soruları - Çevrimiçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform_Calisma_Sorulari.html)
+- [🖼️Sunum-Çevrim İçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform.html)
+- [📄Sunum-Çevrim İçi Platformlar (PDF)](../files/agt/pdf/Bolum_06_Cevrimici_Platform.pdf)
+- [📖Ders Notu - Çevrim İçi Platformlar (HTML)](../files/agt/notlar/Bolum_06_Cevrimici_Platform_Ders_Notu.html)
+- [📝Çalışma Soruları - Çevrim İçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform_Calisma_Sorulari.html)
 
 - [🕹️İki Taraflı Platform Fiyatlama (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
 - [🕹️Sponsorlu Arama Açık Artırması (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html)
