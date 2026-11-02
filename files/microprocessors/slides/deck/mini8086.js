@@ -7,8 +7,14 @@
    SHL/SAL, SHR, SAR, ROL, ROR, RCL, RCR, JMP, Jcc, LOOP/LOOPE/LOOPNE, JCXZ, CALL, RET, RETF, INT, IRET,
    CLC, STC, CMC, CLD, STD, CLI, STI, NOP, HLT, dizgi komutları (REP önekleriyle), IN/OUT (port belleği).
    Yönergeler: ORG, DB, DW, DD, DUP, EQU, =, PROC/ENDP, LABEL, OFFSET, .MODEL/.DATA/.CODE/.STACK.
-   INT 21h: 00h, 02h, 06h (çıktı), 09h, 19h, 25h, 2Ah, 2Ch, 30h, 35h, 40h, 4Ch; INT 10h: 00h, 02h, 03h, 0Eh, 0Fh;
-   INT 20h, INT 3. Klavye girdisi, makrolar ve include yoktur: açık bir Türkçe hata iletisi verilir.
+   Makrolar (emu8086.py ön işlemcisiyle aynı açılım): MACRO/ENDM, parametreler, &param&, LOCAL (??0000 adları), REPT, IRP,
+   IRPC, IF/IFE/IFB/IFNB/IFDEF/IFNDEF/IFIDN/IFDIF/ELSE/ENDIF, include 'emu8086.inc' (PUTC, GOTOXY, PRINT, PRINTN,
+   CURSOROFF/ON, DEFINE_SCAN_NUM, DEFINE_PRINT_NUM, DEFINE_PRINT_NUM_UNS, DEFINE_PRINT_STRING, DEFINE_PTHIS,
+   DEFINE_GET_STRING, DEFINE_CLEAR_SCREEN).
+   INT 21h: 00h, 01h, 02h, 05h, 06h, 07h, 08h, 09h, 0Ah, 0Bh, 0Ch, 19h, 25h, 2Ah, 2Ch, 30h, 35h, 40h, 4Ch;
+   INT 10h: 00h, 01h, 02h, 03h, 05h, 06h, 07h, 08h, 09h, 0Ah, 0Ch, 0Dh, 0Eh, 0Fh, 13h; INT 16h: 00h, 01h, 02h, 10h, 11h;
+   INT 1Ah: 00h, 02h, 04h; INT 15h/86h; INT 20h, INT 3. Klavye girdisi bir kuyruktan okunur (opts.input); kuyruk boşsa
+   InputWait fırlatılır ve adım hiç yürütülmemiş sayılır. IN/OUT: opts.ports (sabit, sıra ya da işlev; yoksa son OUT).
    Tarayıcıda window.Mini8086, Node'da module.exports olarak kullanılır. */
 (function (root) {
   "use strict";
@@ -57,6 +63,8 @@
   AsmError.prototype.toString = function () { return this.message; };
   function EmuError(msg) { this.message = msg; }
   EmuError.prototype.toString = function () { return this.message; };
+  /* klavye kuyruğu boşken okuma: adım geri alınır, girdi gelince yeniden denenir */
+  function InputWait(what) { this.message = "girdi bekleniyor"; this.what = what || ""; }
 
   /* ================= yardımcılar ================= */
   function stripComment(line) {
@@ -313,25 +321,572 @@
   }
   function Segment(name, kind) { this.name = name; this.kind = kind || "code"; this.loc = 0; this.size = 0; this.para = 0; this.stack = false; }
 
+  var EMU8086_INC = [
+    "PUTC    MACRO   char",
+    "        PUSH    AX",
+    "        MOV     AL, char",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        POP     AX",
+    "ENDM",
+    "",
+    "GOTOXY  MACRO   col, row",
+    "        PUSH    AX",
+    "        PUSH    BX",
+    "        PUSH    DX",
+    "        MOV     AH, 02h",
+    "        MOV     DH, row",
+    "        MOV     DL, col",
+    "        MOV     BH, 0",
+    "        INT     10h",
+    "        POP     DX",
+    "        POP     BX",
+    "        POP     AX",
+    "ENDM",
+    "",
+    "PRINT   MACRO   sdat",
+    "LOCAL   next_char, s_dcl, printed, skip_dcl",
+    "        PUSH    AX",
+    "        PUSH    SI",
+    "        JMP     skip_dcl",
+    "        s_dcl DB sdat, 0",
+    "skip_dcl:",
+    "        LEA     SI, s_dcl",
+    "next_char:",
+    "        MOV     AL, CS:[SI]",
+    "        CMP     AL, 0",
+    "        JZ      printed",
+    "        INC     SI",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        JMP     next_char",
+    "printed:",
+    "        POP     SI",
+    "        POP     AX",
+    "ENDM",
+    "",
+    "PRINTN  MACRO   sdat",
+    "LOCAL   next_char, s_dcl, printed, skip_dcl",
+    "        PUSH    AX",
+    "        PUSH    SI",
+    "        JMP     skip_dcl",
+    "        s_dcl DB sdat, 13, 10, 0",
+    "skip_dcl:",
+    "        LEA     SI, s_dcl",
+    "next_char:",
+    "        MOV     AL, CS:[SI]",
+    "        CMP     AL, 0",
+    "        JZ      printed",
+    "        INC     SI",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        JMP     next_char",
+    "printed:",
+    "        POP     SI",
+    "        POP     AX",
+    "ENDM",
+    "",
+    "CURSOROFF MACRO",
+    "        PUSH    AX",
+    "        PUSH    CX",
+    "        MOV     AH, 1",
+    "        MOV     CH, 28h",
+    "        MOV     CL, 09h",
+    "        INT     10h",
+    "        POP     CX",
+    "        POP     AX",
+    "ENDM",
+    "",
+    "CURSORON MACRO",
+    "        PUSH    AX",
+    "        PUSH    CX",
+    "        MOV     AH, 1",
+    "        MOV     CH, 08h",
+    "        MOV     CL, 09h",
+    "        INT     10h",
+    "        POP     CX",
+    "        POP     AX",
+    "ENDM",
+    "",
+    "DEFINE_SCAN_NUM MACRO",
+    "LOCAL make_minus, ten, next_digit, set_minus, too_big, backspace_checked, too_big2",
+    "LOCAL stop_input, not_minus, skip_proc_scan_num, remove_not_digit, ok_AE_0, ok_digit, not_cr",
+    "        JMP     skip_proc_scan_num",
+    "SCAN_NUM PROC NEAR",
+    "        PUSH    DX",
+    "        PUSH    AX",
+    "        PUSH    SI",
+    "        MOV     CX, 0",
+    "        MOV     CS:make_minus, 0",
+    "next_digit:",
+    "        MOV     AH, 00h",
+    "        INT     16h",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        CMP     AL, '-'",
+    "        JE      set_minus",
+    "        CMP     AL, 0Dh",
+    "        JNE     not_cr",
+    "        JMP     stop_input",
+    "not_cr:",
+    "        CMP     AL, 8",
+    "        JNE     backspace_checked",
+    "        MOV     DX, 0",
+    "        MOV     AX, CX",
+    "        DIV     CS:ten",
+    "        MOV     CX, AX",
+    "        PUTC    ' '",
+    "        PUTC    8",
+    "        JMP     next_digit",
+    "backspace_checked:",
+    "        CMP     AL, '0'",
+    "        JAE     ok_AE_0",
+    "        JMP     remove_not_digit",
+    "ok_AE_0:",
+    "        CMP     AL, '9'",
+    "        JBE     ok_digit",
+    "remove_not_digit:",
+    "        PUTC    8",
+    "        PUTC    ' '",
+    "        PUTC    8",
+    "        JMP     next_digit",
+    "ok_digit:",
+    "        PUSH    AX",
+    "        MOV     AX, CX",
+    "        MUL     CS:ten",
+    "        MOV     CX, AX",
+    "        POP     AX",
+    "        CMP     DX, 0",
+    "        JNE     too_big",
+    "        SUB     AL, 30h",
+    "        MOV     AH, 0",
+    "        MOV     DX, CX",
+    "        ADD     CX, AX",
+    "        JC      too_big2",
+    "        JMP     next_digit",
+    "set_minus:",
+    "        MOV     CS:make_minus, 1",
+    "        JMP     next_digit",
+    "too_big2:",
+    "        MOV     CX, DX",
+    "        MOV     DX, 0",
+    "too_big:",
+    "        MOV     AX, CX",
+    "        DIV     CS:ten",
+    "        MOV     CX, AX",
+    "        PUTC    8",
+    "        PUTC    ' '",
+    "        PUTC    8",
+    "        JMP     next_digit",
+    "stop_input:",
+    "        CMP     CS:make_minus, 0",
+    "        JE      not_minus",
+    "        NEG     CX",
+    "not_minus:",
+    "        POP     SI",
+    "        POP     AX",
+    "        POP     DX",
+    "        RET",
+    "make_minus DB ?",
+    "ten        DW 10",
+    "SCAN_NUM ENDP",
+    "skip_proc_scan_num:",
+    "ENDM",
+    "",
+    "DEFINE_PRINT_NUM MACRO",
+    "LOCAL not_zero, positive, printed, skip_proc_print_num",
+    "        JMP     skip_proc_print_num",
+    "PRINT_NUM PROC NEAR",
+    "        PUSH    DX",
+    "        PUSH    AX",
+    "        CMP     AX, 0",
+    "        JNZ     not_zero",
+    "        PUTC    '0'",
+    "        JMP     printed",
+    "not_zero:",
+    "        CMP     AX, 0",
+    "        JNS     positive",
+    "        NEG     AX",
+    "        PUTC    '-'",
+    "positive:",
+    "        CALL    PRINT_NUM_UNS",
+    "printed:",
+    "        POP     AX",
+    "        POP     DX",
+    "        RET",
+    "PRINT_NUM ENDP",
+    "skip_proc_print_num:",
+    "ENDM",
+    "",
+    "DEFINE_PRINT_NUM_UNS MACRO",
+    "LOCAL begin_print, calc, skip, print_zero, end_print, ten, skip_proc_print_num_uns",
+    "        JMP     skip_proc_print_num_uns",
+    "PRINT_NUM_UNS PROC NEAR",
+    "        PUSH    AX",
+    "        PUSH    BX",
+    "        PUSH    CX",
+    "        PUSH    DX",
+    "        MOV     CX, 1",
+    "        MOV     BX, 10000",
+    "        CMP     AX, 0",
+    "        JZ      print_zero",
+    "begin_print:",
+    "        CMP     BX, 0",
+    "        JZ      end_print",
+    "        CMP     CX, 0",
+    "        JE      calc",
+    "        CMP     AX, BX",
+    "        JB      skip",
+    "calc:",
+    "        MOV     CX, 0",
+    "        MOV     DX, 0",
+    "        DIV     BX",
+    "        ADD     AL, 30h",
+    "        PUTC    AL",
+    "        MOV     AX, DX",
+    "skip:",
+    "        PUSH    AX",
+    "        MOV     DX, 0",
+    "        MOV     AX, BX",
+    "        DIV     CS:ten",
+    "        MOV     BX, AX",
+    "        POP     AX",
+    "        JMP     begin_print",
+    "print_zero:",
+    "        PUTC    '0'",
+    "end_print:",
+    "        POP     DX",
+    "        POP     CX",
+    "        POP     BX",
+    "        POP     AX",
+    "        RET",
+    "ten     DW      10",
+    "PRINT_NUM_UNS ENDP",
+    "skip_proc_print_num_uns:",
+    "ENDM",
+    "",
+    "DEFINE_PRINT_STRING MACRO",
+    "LOCAL next_char, printed, skip_proc_print_string",
+    "        JMP     skip_proc_print_string",
+    "PRINT_STRING PROC NEAR",
+    "        PUSH    AX",
+    "        PUSH    SI",
+    "next_char:",
+    "        MOV     AL, [SI]",
+    "        CMP     AL, 0",
+    "        JZ      printed",
+    "        INC     SI",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        JMP     next_char",
+    "printed:",
+    "        POP     SI",
+    "        POP     AX",
+    "        RET",
+    "PRINT_STRING ENDP",
+    "skip_proc_print_string:",
+    "ENDM",
+    "",
+    "DEFINE_PTHIS MACRO",
+    "LOCAL next_char, printed, skip_proc_pthis, temp1",
+    "        JMP     skip_proc_pthis",
+    "PTHIS PROC NEAR",
+    "        MOV     CS:temp1, SI",
+    "        POP     SI",
+    "        PUSH    AX",
+    "next_char:",
+    "        MOV     AL, CS:[SI]",
+    "        INC     SI",
+    "        CMP     AL, 0",
+    "        JZ      printed",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        JMP     next_char",
+    "printed:",
+    "        POP     AX",
+    "        PUSH    SI",
+    "        MOV     SI, CS:temp1",
+    "        RET",
+    "temp1   DW      ?",
+    "PTHIS ENDP",
+    "skip_proc_pthis:",
+    "ENDM",
+    "",
+    "DEFINE_GET_STRING MACRO",
+    "LOCAL empty_buffer, wait_for_key, skip_proc_get_string, exit_get_string, add_to_buffer",
+    "        JMP     skip_proc_get_string",
+    "GET_STRING PROC NEAR",
+    "        PUSH    AX",
+    "        PUSH    CX",
+    "        PUSH    DI",
+    "        PUSH    DX",
+    "        MOV     CX, 0",
+    "        CMP     DX, 1",
+    "        JBE     empty_buffer",
+    "        DEC     DX",
+    "wait_for_key:",
+    "        MOV     AH, 0",
+    "        INT     16h",
+    "        CMP     AL, 0Dh",
+    "        JZ      exit_get_string",
+    "        CMP     AL, 8",
+    "        JNE     add_to_buffer",
+    "        JCXZ    wait_for_key",
+    "        DEC     CX",
+    "        DEC     DI",
+    "        PUTC    8",
+    "        PUTC    ' '",
+    "        PUTC    8",
+    "        JMP     wait_for_key",
+    "add_to_buffer:",
+    "        CMP     CX, DX",
+    "        JAE     wait_for_key",
+    "        MOV     [DI], AL",
+    "        INC     DI",
+    "        INC     CX",
+    "        MOV     AH, 0Eh",
+    "        INT     10h",
+    "        JMP     wait_for_key",
+    "exit_get_string:",
+    "        MOV     BYTE PTR [DI], 0",
+    "empty_buffer:",
+    "        POP     DX",
+    "        POP     DI",
+    "        POP     CX",
+    "        POP     AX",
+    "        RET",
+    "GET_STRING ENDP",
+    "skip_proc_get_string:",
+    "ENDM",
+    "",
+    "DEFINE_CLEAR_SCREEN MACRO",
+    "LOCAL skip_proc_clear_screen",
+    "        JMP     skip_proc_clear_screen",
+    "CLEAR_SCREEN PROC NEAR",
+    "        PUSH    AX",
+    "        PUSH    DS",
+    "        PUSH    BX",
+    "        PUSH    CX",
+    "        PUSH    DI",
+    "        MOV     AX, 40h",
+    "        MOV     DS, AX",
+    "        MOV     AH, 06h",
+    "        MOV     AL, 0",
+    "        MOV     BH, 07",
+    "        MOV     CH, 0",
+    "        MOV     CL, 0",
+    "        MOV     DI, 84h",
+    "        MOV     DH, [DI]",
+    "        MOV     DI, 4Ah",
+    "        MOV     DL, [DI]",
+    "        DEC     DL",
+    "        INT     10h",
+    "        MOV     BH, 0",
+    "        MOV     DL, 0",
+    "        MOV     DH, 0",
+    "        MOV     AH, 02",
+    "        INT     10h",
+    "        POP     DI",
+    "        POP     CX",
+    "        POP     BX",
+    "        POP     DS",
+    "        POP     AX",
+    "        RET",
+    "CLEAR_SCREEN ENDP",
+    "skip_proc_clear_screen:",
+    "ENDM"
+  ].join("\n");
+
+  /* ================= ön işlemci: makrolar, REPT/IRP/IRPC, koşullu assembly, emu8086.inc =================
+     emu8086.py Preprocessor sınıfının birebir karşılığı (aynı LOCAL sayacı, aynı satır numaraları): açılan her satır
+     çağrının satır numarasını taşır; macro alanı açılımın makro adıdır, anchor alanı açılımın kod panelinde hangi kaynak
+     satırının altında gösterileceğidir. emu8086.inc gövdeleri doğrulayıcıdaki yeniden yazımla aynıdır. */
+  function PLine(no, text, macro, anchor) { this.no = no; this.text = text; this.macro = macro || null; this.anchor = anchor == null ? no : anchor; }
+  var BLOCK_OPEN = new RegExp("^\\s*(?:" + IDENT + "\\s+MACRO\\b|REPT\\b|IRP\\b|IRPC\\b)", "iu");
+  var ENDM_RE = new RegExp("^(?:" + IDENT + "\\s+)?ENDM\\b", "iu");
+  var IDENT_Y = new RegExp(IDENT, "uy");
+  var WORDCH = /[\p{L}\p{N}_?@$]/u;
+  function Preprocessor() { this.macros = {}; this.localCounter = 0; this.consts = {}; this.included = false; }
+  var PPP = Preprocessor.prototype;
+  PPP.run = function (source) {
+    var raw = source.replace(/\t/g, " ").split(/\r\n|\r|\n/), lines = [];
+    if (raw.length && raw[raw.length - 1] === "") raw.pop();
+    for (var i = 0; i < raw.length; i++) lines.push(new PLine(i + 1, raw[i], null));
+    return this.process(lines, 0);
+  };
+  PPP.collect = function (lines, i) {
+    var body = [], depth = 1;
+    for (var j = i + 1; j < lines.length; j++) {
+      var t = stripComment(lines[j].text).trim();
+      if (BLOCK_OPEN.test(t)) depth++;
+      else if (ENDM_RE.test(t)) { depth--; if (depth === 0) return [body, j]; }
+      body.push(lines[j]);
+    }
+    throw new AsmError("ENDM bulunamadı", lines[i].no, lines[i].text.trim());
+  };
+  PPP.subst = function (text, map) {
+    if (!Object.keys(map).length) return text;
+    text = text.replace(new RegExp("&(" + IDENT + ")&?", "gu"), function (m0, g1) { var u = g1.toUpperCase(); return has(map, u) ? map[u] : m0; });
+    var res = "", i = 0;
+    while (i < text.length) {
+      var ch = text.charAt(i);
+      if (ch === "'" || ch === '"') {
+        var j = text.indexOf(ch, i + 1);
+        if (j < 0) j = text.length - 1;
+        res += text.slice(i, j + 1); i = j + 1; continue;
+      }
+      IDENT_Y.lastIndex = i;
+      var m = IDENT_Y.exec(text);
+      if (m && (i === 0 || !WORDCH.test(text.charAt(i - 1)))) {
+        var u = m[0].toUpperCase();
+        res += has(map, u) ? map[u] : m[0];
+        i += m[0].length; continue;
+      }
+      res += ch; i++;
+    }
+    return res;
+  };
+  PPP.evalConst = function (expr, no) {
+    var self = this;
+    expr = expr.trim().replace(IDENT_G, function (w) { var u = w.toUpperCase(); return has(self.consts, u) ? String(self.consts[u]) : w; });
+    try { return new Expr(expr, function () { return null; }, 0, no, true).value().val; }
+    catch (e) { if (e instanceof AsmError) return 0; throw e; }
+  };
+  PPP.process = function (lines, depth) {
+    if (depth > 50) throw new AsmError("makro açılımı çok derin (özyineleme?)");
+    var out = [], cond = [], i = 0, m, self = this;
+    var reIf = /^(IF|IFE|IFB|IFNB|IFDEF|IFNDEF|IFIDN|IFDIF)\b([\s\S]*)$/i;
+    var reMac = new RegExp("^(" + IDENT + ")\\s+MACRO\\b([\\s\\S]*)$", "iu");
+    var reEqu = new RegExp("^(" + IDENT + ")\\s+(EQU|=)\\s*([\\s\\S]+)$", "iu");
+    var reLab = new RegExp("^(" + IDENT + ")\\s*:(?!\\s*\\[)\\s*([\\s\\S]*)$", "u");
+    var reCall = new RegExp("^(" + IDENT + ")(\\s+([\\s\\S]*))?$", "u");
+    function active() { return cond.every(function (c) { return c[0]; }); }
+    while (i < lines.length) {
+      var ln = lines[i], t = stripComment(ln.text).trim(), u = t.toUpperCase(), act = active();
+      m = reIf.exec(t);
+      if (m) {
+        if (!act) cond.push([false, true]);
+        else {
+          var kw = m[1].toUpperCase(), arg = m[2].trim(), v;
+          if (kw === "IF") v = this.evalConst(arg, ln.no) !== 0;
+          else if (kw === "IFE") v = this.evalConst(arg, ln.no) === 0;
+          else if (kw === "IFB" || kw === "IFNB") {
+            var a = arg.trim();
+            if (a.charAt(0) === "<" && a.charAt(a.length - 1) === ">") a = a.slice(1, -1);
+            v = (a.trim() === "") === (kw === "IFB");
+          } else if (kw === "IFDEF" || kw === "IFNDEF") v = (has(this.consts, arg.toUpperCase()) || has(this.macros, arg.toUpperCase())) === (kw === "IFDEF");
+          else {
+            var aa = splitTop(arg).map(function (x) { return x.replace(/^[<>]+|[<>]+$/g, "").trim().toUpperCase(); }).concat(["", ""]);
+            v = (aa[0] === aa[1]) === (kw === "IFIDN");
+          }
+          cond.push([v, v]);
+        }
+        i++; continue;
+      }
+      if (/^ELSE\b/.test(u)) {
+        if (!cond.length) throw new AsmError("ELSE için IF yok", ln.no, ln.text.trim());
+        var taken = cond.pop()[1];
+        cond.push([active() && !taken, true]);
+        i++; continue;
+      }
+      if (/^ENDIF\b/.test(u)) {
+        if (!cond.length) throw new AsmError("ENDIF için IF yok", ln.no, ln.text.trim());
+        cond.pop(); i++; continue;
+      }
+      if (!act) {
+        if (BLOCK_OPEN.test(t)) i = this.collect(lines, i)[1] + 1; else i++;
+        continue;
+      }
+      if (!t) { i++; continue; }
+      if (t.charAt(0) === "#" && t.charAt(t.length - 1) === "#") { i++; continue; }
+      m = /^INCLUDE\s+['"<]?([^'">]+)['">]?\s*$/i.exec(t);
+      if (m) {
+        if (/emu8086\.inc$/.test(m[1].trim().toLowerCase())) {
+          if (!this.included) {
+            this.included = true;
+            var inc = EMU8086_INC.split("\n").map(function (x) { return new PLine(ln.no, x, "emu8086.inc", ln.anchor); });
+            out = out.concat(this.process(inc, depth + 1));
+          }
+        } else throw new AsmError("include desteklenmiyor: " + m[1] + " (yalnız emu8086.inc)", ln.no, ln.text.trim());
+        i++; continue;
+      }
+      m = reMac.exec(t);
+      if (m) {
+        var blk = this.collect(lines, i);
+        var params = splitTop(m[2]).filter(function (p) { return p.trim(); }).map(function (p) { return p.split(":")[0].trim().toUpperCase(); });
+        this.macros[m[1].toUpperCase()] = { name: m[1].toUpperCase(), raw: m[1], params: params, body: blk[0] };
+        i = blk[1] + 1; continue;
+      }
+      m = /^(REPT|IRP|IRPC)\b([\s\S]*)$/i.exec(t);
+      if (m) {
+        var b2 = this.collect(lines, i), body = b2[0], kw2 = m[1].toUpperCase(), arg2 = m[2].trim(), exp = [];
+        var anc = ln.macro ? ln.anchor : lines[b2[1]].no;
+        if (kw2 === "REPT") {
+          var n = this.evalConst(arg2, ln.no);
+          for (var r = 0; r < n; r++) body.forEach(function (b) { exp.push(new PLine(ln.no, b.text, b.macro || "REPT", anc)); });
+        } else {
+          var cm = arg2.indexOf(",");
+          if (cm < 0) throw new AsmError(kw2 + " için parametre ve liste gerekir", ln.no, ln.text.trim());
+          var p = arg2.slice(0, cm).trim().toUpperCase(), rest = arg2.slice(cm + 1).trim(), items;
+          if (kw2 === "IRP") {
+            if (rest.charAt(0) === "<" && rest.charAt(rest.length - 1) === ">") rest = rest.slice(1, -1);
+            items = splitTop(rest);
+          } else items = rest.replace(/^[<>]+|[<>]+$/g, "").split("");
+          items.forEach(function (it) {
+            var mp = {}; mp[p] = it;
+            body.forEach(function (b) { exp.push(new PLine(ln.no, self.subst(b.text, mp), b.macro || kw2, anc)); });
+          });
+        }
+        out = out.concat(this.process(exp, depth + 1));
+        i = b2[1] + 1; continue;
+      }
+      m = reEqu.exec(t);
+      if (m) { try { this.consts[m[1].toUpperCase()] = this.evalConst(m[3], ln.no); } catch (e) { /* yok say */ } }
+      var lab = "", rest2 = t;
+      m = reLab.exec(t);
+      if (m && !has(SREG, m[1].toUpperCase())) { lab = m[1] + ":"; rest2 = m[2]; }
+      m = reCall.exec(rest2);
+      if (m && has(this.macros, m[1].toUpperCase())) {
+        var mac = this.macros[m[1].toUpperCase()], g3 = m[3] || "";
+        var args = g3.trim() ? splitTop(g3) : [];
+        args = args.map(function (x) { return x.charAt(0) === "<" && x.charAt(x.length - 1) === ">" ? x.slice(1, -1) : x; });
+        var map = {}, exl = [];
+        mac.params.forEach(function (pp, k) { map[pp] = k < args.length ? args[k] : ""; });
+        if (lab) exl.push(new PLine(ln.no, lab, mac.raw, ln.anchor));
+        mac.body.forEach(function (b) {
+          var bt = stripComment(b.text).trim(), mm = /^LOCAL\b([\s\S]*)$/i.exec(bt);
+          if (mm) {
+            splitTop(mm[1]).forEach(function (nm) {
+              if (!nm) return;
+              var hxs = self.localCounter.toString(16).toUpperCase();
+              while (hxs.length < 4) hxs = "0" + hxs;
+              map[nm.toUpperCase()] = "??" + hxs;
+              self.localCounter++;
+            });
+            return;
+          }
+          exl.push(new PLine(ln.no, b.text, mac.raw, ln.anchor));
+        });
+        exl = exl.map(function (e) { return new PLine(e.no, self.subst(e.text, map), e.macro, e.anchor); });
+        out = out.concat(this.process(exl, depth + 1));
+        i++; continue;
+      }
+      if (/^END\b/.test(u) && !/^ENDP|^ENDS|^ENDM/.test(u)) { out.push(ln); break; }
+      out.push(ln);
+      i++;
+    }
+    if (cond.length) throw new AsmError("kapanmamış IF bloğu");
+    return out;
+  };
+
   /* ================= assembler ================= */
   function Assembler(source, opts) {
     this.source = source; this.leaMasm = !!(opts && opts.leaMasm); this.warnings = []; this._grew = false;
   }
   Assembler.prototype.preprocess = function () {
-    var raw = this.source.replace(/\t/g, " ").split(/\r\n|\r|\n/), out = [];
-    if (raw.length && raw[raw.length - 1] === "") raw.pop();
-    for (var i = 0; i < raw.length; i++) {
-      var t = stripComment(raw[i]).trim(), u = t.toUpperCase();
-      if (t.charAt(0) === "#" && t.charAt(t.length - 1) === "#" && t.length > 1) continue;
-      if (/^INCLUDE\b/.test(u)) throw new AsmError("include (" + t.slice(7).trim() + ") bu laboratuvarda desteklenmiyor", i + 1, raw[i].trim());
-      if (new RegExp("^" + IDENT + "\\s+MACRO\\b", "iu").test(t) || /^(REPT|IRP|IRPC)\b/.test(u))
-        throw new AsmError("makrolar bu laboratuvarda desteklenmiyor", i + 1, raw[i].trim());
-      if (/^(IF|IFE|IFB|IFNB|IFDEF|IFNDEF|IFIDN|IFDIF|ELSE|ENDIF)\b/.test(u))
-        throw new AsmError("koşullu assembly (IF/ELSE/ENDIF) bu laboratuvarda desteklenmiyor", i + 1, raw[i].trim());
-      out.push({ no: i + 1, text: raw[i] });
-      if (/^END\b/.test(u) && !/^ENDP|^ENDS|^ENDM/.test(u)) break;
-    }
-    return out;
+    var pp = new Preprocessor(), lines = pp.run(this.source);
+    this.lines = lines;
+    return lines;
   };
   Assembler.prototype.parse = function () {
     var lines = this.preprocess(), stmts = [], pending = [];
@@ -341,7 +896,8 @@
       var ln = lines[li];
       var t = stripComment(ln.text).trim();
       if (!t) continue;
-      var st = new Stmt(ln.no, t, null);
+      var st = new Stmt(ln.no, t, ln.macro);
+      st.eid = li;
       var m = labRe.exec(t);
       if (m && !has(SREG, m[1].toUpperCase())) { st.label = m[1].toUpperCase(); this.rawName[st.label] = this.rawName[st.label] || m[1]; t = m[2].trim(); }
       st.show = t;
@@ -1001,7 +1557,8 @@
     return [0x70 + (cc ^ 1), 3, 0xE9, rel & 0xFF, rel >> 8];
   };
   Assembler.prototype.build = function () {
-    var self = this, prog = { stmts: this.stmts, syms: this.syms, segs: this.segs, com: this.com, warnings: this.warnings, code: {}, image: [] };
+    var self = this, prog = { stmts: this.stmts, syms: this.syms, segs: this.segs, com: this.com, warnings: this.warnings, code: {}, image: [],
+      lines: (this.lines || []).map(function (l, i) { return { eid: i, no: l.no, text: l.text, macro: l.macro, anchor: l.anchor }; }) };
     if (this.implicitOrg && !this.hasOrg && this.com) prog.warnings.unshift("ORG 100h yok: .COM varsayıldı, kod 0100h'den başlatıldı");
     this.stmts.forEach(function (st) {
       if (st.seg == null || !st.bytes.length) return;
@@ -1047,6 +1604,14 @@
     this.out = ""; this.stepOut = ""; this.memlog = null;
     this.portLast = {}; this.cursor = [0, 0]; this.halted = null; this.steps = 0; this.cur = null;
     this.repStep = !!opts.repStep;
+    this.input = String(opts.input || "").replace(/\r\n/g, "\r").replace(/\n/g, "\r").split("");
+    this.keysRead = 0; this.polls = 0; this.pollDelay = opts.pollDelay || 0; this.pollEmpty = false;
+    this.ports = {};
+    var pk, po = opts.ports || {};
+    for (pk in po) this.ports[/^\d+$/.test(pk) ? +pk : parseNumber(pk)] = Array.isArray(po[pk]) ? po[pk].slice() : po[pk];
+    this.portWrites = []; this.printer = ""; this.pixels = {}; this.svc = null;
+    this.clock = opts.clock || [12, 0, 0, 0];
+    this.date = opts.date || [2026, 1, 1, 4];
     var i;
     for (i = 0; i < 256; i++) { this.w16(i * 4, BIOS_OFF + i); this.w16(i * 4 + 2, BIOS_SEG); }
     this.w16(0x44A, 80); this.mem[0x484] = 24;
@@ -1207,7 +1772,9 @@
     r = !!r;
     return cc & 1 ? !r : r;
   };
+  var INTOPS = { INT: 1, _BIOS: 1, ".EXIT": 1, INTO: 1 };
   MP.interrupt = function (n, retIp) {
+    this.irq = { n: n, flags: this.flagsWord(), cs: this.s[1], ip: retIp };
     this.push(this.flagsWord()); this.push(this.s[1]); this.push(retIp);
     this.f.IF = 0; this.f.TF = 0;
     this.s[1] = this.rd16(0, n * 4 + 2); this.ip = this.rd16(0, n * 4);
@@ -1250,33 +1817,75 @@
       this.mem[a] = 0x20; this.mem[a + 1] = attr;
     }
   };
-  function noKeys(what) { return new EmuError(what + ": klavye girdisi bu laboratuvarda yok"); }
+  /* tarama kodları (emu8086.py SCAN tablosu) */
+  var SCAN = {};
+  "1234567890-=".split("").forEach(function (c, i) { SCAN[c] = 2 + i; });
+  [["qwertyuiop", 0x10], ["asdfghjkl", 0x1E], ["zxcvbnm", 0x2C]].forEach(function (rw) {
+    rw[0].split("").forEach(function (c, i) { SCAN[c] = rw[1] + i; SCAN[c.toUpperCase()] = rw[1] + i; });
+  });
+  SCAN["\r"] = 0x1C; SCAN[" "] = 0x39; SCAN["\x1b"] = 0x01; SCAN["\b"] = 0x0E; SCAN["\t"] = 0x0F;
+  function bcd(v) { return (Math.floor(v / 10) << 4) | (v % 10); }
+  /* tuş durumu sorgusu (INT 16h/01h, INT 21h/0Bh, 06h): pollDelay kadar sorgu "tuş yok" döner */
+  MP.keyReady = function () {
+    if (this.polls < this.pollDelay) { this.polls++; return false; }
+    var r = this.input.length > 0;
+    if (!r) this.pollEmpty = true;
+    return r;
+  };
+  MP.key = function (what) {
+    if (!this.input.length) throw new InputWait(what);
+    this.keysRead++;
+    return this.input.shift();
+  };
   MP.builtin = function (n) {
-    var ah = this.get("AH"), al = this.get("AL"), seg, off, i;
+    var ah = this.get("AH"), al = this.get("AL"), seg, off, i, ch, c;
     if (n === 0x20) { this.halted = "INT 20h"; return; }
     if (n === 0x21) {
       if (ah === 0x00) this.halted = "INT 21h/00h";
       else if (ah === 0x4C) this.halted = "INT 21h/4Ch (çıkış kodu " + al + ")";
+      else if (ah === 0x01) { ch = this.key("INT 21h, AH = 01h"); this.set("AL", ch.charCodeAt(0)); this.emit(ch); }
+      else if (ah === 0x07 || ah === 0x08) this.set("AL", this.key("INT 21h, AH = " + hx(ah, 1)).charCodeAt(0));
       else if (ah === 0x02) { var dl = this.get("DL"); this.emit(String.fromCharCode(dl)); this.set("AL", dl); }
       else if (ah === 0x06) {
         var d6 = this.get("DL");
-        if (d6 === 0xFF) { this.set("AL", 0); this.f.ZF = 1; }
-        else { this.emit(String.fromCharCode(d6)); this.set("AL", d6); }
+        if (d6 === 0xFF) {
+          if (this.keyReady()) { this.keysRead++; this.set("AL", this.input.shift().charCodeAt(0)); this.f.ZF = 0; }
+          else { this.set("AL", 0); this.f.ZF = 1; }
+        } else { this.emit(String.fromCharCode(d6)); this.set("AL", d6); }
       } else if (ah === 0x09) {
         seg = this.s[3]; off = this.get("DX");
         var cnt = 0;
         for (;;) {
-          var c = this.rd8(seg, off);
+          c = this.rd8(seg, off);
           if (c === 0x24) break;
           this.emit(String.fromCharCode(c));
           off = (off + 1) & 0xFFFF;
           if (++cnt > 65535) throw new EmuError("INT 21h/09h: '$' sonlandırıcı bulunamadı");
         }
         this.set("AL", 0x24);
-      } else if (ah === 0x01 || ah === 0x07 || ah === 0x08 || ah === 0x0A || ah === 0x0C) throw noKeys("INT 21h, AH=" + hx(ah, 1));
-      else if (ah === 0x0B) this.set("AL", 0);
-      else if (ah === 0x2C) { this.set("CH", 12); this.set("CL", 0); this.set("DH", 0); this.set("DL", 0); }
-      else if (ah === 0x2A) { this.set("CX", 2026); this.set("DH", 1); this.set("DL", 1); this.set("AL", 4); }
+      } else if (ah === 0x0A) {
+        seg = this.s[3]; off = this.get("DX");
+        /* satır Enter ile bitmeden hiçbir şey yapılmaz (adım yan etkisiz geri alınabilsin) */
+        if (this.input.indexOf("\r") < 0) throw new InputWait("INT 21h, AH = 0Ah");
+        var mx = this.rd8(seg, off), buf = [];
+        for (;;) {
+          ch = this.key("INT 21h, AH = 0Ah");
+          if (ch === "\r") break;
+          if (ch === "\b") { if (buf.length) { buf.pop(); this.emit("\b"); } continue; }
+          if (buf.length < mx - 1) { buf.push(ch); this.emit(ch); }
+        }
+        for (i = 0; i < buf.length; i++) this.wr8(seg, off + 2 + i, buf[i].charCodeAt(0));
+        this.wr8(seg, off + 2 + buf.length, 13);
+        this.wr8(seg, off + 1, buf.length);
+        this.emit("\r");
+        this.svc = { buf: buf.join(""), mx: mx, at: off };
+      } else if (ah === 0x0B) this.set("AL", this.keyReady() ? 0xFF : 0);
+      else if (ah === 0x05) this.printer += String.fromCharCode(this.get("DL"));
+      else if (ah === 0x0C) {
+        this.input = [];
+        if ([1, 6, 7, 8, 0x0A].indexOf(al) >= 0) { this.set("AH", al); this.builtin(0x21); this.set("AH", 0x0C); }
+      } else if (ah === 0x2C) { this.set("CH", this.clock[0]); this.set("CL", this.clock[1]); this.set("DH", this.clock[2]); this.set("DL", this.clock[3]); }
+      else if (ah === 0x2A) { this.set("CX", this.date[0]); this.set("DH", this.date[1]); this.set("DL", this.date[2]); this.set("AL", this.date[3]); }
       else if (ah === 0x25) { this.wr16(0, al * 4, this.get("DX")); this.wr16(0, al * 4 + 2, this.s[3]); }
       else if (ah === 0x35) { this.set("BX", this.rd16(0, al * 4)); this.set("ES", this.rd16(0, al * 4 + 2)); }
       else if (ah === 0x30) this.set("AX", 0x0005);
@@ -1294,14 +1903,97 @@
       else if (ah === 0x02) this.cursor = [this.get("DH"), this.get("DL")];
       else if (ah === 0x03) { this.set("DH", this.cursor[0]); this.set("DL", this.cursor[1]); this.set("CX", 0x0607); }
       else if (ah === 0x00) { this.clearWindow(0, 0, 24, 79, 0x07); this.cursor = [0, 0]; }
-      else if (ah === 0x0F) { this.set("AL", 3); this.set("AH", 80); this.set("BH", 0); }
-      else if (ah === 0x01 || ah === 0x05 || ah === 0x10 || ah === 0x0B) { /* etkisiz */ }
+      else if (ah === 0x06 || ah === 0x07) {
+        if (al === 0) this.clearWindow(this.get("CH"), this.get("CL"), this.get("DH"), this.get("DL"), this.get("BH"));
+        else this.scroll(ah === 0x06, al, this.get("CH"), this.get("CL"), this.get("DH"), this.get("DL"), this.get("BH"));
+      } else if (ah === 0x09 || ah === 0x0A) {
+        var row = this.cursor[0], col = this.cursor[1], k = this.get("CX");
+        for (i = 0; i < k; i++) {
+          var p = row * 80 + col + i;
+          if (p >= 2000) break;
+          var va = (VIDEO_SEG << 4) + 2 * p;
+          this.mem[va] = al;
+          if (ah === 0x09) this.mem[va + 1] = this.get("BL");
+        }
+        var rep = "";
+        for (i = 0; i < k; i++) rep += String.fromCharCode(al);
+        this.stepOut += rep; this.out += rep;
+      } else if (ah === 0x13) {
+        seg = this.s[0]; off = this.get("BP");
+        var cnt2 = this.get("CX"), save = this.cursor.slice(), attrIn = al & 2;
+        this.cursor = [this.get("DH"), this.get("DL")];
+        for (i = 0; i < cnt2; i++) {
+          var cc, at;
+          if (attrIn) { cc = this.rd8(seg, off + 2 * i); at = this.rd8(seg, off + 2 * i + 1); }
+          else { cc = this.rd8(seg, off + i); at = this.get("BL"); }
+          this.emit(String.fromCharCode(cc), at);
+        }
+        if (!(al & 1)) this.cursor = save;
+      } else if (ah === 0x01 || ah === 0x05 || ah === 0x10 || ah === 0x0B) { /* etkisiz */ }
+      else if (ah === 0x0C) this.pixels[this.get("CX") + "," + this.get("DX")] = al;
+      else if (ah === 0x0D) this.set("AL", this.pixels[this.get("CX") + "," + this.get("DX")] || 0);
+      else if (ah === 0x08) {
+        var a8 = (VIDEO_SEG << 4) + 2 * (this.cursor[0] * 80 + this.cursor[1]);
+        this.set("AL", this.mem[a8]); this.set("AH", this.mem[a8 + 1]);
+      } else if (ah === 0x0F) { this.set("AL", 3); this.set("AH", 80); this.set("BH", 0); }
       else throw new EmuError("desteklenmeyen BIOS servisi: INT 10h, AH=" + hx(ah, 1));
       return;
     }
-    if (n === 0x16) throw noKeys("INT 16h");
+    if (n === 0x16) {
+      if (ah === 0x00 || ah === 0x10) {
+        ch = this.key("INT 16h, AH = " + hx(ah, 1));
+        this.set("AL", ch.charCodeAt(0) & 0xFF); this.set("AH", SCAN[ch] || 0);
+      } else if (ah === 0x01 || ah === 0x11) {
+        if (this.keyReady()) { ch = this.input[0]; this.set("AL", ch.charCodeAt(0) & 0xFF); this.set("AH", SCAN[ch] || 0); this.f.ZF = 0; }
+        else this.f.ZF = 1;
+      } else if (ah === 0x02) this.set("AL", 0);
+      else throw new EmuError("desteklenmeyen BIOS servisi: INT 16h, AH=" + hx(ah, 1));
+      return;
+    }
+    if (n === 0x1A) {
+      var ck = this.clock, dt = this.date;
+      if (ah === 0x00) {
+        var tk = Math.floor(((ck[0] * 3600 + ck[1] * 60 + ck[2]) + ck[3] / 100) * 18.2065);
+        this.set("CX", tk >>> 16); this.set("DX", tk & 0xFFFF); this.set("AL", 0);
+      } else if (ah === 0x02) { this.set("CH", bcd(ck[0])); this.set("CL", bcd(ck[1])); this.set("DH", bcd(ck[2])); this.f.CF = 0; }
+      else if (ah === 0x04) {
+        this.set("CH", bcd(Math.floor(dt[0] / 100))); this.set("CL", bcd(dt[0] % 100));
+        this.set("DH", bcd(dt[1])); this.set("DL", bcd(dt[2])); this.f.CF = 0;
+      } else throw new EmuError("desteklenmeyen BIOS servisi: INT 1Ah, AH=" + hx(ah, 1));
+      return;
+    }
+    if (n === 0x15 && ah === 0x86) { this.f.CF = 0; return; }
     if (n === 0x03) { this.halted = "INT 3 (kesme noktası)"; return; }
-    throw new EmuError("desteklenmeyen kesme: INT " + hx(n, 1) + " (AH=" + hx(ah, 1) + ")");
+    throw new EmuError("desteklenmeyen kesme: INT " + hx(n, 1) + " (AH=" + hx(ah, 1) + "); vektör tablosunda bu kesme için bir yordam yok");
+  };
+  MP.scroll = function (up, n, r1, c1, r2, c2, attr) {
+    var rows = [], base = VIDEO_SEG << 4, r, c, i, k;
+    for (r = r1; r <= r2; r++) rows.push(r);
+    for (k = 0; k < n; k++) {
+      var seq = up ? rows : rows.slice().reverse();
+      for (i = 0; i < seq.length - 1; i++) for (c = c1; c <= c2; c++) {
+        var dst = base + 2 * (seq[i] * 80 + c), src = base + 2 * (seq[i + 1] * 80 + c);
+        this.mem[dst] = this.mem[src]; this.mem[dst + 1] = this.mem[src + 1];
+      }
+      for (c = c1; c <= c2; c++) { var a = base + 2 * (seq[seq.length - 1] * 80 + c); this.mem[a] = 0x20; this.mem[a + 1] = attr; }
+    }
+  };
+  MP.portIn = function (port, w) {
+    var src = has(this.ports, port) ? this.ports[port] : null, v;
+    if (src == null) v = has(this.portLast, port) ? this.portLast[port] : 0;
+    else if (typeof src === "function") v = src(port, this);
+    else if (Array.isArray(src)) v = src.length > 1 ? src.shift() : src[0];
+    else v = src;
+    if (w === 2) {
+      if (src == null && has(this.portLast, port + 1)) v = (v & 0xFF) | (this.portLast[port + 1] << 8);
+      return v & 0xFFFF;
+    }
+    return v & 0xFF;
+  };
+  MP.portOut = function (port, v, w) {
+    this.portLast[port] = v & 0xFF;
+    if (w === 2) this.portLast[port + 1] = (v >> 8) & 0xFF;
+    this.portWrites.push([this.steps, port, v & (w === 2 ? 0xFFFF : 0xFF), w]);
   };
   MP.fetch = function () {
     var cs = this.s[1], phys = this.phys(cs, this.ip), st = this.prog.code[phys];
@@ -1556,14 +2248,14 @@
     },
     IN: function (st) {
       var acc = st.ops[0], port = st.ops[1], p = port.kind === "r16" ? this.get("DX") : (port.val & 0xFF);
-      var v = has(this.portLast, p) ? this.portLast[p] : 0;
-      if (acc.size === 2 && has(this.portLast, p + 1)) v = (v & 0xFF) | (this.portLast[p + 1] << 8);
+      var v = this.portIn(p, acc.size);
       this.wr(acc, acc.size, v);
+      this.info = { port: p, v: v };
     },
     OUT: function (st) {
-      var port = st.ops[0], acc = st.ops[1], p = port.kind === "r16" ? this.get("DX") : (port.val & 0xFF), v = this.get(acc.reg);
-      this.portLast[p] = v & 0xFF;
-      if (acc.size === 2) this.portLast[p + 1] = (v >> 8) & 0xFF;
+      var port = st.ops[0], acc = st.ops[1], p = port.kind === "r16" ? this.get("DX") : (port.val & 0xFF);
+      this.portOut(p, this.get(acc.reg), acc.size);
+      this.info = { port: p, v: this.get(acc.reg) & (acc.size === 2 ? 0xFFFF : 0xFF), w: acc.size };
     },
     INT: function (st) { this.doInt(st.ops[0].val & 0xFF, this.ipNext); this.jumped = true; },
     INTO: function () { if (this.f.OF) { this.doInt(4, this.ipNext); this.jumped = true; } },
@@ -1620,11 +2312,30 @@
       } catch (e) { /* okunamayan işlenen: açıklamada kullanılmaz */ }
       return r;
     });
-    this.memlog = []; this.stepOut = ""; this.info = null;
-    var st = this.step();
+    var saved = { r: this.r.slice(), s: this.s.slice(), f: Object.assign({}, this.f), ip: this.ip, undef: Object.assign({}, this.undef),
+      input: this.input.slice(), keysRead: this.keysRead, out: this.out, cursor: this.cursor.slice(), halted: this.halted };
+    var vb = VIDEO_SEG << 4, vbefore = INTOPS[st0.op] ? this.mem.slice(vb, vb + 4000) : null;
+    this.memlog = []; this.stepOut = ""; this.info = null; this.svc = null; this.irq = null; this.pollEmpty = false;
+    var st;
+    try { st = this.step(); }
+    catch (e) {
+      if (e instanceof InputWait) {
+        /* adım hiç yürütülmemiş sayılır: yazmaçlar, bellek, ekran ve kuyruk eski hâline döner */
+        for (var k = this.memlog.length - 1; k >= 0; k--) this.mem[this.memlog[k][0]] = this.memlog[k][3];
+        if (vbefore) this.mem.set(vbefore, vb);
+        this.r = saved.r; this.s = saved.s; this.f = saved.f; this.ip = saved.ip; this.undef = saved.undef;
+        this.input = saved.input; this.keysRead = saved.keysRead; this.out = saved.out; this.cursor = saved.cursor; this.halted = saved.halted;
+        this.memlog = null; this.stepOut = "";
+      }
+      throw e;
+    }
     this.steps++;
+    var video = [];
+    if (vbefore) for (var q = 0; q < 4000; q += 2) if (this.mem[vb + q] !== vbefore[q] || this.mem[vb + q + 1] !== vbefore[q + 1]) video.push(q >> 1);
     var rec = { st: st, before: before, pre: pre, w: w, info: this.info, mem: this.memlog, out: this.stepOut,
-      regs: this.regs(), flags: this.flags(), undef: Object.assign({}, this.undef), halted: this.halted };
+      regs: this.regs(), flags: this.flags(), undef: Object.assign({}, this.undef), halted: this.halted,
+      svc: this.svc, irq: this.irq, keys: saved.input.slice(0, this.keysRead - saved.keysRead).join(""), pollEmpty: this.pollEmpty,
+      video: video, cursorBefore: saved.cursor };
     this.memlog = null;
     rec.text = describe(this, rec);
     return rec;
@@ -1665,9 +2376,103 @@
     if (kind === "inc") return t + "; CF değişmez";
     return t;
   }
+  /* ---- kesme ve hizmet açıklamaları ---- */
+  var DAYS = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+  function so(seg, off) { return hx(seg).slice(0, 4) + ":" + hx(off); }
+  function irqText(m, rec, isDiv) {
+    var q = rec.irq, R = rec.regs;
+    return (isDiv ? "" : "vektör tablosunda INT " + hx(q.n, 1) + " girişi (0000:" + hx(q.n * 4) + ") CS:IP = " + so(R.CS, R.IP).replace(/h$/, "") + "h gösterir; ") +
+      "FLAGS (" + hx(q.flags) + "), CS (" + hx(q.cs) + ") ve " + (isDiv ? "bölme komutundan sonraki komutun adresi" : "dönüş adresi") + " (IP = " + hx(q.ip) + ") yığına itilir (SP = " + hx(R.SP) + "), IF = TF = 0 olur ve " +
+      (isDiv ? "vektör tablosundaki 0000:0000h girişinden kesme hizmet yordamına (" + so(R.CS, R.IP) + ") gidilir." : "kesme hizmet yordamına gidilir.");
+  }
+  function attrText(v) { return hx(v, 1); }
+  function keyText(c) {
+    if (c === 13) return "Enter tuşu (0Dh)";
+    if (c === 8) return "geri silme tuşu (08h)";
+    if (c === 27) return "Esc tuşu (1Bh)";
+    return chText(c);
+  }
+  function serviceText(m, rec, nn) {
+    var B = rec.before.regs, R = rec.regs, ah = B.AX >> 8, al = B.AX & 0xFF, fl = rec.flags, i;
+    var rAL = R.AX & 0xFF, rAH = R.AX >> 8;
+    function dh(v) { return v >> 8; }
+    function lo(v) { return v & 0xFF; }
+    if (nn === 0x20) return "program sonlanır ve DOS'a dönülür.";
+    if (nn === 3) return "kesme noktası: program durur.";
+    if (nn === 0x21) {
+      var dos = "DOS hizmeti AH = " + hx(ah, 1) + ": ";
+      if (ah === 0x02) return dos + "DL'deki " + chText(lo(B.DX)) + " ekrana yazılır.";
+      if (ah === 0x09) return dos + "DS:" + hx(B.DX) + " adresinden başlayan dizgi '$' işaretine kadar ekrana yazılır.";
+      if (ah === 0x4C) return dos + "program sonlanır, çıkış kodu AL = " + hx(al, 1) + ".";
+      if (ah === 0x00) return dos + "program sonlanır.";
+      if (ah === 0x01) return dos + "klavyeden " + keyText(rAL) + " okunur, ekrana yansıtılır ve AL'ye yazılır (AL = " + hx(rAL, 1) + ").";
+      if (ah === 0x07 || ah === 0x08) return dos + "klavyeden " + keyText(rAL) + " okunur; ekrana yansıtılmaz, AL = " + hx(rAL, 1) + ".";
+      if (ah === 0x06) {
+        if (lo(B.DX) !== 0xFF) return dos + "DL'deki " + chText(lo(B.DX)) + " ekrana yazılır.";
+        return dos + "DL = FFh olduğu için klavyeye bakılır: " + (fl.ZF ? "tuş yok, AL = 00h ve ZF = 1." : "tuş var, " + keyText(rAL) + " alınır (AL = " + hx(rAL, 1) + ", ZF = 0).");
+      }
+      if (ah === 0x0A) {
+        var sv = rec.svc || { buf: "", mx: 0, at: B.DX };
+        return dos + "Enter'a kadar yazılan " + sv.buf.length + " karakter" + (sv.buf ? " ('" + sv.buf + "')" : "") + " DS:" + hx(sv.at) + " tamponuna okunur: ilk bayt en çok " + sv.mx +
+          " (Enter dahil), DS:" + hx((sv.at + 1) & 0xFFFF) + " = " + hx(sv.buf.length, 1) + " okunan karakter sayısı, metin DS:" + hx((sv.at + 2) & 0xFFFF) + " adresinden başlar ve sonuna 0Dh yazılır.";
+      }
+      if (ah === 0x0B) return dos + "tuş durumu sorulur: " + (rAL ? "bekleyen tuş var, AL = FFh." : "bekleyen tuş yok, AL = 00h.");
+      if (ah === 0x0C) return dos + "klavye tamponu boşaltılır, ardından AL'deki hizmet (" + hx(al, 1) + ") yürütülür.";
+      if (ah === 0x05) return dos + "DL'deki " + chText(lo(B.DX)) + " yazıcıya gönderilir.";
+      if (ah === 0x2A) return dos + "sistem tarihi alınır: CX = " + R.CX + " (" + hx(R.CX) + "), DH = " + dh(R.DX) + " (ay), DL = " + lo(R.DX) + " (gün), AL = " + rAL +
+        " (haftanın günü: " + (DAYS[rAL] || "?") + "). Laboratuvarda tarih sabittir.";
+      if (ah === 0x2C) return dos + "sistem saati alınır: CH = " + dh(R.CX) + " (saat), CL = " + lo(R.CX) + " (dakika), DH = " + dh(R.DX) + " (saniye), DL = " + lo(R.DX) + " (salise). Laboratuvarda saat sabittir.";
+      if (ah === 0x25) return dos + "INT " + hx(al, 1) + " vektörü DS:DX = " + so(B.DS, B.DX) + " yapılır (vektör tablosunda 0000:" + hx(al * 4) + ").";
+      if (ah === 0x35) return dos + "INT " + hx(al, 1) + " vektörü okunur: ES:BX = " + so(R.ES, R.BX) + ".";
+      if (ah === 0x30) return dos + "DOS sürümü AL = " + rAL + ", AH = " + rAH + " olarak alınır.";
+      if (ah === 0x19) return dos + "geçerli sürücü AL = " + rAL + " (C:) olarak alınır.";
+      if (ah === 0x40) return dos + "DS:" + hx(B.DX) + " adresindeki " + B.CX + " bayt ekrana yazılır; AX = yazılan bayt sayısı.";
+      return dos + "yürütülür.";
+    }
+    if (nn === 0x10) {
+      var bio = "BIOS video hizmeti AH = " + hx(ah, 1) + ": ";
+      var cur = rec.cursorBefore || [0, 0];
+      if (ah === 0x0E) return "BIOS hizmeti AH = 0Eh: AL'deki " + chText(al) + " ekrana yazılır" + (al === 13 || al === 10 || al === 8 ? " (imleç hareket eder)" : ", imleç bir ilerler") + ".";
+      if (ah === 0x00) return bio + "video modu AL = " + hx(al, 1) + " (80×25 metin) seçilir; ekran silinir, imleç (0, 0) konumuna gelir.";
+      if (ah === 0x01) return bio + "imleç biçimi değiştirilir (CH = " + hx(dh(B.CX), 1) + ", CL = " + hx(lo(B.CX), 1) + (dh(B.CX) & 0x20 ? "; bit 5 = 1 olduğu için imleç gizlenir" : "") + ").";
+      if (ah === 0x02) return bio + "imleç DH = " + dh(B.DX) + ". satır, DL = " + lo(B.DX) + ". sütuna taşınır.";
+      if (ah === 0x03) return bio + "imleç konumu okunur: DH = " + dh(R.DX) + " (satır), DL = " + lo(R.DX) + " (sütun); CX = " + hx(R.CX) + " imleç biçimidir.";
+      if (ah === 0x06 || ah === 0x07) {
+        var win = "(" + dh(B.CX) + ", " + lo(B.CX) + ") ile (" + dh(B.DX) + ", " + lo(B.DX) + ") arasındaki pencere";
+        if (al === 0) return bio + win + " BH = " + attrText(dh(B.BX)) + " özniteliğiyle silinir.";
+        return bio + win + " " + al + " satır " + (ah === 0x06 ? "yukarı" : "aşağı") + " kaydırılır; boşalan satırlar BH = " + attrText(dh(B.BX)) + " özniteliğiyle doldurulur.";
+      }
+      if (ah === 0x08) return bio + "imleçteki karakter ve öznitelik okunur: AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + ".";
+      if (ah === 0x09 || ah === 0x0A) return bio + "AL'deki " + chText(al) + " imleç konumuna (" + cur[0] + ", " + cur[1] + ") " + (ah === 0x09 ? "BL = " + attrText(lo(B.BX)) + " özniteliğiyle " : "") +
+        "CX = " + B.CX + " kez yazılır; imleç ilerlemez.";
+      if (ah === 0x0C) return bio + "(" + B.CX + ", " + B.DX + ") pikseline AL = " + hx(al, 1) + " rengi yazılır.";
+      if (ah === 0x0D) return bio + "(" + B.CX + ", " + B.DX + ") pikselinin rengi okunur: AL = " + hx(rAL, 1) + ".";
+      if (ah === 0x0F) return bio + "video modu okunur: AL = " + hx(rAL, 1) + ", AH = " + rAH + " sütun, BH = 0 (sayfa).";
+      if (ah === 0x13) return bio + "ES:BP = " + so(B.ES, B.BP) + " adresindeki " + B.CX + " karakterlik dizgi (" + dh(B.DX) + ", " + lo(B.DX) + ") konumuna " +
+        (al & 2 ? "kendi karakter/öznitelik çiftleriyle" : "BL = " + attrText(lo(B.BX)) + " özniteliğiyle") + " yazılır; AL = " + hx(al, 1) +
+        (al & 1 ? " olduğu için imleç dizginin sonuna ilerler." : " olduğu için imleç yerinde kalır.");
+      return bio + "yürütülür (ekranda görünür bir değişiklik yok).";
+    }
+    if (nn === 0x16) {
+      var kb = "BIOS klavye hizmeti AH = " + hx(ah, 1) + ": ";
+      if (ah === 0x00 || ah === 0x10) return kb + "tampondan " + keyText(rAL) + " alınır: AL = " + hx(rAL, 1) + " (ASCII kodu), AH = " + hx(rAH, 1) + " (tarama kodu); tuş ekrana yazılmaz.";
+      if (ah === 0x01 || ah === 0x11) return kb + (fl.ZF ? "bekleyen tuş yok, ZF = 1." : "bekleyen tuş var (ZF = 0): " + keyText(rAL) + ", AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + "; tuş tamponda kalır.");
+      if (ah === 0x02) return kb + "kaydırma tuşlarının durumu alınır: AL = 00h.";
+    }
+    if (nn === 0x1A) {
+      var rt = "BIOS saat hizmeti AH = " + hx(ah, 1) + ": ";
+      if (ah === 0x00) return rt + "gece yarısından beri geçen saat tıkı sayısı (saniyede yaklaşık 18,2) alınır: CX:DX = " + hx(R.CX).slice(0, 4) + " " + hx(R.DX) + ".";
+      if (ah === 0x02) return rt + "gerçek zamanlı saat paketli BCD olarak alınır: CH = " + hx(dh(R.CX), 1) + " (saat), CL = " + hx(lo(R.CX), 1) + " (dakika), DH = " + hx(dh(R.DX), 1) + " (saniye); CF = 0. Laboratuvarda saat sabittir.";
+      if (ah === 0x04) return rt + "tarih paketli BCD olarak alınır: CX = " + hx(R.CX) + " (yıl), DH = " + hx(dh(R.DX), 1) + " (ay), DL = " + hx(lo(R.DX), 1) + " (gün); CF = 0.";
+    }
+    if (nn === 0x15 && ah === 0x86) return "BIOS bekleme hizmeti: CX:DX = " + hx(B.CX).slice(0, 4) + " " + hx(B.DX) + " = " + (B.CX * 65536 + B.DX).toLocaleString("tr-TR") +
+      " mikrosaniye (≈ " + (Math.round((B.CX * 65536 + B.DX) / 100000) / 10).toLocaleString("tr-TR") + " s) beklenir; laboratuvarda zaman akmadığı için hemen dönülür.";
+    return "INT " + hx(nn, 1) + " hizmeti yürütülür.";
+  }
   function describe(m, rec) {
     var st = rec.st, mn = st.op, ops = st.ops, pre = rec.pre, w = rec.w, R = rec.regs, B = rec.before.regs;
     var head = st.psp ? "INT 20h (PSP:0000h)" : (st.show || st.text).replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ");
+    if (st.macro && st.macro !== "emu8086.inc") head = st.macro + " açılımı · " + head;
     var s = head + ": ", a = ops[0], b = ops[1], an = a ? opName(a) : "", bn = b ? opName(b) : "";
     function post(o, wid) {
       if (o.kind === "r8" || o.kind === "r16" || o.kind === "sreg") return R[o.reg] != null ? R[o.reg] : m.get(o.reg);
@@ -1715,7 +2520,7 @@
         (fl.CF ? "sonuç AX'e sığmadığı için CF = OF = 1." : "sonuç AX'e sığdığı için CF = OF = 0.");
     }
     if (mn === "DIV" || mn === "IDIV") {
-      if (rec.st && m.s[1] !== rec.before.cs || (rec.regs.IP !== ((rec.before.ip + st.size) & 0xFFFF))) return s + "bölme hatası: INT 0 kesme hizmet yordamına gidilir.";
+      if (rec.irq) return s + (pre[0].v === 0 ? "bölen 0 olduğu için" : (w === 1 ? "bölüm AL'ye" : "bölüm AX'e") + " sığmadığı için") + " bölme hatası oluşur (INT 0): " + irqText(m, rec, true);
       if (w === 1) return s + "AX (" + hx(B.AX) + ") ÷ " + an + " (" + hx(pre[0].v, 1) + ") → bölüm AL = " + hx(R.AX & 0xFF, 1) + ", kalan AH = " + hx(R.AX >> 8, 1) + "; bayraklar tanımsız kalır.";
       return s + "DX:AX (" + hx(B.DX).slice(0, 4) + " " + hx(B.AX) + ") ÷ " + an + " (" + hx(pre[0].v) + ") → bölüm AX = " + hx(R.AX) + ", kalan DX = " + hx(R.DX) + "; bayraklar tanımsız kalır.";
     }
@@ -1804,23 +2609,10 @@
       if (base === "SCAS") return s + (wd === 1 ? "AL" : "AX") + " ile ES:" + hx(B.DI) + " adresindeki " + u + " karşılaştırılır; " + (fl.ZF ? "eşit oldukları için ZF = 1" : "farklı oldukları için ZF = 0") + "; DI " + dd + ".";
     }
     if (mn === "INT" || mn === "INTO" || mn === ".EXIT") {
-      var nn = mn === ".EXIT" ? 0x21 : mn === "INTO" ? 4 : a.val & 0xFF, ah = B.AX >> 8;
+      var nn = mn === ".EXIT" ? 0x21 : mn === "INTO" ? 4 : a.val & 0xFF;
       if (mn === "INTO" && !bf.OF) return s + "OF = 0 olduğu için kesme oluşmaz.";
-      if (R.CS !== rec.before.cs || (R.IP !== ((rec.before.ip + st.size) & 0xFFFF) && !rec.halted))
-        return s + "vektör tablosundaki kesme hizmet yordamına gidilir; FLAGS, CS ve IP yığına itilir.";
-      if (nn === 0x20) return s + "program sonlanır ve DOS'a dönülür.";
-      if (nn === 0x21) {
-        if (ah === 0x02) return s + "DOS hizmeti AH = 02h: DL'deki " + chText(B.DX & 0xFF) + " ekrana yazılır.";
-        if (ah === 0x09) return s + "DOS hizmeti AH = 09h: DS:" + hx(B.DX) + " adresinden başlayan dizgi '$' işaretine kadar ekrana yazılır.";
-        if (ah === 0x4C) return s + "DOS hizmeti AH = 4Ch: program sonlanır, çıkış kodu AL = " + hx(B.AX & 0xFF, 1) + ".";
-        if (ah === 0x00) return s + "DOS hizmeti AH = 00h: program sonlanır.";
-        if (ah === 0x06) return s + "DOS hizmeti AH = 06h: DL'deki " + chText(B.DX & 0xFF) + " ekrana yazılır.";
-        return s + "DOS hizmeti AH = " + hx(ah, 1) + " yürütülür.";
-      }
-      if (nn === 0x10 && ah === 0x0E) return s + "BIOS hizmeti AH = 0Eh: AL'deki " + chText(B.AX & 0xFF) + " ekrana yazılır.";
-      if (nn === 0x10) return s + "BIOS video hizmeti AH = " + hx(ah, 1) + " yürütülür.";
-      if (nn === 3) return s + "kesme noktası: program durur.";
-      return s + "INT " + hx(nn, 1) + " hizmeti yürütülür.";
+      if (rec.irq) return s + irqText(m, rec);
+      return s + serviceText(m, rec, nn);
     }
     if (mn === "AAM") return s + "AL (" + hx(B.AX & 0xFF, 1) + ") " + (st.aamBase == null ? 10 : st.aamBase) + " sayısına bölünür: AH = bölüm (" + hx(R.AX >> 8, 1) + "), AL = kalan (" + hx(R.AX & 0xFF, 1) + "); sonuç paketsiz BCD basamaklarıdır.";
     if (mn === "AAD") return s + "AL = AH × " + (st.aamBase == null ? 10 : st.aamBase) + " + AL = " + hx(B.AX >> 8, 1) + " × " + (st.aamBase == null ? 10 : st.aamBase) + " + " + hx(B.AX & 0xFF, 1) + " = " + hx(R.AX & 0xFF, 1) + ", AH = 00h; paketsiz BCD sayı ikiliye çevrilir.";
@@ -1828,9 +2620,17 @@
       (fl.AF ? "düşük nibble'a " + (mn === "DAA" ? "6 eklendi" : "6 çıkarıldı") + " (AF = 1)" : "düşük nibble geçerli (AF = 0)") + ", " + (fl.CF ? "yüksek nibble da düzeltildi (CF = 1)." : "yüksek nibble geçerli (CF = 0).");
     if (mn === "AAA" || mn === "AAS") return s + (fl.AF ? "AL'nin düşük nibble'ı 9'dan büyük ya da AF = 1 olduğu için düzeltme yapılır: AL = " + hx(R.AX & 0xFF, 1) + ", AH = " + hx(R.AX >> 8, 1) + ", CF = AF = 1." :
       "düzeltme gerekmez: AL'nin yüksek nibble'ı temizlenir (AL = " + hx(R.AX & 0xFF, 1) + "), CF = AF = 0.");
-    if (mn === "IRET") return s + "yığından IP, CS ve FLAGS geri alınır; kesilen programa dönülür.";
-    if (mn === "OUT") return s + hx(m.get(b.reg), b.size) + " değeri " + (a.kind === "r16" ? hx(B.DX) : hx(a.val & 0xFF, 1)) + " portuna yazılır.";
-    if (mn === "IN") return s + (b.kind === "r16" ? hx(B.DX) : hx(b.val & 0xFF, 1)) + " portundan okunan değer " + an + " yazmacına alınır.";
+    if (mn === "IRET") return s + "yığından IP = " + hx(R.IP) + ", CS = " + hx(R.CS) + " ve FLAGS = " + hx(m.rd16(R.SS, (B.SP + 4) & 0xFFFF)) +
+      " geri alınır (SP = " + hx(R.SP) + "); kesilen programa dönülür" + (fl.IF !== bf.IF ? " ve IF yeniden " + fl.IF + " olur" : "") + ".";
+    if (mn === "OUT") {
+      var pw = rec.info ? rec.info.port : (a.kind === "r16" ? B.DX : a.val & 0xFF);
+      return s + b.reg + " değeri (" + hx(rec.info ? rec.info.v : m.get(b.reg), b.size) + ") " + hx(pw, pw > 255 ? 2 : 1) + " portuna yazılır" +
+        (b.size === 2 ? " (sözcük: düşük bayt " + hx(pw, pw > 255 ? 2 : 1) + ", yüksek bayt bir sonraki porta)" : "") + ".";
+    }
+    if (mn === "IN") {
+      var pr = rec.info ? rec.info.port : (b.kind === "r16" ? B.DX : b.val & 0xFF);
+      return s + hx(pr, pr > 255 ? 2 : 1) + " portundan okunan " + birim(a.size) + " (" + hx(rec.info ? rec.info.v : R[an], a.size) + ") " + an + " yazmacına alınır.";
+    }
     /* genel: değişen yazmaçlar */
     var ch = [];
     ["AX", "BX", "CX", "DX", "SI", "DI", "BP", "SP"].forEach(function (k) { if (R[k] !== B[k]) ch.push(k + " = " + hx(R[k])); });
@@ -1857,18 +2657,20 @@
         if (rec == null) continue;
       } catch (e) {
         if (e instanceof EmuError) { res.stop = "error"; res.error = "Çalışma hatası: " + e.message; break; }
+        if (e instanceof InputWait) { res.stop = "input_wait"; res.error = "girdi bekleniyor (" + e.what + ")"; break; }
         throw e;
       }
       n++;
       res.steps.push({ step: n, line: rec.st.line, regs: rec.regs, flags: rec.flags, undef: Object.keys(rec.undef).sort(),
-        mem: rec.mem, out: rec.out, text: rec.text });
+        mem: rec.mem, out: rec.out, text: rec.text, macro: rec.st.macro });
     }
     res.output = m.out;
+    res.ports = m.portWrites; res.printer = m.printer;
     res.final = { regs: m.regs(), flags: m.flags(), undef: Object.keys(m.undef).sort() };
     return res;
   }
 
-  var API = { parseNumber: parseNumber, assemble: assemble, Machine: Machine, run: run, AsmError: AsmError, EmuError: EmuError, hx: hx,
+  var API = { parseNumber: parseNumber, assemble: assemble, Machine: Machine, run: run, AsmError: AsmError, EmuError: EmuError, InputWait: InputWait, hx: hx,
     FLAGORDER: FLAGORDER, PSP_SEG: PSP_SEG };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.Mini8086 = API;

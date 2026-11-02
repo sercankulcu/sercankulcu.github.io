@@ -733,6 +733,165 @@ cizgi <span class="kw">ENDP</span>
 
 
 
+<section class="ds-deck__slide" data-title="Laboratuvar: emu8086.inc Kütüphanesi" data-section="Laboratuvar">
+<p class="ds-deck__kicker">Laboratuvar · kütüphane makroları ve prosedürleri</p>
+<h2>Laboratuvar: emu8086.inc Kütüphanesi</h2>
+<div class="ds-deck__demo m-lab" data-demo="m-lab">
+<script type="text/x-asm" data-name="Makrolarla ekran (PRINT, GOTOXY, PUTC)" data-view="ekran" data-acilim="1">
+include emu8086.inc
+ORG    100h
+PRINT 'Hello World!'
+GOTOXY 10, 5
+PUTC 65           ; 65 - is an ASCII code for 'A'
+PUTC 'B'
+RET               ; return to operating system.
+END               ; directive to stop the compiler.
+</script>
+<script type="text/x-asm" data-name="CR ve LF ayrı ayrı" data-view="ekran">
+ORG  100h
+MOV  AH, 0Eh     ; teletype
+MOV  AL, 'a'
+INT  10h
+MOV  AL, 'b'
+INT  10h
+MOV  AL, 10      ; yalnız LF
+INT  10h
+MOV  AL, 'c'
+INT  10h
+MOV  AL, 13      ; yalnız CR
+INT  10h
+MOV  AL, 'd'
+INT  10h
+RET
+</script>
+<script type="text/x-asm" data-name="Sayı oku ve yazdır (SCAN_NUM, PRINT_NUM)" data-input="-25\r" data-view="ekran">
+include 'emu8086.inc'
+ORG    100h
+LEA    SI, msg1       ; ask for the number
+CALL   print_string   ;
+CALL   scan_num       ; get number in CX.
+MOV    AX, CX         ; copy the number to AX.
+CALL   pthis          ; print the following string:
+DB  13, 10, 'You have entered: ', 0
+CALL   print_num      ; print number in AX.
+RET                   ; return to operating system.
+msg1   DB  'Enter the number: ', 0
+DEFINE_SCAN_NUM
+DEFINE_PRINT_STRING
+DEFINE_PRINT_NUM
+DEFINE_PRINT_NUM_UNS  ; required for print_num.
+DEFINE_PTHIS
+END                   ; directive to stop the compiler.
+</script>
+<script type="text/x-asm" data-name="İki sayının toplamı" data-input="12\r30\r" data-view="ekran">
+include 'emu8086.inc'
+ORG  100h
+CALL scan_num     ; 1. sayı → CX
+MOV  BX, CX       ; sakla
+PUTC 13
+PUTC 10           ; alt satır
+CALL scan_num     ; 2. sayı → CX
+PUTC 13
+PUTC 10
+MOV  AX, BX
+ADD  AX, CX       ; işaretli toplam
+JO   tasma
+CALL print_num
+RET
+tasma: PUTC '?'
+RET
+DEFINE_SCAN_NUM
+DEFINE_PRINT_NUM
+DEFINE_PRINT_NUM_UNS
+END
+</script>
+<script type="text/x-asm" data-name="GET_STRING, CLEAR_SCREEN, PRINT_STRING" data-input="Ece\r" data-view="ekran">
+include 'emu8086.inc'
+ORG  100h
+LEA  DI, ad          ; tampon
+MOV  DX, 20          ; boyut
+CALL get_string
+CALL clear_screen
+LEA  SI, ad
+CALL print_string
+RET
+ad DB 20 DUP(0)
+DEFINE_GET_STRING
+DEFINE_CLEAR_SCREEN
+DEFINE_PRINT_STRING
+END
+</script>
+<script type="text/x-asm" data-name="Geri silme (INT 16h)" data-input="Ab\bc\r">
+ORG  100h
+LEA  DI, ad
+oku: MOV AH, 0
+INT  16h         ; AL = tuş (yankısız)
+CMP  AL, 13      ; Enter mi?
+JE   bitti
+MOV  AH, 0Eh
+CMP  AL, 8       ; geri silme mi?
+JNE  ekle
+CMP  DI, OFFSET ad
+JE   oku         ; silinecek harf yok
+DEC  DI
+INT  10h         ; 8: imleç sola
+MOV  AL, ' '
+INT  10h         ; harfin yerine boşluk
+MOV  AL, 8
+INT  10h         ; yine sola
+JMP  oku
+ekle: MOV [DI], AL
+INC  DI
+INT  10h         ; yankı
+JMP  oku
+bitti: MOV BYTE PTR [DI], 0
+RET
+ad   DB 6 DUP(?)
+</script>
+<script type="text/x-asm" data-name="PRINT_NUM_UNS mantığı">
+ORG  100h
+MOV  AX, 1205    ; yazdırılacak sayı
+MOV  BX, 10
+XOR  CX, CX      ; basamak sayacı
+bol: XOR DX, DX
+DIV  BX          ; AX=bölüm, DX=kalan
+PUSH DX          ; basamak yığına
+INC  CX
+OR   AX, AX      ; bölüm 0 mı?
+JNZ  bol
+yaz: POP AX      ; önce en anlamlı
+ADD  AL, '0'
+MOV  AH, 0Eh
+INT  10h
+LOOP yaz
+RET
+</script>
+<script type="text/x-asm" data-name="Çerçeveli başlık" data-view="ekran">
+include 'emu8086.inc'
+ORG  100h
+CALL clear_screen
+GOTOXY 10, 2
+CALL cizgi
+GOTOXY 10, 3
+PRINT '|  BASLIK  |'
+GOTOXY 10, 4
+CALL cizgi
+GOTOXY 0, 6       ; imleç alta
+RET
+cizgi PROC        ; +----------+
+PUTC '+'
+MOV  CX, 10
+tire: PUTC '-'
+LOOP tire
+PUTC '+'
+RET
+cizgi ENDP
+DEFINE_CLEAR_SCREEN
+END
+</script>
+</div>
+</section>
+
 <section class="ds-deck__slide" data-title="Özet" data-section="Özet">
   <p class="ds-deck__kicker">Özet</p>
   <h2>Özet</h2>
@@ -774,4 +933,6 @@ cizgi <span class="kw">ENDP</span>
 </div>
 
 <script src="deck/deck.js"></script>
+<script src="deck/mini8086.js"></script>
+<script src="deck/m-lab.js"></script>
 <script src="deck/Bolum_05_Kutuphane.js"></script>

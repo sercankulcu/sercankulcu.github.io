@@ -1219,6 +1219,149 @@ ret</pre>
   <p class="ds-deck__foot">Giriş değerleri yorumlayıcının port sözlüğüne verildi; çıkışlar G/Ç kaydından okundu.</p>
 </section>
 
+<section class="ds-deck__slide" data-title="Laboratuvar: Port Aygıtları" data-section="Laboratuvar">
+<p class="ds-deck__kicker">Laboratuvar · IN, OUT ve emu8086 sanal aygıtları</p>
+<h2>Laboratuvar: Port Aygıtları</h2>
+<div class="ds-deck__demo m-lab" data-demo="m-lab">
+<script type="text/x-asm" data-name="Trafik ışıkları (port 4)" data-dev="trafik" data-view="aygit">
+#start=Traffic_Lights.exe#
+org 100h
+all_red equ 0000_0010_0100_1001b
+mov ax, all_red
+out 4, ax
+mov si, offset situation
+next:
+mov ax, [si]
+out 4, ax
+mov cx, 4Ch      ; 5 s bekle
+mov dx, 4B40h
+mov ah, 86h
+int 15h
+add si, 2        ; sonraki durum
+cmp si, sit_end
+jb  next
+mov si, offset situation
+jmp next
+situation dw 0000_0011_0000_1100b
+s1 dw 0000_0110_1001_1010b
+s2 dw 0000_1000_0110_0001b
+s3 dw 0000_1000_0110_0001b
+s4 dw 0000_0100_1101_0011b
+sit_end = $
+</script>
+<script type="text/x-asm" data-name="LED gösterge (port 199)" data-dev="led" data-view="aygit">
+#start=led_display.exe#
+mov ax, 1234
+out 199, ax
+mov ax, -5678
+out 199, ax
+; port'a sonsuz döngüde yaz:
+mov ax, 0
+x1:
+out 199, ax
+inc ax
+jmp x1
+hlt              ; hiç çalışmaz
+</script>
+<script type="text/x-asm" data-name="7 bölütlü tarama (8255)" data-dev="gosterge" data-view="aygit">
+org 100h
+mov bx, offset kod
+mov si, 0
+hane:
+mov dx, 312h  ; port C (hane)
+mov al, 0
+out dx, al    ; tümü sönük
+mov al, rakam[si]
+xlat          ; bölüt kodu
+mov dx, 310h  ; port A (bölüt)
+out dx, al
+mov al, secim[si]
+mov dx, 312h
+out dx, al    ; tek hane yanar
+inc si
+cmp si, 4
+jb  hane
+ret
+kod   db 3Fh,06h,5Bh,4Fh,66h
+      db 6Dh,7Dh,07h,7Fh,6Fh
+rakam db 2, 0, 2, 6
+secim db 01h, 02h, 04h, 08h
+</script>
+<script type="text/x-asm" data-name="Termometre ve ısıtıcı (port 125, 127)" data-ports="{&quot;125&quot;: {&quot;ayar&quot;: 55, &quot;min&quot;: -40, &quot;max&quot;: 120, &quot;ad&quot;: &quot;Sıcaklık (°C)&quot;}}" data-dev="termometre" data-view="aygit">
+; emu8086'nın termometre örneği (low/high etiketleri işleçlerle karışmasın diye low_/high_)
+org 100h
+mov ax, cs       ; DS'yi CS'ye eşitle
+mov ds, ax
+start:
+in  al, 125
+cmp al, 60
+jl  low_
+cmp al, 80
+jle ok
+jg  high_
+low_:
+mov al, 1
+out 127, al      ; ısıtıcı açık
+jmp ok
+high_:
+mov al, 0
+out 127, al      ; ısıtıcı kapalı
+ok:
+jmp start        ; sonsuz döngü
+</script>
+<script type="text/x-asm" data-name="8255 kurulumu (port 310h–313h)" data-ports="{&quot;311h&quot;: &quot;96h&quot;}" data-dev="port" data-view="aygit">
+org 100h
+mov dx, 313h   ; kontrol yazmacı
+mov al, 82h    ; A,C çık; B gir
+out dx, al
+mov dx, 311h   ; port B
+in  al, dx     ; anahtarları oku
+mov dx, 310h   ; port A
+out dx, al     ; LED'lere yaz
+mov dx, 313h
+mov al, 0Fh    ; BSR: PC7 = 1
+out dx, al
+ret
+</script>
+<script type="text/x-asm" data-name="Test aygıtı (port 110, 112)" data-ports="{&quot;110&quot;: &quot;FFh&quot;, &quot;112&quot;: &quot;7FFFh&quot;}" data-dev="port" data-view="aygit">
+org 100h
+in   al, 110     ; bayt oku
+inc  al
+out  110, al     ; bayt yaz
+in   ax, 112     ; sözcük oku
+add  ax, 1
+out  112, ax     ; sözcük yaz
+ret
+</script>
+<script type="text/x-asm" data-name="Step motor (port 7)" data-ports="{&quot;7&quot;: [&quot;00h&quot;, &quot;80h&quot;]}" data-dev="port" data-view="aygit">
+#start=stepper_motor.exe#
+org 100h
+steps_before_direction_change = 20h
+jmp start
+datcw     db 110b, 100b, 011b, 010b
+datccw    db 011b, 001b, 110b, 010b
+start:
+mov bx, offset datcw
+mov si, 0
+mov cx, 0        ; tur sayacı
+next_step:
+wait: in al, 7   ; bit 7 = 1: motor hazır
+test al, 10000000b
+jz wait
+mov al, [bx][si]
+out 7, al
+inc si
+cmp si, 4
+jb next_step
+mov si, 0
+inc cx
+cmp cx, steps_before_direction_change
+jb  next_step
+ret
+</script>
+</div>
+</section>
+
 <section class="ds-deck__slide" data-title="Özet" data-section="Özet">
 <p class="ds-deck__kicker">Özet</p>
 <h2>Özet</h2>
@@ -1309,4 +1452,6 @@ ret</pre>
 </div>
 
 <script src="deck/deck.js"></script>
+<script src="deck/mini8086.js"></script>
+<script src="deck/m-lab.js"></script>
 <script src="deck/Bolum_09_Aygit_Kontrolu.js"></script>

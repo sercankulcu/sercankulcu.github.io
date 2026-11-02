@@ -543,6 +543,106 @@ eski <span class="dir">dw</span> ?, ?</pre>
   <p class="ds-deck__foot">Uzun bir ISR içinde STI ile daha öncelikli kesmelere izin verilebilir; bu durumda ISR'nin kendisi de yeniden girişli yazılmalıdır.</p>
 </section>
 
+<section class="ds-deck__slide" data-title="Laboratuvar: Kesme Mekanizması" data-section="Laboratuvar">
+<p class="ds-deck__kicker">Laboratuvar · vektör tablosu, INT ve IRET adım adım</p>
+<h2>Laboratuvar: Kesme Mekanizması</h2>
+<div class="ds-deck__demo m-lab" data-demo="m-lab">
+<script type="text/x-asm" data-name="INT 90h: kendi kesme yordamımız" data-view="kesme">
+org 100h
+mov ax, 0
+mov es, ax          ; ES = 0: IVT kesimi
+cli                 ; kesmeleri kapat
+mov word ptr es:[90h*4], offset isr  ; IP
+mov word ptr es:[90h*4+2], cs       ; CS
+sti                 ; kesmeleri aç
+int 90h             ; kendi kesmemiz
+ret
+isr:
+mov ah, 0Eh
+mov al, '*'
+int 10h
+iret                ; RET değil!
+</script>
+<script type="text/x-asm" data-name="INT 60h: AL ile parametre" data-view="kesme">
+org 100h
+mov ax, 0
+mov es, ax           ; ES = 0: IVT
+cli
+mov word ptr es:[60h*4], offset isr
+mov word ptr es:[60h*4+2], cs
+sti
+mov al, '#'
+int 60h              ; kendi kesmemiz
+ret
+isr:
+mov ah, 0Eh
+int 10h
+iret
+</script>
+<script type="text/x-asm" data-name="INT 0: bölme hatası" data-view="kesme">
+org 100h
+mov ax, 0
+mov es, ax           ; ES = 0: IVT
+mov word ptr es:[0*4], offset hata
+mov word ptr es:[0*4+2], cs
+mov ax, 100
+mov bl, 0
+div bl               ; INT 0!
+mov dl, al           ; dönüş buraya
+ret
+hata:
+mov ax, 0FFFFh       ; hata işareti
+iret
+</script>
+<script type="text/x-asm" data-name="INT 3: vektörü sakla ve geri yükle" data-view="kesme">
+org 100h
+xor ax, ax
+mov es, ax          ; ES = 0: IVT
+mov ax, offset isr3
+xchg ax, es:[3*4]   ; yeni IP ↔ eski
+mov eski, ax
+mov ax, cs
+xchg ax, es:[3*4+2] ; yeni CS ↔ eski
+mov eski+2, ax
+mov ax, 1234h
+int 3               ; bizim ISR
+mov bx, eski
+mov es:[3*4], bx    ; geri yükle
+mov bx, eski+2
+mov es:[3*4+2], bx
+ret
+isr3: push ax
+mov ax, 0E21h       ; AH=0Eh, AL='!'
+int 10h
+pop ax
+iret
+eski dw ?, ?
+</script>
+<script type="text/x-asm" data-name="Hata: RET ile biten ISR" data-view="kesme">
+org 100h
+mov ax, 0
+mov es, ax
+mov word ptr es:[61h*4], offset isr
+mov word ptr es:[61h*4+2], cs
+int 61h
+hlt              ; SP = ?
+isr:
+ret              ; HATA!
+</script>
+<script type="text/x-asm" data-name="IMR ile maskeleme (port 21h)" data-ports="{&quot;21h&quot;: {&quot;ilk&quot;: &quot;B8h&quot;}}" data-view="kesme">
+org 100h
+in al, 21h           ; IMR'yi oku
+or al, 00000010b     ; IRQ1 maskele
+out 21h, al
+mov cx, 3            ; kritik iş
+in al, 21h
+and al, 11111101b    ; IRQ1 aç
+out 21h, al
+ret
+</script>
+</div>
+</section>
+
 <section class="ds-deck__slide" data-title="Özet" data-section="Özet">
   <p class="ds-deck__kicker">Özet</p>
   <h2>Özet</h2>
@@ -584,4 +684,6 @@ eski <span class="dir">dw</span> ?, ?</pre>
 </div>
 
 <script src="deck/deck.js"></script>
+<script src="deck/mini8086.js"></script>
+<script src="deck/m-lab.js"></script>
 <script src="deck/Bolum_05_Kesmeler.js"></script>

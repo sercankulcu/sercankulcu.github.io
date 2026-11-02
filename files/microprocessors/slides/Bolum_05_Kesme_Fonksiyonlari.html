@@ -1511,6 +1511,224 @@ selam db 0Dh, 0Ah, &#x27;Selam!$&#x27;</pre>
   </div>
 </section>
 
+<section class="ds-deck__slide" data-title="Laboratuvar: BIOS ve DOS Hizmetleri" data-section="Laboratuvar">
+<p class="ds-deck__kicker">Laboratuvar · INT 10h, INT 16h, INT 21h adım adım</p>
+<h2>Laboratuvar: BIOS ve DOS Hizmetleri</h2>
+<div class="ds-deck__demo m-lab" data-demo="m-lab">
+<script type="text/x-asm" data-name="INT 10h: imleç, 09h ve 0Eh" data-view="ekran">
+org 100h
+mov ax, 0003h    ; AH=00h, AL=03h
+int 10h          ; ekran silinir
+mov ah, 02h      ; imleç konumla
+mov bh, 0        ; sayfa 0
+mov dx, 0104h    ; DH=1, DL=4
+int 10h
+mov ah, 09h      ; karakter + öznitelik
+mov al, '*'
+mov bl, 4Eh      ; kırmızı üstüne sarı
+mov cx, 3        ; 3 kez
+int 10h          ; imleç ilerlemez!
+mov ah, 0Eh      ; teletype
+mov al, 'A'
+int 10h          ; imleç ilerler
+mov al, 'B'
+int 10h
+ret
+</script>
+<script type="text/x-asm" data-name="INT 10h, AH = 13h: dizgi yaz" data-view="ekran">
+org 100h
+mov ax, 1301h    ; AH=13h, AL=01h
+mov bx, 001Eh    ; BH=0, BL=1Eh
+mov cx, 7        ; dizgi uzunluğu
+mov dx, 0205h    ; satır 2, sütun 5
+lea bp, mesaj    ; ES:BP → dizgi
+int 10h
+ret
+mesaj db 'Merhaba'
+</script>
+<script type="text/x-asm" data-name="INT 10h, AH = 06h: pencere" data-view="ekran">
+org 100h
+mov ax, 0600h   ; AH=06h, AL=0
+mov bh, 1Fh     ; mavi/beyaz
+mov cx, 0000h   ; (0,0)
+mov dx, 184Fh   ; (24,79)
+int 10h
+mov ax, 0600h
+mov bh, 4Fh     ; kırmızı/beyaz
+mov cx, 0714h   ; (7,20)
+mov dx, 103Bh   ; (16,59)
+int 10h
+ret
+</script>
+<script type="text/x-asm" data-name="B800h ekran belleği" data-view="ekran">
+org 100h
+mov ax, 0B800h
+mov es, ax
+mov di, (1*80+4)*2  ; 00A8h
+mov ax, 4E41h
+mov es:[di], ax
+xor di, di
+mov ax, 072Eh
+mov cx, 3           ; ilk 3 hücre
+cld
+rep stosw
+ret
+</script>
+<script type="text/x-asm" data-name="INT 16h: tuş oku ve yansıt" data-input="Ok\r" data-view="ekran">
+org 100h
+oku:
+mov ah, 0        ; tuş bekle
+int 16h          ; AH=tarama, AL=ASCII
+cmp al, 0Dh      ; Enter?
+je bitti
+cmp al, 'a'
+jb yaz
+cmp al, 'z'
+ja yaz
+sub al, 20h      ; küçük → büyük
+yaz:
+mov ah, 0Eh
+int 10h          ; ekrana yaz
+jmp oku
+bitti:
+ret
+</script>
+<script type="text/x-asm" data-name="INT 16h, AH = 01h: tuş yoklama" data-input="x" data-poll="2">
+org 100h
+xor dx, dx       ; iş sayacı
+bekle:
+inc dx           ; arka plan işi
+mov ah, 01h      ; tuş var mı?
+int 16h          ; ZF=1 → yok
+jz bekle
+mov ah, 00h      ; tuşu tampondan al
+int 16h
+ret
+</script>
+<script type="text/x-asm" data-name="INT 21h, AH = 01h / 02h" data-input="k" data-view="ekran">
+org 100h
+mov ah, 01h      ; oku + yansıt
+int 21h          ; AL = karakter
+mov bl, al       ; sakla
+mov ah, 02h      ; karakter yaz
+mov dl, 0Dh      ; CR: satır başı
+int 21h
+mov dl, 0Ah      ; LF: alt satır
+int 21h
+inc bl           ; sonraki harf
+mov dl, bl
+int 21h
+ret
+</script>
+<script type="text/x-asm" data-name="INT 21h, AH = 0Ah: tamponlu giriş" data-input="Ali\r">
+org 100h
+mov dx, offset tampon
+mov ah, 0Ah          ; tamponlu giriş
+int 21h
+mov bl, [tampon+1]   ; okunan sayı
+mov bh, 0
+mov byte ptr tampon[bx+2], '$'
+mov dx, offset selam
+mov ah, 09h
+int 21h
+lea dx, [tampon+2]
+int 21h
+ret
+tampon db 10, ?, 10 dup(?)
+selam  db 0Dh, 0Ah, 'Merhaba $'
+</script>
+<script type="text/x-asm" data-name="Mini menü (AH = 01h, 09h)" data-input="1q" data-view="ekran">
+org 100h
+goster:
+mov dx, offset menu
+mov ah, 09h
+int 21h
+mov ah, 01h       ; seçimi oku
+int 21h
+cmp al, 'q'
+je cikis
+cmp al, '1'
+jne goster
+mov dx, offset selam
+mov ah, 09h
+int 21h
+jmp goster
+cikis:
+mov ax, 4C00h     ; çıkış kodu 0
+int 21h
+menu  db 0Dh, 0Ah, '1:Selam q:Cikis $'
+selam db 0Dh, 0Ah, 'Selam!$'
+</script>
+<script type="text/x-asm" data-name="Gün adı (AH = 2Ah)">
+org 100h
+mov ah, 2Ah
+int 21h          ; AL = 0…6
+mov ah, 0
+mov bl, 4
+mul bl           ; AX = AL × 4
+mov dx, offset gunler
+add dx, ax
+mov ah, 09h
+int 21h
+ret
+gunler db 'Paz$Pzt$Sal$Car$'
+       db 'Per$Cum$Cmt$'
+</script>
+<script type="text/x-asm" data-name="Saat (AH = 2Ch)">
+org 100h
+mov ah, 2Ch       ; sistem saatini al
+int 21h           ; CH=saat CL=dakika
+mov al, ch
+call yaz2
+mov dl, ':'
+mov ah, 02h
+int 21h
+mov al, cl
+call yaz2
+ret
+yaz2:             ; AL (0-99) → 2 hane
+aam               ; AH=onlar AL=birler
+add ax, 3030h     ; ASCII
+mov bx, ax
+mov dl, bh
+mov ah, 02h
+int 21h
+mov dl, bl
+int 21h
+ret
+</script>
+<script type="text/x-asm" data-name="RTC saati (INT 1Ah)">
+org 100h
+mov ah, 02h
+int 1Ah          ; CH=saat CL=dk DH=sn
+jc  son          ; CF=1: saat okunamadı
+mov bl, cl       ; dakikayı sakla
+mov cl, 4        ; SHR kaydırma sayısı
+mov bh, ch
+call bcdyaz      ; "14"
+mov bh, bl
+call ikinokta    ; ":35"
+mov bh, dh
+call ikinokta    ; ":07"
+son: ret
+ikinokta: mov dl, ':'
+mov ah, 02h
+int 21h
+bcdyaz:          ; BH = paketli BCD
+mov dl, bh
+shr dl, cl       ; üst hane
+add dl, 30h      ; ASCII rakam
+mov ah, 02h
+int 21h
+mov dl, bh
+and dl, 0Fh      ; alt hane
+add dl, 30h
+int 21h
+ret
+</script>
+</div>
+</section>
+
 <section class="ds-deck__slide" data-title="Özet" data-section="Özet">
   <p class="ds-deck__kicker">Özet</p>
   <h2>Özet: Hızlı Başvuru</h2>
@@ -1609,4 +1827,6 @@ selam db 0Dh, 0Ah, &#x27;Selam!$&#x27;</pre>
 </div>
 
 <script src="deck/deck.js"></script>
+<script src="deck/mini8086.js"></script>
+<script src="deck/m-lab.js"></script>
 <script src="deck/Bolum_11_Kesme_Fonksiyonlari.js"></script>
