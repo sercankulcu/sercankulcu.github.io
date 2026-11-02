@@ -130,7 +130,7 @@ This study proposes a lightweight radar-image framework that combines HSV-based 
 
 **How to cite:** Külcü, S. (2026). Radar image-based object detection and tracking for autonomous surface vehicles. *Turkish Journal of Maritime and Marine Sciences, 12*(1), 35–47.
 
-[Paper](https://doi.org/10.52998/trjmms.1743670) · [Presentation](/files/presentations/Radar_Image_Based_Object_Detection_Presentation.pdf)
+[Paper](https://doi.org/10.52998/trjmms.1743670) · [Presentation](/files/presentations/slides/Radar_Image_Based_Object_Detection_Presentation.html)
 
 </details>
 
@@ -146,7 +146,7 @@ This study presents mechanisms for integrating low-complexity steerable smart an
 
 **How to cite:** Külcü, S., Görmüş, S., & Jin, Y. (2021). Integration of Steerable Smart Antennas to IETF 6TiSCH Protocol for High Reliability Wireless IoT Networks. *IEEE Access, 9*, 147780–147790.
 
-[Paper](https://doi.org/10.1109/ACCESS.2021.3125144) · [Presentation](/files/presentations/Integration_of_Steerable_Presentation.pdf)
+[Paper](https://doi.org/10.1109/ACCESS.2021.3125144) · [Presentation](/files/presentations/slides/Integration_of_Steerable_Presentation.html)
 
 </details>
 
@@ -162,7 +162,7 @@ This study investigates the integration of low-complexity directional antennas w
 
 **How to cite:** Görmüş, S., & Külcü, S. (2019). Enabling space time division multiple access in IETF 6TiSCH protocol. *Turkish Journal of Electrical Engineering and Computer Sciences, 27*(6), 4151–4166.
 
-[Paper](https://doi.org/10.3906/elk-1903-127) · [Presentation](/files/presentations/Enabling_Space_Time_Presentation.pdf)
+[Paper](https://doi.org/10.3906/elk-1903-127) · [Presentation](/files/presentations/slides/Enabling_Space_Time_Presentation.html)
 
 </details>
 
