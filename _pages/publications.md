@@ -98,7 +98,7 @@ This study introduces a Grad-CAM-guided framework that reduces visual bias in me
 
 **How to cite:** Külcü, S., & Balpetek Külcü, D. (2026). Bias Mitigation in Ensemble-Based Meat Freshness Classification Using Grad-CAM. *Balkan Journal of Electrical and Computer Engineering, 14*, 74–82.
 
-[Paper](https://doi.org/10.17694/bajece.1817907) · [Presentation](/files/presentations/Bias_Mitigation_in_Presentation.pdf)
+[Paper](https://doi.org/10.17694/bajece.1817907) · [Presentation](/files/presentations/slides/Bias_Mitigation_in_Presentation.html)
 
 </details>
 
