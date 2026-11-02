@@ -1,0 +1,360 @@
+---
+layout: without-sidebar
+title: "A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News"
+permalink: /files/presentations/slides/A_Scalable_Approach_Presentation.html
+excerpt: "Interactive presentation of the IEEE ICSC 2016 paper: a Hadoop and Mahout framework that links Turkish tweets to news items and classifies their sentiment. Includes a tweet-to-news mapping lab, a Naive Bayes vs. Complement Naive Bayes demo and explorers for the paper's experiments."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/paper.css">
+<style>
+.ds-deck .tw-in { width: 100%; box-sizing: border-box; padding: 6px 10px; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-bg); color: var(--ds-text); font: inherit; font-size: 14px; }
+.ds-deck .tw-in:focus { outline: 2px solid var(--ds-link); outline-offset: 1px; }
+.ds-deck .tw-nb { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.ds-deck .tw-two { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.ds-deck .tw-scroll { max-height: 300px; overflow: auto; border-radius: 8px; }
+.ds-deck .tw-scroll .ds-deck__table { font-size: 12px; line-height: 1.2; }
+.ds-deck .tw-scroll .ds-deck__table td, .ds-deck .tw-scroll .ds-deck__table th { padding: 3px 7px; }
+.ds-deck .tw-scroll thead th { position: sticky; top: 0; z-index: 1; }
+.ds-deck .tw-map .ds-deck__table { font-size: 12.5px; }
+.ds-deck .tw-map .ds-deck__table td { padding: 4px 8px; }
+.ds-deck .tw-map tr.is-ours td { background: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); font-weight: 700; }
+.ds-deck.is-fluid .tw-nb,
+.ds-deck.is-fluid .tw-two { grid-template-columns: minmax(0, 1fr); }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="en">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="presentation" aria-label="A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Title" data-section="">
+  <p class="pv-venue">IEEE ICSC 2016 · Tenth International Conference on Semantic Computing</p>
+  <h1 class="pv-title">A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News</h1>
+  <div class="pv-authors" style="margin-top:8px">Sercan Kulcu · Erdogan Dogdu</div>
+  <div class="pv-affil">TOBB University of Economics and Technology, Ankara, Türkiye</div>
+  <div class="ds-deck__agenda" aria-label="Contents">
+    <span>Motivation</span><span>Pipeline</span><span>Turkish NLP</span><span>Mapping lab</span><span>MapReduce</span>
+    <span>Dataset</span><span>Bayes demo</span><span>Experiments</span><span>Scalability</span>
+  </div>
+  <small><a href="https://doi.org/10.1109/ICSC.2016.66">doi:10.1109/ICSC.2016.66</a> · Use ← → or Space to navigate, F for full screen</small>
+</section>
+
+<section class="ds-deck__slide" data-title="At a Glance" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>At a Glance</h2>
+  <p>A framework that collects Turkish news and related tweets, <b>links each tweet to a news item</b> and <b>classifies its sentiment</b>, so that the public reaction to every news item can be counted, all on a Hadoop cluster.</p>
+  <div class="pv-kpis">
+    <div class="pv-kpi"><span>Labelled tweets</span><b>6,000</b><small>new Turkish dataset</small></div>
+    <div class="pv-kpi is-best"><span>Best accuracy</span><b>79.38%</b><small>Complement NB, F1 0.880</small></div>
+    <div class="pv-kpi"><span>Tweet-to-news mapping</span><b>40.3%</b><small>88 of 218 correct</small></div>
+    <div class="pv-kpi"><span>Six-node cluster</span><b>3.4×</b><small>faster than one node</small></div>
+  </div>
+  <div class="ds-deck__grid ds-deck__grid--3" style="margin-top:14px">
+    <div class="ds-deck__card"><strong>Classifiers</strong><p>Naive Bayes, Complement Naive Bayes and logistic regression from Apache Mahout.</p></div>
+    <div class="ds-deck__card"><strong>Turkish NLP</strong><p>Zemberek handles stemming and misspelled words in an agglutinative language.</p></div>
+    <div class="ds-deck__card"><strong>Scalable</strong><p>Two MapReduce jobs process new tweets every ten minutes and merge the results.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Motivation" data-section="Introduction">
+  <p class="ds-deck__kicker">1 · Introduction</p>
+  <h2>What Does Twitter Think about the News?</h2>
+  <div class="ds-deck__two ds-deck__two--wide-left">
+    <ul class="ds-deck__small">
+      <li>Decisions depend on "what other people think"; sentiment analysis finds out whether a text is positive or negative.</li>
+      <li>Two families: <b>supervised machine learning</b> (train on labelled data) and <b>semantic orientation</b> (unsupervised, lexicon-like).</li>
+      <li>Tweets arrive continuously, so the classifier must <b>scale</b>: the work is distributed with Hadoop (HDFS + MapReduce) and Mahout.</li>
+      <li>Most earlier work is on English; this study builds a Turkish dataset and applies the same methods to Turkish.</li>
+    </ul>
+    <div class="ds-deck__grid ds-deck__small">
+      <div class="ds-deck__card"><strong>Why Turkish is hard</strong><p>Agglutinative: one root takes many suffixes, e.g. <em>gel-mi-yor-um</em> "I am not coming". Words with the same root can mean different things.</p></div>
+      <div class="ds-deck__card"><strong>Why tweets are hard</strong><p>Short texts, misspellings, missing Turkish characters, URLs, user names and "RT" without sentiment.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Related Work" data-section="Introduction">
+  <p class="ds-deck__kicker">2 · Related Work · Interactive</p>
+  <h2>Related Work</h2>
+  <p class="ds-deck__small" style="margin-bottom:6px">Click a column header to sort.</p>
+  <div class="tw-scroll">
+    <table class="ds-deck__table pv-sort" id="tw-rel">
+      <thead><tr><th>Study</th><th>Approach</th><th>Data</th><th>Finding</th></tr></thead>
+      <tbody>
+        <tr><td>Pang et al.</td><td>NB, maximum entropy, SVM</td><td>movie reviews</td><td>machine learning beats human-made baselines; unigrams beat bigrams</td></tr>
+        <tr><td>Pak and Paroubek</td><td>emoticon-labelled training data, n-grams</td><td>Twitter (English)</td><td>bigrams work best; URLs, stop words and special words removed</td></tr>
+        <tr><td>Khuc et al.</td><td>lexicon builder + Mahout classifier on MapReduce</td><td>Twitter</td><td>real-time distributed system, 73.7% accuracy</td></tr>
+        <tr><td>Pandarachalil et al.</td><td>own unigram NB on Hadoop MapReduce and HDFS</td><td>Amazon movie reviews</td><td>82% accuracy</td></tr>
+        <tr><td>Abel et al.</td><td>bag-of-words matching</td><td>tweets and news</td><td>links tweets to news articles to give them context</td></tr>
+        <tr class="is-ours"><td>This study</td><td>NB, Complement NB, logistic regression on Hadoop + Mahout; Zemberek</td><td>6,000 Turkish tweets</td><td>79.38% accuracy; tweet-to-news linking</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="System Overview" data-section="Method">
+  <p class="ds-deck__kicker">3 · Method · Fig. 1</p>
+  <h2>From News Feed to Sentiment per News Item</h2>
+  <div class="pv-flow">
+    <div><b>News</b>latest 50 items from the NTV RSS feed, stored in HDFS</div><i>→</i>
+    <div><b>Keywords</b>stop words removed, nouns kept (Algorithm 1)</div><i>→</i>
+    <div><b>Tweets</b>Twitter4J filtered by keywords; only tweets geo-located in Türkiye</div><i>→</i>
+    <div><b>Map</b>each tweet to the most similar news item (Algorithm 2)</div><i>→</i>
+    <div><b>Classify</b>positive, neutral or negative; counts per news item</div>
+  </div>
+  <div class="ds-deck__grid ds-deck__grid--3 ds-deck__small" style="margin-top:12px">
+    <div class="ds-deck__card"><strong>Every ten minutes</strong><p>New tweets are collected in ten-minute batches and analysed after each batch.</p></div>
+    <div class="ds-deck__card"><strong>Java toolchain</strong><p>JDOM and Rome parse the RSS XML; Twitter4J streams tweets.</p></div>
+    <div class="ds-deck__card"><strong>Output</strong><p>For each news item: how many supporters and opposers it has on Twitter.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Turkish NLP with Zemberek" data-section="Method">
+  <p class="ds-deck__kicker">3.3 · Tables 1–2</p>
+  <h2>Turkish NLP with Zemberek</h2>
+  <div class="ds-deck__two">
+    <div>
+      <h3 style="margin:0 0 6px">Stemming (Table 1)</h3>
+      <table class="ds-deck__table">
+        <thead><tr><th>Word</th><th>Root</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td>gelmiyorum</td><td>gel</td><td>verb</td></tr>
+          <tr><td>gitmedim</td><td>git</td><td>verb</td></tr>
+          <tr><td>çok</td><td>çok</td><td>adjective</td></tr>
+          <tr><td>erken</td><td>erken</td><td>adverb</td></tr>
+          <tr><td>hakaret</td><td>hakaret</td><td>noun</td></tr>
+          <tr><td>özgürlük</td><td>özgür</td><td>noun</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="margin:0 0 6px">Word similarity (Table 2)</h3>
+      <table class="ds-deck__table">
+        <thead><tr><th>Word 1</th><th>Word 2</th><th class="num">Score</th></tr></thead>
+        <tbody>
+          <tr><td>Yaşasın</td><td>yaşasın</td><td class="num">0.904</td></tr>
+          <tr><td>kötüyüm</td><td>kotuyüm</td><td class="num">0.768</td></tr>
+          <tr><td>akın</td><td>yakın</td><td class="num">0.933</td></tr>
+          <tr><td>akın</td><td>sakın</td><td class="num">0.933</td></tr>
+          <tr><td>hakaret</td><td>hakret</td><td class="num">0.966</td></tr>
+          <tr><td>özgürlük</td><td>özgürlüğü</td><td class="num">0.935</td></tr>
+        </tbody>
+      </table>
+      <p class="ds-deck__foot">Note: <em>akın</em>/<em>yakın</em> pass the 0.90 threshold although they are different words.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Mapping Lab" data-section="Method">
+  <p class="ds-deck__kicker">3.3 · Algorithm 2 · Interactive</p>
+  <h2>Mapping Lab: Which News Is This Tweet About?</h2>
+  <div class="pv-ctrl" style="margin-bottom:6px"><div class="pv-seg" id="tw-map-pre"><button type="button" data-v="metro" class="is-on">Metro tweet</button><button type="button" data-v="zam">Price tweet</button><button type="button" data-v="mac">Match tweet</button><button type="button" data-v="none">Unrelated</button></div></div>
+  <input class="tw-in" id="tw-map-in" type="text" value="" aria-label="Tweet text, editable">
+  <div class="pv-range" style="margin-top:6px"><span>Similarity &gt;</span><input type="range" id="tw-map-thr" min="70" max="99" value="90" aria-label="Word similarity threshold"><output id="tw-map-thr-out"></output></div>
+  <div class="tw-map" style="margin-top:6px">
+    <table class="ds-deck__table">
+      <thead><tr><th>News item (made up)</th><th class="num">Score</th><th>Matching word pairs</th></tr></thead>
+      <tbody id="tw-map-body"></tbody>
+    </table>
+  </div>
+  <p class="pv-note ds-deck__small" id="tw-map-note"></p>
+  <p class="ds-deck__foot">Illustrative: made-up news and tweets; edit the tweet freely. Every word pair above the threshold adds one point, the top-scoring item wins. Zemberek's stemming and similarity are approximated by edit distance on ASCII-folded words plus a shared-stem rule.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Two MapReduce Jobs" data-section="Method">
+  <p class="ds-deck__kicker">3.4 · Figs. 2–3</p>
+  <h2>Two MapReduce Jobs</h2>
+  <div class="ds-deck__grid ds-deck__grid--2 ds-deck__small">
+    <div class="ds-deck__card"><strong>Job 1: analyse a batch</strong>
+      <p><b>Input:</b> (news item, tweet) pairs from the last ten minutes.</p>
+      <p><b>Map:</b> classify each tweet with the model trained in Mahout beforehand.</p>
+      <p><b>Reduce:</b> per news item, count positive, neutral and negative tweets (popularity, supporters, opposers) and write the result to HDFS.</p></div>
+    <div class="ds-deck__card"><strong>Job 2: merge with history</strong>
+      <p><b>Input:</b> the new batch result and all earlier results since system start.</p>
+      <p><b>Map:</b> key each record by a hash id of its news item.</p>
+      <p><b>Reduce:</b> add up the counts per key into one consolidated result.</p></div>
+  </div>
+  <div class="ds-deck__callout ds-deck__small">Splitting the work this way keeps each ten-minute run small: old tweets are never re-classified, only their counts are merged.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Dataset" data-section="Evaluation">
+  <p class="ds-deck__kicker">4.1 · Dataset · Table 3</p>
+  <h2>A New Labelled Turkish Tweet Dataset</h2>
+  <div class="ds-deck__two">
+    <div>
+      <div class="pv-legend"><span><i style="background:var(--pv-s2)"></i>negative 3,000</span><span><i style="background:var(--pv-base)"></i>neutral 1,448</span><span><i style="background:var(--pv-s1)"></i>positive 1,552</span></div>
+      <div style="display:flex;height:34px;border-radius:8px;overflow:hidden;margin:6px 0 12px" role="img" aria-label="Class shares: 50% negative, 24% neutral, 26% positive">
+        <div style="flex:3000;background:var(--pv-s2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center">50%</div>
+        <div style="flex:1448;background:var(--pv-base);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center">24%</div>
+        <div style="flex:1552;background:var(--pv-s1);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center">26%</div>
+      </div>
+      <ul class="ds-deck__small">
+        <li>6,000 tweets from early 2015, each longer than 50 characters.</li>
+        <li>Average length: 9.43 words, 75.3 characters.</li>
+        <li>80% training, 20% test; metrics: accuracy, precision, F1.</li>
+      </ul>
+    </div>
+    <div class="ds-deck__grid ds-deck__small">
+      <div class="ds-deck__card"><strong>Manual labels</strong><p>Every tweet labelled positive, negative or neutral and checked by 10 graduate students.</p></div>
+      <div class="ds-deck__card"><strong>Imbalanced</strong><p>Half of the tweets are negative, which motivates Complement Naive Bayes.</p></div>
+      <div class="ds-deck__card"><strong>Open data</strong><p>Published on GitHub: <a href="https://github.com/sercankulcu/twitterdata">sercankulcu/twitterdata</a>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Naive Bayes Demo" data-section="Evaluation">
+  <p class="ds-deck__kicker">4.2 · Classifiers · Interactive</p>
+  <h2>Naive Bayes vs. Complement Naive Bayes</h2>
+  <div class="tw-nb">
+    <div>
+      <div class="pv-ctrl" style="margin-bottom:6px"><div class="pv-seg" id="tw-nb-m"><button type="button" data-v="nb" class="is-on">Naive Bayes</button><button type="button" data-v="cnb">Complement NB</button></div></div>
+      <div class="pv-ctrl" style="margin-bottom:6px"><span>Try:</span><div class="pv-seg" id="tw-nb-pre"><button type="button" data-v="güzel bir maç" class="is-on">güzel bir maç</button><button type="button" data-v="karar çok kötü">karar çok kötü</button><button type="button" data-v="maç">maç</button><button type="button" data-v="yeni karar">yeni karar</button></div></div>
+      <input class="tw-in" id="tw-nb-in" type="text" value="güzel bir maç" aria-label="Tweet text to classify, editable">
+      <p class="pv-note ds-deck__small" id="tw-nb-out" style="margin-top:8px"></p>
+      <ul class="ds-deck__small">
+        <li><b>Naive Bayes</b>: sum the evidence of each word, plus the class prior, which favours the larger class.</li>
+        <li><b>Complement NB</b> (Rennie et al.) learns from the complement classes and drops the prior; with two classes that missing prior is the visible difference. On <em>maç</em> and <em>yeni karar</em> the two disagree.</li>
+      </ul>
+    </div>
+    <div class="pv-chart" id="tw-nb"></div>
+  </div>
+  <p class="ds-deck__foot">Illustrative: 9 made-up training tweets (6 negative, 3 positive), Laplace smoothing; unknown words are ignored. Blue: towards positive, orange: towards negative.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Experiments" data-section="Evaluation">
+  <p class="ds-deck__kicker">4.2 · Tables 4, 6, 7, 8 · Interactive</p>
+  <h2>Experiments Explorer</h2>
+  <div class="pv-ctrl" style="margin-bottom:4px"><div class="pv-seg" id="tw-exp-g"><button type="button" data-v="alg" class="is-on">Algorithms</button><button type="button" data-v="ngram">n-grams</button><button type="button" data-v="cls">Class setups</button><button type="button" data-v="lr">Logistic regression rate</button></div>
+    <span class="pv-legend" style="margin:0"><span><i style="background:var(--pv-base)"></i>accuracy</span><span><i style="background:var(--pv-s1)"></i>precision</span><span><i style="background:var(--pv-s2)"></i>F1</span></span></div>
+  <div class="pv-chart" id="tw-exp"></div>
+  <p class="pv-note" id="tw-exp-note"></p>
+</section>
+
+<section class="ds-deck__slide" data-title="Dataset Size" data-section="Evaluation">
+  <p class="ds-deck__kicker">4.2 · Table 5 · Interactive</p>
+  <h2>How Much Data Is Enough?</h2>
+  <div class="pv-ctrl" style="margin-bottom:4px"><div class="pv-seg" id="tw-size-m"><button type="button" data-v="a" class="is-on">Accuracy</button><button type="button" data-v="p">Precision</button><button type="button" data-v="f">F1</button></div>
+    <span class="ds-deck__small" style="color:var(--ds-muted)">Naive Bayes, positive vs. negative tweets</span></div>
+  <div class="pv-chart" id="tw-size"></div>
+  <p class="pv-note" id="tw-size-note"></p>
+</section>
+
+<section class="ds-deck__slide" data-title="Mapping and Scalability" data-section="Evaluation">
+  <p class="ds-deck__kicker">4.3–4.4 · Tables 9–10</p>
+  <h2>Mapping Accuracy and Scalability</h2>
+  <div class="tw-two">
+    <div class="ds-deck__small">
+      <h3 style="margin:0 0 6px">Tweet-to-news mapping</h3>
+      <div class="pv-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div class="pv-kpi"><span>Correct</span><b>88</b></div>
+        <div class="pv-kpi"><span>Incorrect</span><b>130</b></div>
+        <div class="pv-kpi"><span>Accuracy</span><b>40.3%</b></div>
+      </div>
+      <p>218 tweets for 29 news items, checked by hand. Plain bag-of-words matching is the weak link of the pipeline; lexicon-based strategies were the next step.</p>
+    </div>
+    <div class="ds-deck__small">
+      <h3 style="margin:0 0 6px">Execution time, 100 MB</h3>
+      <div class="pv-chart" id="tw-speed"></div>
+      <p>Six nodes finish in 637 s instead of 2,137 s. The speed-up is real but well below 6×: job start-up and data shuffling do not shrink with more nodes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Conclusion" data-section="Conclusion">
+  <p class="ds-deck__kicker">5 · Conclusion and Future Work</p>
+  <h2>Conclusion</h2>
+  <ul>
+    <li>A scalable framework links Turkish tweets to news items and rates each item by its positive, neutral and negative tweets.</li>
+    <li>On 6,000 manually labelled Turkish tweets, the <b>Bayes classifiers</b> (Complement NB 79.38%, NB 78.61%) clearly beat logistic regression (63.12%).</li>
+    <li><b>Unigrams</b> are the better feature model, and <b>two-class</b> problems are easier than three-class ones.</li>
+    <li>Mapping by bag of words reaches 40.3%; better mapping, e.g. lexicon-based, is future work.</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Check Questions" data-section="Conclusion">
+  <p class="ds-deck__kicker">5 · Conclusion</p>
+  <h2>Check Questions</h2>
+  <ol class="ds-deck__small">
+    <li>Why does Turkish need stemming before tweets and news can be compared word by word?</li>
+    <li>What problem of Naive Bayes does Complement Naive Bayes address, and why does it matter for this dataset?</li>
+    <li>Why can bigrams and trigrams do worse than unigrams on 6,000 tweets?</li>
+    <li>Why is the second MapReduce job needed?</li>
+    <li>Six nodes give a 3.4× speed-up, not 6×. Why?</li>
+  </ol>
+  <details class="ds-deck__answers">
+    <summary>Show answers</summary>
+    <ol>
+      <li>Turkish is agglutinative: the same root appears with many suffixes, so surface forms rarely match exactly.</li>
+      <li>Bias towards the class with more training examples; half of the tweets are negative.</li>
+      <li>More, sparser features on a small dataset make overfitting easier.</li>
+      <li>To merge each ten-minute batch result with all earlier results into one consolidated count per news item.</li>
+      <li>Fixed overheads such as job start-up, data distribution and the shuffle between map and reduce do not shrink with more nodes.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Selected References" data-section="References">
+  <p class="ds-deck__kicker">References</p>
+  <h2>Selected References</h2>
+  <ul class="ds-deck__small">
+    <li>Pang, B., Lee, L., Vaithyanathan, S. (2002). Thumbs up? Sentiment classification using machine learning techniques. <em>Proc. EMNLP</em>, 79–86.</li>
+    <li>Rennie, J. D. et al. (2003). Tackling the poor assumptions of naive Bayes text classifiers. <em>ICML</em>, 616–623.</li>
+    <li>Pak, A., Paroubek, P. (2010). Twitter as a corpus for sentiment analysis and opinion mining. <em>LREC</em>, 1320–1326.</li>
+    <li>Khuc, V. N. et al. (2012). Towards building large-scale distributed systems for Twitter sentiment analysis. <em>ACM SAC</em>, 459–464.</li>
+    <li>Abel, F. et al. (2011). Semantic enrichment of Twitter posts for user profile construction on the social web. <em>ESWC</em>, 375–389.</li>
+    <li>Can, F. et al. (2008). Information retrieval on Turkish texts. <em>JASIST</em>, 59(3), 407–421.</li>
+  </ul>
+  <p class="ds-deck__foot">See the full paper for the complete reference list. Charts on these slides are drawn from the paper's tables.</p>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="How to Cite" data-section="">
+  <h1 style="font-size:40px">Thank You</h1>
+  <div class="ds-deck__subtitle">A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News</div>
+  <div class="ds-deck__callout" style="max-width:640px;text-align:left;margin-top:22px">
+    <b>How to cite:</b> Kulcu, S., &amp; Dogdu, E. (2016). A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News. In <em>2016 IEEE Tenth International Conference on Semantic Computing (ICSC)</em>, pp. 471–476. IEEE. <a href="https://doi.org/10.1109/ICSC.2016.66">doi:10.1109/ICSC.2016.66</a>
+  </div>
+  <small>sercan.kulcu@giresun.edu.tr · <a href="/publications/">All publications</a></small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Previous slide">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Next slide">→</button>
+        <span class="ds-deck__section" id="ds-deck-section"></span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Go to slide"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/pv.js"></script>
+<script src="deck/sentiment.js"></script>
+<script src="deck/deck.js"></script>

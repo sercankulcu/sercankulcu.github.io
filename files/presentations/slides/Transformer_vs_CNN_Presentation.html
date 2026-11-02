@@ -1,0 +1,320 @@
+---
+layout: without-sidebar
+title: "Transformer vs. CNN: Benchmarking RT-DETR and YOLO Models on the UATD Dataset"
+permalink: /files/presentations/slides/Transformer_vs_CNN_Presentation.html
+excerpt: "Interactive presentation of the UBCAK 17 paper comparing the Transformer-based RT-DETR-L with the CNN-based YOLOv12n and YOLOv8n on forward-looking sonar images: accuracy against speed, class-wise mAP, an explorable confusion matrix and a sample detection."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/paper.css">
+<style>
+.ds-deck .ua-scroll { max-height: 320px; overflow: auto; border-radius: 8px; }
+.ds-deck .ua-scroll .ds-deck__table { font-size: 12px; line-height: 1.2; }
+.ds-deck .ua-scroll .ds-deck__table td, .ds-deck .ua-scroll .ds-deck__table th { padding: 3px 7px; }
+.ds-deck .ua-scroll thead th { position: sticky; top: 0; z-index: 1; }
+.ds-deck .ua-cm { display: grid; grid-template-columns: 470px minmax(0, 1fr); gap: 14px; align-items: start; }
+.ds-deck .ua-wipe { width: 260px; aspect-ratio: 298 / 329; }
+.ds-deck.is-fluid .ua-cm { grid-template-columns: minmax(0, 1fr); }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="en">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="presentation" aria-label="Transformer vs. CNN on the UATD dataset">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Title" data-section="">
+  <p class="pv-venue">UBCAK 17 · 17th International Academic Studies Conference · 2025</p>
+  <h1 class="pv-title">Transformer vs. CNN: Benchmarking RT-DETR and YOLO Models on the UATD Dataset</h1>
+  <div class="ds-deck__subtitle" style="font-size:18px;font-weight:600">Transformer ve CNN: UATD Veri Setinde RT-DETR ve YOLO Modellerinin Karşılaştırılması</div>
+  <div class="pv-authors" style="margin-top:8px">Sercan Külcü</div>
+  <div class="pv-affil">Computer Engineering Department, Giresun University, Türkiye</div>
+  <div class="ds-deck__agenda" aria-label="Contents">
+    <span>Sonar challenges</span><span>Related work</span><span>UATD</span><span>Models</span>
+    <span>Accuracy vs speed</span><span>Per class</span><span>Errors</span><span>Sample</span>
+  </div>
+  <small><a href="https://kongre.akademikiletisim.com/files/ubcak17/ubcak17_tam_metin_kitabi.pdf">Full-text book</a> · Use ← → or Space to navigate, F for full screen</small>
+</section>
+
+<section class="ds-deck__slide" data-title="At a Glance" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>At a Glance</h2>
+  <p>A Transformer detector against two small CNN detectors on 9,200 forward-looking sonar images: <b>RT-DETR-L</b> is the most accurate, <b>YOLOv8n</b> the best trade-off for small underwater robots.</p>
+  <div class="pv-kpis">
+    <div class="pv-kpi is-best"><span>Best mAP50-95</span><b>0.535</b><small>RT-DETR-L</small></div>
+    <div class="pv-kpi"><span>YOLOv8n mAP50-95</span><b>0.507</b><small>YOLOv12n: 0.481</small></div>
+    <div class="pv-kpi"><span>Inference time</span><b>2.7 ms</b><small>YOLOv8n · RT-DETR-L 24.1 ms</small></div>
+    <div class="pv-kpi"><span>Compute</span><b>103.5</b><small>GFLOPs for RT-DETR-L vs 6.3–8.1</small></div>
+  </div>
+  <div class="ds-deck__grid ds-deck__grid--3" style="margin-top:14px">
+    <div class="ds-deck__card"><strong>Transformer</strong><p>Global context pays off on objects with large shadows and distinct outlines, such as plane and ball.</p></div>
+    <div class="ds-deck__card"><strong>CNN</strong><p>About 9× faster with a tenth of the parameters, which suits resource-limited vehicles.</p></div>
+    <div class="ds-deck__card"><strong>Next</strong><p>Hybrid designs that combine Transformer accuracy with YOLO efficiency.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Why Sonar Is Hard" data-section="Introduction">
+  <p class="ds-deck__kicker">Introduction</p>
+  <h2>Why Sonar Images Are Hard</h2>
+  <div class="ds-deck__two ds-deck__two--wide-left">
+    <ul class="ds-deck__small">
+      <li>Cameras fail in turbid water; <b>forward-looking sonar</b> (FLS) sees by sound and works in the dark.</li>
+      <li>FLS images have low resolution, heavy noise and blurry object boundaries; targets are small and sparse.</li>
+      <li>Signal attenuation and seabed reverberation add clutter; there is <b>no colour or texture</b>, only echoes and acoustic shadows.</li>
+      <li>Detectors must also fit on autonomous underwater vehicles (AUVs) with limited power and compute.</li>
+    </ul>
+    <div class="ds-deck__grid ds-deck__small">
+      <div class="ds-deck__card"><strong>Applications</strong><p>Marine resource exploration, subsea construction, ecological monitoring.</p></div>
+      <div class="ds-deck__card"><strong>Research question</strong><p>Does a Transformer's global context beat a CNN's local features on sonar, and at what cost?</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Related Work" data-section="Introduction">
+  <p class="ds-deck__kicker">Introduction · Related Work · Interactive</p>
+  <h2>Detectors for Forward-Looking Sonar</h2>
+  <p class="ds-deck__small" style="margin-bottom:6px">Results as reported by each study; datasets and metrics differ. Click a column header to sort.</p>
+  <div class="ua-scroll">
+    <table class="ds-deck__table pv-sort" id="ua-rel">
+      <thead><tr><th>Model</th><th>Type</th><th>Task</th><th>Reported result</th><th>Study</th></tr></thead>
+      <tbody>
+        <tr><td>FLSD-Net</td><td>CNN (YOLOv8)</td><td>detection</td><td>higher mAP on UATD-2022, less overfitting</td><td>Yang et al., 2024</td></tr>
+        <tr><td>Fast-YOLOv5</td><td>CNN (YOLOv5)</td><td>detection</td><td>mAP 81.2%, 200 FPS</td><td>Yang et al., 2023</td></tr>
+        <tr><td>SonarNet</td><td>CNN-Transformer hybrid</td><td>segmentation</td><td>54.5% mIoU, 215.5 FPS</td><td>He et al., 2024</td></tr>
+        <tr><td>FA-YOLO</td><td>CNN (YOLOv5)</td><td>detection</td><td>98.1% mAP on UATD</td><td>Ding and Liu, 2023</td></tr>
+        <tr><td>Adapted YOLOv7</td><td>CNN (YOLOv7)</td><td>detection</td><td>+15% mAP over YOLOv5</td><td>Ge et al., 2024</td></tr>
+        <tr><td>HMSeg</td><td>hybrid encoder-decoder</td><td>segmentation</td><td>state-of-the-art mIoU on UATD-Seg</td><td>Wang et al., 2025</td></tr>
+        <tr><td>DA-YOLOv7</td><td>CNN (YOLOv7)</td><td>detection</td><td>99.15% mAP on SCTD</td><td>Chen et al., 2024</td></tr>
+        <tr><td>MFF-YOLOv7</td><td>CNN (YOLOv7)</td><td>detection</td><td>robust on UATD, URPC, SCTD</td><td>Zheng et al., 2024</td></tr>
+        <tr><td>AquaYOLO</td><td>CNN (YOLOv8)</td><td>detection</td><td>better sonar feature extraction</td><td>Lu et al., 2025</td></tr>
+        <tr><td>LS-DETR</td><td>Transformer</td><td>detection</td><td>+2.8% accuracy on UATD</td><td>Wang et al., 2025</td></tr>
+        <tr><td>YOLO-DCN</td><td>CNN (YOLOv3)</td><td>detection</td><td>+10.2% mAP on irregular objects</td><td>Hou, 2024</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="UATD Dataset" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">Materials and Methods · Fig. 1</p>
+  <h2>The UATD Dataset</h2>
+  <div class="ds-deck__two">
+    <ul class="ds-deck__small">
+      <li><b>9,200</b> raw sonar images from a Tritech Gemini 1200ik multibeam FLS, recorded in lakes and shallow water in Maoming and Dalian, China.</li>
+      <li>BMP images, 1024×1428, 720 kHz or 1200 kHz, 5–25 m range; bounding boxes in XML.</li>
+      <li>Split: 7,600 training, 800 test_1, 800 test_2.</li>
+      <li>95 images moved from training to test to balance the human body and metal bucket instances.</li>
+      <li>Validation: <b>895 images, 1,362 instances</b>.</li>
+      <li><b>10 classes</b>: cube, ball, cylinder, human body model, tyre, circle cage, square cage, metal bucket, plane model, BlueROV.</li>
+    </ul>
+    <figure style="margin:0"><img src="img/uatd/classes.webp" alt="Bar chart of instances per object class" width="309" height="282" style="display:block;width:100%;max-width:330px;height:auto;margin:0 auto;border-radius:8px;background:#fff"><figcaption class="ds-deck__caption">Fig. 1: instances per class</figcaption></figure>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="The Contenders" data-section="Materials and Methods">
+  <p class="ds-deck__kicker">Materials and Methods · Table 1</p>
+  <h2>The Contenders</h2>
+  <div class="ds-deck__two">
+    <div class="ds-deck__grid ds-deck__small">
+      <div class="ds-deck__card"><strong>RT-DETR-L (Transformer)</strong><p>Real-time DETR: attention links every image region with every other and predicts a set of boxes directly, without non-maximum suppression. 32.0 M parameters.</p></div>
+      <div class="ds-deck__card"><strong>YOLOv8n and YOLOv12n (CNN)</strong><p>Nano one-stage detectors built on local convolutional features; YOLOv12 adds attention blocks. 3.0 M and 2.6 M parameters.</p></div>
+    </div>
+    <table class="ds-deck__table">
+      <thead><tr><th colspan="2">RT-DETR-L training</th></tr></thead>
+      <tbody>
+        <tr><td>Library</td><td>Ultralytics 8.3.167</td></tr>
+        <tr><td>Initialization</td><td>COCO, 926 of 941 weights transferred</td></tr>
+        <tr><td>Epochs</td><td>20, no early stopping</td></tr>
+        <tr><td>Image size</td><td>640×640</td></tr>
+        <tr><td>Batch size</td><td>4 (GPU memory limit)</td></tr>
+        <tr><td>Optimizer</td><td>AdamW, lr 0.000714, momentum 0.9</td></tr>
+        <tr><td>Loss</td><td>GIoU + classification + L1</td></tr>
+        <tr><td>Augmentation</td><td>mosaic 1.0, HSV, horizontal flip 0.5</td></tr>
+        <tr><td>GPU</td><td>NVIDIA GeForce RTX 3050 (6 GB)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Accuracy vs. Speed" data-section="Results">
+  <p class="ds-deck__kicker">Results · Table 2 · Interactive</p>
+  <h2>Accuracy against Speed</h2>
+  <div class="pv-ctrl" style="margin-bottom:4px"><div class="pv-seg" id="ua-trade-m"><button type="button" data-v="m" class="is-on">mAP50-95</button><button type="button" data-v="m50">mAP50</button><button type="button" data-v="p">Precision</button><button type="button" data-v="r">Recall</button></div></div>
+  <div class="pv-chart" id="ua-trade"></div>
+  <p class="pv-note" id="ua-trade-note"></p>
+  <p class="ds-deck__foot">Same validation set for all models; inference time on an RTX 3050. Pre- and post-processing (about 0.3 ms and 1.8–5.1 ms) are similar across models and not included.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Per-Class Results" data-section="Results">
+  <p class="ds-deck__kicker">Results · Table 3 · Interactive</p>
+  <h2>Class-Wise Comparison</h2>
+  <div class="pv-ctrl" style="margin-bottom:4px">
+    <div class="pv-seg" id="ua-cls-m"><button type="button" data-v="1" class="is-on">mAP50-95</button><button type="button" data-v="0">mAP50</button></div>
+    <div class="pv-seg" id="ua-cls-sort"><button type="button" data-v="class" class="is-on">Table order</button><button type="button" data-v="gap">Sort by RT-DETR lead</button></div>
+    <span class="pv-legend" style="margin:0"><span><i class="dot" style="background:var(--pv-s2)"></i>RT-DETR-L</span><span><i class="dot" style="background:var(--pv-base)"></i>YOLOv12n</span><span><i class="dot" style="background:var(--pv-s1)"></i>YOLOv8n</span></span>
+  </div>
+  <div class="pv-chart" id="ua-cls"></div>
+  <p class="pv-note ds-deck__small">Right column: RT-DETR-L minus the better YOLO model. In mAP50-95 its largest leads are on human body (+0.076) and cylinder (+0.069); plane (0.650) and ball (0.607) are its best classes. Only on metal bucket does YOLOv8n come out ahead.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Confusion Matrix" data-section="Results">
+  <p class="ds-deck__kicker">Results · Fig. 2 · Interactive</p>
+  <h2>Where RT-DETR-L Errs</h2>
+  <div class="ua-cm">
+    <div class="pv-chart" id="ua-cm"></div>
+    <div class="ds-deck__small">
+      <p><b>Hover or tap a cell.</b> Columns are ground truth and each column sums to 1; rows are predictions.</p>
+      <p class="pv-note" id="ua-cm-note"></p>
+      <ul>
+        <li><b>Diagonal</b>: 0.92 (tyre) to 1.00 (cylinder).</li>
+        <li><b>Bottom row</b>, missed objects: mainly tyres (6%).</li>
+        <li><b>Right column</b>, false alarms on background: mostly labelled ball (27%), tyre (19%), circle cage (16%) or cylinder (13%). Small, round echoes resemble seabed clutter.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Training Dynamics" data-section="Results">
+  <p class="ds-deck__kicker">Results · Fig. 3</p>
+  <h2>Training Dynamics of RT-DETR-L</h2>
+  <figure style="margin:0"><img src="img/uatd/training.webp" alt="Precision, recall, mAP50 and mAP50-95 of RT-DETR-L over 20 epochs" width="604" height="197" style="display:block;width:100%;height:auto;border-radius:8px;background:#fff"><figcaption class="ds-deck__caption">Precision, recall, mAP50 and mAP50-95 over 20 epochs</figcaption></figure>
+  <div class="ds-deck__grid ds-deck__grid--2 ds-deck__small" style="margin-top:12px">
+    <div class="ds-deck__card"><strong>Epochs 1–10</strong><p>Rapid increase in all metrics: COCO pretraining transfers to sonar quickly.</p></div>
+    <div class="ds-deck__card"><strong>Towards epoch 20</strong><p>The curves flatten into a plateau; more epochs would bring little.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Sample Detection" data-section="Results">
+  <p class="ds-deck__kicker">Results · Fig. 4 · Interactive</p>
+  <h2>A Sample Detection</h2>
+  <div class="ds-deck__two">
+    <div class="pv-wipe ua-wipe" aria-label="Drag to compare the raw sonar image and the detections">
+      <img src="img/uatd/detections.webp" alt="Sonar image with three detected objects" width="298" height="329">
+      <img class="pv-wipe__top" src="img/uatd/raw.webp" alt="Raw multibeam forward-looking sonar image" width="298" height="329">
+      <span class="pv-wipe__lab pv-wipe__lab--l">detections</span><span class="pv-wipe__lab pv-wipe__lab--r">raw</span>
+      <div class="pv-wipe__bar"></div>
+      <input type="range" min="0" max="100" value="50" aria-label="Comparison divider">
+    </div>
+    <div class="ds-deck__small">
+      <p><b>Drag the divider</b> to compare the raw scan and the output of RT-DETR-L.</p>
+      <ul>
+        <li>The raw scan shows acoustic shadows and faint silhouettes in shallow water.</li>
+        <li>Three objects are found: <b>ball</b> (0.85), <b>square cage</b> (0.81) and <b>tyre</b> (0.82).</li>
+        <li>Objects are a few dozen pixels in a large, mostly dark frame: small and sparse targets.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Which Model When" data-section="Discussion">
+  <p class="ds-deck__kicker">Discussion</p>
+  <h2>Which Model, When?</h2>
+  <div class="ds-deck__grid ds-deck__grid--2 ds-deck__small">
+    <div class="ds-deck__pc ds-deck__pc--pro"><h3>RT-DETR-L</h3><ul>
+      <li>highest mAP50-95 (0.535) and recall (0.964)</li>
+      <li>global context helps with shadows and outlines: plane 0.650, ball 0.607</li>
+      <li>for precision-critical tasks: inspection, search, offline analysis</li>
+      <li>cost: 103.5 GFLOPs, 24.1 ms per image</li></ul></div>
+    <div class="ds-deck__pc ds-deck__pc--pro"><h3>YOLOv8n</h3><ul>
+      <li>mAP50-95 0.507, close to RT-DETR-L</li>
+      <li>consistent across classes; best mAP50 on cube, ball, circle cage and metal bucket</li>
+      <li>2.7 ms per image with 8.1 GFLOPs</li>
+      <li>best trade-off for resource-limited underwater robots</li></ul></div>
+  </div>
+  <div class="ds-deck__callout ds-deck__small"><b>YOLOv12n</b> is the lightest (6.3 GFLOPs) but trails in accuracy (0.481), especially on irregular shapes such as cylinder (0.397) and human body (0.429).</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Conclusion" data-section="Discussion">
+  <p class="ds-deck__kicker">Discussion and Conclusions</p>
+  <h2>Conclusion</h2>
+  <ul>
+    <li>Transformer-based <b>RT-DETR-L</b> is the most accurate detector on UATD, with mAP50-95 0.535.</li>
+    <li>CNN-based <b>YOLO</b> models are 7–9× faster and much lighter; YOLOv8n balances accuracy and speed best.</li>
+    <li>Balancing the class distribution made the evaluation fairer for underrepresented classes such as metal bucket.</li>
+    <li>Future work: hybrid models that combine Transformer accuracy with YOLO's lightweight design.</li>
+  </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Check Questions" data-section="Discussion">
+  <p class="ds-deck__kicker">Discussion</p>
+  <h2>Check Questions</h2>
+  <ol class="ds-deck__small">
+    <li>Name three properties of FLS images that make detection harder than in camera images.</li>
+    <li>Why are the models almost equal at mAP50 but clearly different at mAP50-95?</li>
+    <li>Which model would you put on a small AUV, and why?</li>
+    <li>In the confusion matrix, what does the right-hand "background" column measure?</li>
+    <li>Why might global context help on the plane class?</li>
+  </ol>
+  <details class="ds-deck__answers">
+    <summary>Show answers</summary>
+    <ol>
+      <li>Low resolution, heavy noise, blurry boundaries, no colour or texture, small sparse targets, reverberation.</li>
+      <li>At IoU 0.5 a rough box is enough; stricter thresholds reward precise localization, where RT-DETR-L is better.</li>
+      <li>YOLOv8n: near RT-DETR-L accuracy at 2.7 ms and 8.1 GFLOPs.</li>
+      <li>False alarms: how detections on empty background are distributed over the predicted classes.</li>
+      <li>Its outline and large acoustic shadow spread over a wide area; attention relates distant parts of the image.</li>
+    </ol>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Selected References" data-section="References">
+  <p class="ds-deck__kicker">References</p>
+  <h2>Selected References</h2>
+  <ul class="ds-deck__small">
+    <li>Xie, K., Yang, J., Qiu, K. (2022). A dataset with multibeam forward-looking sonar for underwater object detection. <em>Scientific Data</em>, 9, 739.</li>
+    <li>Wang, J. et al. (2025). LS-DETR: Lightweight transformer for object detection in forward-looking sonar images. <em>IEEE Geosci. Remote Sens. Lett.</em>, 22, 1–5.</li>
+    <li>Yang, H. et al. (2024). A lightweight underwater target detection network for forward-looking sonar images. <em>IEEE Trans. Instrum. Meas.</em>, 73, 1–13.</li>
+    <li>He, J. et al. (2024). Efficient SonarNet: Lightweight CNN-grafted vision transformer embedding network for forward-looking sonar image segmentation. <em>IEEE Trans. Geosci. Remote Sens.</em>, 62, 1–17.</li>
+    <li>Lu, Y. et al. (2025). AquaYOLO: Enhancing YOLOv8 for accurate underwater object detection for sonar images. <em>J. Mar. Sci. Eng.</em>, 13(1), 73.</li>
+  </ul>
+  <p class="ds-deck__foot">See the full paper for the complete reference list. Figures on these slides are from the paper.</p>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="How to Cite" data-section="">
+  <h1 style="font-size:40px">Thank You</h1>
+  <div class="ds-deck__subtitle">Transformer vs. CNN: Benchmarking RT-DETR and YOLO Models on the UATD Dataset</div>
+  <div class="ds-deck__callout" style="max-width:640px;text-align:left;margin-top:22px">
+    <b>How to cite:</b> Külcü, S. (2025). Transformer vs. CNN: Benchmarking RT-DETR and YOLO Models on the UATD Dataset. In <em>17th International Academic Studies Conference (UBCAK) Full Text Book</em>, pp. 328–337. Asos Publishing.
+  </div>
+  <small>sercan.kulcu@giresun.edu.tr · <a href="/publications/">All publications</a></small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Previous slide">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Next slide">→</button>
+        <span class="ds-deck__section" id="ds-deck-section"></span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Go to slide"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/pv.js"></script>
+<script src="deck/uatd.js"></script>
+<script src="deck/deck.js"></script>

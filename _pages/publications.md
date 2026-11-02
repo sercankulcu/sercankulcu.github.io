@@ -178,7 +178,7 @@ This review examines the use of computer vision for food quality assessment, inc
 
 **How to cite:** Balpetek Kulcu, D., & Kulcu, S. (2018). Computer Vision Technology on Food Science. *Karaelmas Science and Engineering Journal, 8*(1), 403–409.
 
-[Paper](https://dergipark.org.tr/en/pub/karaelmasfen/article/805752) · [Presentation](/files/presentations/Computer_Vision_Technology_Presentation.pdf)
+[Paper](https://dergipark.org.tr/en/pub/karaelmasfen/article/805752) · [Presentation](/files/presentations/slides/Computer_Vision_Technology_Presentation.html)
 
 </details>
 
@@ -212,7 +212,7 @@ This study compares YOLOv11-seg and YOLOv12-seg for cell-nucleus instance segmen
 
 **How to cite:** Külcü, S. (2025). Nucleus Segmentation in Heterogeneous Microscopy Images on the Data Science Bowl 2018 Dataset. In *Proceedings of the 3rd International Conference on Recent and Innovative Results in Engineering and Technology (ICRIRET 2025)*, pp. 105–114. All Sciences Academy.
 
-[Paper](https://www.researchgate.net/publication/397942031_Nucleus_Segmentation_in_Heterogeneous_Microscopy_Images_on_the_Data_Science_Bowl_2018_Dataset) · [Presentation](/files/presentations/Nucleus_Segmentation_in_Presentation.pdf)
+[Paper](https://www.researchgate.net/publication/397942031_Nucleus_Segmentation_in_Heterogeneous_Microscopy_Images_on_the_Data_Science_Bowl_2018_Dataset) · [Presentation](/files/presentations/slides/Nucleus_Segmentation_in_Presentation.html)
 
 </details>
 
@@ -228,7 +228,7 @@ This study combines EfficientNet-B0, DenseNet201, and ResNet50 with an MLP meta-
 
 **How to cite:** Külcü, S. (2025). Meta-Learner Ensemble Model for Brain Tumor Classification. In *Proceedings of the 7th International Conference on Engineering and Applied Natural Sciences (ICEANS 2025)*, pp. 127–133. All Sciences Academy.
 
-[Paper](https://www.researchgate.net/publication/397081245_Meta_Learner_Ensemble_Model_for_Brain_Tumor_Classification) · [Presentation](/files/presentations/Meta_Learner_Ensemble_Model_Presentation.pdf)
+[Paper](https://www.researchgate.net/publication/397081245_Meta_Learner_Ensemble_Model_for_Brain_Tumor_Classification) · [Presentation](/files/presentations/slides/Meta_Learner_Ensemble_Model_Presentation.html)
 
 </details>
 
@@ -244,7 +244,7 @@ This study benchmarks Transformer-based RT-DETR-L against YOLOv12n and YOLOv8n f
 
 **How to cite:** Külcü, S. (2025). Transformer vs. CNN: Benchmarking RT-DETR and YOLO Models on the UATD Dataset. In *17th International Academic Studies Conference (UBCAK) Full Text Book*, pp. 328–337. Asos Publishing.
 
-[Paper](https://kongre.akademikiletisim.com/files/ubcak17/ubcak17_tam_metin_kitabi.pdf) · [Presentation](/files/presentations/Transformer_vs_CNN_Presentation.pdf)
+[Paper](https://kongre.akademikiletisim.com/files/ubcak17/ubcak17_tam_metin_kitabi.pdf) · [Presentation](/files/presentations/slides/Transformer_vs_CNN_Presentation.html)
 
 </details>
 
@@ -260,7 +260,7 @@ This study evaluates SGDM, ADAM, and RMSprop optimizers with ShuffleNet for clas
 
 **How to cite:** Tomak, Ö., Dikbaş, M. C., & Külcü, S. (2025). Selection of the Most Suitable Parameters for Classification of Hazelnut Fruit Using ShuffleNet Deep Learning Algorithm. In *11th International Azerbaijan Congress on Life, Engineering, Mathematical, and Applied Sciences, Congress Proceedings Book, Vol. I*, pp. 64–73. BZT Turan Publishing House.
 
-[Paper](https://sercankulcu.github.io/files/Selection%20of%20the%20most%20suitable%20parameters%20for%20classification%20of%20hazelnut%20using%20s.pdf) · [Presentation](/files/presentations/Selection_of_the_Presentation.pdf)
+[Paper](https://sercankulcu.github.io/files/Selection%20of%20the%20most%20suitable%20parameters%20for%20classification%20of%20hazelnut%20using%20s.pdf) · [Presentation](/files/presentations/slides/Selection_of_the_Presentation.html)
 
 </details>
 
@@ -276,7 +276,7 @@ This study compares ResNet-50 and ShuffleNet on a 15,770-image hazelnut dataset 
 
 **How to cite:** Tomak, Ö., Dikbaş, M. C., & Külcü, S. (2025). Comparison of the Performance of ResNet-50 and ShuffleNet Deep Learning Algorithms in Classification of Hazelnut Fruit. In *11th International Azerbaijan Congress on Life, Engineering, Mathematical, and Applied Sciences, Congress Proceedings Book, Vol. I*, pp. 55–63. BZT Turan Publishing House.
 
-[Paper](https://sercankulcu.github.io/files/Comparison%20of%20the%20performance%20of%20resnet-50%20and%20shufflenet%20deep%20learning%20algorithm.pdf) · [Presentation](/files/presentations/Comparison_of_the_Presentation.pdf)
+[Paper](https://sercankulcu.github.io/files/Comparison%20of%20the%20performance%20of%20resnet-50%20and%20shufflenet%20deep%20learning%20algorithm.pdf) · [Presentation](/files/presentations/slides/Comparison_of_the_Presentation.html)
 
 </details>
 
@@ -292,7 +292,7 @@ This study proposes a new 6TiSCH message mechanism that allows nodes equipped wi
 
 **How to cite:** Külcü, S., & Görmüş, S. (2022). Improving Synchronization Time in 6TiSCH Networks with Smart Antennas. In *2022 30th Signal Processing and Communications Applications Conference (SIU)*, pp. 1–4. IEEE.
 
-[Paper](https://doi.org/10.1109/SIU55565.2022.9864879) · [Presentation](/files/presentations/Improving_Synchronization_Time_Presentation.pdf)
+[Paper](https://doi.org/10.1109/SIU55565.2022.9864879) · [Presentation](/files/presentations/slides/Improving_Synchronization_Time_Presentation.html)
 
 </details>
 
@@ -308,7 +308,7 @@ This study introduces a new RPL parent-selection objective function for IETF 6Ti
 
 **How to cite:** Aydın, B., Görmüş, S., Aydın, H., & Külcü, S. (2022). A New Routing Objective Function for IETF 6TiSCH Protocol. In *2022 30th Signal Processing and Communications Applications Conference (SIU)*, pp. 1–4. IEEE.
 
-[Paper](https://doi.org/10.1109/SIU55565.2022.9864711) · [Presentation](/files/presentations/A_New_Routing_Presentation.pdf)
+[Paper](https://doi.org/10.1109/SIU55565.2022.9864711) · [Presentation](/files/presentations/slides/A_New_Routing_Presentation.html)
 
 </details>
 
@@ -324,7 +324,7 @@ This survey reviews systems and technologies that combine Semantic Web methods, 
 
 **How to cite:** Kulcu, S., Dogdu, E., & Ozbayoglu, A. M. (2016). A Survey on Semantic Web and Big Data Technologies for Social Network Analysis. In *2016 IEEE International Conference on Big Data (Big Data)*, pp. 1768–1777. IEEE.
 
-[Paper](https://doi.org/10.1109/BigData.2016.7840792) · [Presentation](/files/presentations/A_Survey_on_Presentation.pdf)
+[Paper](https://doi.org/10.1109/BigData.2016.7840792) · [Presentation](/files/presentations/slides/A_Survey_on_Presentation.html)
 
 </details>
 
@@ -340,7 +340,7 @@ This work presents a scalable framework that classifies Turkish tweets by sentim
 
 **How to cite:** Kulcu, S., & Dogdu, E. (2016). A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News. In *2016 IEEE Tenth International Conference on Semantic Computing (ICSC)*, pp. 471–476. IEEE.
 
-[Paper](https://doi.org/10.1109/ICSC.2016.66) · [Presentation](/files/presentations/A_Scalable_Approach_Presentation.pdf)
+[Paper](https://doi.org/10.1109/ICSC.2016.66) · [Presentation](/files/presentations/slides/A_Scalable_Approach_Presentation.html)
 
 </details>
 
