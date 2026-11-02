@@ -1333,19 +1333,21 @@ add  ax, 1
 out  112, ax     ; sözcük yaz
 ret
 </script>
-<script type="text/x-asm" data-name="Step motor (port 7)" data-ports="{&quot;7&quot;: [&quot;00h&quot;, &quot;80h&quot;]}" data-dev="port" data-view="aygit">
+<script type="text/x-asm" data-name="Step motor (port 7)" data-ports="{&quot;7&quot;: [&quot;00h&quot;, &quot;80h&quot;]}" data-dev="step" data-view="aygit">
 #start=stepper_motor.exe#
 org 100h
 steps_before_direction_change = 20h
 jmp start
-datcw     db 110b, 100b, 011b, 010b
-datccw    db 011b, 001b, 110b, 010b
+datcw     db 110b,100b,011b,010b
+datccw    db 011b,001b,110b,010b
+datcw_fs  db 001b,011b,110b,000b
+datccw_fs db 100b,110b,011b,000b
 start:
 mov bx, offset datcw
 mov si, 0
-mov cx, 0        ; tur sayacı
+mov cx, 0   ; tur sayacı
 next_step:
-wait: in al, 7   ; bit 7 = 1: motor hazır
+wait: in al, 7
 test al, 10000000b
 jz wait
 mov al, [bx][si]
@@ -1357,6 +1359,42 @@ mov si, 0
 inc cx
 cmp cx, steps_before_direction_change
 jb  next_step
+mov cx, 0
+add bx, 4   ; sonraki tablo
+cmp bx, offset datccw_fs
+jbe next_step
+mov bx, offset datcw
+jmp next_step
+</script>
+<script type="text/x-asm" data-name="Yazıcı (INT 21h/05h, port 130)" data-dev="yazici" data-view="aygit">
+org 100h
+jmp start
+msg db "Hello, Printer!", 0Ah, 0Dh
+    db "***************"
+    db 13, 9    ; CR ve yatay sekme (HT)
+    db "Have a nice printing day!"
+msg_end db 0
+msg2 db "press any key to eject the page.$"
+start:
+mov dl, 12      ; form feed: yeni sayfa
+mov ah, 5
+int 21h
+mov si, offset msg
+mov cx, offset msg_end - offset msg
+print:
+mov dl, [si]
+mov ah, 5       ; DOS yazıcı işlevi
+int 21h
+inc si          ; sonraki karakter
+loop print
+mov dx, offset msg2
+mov ah, 9
+int 21h
+mov ah, 0
+int 16h         ; tuş bekle
+mov dl, 12      ; form feed: sayfayı çıkar
+mov ah, 5
+int 21h
 ret
 </script>
 </div>

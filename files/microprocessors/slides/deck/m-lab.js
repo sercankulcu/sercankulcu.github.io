@@ -9,19 +9,23 @@
      data-poll="2"                                         tuş yoklamasının ilk n sorgusu "tuş yok" döner
      data-ports='{"21h": {"ilk": "B8h"}, "125": {"ayar": 70}}'  IN değerleri: sabit, dizi (sırayla), ilk değer
                                                            (sonra son OUT) ya da kaydırıcıyla ayarlanabilir değer
-     data-dev="trafik|led|gosterge|termometre|port"        sanal aygıt çizimleri (port 4, 199, 310h/312h, 125/127)
+     data-dev="trafik|led|gosterge|termometre|step|yazici|port"  sanal aygıt çizimleri (port 4, 199, 310h/312h, 125/127,
+                                                           step motor port 7, yazıcı INT 21h/05h)
      data-view="kesme|ekran|aygit"                         yan panelin düzeni; data-acilim="1": makro açılımı açık
      data-clock="14,35,7,42"  data-date="2026,1,7,3"      INT 21h/2Ch, 2Ah ve INT 1Ah için sabit saat/tarih
    Arayüz bu betikte kurulur: solda kod (o anki satır vurgulu; Düzenle ile textarea; makro açılımı; Girdi kutusu), ortada
    yazmaçlar ve bayraklar, sağda bellek dökümü, SS:SP çevresi (itilen FLAGS/CS/IP etiketli), ekran ya da aygıtlar;
-   altta her adımın Türkçe açıklaması. REP önekli dizgi komutları tur tur yürütülür.
+   altta her adımın Türkçe açıklaması. REP önekli dizgi komutları tur tur yürütülür. INT 10h ile mod 13h seçilince ekran
+   paneli 320×200 piksellik bir tuval olur (A000h belleği; doğrudan yazımlar da görünür).
+   Zaman: INT 15h/86h ve INT 1Ah sanal bir saate bağlıdır. Adım ve Çalıştır kiplerinde bekleme tek adımda tamamlanır; Oynat
+   kipinde saat gerçek zamanla akar ve bekleme gerçek zamanda sürer (ikisi de Oynat hızıyla ölçeklenir).
    Geri düğmesi programı baştan k − 1 adım yeniden yürütür (girdiler ve ayarlanan port değerleri kayıttan okunur). */
 (function () {
   "use strict";
   if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
   var M = window.Mini8086;
   if (!M) return;
-  var hx = M.hx, MAX_RUN = 5000, PLAY_MS = 650;
+  var hx = M.hx, MAX_RUN = 5000, PLAY_MS = 650, SPEEDS = [0.5, 1, 2, 5, 20, 100];
   var GP = ["AX", "BX", "CX", "DX"], PAIRS = [["SI", "DI", "BP"], ["SP", "CS", "IP"], ["DS", "ES", "SS"]];
   var FL = ["OF", "DF", "IF", "TF", "SF", "ZF", "AF", "PF", "CF"];
   var VIEWS = {
@@ -38,6 +42,23 @@
     "--ds-muted", "--ds-link", "--ds-good", "--ds-accent", "--ds-bad", "--ds-accent", "--ds-look", "--ds-text"];
   var CNAME = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
     "koyu gri", "açık mavi", "açık yeşil", "açık camgöbeği", "açık kırmızı", "açık eflatun", "sarı", "beyaz"];
+  /* mod 13h: VGA'nın varsayılan 256 renkli paleti (6 bitlik DAC değerleri; ekran görüntüsü olduğu için tema dışı sabit renkler).
+     0–15 metin renkleri, 16–31 gri tonlar, 32–247 üç parlaklık × üç doygunlukta 24 tonluk halkalar, 248–255 siyah. */
+  var PAL = (function () {
+    var p = [], i, k, E = [[0, 0, 0], [0, 0, 42], [0, 42, 0], [0, 42, 42], [42, 0, 0], [42, 0, 42], [42, 21, 0], [42, 42, 42],
+      [21, 21, 21], [21, 21, 63], [21, 63, 21], [21, 63, 63], [63, 21, 21], [63, 21, 63], [63, 63, 21], [63, 63, 63]];
+    var GRAY = [0, 5, 8, 11, 14, 17, 20, 24, 28, 32, 36, 40, 45, 50, 56, 63];
+    var LV = [[0, 16, 31, 47, 63], [31, 39, 47, 55, 63], [45, 49, 54, 58, 63], [0, 7, 14, 21, 28], [14, 17, 21, 24, 28], [20, 22, 24, 26, 28],
+      [0, 4, 8, 12, 16], [8, 10, 12, 14, 16], [11, 12, 13, 15, 16]];
+    var RI = [0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0], GI = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 2, 1],
+      BI = [4, 4, 4, 4, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 4, 4, 4];
+    E.forEach(function (c) { p.push(c); });
+    GRAY.forEach(function (g) { p.push([g, g, g]); });
+    LV.forEach(function (l) { for (k = 0; k < 24; k++) p.push([l[RI[k]], l[GI[k]], l[BI[k]]]); });
+    while (p.length < 256) p.push([0, 0, 0]);
+    for (i = 0; i < 256; i++) p[i] = p[i].map(function (v) { return Math.round(v * 255 / 63); });
+    return p;
+  })();
   /* 7 bölütlü gösterge: bit 0-6 = a-g */
   var SEG7 = { "0": 0x3F, "1": 0x06, "2": 0x5B, "3": 0x4F, "4": 0x66, "5": 0x6D, "6": 0x7D, "7": 0x07, "8": 0x7F, "9": 0x6F, "-": 0x40, " ": 0 };
 
@@ -146,6 +167,54 @@
     p.push('<text class="lbl mono" x="130" y="166">port 127 = ' + heater + "</text>");
     return svgWrap("0 0 280 220", "Termometre " + t + " derece, ısıtıcı " + (heater ? "açık" : "kapalı"), p.join(""), h);
   }
+  function deg(half) {
+    var d = ((half * 11.25) % 360 + 360) % 360;
+    return M.trNum(d, 2) + "°";
+  }
+  function bin3(v) { return ("00" + (v & 7).toString(2)).slice(-3) + "b"; }
+  /* step motor (port 7): mil açısı, üç mıknatıs, hazır biti; st = Mini8086.stepper(portWrites) */
+  function stepperSvg(st, ready, h) {
+    var cx = 84, cy = 92, a = (st.half * 11.25 - 90) * Math.PI / 180, p = ['<circle cx="' + cx + '" cy="' + cy + '" r="62" class="box-empty"/>'];
+    for (var k = 0; k < 32; k++) {
+      var t = k * 11.25 * Math.PI / 180, big = k % 2 === 0, r1 = big ? 50 : 54;
+      p.push('<path class="axis" d="M' + (cx + r1 * Math.sin(t)).toFixed(1) + " " + (cy - r1 * Math.cos(t)).toFixed(1) + " L" + (cx + 58 * Math.sin(t)).toFixed(1) + " " + (cy - 58 * Math.cos(t)).toFixed(1) + '"/>');
+    }
+    p.push('<text class="lbl" x="' + cx + '" y="' + (cy - 66) + '" text-anchor="middle">0°</text>');
+    p.push('<circle cx="' + cx + '" cy="' + cy + '" r="40" class="m-lab-rotor"/>');
+    p.push('<path class="m-lab-shaft" d="M' + cx + " " + cy + " L" + (cx + 44 * Math.cos(a)).toFixed(1) + " " + (cy + 44 * Math.sin(a)).toFixed(1) + '"/>');
+    p.push('<circle cx="' + cx + '" cy="' + cy + '" r="5" class="m-lab-hub"/>');
+    var mag = st.mag == null ? 0 : st.mag;
+    for (var m = 2; m >= 0; m--) {
+      var x = 176 + (2 - m) * 38, on = (mag >> m) & 1;
+      p.push('<rect x="' + x + '" y="14" width="26" height="26" rx="4" class="' + (on ? "m-lab-lamp-r" : "m-lab-lamp-off") + '"/>');
+      p.push('<text class="lbl mono" x="' + (x + 13) + '" y="54" text-anchor="middle">' + m + "</text>");
+    }
+    p.push('<text class="lbl" x="233" y="70" text-anchor="middle">mıknatıslar (bit 2–0)</text>');
+    p.push('<text class="txt" x="168" y="100">mil <tspan class="mono">' + deg(st.half) + "</tspan></text>");
+    p.push('<text class="lbl" x="168" y="120">' + (st.half ? (st.half > 0 ? "+" : "−") + Math.abs(st.half) + " yarım adım (" + (st.half > 0 ? "CW" : "CCW") + ")" : "başlangıç konumu") + "</text>");
+    p.push('<rect x="168" y="134" width="12" height="12" rx="6" class="' + (ready ? "m-lab-lamp-g" : "m-lab-lamp-off") + '"/><text class="lbl" x="186" y="145">bit 7: ' + (ready ? "hazır" : "meşgul") + "</text>");
+    p.push('<text class="lbl mono" x="168" y="170">port 7 = ' + (st.mag == null ? "–" : "00000" + bin3(st.mag)) + "</text>");
+    return svgWrap("0 0 316 180", "Step motor: mil " + deg(st.half) + ", mıknatıslar " + (st.mag == null ? "kapalı" : bin3(st.mag)), p.join(""), h);
+  }
+  /* yazıcı kâğıdı: pp = Mini8086.printerPaper(metin); son satırlar, kafa konumu */
+  function paperSvg(pp0, h) {
+    /* boş yeni sayfada son çıkan sayfa soluk gösterilir */
+    var gone = !pp0.lines.join("").trim() && pp0.last && !pp0.row && !pp0.col;
+    var pp = gone ? { lines: pp0.last, row: -1, col: 0, ejected: pp0.ejected } : pp0;
+    var rows = 7, n = pp.lines.length, r0 = Math.max(0, Math.max(n, pp.row + 1) - rows), cols = 34, i;
+    for (i = 0; i < n; i++) cols = Math.max(cols, pp.lines[i].length + 1);
+    cols = Math.max(cols, pp.col + 1);
+    var cw = 7.2, lh = 16, W = 24 + cols * cw, H = 24 + rows * lh, p = ['<rect class="m-lab-paper' + (gone ? " is-gone" : "") + '" x="6" y="4" width="' + (W - 12).toFixed(0) + '" height="' + (H - 4) + '" rx="3"/>'];
+    for (i = 0; i < 12; i++) p.push('<circle cx="' + (W - 2) + '" cy="' + (12 + i * (H - 16) / 11).toFixed(1) + '" r="1.6" class="m-lab-hole"/><circle cx="2" cy="' + (12 + i * (H - 16) / 11).toFixed(1) + '" r="1.6" class="m-lab-hole"/>');
+    for (i = 0; i < rows; i++) {
+      var r = r0 + i, t = pp.lines[r] || "";
+      if (t) p.push('<text class="m-lab-print mono' + (gone ? " is-gone" : "") + '" x="14" y="' + (20 + i * lh) + '" style="white-space:pre">' + esc(t) + "</text>");
+    }
+    if (pp.row >= r0 && pp.row < r0 + rows) p.push('<rect class="m-lab-head" x="' + (14 + pp.col * cw - 0.5).toFixed(1) + '" y="' + (8 + (pp.row - r0) * lh) + '" width="' + cw.toFixed(1) + '" height="15" rx="1.5"/>');
+    var svg = svgWrap("0 0 " + W.toFixed(0) + " " + H, "Yazıcı kâğıdı: " + pp.lines.filter(Boolean).length + " dolu satır", p.join(""), h);
+    return svg + '<p class="m-lab__papnote">' + (gone ? "sayfa " + pp.ejected + " çıktı (FF); yeni sayfa boş" : "kafa: satır " + (pp.row + 1) + ", sütun " + (pp.col + 1) +
+      (pp.ejected ? " · çıkan sayfa: " + pp.ejected : "")) + "</p>";
+  }
 
   document.querySelectorAll('.ds-deck [data-demo="m-lab"]').forEach(function (demo) {
     var examples = Array.from(demo.querySelectorAll('script[type="text/x-asm"]')).map(function (s) {
@@ -170,7 +239,11 @@
     var bEdit = btn("edit", "Düzenle"), bRun = btn("run", "Çalıştır", "Programı sonuna kadar çalıştır");
     var bBack = btn("back", "◀ Geri", "Bir adım geri"), bStep = btn("step", "Adım ▶", "Bir komut yürüt");
     var bPlay = btn("play", "Oynat", "Adımları otomatik oynat"), bReset = btn("reset", "Sıfırla", "Programı başa al");
-    [bEdit, bRun, bBack, bStep, bPlay, bReset].forEach(function (b) { btns.appendChild(b); });
+    var speedSel = el("select", "m-lab__speed");
+    speedSel.setAttribute("aria-label", "Oynat hızı: adım sıklığı ve saatin akışı bu katsayıyla ölçeklenir");
+    speedSel.title = "Oynat hızı";
+    SPEEDS.forEach(function (v) { var o = el("option", null, "×" + String(v).replace(".", ",")); o.value = v; if (v === 1) o.selected = true; speedSel.appendChild(o); });
+    [bEdit, bRun, bBack, bStep, bPlay, speedSel, bReset].forEach(function (b) { btns.appendChild(b); });
     bar.appendChild(pick); bar.appendChild(btns);
 
     var main = el("div", "m-lab__main");
@@ -232,11 +305,16 @@
     mini.setAttribute("aria-hidden", "true");
     var outBox = pSide.appendChild(el("div", "m-lab__out"));
     outBox.setAttribute("aria-live", "polite");
+    var gfx = pSide.appendChild(el("canvas", "m-lab__gfx"));
+    gfx.width = 640; gfx.height = 400; gfx.hidden = true;
+    gfx.setAttribute("role", "img");
+    var gfxBuf = null;
     var devTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", "Aygıtlar"));
     var devBox = pSide.appendChild(el("div", "m-lab__dev"));
     var devSvg = devBox.appendChild(el("div", "m-lab__devsvg"));
     var devCtl = devBox.appendChild(el("div", "m-lab__devctl"));
     var devPorts = devBox.appendChild(el("div", "m-lab__ports"));
+    var devOut = devBox.appendChild(el("p", "m-lab__devout"));
     main.appendChild(pCode); main.appendChild(pCpu); main.appendChild(pSide);
 
     var status = el("p", "m-lab__status");
@@ -248,6 +326,8 @@
     var memBase = 0, memSeg = null, rows = [], varAt = {}, init = null, showExp = false, hasExp = false;
     var typed = "", waiting = null, resume = null, stackTag = {}, inLog = {}, inIdx = {}, adj = {}, gauge = null, view = VIEWS.normal;
     var chW = 0;
+    /* zaman: tlog[k] = (k+1). adımdan önceki sanal zaman (µs); Geri ile yeniden yürütmede aynı değerler kullanılır */
+    var playing = false, speed = 1, tlog = [], tRef = 0, mode = "step", stepReady = null, lastPix = null;
 
     /* örnek etiketindeki data-init: {"mem": {"DS:0500h": ["25h", "17h"]}} ya da {"mem": {"DS:0200h": "ABC"}} */
     function initNote() {
@@ -364,9 +444,9 @@
     function reset(full) {
       stop();
       n = 0; rec = null; done = null; waiting = null; resume = null; stackTag = {};
-      if (full) { typed = ""; for (var k in inLog) inLog[k] = []; }
+      if (full) { typed = ""; tlog = []; for (var k in inLog) inLog[k] = []; }
       for (var p in inIdx) inIdx[p] = 0;
-      gauge = { a: 0, sel: 0, shown: [0, 0, 0, 0] };
+      gauge = { a: 0, sel: 0, shown: [0, 0, 0, 0] }; stepReady = null; lastPix = null;
       if (err && err.asm) { mach = null; render(); return; }
       err = null;
       var o = { cxSize: true, repStep: true, init: init || undefined, input: (ex.input || "") + typed, ports: buildPorts(),
@@ -382,10 +462,21 @@
     /* bir adım; false: ilerlenemedi */
     function stepOnce() {
       if (!mach || done || (err && !err.soft)) return false;
+      /* sanal saat: Oynat kipinde gerçek zaman (× hız) eklenir; diğer kiplerde kayıtlı değer ya da olduğu gibi */
+      if (playing) {
+        var now = performance.now();
+        if (now > tRef) { mach.us += Math.round((now - tRef) * 1000 * speed); tRef = now; }
+        tlog.length = n; tlog[n] = mach.us;
+      } else if (tlog[n] != null) mach.us = tlog[n];
+      else tlog[n] = mach.us;
+      mach.syncTicks();
       try {
         var r = mach.stepRecord();
         if (r == null) { done = mach.halted; return false; }
         rec = r; n++; waiting = null;
+        r.kip = playing ? "play" : mode; r.speed = speed;
+        r.mem.forEach(function (w) { if (w[0] >= 0xA0000 && w[0] < 0xA0000 + 64000) lastPix = w[0] - 0xA0000; });
+        if (playing && r.svc && r.svc.wait) tRef = performance.now() + r.svc.wait / 1000 / speed;
         if (err && err.soft) err = null;
         if (mach.halted) done = mach.halted;
         followMem(r); tagStack(r); devices(r);
@@ -422,6 +513,7 @@
     }
     /* aygıt durumları port yazımlarından */
     function devices(r) {
+      if (r.st && r.st.op === "IN" && r.info && r.info.port === 7) stepReady = (r.info.v >> 7) & 1;
       if (!r.st || r.st.op !== "OUT" || !r.info) return;
       var p = r.info.port, v = r.info.v;
       if (p === 0x310) {
@@ -440,21 +532,31 @@
       render();
     }
     function stop() {
-      if (!timer) return;
-      clearInterval(timer); timer = null;
+      if (!playing) return;
+      clearTimeout(timer); timer = null; playing = false;
       bPlay.textContent = "Oynat"; bPlay.setAttribute("aria-label", "Adımları otomatik oynat");
     }
-    function play() {
-      if (timer) { stop(); resume = null; render(); return; }
-      if (done || (err && !err.soft)) reset(true);
-      resume = "play";
-      bPlay.textContent = "Durdur"; bPlay.setAttribute("aria-label", "Otomatik oynatmayı durdur");
-      timer = setInterval(function () {
+    /* Oynat: adımlar PLAY_MS / hız arayla; INT 15h/86h beklemesi gerçek zamanda (bekleme / hız) sürer */
+    function schedule(ms) {
+      timer = setTimeout(function () {
+        if (!playing) return;
         if (!slide.classList.contains("is-active")) { stop(); render(); return; }
-        if (!stepOnce() && !waiting) stop();
+        var ok = stepOnce();
+        if (!ok && !waiting) stop();
         else if (done || (err && !err.soft)) stop();
         render();
-      }, PLAY_MS);
+        if (!playing) return;
+        var next = PLAY_MS / speed;
+        if (ok && rec && rec.svc && rec.svc.wait) next = Math.max(next, rec.svc.wait / 1000 / speed);
+        schedule(next);
+      }, ms);
+    }
+    function play() {
+      if (playing) { stop(); resume = null; render(); return; }
+      if (done || (err && !err.soft)) reset(true);
+      resume = "play"; playing = true; tRef = performance.now();
+      bPlay.textContent = "Durdur"; bPlay.setAttribute("aria-label", "Otomatik oynatmayı durdur");
+      schedule(PLAY_MS / speed);
     }
     function runAll() {
       if (editing) setEditing(false);
@@ -462,11 +564,12 @@
       if (err && err.asm) return;
       if (done || (err && !err.soft)) reset(true);
       var k = 0;
-      resume = "run";
+      resume = "run"; mode = "run";
       while (k++ < MAX_RUN && stepOnce()) {
         if (mach.pollEmpty && !mach.input.length) { waiting = { poll: true }; break; }
       }
-      if (!done && !err && !waiting) err = { msg: MAX_RUN + " adımda bitmedi; sonsuz döngü olabilir. Adım, Geri ya da Sıfırla ile incelenebilir", soft: true };
+      if (!done && !err && !waiting) err = { msg: MAX_RUN + " adımda bitmedi; sonsuz döngü olabilir. Adım, Geri ya da Sıfırla ile incelenebilir" +
+        (/\bint\s+1ah|\b0*6ch\b/i.test(text) ? ". Saat Çalıştır kipinde yalnız INT 15h beklemeleriyle ilerler; saati bekleyen döngü Oynat kipinde gerçek zamanla biter" : ""), soft: true };
       render();
     }
     function setEditing(on) {
@@ -553,8 +656,42 @@
     function memNote(seg) {
       if (seg === 0 && memBase < 0x400) return " · IVT";
       if (seg === 0xB800) return " · ekran";
+      if (seg === 0xA000) return " · grafik";
+      if (seg === 0x40 || (seg === 0 && memBase >= 0x400 && memBase < 0x500)) return " · BIOS verileri";
       return "";
     }
+    /* mod 13h: A000h belleği 320×200 tuvale (2 kat), son adımda yazılan piksel halkayla işaretlenir */
+    function drawGfx() {
+      if (!gfxBuf) { gfxBuf = document.createElement("canvas"); gfxBuf.width = 320; gfxBuf.height = 200; }
+      var bctx = gfxBuf.getContext("2d"), img = bctx.createImageData(320, 200), d = img.data, mem = mach.mem, cnt = 0, i, c, v;
+      for (i = 0; i < 64000; i++) {
+        v = mem[0xA0000 + i]; c = PAL[v];
+        if (v) cnt++;
+        d[4 * i] = c[0]; d[4 * i + 1] = c[1]; d[4 * i + 2] = c[2]; d[4 * i + 3] = 255;
+      }
+      bctx.putImageData(img, 0, 0);
+      var g = gfx.getContext("2d");
+      g.imageSmoothingEnabled = false;
+      g.drawImage(gfxBuf, 0, 0, 640, 400);
+      /* son yazılan piksel: bu adımda yazıldıysa dolu halka, daha önce yazıldıysa ince halka */
+      var last = lastPix, now = !!(rec && rec.mem.some(function (w) { return w[0] >= 0xA0000 && w[0] < 0xA0000 + 64000; }));
+      if (last != null) {
+        var x = last % 320, y = Math.floor(last / 320), cs = getComputedStyle(demo);
+        g.lineWidth = now ? 8 : 5; g.strokeStyle = "rgba(0,0,0,.75)";
+        g.beginPath(); g.arc(2 * x + 1, 2 * y + 1, 17, 0, 2 * Math.PI); g.stroke();
+        g.lineWidth = now ? 4 : 2; g.strokeStyle = cs.getPropertyValue("--ds-look").trim() || "orange";
+        g.beginPath(); g.arc(2 * x + 1, 2 * y + 1, 17, 0, 2 * Math.PI); g.stroke();
+      }
+      gfx.setAttribute("aria-label", "Mod 13h ekranı, 320×200: " + cnt + " piksel siyahtan farklı" + (last != null ? "; son yazılan piksel (" + (last % 320) + ", " + Math.floor(last / 320) + ")" : ""));
+    }
+    gfx.addEventListener("mousemove", function (e) {
+      if (!mach) return;
+      var b = gfx.getBoundingClientRect(), s = Math.min(b.width / 320, b.height / 200), ox = (b.width - 320 * s) / 2, oy = (b.height - 200 * s) / 2;
+      var x = Math.floor((e.clientX - b.left - ox) / s), y = Math.floor((e.clientY - b.top - oy) / s);
+      if (x < 0 || y < 0 || x >= 320 || y >= 200) { gfx.title = ""; return; }
+      var v = mach.mem[0xA0000 + y * 320 + x];
+      gfx.title = "(" + x + ", " + y + ") · A000:" + h4(y * 320 + x) + "h = " + h2(v) + "h (" + M.colorName(v) + ")";
+    });
     function renderScreen() {
       if (!chW) {
         var probe = el("span", null, "0000000000");
@@ -620,6 +757,8 @@
         var tp = adjustables()[0], t = tp ? adj[tp.port] : 0;
         html.push(thermoSvg(t, mach.portLast[127] || 0, h));
       }
+      if (ex.dev.indexOf("step") >= 0) html.push(stepperSvg(M.stepper(mach.portWrites), stepReady, Math.min(h, 150)));
+      if (ex.dev.indexOf("yazici") >= 0) html.push(paperSvg(M.printerPaper(mach.printer), Math.min(h - 46, 108)));
       devSvg.innerHTML = html.join("");
       /* port özeti: son yazılan ve okunan değerler */
       var seen = {}, list = [];
@@ -630,11 +769,44 @@
         list.push("<span>" + hp(w[1]) + " ← " + (w[3] === 2 ? hx(w[2]) : hx(w[2], 1)) + "</span>");
       }
       if (rec && rec.st && rec.st.op === "IN" && rec.info) list.unshift('<span class="is-in">' + hp(rec.info.port) + " → " + hx(rec.info.v, rec.st.ops[0].size) + "</span>");
-      devPorts.innerHTML = list.length ? list.join("") : '<span class="is-none">henüz port erişimi yok</span>';
+      devPorts.innerHTML = list.length ? list.join("") : ex.dev.join() === "yazici" ? "" : '<span class="is-none">henüz port erişimi yok</span>';
+      /* aygıt düzeninde ekran çıktısı (INT 21h/09h gibi) tek satırda */
+      var o = mach.out.split(/[\r\n]/).filter(function (x) { return x.trim(); }).pop() || "";
+      devOut.hidden = !o;
+      devOut.innerHTML = o ? "<b>Ekran</b> " + esc(o.length > 46 ? "…" + o.slice(-45) : o) : "";
+    }
+    function timeNote() {
+      if (!rec || !rec.svc || rec.svc.wait == null) return "";
+      var w = rec.svc.wait;
+      if (rec.kip === "play") return " Oynat kipinde bu bekleme gerçek zamanda " + M.secText(Math.round(w / rec.speed)) + " sürer" +
+        (rec.speed !== 1 ? " (hız ×" + String(rec.speed).replace(".", ",") + ")" : "") + ".";
+      return " " + (rec.kip === "run" ? "Çalıştır" : "Adım") + " kipinde bekleme tek adımda tamamlanır: " + M.trNum(w) + " µs geçmiş sayılır.";
+    }
+    function printerNote() {
+      if (ex.dev.indexOf("yazici") < 0 || !rec || !rec.st || rec.st.op !== "INT" || rec.irq || (rec.before.regs.AX >> 8) !== 5) return "";
+      if (!rec.st.ops[0] || rec.st.ops[0].val !== 0x21) return "";
+      var c = rec.before.regs.DX & 0xFF, txt = mach.printer, pb = M.printerPaper(txt.slice(0, -1)), pa = M.printerPaper(txt);
+      if (c === 13) return " Yazıcı kafası satırın başına döner (CR); kâğıt ilerlemez.";
+      if (c === 10) return " Kâğıt bir satır ilerler (LF); kafa aynı sütunda kalır.";
+      if (c === 9) return " Kafa sonraki sekme durağına, " + (pa.col + 1) + ". sütuna atlar (HT).";
+      if (c === 12) return pb.lines.join("").trim() ? " Sayfa yazıcıdan çıkar (FF); yeni sayfa başlar." : " Kâğıt boş olduğu için yalnız yeni sayfanın başına geçilir (FF).";
+      if (c < 32) return " Bu denetim karakteri kâğıtta iz bırakmaz.";
+      var old = (pb.lines[pb.row] || "").charAt(pb.col);
+      return " Kâğıtta " + (pb.row + 1) + ". satır, " + (pb.col + 1) + ". sütuna basılır" +
+        (old && old !== " " ? "; orada önceden '" + old + "' vardı, yeni karakter onun üzerine basılır" : "") + ".";
     }
     function devNote() {
-      if (!rec || !rec.st || !rec.info) return "";
+      var tn = timeNote() + printerNote();
+      if (!rec || !rec.st || !rec.info) return tn;
       var p = rec.info.port;
+      if (p === 7 && ex.dev.indexOf("step") >= 0) {
+        if (rec.st.op === "IN") return (rec.info.v & 0x80 ? " Bit 7 = 1: motor yeni bayta hazır." : " Bit 7 = 0: motor meşgul; durum yeniden okunur.");
+        var sa = M.stepper(mach.portWrites), sb = M.stepper(mach.portWrites.slice(0, -1));
+        if (sa.kind === "ilk") return " Step motor: " + bin3(sa.mag) + " mıknatısları açılır; mil " + deg(sa.half) + " konumunda kilitlenir.";
+        if (sa.kind === "aynı") return " Mıknatıs düzeni (" + bin3(sa.mag) + ") değişmediği için mil kıpırdamaz.";
+        if (sa.kind === "tablo dışı") return " " + bin3(sb.mag) + " → " + bin3(sa.mag) + " geçişi emu8086 örneğinin tablolarında yok; laboratuvarda mil yerinde kalır (" + deg(sa.half) + ").";
+        return " Mıknatıslar " + bin3(sb.mag) + " → " + bin3(sa.mag) + ": " + sa.kind + " (" + (sa.delta > 0 ? "+" : "−") + String(Math.abs(sa.delta) * 11.25).replace(".", ",") + "°); mil " + deg(sa.half) + ".";
+      }
       if (rec.st.op === "OUT") {
         if (p === 4 && ex.dev.indexOf("trafik") >= 0) return " " + trafficText(rec.info.v);
         if (p === 199 && ex.dev.indexOf("led") >= 0) { var v = rec.info.v; return " LED göstergede " + (v & 0x8000 ? v - 0x10000 : v) + " görünür (işaretli onluk)."; }
@@ -646,7 +818,7 @@
         var t = rec.info.v & 0x80 ? rec.info.v - 256 : rec.info.v;
         return " Termometre " + t + " °C gösteriyor" + (t < 0 ? " (işaretli bayt " + h2(rec.info.v) + "h)" : "") + ".";
       }
-      return "";
+      return tn;
     }
     function render() {
       var regs = mach ? mach.regs() : null, before = rec ? rec.before : null;
@@ -660,7 +832,7 @@
       var focus = (cur || prev || (errLine && rows.filter(function (r) { return r.eid == null && r.no === errLine; })[0]) || rows[0] || {}).el;
       if (focus && !code.hidden) {
         var top = focus.offsetTop - code.offsetTop, lh = focus.offsetHeight;
-        if (top < code.scrollTop + lh || top + 3 * lh > code.scrollTop + code.clientHeight) code.scrollTop = Math.max(0, top - code.clientHeight / 3);
+        if (top < code.scrollTop + lh || top + 3 * lh > code.scrollTop + code.clientHeight) code.scrollTop = Math.max(0, Math.round((top - code.clientHeight / 3) / lh) * lh);
       }
       if (!editing) codeTitle.innerHTML = "Kod" + (prog ? " · <b>" + prog.image.reduce(function (a, im) { return a + im[1].length; }, 0) + " bayt</b>" : "");
       kbd.hidden = !needsInput();
@@ -694,7 +866,7 @@
         c.classList.toggle("is-changed", !!(before && (before.flags[f] !== v || !!before.undef[f] !== !!und)));
         c.title = f + (und ? " (8086'da tanımsız)" : "");
       });
-      ipNote.textContent = mach ? "CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + " · adım " + n : "";
+      ipNote.textContent = mach ? "CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + " · adım " + n + (mach.us ? " · t = " + M.secText(mach.us) : "") : "";
       if (mach) {
         /* bellek */
         var seg = memSeg == null ? mach.s[3] : memSeg, written = {};
@@ -713,7 +885,7 @@
         }
         memBox.innerHTML = mrows;
         /* yığın */
-        if (view.stack) {
+        if (view.stack && !stackBox.hidden) {
           var sp = mach.r[4], ss = mach.s[2], top = mach.initSp, k2 = view.stack, start, srows = "";
           start = sp >= top - 2 * (k2 - 1) ? top - 2 * (k2 - 1) : sp;
           if (start < 0) start = 0;
@@ -724,14 +896,19 @@
           }
           stackBox.innerHTML = srows;
         }
-        if (view.scr) renderScreen();
+        var g13 = !!view.scr && mach.videoMode === 0x13;
+        outBox.hidden = !view.scr || g13; mini.hidden = !view.mini || g13; gfx.hidden = !g13;
+        stackTitle.hidden = stackBox.hidden = !view.stack || g13;
+        if (view.scr) scrTitle.innerHTML = g13 ? "Ekran <b>mod 13h · 320×200</b>" : view.scr;
+        if (g13) drawGfx();
+        else if (view.scr) renderScreen();
         if (view.dev) renderDevices();
       } else {
         memTitle.innerHTML = "Bellek"; memBox.innerHTML = ""; stackBox.innerHTML = ""; outBox.innerHTML = ""; devSvg.innerHTML = ""; devPorts.innerHTML = "";
       }
       /* düğmeler */
       var stuck = !mach || !!done || !!(err && !err.soft) || editing;
-      bStep.disabled = stuck; bPlay.disabled = (!mach || editing) && !timer;
+      bStep.disabled = stuck; bPlay.disabled = (!mach || editing) && !playing;
       bBack.disabled = !mach || n === 0 || editing; bReset.disabled = !mach || editing;
       bRun.disabled = !!(err && err.asm) && !editing;
       pick.disabled = editing; bExp.disabled = editing;
@@ -761,6 +938,7 @@
       if (ex.input) extra.push("Girdi kuyruğunda hazır tuşlar var: <b>" + esc(ex.input.split("").map(keyGlyph).join(" ")) + "</b>; başka tuşlar Girdi kutusuna yazılabilir.");
       else if (needsInput()) extra.push("Program klavyeden okuyunca Girdi kutusuna yazılan tuşları alır.");
       if (adjustables().length) extra.push("Termometre değeri kaydırıcıyla değiştirilebilir.");
+      if (/\bint\s+15h|\bint\s+1ah|\b0*6ch\b/i.test(text)) extra.push("Saat sanaldır: Adım ve Çalıştır kiplerinde yalnız INT 15h beklemeleriyle ilerler, Oynat kipinde gerçek zamanla akar (hız ayarıyla ölçekli).");
       if (hasExp && !showExp) extra.push("Açılım düğmesi makroların ürettiği satırları gösterir.");
       return "Program yüklendi: " + size + " bayt, CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + "h. " +
         (note ? "Başlangıç belleği slayttaki varsayımla doldurulur: <b>" + note + "</b>. " : prog.com && !extra.length ? "emu8086'daki gibi CX başlangıçta program boyutunu (" + hx(size) + ") gösterir. " : "") +
@@ -775,7 +953,7 @@
       var act = b.dataset.act;
       if (act === "edit") { setEditing(!editing); return; }
       if (act === "run") { if (editing) { editing = false; src.hidden = true; code.hidden = false; bEdit.textContent = "Düzenle"; if (src.value !== text) load(src.value.replace(/\s+$/, "") + "\n", true); } runAll(); return; }
-      if (act === "step") { stop(); resume = "step"; stepOnce(); render(); return; }
+      if (act === "step") { stop(); resume = "step"; mode = "step"; stepOnce(); render(); return; }
       if (act === "back") { stop(); resume = null; goTo(n - 1); return; }
       if (act === "play") { play(); return; }
       if (act === "reset") { reset(true); }
@@ -793,6 +971,11 @@
       load(ex.src);
     }
     pick.addEventListener("change", function () { choose(+pick.value); });
+    speedSel.addEventListener("change", function () {
+      var v = parseFloat(speedSel.value) || 1;
+      if (playing) { var now = performance.now(); if (now > tRef) { mach.us += Math.round((now - tRef) * 1000 * speed); tRef = now; } }
+      speed = v;
+    });
     /* tema değişince küçük ekran haritası yeniden boyanır */
     if (window.MutationObserver) new MutationObserver(function () { if (mach && view.mini) render(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
     if (window.matchMedia) { var mq = window.matchMedia("(prefers-color-scheme: dark)"); if (mq.addEventListener) mq.addEventListener("change", function () { if (mach && view.mini) render(); }); }

@@ -1610,11 +1610,14 @@
     var pk, po = opts.ports || {};
     for (pk in po) this.ports[/^\d+$/.test(pk) ? +pk : parseNumber(pk)] = Array.isArray(po[pk]) ? po[pk].slice() : po[pk];
     this.portWrites = []; this.printer = ""; this.pixels = {}; this.svc = null;
+    this.videoMode = 3;   /* INT 10h/00h: 03h metin (B800h), 13h 320×200×256 grafik (A000h) */
+    this.us = 0;          /* sanal zaman: program başından beri geçen mikrosaniye (INT 15h/86h ve laboratuvarın Oynat kipi ilerletir) */
     this.clock = opts.clock || [12, 0, 0, 0];
     this.date = opts.date || [2026, 1, 1, 4];
     var i;
     for (i = 0; i < 256; i++) { this.w16(i * 4, BIOS_OFF + i); this.w16(i * 4 + 2, BIOS_SEG); }
-    this.w16(0x44A, 80); this.mem[0x484] = 24;
+    this.w16(0x44A, 80); this.mem[0x484] = 24; this.mem[0x449] = 3;
+    this.syncTicks();
     for (i = 0; i < 2000; i++) { this.mem[(VIDEO_SEG << 4) + 2 * i] = 0x20; this.mem[(VIDEO_SEG << 4) + 2 * i + 1] = 0x07; }
     var psp = PSP_SEG << 4;
     this.mem[psp] = 0xCD; this.mem[psp + 1] = 0x20;
@@ -1669,6 +1672,26 @@
     this.initSp = this.r[4];
   }
   var MP = Machine.prototype;
+  /* ---- sanal zaman: saat + us; 0040:006C tık sayacı (IRQ 0'ın işi) zaman her değiştiğinde güncellenir ---- */
+  MP.nowCs = function () {
+    var c = this.clock;
+    return ((c[0] * 3600 + c[1] * 60 + c[2]) * 100 + c[3] + Math.floor(this.us / 10000)) % 8640000;
+  };
+  MP.nowHmsc = function () {
+    if (!this.us) return this.clock.slice();
+    var t = this.nowCs();
+    return [Math.floor(t / 360000), Math.floor(t / 6000) % 60, Math.floor(t / 100) % 60, t % 100];
+  };
+  MP.ticks = function () {
+    var c = this.clock;
+    /* günde 1800B0h tık: gece yarısında sayaç sıfırlanır */
+    return Math.min(Math.floor((((c[0] * 3600 + c[1] * 60 + c[2]) + c[3] / 100 + this.us / 1000000) % 86400) * 18.2065), 0x1800AF);
+  };
+  MP.syncTicks = function () {
+    var t = this.ticks();
+    this.w16(0x46C, t & 0xFFFF); this.w16(0x46E, t >>> 16);
+  };
+  MP.advance = function (us) { this.us += us; this.syncTicks(); };
   MP.w16 = function (a, v) { this.mem[a & 0xFFFFF] = v & 0xFF; this.mem[(a + 1) & 0xFFFFF] = (v >> 8) & 0xFF; };
   MP.byte = function (a) { return this.mem[a & 0xFFFFF]; };
   MP.word = function (a) { return this.mem[a & 0xFFFFF] | (this.mem[(a + 1) & 0xFFFFF] << 8); };
@@ -1884,7 +1907,7 @@
       else if (ah === 0x0C) {
         this.input = [];
         if ([1, 6, 7, 8, 0x0A].indexOf(al) >= 0) { this.set("AH", al); this.builtin(0x21); this.set("AH", 0x0C); }
-      } else if (ah === 0x2C) { this.set("CH", this.clock[0]); this.set("CL", this.clock[1]); this.set("DH", this.clock[2]); this.set("DL", this.clock[3]); }
+      } else if (ah === 0x2C) { var hm = this.nowHmsc(); this.set("CH", hm[0]); this.set("CL", hm[1]); this.set("DH", hm[2]); this.set("DL", hm[3]); }
       else if (ah === 0x2A) { this.set("CX", this.date[0]); this.set("DH", this.date[1]); this.set("DL", this.date[2]); this.set("AL", this.date[3]); }
       else if (ah === 0x25) { this.wr16(0, al * 4, this.get("DX")); this.wr16(0, al * 4 + 2, this.s[3]); }
       else if (ah === 0x35) { this.set("BX", this.rd16(0, al * 4)); this.set("ES", this.rd16(0, al * 4 + 2)); }
@@ -1902,7 +1925,15 @@
       if (ah === 0x0E) this.emit(String.fromCharCode(al));
       else if (ah === 0x02) this.cursor = [this.get("DH"), this.get("DL")];
       else if (ah === 0x03) { this.set("DH", this.cursor[0]); this.set("DL", this.cursor[1]); this.set("CX", 0x0607); }
-      else if (ah === 0x00) { this.clearWindow(0, 0, 24, 79, 0x07); this.cursor = [0, 0]; }
+      else if (ah === 0x00) {
+        var mode = al & 0x7F;
+        this.videoMode = mode; this.mem[0x449] = mode;
+        this.w16(0x44A, [0, 1, 4, 5, 0x0D, 0x13].indexOf(mode) >= 0 ? 40 : 80);
+        /* 320×200, 256 renk: A000:0000–F9FFh; AL bit 7 = 1 ise bellek silinmez */
+        if (mode === 0x13) { if (!(al & 0x80)) this.mem.fill(0, 0xA0000, 0xA0000 + 64000); }
+        else this.clearWindow(0, 0, 24, 79, 0x07);
+        this.cursor = [0, 0];
+      }
       else if (ah === 0x06 || ah === 0x07) {
         if (al === 0) this.clearWindow(this.get("CH"), this.get("CL"), this.get("DH"), this.get("DL"), this.get("BH"));
         else this.scroll(ah === 0x06, al, this.get("CH"), this.get("CL"), this.get("DH"), this.get("DL"), this.get("BH"));
@@ -1930,12 +1961,19 @@
         }
         if (!(al & 1)) this.cursor = save;
       } else if (ah === 0x01 || ah === 0x05 || ah === 0x10 || ah === 0x0B) { /* etkisiz */ }
-      else if (ah === 0x0C) this.pixels[this.get("CX") + "," + this.get("DX")] = al;
-      else if (ah === 0x0D) this.set("AL", this.pixels[this.get("CX") + "," + this.get("DX")] || 0);
+      else if (ah === 0x0C) {
+        var px = this.get("CX"), py = this.get("DX");
+        if (this.videoMode === 0x13) { if (px < 320 && py < 200) this.wr8(0xA000, py * 320 + px, al); }
+        else this.pixels[px + "," + py] = al;
+      } else if (ah === 0x0D) {
+        var qx = this.get("CX"), qy = this.get("DX");
+        if (this.videoMode === 0x13) this.set("AL", qx < 320 && qy < 200 ? this.rd8(0xA000, qy * 320 + qx) : 0);
+        else this.set("AL", this.pixels[qx + "," + qy] || 0);
+      }
       else if (ah === 0x08) {
         var a8 = (VIDEO_SEG << 4) + 2 * (this.cursor[0] * 80 + this.cursor[1]);
         this.set("AL", this.mem[a8]); this.set("AH", this.mem[a8 + 1]);
-      } else if (ah === 0x0F) { this.set("AL", 3); this.set("AH", 80); this.set("BH", 0); }
+      } else if (ah === 0x0F) { this.set("AL", this.videoMode); this.set("AH", this.mem[0x44A]); this.set("BH", 0); }
       else throw new EmuError("desteklenmeyen BIOS servisi: INT 10h, AH=" + hx(ah, 1));
       return;
     }
@@ -1953,16 +1991,21 @@
     if (n === 0x1A) {
       var ck = this.clock, dt = this.date;
       if (ah === 0x00) {
-        var tk = Math.floor(((ck[0] * 3600 + ck[1] * 60 + ck[2]) + ck[3] / 100) * 18.2065);
+        var tk = this.ticks();
         this.set("CX", tk >>> 16); this.set("DX", tk & 0xFFFF); this.set("AL", 0);
-      } else if (ah === 0x02) { this.set("CH", bcd(ck[0])); this.set("CL", bcd(ck[1])); this.set("DH", bcd(ck[2])); this.f.CF = 0; }
+      } else if (ah === 0x02) { ck = this.nowHmsc(); this.set("CH", bcd(ck[0])); this.set("CL", bcd(ck[1])); this.set("DH", bcd(ck[2])); this.f.CF = 0; }
       else if (ah === 0x04) {
         this.set("CH", bcd(Math.floor(dt[0] / 100))); this.set("CL", bcd(dt[0] % 100));
         this.set("DH", bcd(dt[1])); this.set("DL", bcd(dt[2])); this.f.CF = 0;
       } else throw new EmuError("desteklenmeyen BIOS servisi: INT 1Ah, AH=" + hx(ah, 1));
       return;
     }
-    if (n === 0x15 && ah === 0x86) { this.f.CF = 0; return; }
+    if (n === 0x15 && ah === 0x86) {
+      /* CX:DX mikrosaniye bekle: sanal saat ilerler; laboratuvar Oynat kipinde bu süreyi gerçek zamanda da bekler */
+      var wus = this.get("CX") * 65536 + this.get("DX");
+      this.advance(wus); this.f.CF = 0; this.svc = { wait: wus };
+      return;
+    }
     if (n === 0x03) { this.halted = "INT 3 (kesme noktası)"; return; }
     throw new EmuError("desteklenmeyen kesme: INT " + hx(n, 1) + " (AH=" + hx(ah, 1) + "); vektör tablosunda bu kesme için bir yordam yok");
   };
@@ -2421,7 +2464,7 @@
       if (ah === 0x05) return dos + "DL'deki " + chText(lo(B.DX)) + " yazıcıya gönderilir.";
       if (ah === 0x2A) return dos + "sistem tarihi alınır: CX = " + R.CX + " (" + hx(R.CX) + "), DH = " + dh(R.DX) + " (ay), DL = " + lo(R.DX) + " (gün), AL = " + rAL +
         " (haftanın günü: " + (DAYS[rAL] || "?") + "). Laboratuvarda tarih sabittir.";
-      if (ah === 0x2C) return dos + "sistem saati alınır: CH = " + dh(R.CX) + " (saat), CL = " + lo(R.CX) + " (dakika), DH = " + dh(R.DX) + " (saniye), DL = " + lo(R.DX) + " (salise). Laboratuvarda saat sabittir.";
+      if (ah === 0x2C) return dos + "sistem saati alınır: CH = " + dh(R.CX) + " (saat), CL = " + lo(R.CX) + " (dakika), DH = " + dh(R.DX) + " (saniye), DL = " + lo(R.DX) + " (salise)." + clockNote(m);
       if (ah === 0x25) return dos + "INT " + hx(al, 1) + " vektörü DS:DX = " + so(B.DS, B.DX) + " yapılır (vektör tablosunda 0000:" + hx(al * 4) + ").";
       if (ah === 0x35) return dos + "INT " + hx(al, 1) + " vektörü okunur: ES:BX = " + so(R.ES, R.BX) + ".";
       if (ah === 0x30) return dos + "DOS sürümü AL = " + rAL + ", AH = " + rAH + " olarak alınır.";
@@ -2433,7 +2476,12 @@
       var bio = "BIOS video hizmeti AH = " + hx(ah, 1) + ": ";
       var cur = rec.cursorBefore || [0, 0];
       if (ah === 0x0E) return "BIOS hizmeti AH = 0Eh: AL'deki " + chText(al) + " ekrana yazılır" + (al === 13 || al === 10 || al === 8 ? " (imleç hareket eder)" : ", imleç bir ilerler") + ".";
-      if (ah === 0x00) return bio + "video modu AL = " + hx(al, 1) + " (80×25 metin) seçilir; ekran silinir, imleç (0, 0) konumuna gelir.";
+      if (ah === 0x00) {
+        if ((al & 0x7F) === 0x13) return bio + "video modu AL = " + hx(al, 1) + " seçilir: 320×200 piksel, 256 renk; görüntü belleği A000:0000h–F9FFh, her piksel bir bayt (bağıl konum = y · 320 + x)" +
+          (al & 0x80 ? "; AL'nin 7. biti 1 olduğu için görüntü belleği silinmez." : "; görüntü belleği sıfırlanır (bütün pikseller 0 = siyah).");
+        if ((al & 0x7F) === 3) return bio + "video modu AL = " + hx(al, 1) + " (80×25 metin, B800h) seçilir; ekran silinir, imleç (0, 0) konumuna gelir.";
+        return bio + "video modu AL = " + hx(al, 1) + " seçilir; laboratuvar bu modu 80×25 metin ekranı olarak gösterir: ekran silinir, imleç (0, 0) konumuna gelir.";
+      }
       if (ah === 0x01) return bio + "imleç biçimi değiştirilir (CH = " + hx(dh(B.CX), 1) + ", CL = " + hx(lo(B.CX), 1) + (dh(B.CX) & 0x20 ? "; bit 5 = 1 olduğu için imleç gizlenir" : "") + ").";
       if (ah === 0x02) return bio + "imleç DH = " + dh(B.DX) + ". satır, DL = " + lo(B.DX) + ". sütuna taşınır.";
       if (ah === 0x03) return bio + "imleç konumu okunur: DH = " + dh(R.DX) + " (satır), DL = " + lo(R.DX) + " (sütun); CX = " + hx(R.CX) + " imleç biçimidir.";
@@ -2445,9 +2493,17 @@
       if (ah === 0x08) return bio + "imleçteki karakter ve öznitelik okunur: AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + ".";
       if (ah === 0x09 || ah === 0x0A) return bio + "AL'deki " + chText(al) + " imleç konumuna (" + cur[0] + ", " + cur[1] + ") " + (ah === 0x09 ? "BL = " + attrText(lo(B.BX)) + " özniteliğiyle " : "") +
         "CX = " + B.CX + " kez yazılır; imleç ilerlemez.";
-      if (ah === 0x0C) return bio + "(" + B.CX + ", " + B.DX + ") pikseline AL = " + hx(al, 1) + " rengi yazılır.";
-      if (ah === 0x0D) return bio + "(" + B.CX + ", " + B.DX + ") pikselinin rengi okunur: AL = " + hx(rAL, 1) + ".";
-      if (ah === 0x0F) return bio + "video modu okunur: AL = " + hx(rAL, 1) + ", AH = " + rAH + " sütun, BH = 0 (sayfa).";
+      var g13 = m.videoMode === 0x13, inside = B.CX < 320 && B.DX < 200, pof = B.DX * 320 + B.CX;
+      if (ah === 0x0C) {
+        if (!g13) return bio + "(" + B.CX + ", " + B.DX + ") pikseline AL = " + hx(al, 1) + " rengi yazılır; metin modunda olunduğu için ekranda görünmez.";
+        if (!inside) return bio + "(" + B.CX + ", " + B.DX + ") 320×200 ekranın dışında kaldığı için hiçbir piksel değişmez.";
+        return bio + "(" + B.CX + ", " + B.DX + ") pikseline AL = " + hx(al, 1) + " (" + colorName(al) + ") rengi yazılır: A000:" + hx(pof) + " = " + B.DX + " · 320 + " + B.CX + ".";
+      }
+      if (ah === 0x0D) {
+        if (g13 && inside) return bio + "(" + B.CX + ", " + B.DX + ") pikselinin rengi A000:" + hx(pof) + " baytından okunur: AL = " + hx(rAL, 1) + " (" + colorName(rAL) + ").";
+        return bio + "(" + B.CX + ", " + B.DX + ") pikselinin rengi okunur: AL = " + hx(rAL, 1) + ".";
+      }
+      if (ah === 0x0F) return bio + "video modu okunur: AL = " + hx(rAL, 1) + (rAL === 0x13 ? " (320×200, 256 renk)" : rAL === 3 ? " (80×25 metin)" : "") + ", AH = " + rAH + " sütun, BH = 0 (sayfa).";
       if (ah === 0x13) return bio + "ES:BP = " + so(B.ES, B.BP) + " adresindeki " + B.CX + " karakterlik dizgi (" + dh(B.DX) + ", " + lo(B.DX) + ") konumuna " +
         (al & 2 ? "kendi karakter/öznitelik çiftleriyle" : "BL = " + attrText(lo(B.BX)) + " özniteliğiyle") + " yazılır; AL = " + hx(al, 1) +
         (al & 1 ? " olduğu için imleç dizginin sonuna ilerler." : " olduğu için imleç yerinde kalır.");
@@ -2461,13 +2517,33 @@
     }
     if (nn === 0x1A) {
       var rt = "BIOS saat hizmeti AH = " + hx(ah, 1) + ": ";
-      if (ah === 0x00) return rt + "gece yarısından beri geçen saat tıkı sayısı (saniyede yaklaşık 18,2) alınır: CX:DX = " + hx(R.CX).slice(0, 4) + " " + hx(R.DX) + ".";
-      if (ah === 0x02) return rt + "gerçek zamanlı saat paketli BCD olarak alınır: CH = " + hx(dh(R.CX), 1) + " (saat), CL = " + hx(lo(R.CX), 1) + " (dakika), DH = " + hx(dh(R.DX), 1) + " (saniye); CF = 0. Laboratuvarda saat sabittir.";
+      if (ah === 0x00) return rt + "gece yarısından beri geçen saat tıkı sayısı (saniyede yaklaşık 18,2) alınır: CX:DX = " + hx(R.CX).slice(0, 4) + " " + hx(R.DX) + " = " +
+        trNum(R.CX * 65536 + R.DX) + " tık." + clockNote(m);
+      if (ah === 0x02) return rt + "gerçek zamanlı saat paketli BCD olarak alınır: CH = " + hx(dh(R.CX), 1) + " (saat), CL = " + hx(lo(R.CX), 1) + " (dakika), DH = " + hx(dh(R.DX), 1) + " (saniye); CF = 0." + clockNote(m);
       if (ah === 0x04) return rt + "tarih paketli BCD olarak alınır: CX = " + hx(R.CX) + " (yıl), DH = " + hx(dh(R.DX), 1) + " (ay), DL = " + hx(lo(R.DX), 1) + " (gün); CF = 0.";
     }
-    if (nn === 0x15 && ah === 0x86) return "BIOS bekleme hizmeti: CX:DX = " + hx(B.CX).slice(0, 4) + " " + hx(B.DX) + " = " + (B.CX * 65536 + B.DX).toLocaleString("tr-TR") +
-      " mikrosaniye (≈ " + (Math.round((B.CX * 65536 + B.DX) / 100000) / 10).toLocaleString("tr-TR") + " s) beklenir; laboratuvarda zaman akmadığı için hemen dönülür.";
+    if (nn === 0x15 && ah === 0x86) return "BIOS bekleme hizmeti: CX:DX = " + hx(B.CX).slice(0, 4) + " " + hx(B.DX) + " = " + trNum(B.CX * 65536 + B.DX) +
+      " mikrosaniye (" + secText(B.CX * 65536 + B.DX) + ") beklenir; saat ve tık sayacı bu kadar ilerler, CF = 0.";
     return "INT " + hx(nn, 1) + " hizmeti yürütülür.";
+  }
+  /* 256 renkli VGA paletinin ilk 16 rengi metin renkleriyle aynıdır; 16–31 gri tonlar */
+  var VGA16 = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
+    "koyu gri", "açık mavi", "açık yeşil", "açık camgöbeği", "açık kırmızı", "açık eflatun", "sarı", "beyaz"];
+  function colorName(c) { return c < 16 ? VGA16[c] : c < 32 ? "gri ton " + (c - 16) : c >= 248 ? "siyah" : "palet rengi " + c; }
+  /* Türkçe sayı yazımı: binlik ayırıcı boşluk, ondalık virgül (5 000 000; 0,5) */
+  function trNum(x, frac) {
+    var k = Math.pow(10, frac || 0), p = String(Math.round(x * k) / k).split(".");
+    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return p.join(",");
+  }
+  function secText(us) {
+    var s = us / 1000000;
+    if (us < 1000) return us + " µs";
+    if (us < 1000000) return trNum(us / 1000, 1) + " ms";
+    return trNum(s, 3) + " s";
+  }
+  function clockNote(m) {
+    return m.us ? " Program başından beri " + secText(m.us) + " geçti." : "";
   }
   function describe(m, rec) {
     var st = rec.st, mn = st.op, ops = st.ops, pre = rec.pre, w = rec.w, R = rec.regs, B = rec.before.regs;
@@ -2638,6 +2714,52 @@
     return s + (ch.length ? "değişenler: " + ch.join(", ") + "." : "yazmaçlar değişmez.");
   }
 
+  /* ================= emu8086 sanal aygıt modelleri (laboratuvar çizimleri için) ================= */
+  /* Step motor (port 7): bit 0–2 üç elektromıknatıs; yarım adım 11,25°, tam adım 22,5° (32 yarım adım = bir tur).
+     emu8086 belgesi hangi mıknatıs geçişinin hangi yöne kaç adım olduğunu söylemez. Model, emu8086 örneğinin dört
+     tablosundaki (datcw, datccw, datcw_fs, datccw_fs) ardışık bayt çiftlerinden çıkarılmıştır: 16 geçiş, çakışma yok.
+     Tablolarda olmayan bir geçişte ve ilk baytta mil yerinde kalır. */
+  var STEP_TABLES = [[[6, 4, 3, 2], 1, "saat yönünde yarım adım"], [[3, 1, 6, 2], -1, "saat yönünün tersine yarım adım"],
+    [[1, 3, 6, 0], 2, "saat yönünde tam adım"], [[4, 6, 3, 0], -2, "saat yönünün tersine tam adım"]];
+  var STEP_MOVE = {};
+  STEP_TABLES.forEach(function (t) { for (var i = 0; i < 4; i++) STEP_MOVE[t[0][i] + ">" + t[0][(i + 1) % 4]] = [t[1], t[2]]; });
+  function stepperNext(st, v) {
+    var mag = v & 7, r = { mag: mag, half: st.half, writes: st.writes + 1, kind: null, delta: 0 };
+    if (st.mag == null) r.kind = "ilk";
+    else if (st.mag === mag) r.kind = "aynı";
+    else {
+      var mv = STEP_MOVE[st.mag + ">" + mag];
+      if (mv) { r.delta = mv[0]; r.half += mv[0]; r.kind = mv[1]; } else r.kind = "tablo dışı";
+    }
+    return r;
+  }
+  /* port yazımları [adım, port, değer, genişlik] → port 7'nin son durumu; yarım adım sayısı half (CW +), açı = half · 11,25° */
+  function stepper(writes) {
+    var st = { mag: null, half: 0, writes: 0, kind: null, delta: 0 };
+    (writes || []).forEach(function (w) {
+      if (w[1] === 7) st = stepperNext(st, w[2] & 0xFF);
+      else if (w[1] === 6 && w[3] === 2) st = stepperNext(st, (w[2] >> 8) & 0xFF);
+    });
+    return st;
+  }
+  /* Yazıcı (INT 21h/05h): CR satır başı, LF alt satır, HT sonraki 8'in katı sütun, FF sayfayı çıkarır (boş sayfa çıkmaz;
+     son çıkan sayfa last'ta tutulur);
+     aynı yere ikinci kez basılan karakter öncekinin yerini alır (emu8086 kâğıdı üstteki karakteri gösterir). */
+  function printerPaper(text) {
+    var pages = 0, lines = [[]], row = 0, col = 0, i, c, last = null;
+    function strip(ls) { return ls.map(function (l) { var t = ""; for (var k = 0; k < l.length; k++) t += l[k] || " "; return t.replace(/\s+$/, ""); }); }
+    function empty() { return lines.every(function (l) { return !l.some(function (x) { return x && x !== " "; }); }); }
+    for (i = 0; i < text.length; i++) {
+      c = text.charCodeAt(i);
+      if (c === 12) { if (!empty()) { pages++; last = strip(lines); } lines = [[]]; row = 0; col = 0; }
+      else if (c === 13) col = 0;
+      else if (c === 10) { row++; while (lines.length <= row) lines.push([]); }
+      else if (c === 9) col = (Math.floor(col / 8) + 1) * 8;
+      else if (c >= 32) { lines[row][col] = text.charAt(i); col++; }
+    }
+    return { ejected: pages, lines: strip(lines), row: row, col: col, last: last };
+  }
+
   /* ================= toplu çalıştırma (testler için, emu8086.py run() ile aynı biçim) ================= */
   function run(source, opts) {
     opts = opts || {};
@@ -2665,13 +2787,13 @@
         mem: rec.mem, out: rec.out, text: rec.text, macro: rec.st.macro });
     }
     res.output = m.out;
-    res.ports = m.portWrites; res.printer = m.printer;
+    res.ports = m.portWrites; res.printer = m.printer; res.us = m.us; res.videoMode = m.videoMode;
     res.final = { regs: m.regs(), flags: m.flags(), undef: Object.keys(m.undef).sort() };
     return res;
   }
 
   var API = { parseNumber: parseNumber, assemble: assemble, Machine: Machine, run: run, AsmError: AsmError, EmuError: EmuError, InputWait: InputWait, hx: hx,
-    FLAGORDER: FLAGORDER, PSP_SEG: PSP_SEG };
+    FLAGORDER: FLAGORDER, PSP_SEG: PSP_SEG, stepper: stepper, stepperNext: stepperNext, printerPaper: printerPaper, colorName: colorName, secText: secText, trNum: trNum };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.Mini8086 = API;
 })(this);
