@@ -1,0 +1,1226 @@
+---
+layout: without-sidebar
+title: "Directional and Steerable Antennas in TSCH / 6TiSCH Networks — PhD Research"
+permalink: /files/research/Directional_6TiSCH_PhD_Research.html
+excerpt: "The work carried out in a doctoral study of directional and steerable antennas in IEEE 802.15.4e TSCH / 6TiSCH networks: multi-radio drivers, MSPSim and Cooja extensions, antenna-aware 4eMAC, native Cooja motes, a direction-aware TASA scheduler, scenario design, metrics, results and an index of all 199 changed files."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="notlar.css">
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Doctoral research · 2017–2022</p>
+  <h1>Directional and Steerable Antennas in TSCH / 6TiSCH Networks</h1>
+  <p class="nt-lead">These notes reconstruct, in a form that a newcomer can follow and reproduce, a doctoral study carried out between 2017 and 2022. The study extended a 6TiSCH protocol stack (4eMAC on Contiki) and the Cooja network simulator so that a sensor node can carry two or three sector antennas or a single electronically steerable antenna, and it exploited antenna direction both in distributed medium access and in a centralised scheduler. The notes first introduce Time-Slotted Channel Hopping, the 6TiSCH stack and the antenna models, then prepare the toolchain. Seven laboratory units rebuild the system layer by layer: the multi-radio driver and hardware platforms, the MSP430 emulator, the antenna and propagation model of the simulator, the antenna-aware MAC layer, the native simulation target, the direction-aware TASA scheduler and the end-to-end experiment. The final chapters explain how scenarios were designed and measured, summarise the results and list known defects. An appendix indexes all 199 source files that were changed.</p>
+  <ul class="nt-links" aria-label="Quick links">
+    <li><a href="#lab1">Labs</a></li>
+    <li><a href="#ch8">Experiments</a></li>
+    <li><a href="#self-check">Self-check questions</a></li>
+    <li><a href="#appA">Index of changed files</a></li>
+    <li><a href="#appB">Glossary</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="outcomes">
+  <h2 id="outcomes">Learning outcomes</h2>
+  <dl>
+    <dt>TSCH and 6TiSCH</dt>
+    <dd>Explain slotframes, cells and channel hopping, and the roles of 6P, SF0, RPL and Orchestra.</dd>
+    <dt>Antenna models</dt>
+    <dd>Distinguish omnidirectional, sectored multi-radio and steerable antennas and compute their effective ranges from a link budget.</dd>
+    <dt>Simulator extension</dt>
+    <dd>Extend Contiki, MSPSim and Cooja consistently so that antenna direction flows from the MAC layer to the radio medium and back.</dd>
+    <dt>Antenna-aware MAC</dt>
+    <dd>Implement per-neighbour antenna selection, orientation learning, fake-beacon discovery and autonomous control cells.</dd>
+    <dt>Centralised scheduling</dt>
+    <dd>Modify TASA so that conflicting links with separated beams share a channel, and run it in a closed loop with the simulated network.</dd>
+    <dt>Experimentation</dt>
+    <dd>Design repeatable Cooja scenarios and compute PRR, delay, energy, collision rate and join time from simulation logs.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="contents">
+  <h2 id="contents">Contents</h2>
+  <ol>
+    <li><a href="#preface">1 Preface and how to use these notes</a>
+      <ol>
+        <li><a href="#s1-1">1.1 Prerequisites</a></li>
+        <li><a href="#s1-2">1.2 Conventions</a></li>
+      </ol>
+    </li>
+    <li><a href="#ch1">2 Background: TSCH, 6TiSCH and antennas</a>
+      <ol>
+        <li><a href="#s2-1">2.1 Time-Slotted Channel Hopping</a></li>
+        <li><a href="#s2-2">2.2 The 6TiSCH stack and 4eMAC</a></li>
+        <li><a href="#s2-3">2.3 Why antennas matter for TSCH</a></li>
+        <li><a href="#s2-4">2.4 Research questions addressed</a></li>
+      </ol>
+    </li>
+    <li><a href="#ch2">3 System architecture</a></li>
+    <li><a href="#ch3">4 Development environment</a>
+      <ol>
+        <li><a href="#s4-1">4.1 Host system</a></li>
+        <li><a href="#s4-2">4.2 Source trees</a></li>
+        <li><a href="#s4-3">4.3 Building and launching</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab1">5 Lab 1: Multi-radio hardware abstraction</a>
+      <ol>
+        <li><a href="#s5-1">5.1 Extend the radio driver interface</a></li>
+        <li><a href="#s5-2">5.2 Wire additional CC2420 chips to the platform</a></li>
+        <li><a href="#s5-3">5.3 Make the CC2420 driver address several chips</a></li>
+        <li><a href="#s5-4">5.4 A virtual orientation register for the steerable antenna</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab2">6 Lab 2: Emulating radios in MSPSim</a>
+      <ol>
+        <li><a href="#s6-1">6.1 Virtual registers in the CC2420 model</a></li>
+        <li><a href="#s6-2">6.2 Several chips on one emulated node</a></li>
+        <li><a href="#s6-3">6.3 Mote types in Cooja</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab3">7 Lab 3: Antenna and propagation model in Cooja</a>
+      <ol>
+        <li><a href="#s7-1">7.1 Several radios per mote</a></li>
+        <li><a href="#s7-2">7.2 The Direction interface</a></li>
+        <li><a href="#s7-3">7.3 Angle-dependent connectivity in UDGM</a></li>
+        <li><a href="#s7-4">7.4 Visualisation</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab4">8 Lab 4: Antenna-aware MAC in 4eMAC</a>
+      <ol>
+        <li><a href="#s8-1">8.1 Per-neighbour antenna and orientation</a></li>
+        <li><a href="#s8-2">8.2 Learning the best orientation</a></li>
+        <li><a href="#s8-3">8.3 Orientation policy per slot type</a></li>
+        <li><a href="#s8-4">8.4 Neighbour discovery with fake beacons</a></li>
+        <li><a href="#s8-5">8.5 Autonomous cells for control traffic</a></li>
+        <li><a href="#s8-6">8.6 Adjustments to 6P and SF0</a></li>
+        <li><a href="#s8-7">8.7 Antenna support in Contiki TSCH for the Orchestra baseline</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab5">9 Lab 5: Scaling with native Cooja motes</a>
+      <ol>
+        <li><a href="#s9-1">9.1 Three virtual radios in the native stub</a></li>
+        <li><a href="#s9-2">9.2 Java side: ContikiRadio</a></li>
+        <li><a href="#s9-3">9.3 Platform configuration for 4eMAC</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab6">10 Lab 6: Direction-aware centralised scheduler</a>
+      <ol>
+        <li><a href="#s10-1">10.1 Starting point: TASA</a></li>
+        <li><a href="#s10-2">10.2 Report and schedule protocol</a></li>
+        <li><a href="#s10-3">10.3 Building the network model</a></li>
+        <li><a href="#s10-4">10.4 Direction-aware colouring</a></li>
+        <li><a href="#s10-5">10.5 Autonomous-cell avoidance and pipelining</a></li>
+        <li><a href="#s10-6">10.6 Building, running and replaying</a></li>
+      </ol>
+    </li>
+    <li><a href="#lab7">11 Lab 7: End-to-end experiment</a></li>
+    <li><a href="#ch8">12 Scenario design</a>
+      <ol>
+        <li><a href="#s12-1">12.1 Anatomy of a scenario file</a></li>
+        <li><a href="#s12-2">12.2 Scenario families</a></li>
+      </ol>
+    </li>
+    <li><a href="#ch9">13 Metrics and data collection</a></li>
+    <li><a href="#ch10">14 Representative results</a>
+      <ol>
+        <li><a href="#s14-1">14.1 Sectored antennas (2018–2019, 25 nodes, MSPSim)</a></li>
+        <li><a href="#s14-2">14.2 Steerable antenna: discovery and formation (2019, MSPSim)</a></li>
+        <li><a href="#s14-3">14.3 Centralised scheduling (2020–2021)</a></li>
+      </ol>
+    </li>
+    <li><a href="#ch11">15 Known issues and pitfalls</a></li>
+    <li><a href="#self-check">16 Self-check questions</a></li>
+    <li><a href="#appA">A Index of all 199 changed files</a>
+      <ol>
+        <li><a href="#sA-1">A.1 Multi-radio hardware and CC2420 driver (Lab 1)</a></li>
+        <li><a href="#sA-2">A.2 Radio API and network stack (Lab 1)</a></li>
+        <li><a href="#sA-3">A.3 MAC layer: 4eMAC, Contiki TSCH, Orchestra (Lab 4)</a></li>
+        <li><a href="#sA-4">A.4 MSPSim and Cooja MSPSim motes (Lab 2)</a></li>
+        <li><a href="#sA-5">A.5 Cooja antenna and radio-medium model (Lab 3)</a></li>
+        <li><a href="#sA-6">A.6 Cooja measurement tools (Section 13)</a></li>
+        <li><a href="#sA-7">A.7 Native Cooja mote (Lab 5)</a></li>
+        <li><a href="#sA-8">A.8 Applications and scheduler integration (Labs 6–7)</a></li>
+        <li><a href="#sA-9">A.9 Centralised scheduler (Lab 6)</a></li>
+        <li><a href="#sA-10">A.10 Group modules, tools and documentation (not part of the antenna work)</a></li>
+      </ol>
+    </li>
+    <li><a href="#appB">B Glossary</a></li>
+    <li><a href="#appC">C References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="preface"><span class="nt-num">1</span>Preface and how to use these notes</h2>
+
+<p>These notes reconstruct, in a form that a newcomer can follow and reproduce, a body of work that extended a 6TiSCH protocol stack and the Cooja network simulator with support for nodes carrying several sector antennas or a single electronically steerable antenna, and that exploited antenna direction both in distributed MAC operation and in a centralised scheduler.</p>
+
+<p>The material is organised as a course. Sections 2–4 introduce the concepts and prepare the toolchain. Sections 5–11 consist of seven laboratory units (L1–L7), each of which re-implements one layer of the system: the radio driver and hardware platform, the instruction-level emulator, the propagation model of the simulator, the medium access control (MAC) layer, the fast native simulation target, the centralised scheduler and, finally, the end-to-end experiment that connects them. Sections 12–15 explain how scenarios were designed, which metrics were collected and what results were obtained, and Section 16 offers self-check questions. Appendix A lists every one of the 199 source files that differ from the baseline, grouped by purpose.</p>
+
+<h3 id="s1-1"><span class="nt-num">1.1</span>Prerequisites</h3>
+
+<ul>
+<li>Working knowledge of C (pointers, bit masks, preprocessor conditionals) and Java (classes, interfaces, the Observer pattern).</li>
+<li>Basic Linux command-line usage, <code>make</code> and Apache <code>ant</code>.</li>
+<li>Introductory wireless networking: path loss, received signal strength (RSSI), interference, duty cycling.</li>
+<li>No prior exposure to Contiki, TSCH or Cooja is assumed; Section 2 supplies the necessary background.</li>
+</ul>
+
+<h3 id="s1-2"><span class="nt-num">1.2</span>Conventions</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 1.1: Conventions.</caption><thead><tr><th scope="col">Notation</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>RADIO_PRIMARY = 1</code>, <code>RADIO_SECONDARY = 2</code>, <code>RADIO_TERTIARY = 4</code>, <code>RADIO_ALL = 7</code></td><td>Bit mask selecting one or more physical radios (antennas) of a node. A function receiving <code>radio_index = 3</code> acts on the first two radios.</td></tr><tr><td>Orientation index <i>k</i> ∈ {0,…,23}</td><td>Direction of a steerable antenna in 15° steps; the physical angle is 15·<i>k</i> degrees. The MAC layer and the scheduler exchange <i>k</i>, the emulator and Cooja work in degrees.</td></tr><tr><td>Omni / 2-dir / 3-dir / steerable</td><td>One omnidirectional radio; two radios with 180° sectors at 0° and 180°; three radios with 120° sectors at 0°, 120° and 240°; one radio whose main lobe can be rotated.</td></tr><tr><td>Δ +a / −r</td><td>Lines added and removed with respect to the baseline version of the file (Appendix A).</td></tr></tbody></table></div>
+
+<p>Each laboratory unit opens with <em>learning objectives</em>, proceeds through numbered implementation steps with verbatim excerpts from the final source code, and closes with a <em>checkpoint</em> that tells you how to verify the step before moving on. <em>Pitfall</em> boxes record defects and traps that were found in the original code.</p>
+
+<div class="nt-box nt-box--teorem"><span class="nt-box__title">Provenance of the code</span><p>The protocol stack is a fork of <b>4eMAC</b>, a 6TiSCH implementation for Contiki developed by a research group (S. Görmüş, A. F. Yavuz, K. Yanık and colleagues). The directional-antenna skeleton in Cooja (<code>Direction</code>, <code>ARM</code>, two visualiser skins) originates from a 2015 contribution by V. Rege. The centralised scheduler starts from a public TSCH scheduling library that implements TASA, MCC and MODESA. Everything else described here was added in the doctoral work. Baselines used for comparison are listed in <a href="#appA">Appendix A</a>.</p></div>
+
+<h2 class="nt-pb" id="ch1"><span class="nt-num">2</span>Background: TSCH, 6TiSCH and antennas</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Explain how Time-Slotted Channel Hopping organises time, frequency and cells.</li>
+<li>Name the components of the 6TiSCH stack used in this work (minimal configuration, 6P, SF0, RPL) and the two schedulers used for comparison (6TiSCH minimal/SF0 and Orchestra).</li>
+<li>Distinguish omnidirectional, sectored multi-radio and electronically steerable antennas, and state why each could improve a TSCH network.</li></ul></div>
+
+<h3 id="s2-1"><span class="nt-num">2.1</span>Time-Slotted Channel Hopping</h3>
+
+<p>IEEE 802.15.4e-2012 introduced Time-Slotted Channel Hopping (TSCH) as a MAC mode for low-power industrial networks. Time is divided into <em>timeslots</em> of fixed length (10 ms by default; 15 ms throughout this work), counted network-wide by the <em>Absolute Slot Number</em> (ASN). Timeslots are grouped into a repeating <em>slotframe</em> of <i>L</i> slots. A <em>cell</em> is a pair (slot offset, channel offset) inside the slotframe and is either dedicated to one transmitter–receiver pair or shared by contention. The physical channel used by a cell in a given slot is</p>
+
+<div class="nt-math nt-math--c">channel = HoppingSequence[(ASN + channelOffset) mod |HoppingSequence|] <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(1.1)</span></div>
+
+<p>so that successive uses of the same cell hop across frequencies and escape narrow-band interference. Nodes join the network by listening for <em>Enhanced Beacons</em> (EB), which carry the ASN and the timeslot template, and stay synchronised by timing corrections exchanged in acknowledgements and keep-alive frames.</p>
+
+<h3 id="s2-2"><span class="nt-num">2.2</span>The 6TiSCH stack and 4eMAC</h3>
+
+<p>6TiSCH places IPv6 (6LoWPAN) and the RPL routing protocol on top of TSCH. Three IETF components matter here:</p>
+
+<ul>
+<li><b>Minimal configuration</b> (RFC 8180): a small number of shared cells sufficient for bootstrapping, EB and routing traffic.</li>
+<li><b>6top Protocol, 6P</b> (RFC 8480): a two-way transaction with which neighbours add, delete, list or relocate dedicated cells between them.</li>
+<li><b>Scheduling Function Zero, SF0</b> (IETF draft): a distributed policy that decides how many cells to request from 6P, based on measured traffic and a hysteresis threshold.</li>
+</ul>
+
+<p><b>4eMAC</b> is the Contiki implementation of this stack on which the study builds. Its main files are <code>core/net/mac/4emac/4emac.c</code> (MAC driver), <code>4erdc.c</code> (slot operation, the equivalent of a radio duty-cycling layer), <code>4emac-buf.c</code> (per-neighbour queues and cell tables), <code>4emac-timesynch.c</code> (joining, EB, synchronisation) and the <code>6top-pce/</code> directory (6P and scheduling functions). A node's MAC keeps one <code>destination_t</code> record per neighbour; dedicated cells hang from that record as a list of <code>slot_t</code>.</p>
+
+<p><b>Orchestra</b> (Duquennoy et al., 2015) is an alternative, fully autonomous scheduler for Contiki's own TSCH implementation: every node derives its cells from a hash of node addresses, so no negotiation is required. Orchestra and 6TiSCH-minimal/SF0 serve as the comparison baselines of the 2018 experiments.</p>
+
+<h3 id="s2-3"><span class="nt-num">2.3</span>Why antennas matter for TSCH</h3>
+
+<p>Low-power motes normally carry a single omnidirectional antenna, so every transmission illuminates all neighbours. In a dense TSCH network this has three consequences: the same cell cannot be reused by nearby links (low spatial reuse), shared cells suffer collisions, and receivers spend energy on frames that are not addressed to them. Directional radiation can reduce all three, at the cost of making neighbour discovery harder, because two nodes only hear each other when their beams point at each other. The study examined three antenna models.</p>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 2.1: Why antennas matter for TSCH.</caption><thead><tr><th scope="col">Model</th><th scope="col">Hardware abstraction</th><th scope="col">Beam</th><th scope="col">How a direction is selected</th></tr></thead><tbody><tr><td>Omnidirectional</td><td>One CC2420 radio</td><td>360°</td><td>Not applicable</td></tr><tr><td>Sectored, 2 radios (“2-dir”)</td><td>Two CC2420 chips on one MSP430</td><td>2 × 180° (0°, 180°)</td><td>By choosing which radio transmits (<code>radio_index</code>)</td></tr><tr><td>Sectored, 3 radios (“3-dir”)</td><td>Three CC2420 chips</td><td>3 × 120° (0°, 120°, 240°)</td><td>As above</td></tr><tr><td>Steerable</td><td>One CC2420 with a virtual orientation register</td><td>Cardioid main lobe, rotated in 15° steps</td><td>By writing the orientation register (<code>RADIO_PARAM_ORIENTATION</code>)</td></tr></tbody></table></div>
+
+<h3 id="s2-4"><span class="nt-num">2.4</span>Research questions addressed</h3>
+
+<ol>
+<li>Can sectored antennas reduce collisions and energy in 6TiSCH-minimal/SF0 and in Orchestra, and by how much (2018 conference study)?</li>
+<li>How should a node with a single steerable antenna discover neighbours, learn the best direction to each of them and still join the network in reasonable time (2019)?</li>
+<li>How do network formation time and control overhead scale with node count (25, 49, 81) and density (20, 30, 40 m spacing) for omnidirectional versus steerable nodes (2020)?</li>
+<li>Can a centralised scheduler exploit antenna direction to let interfering links share a channel and thereby shorten the schedule (2020–2022)?</li>
+</ol>
+
+<h2 class="nt-pb" id="ch2"><span class="nt-num">3</span>System architecture</h2>
+
+<p>The system spans four software components, each of which had to be modified consistently: the node firmware (Contiki and 4eMAC), the MSP430 emulator (MSPSim), the network simulator (Cooja) and an external scheduler process on the host.</p>
+
+<figure class="nt-fig nt-fig--wide" id="ch2-fig1" style="--w:760px"><div class="nt-fig__box"><svg aria-label="Layered architecture of the directional 6TiSCH system" class="ds-svg" role="img" viewbox="0 0 760 520">
+
+<defs><marker id="ah" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="ah" d="M0 0L10 5L0 10z"></path></marker></defs>
+<text class="lbl" x="20" y="24">NODE FIRMWARE (C, Contiki)</text>
+<rect class="box-empty" height="52" rx="6" width="440" x="20" y="34"></rect>
+<text class="txt" x="36" y="56">Application · udp-client / udp-server / border-router</text>
+<text class="lbl" x="36" y="74">topology report “T…”, schedule “ts …” (Lab 6–7)</text>
+<rect class="box" height="52" rx="6" width="440" x="20" y="96"></rect>
+<text class="txt" x="36" y="118">4eMAC MAC · 6P · SF0 · time synchronisation</text>
+<text class="lbl" x="36" y="136">per-neighbour antenna / orientation, fake beacons, autonomous cells (Lab 4)</text>
+<rect class="box" height="52" rx="6" width="440" x="20" y="158"></rect>
+<text class="txt" x="36" y="180">Radio API · radio.h · packetbuf attributes</text>
+<text class="lbl" x="36" y="198">radio_index mask, RADIO_PARAM_ORIENTATION (Lab 1)</text>
+<rect class="box" height="62" rx="6" width="212" x="20" y="220"></rect>
+<text class="txt" x="34" y="244">CC2420 driver · exp5438*</text>
+<text class="lbl" x="34" y="262">1–3 chips, orientation reg.</text>
+<text class="lbl" x="34" y="276">(Lab 1)</text>
+<rect class="box" height="62" rx="6" width="212" x="248" y="220"></rect>
+<text class="txt" x="262" y="244">cooja-radio.c (native)</text>
+<text class="lbl" x="262" y="262">3 virtual radios, orientation</text>
+<text class="lbl" x="262" y="276">(Lab 5)</text>
+<text class="lbl" x="20" y="320">SIMULATION HOST (Java)</text>
+<rect class="box" height="62" rx="6" width="212" x="20" y="330"></rect>
+<text class="txt" x="34" y="354">MSPSim</text>
+<text class="lbl" x="34" y="372">CC2420 ×3, 0x31/0x32 registers</text>
+<text class="lbl" x="34" y="386">(Lab 2)</text>
+<rect class="box" height="62" rx="6" width="212" x="248" y="330"></rect>
+<text class="txt" x="262" y="354">ContikiRadio (JNI)</text>
+<text class="lbl" x="262" y="372">reads simRadioOrientation</text>
+<text class="lbl" x="262" y="386">(Lab 5)</text>
+<rect class="box" height="62" rx="6" width="440" x="20" y="402"></rect>
+<text class="txt" x="36" y="426">Cooja · Direction · UDGM · TimeLine · Visualizer</text>
+<text class="lbl" x="36" y="444">antenna gain, angle-dependent links, collision counting (Lab 3)</text>
+<text class="lbl" x="36" y="458">scripts → PRR, join time, energy (Sec. 13)</text>
+<path class="line" d="M126 282V330" marker-end="url(#ah)"></path>
+<path class="line" d="M354 282V330" marker-end="url(#ah)"></path>
+<path class="line" d="M240 392V402"></path>
+<text class="lbl" x="520" y="24">EXTERNAL HOST PROCESSES</text>
+<rect class="box-empty" height="62" rx="6" width="220" x="520" y="34"></rect>
+<text class="txt" x="536" y="58">tunslip6</text>
+<text class="lbl" x="536" y="76">SLIP ↔ tun, fd00::1/64</text>
+<rect class="box" height="80" rx="6" width="220" x="520" y="140"></rect>
+<text class="txt" x="536" y="164">Centralised scheduler</text>
+<text class="lbl" x="536" y="182">UDP :5678, TASA with</text>
+<text class="lbl" x="536" y="198">direction-aware colouring</text>
+<text class="lbl" x="536" y="212">(Lab 6)</text>
+<rect class="box-empty" height="62" rx="6" width="220" x="520" y="402"></rect>
+<text class="txt" x="536" y="426">Serial Socket (server)</text>
+<text class="lbl" x="536" y="444">Cooja plug-in, port 60001</text>
+<path class="line" d="M630 96V140" marker-end="url(#ah)" marker-start="url(#ah)"></path>
+<path class="line" d="M630 402V96" marker-end="url(#ah)"></path>
+<path class="line" d="M460 60H520" marker-end="url(#ah)" marker-start="url(#ah)"></path>
+<text class="lbl" x="476" y="52">UDP</text>
+</svg></div><figcaption><b>Figure 3.1:</b> Components and the laboratory unit in which each is built. Shaded boxes were modified or created in this work.</figcaption></figure>
+
+<p>Two simulation paths exist. In the <b>emulated path</b> (2017–2019) each node runs the real MSP430 binary inside MSPSim, so pin-level details of the second and third CC2420 must be emulated; this is precise but slow and limits experiments to about 35 nodes. In the <b>native path</b> (2020 onward) Contiki is compiled for the host CPU as a shared library and loaded by Cooja through JNI; radio state is exchanged through C variables, which permits 81-node networks and batch runs.</p>
+
+<p>The <b>information flow</b> for directional operation is the same on both paths. The MAC chooses a radio or an orientation for every slot and passes it down through the radio API. The driver (or the native radio stub) records the choice in a register or variable. The simulator reads it, updates the node's <code>Direction</code> object, and the radio medium recomputes which receivers can hear the transmission using the antenna gains of both ends. On reception the driver tags the frame with the receiving radio index or orientation, which the MAC uses to learn the best direction per neighbour.</p>
+
+<h2 class="nt-pb" id="ch3"><span class="nt-num">4</span>Development environment</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Prepare a Linux machine (or the supplied Instant Contiki virtual machine) that can build MSP430 and native Contiki targets and run Cooja.</li>
+<li>Know which source tree to use for which experiment.</li></ul></div>
+
+<h3 id="s4-1"><span class="nt-num">4.1</span>Host system</h3>
+
+<p>All work was carried out in <b>Instant Contiki 3.0</b>, an Ubuntu 12.04 32-bit VMware image, later also on 64-bit Ubuntu with 32-bit compatibility libraries. Cooja's native mote type requires that the Contiki library and the Java virtual machine have the same word size; because 4eMAC and the native radio stub were written for a 32-bit layout, a <b>32-bit JVM</b> and <code>-m32</code> compilation are required.</p>
+
+<ol class="nt-steps">
+<li><b>Install the MSP430 toolchain.</b> The study used a pre-built mspgcc 4.7.2 (supplied as <code>mspgcc-4.7.2-compiled.tar.bz2</code>):
+<pre class="nt-code"><code>tar -xf mspgcc-4.7.2-compiled.tar.bz2
+sudo mv msp430 /usr/local/
+echo 'export PATH=$PATH:/usr/local/msp430/bin' &gt;&gt; ~/.bashrc</code></pre></li>
+<li><b>Install 32-bit runtime libraries and Java 8 (i386)</b> on a 64-bit host:
+<pre class="nt-code"><code>sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386
+sudo apt-get install openjdk-8-jdk:i386 ant gcc-multilib
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-i386</code></pre></li>
+<li><b>Install the libraries of the centralised scheduler:</b> <code>sudo apt-get install libglpk-dev</code> (the linker line expects <code>libglpk.so.40</code>).</li>
+<li><b>Build <code>tunslip6</code></b> once per source tree: <code>cd tools &amp;&amp; make tunslip6</code>.</li>
+</ol>
+
+<h3 id="s4-2"><span class="nt-num">4.2</span>Source trees</h3>
+
+<p>The work was not kept under version control; dated archives stand in for commits. Use the tree that matches the experiment you want to reproduce.</p>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 4.1: Source trees.</caption><thead><tr><th scope="col">Experiment</th><th scope="col">Source tree</th><th scope="col">Mote type in Cooja</th></tr></thead><tbody><tr><td>2018 sectored-antenna study (SF0 / Orchestra × omni / 2-dir / 3-dir)</td><td><code>sharedvm/6tisch_3.0_trl_bildiri_*</code> (one folder per configuration)</td><td>Exp5438 (MSPSim)</td></tr><tr><td>2019 steerable antenna, realistic radiation pattern</td><td><code>sharedvm/sedatgormus-6tisch_3.1.6.7</code></td><td>Exp5438 2-antenna / 3-antenna / steerable</td></tr><tr><td>2019–2020 discovery and network formation (fake beacons)</td><td><code>antenna_sim_2020_02_18.tar.gz</code></td><td>Exp5438 steerable</td></tr><tr><td>2020 scaling study (25–81 nodes) and 2021 centralised scheduling</td><td><code>6tisch_3.1_ky_merge_native_central.20210221.zip</code></td><td>Cooja native (<code>ContikiMoteType</code>)</td></tr><tr><td>Centralised scheduler (host)</td><td><code>tsch_scheduling_algorithms-master.20210221.zip</code> (matches the 2021 firmware); 2022 version in <code>…20220114.zip</code></td><td>—</td></tr></tbody></table></div>
+
+<h3 id="s4-3"><span class="nt-num">4.3</span>Building and launching</h3>
+
+<p>Firmware for an MSPSim node is selected by the Contiki <code>TARGET</code>; the file extension of the resulting binary tells Cooja how many radios to emulate (Lab 2):</p>
+
+<pre class="nt-code"><code>cd examples/ipv6/tsch/rpl-udp/udp-client
+make TARGET=exp5438            udp-client   # → udp-client.exp5438            (omni)
+make TARGET=exp5438_2dir       udp-client   # → udp-client.exp5438_2dir       (two sectors)
+make TARGET=exp5438_3dir       udp-client   # → udp-client.exp5438_3dir       (three sectors)
+make TARGET=exp5438_steerable  udp-client   # → udp-client.exp5438_steerable  (steerable)</code></pre>
+
+<p>Native motes are compiled by Cooja itself from the command stored in the scenario (<code>make udp-client.cooja TARGET=cooja</code>). Cooja is started from the tree whose code you want to simulate, because scenarios refer to sources as <code>[CONTIKI_DIR]/…</code>:</p>
+
+<pre class="nt-code"><code>cd tools/cooja
+ant run                                       # interactive
+ant run_nogui -Dargs=/abs/path/scenario.csc   # batch, writes build/COOJA.testlog</code></pre>
+
+<p>The build file was changed to give the JVM 2048 MB instead of 512 MB, which large native simulations need.</p>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 4.1</span><p>Open any scenario of the chosen tree, press <i>Start</i>, and confirm that motes compile without errors and print <code>4eMAC:joining</code> lines in the Mote output window. On a native tree, a JVM/library word-size mismatch shows up as an <code>UnsatisfiedLinkError</code> when the first mote is created.</p></div>
+
+<h2 class="nt-pb" id="lab1"><span class="nt-num">5</span>Lab 1: Multi-radio hardware abstraction</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Extend Contiki's radio driver interface so that every operation addresses a subset of radios.</li>
+<li>Attach a second and third CC2420 transceiver to the EXP430F5438 platform at the pin level.</li>
+<li>Add a virtual orientation register for a single steerable antenna.</li>
+<li>Measure listen and transmit time per radio with Energest.</li></ul></div>
+
+<h3 id="s5-1"><span class="nt-num">5.1</span>Extend the radio driver interface</h3>
+
+<p>Contiki's <code>struct radio_driver</code> assumes one transceiver. The first step is to add a <code>radio_index</code> argument to every function that touches the hardware, and to define the bit masks that name the radios. The receive path of the RDC layer gets the same argument so that a frame can be answered through the radio that received it.</p>
+
+<pre class="nt-code"><code><span class="cm">// core/dev/radio.h — excerpt · Δ +16 / −8</span>
+#define RADIO_NONE      0
+#define RADIO_PRIMARY   1
+#define RADIO_SECONDARY 2
+#define RADIO_TERTIARY  4
+#define RADIO_ALL       7
+/* ... in enum radio_param_e ... */
+  RADIO_PARAM_ORIENTATION
+/* ... in struct radio_driver ... */
+  int (* prepare)(const void *payload, unsigned short payload_len, unsigned short radio_index);
+  int (* transmit)(unsigned short transmit_len, unsigned short radio_index);
+  int (* send)(const void *payload, unsigned short payload_len, unsigned short radio_index);
+  int (* channel_clear)(unsigned short radio_index);
+  int (* on)(unsigned short radio_index);
+  radio_result_t (* get_value)(radio_param_t param, radio_value_t *value, unsigned short radio_index);
+  radio_result_t (* set_value)(radio_param_t param, radio_value_t value, unsigned short radio_index);</code></pre>
+
+<p>Every caller must then be adapted. In <code>core/net/mac/rdc.h</code> the input hook becomes <code>input(unsigned short radio_index)</code>; <code>nullradio.c</code>, <code>nullrdc.c</code>, <code>nullrdc-noframer.c</code>, <code>contikimac.c</code> and the Linux radio driver <code>cpu/native/net/linuxradio-drv.c</code> receive mechanical signature changes. Where no antenna choice exists, use <code>RADIO_PRIMARY</code> for transmission and <code>RADIO_ALL</code> for <code>on()</code>. Two packet-buffer attributes carry antenna information between the layers:</p>
+
+<pre class="nt-code"><code><span class="cm">// core/net/packetbuf.h — Δ +2 / −0</span>
+  PACKETBUF_ATTR_ANTENNA,              /* radio (mask bit) that received or must send the frame */
+  PACKETBUF_ATTR_ANTENNA_ORIENTATION,  /* orientation index 0..23 of a steerable antenna       */</code></pre>
+
+<p>Finally, extend Energest with one listen and one transmit counter for each additional radio (<code>ENERGEST_TYPE_LISTEN2</code>, <code>LISTEN3</code>, <code>TRANSMIT2</code>, <code>TRANSMIT3</code> in <code>core/sys/energest.h</code>) so that energy can be reported per antenna.</p>
+
+<h3 id="s5-2"><span class="nt-num">5.2</span>Wire additional CC2420 chips to the platform</h3>
+
+<p>The TI EXP430F5438 board drives one CC2420 over SPI with chip select on port 3. Additional chips share the SPI bus but need their own chip select, voltage regulator, reset and interrupt-capable FIFOP/FIFO/CCA/SFD lines. Create the platforms <code>platform/exp5438_2dir</code>, <code>exp5438_3dir</code> and <code>exp5438_steerable</code> by copying <code>platform/exp5438</code>, then add the pin map. The secondary radio uses port 2 with chip select on P6.0; the tertiary radio uses port 4 with chip select on P5.0.</p>
+
+<pre class="nt-code"><code><span class="cm">// platform/exp5438_3dir/platform-conf.h — excerpt · secondary radio</span>
+#define CC2420S_FIFOP_PORT(type)    P2##type
+#define CC2420S_FIFOP_PIN           6
+#define CC2420S_FIFO_PORT(type)     P2##type
+#define CC2420S_FIFO_PIN            5
+#define CC2420S_CCA_PORT(type)      P2##type
+#define CC2420S_CCA_PIN             7
+#define CC2420S_SFD_PORT(type)      P2##type
+#define CC2420S_SFD_PIN             3
+#define CC2420S_CSN_PORT(type)      P6##type
+#define CC2420S_CSN_PIN             0
+#define CC2420S_VREG_PORT(type)     P2##type
+#define CC2420S_VREG_PIN            4
+#define CC2420S_RESET_PORT(type)    P2##type
+#define CC2420S_RESET_PIN           2
+#define CC2420S_IRQ_VECTOR PORT2_VECTOR
+
+#define CC2420S_SPI_ENABLE()     (CC2420S_CSN_PORT(OUT) &amp;= ~BV(CC2420S_CSN_PIN))
+#define CC2420S_SPI_DISABLE()    (CC2420S_CSN_PORT(OUT) |=  BV(CC2420S_CSN_PIN))
+/* CC2420T_* : identical block on port 4, chip select P5.0, PORT4_VECTOR */</code></pre>
+
+<p>The platform headers also define <code>EXP5438_HAS_2_ANTENNA</code>, <code>EXP5438_HAS_3_ANTENNA</code> or <code>EXP5438_HAS_STEERABLE_ANTENNA</code>, which the driver uses to compile only the code paths that exist on the board. The remaining platform files need small, consistent edits:</p>
+
+<ul>
+<li><code>spix.c</code>: configure SCK/MOSI/MISO on ports 5 and 6 as SPI peripheral pins.</li>
+<li><code>msp430.c</code>: clear <code>P2DIR</code> and disable port 3/4 interrupts at boot (<code>P3IE = P4IE = 0</code>).</li>
+<li><code>ld/msp430.x</code>: export the port 3/4 interrupt vector symbols (<code>P3IV</code>, <code>P4IV</code>, <code>PBIE</code>, …). The emulated configuration (Lab 2) must use the same RAM start (0x1a00) and flash start (0x7f00).</li>
+<li><code>cc2420-arch.c</code>: one FIFOP interrupt service routine per radio.</li>
+</ul>
+
+<pre class="nt-code"><code><span class="cm">// platform/exp5438_2dir/cc2420-arch.c — Δ +18 / −1</span>
+ISR(CC2420S_IRQ, cc2420s_fifop_interrupt)
+{
+  ENERGEST_ON(ENERGEST_TYPE_IRQ);
+  /* check P2IV: FIFOP of the secondary radio */
+  if(P2IV == (2 * (1 + CC2420S_FIFOP_PIN))) {
+    if(cc2420_interrupt(RADIO_SECONDARY)) {
+      LPM4_EXIT;
+    }
+  }
+  ENERGEST_OFF(ENERGEST_TYPE_IRQ);
+}</code></pre>
+
+<h3 id="s5-3"><span class="nt-num">5.3</span>Make the CC2420 driver address several chips</h3>
+
+<p>The driver change is the largest single edit of the study (<code>dev/cc2420/cc2420.c</code>, Δ +953 / −223). The pattern is uniform: every low-level SPI primitive takes the mask and repeats the bus transaction for each selected chip.</p>
+
+<pre class="nt-code"><code><span class="cm">// dev/cc2420/cc2420.c — strobe(), the pattern used by getreg, setreg, write_fifo_buf, …</span>
+static void
+strobe(enum cc2420_register regname, int index)
+{
+  if(index &amp; RADIO_PRIMARY) {
+    CC2420_SPI_ENABLE();
+    SPI_WRITE(regname);
+    CC2420_SPI_DISABLE();
+  }
+#ifdef EXP5438_HAS_2_ANTENNA
+  if(index &amp; RADIO_SECONDARY) {
+    CC2420S_SPI_ENABLE();
+    SPI_WRITE(regname);
+    CC2420S_SPI_DISABLE();
+  }
+#endif
+#ifdef EXP5438_HAS_3_ANTENNA
+  if(index &amp; RADIO_TERTIARY) {
+    CC2420T_SPI_ENABLE();
+    SPI_WRITE(regname);
+    CC2420T_SPI_DISABLE();
+  }
+#endif
+}</code></pre>
+
+<p>On top of these primitives:</p>
+
+<ul>
+<li><code>on</code>, <code>prepare</code>, <code>transmit</code>, <code>send</code>, <code>cca</code>, <code>get_value</code> and <code>set_value</code> forward the mask; channel, PAN identifier and address are configured with <code>RADIO_ALL</code>.</li>
+<li><code>cc2420_interrupt(int index)</code> records which radio raised FIFOP; <code>cc2420_read</code> reads the corresponding FIFO (alternating between radios when several are pending) and stores the index in <code>PACKETBUF_ATTR_ANTENNA</code>.</li>
+<li>Energest uses <code>LISTEN2/3</code> and <code>TRANSMIT2/3</code> for the extra radios.</li>
+</ul>
+
+<h3 id="s5-4"><span class="nt-num">5.4</span>A virtual orientation register for the steerable antenna</h3>
+
+<p>Real steerable antennas are controlled by switching lines or a phase network that the CC2420 does not have. The study therefore defines two unused CC2420 register addresses as <em>virtual</em> registers, which the emulator interprets (Lab 2): <code>CC2420_ORIENTATION = 0x31</code> and <code>CC2420_BEAMWIDTH = 0x32</code> in <code>dev/cc2420/cc2420_const.h</code>. At initialisation the driver writes orientation 0 and beam width 180°.</p>
+
+<pre class="nt-code"><code><span class="cm">// dev/cc2420/cc2420.c — steerable antenna</span>
+#ifdef EXP5438_HAS_STEERABLE_ANTENNA
+void
+cc2420_set_orientation(int ori)          /* ori = 0..23 */
+{
+  if(ori &gt;= 0 &amp;&amp; ori &lt; 24)
+  {
+    setreg(CC2420_ORIENTATION, ori * 15, RADIO_PRIMARY);   /* degrees */
+    cc2420_last_orientation = ori;
+  }
+}
+#endif
+/* set_value(): case RADIO_PARAM_ORIENTATION: cc2420_set_orientation(value); */</code></pre>
+
+<p>When a frame is received the driver attaches <code>cc2420_last_orientation</code> as <code>PACKETBUF_ATTR_ANTENNA_ORIENTATION</code>, which lets the MAC learn which direction worked (Lab 4).</p>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 5.1</span><p>All four targets (<code>exp5438</code>, <code>exp5438_2dir</code>, <code>exp5438_3dir</code>, <code>exp5438_steerable</code>) build without warnings about implicit declarations. Grep the build for any remaining call of <code>NETSTACK_RADIO.on()</code> or <code>.transmit(len)</code> with the old arity; every such call is a latent bug that the compiler may only warn about.</p></div>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Common pitfall</span><p>In <code>cpu/msp430/cc2420-arch-sfd.c</code> the port-select lines for the secondary and tertiary SFD use <code>CC2420_SFD_PIN</code> instead of <code>CC2420S_SFD_PIN</code>/<code>CC2420T_SFD_PIN</code>; the pin numbers happen to coincide on this board, so the error is latent. In <code>contikimac.c</code> one <code>#if</code> branch still calls <code>transmit(transmit_len)</code> with the old signature.</p></div>
+
+<h2 class="nt-pb" id="lab2"><span class="nt-num">6</span>Lab 2: Emulating radios in MSPSim</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Teach the MSP430 emulator to host up to three CC2420 chips on the pins chosen in Lab 1.</li>
+<li>Implement the virtual orientation registers and notify Cooja when they change.</li>
+<li>Register 2-antenna, 3-antenna and steerable mote types in Cooja.</li></ul></div>
+
+<h3 id="s6-1"><span class="nt-num">6.1</span>Virtual registers in the CC2420 model</h3>
+
+<p>MSPSim's <code>CC2420.java</code> already keeps an array of registers. Writes to the two virtual addresses are stored and, when the value changes, forwarded to an <code>OrientationListener</code> (a new interface in <code>chip/OrientationListener.java</code> with a single method <code>orientationChanged(int)</code>). <code>Radio802154.java</code> gains the abstract accessors <code>getOrientation()</code>, <code>getBeamwidth()</code>, <code>addOrientationListener()</code> and <code>setRSSIForLastReceivedPacket()</code>; the last one lets the simulator write a per-packet RSSI into the receive FIFO so that the firmware can compare directions.</p>
+
+<pre class="nt-code"><code><span class="cm">// tools/mspsim/se/sics/mspsim/chip/CC2420.java — Δ +46 / −1</span>
+public static final int REG_ORIENTATION = 0x31;
+public static final int REG_BEAMWIDTH   = 0x32;
+/* ... in the register write handler ... */
+case REG_ORIENTATION:
+  registers[address] = data;
+  if(orientation != data){
+    orientation = data;
+    this.orientationListener.orientationChanged(data);
+  }
+  break;
+case REG_BEAMWIDTH:
+  registers[address] = data;
+  if(beamwidth != data){
+    beamwidth = data;
+    this.orientationListener.orientationChanged(data);
+  }
+  break;</code></pre>
+
+<h3 id="s6-2"><span class="nt-num">6.2</span>Several chips on one emulated node</h3>
+
+<p><code>Exp5438Node</code> is given a constructor <code>Exp5438Node(int count)</code> and three fields <code>radio1</code>, <code>radio2</code>, <code>radio3</code>. Port listeners map chip-select bits on ports 3, 6 and 5, and voltage-regulator bits on ports 1, 2 and 4, to the right chip; incoming SPI bytes are routed to whichever chip is currently selected. <code>MSP430f5437Config.java</code> adds the port 3/4 interrupt registers and vectors and sets RAM at 0x1a00 and flash at 0x7f00 to match the linker script of Lab 1.</p>
+
+<pre class="nt-code"><code><span class="cm">// tools/mspsim/se/sics/mspsim/platform/ti/Exp5438Node.java — SPI routing</span>
+if(antennaCount &gt; 0 &amp;&amp; radio1.getChipSelect()) {
+  radio1.dataReceived(source, data);
+}
+else if(antennaCount &gt; 1 &amp;&amp; radio2.getChipSelect()) {
+  radio2.dataReceived(source, data);
+}
+else if(antennaCount &gt; 2 &amp;&amp; radio3.getChipSelect()) {
+  radio3.dataReceived(source, data);
+}</code></pre>
+
+<p><code>MSP430Core.getChips()</code> is modified to return the <em>next</em> matching chip on each call (a counter <code>called_getChips</code>). As a result, when Cooja instantiates the <code>Msp802154Radio</code> interface two or three times for one mote, each instance binds to a different CC2420.</p>
+
+<h3 id="s6-3"><span class="nt-num">6.3</span>Mote types in Cooja</h3>
+
+<ol class="nt-steps">
+<li>Copy <code>Exp5438MoteType.java</code> three times as <code>Exp5438Mote2AntennaType</code>, <code>Exp5438Mote3AntennaType</code> and <code>Exp5438MoteSteerableType</code>. Change the target name and file extension (<code>exp5438_2dir</code>, <code>exp5438_3dir</code>, <code>exp5438_steerable</code>) and list <code>Msp802154Radio</code> two, three or one time(s) among the mote interfaces, followed by <code>Direction</code>.</li>
+<li>In <code>Exp5438Mote.java</code>, create the node according to the firmware extension:
+<pre class="nt-code"><code><span class="cm">// tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/Exp5438Mote.java — Δ +10 / −1</span>
+} else if (filename.endsWith(".exp5438_2dir")) {
+  exp5438Node = new Exp5438Node(2);
+} else if (filename.endsWith(".exp5438_3dir")) {
+  exp5438Node = new Exp5438Node(3);
+} else if (filename.endsWith(".exp5438_steerable")) {
+  exp5438Node = new Exp5438Node(1);</code></pre></li>
+<li>Register the new types in <code>tools/cooja/apps/mspsim/cooja.config</code> (<code>MOTETYPES</code>).</li>
+<li>In <code>Msp802154Radio.java</code>, create a <code>Direction</code> for each radio interface and subscribe to the chip's orientation changes so that Cooja rotates the antenna when the firmware writes register 0x31; also write the simulated RSSI of each received packet back into the chip.</li>
+<li>Give the other radio interfaces (<code>CC1101Radio</code>, <code>CC1120Radio</code>, <code>CC2520Radio</code>, <code>TR1001Radio</code>, Avrora's <code>MicaZRadio</code>) trivial implementations of the new abstract methods so that Cooja still compiles.</li>
+</ol>
+
+<div class="nt-box nt-box--teorem"><span class="nt-box__title">Historical note</span><p>An earlier approach duplicated the radio interface as <code>Msp802154SecondaryRadio</code> and <code>Msp802154TertiaryRadio</code> (fixed to chip 1 and chip 2). These classes are still in the tree but no mote type uses them; the counter in <code>getChips()</code> superseded them.</p></div>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 6.1</span><p>In Cooja, <i>Motes → Add motes</i> must offer “EXP430F5438 2antenna mote”, “3antenna mote” and “Steerable mote”. Add one of each, open <i>Mote interface viewer</i>, and verify that the 3-antenna mote shows three radio interfaces and that writing an orientation from the steerable firmware changes the value displayed by its <code>Direction</code> interface.</p></div>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Common pitfall</span><p>The removal method added to <code>Radio802154.java</code> is misnamed <code>removeChannelListener</code>, so orientation listeners cannot be removed; this is harmless in batch runs but leaks listeners when motes are deleted interactively.</p></div>
+
+<h2 class="nt-pb" id="lab3"><span class="nt-num">7</span>Lab 3: Antenna and propagation model in Cooja</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Attach a <code>Direction</code> object with orientation, beam width and gain pattern to every simulated radio.</li>
+<li>Replace the distance-only Unit Disk Graph Medium (UDGM) decision with a link-budget test that includes both antenna gains.</li>
+<li>Derive the effective communication and interference ranges of each antenna model.</li>
+<li>Visualise sectors and rotating lobes.</li></ul></div>
+
+<h3 id="s7-1"><span class="nt-num">7.1</span>Several radios per mote</h3>
+
+<p>Cooja assumes one <code>Radio</code> per mote. Three changes lift that restriction:</p>
+
+<ul>
+<li><code>MoteInterfaceHandler.java</code> keeps an array of up to three radios and offers <code>getRadio(i)</code>, <code>getRadios()</code> and <code>getRadioCount()</code>. When the radios are created it calls <code>setAntennaOffset(count, i)</code> on each.</li>
+<li><code>interfaces/Radio.java</code> gains a public <code>Direction direction</code> field, <code>radioCount</code> and <code>radioOffset</code>. <code>setAntennaOffset</code> converts the order 0/1/2 into the mask bit 1/2/4 and calls <code>direction.setProperties(count, order)</code>.</li>
+<li><code>AbstractRadioMedium.java</code> registers and unregisters <em>all</em> radios of a mote, not only the first.</li>
+</ul>
+
+<p>Because the new class is called <code>Direction</code>, the pre-existing method <code>getDirection()</code> of <code>DirectionalAntennaRadio</code> and <code>ApplicationRadio</code> is renamed <code>getDirectionAngle()</code>, and its two callers in the MRM plug-in (<code>AreaViewer.java</code>, <code>ChannelModel.java</code>) are updated.</p>
+
+<h3 id="s7-2"><span class="nt-num">7.2</span>The Direction interface</h3>
+
+<p><code>tools/cooja/java/org/contikios/cooja/interfaces/Direction.java</code> (323 lines, new) is a Cooja mote interface, so its state is saved in the scenario file and visible in the interface viewer. Its geometry is fixed by the number of radios on the mote:</p>
+
+<pre class="nt-code"><code><span class="cm">// interfaces/Direction.java — sector layout</span>
+public void setProperties(int radioCount, int order)
+{
+  this.radioCount = radioCount;
+  if(radioCount == 1) {                 /* omni or steerable */
+    omni = true;
+    beamwidthDegrees = 360.0;
+    orientationDegrees = 0.0;
+  }
+  else if(radioCount == 2) {            /* two 180-degree sectors */
+    omni = false;
+    beamwidthDegrees = 180.0;
+    orientationDegrees = (order == 0) ? 0.0 : 180.0;
+  }
+  else if(radioCount == 3) {            /* three 120-degree sectors */
+    omni = false;
+    beamwidthDegrees = 120.0;
+    orientationDegrees = (order == 0) ? 0.0 : (order == 1) ? 120.0 : 240.0;
+  }
+}</code></pre>
+
+<p>A single-radio mote is omnidirectional unless its antenna type is set to directional (<code>setAntennaType(1)</code>, or <code>&lt;omni&gt;0&lt;/omni&gt;</code> in a native scenario), in which case it is <em>steerable</em>.</p>
+
+<h4>Gain pattern</h4>
+
+<p>Let θ be the bearing from the antenna to the other node, measured in degrees with <code>atan2</code>, and θ<sub>0</sub> the antenna orientation. The gain in dBi returned by <code>getGain(θ)</code> is</p>
+
+<div class="nt-math nt-math--c">G<sub>steer</sub>(θ) = 10 · (1 + cos(θ − θ<sub>0</sub>)) − 15 <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L3.1)</span></div>
+
+<div class="nt-math nt-math--c">G<sub>sector</sub>(θ) = +5 if θ<sub>0</sub> ≤ θ &lt; θ<sub>0</sub> + beam width, otherwise −15 <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L3.2)</span></div>
+
+<div class="nt-math nt-math--c">G<sub>omni</sub>(θ) = 0 <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L3.3)</span></div>
+
+<p>The steerable pattern is a cardioid that yields +5 dBi on boresight, −5 dBi at ±90° and −15 dBi behind the antenna. Note that a sector spans <em>from</em> its orientation, not symmetrically around it: the 0° sector of a 2-radio node covers bearings 0°–180°.</p>
+
+<h4>Link budget</h4>
+
+<p>The received power combines log-distance path loss with exponent 2.5, both antenna gains and Gaussian fading with variance 0.5 dB²:</p>
+
+<div class="nt-math nt-math--c">P<sub>rx</sub>(d) = −52 − 25 · log<sub>10</sub> d + G<sub>tx</sub>(θ) + G<sub>rx</sub>(θ + 180°) + 𝒩(0, 0.5)  [dBm] <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L3.4)</span></div>
+
+<pre class="nt-code"><code><span class="cm">// interfaces/Direction.java — link budget</span>
+public double getSignalStrength(double distance, double gain1, double gain2)
+{
+  Random rand = new Random();
+  return -52 - 25 * Math.log10(distance) + gain1 + gain2
+         + rand.nextGaussian() * Math.sqrt(0.5);
+}
+
+public double getMaxRange(double gain1, double gain2)
+{
+  return Math.pow(10.0, (42.5 + (gain1 + gain2)/2) / 25.0);
+}</code></pre>
+
+<h3 id="s7-3"><span class="nt-num">7.3</span>Angle-dependent connectivity in UDGM</h3>
+
+<p>UDGM normally connects a receiver if it lies within a fixed transmission radius. The modified medium instead compares P<sub>rx</sub> with two thresholds: a frame is <em>receivable</em> above −95 dBm and causes <em>interference</em> above −102 dBm. Both gains are evaluated, the receiver's at the reverse bearing.</p>
+
+<pre class="nt-code"><code><span class="cm">// radiomediums/UDGM.java — createConnections(), Δ +87 / −19</span>
+public double TRANSMITTING_RANGE_SIGNAL_STRENGTH = -95;
+public double INTERFERENCE_RANGE_SIGNAL_STRENGTH = -102;
+/* ... for every candidate receiver recv of sender ... */
+double distance = senderPos.getDistanceTo(recvPos);
+double bearing  = sender.direction.getAngle(recv.getPosition());
+if(sender.direction.getSignalStrength(distance, sender.direction.getGain(bearing),
+        recv.direction.getGain(180 + bearing)) &gt; TRANSMITTING_RANGE_SIGNAL_STRENGTH)
+{
+  /* destination or interfered, as in the original UDGM */
+}</code></pre>
+
+<p>The same expression is used in the edge analysis that drives the visualiser, in <code>updateSignalStrengths</code> and, through <code>getMaxRange</code>, in the success-probability computation. A <code>Observer</code> attached to every <code>Direction</code> re-runs the edge analysis whenever an orientation changes, so a steerable node that rotates between slots immediately gains and loses neighbours.</p>
+
+<h4>Worked example: effective ranges</h4>
+
+<p>Setting (L3.4) equal to a threshold <i>T</i> and ignoring fading gives the range</p>
+
+<div class="nt-math nt-math--c">d<sub>max</sub> = 10<sup>(−52 − T + G<sub>tx</sub> + G<sub>rx</sub>) / 25</sup> <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L3.5)</span></div>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 7.1: Angle-dependent connectivity in UDGM.</caption><thead><tr><th scope="col">Antenna pair (tx → rx)</th><th scope="col" style="text-align:right">G<sub>tx</sub> + G<sub>rx</sub> [dB]</th><th scope="col" style="text-align:right">Range, T = −95 dBm</th><th scope="col" style="text-align:right">Interference, T = −102 dBm</th></tr></thead><tbody><tr><td>Omni → omni</td><td style="text-align:right;white-space:nowrap">0</td><td style="text-align:right;white-space:nowrap">52 m</td><td style="text-align:right;white-space:nowrap">100 m</td></tr><tr><td>Steerable boresight → omni</td><td style="text-align:right;white-space:nowrap">+5</td><td style="text-align:right;white-space:nowrap">83 m</td><td style="text-align:right;white-space:nowrap">158 m</td></tr><tr><td>Steerable boresight → steerable boresight</td><td style="text-align:right;white-space:nowrap">+10</td><td style="text-align:right;white-space:nowrap">132 m</td><td style="text-align:right;white-space:nowrap">251 m</td></tr><tr><td>Steerable at ±90° → omni</td><td style="text-align:right;white-space:nowrap">−5</td><td style="text-align:right;white-space:nowrap">33 m</td><td style="text-align:right;white-space:nowrap">63 m</td></tr><tr><td>Steerable rear → omni</td><td style="text-align:right;white-space:nowrap">−15</td><td style="text-align:right;white-space:nowrap">13 m</td><td style="text-align:right;white-space:nowrap">25 m</td></tr><tr><td>Sector (inside) → sector (inside)</td><td style="text-align:right;white-space:nowrap">+10</td><td style="text-align:right;white-space:nowrap">132 m</td><td style="text-align:right;white-space:nowrap">251 m</td></tr></tbody></table></div>
+
+<p>These figures explain the parameters of the 2020 scenarios: omnidirectional runs use a 50 m transmission and 100 m interference radius, steerable runs 79 m and 100 m. The omni and boresight-to-omni values of the model are 52 m and 83 m.</p>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Common pitfall</span><p><code>getMaxRange</code> uses 42.5 and the <em>mean</em> of the two gains, while (L3.5) with T = −95 uses 43 and their <em>sum</em>. The two agree for omni links and diverge for directional ones; any analysis that relies on the success probability should be checked against the edge analysis. An earlier version (3.1.6.4) used a fourth-order polynomial of the bearing for the range and a line <code>rssi = 1;</code> that discarded the computed RSSI; neither survives in the final code.</p></div>
+
+<h3 id="s7-4"><span class="nt-num">7.4</span>Visualisation</h3>
+
+<p><code>UDGMVisualizerSkin.java</code> draws every radio of a mote separately: a circle for an omni radio, a pie slice (<code>Arc2D.PIE</code>) for a sector, and a quadratic-curve lobe rotated with an <code>AffineTransform</code> for a steerable antenna. <code>ARM.java</code>, <code>ARMVisualizerSkin.java</code> and <code>DirectionVisualizerSkin.java</code> come from the 2015 contribution; ARM (“Antenna Radio Medium”) is registered in <code>cooja_applet.config</code> but its antenna effects are only placeholders, so all experiments use the modified UDGM. Register <code>Direction</code> as a default mote interface and add the two native radio properties in <code>cooja_default.config</code>:</p>
+
+<pre class="nt-code"><code>org.contikios.cooja.contikimote.interfaces.ContikiRadio.RADIO_COUNT = 1
+org.contikios.cooja.contikimote.interfaces.ContikiRadio.RADIO_OMNI = 1
+# and append org.contikios.cooja.interfaces.Direction to MOTE_INTERFACES</code></pre>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 7.1</span><p>Place two 3-antenna motes 60 m apart on the x-axis. The visualiser must show three 120° slices per mote, and only the slice of each mote that faces the other should produce a link. Move one mote to 140 m: the link disappears (beyond 132 m), but the interference relation remains.</p></div>
+
+<h2 class="nt-pb" id="lab4"><span class="nt-num">8</span>Lab 4: Antenna-aware MAC in 4eMAC</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Associate an antenna (multi-radio) or an orientation (steerable) with every neighbour and use it in every dedicated slot.</li>
+<li>Learn the best orientation from the RSSI of received frames.</li>
+<li>Let unsynchronised steerable nodes find neighbours with fake beacons.</li>
+<li>Deliver broadcast control traffic (EB, DIO, DIS) reliably through autonomous unicast cells.</li>
+<li>Reproduce the antenna extensions of Contiki TSCH used with Orchestra.</li></ul></div>
+
+<h3 id="s8-1"><span class="nt-num">8.1</span>Per-neighbour antenna and orientation</h3>
+
+<p>Extend the neighbour record in <code>4emac-buf.h</code> with three fields and a second slot list (used in Section 8.5):</p>
+
+<pre class="nt-code"><code><span class="cm">// core/net/mac/4emac/4emac-buf.h — struct destination, added fields</span>
+uint8_t  antenna;      /* RADIO_PRIMARY / SECONDARY / TERTIARY that hears this neighbour */
+int8_t   max_rssi;     /* best RSSI observed from this neighbour so far                 */
+uint16_t orientation;  /* orientation index 0..23 that produced max_rssi                */
+LIST_STRUCT(slot_list2);  /* autonomous cells in the second slotframe                 */</code></pre>
+
+<p>For multi-radio nodes, <code>4erdc.c</code> calls <code>packet_input(radio_index)</code> and the MAC stores the receiving radio in <code>dn-&gt;antenna</code>. Unicast frames to that neighbour are then prepared, transmitted and acknowledged on that radio only, while broadcasts and EBs use <code>RADIO_ALL</code>. <code>4esec.c</code> copies <code>dn-&gt;antenna</code> and <code>dn-&gt;orientation</code> into the packet attributes before the radio is invoked, and the channel of a slot is set on the neighbour's radio.</p>
+
+<h3 id="s8-2"><span class="nt-num">8.2</span>Learning the best orientation</h3>
+
+<p>For a steerable node every received frame carries the orientation that was active. The MAC keeps, per neighbour, the orientation that yielded the highest RSSI; ties are broken in favour of the newer observation.</p>
+
+<pre class="nt-code"><code><span class="cm">// core/net/mac/4emac/4emac-buf.c — foure_mac_buf_slot_inc_rx_from_linkaddr()</span>
+if(simRadioOmni == 0 &amp;&amp; simRadioCount == 1){          /* steerable node */
+  if(dn-&gt;max_rssi &lt;= packetbuf_attr(PACKETBUF_ATTR_RSSI) &amp;&amp;
+     dn-&gt;orientation != packetbuf_attr(PACKETBUF_ATTR_ANTENNA_ORIENTATION))
+  {
+    dn-&gt;max_rssi    = packetbuf_attr(PACKETBUF_ATTR_RSSI);
+    dn-&gt;orientation = packetbuf_attr(PACKETBUF_ATTR_ANTENNA_ORIENTATION);
+    vrt_nbr_cell_table_add_nbr(linkaddr);              /* see Section 8.4 */
+  }
+}</code></pre>
+
+<h3 id="s8-3"><span class="nt-num">8.3</span>Orientation policy per slot type</h3>
+
+<p>Before each slot the scheduler of 4eMAC selects the orientation according to the slot's role:</p>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 8.1: Orientation policy per slot type.</caption><thead><tr><th scope="col">Slot type</th><th scope="col">Orientation</th><th scope="col">Rationale</th></tr></thead><tbody><tr><td>Shared or timekeeping</td><td><code>get_best_orientation()</code> (currently uniform random in 0…23)</td><td>The intended receiver is unknown; random scanning eventually covers all directions.</td></tr><tr><td>Dedicated receive</td><td>Learned orientation with probability ≈ 0.5, otherwise ±1 step</td><td>Keeps tracking the sender if the best direction drifts.</td></tr><tr><td>Dedicated transmit</td><td>Learned orientation</td><td>Point the main lobe at the receiver.</td></tr></tbody></table></div>
+
+<pre class="nt-code"><code><span class="cm">// core/net/mac/4emac/4emac-6top-scheduler-minimal.c — Δ +60 / −6</span>
+if(simRadioOmni == 0 &amp;&amp; simRadioCount == 1){
+  if((sl-&gt;type &amp; SLOT_TYPE_SHARED) || (sl-&gt;type &amp; SLOT_TYPE_TIMEKEEP)){
+    NETSTACK_RADIO.set_value(RADIO_PARAM_ORIENTATION, get_best_orientation(), dn-&gt;antenna);
+  } else if(sl-&gt;type &amp; SLOT_TYPE_RECEIVE){
+    if(random_rand() % 10 &gt; 4)
+      NETSTACK_RADIO.set_value(RADIO_PARAM_ORIENTATION, dn-&gt;orientation, dn-&gt;antenna);
+    else if(random_rand() % 10 &gt; 4)
+      NETSTACK_RADIO.set_value(RADIO_PARAM_ORIENTATION, (dn-&gt;orientation - 1) % 24, dn-&gt;antenna);
+    else
+      NETSTACK_RADIO.set_value(RADIO_PARAM_ORIENTATION, (dn-&gt;orientation + 1) % 24, dn-&gt;antenna);
+  } else {
+    NETSTACK_RADIO.set_value(RADIO_PARAM_ORIENTATION, dn-&gt;orientation, dn-&gt;antenna);
+  }
+}</code></pre>
+
+<p>An earlier, MSPSim-only variant (<code>4emac-6top-scheduler.c</code>, guarded by <code>EXP5438_HAS_STEERABLE_ANTENNA</code>) instead rotated the antenna by +181° (mod 360) in every shared slot, a deterministic sweep that visits every degree.</p>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Common pitfall</span><p><code>(orientation − 1) % 24</code> is negative when the orientation is 0, because C's remainder keeps the sign of the dividend. The driver silently rejects values outside 0…23, so the radio keeps its previous direction. Use <code>(orientation + 23) % 24</code>.</p></div>
+
+<h3 id="s8-4"><span class="nt-num">8.4</span>Neighbour discovery with fake beacons</h3>
+
+<p>A steerable node that has not yet joined must point at a synchronised neighbour exactly when that neighbour sends an EB in a shared slot, which is unlikely. The remedy is to let unsynchronised nodes transmit themselves: every 5 s they send a short <em>fake beacon</em> (FB) on a random channel in a random direction. A synchronised node that receives an FB records the sender and the direction in a <em>virtual neighbour table</em>, and can then aim EBs at it.</p>
+
+<ol class="nt-steps">
+<li>Define the frame type <code>FRAME802154_FAKEBEACONFRAME = 0x04</code> in <code>core/net/mac/frame802154.h</code> and <code>ieee802154e.h</code>.</li>
+<li>Add <code>4emac-ie-fb.c/.h</code> with <code>foure_packet_create_fb()</code> and <code>foure_packet_parse_fb()</code> (constant payload 0x2345) and an IE parser <code>ieee802154e_parse_fb_information_elements()</code> in <code>ieee802154e.c</code>.</li>
+<li>Give FBs their own security level and key index (<code>FOURE_SECURITY_KEY_SEC_LEVEL_FB</code>, <code>FOURE_SECURITY_KEY_INDEX_FB</code>) in <code>4emac-6tisch-minimal-security.c/.h</code> and <code>4esec.c</code>.</li>
+<li>Route received FBs from <code>4erdc.c</code> to <code>tsch_fb_input()</code> and send them from the EB timer when not synchronised:</li>
+</ol>
+
+<pre class="nt-code"><code><span class="cm">// core/net/mac/4emac/4emac-timesynch.c — tsch_send_fb() and the EB timer</span>
+void tsch_send_fb()
+{
+  uint8_t fb_buf[FOURE_MAC_MAX_PACKET_LEN];
+  uint8_t fb_len, hdr_len = 0, tsch_sync_ie_offset;
+  fb_len = foure_packet_create_fb(fb_buf, FOURE_MAC_MAX_PACKET_LEN, &amp;hdr_len, &amp;tsch_sync_ie_offset);
+  if(fb_len &gt; 0) {
+    radio_value_t new_channel = FOURE_RF_CHANNEL_MIN + (random_rand() % NUMBER_OF_MAX_CHANNELS);
+    NETSTACK_RADIO.set_value(RADIO_PARAM_CHANNEL, new_channel, RADIO_PRIMARY);
+    NETSTACK_RADIO.set_value(RADIO_PARAM_ORIENTATION, get_best_orientation(), RADIO_PRIMARY);
+    NETSTACK_RADIO.send(&amp;fb_buf, fb_len, RADIO_PRIMARY);
+  }
+}
+/* in the EB timer process */
+if(foure_control.synched &amp;&amp; default_instance != NULL){
+  tsch_send_eb();                       /* normal EB, jittered interval */
+}
+#ifdef FOURE_CONF_FB_ENABLED
+else if(!foure_control.synched){
+  tsch_send_fb();                       /* not synchronised: fake beacon */
+  etimer_set(&amp;eb_timer, 5 * CLOCK_SECOND);
+}
+#endif</code></pre>
+
+<h3 id="s8-5"><span class="nt-num">8.5</span>Autonomous cells for control traffic</h3>
+
+<p>Even after joining, broadcast control frames sent in a shared slot reach only the neighbours that happen to face the sender. The solution adopted from 2020 onward gives every neighbour pair a pair of <em>autonomous</em> unicast cells in a second, long slotframe (251 slots), computed by both ends from their identifiers without negotiation, in the spirit of Orchestra and ALICE:</p>
+
+<div class="nt-math nt-math--c">s<sub>tx</sub>(a→b) = ((a + 1)·7 + (b + 1)·13) mod 251,   s<sub>rx</sub>(a←b) = ((a + 1)·13 + (b + 1)·7) mod 251 <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L4.1)</span></div>
+
+<p>so that node <i>a</i>'s transmit cell towards <i>b</i> equals <i>b</i>'s receive cell from <i>a</i>. The cells are installed when the neighbour first enters the virtual neighbour table:</p>
+
+<pre class="nt-code"><code><span class="cm">// core/net/mac/4emac/4emac-timesynch.c — vrt_nbr_cell_table_add_nbr()</span>
+n-&gt;id            = linkaddr-&gt;u8[7];
+n-&gt;orientation   = packetbuf_attr(PACKETBUF_ATTR_ANTENNA_ORIENTATION);
+n-&gt;rssi          = packetbuf_attr(PACKETBUF_ATTR_RSSI);
+n-&gt;transmit_slot = ((linkaddr_node_addr.u8[7] + 1) * 7  + (n-&gt;id + 1) * 13) % SLOT_FRAME_MAX_SIZE_2;
+n-&gt;receive_slot  = ((linkaddr_node_addr.u8[7] + 1) * 13 + (n-&gt;id + 1) * 7)  % SLOT_FRAME_MAX_SIZE_2;
+n-&gt;channel       = (linkaddr_node_addr.u8[7] + n-&gt;id) % NUMBER_OF_MAX_CHANNELS;
+list_add(vrt_nbr_cell_table_list, n);
+#ifdef FOURE_CONF_AUTONOMOUS_SLOTS_ENABLED
+foure_mac_buf_destination_add(&amp;n-&gt;linkaddr, NBR_TABLE_REASON_RPL_DIS, NULL);
+foure_mac_buf_slot_schedule2(&amp;n-&gt;linkaddr, SLOT_TYPE_TRANSMIT, SLOT_UNLOCK,
+    n-&gt;transmit_slot, n-&gt;channel, FOURE_SLOT_INFINITE_LIFETIME);
+foure_mac_buf_slot_schedule2(&amp;n-&gt;linkaddr, SLOT_TYPE_RECEIVE, SLOT_UNLOCK,
+    n-&gt;receive_slot, n-&gt;channel, FOURE_SLOT_INFINITE_LIFETIME);
+#endif</code></pre>
+
+<p>When the MAC enqueues an EB, DIS or DIO addressed to the broadcast address, <code>4emac-buf.c</code> places a unicast copy on the autonomous cell of each parent and child in the neighbour table (<code>FOURE_CONF_AUTONOMOUS_SLOTS_ENABLED</code>). Supporting changes:</p>
+
+<ul>
+<li><code>4emac-buf.c</code>: second slot pool and API (<code>slot_mem2</code>, <code>foure_mac_buf_slot_schedule2/unschedule2/get2</code>, <code>get_next_scheduled_2</code>, <code>content_get_scheduled_2</code>), plus <code>foure_mac_buf_slot_unschedule_all()</code> and <code>content_delete_all_buffers()</code> used by the centralised scheduler (Lab 6).</li>
+<li><code>4emac-private.h</code>: <code>SLOT_FRAME_MAX_SIZE = 31</code>, <code>SLOT_FRAME_MAX_SIZE_2 = 251</code>; on Cooja, <code>RTIMER_GUARD 0</code> and a <code>BUSYWAIT_UNTIL_ABS</code> that yields with <code>cooja_mt_yield()</code>.</li>
+<li><code>4emac-6top-scheduler-minimal.c</code>: search the second slotframe (<code>current_slot_2</code>) when the first has no cell in the current slot.</li>
+<li><code>4emac.c</code>: count transmission statistics and blacklisted channels only for slots of the primary slotframe (<code>sl-&gt;primary</code>), so that autonomous cells do not distort SF0.</li>
+<li><code>4emac-ie-eb.c</code>: <code>foure_packet_update_src_addr()</code> rewrites the source address in a copied EB.</li>
+</ul>
+
+<h3 id="s8-6"><span class="nt-num">8.6</span>Adjustments to 6P and SF0</h3>
+
+<p>Smaller changes keep the distributed scheduler stable alongside the new cells: SF0 ignores events from non-primary slots, its add/relocate thresholds are lowered to 10 and a division by zero is guarded (<code>6p-sf-0.c</code>); 6P retries a LIST once more and doubles its process timeouts to 8 s (<code>6top-pce.c</code>); the 6P queue grows from 3 to 8 entries (<code>6p-queue.c</code>). In the 2018 trees, SF time-outs are expressed in seconds instead of slotframes (<code>6p-sf-backup.c</code>, <code>6p-sf-pid.c</code>, <code>6top-pce.h</code>, and the group applications in Appendix A, group 10). A field <code>antenna_offset</code> for 6P cells was sketched in <code>4emac-ie-sixtop.h</code> and <code>6p-protocol.c</code> but left commented out. In 3.1.4, an antenna-aware 6P LIST (<code>NEIGHBOUR_LIST_WRT_ANTENNA</code>) reported only the cells of neighbours on the same antenna, so that cells on other antennas could be reused.</p>
+
+<h3 id="s8-7"><span class="nt-num">8.7</span>Antenna support in Contiki TSCH for the Orchestra baseline</h3>
+
+<p>For the 2018 comparison, the same idea was applied to Contiki's own TSCH, on which Orchestra runs:</p>
+
+<ul>
+<li><code>tsch-private.h</code>: masks <code>RADIO_PRIMARY(1) / SECONDARY(2) / TERTIARY(4) / BOTH(7)</code>.</li>
+<li><code>tsch-queue.h</code>: an <code>antenna</code> field in <code>struct tsch_neighbor</code>; <code>tsch-slot-operation.h</code>: an <code>antenna</code> field in received packets. The slot operation sends unicast on the neighbour's antenna and broadcasts on all.</li>
+<li><code>tsch-conf.h</code>: single-channel hopping sequence (<code>TSCH_HOPPING_SEQUENCE_1_1</code>) and 15 ms timeslots with a matching timing template.</li>
+<li><code>tsch-queue.c/.h</code>: minimum backoff exponent 2 and a linear backoff window (<code>% BE + 1</code>).</li>
+<li><code>apps/orchestra/orchestra-conf.h</code>: shorter slotframes, EB 397 → 31, common shared 31 → 13, unicast 17 → 5.</li>
+</ul>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 8.1</span><p>Run a 3-node line of steerable native motes with <code>FOURE_CONF_FB_ENABLED</code> and <code>FOURE_CONF_AUTONOMOUS_SLOTS_ENABLED</code>. Every node must print <code>4eMAC:joining</code> and later <code>6P:Parent</code>; the mote output must show <code>maxrssi …</code> lines as orientations are learned. Disable FBs and confirm that joining takes noticeably longer.</p></div>
+
+<h2 class="nt-pb" id="lab5"><span class="nt-num">9</span>Lab 5: Scaling with native Cooja motes</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Run 4eMAC on Cooja's native mote type to simulate 49–81 nodes.</li>
+<li>Provide up to three virtual radios and a steerable orientation in the native radio stub.</li>
+<li>Connect the C-side radio state to the Java <code>Direction</code> object.</li></ul></div>
+
+<p>Instruction-level emulation in MSPSim made networks of more than about 35 nodes impractically slow. Cooja's <em>native</em> mote type compiles Contiki for the host CPU, loads one shared library per mote type, and exchanges state with Java by reading and writing C variables in the library's memory. The radio of such a mote is the stub <code>platform/cooja/dev/cooja-radio.c</code> paired with the Java interface <code>ContikiRadio</code>.</p>
+
+<h3 id="s9-1"><span class="nt-num">9.1</span>Three virtual radios in the native stub</h3>
+
+<p>Duplicate every per-radio variable three times and add the antenna state. Cooja finds these symbols by name, so the names must match the Java side exactly.</p>
+
+<pre class="nt-code"><code><span class="cm">// platform/cooja/dev/cooja-radio.c — Δ +203 / −83</span>
+char simInDataBuffer1[COOJA_RADIO_BUFSIZE];   /* ...2, ...3 likewise */
+char simOutDataBuffer1[COOJA_RADIO_BUFSIZE];
+int  simInSize1 = 0,  simOutSize1 = 0;
+char simRadioHWOn1 = 0;
+int  simSignalStrength1 = -100;
+/* antenna state shared with ContikiRadio.java */
+int simRadioOrientation   = 0;   /* degrees, written by the MAC          */
+int simRadioReceivedIndex = 0;   /* radio that received the last frame   */
+int simRadioCount = 1;           /* written by Cooja from the scenario   */
+int simRadioOmni  = 1;           /* 1 = omni, 0 = directional/steerable  */
+
+void
+radio_set_orientation(int orientation)   /* orientation index 0..23 */
+{
+  if(orientation &gt;= 0 &amp;&amp; orientation &lt; 24)
+    simRadioOrientation = orientation * 15;
+}</code></pre>
+
+<p>All driver functions take <code>radio_index</code> and act on radio 2 or 3 only if <code>simRadioCount</code> is large enough. A received frame is tagged with <code>PACKETBUF_ATTR_ANTENNA</code>, <code>PACKETBUF_ATTR_ANTENNA_ORIENTATION</code> and a timestamp. The original stub's busy-wait during transmission, its turnaround delay and its CCA emulation were removed because they interfered with 4eMAC's slot timing. Because <code>simRadioOmni</code> and <code>simRadioCount</code> are global, the MAC code of Lab 4 can test <code>simRadioOmni == 0 &amp;&amp; simRadioCount == 1</code> to detect a steerable node.</p>
+
+<h3 id="s9-2"><span class="nt-num">9.2</span>Java side: ContikiRadio</h3>
+
+<p>The interface reads two new configuration properties, <code>RADIO_COUNT</code> and <code>RADIO_OMNI</code>, from <code>cooja_default.config</code> or from the scenario (<code>&lt;count&gt;</code>, <code>&lt;omni&gt;</code>), and writes them into the mote's memory. Each <code>ContikiRadio</code> instance owns a <code>Direction</code> and uses its <code>radioOffset</code> to read and write the matching <code>…1/2/3</code> variables. After every tick it polls the orientation variable:</p>
+
+<pre class="nt-code"><code><span class="cm">// tools/cooja/java/org/contikios/cooja/contikimote/interfaces/ContikiRadio.java — Δ +162 / −22</span>
+RADIO_COUNT = mote.getType().getConfig().getIntegerValue(ContikiRadio.class, "RADIO_COUNT");
+RADIO_OMNI  = mote.getType().getConfig().getIntegerValue(ContikiRadio.class, "RADIO_OMNI");
+/* ... */
+private int getOrientation() {
+  return myMoteMemory.getIntValueOf("simRadioOrientation");
+}
+/* ... in doActionsAfterTick() ... */
+if (RADIO_COUNT == 1 &amp;&amp; RADIO_OMNI == 0 &amp;&amp; getOrientation() != oldRadioOrientation) {
+  oldRadioOrientation = getOrientation();
+  direction.setOrientation(oldRadioOrientation);   /* triggers UDGM edge re-analysis */
+  lastEvent = RadioEvent.UNKNOWN;
+  this.setChanged();
+  this.notifyObservers();
+}</code></pre>
+
+<p>Two dialog classes must be adapted so that a mote type can list <code>ContikiRadio</code> more than once: <code>AbstractCompileDialog.java</code> no longer rejects duplicate interfaces, and <code>ContikiMoteCompileDialog.java</code> loads the default interface list from the configuration in <code>getDefaultMoteInterfaces()</code>.</p>
+
+<h3 id="s9-3"><span class="nt-num">9.3</span>Platform configuration for 4eMAC</h3>
+
+<ul>
+<li><code>platform/cooja/contiki-conf.h</code>: define the radio masks; set <code>NETSTACK_CONF_MAC foure_mac_driver</code>, <code>NETSTACK_CONF_RDC foure_driver</code>, <code>NETSTACK_CONF_LLSEC foure_sec_driver</code>, <code>FOURE_CONF_DEFAULT_TIMESLOT_LENGTH 15000</code>, <code>RPL_CONF_OF_OCP RPL_OCP_TSCH</code>, <code>ENERGEST_CONF_ON 1</code>; delete the IPv4 and Rime branches.</li>
+<li><code>platform/cooja/contiki-cooja-main.c</code>: hard-wire IPv6 and remove the IPv4/SLIP start-up code; <code>platform/native/contiki-conf.h</code>: IPv6 and 4eMAC by default.</li>
+<li><code>platform/cooja/rtimer-arch.h</code> and <code>cpu/native/rtimer-arch.h</code>: provide <code>US_TO_RTIMERTICKS</code>, <code>RTIMERTICKS_TO_US</code> and their <code>_64</code> variants, which 4eMAC uses; on Cooja one tick equals one microsecond.</li>
+<li><code>cpu/x86/Makefile.x86_common</code>: compile with <code>gcc -m32</code> and <code>CFLAGS += -m32</code>.</li>
+</ul>
+
+<div class="nt-box nt-box--teorem"><span class="nt-box__title">Generated files</span><p>Ten files <code>tools/cooja/{1,2,3,4,}/org/contikios/cooja/corecomm/Lib1.java</code> and <code>Lib2.java</code> are emitted by Cooja from its <code>CoreComm</code> template each time a native mote type is compiled. They are not source code and need not be reproduced.</p></div>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 9.1</span><p>Open <code>sim25steer.csc</code> (Section 12), start it, and add the <i>Radio messages</i> plug-in. With <code>&lt;omni&gt;0&lt;/omni&gt;</code> the visualiser must show rotating lobes that change between slots; with <code>&lt;omni&gt;1&lt;/omni&gt;</code> circles. Twenty-five native motes should run at least an order of magnitude faster than the same scenario on MSPSim.</p></div>
+
+<h2 class="nt-pb" id="lab6"><span class="nt-num">10</span>Lab 6: Direction-aware centralised scheduler</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Turn an offline TSCH scheduling library into a live scheduler that receives topology reports over UDP and returns schedules.</li>
+<li>Modify the TASA channel-allocation (colouring) step so that conflicting transmitters that point in sufficiently different directions may share a channel.</li>
+<li>Avoid the autonomous cells of Lab 4 and give precedence to freshly received packets.</li></ul></div>
+
+<h3 id="s10-1"><span class="nt-num">10.1</span>Starting point: TASA</h3>
+
+<p>The Traffic-Aware Scheduling Algorithm (TASA; Palattella et al.) builds a convergecast schedule on a routing tree. Each slot is filled in two phases. A <em>matching</em> phase selects a set of tree links that can transmit simultaneously without half-duplex conflicts, favouring nodes with the largest queue <i>Q</i>. A <em>colouring</em> phase assigns channel offsets so that links which interfere receive different channels; links that exceed the number of channels are deferred to the next slot. The original library (<code>tsch_scheduling_algorithms-master.zip</code>, 2017) also contains MCC, MODESA and FHSS and reads link-quality files from the Tutornet testbed. All of these except TASA were removed; matrices were reduced to a single channel dimension.</p>
+
+<h3 id="s10-2"><span class="nt-num">10.2</span>Report and schedule protocol</h3>
+
+<p>Nodes report to <code>fd00::1</code>, UDP port 5678, every <code>PERIOD = 2</code> s. The message is ASCII, fields separated by spaces, numbers in hexadecimal except the sequence number:</p>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 10.1: Report and schedule protocol.</caption><thead><tr><th scope="col">Message</th><th scope="col">Format</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td>Topology report</td><td><code>Tello &lt;seq&gt; &lt;parent&gt; &lt;nbr&gt; &lt;ori&gt; &lt;nbr&gt; &lt;ori&gt; …</code></td><td>The first letter is set to <code>T</code> when the neighbour set changed or every 100 periods. <code>ori</code> is the learned orientation index (0–23) towards that neighbour.</td></tr><tr><td>Data</td><td><code>Hello &lt;seq&gt; …</code></td><td>Sent after more than three schedules were received; the scheduler only counts it.</td></tr><tr><td>Schedule</td><td><code>ts &lt;cell&gt; &lt;cell&gt; …</code></td><td>One 32-bit hexadecimal word per cell (below).</td></tr></tbody></table></div>
+
+<p>A cell is encoded as</p>
+
+<div class="nt-math nt-math--c">cell = slot · 2<sup>12</sup> + channel · 2<sup>8</sup> + type · 2<sup>7</sup> + (neighbourId − 1) <span style="float:right;color:var(--ds-muted);font-style:normal;font-size:15px">(L6.1)</span></div>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 10.2: Report and schedule protocol.</caption><thead><tr><th scope="col">Bits</th><th scope="col">Field</th><th scope="col">Range</th></tr></thead><tbody><tr><td style="text-align:right;white-space:nowrap">18–12</td><td>slot offset</td><td>0–127</td></tr><tr><td style="text-align:right;white-space:nowrap">11–8</td><td>channel offset</td><td>0–15</td></tr><tr><td style="text-align:right;white-space:nowrap">7</td><td>type: 0 transmit, 1 receive</td><td>0–1</td></tr><tr><td style="text-align:right;white-space:nowrap">6–0</td><td>neighbour identifier − 1</td><td>0–127</td></tr></tbody></table></div>
+
+<pre class="nt-code"><code><span class="cm">// examples/ipv6/tsch/rpl-udp/udp-client/udp-client.c — schedule installation, Δ +181 / −24</span>
+char *ptr = strtok(str, " ");                 /* "ts" or "ok" */
+if(strncmp(ptr, "ts", 2) == 0) {
+  ts_msg_received++;
+  foure_mac_buf_slot_unschedule_all();        /* replace the whole schedule */
+}
+ptr = strtok(NULL, " ");
+while(ptr != NULL) {
+  int part    = strtol(ptr, NULL, 16);
+  int dest    = part % 128 + 1;
+  int type    = (part &gt;&gt; 7) % 2;              /* 0 tx, 1 rx */
+  int channel = (part &gt;&gt; 8) % 16;
+  int slot    = (part &gt;&gt; 12) % 128;
+  /* find neighbour dest in the virtual neighbour table, then: */
+  foure_mac_buf_slot_schedule(&amp;n-&gt;linkaddr, type + 1, SLOT_UNLOCK,
+                              slot + 3, channel, FOURE_SLOT_INFINITE_LIFETIME);
+  ptr = strtok(NULL, " ");
+}</code></pre>
+
+<p>The offset <code>+3</code> skips the hard cells 0 (timekeeping) and 1–3 (shared) of the 31-slot primary slotframe.</p>
+
+<h3 id="s10-3"><span class="nt-num">10.3</span>Building the network model</h3>
+
+<p><code>main.c</code> listens on an IPv6 UDP socket. For each <code>T</code> report it calls <code>parseMessage(srcid, msg)</code>, which records the parent in <code>parentMatrix</code>, creates links with a fixed ETX, stores each orientation in <code>degreeMatrix[src][nbr]</code>, and marks the autonomous cells of (L4.1) of the reporting node, its parent and its children as occupied in <code>schedule[][]</code>. When every node (exactly <code>MAX_NODES</code>) is attached to the tree, the scheduler builds the connectivity matrix, an interference matrix (nodes within two hops), a conflict matrix and the degree matrix, runs TASA and sends <code>ts …</code> to every node whose schedule changed, 30 ms apart.</p>
+
+<h3 id="s10-4"><span class="nt-num">10.4</span>Direction-aware colouring</h3>
+
+<p>The decisive change is a single condition in <code>tasa/coloring.c</code>. In the original algorithm a link must take a new colour (channel) whenever a conflicting link already uses the current one. In the modified algorithm the colour is advanced only if the two transmitters point within ±8 orientation steps (±120°) of each other; otherwise their main lobes are assumed to be separated enough for both to use the same channel in the same slot.</p>
+
+<pre class="nt-code"><code><span class="cm">// tasa/coloring.c — Δ +20 / −5</span>
+if (confMatrix[nodeToColor-&gt;id][n-&gt;id])            /* the two links conflict */
+{
+  if (ListFind(&amp;n-&gt;channels, (void *)color))       /* and n already uses this colour */
+  {
+    /* 24 * 15 = 360 degree */
+    if(nodeToColor-&gt;antenna_direction - n-&gt;antenna_direction &lt;= 8 &amp;&amp;
+       nodeToColor-&gt;antenna_direction - n-&gt;antenna_direction &gt;= -8)
+    {
+      color++;                                      /* beams overlap: next channel */
+      break;
+    }
+  }
+}</code></pre>
+
+<p>The transmitter's direction is taken from the report of the transmitting node: <code>tx-&gt;antenna_direction = degreeMatrix[n1][n2]</code> in <code>tasa.c</code>. With a single channel (<code>NUM_CHANNELS 1</code>), every link whose colour exceeds 0 is deferred, so the rule directly converts angular separation into shorter schedules.</p>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Common pitfall</span><p>The difference is not wrapped around 360°: orientations 23 and 1 differ by 22 steps in the code, yet only by 2 steps (30°) in reality, so two nearly parallel beams are treated as separated. A correct test is <code>d = abs(a − b) % 24; if (min(d, 24 − d) &lt;= 8) color++;</code>. Only the transmitter's direction is used; the receiver's is commented out.</p></div>
+
+<h3 id="s10-5"><span class="nt-num">10.5</span>Autonomous-cell avoidance and pipelining</h3>
+
+<ul>
+<li><code>tasa/matching.c</code> receives <code>schedule[][]</code> and admits a link in slot <i>k</i> only if <code>schedule[k][tx]</code> and <code>schedule[k][rx]</code> are free, so dedicated cells never collide with the autonomous cells of Lab 4.</li>
+<li>After a link is scheduled, its receiver gets <code>recently_added = 100</code>; matching and colouring order nodes by <i>Q</i> + <code>recently_added</code>, so a packet that has just arrived is forwarded in the next slots (pipelining towards the sink).</li>
+<li><code>graphs.h</code>: <code>MAX_NODES</code> (= <code>NODE_COUNT</code>), <code>NUM_CHANNELS 1</code>, <code>AUTONOMOUS_SLOTFRAME_LENGTH 251</code>; <code>Node_t</code> gains <code>antenna_direction</code>, <code>received_message</code>, <code>recently_added</code>; <code>Link_t</code> gains <code>degree</code>.</li>
+<li><code>util/files.c</code> accepts a new line type <code>d&lt;i&gt;=…</code> carrying link directions when topologies are read from files; <code>util/print.c</code> prints the degree matrix in degrees (×15).</li>
+</ul>
+
+<h3 id="s10-6"><span class="nt-num">10.6</span>Building, running and replaying</h3>
+
+<p>The <code>Makefile</code> of the scheduler is a list of commands without targets; execute the lines yourself:</p>
+
+<pre class="nt-code"><code>gcc -c util/gen_beta.c util/list.c util/print.c util/files.c
+gcc -c tasa/coloring.c tasa/matching.c tasa/tasa.c
+gcc -c graphs/graphs.c
+gcc -g main.c coloring.o files.o graphs.o list.o matching.o print.o tasa.o \
+    /usr/lib/x86_64-linux-gnu/libglpk.so.40 -o Scheduling
+./Scheduling &gt; run.log          # no arguments; listens on UDP 5678</code></pre>
+
+<p>Set <code>MAX_NODES</code> in <code>graphs/graphs.h</code> to the exact number of nodes before compiling; otherwise the “all nodes attached” condition never becomes true and TASA never runs. Two auxiliary programs support offline work: <code>maincoojatofile.c</code> appends every received report as <code>&lt;id&gt; &lt;message&gt;</code> to a topology file (e.g. <code>topolojisercanomni30m</code>), and <code>mainfiletocooja.c</code> replays such a file line by line through <code>parseMessage</code> without Cooja. <code>mainnodebased.c</code> is a byte-identical copy of <code>main.c</code>.</p>
+
+<div class="nt-box nt-box--ornek"><span class="nt-box__title">Checkpoint 10.1</span><p>Replay a recorded 81-node topology with <code>mainfiletocooja.c</code> twice, once with the direction test of Section 10.4 and once with an unconditional <code>color++</code>. The direction-aware run should need fewer slots; in the recorded data a single-channel 20-node run needed between 25 and 32 slots against a lower bound of 19.</p></div>
+
+<h2 class="nt-pb" id="lab7"><span class="nt-num">11</span>Lab 7: End-to-end experiment</h2>
+
+<div class="nt-box nt-box--tanim"><span class="nt-box__title">Objectives</span><ul><li>Bridge a simulated border router to the host's IPv6 stack.</li>
+<li>Run Cooja, <code>tunslip6</code> and the scheduler together and observe schedules being installed.</li></ul></div>
+
+<figure class="nt-fig nt-fig--wide" id="lab7-fig1" style="--w:760px"><div class="nt-fig__box"><svg aria-label="Message sequence between nodes, border router, tunslip6 and the scheduler" class="ds-svg" role="img" viewbox="0 0 760 420">
+
+<defs><marker id="sq" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="ah" d="M0 0L10 5L0 10z"></path></marker></defs>
+<rect class="box" height="40" rx="6" width="150" x="20" y="16"></rect><text class="txt" text-anchor="middle" x="95" y="41">Node (udp-client)</text>
+<rect class="box" height="40" rx="6" width="150" x="210" y="16"></rect><text class="txt" text-anchor="middle" x="285" y="41">Border router</text>
+<rect class="box" height="40" rx="6" width="150" x="400" y="16"></rect><text class="txt" text-anchor="middle" x="475" y="41">tunslip6</text>
+<rect class="box" height="40" rx="6" width="150" x="590" y="16"></rect><text class="txt" text-anchor="middle" x="665" y="41">Scheduler</text>
+<line class="grid" x1="95" x2="95" y1="56" y2="404"></line><line class="grid" x1="285" x2="285" y1="56" y2="404"></line>
+<line class="grid" x1="475" x2="475" y1="56" y2="404"></line><line class="grid" x1="665" x2="665" y1="56" y2="404"></line>
+<text class="lbl" x="100" y="84">joins via EB / FB, learns orientations (Lab 4)</text>
+<path class="line" d="M95 110H285" marker-end="url(#sq)"></path><text class="lbl" x="104" y="104">Tello seq parent nbr ori … (RPL/TSCH)</text>
+<path class="line" d="M285 140H475" marker-end="url(#sq)"></path><text class="lbl" x="296" y="134">SLIP over Serial Socket :60001</text>
+<path class="line" d="M475 170H665" marker-end="url(#sq)"></path><text class="lbl" x="486" y="164">UDP to fd00::1 :5678</text>
+<text class="lbl" x="560" y="200">all MAX_NODES attached →</text>
+<text class="lbl" x="560" y="216">build matrices, run TASA</text>
+<path class="line" d="M665 246H475" marker-end="url(#sq)"></path><text class="lbl" x="486" y="240">ts cell cell …</text>
+<path class="line" d="M475 276H285" marker-end="url(#sq)"></path><text class="lbl" x="296" y="270">SLIP</text>
+<path class="line" d="M285 306H95" marker-end="url(#sq)"></path><text class="lbl" x="104" y="300">ts … (downward RPL route)</text>
+<text class="lbl" x="100" y="336">unschedule_all(); schedule(slot+3, channel)</text>
+<path class="line" d="M95 368H285" marker-end="url(#sq)"></path><text class="lbl" x="104" y="362">Hello seq (data in dedicated cells)</text>
+<text class="lbl" x="100" y="396">reports again on topology change or every 100 periods</text>
+</svg></div><figcaption><b>Figure 11.1:</b> Control loop between the simulated network and the host scheduler.</figcaption></figure>
+
+<ol class="nt-steps">
+<li><b>Prepare the border router.</b> <code>examples/ipv6/tsch/rpl-border-router/border-router.c</code> carries the blocks marked <code>//sercan</code>: it opens a UDP connection on port 5678, reports its own neighbours and orientations as <code>Tello …</code> every 100 s, and parses <code>ts</code> exactly like the client (Δ +135 / −0). Its <code>project-conf.h</code> must match the clients (slotframes 31/251, hard cells 0–3, keep-alive and autonomous cells on, one channel, 26).</li>
+<li><b>Open the scenario.</b> In Cooja open <code>zzotoscript/borderroute.csc</code> (six native motes, mote 1 = border router). Right-click mote 1 → <i>Mote tools → Serial Socket (SERVER)</i>, port 60001, and start the simulation.</li>
+<li><b>Start the tunnel</b> in a second terminal:
+<pre class="nt-code"><code>cd tools
+sudo ./tunslip6 -a 127.0.0.1 fd00::1/64     # equivalently: make connect-router-cooja</code></pre>
+The host now owns <code>fd00::1</code>, the address to which all nodes report.</li>
+<li><b>Start the scheduler</b> (built with <code>MAX_NODES 6</code>) in a third terminal: <code>./Scheduling</code>. It prints <code>DATA recv from …</code> for each report, then <code>Links scheduled at time slot n</code> and the encoded <code>part</code> words it sends.</li>
+<li><b>Observe.</b> Node outputs show <code>ts …</code> being received; after the fourth schedule they switch to <code>Hello</code> data messages. In the reference run of 7 December 2020 the six-node network was scheduled in five slots, and in slot 1 two links shared channel 0 because their transmitters pointed in different directions.</li>
+</ol>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Version pairing</span><p>The 2022 scheduler expects an extra traffic field after the parent (<code>parent q nbr ori …</code>); the February 2021 firmware does not send it. Use the February 2021 scheduler with the February 2021 firmware, or add the queue length to <code>send_packet()</code> in the client.</p></div>
+
+<h2 class="nt-pb" id="ch8"><span class="nt-num">12</span>Scenario design</h2>
+
+<p>Scenarios vary three factors one at a time: network size (7 to 81 nodes), antenna model (omni, two or three sectors, steerable) and density (20, 30 or 40 m grid spacing). The sink is always placed in the centre so that nodes can be grouped into hop rings around it.</p>
+
+<h3 id="s12-1"><span class="nt-num">12.1</span>Anatomy of a scenario file</h3>
+
+<p>A Cooja scenario (<code>.csc</code>) is an XML file with a radio medium, one or more mote types, the motes with their interface configurations, and a test script. The fragments below are taken from <code>sim25steer3anten.csc</code> (2020, native motes).</p>
+
+<pre class="nt-code"><code><span class="cm">&lt;!-- zzotoscript/sim25steer3anten.csc — radio medium and mote type --&gt;</span>
+&lt;radiomedium&gt;
+  org.contikios.cooja.radiomediums.UDGM
+  &lt;transmitting_range&gt;79.0&lt;/transmitting_range&gt;
+  &lt;interference_range&gt;100.0&lt;/interference_range&gt;
+  &lt;success_ratio_tx&gt;1.0&lt;/success_ratio_tx&gt;
+  &lt;success_ratio_rx&gt;1.0&lt;/success_ratio_rx&gt;
+&lt;/radiomedium&gt;
+&lt;motetype&gt;
+  org.contikios.cooja.contikimote.ContikiMoteType
+  &lt;source&gt;[CONTIKI_DIR]/examples/ipv6/tsch/rpl-udp/udp-client/udp-client.c&lt;/source&gt;
+  &lt;commands&gt;make udp-client.cooja TARGET=cooja&lt;/commands&gt;
+  &lt;moteinterface&gt;org.contikios.cooja.interfaces.Position&lt;/moteinterface&gt;
+  &lt;moteinterface&gt;org.contikios.cooja.interfaces.Direction&lt;/moteinterface&gt;
+  ...
+&lt;/motetype&gt;</code></pre>
+
+<pre class="nt-code"><code><span class="cm">&lt;!-- zzotoscript/sim25steer3anten.csc — the sink mote with three directional radios --&gt;</span>
+&lt;mote&gt;
+  &lt;interface_config&gt;
+    org.contikios.cooja.interfaces.Position
+    &lt;x&gt;80.0&lt;/x&gt; &lt;y&gt;80.0&lt;/y&gt; &lt;z&gt;0.0&lt;/z&gt;
+  &lt;/interface_config&gt;
+  &lt;interface_config&gt;
+    org.contikios.cooja.interfaces.Direction
+    &lt;orientationDegrees&gt;0.0&lt;/orientationDegrees&gt;
+  &lt;/interface_config&gt;
+  &lt;interface_config&gt;
+    org.contikios.cooja.contikimote.interfaces.ContikiRadio
+    &lt;bitrate&gt;250.0&lt;/bitrate&gt;
+    &lt;count&gt;3&lt;/count&gt;      &lt;!-- number of radios on this mote --&gt;
+    &lt;omni&gt;0&lt;/omni&gt;        &lt;!-- 0 = directional / steerable    --&gt;
+  &lt;/interface_config&gt;
+  &lt;!-- the ContikiRadio block is repeated once per radio --&gt;
+&lt;/mote&gt;</code></pre>
+
+<p>All scenarios fix the random seed (123456) so that runs are repeatable, and bound the run with <code>TIMEOUT(…)</code> in the script (30 min to 5 h of simulated time).</p>
+
+<h3 id="s12-2"><span class="nt-num">12.2</span>Scenario families</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 12.1: Scenario families.</caption><thead><tr><th scope="col">Period</th><th scope="col">Scenario</th><th scope="col" style="text-align:right">Nodes</th><th scope="col">Layout</th><th scope="col">Antennas</th><th scope="col">Purpose</th></tr></thead><tbody><tr><td>2017–18</td><td><code>sim7lineer</code>, <code>sim9lineer</code></td><td style="text-align:right;white-space:nowrap">7, 9</td><td>Line</td><td>Omni, 2-dir</td><td>First functional tests of sector selection</td></tr><tr><td>2017–18</td><td><code>sim10random</code>, <code>sim15random</code>, <code>sim16dir</code>, <code>sim17lineer</code></td><td style="text-align:right;white-space:nowrap">10–17</td><td>Random; centre + rings; two rows</td><td>Omni, 2-dir, 3-dir</td><td>PRR and collision comparison for the 2018 study</td></tr><tr><td>2018–19</td><td><code>sim25midaraomnioval</code>, <code>sim25makale</code></td><td style="text-align:right;white-space:nowrap">25</td><td>Sink centred, 40 m grid</td><td>Omni, 2-dir, 3-dir</td><td>Main configuration of the published figures; reception ratio 0.70–1.00 swept</td></tr><tr><td>2019</td><td><code>sim50</code>, <code>sim75</code>, <code>sim100</code></td><td style="text-align:right;white-space:nowrap">49, 73, 101</td><td>Grid</td><td>Sectored</td><td>Scaling on MSPSim</td></tr><tr><td>2019</td><td><code>steerable</code>, <code>rssitest</code>, <code>hepsibir</code>, <code>hepsibir6</code></td><td style="text-align:right;white-space:nowrap">3–11</td><td>Small, mixed</td><td>Mixed in one network</td><td>Unit tests of orientation learning and of coexistence of antenna types</td></tr><tr><td>2019–20</td><td><code>steerablescenarios/sim15/25/35 omni|steer</code></td><td style="text-align:right;white-space:nowrap">15, 25, 35</td><td>Grid</td><td>Omni vs. steerable</td><td>Discovery and formation time with fake beacons</td></tr><tr><td>2020</td><td><code>sim25/49/81 omni3anten</code>, <code>…steer3anten</code></td><td style="text-align:right;white-space:nowrap">25, 49, 81</td><td>5×5, 7×7, 9×9, 40 m</td><td>Sink with 3 radios; others omni or steerable</td><td>Effect of a directional sink on joining per hop ring</td></tr><tr><td>2020</td><td><code>sim81allomni</code>, <code>sim81allsteer</code></td><td style="text-align:right;white-space:nowrap">81</td><td>9×9, 40 m</td><td>All omni / all steerable</td><td>Join and synchronisation time, PRR</td></tr><tr><td>2020</td><td><code>sim81all{omni,steer}{20,30,40}m</code></td><td style="text-align:right;white-space:nowrap">25</td><td>5×5, 20/30/40 m</td><td>All omni / all steerable</td><td>Density: time to find a parent, number of EB/RPL/6P transmissions</td></tr><tr><td>2020–21</td><td><code>borderroute</code>, <code>…border*</code></td><td style="text-align:right;white-space:nowrap">6–81</td><td>Random; grids</td><td>Sink omni, others steerable</td><td>Centralised scheduling with a border router (Lab 7)</td></tr></tbody></table></div>
+
+<p>Two design principles recur. First, every steerable scenario has an omni twin with identical positions, so that differences can be attributed to the antenna alone. Second, with the sink in the centre of a square grid, nodes fall into Manhattan rings of 8, 16, 24 and 32 nodes (81-node case); joining time is averaged per ring to show how delay accumulates with hop distance. With a 50 m omni range a node reaches only its four grid neighbours at 40 m spacing, whereas the 79 m boresight range of a steerable antenna also covers the diagonals.</p>
+
+<div class="nt-box nt-box--hata"><span class="nt-box__title">Naming trap</span><p>The files <code>sim81all…20m/30m/40m.csc</code> contain 25 motes, not 81. Topology recordings of 81-node 20/30/40 m networks exist (<code>topolojisercan*</code>) but the scenarios that produced them were not archived.</p></div>
+
+<h2 class="nt-pb" id="ch9"><span class="nt-num">13</span>Metrics and data collection</h2>
+
+<p>All metrics are computed inside Cooja by the scenario's JavaScript test script, which receives every line printed by every mote (<code>msg</code>, <code>id</code>, <code>time</code> in microseconds) and writes results with <code>log.log()</code> to <code>COOJA.testlog</code>. No external post-processing scripts were used; values were transcribed into gnuplot <code>.dat</code> files.</p>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 13.1: Metrics and data collection.</caption><thead><tr><th scope="col">Metric</th><th scope="col">Definition</th><th scope="col">Where it is computed</th></tr></thead><tbody><tr><td>Packet reception ratio (PRR)</td><td>Received / sent application packets, from <code>DATA send</code> and <code>DATA recv</code> lines; the first 100 sends are a warm-up</td><td>Script of the 2017–19 scenarios: <code>Total PRR x recv N sent M noack K</code></td></tr><tr><td>Unacknowledged transmissions</td><td>Count of MAC <code>noack</code> lines</td><td>Same script</td></tr><tr><td>End-to-end delay</td><td>Mean delay of messages 51–150 per node</td><td><code>sim25makale</code>, <code>sim49omni3anten</code>: <code>ortalamadelay</code></td></tr><tr><td>Energy</td><td>Energest listen/transmit/CPU/LPM ticks printed by the client every 60 messages, converted to mWh</td><td>Same scripts: <code>power rx … tx … cpu … lpm …</code> → <code>ortpower</code></td></tr><tr><td>Collision rate</td><td>Share of receptions that were followed by interference in the same slot, per radio</td><td>Cooja <code>TimeLine.java</code> (event codes 1 TX, 2 RX, 3 interfered, 4 RX then interfered); an earlier counter <code>Depo.java</code> is unused</td></tr><tr><td>Join / formation time</td><td>Simulated time of the first <code>4eMAC:joining</code> and <code>6P:Parent</code> line per node, averaged per hop ring</td><td>2020 scenarios</td></tr><tr><td>Control overhead</td><td>Counts of <code>sercan:transmit eb|rpl|6top</code> lines</td><td><code>sim81allomni20m</code></td></tr><tr><td>Schedule length</td><td>Last <code>Links scheduled at time slot n</code> of a TASA run</td><td>Scheduler output</td></tr></tbody></table></div>
+
+<pre class="nt-code"><code><span class="cm">// Test script pattern — join time per hop ring (from sim25steer3anten.csc, abridged)</span>
+TIMEOUT(18000000000, log.log("success\n"));          // 5 h simulated
+nodeCount = 25;
+while(1) {
+  YIELD();                                           // wait for the next printed line
+  msgArray = msg.split(' ');
+  if(msgArray[0].equals("4eMAC:joining")) recvfromallnodes[id-1]    = time/1000000;
+  if(msgArray[0].equals("6P:Parent"))     recvfromallnodesdio[id-1] = time/1000000;
+  /* when every node has joined and found a parent:
+     sum the times of the nodes in ring 1, 2, 3, 4 and print the ring means */
+}</code></pre>
+
+<p>In <code>TimeLine.java</code> the absolute slot number is reconstructed as simulated time / 15 ms, and only slots whose position in a 51-slot frame is 0 or 50 are evaluated (presumably the shared cells of the slotframe used when the counter was written). Up to 81 motes are tracked.</p>
+
+<h2 class="nt-pb" id="ch10"><span class="nt-num">14</span>Representative results</h2>
+
+<p>Sectored antennas reduced collisions by 58–62 % and energy by 53–58 % relative to a single omnidirectional radio, and raised PRR at low traffic from 46 % to 99 % in 6TiSCH minimal.</p>
+
+<h3 id="s14-1"><span class="nt-num">14.1</span>Sectored antennas (2018–2019, 25 nodes, MSPSim)</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 14.1: Sectored antennas (2018–2019, 25 nodes, MSPSim).</caption><thead><tr><th scope="col">Metric</th><th scope="col">Condition</th><th scope="col" style="text-align:right">1 antenna</th><th scope="col" style="text-align:right">2 antennas</th><th scope="col" style="text-align:right">3 antennas</th></tr></thead><tbody><tr><td>Collision rate [%]</td><td>reception ratio 100 % / 70 %</td><td style="text-align:right;white-space:nowrap">39.95 / 72.08</td><td style="text-align:right;white-space:nowrap">31.67 / 52.96</td><td style="text-align:right;white-space:nowrap">16.64 / 27.72</td></tr><tr><td>Energy [mWh]</td><td>reception ratio 100 % / 70 %</td><td style="text-align:right;white-space:nowrap">2.83 / 3.83</td><td style="text-align:right;white-space:nowrap">1.59 / 1.99</td><td style="text-align:right;white-space:nowrap">1.34 / 1.59</td></tr><tr><td>PRR, 6TiSCH minimal [%]</td><td>0.25 / 0.5 / 1 / 2 packets s⁻¹</td><td style="text-align:right;white-space:nowrap">46.3 / 17.1 / 2.1 / 1.0</td><td style="text-align:right;white-space:nowrap">95.4 / 47.7 / 19.4 / 8.0</td><td style="text-align:right;white-space:nowrap">99.4 / 76.6 / 35.5 / 11.6</td></tr><tr><td>PRR, Orchestra [%]</td><td>0.25 / 0.5 / 1 / 2 packets s⁻¹</td><td style="text-align:right;white-space:nowrap">73.2 / 32.3 / 5.8 / 3.4</td><td style="text-align:right;white-space:nowrap">74.8 / 49.9 / 22.1 / 13.6</td><td style="text-align:right;white-space:nowrap">88.5 / 54.0 / 25.9 / 15.6</td></tr><tr><td>PRR, SF0, 1 frequency [%]</td><td>2 packets s⁻¹, reception 100 %</td><td style="text-align:right;white-space:nowrap">12.2</td><td style="text-align:right;white-space:nowrap">68.1</td><td style="text-align:right;white-space:nowrap">78.0</td></tr><tr><td>PRR, SF0, 4 frequencies [%]</td><td>2 packets s⁻¹, reception 100 %</td><td style="text-align:right;white-space:nowrap">87.2</td><td style="text-align:right;white-space:nowrap">94.3</td><td style="text-align:right;white-space:nowrap">95.5</td></tr><tr><td>Delay, SF0 [s]</td><td>1 packet s⁻¹, 1 frequency vs. 3 antennas + 4 frequencies</td><td style="text-align:right;white-space:nowrap">1.72</td><td style="text-align:right;white-space:nowrap">—</td><td style="text-align:right;white-space:nowrap">0.52</td></tr></tbody></table></div>
+
+<h3 id="s14-2"><span class="nt-num">14.2</span>Steerable antenna: discovery and formation (2019, MSPSim)</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 14.2: Steerable antenna: discovery and formation (2019, MSPSim).</caption><thead><tr><th scope="col">Metric</th><th scope="col">Method</th><th scope="col" style="text-align:right">15 nodes</th><th scope="col" style="text-align:right">25 nodes</th><th scope="col" style="text-align:right">35 nodes</th></tr></thead><tbody><tr><td rowspan="3">Discovery time [min]</td><td>Omni</td><td style="text-align:right;white-space:nowrap">4.22</td><td style="text-align:right;white-space:nowrap">7.52</td><td style="text-align:right;white-space:nowrap">13.69</td></tr><tr><td>Steerable, proposed</td><td style="text-align:right;white-space:nowrap">11.21</td><td style="text-align:right;white-space:nowrap">18.40</td><td style="text-align:right;white-space:nowrap">29.21</td></tr><tr><td>Steerable, random direction</td><td style="text-align:right;white-space:nowrap">14.62</td><td style="text-align:right;white-space:nowrap">26.12</td><td style="text-align:right;white-space:nowrap">35.68</td></tr><tr><td rowspan="3">Formation time [min]</td><td>Omni</td><td style="text-align:right;white-space:nowrap">10.23</td><td style="text-align:right;white-space:nowrap">21.76</td><td style="text-align:right;white-space:nowrap">28.93</td></tr><tr><td>Steerable, proposed</td><td style="text-align:right;white-space:nowrap">16.30</td><td style="text-align:right;white-space:nowrap">26.12</td><td style="text-align:right;white-space:nowrap">32.61</td></tr><tr><td>Steerable, random direction</td><td style="text-align:right;white-space:nowrap">25.53</td><td style="text-align:right;white-space:nowrap">30.37</td><td style="text-align:right;white-space:nowrap">37.57</td></tr><tr><td rowspan="3">Synchronisation time-outs [count]</td><td>Omni</td><td style="text-align:right;white-space:nowrap">2</td><td style="text-align:right;white-space:nowrap">2</td><td style="text-align:right;white-space:nowrap">4</td></tr><tr><td>Steerable, proposed</td><td style="text-align:right;white-space:nowrap">0</td><td style="text-align:right;white-space:nowrap">0</td><td style="text-align:right;white-space:nowrap">3</td></tr><tr><td>Steerable, random direction</td><td style="text-align:right;white-space:nowrap">15</td><td style="text-align:right;white-space:nowrap">42</td><td style="text-align:right;white-space:nowrap">79</td></tr></tbody></table></div>
+
+<p>Omnidirectional nodes always discover fastest, but the proposed steerable scheme is 18–30 % faster than random steering and almost eliminates loss of synchronisation. Over three hours, the RSSI of learned links rose from about −80 to −55 dBm (nodes 1–2) as orientations converged. With one frequency at 1 packet s⁻¹, the steerable antenna raised PRR from 46.2 % to 91.6 %.</p>
+
+<h3 id="s14-3"><span class="nt-num">14.3</span>Centralised scheduling (2020–2021)</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 14.3: Centralised scheduling (2020–2021).</caption><thead><tr><th scope="col">Run</th><th scope="col">Setting</th><th scope="col" style="text-align:right">Schedule length [slots]</th></tr></thead><tbody><tr><td>81 nodes, 2 channels, steerable</td><td>Offline replay</td><td style="text-align:right;white-space:nowrap">119</td></tr><tr><td>81 nodes, 2 channels, omni</td><td>Offline replay</td><td style="text-align:right;white-space:nowrap">119</td></tr><tr><td>81 nodes, 3 channels</td><td>Offline replay (label ambiguous)</td><td style="text-align:right;white-space:nowrap">80 (lower bound 80)</td></tr><tr><td>20 nodes, 1 channel</td><td>Live Cooja, four runs, December 2020</td><td style="text-align:right;white-space:nowrap">25–32 (lower bound 19)</td></tr><tr><td>20 / 58 / 61 nodes</td><td>Live Cooja, February 2021</td><td style="text-align:right;white-space:nowrap">31 / 114 / 112</td></tr></tbody></table></div>
+
+<div class="nt-box nt-box--teorem"><span class="nt-box__title">Interpreting the results</span><p>The collision, energy and two-frequency PRR series of the 2019 steerable figures are numerically identical to the 2018 sector-antenna series (relabelled “omni / random / proposed”) and pre-date the steerable implementation. Only the December 2019 Turkish-language data (PRR, delay, energy per traffic rate) were produced with the steerable code. With two channels, direction awareness did not shorten the 81-node schedule in the recorded replay; its effect is expected in the single-channel case.</p></div>
+
+<h2 class="nt-pb" id="ch11"><span class="nt-num">15</span>Known issues and pitfalls</h2>
+
+<p>The following defects were identified while preparing these notes. They do not invalidate the approach but should be fixed before new experiments.</p>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table 15.1: Known issues and pitfalls.</caption><thead><tr><th scope="col">Location</th><th scope="col">Problem</th><th scope="col">Remedy</th></tr></thead><tbody><tr><td><code>tasa/coloring.c</code></td><td>Orientation difference not taken modulo 24</td><td>Use the circular difference (Section 10.4)</td></tr><tr><td><code>4emac-6top-scheduler-minimal.c</code></td><td><code>(orientation − 1) % 24</code> negative at 0</td><td><code>(orientation + 23) % 24</code></td></tr><tr><td><code>4emac-timesynch.c</code></td><td><code>get_best_orientation()</code> returns a random value; the learned table is not used</td><td>Return the orientation of a known neighbour with probability <i>p</i></td></tr><tr><td><code>Direction.getMaxRange</code></td><td>Inconsistent with the link budget used for edges</td><td>Derive from (L3.5)</td></tr><tr><td>Scheduler <code>main.c</code></td><td><code>recvfrom</code> length argument not initialised; results file opened but never written</td><td>Initialise <code>len = sizeof(addr)</code>; remove or fill the file</td></tr><tr><td>Scheduler <code>Makefile</code></td><td>No targets; links a non-existent <code>graph_coloring.o</code></td><td>Write a proper Makefile; drop the object</td></tr><tr><td><code>mainfiletocooja.c</code>, <code>maincoojatofile.c</code></td><td>Use old signatures of <code>createInterferenceMatrix</code> and <code>main_tasa</code></td><td>Update to the current headers</td></tr><tr><td>Topology recordings</td><td>Some files store orientation in degrees, others as an index 0–23</td><td>Normalise to the index before replay</td></tr><tr><td><code>tsch-slot-operation.c</code> (2018 trees)</td><td>A closing <code>);</code> was commented out with a debug remark</td><td>Restore the statement</td></tr><tr><td>Versioning</td><td>No version control; firmware and scheduler versions drift apart</td><td>Import the dated archives into one Git repository</td></tr></tbody></table></div>
+
+<h2 class="nt-pb" id="self-check"><span class="nt-num">16</span>Self-check questions</h2>
+
+<p>Try to answer each question before opening the solution. All answers follow from the chapters above.</p>
+
+<ol class="nt-quiz"><li><p>Why must the radio API carry a <code>radio_index</code> mask rather than a single radio number?</p><details><summary>Answer</summary><p>Some operations must address several radios at once (switching all receivers on, broadcasting an EB on every sector, configuring the channel), while unicast must use exactly one. A bit mask expresses both cases with one argument (<code>RADIO_ALL = 7</code> versus <code>RADIO_SECONDARY = 2</code>).</p></details></li><li><p>How does the firmware tell the simulator where a steerable antenna points, given that the CC2420 has no such feature?</p><details><summary>Answer</summary><p>Through a virtual register: the driver writes 15·<span class="m">k</span> to address 0x31; MSPSim stores it and notifies an <code>OrientationListener</code>, which rotates the <code>Direction</code> object in Cooja. On native motes the same value travels through the C variable <code>simRadioOrientation</code>.</p></details></li><li><p>Using (L3.5), what is the communication range between a steerable antenna pointing at an omnidirectional receiver, and what does the scenario file use?</p><details><summary>Answer</summary><p>With <span class="m">G</span><sub>tx</sub> + <span class="m">G</span><sub>rx</sub> = 5 dB and T = −95 dBm, d = 10<sup>48/25</sup> ≈ 83 m. The 2020 steerable scenarios set a 79 m transmission range.</p></details></li><li><p>Why can a steerable node fail to join a network even though a neighbour sends Enhanced Beacons regularly?</p><details><summary>Answer</summary><p>EBs are sent in shared cells while the joining node points in some random direction; both beams must face each other in the same slot. Fake beacons reverse the roles: the unsynchronised node transmits, and any synchronised neighbour that hears it records the node and its direction.</p></details></li><li><p>Show that the autonomous cells of (L4.1) are consistent at both ends of a link.</p><details><summary>Answer</summary><p>Node <span class="m">a</span> transmits to <span class="m">b</span> in ((a+1)·7 + (b+1)·13) mod 251. Node <span class="m">b</span> receives from <span class="m">a</span> in ((b+1)·13 + (a+1)·7) mod 251, which is the same number because addition is commutative.</p></details></li><li><p>In the direction-aware colouring rule, when may two conflicting links share a channel, and what is wrong with the implemented test?</p><details><summary>Answer</summary><p>When the transmitters' orientation indices differ by more than 8 steps (120°). The code compares the plain difference, so indices 23 and 1 appear 22 steps apart although they are only 2 steps (30°) apart; the circular difference min(d, 24 − d) must be used.</p></details></li><li><p>Why did the study move from MSPSim to native Cooja motes in 2020?</p><details><summary>Answer</summary><p>Instruction-level emulation of MSP430 nodes with several CC2420 chips was too slow for networks beyond roughly 35 nodes. Native motes run Contiki on the host CPU and allowed 49- and 81-node scenarios and batch runs.</p></details></li><li><p>Why does the scheduler never run if <code>MAX_NODES</code> is larger than the number of simulated nodes?</p><details><summary>Answer</summary><p>TASA is started only after every node, counted up to <code>MAX_NODES</code>, has reported and attached to the tree. Missing nodes keep the condition false indefinitely.</p></details></li></ol>
+
+<h2 class="nt-pb" id="appA"><span class="nt-num">A</span>Index of all 199 changed files</h2>
+
+<p>Every file that differs from its baseline is listed exactly once, under the purpose it serves. Baselines: the group's Git history at 6tisch_3.0 (2017-06-15) for the 2018 trees, at 6tisch_3.1 master (2017-11-02) for the 3.1.x and antenna_sim trees, at <code>oldest-6p</code> (2019-10-30) for the merge/native/central archives, the original MSPSim copy for emulator files, and the 2017 scheduling library for the scheduler. New platform directories are compared with <code>platform/exp5438</code>. <span style="color:var(--ds-good);font-weight:700;font-size:.85em">new</span> marks files without a baseline.</p>
+
+<h3 id="sA-1"><span class="nt-num">A.1</span>Multi-radio hardware and CC2420 driver (Lab 1) · 29 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.1: Multi-radio hardware and CC2420 driver (Lab 1).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>dev/cc2420/cc2420.c</code></td><td style="text-align:right;white-space:nowrap">+953 / −223</td><td>All SPI primitives and driver calls take a radio mask; per-radio FIFOP handling; antenna and orientation packet attributes; cc2420_set_orientation(); Energest per radio</td></tr><tr><td><code>dev/cc2420/cc2420.h</code></td><td style="text-align:right;white-space:nowrap">+5 / −5</td><td>Prototypes take radio_index; cc2420_interrupt(int index)</td></tr><tr><td><code>dev/cc2420/cc2420_const.h</code></td><td style="text-align:right;white-space:nowrap">+3 / −0</td><td>Virtual registers CC2420_ORIENTATION 0x31 and CC2420_BEAMWIDTH 0x32</td></tr><tr><td><code>cpu/msp430/cc2420-arch-sfd.c</code></td><td style="text-align:right;white-space:nowrap">+5 / −1</td><td>SFD interrupt considers all radios; port select for extra SFD pins</td></tr><tr><td><code>platform/exp5438/platform-conf.h</code></td><td style="text-align:right;white-space:nowrap">+12 / −6</td><td>EXP5438_HAS_1_ANTENNA, radio masks, CC2420_ prefix for reset/VREG macros; file and log systems disabled</td></tr><tr><td><code>platform/exp5438/cc2420-arch.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>cc2420_interrupt(RADIO_PRIMARY)</td></tr><tr><td><code>platform/exp5438/ld/msp430.x</code></td><td style="text-align:right;white-space:nowrap">+13 / −2</td><td>Port 3/4 interrupt symbols; RAM 0x1a00, ROM 0x7f00</td></tr><tr><td><code>platform/exp5438/msp430.c</code></td><td style="text-align:right;white-space:nowrap">+6 / −2</td><td>P2DIR cleared, ACLK output disabled, P3IE = P4IE = 0</td></tr><tr><td><code>platform/exp5438/spix.c</code></td><td style="text-align:right;white-space:nowrap">+11 / −0</td><td>SPI pins on ports 5 and 6</td></tr><tr><td><code>platform/exp5438/contiki-exp5438-main.c</code></td><td style="text-align:right;white-space:nowrap">+2 / −5</td><td>packetbuf_init removed, duty-cycle scroller enabled (not antenna-related)</td></tr><tr><td><code>platform/exp5438/contiki-conf.h</code></td><td style="text-align:right;white-space:nowrap">+3 / −0</td><td>Comments only</td></tr><tr><td><code>platform/exp5438_2dir/platform-conf.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+74 / −5</td><td>Secondary radio pin map CC2420S_* (port 2, CS P6.0), EXP5438_HAS_2_ANTENNA</td></tr><tr><td><code>platform/exp5438_2dir/cc2420-arch.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+18 / −1</td><td>FIFOP ISR for the secondary radio</td></tr><tr><td><code>platform/exp5438_2dir/spix.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+10 / −0</td><td>SPI pins on ports 5 and 6</td></tr><tr><td><code>platform/exp5438_2dir/ld/msp430.x</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+11 / −0</td><td>Port 3/4 interrupt symbols</td></tr><tr><td><code>platform/exp5438_2dir/msp430.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+6 / −2</td><td>Port initialisation as exp5438</td></tr><tr><td><code>platform/exp5438_2dir/contiki-conf.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+3 / −0</td><td>Comments only</td></tr><tr><td><code>platform/exp5438_3dir/platform-conf.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+132 / −4</td><td>Secondary and tertiary (CC2420T_*, port 4, CS P5.0) pin maps, EXP5438_HAS_3_ANTENNA</td></tr><tr><td><code>platform/exp5438_3dir/cc2420-arch.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+35 / −1</td><td>FIFOP ISRs for secondary and tertiary radios</td></tr><tr><td><code>platform/exp5438_3dir/spix.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+10 / −0</td><td>SPI pins on ports 5 and 6</td></tr><tr><td><code>platform/exp5438_3dir/ld/msp430.x</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+11 / −0</td><td>Port 3/4 interrupt symbols</td></tr><tr><td><code>platform/exp5438_3dir/msp430.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+2 / −0</td><td>P3IE = P4IE = 0</td></tr><tr><td><code>platform/exp5438_3dir/contiki-conf.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+3 / −0</td><td>Comments only</td></tr><tr><td><code>platform/exp5438_steerable/platform-conf.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+134 / −7</td><td>EXP5438_HAS_STEERABLE_ANTENNA; extra-radio pin blocks present but inactive</td></tr><tr><td><code>platform/exp5438_steerable/cc2420-arch.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Primary radio only</td></tr><tr><td><code>platform/exp5438_steerable/spix.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+10 / −0</td><td>SPI pins on ports 5 and 6</td></tr><tr><td><code>platform/exp5438_steerable/ld/msp430.x</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+13 / −2</td><td>As exp5438 (enlarged RAM/ROM)</td></tr><tr><td><code>platform/exp5438_steerable/msp430.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+6 / −2</td><td>As exp5438</td></tr><tr><td><code>platform/exp5438_steerable/contiki-conf.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+3 / −0</td><td>Comments only</td></tr></tbody></table></div>
+
+<h3 id="sA-2"><span class="nt-num">A.2</span>Radio API and network stack (Lab 1) · 15 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.2: Radio API and network stack (Lab 1).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>core/dev/radio.h</code></td><td style="text-align:right;white-space:nowrap">+16 / −8</td><td>Radio masks, RADIO_PARAM_ORIENTATION, radio_index in all driver functions</td></tr><tr><td><code>core/net/mac/rdc.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>input(unsigned short radio_index)</td></tr><tr><td><code>core/dev/nullradio.c</code></td><td style="text-align:right;white-space:nowrap">+9 / −9</td><td>Signatures adapted</td></tr><tr><td><code>core/net/mac/nullrdc.c</code></td><td style="text-align:right;white-space:nowrap">+8 / −8</td><td>Send on the packet's antenna; ACK on the receiving radio; on(RADIO_ALL)</td></tr><tr><td><code>core/net/mac/nullrdc-noframer.c</code></td><td style="text-align:right;white-space:nowrap">+3 / −3</td><td>RADIO_PRIMARY for send, RADIO_ALL for on()</td></tr><tr><td><code>core/net/mac/contikimac/contikimac.c</code></td><td style="text-align:right;white-space:nowrap">+8 / −8</td><td>RADIO_PRIMARY for CCA and transmission; one branch not updated</td></tr><tr><td><code>core/net/packetbuf.h</code></td><td style="text-align:right;white-space:nowrap">+2 / −0</td><td>PACKETBUF_ATTR_ANTENNA, PACKETBUF_ATTR_ANTENNA_ORIENTATION</td></tr><tr><td><code>core/net/mac/frame802154.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −0</td><td>FRAME802154_FAKEBEACONFRAME (0x04)</td></tr><tr><td><code>core/net/packetbuf-enhanced.c</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Interrupt masking in packetbuf_alloc commented out</td></tr><tr><td><code>core/net/packetbuf.c</code></td><td style="text-align:right;white-space:nowrap">+0 / −2</td><td>Attribute arrays always compiled</td></tr><tr><td><code>core/sys/energest.h</code></td><td style="text-align:right;white-space:nowrap">+4 / −1</td><td>LISTEN2/3 and TRANSMIT2/3 counters</td></tr><tr><td><code>core/net/ipv6/sicslowpan.c</code></td><td style="text-align:right;white-space:nowrap">+0 / −60</td><td>2018 copy without the 4eMAC hooks of 6tisch_3.0 (removals only)</td></tr><tr><td><code>core/net/ipv6/uip6.c</code></td><td style="text-align:right;white-space:nowrap">+0 / −31</td><td>2018 copy without the RSSI/ASN forwarding hook</td></tr><tr><td><code>core/net/rpl/rpl-icmp6.c</code></td><td style="text-align:right;white-space:nowrap">+6 / −29</td><td>2018 copy without route callbacks; log prefixes</td></tr><tr><td><code>core/net/ip/tcpip.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −0</td><td>Comment only</td></tr></tbody></table></div>
+
+<h3 id="sA-3"><span class="nt-num">A.3</span>MAC layer: 4eMAC, Contiki TSCH, Orchestra (Lab 4) · 41 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.3: MAC layer: 4eMAC, Contiki TSCH, Orchestra (Lab 4).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>core/net/mac/4emac/4emac-buf.h</code></td><td style="text-align:right;white-space:nowrap">+16 / −0</td><td>Neighbour fields antenna, max_rssi, orientation, slot_list2; primary flag; new prototypes</td></tr><tr><td><code>core/net/mac/4emac/4esec.c</code></td><td style="text-align:right;white-space:nowrap">+11 / −2</td><td>Antenna and orientation attributes from the neighbour record; FB security level</td></tr><tr><td><code>core/net/mac/4emac/4erdc.c</code></td><td style="text-align:right;white-space:nowrap">+92 / −129</td><td>Radio index in all radio calls; packet_input(radio_index); FB dispatch; CCA branches removed</td></tr><tr><td><code>core/net/mac/4emac/4emac-6top-scheduler.c</code></td><td style="text-align:right;white-space:nowrap">+15 / −0</td><td>Steerable: +181 degree sweep in shared slots, learned orientation otherwise</td></tr><tr><td><code>core/net/mac/4emac/4emac-6top-scheduler-minimal.c</code></td><td style="text-align:right;white-space:nowrap">+60 / −6</td><td>Orientation per slot type; search of the autonomous slotframe</td></tr><tr><td><code>core/net/mac/4emac/4emac-ie-fb.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+197 / −0</td><td>Fake-beacon frame creation and parsing</td></tr><tr><td><code>core/net/mac/4emac/4emac-ie-fb.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+65 / −0</td><td>Fake-beacon structure and prototypes</td></tr><tr><td><code>core/net/mac/4emac/4emac-timesynch.c</code></td><td style="text-align:right;white-space:nowrap">+186 / −17</td><td>Virtual neighbour table, autonomous cells (L4.1), tsch_fb_input, tsch_send_fb, get_best_orientation</td></tr><tr><td><code>core/net/mac/4emac/4emac-timesynch.h</code></td><td style="text-align:right;white-space:nowrap">+85 / −0</td><td>vrt_nbr_cell_table_t, VIRTUAL_NEIGHBOUR_NUM, prototypes</td></tr><tr><td><code>core/net/mac/4emac/ieee802154e.c</code></td><td style="text-align:right;white-space:nowrap">+101 / −0</td><td>Information-element parser for fake beacons</td></tr><tr><td><code>core/net/mac/4emac/ieee802154e.h</code></td><td style="text-align:right;white-space:nowrap">+2 / −0</td><td>Fake-beacon frame type and header include</td></tr><tr><td><code>core/net/mac/4emac/4emac-6tisch-minimal-security.c</code></td><td style="text-align:right;white-space:nowrap">+16 / −0</td><td>Security level and key index for fake beacons</td></tr><tr><td><code>core/net/mac/4emac/4emac-6tisch-minimal-security.h</code></td><td style="text-align:right;white-space:nowrap">+14 / −0</td><td>FB security macros</td></tr><tr><td><code>core/net/mac/4emac/4emac-buf.c</code></td><td style="text-align:right;white-space:nowrap">+297 / −4</td><td>Second slot pool and API; EB/DIO/DIS replicated to neighbours; orientation learning; unschedule_all, delete_all_buffers</td></tr><tr><td><code>core/net/mac/4emac/4emac-private.h</code></td><td style="text-align:right;white-space:nowrap">+30 / −4</td><td>Slotframe sizes 31 and 251; Cooja busy-wait yields</td></tr><tr><td><code>core/net/mac/4emac/4emac-ie-eb.c</code></td><td style="text-align:right;white-space:nowrap">+10 / −0</td><td>Rewrite source address of copied EBs</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/nbr-cell-table.c</code></td><td style="text-align:right;white-space:nowrap">+6 / −0</td><td>nbr_cell_table_get_next_nbr</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/nbr-cell-table.h</code></td><td style="text-align:right;white-space:nowrap">+4 / −0</td><td>New prototypes</td></tr><tr><td><code>core/net/mac/4emac/tsch-minimal-conf.h</code></td><td style="text-align:right;white-space:nowrap">+0 / −4</td><td>Hopping macros removed</td></tr><tr><td><code>core/net/mac/4emac/4emac.c</code></td><td style="text-align:right;white-space:nowrap">+3 / −2</td><td>Statistics only for primary-slotframe cells</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-sf-0.c</code></td><td style="text-align:right;white-space:nowrap">+24 / −10</td><td>Thresholds 10; zero-division guard; ignore non-primary slots</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6top-pce.c</code></td><td style="text-align:right;white-space:nowrap">+5 / −5</td><td>SF0 removed from list; LIST retry 2; time-outs 8 s</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-queue.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Queue 3 -&gt; 8</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-sf-backup.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Time-out 8 s (2018 tree)</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-sf-pid.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Time-out 8 s (2018 tree)</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6top-pce.h</code></td><td style="text-align:right;white-space:nowrap">+0 / −3</td><td>Slotframe-duration macros removed</td></tr><tr><td><code>core/net/mac/4emac/4emac-ie-sixtop.c</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Payload termination IE made conditional</td></tr><tr><td><code>core/net/mac/4emac/4emac-ie-sixtop.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −0</td><td>Commented-out antenna_offset field</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-protocol.c</code></td><td style="text-align:right;white-space:nowrap">+7 / −0</td><td>Commented-out antenna_offset handling</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-protocol.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −0</td><td>extern declaration</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-sf.c</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Log macro</td></tr><tr><td><code>core/net/mac/4emac/6top-pce/6p-sf.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −0</td><td>extern declaration</td></tr><tr><td><code>apps/orchestra/orchestra-conf.h</code></td><td style="text-align:right;white-space:nowrap">+3 / −3</td><td>Orchestra periods 397/31/17 -&gt; 31/13/5</td></tr><tr><td><code>core/net/mac/tsch/tsch-conf.h</code></td><td style="text-align:right;white-space:nowrap">+19 / −2</td><td>Single-channel hopping; 15 ms timeslot template</td></tr><tr><td><code>core/net/mac/tsch/tsch-private.h</code></td><td style="text-align:right;white-space:nowrap">+6 / −0</td><td>Radio masks</td></tr><tr><td><code>core/net/mac/tsch/tsch-queue.h</code></td><td style="text-align:right;white-space:nowrap">+2 / −1</td><td>Neighbour antenna field; minimum BE 2</td></tr><tr><td><code>core/net/mac/tsch/tsch-queue.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Linear backoff window</td></tr><tr><td><code>core/net/mac/tsch/tsch-slot-operation.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −0</td><td>Antenna field in received packets</td></tr><tr><td><code>core/net/mac/tsch/tsch-slot-operation.c</code></td><td style="text-align:right;white-space:nowrap">+4 / −1</td><td>Debug comments (see Section 15)</td></tr><tr><td><code>core/net/mac/tsch/tsch-log.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Log level 1</td></tr><tr><td><code>core/net/mac/tsch/tsch.c</code></td><td style="text-align:right;white-space:nowrap">+0 / −1</td><td>Blank line removed</td></tr></tbody></table></div>
+
+<h3 id="sA-4"><span class="nt-num">A.4</span>MSPSim and Cooja MSPSim motes (Lab 2) · 20 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.4: MSPSim and Cooja MSPSim motes (Lab 2).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>tools/mspsim/se/sics/mspsim/chip/CC2420.java</code></td><td style="text-align:right;white-space:nowrap">+46 / −1</td><td>Orientation and beam-width registers, listener, per-packet RSSI</td></tr><tr><td><code>tools/mspsim/se/sics/mspsim/chip/OrientationListener.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+53 / −0</td><td>New listener interface</td></tr><tr><td><code>tools/mspsim/se/sics/mspsim/chip/Radio802154.java</code></td><td style="text-align:right;white-space:nowrap">+15 / −0</td><td>Abstract orientation and RSSI methods</td></tr><tr><td><code>tools/mspsim/se/sics/mspsim/platform/ti/Exp5438Node.java</code></td><td style="text-align:right;white-space:nowrap">+93 / −25</td><td>Up to three CC2420 chips, pin and SPI routing</td></tr><tr><td><code>tools/mspsim/se/sics/mspsim/config/MSP430f5437Config.java</code></td><td style="text-align:right;white-space:nowrap">+7 / −5</td><td>Port 3/4 interrupts; memory map</td></tr><tr><td><code>tools/mspsim/se/sics/mspsim/core/MSP430Core.java</code></td><td style="text-align:right;white-space:nowrap">+8 / −1</td><td>getChips returns the next chip on each call</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/Exp5438Mote2AntennaType.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+238 / −0</td><td>Two-antenna mote type</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/Exp5438Mote3AntennaType.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+238 / −0</td><td>Three-antenna mote type</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/Exp5438MoteSteerableType.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+236 / −0</td><td>Steerable mote type</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/Exp5438Mote.java</code></td><td style="text-align:right;white-space:nowrap">+10 / −1</td><td>Node created by firmware extension</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/Exp5438MoteType.java</code></td><td style="text-align:right;white-space:nowrap">+10 / −5</td><td>Direction import; renamed Exp5438_Omni</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/JCreateMoteType.java</code></td><td style="text-align:right;white-space:nowrap">+6 / −0</td><td>Extra interfaces</td></tr><tr><td><code>tools/cooja/apps/mspsim/cooja.config</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>New mote types registered</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/Msp802154Radio.java</code></td><td style="text-align:right;white-space:nowrap">+23 / −1</td><td>Direction per radio; orientation listener; RSSI write-back</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/Msp802154SecondaryRadio.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+445 / −0</td><td>Superseded copy bound to chip 1 (unused)</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/Msp802154TertiaryRadio.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+447 / −0</td><td>Superseded copy bound to chip 2 (unused)</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/CC1101Radio.java</code></td><td style="text-align:right;white-space:nowrap">+17 / −0</td><td>Stubs for new Radio methods</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/CC1120Radio.java</code></td><td style="text-align:right;white-space:nowrap">+18 / −1</td><td>Stubs for new Radio methods</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/CC2520Radio.java</code></td><td style="text-align:right;white-space:nowrap">+17 / −0</td><td>Stubs for new Radio methods</td></tr><tr><td><code>tools/cooja/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/TR1001Radio.java</code></td><td style="text-align:right;white-space:nowrap">+17 / −0</td><td>Stubs for new Radio methods</td></tr></tbody></table></div>
+
+<h3 id="sA-5"><span class="nt-num">A.5</span>Cooja antenna and radio-medium model (Lab 3) · 21 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.5: Cooja antenna and radio-medium model (Lab 3).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/Direction.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+323 / −0</td><td>Orientation, beam width, gain pattern, link budget, range</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/SecondaryDirection.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+83 / −0</td><td>Subclass, unused</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/TertiaryDirection.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+78 / −0</td><td>Subclass, unused</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/Radio.java</code></td><td style="text-align:right;white-space:nowrap">+23 / −0</td><td>direction field, radio count and offset</td></tr><tr><td><code>tools/cooja/apps/avrora/src/org/contikios/cooja/avrmote/interfaces/MicaZRadio.java</code></td><td style="text-align:right;white-space:nowrap">+17 / −0</td><td>Stubs for new Radio methods</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/DirectionalAntennaRadio.java</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>getDirection -&gt; getDirectionAngle</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/ApplicationRadio.java</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>getDirection -&gt; getDirectionAngle</td></tr><tr><td><code>tools/cooja/apps/mrm/java/org/contikios/mrm/AreaViewer.java</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Follows the rename</td></tr><tr><td><code>tools/cooja/apps/mrm/java/org/contikios/mrm/ChannelModel.java</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Follows the rename</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/MoteInterfaceHandler.java</code></td><td style="text-align:right;white-space:nowrap">+71 / −5</td><td>Up to three radios per mote</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/radiomediums/AbstractRadioMedium.java</code></td><td style="text-align:right;white-space:nowrap">+23 / −3</td><td>Register all radios</td></tr><tr><td><code>tools/cooja/config/cooja_default.config</code></td><td style="text-align:right;white-space:nowrap">+3 / −1</td><td>RADIO_COUNT, RADIO_OMNI, Direction as default interface</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/MoteInterface.java</code></td><td style="text-align:right;white-space:nowrap">+4 / −0</td><td>toString only</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/interfaces/Position.java</code></td><td style="text-align:right;white-space:nowrap">+4 / −0</td><td>toString only</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/radiomediums/UDGM.java</code></td><td style="text-align:right;white-space:nowrap">+87 / −19</td><td>Link-budget thresholds -95/-102 dBm with antenna gains; orientation observer</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/radiomediums/ARM.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+373 / −0</td><td>Antenna Radio Medium skeleton (2015), unused</td></tr><tr><td><code>tools/cooja/config/cooja_applet.config</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>ARM registered</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/skins/UDGMVisualizerSkin.java</code></td><td style="text-align:right;white-space:nowrap">+115 / −21</td><td>Per-radio sectors and rotating lobes</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/skins/ARMVisualizerSkin.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+479 / −0</td><td>ARM visualiser (2015)</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/skins/DirectionVisualizerSkin.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+138 / −0</td><td>Orientation labels (drawing commented out)</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/Visualizer.java</code></td><td style="text-align:right;white-space:nowrap">+45 / −3</td><td>Polar gain helper</td></tr></tbody></table></div>
+
+<h3 id="sA-6"><span class="nt-num">A.6</span>Cooja measurement tools (Section 13) · 6 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.6: Cooja measurement tools (Section 13).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/TimeLine.java</code></td><td style="text-align:right;white-space:nowrap">+151 / −11</td><td>Per-radio timelines and collision counting</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/Depo.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+326 / −0</td><td>Earlier per-antenna collision counter, unused</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/LogScriptEngine.java</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Progress reported in 1 % steps</td></tr><tr><td><code>tools/cooja/build.xml</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>JVM heap 2048 MB</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/EventListener.java</code></td><td style="text-align:right;white-space:nowrap">+2 / −0</td><td>Listens to Direction</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/plugins/analyzers/IEEE802154EAnalyzer.java</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>6P version and SFID masks</td></tr></tbody></table></div>
+
+<h3 id="sA-7"><span class="nt-num">A.7</span>Native Cooja mote (Lab 5) · 22 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.7: Native Cooja mote (Lab 5).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>platform/cooja/dev/cooja-radio.c</code></td><td style="text-align:right;white-space:nowrap">+203 / −83</td><td>Three virtual radios; orientation, count and omni variables</td></tr><tr><td><code>platform/cooja/dev/cooja-radio.h</code></td><td style="text-align:right;white-space:nowrap">+0 / −6</td><td>Prototype removed</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/contikimote/interfaces/ContikiRadio.java</code></td><td style="text-align:right;white-space:nowrap">+162 / −22</td><td>RADIO_COUNT/RADIO_OMNI; per-radio variables; orientation polling</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/dialogs/ContikiMoteCompileDialog.java</code></td><td style="text-align:right;white-space:nowrap">+33 / −18</td><td>Default interfaces from configuration</td></tr><tr><td><code>tools/cooja/java/org/contikios/cooja/dialogs/AbstractCompileDialog.java</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Duplicate interfaces allowed</td></tr><tr><td><code>cpu/native/net/linuxradio-drv.c</code></td><td style="text-align:right;white-space:nowrap">+6 / −6</td><td>Signatures adapted</td></tr><tr><td><code>platform/cooja/contiki-conf.h</code></td><td style="text-align:right;white-space:nowrap">+63 / −54</td><td>4eMAC stack, radio masks, Energest; IPv4/Rime removed</td></tr><tr><td><code>platform/cooja/contiki-cooja-main.c</code></td><td style="text-align:right;white-space:nowrap">+3 / −50</td><td>IPv6 only</td></tr><tr><td><code>platform/native/contiki-conf.h</code></td><td style="text-align:right;white-space:nowrap">+2 / −4</td><td>IPv6 and 4eMAC by default</td></tr><tr><td><code>cpu/x86/Makefile.x86_common</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>-m32</td></tr><tr><td><code>cpu/native/rtimer-arch.h</code></td><td style="text-align:right;white-space:nowrap">+18 / −0</td><td>Microsecond/tick conversion macros</td></tr><tr><td><code>platform/cooja/rtimer-arch.h</code></td><td style="text-align:right;white-space:nowrap">+18 / −0</td><td>64-bit conversion macro</td></tr><tr><td><code>tools/cooja/1/org/contikios/cooja/corecomm/Lib1.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/1/org/contikios/cooja/corecomm/Lib2.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/2/org/contikios/cooja/corecomm/Lib1.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/2/org/contikios/cooja/corecomm/Lib2.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/3/org/contikios/cooja/corecomm/Lib1.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/3/org/contikios/cooja/corecomm/Lib2.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/4/org/contikios/cooja/corecomm/Lib1.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/4/org/contikios/cooja/corecomm/Lib2.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/org/contikios/cooja/corecomm/Lib1.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr><tr><td><code>tools/cooja/org/contikios/cooja/corecomm/Lib2.java</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+58 / −0</td><td>Generated by Cooja</td></tr></tbody></table></div>
+
+<h3 id="sA-8"><span class="nt-num">A.8</span>Applications and scheduler integration (Labs 6–7) · 19 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.8: Applications and scheduler integration (Labs 6–7).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>examples/ipv6/tsch/rpl-udp/udp-client/udp-client.c</code></td><td style="text-align:right;white-space:nowrap">+181 / −24</td><td>Topology reports with orientations; ts parsing and installation</td></tr><tr><td><code>examples/ipv6/tsch/rpl-border-router/border-router.c</code></td><td style="text-align:right;white-space:nowrap">+135 / −0</td><td>Same for the border router</td></tr><tr><td><code>examples/ipv6/tsch/rpl-udp/udp-client/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+48 / −6</td><td>Slotframes 31/251, hard cells 0-3, FB, autonomous cells, channel 26</td></tr><tr><td><code>examples/ipv6/tsch/rpl-border-router/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+25 / −5</td><td>As the client</td></tr><tr><td><code>examples/ipv6/tsch/rpl-udp/udp-server/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+45 / −6</td><td>Older setting 51/251, four channels</td></tr><tr><td><code>examples/ipv6/tsch/rpl-cjoin/rpl-border-router/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+15 / −0</td><td>51/251, four channels, capacities</td></tr><tr><td><code>examples/ipv6/tsch/rpl-udp/udp-server/udp-server.c</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>No server reply; root ::1</td></tr><tr><td><code>examples/ipv6/rpl-udp/Makefile</code></td><td style="text-align:right;white-space:nowrap">+5 / −0</td><td>Contiki TSCH and Orchestra enabled</td></tr><tr><td><code>examples/ipv6/rpl-udp/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+94 / −3</td><td>TSCH MAC, Orchestra callbacks</td></tr><tr><td><code>examples/ipv6/rpl-udp/udp-client.c</code></td><td style="text-align:right;white-space:nowrap">+39 / −7</td><td>Orchestra start-up; period 5 s</td></tr><tr><td><code>examples/ipv6/rpl-udp/udp-server.c</code></td><td style="text-align:right;white-space:nowrap">+37 / −5</td><td>RPL root and TSCH coordinator</td></tr><tr><td><code>examples/ipv6/rpl-tsch/node.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Coordinator rule for all targets</td></tr><tr><td><code>examples/ipv6/rpl-tsch/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+4 / −4</td><td>Orchestra on, log level 1</td></tr><tr><td><code>examples/ipv6/rpl-udp-tsch/Makefile</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+30 / −0</td><td>Builds 4eMAC UDP example</td></tr><tr><td><code>examples/ipv6/rpl-udp-tsch/udp-client.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+310 / −0</td><td>Early 4eMAC client with slotframe report</td></tr><tr><td><code>examples/ipv6/rpl-udp-tsch/udp-server.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+199 / −0</td><td>Early 4eMAC server</td></tr><tr><td><code>examples/ipv6/tsch/rpl-udp/project-conf.h</code></td><td style="text-align:right;white-space:nowrap">+110 / −0</td><td>2019 setting with NEIGHBOUR_LIST_WRT_ANTENNA</td></tr><tr><td><code>examples/ipv6/tsch/rpl-udp/udp-client.c</code></td><td style="text-align:right;white-space:nowrap">+4 / −51</td><td>Early client, period 2 s</td></tr><tr><td><code>examples/ipv6/tsch/rpl-udp/udp-server.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Root ::1</td></tr></tbody></table></div>
+
+<h3 id="sA-9"><span class="nt-num">A.9</span>Centralised scheduler (Lab 6) · 16 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.9: Centralised scheduler (Lab 6).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>main.c</code></td><td style="text-align:right;white-space:nowrap">+388 / −327</td><td>Live UDP scheduler, report parsing, autonomous-cell marking, schedule encoding</td></tr><tr><td><code>mainnodebased.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+448 / −0</td><td>Copy of main.c</td></tr><tr><td><code>Makefile</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+8 / −0</td><td>Command list without targets</td></tr><tr><td><code>maincoojatofile.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+382 / −0</td><td>Records reports to a topology file</td></tr><tr><td><code>mainfiletocooja.c</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+382 / −0</td><td>Replays a topology file</td></tr><tr><td><code>tasa/coloring.c</code></td><td style="text-align:right;white-space:nowrap">+20 / −5</td><td>Direction-aware colouring (+/-8 steps)</td></tr><tr><td><code>tasa/tasa.c</code></td><td style="text-align:right;white-space:nowrap">+36 / −13</td><td>Degree matrix and schedule input; transmitter direction; pipelining priority</td></tr><tr><td><code>tasa/matching.c</code></td><td style="text-align:right;white-space:nowrap">+10 / −7</td><td>Autonomous-cell avoidance; priority</td></tr><tr><td><code>tasa/coloring.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Signature without channel dimension</td></tr><tr><td><code>tasa/matching.h</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Signature with schedule</td></tr><tr><td><code>tasa/tasa.h</code></td><td style="text-align:right;white-space:nowrap">+3 / −2</td><td>New main_tasa prototype</td></tr><tr><td><code>graphs/graphs.c</code></td><td style="text-align:right;white-space:nowrap">+154 / −196</td><td>Degree matrix, two-hop interference, single channel</td></tr><tr><td><code>graphs/graphs.h</code></td><td style="text-align:right;white-space:nowrap">+20 / −19</td><td>MAX_NODES, NUM_CHANNELS 1, slotframe 251; new node and link fields</td></tr><tr><td><code>util/files.c</code></td><td style="text-align:right;white-space:nowrap">+56 / −359</td><td>Direction lines; OpenWSN export removed</td></tr><tr><td><code>util/print.c</code></td><td style="text-align:right;white-space:nowrap">+30 / −75</td><td>Degree matrix output</td></tr><tr><td><code>util/print.h</code></td><td style="text-align:right;white-space:nowrap">+4 / −4</td><td>Prototypes</td></tr></tbody></table></div>
+
+<h3 id="sA-10"><span class="nt-num">A.10</span>Group modules, tools and documentation (not part of the antenna work) · 10 files</h3>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table A.10: Group modules, tools and documentation (not part of the antenna work).</caption><thead><tr><th scope="col">File</th><th scope="col" style="text-align:right">Δ lines</th><th scope="col">Change</th></tr></thead><tbody><tr><td><code>apps/6top-tracking/6p-sf-tracking.c</code></td><td style="text-align:right;white-space:nowrap">+1 / −1</td><td>Time-out in seconds</td></tr><tr><td><code>apps/6top-tracking/6p-tracking-process1.c</code></td><td style="text-align:right;white-space:nowrap">+2 / −2</td><td>Retry delay in seconds</td></tr><tr><td><code>apps/central-sch/4emac-central-scheduler.c</code></td><td style="text-align:right;white-space:nowrap">+5 / −5</td><td>Check intervals in seconds</td></tr><tr><td><code>apps/central-sch/4emac-cs-sf0.c</code></td><td style="text-align:right;white-space:nowrap">+4 / −1</td><td>Time-out in seconds</td></tr><tr><td><code>tools/tunslip6</code></td><td style="text-align:right;white-space:nowrap">binary</td><td>SLIP tunnel binary (Lab 7)</td></tr><tr><td><code>tools/ota/ota-process.c</code></td><td style="text-align:right;white-space:nowrap">+33 / −78</td><td>Group OTA tool (version difference)</td></tr><tr><td><code>tools/ota/ota-process.h</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+59 / −0</td><td>Group OTA constants</td></tr><tr><td><code>tools/ota/ota_process</code></td><td style="text-align:right;white-space:nowrap">binary</td><td>OTA binary</td></tr><tr><td><code>platform/mahmote/dev/board.h</code></td><td style="text-align:right;white-space:nowrap">+8 / −8</td><td>Pin constants rewritten, same values</td></tr><tr><td><code>platform/srf06-cc26xx/6TiSCH_README.md</code> <span class="pill add">new</span></td><td style="text-align:right;white-space:nowrap">+75 / −0</td><td>CC1310 notes of the group</td></tr></tbody></table></div>
+
+<h2 class="nt-pb" id="appB"><span class="nt-num">B</span>Glossary</h2>
+
+<div class="nt-tablewrap"><table class="nt-table nt-table--wide"><caption>Table B.1: Terms used in these notes.</caption><tbody><tr><th scope="row">ASN</th><td>Absolute Slot Number; the network-wide count of timeslots since the start of the network.</td></tr><tr><th scope="row">Autonomous cell</th><td>A cell that both neighbours compute from their identifiers without negotiation (here: equation (L4.1) in a 251-slot slotframe).</td></tr><tr><th scope="row">Beam width</th><td>Angular extent of a sector (180° or 120°) or nominal width of a steerable lobe.</td></tr><tr><th scope="row">Cell</th><td>A (slot offset, channel offset) pair in a slotframe.</td></tr><tr><th scope="row">Colouring</th><td>The TASA step that assigns channel offsets so that conflicting links use different channels.</td></tr><tr><th scope="row">Cooja</th><td>The Java network simulator of Contiki; simulates radio media and hosts emulated or native motes.</td></tr><tr><th scope="row">EB</th><td>Enhanced Beacon; the IEEE 802.15.4e frame that advertises a TSCH network.</td></tr><tr><th scope="row">Energest</th><td>Contiki's energy accounting module, which accumulates time spent in CPU, LPM, listen and transmit states.</td></tr><tr><th scope="row">FB</th><td>Fake beacon; a short frame sent by unsynchronised steerable nodes so that synchronised neighbours can discover them.</td></tr><tr><th scope="row">4eMAC</th><td>The 6TiSCH/TSCH MAC implementation for Contiki on which this work is based.</td></tr><tr><th scope="row">MSPSim</th><td>Instruction-level emulator for the TI MSP430, used by Cooja for “emulated” motes.</td></tr><tr><th scope="row">Native mote</th><td>A Cooja mote whose Contiki code is compiled for the host and loaded through JNI.</td></tr><tr><th scope="row">Orientation index</th><td>Integer 0–23 encoding a steerable antenna direction in 15° steps.</td></tr><tr><th scope="row">Orchestra</th><td>Autonomous TSCH scheduler for Contiki in which cells are derived from node addresses.</td></tr><tr><th scope="row">PRR</th><td>Packet reception ratio; delivered over sent application packets.</td></tr><tr><th scope="row">RDC</th><td>Radio duty-cycling layer of Contiki; in 4eMAC, the slot operation in <code>4erdc.c</code>.</td></tr><tr><th scope="row">RPL</th><td>IPv6 Routing Protocol for Low-Power and Lossy Networks; builds the routing tree (DODAG) using DIO, DIS and DAO messages.</td></tr><tr><th scope="row">Sector antenna</th><td>Fixed directional antenna covering an angular sector; here realised as one CC2420 per sector.</td></tr><tr><th scope="row">SF0</th><td>Scheduling Function Zero; the default distributed 6TiSCH scheduling function.</td></tr><tr><th scope="row">6P</th><td>6top Protocol; transactions for adding, deleting, listing and relocating cells between neighbours.</td></tr><tr><th scope="row">Slotframe</th><td>A repeating sequence of timeslots; this work uses a 31-slot primary and a 251-slot secondary slotframe.</td></tr><tr><th scope="row">Steerable antenna</th><td>A single antenna whose main lobe can be rotated electronically.</td></tr><tr><th scope="row">TASA</th><td>Traffic-Aware Scheduling Algorithm; centralised convergecast scheduler based on matching and colouring.</td></tr><tr><th scope="row">TSCH</th><td>Time-Slotted Channel Hopping, the MAC mode of IEEE 802.15.4e.</td></tr><tr><th scope="row">tunslip6</th><td>Contiki tool that bridges a SLIP serial link to a Linux tun interface.</td></tr><tr><th scope="row">UDGM</th><td>Unit Disk Graph Medium; Cooja radio medium, modified here to use antenna gains.</td></tr></tbody></table></div>
+
+<h2 class="nt-pb" id="appC"><span class="nt-num">C</span>References</h2>
+
+<ol class="nt-refs">
+<li>IEEE Std 802.15.4e-2012, <i>Amendment 1: MAC sublayer</i>. IEEE, 2012.</li>
+<li>X. Vilajosana, K. Pister, T. Watteyne, <i>Minimal IPv6 over the TSCH Mode of IEEE 802.15.4e (6TiSCH) Configuration</i>. RFC 8180, IETF, 2017.</li>
+<li>Q. Wang, X. Vilajosana, T. Watteyne, <i>6TiSCH Operation Sublayer (6top) Protocol (6P)</i>. RFC 8480, IETF, 2018.</li>
+<li>D. Dujovne, L. A. Grieco, M. R. Palattella, N. Accettura, <i>6TiSCH 6top Scheduling Function Zero (SF0)</i>. Internet-Draft draft-ietf-6tisch-6top-sf0, IETF.</li>
+<li>T. Winter et al., <i>RPL: IPv6 Routing Protocol for Low-Power and Lossy Networks</i>. RFC 6550, IETF, 2012.</li>
+<li>S. Duquennoy, B. Al Nahas, O. Landsiedel, T. Watteyne, “Orchestra: Robust Mesh Networks Through Autonomously Scheduled TSCH,” in <i>Proc. ACM SenSys</i>, 2015.</li>
+<li>M. R. Palattella, N. Accettura, M. Dohler, L. A. Grieco, G. Boggia, “Traffic Aware Scheduling Algorithm for Reliable Low-Power Multi-Hop IEEE 802.15.4e Networks,” in <i>Proc. IEEE PIMRC</i>, 2012.</li>
+<li>M. R. Palattella et al., “On Optimal Scheduling in Duty-Cycled Industrial IoT Applications Using IEEE 802.15.4e TSCH,” <i>IEEE Sensors Journal</i>, 13(10), 2013.</li>
+<li>S. Kim, H.-S. Kim, C. Kim, “ALICE: Autonomous Link-based Cell Scheduling for TSCH,” in <i>Proc. ACM/IEEE IPSN</i>, 2019.</li>
+<li>A. Dunkels, B. Grönvall, T. Voigt, “Contiki — a Lightweight and Flexible Operating System for Tiny Networked Sensors,” in <i>Proc. IEEE LCN Workshops</i>, 2004.</li>
+<li>F. Österlind, A. Dunkels, J. Eriksson, N. Finne, T. Voigt, “Cross-Level Sensor Network Simulation with COOJA,” in <i>Proc. IEEE LCN</i>, 2006.</li>
+<li>J. Eriksson et al., “COOJA/MSPSim: Interoperability Testing for Wireless Sensor Networks,” in <i>Proc. SIMUTools</i>, 2009.</li>
+</ol>
+
+<p>These notes were compiled from the source archives in the study folder. Statements marked as presumable in the text are inferences from code and file dates rather than documented facts.</p>
+
+<p class="nt-foot">Related: <a href="#appA">Index of changed files</a> · <a href="#appB">Glossary</a> · <a href="#appC">References</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>
