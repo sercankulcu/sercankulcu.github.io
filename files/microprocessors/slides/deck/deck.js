@@ -299,6 +299,9 @@
     const slide = slides[i];
     const closed = Array.from(slide.querySelectorAll("details:not([open])"));
     closed.forEach(function (d) { d.open = true; });
+    /* unanswered multiple-choice boxes: measure with the explanation (.dsq-why) shown, as after a click */
+    const pending = Array.from(slide.querySelectorAll(".dsq-mc:not(.is-done)"));
+    pending.forEach(function (b) { b.classList.add("is-done"); });
     let worst = slide.scrollHeight - slide.clientHeight;
     stepSets[i].forEach(function (set) {
       const keep = set.index;
@@ -309,6 +312,7 @@
       setStep(set, keep);
     });
     closed.forEach(function (d) { d.open = false; });
+    pending.forEach(function (b) { b.classList.remove("is-done"); });
     return worst;
   }
   function autoFit(i) {
