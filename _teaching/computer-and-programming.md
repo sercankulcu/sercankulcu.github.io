@@ -48,11 +48,11 @@ Bilgisayar, veriyi kesin talimatlarla işleyerek problem çözen bir makinedir. 
 - [📖Ders Notu - Hesaplama (HTML)](../files/computer/notlar/Bolum_01_Hesaplama_Hesaplamali_Dusunme_Ders_Notu.html)
 - [📝Çalışma Soruları - Hesaplama (HTML)](../files/computer/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme_Calisma_Sorulari.html)
 
-- [🕹️Sayı Tabanı Dönüştürücü (HTML)](../files/computer/slides/Chapter_01_Number-Base-Converter.html)
-- [🕹️Mantık Kapıları (HTML)](../files/computer/slides/Chapter_01_Logic-Gates.html)
-- [🕹️Basit CPU: Getir–Çöz–Yürüt (HTML)](../files/computer/slides/Chapter_01_Simple-CPU.html)
-- [🕹️Bir Web İsteğinin Yolculuğu (HTML)](../files/computer/slides/Chapter_01_Packet-Journey.html)
-- [🕹️Turing Makinesi (HTML)](../files/computer/slides/Chapter_01_Turing-Machine.html)
+- [🕹️Sayı Tabanı Dönüştürücü (HTML)](../files/computer/slides/Bolum_01_Number-Base-Converter.html)
+- [🕹️Mantık Kapıları (HTML)](../files/computer/slides/Bolum_01_Logic-Gates.html)
+- [🕹️Basit CPU: Getir–Çöz–Yürüt (HTML)](../files/computer/slides/Bolum_01_Simple-CPU.html)
+- [🕹️Bir Web İsteğinin Yolculuğu (HTML)](../files/computer/slides/Bolum_01_Packet-Journey.html)
+- [🕹️Turing Makinesi (HTML)](../files/computer/slides/Bolum_01_Turing-Machine.html)
 
 ---
 
@@ -69,7 +69,7 @@ Bilgisayar, veriyi kesin talimatlarla işleyerek problem çözen bir makinedir. 
 - [📖Ders Notu - Windows (HTML)](../files/computer/notlar/Bolum_02_Windows_Ders_Notu.html)
 - [📝Çalışma Soruları - Windows (HTML)](../files/computer/slides/Bolum_02_Windows_Calisma_Sorulari.html)
 
-- [🕹️Süreç Çizelgeleme (HTML)](../files/computer/slides/Chapter_02_CPU-Scheduler.html)
+- [🕹️Süreç Çizelgeleme (HTML)](../files/computer/slides/Bolum_02_CPU-Scheduler.html)
 
 ---
 
@@ -90,9 +90,9 @@ Ofis uygulamaları belge hazırlamayı, veri çözümlemeyi ve bilgi sunmayı ko
 - [📖Ders Notu - PowerPoint (HTML)](../files/computer/notlar/Bolum_03_PowerPoint_Ders_Notu.html)
 - [📝Çalışma Soruları - PowerPoint (HTML)](../files/computer/slides/Bolum_03_PowerPoint_Calisma_Sorulari.html)
 
-- [🕹️Word Stilleri ve İçindekiler (HTML)](../files/computer/slides/Chapter_03_Word-Styles.html)
-- [🕹️Excel Hücre Başvuruları (HTML)](../files/computer/slides/Chapter_03_Excel-References.html)
-- [🕹️PowerPoint Animasyon Zaman Çizelgesi (HTML)](../files/computer/slides/Chapter_03_PowerPoint-Animation.html)
+- [🕹️Word Stilleri ve İçindekiler (HTML)](../files/computer/slides/Bolum_03_Word-Styles.html)
+- [🕹️Excel Hücre Başvuruları (HTML)](../files/computer/slides/Bolum_03_Excel-References.html)
+- [🕹️PowerPoint Animasyon Zaman Çizelgesi (HTML)](../files/computer/slides/Bolum_03_PowerPoint-Animation.html)
 
 ---
 
@@ -116,8 +116,8 @@ Programlama, problem çözme adımlarını bilgisayarın yürütebileceği talim
 - [📝Çalışma Soruları - Programlamaya Giriş (HTML)](../files/computer/slides/Bolum_04_Programlama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders04/src)
 
-- [🕹️Sıralama Algoritmaları Görselleştirici (HTML)](../files/computer/slides/Chapter_04_Sorting-Visualizer.html)
-- [🕹️Akış Diyagramı Yürütücü (HTML)](../files/computer/slides/Chapter_04_Flowchart-Runner.html)
+- [🕹️Sıralama Algoritmaları Görselleştirici (HTML)](../files/computer/slides/Bolum_04_Sorting-Visualizer.html)
+- [🕹️Akış Diyagramı Yürütücü (HTML)](../files/computer/slides/Bolum_04_Flowchart-Runner.html)
 
 ---
 
@@ -131,7 +131,7 @@ Java programı düz metin kaynak kod olarak yazılır, bytecode'a derlenir ve JV
 - [📝Çalışma Soruları - Java'ya Giriş ve İlk Program (HTML)](../files/computer/slides/Bolum_05_Java_ve_Ilk_Program_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders05/src)
 
-- [🕹️Java Derleme ve Çalıştırma (HTML)](../files/computer/slides/Chapter_05_Java-Compile-Run.html)
+- [🕹️Java Derleme ve Çalıştırma (HTML)](../files/computer/slides/Bolum_05_Java-Compile-Run.html)
 
 ---
 
@@ -147,7 +147,7 @@ Değişkenler programın kullandığı ve değiştirdiği değerleri saklar. Bö
 - [📝Çalışma Soruları - Değişkenler, Veri Tipleri ve İşleçler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders06/src)
 
-- [🕹️İfade Değerlendirici (HTML)](../files/computer/slides/Chapter_06_Expression-Evaluator.html)
+- [🕹️İfade Değerlendirici (HTML)](../files/computer/slides/Bolum_06_Expression-Evaluator.html)
 
 ---
 
@@ -161,7 +161,7 @@ Koşullu ifadeler programın farklı eylemler arasında seçim yapmasını sağl
 - [📝Çalışma Soruları - Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders07/src)
 
-- [🕹️Karar İzleyici (HTML)](../files/computer/slides/Chapter_07_Decision-Tracer.html)
+- [🕹️Karar İzleyici (HTML)](../files/computer/slides/Bolum_07_Decision-Tracer.html)
 
 ---
 
@@ -175,7 +175,7 @@ Döngüler bir kod bloğunu koşul doğru kaldığı sürece ya da belirli sayı
 - [📝Çalışma Soruları - Döngüler (HTML)](../files/computer/slides/Bolum_08_Donguler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders08/src)
 
-- [🕹️Döngü İzleyici (HTML)](../files/computer/slides/Chapter_08_Loop-Tracer.html)
+- [🕹️Döngü İzleyici (HTML)](../files/computer/slides/Bolum_08_Loop-Tracer.html)
 
 ---
 
@@ -189,7 +189,7 @@ Metotlar programı yeniden kullanılabilir işlemlere böler. Bölüm metot tan�
 - [📝Çalışma Soruları - Metotlar (HTML)](../files/computer/slides/Bolum_09_Metotlar_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders09/src)
 
-- [🕹️Metot Çağrı Yığını (HTML)](../files/computer/slides/Chapter_09_Method-Call-Stack.html)
+- [🕹️Metot Çağrı Yığını (HTML)](../files/computer/slides/Bolum_09_Method-Call-Stack.html)
 
 ---
 
@@ -203,7 +203,7 @@ Dizi, aynı tipte sabit sayıda değeri saklar ve her öğeye indisle erişim sa
 - [📝Çalışma Soruları - Diziler (HTML)](../files/computer/slides/Bolum_10_Diziler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders10/src)
 
-- [🕹️Dizi Laboratuvarı (HTML)](../files/computer/slides/Chapter_10_Array-Lab.html)
+- [🕹️Dizi Laboratuvarı (HTML)](../files/computer/slides/Bolum_10_Array-Lab.html)
 
 ---
 
@@ -217,7 +217,7 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 - [📝Çalışma Soruları - Dizgiler (HTML)](../files/computer/slides/Bolum_11_Dizgiler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders11/src)
 
-- [🕹️Dizgi Laboratuvarı (HTML)](../files/computer/slides/Chapter_11_String-Lab.html)
+- [🕹️Dizgi Laboratuvarı (HTML)](../files/computer/slides/Bolum_11_String-Lab.html)
 
 ---
 
@@ -231,4 +231,4 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/computer/slides/Bolum_12_Ozyineleme_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders12/src)
 
-- [🕹️Özyineleme Görselleştirici (HTML)](../files/computer/slides/Chapter_12_Recursion-Visualizer.html)
+- [🕹️Özyineleme Görselleştirici (HTML)](../files/computer/slides/Bolum_12_Recursion-Visualizer.html)

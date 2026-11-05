@@ -3,10 +3,6 @@ title: "Operating Systems"
 collection: teaching
 type: "Undergraduate"
 permalink: /teaching/operating-systems
-redirect_from:
-  - /files/os/slides/Bolum_14_Coklu_Ortam.html
-  - /files/os/slides/Bolum_14_Coklu_Ortam_Calisma_Sorulari.html
-  - /files/os/slides/Bolum_14_Coklu_Ortam_Sorular.html
 venue: "Giresun University, Computer Engineering"
 date: 2026-01-06
 location: "Giresun, Turkey"
@@ -92,8 +88,8 @@ Süreç, çalışmakta olan bir programdır. Bu bölümde sürecin bellekteki ye
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05)
 
-- [🕹️CPU Çizelgeleme Simülatörü (HTML)](../files/os/slides/Chapter_05_CPU_Scheduling.html)
-- [🕹️Gerçek Zamanlı Çizelgeleme Simülatörü (HTML)](../files/os/slides/Chapter_05_Real_Time_Scheduling.html)
+- [🕹️CPU Çizelgeleme Simülatörü (HTML)](../files/os/slides/Bolum_05_CPU_Scheduling.html)
+- [🕹️Gerçek Zamanlı Çizelgeleme Simülatörü (HTML)](../files/os/slides/Bolum_05_Real_Time_Scheduling.html)
 
 ---
 
@@ -108,7 +104,7 @@ Paylaşılan veriye eş zamanlı erişim yarış durumlarına yol açar. Bölüm
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06)
 
-- [🕹️Senkronizasyon Laboratuvarı (HTML)](../files/os/slides/Chapter_06_Synchronization_Lab.html)
+- [🕹️Senkronizasyon Laboratuvarı (HTML)](../files/os/slides/Bolum_06_Synchronization_Lab.html)
 
 ---
 
@@ -123,7 +119,7 @@ Kilitlenmede bir grup süreç, her biri ötekinin tuttuğu bir kaynağı bekledi
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07)
 
-- [🕹️Kilitlenme ve Bankacı Algoritması Simülatörü (HTML)](../files/os/slides/Chapter_07_Deadlock_Bankers.html)
+- [🕹️Kilitlenme ve Bankacı Algoritması Simülatörü (HTML)](../files/os/slides/Bolum_07_Deadlock_Bankers.html)
 
 ---
 
@@ -140,7 +136,7 @@ Bellek yöneticisi, süreçlerin belleği güvenle paylaşmasını sağlar. Böl
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08)
 
-- [🕹️Bellek Tahsisi Simülatörü (HTML)](../files/os/slides/Chapter_08_Memory_Allocation.html)
+- [🕹️Bellek Tahsisi Simülatörü (HTML)](../files/os/slides/Bolum_08_Memory_Allocation.html)
 
 ---
 
@@ -155,8 +151,8 @@ Sanal bellek, süreçlerin fiziksel bellekten büyük adres alanlarıyla çalı�
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09)
 
-- [🕹️Sayfa Yer Değiştirme Simülatörü (HTML)](../files/os/slides/Chapter_09_Page_Replacement.html)
-- [🕹️Sayfalama ve Adres Çevirisi Simülatörü (HTML)](../files/os/slides/Chapter_09_Address_Translation.html)
+- [🕹️Sayfa Yer Değiştirme Simülatörü (HTML)](../files/os/slides/Bolum_09_Page_Replacement.html)
+- [🕹️Sayfalama ve Adres Çevirisi Simülatörü (HTML)](../files/os/slides/Bolum_09_Address_Translation.html)
 
 ---
 
@@ -184,8 +180,8 @@ G/Ç sistemi, çok farklı hızlardaki aygıtları ortak bir arayüzle yönetir.
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11)
 
-- [🕹️Disk Kolu Çizelgeleme Simülatörü (HTML)](../files/os/slides/Chapter_11_Disk_Scheduling.html)
-- [🕹️Kesme, DMA ve G/Ç Akışı Simülatörü (HTML)](../files/os/slides/Chapter_11_IO_Interrupt_DMA.html)
+- [🕹️Disk Kolu Çizelgeleme Simülatörü (HTML)](../files/os/slides/Bolum_11_Disk_Scheduling.html)
+- [🕹️Kesme, DMA ve G/Ç Akışı Simülatörü (HTML)](../files/os/slides/Bolum_11_IO_Interrupt_DMA.html)
 
 ---
 
@@ -201,7 +197,7 @@ Birden çok işlemci, işletim sistemine yeni sorunlar getirir. Bölüm; UMA ve 
 - [📝Çalışma Soruları - Çok İşlemcili Sistemler (HTML)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
 
-- [🕹️Çok Çekirdekli Çizelgeleme ve Yük Dengeleme Simülatörü (HTML)](../files/os/slides/Chapter_12_Multicore_Scheduling.html)
+- [🕹️Çok Çekirdekli Çizelgeleme ve Yük Dengeleme Simülatörü (HTML)](../files/os/slides/Bolum_12_Multicore_Scheduling.html)
 
 ---
 
@@ -215,7 +211,7 @@ Güvenlik; gizlilik, bütünlük ve erişilebilirliği tehditlere karşı koruma
 - [📝Çalışma Soruları - Güvenlik (HTML)](../files/os/slides/Bolum_13_Guvenlik_Calisma_Sorulari.html)
 - [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
 
-- [🕹️İşletim Sistemi Koruma ve İzinler Laboratuvarı (HTML)](../files/os/slides/Chapter_13_Permissions_Security.html)
+- [🕹️İşletim Sistemi Koruma ve İzinler Laboratuvarı (HTML)](../files/os/slides/Bolum_13_Permissions_Security.html)
 
 ---
 
@@ -239,4 +235,4 @@ Linux, dersin kavramlarını gerçek bir sistemde bir arada gösterir. Bu bölü
 - [📖Ders Notu - Linux (HTML)](../files/os/notlar/Bolum_15_Linux_Ders_Notu.html)
 - [📝Çalışma Soruları - Linux (HTML)](../files/os/slides/Bolum_15_Linux_Calisma_Sorulari.html)
 
-- [🕹️Linux Süreç Gezgini (HTML)](../files/os/slides/Chapter_15_Linux_Process_Explorer.html)
+- [🕹️Linux Süreç Gezgini (HTML)](../files/os/slides/Bolum_15_Linux_Process_Explorer.html)

@@ -1,0 +1,385 @@
+---
+layout: without-sidebar
+title: "Dizgi Benzerliği: Levenshtein Uzaklığı"
+permalink: /files/algorithms/slides/Bolum_05_String_Similarity.html
+excerpt: "Levenshtein uzaklığını ve dizgi benzerliğini adım adım gösteren etkileşimli simülasyon."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-similarity .ls-wrap { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.algo-similarity .ls-controls { display: flex; align-items: center; gap: 6px; }
+.algo-similarity .ls-controls label { color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.algo-similarity .ls-controls input { flex: 1; min-width: 0; font-family: Consolas, Monaco, monospace; }
+.algo-similarity .ls-controls button { padding: 0 12px; font-size: 14px; }
+.algo-similarity .panel { min-width: 0; min-height: 0; padding: 8px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-similarity .panel-title { margin: 0 0 6px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-similarity .ls-status { flex: none; min-height: 22px; margin: 0; padding: 0 2px; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-similarity .ls-main { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) 236px; grid-template-rows: minmax(0, 1fr); gap: 8px; min-height: 0; }
+.algo-similarity .ls-matrix { display: flex; flex-direction: column; overflow: hidden; }
+.algo-similarity .ls-table-wrap { display: flex; flex: 1; align-items: center; justify-content: center; min-height: 0; }
+.algo-similarity .ls-table-wrap table { border-collapse: collapse; table-layout: fixed; background: var(--ds-bg); }
+.algo-similarity .ls-table-wrap th,
+.algo-similarity .ls-table-wrap td { width: var(--cell, 32px); min-width: var(--cell, 32px); height: var(--cell, 32px); padding: 0; border: 1.5px solid var(--ds-border); text-align: center; font: var(--fs, 14px) Consolas, Monaco, monospace; }
+.algo-similarity .ls-table-wrap th { background: var(--ds-surface-strong); color: var(--ds-text); font-weight: 700; }
+.algo-similarity .ls-table-wrap th.is-cur { background: var(--ds-hot); }
+.algo-similarity .ls-table-wrap td.is-done { background: color-mix(in srgb, var(--ds-good) 12%, var(--ds-bg)); }
+.algo-similarity .ls-table-wrap td.is-src { background: var(--ds-node); outline: 2px solid var(--ds-link); outline-offset: -3px; }
+.algo-similarity .ls-table-wrap td.is-active { background: var(--ds-hot); outline: 2.5px solid var(--ds-warn); outline-offset: -3px; font-weight: 800; }
+.algo-similarity .ls-table-wrap td.is-final { background: color-mix(in srgb, var(--ds-good) 40%, var(--ds-bg)); font-weight: 800; }
+.algo-similarity .ls-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.algo-similarity .ls-metric { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 6px 12px; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-bg); color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-similarity .ls-metric strong { color: var(--ds-text); font-size: 19px; }
+.algo-similarity .ls-explain { flex: 1; overflow: hidden; }
+.algo-similarity .ls-pre { margin: 0; padding: 0; border: 0; background: none; color: var(--ds-text); white-space: pre-wrap; font: 13px/1.5 Consolas, Monaco, monospace; }
+.algo-similarity .ls-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 6px 0 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.algo-similarity .ls-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 4px; border: 1.5px solid; border-radius: 3px; vertical-align: -1px; }
+.algo-similarity .ls-legend .lg-active { border-color: var(--ds-warn); background: var(--ds-hot); }
+.algo-similarity .ls-legend .lg-src { border-color: var(--ds-link); background: var(--ds-node); }
+.algo-similarity .ls-legend .lg-done { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 12%, var(--ds-bg)); }
+</style>
+
+<div class="algo-similarity algo-stage algo-stage--stage" lang="tr">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Bölüm 5 · Simülasyon</p><h1>Dizgi Benzerliği: Levenshtein Uzaklığı</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="ls-help" aria-label="Bilgi ve yardım">?</button>
+    <a class="algo-stage__back" href="Bolum_05_Dizgi_2.html">← Bölüm 5</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="ls-wrap">
+      <div class="ls-controls">
+        <label for="algo-similarity-a">Dizgi A</label>
+        <input id="algo-similarity-a" value="kitten" maxlength="12" spellcheck="false" autocomplete="off">
+        <label for="algo-similarity-b">Dizgi B</label>
+        <input id="algo-similarity-b" value="sitting" maxlength="12" spellcheck="false" autocomplete="off">
+        <button id="algo-similarity-build" type="button" class="is-primary">Matrisi Kur</button>
+        <button id="algo-similarity-step" type="button">Adım İlerle</button>
+        <button id="algo-similarity-auto" type="button">Otomatik Oynat</button>
+        <button id="algo-similarity-reset" type="button">Sıfırla</button>
+      </div>
+
+      <p id="algo-similarity-status" class="ls-status" role="status">Hazır.</p>
+
+      <div class="ls-main">
+        <section class="panel ls-matrix">
+          <p class="panel-title">Dinamik Programlama Tablosu</p>
+          <div id="algo-similarity-matrix" class="ls-table-wrap"></div>
+          <p class="ls-legend" aria-hidden="true"><span><i class="lg-active"></i>geçerli hücre</span><span><i class="lg-src"></i>silme / ekleme / değiştirme kaynakları</span><span><i class="lg-done"></i>hesaplandı</span></p>
+        </section>
+
+        <div class="ls-side">
+          <div class="ls-metric">Uzaklık <strong id="algo-similarity-distance">—</strong></div>
+          <div class="ls-metric">Benzerlik <strong id="algo-similarity-score">—</strong></div>
+          <div class="ls-metric">İlerleme <strong id="algo-similarity-progress">%0</strong></div>
+          <section class="panel ls-explain">
+            <p class="panel-title">Adım Açıklaması</p>
+            <pre id="algo-similarity-log" class="ls-pre"></pre>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dialog class="algo-stage__dialog" id="ls-help"><button type="button" class="algo-stage__close">Kapat</button>
+    <h2>Dizgi Benzerliği: Levenshtein Uzaklığı</h2>
+    <p>Dinamik programlama matrisi adım adım doldurulur; ekleme, silme ve değiştirme maliyetlerinin düzenleme uzaklığını nasıl belirlediği görülür.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>İki dizgi girin (her biri en çok 12 karakter) ve <b>Matrisi Kur</b> düğmesine basın.</li>
+      <li><b>Adım İlerle</b> bir hücreyi hesaplar, <b>Otomatik Oynat</b> tablonun kalanını doldurur, <b>Sıfırla</b> matrisi yeniden kurar.</li>
+      <li>Sarı hücre hesaplanan hücredir; üç mavi hücre onun türetildiği değerlerdir.</li>
+    </ul>
+    <h3>Yineleme bağıntısı</h3>
+    <p><code>D[i][j]</code>, A'nın ilk <code>i</code> karakteri ile B'nin ilk <code>j</code> karakteri arasındaki düzenleme uzaklığıdır. İlk satır ve ilk sütun boş dizgiden (ε) ya da boş dizgiye olan düzenleme uzaklığıdır: <code>D[i][0] = i</code>, <code>D[0][j] = j</code>.</p>
+    <p><code>D[i][j] = min(D[i−1][j] + 1, D[i][j−1] + 1, D[i−1][j−1] + maliyet)</code>; burada <code>A[i−1] = B[j−1]</code> ise <code>maliyet = 0</code>, değilse 1'dir.</p>
+    <ul>
+      <li><b>Silme</b> (yukarıdan): <code>A[i−1]</code> silinir.</li>
+      <li><b>Ekleme</b> (soldan): <code>B[j−1]</code> eklenir.</li>
+      <li><b>Değiştirme / eşleşme</b> (çaprazdan): karakter değiştirilir ya da korunur.</li>
+    </ul>
+    <p>Sağ alt hücre Levenshtein uzaklığıdır. Normalleştirilmiş benzerlik = (1 − uzaklık / max(|A|, |B|)) × %100.</p>
+    <h3>Karmaşıklık</h3>
+    <p>O(|A|·|B|) zaman. Tablonun tamamı O(|A|·|B|) bellek ister; yalnız uzaklık gerekiyorsa iki satır tutmak bunu O(min(|A|, |B|))'ye indirir.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-similarity");
+    if (!root) return;
+
+    function q(id) {
+        return root.querySelector("#" + id);
+    }
+
+    var aInput = q("algo-similarity-a");
+    var bInput = q("algo-similarity-b");
+    var buildBtn = q("algo-similarity-build");
+    var stepBtn = q("algo-similarity-step");
+    var autoBtn = q("algo-similarity-auto");
+    var resetBtn = q("algo-similarity-reset");
+    var matrixEl = q("algo-similarity-matrix");
+    var logEl = q("algo-similarity-log");
+    var statusEl = q("algo-similarity-status");
+    var distanceEl = q("algo-similarity-distance");
+    var scoreEl = q("algo-similarity-score");
+    var progressEl = q("algo-similarity-progress");
+
+    var A = "";
+    var B = "";
+    var dp = [];
+    var cells = [];
+    var index = 0;
+    var done = false;
+    var stepNo = 0;
+    var timer = null;
+    var activeCell = null;
+
+    function init() {
+        clearInterval(timer);
+        timer = null;
+
+        A = aInput.value;
+        B = bInput.value;
+
+        dp = Array.from({ length: A.length + 1 }, function () {
+            return Array(B.length + 1).fill("");
+        });
+
+        for (var i = 0; i <= A.length; i++) {
+            dp[i][0] = i;
+        }
+
+        for (var j = 0; j <= B.length; j++) {
+            dp[0][j] = j;
+        }
+
+        cells = [];
+
+        for (var r = 1; r <= A.length; r++) {
+            for (var c = 1; c <= B.length; c++) {
+                cells.push([r, c]);
+            }
+        }
+
+        index = 0;
+        done = false;
+        stepNo = 0;
+        activeCell = null;
+
+        distanceEl.textContent = "—";
+        scoreEl.textContent = "—";
+        progressEl.textContent = cells.length ? "%0" : "%100";
+
+        statusEl.textContent = "Matris hazırlandı.";
+        render(
+            "İlk satır ve ilk sütun boş dizgiden ya da boş dizgiye olan düzenleme uzaklığıdır."
+        );
+
+        if (cells.length === 0) {
+            finish();
+        }
+    }
+
+    function render(message) {
+        var rows = A.length + 2;
+        var cols = B.length + 2;
+        var cell = Math.max(24, Math.min(40, Math.floor(Math.min(490 / cols, 360 / rows))));
+        matrixEl.style.setProperty("--cell", cell + "px");
+        matrixEl.style.setProperty("--fs", (cell >= 30 ? 15 : 13) + "px");
+
+        var ai = activeCell ? activeCell[0] : -1;
+        var aj = activeCell ? activeCell[1] : -1;
+        var html = "<table><thead><tr><th></th><th>ε</th>";
+
+        Array.from(B).forEach(function (ch, k) {
+            html += "<th" + (k + 1 === aj ? ' class="is-cur"' : "") + ">" + escapeHtml(ch) + "</th>";
+        });
+
+        html += "</tr></thead><tbody>";
+
+        for (var i = 0; i <= A.length; i++) {
+            html += "<th" + (i > 0 && i === ai ? ' class="is-cur"' : "") + ">" +
+                (i === 0 ? "ε" : escapeHtml(A[i - 1])) + "</th>";
+
+            for (var j = 0; j <= B.length; j++) {
+                var cls = "";
+
+                if (activeCell && ai === i && aj === j) {
+                    cls = "is-active";
+                } else if (
+                    activeCell &&
+                    ((i === ai - 1 && j === aj) || (i === ai && j === aj - 1) || (i === ai - 1 && j === aj - 1))
+                ) {
+                    cls = "is-src";
+                } else if (done && i === A.length && j === B.length) {
+                    cls = "is-final";
+                } else if (dp[i][j] !== "") {
+                    cls = "is-done";
+                }
+
+                html +=
+                    '<td class="' + cls + '">' +
+                    escapeHtml(dp[i][j]) +
+                    "</td>";
+            }
+
+            html += "</tr>";
+        }
+
+        html += "</tbody></table>";
+
+        matrixEl.innerHTML = html;
+        logEl.textContent = message;
+    }
+
+    function step() {
+        if (done) {
+            render(
+                "Hesaplama tamamlandı. Levenshtein uzaklığı = " +
+                dp[A.length][B.length] + "."
+            );
+            return false;
+        }
+
+        if (index >= cells.length) {
+            finish();
+            return false;
+        }
+
+        stepNo++;
+
+        var cell = cells[index++];
+        var i = cell[0];
+        var j = cell[1];
+
+        var cost = A[i - 1] === B[j - 1] ? 0 : 1;
+        var deletion = dp[i - 1][j] + 1;
+        var insertion = dp[i][j - 1] + 1;
+        var substitution = dp[i - 1][j - 1] + cost;
+
+        dp[i][j] = Math.min(
+            deletion,
+            insertion,
+            substitution
+        );
+
+        activeCell = [i, j];
+
+        var progress =
+            cells.length === 0
+                ? 100
+                : Math.round(index / cells.length * 100);
+
+        progressEl.textContent = "%" + progress;
+
+        statusEl.textContent =
+            "(" + i + ", " + j + ") hücresi hesaplanıyor.";
+
+        render(
+            "Adım " + stepNo + ":\n" +
+            "A[" + (i - 1) + "] = '" + A[i - 1] +
+            "', B[" + (j - 1) + "] = '" + B[j - 1] + "'\n" +
+            (cost === 0 ? "Aynı karakter, maliyet 0." : "Farklı karakter, maliyet 1.") + "\n" +
+            "Silme = " + deletion + "\n" +
+            "Ekleme = " + insertion + "\n" +
+            "Değiştirme / eşleşme = " + substitution + "\n" +
+            "Seçilen en küçük = " + dp[i][j] + "."
+        );
+
+        if (index >= cells.length) {
+            finish(false);
+            return false;
+        }
+
+        return true;
+    }
+
+    function finish(updateRender) {
+        clearInterval(timer);
+        timer = null;
+        done = true;
+
+        var distance =
+            dp[A.length] && dp[A.length][B.length] !== ""
+                ? Number(dp[A.length][B.length])
+                : Math.max(A.length, B.length);
+
+        var denom = Math.max(A.length, B.length);
+        var similarity =
+            denom === 0
+                ? 100
+                : Math.max(0, (1 - distance / denom) * 100);
+
+        distanceEl.textContent = String(distance);
+        scoreEl.textContent = "%" + similarity.toFixed(1).replace(".", ",");
+        progressEl.textContent = "%100";
+
+        statusEl.textContent = "Hesaplama tamamlandı. Levenshtein uzaklığı = " + distance + ".";
+
+        if (updateRender !== false) {
+            activeCell = null;
+            render(
+                "Bitti.\n" +
+                "Levenshtein uzaklığı = " + distance + ".\n" +
+                "Normalleştirilmiş benzerlik = %" + similarity.toFixed(1).replace(".", ",") + "."
+            );
+        }
+    }
+
+    function autoRun() {
+        clearInterval(timer);
+
+        timer = setInterval(function () {
+            if (!step()) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }, 350);
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (ch) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[ch];
+        });
+    }
+
+    buildBtn.addEventListener("click", init);
+    stepBtn.addEventListener("click", step);
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", init);
+
+    init();
+})();
+</script>
+<script src="deck/stage.js"></script>

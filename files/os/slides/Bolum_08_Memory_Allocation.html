@@ -1,0 +1,1118 @@
+---
+layout: without-sidebar
+title: "Bellek Tahsisi Simülatörü"
+permalink: /files/os/slides/Bolum_08_Memory_Allocation.html
+excerpt: "İlk uyan, en iyi uyan, en kötü uyan ve sonraki uyan algoritmaları için animasyonlu bellek haritası, delik tarama, bölme, birleştirme ve parçalanma karşılaştırması sunan etkileşimli bellek tahsisi simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.osim,.osim-dlg{
+  --ds-c0:#0072b2;--ds-c1:#e69f00;--ds-c2:#009e73;--ds-c3:#cc79a7;--ds-c4:#56b4e9;--ds-c5:#d55e00;--ds-c6:#7b5fb0;--ds-c7:#a89a00;
+  --o-bg:var(--ds-bg);
+  --o-fg:var(--ds-text);
+  --o-link:var(--ds-link);
+  --o-muted:color-mix(in srgb,var(--o-fg) 82%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 66%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:var(--ds-link);
+  --o-on-pri:var(--ds-bg);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,var(--ds-c0) 60%,var(--o-fg));
+  --o-flt:color-mix(in srgb,var(--ds-c5) 60%,var(--o-fg));
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+}
+.osim{
+  --o-dur:420ms;
+  position:relative;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;height:100%;
+  color:var(--o-fg);overflow:hidden;
+  font:14px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+.osim *,.osim *::before,.osim *::after{box-sizing:border-box;transition:none}
+.osim [hidden]{display:none !important}
+.osim table,.osim thead,.osim tbody,.osim tr,.osim th,.osim td{color:var(--o-fg);background:transparent;border-color:var(--o-soft)}
+.osim h1,.osim h3,.osim p{margin:0;padding:0}
+.osim button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:32px;min-height:0;padding:0 10px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:650;font-size:13.5px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim button:hover{background:var(--o-cell)}
+.osim button:disabled{opacity:.45;cursor:not-allowed}
+.osim button:focus-visible,.osim input:focus-visible,.osim [tabindex]:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim button.osim-pri,.osim button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:var(--o-on-pri)}
+.osim .osim-ib{width:32px;padding:0}
+.osim svg{width:18px;height:18px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;flex:none;display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:var(--o-bg);border-radius:10px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.03em}
+.osim .osim-seg{display:inline-flex;flex:none;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .osim-seg button{border:0;height:28px;border-radius:8px;padding:0 8px}
+.osim .osim-seg-sm button{padding:0 7px;font-size:13px}
+.osim .osim-grp{display:inline-flex;flex:none;align-items:center;gap:3px}
+.osim .osim-num{min-width:20px;text-align:center;font-weight:800;font-size:16px}
+.osim .osim-spacer{flex:1}
+.osim input[type="range"]{width:70px;height:20px;min-height:0;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:13px;font-weight:700;min-width:34px}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px color-mix(in srgb,var(--o-fg) 18%,transparent)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 236px;gap:6px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:10px;padding:6px 8px;box-shadow:0 0 0 1px var(--o-soft);display:flex;flex-direction:column;gap:6px}
+.osim .osim-side{display:flex;flex-direction:column;gap:5px;min-height:0;min-width:0;padding:7px 8px;background:var(--o-bg);border-radius:10px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-foot{flex:none;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:4px 8px;background:var(--o-bg);border-radius:10px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 6px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;flex:none;gap:4px;flex-wrap:nowrap}
+.osim .osim-stat{display:inline-flex;gap:4px;height:26px;align-items:center;padding:0 7px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12px;font-weight:650;color:var(--o-muted);white-space:nowrap}
+.osim .osim-stat b{font-size:14px;color:var(--o-fg)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;inset:0;display:flex;flex-direction:column;gap:8px;padding:10px 12px;
+  background:var(--o-bg);border-radius:10px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px color-mix(in srgb,var(--o-fg) 22%,transparent);overflow:hidden}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim-dlg dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 8px}
+.osim-dlg dt{font-weight:800}
+.osim-dlg dd{margin:0}
+.osim-dlg .osim-legend{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;font-size:14px;font-weight:650}
+.osim-dlg .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:7px}
+.osim .osim-chips{display:flex;flex-wrap:wrap;gap:3px;flex:1;min-width:0;padding:1px;overflow:hidden}
+.osim .osim-chip{position:relative;flex:none}
+.agt-oyun .osim .osim-chip input{display:block;width:4em;height:26px;min-height:0;margin:0;padding:0 2px;text-align:center;font:inherit;font-weight:750;font-size:13px;
+  color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:8px;box-shadow:none}
+.agt-oyun .osim .osim-chip input:hover{border-color:var(--o-fg)}
+.agt-oyun .osim .osim-chip.fr input{border-style:dashed}
+.agt-oyun .osim .osim-chip.cur input{background:var(--o-pri);border-color:var(--o-pri);color:var(--o-on-pri)}
+.agt-oyun .osim .osim-chip.done input{background:var(--o-cell)}
+.agt-oyun .osim .osim-chip input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg);color:var(--o-fg)}
+.osim .osim-state{position:relative;flex:1;min-height:0;overflow:hidden}
+.osim .osim-state.sm .it .tile{height:100%;font-size:13px;min-width:36px}
+.osim .osim-state.sm .it .rk{min-width:36px}
+.osim .osim-state.cols .it{gap:4px;padding:0 4px}
+.osim .osim-state.cols .it .track{display:none}
+.osim .osim-state.cols .it .rk{min-width:0;flex:1}
+.osim .osim-state.cols .it .tag{min-width:12px}
+.osim .ma-procs.mini .pp{height:20px;padding:0 4px}
+.osim .ma-procs.mini .pp i{display:none}
+.osim .osim-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--o-muted);font-size:13px;font-weight:650}
+.osim .it{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:7px;padding:0 6px;border-radius:9px;background:var(--o-surf)}
+.osim .it.mv{transition:transform var(--o-dur) ease}
+.osim .it .rk{font-size:12px;font-weight:750;color:var(--o-muted);min-width:40px;text-align:right}
+.osim .it .tile{flex:none;display:flex;align-items:center;justify-content:center;min-width:42px;padding:0 4px;height:calc(100% - 8px);max-height:34px;border-radius:7px;
+  font-weight:800;font-size:15px;background:var(--o-cell);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .it .track{flex:1;height:8px;border-radius:4px;background:var(--o-soft);overflow:hidden;min-width:20px}
+.osim .it .fill{display:block;height:100%;width:0;border-radius:4px;background:var(--o-acc)}
+.osim .it .fill.mv{transition:width var(--o-dur) ease}
+.osim .it .tag{flex:none;min-width:22px;text-align:center;font-size:13px;font-weight:900;color:var(--o-fg)}
+.osim .it.ok .tile{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+.osim .it.no .tile{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--o-flt) 14%,transparent) 5px 8px),var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt)}
+.osim .it.best,.osim .it.pick{box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .it.chg .tile{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+.osim .it.enter{animation:osim-enter var(--o-dur) ease-out both}
+@keyframes osim-enter{from{opacity:0;margin-left:-30px}to{opacity:1;margin-left:0}}
+.osim .osim-stat.x{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim-dlg kbd{font:inherit;font-size:13px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+
+/* ---- memory allocation specific ---- */
+.osim .ma-viz{display:flex;flex-direction:column;gap:4px}
+.osim .ma-lane{position:relative;flex:none;height:48px}
+.osim .ma-ghost{position:absolute;left:0;bottom:18px;height:30px;width:60px;display:flex;align-items:center;justify-content:center;gap:5px;overflow:hidden;white-space:nowrap;
+  border:2px dashed var(--o-acc);border-radius:8px;background:color-mix(in srgb,var(--o-link) 14%,var(--o-bg));font-weight:800;font-size:14px;opacity:0;z-index:3}
+.osim .ma-ghost.on{opacity:1}
+.osim .ma-ghost.mv{transition:left var(--o-dur) ease,width var(--o-dur) ease,transform var(--o-dur) ease-in,opacity var(--o-dur) ease}
+.osim .ma-ghost.ok{border-style:solid;border-color:var(--o-hit);background:var(--o-hit-bg)}
+.osim .ma-ghost.no{border-color:var(--o-flt);background:var(--o-flt-bg)}
+.osim .ma-ghost.drop{transform:translateY(48px);opacity:0}
+.osim .ma-ghost.fail{animation:ma-shake var(--o-dur) ease}
+@keyframes ma-shake{0%,100%{margin-left:0}25%{margin-left:-8px}75%{margin-left:8px}}
+.osim .ma-ghost i{font-style:normal;font-weight:900}
+.osim .ma-nf{position:absolute;bottom:0;left:0;width:0;height:18px;opacity:0;z-index:2}
+.osim .ma-nf.on{opacity:1}
+.osim .ma-nf.mv{transition:left var(--o-dur) ease}
+.osim .ma-nf::before{content:"";position:absolute;left:-8px;bottom:0;border:8px solid transparent;border-bottom:0;border-top:10px solid var(--o-acc)}
+.osim .ma-nf span{position:absolute;left:10px;bottom:0;font-size:12px;font-weight:800;color:var(--o-fg);white-space:nowrap}
+.osim .ma-nf.flip span{left:auto;right:10px}
+.osim .ma-bar{position:relative;flex:none;height:var(--barh,130px);border-radius:10px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .mb{position:absolute;top:0;bottom:0;left:0;width:0;z-index:1}
+.osim .ma-bar.mv .mb{transition:left var(--o-dur) ease,width var(--o-dur) ease,opacity var(--o-dur) ease}
+.osim .mb.gone{z-index:0;opacity:0}
+.osim .mb .in{position:absolute;inset:3px 1.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;overflow:hidden;border-radius:7px;text-align:center;line-height:1.05}
+.osim .mb .nm{font-weight:800;font-size:var(--bfs,17px);white-space:nowrap}
+.osim .mb .sz{font-size:max(12px,calc(var(--bfs,17px)*.72));font-weight:650;white-space:nowrap}
+.osim .mb.xs .nm,.osim .mb.xs .sz,.osim .mb.sm .sz{display:none}
+.osim .mb.free .in{background:repeating-linear-gradient(135deg,transparent 0 7px,color-mix(in srgb,var(--o-fg) 10%,transparent) 7px 9px),var(--o-bg);border:2px dashed var(--o-line)}
+.osim .mb.free .nm,.osim .mb.free .sz{background:var(--o-bg);padding:1px 4px;border-radius:5px}
+.osim .mb.used .in{background:color-mix(in srgb,var(--pc) 26%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc) 75%,var(--o-fg))}
+.osim .mb.sys .in{background:repeating-linear-gradient(45deg,var(--o-cell) 0 3px,var(--o-soft) 3px 6px),var(--o-cell);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .mb.sys .nm{font-size:12px;font-weight:800;background:var(--o-bg);padding:1px 4px;border-radius:5px;color:var(--o-fg)}
+.osim .mb.nfh .in{box-shadow:inset 0 4px 0 var(--o-acc)}
+.osim .mb.scan .in{outline:3px solid var(--o-acc);outline-offset:-1px}
+.osim .mb.ok .in{border:2px solid var(--o-hit);background:var(--o-hit-bg)}
+.osim .mb.no .in{border:2px solid var(--o-flt);background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--o-flt) 14%,transparent) 5px 8px),var(--o-flt-bg)}
+.osim .mb.best .in{outline:3px dashed var(--o-acc);outline-offset:-1px}
+.osim .mb.pick .in{outline:3px solid var(--o-fg);outline-offset:-1px}
+.osim .mb.freeing .in{outline:3px dashed var(--o-flt);outline-offset:-1px}
+.osim .mb.freed .in{border-color:var(--o-hit);box-shadow:inset 0 0 0 1px var(--o-hit)}
+.osim .mb .bdg{position:absolute;top:5px;left:5px;z-index:2;display:none;min-width:18px;height:18px;padding:0 3px;border-radius:5px;background:var(--o-bg);color:var(--o-fg);box-shadow:0 0 0 1px var(--o-line);font-size:12px;font-weight:900;line-height:18px;text-align:center}
+.osim .mb.ok .bdg,.osim .mb.no .bdg,.osim .mb.best .bdg,.osim .mb.pick .bdg{display:block}
+.osim .mb.new .in{animation:ma-pop var(--o-dur) ease-out}
+@keyframes ma-pop{from{filter:brightness(1.25)}to{filter:none}}
+.osim .ma-ticks{position:relative;flex:none;height:22px}
+.osim .ma-ticks .tk{position:absolute;top:0;padding-top:5px;font-size:12px;font-weight:650;color:var(--o-muted);transform:translateX(-50%);white-space:nowrap}
+.osim .ma-ticks .tk::before{content:"";position:absolute;left:50%;top:0;width:1px;height:6px;background:var(--o-line)}
+.osim .ma-ticks .tk.l{transform:none}
+.osim .ma-ticks .tk.l::before{left:0}
+.osim .ma-ticks .tk.r{transform:translateX(-100%)}
+.osim .ma-ticks .tk.r::before{left:auto;right:0}
+.osim .ma-hh{flex:none;display:flex;align-items:center;gap:8px;margin:0}
+.osim .ma-hist{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--hg,3px);overflow:hidden}
+.osim .ma-hr{flex:none;display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;align-items:center;height:var(--hh,16px);cursor:pointer;border-radius:5px}
+.osim .ma-hr .hl{font-size:12px;font-weight:700;color:var(--o-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.osim .ma-hr .ht{position:relative;height:100%;border-radius:4px;background:var(--o-surf);overflow:hidden}
+.osim .ma-hr .ht i{position:absolute;top:1px;bottom:1px}
+.osim .ma-hr .ht i.f{background:repeating-linear-gradient(135deg,transparent 0 4px,color-mix(in srgb,var(--o-fg) 12%,transparent) 4px 6px)}
+.osim .ma-hr .ht i.s{background:var(--o-soft)}
+.osim .ma-hr .ht i.u{background:color-mix(in srgb,var(--pc) 45%,var(--o-bg));box-shadow:inset -1px 0 0 var(--o-bg)}
+.osim .ma-hr.fut .ht{opacity:.25}
+.osim .ma-hr.cur{box-shadow:0 0 0 2px var(--o-acc)}
+.osim .ma-hr.cur .hl{color:var(--o-fg)}
+.osim .ma-hist.tight .ma-hr .hl{display:none}
+.osim .ma-hist.tight .ma-hr{grid-template-columns:minmax(0,1fr)}
+.osim .ma-procs{flex:none;max-height:42%;overflow:hidden;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start}
+.osim .ma-procs .m{display:none}
+.osim .ma-procs.mini .t{display:none}
+.osim .ma-procs.mini .m{display:inline}
+.osim .pp{display:inline-flex;align-items:center;gap:4px;height:23px;padding:0 6px;border-radius:7px;font-size:12px;font-weight:700;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);white-space:nowrap}
+.osim .pp i{width:12px;height:12px;border-radius:3px;background:color-mix(in srgb,var(--pc) 70%,var(--o-bg));box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .pp.wait{color:var(--o-muted);background:transparent;box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .pp.wait i{opacity:.35}
+.osim .pp.gone{text-decoration:line-through;color:var(--o-muted)}
+.osim .pp.fail{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .pp.now{box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .cm-row{display:flex;flex-direction:column;gap:4px;width:100%;height:auto;padding:5px 8px;border:0;align-items:stretch;background:transparent;border-radius:9px}
+.osim .cm-row:hover{background:var(--o-surf)}
+.osim .cm-row[aria-pressed="true"]{background:var(--o-surf);color:var(--o-fg);box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .cm-top{display:flex;align-items:baseline;gap:8px;font-size:13px;font-weight:650;color:var(--o-muted)}
+.osim .cm-top b{font-size:14.5px;color:var(--o-fg);min-width:44px;text-align:left}
+.osim .cm-top em{font-style:normal;font-weight:800;color:var(--o-fg)}
+.osim .cm-map{position:relative;height:26px;border-radius:5px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .cm-map i{position:absolute;top:2px;bottom:2px}
+.osim .cm-map i.f{background:repeating-linear-gradient(135deg,transparent 0 4px,color-mix(in srgb,var(--o-fg) 14%,transparent) 4px 6px)}
+.osim .cm-map i.s{background:var(--o-soft)}
+.osim .cm-map i.u{background:color-mix(in srgb,var(--pc) 45%,var(--o-bg));box-shadow:inset -1px 0 0 var(--o-bg)}
+.osim .cm-frag{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--o-muted)}
+.osim .cm-frag .bt{flex:1;height:8px;border-radius:4px;background:var(--o-soft);overflow:hidden}
+.osim .cm-frag .bf{display:block;height:100%;background:var(--o-line);border-radius:4px}
+.osim .cm-row[aria-pressed="true"] .bf{background:var(--o-pri)}
+.osim-dlg .lg-free{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--o-fg) 14%,transparent) 5px 7px);box-shadow:inset 0 0 0 1.5px var(--o-line)}
+.osim-dlg .lg-used{background:color-mix(in srgb,var(--ds-c0) 26%,var(--o-bg));box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim-dlg .lg-sys{background:repeating-linear-gradient(45deg,var(--o-cell) 0 3px,var(--o-soft) 3px 6px);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim-dlg .lg-ok{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim-dlg .lg-no{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim-dlg .lg-best{outline:2px dashed var(--o-acc);outline-offset:-2px}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
+</style>
+
+<div class="osim-ma-stage agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 8 · Simülasyon</p><h1>Bellek Tahsisi</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ma-about" aria-label="Bilgi ve yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_08_Bellek_Yonetimi.html">← Bölüm 8</a>
+  </header>
+  <div class="agt-oyun__body">
+<div class="osim" id="osim-ma">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <div class="osim-seg" role="group" aria-label="Algoritma" id="ma-algos">
+        <button type="button" data-algo="first" title="İlk uyan: yeterince büyük ilk delik">İlk</button>
+        <button type="button" data-algo="best" title="En iyi uyan: yeterince büyük en küçük delik">En iyi</button>
+        <button type="button" data-algo="worst" title="En kötü uyan: en büyük delik">En kötü</button>
+        <button type="button" data-algo="next" title="Sonraki uyan: imleçten başlayıp başa dönen ilk uyan">Sonraki</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Oynatma">
+        <button type="button" class="osim-ib" data-act="first" aria-label="İlk adım (Home)" title="İlk (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Önceki adım (Sol ok)" title="Geri (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="ma-play" aria-label="Oynat (Boşluk)" title="Oynat / duraklat (Boşluk)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="ma-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Sonraki adım (Sağ ok)" title="Adım (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Son adım (End)" title="Son (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="ma-speed-l">Hız</span>
+        <input type="range" id="ma-speed" min="0" max="6" step="1" value="2" aria-labelledby="ma-speed-l" aria-valuetext="saniyede 0.75 adım">
+        <span class="osim-speedv" id="ma-speedv">0.75/s</span>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" data-act="compare" id="ma-cmpbtn" aria-label="Tümünü karşılaştır" aria-expanded="false" aria-controls="ma-compare"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg><span class="osim-cmpt">Karşılaştır</span></button>
+    </div>
+    <div class="osim-row">
+      <div class="osim-grp" role="group" aria-label="Başlangıç delikleri">
+        <span class="osim-lbl">Delikler</span>
+        <div class="osim-seg osim-seg-sm" id="ma-holes">
+          <button type="button" data-holes="default" title="Delikler 180 90 250 140 220 (aralarda 40’lık İS blokları)">Varsayılan</button>
+          <button type="button" data-holes="fragmented" title="Delikler 60 130 45 170 80 110 55">Parçalı</button>
+          <button type="button" data-holes="large" title="Delikler 320 180 420 260">Büyük</button>
+        </div>
+      </div>
+      <span class="osim-lbl">Kuyruk</span>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Hazır kuyruklar" id="ma-presets">
+        <button type="button" data-preset="mixed" title="A=120 B=200 C=60 -A D=100 E=130 -C F=40 G=210">Karışık</button>
+        <button type="button" data-preset="classic" title="A=180 B=90 C=10 D=30">Klasik</button>
+        <button type="button" data-preset="cursor" title="X=50 Y=50: sonraki uyan Y’yi X’in hemen ardına yerleştirir">İmleç</button>
+        <button type="button" data-preset="random" title="Rastgele tahsis ve serbest bırakmalar">Rastgele</button>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" class="osim-ib" data-act="add" id="ma-add" aria-label="İstek ekle" title="İstek ekle"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button>
+      <button type="button" class="osim-ib" data-act="clear" aria-label="Kuyruğu temizle" title="Temizle (sonra yaz ya da yapıştır)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+    </div>
+    <div class="osim-row osim-qrow">
+      <span class="osim-lbl" id="ma-q-l" title="A=120, A’ya 120 birim tahsis eder; -A, A’yı serbest bırakır">İstekler</span>
+      <div class="osim-chips" id="ma-chips" role="list" aria-labelledby="ma-q-l"></div>
+    </div>
+    <div class="osim-alert" id="ma-alert" role="alert"></div>
+  </div>
+
+  <div class="osim-stage">
+    <div class="osim-viz ma-viz" id="ma-viz">
+      <div class="ma-lane" id="ma-lane">
+        <div class="ma-ghost" id="ma-ghost" aria-hidden="true"></div>
+        <div class="ma-nf" id="ma-nf" title="Sonraki uyan imleci: sıradaki arama buradan başlar"><span>imleç</span></div>
+      </div>
+      <div class="ma-bar" id="ma-bar" role="img" aria-label="Bellek haritası"></div>
+      <div class="ma-ticks" id="ma-ticks" aria-hidden="true"></div>
+      <div class="ma-hh"><span class="osim-lbl" title="Her istekten sonraki bellek haritası; satıra tıklamak o adıma atlar">Geçmiş</span></div>
+      <div class="ma-hist" id="ma-hist"></div>
+    </div>
+    <aside class="osim-side" aria-label="Ayırıcının durumu">
+      <div class="osim-sh"><b>Delikler</b><span id="ma-sides">adres sırası</span></div>
+      <div class="osim-state" id="ma-state"></div>
+      <div class="osim-sh"><b>Süreçler</b><span id="ma-pcount"></span></div>
+      <div class="ma-procs" id="ma-procs"></div>
+    </aside>
+    <div class="osim-panel wide" id="ma-compare" hidden aria-label="Tüm algoritmaları karşılaştır"></div>
+  </div>
+
+  <div class="osim-foot">
+    <p class="osim-narr" id="ma-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat h" title="Toplam boş bellek">Boş <b id="ma-sfree">0</b></span>
+      <span class="osim-stat" title="En büyük delik">En büyük <b id="ma-slg">0</b></span>
+      <span class="osim-stat x" title="Dış parçalanma: toplam boş bellek eksi en büyük delik">Dış parç. <b id="ma-sext">0</b></span>
+      <span class="osim-stat x" title="Delik bulamayan istekler">&#10007; Başarısız <b id="ma-sfail">0</b></span>
+      <span class="osim-stat" title="Şu anki adım">Adım <b id="ma-ss">0/0</b></span>
+    </div>
+  </div>
+</div>
+  </div>
+  <dialog class="agt-oyun__dialog osim-dlg" id="ma-about">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Bellek Tahsisi</h2>
+    <p>Değişken bölümlü bitişik tahsis: bir istek kuyruğu (<code>A=120</code>, A’ya 120 birim tahsis eder; <code>-A</code>, A’yı serbest bırakır) ilk uyan, en iyi uyan, en kötü uyan ya da sonraki uyan ile karşılanır. Bellek haritası delikleri, süreçleri ve işletim sistemine (İS) ayrılmış blokları gösterir; bir adım sırasında aday delikler tek tek denetlenir. Alttaki geçmişte her istek için bir satır vardır; yan panel delikleri adres sırasıyla ve her sürecin durumunu listeler.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir algoritma ve başlangıç delik düzeni (Varsayılan, Parçalı, Büyük) seçilir.</li>
+      <li>İstekler doğrudan düzenlenir, eklenir (+) ya da temizlenir (×) (en çok 24) veya hazır bir kuyruk yüklenir.</li>
+      <li>▶ oynatır; adım düğmeleri bir istek geri ya da ileri gider veya başa ya da sona atlar. Geçmişteki bir satıra tıklamak o adıma atlar.</li>
+      <li><b>Karşılaştır</b>, dört algoritmayı aynı kuyrukla çalıştırır; son bellek haritalarını ve dış parçalanmayı gösterir.</li>
+    </ul>
+    <h3>Algoritmalar</h3>
+      <dl>
+        <dt>İlk</dt><dd>İlk uyan: yeterince büyük ilk delik.</dd>
+        <dt>En iyi</dt><dd>En iyi uyan: yeterince büyük en küçük delik.</dd>
+        <dt>En kötü</dt><dd>En kötü uyan: en büyük delik.</dd>
+        <dt>Sonraki</dt><dd>Sonraki uyan: imleçten (son tahsisin ardından) başlayıp başa dönen ilk uyan.</dd>
+        <dt>Dış parç.</dt><dd>Dış parçalanma: toplam boş bellek eksi en büyük delik.</dd>
+      </dl>
+      <h3>Kuyruk</h3>
+      <dl>
+        <dt>A=120</dt><dd>A’ya 120 birim tahsis et.</dd>
+        <dt>-A</dt><dd>A’yı serbest bırak; komşu delikler birleşir.</dd>
+      </dl>
+      <h3>Gösterim</h3>
+      <div class="osim-legend">
+        <span class="lg-free">delik</span>
+        <span class="lg-used">süreç</span>
+        <span class="lg-sys">İS (ayrılmış)</span>
+        <span class="lg-ok">&#10003; sığar</span>
+        <span class="lg-no">&#10007; çok küçük</span>
+        <span class="lg-best">&#9733; şimdilik en iyi</span>
+        <span>&#9660; sonraki uyan imleci</span>
+      </div>
+      <h3>Tuşlar</h3>
+      <div class="osim-legend"><span><kbd>&#8592;</kbd><kbd>&#8594;</kbd> adım</span><span><kbd>Boşluk</kbd> oynat</span><span><kbd>Home</kbd><kbd>End</kbd></span><span><kbd>Esc</kbd> kapat</span></div>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.getElementById("osim-ma");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
+
+var ALGOS=["first","best","worst","next"];
+var NAMES={first:"İlk uyan",best:"En iyi uyan",worst:"En kötü uyan",next:"Sonraki uyan"};
+var SHORT={first:"İlk",best:"En iyi",worst:"En kötü",next:"Sonraki"};
+var WHY={first:"sığan ilk delik",best:"sığan en küçük delik",worst:"en büyük delik",next:"imleçten ilk sığan"};
+var HOLESETS={default:[180,90,250,140,220],fragmented:[60,130,45,170,80,110,55],large:[320,180,420,260]};
+var SYSSIZE=40;
+var PRESETS={
+  mixed:"A=120 B=200 C=60 -A D=100 E=130 -C F=40 G=210",
+  classic:"A=180 B=90 C=10 D=30",
+  cursor:"X=50 Y=50"
+};
+var PAL=["var(--ds-c0)","var(--ds-c1)","var(--ds-c2)","var(--ds-c3)","var(--ds-c4)","var(--ds-c5)","var(--ds-c7)"];
+var SPEEDS=[0.25,0.5,0.75,1,1.5,2,3];
+var MAXOPS=24,MAXSIZE=9999;
+var narrow={matches:false}; /* the 800×600 stage is scaled as a whole on small screens */
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+
+var st={algo:"first",holes:"default",ops:[],chips:PRESETS.mixed.split(" "),step:0,playing:false,timer:0,speed:0.75,sim:null,preset:"mixed",colors:{}};
+
+/* ---------- allocator (verified logic, extended with per-step state) ---------- */
+function clone(blocks){return blocks.map(function(b){return {id:b.id,type:b.type,pid:b.pid,size:b.size,start:b.start};});}
+function recalcStarts(blocks){var p=0;blocks.forEach(function(b){b.start=p;p+=b.size;});}
+function totalSize(blocks){return blocks.reduce(function(s,b){return s+b.size;},0);}
+function simulate(algo,sizes,ops){
+  var uid=0,blocks=[];
+  sizes.forEach(function(size,i){
+    if(i>0){blocks.push({id:"b"+(uid++),type:"sys",pid:"OS",size:SYSSIZE,start:0});}
+    blocks.push({id:"b"+(uid++),type:"free",pid:"",size:size,start:0});
+  });
+  recalcStarts(blocks);
+  var cursor=0,states=[clone(blocks)],cursors=[0],recs=[];
+  ops.forEach(function(op){
+    var rec={op:op,before:clone(blocks),cursorBefore:cursor,scan:[],pick:null,mid:null,merged:[]};
+    if(op.t==="a"){
+      var holes=[],i,off;
+      blocks.forEach(function(b,bi){if(b.type==="free"){holes.push(bi);}});
+      var pick=-1;
+      if(algo==="first"){
+        for(i=0;i<holes.length;i++){
+          var f1=blocks[holes[i]].size>=op.size;
+          rec.scan.push({id:blocks[holes[i]].id,fits:f1});
+          if(f1){pick=holes[i];break;}
+        }
+      }else if(algo==="best"||algo==="worst"){
+        holes.forEach(function(hi){
+          var fits=blocks[hi].size>=op.size;
+          if(fits&&(pick<0||(algo==="best"?blocks[hi].size<blocks[pick].size:blocks[hi].size>blocks[pick].size))){pick=hi;}
+          rec.scan.push({id:blocks[hi].id,fits:fits,best:pick>=0?blocks[pick].id:null});
+        });
+      }else{
+        var k=holes.findIndex(function(hi){return blocks[hi].start+blocks[hi].size>cursor;});
+        if(k<0){k=0;}
+        rec.startHole=holes.length?blocks[holes[k]].id:null;
+        for(off=0;off<holes.length;off++){
+          var hj=holes[(k+off)%holes.length];
+          var f2=blocks[hj].size>=op.size;
+          rec.scan.push({id:blocks[hj].id,fits:f2});
+          if(f2){pick=hj;break;}
+        }
+      }
+      if(pick<0){
+        rec.kind="fail";
+      }else{
+        var hole=blocks[pick];
+        var used={id:"b"+(uid++),type:"used",pid:op.pid,size:op.size,start:hole.start};
+        var rest=hole.size-op.size;
+        var rep=[used];
+        if(rest>0){rep.push({id:hole.id,type:"free",pid:"",size:rest,start:hole.start+op.size});}
+        blocks.splice.apply(blocks,[pick,1].concat(rep));
+        recalcStarts(blocks);
+        cursor=used.start+op.size;
+        if(cursor>=totalSize(blocks)){cursor=0;}
+        rec.kind="alloc";rec.pick=hole.id;rec.newId=used.id;rec.at=used.start;rec.holeSize=hole.size;rec.rest=rest;
+      }
+    }else{
+      var idx=blocks.findIndex(function(b){return b.type==="used"&&b.pid===op.pid;});
+      if(idx<0){
+        rec.kind="skip";
+      }else{
+        rec.kind="free";rec.freedId=blocks[idx].id;rec.at=blocks[idx].start;rec.size=blocks[idx].size;
+        blocks[idx]={id:blocks[idx].id,type:"free",pid:"",size:blocks[idx].size,start:blocks[idx].start};
+        rec.mid=clone(blocks);
+        var out=[];
+        blocks.forEach(function(b){
+          var last=out[out.length-1];
+          if(last&&last.type==="free"&&b.type==="free"){last.size+=b.size;rec.merged.push(b.id);rec.into=last.id;}
+          else{out.push({id:b.id,type:b.type,pid:b.pid,size:b.size,start:b.start});}
+        });
+        blocks=out;recalcStarts(blocks);
+      }
+    }
+    rec.after=clone(blocks);rec.cursorAfter=cursor;
+    recs.push(rec);states.push(clone(blocks));cursors.push(cursor);
+  });
+  return {recs:recs,states:states,cursors:cursors};
+}
+function metrics(blocks){
+  var free=blocks.filter(function(b){return b.type==="free";});
+  var tf=free.reduce(function(s,b){return s+b.size;},0);
+  var lg=free.length?Math.max.apply(null,free.map(function(b){return b.size;})):0;
+  return {free:tf,largest:lg,ext:Math.max(0,tf-lg),holes:free.length};
+}
+function failsUpTo(sim,n){var f=0;for(var i=0;i<n;i++){if(sim.recs[i].kind==="fail"){f++;}}return f;}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(160,Math.min(520,interval()*0.6)));}
+function alertMsg(t){$("ma-alert").textContent=t||"";}
+function colorOf(pid){return st.colors[pid]||PAL[0];}
+function opText(op){return op.t==="a"?op.pid+"="+op.size:"−"+op.pid;}
+function assignColors(){
+  st.colors={};var n=0;
+  st.ops.forEach(function(op){if(op.t==="a"&&!st.colors[op.pid]){st.colors[op.pid]=PAL[n%PAL.length];n++;}});
+}
+
+/* ---------- layout: proportional widths with a minimum ---------- */
+function layout(blocks,W,minW){
+  var n=blocks.length,i;
+  if(!n){return {pos:[],s:0,min:minW,W:W};}
+  if(minW*n>W){minW=W/n;}
+  var fixed=[],free=W,tot=0;
+  for(i=0;i<n;i++){fixed.push(false);tot+=blocks[i].size;}
+  var s=free/tot,changed=true;
+  while(changed&&tot>0){
+    changed=false;s=free/tot;
+    for(i=0;i<n;i++){if(!fixed[i]&&blocks[i].size*s<minW){fixed[i]=true;free-=minW;tot-=blocks[i].size;changed=true;}}
+  }
+  if(tot>0){s=free/tot;}
+  var x=0,pos=[];
+  for(i=0;i<n;i++){var w=fixed[i]?minW:blocks[i].size*s;pos.push({x:x,w:w});x+=w;}
+  return {pos:pos,s:s,min:minW,W:W};
+}
+function addrX(blocks,L,a){
+  for(var i=0;i<blocks.length;i++){
+    var b=blocks[i];
+    if(a>=b.start&&a<b.start+b.size){return L.pos[i].x+(a-b.start)/b.size*L.pos[i].w;}
+  }
+  return L.W;
+}
+
+/* ---------- memory bar ---------- */
+var bar=$("ma-bar"),ghost=$("ma-ghost"),nf=$("ma-nf"),ticks=$("ma-ticks"),viz=$("ma-viz");
+var barEls=new Map(),timers=[];
+function clearTimers(){timers.forEach(clearTimeout);timers=[];}
+function minW(){return narrow.matches?22:30;}
+function curLayout(blocks){return layout(blocks,bar.clientWidth,minW());}
+function blockHtml(b){
+  if(b.type==="free"){return "<span class=\"bdg\"></span><div class=\"in\"><span class=\"nm\">"+b.size+"</span><span class=\"sz\">boş</span></div>";}
+  if(b.type==="sys"){return "<div class=\"in\"><span class=\"nm\">İS</span></div>";}
+  return "<span class=\"bdg\"></span><div class=\"in\"><span class=\"nm\">"+esc(b.pid)+"</span><span class=\"sz\">"+b.size+"</span></div>";
+}
+function blockTitle(b){
+  var nm=b.type==="free"?"Delik":b.type==="sys"?"İS (ayrılmış)":b.pid;
+  return nm+": "+b.size+" birim, @"+b.start+"–"+(b.start+b.size-1);
+}
+var BADGE={ok:"✓",no:"✗",best:"★",pick:"★"};
+function renderBar(blocks,o){
+  o=o||{};
+  var marks=o.marks||{},L=curLayout(blocks),seen={};
+  bar.classList.toggle("mv",!!o.anim);
+  blocks.forEach(function(b,i){
+    var el=barEls.get(b.id),isNew=!el,p=L.pos[i];
+    if(!el){
+      el=document.createElement("div");
+      bar.appendChild(el);barEls.set(b.id,el);
+      if(o.anim){el.style.transition="none";el.style.left=p.x+"px";el.style.width="0px";void el.offsetWidth;el.style.transition="";}
+    }
+    var m=marks[b.id]||"";
+    var lab=b.type==="used"?b.pid:b.type==="free"?String(b.size):"İS";
+    var cls="mb "+b.type+(p.w<Math.max(26,lab.length*11+10)?" xs":p.w<52?" sm":"")+(m?" "+m:"")+(o.nfh===b.id?" nfh":"")+(isNew&&o.anim&&b.type==="used"?" new":"");
+    var key=b.type+"|"+b.pid+"|"+b.size;
+    if(el.getAttribute("data-k")!==key){el.innerHTML=blockHtml(b);el.setAttribute("data-k",key);}
+    el.className=cls;
+    if(b.type==="used"){el.style.setProperty("--pc",colorOf(b.pid));}
+    var bd=el.querySelector(".bdg");
+    if(bd){bd.textContent=BADGE[m.split(" ")[0]]||"";}
+    el.style.left=p.x+"px";el.style.width=p.w+"px";
+    el.title=blockTitle(b);
+    seen[b.id]=1;
+  });
+  barEls.forEach(function(el,id){
+    if(seen[id]){return;}
+    barEls.delete(id);
+    if(o.anim){el.classList.add("gone");setTimeout(function(){el.remove();},dur()+80);}
+    else{el.remove();}
+  });
+  bar.setAttribute("aria-label","Bellek haritası: "+blocks.map(function(b){return (b.type==="free"?"delik ":b.type==="sys"?"İS ":b.pid+" ")+b.size;}).join(", "));
+  return L;
+}
+function resetBar(){barEls.forEach(function(el){el.remove();});barEls.clear();}
+function renderTicks(blocks){
+  var L=curLayout(blocks),W=L.W,pts=[],last=-1e9,html="",tot=totalSize(blocks);
+  blocks.forEach(function(b,i){pts.push({x:L.pos[i].x,a:b.start});});
+  pts.push({x:W,a:tot});
+  var keep=[];
+  pts.forEach(function(p,i){
+    if(p.x-last>=40){keep.push(p);last=p.x;}
+    else if(i===pts.length-1){keep.pop();keep.push(p);}
+  });
+  keep.forEach(function(p,i){
+    var c=i===0?" l":(p.x>=W-1?" r":"");
+    html+="<span class=\"tk"+c+"\" style=\"left:"+p.x.toFixed(1)+"px\">"+p.a+"</span>";
+  });
+  ticks.innerHTML=html;
+}
+function placeNf(blocks,cursor,anim){
+  if(st.algo!=="next"){nf.classList.remove("on");return;}
+  var L=curLayout(blocks),x=addrX(blocks,L,cursor);
+  nf.classList.toggle("mv",!!anim);
+  nf.style.left=x.toFixed(1)+"px";
+  nf.classList.toggle("flip",x>L.W-60);
+  nf.classList.add("on");
+  nf.title="Sonraki uyan imleci @"+cursor;
+}
+function nfHole(blocks,cursor){
+  if(st.algo!=="next"){return null;}
+  var h=blocks.filter(function(b){return b.type==="free";});
+  var c=h.find(function(b){return b.start+b.size>cursor;})||h[0];
+  return c?c.id:null;
+}
+function sizeBar(){
+  var H=viz.clientHeight;
+  var bh=narrow.matches?96:Math.round(Math.max(56,Math.min(150,H*0.27)));
+  bar.style.setProperty("--barh",bh+"px");
+  bar.style.setProperty("--bfs",Math.round(Math.max(13,Math.min(22,bh*0.15)))+"px");
+}
+
+/* ---------- history ---------- */
+var hist=$("ma-hist");
+function pctLayout(blocks){return layout(blocks,1000,10);}
+function renderHist(){
+  var S=st.sim.states,n=S.length,html="";
+  for(var i=0;i<n;i++){
+    var bl=S[i],L=pctLayout(bl),cells="";
+    bl.forEach(function(b,j){
+      var p=L.pos[j],c=b.type==="free"?"f":b.type==="sys"?"s":"u";
+      cells+="<i class=\""+c+"\" style=\"left:"+(p.x/10).toFixed(2)+"%;width:"+(p.w/10).toFixed(2)+"%"+(c==="u"?";--pc:"+colorOf(b.pid):"")+"\"></i>";
+    });
+    var lab=i===0?"başlangıç":(i+" "+opText(st.ops[i-1]));
+    html+="<div class=\"ma-hr"+(i===st.step?" cur":i>st.step?" fut":"")+"\" data-i=\""+i+"\" title=\""+esc(lab)+": dış parçalanma "+metrics(bl).ext+"\"><span class=\"hl\">"+esc(lab)+"</span><span class=\"ht\">"+cells+"</span></div>";
+  }
+  hist.innerHTML=html;
+  sizeHist();
+}
+function sizeHist(){
+  var n=st.sim.states.length,H=hist.clientHeight;
+  /* all rows must fit: thinner rows and gaps for long queues */
+  var hg=n>14?1:3;
+  var hh=narrow.matches?14:Math.max(2,Math.min(24,Math.floor((H-hg*(n-1))/n)));
+  hist.style.setProperty("--hh",hh+"px");hist.style.setProperty("--hg",hg+"px");
+  hist.classList.toggle("tight",hh<14);
+}
+function markHist(){
+  hist.querySelectorAll(".ma-hr").forEach(function(r){
+    var i=+r.getAttribute("data-i");
+    r.classList.toggle("cur",i===st.step);r.classList.toggle("fut",i>st.step);
+  });
+}
+hist.addEventListener("click",function(e){
+  var r=e.target.closest(".ma-hr");if(!r){return;}
+  pause();go(+r.getAttribute("data-i"),false);
+});
+
+/* ---------- side: holes list + processes ---------- */
+var stateBox=$("ma-state"),listItems=new Map();
+function renderHoles(blocks,marks,anim){
+  marks=marks||{};
+  var holes=blocks.filter(function(b){return b.type==="free";});
+  var empty=stateBox.querySelector(".osim-empty");
+  if(!holes.length){
+    listItems.forEach(function(el){el.remove();});listItems.clear();
+    if(!empty){stateBox.insertAdjacentHTML("beforeend","<div class=\"osim-empty\">Boş delik yok</div>");}
+    return;
+  }
+  if(empty){empty.remove();}
+  var H=stateBox.clientHeight,n=holes.length,gap=n>7?2:5;
+  /* no scrolling: when the holes do not fit in one column, use two or three */
+  var rowsFit=Math.max(1,Math.floor((H+gap)/(16+gap))),cols=Math.min(3,Math.ceil(n/rowsFit)),per=Math.ceil(n/cols);
+  var rowH=Math.max(14,Math.min(46,Math.floor((H-gap*(per-1))/per)));
+  stateBox.classList.toggle("sm",rowH<26||cols>1);stateBox.classList.toggle("cols",cols>1);
+  var maxS=1;holes.forEach(function(h){if(h.size>maxS){maxS=h.size;}});
+  var keep={};holes.forEach(function(h){keep[h.id]=1;});
+  listItems.forEach(function(el,id){if(!keep[id]){listItems.delete(id);el.remove();}});
+  holes.forEach(function(h,r){
+    var el=listItems.get(h.id),isNew=false;
+    if(!el){
+      isNew=true;el=document.createElement("div");el.className="it";
+      el.innerHTML="<span class=\"rk\"></span><span class=\"tile\"></span><span class=\"track\"><span class=\"fill\"></span></span><span class=\"tag\"></span>";
+      stateBox.appendChild(el);listItems.set(h.id,el);
+    }
+    var m=marks[h.id]||"";
+    el.style.height=rowH+"px";
+    el.classList.toggle("mv",!!anim&&!isNew);
+    el.querySelector(".fill").classList.toggle("mv",!!anim&&!isNew);
+    el.style.right="auto";el.style.width="calc("+(100/cols).toFixed(3)+"% - "+(cols>1?3:0)+"px)";el.style.left=(Math.floor(r/per)*100/cols).toFixed(3)+"%";
+    el.style.transform="translateY("+((r%per)*(rowH+gap))+"px)";
+    el.querySelector(".rk").textContent="@"+h.start;
+    el.querySelector(".tile").textContent=h.size;
+    el.querySelector(".fill").style.width=Math.round(100*h.size/maxS)+"%";
+    el.querySelector(".tag").textContent=m==="ok"?"✓":m==="no"?"✗":(m==="best"||m==="pick")?"★":m==="chg"?"●":"";
+    el.className="it"+(anim&&!isNew?" mv":"")+(m?" "+m:"");
+    el.title="Delik @"+h.start+": "+h.size+" birim"+(m==="ok"?" (sığar)":m==="no"?" (çok küçük)":m==="best"?" (şimdilik en iyi)":m==="pick"?" (seçildi)":"");
+    if(isNew&&anim&&!reduce.matches){el.classList.add("enter");setTimeout(function(){el.classList.remove("enter");},dur()+40);}
+  });
+  stateBox.style.setProperty("--rows",n);
+}
+function resetSide(){listItems.forEach(function(el){el.remove();});listItems.clear();stateBox.innerHTML="";}
+function renderProcs(){
+  var n=st.step,html="",live=0,fails=0,seen={};
+  var cur=n>0?st.ops[n-1]:null;
+  var state={};
+  st.ops.forEach(function(op,i){
+    if(op.t!=="a"){return;}
+    if(!(op.pid in seen)){seen[op.pid]=1;}
+  });
+  var order=[];
+  st.ops.forEach(function(op,i){
+    var r=i<n?st.sim.recs[i]:null;
+    if(op.t==="a"){
+      var o={pid:op.pid,size:op.size,cls:"wait",txt:op.pid+" "+op.size};
+      if(r){if(r.kind==="alloc"){o.cls="";o.txt=op.pid+" "+op.size+" @"+r.at;live++;}else{o.cls="fail";o.txt="✗ "+op.pid+" "+op.size;fails++;}}
+      if(cur&&i===n-1){o.cls+=" now";}
+      state[op.pid]=o;order.push(o);
+    }else if(r&&state[op.pid]){
+      if(r.kind==="free"){state[op.pid].cls="gone";state[op.pid].txt=op.pid+" serbest";live--;}
+      if(i===n-1){state[op.pid].cls+=" now";}
+    }
+  });
+  order.forEach(function(o){
+    html+="<span class=\"pp "+o.cls+"\" style=\"--pc:"+colorOf(o.pid)+"\" title=\""+esc(o.txt)+"\"><i></i><span class=\"t\">"+esc(o.txt)+"</span><span class=\"m\">"+(/fail/.test(o.cls)?"✗ ":"")+esc(o.pid)+"</span></span>";
+  });
+  var pb=$("ma-procs");
+  pb.innerHTML=html||"<span class=\"pp wait\">yok</span>";
+  /* no scrolling: fall back to names only when the list does not fit */
+  pb.classList.remove("mini");
+  if(pb.scrollHeight>pb.clientHeight+1){pb.classList.add("mini");}
+  $("ma-pcount").textContent=live+" bellekte";
+}
+
+/* ---------- narration + stats ---------- */
+function narration(){
+  var n=st.step;
+  if(n===0){return "<b>▶</b> ile oynat ya da <kbd>→</kbd> ile adım at";}
+  var r=st.sim.recs[n-1],op=r.op,h="<b>"+esc(opText(op))+"</b> → ";
+  if(r.kind==="alloc"){return h+"<span class=\"osim-k h\">✓ @"+r.at+"</span> "+WHY[st.algo]+(r.rest>0?" · artan "+r.rest:" · tam sığdı");}
+  if(r.kind==="fail"){var m=metrics(r.before);return h+"<span class=\"osim-k x\">✗ ≥ "+op.size+" delik yok</span> · en büyük "+m.largest;}
+  if(r.kind==="free"){var k=r.merged.length;return h+"serbest bırakıldı: "+r.size+" @"+r.at+(k?" · "+(k+1)+" delik birleşti":" · birleşme yok");}
+  return h+"serbest bırakılacak blok yok ("+esc(op.pid)+" hiç yerleşmedi)";
+}
+function renderStats(){
+  var n=st.step,bl=st.sim.states[n],m=metrics(bl);
+  $("ma-sfree").textContent=m.free;$("ma-slg").textContent=m.largest;$("ma-sext").textContent=m.ext;
+  $("ma-sfail").textContent=failsUpTo(st.sim,n);
+  $("ma-ss").textContent=n+"/"+st.ops.length;
+  $("ma-narr").innerHTML=narration();
+}
+
+/* ---------- chips editor ---------- */
+var chipsBox=$("ma-chips");
+var RX_A=/^([A-Za-z][A-Za-z0-9_]{0,5})\s*[=:]\s*(\d{1,4})$/,RX_F=/^[-−~]\s*([A-Za-z][A-Za-z0-9_]{0,5})$/;
+function chipWidth(inp){inp.style.width=(Math.max(2,inp.value.length)*0.6+1.2)+"em";}
+function renderChips(focusIdx){
+  chipsBox.innerHTML="";
+  st.chips.forEach(function(v,i){
+    var w=document.createElement("span");
+    w.className="osim-chip"+(RX_F.test(v.trim())?" fr":"");w.setAttribute("role","listitem");
+    var inp=document.createElement("input");
+    inp.type="text";inp.maxLength=12;inp.value=v;inp.autocomplete="off";inp.spellcheck=false;
+    inp.setAttribute("aria-label","İstek "+(i+1));inp.setAttribute("data-i",i);
+    chipWidth(inp);w.appendChild(inp);chipsBox.appendChild(w);
+  });
+  $("ma-add").disabled=st.chips.length>=MAXOPS;
+  markChips();
+  if(focusIdx!=null){var t=chipsBox.querySelectorAll("input")[focusIdx];if(t){t.focus();t.select();}}
+}
+function markChips(){
+  var ws=chipsBox.querySelectorAll(".osim-chip"),cur=st.step-1,idx=0;
+  ws.forEach(function(w,i){
+    var v=st.chips[i];
+    var mapped=(v!==undefined&&v.trim()!=="")?idx++:-1;
+    w.classList.toggle("cur",mapped===cur&&cur>=0);
+    w.classList.toggle("done",mapped>=0&&mapped<cur);
+  });
+}
+function parseChips(){
+  var vals=st.chips.map(function(s){return s.trim();});
+  var ins=chipsBox.querySelectorAll("input"),ops=[],err=null,errAt=-1,live={},n=0;
+  vals.forEach(function(s,i){
+    if(s===""){if(ins[i]){ins[i].setAttribute("aria-invalid","false");}return;}
+    n++;
+    var op=null,msg=null,m;
+    if((m=RX_A.exec(s))){
+      op={t:"a",pid:m[1],size:+m[2]};
+      if(/^sys/i.test(op.pid)){msg="SYS ile başlayan adlar işletim sistemine ayrılmıştır.";}
+      else if(op.size<1||op.size>MAXSIZE){msg="boyut 1–"+MAXSIZE+" arasında olmalı.";}
+      else if(live[op.pid]){msg=op.pid+" zaten tahsisli; önce serbest bırakılmalı (-"+op.pid+").";}
+      else{live[op.pid]=1;}
+    }else if((m=RX_F.exec(s))){
+      op={t:"f",pid:m[1]};
+      if(!live[op.pid]){msg="-"+op.pid+" var ama "+op.pid+" tahsisli değil.";}
+      else{delete live[op.pid];}
+    }else{msg="“"+s+"” geçersiz: tahsis için A=120, serbest bırakmak için -A yazılır.";}
+    if(ins[i]){ins[i].setAttribute("aria-invalid",msg?"true":"false");}
+    if(msg&&!err){err="İstek "+n+": "+msg;errAt=i;}
+    if(op){ops.push(op);}
+  });
+  if(err){alertMsg(err);return null;}
+  if(!ops.length){alertMsg("En az bir istek gerekir, ör. A=120.");return null;}
+  if(ops.length>MAXOPS){alertMsg("En çok "+MAXOPS+" istek olabilir (şu an "+ops.length+").");return null;}
+  alertMsg("");
+  return ops;
+}
+function sameOps(a,b){return a.length===b.length&&a.every(function(x,i){return x.t===b[i].t&&x.pid===b[i].pid&&x.size===b[i].size;});}
+function applyChips(){
+  var ops=parseChips();
+  if(!ops){return;}
+  if(!sameOps(ops,st.ops)){st.ops=ops;st.preset=null;recompute(true);}
+}
+function splitInto(i,text){
+  var parts=text.split(/[\s,;]+/).filter(Boolean);
+  var next=st.chips.slice(0,i).concat(parts,st.chips.slice(i+1));
+  var cnt=next.filter(function(s){return s.trim()!=="";}).length;
+  if(cnt>MAXOPS){alertMsg("En çok "+MAXOPS+" istek olabilir (bununla "+cnt+" olur).");return;}
+  st.chips=next;renderChips(Math.min(i+parts.length-1,next.length-1));applyChips();
+}
+chipsBox.addEventListener("input",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  var i=+inp.getAttribute("data-i");
+  if(/[\s,;]/.test(inp.value.replace(/^\s+|\s+$/g,""))||/[,;]$/.test(inp.value)){splitInto(i,inp.value);return;}
+  st.chips[i]=inp.value;chipWidth(inp);
+  inp.parentNode.classList.toggle("fr",RX_F.test(inp.value.trim()));
+  applyChips();
+});
+chipsBox.addEventListener("paste",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  var txt=(e.clipboardData||window.clipboardData).getData("text");
+  if(/[\s,;]/.test(txt.trim())){e.preventDefault();splitInto(+inp.getAttribute("data-i"),txt.trim());}
+});
+chipsBox.addEventListener("keydown",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  var i=+inp.getAttribute("data-i"),ins=chipsBox.querySelectorAll("input");
+  if(e.key==="Enter"||e.key===" "||e.key===","){
+    e.preventDefault();
+    if(i===ins.length-1){if(st.chips.length<MAXOPS&&inp.value.trim()!==""){st.chips.push("");renderChips(i+1);}}
+    else{ins[i+1].focus();ins[i+1].select();}
+  }else if(e.key==="Backspace"&&inp.value===""&&st.chips.length>1){
+    e.preventDefault();st.chips.splice(i,1);renderChips(Math.max(0,i-1));applyChips();
+  }else if(e.key==="ArrowLeft"&&inp.selectionStart===0&&i>0){
+    e.preventDefault();ins[i-1].focus();ins[i-1].select();
+  }else if(e.key==="ArrowRight"&&inp.selectionEnd===inp.value.length&&i<ins.length-1){
+    e.preventDefault();ins[i+1].focus();ins[i+1].select();
+  }else if(e.key==="Escape"){inp.blur();}
+});
+chipsBox.addEventListener("focusout",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  setTimeout(function(){
+    if(chipsBox.contains(document.activeElement)){return;}
+    var before=st.chips.length;
+    st.chips=st.chips.filter(function(s){return s.trim()!=="";});
+    if(!st.chips.length){st.chips=st.ops.map(function(o){return o.t==="a"?o.pid+"="+o.size:"-"+o.pid;});}
+    if(st.chips.length!==before){renderChips();applyChips();}
+  },0);
+});
+
+/* ---------- compare panel ---------- */
+var cmp=$("ma-compare");
+function mapHtml(blocks){
+  var L=pctLayout(blocks),h="";
+  blocks.forEach(function(b,j){
+    var p=L.pos[j],c=b.type==="free"?"f":b.type==="sys"?"s":"u";
+    h+="<i class=\""+c+"\" style=\"left:"+(p.x/10).toFixed(2)+"%;width:"+(p.w/10).toFixed(2)+"%"+(c==="u"?";--pc:"+colorOf(b.pid):"")+"\" title=\""+esc(blockTitle(b))+"\"></i>";
+  });
+  return h;
+}
+function renderCompare(){
+  if(cmp.hidden){return;}
+  var sizes=HOLESETS[st.holes],res=[],maxF=1;
+  ALGOS.forEach(function(a){
+    var s=simulate(a,sizes,st.ops),fin=s.states[s.states.length-1],m=metrics(fin);
+    res.push({a:a,fin:fin,m:m,fail:failsUpTo(s,s.recs.length)});
+    if(m.free>maxF){maxF=m.free;}
+  });
+  var h="<div class=\"osim-ph\"><div><b>Tümünü karşılaştır</b> <span>aynı kuyruk · "+st.ops.length+" istek</span></div><button type=\"button\" class=\"osim-ib\" data-act=\"compare\" aria-label=\"Karşılaştırmayı kapat\"><svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>";
+  h+="<div class=\"osim-sub\">Son bellek haritası · dış parçalanma</div>";
+  res.forEach(function(r){
+    h+="<button type=\"button\" class=\"cm-row\" data-algo=\""+r.a+"\" aria-pressed=\""+(r.a===st.algo)+"\" title=\""+NAMES[r.a]+": dış parçalanma "+r.m.ext+", en büyük delik "+r.m.largest+", başarısız "+r.fail+"\">";
+    h+="<span class=\"cm-top\"><b>"+SHORT[r.a]+"</b>dış parç. <em>"+r.m.ext+"</em> · en büyük <em>"+r.m.largest+"</em> · delik <em>"+r.m.holes+"</em>"+(r.fail?" · <em>✗ "+r.fail+"</em> başarısız":"")+"</span>";
+    h+="<span class=\"cm-map\">"+mapHtml(r.fin)+"</span>";
+    h+="<span class=\"cm-frag\"><span class=\"bt\"><span class=\"bf\" style=\"width:"+Math.max(1,100*r.m.ext/maxF).toFixed(1)+"%\"></span></span></span>";
+    h+="</button>";
+  });
+  cmp.innerHTML=h;
+}
+cmp.addEventListener("click",function(e){var b=e.target.closest("button[data-algo]");if(b){setAlgo(b.getAttribute("data-algo"));}});
+function togglePanel(id,force){
+  var p=$("ma-compare"),open=force!=null?force:p.hidden;
+  p.hidden=!open;
+  $("ma-cmpbtn").setAttribute("aria-expanded",String(open));
+  if(open){renderCompare();}
+}
+
+/* ---------- drawing ---------- */
+function staticDraw(){
+  var n=st.step,bl=st.sim.states[n],cur=st.sim.cursors[n];
+  var r=n>0?st.sim.recs[n-1]:null,marks={},side={};
+  if(r&&r.kind==="alloc"){marks[r.newId]="pick";if(r.rest>0){side[r.pick]="chg";}}
+  if(r&&r.kind==="free"){var id=r.into||r.freedId;marks[id]="freed";side[id]="chg";}
+  ghost.className="ma-ghost";
+  renderBar(bl,{marks:marks,nfh:nfHole(bl,cur)});
+  renderTicks(bl);
+  placeNf(bl,cur,false);
+  renderHoles(bl,side,false);
+}
+function playStep(r){
+  var events=[],marks={},side={};
+  var T=Math.max(dur(),interval()*0.85);
+  var before=r.before;
+  ghost.className="ma-ghost";
+  renderBar(before,{nfh:st.algo==="next"?r.startHole:null});
+  renderTicks(before);
+  placeNf(before,r.cursorBefore,false);
+  renderHoles(before,{},false);
+  if(r.op.t==="a"){
+    var L0=curLayout(before);
+    var gw=Math.min(L0.W,Math.max(L0.min,r.op.size*L0.s));
+    var pos={};before.forEach(function(b,i){pos[b.id]=L0.pos[i];});
+    var startX=r.scan.length?pos[r.scan[0].id].x:0;
+    ghost.innerHTML="<span>"+esc(r.op.pid)+" "+r.op.size+"</span><i></i>";
+    ghost.style.width=gw+"px";
+    ghost.style.left=Math.min(startX,L0.W-gw)+"px";
+    void ghost.offsetWidth;
+    ghost.className="ma-ghost on mv";
+    r.scan.forEach(function(e){
+      events.push(function(){
+        var p=pos[e.id];
+        ghost.style.left=Math.max(0,Math.min(p.x,L0.W-gw))+"px";
+        ghost.className="ma-ghost on mv "+(e.fits?"ok":"no");
+        ghost.querySelector("i").textContent=e.fits?"✓":"✗";
+        Object.keys(marks).forEach(function(k){if(marks[k]==="scan"||marks[k].indexOf("scan")>=0){marks[k]=marks[k].replace(" scan","");}});
+        marks[e.id]=(e.fits?"ok":"no")+" scan";side[e.id]=e.fits?"ok":"no";
+        if(e.best!==undefined){
+          Object.keys(marks).forEach(function(k){if(marks[k].indexOf("best")===0){marks[k]="ok";side[k]="ok";}});
+          if(e.best){marks[e.best]="best"+(e.best===e.id?" scan":"");side[e.best]="best";}
+        }
+        renderBar(before,{marks:marks,anim:true,nfh:st.algo==="next"?r.startHole:null});
+        renderHoles(before,side,true);
+      });
+    });
+    if(r.kind==="alloc"){
+      events.push(function(){
+        var p=pos[r.pick];
+        Object.keys(marks).forEach(function(k){marks[k]=marks[k].replace(" scan","");});
+        marks[r.pick]="pick";side[r.pick]="pick";
+        ghost.style.left=Math.max(0,Math.min(p.x,L0.W-gw))+"px";
+        ghost.className="ma-ghost on mv ok drop";
+        renderBar(before,{marks:marks,anim:true});
+        renderHoles(before,side,true);
+      });
+      events.push(function(){
+        ghost.className="ma-ghost";
+        var m2={};m2[r.newId]="pick";
+        renderBar(r.after,{marks:m2,anim:true,nfh:nfHole(r.after,r.cursorAfter)});
+        renderTicks(r.after);
+        placeNf(r.after,r.cursorAfter,true);
+        var s2={};if(r.rest>0){s2[r.pick]="chg";}
+        renderHoles(r.after,s2,true);
+      });
+    }else{
+      events.push(function(){ghost.className="ma-ghost on mv no fail";});
+      events.push(function(){
+        ghost.className="ma-ghost mv no";
+        renderBar(before,{anim:true,nfh:nfHole(before,r.cursorAfter)});
+        renderHoles(before,{},true);
+      });
+    }
+  }else if(r.kind==="free"){
+    events.push(function(){var m={};m[r.freedId]="freeing";renderBar(before,{marks:m,anim:true});});
+    events.push(function(){var m={};m[r.freedId]="freed";renderBar(r.mid,{marks:m,anim:true});renderTicks(r.mid);renderHoles(r.mid,(function(){var s={};s[r.freedId]="chg";return s;})(),true);});
+    events.push(function(){
+      var id=r.into||r.freedId,m={};m[id]="freed";
+      renderBar(r.after,{marks:m,anim:true,nfh:nfHole(r.after,r.cursorAfter)});
+      renderTicks(r.after);placeNf(r.after,r.cursorAfter,true);
+      var s={};s[id]="chg";renderHoles(r.after,s,true);
+    });
+  }else{
+    events.push(function(){renderBar(before,{nfh:nfHole(before,r.cursorAfter)});});
+  }
+  var dt=Math.max(90,Math.min(560,T/(events.length+0.3)));
+  root.style.setProperty("--o-dur",Math.round(Math.min(520,dt*0.85))+"ms");
+  events.forEach(function(fn,i){timers.push(setTimeout(fn,Math.round((i+0.3)*dt)));});
+}
+function renderControls(){
+  root.querySelectorAll("#ma-algos button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-algo")===st.algo));});
+  root.querySelectorAll("#ma-holes button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-holes")===st.holes));});
+  root.querySelectorAll("#ma-presets button").forEach(function(b){
+    var p=b.getAttribute("data-preset");
+    var cur=st.ops.map(function(o){return o.t==="a"?o.pid+"="+o.size:"-"+o.pid;}).join(" ");
+    b.setAttribute("aria-pressed",String(p===st.preset||(PRESETS[p]===cur)));
+  });
+  var atEnd=st.step>=st.ops.length;
+  root.querySelector("[data-act=prev]").disabled=st.step<=0;
+  root.querySelector("[data-act=first]").disabled=st.step<=0;
+  root.querySelector("[data-act=next]").disabled=atEnd;
+  root.querySelector("[data-act=last]").disabled=atEnd;
+  $("ma-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("ma-play").setAttribute("aria-label",st.playing?"Duraklat (Boşluk)":"Oynat (Boşluk)");
+  $("ma-sides").textContent=st.algo==="best"?"sığan en küçük kazanır":st.algo==="worst"?"en büyük kazanır":st.algo==="next"?"imleçten tarama":"adres sırası";
+}
+function draw(anim){
+  clearTimers();
+  root.style.setProperty("--o-dur",dur()+"ms");
+  if(anim){playStep(st.sim.recs[st.step-1]);}else{staticDraw();}
+  renderStats();renderControls();markChips();markHist();renderProcs();
+}
+function recompute(keepStep){
+  pause();
+  assignColors();
+  st.sim=simulate(st.algo,HOLESETS[st.holes],st.ops);
+  st.step=keepStep?Math.min(st.step,st.ops.length):0;
+  clearTimers();resetBar();resetSide();
+  sizeBar();renderHist();draw(false);renderCompare();
+}
+function go(step,anim){
+  var prev=st.step;
+  st.step=Math.max(0,Math.min(st.ops.length,step));
+  draw(!!anim&&!reduce.matches&&st.step===prev+1);
+}
+function tick(){
+  if(!st.playing){return;}
+  if(st.step>=st.ops.length){pause();return;}
+  go(st.step+1,true);
+  if(st.step>=st.ops.length){st.playing=false;renderControls();return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){
+  if(st.playing){return;}
+  if(st.step>=st.ops.length){go(0,false);}
+  st.playing=true;renderControls();tick();
+}
+function pause(){st.playing=false;clearTimeout(st.timer);if(st.sim){renderControls();}}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+function setAlgo(a){if(a===st.algo){return;}st.algo=a;recompute(true);}
+function setHoles(h){if(h===st.holes){return;}st.holes=h;recompute(true);}
+function randomOps(){
+  var names="ABCDEFGHJK".split(""),live=[],ops=[],next=0;
+  for(var i=0;i<10;i++){
+    if(live.length&&(Math.random()<0.3||next>=names.length)){
+      var k=Math.floor(Math.random()*live.length);ops.push("-"+live[k]);live.splice(k,1);
+    }else if(next<names.length){
+      var nm=names[next++];ops.push(nm+"="+(10*(2+Math.floor(Math.random()*22))));live.push(nm);
+    }
+  }
+  return ops;
+}
+function setPreset(p){
+  pause();
+  st.preset=p;
+  st.chips=p==="random"?randomOps():PRESETS[p].split(" ");
+  renderChips();
+  var ops=parseChips();
+  if(ops){st.ops=ops;recompute(false);}
+}
+
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.closest("#ma-compare")&&b.hasAttribute("data-algo")){return;}
+  if(b.hasAttribute("data-algo")&&b.closest("#ma-algos")){setAlgo(b.getAttribute("data-algo"));return;}
+  if(b.hasAttribute("data-holes")){setHoles(b.getAttribute("data-holes"));return;}
+  if(b.hasAttribute("data-preset")){setPreset(b.getAttribute("data-preset"));return;}
+  switch(b.getAttribute("data-act")){
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,false);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();go(st.ops.length,false);break;
+    case "play":togglePlay();break;
+    case "compare":togglePanel("ma-compare");break;
+    case "clear":pause();alertMsg("");st.chips=[""];renderChips(0);break;
+    case "add":
+      if(st.chips.length<MAXOPS){st.chips=st.chips.filter(function(s){return s.trim()!=="";});st.chips.push("");renderChips(st.chips.length-1);}
+      break;
+  }
+});
+var speed=$("ma-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("ma-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext","saniyede "+st.speed+" adım");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(e.key==="Escape"){
+    if(!$("ma-compare").hidden){togglePanel("ma-compare",false);}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,false);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();go(st.ops.length,false);break;
+  }
+});
+
+/* ---------- fit to the 800×600 stage ---------- */
+var lastFit="";
+function fit(){
+  var key=viz.clientWidth+"x"+viz.clientHeight+"x"+stateBox.clientHeight;
+  if(key!==lastFit&&st.sim){lastFit=key;clearTimers();sizeBar();sizeHist();staticDraw();}
+}
+window.addEventListener("load",fit);
+if(window.ResizeObserver){var ro=new ResizeObserver(function(){fit();});ro.observe(viz);ro.observe(stateBox);}
+
+/* ---------- init ---------- */
+renderChips();
+st.ops=parseChips()||[];
+recompute(false);
+fit();
+setTimeout(fit,400);
+})();
+</script>
+<script src="deck/oyun.js"></script>

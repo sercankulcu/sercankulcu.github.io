@@ -1,0 +1,319 @@
+---
+layout: without-sidebar
+title: "Dizgi Dönüşümü: Burrows–Wheeler Dönüşümü"
+permalink: /files/algorithms/slides/Bolum_05_String_Transformation.html
+excerpt: "Burrows–Wheeler dönüşümünü adım adım gösteren etkileşimli simülasyon."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-bwt .algo-stage__body { display: flex; flex-direction: column; gap: 8px; }
+.algo-bwt .algo-bwt__controls { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: 8px; }
+.algo-bwt .algo-bwt__controls label, .algo-bwt .algo-bwt__controls input { margin: 0; }
+.algo-bwt .algo-bwt__controls label { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.algo-bwt .algo-bwt__controls input[type="text"] { width: 150px; font-family: Consolas, Monaco, monospace; letter-spacing: .06em; }
+.algo-bwt .algo-bwt__controls label.algo-bwt__check { text-transform: none; letter-spacing: 0; font-size: 14px; }
+.algo-bwt .algo-bwt__controls button { padding: 0 12px; }
+.algo-bwt .algo-bwt__phases { display: grid; flex: none; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.algo-bwt .algo-bwt__phase { padding: 4px 8px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-muted); font-size: 14px; font-weight: 700; text-align: center; }
+.algo-bwt .algo-bwt__phase.is-active { border-color: var(--ds-warn); background: color-mix(in srgb, var(--ds-warn) 18%, var(--ds-bg)); color: var(--ds-text); }
+.algo-bwt .algo-bwt__phase.is-done { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); color: var(--ds-text); }
+.algo-bwt .algo-bwt__main { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; }
+.algo-bwt .algo-bwt__card { min-width: 0; min-height: 0; padding: 8px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); overflow: hidden; }
+.algo-bwt .algo-bwt__card h2 { margin: 0 0 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-bwt .algo-bwt__side { display: flex; min-width: 0; min-height: 0; flex-direction: column; gap: 10px; }
+.algo-bwt .algo-bwt__table { width: 100%; margin: 0; border-collapse: collapse; font-size: 15px; }
+.algo-bwt .algo-bwt__table th, .algo-bwt .algo-bwt__table td { padding: 1px 8px; border: 1px solid var(--ds-border); text-align: center; line-height: 1.4; font-family: Consolas, Monaco, monospace; }
+.algo-bwt .algo-bwt__table th { background: var(--ds-surface-strong); font-family: inherit; font-size: 13px; }
+.algo-bwt .algo-bwt__table td.is-rot { text-align: left; letter-spacing: .12em; }
+.algo-bwt .algo-bwt__table td.is-rot .f { color: var(--ds-link); font-weight: 800; }
+.algo-bwt .algo-bwt__table td.is-rot .l { color: var(--ds-accent); font-weight: 800; }
+.algo-bwt .algo-bwt__table td.is-last { background: color-mix(in srgb, var(--ds-accent) 10%, var(--ds-bg)); color: var(--ds-accent); font-weight: 800; }
+.algo-bwt .algo-bwt__table tr.is-new td { background: color-mix(in srgb, var(--ds-warn) 22%, var(--ds-bg)); }
+.algo-bwt .algo-bwt__table tr.is-orig td { box-shadow: inset 0 2px 0 var(--ds-good), inset 0 -2px 0 var(--ds-good); }
+.algo-bwt .algo-bwt__empty { margin: 30px 0 0; color: var(--ds-muted); text-align: center; }
+.algo-bwt .algo-bwt__result { margin: 0; padding: 8px 10px; border-radius: 10px; background: var(--ds-surface-strong); font: 800 24px/1.3 Consolas, Monaco, monospace; letter-spacing: .14em; word-break: break-all; color: var(--ds-accent); }
+.algo-bwt .algo-bwt__meta { margin: 6px 0 0; color: var(--ds-muted); font-size: 14px; }
+.algo-bwt .algo-bwt__msg { flex: 1; }
+.algo-bwt .algo-bwt__msg p { margin: 0 0 4px; font-size: 15px; line-height: 1.45; }
+.algo-bwt .algo-bwt__status { font-weight: 700; }
+</style>
+
+<div class="algo-bwt algo-stage algo-stage--stage" lang="tr">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Bölüm 5 · Simülasyon</p><h1>Dizgi Dönüşümü: Burrows–Wheeler Dönüşümü</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="algo-bwt-help" aria-label="Bilgi ve yardım">?</button>
+    <a class="algo-stage__back" href="Bolum_05_Dizgi_2.html">← Bölüm 5</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="algo-bwt__controls">
+      <label>Girdi <input id="algo-bwt-input" type="text" value="BANANA" maxlength="12" spellcheck="false" aria-label="Örnek girdi"></label>
+      <label class="algo-bwt__check"><input id="algo-bwt-sentinel" type="checkbox" checked> $ ekle</label>
+      <button id="algo-bwt-load" type="button" class="is-primary">Girdiyi Yükle</button>
+      <button id="algo-bwt-step" type="button">Adım İlerle</button>
+      <button id="algo-bwt-auto" type="button">Otomatik Oynat</button>
+      <button id="algo-bwt-reset" type="button">Sıfırla</button>
+    </div>
+    <div class="algo-bwt__phases">
+      <div id="algo-bwt-phase-make" class="algo-bwt__phase">1. Döndürmeleri Üret</div>
+      <div id="algo-bwt-phase-sort" class="algo-bwt__phase">2. Döndürmeleri Sırala</div>
+      <div id="algo-bwt-phase-last" class="algo-bwt__phase">3. Son Sütunu Oku</div>
+    </div>
+    <div class="algo-bwt__main">
+      <section class="algo-bwt__card">
+        <h2 id="algo-bwt-table-title">Döndürme Tablosu</h2>
+        <div id="algo-bwt-table"></div>
+      </section>
+      <div class="algo-bwt__side">
+        <section class="algo-bwt__card">
+          <h2>BWT Sonucu</h2>
+          <p id="algo-bwt-result" class="algo-bwt__result">–</p>
+          <p id="algo-bwt-meta" class="algo-bwt__meta">Henüz oluşturulmadı.</p>
+        </section>
+        <section class="algo-bwt__card algo-bwt__msg">
+          <h2>Adım</h2>
+          <p id="algo-bwt-status" class="algo-bwt__status" role="status">Hazır.</p>
+          <p id="algo-bwt-log"></p>
+        </section>
+      </div>
+    </div>
+  </div>
+  <dialog class="algo-stage__dialog" id="algo-bwt-help"><button type="button" class="algo-stage__close">Kapat</button>
+    <h2>Burrows–Wheeler Dönüşümü</h2>
+    <p>Tüm dairesel döndürmeler üretilir, sözlüksel sıraya dizilir ve son sütun okunarak BWT elde edilir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>En çok 12 karakterlik bir dizgi yazın ve <strong>Girdiyi Yükle</strong> düğmesine basın (aynı girdiyle baştan başlamak için <strong>Sıfırla</strong>).</li>
+      <li><strong>$ ekle</strong>, her harf ve rakamdan önce sıralanan <code>$</code> bitiş işaretini ekler. İşaret olmadan da dönüşüm hesaplanır; ancak özgün dizgi yalnız satır indisi de saklanırsa geri elde edilebilir.</li>
+      <li><strong>Adım İlerle</strong> bir adım yapar: önce her adımda bir döndürme, sonra sıralama, sonra son sütunun okunması. <strong>Otomatik Oynat</strong> kalan adımları oynatır (duraklatmak için yeniden basın).</li>
+      <li>Tabloda ilk sütun (F) bağlantı renginde, son sütun (L) kırmızı gösterilir; en yeni döndürme vurgulanır. Sıralamadan sonra çerçeveli satır özgün dizgidir; <em>Kayma</em> döndürme miktarıdır (<code>$</code> varken bu sütun sonek dizisidir).</li>
+    </ul>
+    <h3>Neden işe yarar?</h3>
+    <p>Döndürmeleri sıralamak, benzer bağlamlardan önce gelen karakterleri bir araya toplar; bu yüzden son sütunda aynı karakterlerin uzun tekrar grupları oluşur (örneğin <code>BANANA$</code> → <code>ANNB$AA</code>). Çalışma uzunluğu kodlaması (RLE) ve öne taşıma (move-to-front) kodlaması bunu iyi sıkıştırır; bzip2'nin özü budur.</p>
+    <h3>Dönüşümü tersine çevirme</h3>
+    <p>İlk sütun F, son sütun L'nin sıralanmış hâlidir. LF eşlemesi bir karakterin L'deki i'nci geçişini F'deki i'nci geçişine bağlar; böylece özgün dizgi, onu tutan satırdan başlanarak geriye doğru yeniden kurulur.</p>
+    <h3>Karmaşıklık</h3>
+    <p>Bu kaba kuvvet yöntem n uzunluğunda n döndürme kurar ve sıralar: O(n² log n) zaman ve O(n²) bellek. Pratik uygulamalar BWT'yi bir sonek dizisinden O(n) ya da O(n log n) zamanda türetir.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-bwt");
+    if (!root) return;
+
+    function q(id) { return root.querySelector("#" + id); }
+
+    var inputEl = q("algo-bwt-input");
+    var sentinelEl = q("algo-bwt-sentinel");
+    var loadBtn = q("algo-bwt-load");
+    var stepBtn = q("algo-bwt-step");
+    var autoBtn = q("algo-bwt-auto");
+    var resetBtn = q("algo-bwt-reset");
+    var statusEl = q("algo-bwt-status");
+    var tableEl = q("algo-bwt-table");
+    var tableTitle = q("algo-bwt-table-title");
+    var logEl = q("algo-bwt-log");
+    var resultEl = q("algo-bwt-result");
+    var metaEl = q("algo-bwt-meta");
+
+    var phaseMake = q("algo-bwt-phase-make");
+    var phaseSort = q("algo-bwt-phase-sort");
+    var phaseLast = q("algo-bwt-phase-last");
+
+    var MAX = 12;
+    var s = "";
+    var rotations = [];
+    var sorted = [];
+    var phase = "make";
+    var k = 0;
+    var bwt = "";
+    var done = false;
+    var stepNo = 0;
+    var timer = null;
+    var highlightRow = -1;
+
+    function updatePhases() {
+        [phaseMake, phaseSort, phaseLast].forEach(function (el) { el.classList.remove("is-active", "is-done"); });
+        if (phase === "make") phaseMake.classList.add("is-active");
+        if (phase === "sort") { phaseMake.classList.add("is-done"); phaseSort.classList.add("is-active"); }
+        if (phase === "last") { phaseMake.classList.add("is-done"); phaseSort.classList.add("is-done"); phaseLast.classList.add("is-active"); }
+        if (phase === "done" && s.length) { phaseMake.classList.add("is-done"); phaseSort.classList.add("is-done"); phaseLast.classList.add("is-done"); }
+    }
+
+    function stopAuto() {
+        clearInterval(timer);
+        timer = null;
+        autoBtn.textContent = "Otomatik Oynat";
+    }
+
+    function init() {
+        stopAuto();
+
+        var raw = inputEl.value.replace(/\s+/g, "").slice(0, MAX);
+        inputEl.value = raw;
+        s = raw;
+        if (s.length && sentinelEl.checked && s.indexOf("$") < 0) s += "$";
+
+        rotations = [];
+        sorted = [];
+        phase = "make";
+        k = 0;
+        bwt = "";
+        done = false;
+        stepNo = 0;
+        highlightRow = -1;
+
+        if (!s.length) {
+            done = true;
+            phase = "done";
+            statusEl.textContent = "Girdi boş olamaz.";
+            render("Boş olmayan bir dizgi girin ve Girdiyi Yükle düğmesine basın.");
+            return;
+        }
+
+        statusEl.textContent = "Girdi yüklendi: " + s + " (n = " + s.length + ").";
+        render("Sıradaki: " + s.length + " dairesel döndürmenin tümü üretilecek.");
+    }
+
+    function rotationCell(rotation) {
+        if (!rotation.length) return "";
+        if (rotation.length === 1) return '<span class="f">' + escapeHtml(rotation) + "</span>";
+        return '<span class="f">' + escapeHtml(rotation[0]) + "</span>" +
+            escapeHtml(rotation.slice(1, -1)) +
+            '<span class="l">' + escapeHtml(rotation[rotation.length - 1]) + "</span>";
+    }
+
+    function render(message) {
+        updatePhases();
+
+        var isSorted = phase === "last" || phase === "done";
+        var rows = isSorted ? sorted : rotations;
+        tableTitle.textContent = isSorted ? "Sıralı Döndürmeler" : "Döndürme Tablosu";
+
+        if (!rows.length) {
+            tableEl.innerHTML = '<p class="algo-bwt__empty">Henüz döndürme yok.</p>';
+        } else {
+            var html = '<table class="algo-bwt__table"><thead><tr><th>#</th><th>Döndürme (F … L)</th><th>Kayma</th><th>L</th></tr></thead><tbody>';
+            rows.forEach(function (row, index) {
+                var cls = [];
+                if (index === highlightRow) cls.push("is-new");
+                if (isSorted && row.shift === 0) cls.push("is-orig");
+                var last = row.text.length ? row.text[row.text.length - 1] : "";
+                html += "<tr" + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + ">" +
+                    "<td>" + index + "</td>" +
+                    '<td class="is-rot">' + rotationCell(row.text) + "</td>" +
+                    "<td>" + row.shift + "</td>" +
+                    '<td class="is-last">' + escapeHtml(last) + "</td></tr>";
+            });
+            html += "</tbody></table>";
+            tableEl.innerHTML = html;
+        }
+
+        logEl.textContent = message;
+        if (bwt) {
+            resultEl.textContent = bwt;
+            var primary = sorted.findIndex(function (r) { return r.shift === 0; });
+            metaEl.textContent = "Özgün dizgi sıralı tablonun " + primary + " numaralı satırı" + (s.indexOf("$") >= 0 ? "; $ sonu gösterir." : ".");
+        } else {
+            resultEl.textContent = "–";
+            metaEl.textContent = "Henüz oluşturulmadı.";
+        }
+    }
+
+    function step() {
+        if (done) {
+            if (bwt) render("Burrows–Wheeler dönüşümü tamamlandı. Sonuç = " + bwt + ".");
+            return false;
+        }
+
+        stepNo++;
+        highlightRow = -1;
+
+        if (phase === "make") {
+            if (k < s.length) {
+                var rotation = s.slice(k) + s.slice(0, k);
+                rotations.push({ text: rotation, shift: k });
+                highlightRow = rotations.length - 1;
+                statusEl.textContent = "Adım " + stepNo + ": döndürme " + k + " / " + (s.length - 1) + ".";
+                render(k === 0 ? "Döndürme 0 dizginin kendisidir: " + rotation + "." : "Döndürme " + k + ", ilk " + k + " karakteri sona taşır: " + rotation + ".");
+                k++;
+                return true;
+            }
+            phase = "sort";
+            statusEl.textContent = "Adım " + stepNo + ": tüm döndürmeler üretildi.";
+            render("Sıradaki: döndürmeler sözlüksel sıraya dizilecek.");
+            return true;
+        }
+
+        if (phase === "sort") {
+            sorted = rotations.slice().sort(function (a, b) { return a.text < b.text ? -1 : a.text > b.text ? 1 : a.shift - b.shift; });
+            phase = "last";
+            statusEl.textContent = "Adım " + stepNo + ": döndürmeler sıralandı.";
+            render("İlk sütun F artık sıralı; son sütun L, BWT çıktısı olacak.");
+            return true;
+        }
+
+        if (phase === "last") {
+            bwt = sorted.map(function (r) { return r.text[r.text.length - 1]; }).join("");
+            phase = "done";
+            done = true;
+            statusEl.textContent = "Adım " + stepNo + ": dönüşüm tamamlandı.";
+            render("Her sıralı döndürmenin son karakteri yukarıdan aşağıya okunur: BWT = " + bwt + ".");
+            return false;
+        }
+
+        return false;
+    }
+
+    function autoRun() {
+        if (timer) { stopAuto(); return; }
+        if (done) return;
+        autoBtn.textContent = "Duraklat";
+        timer = setInterval(function () {
+            if (!step()) stopAuto();
+        }, 600);
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (ch) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+        });
+    }
+
+    loadBtn.addEventListener("click", init);
+    stepBtn.addEventListener("click", function () { stopAuto(); step(); });
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", init);
+    inputEl.addEventListener("keydown", function (e) { if (e.key === "Enter") init(); });
+
+    init();
+})();
+</script>
+<script src="deck/stage.js"></script>

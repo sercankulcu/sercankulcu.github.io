@@ -1,0 +1,487 @@
+---
+layout: without-sidebar
+title: "Sonlu Durum Makinesiyle Dizgi Ayrıştırma"
+permalink: /files/algorithms/slides/Bolum_05_String_Parsing.html
+excerpt: "Tanımlayıcıları adım adım doğrulayan etkileşimli sonlu durum makinesi ayrıştırıcısı."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-parsing .ps-wrap { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.algo-parsing .ps-controls { display: flex; align-items: center; gap: 6px; }
+.algo-parsing .ps-controls label { color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-parsing .ps-controls input { flex: 1; min-width: 0; font-family: Consolas, Monaco, monospace; }
+.algo-parsing .ps-controls button { padding: 0 12px; font-size: 14px; }
+.algo-parsing .panel { min-width: 0; padding: 8px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-parsing .panel-title { margin: 0 0 4px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-parsing .ps-scan { flex: none; }
+.algo-parsing .ps-items { display: flex; gap: 3px; min-height: var(--cell, 34px); padding-top: 16px; box-sizing: content-box; }
+.algo-parsing .ps-item { position: relative; display: flex; align-items: center; justify-content: center; width: var(--cell, 34px); height: var(--cell, 34px); flex: none; border: 1.5px solid var(--ds-border); border-radius: 7px; background: var(--ds-bg); font: 700 15px Consolas, Monaco, monospace; }
+.algo-parsing .ps-item.is-wide { width: auto; padding: 0 10px; color: var(--ds-muted); font-weight: 400; }
+.algo-parsing .ps-item small { position: absolute; top: -17px; left: 0; right: 0; color: var(--ds-muted); font: 400 12px/1 system-ui, sans-serif; text-align: center; }
+.algo-parsing .ps-item.is-done { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); }
+.algo-parsing .ps-item.is-active { border-color: var(--ds-warn); background: var(--ds-hot); }
+.algo-parsing .ps-item.is-error { border-color: var(--ds-bad); background: color-mix(in srgb, var(--ds-bad) 24%, var(--ds-bg)); }
+.algo-parsing .ps-status { flex: none; min-height: 22px; margin: 0; padding: 0 2px; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-parsing .ps-status.is-accept { color: var(--ds-good); }
+.algo-parsing .ps-status.is-reject { color: var(--ds-bad); }
+.algo-parsing .ps-main { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) 286px; grid-template-rows: minmax(0, 1fr); gap: 8px; min-height: 0; }
+.algo-parsing .ps-main > .panel { min-height: 0; overflow: hidden; }
+.algo-parsing .ps-diagram { display: flex; flex-direction: column; }
+.algo-parsing .ps-diagram svg { display: block; flex: 1; width: 100%; min-height: 0; }
+.algo-parsing .ps-state { margin: 4px 0 0; font: 13px Consolas, Monaco, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-parsing svg .node circle { fill: var(--ds-node); stroke: var(--ds-link); stroke-width: 2; }
+.algo-parsing svg .node text { fill: var(--ds-text); font: 700 13px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+.algo-parsing svg .node.is-accept circle { fill: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); stroke: var(--ds-good); }
+.algo-parsing svg .node.is-reject circle { fill: color-mix(in srgb, var(--ds-bad) 14%, var(--ds-bg)); stroke: var(--ds-bad); }
+.algo-parsing svg .node.is-current circle { fill: var(--ds-hot); stroke: var(--ds-warn); stroke-width: 3.5; }
+.algo-parsing svg .node.is-accept.is-current circle { fill: color-mix(in srgb, var(--ds-good) 45%, var(--ds-bg)); stroke: var(--ds-good); }
+.algo-parsing svg .node.is-reject.is-current circle { fill: color-mix(in srgb, var(--ds-bad) 45%, var(--ds-bg)); stroke: var(--ds-bad); }
+.algo-parsing svg .edge path { fill: none; stroke: var(--ds-muted); stroke-width: 1.8; }
+.algo-parsing svg .edge text { fill: var(--ds-muted); font: 12px system-ui, sans-serif; text-anchor: middle; }
+.algo-parsing svg .edge.is-taken path { stroke: var(--ds-warn); stroke-width: 3.5; }
+.algo-parsing svg .edge.is-taken text { fill: var(--ds-text); font-weight: 700; }
+.algo-parsing svg .arrow { fill: var(--ds-muted); }
+.algo-parsing .ps-table table { width: 100%; border-collapse: collapse; font: 13px Consolas, Monaco, monospace; }
+.algo-parsing .ps-table th,
+.algo-parsing .ps-table td { padding: 2px 6px; border: 1.5px solid var(--ds-border); text-align: center; }
+.algo-parsing .ps-table th { background: var(--ds-surface-strong); font-family: system-ui, sans-serif; font-size: 12px; }
+.algo-parsing .ps-table tr.is-current td { background: var(--ds-hot); font-weight: 700; }
+.algo-parsing .ps-log { flex: none; height: 68px; margin: 0; padding: 4px 10px 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-surface); list-style: none; font: 13px/1.4 Consolas, Monaco, monospace; }
+.algo-parsing .ps-log li { margin: 0; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-parsing .ps-log li:first-child { font-weight: 700; }
+</style>
+
+<div class="algo-parsing algo-stage algo-stage--stage" lang="tr">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Bölüm 5 · Simülasyon</p><h1>Dizgi Ayrıştırma: Sonlu Durum Makinesi</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="ps-help" aria-label="Bilgi ve yardım">?</button>
+    <a class="algo-stage__back" href="Bolum_05_Dizgi_2.html">← Bölüm 5</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="ps-wrap">
+      <div class="ps-controls">
+        <label for="algo-parsing-input">Girdi</label>
+        <input id="algo-parsing-input" value="user_count_2023" maxlength="24" spellcheck="false" autocomplete="off">
+        <button id="algo-parsing-load" type="button" class="is-primary">Girdiyi Yükle</button>
+        <button id="algo-parsing-step" type="button">Adım İlerle</button>
+        <button id="algo-parsing-auto" type="button">Otomatik Oynat</button>
+        <button id="algo-parsing-reset" type="button">Sıfırla</button>
+      </div>
+
+      <section class="panel ps-scan" aria-label="Girdi taraması">
+        <div id="algo-parsing-scan" class="ps-items"></div>
+      </section>
+
+      <p class="ps-status" id="algo-parsing-status" role="status">Kural: ilk karakter harf ya da alt çizgi olmalıdır.</p>
+
+      <div class="ps-main">
+        <section class="panel ps-diagram">
+          <p class="panel-title">Durum Diyagramı</p>
+          <svg viewBox="0 0 440 236" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Tanımlayıcı için sonlu durum makinesi">
+            <defs>
+              <marker id="ps-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path class="arrow" d="M0,0 L10,5 L0,10 z"></path></marker>
+            </defs>
+            <g class="edge" data-edge="start-in"><path d="M80,120 L178,120" marker-end="url(#ps-arrow)"></path><text x="129" y="111">harf, _</text></g>
+            <g class="edge" data-edge="start-rej"><path d="M52,148 Q70,212 330,200" marker-end="url(#ps-arrow)"></path><text x="150" y="218">rakam, diğer, son</text></g>
+            <g class="edge" data-edge="loop"><path d="M196,94 C172,30 244,30 220,94" marker-end="url(#ps-arrow)"></path><text x="208" y="34">harf, rakam, _</text></g>
+            <g class="edge" data-edge="in-acc"><path d="M234,104 L332,66" marker-end="url(#ps-arrow)"></path><text x="270" y="72">son</text></g>
+            <g class="edge" data-edge="in-rej"><path d="M234,136 L332,178" marker-end="url(#ps-arrow)"></path><text x="270" y="176">diğer</text></g>
+            <g class="node" data-state="START"><circle cx="52" cy="120" r="28"></circle><text x="52" y="120">BAŞLA</text></g>
+            <g class="node" data-state="IN_ID"><circle cx="208" cy="120" r="28"></circle><text x="208" y="120">TANIM</text></g>
+            <g class="node is-accept" data-state="ACCEPT"><circle cx="370" cy="56" r="34"></circle><circle cx="370" cy="56" r="28"></circle><text x="370" y="56">KABUL</text></g>
+            <g class="node is-reject" data-state="REJECT"><circle cx="370" cy="190" r="30"></circle><text x="370" y="190">RET</text></g>
+          </svg>
+          <p id="algo-parsing-state" class="ps-state"></p>
+        </section>
+
+        <section class="panel ps-table">
+          <p class="panel-title">Geçiş Tablosu</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Geçerli Durum</th>
+                <th>Karakter Sınıfı</th>
+                <th>Sonraki Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-state="START" data-class="LETTER">
+                <td>BAŞLA</td><td>HARF</td><td>TANIM</td>
+              </tr>
+              <tr data-state="START" data-class="UNDERSCORE">
+                <td>BAŞLA</td><td>ALT_ÇİZGİ</td><td>TANIM</td>
+              </tr>
+              <tr data-state="START" data-class="DIGIT">
+                <td>BAŞLA</td><td>RAKAM</td><td>RET</td>
+              </tr>
+              <tr data-state="START" data-class="OTHER">
+                <td>BAŞLA</td><td>DİĞER</td><td>RET</td>
+              </tr>
+              <tr data-state="IN_ID" data-class="LETTER">
+                <td>TANIM</td><td>HARF</td><td>TANIM</td>
+              </tr>
+              <tr data-state="IN_ID" data-class="DIGIT">
+                <td>TANIM</td><td>RAKAM</td><td>TANIM</td>
+              </tr>
+              <tr data-state="IN_ID" data-class="UNDERSCORE">
+                <td>TANIM</td><td>ALT_ÇİZGİ</td><td>TANIM</td>
+              </tr>
+              <tr data-state="IN_ID" data-class="OTHER">
+                <td>TANIM</td><td>DİĞER</td><td>RET</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <ul id="algo-parsing-log" class="ps-log" aria-label="Son adımlar"></ul>
+    </div>
+  </div>
+  <dialog class="algo-stage__dialog" id="ps-help"><button type="button" class="algo-stage__close">Kapat</button>
+    <h2>Dizgi Ayrıştırma: Sonlu Durum Makinesi</h2>
+    <p>Bir tanımlayıcı; durumlar, karakter sınıfları ve açık geçişlerle adım adım doğrulanır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Örnek bir girdi (en çok 24 karakter) yazın ve <b>Girdiyi Yükle</b> düğmesine basın.</li>
+      <li><b>Adım İlerle</b> bir karakter okur, <b>Otomatik Oynat</b> makine kabul ya da ret verene kadar sürer, <b>Sıfırla</b> girdiyi yeniden yükler.</li>
+      <li>Sarı hücre: okunacak sonraki karakter. Yeşil hücreler: okunmuş karakterler. Kırmızı hücre: retti doğuran karakter.</li>
+      <li>Durum diyagramı ve geçiş tablosu az önce izlenen geçişi vurgular.</li>
+    </ul>
+    <h3>Tanımlayıcı kuralı</h3>
+    <p>Bir tanımlayıcı harf ya da alt çizgiyle başlar; kalan karakterler harf, rakam ya da alt çizgidir. Her karakter önce bir karakter sınıfına (HARF, RAKAM, ALT_ÇİZGİ, DİĞER) eşlenir; sonraki durum yalnız geçerli duruma ve bu sınıfa bağlıdır.</p>
+    <ul>
+      <li><b>BAŞLA</b>: henüz bir şey okunmadı. HARF ya da ALT_ÇİZGİ TANIM durumuna geçirir; RAKAM ya da DİĞER ret verir.</li>
+      <li><b>TANIM</b>: şimdiye kadar geçerli bir tanımlayıcı okundu. HARF, RAKAM ve ALT_ÇİZGİ makineyi TANIM durumunda tutar; DİĞER ret verir.</li>
+      <li>Girdi bittiğinde dizgi yalnız makine TANIM durumundaysa kabul edilir; boş girdi reddedilir.</li>
+    </ul>
+    <h3>Neden durum makinesi?</h3>
+    <p>Derleyici ve yorumlayıcılardaki sözcüksel çözümleyiciler (lexer) tanımlayıcıları, sayıları ve anahtar sözcükleri tam da bu tür bir deterministik sonlu otomatla tanır: karakter başına bir tablo bakışı, geri izleme yok.</p>
+    <h3>Karmaşıklık</h3>
+    <p>n uzunluğundaki girdi için O(n) zaman (karakter başına bir geçiş) ve O(1) ek bellek; geçiş tablosunda |durumlar| × |sınıflar| kayıt vardır.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-parsing");
+    if (!root) return;
+
+    function q(id) {
+        return root.querySelector("#" + id);
+    }
+
+    var inputEl = q("algo-parsing-input");
+    var loadBtn = q("algo-parsing-load");
+    var stepBtn = q("algo-parsing-step");
+    var autoBtn = q("algo-parsing-auto");
+    var resetBtn = q("algo-parsing-reset");
+    var stateEl = q("algo-parsing-state");
+    var logEl = q("algo-parsing-log");
+    var scanEl = q("algo-parsing-scan");
+    var statusEl = q("algo-parsing-status");
+
+    var text = "";
+    var index = 0;
+    var state = "START";
+    var accepted = false;
+    var rejected = false;
+    var stepNo = 0;
+    var timer = null;
+    var lastClass = null;
+    var lastEdge = null;
+    var errorIndex = -1;
+    var logLines = [];
+    var LOG_MAX = 3;
+    /* ekranda gösterilen Türkçe adlar (iç değerler ve data-* öznitelikleri değişmez) */
+    var AD = { START: "BAŞLA", IN_ID: "TANIM", ACCEPT: "KABUL", REJECT: "RET",
+               LETTER: "HARF", DIGIT: "RAKAM", UNDERSCORE: "ALT_ÇİZGİ", OTHER: "DİĞER" };
+
+    function charClass(ch) {
+        if (/[A-Za-z]/.test(ch)) return "LETTER";
+        if (/[0-9]/.test(ch)) return "DIGIT";
+        if (ch === "_") return "UNDERSCORE";
+        return "OTHER";
+    }
+
+    function clearRowHighlight() {
+        root.querySelectorAll("tbody tr").forEach(function (row) {
+            row.classList.remove("is-current");
+        });
+    }
+
+    function highlightTransition(currentState, cls) {
+        clearRowHighlight();
+
+        if (!cls) return;
+
+        var row = root.querySelector(
+            'tbody tr[data-state="' + currentState + '"][data-class="' + cls + '"]'
+        );
+
+        if (row) row.classList.add("is-current");
+    }
+
+    function setStatus(message, kind) {
+        statusEl.textContent = message;
+        statusEl.classList.toggle("is-accept", kind === "accept");
+        statusEl.classList.toggle("is-reject", kind === "reject");
+    }
+
+    function renderDiagram() {
+        root.querySelectorAll("svg .node").forEach(function (g) {
+            g.classList.toggle("is-current", g.getAttribute("data-state") === state);
+        });
+        root.querySelectorAll("svg .edge").forEach(function (g) {
+            g.classList.toggle("is-taken", g.getAttribute("data-edge") === lastEdge);
+        });
+    }
+
+    function render(message, transitionState) {
+        stateEl.textContent =
+            "Durum: " + AD[state] +
+            " · İndis: " + index +
+            " · Kabul: " + (accepted ? "evet" : "hayır") +
+            " · Ret: " + (rejected ? "evet" : "hayır");
+
+        var n = Math.max(1, Array.from(text).length);
+        var cell = Math.max(22, Math.min(32, Math.floor(736 / n) - 3));
+        scanEl.style.setProperty("--cell", cell + "px");
+        scanEl.innerHTML = "";
+
+        if (!text.length) {
+            var empty = document.createElement("span");
+            empty.className = "ps-item is-wide";
+            empty.textContent = "boş girdi";
+            scanEl.appendChild(empty);
+        } else {
+            Array.from(text).forEach(function (ch, i) {
+                var item = document.createElement("span");
+                item.className = "ps-item";
+
+                if (i < index) {
+                    item.classList.add("is-done");
+                }
+
+                if (i === index && !accepted && !rejected) {
+                    item.classList.add("is-active");
+                }
+
+                if (i === errorIndex) {
+                    item.classList.add("is-error");
+                }
+
+                var small = document.createElement("small");
+                small.textContent = String(i);
+
+                item.appendChild(small);
+                item.appendChild(document.createTextNode(ch));
+                scanEl.appendChild(item);
+            });
+        }
+
+        if (message) {
+            logLines.unshift(message);
+            if (logLines.length > LOG_MAX) logLines.length = LOG_MAX;
+        }
+        logEl.innerHTML = "";
+        logLines.forEach(function (t) {
+            var li = document.createElement("li");
+            li.textContent = t;
+            logEl.appendChild(li);
+        });
+
+        highlightTransition(transitionState || state, lastClass);
+        renderDiagram();
+    }
+
+    function loadData() {
+        clearInterval(timer);
+        timer = null;
+
+        text = inputEl.value;
+        index = 0;
+        state = "START";
+        accepted = false;
+        rejected = false;
+        stepNo = 0;
+        lastClass = null;
+        lastEdge = null;
+        errorIndex = -1;
+        logLines = [];
+
+        setStatus("Girdi yüklendi. Ayrıştırıcı BAŞLA durumunda başlar.");
+
+        render("Girdi yüklendi. Makine BAŞLA durumunda başlar.", "START");
+    }
+
+    function step() {
+        if (accepted || rejected) {
+            setStatus(
+                accepted
+                    ? "Dizgi geçerli bir tanımlayıcı olarak kabul edildi."
+                    : "Dizgi reddedildi.",
+                accepted ? "accept" : "reject"
+            );
+            return false;
+        }
+
+        stepNo++;
+
+        if (index >= text.length) {
+            lastClass = null;
+            clearRowHighlight();
+
+            if (state === "IN_ID") {
+                accepted = true;
+                state = "ACCEPT";
+                lastEdge = "in-acc";
+                setStatus("Kabul: geçerli tanımlayıcı.", "accept");
+                render(
+                    "Adım " + stepNo +
+                    ": girdi, kabul edilebilir durumdayken bitti."
+                );
+            } else {
+                rejected = true;
+                state = "REJECT";
+                lastEdge = "start-rej";
+                setStatus("Ret: boş ya da eksik girdi.", "reject");
+                render(
+                    "Adım " + stepNo +
+                    ": geçerli bir tanımlayıcı oluşmadan girdi bitti."
+                );
+            }
+
+            return false;
+        }
+
+        var ch = text[index];
+        var cls = charClass(ch);
+        var oldState = state;
+
+        lastClass = cls;
+        errorIndex = -1;
+
+        if (state === "START") {
+            if (cls === "LETTER" || cls === "UNDERSCORE") {
+                state = "IN_ID";
+                index++;
+                lastEdge = "start-in";
+
+                setStatus("Geçerli geçiş: BAŞLA → TANIM.");
+
+                render(
+                    "Adım " + stepNo +
+                    ": '" + ch + "' sınıfı " + AD[cls] +
+                    ". Geçiş BAŞLA → TANIM.",
+                    oldState
+                );
+
+                return true;
+            }
+
+            state = "REJECT";
+            rejected = true;
+            errorIndex = index;
+            lastEdge = "start-rej";
+
+            setStatus("Ret: tanımlayıcı bu karakterle başlayamaz.", "reject");
+
+            render(
+                "Adım " + stepNo +
+                ": '" + ch + "' sınıfı " + AD[cls] +
+                ". Geçiş BAŞLA → RET.",
+                oldState
+            );
+
+            return false;
+        }
+
+        if (state === "IN_ID") {
+            if (
+                cls === "LETTER" ||
+                cls === "DIGIT" ||
+                cls === "UNDERSCORE"
+            ) {
+                index++;
+                lastEdge = "loop";
+
+                setStatus("Geçerli karakter. TANIM durumunda kalınır.");
+
+                render(
+                    "Adım " + stepNo +
+                    ": '" + ch + "' sınıfı " + AD[cls] +
+                    ". TANIM durumunda kalınır.",
+                    oldState
+                );
+
+                return true;
+            }
+
+            state = "REJECT";
+            rejected = true;
+            errorIndex = index;
+            lastEdge = "in-rej";
+
+            setStatus("Ret: bu karakter tanımlayıcı içinde kullanılamaz.", "reject");
+
+            render(
+                "Adım " + stepNo +
+                ": '" + ch + "' sınıfı DİĞER." +
+                " Geçiş TANIM → RET.",
+                oldState
+            );
+
+            return false;
+        }
+
+        return false;
+    }
+
+    function autoRun() {
+        clearInterval(timer);
+
+        timer = setInterval(function () {
+            var keepGoing = step();
+
+            if (!keepGoing || accepted || rejected) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }, 650);
+    }
+
+    loadBtn.addEventListener("click", loadData);
+    stepBtn.addEventListener("click", step);
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", loadData);
+
+    loadData();
+})();
+</script>
+<script src="deck/stage.js"></script>

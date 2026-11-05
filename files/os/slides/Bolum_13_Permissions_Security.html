@@ -1,0 +1,820 @@
+---
+layout: without-sidebar
+title: "İşletim Sistemi Koruma ve İzinler Laboratuvarı"
+permalink: /files/os/slides/Bolum_13_Permissions_Security.html
+excerpt: "rwx bitlerini, sekizlik gösterimi, chmod’u, sahipliği, erişim denetimini ve en az ayrıcalık ilkesini kapsayan etkileşimli işletim sistemi koruma ve UNIX izinleri laboratuvarı."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+.osim{
+  --o-bg:var(--ds-bg);
+  --o-fg:var(--ds-text);
+  --o-link:var(--ds-link);
+  --o-muted:color-mix(in srgb,var(--o-fg) 78%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 62%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:var(--ds-link);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,var(--ds-link) 80%,var(--o-fg));
+  --o-flt:var(--ds-accent);
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-shadow:color-mix(in srgb,var(--o-fg) 22%,transparent);
+  --o-dur:420ms;
+  font-variant-numeric:tabular-nums;
+}
+.osim .agt-oyun__body{display:flex;flex-direction:column;gap:6px;color:var(--o-fg);
+  font:14px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums}
+.osim .agt-oyun__body *,.osim .agt-oyun__body *::before,.osim .agt-oyun__body *::after{box-sizing:border-box;transition:none}
+.osim .agt-oyun__body p{margin:0;padding:0}
+.osim .agt-oyun__body [hidden]{display:none !important}
+.osim .agt-oyun__body button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:32px;min-height:0;padding:0 9px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font-weight:650;font-size:13.5px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim .agt-oyun__body button:hover{background:var(--o-cell)}
+.osim .agt-oyun__body button:disabled{opacity:.45;cursor:not-allowed}
+.osim .agt-oyun__body button:focus-visible,.osim .agt-oyun__body input:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim .agt-oyun__body button.osim-pri,.osim .agt-oyun__body button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:var(--o-bg);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .agt-oyun__body .osim-ib{width:32px;padding:0}
+.osim .agt-oyun__body svg{width:17px;height:17px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;flex:none;display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.osim .osim-seg{display:inline-flex;flex:none;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .agt-oyun__body .osim-seg button{border:0;height:26px;border-radius:8px;padding:0 9px}
+.osim .agt-oyun__body .osim-seg-sm button{padding:0 8px;font-size:13px}
+.osim .osim-grp{display:inline-flex;flex:none;align-items:center;gap:3px}
+.osim .osim-spacer{flex:1}
+.osim .agt-oyun__body input[type="range"]{width:72px;height:20px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:12.5px;font-weight:700;min-width:36px}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px var(--o-shadow)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:6px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;padding:8px 10px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-side{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-foot{flex:none;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:4px 8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 7px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;flex:none;gap:4px;flex-wrap:nowrap}
+.osim .osim-stat{display:inline-flex;gap:4px;height:26px;align-items:center;padding:0 7px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12px;font-weight:650;color:var(--o-muted);white-space:nowrap}
+.osim .osim-stat b{font-size:14px;color:var(--o-fg)}
+.osim .osim-stat.x{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(380px,100%);display:flex;flex-direction:column;gap:8px;padding:10px 12px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px var(--o-shadow);overflow:hidden}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-cap{font-size:12.5px;font-weight:650}
+.osim .osim-num{min-width:20px;text-align:center;font-weight:800;font-size:16px}
+.osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+/* help dialog (oyun.js moves it to <body>, so it carries its own tokens) */
+.osim-dlg{--o-fg:var(--ds-text);--o-bg:var(--ds-bg);--o-line:color-mix(in srgb,var(--o-fg) 62%,var(--o-bg));
+  --o-acc:color-mix(in srgb,var(--ds-link) 65%,var(--o-fg));--o-hit:color-mix(in srgb,var(--ds-link) 80%,var(--o-fg));--o-flt:var(--ds-accent);
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg))}
+.osim-dlg dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 8px}
+.osim-dlg dt{font-weight:800}
+.osim-dlg dd{margin:0}
+.osim-dlg .lg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;font-size:14px;font-weight:650}
+.osim-dlg .lg span{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:7px}
+.osim-dlg kbd{font:inherit;font-size:13px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+/* ---- permissions lab specific ---- */
+.osim .osim-stage.pm-stage{grid-template-columns:minmax(0,1fr)}
+.osim .pm-viz{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:12px;padding:10px 12px}
+.osim .pm-left{display:flex;flex-direction:column;gap:9px;min-width:0;min-height:0;justify-content:center}
+.osim .pm-mode{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.osim .pm-sym{display:flex;gap:3px;font:800 20px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.osim .pm-sym span{display:flex;flex-direction:column;align-items:center;justify-content:center;width:22px;height:36px;border-radius:6px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);transition:background var(--o-dur),box-shadow var(--o-dur)}
+.osim .pm-sym span.ty{background:transparent;box-shadow:none;width:16px}
+.osim .pm-sym span.g1{margin-left:5px}
+.osim .pm-sym span.cls{box-shadow:inset 0 0 0 2px var(--o-acc);background:var(--o-cell)}
+.osim .pm-sym span.sp{background:var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt)}
+.osim .pm-sym span.dec.yes{background:var(--o-hit-bg);box-shadow:inset 0 0 0 3px var(--o-hit)}
+.osim .pm-sym span.dec.no{background:var(--o-flt-bg);box-shadow:inset 0 0 0 3px var(--o-flt)}
+.osim .pm-oct{display:flex;align-items:center;gap:6px}
+.osim .agt-oyun__body .pm-oct input{width:4.1em;height:38px;min-height:0;margin:0;padding:0 2px;text-align:center;font:850 19px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--o-fg);background:var(--o-bg);border:1.5px solid var(--o-line);border-radius:10px;box-shadow:none;letter-spacing:.05em}
+.osim .agt-oyun__body .pm-oct input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .pm-cmd{font:700 13px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--o-muted);white-space:pre;overflow:hidden;text-overflow:ellipsis}
+.osim .pm-grid{display:grid;grid-template-columns:minmax(110px,auto) repeat(3,52px) 34px;gap:6px;align-items:center}
+.osim .pm-grid .hd{font-size:12px;font-weight:800;color:var(--o-muted);text-align:center;text-transform:uppercase;letter-spacing:.03em;line-height:1.1}
+.osim .pm-grid .hd small{display:block;text-transform:none;letter-spacing:0;font-weight:650;font-size:12px}
+.osim .pm-rh{display:flex;align-items:center;gap:7px;padding:3px 8px;height:100%;min-height:38px;border-radius:9px;transition:box-shadow var(--o-dur),background var(--o-dur)}
+.osim .pm-rh b{display:block;font-size:14px}
+.osim .pm-rh span{display:block;font-size:12px;color:var(--o-muted);font-weight:650;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.osim .agt-oyun__body .pm-rh svg{width:19px;height:19px;color:var(--o-acc)}
+.osim .pm-rh>div{min-width:0}
+.osim .pm-row.cls .pm-rh{background:var(--o-cell);box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .pm-row{display:contents}
+.osim .agt-oyun__body .pm-bit{height:38px;width:100%;padding:0;font:850 19px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border-radius:9px;transition:background var(--o-dur),box-shadow var(--o-dur)}
+.osim .agt-oyun__body .pm-bit[aria-pressed="false"]{border-style:dashed;color:var(--o-muted);background:var(--o-bg)}
+.osim .agt-oyun__body .pm-bit[aria-pressed="true"]{background:var(--o-pri);color:var(--o-bg);border-color:var(--o-pri)}
+.osim .agt-oyun__body .pm-bit.need{outline:3px solid var(--o-hit);outline-offset:2px}
+.osim .agt-oyun__body .pm-bit.need.miss{outline:3px dashed var(--o-flt)}
+.osim .pm-bit .ck{font:900 12px/1 system-ui,sans-serif;margin-left:2px}
+.osim .agt-oyun__body .pm-bit.sp{font-size:15px}
+.osim .pm-dg{font:850 22px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center}
+.osim .pm-flowbox{position:relative;min-width:0;min-height:0}
+.osim .agt-oyun__body .pm-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;font-family:inherit}
+.osim .pm-svg .n{fill:var(--o-surf);stroke:var(--o-line);stroke-width:1.5;transition:fill var(--o-dur),stroke var(--o-dur)}
+.osim .pm-svg .n.vis{fill:var(--o-cell);stroke:var(--o-acc);stroke-width:2.5}
+.osim .pm-svg .n.cur{stroke:var(--o-fg);stroke-width:3}
+.osim .pm-svg .n.ok{fill:var(--o-hit-bg);stroke:var(--o-hit);stroke-width:3}
+.osim .pm-svg .n.bad{fill:url(#pm-hatch);stroke:var(--o-flt);stroke-width:3}
+.osim .pm-svg .t{fill:var(--o-fg);font-size:13px;font-weight:750;text-anchor:middle}
+.osim .pm-svg .t.b{font-size:15px;font-weight:850}
+.osim .pm-svg .t.m{fill:var(--o-fg);font-size:12px;font-weight:600}
+.osim .pm-svg .t.big{font:850 19px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
+.osim .pm-svg .t.res{font-size:16px;font-weight:900;paint-order:stroke;stroke:var(--o-bg);stroke-width:5px;stroke-linejoin:round}
+.osim .pm-svg tspan.hit{fill:var(--o-fg);text-decoration:underline}
+.osim .pm-svg .e{fill:none;stroke:var(--o-line);stroke-width:1.6;stroke-dasharray:5 4}
+.osim .pm-svg .e.on{stroke:var(--o-acc);stroke-width:3.5;stroke-dasharray:none}
+.osim .pm-svg .e.on.draw{stroke-dasharray:var(--len) var(--len);animation:pm-draw var(--o-dur) ease-out both}
+@keyframes pm-draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+.osim .pm-svg .el{fill:var(--o-muted);font-size:12px;font-weight:800;text-anchor:middle;paint-order:stroke;stroke:var(--o-bg);stroke-width:4px}
+.osim .pm-svg .el.on{fill:var(--o-fg)}
+.osim .pm-svg marker path{fill:var(--o-line)}
+.osim .pm-svg #pm-ah-on path{fill:var(--o-acc)}
+.osim .pm-svg .pat-a{fill:var(--o-flt-bg)}
+.osim .pm-svg .pat-b{stroke:color-mix(in srgb,var(--o-flt) 30%,transparent);stroke-width:2}
+.osim .pm-svg .pulse{animation:pm-pulse 1.1s ease-in-out infinite}
+@keyframes pm-pulse{50%{stroke-width:5}}
+.osim .pm-in{display:inline-flex;flex:none;align-items:center;gap:4px}
+.osim .agt-oyun__body .pm-in input{width:6em;height:30px;min-height:0;margin:0;padding:0 6px;font:inherit;font-weight:700;font-size:14px;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:8px;box-shadow:none}
+.osim .agt-oyun__body .pm-in input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .osim-panel.pm-umpanel{width:min(580px,100%);bottom:auto}
+.osim .pm-um{display:flex;flex-direction:column;gap:7px}
+.osim .pm-umin{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.osim .agt-oyun__body .pm-umin input{width:4em;height:32px;min-height:0;margin:0;padding:0 6px;text-align:center;font:850 18px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--o-fg);background:var(--o-bg);border:1.5px solid var(--o-line);border-radius:8px;box-shadow:none}
+.osim .agt-oyun__body .pm-umin input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .pm-umalert{font-size:12.5px;font-weight:700;padding:4px 8px;border-radius:8px;border:2px solid var(--o-flt);background:var(--o-bg)}
+.osim .pm-umalert:empty{display:none}
+.osim .pm-umcols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.osim .pm-umcol{display:flex;flex-direction:column;gap:5px;min-width:0}
+.osim .pm-strip{display:grid;grid-template-columns:40px repeat(9,1fr) 38px;gap:2px;align-items:center;font-size:12px;font-weight:750}
+.osim .pm-strip i{font:800 12.5px/22px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;text-align:center;height:22px;border-radius:4px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);color:var(--o-muted)}
+.osim .pm-strip i.on{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit);color:var(--o-fg)}
+.osim .pm-strip i.rm{background:repeating-linear-gradient(135deg,var(--o-flt-bg) 0 3px,var(--o-bg) 3px 6px);box-shadow:inset 0 0 0 1.5px var(--o-flt);color:var(--o-fg)}
+.osim .pm-strip b{font:850 13.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:right}
+.osim .pm-strip.res i.on{background:var(--o-pri);color:var(--o-bg);box-shadow:none}
+.osim .pm-umres{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px}
+.osim .agt-oyun__body .pm-umres button{height:28px;font-size:12.5px;padding:0 8px}
+.osim .pm-mat{width:100%;border-collapse:separate;border-spacing:4px;font-size:13.5px}
+.osim .pm-mat th{font-weight:800;text-align:left;padding:4px 6px;border:0;background:none}
+.osim .pm-mat td{text-align:center;font-weight:900;padding:6px 4px;border-radius:7px;border:0}
+.osim .pm-mat td.y{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .pm-mat td.n{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--o-flt) 14%,transparent) 5px 8px),var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .pm-mat tr.me th{box-shadow:inset 3px 0 0 var(--o-acc)}
+.osim .pm-mat tr.me th span{font-weight:650;color:var(--o-muted);font-size:12px}
+.osim .pm-mat th,.osim .pm-mat td{color:var(--o-fg)}
+.osim .pm-mat thead,.osim .pm-mat tbody,.osim .pm-mat tr,.osim .pm-mat thead th{background:transparent}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
+</style>
+
+<div class="osim agt-oyun agt-oyun--stage" id="osim-pm" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 13 · Simülasyon</p><h1>İzinler Laboratuvarı</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="pm-help" aria-label="Yardım ve gösterim">?</button>
+    <a class="agt-oyun__back" href="Bolum_13_Guvenlik.html">← Bölüm 13</a>
+  </header>
+
+  <div class="agt-oyun__body">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <div class="osim-seg" role="group" aria-label="Nesne türü" id="pm-type">
+        <button type="button" data-type="file" title="Normal dosya">Dosya</button>
+        <button type="button" data-type="dir" title="Dizin: x = arama/geçiş, yazma için w+x gerekir">Dizin</button>
+      </div>
+      <div class="osim-seg" role="group" aria-label="İstenen işlem" id="pm-op">
+        <button type="button" data-op="r">Okuma</button>
+        <button type="button" data-op="w">Yazma</button>
+        <button type="button" data-op="x">Çalıştırma</button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl">Rol</span>
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="İsteyen kullanıcının rolü" id="pm-who">
+          <button type="button" data-who="owner" title="Dosyanın sahibi olarak iste">Sahip</button>
+          <button type="button" data-who="group" title="Dosyanın grubunun bir üyesi olarak iste">Grup</button>
+          <button type="button" data-who="other" title="İlgisiz bir kullanıcı olarak iste">Diğer</button>
+        </div>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" data-act="umask" id="pm-umbtn" aria-expanded="false" aria-controls="pm-umpanel" title="umask hesaplayıcısı">umask</button>
+      <button type="button" data-act="compare" id="pm-cmpbtn" aria-label="Tüm sınıflar için erişim matrisi" aria-expanded="false" aria-controls="pm-compare" title="Erişim matrisi"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 4v16"/></svg>Matris</button>
+    </div>
+    <div class="osim-row">
+      <label class="pm-in"><span class="osim-lbl">Sahip</span><input type="text" id="pm-owner" value="alice" maxlength="16" autocomplete="off" spellcheck="false" aria-label="Dosyanın sahibi"></label>
+      <label class="pm-in"><span class="osim-lbl">Grup</span><input type="text" id="pm-group" value="ogrenciler" maxlength="16" autocomplete="off" spellcheck="false" aria-label="Dosyanın grubu"></label>
+      <label class="pm-in"><span class="osim-lbl">Kullanıcı</span><input type="text" id="pm-user" value="bob" maxlength="16" autocomplete="off" spellcheck="false" aria-label="İsteyen kullanıcı"></label>
+      <label class="pm-in"><span class="osim-lbl">Grupları</span><input type="text" id="pm-ugroups" value="ogrenciler" maxlength="40" autocomplete="off" spellcheck="false" aria-label="Kullanıcının grupları (virgülle ayrılır)" style="width:9.5em"></label>
+    </div>
+    <div class="osim-row">
+      <div class="osim-grp">
+        <span class="osim-lbl">İzinler</span>
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="Hazır izin değerleri" id="pm-presets">
+          <button type="button" data-mode="644">644</button>
+          <button type="button" data-mode="755">755</button>
+          <button type="button" data-mode="600">600</button>
+          <button type="button" data-mode="044" title="Sahibin hiç biti yok: ilk eşleşme sahibi reddeder">044</button>
+          <button type="button" data-mode="4755" title="setuid, passwd gibi">4755</button>
+          <button type="button" data-mode="1777" title="sticky dizin, /tmp gibi">1777</button>
+        </div>
+      </div>
+      <span class="osim-spacer"></span>
+      <div class="osim-grp" role="group" aria-label="Oynatma">
+        <button type="button" class="osim-ib" data-act="first" aria-label="İlk adım (Home)" title="İlk (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Önceki adım (Sol ok)" title="Geri (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="pm-play" aria-label="Denetimi yeniden oynat (Boşluk)" title="Yeniden oynat / duraklat (Boşluk)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="pm-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Sonraki adım (Sağ ok)" title="Adım (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Son adım (End)" title="Son (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="pm-speed-l">Hız</span>
+        <input type="range" id="pm-speed" min="0" max="6" step="1" value="3" aria-labelledby="pm-speed-l" aria-valuetext="saniyede 2 adım">
+        <span class="osim-speedv" id="pm-speedv">2/s</span>
+      </div>
+    </div>
+    <div class="osim-alert" id="pm-alert" role="alert"></div>
+  </div>
+
+  <div class="osim-stage pm-stage">
+    <div class="osim-viz pm-viz" id="pm-viz">
+      <div class="pm-left">
+        <div class="pm-mode">
+          <div class="pm-sym" id="pm-sym" aria-label="Sembolik gösterim"></div>
+          <label class="pm-oct"><span class="osim-lbl">Sekizlik</span><input type="text" id="pm-octal" inputmode="numeric" maxlength="4" value="0644" autocomplete="off" aria-label="Sekizlik izinler (3 ya da 4 rakam)"></label>
+        </div>
+        <div class="pm-cmd" id="pm-cmd">chmod 644 dosya.txt</div>
+        <div class="pm-grid" id="pm-grid" role="group" aria-label="İzin bitleri"></div>
+      </div>
+      <div class="pm-flowbox" id="pm-flowbox"><svg class="pm-svg" id="pm-svg" role="img" aria-label="Erişim denetimi akışı"></svg></div>
+    </div>
+    <div class="osim-panel pm-umpanel" id="pm-umpanel" hidden aria-label="umask hesaplayıcısı">
+      <div class="osim-ph"><div><b>umask</b> <span>yeni dosya / dizin izinleri</span></div><button type="button" class="osim-ib" data-act="umask" aria-label="umask hesaplayıcısını kapat"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="pm-um">
+        <div class="pm-umin">
+          <input type="text" id="pm-umask" inputmode="numeric" maxlength="4" value="022" autocomplete="off" aria-label="umask (sekizlik)">
+          <div class="osim-seg osim-seg-sm" role="group" aria-label="Hazır umask değerleri" id="pm-umpre">
+            <button type="button" data-um="022">022</button>
+            <button type="button" data-um="027">027</button>
+            <button type="button" data-um="033">033</button>
+            <button type="button" data-um="077">077</button>
+          </div>
+        </div>
+        <div class="pm-umalert" id="pm-umalert" role="alert"></div>
+        <div class="pm-umcols">
+          <div class="pm-umcol">
+            <div class="osim-sub">Dosya: 666 &amp; ~umask</div>
+            <div id="pm-umfile"></div>
+            <div class="pm-umres"><span id="pm-umf-t"></span><button type="button" data-act="umfile" title="Izgaraya bu dosya izinlerini yükle">Uygula</button></div>
+          </div>
+          <div class="pm-umcol">
+            <div class="osim-sub">Dizin: 777 &amp; ~umask</div>
+            <div id="pm-umdir"></div>
+            <div class="pm-umres"><span id="pm-umd-t"></span><button type="button" data-act="umdir" title="Izgaraya bu dizin izinlerini yükle">Uygula</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="osim-panel" id="pm-compare" hidden aria-label="Erişim matrisi"></div>
+  </div>
+
+  <div class="osim-foot">
+    <p class="osim-narr" id="pm-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat" title="Sekizlik izinler">İzin <b id="pm-so">0644</b></span>
+      <span class="osim-stat" title="Çekirdeğin denetlediği sınıf (ilk eşleşme)">Sınıf <b id="pm-sc">&#8211;</b></span>
+      <span class="osim-stat" title="İşlemin gerektirdiği bitler">Gereken <b id="pm-sn">&#8211;</b></span>
+      <span class="osim-stat" id="pm-srbox" title="Karar">Sonuç <b id="pm-sr">&#8211;</b></span>
+      <span class="osim-stat" title="Şu anki adım">Adım <b id="pm-ss">0/0</b></span>
+    </div>
+  </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog osim-dlg" id="pm-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>İzinler Laboratuvarı</h2>
+    <p>Bir Unix çekirdeği, bir kullanıcının bir dosyayı ya da dizini okuyup okuyamayacağına, yazıp yazamayacağına, çalıştırıp çalıştıramayacağına nasıl karar verir? İzin bitleri (sahip, grup ve diğerleri için rwx; ayrıca setuid, setgid ve sticky) ve ilk eşleşme kuralıyla yapılan erişim denetimi, akış şeması üzerinde adım adım gösterilir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Nesne türü (<b>Dosya</b> / <b>Dizin</b>) ve işlem seçilir; <b>Rol</b> düğmeleri kullanıcı alanına sahibi, bir grup üyesini ya da ilgisiz bir kullanıcıyı yazar.</li>
+      <li>Sahip, dosyanın grubu, isteyen kullanıcı ve kullanıcının grupları (virgülle ayrılmış) doğrudan düzenlenebilir.</li>
+      <li>Izgaradaki bitler açılıp kapatılır, sekizlik izin değeri yazılır ya da hazır bir <b>İzinler</b> değeri seçilir. Her değişiklik denetimi yeniden oynatır; oynatma düğmeleriyle adım adım izlenebilir.</li>
+      <li><b>umask</b>, umask hesaplayıcısını açar (yeni dosya ve dizin izinleri; <b>Uygula</b> sonucu ızgaraya yükler). <b>Matris</b>, her sınıf için kimin ne yapabileceğini gösterir.</li>
+    </ul>
+    <h3>Kurallar</h3>
+    <dl>
+      <dt>İlk eşleşme</dt><dd>Kullanıcı sahip mi? Sahip bitleri kullanılır. Değilse grupta mı? Grup bitleri. Değilse diğerlerinin bitleri.</dd>
+      <dt>r w x</dt><dd>Her sınıfın rakamında 4 + 2 + 1.</dd>
+      <dt>Dizin r</dt><dd>Adları listeleme.</dd>
+      <dt>Dizin w</dt><dd>Girdi oluşturma, silme, yeniden adlandırma; w ve x gerekir.</dd>
+      <dt>Dizin x</dt><dd>Arama / geçiş (cd, dosyalara adla erişim).</dd>
+      <dt>setuid</dt><dd>4xxx: program sahibinin kimliğiyle çalışır (sahibin x yerinde s/S).</dd>
+      <dt>setgid</dt><dd>2xxx: program grubun kimliğiyle çalışır; dizinler grubunu yeni girdilere aktarır.</dd>
+      <dt>sticky</dt><dd>1xxx: dizinde her kullanıcı yalnızca kendi dosyalarını silebilir (t/T).</dd>
+      <dt>umask</dt><dd>666 / 777’den silinen bitler (çıkarma değil, maskeleme).</dd>
+      <dt>Kapsam</dt><dd>Yalnızca sıradan kullanıcılar: root, ACL ya da üst dizin yolu denetimi yok.</dd>
+    </dl>
+    <h3>Gösterim</h3>
+    <div class="lg">
+      <span style="box-shadow:inset 0 0 0 2px var(--o-acc)">kullanılan sınıf</span>
+      <span style="outline:3px solid var(--o-hit);outline-offset:-3px">gereken bit açık</span>
+      <span style="outline:3px dashed var(--o-flt);outline-offset:-3px">gereken bit eksik</span>
+      <span>&#10003; izin var</span><span>&#10007; izin yok</span>
+    </div>
+    <h3>Tuşlar</h3>
+    <div class="lg"><span><kbd>&#8592;</kbd><kbd>&#8594;</kbd> adım</span><span><kbd>Boşluk</kbd> yeniden oynat</span><span><kbd>Home</kbd><kbd>End</kbd> ilk / son</span><span><kbd>Esc</kbd> kapat</span></div>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.getElementById("osim-pm");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
+
+var WHO=["owner","group","other"];
+var CLS_NAME={owner:"sahip",group:"grup",other:"diğerleri"};
+var SPEEDS=[0.5,1,1.5,2,3,4,6];
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+var OPS={file:{r:"Okuma",w:"Yazma",x:"Çalıştırma"},dir:{r:"Listeleme",w:"Yazma",x:"Arama"}};
+var OPV={file:{r:"okuma",w:"yazma",x:"çalıştırma"},dir:{r:"listeleme",w:"değiştirme",x:"arama"}};
+var COLH={file:{r:"oku",w:"yaz",x:"çalıştır"},dir:{r:"listele",w:"değiştir",x:"ara"}};
+var ICON={owner:"<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c1-4 4-6 8-6s7 2 8 6\"/></svg>",
+  group:"<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"9\" cy=\"8\" r=\"3.2\"/><circle cx=\"17\" cy=\"9\" r=\"2.6\"/><path d=\"M2.5 20c.8-3.4 3.3-5 6.5-5s5.7 1.6 6.5 5M15 14.5c3 0 5.5 1.5 6.5 5\"/></svg>",
+  other:"<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18\"/></svg>",
+  special:"<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z\"/></svg>"};
+
+var st={mode:0o644,type:"file",op:"r",umask:0o022,step:0,path:[],playing:false,timer:0,speed:2,fast:false};
+
+/* ---------- permission logic (verified: first match, owner -> group -> others) ---------- */
+function octalText(m){
+  var low=(m&511).toString(8);while(low.length<3){low="0"+low;}
+  return (m&3584)?((m>>9)&7)+low:low;
+}
+function oct4(m){var t=octalText(m);return t.length===3?"0"+t:t;}
+function symbolic(m,type){
+  var s=type==="dir"?"d":"-",sp=[[2048,"s","S"],[1024,"s","S"],[512,"t","T"]];
+  WHO.forEach(function(w,i){
+    var d=(m>>((2-i)*3))&7;
+    s+=(d&4?"r":"-")+(d&2?"w":"-");
+    var x=!!(d&1),special=!!(m&sp[i][0]);
+    s+=special?(x?sp[i][1]:sp[i][2]):(x?"x":"-");
+  });
+  return s;
+}
+function parseOctal(text){
+  var t=String(text).trim();
+  if(!/^[0-7]{3,4}$/.test(t)){return null;}
+  return parseInt(t,8);
+}
+function groupsOf(text){return String(text).split(/[\s,]+/).filter(Boolean);}
+function accessClass(user,own,fgroup,ugroups){
+  if(user===own){return "owner";}
+  if(ugroups.indexOf(fgroup)>=0){return "group";}
+  return "other";
+}
+function bitsFor(m,cls){return (m>>((2-WHO.indexOf(cls))*3))&7;}
+function required(op,type){
+  if(op==="r"){return 4;}
+  if(op==="x"){return 1;}
+  return type==="dir"?3:2;
+}
+function needText(n){return n===3?"w+x":n===4?"r":n===2?"w":"x";}
+function triad(m,cls,type){var s=symbolic(m,type),i=WHO.indexOf(cls);return s.slice(1+i*3,4+i*3);}
+
+/* ---------- inputs ---------- */
+var ownerIn=$("pm-owner"),groupIn=$("pm-group"),userIn=$("pm-user"),ugIn=$("pm-ugroups"),octIn=$("pm-octal"),umIn=$("pm-umask");
+function alertMsg(t){$("pm-alert").textContent=t||"";}
+function req(){
+  var own=ownerIn.value.trim(),fg=groupIn.value.trim(),user=userIn.value.trim();
+  ownerIn.setAttribute("aria-invalid",own?"false":"true");
+  groupIn.setAttribute("aria-invalid",fg?"false":"true");
+  userIn.setAttribute("aria-invalid",user?"false":"true");
+  if(!own||!fg||!user){return null;}
+  return {own:own,fg:fg,user:user,ug:groupsOf(ugIn.value)};
+}
+function decide(){
+  var r=req();
+  if(!r){return null;}
+  var cls=accessClass(r.user,r.own,r.fg,r.ug),need=required(st.op,st.type),have=bitsFor(st.mode,cls);
+  return {r:r,cls:cls,need:need,have:have,allowed:(have&need)===need};
+}
+function buildPath(d){
+  if(!d){return [];}
+  if(d.cls==="owner"){return ["req","d1","owner","res"];}
+  return ["req","d1","d2",d.cls,"res"];
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function short(s,n){s=String(s);return s.length>n?s.slice(0,n-1)+"…":s;}
+function interval(){var i=1000/st.speed;return st.fast?Math.min(i,380):i;}
+function dur(){return Math.round(Math.max(160,Math.min(560,interval()*0.75)));}
+function f1(v){return v.toFixed(1);}
+function objName(){return st.type==="dir"?"proje/":"dosya.txt";}
+
+/* ---------- mode grid + symbolic ---------- */
+var grid=$("pm-grid");
+function buildGrid(){
+  var h="<span></span>";
+  ["r","w","x"].forEach(function(b){h+="<span class=\"hd\" id=\"pm-h-"+b+"\">"+b+"<small>"+COLH[st.type][b]+"</small></span>";});
+  h+="<span class=\"hd\">rakam</span>";
+  WHO.concat(["special"]).forEach(function(w){
+    var lab=w==="owner"?"Sahip":w==="group"?"Grup":w==="other"?"Diğerleri":"Özel";
+    h+="<div class=\"pm-row\" data-row=\""+w+"\"><div class=\"pm-rh\">"+ICON[w]+"<div><b>"+lab+"</b><span id=\"pm-rn-"+w+"\"></span></div></div>";
+    var bits=w==="special"?[["u","s","setuid"],["g","s","setgid"],["t","t","sticky"]]:[["r","r","okuma"],["w","w","yazma"],["x","x","çalıştırma"]];
+    bits.forEach(function(b){
+      h+="<button type=\"button\" class=\"pm-bit"+(w==="special"?" sp":"")+"\" data-cls=\""+w+"\" data-bit=\""+b[0]+"\" aria-pressed=\"false\" aria-label=\""+lab+" "+b[2]+"\" title=\""+lab+" "+b[2]+"\">"+b[1]+"</button>";
+    });
+    h+="<span class=\"pm-dg\" id=\"pm-dg-"+w+"\">0</span></div>";
+  });
+  grid.innerHTML=h;
+}
+function bitMask(cls,bit){
+  if(cls==="special"){return bit==="u"?2048:bit==="g"?1024:512;}
+  var sh=(2-WHO.indexOf(cls))*3;
+  return (bit==="r"?4:bit==="w"?2:1)<<sh;
+}
+function renderGrid(d,showCls){
+  var m=st.mode,r=d?d.r:null;
+  ["r","w","x"].forEach(function(b){$("pm-h-"+b).innerHTML=b+"<small>"+COLH[st.type][b]+"</small>";});
+  $("pm-rn-owner").textContent=r?r.own:"?";
+  $("pm-rn-group").textContent=r?r.fg:"?";
+  $("pm-rn-other").textContent="diğer herkes";
+  $("pm-rn-special").textContent="suid sgid sticky";
+  grid.querySelectorAll(".pm-row").forEach(function(row){
+    var w=row.getAttribute("data-row");
+    row.classList.toggle("cls",!!(d&&showCls&&w===d.cls));
+  });
+  grid.querySelectorAll(".pm-bit").forEach(function(b){
+    var cls=b.getAttribute("data-cls"),bit=b.getAttribute("data-bit"),on=!!(m&bitMask(cls,bit));
+    b.setAttribute("aria-pressed",String(on));
+    var need=false;
+    if(d&&showCls&&cls===d.cls){var v=bit==="r"?4:bit==="w"?2:1;need=!!(d.need&v);}
+    b.classList.toggle("need",need);b.classList.toggle("miss",need&&!on);
+    var base=cls==="special"?(bit==="t"?"t":"s"):bit;
+    b.innerHTML=base+(need?"<span class=\"ck\">"+(on?"✓":"✗")+"</span>":"");
+  });
+  WHO.forEach(function(w){$("pm-dg-"+w).textContent=bitsFor(m,w);});
+  $("pm-dg-special").textContent=(m>>9)&7;
+}
+function renderSym(d,showCls){
+  var s=symbolic(st.mode,st.type),h="";
+  for(var i=0;i<10;i++){
+    var c="",ci=i===0?-1:Math.floor((i-1)/3),pos=(i-1)%3;
+    if(i===0){c="ty";}
+    else{
+      if(pos===0&&ci>0){c+=" g1";}
+      if(/[sStT]/.test(s[i])){c+=" sp";}
+      if(d&&showCls&&WHO[ci]===d.cls){
+        c+=" cls";
+        var v=pos===0?4:pos===1?2:1;
+        if(d.need&v){c+=" dec "+((d.have&v)?"yes":"no");}
+      }
+    }
+    h+="<span class=\""+c.trim()+"\" title=\""+(i===0?(st.type==="dir"?"dizin":"normal dosya"):CLS_NAME[WHO[ci]]+" "+["okuma","yazma","çalıştırma"][pos])+"\">"+s[i]+"</span>";
+  }
+  $("pm-sym").innerHTML=h;
+  if(document.activeElement!==octIn){octIn.value=oct4(st.mode);octIn.setAttribute("aria-invalid","false");}
+  $("pm-cmd").textContent="chmod "+octalText(st.mode)+" "+objName()+"   # "+s;
+}
+
+/* ---------- flowchart ---------- */
+var svg=$("pm-svg"),fbox=$("pm-flowbox"),F=null;
+function flowGeom(){
+  var W=Math.max(240,fbox.clientWidth),H=Math.max(220,fbox.clientHeight);
+  var cx=W*0.30,rx=W*0.80,dw=Math.min(W*0.255,118),dh=Math.max(24,Math.min(H*0.085,40));
+  var bw=Math.min(W*0.33,150),bh=Math.max(46,Math.min(H*0.15,70));
+  return {W:W,H:H,cx:cx,rx:rx,dw:dw,dh:dh,bw:bw,bh:bh,
+    req:{x:cx,y:Math.max(20,H*0.07),w:Math.min(W*0.62,270),h:34},
+    d1:{x:cx,y:H*0.27},d2:{x:cx,y:H*0.50},
+    owner:{x:rx,y:H*0.27},group:{x:rx,y:H*0.50},other:{x:cx,y:H*0.72},
+    res:{x:W*0.52,y:H-26,w:Math.min(W*0.84,320),h:40}};
+}
+function renderFlow(d,anim){
+  var g=flowGeom();F=g;
+  var path=st.path,k=st.step,vis={},cur=path[k],on={};
+  for(var i=0;i<=k&&i<path.length;i++){vis[path[i]]=1;if(i>0){on[path[i-1]+"-"+path[i]]=1;}}
+  var newEdge=k>0&&anim?path[k-1]+"-"+path[k]:"";
+  var final=path.length&&k===path.length-1;
+  svg.setAttribute("viewBox","0 0 "+g.W+" "+g.H);
+  var h="<defs><marker id=\"pm-ah\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\"/></marker>"+
+    "<marker id=\"pm-ah-on\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"5\" markerHeight=\"5\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\"/></marker>"+
+    "<pattern id=\"pm-hatch\" width=\"7\" height=\"7\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><rect class=\"pat-a\" width=\"7\" height=\"7\"/><line class=\"pat-b\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"7\"/></pattern></defs>";
+  function edge(key,pts,label,lx,ly){
+    var a=!!on[key],len=0;
+    for(var j=1;j<pts.length;j++){len+=Math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]);}
+    var dd="M"+pts.map(function(p){return f1(p[0])+" "+f1(p[1]);}).join("L");
+    var s="<path class=\"e"+(a?" on":"")+(a&&key===newEdge?" draw":"")+"\" style=\"--len:"+Math.ceil(len+10)+"\" marker-end=\"url(#"+(a?"pm-ah-on":"pm-ah")+")\" d=\""+dd+"\"/>";
+    if(label){s+="<text class=\"el"+(a?" on":"")+"\" x=\""+f1(lx)+"\" y=\""+f1(ly)+"\">"+label+"</text>";}
+    return s;
+  }
+  var R=g.req,D1=g.d1,D2=g.d2,O=g.owner,Gp=g.group,X=g.other,RS=g.res;
+  h+=edge("req-d1",[[R.x,R.y+R.h/2],[D1.x,D1.y-g.dh-2]]);
+  h+=edge("d1-owner",[[D1.x+g.dw,D1.y],[O.x-g.bw/2-2,O.y]],"evet",(D1.x+g.dw+O.x-g.bw/2)/2,D1.y-7);
+  h+=edge("d1-d2",[[D1.x,D1.y+g.dh],[D2.x,D2.y-g.dh-2]],"hayır",D1.x+16,D1.y+g.dh+16);
+  h+=edge("d2-group",[[D2.x+g.dw,D2.y],[Gp.x-g.bw/2-2,Gp.y]],"evet",(D2.x+g.dw+Gp.x-g.bw/2)/2,D2.y-7);
+  h+=edge("d2-other",[[D2.x,D2.y+g.dh],[X.x,X.y-g.bh/2-2]],"hayır",D2.x+16,D2.y+g.dh+16);
+  var rxE=Math.min(g.W-6,O.x+g.bw/2+14);
+  h+=edge("owner-res",[[O.x+g.bw/2,O.y],[rxE,O.y],[rxE,RS.y],[RS.x+RS.w/2+2,RS.y]]);
+  h+=edge("group-res",[[Gp.x,Gp.y+g.bh/2],[Gp.x,RS.y-RS.h/2-2]]);
+  h+=edge("other-res",[[X.x,X.y+g.bh/2],[X.x,RS.y-RS.h/2-2]]);
+  function ncls(key){return "n"+(vis[key]?" vis":"")+(cur===key&&!final?" cur":"");}
+  var r=d?d.r:null;
+  h+="<rect class=\""+ncls("req")+"\" x=\""+f1(R.x-R.w/2)+"\" y=\""+f1(R.y-R.h/2)+"\" width=\""+f1(R.w)+"\" height=\""+R.h+"\" rx=\"17\"/>";
+  h+="<text class=\"t\" x=\""+f1(R.x)+"\" y=\""+f1(R.y+5)+"\">"+(r?esc(short(r.user,12))+" → "+OPV[st.type][st.op]+" ("+objName()+")":"sahip, grup ve kullanıcı girilmeli")+"</text>";
+  function diamond(key,c,l1,l2){
+    return "<path class=\""+ncls(key)+"\" d=\"M"+f1(c.x)+" "+f1(c.y-g.dh)+"L"+f1(c.x+g.dw)+" "+f1(c.y)+"L"+f1(c.x)+" "+f1(c.y+g.dh)+"L"+f1(c.x-g.dw)+" "+f1(c.y)+"Z\"/>"+
+      "<text class=\"t\" x=\""+f1(c.x)+"\" y=\""+f1(c.y-2)+"\">"+l1+"</text><text class=\"t m\" x=\""+f1(c.x)+"\" y=\""+f1(c.y+14)+"\">"+l2+"</text>";
+  }
+  h+=diamond("d1",D1,"kullanıcı = sahip?",r?esc(short(r.user,9))+" / "+esc(short(r.own,9)):"");
+  h+=diamond("d2",D2,"grupta mı?",r?esc(short(r.fg,14)):"");
+  function clsBox(key,c,lab){
+    var isCls=d&&d.cls===key&&vis[key],tri=triad(st.mode,key,st.type),tx="";
+    for(var j=0;j<3;j++){var v=j===0?4:j===1?2:1,hit=isCls&&(d.need&v);tx+=hit?"<tspan class=\"hit\">"+tri[j]+"</tspan>":tri[j];}
+    return "<rect class=\""+ncls(key)+"\" x=\""+f1(c.x-g.bw/2)+"\" y=\""+f1(c.y-g.bh/2)+"\" width=\""+f1(g.bw)+"\" height=\""+f1(g.bh)+"\" rx=\"10\"/>"+
+      "<text class=\"t m\" x=\""+f1(c.x)+"\" y=\""+f1(c.y-g.bh/2+17)+"\">"+lab+" bitleri</text>"+
+      "<text class=\"t big\" x=\""+f1(c.x)+"\" y=\""+f1(c.y+g.bh/2-10)+"\">"+tx+"</text>";
+  }
+  h+=clsBox("owner",O,"sahip");h+=clsBox("group",Gp,"grup");h+=clsBox("other",X,"diğerlerinin");
+  var rc="n"+(vis.res?(d.allowed?" ok":" bad"):"");
+  h+="<rect class=\""+rc+(vis.res&&!reduce.matches&&anim?" pulse":"")+"\" x=\""+f1(RS.x-RS.w/2)+"\" y=\""+f1(RS.y-RS.h/2)+"\" width=\""+f1(RS.w)+"\" height=\""+RS.h+"\" rx=\"20\"/>";
+  h+="<text class=\"t res\" x=\""+f1(RS.x)+"\" y=\""+f1(RS.y+6)+"\">"+(vis.res?(d.allowed?"✓ İzin var":"✗ İzin yok")+" · "+OPV[st.type][st.op]+" için "+needText(d.need)+" gerekir":"karar")+"</text>";
+  svg.innerHTML=h;
+  svg.setAttribute("aria-label","Erişim denetimi: "+path.slice(0,k+1).join(" → ")+(vis.res?(d.allowed?", izin var":", izin yok"):""));
+}
+
+/* ---------- side: umask ---------- */
+function strip(lab,base,mask,val,res){
+  var s="<div class=\"pm-strip"+(res?" res":"")+"\"><span>"+lab+"</span>",chars="rwxrwxrwx";
+  for(var i=0;i<9;i++){
+    var bit=1<<(8-i),c="",t="·";
+    if(mask!=null){if(mask&bit){c="rm";t="✗";}}
+    else if(base&bit){c="on";t=chars[i];}
+    s+="<i class=\""+c+"\">"+t+"</i>";
+  }
+  return s+"<b>"+val+"</b></div>";
+}
+function renderUmask(){
+  var u=parseOctal(umIn.value);
+  if(u===null||u>511){
+    umIn.setAttribute("aria-invalid","true");
+    $("pm-umalert").textContent="umask: 3–4 sekizlik rakam, ör. 022 ya da 0027.";
+    return;
+  }
+  umIn.setAttribute("aria-invalid","false");$("pm-umalert").textContent="";
+  st.umask=u;
+  var f=438&~u,dd=511&~u,ut=octalText(u);
+  $("pm-umfile").innerHTML=strip("taban",438,null,"666")+strip("maske",0,u,ut)+strip("=",f,null,octalText(f),true);
+  $("pm-umdir").innerHTML=strip("taban",511,null,"777")+strip("maske",0,u,ut)+strip("=",dd,null,octalText(dd),true);
+  $("pm-umf-t").innerHTML="<b>"+octalText(f)+"</b> "+symbolic(f,"file");
+  $("pm-umd-t").innerHTML="<b>"+octalText(dd)+"</b> "+symbolic(dd,"dir");
+  root.querySelectorAll("#pm-umpre button").forEach(function(b){b.setAttribute("aria-pressed",String(parseInt(b.getAttribute("data-um"),8)===u));});
+}
+
+/* ---------- narration + stats ---------- */
+function narration(d){
+  if(!d){return "Sahip, grup ve kullanıcı girilmeli";}
+  var r=d.r,node=st.path[st.step],u="<b>"+esc(short(r.user,12))+"</b>";
+  switch(node){
+    case "req":return u+", "+objName()+" için <b>"+OPV[st.type][st.op]+"</b> istiyor";
+    case "d1":return d.cls==="owner"?u+" sahip mi? <span class=\"osim-k h\">evet</span> → yalnızca sahip bitleri":u+" sahip ("+esc(short(r.own,10))+") mi? <span class=\"osim-k x\">hayır</span>";
+    case "d2":return d.cls==="group"?u+", "+esc(short(r.fg,10))+" grubunda mı? <span class=\"osim-k h\">evet</span> → grup bitleri":u+", "+esc(short(r.fg,10))+" grubunda mı? <span class=\"osim-k x\">hayır</span> → diğerlerinin bitleri";
+    case "res":
+      if(d.allowed){return "<span class=\"osim-k h\">✓ İzin var</span> ("+CLS_NAME[d.cls]+" sınıfı üzerinden)";}
+      var other=WHO.some(function(w){return w!==d.cls&&(bitsFor(st.mode,w)&d.need)===d.need;});
+      return "<span class=\"osim-k x\">✗ İzin yok</span>, "+CLS_NAME[d.cls]+" sınıfının bitleri yüzünden"+(other?" — ilk eşleşme geçerli":"");
+    default:
+      var tri=triad(st.mode,d.cls,st.type);
+      return ({owner:"Sahip",group:"Grup",other:"Diğerlerinin"})[d.cls]+" bitleri <b>"+tri+"</b> · gereken "+needText(d.need)+" → "+(d.allowed?"var":"eksik");
+  }
+}
+function renderStats(d){
+  $("pm-so").textContent=oct4(st.mode);
+  $("pm-sc").textContent=d?CLS_NAME[d.cls]:"–";
+  $("pm-sn").textContent=d?needText(d.need):"–";
+  $("pm-sr").textContent=d?(d.allowed?"✓ İzin var":"✗ İzin yok"):"–";
+  var box=$("pm-srbox");box.classList.toggle("h",!!(d&&d.allowed));box.classList.toggle("x",!!(d&&!d.allowed));
+  $("pm-ss").textContent=st.path.length?st.step+"/"+(st.path.length-1):"0/0";
+  $("pm-narr").innerHTML=narration(d);
+}
+
+/* ---------- compare: access matrix ---------- */
+var cmp=$("pm-compare");
+function renderCompare(){
+  if(cmp.hidden){return;}
+  var d=decide(),r=d?d.r:null;
+  var h="<div class=\"osim-ph\"><div><b>Erişim matrisi</b> <span>"+oct4(st.mode)+" · "+(st.type==="dir"?"dizin":"dosya")+"</span></div><button type=\"button\" class=\"osim-ib\" data-act=\"compare\" aria-label=\"Erişim matrisini kapat\"><svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>";
+  h+="<div class=\"osim-sub\">Kim ne yapabilir (sınıf başına ilk eşleşme)</div><table class=\"pm-mat\"><thead><tr><th></th>";
+  ["r","w","x"].forEach(function(o){h+="<th scope=\"col\" style=\"text-align:center\">"+OPS[st.type][o]+"</th>";});
+  h+="</tr></thead><tbody>";
+  WHO.forEach(function(w){
+    var lab=w==="owner"?"Sahip"+(r?" <span>("+esc(short(r.own,10))+")</span>":""):w==="group"?"Grup"+(r?" <span>("+esc(short(r.fg,10))+")</span>":""):"Diğerleri";
+    h+="<tr class=\""+(d&&d.cls===w?"me":"")+"\" data-cls=\""+w+"\"><th scope=\"row\">"+lab+(d&&d.cls===w?" <span>← "+esc(short(r.user,8))+"</span>":"")+"</th>";
+    ["r","w","x"].forEach(function(o){
+      var need=required(o,st.type),ok=(bitsFor(st.mode,w)&need)===need;
+      h+="<td class=\""+(ok?"y":"n")+"\" data-op=\""+o+"\" title=\""+CLS_NAME[w]+" "+OPV[st.type][o]+": "+(ok?"izin var":"izin yok")+"\">"+(ok?"✓":"✗")+"</td>";
+    });
+    h+="</tr>";
+  });
+  h+="</tbody></table><p class=\"osim-cap\">Yalnızca ilk eşleşen satır denetlenir; alttaki bir satır, reddedilen sahibi hiçbir zaman kurtarmaz.</p>";
+  cmp.innerHTML=h;
+}
+function togglePanel(id,force){
+  var p=$(id),other=id==="pm-compare"?$("pm-umpanel"):$("pm-compare");
+  var open=force!=null?force:p.hidden;
+  p.hidden=!open;if(open){other.hidden=true;}
+  $("pm-cmpbtn").setAttribute("aria-expanded",String(!$("pm-compare").hidden));
+  $("pm-umbtn").setAttribute("aria-expanded",String(!$("pm-umpanel").hidden));
+  if(id==="pm-compare"&&open){renderCompare();}
+}
+
+/* ---------- controls + transport ---------- */
+function renderControls(d){
+  root.querySelectorAll("#pm-type button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-type")===st.type));});
+  root.querySelectorAll("#pm-op button").forEach(function(b){
+    var o=b.getAttribute("data-op");
+    b.textContent=OPS[st.type][o];
+    b.title=st.type==="dir"?(o==="r"?"Adları listele (r)":o==="w"?"Girdi oluştur/sil/yeniden adlandır (w ve x gerekir)":"Arama: cd, dosyalara adla erişim (x)"):(o==="r"?"İçeriği oku (r)":o==="w"?"İçeriği değiştir (w)":"Program olarak çalıştır (x)");
+    b.setAttribute("aria-pressed",String(o===st.op));
+  });
+  root.querySelectorAll("#pm-who button").forEach(function(b){b.setAttribute("aria-pressed",String(!!d&&b.getAttribute("data-who")===d.cls));});
+  root.querySelectorAll("#pm-presets button").forEach(function(b){b.setAttribute("aria-pressed",String(parseInt(b.getAttribute("data-mode"),8)===st.mode));});
+  var N=Math.max(0,st.path.length-1),atEnd=st.step>=N;
+  root.querySelector("[data-act=prev]").disabled=st.step<=0;
+  root.querySelector("[data-act=first]").disabled=st.step<=0;
+  root.querySelector("[data-act=next]").disabled=atEnd;
+  root.querySelector("[data-act=last]").disabled=atEnd;
+  root.querySelector("[data-act=play]").disabled=!st.path.length;
+  $("pm-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("pm-play").setAttribute("aria-label",st.playing?"Duraklat (Boşluk)":"Denetimi yeniden oynat (Boşluk)");
+}
+function draw(anim){
+  root.style.setProperty("--o-dur",dur()+"ms");
+  var d=decide();
+  st.path=buildPath(d);
+  if(st.step>st.path.length-1){st.step=Math.max(0,st.path.length-1);}
+  var node=st.path[st.step],ci=st.path.indexOf(d?d.cls:"");
+  var showCls=!!d&&ci>=0&&st.step>=ci;
+  if(!d){alertMsg("Sahip, grup ve kullanıcı boş bırakılamaz.");}
+  else if($("pm-alert").getAttribute("data-k")!=="oct"){alertMsg("");}
+  renderSym(d,showCls);renderGrid(d,showCls);renderFlow(d,anim);renderStats(d);renderControls(d);renderCompare();
+  void node;
+}
+function go(step,anim){
+  var prev=st.step;
+  st.step=Math.max(0,Math.min(Math.max(0,st.path.length-1),step));
+  draw(!!anim&&!reduce.matches&&st.step===prev+1);
+}
+function tick(){
+  if(!st.playing){return;}
+  var N=st.path.length-1;
+  if(st.step>=N){pause();return;}
+  go(st.step+1,true);
+  if(st.step>=N){st.playing=false;st.fast=false;renderControls(decide());return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){if(st.playing||!st.path.length){return;}if(st.step>=st.path.length-1){st.step=0;draw(false);}st.playing=true;renderControls(decide());st.timer=setTimeout(tick,interval());}
+function pause(){st.playing=false;st.fast=false;clearTimeout(st.timer);renderControls(decide());}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+/* any change: replay the check quickly from the start (or jump to the result with reduced motion) */
+function replay(){
+  pause();
+  var d=decide();st.path=buildPath(d);
+  if(reduce.matches||!d){st.step=Math.max(0,st.path.length-1);draw(false);return;}
+  st.step=0;draw(false);st.fast=true;st.playing=true;renderControls(d);st.timer=setTimeout(tick,interval());
+}
+function setMode(m){st.mode=m;replay();}
+
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.classList.contains("pm-bit")){setMode(st.mode^bitMask(b.getAttribute("data-cls"),b.getAttribute("data-bit")));return;}
+  if(b.hasAttribute("data-type")){var t=b.getAttribute("data-type");if(t!==st.type){st.type=t;replay();}return;}
+  if(b.hasAttribute("data-op")){var o=b.getAttribute("data-op");if(o!==st.op){st.op=o;replay();}return;}
+  if(b.hasAttribute("data-mode")){setMode(parseInt(b.getAttribute("data-mode"),8));return;}
+  if(b.hasAttribute("data-um")){umIn.value=b.getAttribute("data-um");renderUmask();return;}
+  if(b.hasAttribute("data-who")){
+    var w=b.getAttribute("data-who"),own=ownerIn.value.trim()||"alice",fg=groupIn.value.trim()||"ogrenciler";
+    ownerIn.value=own;groupIn.value=fg;
+    if(w==="owner"){userIn.value=own;}
+    else if(w==="group"){userIn.value=own==="bob"?"carol":"bob";ugIn.value=fg;}
+    else{userIn.value=own==="eve"?"mallory":"eve";ugIn.value="misafirler";}
+    replay();return;
+  }
+  switch(b.getAttribute("data-act")){
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,false);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();go(st.path.length-1,false);break;
+    case "play":togglePlay();break;
+    case "compare":togglePanel("pm-compare");break;
+    case "umask":togglePanel("pm-umpanel");break;
+    case "umfile":if(st.umask!=null&&umIn.getAttribute("aria-invalid")!=="true"){st.type="file";setMode(438&~st.umask);}break;
+    case "umdir":if(st.umask!=null&&umIn.getAttribute("aria-invalid")!=="true"){st.type="dir";setMode(511&~st.umask);}break;
+  }
+});
+[ownerIn,groupIn,userIn,ugIn].forEach(function(el){
+  el.addEventListener("input",replay);
+  el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"){el.blur();}});
+});
+octIn.addEventListener("input",function(){
+  var m=parseOctal(octIn.value),al=$("pm-alert");
+  if(m===null){octIn.setAttribute("aria-invalid","true");al.setAttribute("data-k","oct");alertMsg("Sekizlik izinler: 0–7 arası 3 ya da 4 rakam, ör. 644, 0755, 4755, 1777.");return;}
+  octIn.setAttribute("aria-invalid","false");al.removeAttribute("data-k");alertMsg("");
+  if(m!==st.mode){setMode(m);}
+});
+octIn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"){octIn.blur();}});
+octIn.addEventListener("blur",function(){
+  if(parseOctal(octIn.value)===null){$("pm-alert").removeAttribute("data-k");octIn.value=oct4(st.mode);octIn.setAttribute("aria-invalid","false");draw(false);}
+  else{octIn.value=oct4(st.mode);}
+});
+umIn.addEventListener("input",renderUmask);
+umIn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"){umIn.blur();}});
+var speed=$("pm-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("pm-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext","saniyede "+st.speed+" adım");
+  root.style.setProperty("--o-dur",dur()+"ms");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(document.querySelector("dialog[open]")){return;}
+  if(e.key==="Escape"){
+    if(!$("pm-compare").hidden||!$("pm-umpanel").hidden){togglePanel("pm-compare",false);togglePanel("pm-umpanel",false);}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,false);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();go(st.path.length-1,false);break;
+  }
+});
+
+/* ---------- redraw the flowchart when its box changes size ---------- */
+var lastFit="";
+function fit(){
+  var key=fbox.clientWidth+"x"+fbox.clientHeight;
+  if(key!==lastFit){lastFit=key;renderFlow(decide(),false);}
+}
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe(fbox);}
+
+/* ---------- init ---------- */
+buildGrid();
+renderUmask();
+st.path=buildPath(decide());
+st.step=Math.max(0,st.path.length-1);
+draw(false);
+fit();
+setTimeout(fit,400);
+})();
+</script>
+<script src="deck/oyun.js"></script>

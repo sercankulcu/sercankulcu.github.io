@@ -43,7 +43,7 @@ Mikroişlemci, komutları bellekten getirip çözen ve yürüten bir bilgisayar 
 - [📄Sunum-Sayı Sistemleri (PDF)](../files/microprocessors/pdf/Bolum_01_Sayi_Sistemleri.pdf)
 - [📖Ders Notu - Sayı Sistemleri (HTML)](../files/microprocessors/notlar/Bolum_01_Sayi_Sistemleri_Ders_Notu.html)
 - [📝Çalışma Soruları - Sayı Sistemleri (HTML)](../files/microprocessors/slides/Bolum_01_Sayi_Sistemleri_Calisma_Sorulari.html)
-  - [🕹️İkiye Tümleyen Laboratuvarı (HTML)](../files/microprocessors/slides/Chapter_01_Twos-Complement-Lab.html)
+  - [🕹️İkiye Tümleyen Laboratuvarı (HTML)](../files/microprocessors/slides/Bolum_01_Twos-Complement-Lab.html)
 
 ---
 
@@ -59,7 +59,7 @@ Intel 8086, 1978'de tanıtılan ve x86 ailesini başlatan 16 bitlik bir mikroiş
 - [📄Sunum-8086 Yazmaçlar (PDF)](../files/microprocessors/pdf/Bolum_02_8086_Yazmaclar.pdf)
 - [📖Ders Notu - 8086 Yazmaçlar (HTML)](../files/microprocessors/notlar/Bolum_02_8086_Yazmaclar_Ders_Notu.html)
 - [📝Çalışma Soruları - 8086 Yazmaçlar (HTML)](../files/microprocessors/slides/Bolum_02_8086_Yazmaclar_Calisma_Sorulari.html)
-  - [🕹️Yazmaç Gezgini (HTML)](../files/microprocessors/slides/Chapter_02_Register-Explorer.html)
+  - [🕹️Yazmaç Gezgini (HTML)](../files/microprocessors/slides/Bolum_02_Register-Explorer.html)
 
 ---
 
@@ -88,8 +88,8 @@ Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama dü
 - [📄Sunum-Bellek Erişimi (PDF)](../files/microprocessors/pdf/Bolum_04_Bellek_Erisimi.pdf)
 - [📖Ders Notu - Bellek Erişimi (HTML)](../files/microprocessors/notlar/Bolum_04_Bellek_Erisimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Bellek Erişimi (HTML)](../files/microprocessors/slides/Bolum_04_Bellek_Erisimi_Calisma_Sorulari.html)
-  - [🕹️Kesim:Bağıl Konum Hesaplayıcı (HTML)](../files/microprocessors/slides/Chapter_04_Segment-Offset.html)
-  - [🕹️Adresleme Modları (HTML)](../files/microprocessors/slides/Chapter_04_Addressing-Modes.html)
+  - [🕹️Kesim:Bağıl Konum Hesaplayıcı (HTML)](../files/microprocessors/slides/Bolum_04_Segment-Offset.html)
+  - [🕹️Adresleme Modları (HTML)](../files/microprocessors/slides/Bolum_04_Addressing-Modes.html)
 - [🖼️Sunum-Değişkenler (HTML)](../files/microprocessors/slides/Bolum_04_Degiskenler.html)
 - [📄Sunum-Değişkenler (PDF)](../files/microprocessors/pdf/Bolum_04_Degiskenler.pdf)
 - [📖Ders Notu - Değişkenler (HTML)](../files/microprocessors/notlar/Bolum_04_Degiskenler_Ders_Notu.html)
@@ -105,7 +105,7 @@ Kesme, işlemcinin o anki işini geçici olarak bırakıp özel bir hizmet yorda
 - [📄Sunum-Kesmeler (PDF)](../files/microprocessors/pdf/Bolum_05_Kesmeler.pdf)
 - [📖Ders Notu - Kesmeler (HTML)](../files/microprocessors/notlar/Bolum_05_Kesmeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Kesmeler (HTML)](../files/microprocessors/slides/Bolum_05_Kesmeler_Calisma_Sorulari.html)
-  - [🕹️Kesme Vektör Tablosu (HTML)](../files/microprocessors/slides/Chapter_05_Interrupt-Vector.html)
+  - [🕹️Kesme Vektör Tablosu (HTML)](../files/microprocessors/slides/Bolum_05_Interrupt-Vector.html)
 - [🖼️Sunum-Kesme Fonksiyonları (HTML)](../files/microprocessors/slides/Bolum_05_Kesme_Fonksiyonlari.html)
 - [📄Sunum-Kesme Fonksiyonları (PDF)](../files/microprocessors/pdf/Bolum_05_Kesme_Fonksiyonlari.pdf)
 - [📖Ders Notu - Kesme Fonksiyonları (HTML)](../files/microprocessors/notlar/Bolum_05_Kesme_Fonksiyonlari_Ders_Notu.html)
@@ -124,8 +124,8 @@ Aritmetik ve mantık komutları, işlemcinin veri üzerinde hesap yapmasını ve
 - [📖Ders Notu - Aritmetik ve Mantıksal İşlemler (HTML)](../files/microprocessors/notlar/Bolum_06_Aritmetik_Mantik_Ders_Notu.html)
 - [📝Çalışma Soruları - Aritmetik ve Mantıksal İşlemler (HTML)](../files/microprocessors/slides/Bolum_06_Aritmetik_Mantik_Calisma_Sorulari.html)
 
-- [🕹️Bayrak Laboratuvarı (HTML)](../files/microprocessors/slides/Chapter_06_Flags-Lab.html)
-- [🕹️Kaydırma ve Döndürme (HTML)](../files/microprocessors/slides/Chapter_06_Shift-Rotate.html)
+- [🕹️Bayrak Laboratuvarı (HTML)](../files/microprocessors/slides/Bolum_06_Flags-Lab.html)
+- [🕹️Kaydırma ve Döndürme (HTML)](../files/microprocessors/slides/Bolum_06_Shift-Rotate.html)
 
 ---
 
@@ -138,7 +138,7 @@ Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla
 - [📖Ders Notu - Akış Kontrolü (HTML)](../files/microprocessors/notlar/Bolum_07_Akis_Kontrol_Ders_Notu.html)
 - [📝Çalışma Soruları - Akış Kontrolü (HTML)](../files/microprocessors/slides/Bolum_07_Akis_Kontrol_Calisma_Sorulari.html)
 
-- [🕹️Koşullu Atlamalar (HTML)](../files/microprocessors/slides/Chapter_07_Jump-Conditions.html)
+- [🕹️Koşullu Atlamalar (HTML)](../files/microprocessors/slides/Bolum_07_Jump-Conditions.html)
 
 ---
 
@@ -150,7 +150,7 @@ Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla
 - [📄Sunum-Yığın (PDF)](../files/microprocessors/pdf/Bolum_08_Yigin.pdf)
 - [📖Ders Notu - Yığın (HTML)](../files/microprocessors/notlar/Bolum_08_Yigin_Ders_Notu.html)
 - [📝Çalışma Soruları - Yığın (HTML)](../files/microprocessors/slides/Bolum_08_Yigin_Calisma_Sorulari.html)
-  - [🕹️Yığın, CALL ve RET (HTML)](../files/microprocessors/slides/Chapter_08_Stack-Call.html)
+  - [🕹️Yığın, CALL ve RET (HTML)](../files/microprocessors/slides/Bolum_08_Stack-Call.html)
 - [🖼️Sunum-Prosedürler (HTML)](../files/microprocessors/slides/Bolum_08_Prosedurler.html)
 - [📄Sunum-Prosedürler (PDF)](../files/microprocessors/pdf/Bolum_08_Prosedurler.pdf)
 - [📖Ders Notu - Prosedürler (HTML)](../files/microprocessors/notlar/Bolum_08_Prosedurler_Ders_Notu.html)
@@ -187,7 +187,7 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 - [📄Sunum-Aygıt Kontrolü (PDF)](../files/microprocessors/pdf/Bolum_10_Aygit_Kontrolu.pdf)
 - [📖Ders Notu - Aygıt Kontrolü (HTML)](../files/microprocessors/notlar/Bolum_10_Aygit_Kontrolu_Ders_Notu.html)
 - [📝Çalışma Soruları - Aygıt Kontrolü (HTML)](../files/microprocessors/slides/Bolum_10_Aygit_Kontrolu_Calisma_Sorulari.html)
-  - [🕹️Port ile Aygıt Kontrolü (HTML)](../files/microprocessors/slides/Chapter_10_IO-Ports.html)
+  - [🕹️Port ile Aygıt Kontrolü (HTML)](../files/microprocessors/slides/Bolum_10_IO-Ports.html)
 
 ---
 
@@ -200,4 +200,4 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 - [📖Ders Notu - Komut Kodlama ve Dizgi Komutları (HTML)](../files/microprocessors/notlar/Bolum_11_Komut_Kumesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Komut Kodlama ve Dizgi Komutları (HTML)](../files/microprocessors/slides/Bolum_11_Komut_Kumesi_Calisma_Sorulari.html)
 
-- [🕹️Komut Kodlama (HTML)](../files/microprocessors/slides/Chapter_11_Instruction-Encoding.html)
+- [🕹️Komut Kodlama (HTML)](../files/microprocessors/slides/Bolum_11_Instruction-Encoding.html)

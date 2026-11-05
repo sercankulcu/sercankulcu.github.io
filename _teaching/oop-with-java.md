@@ -31,7 +31,7 @@ Programlamanın zemini, bilgisayarın bilgiyi nasıl temsil ettiği ve işlediğ
 - [📄Sunum-Bilgisayarlar (PDF)](../files/java/pdf/Bolum_01_Bilgisayarlar.pdf)
 - [📖Ders Notu - Bilgisayarlar (HTML)](../files/java/notlar/Bolum_01_Bilgisayarlar_Ders_Notu.html)
 - [📝Çalışma Soruları - Bilgisayarlar (HTML)](../files/java/slides/Bolum_01_Bilgisayarlar_Calisma_Sorulari.html)
-  - [🕹️ASCII Tablosu (HTML)](../files/java/slides/Chapter_01_ASCII-Table.html)
+  - [🕹️ASCII Tablosu (HTML)](../files/java/slides/Bolum_01_ASCII-Table.html)
 - [🖼️Sunum-Hesaplama ve Hesaplamalı Düşünme (HTML)](../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.html)
 - [📄Sunum-Hesaplama ve Hesaplamalı Düşünme (PDF)](../files/java/pdf/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf)
 - [📖Ders Notu - Hesaplama ve Hesaplamalı Düşünme (HTML)](../files/java/notlar/Bolum_01_Hesaplama_Hesaplamali_Dusunme_Ders_Notu.html)
@@ -60,7 +60,7 @@ Bir programlama dili, belirli söz dizimi ve anlam kurallarına uyan ifadelerden
 - [📄Sunum-Söz Dizimi Kuralları (PDF)](../files/java/pdf/Bolum_02_Soz_Dizimi_Kurallari.pdf)
 - [📖Ders Notu - Söz Dizimi Kuralları (HTML)](../files/java/notlar/Bolum_02_Soz_Dizimi_Kurallari_Ders_Notu.html)
 - [📝Çalışma Soruları - Söz Dizimi Kuralları (HTML)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari_Calisma_Sorulari.html)
-  - [🕹️İlkel Tipler Laboratuvarı (HTML)](../files/java/slides/Chapter_02_Primitive-Types-Lab.html)
+  - [🕹️İlkel Tipler Laboratuvarı (HTML)](../files/java/slides/Bolum_02_Primitive-Types-Lab.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
 
 ---
@@ -77,7 +77,7 @@ Programın akışı karar yapıları ve döngülerle yönlendirilir. Bölümde i
 - [📄Sunum-Fonksiyonlar (PDF)](../files/java/pdf/Bolum_03_Fonksiyonlar.pdf)
 - [📖Ders Notu - Fonksiyonlar (HTML)](../files/java/notlar/Bolum_03_Fonksiyonlar_Ders_Notu.html)
 - [📝Çalışma Soruları - Fonksiyonlar (HTML)](../files/java/slides/Bolum_03_Fonksiyonlar_Calisma_Sorulari.html)
-  - [🕹️Değer ile Aktarım Laboratuvarı (HTML)](../files/java/slides/Chapter_03_Pass-By-Value-Lab.html)
+  - [🕹️Değer ile Aktarım Laboratuvarı (HTML)](../files/java/slides/Bolum_03_Pass-By-Value-Lab.html)
 - [🖼️Sunum-Diziler (HTML)](../files/java/slides/Bolum_03_Diziler.html)
 - [📄Sunum-Diziler (PDF)](../files/java/pdf/Bolum_03_Diziler.pdf)
 - [📖Ders Notu - Diziler (HTML)](../files/java/notlar/Bolum_03_Diziler_Ders_Notu.html)
@@ -86,7 +86,7 @@ Programın akışı karar yapıları ve döngülerle yönlendirilir. Bölümde i
 - [📄Sunum-Dizgi (PDF)](../files/java/pdf/Bolum_03_Dizgi.pdf)
 - [📖Ders Notu - Dizgi (HTML)](../files/java/notlar/Bolum_03_Dizgi_Ders_Notu.html)
 - [📝Çalışma Soruları - Dizgi (HTML)](../files/java/slides/Bolum_03_Dizgi_Calisma_Sorulari.html)
-  - [🕹️Dizgi Havuzu (HTML)](../files/java/slides/Chapter_05_String-Pool.html)
+  - [🕹️Dizgi Havuzu (HTML)](../files/java/slides/Bolum_03_String-Pool.html)
 - [🖼️Sunum-Özyineleme (HTML)](../files/java/slides/Bolum_03_Ozyineleme.html)
 - [📄Sunum-Özyineleme (PDF)](../files/java/pdf/Bolum_03_Ozyineleme.pdf)
 - [📖Ders Notu - Özyineleme (HTML)](../files/java/notlar/Bolum_03_Ozyineleme_Ders_Notu.html)
@@ -105,12 +105,12 @@ Nesne yönelimli programlama, veriyi ve bu veri üzerinde çalışan davranış�
 - [📄Sunum-Nesne ve Sınıflar (PDF)](../files/java/pdf/Bolum_04_Nesne_Sinif.pdf)
 - [📖Ders Notu - Nesne ve Sınıflar (HTML)](../files/java/notlar/Bolum_04_Nesne_Sinif_Ders_Notu.html)
 - [📝Çalışma Soruları - Nesne ve Sınıflar (HTML)](../files/java/slides/Bolum_04_Nesne_Sinif_Calisma_Sorulari.html)
-  - [🕹️Yığın ve Heap Gezgini (HTML)](../files/java/slides/Chapter_04_Heap-Stack-Explorer.html)
+  - [🕹️Yığın ve Heap Gezgini (HTML)](../files/java/slides/Bolum_04_Heap-Stack-Explorer.html)
 - [🖼️Sunum-Sarmalama (HTML)](../files/java/slides/Bolum_04_Sarmalama.html)
 - [📄Sunum-Sarmalama (PDF)](../files/java/pdf/Bolum_04_Sarmalama.pdf)
 - [📖Ders Notu - Sarmalama (HTML)](../files/java/notlar/Bolum_04_Sarmalama_Ders_Notu.html)
 - [📝Çalışma Soruları - Sarmalama (HTML)](../files/java/slides/Bolum_04_Sarmalama_Calisma_Sorulari.html)
-  - [🕹️Erişim Belirleyiciler (HTML)](../files/java/slides/Chapter_04_Access-Modifiers.html)
+  - [🕹️Erişim Belirleyiciler (HTML)](../files/java/slides/Bolum_04_Access-Modifiers.html)
 - [🖼️Sunum-Kalıtım (HTML)](../files/java/slides/Bolum_04_Kalitim.html)
 - [📄Sunum-Kalıtım (PDF)](../files/java/pdf/Bolum_04_Kalitim.pdf)
 - [📖Ders Notu - Kalıtım (HTML)](../files/java/notlar/Bolum_04_Kalitim_Ders_Notu.html)
@@ -119,7 +119,7 @@ Nesne yönelimli programlama, veriyi ve bu veri üzerinde çalışan davranış�
 - [📄Sunum-Çok Biçimlilik (PDF)](../files/java/pdf/Bolum_04_Cok_Bicimlilik.pdf)
 - [📖Ders Notu - Çok Biçimlilik (HTML)](../files/java/notlar/Bolum_04_Cok_Bicimlilik_Ders_Notu.html)
 - [📝Çalışma Soruları - Çok Biçimlilik (HTML)](../files/java/slides/Bolum_04_Cok_Bicimlilik_Calisma_Sorulari.html)
-  - [🕹️Dinamik Bağlama (HTML)](../files/java/slides/Chapter_04_Dynamic-Dispatch.html)
+  - [🕹️Dinamik Bağlama (HTML)](../files/java/slides/Bolum_04_Dynamic-Dispatch.html)
 - [🖼️Sunum-Soyut Sınıflar ve Arayüzler (HTML)](../files/java/slides/Bolum_04_Soyut_Siniflar.html)
 - [📄Sunum-Soyut Sınıflar ve Arayüzler (PDF)](../files/java/pdf/Bolum_04_Soyut_Siniflar.pdf)
 - [📖Ders Notu - Soyut Sınıflar ve Arayüzler (HTML)](../files/java/notlar/Bolum_04_Soyut_Siniflar_Ders_Notu.html)
@@ -138,8 +138,8 @@ Java koleksiyon çerçevesi, nesne gruplarını saklamak ve işlemek için ortak
 - [📝Çalışma Soruları - Koleksiyonlar (HTML)](../files/java/slides/Bolum_05_Koleksiyonlar_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
 
-- [🕹️Koleksiyonların İç Yapısı (HTML)](../files/java/slides/Chapter_05_Collections-Internals.html)
-- [🕹️Akış Boru Hattı (HTML)](../files/java/slides/Chapter_07_Stream-Pipeline.html)
+- [🕹️Koleksiyonların İç Yapısı (HTML)](../files/java/slides/Bolum_05_Collections-Internals.html)
+- [🕹️Akış Boru Hattı (HTML)](../files/java/slides/Bolum_05_Stream-Pipeline.html)
 
 ---
 
@@ -155,7 +155,7 @@ Java koleksiyon çerçevesi, nesne gruplarını saklamak ve işlemek için ortak
 - [📝Çalışma Soruları - İstisnalar (HTML)](../files/java/slides/Bolum_06_Istisnalar_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders06/src)
 
-- [🕹️İstisna Akışı (HTML)](../files/java/slides/Chapter_06_Exception-Flow.html)
+- [🕹️İstisna Akışı (HTML)](../files/java/slides/Bolum_06_Exception-Flow.html)
 
 ---
 
@@ -195,7 +195,7 @@ Grafik kullanıcı arayüzü, programla kullanıcı arasındaki etkileşimi penc
 - [📝Çalışma Soruları - Grafikler (HTML)](../files/java/slides/Bolum_09_Grafikler_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders08/src)
 
-- [🕹️Swing Yerleşim Yöneticileri (HTML)](../files/java/slides/Chapter_08_Swing-Layouts.html)
+- [🕹️Swing Yerleşim Yöneticileri (HTML)](../files/java/slides/Bolum_09_Swing-Layouts.html)
 
 ---
 
@@ -209,7 +209,7 @@ Grafik kullanıcı arayüzü, programla kullanıcı arasındaki etkileşimi penc
 - [📝Çalışma Soruları - İş Parçacıkları (HTML)](../files/java/slides/Bolum_10_Is_Parcaciklari_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders09/src)
 
-- [🕹️İş Parçacığı Yarışı (HTML)](../files/java/slides/Chapter_09_Thread-Race.html)
+- [🕹️İş Parçacığı Yarışı (HTML)](../files/java/slides/Bolum_10_Thread-Race.html)
 
 ---
 

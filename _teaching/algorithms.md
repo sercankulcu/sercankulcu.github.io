@@ -31,13 +31,13 @@ Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yön
 - [📄Sunum-Giriş (PDF)](../files/algorithms/pdf/Bolum_01_01_Giris.pdf)
 - [📖Ders Notu - Giriş (HTML)](../files/algorithms/notlar/Bolum_01_01_Giris_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş (HTML)](../files/algorithms/slides/Bolum_01_01_Giris_Calisma_Sorulari.html)
-  - [🕹️Algoritma Karmaşıklığı Analizi (HTML)](../files/algorithms/slides/Chapter_01_Algorithm_Complexity.html)
+  - [🕹️Algoritma Karmaşıklığı Analizi (HTML)](../files/algorithms/slides/Bolum_01_Algorithm_Complexity.html)
 - [🖼️Sunum-Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
 - [📄Sunum-Karmaşıklık (PDF)](../files/algorithms/pdf/Bolum_01_02_Karmasiklik.pdf)
 - [📖Ders Notu - Karmaşıklık (HTML)](../files/algorithms/notlar/Bolum_01_02_Karmasiklik_Ders_Notu.html)
 - [📝Çalışma Soruları - Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik_Calisma_Sorulari.html)
-  - [🕹️Asimptotik Büyüme Gezgini (HTML)](../files/algorithms/slides/Chapter_01_Asymptotic_Growth_Explorer.html)
-  - [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Chapter_01_Recurrence_Master_Theorem.html)
+  - [🕹️Asimptotik Büyüme Gezgini (HTML)](../files/algorithms/slides/Bolum_01_Asymptotic_Growth_Explorer.html)
+  - [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
@@ -52,9 +52,9 @@ Sıralama, verinin belirli bir düzene sokulmasıdır ve pek çok algoritmanın 
 - [📝Çalışma Soruları - Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
-- [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Chapter_02_Sorting.html)
-- [🕹️Sıralama Yarışı (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Race.html)
-- [🕹️Sıralama Özellikleri Laboratuvarı (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Properties_Lab.html)
+- [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
+- [🕹️Sıralama Yarışı (HTML)](../files/algorithms/slides/Bolum_02_Sorting_Race.html)
+- [🕹️Sıralama Özellikleri Laboratuvarı (HTML)](../files/algorithms/slides/Bolum_02_Sorting_Properties_Lab.html)
 
 ---
 
@@ -68,9 +68,9 @@ Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde 
 - [📝Çalışma Soruları - Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Arama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
-- [🕹️Arama Algoritmaları (HTML)](../files/algorithms/slides/Chapter_03_Search.html)
-- [🕹️Hash ve Ara Değer Arama (HTML)](../files/algorithms/slides/Chapter_03_Hash_Interpolation_Search.html)
-- [🕹️Üstel Arama (HTML)](../files/algorithms/slides/Chapter_03_Exponential_Search.html)
+- [🕹️Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Search.html)
+- [🕹️Hash ve Ara Değer Arama (HTML)](../files/algorithms/slides/Bolum_03_Hash_Interpolation_Search.html)
+- [🕹️Üstel Arama (HTML)](../files/algorithms/slides/Bolum_03_Exponential_Search.html)
 
 ---
 
@@ -84,25 +84,25 @@ Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde 
 - [📄Sunum-Çizge Gezinme (PDF)](../files/algorithms/pdf/Bolum_04_01_Cizge_Gezinme.pdf)
 - [📖Ders Notu - Çizge Gezinme (HTML)](../files/algorithms/notlar/Bolum_04_01_Cizge_Gezinme_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizge Gezinme (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme_Calisma_Sorulari.html)
-  - [🕹️Çizge Gezinme Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_Graph_Traversal.html)
-  - [🕹️Çizge Yapısı Algoritmaları Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_Graph_Structure_Algorithms.html)
-  - [🕹️İki Parçalılık, Döngü ve Köprü Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_Bipartite_Cycle_Bridge.html)
+  - [🕹️Çizge Gezinme Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Graph_Traversal.html)
+  - [🕹️Çizge Yapısı Algoritmaları Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Graph_Structure_Algorithms.html)
+  - [🕹️İki Parçalılık, Döngü ve Köprü Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Bipartite_Cycle_Bridge.html)
 - [🖼️Sunum-Çizge En Kısa Yol (HTML)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.html)
 - [📄Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/pdf/Bolum_04_02_En_Kisa_Yol.pdf)
 - [📖Ders Notu - Çizge En Kısa Yol (HTML)](../files/algorithms/notlar/Bolum_04_02_En_Kisa_Yol_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizge En Kısa Yol (HTML)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol_Calisma_Sorulari.html)
-  - [🕹️En Kısa Yol Algoritmaları Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_Shortest_Path.html)
-  - [🕹️A* Yol Bulma Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_AStar.html)
+  - [🕹️En Kısa Yol Algoritmaları Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Shortest_Path.html)
+  - [🕹️A* Yol Bulma Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_AStar.html)
 - [🖼️Sunum-Çizge Minimum Kapsayan (HTML)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.html)
 - [📄Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/pdf/Bolum_04_03_Min_Kapsayan.pdf)
 - [📖Ders Notu - Çizge Minimum Kapsayan (HTML)](../files/algorithms/notlar/Bolum_04_03_Min_Kapsayan_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizge Minimum Kapsayan (HTML)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan_Calisma_Sorulari.html)
-  - [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_MST.html)
+  - [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_MST.html)
 - [🖼️Sunum-Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.html)
 - [📄Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/pdf/Bolum_04_04_Ag_Akis.pdf)
 - [📖Ders Notu - Çizge Ağ Akış (HTML)](../files/algorithms/notlar/Bolum_04_04_Ag_Akis_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis_Calisma_Sorulari.html)
-  - [🕹️Ağ Akışı Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_Network_Flow.html)
+  - [🕹️Ağ Akışı Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Network_Flow.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
 ---
@@ -115,22 +115,22 @@ Dizgi algoritmaları metin arama, veri sıkıştırma ve biyolojik dizi çözüm
 - [📄Sunum-Dizgi Algoritmaları (1) (PDF)](../files/algorithms/pdf/Bolum_05_Dizgi.pdf)
 - [📖Ders Notu - Dizgi Algoritmaları (1) (HTML)](../files/algorithms/notlar/Bolum_05_Dizgi_Ders_Notu.html)
 - [📝Çalışma Soruları - Dizgi Algoritmaları (1) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Calisma_Sorulari.html)
-  - [🕹️Dizgi Eşleştirme Algoritmaları (HTML)](../files/algorithms/slides/Chapter_05_String_Matching.html)
-  - [🕹️Önek Fonksiyonu ve Z Algoritması (HTML)](../files/algorithms/slides/Chapter_05_Prefix_Z_Algorithms.html)
-  - [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Chapter_05_String_Compression.html)
+  - [🕹️Dizgi Eşleştirme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Matching.html)
+  - [🕹️Önek Fonksiyonu ve Z Algoritması (HTML)](../files/algorithms/slides/Bolum_05_Prefix_Z_Algorithms.html)
+  - [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Compression.html)
 - [🖼️Sunum-Dizgi Algoritmaları (2) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_2.html)
 - [📄Sunum-Dizgi Algoritmaları (2) (PDF)](../files/algorithms/pdf/Bolum_05_Dizgi_2.pdf)
 - [📖Ders Notu - Dizgi Algoritmaları (2) (HTML)](../files/algorithms/notlar/Bolum_05_Dizgi_2_Ders_Notu.html)
 - [📝Çalışma Soruları - Dizgi Algoritmaları (2) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_2_Calisma_Sorulari.html)
-  - [🕹️Dizgi Sıralama: LSD Basamak Sıralaması (HTML)](../files/algorithms/slides/Chapter_05_String_Sorting.html)
-  - [🕹️Sonlu Durum Makinesiyle Dizgi Ayrıştırma (HTML)](../files/algorithms/slides/Chapter_05_String_Parsing.html)
-  - [🕹️Dizgi Benzerliği: Levenshtein Uzaklığı (HTML)](../files/algorithms/slides/Chapter_05_String_Similarity.html)
-  - [🕹️Dizgi Dönüşümü: Burrows–Wheeler Dönüşümü (HTML)](../files/algorithms/slides/Chapter_05_String_Transformation.html)
+  - [🕹️Dizgi Sıralama: LSD Basamak Sıralaması (HTML)](../files/algorithms/slides/Bolum_05_String_Sorting.html)
+  - [🕹️Sonlu Durum Makinesiyle Dizgi Ayrıştırma (HTML)](../files/algorithms/slides/Bolum_05_String_Parsing.html)
+  - [🕹️Dizgi Benzerliği: Levenshtein Uzaklığı (HTML)](../files/algorithms/slides/Bolum_05_String_Similarity.html)
+  - [🕹️Dizgi Dönüşümü: Burrows–Wheeler Dönüşümü (HTML)](../files/algorithms/slides/Bolum_05_String_Transformation.html)
 - [🖼️Sunum-Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries.html)
 - [📄Sunum-Trie (PDF)](../files/algorithms/pdf/Bolum_05_Tries.pdf)
 - [📖Ders Notu - Trie (HTML)](../files/algorithms/notlar/Bolum_05_Tries_Ders_Notu.html)
 - [📝Çalışma Soruları - Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries_Calisma_Sorulari.html)
-  - [🕹️Trie ve Sonek Algoritmaları (HTML)](../files/algorithms/slides/Chapter_05_Trie_Suffix_Algorithms.html)
+  - [🕹️Trie ve Sonek Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_Trie_Suffix_Algorithms.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
 ---
@@ -147,8 +147,8 @@ Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt proble
 - [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
 
-- [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Chapter_01_Recurrence_Master_Theorem.html)
-- [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Chapter_02_Sorting.html)
+- [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
+- [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
 
 ---
 
@@ -162,8 +162,8 @@ Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi g�
 - [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_07_Acgozlu_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
 
-- [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_MST.html)
-- [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Chapter_05_String_Compression.html)
+- [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_MST.html)
+- [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Compression.html)
 
 ---
 
@@ -203,7 +203,7 @@ Dal sınır yöntemi, durum uzayı ağacını tararken her düğüm için bir s�
 - [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_10_Dal_Sinir_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
 
-- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_TSP.html)
+- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Bolum_10_TSP.html)
 
 ---
 
@@ -217,7 +217,7 @@ Yaklaşım algoritmaları, en iyi çözümü bulmanın çok pahalı olduğu NP-z
 - [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_11_Yakinsama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
 
-- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Chapter_04_TSP.html)
+- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Bolum_10_TSP.html)
 
 ---
 
@@ -233,7 +233,7 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 - [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Rastgele_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
 
-- [🕹️Monte Carlo ile π Tahmini (HTML)](../files/algorithms/slides/Chapter_12_Monte_Carlo_Pi.html)
+- [🕹️Monte Carlo ile π Tahmini (HTML)](../files/algorithms/slides/Bolum_12_Monte_Carlo_Pi.html)
 
 ---
 
