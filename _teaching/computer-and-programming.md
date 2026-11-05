@@ -114,7 +114,7 @@ Programlama, problem çözme adımlarını bilgisayarın yürütebileceği talim
 - [📄Sunum-Programlamaya Giriş (PDF)](../files/computer/pdf/Bolum_04_Programlama.pdf)
 - [📖Ders Notu - Programlamaya Giriş (HTML)](../files/computer/notlar/Bolum_04_Programlama_Ders_Notu.html)
 - [📝Çalışma Soruları - Programlamaya Giriş (HTML)](../files/computer/slides/Bolum_04_Programlama_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders04/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum04/src)
 
 - [🕹️Sıralama Algoritmaları Görselleştirici (HTML)](../files/computer/slides/Bolum_04_Sorting-Visualizer.html)
 - [🕹️Akış Diyagramı Yürütücü (HTML)](../files/computer/slides/Bolum_04_Flowchart-Runner.html)
@@ -129,7 +129,7 @@ Java programı düz metin kaynak kod olarak yazılır, bytecode'a derlenir ve JV
 - [📄Sunum-Java'ya Giriş ve İlk Program (PDF)](../files/computer/pdf/Bolum_05_Java_ve_Ilk_Program.pdf)
 - [📖Ders Notu - Java'ya Giriş ve İlk Program (HTML)](../files/computer/notlar/Bolum_05_Java_ve_Ilk_Program_Ders_Notu.html)
 - [📝Çalışma Soruları - Java'ya Giriş ve İlk Program (HTML)](../files/computer/slides/Bolum_05_Java_ve_Ilk_Program_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders05/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum05/src)
 
 - [🕹️Java Derleme ve Çalıştırma (HTML)](../files/computer/slides/Bolum_05_Java-Compile-Run.html)
 
@@ -145,7 +145,7 @@ Değişkenler programın kullandığı ve değiştirdiği değerleri saklar. Bö
 - [📄Sunum-Değişkenler, Veri Tipleri ve İşleçler (PDF)](../files/computer/pdf/Bolum_06_Degiskenler_ve_Operatorler.pdf)
 - [📖Ders Notu - Değişkenler, Veri Tipleri ve İşleçler (HTML)](../files/computer/notlar/Bolum_06_Degiskenler_ve_Operatorler_Ders_Notu.html)
 - [📝Çalışma Soruları - Değişkenler, Veri Tipleri ve İşleçler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders06/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum06/src)
 
 - [🕹️İfade Değerlendirici (HTML)](../files/computer/slides/Bolum_06_Expression-Evaluator.html)
 
@@ -159,7 +159,7 @@ Koşullu ifadeler programın farklı eylemler arasında seçim yapmasını sağl
 - [📄Sunum-Koşullu İfadeler (PDF)](../files/computer/pdf/Bolum_07_Kosullu_Ifadeler.pdf)
 - [📖Ders Notu - Koşullu İfadeler (HTML)](../files/computer/notlar/Bolum_07_Kosullu_Ifadeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders07/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum07/src)
 
 - [🕹️Karar İzleyici (HTML)](../files/computer/slides/Bolum_07_Decision-Tracer.html)
 
@@ -173,7 +173,7 @@ Döngüler bir kod bloğunu koşul doğru kaldığı sürece ya da belirli sayı
 - [📄Sunum-Döngüler (PDF)](../files/computer/pdf/Bolum_08_Donguler.pdf)
 - [📖Ders Notu - Döngüler (HTML)](../files/computer/notlar/Bolum_08_Donguler_Ders_Notu.html)
 - [📝Çalışma Soruları - Döngüler (HTML)](../files/computer/slides/Bolum_08_Donguler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders08/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum08/src)
 
 - [🕹️Döngü İzleyici (HTML)](../files/computer/slides/Bolum_08_Loop-Tracer.html)
 
@@ -187,7 +187,7 @@ Metotlar programı yeniden kullanılabilir işlemlere böler. Bölüm metot tan�
 - [📄Sunum-Metotlar (PDF)](../files/computer/pdf/Bolum_09_Metotlar.pdf)
 - [📖Ders Notu - Metotlar (HTML)](../files/computer/notlar/Bolum_09_Metotlar_Ders_Notu.html)
 - [📝Çalışma Soruları - Metotlar (HTML)](../files/computer/slides/Bolum_09_Metotlar_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders09/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum09/src)
 
 - [🕹️Metot Çağrı Yığını (HTML)](../files/computer/slides/Bolum_09_Method-Call-Stack.html)
 
@@ -201,7 +201,7 @@ Dizi, aynı tipte sabit sayıda değeri saklar ve her öğeye indisle erişim sa
 - [📄Sunum-Diziler (PDF)](../files/computer/pdf/Bolum_10_Diziler.pdf)
 - [📖Ders Notu - Diziler (HTML)](../files/computer/notlar/Bolum_10_Diziler_Ders_Notu.html)
 - [📝Çalışma Soruları - Diziler (HTML)](../files/computer/slides/Bolum_10_Diziler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders10/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum10/src)
 
 - [🕹️Dizi Laboratuvarı (HTML)](../files/computer/slides/Bolum_10_Array-Lab.html)
 
@@ -215,7 +215,7 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 - [📄Sunum-Dizgiler (PDF)](../files/computer/pdf/Bolum_11_Dizgiler.pdf)
 - [📖Ders Notu - Dizgiler (HTML)](../files/computer/notlar/Bolum_11_Dizgiler_Ders_Notu.html)
 - [📝Çalışma Soruları - Dizgiler (HTML)](../files/computer/slides/Bolum_11_Dizgiler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders11/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum11/src)
 
 - [🕹️Dizgi Laboratuvarı (HTML)](../files/computer/slides/Bolum_11_String-Lab.html)
 
@@ -229,6 +229,6 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 - [📄Sunum-Özyineleme (PDF)](../files/computer/pdf/Bolum_12_Ozyineleme.pdf)
 - [📖Ders Notu - Özyineleme (HTML)](../files/computer/notlar/Bolum_12_Ozyineleme_Ders_Notu.html)
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/computer/slides/Bolum_12_Ozyineleme_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders12/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Bolum12/src)
 
 - [🕹️Özyineleme Görselleştirici (HTML)](../files/computer/slides/Bolum_12_Recursion-Visualizer.html)
