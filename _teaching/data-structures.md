@@ -31,7 +31,7 @@ Veri yapıları, verinin bellekte nasıl düzenleneceğini ve ona nasıl erişil
 - [📄Sunum-Giriş (PDF)](../files/data_structures/pdf/Bolum_01_Giris.pdf)
 - [📖Ders Notu - Giriş (HTML)](../files/data_structures/notlar/Bolum_01_Giris_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum01/src)
 
 ---
 
@@ -43,7 +43,7 @@ Algoritma analizi, çözümleri uygulamadan önce karşılaştırmayı sağlar. 
 - [📄Sunum-Algoritma Analizi (PDF)](../files/data_structures/pdf/Bolum_02_Algoritma_Analizi.pdf)
 - [📖Ders Notu - Algoritma Analizi (HTML)](../files/data_structures/notlar/Bolum_02_Algoritma_Analizi_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritma Analizi (HTML)](../files/data_structures/slides/Bolum_02_Algoritma_Analizi_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum02/src)
 
 ---
 
@@ -56,7 +56,7 @@ Dizi, öğeleri bellekte bitişik yerleşen en temel veri yapısıdır; her öğ
 - [📖Ders Notu - Diziler (HTML)](../files/data_structures/notlar/Bolum_03_Diziler_Ders_Notu.html)
 - [📝Çalışma Soruları - Diziler (HTML)](../files/data_structures/slides/Bolum_03_Diziler_Calisma_Sorulari.html)
 - [🕹️Dizi Simülatörü (HTML)](../files/data_structures/slides/Bolum_03_Arrays.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum03/src)
 
 ---
 
@@ -69,6 +69,7 @@ Dizi, öğeleri bellekte bitişik yerleşen en temel veri yapısıdır; her öğ
 - [📖Ders Notu - Özyineleme (HTML)](../files/data_structures/notlar/Bolum_04_Ozyineleme_Ders_Notu.html)
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/data_structures/slides/Bolum_04_Ozyineleme_Calisma_Sorulari.html)
 - [🕹️Hanoi Kuleleri Simülatörü (HTML)](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum04/src)
 
 ---
 
@@ -85,7 +86,7 @@ Bağlı liste, her biri veri ve bir sonraki düğüme referans taşıyan düğü
 - [🕹️Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Linked_List.html)
 - [🕹️Çift Yönlü Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Doubly_Linked_List.html)
 - [🕹️Dairesel Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Circular_Linked_List.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum05/src)
 
 ---
 
@@ -98,7 +99,7 @@ Liste, öğelerin sıralı bir dizisini temsil eden soyut veri tipidir; büyüy�
 - [📖Ders Notu - Liste (HTML)](../files/data_structures/notlar/Bolum_06_Liste_Ders_Notu.html)
 - [📝Çalışma Soruları - Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)
 - [🕹️Liste ADT Simülatörü (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum06/src)
 
 ---
 
@@ -114,7 +115,7 @@ Yığın, son giren ilk çıkar (LIFO) ilkesiyle çalışır: ekleme (push) ve �
 - [🕹️Stock Span Simülatörü (HTML)](../files/data_structures/slides/Bolum_07_Stock_Span.html)
 - [🕹️Infix → Prefix Dönüştürücü (HTML)](../files/data_structures/slides/Bolum_07_Infix_to_Prefix.html)
 - [🕹️Infix → Postfix Dönüştürücü (HTML)](../files/data_structures/slides/Bolum_07_Infix_to_Postfix.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum07/src)
 
 ---
 
@@ -130,7 +131,7 @@ Kuyruk, ilk giren ilk çıkar (FIFO) ilkesiyle çalışır: öğeler bir uçtan 
 - [🕹️Deque Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Deque.html)
 - [🕹️Dairesel Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Circular_Queue.html)
 - [🕹️Round Robin Çizelgeleyici (HTML)](../files/data_structures/slides/Bolum_08_Scheduler.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum08/src)
 
 ---
 
@@ -145,7 +146,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 - [📖Ders Notu - Ağaçlar (HTML)](../files/data_structures/notlar/Bolum_09_Agac_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağaçlar (HTML)](../files/data_structures/slides/Bolum_09_Agac_Calisma_Sorulari.html)
 - [🕹️Genel Ağaç Simülatörü (HTML)](../files/data_structures/slides/Bolum_09_General_Tree.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum09/src)
 
 ---
 
@@ -164,7 +165,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 - [🕹️Splay Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)
 - [🕹️B-Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_BTree.html)
 - [🕹️B+ Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_BPlusTree.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum10/src)
 
 ---
 
@@ -179,7 +180,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 - [🕹️İkili Heap Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Heap.html)
 - [🕹️Öncelikli Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Priority_Queue.html)
 - [🕹️Öncelikli Çizelgeleyici Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Priority_Scheduler.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum11/src)
 
 ---
 
@@ -196,7 +197,7 @@ Eşleme (map), anahtarları değerlere bağlayan soyut veri tipidir. Hash tablos
 - [🕹️Hash Tablosu Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Hash_Table.html)
 - [🕹️Eşleme Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Map.html)
 - [🕹️Açık Adresleme Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Open_Addressing.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum12/src)
 
 ---
 
@@ -210,7 +211,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 - [📝Çalışma Soruları - Kümeler (HTML)](../files/data_structures/slides/Bolum_13_Kumeler_Calisma_Sorulari.html)
 - [🕹️Küme ADT Simülatörü (HTML)](../files/data_structures/slides/Bolum_13_Set_ADT.html)
 - [🕹️Ayrık Kümeler Simülatörü (HTML)](../files/data_structures/slides/Bolum_13_Disjoint_Set_Union.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum13/src)
 
 ---
 
@@ -226,4 +227,4 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 - [🕹️Yönlü Çizge Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Directed_Graph.html)
 - [🕹️Dijkstra Algoritması Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Dijkstra.html)
 - [🕹️Ders Ön Koşul Planlayıcısı (HTML)](../files/data_structures/slides/Bolum_14_Course_Planner.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum14/src)

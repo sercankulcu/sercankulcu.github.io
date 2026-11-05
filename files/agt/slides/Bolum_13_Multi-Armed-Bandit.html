@@ -1,0 +1,390 @@
+---
+layout: without-sidebar
+title: "Çok Kollu Haydut Öğrenme Oyunu"
+permalink: /files/agt/slides/Bolum_13_Multi-Armed-Bandit.html
+excerpt: "Keşif–sömürü dengesi, ε-açgözlü, UCB1, pişmanlık, öneriler ve değişen ödüller için etkileşimli çok kollu haydut laboratuvarı."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-bandit .agt-oyun__body{display:grid;grid-template-columns:212px minmax(0,1fr);gap:12px;font-size:14px}
+.agt-bandit .side,.agt-bandit .main{display:flex;flex-direction:column;gap:8px;min-height:0}
+.agt-bandit .box{background:var(--ds-bg);border:1.5px solid var(--ds-border);border-radius:12px;padding:10px 12px}
+.agt-bandit .side .box{display:grid;gap:7px}
+.agt-bandit label.field{display:grid;gap:2px;font-size:12px;font-weight:700;color:var(--ds-muted);text-transform:uppercase;letter-spacing:.05em}
+.agt-bandit select{width:100%;min-height:30px;font-size:13.5px;text-transform:none;letter-spacing:0}
+.agt-bandit .btn{width:100%;min-height:32px;font-size:14px;border:1.5px solid var(--ds-link);background:var(--ds-link);color:var(--ds-bg)}
+.agt-bandit .btn:hover:not(:disabled){background:color-mix(in srgb,var(--ds-link) 85%,var(--ds-text))}
+.agt-bandit .btn.secondary{background:var(--ds-bg);color:var(--ds-text)!important;border-color:var(--ds-border)}
+.agt-bandit .btn.secondary:hover:not(:disabled){background:var(--ds-surface-strong);border-color:var(--ds-link)}
+.agt-bandit .check{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.agt-bandit .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.agt-bandit .metric{padding:6px 2px;border:1.5px solid var(--ds-border);border-radius:10px;text-align:center;background:var(--ds-surface);font-size:11.5px;color:var(--ds-muted);font-weight:700}
+.agt-bandit .metric b{display:block;font-size:19px;color:var(--ds-accent);line-height:1.2}
+.agt-bandit .status{padding:8px 10px;border-radius:10px;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border);font-size:13px;line-height:1.35;min-height:58px}
+.agt-bandit .arms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.agt-bandit .choice{display:grid;gap:3px;justify-items:center;min-height:0;height:auto;padding:8px 6px;border:2px solid var(--ds-border);border-radius:12px;background:var(--ds-bg);color:var(--ds-text);font-size:14px;line-height:1.2}
+.agt-bandit .choice:hover:not(:disabled){border-color:var(--ds-link)}
+.agt-bandit .choice.is-rec{border-color:var(--ds-good);box-shadow:inset 0 0 0 1.5px var(--ds-good)}
+.agt-bandit .choice.is-last{background:var(--ds-surface-strong)}
+.agt-bandit .choice .arm-name{font-weight:800;font-size:15px}
+.agt-bandit .choice .arm-meta{font-size:12px;font-weight:600;color:var(--ds-muted)}
+.agt-bandit .choice .tag{min-height:15px;font-size:11.5px;font-weight:800;color:color-mix(in srgb,var(--ds-good) 75%,var(--ds-text))}
+.agt-bandit .meter{width:100%;height:8px;border-radius:99px;background:var(--ds-surface-strong);border:1px solid var(--ds-border);overflow:hidden;position:relative}
+.agt-bandit .meter span{display:block;height:100%;background:var(--ds-link)}
+.agt-bandit .meter i{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ds-accent)}
+.agt-bandit .chart-box{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px}
+.agt-bandit .chart-head{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ds-muted)}
+.agt-bandit .chart-head .k1{color:var(--ds-accent)}
+.agt-bandit .chart-head .k2{color:var(--ds-link)}
+.agt-bandit svg.chart{display:block;width:100%;flex:1;min-height:0}
+.agt-bandit .log{margin:0;padding:6px 10px;list-style:none;height:108px;overflow:hidden;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border);border-radius:10px;font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+.agt-bandit .log li{margin:0}
+.agt-bandit .log li:first-child{font-weight:700}
+.agt-bandit .agt-oyun__head a.agt-oyun__back{color:var(--ds-link)}
+.agt-bandit .side .box{gap:5px;padding:8px 10px}
+.agt-bandit.agt-oyun .agt-oyun__body{grid-template-columns:226px minmax(0,1fr)}
+.agt-bandit select{min-height:28px}
+.agt-bandit .side{gap:6px}
+.agt-bandit .choice .arm-name{font-size:13.5px;white-space:nowrap}
+.agt-bandit .side .btn{font-size:13px;line-height:1.2;min-height:30px}
+.agt-bandit .check{font-size:12.5px}
+.agt-bandit .status{min-height:0;font-size:12.5px}
+.agt-bandit .metric{padding:4px 2px}
+.agt-bandit .metric b{font-size:17px}
+.agt-bandit .log{height:90px;font-size:12px}
+.agt-bandit .choice .arm-meta{font-size:11.5px;text-align:center}
+.agt-bandit .choice .tag{font-size:11px;text-align:center}
+</style>
+
+<div class="agt-bandit agt-oyun agt-oyun--stage" lang="tr">
+<header class="agt-oyun__head">
+<div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 13 · Simülasyon</p><h1>Çok Kollu Haydut</h1></div>
+<button type="button" class="agt-oyun__help" aria-controls="bandit-help" aria-label="Yardım">?</button>
+<a class="agt-oyun__back" href="Bolum_13_Ogrenme.html">← Bölüm 13</a>
+</header>
+
+<div class="agt-oyun__body">
+<aside class="side">
+<div class="box">
+<label class="field"><span>Mod</span>
+<select class="mode-select">
+<option value="human">Kıyaslama</option>
+<option value="cpu">Öneriyle</option>
+<option value="demo">Bilgisayar öğrenir</option>
+</select>
+</label>
+<label class="field"><span>Seviye</span>
+<select class="level-select">
+<option value="1">1 — 3 kol</option>
+<option value="2">2 — 4 kol</option>
+<option value="3">3 — Değişen</option>
+</select>
+</label>
+<label class="field"><span>Algoritma</span>
+<select class="alg-select">
+<option value="eg">ε-açgözlü</option>
+<option value="ucb">UCB1</option>
+</select>
+</label>
+<button class="btn reset-btn" type="button">Yeni deney</button>
+<button class="btn secondary run50-btn" type="button">Algoritma: 50 tur</button>
+<label class="check"><input class="reveal-box" type="checkbox"> <span>Gerçek olasılıklar</span></label>
+</div>
+<div class="metrics">
+<div class="metric">Ödül<b class="reward">0</b></div>
+<div class="metric">Tur<b class="rounds">0</b></div>
+<div class="metric">Pişmanlık<b class="regret">0</b></div>
+</div>
+<div class="status" aria-live="polite"></div>
+</aside>
+
+<section class="main">
+<div class="arms"></div>
+<div class="box chart-box">
+<div class="chart-head"><span>Birikimli ödül ve en iyi kol beklentisi</span><span><span class="k2">■ ödül</span> · <span class="k1">■ pişmanlık</span></span></div>
+<svg class="chart" viewBox="0 0 520 200" preserveAspectRatio="none" role="img" aria-label="Birikimli ödül ve pişmanlık grafiği"></svg>
+</div>
+<ul class="log" aria-live="polite"></ul>
+</section>
+</div>
+
+<dialog class="agt-oyun__dialog" id="bandit-help">
+<button type="button" class="agt-oyun__close">Kapat</button>
+<h2>Nasıl oynanır</h2>
+<p>Her kol, 1 ödül verme olasılığı gizli olan bir eylemdir. Bir kolu çekmek için üzerine tıklanır; her çekiş 1 ya da 0 döndürür. Amaç, birikimli <b>pişmanlığı</b> düşük tutarken hangi kolun en iyi olduğunu öğrenmektir. Her yeni deney yeni gizli olasılıklar çeker; bu yüzden önceki kazananı ezberlemek işe yaramaz.</p>
+<ul>
+<li><b>Ödül</b> başarı sayısıdır, <b>Tur</b> bütün çekişleri sayar.</li>
+<li>Her kol kartı çekiş sayısını ve gözlenen ortalamayı (çubuk) gösterir. “Gerçek olasılıklar” işaretlenirse kırmızı çizgi gizli değeri gösterir.</li>
+<li><b>Pişmanlık</b> = gerçekte en iyi kolu hep çekmenin beklenen ödülü − elde edilen ödül.</li>
+<li>“Algoritma: 50 tur” düğmesi, kıyaslama için seçili algoritmanın aynı deneye devam etmesini sağlar.</li>
+</ul>
+<h3>Oyun kuramına katkısı</h3>
+<p>Haydut algoritmaları belirsiz seçeneklerin <b>keşfi</b> ile en iyi bilinen seçeneğin <b>sömürüsü</b> arasında denge kurar. Bu, tekrarlı oyunların, öneri sistemlerinin ve çevrim içi reklamcılığın arkasındaki temel öğrenme sorunudur.</p>
+<h3>Modlar</h3>
+<ul>
+<li><b>Kıyaslama</b>: her kolu sen seçersin; ödülünü ve pişmanlığını algoritma çalıştırmalarıyla karşılaştırırsın. Karar vermeden önce yeterince keşif yapıp yapmadığına bakılır.</li>
+<li><b>Öneriyle</b>: seçili algoritmanın sömüreceği kol “Önerilen” olarak işaretlenir. Öneri izlenebilir ya da reddedilebilir; otomasyon yanlılığını tartışmak için yararlıdır.</li>
+<li><b>Bilgisayar öğrenir</b>: algoritma ilk 50 turu oynar; yakınsamayı izlemek için 50'şerlik turlarla devam edilir.</li>
+</ul>
+<h3>Seviyeler</h3>
+<ul>
+<li><b>1. seviye — 3 kol</b>: durağan; keşif–sömürü ikilemine en iyi giriş.</li>
+<li><b>2. seviye — 4 kol</b>: durağan; fazladan kol keşfi dağıtır ve erken bağlanmayı daha maliyetli kılar.</li>
+<li><b>3. seviye — Değişen ödül</b>: dört kol; 40. turdan sonra gizli olasılıklar değişir. Eski gözlemler yanıltıcı olur; öğrenenin yeniden keşfe başlayıp başlamadığı izlenir.</li>
+</ul>
+<h3>Algoritmalar</h3>
+<ul>
+<li><b>ε-açgözlü</b>: ε = 0.15 olasılıkla rastgele bir kol, aksi hâlde gözlenen ortalaması en yüksek kol çekilir. Basittir, keşfi hiç bırakmaz, bu yüzden değişimi fark edebilir; ama açıkça zayıf kollara çekiş harcar.</li>
+<li><b>UCB1</b>: puanı en yüksek kol çekilir; puan = ortalama + √(2 ln t / çekiş). Az çekilen kollar büyük bonus alır, böylece keşif amaçlı olur. Durağan ortamlarda güçlüdür; ani değişimlerden sonra yavaştır, çünkü eski kanıt ortalamalarda kalır.</li>
+</ul>
+<h3>Mod × seviye</h3>
+<table>
+<tr><th>Mod</th><th>1. seviye</th><th>2. seviye</th><th>3. seviye</th></tr>
+<tr><th>Kıyaslama</th><td>Temel keşif–sömürü ödünleşimi.</td><td>Dikkat dört seçeneğe adilce dağılıyor mu?</td><td>Değişimi fark etmek ve eski inançları bırakmak.</td></tr>
+<tr><th>Öneri</th><td>Sezgi ile kararlı bir öneri.</td><td>Kanıt dağıldıkça öneriler değişir.</td><td>Eski öneriyi izlemek uyumu geciktirir mi?</td></tr>
+<tr><th>Bilgisayar</th><td>Hızlı yakınsama temel çizgisi.</td><td>Daha çok keşif gerektiğinde algoritmaları karşılaştırma.</td><td>Değişimden sonra toparlanma; bayat veri.</td></tr>
+</table>
+<h3>Önerilen sıra</h3>
+<ol>
+<li>Kıyaslama + 1. seviye + ε-açgözlü: en az 20 elle seçim.</li>
+<li>Aynısını UCB1 ile tekrarlayıp kolların ne kadar eşit örneklendiğini karşılaştırma.</li>
+<li>2. seviye: fazladan bir seçeneğin keşif maliyetini nasıl artırdığını görme.</li>
+<li>Öneri modu: bazı önerileri bilerek reddedip sonucu değerlendirme.</li>
+<li>Bilgisayar öğrenir + 3. seviye: 40. turdaki değişimden sonra iki algoritmayı karşılaştırma.</li>
+</ol>
+<p><b>Yorum notu:</b> tek bir çalıştırma bir algoritmanın üstün olduğunu söylemeye yetmez. Ödüller rastgeledir; birkaç deney ortalama ödül, pişmanlık ve uyum hızıyla karşılaştırılmalıdır.</p>
+</dialog>
+</div>
+
+<script>
+(() => {
+  const root=document.querySelector('.agt-bandit');
+  if(!root)return;
+
+  const mode=root.querySelector('.mode-select');
+  const level=root.querySelector('.level-select');
+  const alg=root.querySelector('.alg-select');
+  const resetBtn=root.querySelector('.reset-btn');
+  const run50Btn=root.querySelector('.run50-btn');
+  const revealBox=root.querySelector('.reveal-box');
+  const arms=root.querySelector('.arms');
+  const reward=root.querySelector('.reward');
+  const rounds=root.querySelector('.rounds');
+  const regret=root.querySelector('.regret');
+  const statusEl=root.querySelector('.status');
+  const chart=root.querySelector('.chart');
+  const logEl=root.querySelector('.log');
+
+  const EPS=.15;
+  const MAX_ROUNDS=1000;
+  let probs=[];
+  let count=[];
+  let sum=[];
+  let t=0;
+  let totalR=0;
+  let bestSum=0;
+  let changed=false;
+  let last=-1;
+  let history=[];
+  let lines=[];
+  let armButtons=[];
+
+  function mean(i){
+    return count[i]?sum[i]/count[i]:0;
+  }
+
+  function argmax(values){
+    let best=0;
+    for(let i=1;i<values.length;i++){
+      if(values[i]>values[best])best=i;
+    }
+    return best;
+  }
+
+  /* the arm the algorithm would exploit now (deterministic, used for the recommendation) */
+  function exploitArm(){
+    if(alg.value==='eg'){
+      return argmax(count.map((c,i)=>c?mean(i):1));
+    }
+    return argmax(count.map((c,i)=>c?mean(i)+Math.sqrt(2*Math.log(Math.max(1,t))/c):Infinity));
+  }
+
+  function choose(){
+    if(alg.value==='eg' && Math.random()<EPS){
+      return Math.floor(Math.random()*probs.length);
+    }
+    return exploitArm();
+  }
+
+  function addLine(text){
+    lines.unshift(text);
+    lines=lines.slice(0,5);
+  }
+
+  function pull(index){
+    if(t>=MAX_ROUNDS)return;
+    if(level.value==='3' && t===40 && !changed){
+      changed=true;
+      probs=probs.map(p=>Math.min(.9,Math.max(.1,p+(Math.random()-.5)*.5)));
+      addLine('40. tur: gizli olasılıklar değişti!');
+    }
+
+    const r=Math.random()<probs[index]?1:0;
+
+    bestSum+=Math.max(...probs);
+    t++;
+    count[index]++;
+    sum[index]+=r;
+    totalR+=r;
+    last=index;
+    history.push([totalR,bestSum-totalR]);
+
+    addLine(`Tur ${t}: Kol ${index+1} → ödül ${r}`);
+  }
+
+  function auto(k){
+    for(let j=0;j<k && t<MAX_ROUNDS;j++){
+      pull(choose());
+    }
+    render();
+  }
+
+  function buildArms(){
+    arms.style.gridTemplateColumns=`repeat(${probs.length},minmax(0,1fr))`;
+    arms.innerHTML=probs.map((_,i)=>`
+      <button class="choice" data-arm="${i}" type="button">
+        <span class="arm-name">🎰 Kol ${i+1}</span>
+        <span class="arm-meta"></span>
+        <span class="meter"><span></span><i hidden></i></span>
+        <span class="tag"></span>
+      </button>`).join('');
+    armButtons=[...arms.querySelectorAll('[data-arm]')];
+    armButtons.forEach(button=>{
+      button.addEventListener('click',()=>{
+        if(mode.value==='demo')return;
+        pull(+button.dataset.arm);
+        render();
+      });
+    });
+  }
+
+  function drawChart(){
+    const W=520;
+    const H=200;
+    const n=Math.max(10,history.length);
+    const maxY=Math.max(5,...history.map(h=>Math.max(h[0],h[1])));
+    const grid=[0,.25,.5,.75,1].map(f=>{
+      const y=(H-6-f*(H-16)).toFixed(1);
+      return `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="var(--ds-border)" stroke-width="1" opacity=".5"/>`;
+    }).join('');
+    function path(k){
+      if(!history.length)return '';
+      const pts=[[0,0]].concat(history.map((h,i)=>[i+1,h[k]]));
+      return pts.map((p,i)=>(i?'L':'M')+(p[0]/n*W).toFixed(1)+','+(H-6-p[1]/maxY*(H-16)).toFixed(1)).join('');
+    }
+    const changeX=level.value==='3'?(40/n*W):-1;
+    chart.innerHTML=grid+
+      (changeX>=0&&changeX<=W?`<line x1="${changeX}" x2="${changeX}" y1="0" y2="${H}" stroke="var(--ds-warn)" stroke-dasharray="4 4" stroke-width="1.5"/>`:'')+
+      `<path d="${path(0)}" fill="none" stroke="var(--ds-link)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`+
+      `<path d="${path(1)}" fill="none" stroke="var(--ds-accent)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`+
+      `<text x="4" y="12" font-size="11" fill="var(--ds-muted)">max ${maxY.toFixed(0)}</text>`+
+      `<text x="${W-4}" y="${H-10}" font-size="11" fill="var(--ds-muted)" text-anchor="end">${history.length} tur</text>`;
+  }
+
+  function render(){
+    const rec=mode.value==='cpu'?exploitArm():-1;
+    const demo=mode.value==='demo';
+    armButtons.forEach((button,i)=>{
+      const m=mean(i);
+      button.querySelector('.arm-meta').textContent=
+        `${count[i]} çekiş · ort. ${count[i]?m.toFixed(2):'—'}`;
+      button.querySelector('.meter span').style.width=(m*100).toFixed(1)+'%';
+      const tick=button.querySelector('.meter i');
+      tick.hidden=!revealBox.checked;
+      tick.style.left=`calc(${(probs[i]*100).toFixed(1)}% - 1px)`;
+      button.querySelector('.tag').textContent=
+        [rec===i?'Önerilen':'',revealBox.checked?'gerçek'+' p = '+probs[i].toFixed(2):''].filter(Boolean).join(' · ');
+      button.classList.toggle('is-rec',rec===i);
+      button.classList.toggle('is-last',last===i);
+      button.disabled=demo || t>=MAX_ROUNDS;
+    });
+
+    reward.textContent=totalR;
+    rounds.textContent=t;
+    regret.textContent=(bestSum-totalR).toFixed(1);
+
+    const algAd=alg.value==='eg'?'ε-açgözlü':'UCB1';
+    statusEl.innerHTML=
+      t>=MAX_ROUNDS
+        ? `${MAX_ROUNDS} tur sınırına ulaşıldı. Yeni bir deney başlat.`
+        : demo
+          ? `${algAd} seçiyor. Öğrenmeyi sürdürmek için “50 tur”.`
+          : mode.value==='cpu'
+            ? `Bir kol seç. ${algAd} önerisi: Kol ${rec+1}; karar senin.`
+            : 'Bir kol seç. Ödül olasılıkları gizli.';
+    run50Btn.disabled=t>=MAX_ROUNDS;
+
+    logEl.innerHTML=lines.map(l=>`<li>${l}</li>`).join('');
+    while(logEl.children.length>1&&logEl.scrollHeight>logEl.clientHeight+1)logEl.lastElementChild.remove();
+    drawChart();
+  }
+
+  function resetGame(){
+    const n=level.value==='1'?3:4;
+    probs=Array.from({length:n},()=>.15+Math.random()*.7);
+    count=Array(n).fill(0);
+    sum=Array(n).fill(0);
+    t=0;
+    totalR=0;
+    bestSum=0;
+    changed=false;
+    last=-1;
+    history=[];
+    lines=['Deney hazır.'];
+    buildArms();
+    if(mode.value==='demo'){
+      auto(50);
+    }else{
+      render();
+    }
+  }
+
+  resetBtn.addEventListener('click',resetGame);
+  run50Btn.addEventListener('click',()=>auto(50));
+  revealBox.addEventListener('change',render);
+  level.addEventListener('change',resetGame);
+  mode.addEventListener('change',resetGame);
+  alg.addEventListener('change',()=>{
+    if(mode.value==='demo')resetGame();
+    else render();
+  });
+
+  resetGame();
+})();
+</script>
+<script src="deck/oyun.js"></script>

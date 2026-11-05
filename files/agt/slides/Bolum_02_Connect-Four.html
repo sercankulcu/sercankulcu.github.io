@@ -1,0 +1,442 @@
+---
+layout: without-sidebar
+title: "Dörtlü Bağla"
+permalink: /files/agt/slides/Bolum_02_Connect-Four.html
+excerpt: "Etkileşimli Dörtlü Bağla oyunu: iki oyunculu ve bilgisayara karşı modlar, farklı zorluk seviyeleri, tehdit tespiti ve hamle izleme."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-connect-four .c4-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 236px;
+  gap: 14px;
+  height: 100%;
+}
+
+.agt-connect-four .panel {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+
+.agt-connect-four .board-area { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+
+.agt-connect-four .controls { display: flex; flex-direction: column; gap: 10px; }
+
+.agt-connect-four .field label {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.agt-connect-four .field select,
+.agt-connect-four .new-btn { width: 100%; }
+.agt-connect-four .stat b.turn-value { font-size: 15px; }
+
+.agt-connect-four .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.agt-connect-four .stat { padding: 6px 8px; border-radius: 10px; background: var(--ds-surface-strong); text-align: center; }
+.agt-connect-four .stat b { display: block; font-size: 19px; line-height: 1.25; }
+.agt-connect-four .stat > span { display: block; color: var(--ds-muted); font-size: 11px; font-weight: 700; line-height: 1.25; }
+
+.agt-connect-four .status {
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.agt-connect-four .status.is-over { color: var(--ds-accent); }
+.agt-connect-four .score { margin-top: auto; }
+
+/* board: classic blue frame with red / yellow discs (game colours) */
+.agt-connect-four .drops {
+  display: grid;
+  grid-template-columns: repeat(7, 54px);
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.agt-connect-four .drops button {
+  width: 54px;
+  min-width: 0;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 8px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.agt-connect-four .drops button.is-hover { border-color: var(--ds-link); background: var(--ds-surface-strong); }
+
+.agt-connect-four .board {
+  display: grid;
+  grid-template-columns: repeat(7, 54px);
+  gap: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  background: #1d4ed8;
+}
+
+.agt-connect-four .board .cell {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--ds-bg);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, .3);
+  cursor: pointer;
+}
+
+.agt-connect-four .board .cell.col-hover { background: color-mix(in srgb, var(--ds-link) 18%, var(--ds-bg)); }
+.agt-connect-four .board .cell.p1 { background: #ef4444; }
+.agt-connect-four .board .cell.p2 { background: #facc15; }
+.agt-connect-four .board .cell.last { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .75); }
+.agt-connect-four .board .cell.win { box-shadow: inset 0 0 0 5px #fff, 0 0 0 3px #16a34a; }
+
+.agt-connect-four .disc { display: inline-block; width: 13px; height: 13px; margin-right: 6px; border-radius: 50%; vertical-align: -1px; }
+.agt-connect-four .disc.red { background: #ef4444; }
+.agt-connect-four .disc.yellow { background: #facc15; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25); }
+</style>
+
+<div class="agt-connect-four agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 2 · Oyun</p><h1>Dörtlü Bağla</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="c4-help" aria-label="Açıklama ve kurallar">?</button>
+    <a class="agt-oyun__back" href="Bolum_02_Oyunlar_ve_Temsiller.html">← Bölüm 2</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="c4-layout">
+      <section class="panel board-area">
+        <div class="drops" aria-label="Pul bırak"></div>
+        <div class="board" aria-hidden="true"></div>
+      </section>
+
+      <aside class="panel controls">
+        <div class="field">
+          <label for="c4Mode">Mod</label>
+          <select id="c4Mode" class="mode-select">
+            <option value="ai">Bilgisayar</option>
+            <option value="human">İki oyuncu</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="c4Diff">Zorluk</label>
+          <select id="c4Diff" class="difficulty-select">
+            <option value="Easy">Kolay</option>
+            <option value="Medium" selected>Orta</option>
+            <option value="Hard">Zor</option>
+          </select>
+        </div>
+        <button class="new-btn is-primary" type="button">Yeni oyun</button>
+        <div class="stats">
+          <div class="stat"><b class="turn-value"><span class="disc red"></span>Kırmızı</b><span>Sıra</span></div>
+          <div class="stat"><b class="moves-value">0</b><span>Hamle</span></div>
+        </div>
+        <div class="status" aria-live="polite"></div>
+        <div class="stats score">
+          <div class="stat"><b class="wins-1">0</b><span class="name-1">Kırmızı (sen)</span></div>
+          <div class="stat"><b class="wins-2">0</b><span class="name-2">Sarı (YZ)</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="c4-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Nasıl oynanır?</h2>
+    <ol>
+      <li>Oyuncular sırayla yedi sütundan birini seçer (bir sütuna tıklanır ya da tahtanın üstündeki ok düğmeleri Tab ve Enter ile kullanılır).</li>
+      <li>Pul o sütundaki en alttaki boş hücreye düşer. Her zaman Kırmızı başlar.</li>
+      <li>Yatay, dikey ya da çapraz bir doğruda dört pulu ilk birleştiren oyuncu hemen kazanır.</li>
+      <li>Dolu bir sütun seçilemez.</li>
+      <li>Tahta dört pul yan yana gelmeden dolarsa oyun berabere biter.</li>
+    </ol>
+    <h3>Bilgisayar seviyeleri</h3>
+    <ul>
+      <li><b>Kolay</b> rastgele oynar ama hemen kazanabileceği hamleyi kaçırmaz.</li>
+      <li><b>Orta</b> anlık tehditlerle kazanır ya da onları engeller ve bir tehdidin üstündeki kareyi rakibe vermekten kaçınır.</li>
+      <li><b>Zor</b> minimaks ve alfa-beta budamasıyla yedi hamle ileriye bakar; açık ikili ve üçlü dizileri puanlar.</li>
+    </ul>
+    <h3>Tehditler ve çatallar</h3>
+    <p>Güçlü bir hamle çoğu zaman bir <b>tehdit</b> yaratır: bir sonraki turda kazandıracak bir kare. Daha da güçlüsü çataldır: bir sonraki turda iki ayrı kazandıran hamle vardır ve rakip yalnızca birini engelleyebilir. Pullar aşağı düştüğü için gelecekteki her tehdit, altındaki destek hücrelerinin güvenle doldurulup doldurulamayacağına da bağlıdır.</p>
+    <h3>Strateji ipuçları</h3>
+    <ul>
+      <li>Orta sütun, olası dörtlü dizilere kenar sütunlardan daha çok katılır.</li>
+      <li>Kendi uzun planının peşine düşmeden önce rakibin hemen kazanıp kazanamayacağına bakmak gerekir.</li>
+      <li>Rakibe kazandıran bir çapraz için gereken destek karesini veren hamlelerden kaçınmak gerekir.</li>
+      <li>Zor seviyeye karşı tek bir belirgin diziye güvenmek yerine birden çok tehdit kurmak işe yarar.</li>
+    </ul>
+    <h3>Oyun kuramıyla bağlantı</h3>
+    <p>Dörtlü Bağla, deterministik ve mükemmel bilgili bir oyundur; 1988'de çözüldü: kusursuz oyunda ilk oyuncu kazanır. Minimaks akıl yürütmesi, taktik tehdit tespiti, alfa-beta budaması ve sezgisel değerlendirme için derli toplu bir ortamdır. Yerçekimi kuralı eylem uzayını özellikle ilginç kılar, çünkü her boş kare hemen oynanabilir değildir.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.agt-connect-four');
+  if (!root) return;
+
+  var modeSelect = root.querySelector('.mode-select');
+  var difficultySelect = root.querySelector('.difficulty-select');
+  var newBtn = root.querySelector('.new-btn');
+  var turnValue = root.querySelector('.turn-value');
+  var movesValue = root.querySelector('.moves-value');
+  var statusEl = root.querySelector('.status');
+  var boardEl = root.querySelector('.board');
+  var dropsEl = root.querySelector('.drops');
+  var DIRS = [[0, 1], [1, 0], [1, 1], [1, -1]];
+  var ORDER = [3, 2, 4, 1, 5, 0, 6];
+
+  var board = [], turn = 1, moves = 0, over = false, lastIndex = -1, winCells = [], aiTimer = null, wins = [0, 0, 0];
+  var cells = [], dropBtns = [];
+
+  function vsAI() { return modeSelect.value === 'ai'; }
+  function pnameTr(p) { return p === 1 ? 'Kırmızı' : 'Sarı'; }
+
+  function build() {
+    for (var c = 0; c < 7; c++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = '▼';
+      b.setAttribute('aria-label', (c + 1) + '. sütuna bırak');
+      b.dataset.c = c;
+      dropsEl.appendChild(b);
+      dropBtns.push(b);
+    }
+    for (var i = 0; i < 42; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.c = i % 7;
+      boardEl.appendChild(cell);
+      cells.push(cell);
+    }
+    function onClick(e) {
+      var t = e.target.closest('[data-c]');
+      if (t) play(+t.dataset.c, false);
+    }
+    function hover(c) {
+      cells.forEach(function (cell, i) { cell.classList.toggle('col-hover', c !== null && i % 7 === c && !over); });
+      dropBtns.forEach(function (b, i) { b.classList.toggle('is-hover', i === c); });
+    }
+    [boardEl, dropsEl].forEach(function (el) {
+      el.addEventListener('click', onClick);
+      el.addEventListener('mouseover', function (e) { var t = e.target.closest('[data-c]'); hover(t ? +t.dataset.c : null); });
+      el.addEventListener('mouseleave', function () { hover(null); });
+    });
+    dropsEl.addEventListener('focusin', function (e) { var t = e.target.closest('[data-c]'); hover(t ? +t.dataset.c : null); });
+    dropsEl.addEventListener('focusout', function () { hover(null); });
+  }
+
+  function reset() {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+    board = Array(42).fill(0);
+    turn = 1;
+    moves = 0;
+    over = false;
+    lastIndex = -1;
+    winCells = [];
+    render();
+    status('Sıra: Kırmızı');
+  }
+
+  function dropRow(b, column) {
+    for (var row = 5; row >= 0; row--) if (!b[row * 7 + column]) return row;
+    return -1;
+  }
+
+  function lineAt(b, index) {
+    var p = b[index], r0 = Math.floor(index / 7), c0 = index % 7;
+    for (var d = 0; d < 4; d++) {
+      var dr = DIRS[d][0], dc = DIRS[d][1], line = [index];
+      for (var s = -1; s <= 1; s += 2) {
+        var r = r0 + dr * s, c = c0 + dc * s;
+        while (r >= 0 && r < 6 && c >= 0 && c < 7 && b[r * 7 + c] === p) { line.push(r * 7 + c); r += dr * s; c += dc * s; }
+      }
+      if (line.length >= 4) return line;
+    }
+    return null;
+  }
+
+  function play(column, fromAI) {
+    if (over) return;
+    if (!fromAI && vsAI() && turn === 2) return;
+    var row = dropRow(board, column);
+    if (row < 0) return;
+    var index = row * 7 + column;
+    board[index] = turn;
+    lastIndex = index;
+    moves++;
+    var line = lineAt(board, index);
+    if (line) {
+      over = true;
+      winCells = line;
+      wins[turn]++;
+      render();
+      status(vsAI() ? (turn === 1 ? 'Kazandın! (Kırmızı)' : 'Bilgisayar (Sarı) kazandı!') : pnameTr(turn) + ' kazandı!', true);
+      return;
+    }
+    if (moves === 42) {
+      over = true;
+      render();
+      status('Berabere: tahta doldu.', true);
+      return;
+    }
+    turn = 3 - turn;
+    render();
+    status('Sıra: ' + pnameTr(turn));
+    if (vsAI() && turn === 2) aiTimer = setTimeout(ai, 320);
+  }
+
+  function legalCols(b) { return ORDER.filter(function (c) { return !b[c]; }); }
+
+  function winsAt(b, c, p) {
+    var r = dropRow(b, c);
+    if (r < 0) return false;
+    b[r * 7 + c] = p;
+    var w = !!lineAt(b, r * 7 + c);
+    b[r * 7 + c] = 0;
+    return w;
+  }
+
+  function scoreWindow(cnt, empty, opp) {
+    if (cnt === 3 && empty === 1) return 5;
+    if (cnt === 2 && empty === 2) return 2;
+    if (opp === 3 && empty === 1) return -4;
+    return 0;
+  }
+
+  function evaluate(b, p) {
+    var s = 0, q = 3 - p;
+    for (var r = 0; r < 6; r++) if (b[r * 7 + 3] === p) s += 3; else if (b[r * 7 + 3] === q) s -= 3;
+    for (r = 0; r < 6; r++) for (var c = 0; c < 7; c++) for (var d = 0; d < 4; d++) {
+      var er = r + DIRS[d][0] * 3, ec = c + DIRS[d][1] * 3;
+      if (er < 0 || er > 5 || ec < 0 || ec > 6) continue;
+      var mine = 0, theirs = 0, empty = 0;
+      for (var k = 0; k < 4; k++) {
+        var v = b[(r + DIRS[d][0] * k) * 7 + c + DIRS[d][1] * k];
+        if (v === p) mine++; else if (v === q) theirs++; else empty++;
+      }
+      if (!theirs) s += scoreWindow(mine, empty, 0);
+      if (!mine) s -= scoreWindow(theirs, empty, 0) + (theirs === 3 && empty === 1 ? 1 : 0);
+    }
+    return s;
+  }
+
+  function negamax(b, depth, alpha, beta, p, filled) {
+    var cols = legalCols(b);
+    if (!cols.length) return 0;
+    for (var i = 0; i < cols.length; i++) if (winsAt(b, cols[i], p)) return 1000 + depth;
+    if (depth === 0) return evaluate(b, p);
+    var best = -Infinity;
+    for (i = 0; i < cols.length; i++) {
+      var r = dropRow(b, cols[i]);
+      b[r * 7 + cols[i]] = p;
+      var v = -negamax(b, depth - 1, -beta, -alpha, 3 - p, filled + 1);
+      b[r * 7 + cols[i]] = 0;
+      if (v > best) best = v;
+      if (best > alpha) alpha = best;
+      if (alpha >= beta) break;
+    }
+    return best;
+  }
+
+  function ai() {
+    aiTimer = null;
+    if (over || turn !== 2) return;
+    var b = board.slice();
+    var cols = legalCols(b);
+    var difficulty = difficultySelect.value;
+    var move = cols[Math.floor(Math.random() * cols.length)];
+    var win = cols.filter(function (c) { return winsAt(b, c, 2); });
+    var block = cols.filter(function (c) { return winsAt(b, c, 1); });
+    if (win.length) move = win[0];
+    else if (difficulty === 'Medium') {
+      if (block.length) move = block[0];
+      else {
+        var safe = cols.filter(function (c) {
+          var r = dropRow(b, c);
+          b[r * 7 + c] = 2;
+          var bad = winsAt(b, c, 1);
+          b[r * 7 + c] = 0;
+          return !bad;
+        });
+        var pool = safe.length ? safe : cols;
+        move = Math.random() < 0.6 ? pool[0] : pool[Math.floor(Math.random() * pool.length)];
+      }
+    } else if (difficulty === 'Hard') {
+      var best = -Infinity;
+      cols.forEach(function (c) {
+        var r = dropRow(b, c);
+        b[r * 7 + c] = 2;
+        var v = -negamax(b, 6, -Infinity, Infinity, 1, moves + 1);
+        b[r * 7 + c] = 0;
+        if (v > best) { best = v; move = c; }
+      });
+    }
+    play(move, true);
+  }
+
+  function status(tr, end) {
+    statusEl.textContent = tr;
+    statusEl.classList.toggle('is-over', !!end);
+  }
+
+  function render() {
+    cells.forEach(function (cell, i) {
+      cell.className = 'cell' + (board[i] === 1 ? ' p1' : board[i] === 2 ? ' p2' : '') +
+        (i === lastIndex && !over ? ' last' : '') + (winCells.indexOf(i) >= 0 ? ' win' : '');
+    });
+    var blocked = over || (vsAI() && turn === 2);
+    dropBtns.forEach(function (b, c) { b.disabled = blocked || !!board[c]; });
+    turnValue.innerHTML = '<span class="disc ' + (turn === 1 ? 'red' : 'yellow') + '"></span>' + pnameTr(turn);
+    movesValue.textContent = moves;
+    root.querySelector('.wins-1').textContent = wins[1];
+    root.querySelector('.wins-2').textContent = wins[2];
+    root.querySelector('.name-1').textContent = vsAI() ? 'Kırmızı (sen)' : 'Kırmızı';
+    root.querySelector('.name-2').textContent = vsAI() ? 'Sarı (YZ)' : 'Sarı';
+  }
+
+  build();
+  newBtn.addEventListener('click', reset);
+  modeSelect.addEventListener('change', function () { wins = [0, 0, 0]; reset(); });
+  reset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

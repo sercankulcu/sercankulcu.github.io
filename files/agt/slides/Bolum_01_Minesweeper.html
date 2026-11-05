@@ -1,0 +1,397 @@
+---
+layout: without-sidebar
+title: "Mayın Tarlası"
+permalink: /files/agt/slides/Bolum_01_Minesweeper.html
+excerpt: "Ölçeklenebilir zorluk, bayraklar, taşmalı açılış, süre ölçer, güvenli ipuçları ve kısıt temelli akıl yürütmeyle etkileşimli Mayın Tarlası bulmacası."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-minesweeper.agt-oyun{
+  /* classic Minesweeper number colours (part of the game) */
+  --ms-n1:#1d4ed8;
+  --ms-n2:#15803d;
+  --ms-n3:#c81e1e;
+  --ms-n4:#4c1d95;
+  --ms-n5:#7f1d1d;
+  --ms-n6:#0f766e;
+  --ms-n7:#111827;
+  --ms-n8:#4b5563;
+  --ms-cell:40px
+}
+html[data-theme="dark"] .agt-minesweeper.agt-oyun{
+  --ms-n1:#7aa7ff;
+  --ms-n2:#6ee7a0;
+  --ms-n3:#ff8a8a;
+  --ms-n4:#c4a5ff;
+  --ms-n5:#ffb38a;
+  --ms-n6:#5eead4;
+  --ms-n7:#f3f4f6;
+  --ms-n8:#cbd5e1
+}
+.agt-minesweeper .agt-oyun__body{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;font-size:14px}
+.agt-minesweeper .side{display:flex;flex-direction:column;gap:8px;min-height:0}
+.agt-minesweeper .box{background:var(--ds-bg);border:1.5px solid var(--ds-border);border-radius:12px;padding:10px 12px}
+.agt-minesweeper .side .box{display:grid;gap:7px}
+.agt-minesweeper label.field{display:grid;gap:2px;font-size:12px;font-weight:700;color:var(--ds-muted);text-transform:uppercase;letter-spacing:.05em}
+.agt-minesweeper select{width:100%;min-height:30px;font-size:13.5px;text-transform:none;letter-spacing:0}
+.agt-minesweeper .btn{width:100%;min-height:32px;font-size:14px;border:1.5px solid var(--ds-link);background:var(--ds-link);color:var(--ds-bg)}
+.agt-minesweeper .btn:hover:not(:disabled){background:color-mix(in srgb,var(--ds-link) 85%,var(--ds-text))}
+.agt-minesweeper .btn.secondary{background:var(--ds-bg);color:var(--ds-text)!important;border-color:var(--ds-border)}
+.agt-minesweeper.agt-oyun .agt-oyun__body{grid-template-columns:250px minmax(0,1fr)}
+.agt-minesweeper .side .btn{font-size:13px;min-height:30px;line-height:1.2}
+.agt-minesweeper .side .box{gap:6px;padding:8px 10px}
+.agt-minesweeper .status{min-height:0;font-size:13px}
+.agt-minesweeper .metric{padding:4px 2px}
+.agt-minesweeper .metric b{font-size:17px}
+.agt-minesweeper .btn.secondary:hover:not(:disabled){background:var(--ds-surface-strong);border-color:var(--ds-link)}
+.agt-minesweeper .btn.secondary[aria-pressed="true"]{background:var(--ds-surface-strong);border-color:var(--ds-accent);box-shadow:inset 0 0 0 1.5px var(--ds-accent)}
+.agt-minesweeper .metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.agt-minesweeper .metric{padding:6px 2px;border:1.5px solid var(--ds-border);border-radius:10px;text-align:center;background:var(--ds-surface);font-size:11.5px;color:var(--ds-muted);font-weight:700}
+.agt-minesweeper .metric b{display:block;font-size:19px;color:var(--ds-accent);line-height:1.2}
+.agt-minesweeper .status{padding:8px 10px;border-radius:10px;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border);font-size:13.5px;font-weight:700;line-height:1.35;min-height:76px}
+.agt-minesweeper .status.win{border-color:var(--ds-good);border-left-width:6px}
+.agt-minesweeper .status.lose{border-color:var(--ds-bad);border-left-width:6px}
+.agt-minesweeper .keys{font-size:12px;color:var(--ds-muted);line-height:1.4}
+.agt-minesweeper .board-area{display:grid;place-items:center;min-height:0}
+.agt-minesweeper .board{display:grid;gap:2px;padding:8px;border-radius:12px;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border)}
+.agt-minesweeper .board .cell{display:grid;place-items:center;width:var(--ms-cell);height:var(--ms-cell);min-height:0;padding:0;border-radius:6px;border:1.5px solid var(--ds-border);background:color-mix(in srgb,var(--ds-link) 24%,var(--ds-bg));color:var(--ds-text);font-size:calc(var(--ms-cell)*.45);font-weight:900;line-height:1;user-select:none;cursor:pointer}
+.agt-minesweeper .board .cell:hover:not(.is-open){border-color:var(--ds-link);background:color-mix(in srgb,var(--ds-link) 34%,var(--ds-bg))}
+.agt-minesweeper .board .cell.is-open{background:var(--ds-bg);border-color:color-mix(in srgb,var(--ds-border) 45%,var(--ds-bg));cursor:default}
+.agt-minesweeper .board .cell.is-boom{background:color-mix(in srgb,var(--ds-bad) 30%,var(--ds-bg))}
+.agt-minesweeper .board .cell.is-hint{box-shadow:0 0 0 3px var(--ds-warn)}
+.agt-minesweeper .board .cell.is-wrong{background:color-mix(in srgb,var(--ds-warn) 30%,var(--ds-bg))}
+.agt-minesweeper .cell.n1{color:var(--ms-n1)}
+.agt-minesweeper .cell.n2{color:var(--ms-n2)}
+.agt-minesweeper .cell.n3{color:var(--ms-n3)}
+.agt-minesweeper .cell.n4{color:var(--ms-n4)}
+.agt-minesweeper .cell.n5{color:var(--ms-n5)}
+.agt-minesweeper .cell.n6{color:var(--ms-n6)}
+.agt-minesweeper .cell.n7{color:var(--ms-n7)}
+.agt-minesweeper .cell.n8{color:var(--ms-n8)}
+.agt-minesweeper .agt-oyun__head a.agt-oyun__back{color:var(--ds-link)}
+</style>
+
+<div class="agt-minesweeper agt-oyun agt-oyun--stage" lang="tr">
+<header class="agt-oyun__head">
+<div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Oyun</p><h1>Mayın Tarlası</h1></div>
+<button type="button" class="agt-oyun__help" aria-controls="minesweeper-help" aria-label="Yardım">?</button>
+<a class="agt-oyun__back" href="Bolum_01_Karar_Kurami.html">← Bölüm 1</a>
+</header>
+
+<div class="agt-oyun__body">
+<aside class="side">
+<div class="box">
+<label class="field"><span>Seviye</span>
+<select class="level-select">
+<option value="8,10">Kolay · 8×8 · 10</option>
+<option value="10,15" selected>Orta · 10×10 · 15</option>
+<option value="14,30">Zor · 14×14 · 30</option>
+</select>
+</label>
+<button class="btn new-btn" type="button">Yeni oyun</button>
+<button class="btn secondary hint-btn" type="button">Güvenli ipucu</button>
+<button class="btn secondary flag-btn" type="button" aria-pressed="false">Bayrak kipi: Kapalı</button>
+</div>
+<div class="metrics">
+<div class="metric">Kalan mayın<b class="mines-left">0</b></div>
+<div class="metric">Açılan<b class="opened-count">0</b></div>
+<div class="metric">Saniye<b class="timer">0</b></div>
+<div class="metric">İpucu<b class="hints-used">0</b></div>
+</div>
+<div class="status game-status" aria-live="polite"></div>
+<div class="keys">Tık: aç · Sağ tık ya da bayrak kipi: bayrak<br></div>
+</aside>
+<div class="board-area"><div class="board" role="grid" aria-label="Mayın tarlası"></div></div>
+</div>
+
+<dialog class="agt-oyun__dialog" id="minesweeper-help">
+<button type="button" class="agt-oyun__close">Kapat</button>
+<h2>Nasıl oynanır</h2>
+<ol>
+<li>Bir hücreyi açmak için üzerine tıklanır. Amaç, hiç mayın açmadan bütün güvenli hücreleri açmaktır. İlk tıklama her zaman güvenlidir ve boş bir bölge açar.</li>
+<li>Bir sayı, sekiz komşu hücre arasında tam olarak kaç mayın bulunduğunu söyler.</li>
+<li>Sağ tıkla (dokunmatik ekranda <b>Bayrak kipi</b> açılarak) mayın olduğu düşünülen yere bayrak konur ya da bayrak kaldırılır.</li>
+<li>Sıfır hücresi açılınca çevresindeki güvenli bölge kendiliğinden açılır.</li>
+<li>Mayın olmayan bütün hücreler açılınca oyun kazanılır; mayın açmak oyunu bitirir. Oyun sonunda yanlış konmuş bayraklar gölgeli gösterilir.</li>
+</ol>
+<h3>Güvenli ipucu</h3>
+<p>İpucu önce görünen sayıların <b>mantıksal olarak zorunlu kıldığı</b> güvenli bir hücre arar ve onu açar (çerçeveli). Zorunlu hamle yoksa rastgele bir güvenli hücreyi açar ve aksi hâlde tahmin etmek gerekeceğini bildirir.</p>
+<h3>Güvenli hücreler nasıl çıkarılır</h3>
+<p>Her sayı yerel bir kısıt olarak ele alınır. Bir “1” tam olarak bir açılmamış hücreye değiyorsa o hücre mayındır. Bir “2” zaten bilinen iki mayına değiyorsa açılmamış öteki komşuları güvenlidir. Örtüşen kısıtları birleştirmek, büyük tahtaları tahmin etmeden çözmeyi sağlar.</p>
+<h3>Strateji ipuçları</h3>
+<ul>
+<li>Bayraklar hafıza yardımcısıdır: ipuçları doğrulayana kadar bayrak yalnızca bir varsayımdır.</li>
+<li>Önce en çok bilgi içeren bölgelerden çalışılır.</li>
+<li>Komşu sayılar karşılaştırılarak kısıt kümeleri arasında hangi açılmamış hücrelerin farklı olduğu çıkarılır.</li>
+</ul>
+<h3>Akıl yürütmeyle bağlantı</h3>
+<p>Mayın Tarlası bir rakibe karşı oynanan stratejik bir oyun değil, kısıt sağlama ve çıkarım bulmacasıdır. Yerel akıl yürütmeyi, bilginin yayılmasını, belirsizliğin azalmasını ve mantıksal olarak zorunlu hamlelerle tahminler arasındaki farkı gösterir.</p>
+</dialog>
+</div>
+
+<script>
+(() => {
+  const root=document.querySelector('.agt-minesweeper');
+  if(!root)return;
+
+  const level=root.querySelector('.level-select');
+  const newBtn=root.querySelector('.new-btn');
+  const hintBtn=root.querySelector('.hint-btn');
+  const flagBtn=root.querySelector('.flag-btn');
+  const board=root.querySelector('.board');
+  const minesLeft=root.querySelector('.mines-left');
+  const openedCount=root.querySelector('.opened-count');
+  const timerEl=root.querySelector('.timer');
+  const hintsEl=root.querySelector('.hints-used');
+  const statusEl=root.querySelector('.game-status');
+
+  const cellSize={8:44,10:40,14:32};
+  let N=10;
+  let M=15;
+  let cells=[];
+  let buttons=[];
+  let started=0;
+  let tick=null;
+  let over=false;
+  let flagMode=false;
+  let firstMove=true;
+  let hints=0;
+  let hinted=-1;
+
+  function neighbors(i){
+    const r=Math.floor(i/N);
+    const c=i%N;
+    const result=[];
+    for(let dr=-1;dr<=1;dr++){
+      for(let dc=-1;dc<=1;dc++){
+        const x=r+dr;
+        const y=c+dc;
+        if((dr||dc)&&x>=0&&y>=0&&x<N&&y<N)result.push(x*N+y);
+      }
+    }
+    return result;
+  }
+
+  function message(tr,kind){
+    statusEl.innerHTML=tr;
+    statusEl.className='status game-status'+(kind?' '+kind:'');
+  }
+
+  function stopTimer(){
+    clearInterval(tick);
+    tick=null;
+  }
+
+  function placeMines(safe){
+    const banned=new Set([safe,...neighbors(safe)]);
+    let pool=[...cells.keys()].filter(i=>!banned.has(i));
+    if(pool.length<M)pool=[...cells.keys()].filter(i=>i!==safe);
+    for(let k=pool.length-1;k>0;k--){
+      const j=Math.floor(Math.random()*(k+1));
+      [pool[k],pool[j]]=[pool[j],pool[k]];
+    }
+    pool.slice(0,M).forEach(i=>{cells[i].mine=true;});
+    cells.forEach((cell,i)=>{
+      cell.n=neighbors(i).filter(j=>cells[j].mine).length;
+    });
+  }
+
+  function build(){
+    board.innerHTML='';
+    board.style.gridTemplateColumns=`repeat(${N},var(--ms-cell))`;
+    root.style.setProperty('--ms-cell',cellSize[N]+'px');
+    buttons=cells.map((cell,i)=>{
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='cell';
+      button.addEventListener('click',()=>{
+        if(flagMode)flag(i);
+        else openCell(i);
+      });
+      button.addEventListener('contextmenu',event=>{
+        event.preventDefault();
+        flag(i);
+      });
+      board.appendChild(button);
+      return button;
+    });
+  }
+
+  function render(){
+    cells.forEach((cell,i)=>{
+      const button=buttons[i];
+      button.className='cell'+
+        (cell.open?' is-open':'')+
+        (cell.boom?' is-boom':'')+
+        (over&&cell.flag&&!cell.mine?' is-wrong':'')+
+        (i===hinted&&!over?' is-hint':'')+
+        (cell.open&&!cell.mine&&cell.n?' n'+cell.n:'');
+      const text=cell.open?(cell.mine?'💣':(cell.n||'')):(cell.flag?'🚩':'');
+      if(button.textContent!==String(text))button.textContent=text;
+      button.setAttribute('aria-label',`Satır ${Math.floor(i/N)+1}, sütun ${i%N+1}: `+(cell.open?(cell.mine?'mayın':cell.n+' komşu mayın'):cell.flag?'bayraklı':'kapalı'));
+    });
+    minesLeft.textContent=M-cells.filter(c=>c.flag).length;
+    openedCount.textContent=cells.filter(c=>c.open&&!c.mine).length;
+    hintsEl.textContent=hints;
+    hintBtn.disabled=over;
+  }
+
+  function openCell(i,fromHint){
+    if(over||cells[i].flag||cells[i].open)return;
+    if(!fromHint)hinted=-1;
+    if(firstMove){
+      firstMove=false;
+      placeMines(i);
+      started=Date.now();
+      stopTimer();
+      tick=setInterval(()=>{
+        timerEl.textContent=Math.floor((Date.now()-started)/1000);
+      },500);
+    }
+    if(cells[i].mine){
+      cells[i].open=true;
+      cells[i].boom=true;
+      over=true;
+      stopTimer();
+      cells.forEach(cell=>{if(cell.mine&&!cell.flag)cell.open=true;});
+      render();
+      message('Bum! Mayına basıldı. Yeniden denemek için Yeni oyun.','lose');
+      return;
+    }
+    const queue=[i];
+    while(queue.length){
+      const k=queue.pop();
+      const cell=cells[k];
+      if(cell.open||cell.flag)continue;
+      cell.open=true;
+      if(cell.n===0){
+        neighbors(k).forEach(j=>{
+          if(!cells[j].open&&!cells[j].mine)queue.push(j);
+        });
+      }
+    }
+    if(cells.filter(c=>c.open&&!c.mine).length===N*N-M){
+      over=true;
+      stopTimer();
+      cells.forEach(c=>{if(c.mine)c.flag=true;});
+      render();
+      message(`Tarlayı ${timerEl.textContent} sn içinde temizledin${hints?` (${hints} ipucuyla)`:''}!`,'win');
+      return;
+    }
+    render();
+    if(!fromHint)message('Devam: güvenli hücreleri bulmak için sayıları kullan.','');
+  }
+
+  function flag(i){
+    if(over||cells[i].open||firstMove)return;
+    cells[i].flag=!cells[i].flag;
+    render();
+  }
+
+  /* single-constraint deduction from the visible numbers only */
+  function forcedSafe(){
+    const knownMine=new Set();
+    let changed=true;
+    while(changed){
+      changed=false;
+      cells.forEach((cell,i)=>{
+        if(!cell.open||cell.mine||!cell.n)return;
+        const closed=neighbors(i).filter(j=>!cells[j].open);
+        if(closed.length===cell.n){
+          closed.forEach(j=>{
+            if(!knownMine.has(j)){knownMine.add(j);changed=true;}
+          });
+        }
+      });
+    }
+    for(let i=0;i<cells.length;i++){
+      const cell=cells[i];
+      if(!cell.open||cell.mine||!cell.n)continue;
+      const closed=neighbors(i).filter(j=>!cells[j].open);
+      const mines=closed.filter(j=>knownMine.has(j)).length;
+      if(mines===cell.n){
+        const safe=closed.find(j=>!knownMine.has(j)&&!cells[j].flag);
+        if(safe!==undefined)return safe;
+      }
+    }
+    return -1;
+  }
+
+  function safeHint(){
+    if(over)return;
+    hints++;
+    if(firstMove){
+      const centre=Math.floor(N/2)*N+Math.floor(N/2);
+      hinted=centre;
+      openCell(centre,true);
+      if(!over)message('İpucu: ortadan başlandı (ilk tıklama her zaman güvenlidir).','');
+      return;
+    }
+    let target=forcedSafe();
+    let forced=true;
+    if(target<0){
+      forced=false;
+      const candidates=cells.map((c,i)=>!c.mine&&!c.open&&!c.flag?i:-1).filter(i=>i>=0);
+      if(!candidates.length){render();return;}
+      target=candidates[Math.floor(Math.random()*candidates.length)];
+    }
+    hinted=target;
+    const r=Math.floor(target/N)+1;
+    const c=target%N+1;
+    openCell(target,true);
+    if(!over&&forced)message(`İpucu: satır ${r}, sütun ${c} komşularının sayılarına göre zorunlu olarak güvenli.`,'');
+    else if(!over)message(`İpucu: zorunlu hamle yoktu, tahmin etmek gerekecekti. Satır ${r}, sütun ${c} açıldı.`,'');
+  }
+
+  function reset(){
+    [N,M]=level.value.split(',').map(Number);
+    cells=Array.from({length:N*N},()=>({mine:false,open:false,flag:false,boom:false,n:0}));
+    over=false;
+    firstMove=true;
+    hints=0;
+    hinted=-1;
+    stopTimer();
+    timerEl.textContent='0';
+    build();
+    render();
+    message('Başlamak için bir hücreye tıkla; ilk tıklama her zaman güvenlidir.','');
+  }
+
+  newBtn.addEventListener('click',reset);
+  hintBtn.addEventListener('click',safeHint);
+  flagBtn.addEventListener('click',()=>{
+    flagMode=!flagMode;
+    flagBtn.setAttribute('aria-pressed',String(flagMode));
+    flagBtn.innerHTML='Bayrak kipi: '+(flagMode?'Açık':'Kapalı');
+  });
+  level.addEventListener('change',reset);
+
+  reset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

@@ -44,13 +44,13 @@ Stratejik etkileşimden önce tek bir karar verici incelenir. Beklenen fayda ve 
 - [📖Ders Notu - Karar Kuramı (HTML)](../files/agt/notlar/Bolum_01_Karar_Kurami_Ders_Notu.html)
 - [📝Çalışma Soruları - Karar Kuramı (HTML)](../files/agt/slides/Bolum_01_Karar_Kurami_Calisma_Sorulari.html)
 
-- [🕹️Bayesçi Karar Laboratuvarı (HTML)](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
-- [🕹️Blackjack Karar Laboratuvarı (HTML)](../files/agt/slides/Chapter_13_Blackjack.html)
-- [🕹️Poker Oyunu (HTML)](../files/agt/slides/Chapter_13_Poker.html)
-- [🕹️Tavla YZ (HTML)](../files/agt/slides/Chapter_13_Backgammon.html)
-- [🕹️Mayın Tarlası (HTML)](../files/agt/slides/Chapter_13_Minesweeper.html)
-- [🕹️Pişti (HTML)](../files/agt/slides/Chapter_13_Pisti.html)
-- [🕹️Hokm (HTML)](../files/agt/slides/Chapter_13_Hokm.html)
+- [🕹️Bayesçi Karar Laboratuvarı (HTML)](../files/agt/slides/Bolum_01_Bayesian-Decision-Lab.html)
+- [🕹️Blackjack Karar Laboratuvarı (HTML)](../files/agt/slides/Bolum_01_Blackjack.html)
+- [🕹️Poker Oyunu (HTML)](../files/agt/slides/Bolum_01_Poker.html)
+- [🕹️Tavla YZ (HTML)](../files/agt/slides/Bolum_01_Backgammon.html)
+- [🕹️Mayın Tarlası (HTML)](../files/agt/slides/Bolum_01_Minesweeper.html)
+- [🕹️Pişti (HTML)](../files/agt/slides/Bolum_01_Pisti.html)
+- [🕹️Hokm (HTML)](../files/agt/slides/Bolum_01_Hokm.html)
 
 ---
 
@@ -66,18 +66,18 @@ Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançla
 - [📄Sunum-Minimaks ve Alfa-Beta Budaması (PDF)](../files/agt/pdf/Bolum_02_Minimaks_ve_Budama.pdf)
 - [📝Çalışma Soruları - Minimaks ve Alfa-Beta Budaması (HTML)](../files/agt/slides/Bolum_02_Minimaks_ve_Budama_Calisma_Sorulari.html)
 
-- [🕹️2/3 Ortalaması Oyunu (HTML)](../files/agt/slides/Chapter_01_Guess_Average.html)
-- [🕹️Minimaks XOX (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
-- [🕹️Nim (HTML)](../files/agt/slides/Chapter_01_Nim.html)
-- [🕹️21'i Söyleme (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21.html)
-- [🕹️Dörtlü Bağla (HTML)](../files/agt/slides/Chapter_02_Connect-Four.html)
-- [🕹️Hex (HTML)](../files/agt/slides/Chapter_02_Hex.html)
-- [🕹️Othello (HTML)](../files/agt/slides/Chapter_02_Othello.html)
-- [🕹️Mangala (HTML)](../files/agt/slides/Chapter_13_Mangala.html)
-- [🕹️Satranç (YZ'ye karşı) (HTML)](../files/agt/slides/Chapter_03_Chess.html)
-- [🕹️Dama (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
-- [🕹️Tilki ve Kazlar (HTML)](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
-- [🕹️Dokuz Taş (HTML)](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
+- [🕹️2/3 Ortalaması Oyunu (HTML)](../files/agt/slides/Bolum_02_Guess_Average.html)
+- [🕹️Minimaks XOX (HTML)](../files/agt/slides/Bolum_02_TicTacToe.html)
+- [🕹️Nim (HTML)](../files/agt/slides/Bolum_02_Nim.html)
+- [🕹️21'i Söyleme (HTML)](../files/agt/slides/Bolum_02_Dont-Say-21.html)
+- [🕹️Dörtlü Bağla (HTML)](../files/agt/slides/Bolum_02_Connect-Four.html)
+- [🕹️Hex (HTML)](../files/agt/slides/Bolum_02_Hex.html)
+- [🕹️Othello (HTML)](../files/agt/slides/Bolum_02_Othello.html)
+- [🕹️Mangala (HTML)](../files/agt/slides/Bolum_02_Mangala.html)
+- [🕹️Satranç (YZ'ye karşı) (HTML)](../files/agt/slides/Bolum_02_Chess.html)
+- [🕹️Dama (HTML)](../files/agt/slides/Bolum_02_Checkers.html)
+- [🕹️Tilki ve Kazlar (HTML)](../files/agt/slides/Bolum_02_Fox-and-Geese.html)
+- [🕹️Dokuz Taş (HTML)](../files/agt/slides/Bolum_02_Nine-Mens-Morris.html)
 
 ---
 
@@ -90,10 +90,10 @@ Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı
 - [📖Ders Notu - Nash Dengesi (HTML)](../files/agt/notlar/Bolum_03_Nash_Dengesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Nash Dengesi (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi_Calisma_Sorulari.html)
 
-- [🕹️Mahkûmun İkilemi Simülatörü (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
-- [🕹️Matris Oyunu ve Nash Dengesi Laboratuvarı (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
-- [🕹️Taş Kağıt Makas (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
-- [🕹️Albay Blotto (HTML)](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
+- [🕹️Mahkûmun İkilemi Simülatörü (HTML)](../files/agt/slides/Bolum_03_Prisoners_Dilemma.html)
+- [🕹️Matris Oyunu ve Nash Dengesi Laboratuvarı (HTML)](../files/agt/slides/Bolum_03_Matrix-Nash.html)
+- [🕹️Taş Kağıt Makas (HTML)](../files/agt/slides/Bolum_03_Rock_Scissors_Paper.html)
+- [🕹️Albay Blotto (HTML)](../files/agt/slides/Bolum_03_Colonel-Blotto.html)
 
 ---
 
@@ -108,9 +108,9 @@ Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çı
 - [📖Ders Notu - Mekanizma Tasarımı (HTML)](../files/agt/notlar/Bolum_04_Mekanizma_Ders_Notu.html)
 - [📝Çalışma Soruları - Mekanizma Tasarımı (HTML)](../files/agt/slides/Bolum_04_Mekanizma_Calisma_Sorulari.html)
 
-- [🕹️Ültimatom Oyunu (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
-- [🕹️Kararlı Eşleştirme Simülatörü (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
-- [🕹️Teşvik Uyumluluğu Laboratuvarı (HTML)](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
+- [🕹️Ültimatom Oyunu (HTML)](../files/agt/slides/Bolum_04_Ultimatum-Game.html)
+- [🕹️Kararlı Eşleştirme Simülatörü (HTML)](../files/agt/slides/Bolum_04_Stable-Matching.html)
+- [🕹️Teşvik Uyumluluğu Laboratuvarı (HTML)](../files/agt/slides/Bolum_04_Incentive-Compatibility-Lab.html)
 
 ---
 
@@ -123,12 +123,12 @@ Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde 
 - [📖Ders Notu - Açık Artırmalar (HTML)](../files/agt/notlar/Bolum_05_Acik_Arttirma_Ders_Notu.html)
 - [📝Çalışma Soruları - Açık Artırmalar (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma_Calisma_Sorulari.html)
 
-- [🕹️Vickrey Açık Artırması (HTML)](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
-- [🕹️İngiliz Açık Artırması (HTML)](../files/agt/slides/Chapter_05_english-auction-simulator.html)
-- [🕹️Hollanda Açık Artırması (HTML)](../files/agt/slides/Chapter_05_dutch-auction-simulator.html)
-- [🕹️Birinci Fiyat Kapalı Zarf Açık Artırması (HTML)](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
-- [🕹️Çift Taraflı Açık Artırma Piyasası (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
-- [🕹️Monopoly (isteğe bağlı) (HTML)](../files/agt/slides/Chapter_05_Monopoly.html)
+- [🕹️Vickrey Açık Artırması (HTML)](../files/agt/slides/Bolum_05_second-price-sealed-bid-auction.html)
+- [🕹️İngiliz Açık Artırması (HTML)](../files/agt/slides/Bolum_05_english-auction-simulator.html)
+- [🕹️Hollanda Açık Artırması (HTML)](../files/agt/slides/Bolum_05_dutch-auction-simulator.html)
+- [🕹️Birinci Fiyat Kapalı Zarf Açık Artırması (HTML)](../files/agt/slides/Bolum_05_first-price-auction-simulator.html)
+- [🕹️Çift Taraflı Açık Artırma Piyasası (HTML)](../files/agt/slides/Bolum_05_Double-Auction-Market-Simulator.html)
+- [🕹️Monopoly (isteğe bağlı) (HTML)](../files/agt/slides/Bolum_05_Monopoly.html)
 
 ---
 
@@ -141,8 +141,8 @@ Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getir
 - [📖Ders Notu - Çevrim İçi Platformlar (HTML)](../files/agt/notlar/Bolum_06_Cevrimici_Platform_Ders_Notu.html)
 - [📝Çalışma Soruları - Çevrim İçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform_Calisma_Sorulari.html)
 
-- [🕹️İki Taraflı Platform Fiyatlama (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
-- [🕹️Sponsorlu Arama Açık Artırması (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html)
+- [🕹️İki Taraflı Platform Fiyatlama (HTML)](../files/agt/slides/Bolum_06_Two-Sided-Platform-Pricing.html)
+- [🕹️Sponsorlu Arama Açık Artırması (HTML)](../files/agt/slides/Bolum_06_Sponsored-Search-Ad-Auction-Game.html)
 
 ---
 
@@ -155,9 +155,9 @@ Sosyal seçim, bireysel tercihlerin ortak bir karara nasıl dönüştürüldüğ
 - [📖Ders Notu - Oylama (HTML)](../files/agt/notlar/Bolum_07_Oylama_Ders_Notu.html)
 - [📝Çalışma Soruları - Oylama (HTML)](../files/agt/slides/Bolum_07_Oylama_Calisma_Sorulari.html)
 
-- [🕹️Oylama Kuralları ve Manipülasyon (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
-- [🕹️Condorcet Paradoksu (HTML)](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
-- [🕹️Tesis Yerleşimi (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
+- [🕹️Oylama Kuralları ve Manipülasyon (HTML)](../files/agt/slides/Bolum_07_Voting-Rules.html)
+- [🕹️Condorcet Paradoksu (HTML)](../files/agt/slides/Bolum_07_Condorcet-Voting-Paradox.html)
+- [🕹️Tesis Yerleşimi (HTML)](../files/agt/slides/Bolum_07_Facility_Location.html)
 
 ---
 
@@ -172,9 +172,9 @@ Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merke
 - [📖Ders Notu - Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/notlar/Bolum_08_Ag_Tasarimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi_Calisma_Sorulari.html)
 
-- [🕹️Braess Paradoksu (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
-- [🕹️Bencil Yönlendirme ve PoA (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html)
-- [🕹️Ağ Oluşturma Oyunu (HTML)](../files/agt/slides/Chapter_08_Network-Formation.html)
+- [🕹️Braess Paradoksu (HTML)](../files/agt/slides/Bolum_08_Braess-Paradox-Visualizer.html)
+- [🕹️Bencil Yönlendirme ve PoA (HTML)](../files/agt/slides/Bolum_08_Selfish-Routing.html)
+- [🕹️Ağ Oluşturma Oyunu (HTML)](../files/agt/slides/Bolum_08_Network-Formation.html)
 
 ---
 
@@ -187,7 +187,7 @@ Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davran
 - [📖Ders Notu - Anarşinin Bedeli (HTML)](../files/agt/notlar/Bolum_09_Anarsi_Ders_Notu.html)
 - [📝Çalışma Soruları - Anarşinin Bedeli (HTML)](../files/agt/slides/Bolum_09_Anarsi_Calisma_Sorulari.html)
 
-- [🕹️Yük Dengeleme ve PoA (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
+- [🕹️Yük Dengeleme ve PoA (HTML)](../files/agt/slides/Bolum_09_Load-Balancing-Price-of-Anarchy-Game.html)
 
 ---
 
@@ -202,7 +202,7 @@ Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davran
 - [📖Ders Notu - Çoklu Ajan Sistemleri (HTML)](../files/agt/notlar/Bolum_10_Coklu_Ajan_Ders_Notu.html)
 - [📝Çalışma Soruları - Çoklu Ajan Sistemleri (HTML)](../files/agt/slides/Bolum_10_Coklu_Ajan_Calisma_Sorulari.html)
 
-- [🕹️Shapley Koalisyon Oyunu (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
+- [🕹️Shapley Koalisyon Oyunu (HTML)](../files/agt/slides/Bolum_10_Shapley-Coalition-Game.html)
 
 ---
 
@@ -215,7 +215,7 @@ Algoritmik kararlar ve dağıtımlar bireyleri ve grupları farklı biçimlerde 
 - [📖Ders Notu - Algoritmik Adalet ve Etik (HTML)](../files/agt/notlar/Bolum_11_Algoritmik_Etik_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritmik Adalet ve Etik (HTML)](../files/agt/slides/Bolum_11_Algoritmik_Etik_Calisma_Sorulari.html)
 
-- [🕹️Adil Bölüşüm Oyunu (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
+- [🕹️Adil Bölüşüm Oyunu (HTML)](../files/agt/slides/Bolum_11_Fair-Division-Game.html)
 
 ---
 
@@ -228,7 +228,7 @@ Gerçek insanlar rasyonel modelden sapar; gruplar da tek tek bireylerin karşıl
 - [📖Ders Notu - Davranışsal ve Kolektif Karar (HTML)](../files/agt/notlar/Bolum_12_Kolektif_Karar_Ders_Notu.html)
 - [📝Çalışma Soruları - Davranışsal ve Kolektif Karar (HTML)](../files/agt/slides/Bolum_12_Kolektif_Karar_Calisma_Sorulari.html)
 
-- [🕹️Kamu Malı Oyunu (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
+- [🕹️Kamu Malı Oyunu (HTML)](../files/agt/slides/Bolum_12_Public-Goods-Game.html)
 
 ---
 
@@ -243,20 +243,20 @@ Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En 
 - [📖Ders Notu - Öğrenme ve Adaptasyon (HTML)](../files/agt/notlar/Bolum_13_Ogrenme_Ders_Notu.html)
 - [📝Çalışma Soruları - Öğrenme ve Adaptasyon (HTML)](../files/agt/slides/Bolum_13_Ogrenme_Calisma_Sorulari.html)
 
-- [🕹️Çok Kollu Haydut Öğrenme Oyunu (HTML)](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
-- [🕹️Tekrarlı Mahkûmun İkilemi Turnuvası (HTML)](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
-- [🕹️Replikatör Dinamiği ve Evrimsel Oyun Laboratuvarı (HTML)](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
+- [🕹️Çok Kollu Haydut Öğrenme Oyunu (HTML)](../files/agt/slides/Bolum_13_Multi-Armed-Bandit.html)
+- [🕹️Tekrarlı Mahkûmun İkilemi Turnuvası (HTML)](../files/agt/slides/Bolum_13_Repeated-Prisoners-Dilemma-Tournament.html)
+- [🕹️Replikatör Dinamiği ve Evrimsel Oyun Laboratuvarı (HTML)](../files/agt/slides/Bolum_13_Replicator-Dynamics.html)
 
 ---
 
 ### Bölüm 14: Gelecek Yönelimler
 
-Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik danışıklılık, veriden öğrenilen mekanizmalar ve örneklem karmaşıklıkları, diferansiyel mahremiyet, blokzincirlerde işlem ücreti mekanizmaları ve MEV. Bölüm, dersin genel haritası ve proje yönergeleriyle kapanır.
+Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik danışıklılık, veriden öğrenilen mekanizmalar ve örneklem karmaşıklıkları, diferansiyel mahremiyet, blokzincirlerde işlem ücreti mekanizmaları ve MEV. Bölüm, dersin genel haritasıyla kapanır.
 
 - [🖼️Sunum-Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek.html)
 - [📄Sunum-Gelecek Yönelimler (PDF)](../files/agt/pdf/Bolum_14_Gelecek.pdf)
 - [📖Ders Notu - Gelecek Yönelimler (HTML)](../files/agt/notlar/Bolum_14_Gelecek_Ders_Notu.html)
 - [📝Çalışma Soruları - Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek_Calisma_Sorulari.html)
 
-- [🕹️YZ Ajanı Strateji Turnuvası (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
-- [🕹️Age of Çotanak (isteğe bağlı) (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html)
+- [🕹️YZ Ajanı Strateji Turnuvası (HTML)](../files/agt/slides/Bolum_14_Ai-Agent-Strategy-Tournament.html)
+- [🕹️Age of Çotanak (isteğe bağlı) (HTML)](../files/agt/slides/Bolum_14_Age-of-Cotanak.html)
