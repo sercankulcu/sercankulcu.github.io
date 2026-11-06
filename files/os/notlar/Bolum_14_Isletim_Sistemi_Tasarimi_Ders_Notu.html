@@ -1562,13 +1562,13 @@ Read of size 8 at addr ffff888012a4c010 by task cat/1432</code></pre>
     int8_t s = *(int8_t *)(((uintptr_t)a &gt;&gt; 3)
                            + GOLGE_OFS);
     <span class="kw">if</span> (s == 0) <span class="kw">return</span>;            <span class="cm">/* hızlı yol */</span>
-    <span class="kw">if</span> (((uintptr_t)a &amp; 7) + boy - 1 &gt;= s)
+    <span class="kw">if</span> ((<span class="kw">int</span>)((uintptr_t)a &amp; 7) + boy - 1 &gt;= s)
         rapor(a, s);
 }
 <span class="cm">/* p = kmalloc(13); p[3]; p[12]; p[13]; */</span>
 <span class="cm">/* kfree(p); p[0]; */</span></code></pre>
 
-<p>Fonksiyon önce gölge baytı bulur. Adres 3 bit sağa kaydırılır, yani 8'e bölünür; sonuca sabit bir bağıl konum eklenir. Gölge baytı 0 ise bölgenin tamamı geçerlidir ve denetim tek bir karşılaştırmayla biter. Bu hızlı yoldur ve erişimlerin büyük çoğunluğu buradan geçer. Değer sıfır değilse erişimin bölge içindeki son baytının konumu hesaplanır: <code>(a &amp; 7) + boy - 1</code>. Bu konum gölge değerine eşit ya da büyükse erişim geçerli baytların dışına taşıyordur ve rapor üretilir. Negatif bir gölge değeri her konumda bu koşulu sağlar.</p>
+<p>Fonksiyon önce gölge baytı bulur. Adres 3 bit sağa kaydırılır, yani 8'e bölünür; sonuca sabit bir bağıl konum eklenir. Gölge baytı 0 ise bölgenin tamamı geçerlidir ve denetim tek bir karşılaştırmayla biter. Bu hızlı yoldur ve erişimlerin büyük çoğunluğu buradan geçer. Değer sıfır değilse erişimin bölge içindeki son baytının konumu hesaplanır: <code>(a &amp; 7) + boy - 1</code>. Bu konum gölge değerine eşit ya da büyükse erişim geçerli baytların dışına taşıyordur ve rapor üretilir. Karşılaştırmanın işaretli yapılması önemlidir: konum <code>(int)</code> ile tamsayıya çevrildiği için <code>s</code> de işaretli olarak karşılaştırılır. Böylece negatif bir gölge değeri her konumda bu koşulu sağlar; Linux KASAN da bu denetimi işaretli bir baytla yapar. Çevirme yapılmasaydı <code>uintptr_t</code> yüzünden karşılaştırma işaretsiz olur, −5 çok büyük bir sayıya dönüşür ve serbest bırakılmış bellek hiç raporlanmazdı.</p>
 
 <p>Senaryoda <code>p = kmalloc(13)</code> çağrılıyor. Çekirdeğin ayırıcısı 13 baytlık istek için 16 baytlık bir yuva verir. Gölge şöyle kurulur: ilk 8 bayt tamamen geçerlidir (0), ikinci bölgenin ilk 13 − 8 = 5 baytı geçerlidir (5), arkasındaki bölge kırmızı bölgedir (0xfc, yani −4). Ardından sırayla <code>p[3]</code>, <code>p[12]</code> ve <code>p[13]</code> okunuyor; sonra <code>kfree(p)</code> ve <code>p[0]</code> geliyor (<a href="#tab-kasan">Tablo 14.16</a>).</p>
 

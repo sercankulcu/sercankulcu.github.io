@@ -809,10 +809,12 @@ printf("%ld bayt\n", toplam);</code></pre>
         waitpid(-1, &amp;status, 0);
     } <span class="kw">else</span> {                <span class="cm">/* çocuk süreç */</span>
         execve(command, parameters, 0);
+        perror("execve");   <span class="cm">/* başarısızsa */</span>
+        _exit(127);
     }
 }</code></pre>
 
-<p>Kabuk sonsuz bir döngüde çalışır. Her turda istemi yazar (<code>type_prompt</code>), kullanıcının yazdığı satırı okuyup komut adına ve parametrelere ayırır (<code>read_command</code>). Sonra <code>fork</code> çağırır. Dönüş değeri 0'dan farklıysa bu kod ebeveynde, yani kabuğun kendisinde çalışıyordur; kabuk <code>waitpid</code> ile çocuğun bitmesini bekler. Dönüş değeri 0 ise kod çocukta çalışıyordur; çocuk <code>execve</code> ile kendini istenen programla değiştirir.</p>
+<p>Kabuk sonsuz bir döngüde çalışır. Her turda istemi yazar (<code>type_prompt</code>), kullanıcının yazdığı satırı okuyup komut adına ve parametrelere ayırır (<code>read_command</code>). Sonra <code>fork</code> çağırır. Dönüş değeri 0'dan farklıysa bu kod ebeveynde, yani kabuğun kendisinde çalışıyordur; kabuk <code>waitpid</code> ile çocuğun bitmesini bekler. Dönüş değeri 0 ise kod çocukta çalışıyordur; çocuk <code>execve</code> ile kendini istenen programla değiştirir. Başarılı <code>execve</code> geri dönmediği için sonraki iki satır yalnız çağrı başarısız olursa çalışır: çocuk hatayı yazar ve <code>_exit(127)</code> ile sonlanır (127, kabukların “komut bulunamadı” için kullandığı çıkış durumudur).</p>
 
 <div class="nt-box nt-box--ornek" id="ornek-kabuk">
   <span class="nt-box__title">Örnek 2.8</span>
@@ -838,7 +840,7 @@ printf("%ld bayt\n", toplam);</code></pre>
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Sık yapılan hata</span>
-  <p><code>execve</code> başarısız olduğunda çocuğun sonlandırılmasını unutmak. Kullanıcı var olmayan bir komut yazarsa <code>execve</code> −1 döndürür ve çocuk, kabuk koduyla çalışmaya devam eder. Çocukta <code>execve</code>'nin ardından bir <code>exit</code> yoksa çocuk döngünün başına döner ve kendisi de bir kabuk gibi davranmaya başlar. Kullanıcı artık iki kabukla karşı karşıyadır.</p>
+  <p><code>execve</code> başarısız olduğunda çocuğun sonlandırılmasını unutmak. Kullanıcı var olmayan bir komut yazarsa <code>execve</code> −1 döndürür ve çocuk, kabuk koduyla çalışmaya devam eder. Çocukta <code>execve</code>'nin ardından bir <code>exit</code> yoksa çocuk döngünün başına döner ve kendisi de bir kabuk gibi davranmaya başlar. Kullanıcı artık iki kabukla karşı karşıyadır. İskeletteki <code>_exit(127)</code> satırı bu yüzden vardır.</p>
 </div>
 
 <h3 id="s2-5-3"><span class="nt-num">2.5.3</span>Dosya yönetimi</h3>
@@ -1458,7 +1460,7 @@ receive(FS, &amp;m);       <span class="cm">/* yanıtı bekle */</span>
     </details>
   </li>
   <li>
-    <p>Basit kabuk iskeletinde çocuk süreç <code>execve</code>'den sonra <code>exit</code> çağırmıyor. Kullanıcı <code>lss</code> diye var olmayan bir komut yazarsa ne olur?</p>
+    <p>Basit kabuk iskeletinde çocuktaki <code>perror</code> ve <code>_exit(127)</code> satırları silinmiş olsun: çocuk <code>execve</code>'den sonra <code>exit</code> çağırmıyor. Kullanıcı <code>lss</code> diye var olmayan bir komut yazarsa ne olur?</p>
     <details><summary>Cevap</summary>
       <p><code>execve</code> programı bulamaz ve −1 döndürür. Çocuk, kabuğun koduyla <code>else</code> bloğundan çıkar ve <code>while</code> döngüsünün başına döner: istem yazar ve komut beklemeye başlar. Ebeveyn kabuk ise hâlâ <code>waitpid</code>'de bu çocuğun bitmesini beklemektedir. Kullanıcı farkında olmadan ikinci bir kabukla konuşur; ancak o “kabuktan” çıkıldığında ebeveyn uyanır.</p>
     </details>
