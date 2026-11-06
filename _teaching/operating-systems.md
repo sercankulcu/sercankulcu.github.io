@@ -31,8 +31,8 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 - [📄Sunum-Giriş (PDF)](../files/os/pdf/Bolum_01_Giris.pdf)
 - [📖Ders Notu - Giriş (HTML)](../files/os/notlar/Bolum_01_Giris_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş (HTML)](../files/os/slides/Bolum_01_Giris_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum01)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
 
 ---
 
@@ -44,8 +44,8 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 - [📄Sunum-İşletim Sistemi Yapıları (PDF)](../files/os/pdf/Bolum_02_Yapilar.pdf)
 - [📖Ders Notu - İşletim Sistemi Yapıları (HTML)](../files/os/notlar/Bolum_02_Yapilar_Ders_Notu.html)
 - [📝Çalışma Soruları - İşletim Sistemi Yapıları (HTML)](../files/os/slides/Bolum_02_Yapilar_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum02)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02)
 
 ---
 
@@ -59,8 +59,8 @@ Süreç, çalışmakta olan bir programdır. Bu bölümde sürecin bellekteki ye
 - [📄Sunum-Süreçler (PDF)](../files/os/pdf/Bolum_03_Surecler.pdf)
 - [📖Ders Notu - Süreçler (HTML)](../files/os/notlar/Bolum_03_Surecler_Ders_Notu.html)
 - [📝Çalışma Soruları - Süreçler (HTML)](../files/os/slides/Bolum_03_Surecler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum03)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03)
 
 ---
 
@@ -72,8 +72,9 @@ Süreç, çalışmakta olan bir programdır. Bu bölümde sürecin bellekteki ye
 - [📄Sunum-İş Parçacıkları (PDF)](../files/os/pdf/Bolum_04_Is_Parcaciklari.pdf)
 - [📖Ders Notu - İş Parçacıkları (HTML)](../files/os/notlar/Bolum_04_Is_Parcaciklari_Ders_Notu.html)
 - [📝Çalışma Soruları - İş Parçacıkları (HTML)](../files/os/slides/Bolum_04_Is_Parcaciklari_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum04)
+- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Bolum04/src)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04)
 
 ---
 
@@ -85,8 +86,8 @@ Süreç, çalışmakta olan bir programdır. Bu bölümde sürecin bellekteki ye
 - [📄Sunum-CPU Çizelgeleme (PDF)](../files/os/pdf/Bolum_05_Cizelgeleme.pdf)
 - [📖Ders Notu - CPU Çizelgeleme (HTML)](../files/os/notlar/Bolum_05_Cizelgeleme_Ders_Notu.html)
 - [📝Çalışma Soruları - CPU Çizelgeleme (HTML)](../files/os/slides/Bolum_05_Cizelgeleme_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum05)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05)
 
 - [🕹️CPU Çizelgeleme Simülatörü (HTML)](../files/os/slides/Bolum_05_CPU_Scheduling.html)
 - [🕹️Gerçek Zamanlı Çizelgeleme Simülatörü (HTML)](../files/os/slides/Bolum_05_Real_Time_Scheduling.html)
@@ -101,8 +102,9 @@ Paylaşılan veriye eş zamanlı erişim yarış durumlarına yol açar. Bölüm
 - [📄Sunum-Senkronizasyon (PDF)](../files/os/pdf/Bolum_06_Senkronizasyon.pdf)
 - [📖Ders Notu - Senkronizasyon (HTML)](../files/os/notlar/Bolum_06_Senkronizasyon_Ders_Notu.html)
 - [📝Çalışma Soruları - Senkronizasyon (HTML)](../files/os/slides/Bolum_06_Senkronizasyon_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum06)
+- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Bolum06/src)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06)
 
 - [🕹️Senkronizasyon Laboratuvarı (HTML)](../files/os/slides/Bolum_06_Synchronization_Lab.html)
 
@@ -116,8 +118,9 @@ Kilitlenmede bir grup süreç, her biri ötekinin tuttuğu bir kaynağı bekledi
 - [📄Sunum-Kilitlenme (PDF)](../files/os/pdf/Bolum_07_Kilitlenme.pdf)
 - [📖Ders Notu - Kilitlenme (HTML)](../files/os/notlar/Bolum_07_Kilitlenme_Ders_Notu.html)
 - [📝Çalışma Soruları - Kilitlenme (HTML)](../files/os/slides/Bolum_07_Kilitlenme_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum07)
+- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Bolum07/src)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07)
 
 - [🕹️Kilitlenme ve Bankacı Algoritması Simülatörü (HTML)](../files/os/slides/Bolum_07_Deadlock_Bankers.html)
 
@@ -133,8 +136,8 @@ Bellek yöneticisi, süreçlerin belleği güvenle paylaşmasını sağlar. Böl
 - [📄Sunum-Bellek Yönetimi (PDF)](../files/os/pdf/Bolum_08_Bellek_Yonetimi.pdf)
 - [📖Ders Notu - Bellek Yönetimi (HTML)](../files/os/notlar/Bolum_08_Bellek_Yonetimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Bellek Yönetimi (HTML)](../files/os/slides/Bolum_08_Bellek_Yonetimi_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum08)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08)
 
 - [🕹️Bellek Tahsisi Simülatörü (HTML)](../files/os/slides/Bolum_08_Memory_Allocation.html)
 
@@ -148,8 +151,8 @@ Sanal bellek, süreçlerin fiziksel bellekten büyük adres alanlarıyla çalı�
 - [📄Sunum-Sanal Bellek (PDF)](../files/os/pdf/Bolum_09_Sanal_Bellek.pdf)
 - [📖Ders Notu - Sanal Bellek (HTML)](../files/os/notlar/Bolum_09_Sanal_Bellek_Ders_Notu.html)
 - [📝Çalışma Soruları - Sanal Bellek (HTML)](../files/os/slides/Bolum_09_Sanal_Bellek_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum09)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09)
 
 - [🕹️Sayfa Yer Değiştirme Simülatörü (HTML)](../files/os/slides/Bolum_09_Page_Replacement.html)
 - [🕹️Sayfalama ve Adres Çevirisi Simülatörü (HTML)](../files/os/slides/Bolum_09_Address_Translation.html)
@@ -164,8 +167,8 @@ Dosya sistemi, verinin diskte kalıcı ve düzenli biçimde saklanmasını sağl
 - [📄Sunum-Dosya Sistemleri (PDF)](../files/os/pdf/Bolum_10_Dosya_Sistemleri.pdf)
 - [📖Ders Notu - Dosya Sistemleri (HTML)](../files/os/notlar/Bolum_10_Dosya_Sistemleri_Ders_Notu.html)
 - [📝Çalışma Soruları - Dosya Sistemleri (HTML)](../files/os/slides/Bolum_10_Dosya_Sistemleri_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum10)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10)
 
 ---
 
@@ -177,8 +180,8 @@ G/Ç sistemi, çok farklı hızlardaki aygıtları ortak bir arayüzle yönetir.
 - [📄Sunum-Giriş/Çıkış (PDF)](../files/os/pdf/Bolum_11_Giris_Cikis.pdf)
 - [📖Ders Notu - Giriş/Çıkış (HTML)](../files/os/notlar/Bolum_11_Giris_Cikis_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş/Çıkış (HTML)](../files/os/slides/Bolum_11_Giris_Cikis_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
-- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum11)
+- [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11)
 
 - [🕹️Disk Kolu Çizelgeleme Simülatörü (HTML)](../files/os/slides/Bolum_11_Disk_Scheduling.html)
 - [🕹️Kesme, DMA ve G/Ç Akışı Simülatörü (HTML)](../files/os/slides/Bolum_11_IO_Interrupt_DMA.html)
@@ -195,7 +198,8 @@ Birden çok işlemci, işletim sistemine yeni sorunlar getirir. Bölüm; UMA ve 
 - [📄Sunum-Çok İşlemcili Sistemler (PDF)](../files/os/pdf/Bolum_12_Cok_Islemcili_Sistemler.pdf)
 - [📖Ders Notu - Çok İşlemcili Sistemler (HTML)](../files/os/notlar/Bolum_12_Cok_Islemcili_Sistemler_Ders_Notu.html)
 - [📝Çalışma Soruları - Çok İşlemcili Sistemler (HTML)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum12)
+- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Bolum12/src)
 
 - [🕹️Çok Çekirdekli Çizelgeleme ve Yük Dengeleme Simülatörü (HTML)](../files/os/slides/Bolum_12_Multicore_Scheduling.html)
 
@@ -209,7 +213,7 @@ Güvenlik; gizlilik, bütünlük ve erişilebilirliği tehditlere karşı koruma
 - [📄Sunum-Güvenlik (PDF)](../files/os/pdf/Bolum_13_Guvenlik.pdf)
 - [📖Ders Notu - Güvenlik (HTML)](../files/os/notlar/Bolum_13_Guvenlik_Ders_Notu.html)
 - [📝Çalışma Soruları - Güvenlik (HTML)](../files/os/slides/Bolum_13_Guvenlik_Calisma_Sorulari.html)
-- [💻Kod Örnekleri, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum13)
 
 - [🕹️İşletim Sistemi Koruma ve İzinler Laboratuvarı (HTML)](../files/os/slides/Bolum_13_Permissions_Security.html)
 
@@ -223,6 +227,7 @@ Güvenlik; gizlilik, bütünlük ve erişilebilirliği tehditlere karşı koruma
 - [📄Sunum-İşletim Sistemi Tasarımı (PDF)](../files/os/pdf/Bolum_14_Isletim_Sistemi_Tasarimi.pdf)
 - [📖Ders Notu - İşletim Sistemi Tasarımı (HTML)](../files/os/notlar/Bolum_14_Isletim_Sistemi_Tasarimi_Ders_Notu.html)
 - [📝Çalışma Soruları - İşletim Sistemi Tasarımı (HTML)](../files/os/slides/Bolum_14_Isletim_Sistemi_Tasarimi_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum14)
 
 ---
 
@@ -236,3 +241,4 @@ Linux, dersin kavramlarını gerçek bir sistemde bir arada gösterir. Bu bölü
 - [📝Çalışma Soruları - Linux (HTML)](../files/os/slides/Bolum_15_Linux_Calisma_Sorulari.html)
 
 - [🕹️Linux Süreç Gezgini (HTML)](../files/os/slides/Bolum_15_Linux_Process_Explorer.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum15)
