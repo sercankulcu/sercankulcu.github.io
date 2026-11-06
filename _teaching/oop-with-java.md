@@ -44,7 +44,7 @@ Programlamanın zemini, bilgisayarın bilgiyi nasıl temsil ettiği ve işlediğ
 - [📄Sunum-Akış Diyagramları (PDF)](../files/java/pdf/Bolum_01_Akis_Diyagramlari.pdf)
 - [📖Ders Notu - Akış Diyagramları (HTML)](../files/java/notlar/Bolum_01_Akis_Diyagramlari_Ders_Notu.html)
 - [📝Çalışma Soruları - Akış Diyagramları (HTML)](../files/java/slides/Bolum_01_Akis_Diyagramlari_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum01/src)
 
 ---
 
@@ -61,7 +61,7 @@ Bir programlama dili, belirli söz dizimi ve anlam kurallarına uyan ifadelerden
 - [📖Ders Notu - Söz Dizimi Kuralları (HTML)](../files/java/notlar/Bolum_02_Soz_Dizimi_Kurallari_Ders_Notu.html)
 - [📝Çalışma Soruları - Söz Dizimi Kuralları (HTML)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari_Calisma_Sorulari.html)
   - [🕹️İlkel Tipler Laboratuvarı (HTML)](../files/java/slides/Bolum_02_Primitive-Types-Lab.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum02/src)
 
 ---
 
@@ -91,7 +91,7 @@ Programın akışı karar yapıları ve döngülerle yönlendirilir. Bölümde i
 - [📄Sunum-Özyineleme (PDF)](../files/java/pdf/Bolum_03_Ozyineleme.pdf)
 - [📖Ders Notu - Özyineleme (HTML)](../files/java/notlar/Bolum_03_Ozyineleme_Ders_Notu.html)
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/java/slides/Bolum_03_Ozyineleme_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum03/src)
 
 ---
 
@@ -124,7 +124,7 @@ Nesne yönelimli programlama, veriyi ve bu veri üzerinde çalışan davranış�
 - [📄Sunum-Soyut Sınıflar ve Arayüzler (PDF)](../files/java/pdf/Bolum_04_Soyut_Siniflar.pdf)
 - [📖Ders Notu - Soyut Sınıflar ve Arayüzler (HTML)](../files/java/notlar/Bolum_04_Soyut_Siniflar_Ders_Notu.html)
 - [📝Çalışma Soruları - Soyut Sınıflar ve Arayüzler (HTML)](../files/java/slides/Bolum_04_Soyut_Siniflar_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum04/src)
 
 ---
 
@@ -136,7 +136,7 @@ Java koleksiyon çerçevesi, nesne gruplarını saklamak ve işlemek için ortak
 - [📄Sunum-Koleksiyonlar (PDF)](../files/java/pdf/Bolum_05_Koleksiyonlar.pdf)
 - [📖Ders Notu - Koleksiyonlar (HTML)](../files/java/notlar/Bolum_05_Koleksiyonlar_Ders_Notu.html)
 - [📝Çalışma Soruları - Koleksiyonlar (HTML)](../files/java/slides/Bolum_05_Koleksiyonlar_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum05/src)
 
 - [🕹️Koleksiyonların İç Yapısı (HTML)](../files/java/slides/Bolum_05_Collections-Internals.html)
 - [🕹️Akış Boru Hattı (HTML)](../files/java/slides/Bolum_05_Stream-Pipeline.html)
@@ -153,7 +153,7 @@ Java koleksiyon çerçevesi, nesne gruplarını saklamak ve işlemek için ortak
 - [📄Sunum-İstisnalar (PDF)](../files/java/pdf/Bolum_06_Istisnalar.pdf)
 - [📖Ders Notu - İstisnalar (HTML)](../files/java/notlar/Bolum_06_Istisnalar_Ders_Notu.html)
 - [📝Çalışma Soruları - İstisnalar (HTML)](../files/java/slides/Bolum_06_Istisnalar_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders06/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum06/src)
 
 - [🕹️İstisna Akışı (HTML)](../files/java/slides/Bolum_06_Exception-Flow.html)
 
@@ -167,7 +167,7 @@ Test, bir programın beklenen biçimde çalıştığını sınamak; hata ayıkla
 - [📄Sunum-Test ve Hata Ayıklama (PDF)](../files/java/pdf/Bolum_07_Test.pdf)
 - [📖Ders Notu - Test ve Hata Ayıklama (HTML)](../files/java/notlar/Bolum_07_Test_Ders_Notu.html)
 - [📝Çalışma Soruları - Test ve Hata Ayıklama (HTML)](../files/java/slides/Bolum_07_Test_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders11/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum07/src)
 
 ---
 
@@ -181,7 +181,7 @@ Java'da veri okuma ve yazma işlemleri akış kavramı üzerine kuruludur. Böl�
 - [📄Sunum-Giriş Çıkış (PDF)](../files/java/pdf/Bolum_08_Giris_Cikis.pdf)
 - [📖Ders Notu - Giriş Çıkış (HTML)](../files/java/notlar/Bolum_08_Giris_Cikis_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş Çıkış (HTML)](../files/java/slides/Bolum_08_Giris_Cikis_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders07/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum08/src)
 
 ---
 
@@ -193,7 +193,7 @@ Grafik kullanıcı arayüzü, programla kullanıcı arasındaki etkileşimi penc
 - [📄Sunum-Grafikler (PDF)](../files/java/pdf/Bolum_09_Grafikler.pdf)
 - [📖Ders Notu - Grafikler (HTML)](../files/java/notlar/Bolum_09_Grafikler_Ders_Notu.html)
 - [📝Çalışma Soruları - Grafikler (HTML)](../files/java/slides/Bolum_09_Grafikler_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders08/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum09/src)
 
 - [🕹️Swing Yerleşim Yöneticileri (HTML)](../files/java/slides/Bolum_09_Swing-Layouts.html)
 
@@ -207,7 +207,7 @@ Grafik kullanıcı arayüzü, programla kullanıcı arasındaki etkileşimi penc
 - [📄Sunum-İş Parçacıkları (PDF)](../files/java/pdf/Bolum_10_Is_Parcaciklari.pdf)
 - [📖Ders Notu - İş Parçacıkları (HTML)](../files/java/notlar/Bolum_10_Is_Parcaciklari_Ders_Notu.html)
 - [📝Çalışma Soruları - İş Parçacıkları (HTML)](../files/java/slides/Bolum_10_Is_Parcaciklari_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders09/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum10/src)
 
 - [🕹️İş Parçacığı Yarışı (HTML)](../files/java/slides/Bolum_10_Thread-Race.html)
 
@@ -222,4 +222,4 @@ Veri tabanları, verinin kalıcı, tutarlı ve sorgulanabilir biçimde saklanmas
 - [📖Ders Notu - Veri Tabanı (HTML)](../files/java/notlar/Bolum_11_Veri_Tabani_Ders_Notu.html)
 - [📝Çalışma Soruları - Veri Tabanı (HTML)](../files/java/slides/Bolum_11_Veri_Tabani_Calisma_Sorulari.html)
 - [💻Öğrenci Yönetimi Uygulaması (GitHub)](https://github.com/sercankulcu/StudentManagement)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders10/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Bolum11/src)
