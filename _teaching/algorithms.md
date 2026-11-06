@@ -38,7 +38,7 @@ Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yön
 - [📝Çalışma Soruları - Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik_Calisma_Sorulari.html)
   - [🕹️Asimptotik Büyüme Gezgini (HTML)](../files/algorithms/slides/Bolum_01_Asymptotic_Growth_Explorer.html)
   - [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum01/src)
 
 ---
 
@@ -50,7 +50,7 @@ Sıralama, verinin belirli bir düzene sokulmasıdır ve pek çok algoritmanın 
 - [📄Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_02_Siralama.pdf)
 - [📖Ders Notu - Sıralama Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_02_Siralama_Ders_Notu.html)
 - [📝Çalışma Soruları - Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum02/src)
 
 - [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
 - [🕹️Sıralama Yarışı (HTML)](../files/algorithms/slides/Bolum_02_Sorting_Race.html)
@@ -66,7 +66,7 @@ Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde 
 - [📄Sunum-Arama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_03_Arama.pdf)
 - [📖Ders Notu - Arama Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_03_Arama_Ders_Notu.html)
 - [📝Çalışma Soruları - Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Arama_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum03/src)
 
 - [🕹️Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Search.html)
 - [🕹️Hash ve Ara Değer Arama (HTML)](../files/algorithms/slides/Bolum_03_Hash_Interpolation_Search.html)
@@ -103,7 +103,7 @@ Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde 
 - [📖Ders Notu - Çizge Ağ Akış (HTML)](../files/algorithms/notlar/Bolum_04_04_Ag_Akis_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis_Calisma_Sorulari.html)
   - [🕹️Ağ Akışı Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Network_Flow.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum04/src)
 
 ---
 
@@ -131,7 +131,7 @@ Dizgi algoritmaları metin arama, veri sıkıştırma ve biyolojik dizi çözüm
 - [📖Ders Notu - Trie (HTML)](../files/algorithms/notlar/Bolum_05_Tries_Ders_Notu.html)
 - [📝Çalışma Soruları - Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries_Calisma_Sorulari.html)
   - [🕹️Trie ve Sonek Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_Trie_Suffix_Algorithms.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum05/src)
 
 ---
 
@@ -145,7 +145,7 @@ Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt proble
 - [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_06_Bol_Fethet.pdf)
 - [📖Ders Notu - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/notlar/Bolum_06_Bol_Fethet_Ders_Notu.html)
 - [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum06/src)
 
 - [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
 - [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
@@ -160,7 +160,7 @@ Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi g�
 - [📄Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_07_Acgozlu.pdf)
 - [📖Ders Notu - Açgözlü Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_07_Acgozlu_Ders_Notu.html)
 - [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_07_Acgozlu_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum07/src)
 
 - [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_MST.html)
 - [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Compression.html)
@@ -175,7 +175,7 @@ Dinamik programlama, örtüşen alt problemleri bir kez çözüp sonuçlarını 
 - [📄Sunum-Dinamik Programlama (PDF)](../files/algorithms/pdf/Bolum_08_Dinamik.pdf)
 - [📖Ders Notu - Dinamik Programlama (HTML)](../files/algorithms/notlar/Bolum_08_Dinamik_Ders_Notu.html)
 - [📝Çalışma Soruları - Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_08_Dinamik_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum08/src)
 
 ---
 
@@ -189,7 +189,7 @@ Geri izleme, kısmi çözümleri adım adım genişleten ve geçerli bir çözü
 - [📄Sunum-Geri İzleme Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_09_Geri_Donuslu.pdf)
 - [📖Ders Notu - Geri İzleme Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_09_Geri_Donuslu_Ders_Notu.html)
 - [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_09_Geri_Donuslu_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum09/src)
 
 ---
 
@@ -201,7 +201,7 @@ Dal sınır yöntemi, durum uzayı ağacını tararken her düğüm için bir s�
 - [📄Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_10_Dal_Sinir.pdf)
 - [📖Ders Notu - Dal Sınır Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_10_Dal_Sinir_Ders_Notu.html)
 - [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_10_Dal_Sinir_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum10/src)
 
 - [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Bolum_10_TSP.html)
 
@@ -215,7 +215,7 @@ Yaklaşım algoritmaları, en iyi çözümü bulmanın çok pahalı olduğu NP-z
 - [📄Sunum-Yaklaşım Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_11_Yakinsama.pdf)
 - [📖Ders Notu - Yaklaşım Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_11_Yakinsama_Ders_Notu.html)
 - [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_11_Yakinsama_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum11/src)
 
 - [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Bolum_10_TSP.html)
 
@@ -231,7 +231,7 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 - [📄Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_12_Rastgele.pdf)
 - [📖Ders Notu - Rastgele Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_12_Rastgele_Ders_Notu.html)
 - [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Rastgele_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum12/src)
 
 - [🕹️Monte Carlo ile π Tahmini (HTML)](../files/algorithms/slides/Bolum_12_Monte_Carlo_Pi.html)
 
@@ -245,7 +245,7 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 - [📄Sunum-Çevrim İçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Cevrimici.pdf)
 - [📖Ders Notu - Çevrim İçi Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_13_Cevrimici_Ders_Notu.html)
 - [📝Çalışma Soruları - Çevrim İçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum13/src)
 
 ---
 
@@ -257,4 +257,4 @@ Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalış
 - [📄Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_14_Paralel.pdf)
 - [📖Ders Notu - Paralel Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_14_Paralel_Ders_Notu.html)
 - [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_14_Paralel_Calisma_Sorulari.html)
-- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum14/src)
