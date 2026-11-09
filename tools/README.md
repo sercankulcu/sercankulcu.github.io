@@ -1,0 +1,141 @@
+# tools
+
+*Programming with C* ders notlarından **türetilmiş çıktıları** üreten betikler:
+PDF kitap ve notların içindeki adımlayıcı figürler. Ayrıca
+`deck.js` kullanan HTML sunumlardan (computer, data_structures, agt) PDF üreten
+betik.
+
+Site bu klasöre bağımlı değildir. Jekyll onu yok sayar (`_config.yml` →
+`exclude`) ve **ders sayfasından buraya bağlantı verilmez** — burası yazarın
+mutfağı, öğrencinin değil.
+
+Python 3.9+ yeter. Yalnızca kitap ve sunum PDF üreteçleri dış paket ister:
+
+```bash
+pip install -r tools/requirements.txt
+```
+
+Bütün betikler depo kökünden çalıştırılmak üzere yazılmıştır ve kendi
+konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
+
+## Kitap
+
+```bash
+python tools/make_book.py
+```
+
+56 notu tek bir A4 PDF'e dönüştürür ve `files/c/Programming-with-C.pdf`
+üzerine yazar. 10–20 dakika sürer, Chrome (veya Edge) gerekir. Dört aşama:
+
+| Aşama | Dosya | İş |
+|---|---|---|
+| 1 | `book/build.py` | 56 notu tek `book.html` içinde birleştirir; başlıkları bölüm/kısım hiyerarşisine çevirir, `book.css` gömer |
+| 2 | `book/finalize.py` | Chrome ile iki kez basar: ilk baskı sayfa haritasını çıkarır, ikincisi içindekiler tablosunu gerçek sayfa numaralarıyla doldurur |
+| 3 | `book/overlay.py` | reportlab ile sayfa numarası, üst bilgi ve PDF yer imlerini bindirir |
+| 4 | `book/compress.py` | İçerik akışlarını yeniden sıkıştırır (136 MB → ~10 MB) |
+
+Ara çıktılar `tools/book/build/` altında kalır ve git'e girmez. Sayfa sayısı
+değişirse ders sayfasındaki "781 pages, 9.7 MB" ifadesini elle güncelleyin.
+
+Sayfa düzeni `book/book.css` içindedir. Bölüm tespiti PDF metninden yapıldığı
+için `letter-spacing` kullanan başlıklarda karşılaştırmadan önce boşluklar
+atılır — `finalize.py` içindeki normalizasyonu kaldırmayın.
+
+## Sunum PDF'leri
+
+```bash
+python tools/make_slide_pdf.py computer                     # dersin tüm sunumları
+python tools/make_slide_pdf.py computer Bolum_10_Diziler    # yalnızca verilenler
+python tools/make_slide_pdf.py data_structures --stale      # PDF'i sunumundan eski olanlar
+```
+
+`files/<ders>/slides/` altındaki `deck.js` sunumlarını `files/<ders>/pdf/`
+altına PDF olarak basar; çalışma soruları ve simülatörler atlanır. Her slayt ve
+her animasyon adımı ayrı bir sayfadır (800×600). Chrome ya da Edge gerekir
+(`playwright` sistemdeki tarayıcıyı kullanır).
+
+Betik sunumu `deck.js`'in kendi "ileri" düğmesiyle baştan sona gezer, her
+durumda etkin slaydın anlık hâlini toplar ve sonunda hepsini **tek seferde**
+basar. Her durumu ayrı ayrı basıp birleştirmek yazı tiplerini her sayfaya
+yeniden gömer ve dosyayı ~4 kat büyütür — denendi.
+
+Sayfalar yerel dosyalardan basılır, yani commitlenmemiş değişiklikler de
+girer. Yerel dosyada sitenin sayfa düzeni yoktur. Bu yüzden canlı siteden bir
+sunumun düzeni alınır (tema, `.page__content` sarmalayıcısı, MathJax) ve yerel
+içerik, Jekyll'deki gibi ön bilgisi atılarak bunun içine konur. Böylece
+`deck.js`'in otomatik sığdırması da yayımdaki ölçüleri görür. Çevrimdışıysanız
+`--no-theme` verin; o zaman yazılar küçük çıkar ve sığdırma farklı olur. Yerel
+HTTP sunucusu kullanılmaz: dosyalar Playwright'ın istek yakalamasıyla
+(`http://localhost:8765/…` adresinden) doğrudan tarayıcıya verilir. Yerel sunucu
+bu makinede 64 KB'tan büyük yanıtlarda bağlantıyı ara sıra koparıyor, büyük
+sunumlar yarım yükleniyordu.
+
+Her sunum için basılan sayfa sayısı, sunumdaki adım sayısıyla karşılaştırılır;
+tutmazsa betik hata koduyla çıkar. `--stale`, PDF'i olmayan ya da HTML'i
+PDF'inden sonra değişmiş (dosya zamanı veya son commit) sunumları seçer.
+Sunumu güncelledikten sonra:
+
+```bash
+python tools/make_slide_pdf.py <ders> --stale
+```
+
+## Göndermeden önce denetim
+
+```bash
+python tools/check_site.py computer data_structures agt algorithms           # dosya denetimleri, saniyeler
+python tools/check_site.py algorithms --browser                              # + tarayıcıda, ders başına birkaç dakika
+```
+
+Ders verilmezse `files/` altında `slides/` klasörü olan bütün dersler denetlenir.
+Hata varsa çıkış kodu 1'dir; uyarılar çıkış kodunu değiştirmez.
+
+- **Dosya denetimleri:**
+  - **Liquid:** Jekyll ön bilgili her sayfayı Liquid ile işler. Metinde `{{` ya da `{%`
+    geçerse (ör. Java'da `int[][] a = {{1, 2}}`) bütün Pages derlemesi durur; ilk
+    parantezi `&#123;` yazın.
+  - **Etiket dengesi:** `section`, `details`, `svg` ve `pre` açılış/kapanış sayıları.
+  - **Çoktan seçmeli:** Her soruda tam bir `data-ok` olmalı. Doğru şıkkın belirgin uzun
+    olduğu sorular ve sayfa genelinde doğru şıkkın en uzun olma oranı %40'ı aşarsa uyarı.
+  - **SVG kimlikleri:** Aynı `<marker>` kimliği birden çok çizimde tanımlanmışsa ok uçları
+    kaybolur, çünkü tarayıcı tanımı gizli adımdaki çizimden alır.
+  - **ds-guard** ve istenmeyen yönerge cümleleri.
+- **`--browser` ile ek olarak:** Sayfalar `make_slide_pdf.py` gibi canlı site düzeninin
+  içinde açılır.
+  - Her slayt, bütün adımları ve cevapları açıkken taşma için ölçülür. Otomatik
+    sığdırmanın %90'ın altına küçülttüğü slaytlar uyarı olarak listelenir.
+  - Konsol hatası, yüklenemeyen dosya ve kırık iç bağlantı aranır.
+
+## Figürler
+
+```bash
+python tools/figures/steps_1.py
+```
+
+`steps_1` … `steps_4`, notların içindeki SVG figürleri ve CSS-only
+adımlayıcıları üretip yerine gömer. Her betik kendi haftalarından sorumludur:
+
+| Betik | Haftalar |
+|---|---|
+| `steps_1.py` | 18, 19, 20, 33, 41 |
+| `steps_2.py` | 25, 26, 27, 34, 39, 47, 50, 51, 54 |
+| `steps_3.py` | 7, 28, 30, 46, 53 |
+| `steps_4.py` | 29, 40, 45, 48 |
+
+Betikler **etkisizdir (idempotent)**: yeniden çalıştırmak eskisini silip aynısını
+yazar, çıktı büyümez. Eski bloğu silen `strip_generated()` satır bazlı çalışır ve
+`<div>` derinliği sayar. Bunu regex'e çevirmeyin — denendi, beş notta 325 satır
+silindi ve hatayı yalnızca doğrulama takımı yakaladı.
+
+Notlarda **JavaScript yoktur ve olmamalıdır**: `_config.yml` içindeki
+`compress_html` ayarı satır içi betiklerdeki `//` yorumlarını bozar. Adımlayıcılar
+bu yüzden gizli radio input + `:checked ~` seçicisiyle yapılmıştır. Baskıda tüm
+adımlar görünür, `prefers-reduced-motion` geçişleri kapatır.
+
+## Değişiklikten sonra
+
+Üretilen HTML'i her zaman doğrulayın — bu betikler canlı ders notlarının
+üzerine yazar:
+
+```bash
+git diff --stat files/
+```

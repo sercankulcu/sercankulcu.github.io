@@ -1,0 +1,976 @@
+---
+layout: without-sidebar
+title: "Liste ADT Simülatörü"
+permalink: /files/data_structures/slides/Bolum_06_List_ADT.html
+excerpt: "Aynı liste işlemlerini dizi tabanlı ve bağlı liste tabanlı gerçeklemelerde yan yana çalıştıran etkileşimli Liste ADT simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ---------- 800x600 stage (agt-oyun) ---------- */
+.ds-st { font-size: 15px; line-height: 1.3; }
+:where(.ds-st) .agt-oyun__body { display: flex; flex-direction: column; }
+:where(.ds-st) .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button:hover:not(:disabled) { border-color: var(--ds-link); }
+:where(.ds-st) .agt-oyun__body button:disabled { opacity: .4; cursor: default; }
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ds-link) 85%, var(--ds-text)); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+}
+:where(.ds-st) .agt-oyun__body input[type="checkbox"],
+:where(.ds-st) .agt-oyun__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+:where(.ds-st) .agt-oyun__body label {
+  margin: 0;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-st .ds-sim__status {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+:where(.ds-st) .agt-oyun__body li { margin: 0; }
+
+.list-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.list-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.list-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.list-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.list-field input { width: 100%; }
+
+.list-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.list-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.list-panel-title {
+  margin: 0;
+  padding: 8px 10px 0;
+  text-align: center;
+}
+
+.list-array,
+.list-linked {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 10px 8px;
+  overflow: hidden;
+}
+
+.list-cell,
+.list-node {
+  min-width: 56px;
+  min-height: 58px;
+  padding: 5px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+  transition: transform .18s ease, opacity .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.list-cell {
+  flex: 1 1 0;
+  max-width: 76px;
+}
+
+.list-node {
+  flex: 0 1 68px;
+  max-width: 74px;
+}
+
+.list-cell small,
+.list-node small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.list-arrow {
+  flex: 0 0 auto;
+  color: var(--ds-link);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.list-cell.checking,
+.list-node.checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateY(-3px);
+}
+
+.list-cell.found,
+.list-node.found,
+.list-cell.adding,
+.list-node.adding {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateY(-3px) scale(1.02);
+}
+
+.list-cell.moving,
+.list-node.moving {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateX(5px);
+}
+
+.list-cell.removing,
+.list-node.removing {
+  border-color: var(--ds-bad);
+  background: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg));
+  opacity: .7;
+  transform: translateY(-4px);
+}
+
+.list-empty {
+  width: 100%;
+  color: var(--ds-muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+.list-status {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-status.success { color: var(--ds-good); }
+.list-status.error { color: var(--ds-bad); }
+.list-status.warning { color: color-mix(in srgb, var(--ds-warn) 60%, var(--ds-text)); }
+
+.list-footer {
+  display: grid;
+  grid-template-columns: 1.1fr .8fr 1fr 1fr 2.1fr;
+  gap: 6px;
+}
+
+.list-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 6 · Simülasyon</p><h1>Liste ADT Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="list-help" aria-label="Yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_06_Liste.html">← Bölüm 6</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+        <div class="ds-sim__root list-sim">
+          <div class="list-controls">
+            <div class="list-row">
+              <div class="list-field">
+                <label for="list-value">Değer</label>
+                <input id="list-value" type="number" value="42" inputmode="numeric">
+              </div>
+
+              <div class="list-field">
+                <label for="list-index">İndis</label>
+                <input id="list-index" type="number" min="0" value="2" inputmode="numeric">
+              </div>
+
+              <button class="is-primary" id="list-append" type="button">Sona Ekle</button>
+              <button class="is-primary" id="list-prepend" type="button">Başa Ekle</button>
+              <button class="is-primary" id="list-insert" type="button">İndise Ekle</button>
+              <button id="list-access" type="button">Eriş</button>
+            </div>
+
+            <div class="list-row">
+              <button class="is-danger" id="list-delete" type="button">Sil</button>
+              <button id="list-search" type="button">Ara</button>
+              <button id="list-traverse" type="button">Gez</button>
+              <button id="list-load" type="button">Örnek</button>
+              <button id="list-random" type="button">Rastgele</button>
+              <button class="is-danger" id="list-clear" type="button">Temizle</button>
+              <button class="is-danger" id="list-cancel" type="button">İptal</button>
+            </div>
+          </div>
+
+          <div class="list-stage">
+            <div class="list-panel ds-sim__panel">
+              <p class="list-panel-title ds-sim__caption">Dizi tabanlı depolama</p>
+              <div class="list-array" id="list-array"></div>
+            </div>
+
+            <div class="list-panel ds-sim__panel">
+              <p class="list-panel-title ds-sim__caption">Bağlı liste tabanlı depolama</p>
+              <div class="list-linked" id="list-linked"></div>
+            </div>
+
+            <div class="list-status" id="list-status" aria-live="polite">Hazır.</div>
+          </div>
+
+          <div class="list-footer">
+            <div class="list-stat"><strong>İşlem</strong><span id="list-operation">Boşta</span></div>
+            <div class="list-stat"><strong>Boyut</strong><span id="list-size">0 / 8</span></div>
+            <div class="list-stat"><strong>Dizi adımı</strong><span id="list-array-steps">0</span></div>
+            <div class="list-stat"><strong>Bağlı adım</strong><span id="list-linked-steps">0</span></div>
+            <div class="list-stat"><strong>Sonuç</strong><span id="list-result">—</span></div>
+          </div>
+        </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="list-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Liste ADT Simülatörü</h2>
+    <p>Aynı liste işlemleri iki gerçeklemede yan yana çalışır: dizi tabanlı liste (<code>ArrayList</code> gibi) ve baş ile son referansları tutan tek yönlü bağlı liste (<code>LinkedList</code> gibi). Adım sayaçları her birinin ne kadar iş yaptığını gösterir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><b>Değer</b> ve <b>İndis</b> işlemlerin argümanlarıdır. <b>Sona Ekle</b> sona, <b>Başa Ekle</b> 0 indisine, <b>İndise Ekle</b> verilen indise ekler.</li>
+      <li><b>Eriş</b> bir indisteki öğeyi okur, <b>Sil</b> onu çıkarır, <b>Ara</b> değerin ilk geçtiği yeri bulur, <b>Gez</b> her öğeyi ziyaret eder.</li>
+      <li><b>Örnek</b> ve <b>Rastgele</b> listeyi doldurur (en fazla 8 öğe), <b>Temizle</b> boşaltır, <b>İptal</b> çalışan canlandırmayı durdurur.</li>
+    </ul>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Dizi indisle doğrudan erişim sağlar; ancak ortaya ekleme ya da ortadan silme sonraki öğeleri kaydırır.</li>
+      <li>Bağlı liste bir indise ulaşmak için baştan yürümek zorundadır; oraya varınca yalnızca birkaç referansı değiştirir.</li>
+    </ul>
+    <h3>Karmaşıklık</h3>
+    <table>
+      <tr><th>İşlem</th><th>Dizi tabanlı liste</th><th>Bağlı liste</th></tr>
+      <tr><td>access(i)</td><td>O(1)</td><td>O(i)</td></tr>
+      <tr><td>sona ekleme</td><td>O(1) amortize</td><td>tail ile O(1)</td></tr>
+      <tr><td>başa ekleme</td><td>O(n)</td><td>O(1)</td></tr>
+      <tr><td>i indisine ekleme / silme</td><td>O(n − i)</td><td>O(i)</td></tr>
+      <tr><td>arama, gezinme</td><td>O(n)</td><td>O(n)</td></tr>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    value: $("list-value"),
+    index: $("list-index"),
+    append: $("list-append"),
+    prepend: $("list-prepend"),
+    insert: $("list-insert"),
+    access: $("list-access"),
+    del: $("list-delete"),
+    search: $("list-search"),
+    traverse: $("list-traverse"),
+    load: $("list-load"),
+    random: $("list-random"),
+    clear: $("list-clear"),
+    cancel: $("list-cancel"),
+    array: $("list-array"),
+    linked: $("list-linked"),
+    status: $("list-status"),
+    operation: $("list-operation"),
+    size: $("list-size"),
+    arraySteps: $("list-array-steps"),
+    linkedSteps: $("list-linked-steps"),
+    result: $("list-result")
+  };
+
+  const MAX = 8;
+  const DELAY = 280;
+
+  let data = [12, 28, 41, 56, 73];
+  let token = 0;
+  let running = false;
+  let aSteps = 0;
+  let lSteps = 0;
+  let lastResult = "—";
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function integer(input) {
+    if (String(input.value).trim() === "") return null;
+    const value = Number(input.value);
+    return Number.isInteger(value) ? value : null;
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "list-status" + (type ? " " + type : "");
+  }
+
+  function updateStats() {
+    el.size.textContent = `${data.length} / ${MAX}`;
+    el.arraySteps.textContent = aSteps;
+    el.linkedSteps.textContent = lSteps;
+    el.result.textContent = lastResult;
+  }
+
+  function resetStats(operation = "Boşta") {
+    aSteps = 0;
+    lSteps = 0;
+    lastResult = "—";
+    el.operation.textContent = operation;
+    updateStats();
+  }
+
+  function setRunning(value) {
+    running = value;
+    [
+      el.append, el.prepend, el.insert, el.access, el.del,
+      el.search, el.traverse, el.load, el.random, el.clear
+    ].forEach(button => button.disabled = value);
+    el.cancel.disabled = !value;
+  }
+
+  function render(states = {}) {
+    el.array.innerHTML = "";
+    el.linked.innerHTML = "";
+
+    if (!data.length) {
+      const a = document.createElement("div");
+      a.className = "list-empty";
+      a.textContent = "Liste boş.";
+      el.array.appendChild(a);
+
+      const l = document.createElement("div");
+      l.className = "list-empty";
+      l.textContent = "Liste boş.";
+      el.linked.appendChild(l);
+
+      updateStats();
+      return;
+    }
+
+    data.forEach((value, index) => {
+      const cell = document.createElement("div");
+      cell.className = "list-cell";
+      applyState(cell, index, states.array || {});
+
+      const cellValue = document.createElement("span");
+      cellValue.textContent = value;
+
+      const cellIndex = document.createElement("small");
+      cellIndex.textContent = `[${index}]`;
+
+      cell.append(cellValue, cellIndex);
+      el.array.appendChild(cell);
+
+      if (index > 0) {
+        const arrow = document.createElement("div");
+        arrow.className = "list-arrow";
+        arrow.textContent = "→";
+        el.linked.appendChild(arrow);
+      }
+
+      const node = document.createElement("div");
+      node.className = "list-node";
+      applyState(node, index, states.linked || {});
+
+      const nodeValue = document.createElement("span");
+      nodeValue.textContent = value;
+
+      const nodeIndex = document.createElement("small");
+      nodeIndex.textContent = index === 0 ? "HEAD" : `#${index}`;
+
+      node.append(nodeValue, nodeIndex);
+      el.linked.appendChild(node);
+    });
+
+    updateStats();
+  }
+
+  function applyState(node, index, state) {
+    if (state.checking?.includes(index)) node.classList.add("checking");
+    if (state.found?.includes(index)) node.classList.add("found");
+    if (state.adding?.includes(index)) node.classList.add("adding");
+    if (state.moving?.includes(index)) node.classList.add("moving");
+    if (state.removing?.includes(index)) node.classList.add("removing");
+  }
+
+  async function pause(localToken) {
+    await wait(DELAY);
+    if (localToken !== token) throw new Error("cancelled");
+  }
+
+  async function animate(localToken, states, message) {
+    if (message) setStatus(message);
+    render(states);
+    await pause(localToken);
+  }
+
+  function begin(operation) {
+    token++;
+    resetStats(operation);
+    setRunning(true);
+    return token;
+  }
+
+  function finish(localToken, message, type = "") {
+    if (localToken !== token) return;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    setStatus(message, type);
+    render();
+  }
+
+  function fail(localToken, error) {
+    if (error?.message === "cancelled" || localToken !== token) return;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    setStatus("İşlem durduruldu.", "error");
+    render();
+  }
+
+  function ensureSpace() {
+    if (data.length >= MAX) {
+      setStatus(`Liste dolu: en fazla ${MAX} öğe.`, "error");
+      return false;
+    }
+    return true;
+  }
+
+  function validIndex(index, allowEnd = false) {
+    const upper = allowEnd ? data.length : data.length - 1;
+    return Number.isInteger(index) && index >= 0 && index <= upper;
+  }
+
+  async function append() {
+    if (!ensureSpace()) return;
+
+    const value = integer(el.value);
+    if (value === null) {
+      setStatus("Tam sayı bir değer girin.", "error");
+      return;
+    }
+
+    const t = begin("Sona Ekle");
+
+    try {
+      data.push(value);
+      aSteps = 1;
+      lSteps = 1;
+      lastResult = value;
+      updateStats();
+
+      await animate(
+        t,
+        {
+          array: { adding: [data.length - 1] },
+          linked: { adding: [data.length - 1] }
+        },
+        `${value} sona ekleniyor...`
+      );
+
+      finish(t, `${value} sona eklendi.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function prepend() {
+    if (!ensureSpace()) return;
+
+    const value = integer(el.value);
+    if (value === null) {
+      setStatus("Tam sayı bir değer girin.", "error");
+      return;
+    }
+
+    const t = begin("Başa Ekle");
+
+    try {
+      const oldLength = data.length;
+
+      for (let i = oldLength - 1; i >= 0; i--) {
+        aSteps++;
+        updateStats();
+        await animate(
+          t,
+          { array: { moving: [i] }, linked: {} },
+          `Dizi: kaydırma [${i}] → [${i + 1}]...`
+        );
+      }
+
+      lSteps = 1;
+      data.unshift(value);
+      lastResult = value;
+      updateStats();
+
+      await animate(
+        t,
+        {
+          array: { adding: [0] },
+          linked: { adding: [0] }
+        },
+        `${value} eklendi: indis 0.`
+      );
+
+      finish(t, `${value} başa eklendi.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function insert() {
+    if (!ensureSpace()) return;
+
+    const value = integer(el.value);
+    const index = integer(el.index);
+
+    if (value === null) {
+      setStatus("Tam sayı bir değer girin.", "error");
+      return;
+    }
+
+    if (!validIndex(index, true)) {
+      setStatus(`İndis 0 ile ${data.length} arasında olmalı.`, "error");
+      return;
+    }
+
+    const t = begin("İndise Ekle");
+
+    try {
+      for (let i = data.length - 1; i >= index; i--) {
+        aSteps++;
+        updateStats();
+        await animate(
+          t,
+          { array: { moving: [i] }, linked: {} },
+          `Dizi: kaydırma [${i}] → [${i + 1}]...`
+        );
+      }
+
+      if (index > 0) {
+        for (let i = 0; i < index; i++) {
+          lSteps++;
+          updateStats();
+          await animate(
+            t,
+            { array: {}, linked: { checking: [i] } },
+            `Bağlı liste: düğüm ${i} üzerinden geçiliyor...`
+          );
+        }
+      } else {
+        lSteps = 1;
+      }
+
+      data.splice(index, 0, value);
+      lastResult = value;
+      updateStats();
+
+      await animate(
+        t,
+        {
+          array: { adding: [index] },
+          linked: { adding: [index] }
+        },
+        `${value} eklendi: indis ${index}.`
+      );
+
+      finish(t, `${value} eklendi: indis ${index}.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function access() {
+    if (!data.length) {
+      setStatus("Liste boş.", "error");
+      return;
+    }
+
+    const index = integer(el.index);
+    if (!validIndex(index)) {
+      setStatus(`İndis 0 ile ${data.length - 1} arasında olmalı.`, "error");
+      return;
+    }
+
+    const t = begin("Erişim");
+
+    try {
+      aSteps = 1;
+      updateStats();
+
+      await animate(
+        t,
+        { array: { found: [index] }, linked: {} },
+        `Dizi: indis ${index} konumuna doğrudan erişim.`
+      );
+
+      for (let i = 0; i <= index; i++) {
+        lSteps++;
+        updateStats();
+        await animate(
+          t,
+          {
+            array: { found: [index] },
+            linked: { checking: [i] }
+          },
+          `Bağlı liste: düğüm ${i} ziyaret ediliyor...`
+        );
+      }
+
+      lastResult = data[index];
+      updateStats();
+
+      await animate(
+        t,
+        {
+          array: { found: [index] },
+          linked: { found: [index] }
+        },
+        `İndis ${index} değeri: ${data[index]}.`
+      );
+
+      finish(t, `Erişim sonucu: ${data[index]}.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function deleteIndex() {
+    if (!data.length) {
+      setStatus("Liste boş.", "error");
+      return;
+    }
+
+    const index = integer(el.index);
+    if (!validIndex(index)) {
+      setStatus(`İndis 0 ile ${data.length - 1} arasında olmalı.`, "error");
+      return;
+    }
+
+    const value = data[index];
+    const t = begin("Silme");
+
+    try {
+      if (index > 0) {
+        for (let i = 0; i <= index; i++) {
+          lSteps++;
+          updateStats();
+          await animate(
+            t,
+            { array: {}, linked: { checking: [i] } },
+            `Bağlı liste: düğüm ${i} üzerinden geçiliyor...`
+          );
+        }
+      } else {
+        lSteps = 1;
+      }
+
+      await animate(
+        t,
+        {
+          array: { removing: [index] },
+          linked: { removing: [index] }
+        },
+        `${value} çıkarılıyor: indis ${index}...`
+      );
+
+      data.splice(index, 1);
+
+      for (let i = index; i < data.length; i++) {
+        aSteps++;
+        updateStats();
+        await animate(
+          t,
+          { array: { moving: [i] }, linked: {} },
+          `Dizi: kaydırma [${i + 1}] → [${i}]...`
+        );
+      }
+
+      lastResult = value;
+      updateStats();
+      finish(t, `${value} silindi: indis ${index}.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function search() {
+    if (!data.length) {
+      setStatus("Liste boş.", "error");
+      return;
+    }
+
+    const target = integer(el.value);
+    if (target === null) {
+      setStatus("Aranacak tam sayıyı girin.", "error");
+      return;
+    }
+
+    const t = begin("Arama");
+
+    try {
+      for (let i = 0; i < data.length; i++) {
+        aSteps++;
+        lSteps++;
+        updateStats();
+
+        await animate(
+          t,
+          {
+            array: { checking: [i] },
+            linked: { checking: [i] }
+          },
+          `Karşılaştırma: ${data[i]} ile ${target}...`
+        );
+
+        if (data[i] === target) {
+          lastResult = `indis ${i}`;
+          updateStats();
+
+          await animate(
+            t,
+            {
+              array: { found: [i] },
+              linked: { found: [i] }
+            },
+            `${target} bulundu: indis ${i}.`
+          );
+
+          finish(t, `${target} bulundu: indis ${i}.`, "success");
+          return;
+        }
+      }
+
+      lastResult = "bulunamadı";
+      updateStats();
+      finish(t, `${target} bulunamadı.`, "error");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function traverse() {
+    if (!data.length) {
+      setStatus("Liste boş.", "error");
+      return;
+    }
+
+    const t = begin("Gezinme");
+
+    try {
+      for (let i = 0; i < data.length; i++) {
+        aSteps++;
+        lSteps++;
+        updateStats();
+
+        await animate(
+          t,
+          {
+            array: { checking: [i] },
+            linked: { checking: [i] }
+          },
+          `Ziyaret: indis ${i} → ${data[i]}`
+        );
+      }
+
+      lastResult = data.join(" → ");
+      updateStats();
+      finish(t, `Gezinme tamamlandı.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  function loadExample() {
+    token++;
+    running = false;
+    data = [12, 28, 41, 56, 73];
+    resetStats();
+    setRunning(false);
+    render();
+    setStatus("Örnek liste yüklendi.", "success");
+  }
+
+  function randomize() {
+    token++;
+    running = false;
+    const count = 6;
+    data = Array.from({ length: count }, () => Math.floor(Math.random() * 90) + 10);
+    resetStats();
+    setRunning(false);
+    render();
+    setStatus("Rastgele liste yüklendi.", "success");
+  }
+
+  function clearList() {
+    token++;
+    running = false;
+    data = [];
+    resetStats();
+    setRunning(false);
+    render();
+    setStatus("Liste temizlendi.");
+  }
+
+  function cancel() {
+    if (!running) return;
+    token++;
+    running = false;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("Canlandırma iptal edildi.");
+  }
+
+  el.append.addEventListener("click", append);
+  el.prepend.addEventListener("click", prepend);
+  el.insert.addEventListener("click", insert);
+  el.access.addEventListener("click", access);
+  el.del.addEventListener("click", deleteIndex);
+  el.search.addEventListener("click", search);
+  el.traverse.addEventListener("click", traverse);
+  el.load.addEventListener("click", loadExample);
+  el.random.addEventListener("click", randomize);
+  el.clear.addEventListener("click", clearList);
+  el.cancel.addEventListener("click", cancel);
+
+  el.cancel.disabled = true;
+  resetStats();
+  render();
+})();
+</script>
+<script src="deck/oyun.js"></script>

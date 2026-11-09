@@ -1,0 +1,885 @@
+---
+layout: without-sidebar
+title: "Linux Süreç Gezgini"
+permalink: /files/os/slides/Bolum_15_Linux_Process_Explorer.html
+excerpt: "Etkileşimli Linux süreç gezgini: fork, kill, zombiler, wait ve PID 1’e yeniden bağlanmayı gösteren animasyonlu süreç ağacı, ps/top tablosu ve /proc/<pid> denetçisi."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+.osim{
+  --o-bg:var(--ds-bg);
+  --o-fg:var(--ds-text);
+  --o-link:var(--ds-link);
+  --o-muted:color-mix(in srgb,var(--o-fg) 78%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 62%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:var(--ds-link);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,var(--ds-link) 80%,var(--o-fg));
+  --o-flt:var(--ds-accent);
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-shadow:color-mix(in srgb,var(--o-fg) 22%,transparent);
+  --o-dur:420ms;
+  font-variant-numeric:tabular-nums;
+}
+.osim .agt-oyun__body{display:flex;flex-direction:column;gap:6px;color:var(--o-fg);
+  font:14px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums}
+.osim .agt-oyun__body *,.osim .agt-oyun__body *::before,.osim .agt-oyun__body *::after{box-sizing:border-box;transition:none}
+.osim .agt-oyun__body p{margin:0;padding:0}
+.osim .agt-oyun__body [hidden]{display:none !important}
+.osim .agt-oyun__body button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:32px;min-height:0;padding:0 9px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font-weight:650;font-size:13.5px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim .agt-oyun__body button:hover{background:var(--o-cell)}
+.osim .agt-oyun__body button:disabled{opacity:.45;cursor:not-allowed}
+.osim .agt-oyun__body button:focus-visible,.osim .agt-oyun__body input:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim .agt-oyun__body button.osim-pri,.osim .agt-oyun__body button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:var(--o-bg);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .agt-oyun__body .osim-ib{width:32px;padding:0}
+.osim .agt-oyun__body svg{width:17px;height:17px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;flex:none;display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.osim .osim-seg{display:inline-flex;flex:none;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .agt-oyun__body .osim-seg button{border:0;height:26px;border-radius:8px;padding:0 9px}
+.osim .agt-oyun__body .osim-seg-sm button{padding:0 8px;font-size:13px}
+.osim .osim-grp{display:inline-flex;flex:none;align-items:center;gap:3px}
+.osim .osim-spacer{flex:1}
+.osim .agt-oyun__body input[type="range"]{width:72px;height:20px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:12.5px;font-weight:700;min-width:36px}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px var(--o-shadow)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:6px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;padding:8px 10px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-side{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-foot{flex:none;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:4px 8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 7px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;flex:none;gap:4px;flex-wrap:nowrap}
+.osim .osim-stat{display:inline-flex;gap:4px;height:26px;align-items:center;padding:0 7px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12px;font-weight:650;color:var(--o-muted);white-space:nowrap}
+.osim .osim-stat b{font-size:14px;color:var(--o-fg)}
+.osim .osim-stat.x{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(380px,100%);display:flex;flex-direction:column;gap:8px;padding:10px 12px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px var(--o-shadow);overflow:hidden}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-cap{font-size:12.5px;font-weight:650}
+.osim .osim-num{min-width:20px;text-align:center;font-weight:800;font-size:16px}
+.osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+/* help dialog (oyun.js moves it to <body>, so it carries its own tokens) */
+.osim-dlg{--o-fg:var(--ds-text);--o-bg:var(--ds-bg);--o-line:color-mix(in srgb,var(--o-fg) 62%,var(--o-bg));
+  --o-acc:color-mix(in srgb,var(--ds-link) 65%,var(--o-fg));--o-hit:color-mix(in srgb,var(--ds-link) 80%,var(--o-fg));--o-flt:var(--ds-accent);
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg))}
+.osim-dlg dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 8px}
+.osim-dlg dt{font-weight:800}
+.osim-dlg dd{margin:0}
+.osim-dlg .lg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;font-size:14px;font-weight:650}
+.osim-dlg .lg span{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:7px}
+.osim-dlg kbd{font:inherit;font-size:13px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim,.osim-dlg{--u-root:color-mix(in srgb,var(--ds-accent) 60%,var(--ds-link));--u-alice:var(--ds-link);--u-bob:var(--ds-warn,var(--ds-accent));--u-other:var(--ds-good,var(--ds-link))}
+.osim .osim-stage{grid-template-columns:minmax(0,1fr) 300px}
+.osim .osim-viz{display:flex;flex-direction:column;padding:8px 10px}
+.osim .lp-sidehd{align-items:center}
+.osim .lp-pspane{flex:1;display:flex;flex-direction:column;gap:4px;min-height:0}
+.osim .lp-drawer .osim-sh{flex-wrap:nowrap}
+
+/* ---- process tree ---- */
+.osim .lp-tree{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:10px}
+.osim .lp-inner{position:relative;transform-origin:0 0}
+.osim .agt-oyun__body .lp-edges{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.osim .lp-edges path{fill:none;stroke:var(--o-line);stroke-width:2}
+.osim .lp-edges path.moved{stroke:var(--o-acc);stroke-width:2.6;stroke-dasharray:6 4}
+.osim .lp-edges path.newe{stroke:var(--o-acc);stroke-width:2.6}
+.osim .lp-edges path.dim{opacity:.35}
+.osim .lp-node{position:absolute;left:0;top:0;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;align-items:center;
+  padding:4px 8px 4px 6px;border-radius:9px;background:var(--o-bg);color:var(--o-fg);cursor:pointer;transform-origin:0 50%;
+  box-shadow:inset 0 0 0 1.5px var(--o-line);border-left:5px solid var(--uc,var(--o-line));outline:none;user-select:none;will-change:transform}
+.osim .lp-node .ic{grid-row:1 / 3;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--o-line);background:var(--o-surf)}
+.osim .agt-oyun__body .lp-node .ic svg{width:14px;height:14px}
+.osim .lp-node .l1{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:14px;line-height:1.15;white-space:nowrap}
+.osim .lp-node .l1 b{font-weight:800}
+.osim .lp-node .l1 span{overflow:hidden;text-overflow:ellipsis;font-weight:650}
+.osim .lp-node .l2{font-size:12px;font-weight:650;color:var(--o-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.osim .lp-node.cmp{grid-template-rows:auto}
+.osim .lp-node.cmp .ic{grid-row:auto;width:20px;height:20px}
+.osim .lp-node.cmp .l2{display:none}
+.osim .lp-node.st-R .ic{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .lp-node.st-Z{background:repeating-linear-gradient(135deg,var(--o-flt-bg) 0 3px,var(--o-bg) 3px 7px);box-shadow:inset 0 0 0 2px var(--o-flt);border-left-style:dashed}
+.osim .lp-node.st-Z .ic{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .lp-node.st-Z .l1 span{font-style:italic}
+.osim .lp-node:hover{background-color:var(--o-cell)}
+.osim .lp-node.sel{box-shadow:inset 0 0 0 3px var(--o-acc),0 4px 14px var(--o-shadow);z-index:3}
+.osim .lp-node:focus-visible{outline:2px solid var(--o-fg);outline-offset:3px}
+.osim .lp-node.dim{opacity:.38}
+.osim .lp-node.hit{box-shadow:inset 0 0 0 1.5px var(--o-line),0 0 0 3px color-mix(in srgb,var(--o-acc) 55%,transparent)}
+.osim .lp-node.sel.hit{box-shadow:inset 0 0 0 3px var(--o-acc),0 0 0 3px color-mix(in srgb,var(--o-acc) 55%,transparent)}
+.osim .agt-oyun__body .lp-node .lk{width:11px;height:11px;margin-left:auto;align-self:center;color:var(--o-muted)}
+.osim .agt-oyun__body .lp-search{height:30px;min-height:0;width:180px;max-width:100%;margin:0;padding:0 9px;font:inherit;font-size:14px;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;box-shadow:none}
+.osim .agt-oyun__body .lp-search:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim .agt-oyun__body .lp-search[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+
+/* ---- /proc drawer ---- */
+.osim .lp-drawer{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;padding:7px 9px;border-radius:10px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .lp-drawer .osim-sh{flex-wrap:wrap;justify-content:flex-start}
+.osim .lp-drawer .osim-sh code{font:inherit;font-weight:800;font-size:14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.osim .lp-pre{flex:1;min-height:0;margin:0;padding:7px 9px;overflow:hidden;border-radius:8px;background:var(--o-bg);color:var(--o-fg);box-shadow:inset 0 0 0 1px var(--o-soft);
+  font:12px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:9}
+.osim .lp-pre .c{color:var(--o-muted)}
+.osim .lp-pre .k{font-weight:800}
+.osim .lp-note{font-size:12px;font-weight:700;color:var(--o-muted)}
+
+/* ---- ps table ---- */
+.osim .lp-ps{display:flex;flex-direction:column;gap:1px;min-height:0;overflow:hidden;flex:1;font-size:12.5px}
+.osim .lp-tr{display:grid;grid-template-columns:36px 38px 50px 14px 38px 40px minmax(0,1fr);gap:3px;align-items:center;padding:1px 4px;min-height:19px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.osim .lp-tr span{overflow:hidden;text-overflow:ellipsis}
+.osim .lp-tr span.n{text-align:right}
+.osim .lp-tr.hd{cursor:default;font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;position:sticky;top:0;background:var(--o-bg);z-index:1}
+.osim .lp-tr:not(.hd):hover{background:var(--o-cell)}
+.osim .lp-tr.sel{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit);font-weight:750}
+.osim .lp-tr.z span{font-style:italic}
+.osim .lp-tr:focus-visible{outline:2px solid var(--o-fg);outline-offset:-2px}
+.osim .lp-tr .ud{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--uc);margin-right:3px}
+.osim .lp-sum{font-size:12px;font-weight:700;color:var(--o-muted);padding-top:4px;border-top:1px solid var(--o-soft)}
+.osim .lp-empty{padding:8px;font-size:13px;color:var(--o-muted);font-weight:650}
+.osim .agt-oyun__body .osim-stat svg{width:13px;height:13px}
+.osim .osim-stat.z{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+
+.osim .lp-node.cmp{padding-top:1px;padding-bottom:1px}
+.osim .lp-node.cmp .ic{width:18px;height:18px}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
+</style>
+
+<div class="osim agt-oyun agt-oyun--stage" id="osim-lp" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 15 · Simülasyon</p><h1>Linux Süreç Gezgini</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="lp-help" aria-label="Yardım ve gösterim">?</button>
+    <a class="agt-oyun__back" href="Bolum_15_Linux.html">← Bölüm 15</a>
+  </header>
+
+  <div class="agt-oyun__body">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <div class="osim-seg" role="group" aria-label="Senaryo" id="lp-scen">
+        <button type="button" data-scen="system" title="Küçük bir masaüstü sistemi: systemd, sshd, bash, python3, code, node">Sistem</button>
+        <button type="button" data-scen="demo" title="Kayıtlı gösterim: fork, kill, zombi, wait ve yetim sürecin PID 1 tarafından sahiplenilmesi (▶ ile oynatılır)">Demo</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Geçmişi oynatma">
+        <button type="button" class="osim-ib" data-act="first" aria-label="İlk adım (Home)" title="İlk (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Önceki adım (Sol ok)" title="Geri (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="lp-play" aria-label="Oynat (Boşluk)" title="Oynat / duraklat (Boşluk)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="lp-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Sonraki adım (Sağ ok)" title="Adım (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Son adım (End)" title="Son (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="lp-speed-l">Hız</span>
+        <input type="range" id="lp-speed" min="0" max="3" step="1" value="1" aria-labelledby="lp-speed-l" aria-valuetext="saniyede 1 adım">
+        <span class="osim-speedv" id="lp-speedv">1/s</span>
+      </div>
+      <span class="osim-spacer"></span>
+      <input type="search" class="lp-search" id="lp-q" placeholder="Filtre: komut ya da PID" aria-label="Komuta ya da PID’ye göre filtrele" autocomplete="off" spellcheck="false" maxlength="24">
+    </div>
+    <div class="osim-row">
+      <span class="osim-lbl">Seçili</span>
+      <div class="osim-grp" role="group" aria-label="Süreç işlemleri">
+        <button type="button" data-act="fork" id="lp-fork" title="fork(): seçili sürecin çocuk bir kopyasını oluştur"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="12" cy="19" r="2.4"/><path d="M6 8.5v1.5a4 4 0 004 4h4a4 4 0 004-4V8.5M12 14v2.6"/></svg>fork()</button>
+        <button type="button" data-act="kill" id="lp-kill" title="kill -9: süreç sonlanır; çocuklarını PID 1 sahiplenir"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M9 9l6 6M15 9l-6 6"/></svg>kill -9</button>
+        <button type="button" data-act="wait" id="lp-wait" title="wait(): seçili ebeveyn zombi çocuklarını toplar (zombi seçiliyse onun ebeveyni toplar)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9"/></svg>wait()</button>
+        <button type="button" data-act="refresh" id="lp-refresh" title="top yenilemesi: CPU %, MEM % ve R/S durumları değişir"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 11-2.3-5.6M20 4v5h-5"/></svg>yenile</button>
+      </div>
+      <span class="osim-spacer"></span>
+      <span class="osim-lbl">Kullanıcı</span>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Kullanıcıya göre filtrele" id="lp-users">
+        <button type="button" data-user="all">Tümü</button>
+        <button type="button" data-user="root">root</button>
+        <button type="button" data-user="alice">alice</button>
+        <button type="button" data-user="bob">bob</button>
+      </div>
+    </div>
+    <div class="osim-alert" id="lp-alert" role="alert"></div>
+  </div>
+
+  <div class="osim-stage">
+    <div class="osim-viz" id="lp-viz">
+      <div class="lp-tree" id="lp-tree"><div class="lp-inner" id="lp-inner" role="tree" aria-label="Süreç ağacı"><svg class="lp-edges" id="lp-edges" aria-hidden="true" focusable="false"></svg></div></div>
+    </div>
+    <aside class="osim-side" aria-label="Süreç tablosu ve /proc denetçisi">
+      <div class="osim-sh lp-sidehd">
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="Yan panel" id="lp-panes">
+          <button type="button" data-act="pane-ps" id="lp-psbtn" title="ps: süreç tablosu">ps</button>
+          <button type="button" data-act="proc" id="lp-procbtn" aria-controls="lp-drawer" title="Seçili süreç için /proc denetçisi (düğümde Enter)">/proc</button>
+        </div>
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="Süreçleri sıralama ölçütü" id="lp-sort">
+          <button type="button" data-sort="pid">PID</button>
+          <button type="button" data-sort="cpu">%CPU</button>
+          <button type="button" data-sort="mem">%MEM</button>
+        </div>
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="/proc dosyası" id="lp-tabs">
+          <button type="button" data-tab="status" title="/proc/&lt;pid&gt;/status (alıntı)">status</button>
+          <button type="button" data-tab="fd" title="/proc/&lt;pid&gt;/fd (basitleştirilmiş)">fd</button>
+          <button type="button" data-tab="maps" title="/proc/&lt;pid&gt;/maps (kısaltılmış)">maps</button>
+        </div>
+      </div>
+      <div class="lp-pspane" id="lp-pspane">
+        <div class="lp-ps" id="lp-ps" role="grid" aria-label="Süreç tablosu"></div>
+        <div class="lp-sum" id="lp-sum"></div>
+      </div>
+      <div class="lp-drawer" id="lp-drawer">
+        <div class="osim-sh"><code id="lp-path">/proc/1/status</code><span class="lp-note" id="lp-pnote">alıntı</span></div>
+        <pre class="lp-pre" id="lp-pre" tabindex="0" aria-label="/proc dosyasının içeriği"></pre>
+      </div>
+    </aside>
+  </div>
+
+  <div class="osim-foot">
+    <p class="osim-narr" id="lp-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat" title="Geçmişteki adım / toplam adım">Adım <b id="lp-ss">0/0</b></span>
+      <span class="osim-stat" title="Tablodaki süreçler">Süreç <b id="lp-sn">0</b></span>
+      <span class="osim-stat h" title="Çalışıyor (R)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4l13 8-13 8z"/></svg>R <b id="lp-sr">0</b></span>
+      <span class="osim-stat" title="Uyuyor (S)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>S <b id="lp-sl">0</b></span>
+      <span class="osim-stat z" title="Zombiler (Z)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>Z <b id="lp-sz">0</b></span>
+    </div>
+  </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog osim-dlg" id="lp-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Linux Süreç Gezgini</h2>
+    <p>Benzetimi yapılan bir Linux sistemi; süreç ağacı (ebeveyn → çocuklar), <code>ps</code> benzeri bir tablo ve bir <code>/proc</code> denetçisiyle gösterilir. Değerler örnek amaçlıdır; sayfa bilgisayardan hiçbir bilgi okumaz.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Ağaçta bir düğüme ya da tabloda bir satıra tıklanarak süreç seçilir; ardından <b>fork()</b>, <b>kill -9</b>, <b>wait()</b> ya da <b>yenile</b> (top benzeri CPU / MEM güncellemesi) uygulanır. En çok 14 süreç olabilir.</li>
+      <li><b>Demo</b> kayıtlı bir diziyi yeniden oynatır: fork, kill, zombi, wait ve yetim sürecin PID 1 tarafından sahiplenilmesi. Oynatma düğmeleri iki senaryoda da geçmiş adımlar arasında gezinir.</li>
+      <li>Kullanıcıya ya da komut / PID’ye göre filtrelenebilir; eşleşen süreçler ağaçta vurgulanır.</li>
+      <li>Yan panel <b>ps</b> (PID, %CPU ya da %MEM’e göre sıralanabilir) ile <b>/proc</b> (seçili sürecin status, fd ve maps dosyaları) arasında geçiş yapar.</li>
+    </ul>
+    <h3>Terimler</h3>
+    <dl>
+      <dt>PID / PPID</dt><dd>Süreç kimliği / ebeveynin süreç kimliği.</dd>
+      <dt>fork()</dt><dd>Yeni çocuk süreç: yeni PID; aynı UID/GID ve program, fd kopyaları ve (yazınca kopyalama ile) aynı bellek.</dd>
+      <dt>kill -9</dt><dd>Süreç sonlanır; çocukları PID 1’e yeniden bağlanır.</dd>
+      <dt>Zombi</dt><dd>Sonlanmış süreç (Z); ebeveyni wait() çağırana dek tabloda tutulur.</dd>
+      <dt>wait()</dt><dd>Ebeveyn çıkış durumunu alır; zombi ortadan kalkar.</dd>
+      <dt>PID 1</dt><dd>systemd: yetim süreçleri sahiplenir ve zombi olduklarında hemen toplar; burada korumalıdır.</dd>
+      <dt>STAT</dt><dd>R çalışıyor · S uyuyor · Z zombi.</dd>
+      <dt>/proc</dt><dd>Her süreç için çekirdeğin görünümü. Uid/Gid satırları gerçek, etkin, saklanan ve dosya sistemi kimliklerini listeler.</dd>
+    </dl>
+    <h3>Gösterim</h3>
+    <div class="lg">
+      <span style="box-shadow:inset 0 0 0 1.5px var(--o-hit)">&#9654; R çalışıyor</span>
+      <span style="box-shadow:inset 0 0 0 1.5px var(--o-line)">&#9790; S uyuyor</span>
+      <span style="box-shadow:inset 0 0 0 2px var(--o-flt)">&#10007; Z zombi</span>
+      <span style="box-shadow:inset 0 0 0 1.5px var(--o-line);border-left:5px solid var(--u-alice)">sol kenar = kullanıcı</span>
+      <span><svg viewBox="0 0 40 12" style="width:40px;height:12px" aria-hidden="true"><path d="M2 6h36" stroke="currentColor" stroke-width="2.4" stroke-dasharray="6 4"/></svg>yeni ebeveyne bağlandı</span>
+    </div>
+    <h3>Tuşlar</h3>
+    <div class="lg"><span>Ağaç: <kbd>&#8593;</kbd><kbd>&#8595;</kbd> gezin <kbd>&#8592;</kbd> ebeveyn <kbd>&#8594;</kbd> çocuk <kbd>Enter</kbd> /proc</span><span>Başka yerde: <kbd>&#8592;</kbd><kbd>&#8594;</kbd> geçmiş</span><span><kbd>Boşluk</kbd> oynat</span><span><kbd>Esc</kbd> ps’ye dön</span></div>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.getElementById("osim-lp");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
+
+var UIDS={root:0,alice:1000,bob:1001};
+var UCOL={root:"var(--u-root)",alice:"var(--u-alice)",bob:"var(--u-bob)"};
+var STATES={R:"R (running)",S:"S (sleeping)",D:"D (disk sleep)",T:"T (stopped)",Z:"Z (zombie)"};
+var WORD={R:"çalışıyor",S:"uyuyor",D:"disk bekliyor",T:"durduruldu",Z:"zombi"};
+var MAXP=14,SPEEDS=[0.5,1,2,3];
+var ICON={
+  R:"<svg class=\"fi\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M7 4l13 8-13 8z\"/></svg>",
+  S:"<svg class=\"fi\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z\"/></svg>",
+  Z:"<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg>"
+};
+var LOCK="<svg class=\"lk st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 018 0v4\"/></svg>";
+var narrow={matches:false};
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+
+function defaults(){
+  return [
+    {pid:1,ppid:0,user:"root",stat:"S",cpu:.1,mem:.3,cmd:"systemd",
+     fds:["0 -> /dev/null","1 -> /dev/null","2 -> /dev/null","3 -> anon_inode:[eventpoll]"],
+     maps:["55d4c3a00000-55d4c3a52000 r-xp 00000000 08:01 1312      /usr/lib/systemd/systemd",
+           "55d4c5651000-55d4c5654000 rw-p 00000000 00:00 0         [heap]",
+           "7f3a1c200000-7f3a1c3c8000 r-xp 00028000 08:01 2049      /usr/lib/x86_64-linux-gnu/libc.so.6",
+           "7ffd8a1f0000-7ffd8a211000 rw-p 00000000 00:00 0         [stack]"]},
+    {pid:421,ppid:1,user:"root",stat:"S",cpu:0,mem:.2,cmd:"sshd",
+     fds:["0 -> /dev/null","1 -> /dev/null","2 -> /dev/null","3 -> socket:[14302]","4 -> /run/sshd.pid"],
+     maps:["5612b0e00000-5612b0e80000 r-xp 00000000 08:01 3311      /usr/sbin/sshd",
+           "5612b2a10000-5612b2a31000 rw-p 00000000 00:00 0         [heap]",
+           "7f1000200000-7f10003c8000 r-xp 00028000 08:01 2049      /usr/lib/x86_64-linux-gnu/libc.so.6",
+           "7ffc41b10000-7ffc41b31000 rw-p 00000000 00:00 0         [stack]"]},
+    {pid:812,ppid:1,user:"alice",stat:"S",cpu:.2,mem:.4,cmd:"bash",
+     fds:["0 -> /dev/pts/0","1 -> /dev/pts/0","2 -> /dev/pts/0","255 -> /dev/pts/0"],
+     maps:["55e0f7c00000-55e0f7cdd000 r-xp 00000000 08:01 4127      /usr/bin/bash",
+           "55e0f8a00000-55e0f8b20000 rw-p 00000000 00:00 0         [heap]",
+           "7f8e44200000-7f8e443c8000 r-xp 00028000 08:01 2049      /usr/lib/x86_64-linux-gnu/libc.so.6",
+           "7ffe93c00000-7ffe93c21000 rw-p 00000000 00:00 0         [stack]"]},
+    {pid:934,ppid:812,user:"alice",stat:"R",cpu:12.4,mem:3.8,cmd:"python3 server.py",
+     fds:["0 -> /dev/pts/0","1 -> /dev/pts/0","2 -> /dev/pts/0","3 -> socket:[20191]","4 -> /home/alice/data.db"],
+     maps:["55a1d2400000-55a1d2431000 r-xp 00000000 08:01 5230      /usr/bin/python3.12",
+           "55a1d3400000-55a1d3900000 rw-p 00000000 00:00 0         [heap]",
+           "7f2200000000-7f2200200000 r--s 00000000 08:01 7781      /home/alice/data.db",
+           "7f2200400000-7f22005c8000 r-xp 00028000 08:01 2049      /usr/lib/x86_64-linux-gnu/libc.so.6",
+           "7ffd55500000-7ffd55521000 rw-p 00000000 00:00 0         [stack]"]},
+    {pid:1042,ppid:1,user:"bob",stat:"S",cpu:.3,mem:1.1,cmd:"code",
+     fds:["0 -> /dev/null","1 -> /tmp/code.log","2 -> /tmp/code.log","7 -> socket:[22001]"],
+     maps:["5590aa000000-5590aa300000 r-xp 00000000 08:01 6044      /usr/share/code/code",
+           "5590ac000000-5590acb00000 rw-p 00000000 00:00 0         [heap]",
+           "7f5000000000-7f50001c8000 r-xp 00028000 08:01 2049      /usr/lib/x86_64-linux-gnu/libc.so.6",
+           "7fff70000000-7fff70021000 rw-p 00000000 00:00 0         [stack]"]},
+    {pid:1177,ppid:1042,user:"bob",stat:"S",cpu:2.1,mem:2.4,cmd:"node extensionHost",
+     fds:["0 -> pipe:[3101]","1 -> pipe:[3102]","2 -> pipe:[3103]","9 -> socket:[3109]"],
+     maps:["55c3e1400000-55c3e1600000 r-xp 00000000 08:01 6102      /usr/bin/node",
+           "55c3e2000000-55c3e2900000 rw-p 00000000 00:00 0         [heap]",
+           "7f7000000000-7f70001c8000 r-xp 00028000 08:01 2049      /usr/lib/x86_64-linux-gnu/libc.so.6",
+           "7ffc80000000-7ffc80021000 rw-p 00000000 00:00 0         [stack]"]}
+  ];
+}
+
+var st={hist:[],step:0,sel:1,user:"all",q:"",sort:"pid",tab:"status",drawer:false,help:false,playing:false,timer:0,speed:1,scen:"system"};
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function alertMsg(t){$("lp-alert").textContent=t||"";}
+function uid(u){return UIDS[u]===undefined?65534:UIDS[u];}
+function comm(p){return p.cmd.split(" ")[0].slice(0,15);}
+function label(p){return p.stat==="Z"?"["+comm(p)+"] <defunct>":p.cmd;}
+function find(ps,pid){for(var i=0;i<ps.length;i++){if(ps[i].pid===pid){return ps[i];}}return null;}
+function clone(ps){return ps.map(function(p){return {pid:p.pid,ppid:p.ppid,user:p.user,stat:p.stat,cpu:p.cpu,mem:p.mem,cmd:p.cmd,fds:p.fds.slice(),maps:p.maps.slice()};});}
+function plist(a){if(a.length>2){return a.slice(0,2).join(", ")+" +"+(a.length-2);}return a.join(", ");}
+function cur(){return st.hist[st.step];}
+function procs(){return cur().procs;}
+function selected(){return st.sel==null?null:find(procs(),st.sel);}
+function matches(p){
+  var q=st.q.trim().toLowerCase();
+  return (st.user==="all"||p.user===st.user)&&(!q||p.cmd.toLowerCase().indexOf(q)>=0||String(p.pid).indexOf(q)>=0);
+}
+function filtering(){return st.user!=="all"||st.q.trim()!=="";}
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(260,Math.min(700,interval()*0.7)));}
+
+/* ---------- simulation rules (fork / exit / wait / refresh) ---------- */
+function opFork(s,pid){
+  var ps=clone(s.procs),p=find(ps,pid);
+  if(!p){return "fork() için önce bir süreç seçilmeli.";}
+  if(p.stat==="Z"){return "PID "+p.pid+" bir zombi: sonlanmış olduğu için fork() yapamaz.";}
+  if(ps.length>=MAXP){return "Süreç sınırına ulaşıldı: bu simülasyonda en çok "+MAXP+" süreç olabilir.";}
+  var c={pid:s.nextPid,ppid:p.pid,user:p.user,stat:"R",cpu:0,mem:p.mem,cmd:p.cmd,fds:p.fds.slice(),maps:p.maps.slice()};
+  ps.push(c);
+  return {procs:ps,nextPid:s.nextPid+1,sel:c.pid,op:{type:"fork",pid:p.pid,child:c.pid},
+    narr:"fork(): <b>"+p.pid+"</b> → çocuk <b>"+c.pid+"</b>, UID "+uid(p.user)+" devralınır"};
+}
+function opKill(s,pid){
+  var ps=clone(s.procs),p=find(ps,pid);
+  if(!p){return "kill için önce bir süreç seçilmeli.";}
+  if(p.pid===1){return "PID 1 (systemd) korumalı: sistem init olmadan çalışamaz.";}
+  if(p.stat==="Z"){return "PID "+p.pid+" zaten bir zombi; ebeveyni ("+p.ppid+") wait() çağırmalı.";}
+  var kids=ps.filter(function(x){return x.ppid===p.pid;}).sort(function(a,b){return a.pid-b.pid;});
+  kids.forEach(function(k){k.ppid=1;});
+  var reaped=kids.filter(function(k){return k.stat==="Z";}).map(function(k){return k.pid;});
+  var parent=find(ps,p.ppid),zombie=!!parent&&p.ppid!==1;
+  if(zombie){p.stat="Z";p.cpu=0;p.mem=0;p.fds=[];p.maps=[];}
+  else{reaped.push(p.pid);}
+  ps=ps.filter(function(x){return reaped.indexOf(x.pid)<0;});
+  var adopted=kids.map(function(k){return k.pid;}),live=kids.filter(function(k){return k.stat!=="Z";}).map(function(k){return k.pid;}),zk=kids.filter(function(k){return k.stat==="Z";}).map(function(k){return k.pid;});
+  var nn=function(a){return a.length>1?a.length+" çocuk":String(a[0]);};
+  var tail;
+  if(live.length&&zk.length){tail=" · "+nn(live)+" sahiplenildi, zombi "+nn(zk)+" toplandı";}
+  else if(live.length){tail=" · "+nn(live)+" PID 1 tarafından sahiplenildi";}
+  else if(zk.length){tail=" · init zombiyi toplar: "+nn(zk);}
+  else{tail=zombie?" ("+p.ppid+" wait() çağırana dek)":", init tarafından toplandı";}
+  return {procs:ps,nextPid:s.nextPid,sel:zombie?p.pid:(parent?parent.pid:1),op:{type:"kill",pid:p.pid,zombie:zombie,adopted:adopted,reaped:reaped},
+    narr:"kill -9 <b>"+p.pid+"</b> → "+(zombie?"<span class=\"osim-k x\">zombi</span>":"sonlanır")+tail};
+}
+function opWait(s,pid){
+  var ps=clone(s.procs),p=find(ps,pid);
+  if(!p){return "Önce bir ebeveyn süreç (ya da bir zombi) seçilmeli.";}
+  var par=p.stat==="Z"?find(ps,p.ppid):p;
+  if(!par){return "PID "+p.pid+" için wait() çağıracak bir ebeveyn yok.";}
+  var z=ps.filter(function(x){return x.ppid===par.pid&&x.stat==="Z";}).map(function(x){return x.pid;});
+  if(!z.length){return "PID "+par.pid+" için toplanacak zombi çocuk yok.";}
+  ps=ps.filter(function(x){return z.indexOf(x.pid)<0;});
+  return {procs:ps,nextPid:s.nextPid,sel:par.pid,op:{type:"wait",pid:par.pid,reaped:z},
+    narr:"wait(): <b>"+par.pid+"</b> zombiyi toplar: "+plist(z)};
+}
+function opRefresh(s){
+  var ps=clone(s.procs);
+  ps.forEach(function(p){
+    if(p.stat==="Z"){return;}
+    p.cpu=Math.max(0,Math.min(99,p.cpu+(Math.random()*4-2)));
+    p.mem=Math.max(.1,Math.min(99,p.mem+(Math.random()*.4-.2)));
+    p.stat=Math.random()>.75?"R":"S";
+  });
+  return {procs:ps,nextPid:s.nextPid,sel:st.sel,op:{type:"refresh"},narr:"top yenilemesi: CPU, bellek ve R/S durumları değişir"};
+}
+function base(narr){return {procs:defaults(),nextPid:2200,sel:1,op:null,narr:narr};}
+
+/* ---------- tree layout ---------- */
+var tree=$("lp-tree"),inner=$("lp-inner"),edgesSvg=$("lp-edges");
+function layout(ps){
+  var kids={},has={};
+  ps.forEach(function(p){has[p.pid]=1;(kids[p.ppid]=kids[p.ppid]||[]).push(p);});
+  Object.keys(kids).forEach(function(k){kids[k].sort(function(a,b){return a.pid-b.pid;});});
+  var roots=ps.filter(function(p){return !has[p.ppid];}).sort(function(a,b){return a.pid-b.pid;});
+  var slot=0,pos={},maxD=0,order=[];
+  function dfs(p,d){
+    order.push(p.pid);maxD=Math.max(maxD,d);
+    var ch=kids[p.pid]||[],y;
+    if(!ch.length){y=slot++;}
+    else{var ys=ch.map(function(c){return dfs(c,d+1);});y=(ys[0]+ys[ys.length-1])/2;}
+    pos[p.pid]={d:d,slot:y};
+    return y;
+  }
+  roots.forEach(function(r){dfs(r,0);});
+  var leaves=Math.max(1,slot),nm=narrow.matches;
+  var W=Math.max(220,tree.clientWidth-4),H=Math.max(120,tree.clientHeight-4);
+  var cw=clamp(Math.floor((W-16)/(maxD+1))-14,96,210);
+  var colW=maxD?Math.min(cw+120,(W-16-cw)/maxD):0;
+  if(maxD&&colW<cw+24){cw=Math.max(88,Math.floor(colW-24));if(colW<cw+24){colW=cw+24;}}
+  if(nm){cw=128;colW=maxD?cw+22:0;}
+  var rowH=nm?42:clamp(Math.floor((H-12)/leaves),32,78);
+  var ch=clamp(rowH-12,24,50),cmp=ch<40;
+  var cH=12+leaves*rowH,cW=16+cw+maxD*colW;
+  var offY=nm?6:Math.max(6,(H-cH)/2+6);
+  if(cW>W+1||cH>H+1){
+    /* too wide or too tall for the stage: indented list (one row per process, like pstree) */
+    var ind=22,n=order.length,rH=clamp(Math.floor((H-8)/n),22,40),cH2=clamp(rH-3,20,34),cw2=clamp(W-16-maxD*ind,120,260);
+    order.forEach(function(pid,k){var q=pos[pid];q.x=Math.round(8+q.d*ind);q.y=Math.round(4+k*rH+(rH-cH2)/2);});
+    return {pos:pos,cw:cw2,ch:cH2,cmp:true,ind:true,W:Math.max(W,Math.ceil(16+cw2+maxD*ind)),H:Math.max(H,8+n*rH),order:order,kids:kids,cH:8+n*rH};
+  }
+  ps.forEach(function(p){var q=pos[p.pid];q.x=Math.round(8+q.d*colW);q.y=Math.round(offY+q.slot*rowH+(rowH-ch)/2);});
+  return {pos:pos,cw:cw,ch:ch,cmp:cmp,W:Math.max(W,Math.ceil(cW)),H:Math.ceil(Math.max(nm?cH:H,cH+offY-6)),order:order,kids:kids,cH:cH};
+}
+
+/* ---------- tree rendering with tweened fork / exit / re-parent animation ---------- */
+var nodeEls={},edgeEls={},disp={},tw=null,lastL=null,L=null;
+function aOut(d,G){return G.ind?[d.x+11*d.s,d.y+G.ch*d.s]:[d.x+G.cw*d.s,d.y+G.ch/2];}
+function aIn(d,G){return [d.x,d.y+G.ch/2];}
+function lerp(a,b,t){return a+(b-a)*t;}
+function curve(s,e){if(L&&L.ind){return "M"+s[0].toFixed(1)+" "+s[1].toFixed(1)+"V"+e[1].toFixed(1)+"H"+e[0].toFixed(1);}var dx=Math.max(14,(e[0]-s[0])/2);return "M"+s[0].toFixed(1)+" "+s[1].toFixed(1)+"C"+(s[0]+dx).toFixed(1)+" "+s[1].toFixed(1)+" "+(e[0]-dx).toFixed(1)+" "+e[1].toFixed(1)+" "+e[0].toFixed(1)+" "+e[1].toFixed(1);}
+function fillNode(el,p,G,ps){
+  var sel=p.pid===st.sel,f=filtering(),m=matches(p);
+  el.className="lp-node st-"+p.stat+(sel?" sel":"")+(f&&!m?" dim":"")+(f&&m?" hit":"")+(G.cmp?" cmp":"");
+  el.style.setProperty("--uc",UCOL[p.user]||"var(--u-other)");
+  el.style.width=G.cw+"px";el.style.height=G.ch+"px";
+  el.setAttribute("data-pid",p.pid);
+  el.setAttribute("data-ppid",p.ppid);
+  el.setAttribute("data-stat",p.stat);
+  el.setAttribute("data-user",p.user);
+  el.setAttribute("role","treeitem");
+  el.setAttribute("aria-level",String(G.pos[p.pid].d+1));
+  el.setAttribute("aria-selected",String(sel));
+  var nk=(G.kids[p.pid]||[]).length;
+  el.setAttribute("aria-label","PID "+p.pid+", "+label(p)+", kullanıcı "+p.user+" UID "+uid(p.user)+", "+WORD[p.stat]+", ebeveyn "+p.ppid+(nk?", "+nk+" çocuk":"")+(p.pid===1?", korumalı":""));
+  el.title="PID "+p.pid+" · PPID "+p.ppid+" · "+p.user+" (UID "+uid(p.user)+") · "+p.stat+" ("+WORD[p.stat]+")"+(p.pid===1?" · korumalı":"");
+  el.innerHTML="<span class=\"ic\">"+ICON[p.stat]+"</span><span class=\"l1\"><b>"+p.pid+"</b><span>"+esc(label(p))+"</span>"+(p.pid===1?LOCK:"")+"</span><span class=\"l2\">"+esc(p.user)+" · uid "+uid(p.user)+" · "+WORD[p.stat]+"</span>";
+}
+function finishTween(){
+  if(!tw){return;}
+  cancelAnimationFrame(tw.raf);
+  tw.frame(1);
+  tw.gone.forEach(function(pid){if(nodeEls[pid]){nodeEls[pid].remove();delete nodeEls[pid];}});
+  tw.goneE.forEach(function(pid){if(edgeEls[pid]){edgeEls[pid].remove();delete edgeEls[pid];}});
+  var nd={};Object.keys(tw.to).forEach(function(k){if(tw.gone.indexOf(+k)<0){nd[k]=tw.to[k];}});
+  disp=nd;tw=null;
+}
+function renderTree(anim){
+  finishTween();
+  var s=cur(),ps=s.procs,G=layout(ps),op=s.op||{};
+  L=G;
+  if(narrow.matches){tree.style.height=(G.cH+8)+"px";}else{tree.style.height="";}
+  inner.style.width=G.W+"px";inner.style.height=G.H+"px";
+  /* the tree never scrolls: if it is larger than its box, shrink it to fit */
+  var fitS=Math.min(1,(tree.clientWidth-2)/G.W,(tree.clientHeight-2)/G.H);
+  inner.style.transform=fitS<1?"scale("+fitS.toFixed(3)+")":"";
+  edgesSvg.setAttribute("width",G.W);edgesSvg.setAttribute("height",G.H);
+  var from={},to={},present={},gone=[],goneE=[],eFrom={},cpos={};
+  ps.forEach(function(p){
+    present[p.pid]=1;
+    var t=G.pos[p.pid];to[p.pid]={x:t.x,y:t.y,s:1,o:1};
+    var el=nodeEls[p.pid];
+    if(!el){
+      el=document.createElement("div");
+      inner.appendChild(el);nodeEls[p.pid]=el;
+      var pd=disp[p.ppid]||G.pos[p.ppid];
+      from[p.pid]=pd?{x:pd.x+G.cw*0.35,y:pd.y,s:0.15,o:0}:{x:t.x,y:t.y,s:0.15,o:0};
+    }else{
+      var d=disp[p.pid];
+      from[p.pid]=d?{x:d.x,y:d.y,s:d.s,o:d.o}:{x:t.x,y:t.y,s:1,o:1};
+    }
+    fillNode(el,p,G,ps);
+  });
+  Object.keys(nodeEls).forEach(function(k){
+    var pid=+k;
+    if(!present[pid]){gone.push(pid);var d=disp[pid]||{x:0,y:0,s:1,o:1};from[pid]={x:d.x,y:d.y,s:d.s,o:d.o};to[pid]={x:d.x+6,y:d.y,s:0.55,o:0};nodeEls[pid].className+=" dim";nodeEls[pid].removeAttribute("tabindex");nodeEls[pid].setAttribute("aria-hidden","true");}
+  });
+  var adopted=op.type==="kill"?op.adopted:[];
+  ps.forEach(function(p){
+    if(!present[p.ppid]){return;}
+    var e=edgeEls[p.pid];
+    if(!e){
+      e=document.createElementNS(edgesSvg.namespaceURI,"path");
+      edgesSvg.appendChild(e);edgeEls[p.pid]=e;e.setAttribute("data-pp",p.ppid);
+    }else{
+      var old=+e.getAttribute("data-pp");
+      if(old!==p.ppid){var od=disp[old];if(od&&lastL){eFrom[p.pid]=aOut(od,lastL);}e.setAttribute("data-pp",p.ppid);}
+    }
+    var cls=[];
+    if(adopted.indexOf(p.pid)>=0){cls.push("moved");}
+    if(op.type==="fork"&&op.child===p.pid){cls.push("newe");}
+    if(filtering()&&!matches(p)){cls.push("dim");}
+    e.setAttribute("class",cls.join(" "));
+    e.setAttribute("data-child",p.pid);
+  });
+  Object.keys(edgeEls).forEach(function(k){var c=+k;if(!present[c]||!present[+edgeEls[c].getAttribute("data-pp")]){if(goneE.indexOf(c)<0){goneE.push(c);}}});
+  function frame(t){
+    var e=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    Object.keys(from).forEach(function(k){
+      var a=from[k],b=to[k],d={x:lerp(a.x,b.x,e),y:lerp(a.y,b.y,e),s:lerp(a.s,b.s,e),o:lerp(a.o,b.o,e)};
+      cpos[k]=d;
+      var el=nodeEls[k];
+      if(el){el.style.transform="translate("+d.x.toFixed(1)+"px,"+d.y.toFixed(1)+"px) scale("+d.s.toFixed(3)+")";el.style.opacity=d.o.toFixed(3);}
+    });
+    Object.keys(edgeEls).forEach(function(k){
+      var c=+k,el=edgeEls[k],pp=+el.getAttribute("data-pp"),cd=cpos[c],pd=cpos[pp];
+      if(!cd){return;}
+      var src;
+      if(eFrom[c]&&pd){var tgt=aOut(pd,G);src=[lerp(eFrom[c][0],tgt[0],e),lerp(eFrom[c][1],tgt[1],e)];}
+      else if(pd){src=aOut(pd,G);}
+      else{return;}
+      el.setAttribute("d",curve(src,aIn(cd,G)));
+      el.style.opacity=Math.min(cd.o,pd?pd.o:1).toFixed(3);
+    });
+  }
+  tw={from:from,to:to,gone:gone,goneE:goneE,frame:frame,raf:0};
+  lastL=G;
+  if(!anim||reduce.matches){finishTween();}
+  else{
+    var t0=performance.now(),D=dur();
+    var loop=function(now){
+      if(!tw||tw.frame!==frame){return;}
+      var t=Math.min(1,(now-t0)/D);
+      frame(t);
+      if(t<1){tw.raf=requestAnimationFrame(loop);}else{finishTween();}
+    };
+    frame(0);
+    tw.raf=requestAnimationFrame(loop);
+  }
+  var focusPid=st.sel!=null&&present[st.sel]?st.sel:1;
+  ps.forEach(function(p){nodeEls[p.pid].tabIndex=p.pid===focusPid?0:-1;});
+  inner.setAttribute("aria-activedescendant","");
+}
+
+/* ---------- ps table ---------- */
+var psEl=$("lp-ps");
+function visibleRows(){
+  return procs().filter(matches).sort(function(a,b){
+    if(st.sort==="cpu"){return b.cpu-a.cpu||a.pid-b.pid;}
+    if(st.sort==="mem"){return b.mem-a.mem||a.pid-b.pid;}
+    return a.pid-b.pid;
+  });
+}
+function renderTable(){
+  var rows=visibleRows(),focusPid=null;
+  rows.forEach(function(p){if(p.pid===st.sel){focusPid=p.pid;}});
+  if(focusPid===null&&rows.length){focusPid=rows[0].pid;}
+  var h="<div class=\"lp-tr hd\" role=\"row\"><span class=\"n\" role=\"columnheader\">PID</span><span class=\"n\" role=\"columnheader\">PPID</span><span role=\"columnheader\">USER</span><span role=\"columnheader\" title=\"Durum\">S</span><span class=\"n\" role=\"columnheader\">%CPU</span><span class=\"n\" role=\"columnheader\">%MEM</span><span role=\"columnheader\">COMMAND</span></div>";
+  rows.forEach(function(p){
+    var sel=p.pid===st.sel;
+    h+="<div class=\"lp-tr"+(sel?" sel":"")+(p.stat==="Z"?" z":"")+"\" role=\"row\" data-pid=\""+p.pid+"\" tabindex=\""+(p.pid===focusPid?0:-1)+"\" aria-selected=\""+sel+"\" style=\"--uc:"+(UCOL[p.user]||"var(--u-other)")+"\">"+
+      "<span class=\"n\" role=\"gridcell\">"+p.pid+"</span><span class=\"n\" role=\"gridcell\">"+p.ppid+"</span><span role=\"gridcell\"><i class=\"ud\" aria-hidden=\"true\"></i>"+esc(p.user)+"</span><span role=\"gridcell\">"+esc(p.stat)+"</span>"+
+      "<span class=\"n\" role=\"gridcell\">"+p.cpu.toFixed(1)+"</span><span class=\"n\" role=\"gridcell\">"+p.mem.toFixed(1)+"</span><span role=\"gridcell\" title=\""+esc(label(p))+"\">"+esc(label(p))+"</span></div>";
+  });
+  if(!rows.length){h+="<div class=\"lp-empty\">Filtreye uyan süreç yok.</div>";}
+  psEl.innerHTML=h;
+  var ps=procs(),r=0,s=0,z=0;
+  ps.forEach(function(p){if(p.stat==="R"){r++;}else if(p.stat==="Z"){z++;}else{s++;}});
+  $("lp-sum").textContent="Toplam "+ps.length+" süreç: "+r+" çalışıyor, "+s+" uyuyor, "+z+" zombi"+(filtering()?" · "+rows.length+" gösteriliyor":"");
+  $("lp-sn").textContent=ps.length;$("lp-sr").textContent=r;$("lp-sl").textContent=s;$("lp-sz").textContent=z;
+  var se=psEl.querySelector(".lp-tr.sel");
+  if(se){var top=se.offsetTop-psEl.offsetTop,ph=psEl.clientHeight;if(top<psEl.scrollTop+24||top>psEl.scrollTop+ph-30){psEl.scrollTop=Math.max(0,top-ph/2);}}
+}
+
+/* ---------- /proc inspector ---------- */
+function renderDrawer(){
+  var dr=$("lp-drawer");
+  dr.hidden=!st.drawer;
+  $("lp-pspane").hidden=st.drawer;$("lp-sort").hidden=st.drawer;$("lp-tabs").hidden=!st.drawer;
+  $("lp-psbtn").setAttribute("aria-pressed",String(!st.drawer));
+  $("lp-procbtn").setAttribute("aria-expanded",String(st.drawer));
+  $("lp-procbtn").setAttribute("aria-pressed",String(st.drawer));
+  root.querySelectorAll("#lp-tabs button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-tab")===st.tab));});
+  if(!st.drawer){return;}
+  var p=selected(),pre=$("lp-pre"),K=function(k){return "<span class=\"k\">"+k+"</span>";},C=function(t){return "<span class=\"c\">"+esc(t)+"</span>";};
+  var notes={status:"alıntı",fd:"basitleştirilmiş: fd -> hedef",maps:"kısaltılmış"};
+  $("lp-pnote").textContent=notes[st.tab];
+  if(!p){$("lp-path").textContent="/proc/<pid>/"+st.tab;pre.innerHTML=C("Seçili süreç yok.");return;}
+  $("lp-path").textContent="/proc/"+p.pid+"/"+st.tab;
+  var u=uid(p.user),h;
+  if(st.tab==="status"){
+    h=K("Name:")+"\t"+esc(comm(p))+"\n"+K("State:")+"\t"+esc(STATES[p.stat]||p.stat)+"\n"+K("Tgid:")+"\t"+p.pid+"\n"+K("Pid:")+"\t"+p.pid+"\n"+K("PPid:")+"\t"+p.ppid+"\n"+
+      K("Uid:")+"\t"+u+"\t"+u+"\t"+u+"\t"+u+"\n"+K("Gid:")+"\t"+u+"\t"+u+"\t"+u+"\t"+u+"\n"+K("Threads:")+"\t1"+(p.stat==="Z"?"\n"+C("(sonlandı; ebeveyni "+p.ppid+" wait() çağırana dek bekliyor)"):"");
+  }else if(st.tab==="fd"){
+    h=p.fds.length?p.fds.map(esc).join("\n"):C("(boş: zombi tüm dosya tanımlayıcılarını kapatmıştır)");
+  }else{
+    h=p.maps.length?p.maps.map(esc).join("\n"):C("(boş: zombinin adres alanı yoktur)");
+  }
+  pre.innerHTML=h;
+}
+
+/* ---------- narration, stats, controls ---------- */
+function renderStats(){
+  var s=cur(),n=st.hist.length-1;
+  $("lp-ss").textContent=st.step+"/"+n;
+  $("lp-narr").innerHTML=s.narr;
+}
+function renderControls(){
+  root.querySelectorAll("#lp-scen button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-scen")===st.scen));});
+  root.querySelectorAll("#lp-users button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-user")===st.user));});
+  root.querySelectorAll("#lp-sort button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-sort")===st.sort));});
+  var n=st.hist.length-1,atEnd=st.step>=n;
+  root.querySelector("[data-act=prev]").disabled=st.step<=0;
+  root.querySelector("[data-act=first]").disabled=st.step<=0;
+  root.querySelector("[data-act=next]").disabled=atEnd;
+  root.querySelector("[data-act=last]").disabled=atEnd;
+  root.querySelector("[data-act=play]").disabled=n<1;
+  $("lp-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("lp-play").setAttribute("aria-label",st.playing?"Duraklat (Boşluk)":"Oynat (Boşluk)");
+  var p=selected();
+  ["lp-fork","lp-kill","lp-wait"].forEach(function(id){$(id).disabled=!p;});
+}
+function render(anim){
+  if(st.sel!=null&&!find(procs(),st.sel)){st.sel=null;}
+  renderTree(anim);
+  renderTable();
+  renderDrawer();
+  renderStats();
+  renderControls();
+}
+
+/* ---------- history ---------- */
+function commit(res){
+  if(typeof res==="string"){alertMsg(res);return false;}
+  alertMsg("");
+  pause();
+  st.hist=st.hist.slice(0,st.step+1);
+  st.hist.push(res);
+  st.step=st.hist.length-1;
+  st.sel=res.sel;
+  render(true);
+  return true;
+}
+function go(step,anim){
+  var prev=st.step;
+  st.step=clamp(step,0,st.hist.length-1);
+  if(st.step!==prev){st.sel=cur().sel;alertMsg("");}
+  render(!!anim&&Math.abs(st.step-prev)===1);
+}
+function tick(){
+  if(!st.playing){return;}
+  if(st.step>=st.hist.length-1){pause();return;}
+  go(st.step+1,true);
+  if(st.step>=st.hist.length-1){pause();return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){
+  if(st.playing||st.hist.length<2){return;}
+  if(st.step>=st.hist.length-1){go(0,false);}
+  st.playing=true;renderControls();
+  st.timer=setTimeout(tick,Math.min(400,interval()));
+}
+function pause(){st.playing=false;clearTimeout(st.timer);renderControls();}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+function setScen(sc){
+  st.playing=false;clearTimeout(st.timer);
+  st.scen=sc;alertMsg("");
+  if(sc==="demo"){
+    var h=[base("Demo · fork, kill, zombi ve wait adımlarını yeniden oynatmak için ▶")];
+    var seq=[["fork",812],["fork",2200],["kill",2200],["wait",812],["kill",934],["kill",812]];
+    seq.forEach(function(x){
+      var s=h[h.length-1],r=x[0]==="fork"?opFork(s,x[1]):x[0]==="kill"?opKill(s,x[1]):opWait(s,x[1]);
+      if(typeof r!=="string"){h.push(r);}
+    });
+    st.hist=h;
+  }else{
+    st.hist=[base("Bir süreç seçip fork(), kill -9 ya da wait() uygulanabilir")];
+  }
+  st.step=0;st.sel=1;
+  Object.keys(nodeEls).forEach(function(k){nodeEls[k].remove();});
+  Object.keys(edgeEls).forEach(function(k){edgeEls[k].remove();});
+  nodeEls={};edgeEls={};disp={};tw=null;
+  render(false);
+}
+
+/* ---------- selection & keyboard on the tree / table ---------- */
+function select(pid,focusWhere){
+  st.sel=pid;alertMsg("");
+  render(false);
+  if(focusWhere==="tree"&&nodeEls[pid]){nodeEls[pid].focus();}
+  if(focusWhere==="table"){var r=psEl.querySelector(".lp-tr[data-pid=\""+pid+"\"]");if(r){r.focus();}}
+}
+inner.addEventListener("click",function(e){
+  var n=e.target.closest(".lp-node");
+  if(!n||!n.hasAttribute("tabindex")){return;}
+  select(+n.getAttribute("data-pid"),"tree");
+});
+inner.addEventListener("dblclick",function(e){
+  var n=e.target.closest(".lp-node");
+  if(n){st.drawer=true;render(false);fit();}
+});
+inner.addEventListener("keydown",function(e){
+  var n=e.target.closest&&e.target.closest(".lp-node");
+  if(!n||!L){return;}
+  var pid=+n.getAttribute("data-pid"),ps=procs(),p=find(ps,pid);
+  if(!p){return;}
+  var ord=L.order,i=ord.indexOf(pid),to=null;
+  switch(e.key){
+    case "ArrowDown":to=ord[Math.min(ord.length-1,i+1)];break;
+    case "ArrowUp":to=ord[Math.max(0,i-1)];break;
+    case "ArrowLeft":to=find(ps,p.ppid)?p.ppid:pid;break;
+    case "ArrowRight":to=(L.kids[pid]&&L.kids[pid].length)?L.kids[pid][0].pid:pid;break;
+    case "Home":to=ord[0];break;
+    case "End":to=ord[ord.length-1];break;
+    case "Enter":e.preventDefault();e.stopPropagation();st.sel=pid;st.drawer=!st.drawer;render(false);fit();if(nodeEls[pid]){nodeEls[pid].focus();}return;
+    case " ":case "Spacebar":e.preventDefault();e.stopPropagation();select(pid,"tree");return;
+    default:return;
+  }
+  e.preventDefault();e.stopPropagation();
+  select(to,"tree");
+});
+psEl.addEventListener("click",function(e){
+  var r=e.target.closest(".lp-tr[data-pid]");
+  if(r){select(+r.getAttribute("data-pid"),"table");}
+});
+psEl.addEventListener("keydown",function(e){
+  var r=e.target.closest&&e.target.closest(".lp-tr[data-pid]");
+  if(!r){return;}
+  var rows=[].slice.call(psEl.querySelectorAll(".lp-tr[data-pid]")),i=rows.indexOf(r),to=null;
+  if(e.key==="ArrowDown"){to=rows[Math.min(rows.length-1,i+1)];}
+  else if(e.key==="ArrowUp"){to=rows[Math.max(0,i-1)];}
+  else if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){to=r;}
+  else{return;}
+  e.preventDefault();e.stopPropagation();
+  select(+to.getAttribute("data-pid"),"table");
+});
+
+/* ---------- toolbar ---------- */
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.hasAttribute("data-scen")){setScen(b.getAttribute("data-scen"));return;}
+  if(b.hasAttribute("data-user")){st.user=b.getAttribute("data-user");checkFilter();render(false);return;}
+  if(b.hasAttribute("data-sort")){st.sort=b.getAttribute("data-sort");render(false);return;}
+  if(b.hasAttribute("data-tab")){st.tab=b.getAttribute("data-tab");renderDrawer();return;}
+  switch(b.getAttribute("data-act")){
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,true);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();go(st.hist.length-1,false);break;
+    case "play":togglePlay();break;
+    case "fork":commit(opFork(cur(),st.sel));break;
+    case "kill":commit(opKill(cur(),st.sel));break;
+    case "wait":commit(opWait(cur(),st.sel));break;
+    case "refresh":commit(opRefresh(cur()));break;
+    case "proc":st.drawer=true;render(false);fit();break;
+    case "pane-ps":st.drawer=false;render(false);fit();break;
+  }
+});
+var qEl=$("lp-q");
+function checkFilter(){
+  var any=procs().some(matches);
+  qEl.setAttribute("aria-invalid",String(!any&&st.q.trim()!==""));
+  if(!any){alertMsg("Filtreye uyan süreç yok"+(st.q.trim()?": “"+st.q.trim()+"”":"")+(st.user!=="all"?" (kullanıcı: "+st.user+")":"")+".");}
+  else{alertMsg("");}
+}
+qEl.addEventListener("input",function(){st.q=qEl.value;checkFilter();render(false);});
+var speed=$("lp-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("lp-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext","saniyede "+st.speed+" adım");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(e.key!=="Escape"&&document.querySelector("dialog[open]")){return;}
+  if(e.key==="Escape"){
+    if(document.querySelector("dialog[open]")){return;}
+    if(tag==="INPUT"&&root.contains(t)){t.blur();}
+    else if(st.drawer&&root.contains(t)){st.drawer=false;render(false);fit();}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,true);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();go(st.hist.length-1,false);break;
+  }
+});
+
+/* ---------- re-layout the tree when its box changes size ---------- */
+var lastFit="";
+function fit(){
+  var key=tree.clientWidth+"x"+tree.clientHeight+"x"+st.drawer;
+  if(key!==lastFit){lastFit=key;renderTree(false);}
+}
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe(tree);}
+
+/* ---------- init ---------- */
+setScen("system");
+fit();
+setTimeout(fit,400);
+})();
+</script>
+<script src="deck/oyun.js"></script>

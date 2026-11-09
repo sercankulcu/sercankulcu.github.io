@@ -1,0 +1,48 @@
+---
+title: "The Letter Left My Pocket"
+date: 2009-05-23
+description: "Carrying a resignation letter without using it was heavier than handing it in — the burden was the daily argument of deciding again, not the decision itself."
+tags:
+   - work
+   - career
+   - military-service
+   - uncertainty
+---
+
+For a long time, the resignation letter stayed with me without becoming a resignation.
+
+Military service was approaching, and there were practical reasons to delay the decision. Money mattered. Timing mattered. Taking another short-term job before leaving made little sense. So I kept working while the letter remained ready, and the unresolved decision followed me into every day.
+
+Then the deadline came close enough that postponement stopped being useful.
+
+I handed in the letter.
+
+The future did not become easier. Military service was still ahead. Work had not suddenly become secure, and there was no new plan waiting on the other side.
+
+Yet I felt lighter.
+
+For roughly two weeks, there was an unusual space between one life and the next. The decision had been made, but its consequences had not fully arrived. The office was still there, but it had already lost some authority over me because I knew I was leaving.
+
+That was the part I had not expected.
+
+I had thought the burden was the resignation itself. Instead, much of the burden had been carrying the decision without using it. Every day required the same private argument: now, later, maybe next week.
+
+Once the letter left my pocket, that argument stopped.
+
+Nothing had been solved.
+
+But one question had finally gone quiet.
+
+A letter leaving a pocket feels more serious than a message being sent. Paper has weight. It can be folded badly, touched too often, damaged by nervous hands.
+
+Digital words disappear into a system. A letter crosses a small physical distance. It makes the sender visible.
+
+That is probably why the moment stayed.
+
+Once the letter left my pocket, the thought was no longer only mine.
+
+## Inside The Letter Left My Pocket
+
+The day probably looked forgettable from outside, which makes its survival more interesting. A minor detail can be more faithful than a grand summary.
+
+The smallness is not a weakness. It is the reason the memory can remain exact. I think the truth of the memory lives exactly in that uneven size.

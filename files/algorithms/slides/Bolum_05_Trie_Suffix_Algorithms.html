@@ -1,0 +1,260 @@
+---
+layout: without-sidebar
+title: "Trie ve Sonek Algoritmaları"
+permalink: /files/algorithms/slides/Bolum_05_Trie_Suffix_Algorithms.html
+excerpt: "Trie, sonek dizisi ve sonek trie'sinin temellerini gösteren etkileşimli simülasyon."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.alg-ts .ts-body { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.alg-ts .ts-controls { display: flex; flex: none; align-items: center; gap: 8px; }
+.alg-ts .ts-controls label { color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.alg-ts .ts-controls input { min-width: 0; font-size: 14px; }
+.alg-ts .ts-controls button { padding: 0 12px; font-size: 14px; }
+.alg-ts .ts-tabs { display: flex; flex: none; gap: 0; }
+.alg-ts .ts-tabs button { border-radius: 0; }
+.alg-ts .ts-tabs button:first-child { border-radius: 999px 0 0 999px; }
+.alg-ts .ts-tabs button:last-child { margin-left: -1.5px; border-radius: 0 999px 999px 0; }
+.alg-ts .ts-tabs button[aria-pressed="true"] { border-color: var(--ds-link); background: var(--ds-surface-strong); color: var(--ds-link); }
+.alg-ts .ts-group { display: flex; flex: 1; min-width: 0; align-items: center; gap: 8px; }
+.alg-ts .ts-group[hidden] { display: none; }
+.alg-ts #ts-words { flex: 1; }
+.alg-ts #ts-prefix { width: 90px; }
+.alg-ts #ts-text { flex: 1; font-family: Consolas, Monaco, monospace; }
+.alg-ts .ts-main { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.alg-ts .ts-main.is-suffix { grid-template-columns: 250px minmax(0, 1fr); }
+.alg-ts .ts-panel { position: relative; min-width: 0; min-height: 0; overflow: hidden; padding: 6px 8px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.alg-ts .ts-panel h2 { margin: 0 0 4px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.alg-ts .ts-tree-panel { display: flex; flex-direction: column; }
+.alg-ts .ts-svg { display: block; flex: 1; width: 100%; min-height: 0; }
+.alg-ts .ts-sa[hidden] { display: none; }
+.alg-ts table.ts-table { width: 100%; margin: 0; font-size: 13px; line-height: 1.2; }
+.alg-ts .ts-table th, .alg-ts .ts-table td { padding: 2px 5px; border-width: 1px; text-align: center; }
+.alg-ts .ts-table td.ts-suf { font-family: Consolas, Monaco, monospace; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+.alg-ts .ts-table tbody tr { cursor: pointer; }
+.alg-ts .ts-table tbody tr:hover td { background: var(--ds-surface-strong); }
+.alg-ts .ts-table tbody tr.is-sel td { background: var(--ds-hot); color: var(--ds-text); font-weight: 700; }
+.alg-ts .ts-edge { stroke: var(--ds-border); stroke-width: 1.5; }
+.alg-ts .ts-edge.is-hot { stroke: var(--ds-accent); stroke-width: 3; }
+.alg-ts .ts-node circle { fill: var(--ds-node); stroke: var(--ds-link); stroke-width: 1.5; }
+.alg-ts .ts-node text { fill: var(--ds-text); font: 700 13px Consolas, Monaco, monospace; text-anchor: middle; dominant-baseline: central; }
+.alg-ts .ts-node.is-end circle { fill: var(--ds-link); }
+.alg-ts .ts-node.is-end text { fill: var(--ds-bg); }
+.alg-ts .ts-node.is-hot circle { fill: var(--ds-hot); stroke: var(--ds-accent); stroke-width: 2.5; }
+.alg-ts .ts-node.is-hot text { fill: var(--ds-text); }
+.alg-ts .ts-node.is-root circle { fill: var(--ds-surface-strong); }
+.alg-ts .ts-legend { position: absolute; right: 10px; top: 6px; display: flex; gap: 12px; color: var(--ds-muted); font-size: 12px; }
+.alg-ts .ts-legend span::before { content: ""; display: inline-block; width: 11px; height: 11px; margin-right: 4px; vertical-align: -1px; border-radius: 50%; border: 1.5px solid var(--ds-link); }
+.alg-ts .ts-legend .l-end::before { background: var(--ds-link); }
+.alg-ts .ts-legend .l-hot::before { background: var(--ds-hot); border-color: var(--ds-accent); }
+.alg-ts .ts-status { flex: none; margin: 0; overflow: hidden; font-size: 14px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+</style>
+
+<div class="alg-ts algo-stage algo-stage--stage" lang="tr">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Bölüm 5 · Simülasyon</p><h1>Trie, Sonek Dizisi ve Sonek Trie'si</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="ts-help" aria-label="Bilgi ve yardım">?</button>
+    <a class="algo-stage__back" href="Bolum_05_Tries.html">← Bölüm 5</a>
+  </header>
+
+  <div class="algo-stage__body">
+    <div class="ts-body">
+      <div class="ts-controls">
+        <div class="ts-tabs" role="group" aria-label="Yapı">
+          <button type="button" id="ts-tab-trie" aria-pressed="true">Trie</button>
+          <button type="button" id="ts-tab-suffix" aria-pressed="false">Sonek</button>
+        </div>
+        <div class="ts-group" id="ts-group-trie">
+          <input id="ts-words" value="kan, kar, kart, top" aria-label="Virgülle ayrılmış sözcükler" spellcheck="false" autocomplete="off">
+          <input id="ts-prefix" value="kar" aria-label="Önek" spellcheck="false" autocomplete="off">
+          <button id="ts-build" type="button" class="is-primary">Kur / Önek Ara</button>
+        </div>
+        <div class="ts-group" id="ts-group-suffix" hidden>
+          <label for="ts-text">Metin</label>
+          <input id="ts-text" value="banana" maxlength="16" spellcheck="false" autocomplete="off">
+          <button id="ts-suffix" type="button" class="is-primary">Sonek Yapılarını Kur</button>
+        </div>
+      </div>
+
+      <div class="ts-main" id="ts-main">
+        <section class="ts-panel ts-sa" id="ts-sa" hidden>
+          <h2>Sonek dizisi (satıra tıklayın)</h2>
+          <table class="ts-table">
+            <thead><tr><th>sıra</th><th>SA</th><th>sonek</th><th>LCP</th></tr></thead>
+            <tbody id="ts-sa-body"></tbody>
+          </table>
+        </section>
+        <section class="ts-panel ts-tree-panel">
+          <h2 id="ts-tree-title">Trie</h2>
+          <div class="ts-legend" aria-hidden="true"><span class="l-end" id="ts-legend-end">sözcük sonu</span><span class="l-hot">arama yolu</span></div>
+          <svg id="ts-svg" class="ts-svg" role="img" aria-label="Ağaç çizimi"></svg>
+        </section>
+      </div>
+
+      <p id="ts-status" class="ts-status" role="status">Hazır.</p>
+    </div>
+  </div>
+
+  <dialog class="algo-stage__dialog" id="ts-help">
+    <button type="button" class="algo-stage__close">Kapat</button>
+    <h2>Trie, Sonek Dizisi ve Sonek Trie'si</h2>
+    <p>Sözcüklerden bir trie kurulur, önek sorguları incelenir ve sonek dizisinin sıralaması sonek trie'sinin saklama biçimiyle karşılaştırılır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><strong>Trie</strong>: virgülle ayrılmış sözcükler (en çok 10 sözcük, her biri en çok 12 harf) ve bir önek girin, ardından <strong>Kur / Önek Ara</strong> düğmesine basın. Arama yolu vurgulanır; dolu düğümler sözcük sonunu gösterir.</li>
+      <li><strong>Sonek</strong>: en çok 16 karakterlik bir metin girin ve <strong>Sonek Yapılarını Kur</strong> düğmesine basın. Sonek dizisi solda listelenir, kaba kuvvet sonek trie'si sağda çizilir.</li>
+      <li>Sonek dizisinde bir satıra tıklayınca o sonekin sonek trie'sindeki yolu vurgulanır. Giriş alanında Enter da yeniden kurar.</li>
+    </ul>
+    <h3>Trie</h3>
+    <p>Her kenar bir karakter saklar; ortak öneki olan tüm sözcükler kökten aynı yolu paylaşır. Önek sorgusu en çok |p| kenar aşağı iner; bu yüzden kaç sözcük saklandığından bağımsız olarak O(|p|) zaman alır.</p>
+    <h3>Sonek dizisi ve LCP</h3>
+    <p>Sonek dizisi, soneklerin başlangıç konumlarını sıralı tutar. LCP sütunu, bir sonek ile sıralamada ondan önceki sonekin en uzun ortak önekinin uzunluğunu verir. Sonekler karakter karakter (kod noktası sırasıyla) karşılaştırılır.</p>
+    <h3>Sonek trie'si</h3>
+    <p>Sonek trie'si her soneki kökten başlayan bir yol olarak saklar; kaba kuvvet sonek trie'si O(n²) bellek gerektirebilir. Dolu düğüm bir sonekin sonunu gösterir. Sonek ağaçları tek çocuklu zincirleri sıkıştırarak O(n) belleğe iner.</p>
+    <h3>Karmaşıklık</h3>
+    <table>
+      <tr><th>Yapı</th><th>Kurma</th><th>Bellek</th><th>Sorgu</th></tr>
+      <tr><td>Trie</td><td>O(toplam uzunluk)</td><td>O(toplam uzunluk)</td><td>O(|p|)</td></tr>
+      <tr><td>Sonek dizisi (kaba kuvvet sıralama)</td><td>O(n² log n)</td><td>O(n)</td><td>O(|p| log n)</td></tr>
+      <tr><td>Sonek trie'si (kaba kuvvet)</td><td>O(n²)</td><td>O(n²)</td><td>O(|p|)</td></tr>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.querySelector(".alg-ts");if(!root)return;
+function q(id){return root.querySelector("#"+id);}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c];});}
+var NS="http://www.w3.org/2000/svg";
+var mode="trie",suffixState=null;
+/* düğüm: {ch, kids:{}, end:bool} */
+function buildTrie(words){var r={ch:"",kids:{},end:false};words.forEach(function(w){var n=r;for(var i=0;i<w.length;i++){var c=w[i];if(!n.kids[c])n.kids[c]={ch:c,kids:{},end:false};n=n.kids[c];}n.end=true;});return r;}
+function countNodes(n){var k=1;Object.keys(n.kids).forEach(function(c){k+=countNodes(n.kids[c]);});return k;}
+function cmp(a,b){return a<b?-1:a>b?1:0;}
+function vis(ch){return ch===" "?"␣":ch;}
+/* ağaç çizimi: yapraklar soldan sağa yuvalara, iç düğüm çocuklarının ortasına */
+function drawTree(trie,hotPath){
+  var svg=q("ts-svg");
+  var W=svg.clientWidth||700,H=svg.clientHeight||400;
+  svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var leaves=0,depth=0,list=[];
+  (function place(n,d){
+    depth=Math.max(depth,d);
+    var keys=Object.keys(n.kids).sort(cmp);
+    n.d=d;
+    if(!keys.length){n.slot=leaves++;}
+    else{keys.forEach(function(k){place(n.kids[k],d+1);});n.slot=(n.kids[keys[0]].slot+n.kids[keys[keys.length-1]].slot)/2;}
+    list.push(n);
+  })(trie,0);
+  var D=Math.max(1,depth),slotW=(W-16)/Math.max(1,leaves);
+  var r=Math.max(8,Math.min(13,slotW/2-2,(H-34)/D/2-2));
+  var levelH=Math.min(56,(H-8-2*r)/D);
+  function X(n){return 8+slotW*(n.slot+0.5);}
+  function Y(n){return 4+r+n.d*levelH;}
+  var hot=new Set(hotPath||[]);
+  var gE=document.createElementNS(NS,"g"),gN=document.createElementNS(NS,"g");
+  svg.appendChild(gE);svg.appendChild(gN);
+  list.forEach(function(n){
+    Object.keys(n.kids).forEach(function(k){
+      var c=n.kids[k],l=document.createElementNS(NS,"line");
+      l.setAttribute("x1",X(n));l.setAttribute("y1",Y(n));l.setAttribute("x2",X(c));l.setAttribute("y2",Y(c));
+      l.setAttribute("class","ts-edge"+(hot.has(c)?" is-hot":""));gE.appendChild(l);
+    });
+    var g=document.createElementNS(NS,"g");
+    g.setAttribute("class","ts-node"+(n===trie?" is-root":"")+(n.end?" is-end":"")+(hot.has(n)?" is-hot":""));
+    var ci=document.createElementNS(NS,"circle");ci.setAttribute("cx",X(n));ci.setAttribute("cy",Y(n));ci.setAttribute("r",n===trie?r*0.7:r);g.appendChild(ci);
+    if(n!==trie){var t=document.createElementNS(NS,"text");t.setAttribute("x",X(n));t.setAttribute("y",Y(n));t.textContent=vis(n.ch);g.appendChild(t);}
+    gN.appendChild(g);
+  });
+}
+function walk(trie,s){var path=[trie],n=trie;for(var i=0;i<s.length;i++){n=n.kids[s[i]];if(!n)return {path:path,ok:false};path.push(n);}return {path:path,ok:true,node:n};}
+function collect(n,pre,out){if(n.end)out.push(pre);Object.keys(n.kids).sort(cmp).forEach(function(k){collect(n.kids[k],pre+k,out);});return out;}
+function setMode(m){
+  mode=m;
+  q("ts-tab-trie").setAttribute("aria-pressed",String(m==="trie"));
+  q("ts-tab-suffix").setAttribute("aria-pressed",String(m==="suffix"));
+  q("ts-group-trie").hidden=m!=="trie";q("ts-group-suffix").hidden=m!=="suffix";
+  q("ts-sa").hidden=m!=="suffix";q("ts-main").classList.toggle("is-suffix",m==="suffix");
+  q("ts-tree-title").textContent=m==="trie"?"Trie":"Sonek trie'si (kaba kuvvet)";
+  q("ts-legend-end").textContent=m==="trie"?"sözcük sonu":"sonek sonu";
+  if(m==="trie")trieRun();else suffixRun();
+}
+function trieRun(){
+  var raw=q("ts-words").value.split(",").map(function(s){return s.trim().toLowerCase();}).filter(Boolean);
+  if(!raw.length){drawTree({ch:"",kids:{},end:false},[]);q("ts-status").textContent="En az bir sözcük girin.";return;}
+  var note="";
+  var words=raw.slice(0,10).map(function(w){return w.slice(0,12);});
+  if(raw.length>10||raw.some(function(w){return w.length>12;}))note=" (10 sözcük × 12 harfle sınırlandı)";
+  var p=q("ts-prefix").value.trim().toLowerCase(),trie=buildTrie(words),res=walk(trie,p);
+  drawTree(trie,res.ok?res.path:res.path);
+  var msg;
+  if(!p)msg="Boş önek: her sözcük eşleşir.";
+  else if(res.ok){var found=collect(res.node,p,[]);msg="“"+p+"” öneki bulundu · sözcükler: "+(found.length?found.join(", "):"yok");}
+  else{var got=p.slice(0,res.path.length-1);msg="“"+p+"” öneki bulunamadı: "+(got?"yol “"+got+"” sonrasında kesiliyor":"“"+p[0]+"” ile başlayan sözcük yok")+".";}
+  q("ts-status").textContent=msg+" · "+countNodes(trie)+" düğüm"+note;
+}
+function suffixRun(){
+  var text=q("ts-text").value;
+  if(!text.trim()){suffixState=null;q("ts-sa-body").innerHTML="";drawTree({ch:"",kids:{},end:false},[]);q("ts-status").textContent="Boş olmayan bir dizgi girin.";return;}
+  var note="";
+  if(text.length>16){text=text.slice(0,16);q("ts-text").value=text;note=" (16 karakterle sınırlandı)";}
+  var suffixes=[];
+  for(var i=0;i<text.length;i++)suffixes.push({i:i,s:text.slice(i)});
+  /* kod noktası sırası (localeCompare büyük/küçük harfi ve noktalamayı farklı sıralar) */
+  suffixes.sort(function(a,b){return cmp(a.s,b.s);});
+  var trie=buildTrie(suffixes.map(function(x){return x.s;}));
+  suffixState={text:text,suffixes:suffixes,trie:trie,sel:-1};
+  var rows="";
+  suffixes.forEach(function(x,k){
+    var lcp=0;if(k>0){var p=suffixes[k-1].s;while(lcp<p.length&&lcp<x.s.length&&p[lcp]===x.s[lcp])lcp++;}
+    rows+="<tr data-k='"+k+"'><td>"+k+"</td><td>"+x.i+"</td><td class='ts-suf' title='"+escapeHtml(x.s)+"'>"+escapeHtml(x.s.replace(/ /g,"␣"))+"</td><td>"+(k?lcp:"–")+"</td></tr>";
+  });
+  q("ts-sa-body").innerHTML=rows;
+  drawTree(trie,[]);
+  var nodes=countNodes(trie)-1;
+  q("ts-status").textContent="n = "+text.length+" · sonek dizisi: "+text.length+" kayıt · sonek trie'si: "+nodes+" düğüm (en çok n(n+1)/2 = "+(text.length*(text.length+1)/2)+")"+note;
+}
+q("ts-sa-body").addEventListener("click",function(e){
+  var tr=e.target.closest("tr[data-k]");if(!tr||!suffixState)return;
+  var k=+tr.getAttribute("data-k");suffixState.sel=k;
+  Array.prototype.forEach.call(q("ts-sa-body").children,function(row,j){row.classList.toggle("is-sel",j===k);});
+  var x=suffixState.suffixes[k];
+  drawTree(suffixState.trie,walk(suffixState.trie,x.s).path);
+  q("ts-status").textContent="Sonek "+x.i+": “"+x.s+"” · sıra "+k+" · yol uzunluğu "+x.s.length;
+});
+q("ts-tab-trie").addEventListener("click",function(){setMode("trie");});
+q("ts-tab-suffix").addEventListener("click",function(){setMode("suffix");});
+q("ts-build").addEventListener("click",trieRun);q("ts-suffix").addEventListener("click",suffixRun);
+["ts-words","ts-prefix"].forEach(function(id){q(id).addEventListener("keydown",function(e){if(e.key==="Enter")trieRun();});});
+q("ts-text").addEventListener("keydown",function(e){if(e.key==="Enter")suffixRun();});
+setMode("trie");
+})();
+</script>
+<script src="deck/stage.js"></script>

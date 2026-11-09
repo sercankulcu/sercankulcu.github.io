@@ -1,0 +1,796 @@
+---
+layout: without-sidebar
+title: "Canlı Sınıf Oyunları"
+permalink: /files/agt/canli/
+excerpt: "Algoritmik Oyun Kuramı dersi için canlı sınıf oyunları: 2/3 ortalaması, kapalı zarf açık artırma, Mahkûmun İkilemi ve Condorcet oylaması. Öğrenciler telefonla oda koduyla katılır, sonuçlar tahtada canlı güncellenir."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../slides/deck/oyun.css">
+<link rel="stylesheet" href="canli.css">
+
+<div class="canli canli--sunucu agt-oyun agt-oyun--stage" id="uygulama" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles">
+      <p class="agt-oyun__kicker">Canlı Sınıf · Oyun <span class="durum" id="ustDurum"></span></p>
+      <h1 id="baslik">Canlı Sınıf Oyunları</h1>
+    </div>
+    <button type="button" class="agt-oyun__help" aria-controls="canli-yardim" aria-label="Açıklama ve kurallar">?</button>
+    <a class="agt-oyun__back" href="https://sercankulcu.github.io/teaching/algorithmic-game-theory">← Ders</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="bilgi" id="ekYukleniyor"><p>Bağlanıyor…</p></div>
+
+    <div class="bilgi" id="ekKurulum" hidden>
+      <h2>Kurulum tamamlanmadı</h2>
+      <p>Canlı oyunlar için bir Firebase projesi gerekir. Yapılandırma <code>firebase-config.js</code> dosyasına yapıştırılınca bu sayfa çalışır.</p>
+      <p><a href="KURULUM">Kurulum ve kullanım kılavuzu</a></p>
+      <p class="ipucu">Kurulumsuz deneme: adresin sonuna <code>?test=1</code> ekleyin (yalnızca bu tarayıcının sekmeleri arasında çalışır).</p>
+    </div>
+
+    <div class="bilgi" id="ekHata" hidden>
+      <h2>Bağlantı kurulamadı</h2>
+      <p id="hataMetni"></p>
+      <p><a href="KURULUM">Kurulum ve kullanım kılavuzu</a></p>
+    </div>
+
+    <section class="secim" id="ekSec" hidden aria-labelledby="secBaslik">
+      <h2 id="secBaslik">Oyun seçin</h2>
+    </section>
+
+    <div class="oda" id="ekOda" hidden>
+      <aside class="yan" aria-label="Oda">
+        <div class="kod-etiket">Oda kodu <span class="rozet test" id="testRozet" hidden>Test</span></div>
+        <div class="kod" id="odaKodu">----</div>
+        <div class="qr" id="qr" role="img" aria-label="Katılım adresinin QR kodu"></div>
+        <div class="adres" id="adres"></div>
+        <div class="sayac" aria-live="polite"><span id="katilimci">0</span> katılımcı</div>
+        <button type="button" class="birincil" id="btnBaslat">Turu başlat</button>
+        <button type="button" id="btnKapat">Cevapları kapat</button>
+        <button type="button" id="btnSonuc">Sonuçları göster</button>
+        <button type="button" id="btnYeni">Yeni tur</button>
+        <button type="button" class="tehlike kapat" id="btnOdaKapat">Odayı kapat</button>
+      </aside>
+      <main class="sahne" id="sahne" aria-live="polite"></main>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="canli-yardim" lang="tr">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Canlı sınıf oyunları</h2>
+    <p>Öğretmen bu ekranda bir oyun seçip oda açar; öğrenciler telefonla QR kodu okutarak ya da <strong>katil.html</strong> sayfasına oda kodunu yazarak katılır. Hesap açılmaz; yalnızca takma ad saklanır.</p>
+    <h3>Kullanım</h3>
+    <ol>
+      <li><strong>Turu başlat</strong>: soru öğrencilerin telefonunda açılır; sağda kaç kişinin cevap verdiği görünür.</li>
+      <li><strong>Cevapları kapat</strong>, ardından <strong>Sonuçları göster</strong>: sonuç tahtada ve her öğrencinin telefonunda görünür.</li>
+      <li><strong>Yeni tur</strong> aynı odada oyunu tekrarlar (öğrenme ve tekrarlı oyun için). <strong>Odayı kapat</strong> bütün cevapları siler.</li>
+      <li>Projeksiyonda ⛶ düğmesi sahneyi tam ekrana büyütür.</li>
+    </ol>
+    <div data-yardim="ortalama" hidden>
+      <h3>2/3 Ortalaması (Bölüm 2)</h3>
+      <p>Her öğrenci 0 ile 90 arasında bir sayı yazar (tam ya da ondalıklı). Bütün sayıların <strong>ortalamasının 2/3'üne</strong> en yakın sayı kazanır; eşitlikte kazanç paylaşılır. Baskın olunan stratejilerin art arda elenmesi tek dengeye, 0'a götürür; tekrarlanan turlarda tahminler 0'a doğru iner.</p>
+    </div>
+    <div data-yardim="artirma" hidden>
+      <h3>Kapalı Zarf Açık Artırma (Bölüm 5)</h3>
+      <p>Her öğrencinin telefonunda 0–100 TL arası gizli bir <strong>değer</strong> vardır; öğrenci kapalı zarfa 0–200 TL arası bir teklif yazar. Teklifler 4'erli rastgele gruplarda (ya da tüm sınıfta) karşılaştırılır; en yüksek teklif kazanır, eşitlikte önce gönderen kazanır. Aynı teklifler iki kuralla sonuçlanır: <strong>birinci fiyat</strong> (kazanan kendi teklifini öder) ve <strong>ikinci fiyat</strong> (kazanan ikinci en yüksek teklifi öder). Kazanç = değer − ödenen fiyat.</p>
+      <p>Grafikte y = x doğrusu ikinci fiyattaki dürüst teklifi, b = (n−1)v/n doğrusu birinci fiyattaki denge teklifini (n kişilik grup, değerler düzgün dağılımlı) gösterir.</p>
+    </div>
+    <div data-yardim="ikilem" hidden>
+      <h3>Mahkûmun İkilemi (Bölüm 3)</h3>
+      <p>Öğrenciler rastgele ikili eşleşir ve rakibinin seçimini bilmeden <strong>Sessiz</strong> kalır ya da <strong>İhanet</strong> eder. Kazanç = −(hapis yılı): büyük sayı iyidir.</p>
+      <table><tr><th></th><th>Rakip: Sessiz</th><th>Rakip: İhanet</th></tr><tr><th>Sen: Sessiz</th><td>(−1, −1)</td><td>(−3, 0)</td></tr><tr><th>Sen: İhanet</th><td>(0, −3)</td><td>(−2, −2)</td></tr></table>
+      <p>Tek kalan öğrenci bilgisayarla eşleşir: bilgisayar Tit-for-Tat oynar (ilk tur sessiz, sonra öğrencinin bir önceki seçimini kopyalar). "Aynı eşleşmeyle tekrarla" seçilirse eşleşmeler turlar boyunca korunur (tekrarlı oyun).</p>
+    </div>
+    <div data-yardim="oylama" hidden>
+      <h3>Condorcet Oylaması (Bölüm 7)</h3>
+      <p>Her öğrenci üç adayı en çok tercih ettiğinden en aza sıralar. Her aday çifti ikili çoğunlukla karşılaştırılır; bütün rakiplerini yenen aday <strong>Condorcet kazananı</strong> olur. Böyle bir aday yoksa çoğunluk tercihleri bir döngü oluşturur (Condorcet paradoksu). Aynı oylar çoğulluk, Borda sayımı ve anında ikinci tur kurallarıyla da sayılır.</p>
+    </div>
+  </dialog>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="firebase-config.js"></script>
+<script src="canli.js"></script>
+<script src="../slides/deck/oyun.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.Canli;
+  var K = null, kod = null, oda = null, abonelik = null, qrKod = null;
+  var bekleyen = {};
+  var $ = function (id) { return document.getElementById(id); };
+  var e = C.kacis, b = C.bicim;
+  var ODA_ANAHTAR = 'canli-sunucu-oda', ODALAR_ANAHTAR = 'canli-sunucu-odalar';
+
+  function goster(id) {
+    ['ekYukleniyor', 'ekKurulum', 'ekHata', 'ekSec', 'ekOda'].forEach(function (x) { $(x).hidden = x !== id; });
+  }
+  function depo(k, v) {
+    try {
+      if (v === undefined) return JSON.parse(localStorage.getItem(k));
+      if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v));
+    } catch (err) { return null; }
+  }
+  function hata(err) {
+    console.error(err);
+    $('ustDurum').textContent = 'Hata: ' + (err && (err.code || err.message) || err);
+  }
+
+  /* ---------- açılış ---------- */
+  C.baglan().then(function (k) {
+    if (!k) { goster('ekKurulum'); return; }
+    K = k;
+    $('testRozet').hidden = K.tur !== 'test';
+    eskileriTemizle();
+    oyunKartlari();
+    var son = depo(ODA_ANAHTAR);
+    if (son) {
+      K.get('rooms/' + son + '/meta').then(function (m) {
+        if (m && m.sahip === K.uid) gir(son); else { depo(ODA_ANAHTAR, null); goster('ekSec'); }
+      }, function () { goster('ekSec'); });
+    } else goster('ekSec');
+  }, function (err) {
+    console.error(err);
+    $('hataMetni').textContent = String(err && (err.code || err.message) || err);
+    goster('ekHata');
+  });
+
+  /* 24 saatten eski odalarımızı sil */
+  function eskileriTemizle() {
+    var liste = depo(ODALAR_ANAHTAR) || [], kalan = [];
+    liste.forEach(function (o) {
+      if (Date.now() - o.t > C.GUN) K.remove('rooms/' + o.kod).catch(function () {});
+      else kalan.push(o);
+    });
+    depo(ODALAR_ANAHTAR, kalan);
+  }
+
+  function oyunKartlari() {
+    var s = $('ekSec');
+    C.SIRA.forEach(function (oyun) {
+      var o = C.OYUNLAR[oyun];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'oyun-kart';
+      btn.innerHTML = '<b>' + e(o.ad) + '</b><span class="ipucu">Bölüm ' + o.bolum + ' · oda oluştur</span>';
+      btn.addEventListener('click', function () { odaKur(oyun); });
+      s.appendChild(btn);
+    });
+  }
+
+  function varsayilanAyar(oyun) {
+    if (oyun === 'artirma') return { mod: 'grup4' };
+    if (oyun === 'ikilem') return { tekrar: false };
+    if (oyun === 'oylama') return { adaylar: ['A', 'B', 'C'] };
+    return {};
+  }
+
+  function odaKur(oyun) {
+    var deneme = 0;
+    $('ustDurum').textContent = 'Oda oluşturuluyor…';
+    (function dene() {
+      var k = C.odaKodu();
+      var meta = { oyun: oyun, durum: 'bekliyor', tur: 1, sahip: K.uid, olusturma: Date.now(), ayar: varsayilanAyar(oyun) };
+      K.odaOlustur(k, meta).then(function (ok) {
+        if (ok) {
+          var liste = depo(ODALAR_ANAHTAR) || [];
+          liste.push({ kod: k, t: Date.now() });
+          depo(ODALAR_ANAHTAR, liste);
+          gir(k);
+          return;
+        }
+        if (++deneme > 25) { hata('Boş oda kodu bulunamadı.'); return; }
+        /* kod dolu: 24 saatten eskiyse silip yeniden dene, değilse başka kod */
+        return K.get('rooms/' + k + '/meta').then(function (m) {
+          if (m && Date.now() - m.olusturma > C.GUN) return K.remove('rooms/' + k).then(dene, dene);
+          dene();
+        });
+      }).catch(hata);
+    })();
+  }
+
+  function gir(k) {
+    kod = k;
+    depo(ODA_ANAHTAR, k);
+    goster('ekOda');
+    $('odaKodu').textContent = k;
+    var url = new URL('katil.html', location.href);
+    url.search = '';
+    url.hash = '';
+    url.searchParams.set('oda', k);
+    if (K.tur === 'test') url.searchParams.set('test', '1');
+    $('adres').textContent = url.host + url.pathname + '?oda=' + k;
+    var qr = $('qr');
+    qr.innerHTML = '';
+    if (window.QRCode) {
+      qrKod = new QRCode(qr, { text: url.href, width: 250, height: 250, colorDark: css('--c-qr-fg'), colorLight: css('--c-qr-bg'), correctLevel: QRCode.CorrectLevel.M });
+    } else qr.textContent = 'QR kodu yüklenemedi';
+    qr.setAttribute('aria-label', 'Katılım adresinin QR kodu: ' + url.href);
+    if (abonelik) abonelik();
+    abonelik = K.on('rooms/' + k, function (v) {
+      if (!v || !v.meta) {
+        if (kod === k) { kod = null; oda = null; depo(ODA_ANAHTAR, null); goster('ekSec'); baslikYaz(); }
+        return;
+      }
+      oda = v;
+      gecKatilanlar();
+      ciz();
+    });
+  }
+
+  function css(ad) { return getComputedStyle(document.documentElement).getPropertyValue(ad).trim() || undefined; }
+
+  /* ---------- oda verisi yardımcıları ---------- */
+  function meta() { return oda.meta; }
+  function ayar() { return oda.meta.ayar || {}; }
+  function oyuncular() { return oda.players || {}; }
+  function oyuncuIdleri() {
+    var p = oyuncular();
+    return Object.keys(p).sort(function (a, c) { return (p[a].katilma || 0) - (p[c].katilma || 0); });
+  }
+  function ad(uid) {
+    if (uid === C.PC) return 'Bilgisayar';
+    var p = oyuncular()[uid];
+    return p && p.ad ? p.ad : 'Öğrenci';
+  }
+  function cevaplar(tur) { return (oda.answers && oda.answers[tur]) || {}; }
+  function sonuc(tur) { return (oda.results && oda.results[tur]) || null; }
+
+  /* Tur açıkken sonradan katılanlara değer ya da eş ver. */
+  function gecKatilanlar() {
+    var m = meta();
+    if (m.durum !== 'acik') return;
+    var ids = oyuncuIdleri(), up = {};
+    if (m.oyun === 'artirma') {
+      var priv = oda['private'] || {};
+      var eksik = ids.filter(function (u) { return !(priv[u] && priv[u].tur === m.tur) && !bekleyen['p' + m.tur + u]; });
+      var d = C.degerAta(eksik);
+      eksik.forEach(function (u) { bekleyen['p' + m.tur + u] = 1; up['private/' + u] = { deger: d[u], tur: m.tur }; });
+    }
+    if (m.oyun === 'ikilem') {
+      var es = (oda.pairs && oda.pairs[m.tur]) || {};
+      ids.forEach(function (u) {
+        if (!es[u] && !bekleyen['e' + m.tur + u]) { bekleyen['e' + m.tur + u] = 1; up['pairs/' + m.tur + '/' + u] = C.PC; }
+      });
+    }
+    if (Object.keys(up).length) K.update('rooms/' + kod, up).catch(hata);
+  }
+
+  /* ---------- düğmeler ---------- */
+  $('btnBaslat').addEventListener('click', function () {
+    var m = meta(), ids = oyuncuIdleri(), up = { 'meta/durum': 'acik' };
+    if (!ids.length) { $('ustDurum').textContent = 'Henüz katılan yok.'; return; }
+    if (m.oyun === 'artirma') {
+      var d = C.degerAta(ids);
+      ids.forEach(function (u) { bekleyen['p' + m.tur + u] = 1; up['private/' + u] = { deger: d[u], tur: m.tur }; });
+    }
+    if (m.oyun === 'ikilem') {
+      var onceki = ayar().tekrar && oda.pairs ? oda.pairs[m.tur - 1] : null;
+      var es = C.ikilemEslestir(ids, null, onceki);
+      ids.forEach(function (u) { bekleyen['e' + m.tur + u] = 1; });
+      up['pairs/' + m.tur] = es;
+    }
+    K.update('rooms/' + kod, up).catch(hata);
+  });
+
+  $('btnKapat').addEventListener('click', function () {
+    K.update('rooms/' + kod + '/meta', { durum: 'kapali' }).catch(hata);
+  });
+
+  $('btnSonuc').addEventListener('click', function () {
+    var r = hesapla();
+    var up = { 'meta/durum': 'sonuc' };
+    up['results/' + meta().tur] = r;
+    K.update('rooms/' + kod, up).catch(hata);
+  });
+
+  $('btnYeni').addEventListener('click', function () {
+    K.update('rooms/' + kod + '/meta', { tur: meta().tur + 1, durum: 'bekliyor' }).catch(hata);
+  });
+
+  $('btnOdaKapat').addEventListener('click', function () {
+    if (!window.confirm('Oda ' + kod + ' kapatılsın mı? Bütün cevaplar ve sonuçlar silinir.')) return;
+    var k = kod;
+    depo(ODA_ANAHTAR, null);
+    depo(ODALAR_ANAHTAR, (depo(ODALAR_ANAHTAR) || []).filter(function (o) { return o.kod !== k; }));
+    K.remove('rooms/' + k).catch(hata);
+  });
+
+  /* ---------- sonuç hesabı (saf fonksiyonlar canli.js'te) ---------- */
+  function adlarEkle(r, ids) {
+    r.adlar = {};
+    ids.forEach(function (u) { if (u !== C.PC) r.adlar[u] = ad(u); });
+    return r;
+  }
+
+  function hesapla() {
+    var m = meta(), cv = cevaplar(m.tur), ids = Object.keys(cv), r;
+    if (m.oyun === 'ortalama') {
+      var t = {};
+      ids.forEach(function (u) { if (typeof cv[u].sayi === 'number') t[u] = cv[u].sayi; });
+      r = C.ortalamaSonuc(t);
+      return adlarEkle(r, Object.keys(r.kisi));
+    }
+    if (m.oyun === 'artirma') {
+      var priv = oda['private'] || {}, liste = [];
+      ids.forEach(function (u) {
+        var p = priv[u];
+        if (p && p.tur === m.tur && typeof cv[u].teklif === 'number') liste.push({ uid: u, teklif: cv[u].teklif, deger: p.deger, zaman: cv[u].zaman });
+      });
+      r = C.artirmaSonuc(liste, ayar().mod);
+      return adlarEkle(r, Object.keys(r.kisi));
+    }
+    if (m.oyun === 'ikilem') {
+      var es = (oda.pairs && oda.pairs[m.tur]) || {}, sec = {}, onc = {}, ocv = cevaplar(m.tur - 1);
+      ids.forEach(function (u) { sec[u] = cv[u].secim; });
+      Object.keys(ocv).forEach(function (u) { onc[u] = ocv[u].secim; });
+      r = C.ikilemSonuc(es, sec, onc);
+      /* toplam kazanç: önceki turların sonuçları + bu tur */
+      Object.keys(r.kisi).forEach(function (u) {
+        var top = r.kisi[u].kazanc;
+        for (var t = 1; t < m.tur; t++) {
+          var s = sonuc(t);
+          if (s && s.kisi && s.kisi[u]) top += s.kisi[u].kazanc;
+        }
+        r.kisi[u].toplam = top;
+      });
+      return adlarEkle(r, Object.keys(r.kisi));
+    }
+    var adaylar = C.dizi(ayar().adaylar);
+    if (adaylar.length !== 3) adaylar = ['A', 'B', 'C'];
+    var siralar = [], kisi = {};
+    ids.forEach(function (u) { if (cv[u].sira) { siralar.push(cv[u].sira); kisi[u] = { sira: cv[u].sira }; } });
+    r = C.oylamaSonuc(siralar, 3);
+    /* Firebase sayısal görünen anahtarları diziye çevirebilir: profil C.SIRALAR sırasında dizi olarak saklanır */
+    r.profil = C.SIRALAR.map(function (s) { return r.profil[s] || 0; });
+    r.adaylar = adaylar;
+    r.kisi = kisi;
+    return adlarEkle(r, Object.keys(kisi));
+  }
+
+  /* ---------- çizim ---------- */
+  var DURUM_AD = { bekliyor: 'Bekliyor', acik: 'Açık', kapali: 'Kapandı', sonuc: 'Sonuç' };
+
+  function baslikYaz() {
+    var oyun = oda ? meta().oyun : null;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-yardim]'), function (d) { d.hidden = d.getAttribute('data-yardim') !== oyun; });
+    if (!oda) {
+      $('baslik').textContent = 'Canlı Sınıf Oyunları';
+      $('ustDurum').textContent = '';
+      return;
+    }
+    var o = C.OYUNLAR[oyun];
+    $('baslik').textContent = o.ad;
+    $('ustDurum').innerHTML = 'Tur ' + meta().tur + ' · <span class="rozet' + (meta().durum === 'acik' ? ' acik' : '') + '">' + DURUM_AD[meta().durum] + '</span>';
+  }
+
+  function ciz() {
+    var m = meta(), d = m.durum, n = oyuncuIdleri().length;
+    baslikYaz();
+    $('katilimci').textContent = n;
+    $('btnBaslat').disabled = d !== 'bekliyor';
+    $('btnKapat').disabled = d !== 'acik';
+    $('btnSonuc').disabled = d !== 'acik' && d !== 'kapali';
+    $('btnYeni').disabled = d !== 'sonuc';
+    ['btnBaslat', 'btnKapat', 'btnSonuc', 'btnYeni'].forEach(function (id) { $(id).classList.toggle('birincil', !$(id).disabled); });
+    var s = $('sahne');
+    var odak = document.activeElement && s.contains(document.activeElement) ? document.activeElement.id : null;
+    /* bekleme ekranında yalnız katılan listesi değişiyorsa ayar kutularını yeniden çizme (yazarken odak kaybolmasın) */
+    var anahtar = d + m.tur + JSON.stringify(ayar());
+    if (d === 'bekliyor' && s.dataset.anahtar === anahtar && $('adListe')) {
+      $('adListe').innerHTML = adListesi(null);
+      $('adSayi').textContent = n;
+      return;
+    }
+    s.dataset.anahtar = anahtar;
+    if (d === 'bekliyor') s.innerHTML = bekleme();
+    else if (d === 'acik' || d === 'kapali') s.innerHTML = cevapDurumu();
+    else s.innerHTML = sonucGorunumu();
+    ayarBagla();
+    if (odak && $(odak)) $(odak).focus();
+  }
+
+  function adListesi(isaretli) {
+    var ids = oyuncuIdleri();
+    if (!ids.length) return '<p class="not">Henüz katılan yok. Öğrenciler QR kodu okutarak ya da oda kodunu girerek katılır.</p>';
+    return '<ul class="adlar">' + ids.map(function (u) {
+      return '<li' + (isaretli && isaretli[u] ? ' class="tamam"' : '') + '>' + e(ad(u)) + (isaretli && isaretli[u] ? ' ✓' : '') + '</li>';
+    }).join('') + '</ul>';
+  }
+
+  function ayarlarHtml() {
+    var m = meta(), a = ayar();
+    if (m.oyun === 'artirma') {
+      return '<div class="ayarlar"><label for="ayMod">Açık artırma</label><select id="ayMod">' +
+        '<option value="grup4"' + (a.mod !== 'sinif' ? ' selected' : '') + '>4\'erli rastgele gruplar</option>' +
+        '<option value="sinif"' + (a.mod === 'sinif' ? ' selected' : '') + '>Tüm sınıf tek açık artırma</option></select></div>';
+    }
+    if (m.oyun === 'ikilem') {
+      return '<div class="ayarlar"><label><input type="checkbox" id="ayTekrar"' + (a.tekrar ? ' checked' : '') + '> Aynı eşleşmeyle tekrarla (tekrarlı oyun)</label></div>';
+    }
+    if (m.oyun === 'oylama') {
+      var ad3 = C.dizi(a.adaylar);
+      return '<div class="ayarlar"><span>Adaylar</span>' + [0, 1, 2].map(function (i) {
+        return '<label>' + (i + 1) + '. <input type="text" id="ayAday' + i + '" maxlength="20" value="' + e(ad3[i] || 'ABC'[i]) + '" aria-label="' + (i + 1) + '. aday"></label>';
+      }).join('') + '</div>';
+    }
+    return '';
+  }
+
+  function ayarBagla() {
+    var y = function (o) { K.update('rooms/' + kod + '/meta/ayar', o).catch(hata); };
+    if ($('ayMod')) $('ayMod').addEventListener('change', function () { y({ mod: this.value }); });
+    if ($('ayTekrar')) $('ayTekrar').addEventListener('change', function () { y({ tekrar: this.checked }); });
+    [0, 1, 2].forEach(function (i) {
+      var el = $('ayAday' + i);
+      if (el) el.addEventListener('change', function () {
+        var v = this.value.trim().slice(0, 20) || 'ABC'[i];
+        var o = {}; o['adaylar/' + i] = v;
+        y(o);
+      });
+    });
+  }
+
+  /* sahnedeki kısa görev cümlesi; kuralların tamamı ? penceresinde */
+  function gorevHtml() {
+    var m = meta(), a = ayar(), tr;
+    if (m.oyun === 'ortalama') {
+      tr = '0 ile 90 arasında bir sayı yazın; bütün sayıların <b>ortalamasının 2/3\'üne</b> en yakın sayı kazanır.';
+    } else if (m.oyun === 'artirma') {
+      tr = 'Telefondaki gizli <b>değerinize</b> (0–100 TL) göre kapalı teklif verin (0–200 TL). En yüksek teklif kazanır; sonuç <b>birinci fiyat</b> ve <b>ikinci fiyat</b> kuralıyla hesaplanır.';
+    } else if (m.oyun === 'ikilem') {
+      tr = 'Rakibinizin seçimini bilmeden <b>Sessiz</b> kalın ya da <b>İhanet</b> edin. Kazanç = −(hapis yılı): büyük sayı iyidir.';
+    } else {
+      tr = 'Adayları en çok tercih ettiğinizden en aza sıralayın: <b>' + C.dizi(a.adaylar).map(e).join(', ') + '</b>. Bütün rakiplerini ikili çoğunlukla yenen aday Condorcet kazananıdır.';
+    }
+    var not = '';
+    if (m.oyun === 'artirma') not = '<p class="not">' + (a.mod === 'sinif' ? 'Tüm sınıf tek açık artırma.' : 'Teklifler 4\'erli rastgele gruplarda karşılaştırılır.') + '</p>';
+    if (m.oyun === 'ikilem') not = matrisHtml() + '<p class="not">Tek kalan öğrenci bilgisayarla (Tit-for-Tat) eşleşir.' + (a.tekrar ? ' Eşleşmeler turlar boyunca aynı kalır.' : '') + '</p>';
+    return '<p class="gorev">' + tr + '</p>' + not;
+  }
+
+  /* Bölüm 2/3 Sam–John matrisi; hücrede (sen, rakip) kazanç = −(hapis yılı) */
+  function matrisHtml() {
+    var th = function (tr) { return '<th>' + tr + '</th>'; };
+    return '<table class="tablo matris"><tr><th></th>' + th('Rakip: Sessiz') + th('Rakip: İhanet') + '</tr>' +
+      '<tr>' + th('Sen: Sessiz') + '<td>(−1, −1)</td><td>(−3, 0)</td></tr>' +
+      '<tr>' + th('Sen: İhanet') + '<td>(0, −3)</td><td>(−2, −2)</td></tr></table>';
+  }
+
+  function bekleme() {
+    var m = meta();
+    return '<h2>' + (m.tur > 1 ? 'Tur ' + m.tur + ' hazır' : 'Katılanlar bekleniyor') + '</h2>' + ayarlarHtml() + gorevHtml() +
+      '<p class="alt-baslik">Katılanlar (<span id="adSayi">' + oyuncuIdleri().length + '</span>)</p><div class="ad-kutu" id="adListe">' + adListesi(null) + '</div>';
+  }
+
+  function cevapDurumu() {
+    var m = meta(), cv = cevaplar(m.tur), n = oyuncuIdleri().length, c = Object.keys(cv).length;
+    var oran = n ? Math.min(100, Math.round(100 * c / n)) : 0;
+    var kapali = m.durum === 'kapali';
+    return '<h2>' + (kapali ? 'Cevaplar kapandı' : 'Cevaplar toplanıyor') + '</h2>' + gorevHtml() +
+      '<div class="ilerleme"><b>' + c + '</b><small>/ ' + n + ' cevap</small></div>' +
+      '<div class="cubuk-dis" role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + c + '" aria-label="Cevap verenler"><div class="cubuk-ic" style="width:' + oran + '%"></div></div>' +
+      '<p class="alt-baslik">Cevap verenler</p><div class="ad-kutu">' + adListesi(cv) + '</div>';
+  }
+
+  function istat(etiket, deger, alt, sinif) {
+    return '<div' + (sinif ? ' class="' + sinif + '"' : '') + '><span>' + etiket + '</span><b title="' + e(String(deger).replace(/<[^>]*>/g, '')) + '">' + deger + '</b>' + (alt ? '<small>' + alt + '</small>' : '') + '</div>';
+  }
+
+  function panel(baslik, ic, sinif) {
+    return '<div class="panel' + (sinif ? ' ' + sinif : '') + '"><h3>' + baslik + '</h3>' + ic + '</div>';
+  }
+
+  function sonucGorunumu() {
+    var m = meta(), r = sonuc(m.tur);
+    if (!r) return '<p class="not">Sonuç hesaplanıyor…</p>';
+    if (m.oyun === 'ortalama') return ortalamaGorunum(r);
+    if (m.oyun === 'artirma') return artirmaGorunum(r);
+    if (m.oyun === 'ikilem') return ikilemGorunum(r);
+    return oylamaGorunum(r);
+  }
+
+  function adlariYaz(r, ids) { return ids.map(function (u) { return e((r.adlar && r.adlar[u]) || ad(u)); }).join(', '); }
+
+  /* SVG yardımcıları */
+  var SVG_KAPA = '</svg>';
+  function svgAc(W, H, etiket) {
+    return '<svg class="grafik" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + etiket + '">';
+  }
+  function yazi(sinif, x, y, metin, ek) {
+    return '<text class="' + sinif + '" x="' + x + '" y="' + y + '"' + (ek || '') + '>' + metin + '</text>';
+  }
+  /* etiketleri dikeyde en az `ara` aralıkla yerleştir (çakışmasın) */
+  function ayir(liste, ara, ust, alt) {
+    liste.sort(function (p, q) { return p.y - q.y; });
+    for (var i = 1; i < liste.length; i++) if (liste[i].y - liste[i - 1].y < ara) liste[i].y = liste[i - 1].y + ara;
+    var tasma = liste.length ? liste[liste.length - 1].y - alt : 0;
+    if (tasma > 0) liste.forEach(function (p) { p.y -= tasma; });
+    liste.forEach(function (p) { if (p.y < ust) p.y = ust; });
+    return liste;
+  }
+
+  /* --- 2/3 ortalaması --- */
+  function ortalamaGorunum(r) {
+    if (!r.n) return '<h2>Bu turda cevap yok.</h2>';
+    var kaz = C.dizi(r.kazananlar);
+    var kazAlt = kaz.map(function (u) { return b(r.kisi[u].sayi); }).join(', ');
+    var gecmis = [];
+    for (var t = 1; t <= meta().tur; t++) { var s = sonuc(t); if (s && s.n) gecmis.push({ tur: t, ort: s.ortalama, hedef: s.hedef }); }
+    return '<div class="istat">' +
+      istat('Katılımcı', r.n) +
+      istat('Ortalama', b(r.ortalama)) +
+      istat('Hedef (2/3)', b(r.hedef), '2/3 × ' + b(r.ortalama), 'vurgu') +
+      istat(kaz.length > 1 ? 'Kazananlar' : 'Kazanan', adlariYaz(r, kaz), 'tahmin: ' + kazAlt, 'iyi') +
+      '</div><div class="yigin">' +
+      panel('Tahminlerin dağılımı', '<div class="cizim">' + histogramSvg(C.dizi(r.histogram), r.ortalama, r.hedef) + '</div>', 'genis') +
+      panel('Turlar boyunca', '<div class="cizim">' + gecmisSvg(gecmis) + '</div>', 'dar') +
+      '</div>';
+  }
+
+  function histogramSvg(h, ort, hedef) {
+    var W = 530, H = 220, L = 14, R = 14, T = 30, B = 36, gw = W - L - R, gh = H - T - B;
+    var mx = Math.max(1, Math.max.apply(null, h));
+    var x = function (v) { return L + v / 90 * gw; };
+    var y = function (c) { return T + gh - c / mx * gh; };
+    var s = svgAc(W, H, 'Tahmin histogramı: ortalama ' + b(ort) + ', hedef ' + b(hedef));
+    /* lejant: çizgilerin üstünde ayrı satır */
+    s += '<line class="cizgi-hedef" x1="' + L + '" y1="10" x2="' + (L + 22) + '" y2="10"/>' + yazi('yazi-hedef', L + 28, 14, 'hedef ' + b(hedef, 1)) +
+      '<line class="cizgi-ort" x1="' + (L + 190) + '" y1="10" x2="' + (L + 212) + '" y2="10"/>' + yazi('yazi-ort', L + 218, 14, 'ortalama ' + b(ort, 1));
+    for (var i = 0; i < 9; i++) {
+      if (!h[i]) continue;
+      s += '<rect class="cubuk soluk-c" x="' + (x(i * 10) + 3) + '" y="' + y(h[i]) + '" width="' + (gw / 9 - 6) + '" height="' + (T + gh - y(h[i])) + '" rx="3"/>';
+    }
+    s += '<line class="eksen" x1="' + L + '" y1="' + (T + gh) + '" x2="' + (W - R) + '" y2="' + (T + gh) + '"/>';
+    for (var t = 0; t <= 90; t += 10) s += yazi('soluk', x(t), T + gh + 16, t, ' text-anchor="middle"');
+    s += yazi('soluk', W - R, H - 2, 'tahmin', ' text-anchor="end"');
+    var ax = x(ort), tx = x(hedef);
+    s += '<line class="cizgi-ort" x1="' + ax + '" y1="' + (T - 6) + '" x2="' + ax + '" y2="' + (T + gh) + '"/>' +
+      '<line class="cizgi-hedef" x1="' + tx + '" y1="' + (T - 6) + '" x2="' + tx + '" y2="' + (T + gh) + '"/>';
+    /* sayılar çizgilerin üstünde, zemin renginde hale ile */
+    for (i = 0; i < 9; i++) {
+      if (!h[i]) continue;
+      var ic = T + gh - y(h[i]) >= 24;
+      s += yazi('yazi kalin hale', x(i * 10 + 5), ic ? y(h[i]) + 17 : y(h[i]) - 5, h[i], ' text-anchor="middle"');
+    }
+    return s + SVG_KAPA;
+  }
+
+  function gecmisSvg(g) {
+    var W = 530, H = 160, L = 30, R = 150, T = 10, B = 22, gw = W - L - R, gh = H - T - B;
+    var n = Math.max(2, g.length);
+    var x = function (i) { return L + (g.length < 2 ? gw / 2 : i / (n - 1) * gw); };
+    var y = function (v) { return T + gh - v / 90 * gh; };
+    var s = svgAc(W, H, 'Turlar boyunca ortalama ve hedef');
+    [0, 30, 60, 90].forEach(function (v) {
+      s += '<line class="izgara" x1="' + L + '" y1="' + y(v) + '" x2="' + (W - R + 4) + '" y2="' + y(v) + '"/>' + yazi('soluk', L - 6, y(v) + 4, v, ' text-anchor="end"');
+    });
+    s += '<line class="cizgi-denge" x1="' + L + '" y1="' + y(0) + '" x2="' + (W - R + 4) + '" y2="' + y(0) + '"/>';
+    ['ort', 'hedef'].forEach(function (k) {
+      var pts = g.map(function (p, i) { return x(i) + ',' + y(p[k]); }).join(' ');
+      s += '<polyline class="cizgi-' + k + '" points="' + pts + '"/>';
+      g.forEach(function (p, i) { s += '<circle class="nokta ' + k + '" cx="' + x(i) + '" cy="' + y(p[k]) + '" r="4"/>'; });
+    });
+    g.forEach(function (p, i) { s += yazi('soluk', x(i), H - 4, 'T' + p.tur, ' text-anchor="middle"'); });
+    /* çizgi ucunda doğrudan etiket (lejant yok); denge çizgisinin etiketi de aynı sütunda */
+    var son = g.length ? g[g.length - 1] : null, et = [{ y: y(0) + 4, s: 'yazi-denge', t: 'denge 0' }];
+    if (son) {
+      et.push({ y: y(son.ort) + 4, s: 'yazi-ort', t: 'ortalama ' + b(son.ort, 1) });
+      et.push({ y: y(son.hedef) + 4, s: 'yazi-hedef', t: 'hedef ' + b(son.hedef, 1) });
+      s += '<desc>Son tur: ortalama ' + b(son.ort) + ', hedef ' + b(son.hedef) + '</desc>';
+    }
+    ayir(et, 15, T + 4, H - B + 6).forEach(function (p) { s += yazi(p.s, W - R + 10, p.y, p.t); });
+    return s + SVG_KAPA;
+  }
+
+  /* --- kapalı zarf açık artırma --- */
+  function para(x) { return b(x) + ' TL'; }
+  function isaretli(x) { return '<span class="' + (x < 0 ? 'eksi' : x > 0 ? 'arti' : '') + '">' + b(x) + '</span>'; }
+
+  function artirmaGorunum(r) {
+    if (!r.n) return '<h2>Bu turda teklif yok.</h2>';
+    var gr = C.dizi(r.gruplar), kisi = r.kisi || {};
+    var boy = r.mod === 'sinif' ? r.n : C.GRUP;
+    var th = function (tr, ek) { return '<th' + (ek || '') + '>' + tr + '</th>'; };
+    var satir = gr.map(function (g, i) {
+      var k = g.kazanan, kk = kisi[k];
+      return '<tr><td class="orta">' + (i + 1) + '</td><td class="ad" title="' + e(r.adlar[k]) + '">' + e(r.adlar[k]) + '</td><td>' + b(kk.deger) + '</td>' +
+        '<td>' + b(g.birinci.fiyat) + '</td><td>' + isaretli(g.birinci.kazanc) + '</td>' +
+        '<td>' + b(g.ikinci.fiyat) + '</td><td>' + isaretli(g.ikinci.kazanc) + '</td></tr>';
+    }).join('');
+    var noktalar = Object.keys(kisi).map(function (u) { return { d: kisi[u].deger, t: kisi[u].teklif, w: kisi[u].birinci.kazandi }; });
+    return '<div class="istat">' +
+      istat('Teklif', r.n, r.mod === 'sinif' ? 'tek açık artırma' : gr.length + ' grup') +
+      istat('Gelir: 1. fiyat', para(r.gelir.birinci)) +
+      istat('Gelir: 2. fiyat', para(r.gelir.ikinci)) +
+      istat('Kazananların kazancı', b(r.kazanc.birinci) + ' / ' + b(r.kazanc.ikinci), '1. fiyat / 2. fiyat') +
+      '</div><div class="yigin">' +
+      '<div class="tablo-kutu"><table class="tablo"><thead>' +
+      '<tr>' + th('Grup', ' rowspan="2"') + th('Kazanan', ' rowspan="2"') + th('Değer', ' rowspan="2"') + th('1. fiyat', ' colspan="2"') + th('2. fiyat', ' colspan="2"') + '</tr>' +
+      '<tr>' + th('Öder') + th('Kazanç') + th('Öder') + th('Kazanç') + '</tr></thead><tbody>' + satir + '</tbody></table></div>' +
+      panel('Teklif ve değer (TL)', '<div class="cizim">' + saclimSvg(noktalar, boy) + '</div>', 'genis') +
+      '</div>';
+  }
+
+  function saclimSvg(p, n) {
+    var W = 530, H = 270, L = 46, T = 8, B = 36, gh = H - T - B, gw = 300;
+    var ymax = 100;
+    p.forEach(function (q) { if (q.t > ymax) ymax = Math.min(200, Math.ceil(q.t / 50) * 50); });
+    var x = function (v) { return L + v / 100 * gw; };
+    var y = function (v) { return T + gh - v / ymax * gh; };
+    var s = svgAc(W, H, 'Teklif ve değer saçılım grafiği, y = x ve (n−1)v/n doğrularıyla');
+    for (var v = 0; v <= ymax; v += 50) s += '<line class="izgara" x1="' + L + '" y1="' + y(v) + '" x2="' + (L + gw) + '" y2="' + y(v) + '"/>' + yazi('soluk', L - 6, y(v) + 4, v, ' text-anchor="end"');
+    for (var d = 0; d <= 100; d += 25) s += yazi('soluk', x(d), T + gh + 15, d, ' text-anchor="middle"');
+    s += yazi('soluk', L + gw / 2, H - 3, 'değer', ' text-anchor="middle"');
+    s += yazi('soluk', 12, T + gh / 2, 'teklif', ' text-anchor="middle" transform="rotate(-90 12 ' + (T + gh / 2) + ')"');
+    s += '<line class="eksen" x1="' + L + '" y1="' + (T + gh) + '" x2="' + (L + gw) + '" y2="' + (T + gh) + '"/><line class="eksen" x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (T + gh) + '"/>';
+    var k = n > 1 ? (n - 1) / n : 1;
+    s += '<line class="cizgi-denge" x1="' + x(0) + '" y1="' + y(0) + '" x2="' + x(100) + '" y2="' + y(100) + '"/>';
+    s += '<line class="cizgi-ort" x1="' + x(0) + '" y1="' + y(0) + '" x2="' + x(100) + '" y2="' + y(100 * k) + '"/>';
+    p.filter(function (q) { return !q.w; }).forEach(function (q) { s += '<circle class="nokta" cx="' + x(q.d) + '" cy="' + y(Math.min(q.t, ymax)) + '" r="6"/>'; });
+    p.filter(function (q) { return q.w; }).forEach(function (q) { s += '<circle class="nokta iyi" cx="' + x(q.d) + '" cy="' + y(Math.min(q.t, ymax)) + '" r="7.5"/>'; });
+    /* lejant: grafiğin sağında, çizgilerden ayrı */
+    var lx = L + gw + 24, ly = T + 14;
+    s += '<line class="cizgi-denge" x1="' + lx + '" y1="' + (ly - 4) + '" x2="' + (lx + 22) + '" y2="' + (ly - 4) + '"/>' +
+      yazi('yazi-denge', lx + 30, ly, 'y = x') + yazi('soluk', lx + 30, ly + 16, 'dürüst teklif (2. fiyat)');
+    ly += 42;
+    s += '<line class="cizgi-ort" x1="' + lx + '" y1="' + (ly - 4) + '" x2="' + (lx + 22) + '" y2="' + (ly - 4) + '"/>' +
+      yazi('yazi-ort', lx + 30, ly, 'b = (n−1)v/n, n = ' + n) + yazi('soluk', lx + 30, ly + 16, 'denge teklifi (1. fiyat)');
+    ly += 42;
+    s += '<circle class="nokta iyi" cx="' + (lx + 11) + '" cy="' + (ly - 5) + '" r="7"/>' + yazi('yazi kalin', lx + 30, ly, 'kazanan');
+    ly += 24;
+    s += '<circle class="nokta" cx="' + (lx + 11) + '" cy="' + (ly - 5) + '" r="6"/>' + yazi('yazi', lx + 30, ly, 'öteki teklifler');
+    return s + SVG_KAPA;
+  }
+
+  /* --- Mahkûmun İkilemi --- */
+  function ikilemGorunum(r) {
+    if (!r.n) return '<h2>Bu turda seçim yok.</h2>';
+    var sec = r.secim || { S: 0, I: 0 }, top = (sec.S || 0) + (sec.I || 0), dg = r.dagilim || {};
+    var yuzde = function (x) { return top ? Math.round(100 * (x || 0) / top) + '%' : '–'; };
+    var pc = C.dizi(r.eslesmeler).filter(function (x) { return x.b === C.PC; }).length;
+    var gecmis = [];
+    for (var t = 1; t <= meta().tur; t++) {
+      var s = sonuc(t);
+      if (s && s.n) gecmis.push({ tur: t, s: s.secim ? Math.round(100 * (s.secim.S || 0) / s.n) : 0, k: s.ortKazanc });
+    }
+    var th = function (tr) { return '<th>' + tr + '</th>'; };
+    var tablo = gecmis.length > 1 ? '<div class="tablo-kutu"><table class="tablo dar"><tr>' + th('Tur') + gecmis.map(function (g) { return '<th>' + g.tur + '</th>'; }).join('') + '</tr>' +
+      '<tr>' + th('Sessiz') + gecmis.map(function (g) { return '<td>' + g.s + '%</td>'; }).join('') + '</tr>' +
+      '<tr>' + th('Ort. kazanç') + gecmis.map(function (g) { return '<td>' + b(g.k) + '</td>'; }).join('') + '</tr></table></div>' : '';
+    var es = C.dizi(r.eslesmeler).length;
+    return '<div class="istat">' +
+      istat('Sessiz', yuzde(sec.S), (sec.S || 0) + ' kişi') +
+      istat('İhanet', yuzde(sec.I), (sec.I || 0) + ' kişi', 'vurgu') +
+      istat('Ortalama kazanç', b(r.ortKazanc), r.n + ' öğrenci') +
+      istat('Herkes sessiz', b(r.herkesSessiz), 'herkes ihanet: ' + b(r.herkesIhanet)) +
+      '</div><div class="izgara2">' +
+      panel('Eşleşme sonuçları', '<p class="not">' + es + ' eşleşme' + (pc ? ', ' + pc + ' bilgisayarla' : '') + '</p><div class="cizim">' + dagilimSvg(dg) + '</div>') +
+      panel('Ortalama kazanç', '<p class="not">büyük sayı iyidir</p><div class="cizim">' + kiyasSvg(r.ortKazanc) + '</div>') +
+      '</div>' + tablo;
+  }
+
+  function dagilimSvg(dg) {
+    var W = 270, H = 200, L = 2, R = 34, satir = 66;
+    var v = [['SS', 'Sessiz–Sessiz', '(−1, −1)', 'iyi'], ['SI', 'Sessiz–İhanet', '(−3, 0)', 'uyari'], ['II', 'İhanet–İhanet', '(−2, −2)', 'kotu']];
+    var mx = Math.max(1, dg.SS || 0, dg.SI || 0, dg.II || 0);
+    var s = svgAc(W, H, 'Eşleşme sonuçları: SS ' + (dg.SS || 0) + ', Sİ ' + (dg.SI || 0) + ', İİ ' + (dg.II || 0));
+    v.forEach(function (q, i) {
+      var c = dg[q[0]] || 0, y = 4 + i * satir, w = Math.max(3, c / mx * (W - L - R));
+      s += yazi('yazi kalin', L, y + 13, q[1]) +
+        yazi('soluk', W, y + 13, q[2], ' text-anchor="end"') +
+        '<rect class="cubuk ' + q[3] + '" x="' + L + '" y="' + (y + 20) + '" width="' + w + '" height="28" rx="4"/>' +
+        yazi('yazi kalin', L + w + 7, y + 40, c);
+    });
+    return s + SVG_KAPA;
+  }
+
+  function kiyasSvg(ort) {
+    var W = 270, H = 200, L = 2, R = 52, satir = 66;
+    var v = [['Bu tur (sınıf)', ort, 'cubuk'], ['Herkes sessiz', C.PD.SS, 'cubuk iyi'], ['Herkes ihanet', C.PD.II, 'cubuk kotu']];
+    var s = svgAc(W, H, 'Ortalama kazanç: sınıf ' + b(ort) + ', herkes sessiz −1, herkes ihanet −2');
+    v.forEach(function (q, i) {
+      var y = 4 + i * satir, w = Math.max(3, Math.abs(q[1]) / 3 * (W - L - R));
+      s += yazi('yazi kalin', L, y + 13, q[0]) +
+        '<rect class="' + q[2] + '" x="' + L + '" y="' + (y + 20) + '" width="' + w + '" height="28" rx="4"/>' +
+        yazi('yazi kalin', L + w + 7, y + 40, b(q[1]));
+    });
+    return s + SVG_KAPA;
+  }
+
+  /* --- Condorcet oylaması --- */
+  function oylamaGorunum(r) {
+    if (!r.n) return '<h2>Bu turda oy yok.</h2>';
+    var A = C.dizi(r.adaylar), ik = C.dizi(r.ikili).map(C.dizi);
+    var adl = function (lst) { lst = C.dizi(lst); return lst.length ? lst.map(function (i) { return e(A[i]); }).join(' = ') : '–'; };
+    var var_ = r.condorcet !== null && r.condorcet !== undefined;
+    var cond = var_ ? e(A[r.condorcet]) : 'Yok';
+    var cog = C.dizi(r.cogulluk.puan), bor = C.dizi(r.borda.puan);
+    var irvT = C.dizi(r.irv.turlar).map(function (t, i) {
+      var el = C.dizi(t.elenen);
+      return (i + 1) + '. tur: ' + C.dizi(t.sayim).map(function (p) { p = C.dizi(p); return e(A[p[0]]) + ' ' + p[1]; }).join(', ') + (el.length ? ' → ' + el.map(function (c) { return e(A[c]); }).join(', ') + ' elenir' : '');
+    }).join(' · ');
+    var pd = C.dizi(r.profil), profil = {};
+    C.SIRALAR.forEach(function (s, i) { profil[s] = pd[i] || 0; });
+    var th = function (tr, ek) { return '<th' + (ek || '') + '>' + tr + '</th>'; };
+    var prof = C.SIRALAR.filter(function (s) { return profil[s]; }).sort(function (a, c) { return profil[c] - profil[a]; })
+      .map(function (s) { return '<tr><td class="sol">' + e(C.siraMetni(s, A)) + '</td><td>' + profil[s] + '</td></tr>'; }).join('');
+    var mat = '<table class="tablo matris"><tr><th></th>' + A.map(function (a) { return '<th>' + e(a) + '</th>'; }).join('') + '</tr>' +
+      A.map(function (a, i) {
+        return '<tr><th>' + e(a) + '</th>' + A.map(function (x, j) {
+          if (i === j) return '<td>–</td>';
+          var v = ik[i][j], o = ik[j][i];
+          return '<td class="' + (v > o ? 'arti' : v < o ? 'eksi' : '') + '">' + v + '</td>';
+        }).join('') + '</tr>';
+      }).join('') + '</table>';
+    return '<div class="istat">' +
+      istat('Condorcet kazananı', cond, r.n + ' seçmen' + (r.dongu ? ' · döngü' : ''), var_ ? 'iyi' : 'vurgu') +
+      istat('Çoğulluk', adl(r.cogulluk.kazananlar), A.map(function (a, i) { return e(a) + ' ' + cog[i]; }).join(' · ')) +
+      istat('Borda sayımı', adl(r.borda.kazananlar), A.map(function (a, i) { return e(a) + ' ' + bor[i]; }).join(' · ')) +
+      istat('Anında ikinci tur', adl(r.irv.kazananlar), C.dizi(r.irv.turlar).length + ' tur') +
+      '</div><div class="izgara2">' +
+      '<div class="yigin">' +
+      panel('Tercih profili', '<div class="tablo-kutu"><table class="tablo"><tr>' + th('Sıralama') + th('Kişi') + '</tr>' + prof + '</table></div>') +
+      panel('İkili karşılaştırma', mat + '<p class="not">satır ≻ sütun diyen seçmen</p>') +
+      '</div>' +
+      panel('İkili çoğunluk çizgesi', '<div class="cizim">' + cizgeSvg(A, ik, r.dongu, var_ ? r.condorcet : -1) + '</div>') +
+      '</div><p class="not">Anında ikinci tur: ' + irvT + '</p>';
+  }
+
+  function cizgeSvg(A, ik, dongu, kazanan) {
+    var W = 260, H = 290, R0 = 26;
+    var p = [[130, 62], [42, 222], [218, 222]], mx0 = 130, my0 = 169;
+    var s = svgAc(W, H, 'İkili çoğunluk çizgesi: ok, kazanandan kaybedene');
+    var ozet = [], etiket = '';
+    for (var i = 0; i < 3; i++) for (var j = i + 1; j < 3; j++) {
+      var a = i, c = j, v = ik[i][j], o = ik[j][i];
+      if (o > v) { a = j; c = i; }
+      var x1 = p[a][0], y1 = p[a][1], x2 = p[c][0], y2 = p[c][1];
+      var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L;
+      var sx = x1 + ux * R0, sy = y1 + uy * R0, ex = x2 - ux * (R0 + 3), ey = y2 - uy * (R0 + 3);
+      var mx = (x1 + x2) / 2, my = (y1 + y2) / 2, nx = -uy, ny = ux;
+      if (v === o) {
+        s += '<line class="ok esit" x1="' + sx + '" y1="' + sy + '" x2="' + (x2 - ux * R0) + '" y2="' + (y2 - uy * R0) + '"/>';
+        ozet.push(e(A[i]) + ' ile ' + e(A[j]) + ' berabere');
+      } else {
+        var sinif = dongu ? ' dongu' : '';
+        s += '<line class="ok' + sinif + '" x1="' + sx + '" y1="' + sy + '" x2="' + (ex - ux * 8) + '" y2="' + (ey - uy * 8) + '"/>' +
+          '<polygon class="ok-ucu' + sinif + '" points="' + ex + ',' + ey + ' ' + (ex - ux * 14 + nx * 7) + ',' + (ey - uy * 14 + ny * 7) + ' ' + (ex - ux * 14 - nx * 7) + ',' + (ey - uy * 14 - ny * 7) + '"/>';
+        ozet.push(e(A[a]) + ' ' + e(A[c]) + '\'yi yener');
+      }
+      /* sayı, kenarın dışına (ağırlık merkezinden uzağa) yazılır */
+      var ox = mx - mx0, oy = my - my0, ol = Math.sqrt(ox * ox + oy * oy) || 1;
+      var lx = mx + ox / ol * 20, ly = my + oy / ol * 20;
+      etiket += yazi('yazi kalin hale', lx, ly + 5, Math.max(v, o) + '–' + Math.min(v, o), ' text-anchor="middle"');
+    }
+    for (var k = 0; k < 3; k++) {
+      s += '<circle class="dugum' + (k === kazanan ? ' iyi' : '') + '" cx="' + p[k][0] + '" cy="' + p[k][1] + '" r="' + R0 + '"/>' +
+        yazi('yazi kalin', p[k][0], k ? p[k][1] + R0 + 20 : p[k][1] - R0 - 9, e(A[k]), ' text-anchor="middle"');
+    }
+    return s + etiket + '<desc>' + ozet.join('; ') + '</desc>' + SVG_KAPA;
+  }
+})();
+</script>

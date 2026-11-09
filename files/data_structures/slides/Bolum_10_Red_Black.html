@@ -1,0 +1,913 @@
+---
+layout: without-sidebar
+title: "Kırmızı-Siyah Ağaç Simülatörü"
+permalink: /files/data_structures/slides/Bolum_10_Red_Black.html
+excerpt: "Etkileşimli kırmızı-siyah ağaç simülatörü: adım adım ekleme onarımı (amca kırmızı: yeniden renklendir; amca siyah: döndür), kardeş durumlarıyla silme, arama ve doğrulama."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* 800x600 agt-oyun sahnesi: ortak simülatör denetimleri */
+.ds-sim.agt-oyun { font-size: 15px; }
+.ds-sim .ds-sim__body { display: flex; flex-direction: column; gap: 8px; line-height: 1.3; }
+.ds-sim .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.ds-sim .ds-sim__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body button.is-danger {
+  border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border));
+  color: var(--ds-bad);
+}
+.ds-sim .ds-sim__body input,
+.ds-sim .ds-sim__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 8px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body input[type="checkbox"],
+.ds-sim .ds-sim__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+.ds-sim .ds-sim__body input[type="range"] { padding: 0; border: 0; background: none; }
+.ds-sim .ds-sim__body label {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-sim .ds-sim__status {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__status.is-ok { color: var(--ds-good); }
+.ds-sim .ds-sim__status.is-bad { color: var(--ds-bad); }
+.ds-sim .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.rb-sim {
+  position: relative;
+  height: 100%;
+  line-height: 1.35;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+}
+
+.rb-controls {
+  display: grid;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.rb-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.rb-row input[type="number"] {
+  width: 76px;
+}
+
+.rb-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 244px;
+  gap: 8px;
+}
+
+.rb-left {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.rb-visual {
+  min-height: 0;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.rb-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.rb-status {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-edge {
+  stroke: var(--ds-link);
+  stroke-width: 2;
+}
+
+.rb-edge.is-active {
+  stroke: var(--ds-warn);
+  stroke-width: 4;
+}
+
+.rb-node circle {
+  stroke-width: 2.5;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.rb-node.is-red circle {
+  fill: var(--ds-bad);
+  stroke: color-mix(in srgb, var(--ds-bad) 60%, var(--ds-text));
+}
+
+.rb-node.is-black circle {
+  fill: var(--ds-text);
+  stroke: var(--ds-text);
+}
+
+.rb-node text {
+  fill: var(--ds-bg);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.rb-node.is-checking circle {
+  stroke: var(--ds-warn);
+  stroke-width: 6;
+}
+
+.rb-node.is-found circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+}
+
+.rb-node.is-found text {
+  fill: var(--ds-text);
+}
+
+.rb-empty {
+  fill: var(--ds-muted);
+  font-size: 15px;
+  text-anchor: middle;
+}
+
+.rb-side {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.rb-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.rb-stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.rb-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: normal;
+}
+
+.rb-box {
+  min-height: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+.rb-path {
+  height: 58px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.rb-events {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+  list-style: decimal inside;
+}
+
+.rb-events li {
+  height: 20px;
+  margin: 0;
+  padding: 0 6px;
+  border: 1px solid var(--ds-border);
+  border-radius: 6px;
+  background: var(--ds-surface);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-sim agt-oyun agt-oyun--stage" id="ds-sim" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 10 · Simülasyon</p><h1>Kırmızı-Siyah Ağaç Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-rb-help" aria-label="Simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_10_Arama_Agaclari.html">← Bölüm 10</a>
+  </header>
+
+  <div class="agt-oyun__body ds-sim__body">
+    <div class="ds-sim__root rb-sim">
+      <div class="rb-controls">
+        <div class="rb-row">
+          <label for="ds-rb-value">Tam sayı değer</label>
+          <input id="ds-rb-value" type="number" value="42">
+          <button class="is-primary" id="ds-rb-insert" type="button">Ekle</button>
+          <button id="ds-rb-search" type="button">Ara</button>
+          <button class="is-danger" id="ds-rb-delete" type="button">Sil</button>
+          <button id="ds-rb-min" type="button">Minimum</button>
+          <button id="ds-rb-max" type="button">Maksimum</button>
+        </div>
+        <div class="rb-row">
+          <button id="ds-rb-inorder" type="button">Kök ortada</button>
+          <button id="ds-rb-validate" type="button">Doğrula</button>
+          <button id="ds-rb-example" type="button">Örnek yükle</button>
+          <button id="ds-rb-random" type="button">Rastgele ağaç</button>
+          <button class="is-danger" id="ds-rb-reset" type="button">Sıfırla</button>
+          <button class="is-danger" id="ds-rb-cancel" type="button">Durdur</button>
+        </div>
+      </div>
+
+      <div class="rb-main">
+        <div class="rb-left">
+          <div class="rb-visual ds-sim__panel">
+            <svg id="ds-rb-svg" class="rb-svg" viewBox="0 0 500 330" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Etkileşimli kırmızı-siyah ağaç"></svg>
+          </div>
+          <p id="ds-rb-status" class="ds-sim__status rb-status" role="status" aria-live="polite">Örnek kırmızı-siyah ağaç yüklendi. Bir işlem seçin.</p>
+        </div>
+
+        <div class="rb-side">
+          <div class="rb-stats">
+            <div class="rb-stat"><strong>Düğüm</strong><span id="ds-rb-nodes">0</span></div>
+            <div class="rb-stat"><strong>Yükseklik</strong><span id="ds-rb-height">0</span></div>
+            <div class="rb-stat"><strong>Siyah yükseklik</strong><span id="ds-rb-black-height">0</span></div>
+            <div class="rb-stat"><strong>Döndürme</strong><span id="ds-rb-rotations">0</span></div>
+          </div>
+          <div class="rb-box ds-sim__panel">
+            <p class="ds-sim__caption">İşlem yolu</p>
+            <div id="ds-rb-path" class="rb-path">—</div>
+          </div>
+          <div class="rb-box ds-sim__panel">
+            <p class="ds-sim__caption">Dengeleme adımları</p>
+            <ol id="ds-rb-events" class="rb-events"><li>Henüz dengeleme adımı yok.</li></ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-rb-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Kırmızı-Siyah Ağaç Simülatörü</h2>
+    <p>Kırmızı-siyah ağaç kendini dengeleyen bir ikili arama ağacıdır. Her düğüm kırmızı ya da siyahtır; boş (NIL) çocuklar siyah yaprak sayılır. Ekleme ve silmeden sonra yeniden renklendirme ve döndürmeler aşağıdaki özellikleri geri getirir; böylece yükseklik O(log n) kalır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir tam sayı yazıp <b>Ekle</b>, <b>Ara</b> ya da <b>Sil</b> düğmesine basın. Yol vurgulanır; her yeniden renklendirme ve döndürme dengeleme adımlarında listelenir.</li>
+      <li><b>Doğrula</b> ikili arama ağacı sırasını ve tüm kırmızı-siyah özelliklerini denetler.</li>
+      <li><b>Örnek yükle</b>, <b>Rastgele ağaç</b> ve <b>Sıfırla</b> ağacı değiştirir; <b>Durdur</b> çalışan animasyonu keser.</li>
+    </ul>
+    <h3>Kırmızı-siyah özellikleri</h3>
+    <ul>
+      <li><b>Siyah kök:</b> kök her zaman siyahtır.</li>
+      <li><b>Kırmızı-kırmızı yok:</b> kırmızı düğümün kırmızı çocuğu olamaz.</li>
+      <li><b>Eşit siyah yükseklik:</b> bir düğümden NIL yapraklara giden her yolda aynı sayıda siyah düğüm bulunur.</li>
+    </ul>
+    <h3>Ekleme onarımı</h3>
+    <p>Yeni düğüm kırmızı eklenir. Ebeveyni de kırmızıysa <b>amca</b>ya (ebeveynin kardeşi) bakılır:</p>
+    <ul>
+      <li><b>Amca kırmızı:</b> ebeveyn ve amca siyaha, büyük ebeveyn kırmızıya boyanır; denetim büyük ebeveynden yukarı sürer.</li>
+      <li><b>Amca siyah, üçgen:</b> ebeveynde döndürme şekli doğruya çevirir (çift döndürmenin ilk adımı).</li>
+      <li><b>Amca siyah, doğru:</b> büyük ebeveynde döndürme yapılır; ebeveyn siyah, büyük ebeveyn kırmızı olur.</li>
+      <li>Sonunda kök kırmızıysa siyaha boyanır.</li>
+    </ul>
+    <h3>Silme onarımı</h3>
+    <p>İki çocuklu düğümün yerine kök ortada ardılı kopyalanır. Kaldırılan düğüm kırmızıysa özellik bozulmaz; siyahsa ve kırmızı çocuğu varsa çocuk siyaha döner. Aksi hâlde yerine geçen düğüm <b>çift siyah</b> olur ve <b>kardeşe</b> göre onarılır:</p>
+    <table>
+      <thead><tr><th>Durum</th><th>Kardeş</th><th>İşlem</th></tr></thead>
+      <tbody>
+        <tr><td>Durum 1</td><td>Kırmızı</td><td>Yeniden renklendirme, ebeveynde döndürme; Durum 2–4'e geçilir.</td></tr>
+        <tr><td>Durum 2</td><td>Siyah, çocukları siyah</td><td>Kardeş kırmızıya boyanır, çift siyah yukarı çıkar.</td></tr>
+        <tr><td>Durum 3</td><td>Siyah, uzak çocuk siyah</td><td>Kardeşte döndürme; Durum 4'e geçilir.</td></tr>
+        <tr><td>Durum 4</td><td>Siyah, uzak çocuk kırmızı</td><td>Yeniden renklendirme, ebeveynde döndürme; onarım biter.</td></tr>
+      </tbody>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var RED=true,BLACK=false;
+
+  /* classic red-black tree (null children are the black NIL leaves). Every operation
+     is computed at once and recorded as frames that the UI plays back */
+  function Node(value,color){this.value=value;this.color=color===undefined?RED:color;this.left=null;this.right=null;this.parent=null;}
+
+  function RBTree(){this.root=null;this.rotations=0;this.events=[];this.frames=[];}
+
+  function marks(){
+    var m={};
+    for(var i=0;i<arguments.length;i++)if(arguments[i])m[String(arguments[i].value)]="is-checking";
+    return m;
+  }
+
+  function name(n){return n?String(n.value):"NIL";}
+
+  /* rotation direction ("left"/"right") as shown in messages */
+  function yon(d){return d==="left"?"sola":"sağa";}
+
+  RBTree.prototype.isRed=function(n){return !!n&&n.color===RED;};
+
+  RBTree.prototype.copy=function(n,parent){
+    if(!n)return null;
+    var c=new Node(n.value,n.color);c.parent=parent||null;
+    c.left=this.copy(n.left,c);c.right=this.copy(n.right,c);
+    return c;
+  };
+
+  RBTree.prototype.frame=function(msg,m,edge,path){
+    this.frames.push({root:this.copy(this.root,null),marks:m||{},edge:edge||"",msg:msg,path:path,events:this.events.length,rotations:this.rotations});
+  };
+
+  RBTree.prototype.replace=function(u,v){
+    if(!u.parent)this.root=v;
+    else if(u===u.parent.left)u.parent.left=v;
+    else u.parent.right=v;
+    if(v)v.parent=u.parent;
+  };
+
+  RBTree.prototype.rotateLeft=function(x){
+    var y=x.right;
+    x.right=y.left;if(y.left)y.left.parent=x;
+    this.replace(x,y);
+    y.left=x;x.parent=y;
+    this.rotations++;
+  };
+
+  RBTree.prototype.rotateRight=function(x){
+    var y=x.left;
+    x.left=y.right;if(y.right)y.right.parent=x;
+    this.replace(x,y);
+    y.right=x;x.parent=y;
+    this.rotations++;
+  };
+
+  RBTree.prototype.rotate=function(x,dir){if(dir==="left")this.rotateLeft(x);else this.rotateRight(x);};
+
+  RBTree.prototype.search=function(value){
+    var path=[],n=this.root;
+    while(n){
+      path.push(n);
+      if(value===n.value)return{found:true,node:n,path:path};
+      n=value<n.value?n.left:n.right;
+    }
+    return{found:false,node:null,path:path};
+  };
+
+  RBTree.prototype.descend=function(value){
+    var path=[],n=this.root;
+    while(n){
+      var edge=path.length?path[path.length-1].value+"->"+n.value:"";
+      path.push(n);
+      var text=path.map(function(x){return x.value;}).join(" → ");
+      if(value===n.value){this.frame(value+" bulundu.",marks(n),edge,text);break;}
+      var goLeft=value<n.value;
+      this.frame(value+" ile "+n.value+" karşılaştırılır: "+(goLeft?"sola":"sağa")+" gidilir.",marks(n),edge,text);
+      n=goLeft?n.left:n.right;
+    }
+    return path;
+  };
+
+  RBTree.prototype.insert=function(value){
+    this.events=[];this.frames=[];
+    var path=this.descend(value),p=path[path.length-1]||null;
+    if(p&&p.value===value)return false;
+
+    var x=new Node(value,RED);x.parent=p;
+    if(!p)this.root=x;
+    else if(value<p.value)p.left=x;
+    else p.right=x;
+    this.frame(p?value+", "+p.value+" düğümünün kırmızı "+(value<p.value?"sol":"sağ")+" çocuğu olarak eklenir.":value+" kırmızı kök olarak eklenir.",marks(x),p?p.value+"->"+value:"");
+    this.fixInsert(x);
+    return true;
+  };
+
+  /* x is red; while its parent is also red, look at the uncle u */
+  RBTree.prototype.fixInsert=function(x){
+    while(x!==this.root&&this.isRed(x.parent)){
+      var p=x.parent,g=p.parent,pLeft=p===g.left,u=pLeft?g.right:g.left;
+      this.frame("Kırmızı "+x.value+" düğümünün ebeveyni "+p.value+" de kırmızı; amca "+name(u)+" "+(this.isRed(u)?"kırmızı":"siyah")+".",marks(x,p,u));
+
+      if(this.isRed(u)){
+        p.color=BLACK;u.color=BLACK;g.color=RED;
+        this.events.push("Amca "+u.value+" kırmızı: "+p.value+", "+u.value+", "+g.value+" yeniden renklendirilir.");
+        this.frame("Amca kırmızı: "+p.value+", "+u.value+" siyah, "+g.value+" kırmızı; "+g.value+" düğümüne çıkılır.",marks(g));
+        x=g;
+        continue;
+      }
+
+      if(pLeft!==(x===p.left)){
+        var d1=pLeft?"left":"right";
+        this.rotate(p,d1);
+        this.events.push("Üçgen: "+p.value+" düğümünde "+yon(d1)+" döndürme.");
+        this.frame("Amca siyah, üçgen: "+p.value+" düğümünde "+yon(d1)+" döndürme bir doğru oluşturur.",marks(p,x));
+        x=p;p=x.parent;
+      }
+
+      var d2=pLeft?"right":"left";
+      this.rotate(g,d2);
+      p.color=BLACK;g.color=RED;
+      this.events.push("Doğru: "+g.value+" düğümünde "+yon(d2)+" döndürme; "+p.value+", "+g.value+" yeniden renklendirilir.");
+      this.frame("Amca siyah, doğru: "+g.value+" düğümünde "+yon(d2)+" döndürme; "+p.value+" siyah, "+g.value+" kırmızı.",marks(p,g));
+    }
+
+    if(this.isRed(this.root)){
+      this.root.color=BLACK;
+      this.events.push("Kök "+this.root.value+" siyaha boyanır.");
+      this.frame("Kök siyah olmalı: "+this.root.value+" siyaha boyanır.",marks(this.root));
+    }
+  };
+
+  RBTree.prototype.delete=function(value){
+    this.events=[];this.frames=[];
+    var path=this.descend(value),z=path[path.length-1]||null;
+    if(!z||z.value!==value)return false;
+
+    /* y is the node that is physically removed: z itself, or z's inorder successor */
+    var y=z;
+    if(z.left&&z.right){
+      this.frame(value+" düğümünün iki çocuğu var: kök ortada ardılı bulunur.",marks(z));
+      y=z.right;
+      while(true){
+        this.frame(y.left?"Ardıl araması: "+y.value+" düğümünden sola gidilir.":"Ardıl "+y.value+": değeri "+value+" düğümüne kopyalanır.",marks(z,y),y.parent.value+"->"+y.value);
+        if(!y.left)break;
+        y=y.left;
+      }
+      z.value=y.value;
+    }
+
+    var x=y.left||y.right,xParent=y.parent,removedColor=y.color,label=y===z?String(value):"eski "+y.value;
+    this.replace(y,x);
+    if(removedColor===RED){
+      this.frame(label+" kaldırılır: kırmızıydı, hiçbir özellik bozulmaz.",marks(x));
+      return true;
+    }
+    if(this.isRed(x)){
+      x.color=BLACK;
+      this.events.push("Siyah "+label+" kaldırıldı: çocuğu "+x.value+" siyaha döner.");
+      this.frame("Siyah "+label+" kaldırılır; kırmızı çocuğu "+x.value+" siyaha döner.",marks(x));
+      return true;
+    }
+    this.frame("Siyah "+label+" kaldırılır: "+name(x)+" artık çift siyah.",marks(x,xParent));
+    this.fixDelete(x,xParent);
+    return true;
+  };
+
+  /* x carries an extra black; the four cases look at x's sibling w */
+  RBTree.prototype.fixDelete=function(x,xParent){
+    while(x!==this.root&&!this.isRed(x)){
+      var left=x===xParent.left,w=left?xParent.right:xParent.left;
+      var toward=left?"left":"right",away=left?"right":"left";
+
+      if(this.isRed(w)){
+        w.color=BLACK;xParent.color=RED;this.rotate(xParent,toward);
+        this.events.push("Durum 1: kardeş "+w.value+" kırmızı; "+xParent.value+" düğümünde "+yon(toward)+" döndürme.");
+        this.frame("Durum 1, kardeş "+w.value+" kırmızı: yeniden renklendirme, "+xParent.value+" düğümünde "+yon(toward)+" döndürme.",marks(w,xParent,x));
+        w=left?xParent.right:xParent.left;
+      }
+
+      var near=left?w.left:w.right,far=left?w.right:w.left;
+      if(!this.isRed(near)&&!this.isRed(far)){
+        w.color=RED;
+        this.events.push("Durum 2: kardeş "+w.value+" siyah, çocukları siyah: kırmızıya boyanır.");
+        this.frame("Durum 2: kardeş "+w.value+" ve çocukları siyah; "+w.value+" kırmızı, yukarı çıkılır.",marks(w,xParent));
+        x=xParent;xParent=x.parent;
+        continue;
+      }
+
+      if(!this.isRed(far)){
+        near.color=BLACK;w.color=RED;this.rotate(w,away);
+        this.events.push("Durum 3: kardeş "+w.value+" düğümünde "+yon(away)+" döndürme.");
+        this.frame("Durum 3: kardeşin uzak çocuğu siyah: "+w.value+" düğümünde "+yon(away)+" döndürme.",marks(near,w));
+        w=near;far=left?w.right:w.left;
+      }
+
+      w.color=xParent.color;xParent.color=BLACK;if(far)far.color=BLACK;
+      this.rotate(xParent,toward);
+      this.events.push("Durum 4: "+xParent.value+" düğümünde "+yon(toward)+" döndürme; bitti.");
+      this.frame("Durum 4: uzak çocuk kırmızı: yeniden renklendirme, "+xParent.value+" düğümünde "+yon(toward)+" döndürme.",marks(w,xParent,far));
+      x=this.root;xParent=null;
+    }
+
+    if(x&&x.color===RED){
+      x.color=BLACK;
+      this.frame(x.value+" siyaha boyanır; fazladan siyah emilir.",marks(x));
+    }
+  };
+
+  RBTree.prototype.minimum=function(){
+    var path=[],n=this.root;
+    while(n){path.push(n);if(!n.left)break;n=n.left;}
+    return{node:n,path:path};
+  };
+
+  RBTree.prototype.maximum=function(){
+    var path=[],n=this.root;
+    while(n){path.push(n);if(!n.right)break;n=n.right;}
+    return{node:n,path:path};
+  };
+
+  RBTree.prototype.inorder=function(){
+    var out=[];
+    function walk(n){if(!n)return;walk(n.left);out.push(n);walk(n.right);}
+    walk(this.root);return out;
+  };
+
+  /* checks BST order, a black root, no red node with a red child, equal black height */
+  RBTree.prototype.validate=function(start){
+    var top=start===undefined?this.root:start;
+    if(top&&this.isRed(top))return{valid:false,message:"Kök kırmızı."};
+    var self=this;
+    function walk(n,min,max){
+      if(!n)return{valid:true,bh:1};
+      if(n.value<=min||n.value>=max)return{valid:false,message:n.value+" düğümünde ikili arama ağacı sırası bozuk."};
+      if(self.isRed(n)&&(self.isRed(n.left)||self.isRed(n.right)))return{valid:false,message:n.value+" düğümünde kırmızı-kırmızı ihlali."};
+      var l=walk(n.left,min,n.value);if(!l.valid)return l;
+      var r=walk(n.right,n.value,max);if(!r.valid)return r;
+      if(l.bh!==r.bh)return{valid:false,message:n.value+" düğümünde siyah yükseklikler eşit değil."};
+      return{valid:true,bh:l.bh+(self.isRed(n)?0:1)};
+    }
+    var result=walk(top,-Infinity,Infinity);
+    return result.valid?{valid:true,message:"Tüm kırmızı-siyah özellikleri sağlanıyor.",bh:Math.max(0,result.bh-1)}:result;
+  };
+
+  var root=document.getElementById("ds-sim");if(!root)return;
+  function q(id){return root.querySelector("#"+id);}
+  var ns="http://www.w3.org/2000/svg";
+  var tree=new RBTree();
+
+  var el={
+    value:q("ds-rb-value"),
+    svg:q("ds-rb-svg"),status:q("ds-rb-status"),nodes:q("ds-rb-nodes"),height:q("ds-rb-height"),
+    blackHeight:q("ds-rb-black-height"),rotations:q("ds-rb-rotations"),path:q("ds-rb-path"),events:q("ds-rb-events")
+  };
+
+  var btn={
+    insert:q("ds-rb-insert"),search:q("ds-rb-search"),delete:q("ds-rb-delete"),min:q("ds-rb-min"),max:q("ds-rb-max"),
+    inorder:q("ds-rb-inorder"),validate:q("ds-rb-validate"),example:q("ds-rb-example"),random:q("ds-rb-random"),
+    reset:q("ds-rb-reset"),cancel:q("ds-rb-cancel")
+  };
+
+  /* animation step in ms (the original slider default) */
+  var DELAY=400;
+
+  var token=0,marked={},activeEdge="";
+  /* frame being played (null = draw the live tree) */
+  var view=null;
+  function shownRoot(){return view?view.root:tree.root;}
+
+  /* drawing geometry (SVG user units); the viewBox follows the tree's extent,
+     so a large tree is scaled down instead of overflowing the panel */
+  var SX=48,SY=66,PAD=34,TOP=32,BOTTOM=34,MIN_W=500,MIN_H=330;
+  /* rows shown in the event list (fixed-height rows) */
+  var EVENT_ROWS=6;
+
+  function readValue(){
+    if(el.value.value.trim()==="")throw new Error("Bir değer girin.");
+    var value=Number(el.value.value);
+    if(!Number.isSafeInteger(value))throw new Error("Geçerli bir tam sayı girin.");
+    return value;
+  }
+
+  function setStatus(message,type){
+    el.status.textContent=message;
+    el.status.title=message;
+    el.status.classList.remove("is-ok","is-bad");
+    if(type)el.status.classList.add(type);
+  }
+
+  function delay(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});}
+
+  function disable(state){
+    Object.keys(btn).forEach(function(key){btn[key].disabled=state&&key!=="cancel";});
+    btn.cancel.disabled=!state;
+  }
+
+  function clearMarks(){marked={};activeEdge="";}
+
+  /* x = inorder rank, y = depth: nodes never overlap */
+  function layout(){
+    var nodes=[],edges=[],rank=0,maxDepth=0;
+    function place(node,depth,parentNode){
+      if(!node)return;
+      if(parentNode)edges.push({from:parentNode,to:node});
+      place(node.left,depth+1,node);
+      nodes.push({node:node,x:PAD+rank*SX,y:TOP+depth*SY,depth:depth});
+      rank++;
+      if(depth>maxDepth)maxDepth=depth;
+      place(node.right,depth+1,node);
+    }
+    place(shownRoot(),0,null);
+    return{nodes:nodes,edges:edges,width:PAD*2+Math.max(0,rank-1)*SX,height:TOP+maxDepth*SY+BOTTOM};
+  }
+
+  function metrics(){
+    var count=0,height=0;
+    function walk(n,d){if(!n)return;count++;if(d>height)height=d;walk(n.left,d+1);walk(n.right,d+1);}
+    walk(shownRoot(),1);
+    el.nodes.textContent=String(count);
+    el.height.textContent=String(height);
+    var v=tree.validate(shownRoot());
+    el.blackHeight.textContent=v.valid?String(v.bh):"—";
+    el.rotations.textContent=String(view?view.rotations:tree.rotations);
+  }
+
+  function render(){
+    while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
+
+    if(!shownRoot()){
+      el.svg.setAttribute("viewBox","0 0 "+MIN_W+" "+MIN_H);
+      var empty=document.createElementNS(ns,"text");
+      empty.setAttribute("x",String(MIN_W/2));empty.setAttribute("y",String(MIN_H/2));
+      empty.setAttribute("class","rb-empty");empty.textContent="Ağaç boş.";el.svg.appendChild(empty);metrics();return;
+    }
+
+    var data=layout();
+    var vbW=Math.max(MIN_W,data.width),vbH=Math.max(MIN_H,data.height);
+    el.svg.setAttribute("viewBox",(-(vbW-data.width)/2)+" 0 "+vbW+" "+vbH);
+
+    data.edges.forEach(function(edge){
+      var a=data.nodes.find(function(x){return x.node===edge.from;});
+      var b=data.nodes.find(function(x){return x.node===edge.to;});
+      var line=document.createElementNS(ns,"line");
+      line.setAttribute("x1",String(a.x));line.setAttribute("y1",String(a.y));
+      line.setAttribute("x2",String(b.x));line.setAttribute("y2",String(b.y));
+      line.setAttribute("class","rb-edge"+(activeEdge===edge.from.value+"->"+edge.to.value?" is-active":""));
+      el.svg.appendChild(line);
+    });
+
+    data.nodes.forEach(function(item){
+      var g=document.createElementNS(ns,"g");
+      var state=marked[String(item.node.value)]||"";
+      g.setAttribute("class","rb-node "+(item.node.color===RED?"is-red":"is-black")+(state?" "+state:""));
+      g.setAttribute("transform","translate("+item.x+" "+item.y+")");
+      var c=document.createElementNS(ns,"circle");c.setAttribute("r","20");
+      var t=document.createElementNS(ns,"text");t.setAttribute("y","1");t.textContent=String(item.node.value);
+      g.appendChild(c);g.appendChild(t);el.svg.appendChild(g);
+    });
+    metrics();
+  }
+
+  function showEvents(count){
+    var events=count===undefined?tree.events:tree.events.slice(0,count);
+    el.events.innerHTML="";
+    if(!events.length){
+      var li=document.createElement("li");li.textContent="Dengeleme adımı gerekmedi.";el.events.appendChild(li);return;
+    }
+    var shown=events.length>EVENT_ROWS?events.slice(0,EVENT_ROWS-1):events;
+    shown.forEach(function(event){
+      var li=document.createElement("li");li.textContent=event;li.title=event;el.events.appendChild(li);
+    });
+    if(shown.length<events.length){
+      var more=document.createElement("li");more.textContent="… "+(events.length-shown.length)+" tane daha";el.events.appendChild(more);
+    }
+  }
+
+  async function animatePath(path,finalNode){
+    token++;
+    var t=token;disable(true);
+    for(var i=0;i<path.length;i++){
+      clearMarks();
+      marked[String(path[i].value)]="is-checking";
+      if(i>0)activeEdge=path[i-1].value+"->"+path[i].value;
+      if(finalNode&&path[i]===finalNode&&i===path.length-1)marked[String(path[i].value)]="is-found";
+      el.path.textContent=path.slice(0,i+1).map(function(n){return n.value;}).join(" → ");
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    disable(false);return true;
+  }
+
+  async function animateInorder(nodes){
+    token++;
+    var t=token,visited=[];disable(true);clearMarks();
+    for(var i=0;i<nodes.length;i++){
+      marked[String(nodes[i].value)]="is-checking";
+      visited.push(nodes[i].value);
+      el.path.textContent=visited.join(" → ");
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    disable(false);setStatus("Kök ortada gezinme tamamlandı.","is-ok");return true;
+  }
+
+  /* plays recorded frames; the tree itself is already in its final state */
+  async function play(frames,t){
+    for(var i=0;i<frames.length;i++){
+      var f=frames[i];
+      view=f;marked=f.marks;activeEdge=f.edge;
+      if(f.path!==undefined)el.path.textContent=f.path;
+      setStatus(f.msg);
+      showEvents(f.events);
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    view=null;
+    return true;
+  }
+
+  function finish(){
+    view=null;
+    showEvents();
+    disable(false);
+    render();
+  }
+
+  btn.insert.addEventListener("click",async function(){
+    try{
+      var value=readValue();
+      token++;
+      var t=token;
+      disable(true);
+      var inserted=tree.insert(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      marked[String(value)]="is-checking";
+      finish();
+      setStatus(inserted?value+" eklendi; tüm kırmızı-siyah özellikleri sağlanıyor.":value+" zaten var.",inserted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
+  });
+
+  btn.search.addEventListener("click",async function(){
+    try{
+      var value=readValue(),r=tree.search(value);
+      if(!(await animatePath(r.path,r.found?r.node:null)))return;
+      setStatus(r.found?value+" bulundu.":value+" bulunamadı.",r.found?"is-ok":"is-bad");
+    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+  });
+
+  btn.delete.addEventListener("click",async function(){
+    try{
+      var value=readValue();
+      token++;
+      var t=token;
+      disable(true);
+      var deleted=tree.delete(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      finish();
+      setStatus(deleted?value+" silindi; tüm kırmızı-siyah özellikleri sağlanıyor.":value+" bulunamadı.",deleted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
+  });
+
+  btn.min.addEventListener("click",async function(){
+    var r=tree.minimum();if(!r.node){setStatus("Ağaç boş.","is-bad");return;}
+    if(!(await animatePath(r.path,r.node)))return;setStatus("Minimum: "+r.node.value+".","is-ok");
+  });
+
+  btn.max.addEventListener("click",async function(){
+    var r=tree.maximum();if(!r.node){setStatus("Ağaç boş.","is-bad");return;}
+    if(!(await animatePath(r.path,r.node)))return;setStatus("Maksimum: "+r.node.value+".","is-ok");
+  });
+
+  btn.inorder.addEventListener("click",function(){animateInorder(tree.inorder());});
+
+  btn.validate.addEventListener("click",function(){
+    var result=tree.validate();
+    setStatus(result.message,result.valid?"is-ok":"is-bad");
+    el.path.textContent=result.valid?"Siyah yükseklik = "+result.bh:result.message;
+  });
+
+  function load(values){
+    token++;view=null;tree=new RBTree();
+    values.forEach(function(v){tree.insert(v);});
+    clearMarks();el.path.textContent="—";showEvents();disable(false);render();
+  }
+
+  btn.example.addEventListener("click",function(){
+    load([40,20,60,10,30,50,70,25,35,65,80]);
+    setStatus("Örnek kırmızı-siyah ağaç yüklendi.","is-ok");
+  });
+
+  btn.random.addEventListener("click",function(){
+    var values=[],used={};
+    while(values.length<12){
+      var v=Math.floor(Math.random()*90)+10;
+      if(!used[v]){used[v]=true;values.push(v);}
+    }
+    load(values);setStatus("Rastgele kırmızı-siyah ağaç oluşturuldu.","is-ok");
+  });
+
+  btn.reset.addEventListener("click",function(){
+    token++;view=null;tree=new RBTree();clearMarks();el.path.textContent="—";showEvents();disable(false);render();setStatus("Ağaç temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    var playing=view!==null;
+    token++;clearMarks();finish();setStatus(playing?"Animasyon durduruldu; ağacın son hâli gösteriliyor.":"Animasyon durduruldu.");
+  });
+
+  load([40,20,60,10,30,50,70]);
+  btn.cancel.disabled=true;
+})();
+</script>
+<script src="deck/oyun.js"></script>

@@ -1,0 +1,39 @@
+---
+title: "Two Bottles in the Refrigerator"
+date: 2010-06-24
+description: "Two bottles of mineral water he had always disliked were the only things left in the refrigerator — once every easier choice was gone, he discovered the dislike had been optional."
+tags:
+   - student-life
+   - university
+   - friends
+---
+
+The refrigerator contained two bottles of mineral water and almost nothing else worth drinking.
+
+I had disliked mineral water since childhood. Friends sometimes brought it when they visited because they knew I would not already have any, and a few unopened bottles had survived their owners. I opened the refrigerator, saw them, and closed the door again.
+
+There had to be another option.
+
+There was no water, no cola, and no milk. The student apartment had reached the point where thirst was more organized than the household. After some time, I opened the refrigerator again. The same two bottles were waiting with the calm confidence of objects that knew I was running out of principles.
+
+I opened one.
+
+The first drink did not produce a miracle, but after a little while I had a much more embarrassing thought: why had I spent years refusing this?
+
+Soon I was buying mineral water myself, often several bottles at a time. A childhood dislike had disappeared not because someone persuaded me, but because an almost empty refrigerator removed every easier choice.
+
+That apartment taught many things badly and a few things well. On this particular day, it taught me that taste can change while pride is looking somewhere else.
+
+The two bottles did not belong to me when they entered the refrigerator.
+
+The next ones did.
+
+## After Two Bottles in the Refrigerator
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future.
+
+What returns is the public awkwardness of learning how to be a person among other people. The memory does not ask to be important; it only asks not to be erased.
+
+Buzdolabındaki iki şişe, sessiz durdukları için daha komik. Birinin planı, birinin gelişi, birinin beklentisi ya da yalnızca kötü hesaplanmış bir alışveriş orada soğuk biçimde bekler.
+
+Bazı nesneler konuşmadıkları için hafızada daha net kalıyor. Onlara yüklediğimiz anlamı reddetmiyorlar. Şişeler yalnızca duruyor; hikâyeyi biz tamamlıyoruz.

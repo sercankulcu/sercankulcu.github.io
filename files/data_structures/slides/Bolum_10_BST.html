@@ -1,0 +1,828 @@
+---
+layout: without-sidebar
+title: "İkili Arama Ağacı Simülatörü"
+permalink: /files/data_structures/slides/Bolum_10_BST.html
+excerpt: "Ekleme, arama, silme, öncül, ardıl ve gezinme işlemlerini SVG çizimiyle gösteren etkileşimli ikili arama ağacı simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* 800x600 agt-oyun sahnesi: ortak simülatör denetimleri */
+.ds-sim.agt-oyun { font-size: 15px; }
+.ds-sim .ds-sim__body { display: flex; flex-direction: column; gap: 8px; line-height: 1.3; }
+.ds-sim .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.ds-sim .ds-sim__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body button.is-danger {
+  border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border));
+  color: var(--ds-bad);
+}
+.ds-sim .ds-sim__body input,
+.ds-sim .ds-sim__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 8px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body input[type="checkbox"],
+.ds-sim .ds-sim__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+.ds-sim .ds-sim__body input[type="range"] { padding: 0; border: 0; background: none; }
+.ds-sim .ds-sim__body label {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-sim .ds-sim__status {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__status.is-ok { color: var(--ds-good); }
+.ds-sim .ds-sim__status.is-bad { color: var(--ds-bad); }
+.ds-sim .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.ds-bst {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+/* ---------- controls ---------- */
+.ds-bst__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.ds-bst__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.ds-bst__field {
+  display: grid;
+  gap: 2px;
+  width: 96px;
+}
+
+.ds-bst__field input { width: 100%; }
+
+/* ---------- tree and results ---------- */
+.ds-bst__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  gap: 6px;
+}
+
+.ds-bst__visual {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ds-bst__svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-bst__empty-text {
+  fill: var(--ds-muted);
+  font-size: 14px;
+  text-anchor: middle;
+}
+
+.ds-bst__edge {
+  stroke: var(--ds-link);
+  stroke-width: 2;
+}
+
+.ds-bst__edge.is-active {
+  stroke: var(--ds-warn);
+  stroke-width: 4;
+}
+
+.ds-bst__node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 2.4;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.ds-bst__node text {
+  fill: var(--ds-text);
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.ds-bst__node.is-checking circle,
+.ds-bst__node.is-visited circle {
+  fill: var(--ds-hot);
+  stroke: var(--ds-warn);
+}
+
+.ds-bst__node.is-found circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+}
+
+.ds-bst__side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-bst__result {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 5px 8px 8px;
+  overflow: hidden;
+}
+
+.ds-bst__output {
+  min-height: 0;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 15px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- footer: status and stats ---------- */
+.ds-bst__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 2.6fr) repeat(4, minmax(0, .85fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-sim .ds-bst__status {
+  margin: 0;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-bst__status.is-success { color: var(--ds-good); }
+.ds-bst__status.is-error { color: var(--ds-bad); }
+
+.ds-bst__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-bst__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-bst * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-sim agt-oyun agt-oyun--stage" id="ds-sim" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 10 · Simülasyon</p><h1>İkili Arama Ağacı Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-bst-help" aria-label="Simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_10_Arama_Agaclari.html">← Bölüm 10</a>
+  </header>
+
+  <div class="agt-oyun__body ds-sim__body">
+    <div class="ds-sim__root ds-bst">
+      <div class="ds-bst__panel">
+        <div class="ds-bst__group">
+          <div class="ds-bst__field"><label for="ds-bst-value">Tam sayı değer</label><input id="ds-bst-value" type="number" value="42"></div>
+          <button class="is-primary" id="ds-bst-insert" type="button">Ekle</button>
+          <button id="ds-bst-search" type="button">Ara</button>
+          <button class="is-danger" id="ds-bst-delete" type="button">Sil</button>
+          <button id="ds-bst-predecessor" type="button">Öncül</button>
+          <button id="ds-bst-successor" type="button">Ardıl</button>
+        </div>
+
+        <div class="ds-bst__group">
+          <button id="ds-bst-min" type="button">Minimum</button>
+          <button id="ds-bst-max" type="button">Maksimum</button>
+          <button id="ds-bst-inorder" type="button">Kök ortada</button>
+          <button id="ds-bst-preorder" type="button">Kök önde</button>
+          <button id="ds-bst-postorder" type="button">Kök sonda</button>
+          <button id="ds-bst-levelorder" type="button">Düzey sırası</button>
+        </div>
+
+        <div class="ds-bst__group">
+          <button id="ds-bst-example" type="button">Örnek yükle</button>
+          <button id="ds-bst-random" type="button">Rastgele ağaç</button>
+          <button class="is-danger" id="ds-bst-reset" type="button">Sıfırla</button>
+          <button class="is-danger" id="ds-bst-cancel" type="button">Animasyonu durdur</button>
+        </div>
+      </div>
+
+      <div class="ds-bst__main">
+        <div class="ds-bst__visual ds-sim__panel">
+          <svg id="ds-bst-svg" class="ds-bst__svg" viewBox="0 0 480 260" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Etkileşimli ikili arama ağacı"></svg>
+        </div>
+
+        <div class="ds-bst__side">
+          <div class="ds-bst__result ds-sim__panel">
+            <p class="ds-sim__caption">Arama / işlem yolu</p>
+            <div id="ds-bst-path" class="ds-bst__output">—</div>
+          </div>
+          <div class="ds-bst__result ds-sim__panel">
+            <p class="ds-sim__caption">Gezinme sonucu</p>
+            <div id="ds-bst-traversal" class="ds-bst__output">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-bst__footer">
+        <p id="ds-bst-status" class="ds-bst__status ds-sim__status" role="status" aria-live="polite">Örnek ağaç yüklendi. Bir işlem seçin.</p>
+        <div class="ds-bst__stat"><strong>Düğüm</strong><span id="ds-bst-nodes">0</span></div>
+        <div class="ds-bst__stat"><strong>Yükseklik</strong><span id="ds-bst-height">0</span></div>
+        <div class="ds-bst__stat"><strong>Yaprak</strong><span id="ds-bst-leaves">0</span></div>
+        <div class="ds-bst__stat"><strong>Karşılaştırma</strong><span id="ds-bst-comparisons">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-bst-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>İkili Arama Ağacı Simülatörü</h2>
+    <p>Her düğümde sol alt ağaçtaki tüm değerler düğümden küçük, sağ alt ağaçtakilerin tümü büyüktür. Arama, ekleme, silme, öncül, ardıl, minimum, maksimum ve sıralı gezinme bu sıralama kuralıyla belirlenir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir tam sayı yazıp <b>Ekle</b>, <b>Ara</b>, <b>Sil</b>, <b>Öncül</b> ya da <b>Ardıl</b> düğmesine basın; yol boyunca ziyaret edilen düğümler vurgulanır.</li>
+      <li>Gezinme düğmeleri ziyaret sırasını canlandırır ve bu sırayı gezinme sonucu kutusuna yazar.</li>
+      <li><b>Örnek yükle</b>, <b>Rastgele ağaç</b> ve <b>Sıfırla</b> ağacı değiştirir; <b>Animasyonu durdur</b> çalışan işlemi keser.</li>
+    </ul>
+    <h3>İkili arama ağacı kavramları</h3>
+    <ul>
+      <li><b>Arama kararları:</b> her düğümde eşitlik aramayı bitirir. Aranan değer küçükse sola, büyükse sağa gidilir.</li>
+      <li><b>Öncül ve ardıl:</b> öncül, değerden küçük anahtarların en büyüğü; ardıl, değerden büyük anahtarların en küçüğüdür. Bir alt ağaçta ya da atalar arasında bulunabilirler.</li>
+      <li><b>Silme:</b> yaprak doğrudan kaldırılır; tek çocuklu düğümün yerine çocuğu geçer; iki çocuklu düğüm, sağ alt ağacının minimumunu (kök ortada ardılını) alır.</li>
+      <li><b>Bozulma:</b> sıralı değerler eklemek bir zincir oluşturur. Ağaç geçerli kalır ama yükseklik ve işlem süresi doğrusal olur.</li>
+    </ul>
+    <h3>Gezinme sıraları</h3>
+    <table>
+      <thead><tr><th>Gezinme</th><th>Sıra</th><th>Tipik kullanım</th></tr></thead>
+      <tbody>
+        <tr><td>Kök ortada (inorder)</td><td>Sol, kök, sağ</td><td>Değerleri sıralı okumak.</td></tr>
+        <tr><td>Kök önde (preorder)</td><td>Kök, sol, sağ</td><td>Ağaç yapısını serileştirmek ya da kopyalamak.</td></tr>
+        <tr><td>Kök sonda (postorder)</td><td>Sol, sağ, kök</td><td>Önce alt ağaçları silmek ya da değerlendirmek.</td></tr>
+        <tr><td>Düzey sırası (level-order)</td><td>Düzey düzey</td><td>Ağacı her seferinde bir düzey incelemek.</td></tr>
+      </tbody>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  function Node(value){this.value=value;this.left=null;this.right=null;}
+
+  function BST(){this.root=null;}
+
+  BST.prototype.trace=function(value){
+    var path=[],node=this.root;
+    while(node){
+      path.push(node);
+      if(value===node.value)return{found:true,node:node,path:path};
+      node=value<node.value?node.left:node.right;
+    }
+    return{found:false,node:null,path:path};
+  };
+
+  BST.prototype.insert=function(value){
+    if(!this.root){this.root=new Node(value);return{inserted:true,path:[this.root]};}
+    var node=this.root,path=[];
+    while(node){
+      path.push(node);
+      if(value===node.value)return{inserted:false,path:path};
+      if(value<node.value){
+        if(!node.left){node.left=new Node(value);path.push(node.left);return{inserted:true,path:path};}
+        node=node.left;
+      }else{
+        if(!node.right){node.right=new Node(value);path.push(node.right);return{inserted:true,path:path};}
+        node=node.right;
+      }
+    }
+  };
+
+  BST.prototype.delete=function(value){
+    var path=[],deleted=false;
+    function remove(node){
+      if(!node)return null;
+      path.push(node);
+      if(value<node.value){node.left=remove(node.left);return node;}
+      if(value>node.value){node.right=remove(node.right);return node;}
+      deleted=true;
+      if(!node.left)return node.right;
+      if(!node.right)return node.left;
+      var successor=node.right;
+      while(successor.left){path.push(successor);successor=successor.left;}
+      path.push(successor);
+      node.value=successor.value;
+      function removeMin(n){if(!n.left)return n.right;n.left=removeMin(n.left);return n;}
+      node.right=removeMin(node.right);
+      return node;
+    }
+    this.root=remove(this.root);
+    return{deleted:deleted,path:path};
+  };
+
+  BST.prototype.minimum=function(){
+    var path=[],n=this.root;
+    while(n){path.push(n);if(!n.left)break;n=n.left;}
+    return{node:n,path:path};
+  };
+
+  BST.prototype.maximum=function(){
+    var path=[],n=this.root;
+    while(n){path.push(n);if(!n.right)break;n=n.right;}
+    return{node:n,path:path};
+  };
+
+  BST.prototype.predecessor=function(value){
+    var path=[],n=this.root,candidate=null;
+    while(n){
+      path.push(n);
+      if(value<=n.value)n=n.left;
+      else{candidate=n;n=n.right;}
+    }
+    return{node:candidate,path:path};
+  };
+
+  BST.prototype.successor=function(value){
+    var path=[],n=this.root,candidate=null;
+    while(n){
+      path.push(n);
+      if(value>=n.value)n=n.right;
+      else{candidate=n;n=n.left;}
+    }
+    return{node:candidate,path:path};
+  };
+
+  BST.prototype.traverse=function(type){
+    var out=[];
+    if(type==="level"){
+      var q=this.root?[this.root]:[];
+      while(q.length){
+        var n=q.shift();out.push(n);
+        if(n.left)q.push(n.left);
+        if(n.right)q.push(n.right);
+      }
+      return out;
+    }
+    function walk(n){
+      if(!n)return;
+      if(type==="pre")out.push(n);
+      walk(n.left);
+      if(type==="in")out.push(n);
+      walk(n.right);
+      if(type==="post")out.push(n);
+    }
+    walk(this.root);
+    return out;
+  };
+
+  var root=document.querySelector(".ds-bst");
+  if(!root)return;
+  function q(id){return root.querySelector("#"+id);}
+  var ns="http://www.w3.org/2000/svg";
+  var tree=new BST();
+
+  /* the 800x600 stage holds at most MAX_NODES nodes; the drawing always fits its panel */
+  var MAX_NODES=15;
+  var DELAY=400;
+  var MARGIN=20;
+
+  var el={
+    value:q("ds-bst-value"),svg:q("ds-bst-svg"),status:q("ds-bst-status"),nodes:q("ds-bst-nodes"),height:q("ds-bst-height"),
+    leaves:q("ds-bst-leaves"),comparisons:q("ds-bst-comparisons"),path:q("ds-bst-path"),traversal:q("ds-bst-traversal")
+  };
+  var btn={
+    insert:q("ds-bst-insert"),search:q("ds-bst-search"),delete:q("ds-bst-delete"),
+    predecessor:q("ds-bst-predecessor"),successor:q("ds-bst-successor"),min:q("ds-bst-min"),max:q("ds-bst-max"),
+    inorder:q("ds-bst-inorder"),preorder:q("ds-bst-preorder"),postorder:q("ds-bst-postorder"),levelorder:q("ds-bst-levelorder"),
+    example:q("ds-bst-example"),random:q("ds-bst-random"),reset:q("ds-bst-reset"),cancel:q("ds-bst-cancel")
+  };
+
+  var token=0,marked={},activeEdge="",lastComparisons=0;
+
+  function readValue(){
+    if(el.value.value.trim()==="")throw new Error("Bir değer girin.");
+    var value=Number(el.value.value);
+    if(!Number.isSafeInteger(value))throw new Error("Geçerli bir tam sayı girin.");
+    return value;
+  }
+
+  function setStatus(message,type){
+    el.status.textContent=message;
+    el.status.classList.remove("is-success","is-error");
+    if(type)el.status.classList.add(type);
+  }
+
+  /* fixed-height output boxes keep their newest line visible */
+  function showText(box,text){
+    box.textContent=text;
+    box.scrollTop=box.scrollHeight;
+  }
+
+  function delay(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});}
+
+  function disable(state){
+    Object.keys(btn).forEach(function(key){btn[key].disabled=state&&key!=="cancel";});
+    btn.cancel.disabled=!state;
+  }
+
+  function clearMarks(){marked={};activeEdge="";}
+
+  /* positions in the panel's own pixels: every node gets its own column in inorder
+     (sorted) order, so even a deep tree keeps readable nodes; the level gap and node
+     radius shrink so that every level fits the height */
+  function layout(width,height){
+    var nodes=[],edges=[],maxDepth=0,total=0;
+    (function count(node){if(node){total++;count(node.left);count(node.right);}})(tree.root);
+    var col=(width-2*MARGIN)/Math.max(1,total),rank=0;
+    function place(node,depth,parentNode){
+      if(!node)return;
+      if(depth>maxDepth)maxDepth=depth;
+      if(parentNode)edges.push({from:parentNode,to:node});
+      place(node.left,depth+1,node);
+      nodes.push({node:node,x:MARGIN+(rank+0.5)*col,y:0,depth:depth});
+      rank++;
+      place(node.right,depth+1,node);
+    }
+    place(tree.root,0,null);
+
+    var minGap=width,levels={};
+    nodes.forEach(function(n){(levels[n.depth]=levels[n.depth]||[]).push(n.x);});
+    Object.keys(levels).forEach(function(d){
+      var xs=levels[d].sort(function(a,b){return a-b;});
+      for(var i=1;i<xs.length;i++)minGap=Math.min(minGap,xs[i]-xs[i-1]);
+    });
+
+    var levelGap=maxDepth?Math.min(70,(height-2*MARGIN)/maxDepth):0;
+    var r=Math.max(6,Math.min(18,minGap*0.45,maxDepth?levelGap*0.42:18));
+    var top=r+4;
+    levelGap=maxDepth?Math.min(70,Math.max(2*r+2,(height-2*top)/maxDepth)):0;
+    var used=2*top+levelGap*maxDepth;
+    var offset=Math.max(0,(height-used)/2);
+    nodes.forEach(function(n){n.y=offset+top+n.depth*levelGap;});
+
+    return{nodes:nodes,edges:edges,r:r,height:Math.max(height,used)};
+  }
+
+  function metrics(){
+    var count=0,leaves=0,height=0;
+    function walk(node,depth){
+      if(!node)return;
+      count++;
+      if(depth>height)height=depth;
+      if(!node.left&&!node.right)leaves++;
+      walk(node.left,depth+1);walk(node.right,depth+1);
+    }
+    walk(tree.root,1);
+    el.nodes.textContent=String(count);
+    el.height.textContent=String(height);
+    el.leaves.textContent=String(leaves);
+    el.comparisons.textContent=String(lastComparisons);
+  }
+
+  function render(){
+    while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
+    var box=el.svg.parentNode,width=box.clientWidth||480,height=box.clientHeight||260;
+    if(!tree.root){
+      el.svg.setAttribute("viewBox","0 0 "+width+" "+height);
+      var empty=document.createElementNS(ns,"text");
+      empty.setAttribute("x",String(width/2));empty.setAttribute("y",String(height/2));
+      empty.setAttribute("class","ds-bst__empty-text");empty.textContent="Ağaç boş.";el.svg.appendChild(empty);metrics();return;
+    }
+
+    var data=layout(width,height);
+    el.svg.setAttribute("viewBox","0 0 "+width+" "+data.height);
+
+    data.edges.forEach(function(edge){
+      var a=data.nodes.find(function(x){return x.node===edge.from;});
+      var b=data.nodes.find(function(x){return x.node===edge.to;});
+      var line=document.createElementNS(ns,"line");
+      line.setAttribute("x1",String(a.x));line.setAttribute("y1",String(a.y));
+      line.setAttribute("x2",String(b.x));line.setAttribute("y2",String(b.y));
+      line.setAttribute("class","ds-bst__edge"+(activeEdge===edge.from.value+"->"+edge.to.value?" is-active":""));
+      el.svg.appendChild(line);
+    });
+
+    data.nodes.forEach(function(item){
+      var g=document.createElementNS(ns,"g");
+      var state=marked[String(item.node.value)]||"";
+      g.setAttribute("class","ds-bst__node"+(state?" "+state:""));
+      g.setAttribute("transform","translate("+item.x+" "+item.y+")");
+      var c=document.createElementNS(ns,"circle");c.setAttribute("r",String(data.r));
+      var t=document.createElementNS(ns,"text");t.setAttribute("font-size",String(Math.max(12,Math.min(15,Math.round(data.r*0.82)))));t.textContent=String(item.node.value);
+      g.appendChild(c);g.appendChild(t);el.svg.appendChild(g);
+    });
+    metrics();
+  }
+
+  function begin(){
+    token++;
+    disable(true);
+    clearMarks();
+    lastComparisons=0;
+    return token;
+  }
+
+  function finish(){
+    disable(false);
+    render();
+  }
+
+  /* walks the path one node at a time; every visited node is one key comparison */
+  async function animatePath(path,t){
+    for(var i=0;i<path.length;i++){
+      clearMarks();
+      marked[String(path[i].value)]="is-checking";
+      if(i>0)activeEdge=path[i-1].value+"->"+path[i].value;
+      lastComparisons=i+1;
+      showText(el.path,path.slice(0,i+1).map(function(n){return n.value;}).join(" → "));
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    return true;
+  }
+
+  /* shows the answer node (which need not be the last node on the path) */
+  async function showAnswer(node,t){
+    if(!node)return true;
+    marked[String(node.value)]="is-found";
+    render();
+    return await wait(delay(),t);
+  }
+
+  async function animateTraversal(nodes,label){
+    var t=begin(),visited=[];
+
+    for(var i=0;i<nodes.length;i++){
+      marked[String(nodes[i].value)]="is-visited";
+      visited.push(nodes[i].value);
+      showText(el.traversal,visited.join(" → "));
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+
+    finish();
+    setStatus("Gezinme tamamlandı ("+label+").","is-success");
+    return true;
+  }
+
+  btn.insert.addEventListener("click",async function(){
+    try{
+      var value=readValue(),before=tree.trace(value);
+      if(!before.found&&tree.traverse("in").length>=MAX_NODES)throw new Error("Ağaç dolu: bu simülatör en çok "+MAX_NODES+" düğüm tutar.");
+      var t=begin();
+      if(!(await animatePath(before.path,t)))return;
+      if(before.found){
+        marked[String(value)]="is-found";finish();
+        setStatus(value+" zaten var; ikili arama ağacı her anahtarı bir kez tutar.","is-error");
+        return;
+      }
+      var parent=before.path[before.path.length-1]||null;
+      tree.insert(value);
+      clearMarks();
+      marked[String(value)]="is-found";
+      if(parent)activeEdge=parent.value+"->"+value;
+      finish();
+      setStatus(parent?value+", "+parent.value+" düğümünün "+(value<parent.value?"sol":"sağ")+" çocuğu olarak eklendi.":value+" kök olarak eklendi.","is-success");
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  btn.search.addEventListener("click",async function(){
+    try{
+      var value=readValue(),result=tree.trace(value);
+      var t=begin();
+      if(!(await animatePath(result.path,t)))return;
+      if(result.found)marked[String(value)]="is-found";
+      finish();
+      setStatus(result.found?value+" bulundu.":value+" bulunamadı (boş bir alt ağaca ulaşıldı).",result.found?"is-success":"is-error");
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  btn.delete.addEventListener("click",async function(){
+    try{
+      var value=readValue(),before=tree.trace(value);
+      var t=begin();
+      if(!(await animatePath(before.path,t)))return;
+      if(!before.found){finish();setStatus(value+" bulunamadı.","is-error");return;}
+
+      var node=before.node,message;
+      marked[String(value)]="is-found";
+      render();
+
+      if(node.left&&node.right){
+        /* two children: the inorder successor is the leftmost node of the right subtree */
+        setStatus("İki çocuk: ardıl = sağ alt ağacın en soldaki düğümü.");
+        if(!(await wait(delay(),t)))return;
+        var prev=node,s=node.right;
+        while(true){
+          clearMarks();
+          marked[String(value)]="is-found";
+          marked[String(s.value)]="is-checking";
+          activeEdge=prev.value+"->"+s.value;
+          render();
+          if(!(await wait(delay(),t)))return;
+          if(!s.left)break;
+          prev=s;s=s.left;
+        }
+        setStatus("Ardıl "+s.value+": "+s.value+" değeri "+value+" düğümüne kopyalanır, sonra eski "+s.value+" kaldırılır.");
+        if(!(await wait(delay(),t)))return;
+        message=value+" silindi (iki çocuk): yerine ardıl "+s.value+" geçti.";
+        tree.delete(value);
+        clearMarks();
+        marked[String(s.value)]="is-found";
+      }else if(node.left||node.right){
+        var child=node.left||node.right;
+        message=value+" silindi (tek çocuk): yerine çocuğu "+child.value+" geçti.";
+        tree.delete(value);
+        clearMarks();
+        marked[String(child.value)]="is-found";
+      }else{
+        message=value+" silindi (yaprak): doğrudan kaldırıldı.";
+        tree.delete(value);
+        clearMarks();
+      }
+      finish();
+      setStatus(message,"is-success");
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  btn.min.addEventListener("click",async function(){
+    var r=tree.minimum();
+    if(!r.node){setStatus("Ağaç boş.","is-error");return;}
+    var t=begin();
+    if(!(await animatePath(r.path,t)))return;
+    marked[String(r.node.value)]="is-found";finish();
+    setStatus("Minimum: "+r.node.value+" (sol çocuğu yok).","is-success");
+  });
+
+  btn.max.addEventListener("click",async function(){
+    var r=tree.maximum();
+    if(!r.node){setStatus("Ağaç boş.","is-error");return;}
+    var t=begin();
+    if(!(await animatePath(r.path,t)))return;
+    marked[String(r.node.value)]="is-found";finish();
+    setStatus("Maksimum: "+r.node.value+" (sağ çocuğu yok).","is-success");
+  });
+
+  /* predecessor = last node where the search turned right (the largest key smaller than
+     the value); this covers both "max of the left subtree" and "go up to an ancestor" */
+  btn.predecessor.addEventListener("click",async function(){
+    try{
+      var value=readValue(),r=tree.predecessor(value);
+      var t=begin();
+      if(!(await animatePath(r.path,t)))return;
+      if(!(await showAnswer(r.node,t)))return;
+      finish();
+      setStatus(r.node?value+" değerinin öncülü "+r.node.value+" ("+value+" değerinden küçük en büyük anahtar).":"Öncül yok: hiçbir anahtar "+value+" değerinden küçük değil.",r.node?"is-success":"is-error");
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  btn.successor.addEventListener("click",async function(){
+    try{
+      var value=readValue(),r=tree.successor(value);
+      var t=begin();
+      if(!(await animatePath(r.path,t)))return;
+      if(!(await showAnswer(r.node,t)))return;
+      finish();
+      setStatus(r.node?value+" değerinin ardılı "+r.node.value+" ("+value+" değerinden büyük en küçük anahtar).":"Ardıl yok: hiçbir anahtar "+value+" değerinden büyük değil.",r.node?"is-success":"is-error");
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  btn.inorder.addEventListener("click",function(){animateTraversal(tree.traverse("in"),"kök ortada");});
+  btn.preorder.addEventListener("click",function(){animateTraversal(tree.traverse("pre"),"kök önde");});
+  btn.postorder.addEventListener("click",function(){animateTraversal(tree.traverse("post"),"kök sonda");});
+  btn.levelorder.addEventListener("click",function(){animateTraversal(tree.traverse("level"),"düzey sırası");});
+
+  function load(values){
+    token++;tree=new BST();clearMarks();lastComparisons=0;
+    values.forEach(function(v){tree.insert(v);});
+    el.path.textContent="—";el.traversal.textContent="—";disable(false);render();
+  }
+
+  btn.example.addEventListener("click",function(){
+    load([50,30,70,20,40,60,80,10,25,35,45,65,75]);
+    setStatus("Örnek ağaç yüklendi.","is-success");
+  });
+
+  btn.random.addEventListener("click",function(){
+    var values=[],used={};
+    while(values.length<12){
+      var v=Math.floor(Math.random()*90)+10;
+      if(!used[v]){used[v]=true;values.push(v);}
+    }
+    load(values);setStatus("Rastgele ikili arama ağacı oluşturuldu.","is-success");
+  });
+
+  btn.reset.addEventListener("click",function(){
+    token++;tree=new BST();clearMarks();lastComparisons=0;
+    el.path.textContent="—";el.traversal.textContent="—";disable(false);render();setStatus("Ağaç temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    token++;clearMarks();disable(false);render();setStatus("Animasyon durduruldu.");
+  });
+
+
+  load([50,30,70,20,40,60,80]);
+  btn.cancel.disabled=true;
+})();
+</script>
+<script src="deck/oyun.js"></script>

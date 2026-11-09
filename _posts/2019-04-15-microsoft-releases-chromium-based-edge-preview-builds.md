@@ -1,0 +1,15 @@
+---
+title: Microsoft Releases Chromium-Based Edge Preview Builds
+date: 2019-04-15
+permalink: /posts/2019/04/microsoft-releases-chromium-based-edge-preview-builds/
+tags:
+  - software
+  - programming
+  - computing-history
+---
+
+Microsoft announced the new Chromium-based Edge on December 6, 2018, and released the first Canary and Dev channel builds on January 20, 2019, followed by the Beta channel on April 8, 2019. The decision meant abandoning EdgeHTML — the proprietary rendering engine built from the remnants of Trident (Internet Explorer's engine) and introduced with Windows 10 in 2015 — along with the Chakra JavaScript engine. At the time of the announcement, Edge held approximately 4% global browser market share versus Chrome's ~63%, Internet Explorer's ~7%, and Firefox's ~10% (StatCounter data, Q4 2018). The compatibility situation was the primary driver: websites routinely displayed "Works best in Chrome" banners when accessed from Edge, and developer tools in Chromium's DevTools were far more capable than Edge's F12 tools. The extension ecosystem was another gap — the Chrome Web Store had tens of thousands of extensions while Edge's own extension library had a few hundred.
+
+Microsoft chose Chromium's open-source codebase as the base rather than forking Chrome directly: Chromium is the upstream project (MIT and BSD licensed) that Google's Chrome builds on, and Microsoft's Edge team contributed patches back to the Chromium project rather than maintaining a private fork. Microsoft's contributions focused on PWA (Progressive Web App) improvements, accessibility APIs (integrating with Windows UIA/MSAA rather than only Chromium's AT-SPI), ARM64 support for Windows on ARM devices, and IE Mode — a component allowing specific intranet URLs to render in an embedded Internet Explorer 11 engine (Trident/MSHTML) for enterprise compatibility with legacy ActiveX-based applications that organizations hadn't migrated. The combination of modern web rendering for most sites and IE Mode for legacy internal apps was the key enterprise selling point Microsoft used to position Edge as an IE replacement.
+
+The stable release of Chromium-based Microsoft Edge launched January 15, 2020 for Windows 7, 8.1, 10, and macOS simultaneously — the first time Microsoft had simultaneously shipped a major Windows browser on macOS. Microsoft pushed the new Edge to Windows 10 machines via Windows Update in 2020, replacing the original EdgeHTML-based Edge (which was subsequently removed from Windows 10 20H2 onwards as a separately installable app). Edge added differentiating features including Collections (saving and organizing web research into named groups), sleeping tabs (suspending background tabs to reclaim RAM), vertical tabs (moving the tab bar to the left side of the browser), and a built-in coupon finder. Opera had switched from its own Presto engine to Chromium/Blink in 2013; with Edge's transition, Firefox (Gecko) and Safari (WebKit) remained the only major browsers with fully independent rendering engines.

@@ -1,0 +1,160 @@
+---
+layout: without-sidebar
+title: "Arama Algoritmaları"
+permalink: /files/algorithms/slides/Bolum_03_Search.html
+excerpt: "Doğrusal, ikili ve atlayarak arama için etkileşimli simülasyon."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-search .algo-stage__body { display: flex; flex-direction: column; gap: 8px; }
+.algo-search .sr-controls { flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+.algo-search .sr-controls label { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.algo-search .sr-controls input { width: 84px; }
+.algo-search .sr-visual { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 10px 12px 8px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-search .sr-row { display: grid; grid-template-columns: repeat(16, 1fr); gap: 5px; }
+.algo-search .sr-bars { flex: 1; min-height: 0; align-items: end; border-bottom: 1.5px solid var(--ds-border); }
+.algo-search .sr-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; height: 100%; }
+.algo-search .sr-val { color: var(--ds-text); font-size: 15px; font-weight: 800; text-align: center; }
+.algo-search .sr-bar { border-radius: 6px 6px 0 0; background: var(--ds-node); border: 1.5px solid var(--ds-link); border-bottom: 0; transition: background .15s ease; }
+.algo-search .sr-col.is-out .sr-bar { background: var(--ds-surface); border-color: var(--ds-border); }
+.algo-search .sr-col.is-out .sr-val { color: var(--ds-muted); }
+.algo-search .sr-col.is-checking .sr-bar { background: var(--ds-hot); border-color: var(--ds-warn); }
+.algo-search .sr-col.is-found .sr-bar { background: var(--ds-good); border-color: var(--ds-good); }
+.algo-search .sr-col.is-found .sr-val { color: var(--ds-good); }
+.algo-search .sr-idx { padding-top: 3px; color: var(--ds-muted); font-size: 12px; text-align: center; }
+.algo-search .sr-mark { height: 20px; color: var(--ds-accent); font-size: 13px; font-weight: 800; text-align: center; white-space: nowrap; }
+.algo-search .sr-metrics { flex: none; display: grid; grid-template-columns: 1fr 1fr 2.4fr; gap: 8px; }
+.algo-search .sr-metric { padding: 5px 10px; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-bg); text-align: center; }
+.algo-search .sr-metric b { display: block; color: var(--ds-muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.algo-search .sr-metric span { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.algo-search .sr-log { flex: none; height: 76px; margin: 0; padding: 4px 12px; overflow: hidden; border-radius: 12px; background: var(--ds-surface-strong); list-style: none; font-size: 14px; line-height: 1.55; }
+.algo-search .sr-log li { margin: 0; color: var(--ds-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-search .sr-log li:last-child { color: var(--ds-text); font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .algo-search .sr-bar { transition: none; } }
+</style>
+
+<div class="algo-search algo-stage algo-stage--stage" lang="tr">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Bölüm 3 · Simülasyon</p><h1>Arama Algoritmaları</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="search-help">?</button>
+    <a class="algo-stage__back" href="Bolum_03_Arama.html">← Bölüm 3</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="sr-controls">
+      <label for="algo-search-target">Hedef <input id="algo-search-target" type="number" placeholder="Değer" aria-label="Hedef değer"></label>
+      <button id="algo-search-linear" class="is-primary" type="button">Doğrusal</button>
+      <button id="algo-search-binary" class="is-primary" type="button">İkili</button>
+      <button id="algo-search-jump" class="is-primary" type="button">Atlayarak</button>
+      <button id="algo-search-reset" type="button">Yeni Dizi</button>
+      <label for="algo-search-speed">Hız <select id="algo-search-speed" aria-label="Animasyon hızı"><option value="800">Yavaş</option><option value="420" selected>Normal</option><option value="150">Hızlı</option></select></label>
+    </div>
+    <div class="sr-visual">
+      <div id="algo-search-array" class="sr-row sr-bars"></div>
+      <div id="algo-search-idx" class="sr-row"></div>
+      <div id="algo-search-marks" class="sr-row"></div>
+    </div>
+    <div class="sr-metrics">
+      <div class="sr-metric"><b>Algoritma</b><span id="algo-search-alg">–</span></div>
+      <div class="sr-metric"><b>Karşılaştırma</b><span id="algo-search-count">0</span></div>
+      <div class="sr-metric"><b>Durum</b><span id="algo-search-message" role="status">Hazır.</span></div>
+    </div>
+    <ul id="algo-search-log" class="sr-log" aria-live="polite"></ul>
+  </div>
+  <dialog class="algo-stage__dialog" id="search-help"><button type="button" class="algo-stage__close">Kapat</button>
+    <h2>Arama Algoritmaları</h2>
+    <p>Doğrusal, ikili ve atlayarak aramayı aynı dizi üzerinde adım adım karşılaştırın.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir hedef değer yazın (0–99) ve <strong>Doğrusal</strong>, <strong>İkili</strong> ya da <strong>Atlayarak</strong> düğmesine basın. Turuncu çubuk karşılaştırılan öğedir; soluk çubuklar dizinin hâlâ incelenen bölümünün dışındadır.</li>
+      <li>İkili arama ve atlayarak arama yalnızca sıralı veride çalıştığı için önce diziyi sıralar.</li>
+      <li><strong>Yeni Dizi</strong> 16 rastgele değer üretir; <strong>Hız</strong> animasyon gecikmesini değiştirir. Çubukların altındaki işaretler ikili aramada L / M / R'yi (sol, orta, sağ), atlayarak aramada o anki bloğu (atla, son) gösterir.</li>
+    </ul>
+    <h3>Doğrusal arama</h3>
+    <p>Değerleri tek tek denetler. Sıralı dizi gerektirmez; en kötü durumda O(n) sürede çalışır.</p>
+    <h3>İkili arama</h3>
+    <p>Sıralı veri gerektirir ve kalan arama aralığını tekrar tekrar yarıya indirir; en kötü durumda süre O(log n)'dir.</p>
+    <h3>Atlayarak arama</h3>
+    <p>Sıralı veri gerektirir. Yaklaşık √n konumluk atlamalar yapar, ardından kısa bir doğrusal tarama yapar; en kötü durumda süre O(√n)'dir.</p>
+    <table>
+      <tr><th>Algoritma</th><th>Sıralı veri gerekir mi?</th><th>En kötü durum</th><th>n = 16</th></tr>
+      <tr><td>Doğrusal</td><td>Hayır</td><td>O(n)</td><td>16 karşılaştırma</td></tr>
+      <tr><td>İkili</td><td>Evet</td><td>O(log n)</td><td>5 karşılaştırma</td></tr>
+      <tr><td>Atlayarak</td><td>Evet</td><td>O(√n)</td><td>yaklaşık 8 karşılaştırma</td></tr>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.querySelector(".algo-search");if(!root)return;
+function q(id){return root.querySelector("#"+id);}
+var array=[],token=0,count=0,logLines=[],box=q("algo-search-array"),msg=q("algo-search-message"),input=q("algo-search-target"),buttons=[q("algo-search-linear"),q("algo-search-binary"),q("algo-search-jump"),q("algo-search-reset")];
+function setBusy(v){buttons.slice(0,3).forEach(function(b){b.disabled=v;});}
+/* st: {check, found, lo, hi, marks:{index:label}} */
+function render(st){st=st||{};var lo=st.lo===undefined?0:st.lo,hi=st.hi===undefined?array.length-1:st.hi,marks=st.marks||{};
+box.innerHTML="";var idx=q("algo-search-idx"),mk=q("algo-search-marks");idx.innerHTML="";mk.innerHTML="";
+array.forEach(function(v,i){var col=document.createElement("div");col.className="sr-col"+(i<lo||i>hi?" is-out":"")+(i===st.check?" is-checking":"")+(i===st.found?" is-found":"");
+var lab=document.createElement("div");lab.className="sr-val";lab.textContent=v;var bar=document.createElement("div");bar.className="sr-bar";bar.style.height=Math.max(3,v)*0.82+"%";
+col.appendChild(lab);col.appendChild(bar);box.appendChild(col);
+var d=document.createElement("div");d.className="sr-idx";d.textContent=i;idx.appendChild(d);
+var m=document.createElement("div");m.className="sr-mark";m.textContent=marks[i]||"";mk.appendChild(m);});}
+function log(t){logLines.push(t);if(logLines.length>3)logLines.shift();var ul=q("algo-search-log");ul.innerHTML="";logLines.forEach(function(s){var li=document.createElement("li");li.textContent=s;ul.appendChild(li);});}
+function cmp(){count++;q("algo-search-count").textContent=count;}
+function begin(name){count=0;logLines=[];q("algo-search-count").textContent=0;q("algo-search-alg").textContent=name;q("algo-search-log").innerHTML="";}
+function finish(text,st){render(st);msg.textContent=text;log(text);setBusy(false);}
+function generate(){token++;array=Array.from({length:16},function(){return Math.floor(Math.random()*100);});render();begin("–");msg.textContent="Yeni rastgele dizi.";log("16 değerli yeni rastgele dizi üretildi.");setBusy(false);}
+function target(){var v=Number(input.value);if(input.value.trim()===""||!Number.isFinite(v))throw new Error("Geçerli bir hedef değer girin.");return v;}
+function delay(){return Number(q("algo-search-speed").value)||420;}
+function wait(t){return new Promise(function(r){setTimeout(function(){r(t===token);},delay());});}
+function sortArr(){array.sort(function(a,b){return a-b;});}
+async function linear(){var value=target(),t=++token;setBusy(true);begin("Doğrusal");msg.textContent="Aranıyor…";log("Doğrusal arama, hedef "+value+".");
+for(var i=0;i<array.length;i++){render({check:i,lo:i});cmp();if(!await wait(t))return;
+if(array[i]===value){finish("Bulundu: indis "+i+".",{found:i,lo:i,hi:i});return;}log("A["+i+"] = "+array[i]+" ≠ "+value+".");}
+finish("Hedef "+value+" bulunamadı.",{lo:array.length});}
+async function binary(){var value=target(),t=++token;sortArr();setBusy(true);begin("İkili");msg.textContent="Aranıyor…";log("Dizi sıralandı. İkili arama, hedef "+value+".");
+var l=0,r=array.length-1;while(l<=r){var m=Math.floor((l+r)/2),mk={};mk[l]="L";mk[r]=(mk[r]?mk[r]+" ":"")+"R";mk[m]=(mk[m]?mk[m]+" ":"")+"M";
+render({check:m,lo:l,hi:r,marks:mk});cmp();if(!await wait(t))return;
+if(array[m]===value){finish("Bulundu: indis "+m+".",{found:m,lo:m,hi:m});return;}
+if(array[m]<value){log("A["+m+"] = "+array[m]+" < "+value+" → L = "+(m+1)+".");l=m+1;}else{log("A["+m+"] = "+array[m]+" > "+value+" → R = "+(m-1)+".");r=m-1;}}
+finish("Hedef "+value+" bulunamadı.",{lo:1,hi:0});}
+async function jump(){var value=target(),t=++token;sortArr();setBusy(true);begin("Atlayarak");msg.textContent="Aranıyor…";var n=array.length,sq=Math.floor(Math.sqrt(n)),step=sq,prev=0;log("Dizi sıralandı. Atlama boyu ⌊√"+n+"⌋ = "+sq+".");
+while(prev<n&&array[Math.min(step,n)-1]<value){var idx=Math.min(step,n)-1,mk={};mk[idx]="atla";render({check:idx,lo:prev,hi:idx,marks:mk});cmp();if(!await wait(t))return;
+log("A["+idx+"] = "+array[idx]+" < "+value+" → sonraki bloğa atla.");prev=step;step+=sq;
+if(prev>=n){finish("Hedef "+value+" bulunamadı.",{lo:1,hi:0});return;}}
+var end=Math.min(step,n)-1;if(prev<n){var mk2={};mk2[end]="son";render({check:end,lo:prev,hi:end,marks:mk2});cmp();if(!await wait(t))return;log("A["+end+"] = "+array[end]+" ≥ "+value+" → ["+prev+", "+end+"] bloğunu tara.");}
+while(prev<Math.min(step,n)&&array[prev]<value){render({check:prev,lo:prev,hi:end});cmp();if(!await wait(t))return;log("A["+prev+"] = "+array[prev]+" < "+value+".");prev++;}
+if(prev<n&&prev<=end){render({check:prev,lo:prev,hi:end});cmp();if(!await wait(t))return;}
+if(prev<n&&array[prev]===value){finish("Bulundu: indis "+prev+".",{found:prev,lo:prev,hi:prev});return;}
+finish("Hedef "+value+" bulunamadı.",{lo:1,hi:0});}
+function safe(fn){return function(){try{var p=fn();if(p&&p.catch)p.catch(function(e){msg.textContent=e.message;setBusy(false);});}catch(e){msg.textContent=e.message;log(e.message);setBusy(false);}}}
+q("algo-search-linear").addEventListener("click",safe(linear));q("algo-search-binary").addEventListener("click",safe(binary));q("algo-search-jump").addEventListener("click",safe(jump));q("algo-search-reset").addEventListener("click",generate);
+generate();
+})();
+</script>
+<script src="deck/stage.js"></script>

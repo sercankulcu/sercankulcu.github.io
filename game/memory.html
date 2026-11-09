@@ -1,0 +1,580 @@
+---
+layout: without-sidebar
+title: "Memory Game"
+permalink: /game/memory/
+redirect_from:
+  - /game/memory.html
+excerpt: "Match pairs of cards while tracking moves and time."
+---
+
+<style>
+.memory-app,
+.memory-app *,
+.memory-app *::before,
+.memory-app *::after {
+  box-sizing: border-box;
+}
+
+.memory-app {
+  width: min(860px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.memory-panel {
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.memory-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.memory-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.memory-logo {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--global-link-color);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.memory-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.65rem, 4vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.memory-subtitle {
+  margin: 4px 0 0;
+  color: var(--global-text-color);
+  opacity: .64;
+  font-size: .92rem;
+}
+
+.memory-help,
+.memory-button,
+.memory-card {
+  font: inherit;
+}
+
+.memory-help {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.memory-help:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.memory-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.memory-stat {
+  padding: 9px 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .06);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.memory-grid {
+  width: min(100%, 520px);
+  margin: 12px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.memory-card {
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+  background: rgba(127, 127, 127, .07);
+  color: var(--global-text-color);
+  font-size: clamp(24px, 6vw, 38px);
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.memory-card:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--global-link-color);
+}
+
+.memory-card.is-open {
+  background: var(--global-link-color);
+  color: #fff;
+  border-color: var(--global-link-color);
+}
+
+.memory-card.is-matched {
+  background: rgba(47, 133, 90, .14);
+  border-color: rgba(47, 133, 90, .45);
+}
+
+.memory-card:disabled {
+  cursor: default;
+}
+
+.memory-message {
+  min-height: 34px;
+  margin: 14px 0 2px;
+  color: var(--global-text-color);
+  text-align: center;
+  font-weight: 800;
+}
+
+.memory-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.memory-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.memory-button:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.memory-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 24px;
+  display: none;
+  overflow: auto;
+  background: rgba(0, 0, 0, .62);
+}
+
+.memory-modal.is-open {
+  display: block;
+}
+
+.memory-modal-box {
+  width: min(680px, 100%);
+  margin: 8vh auto;
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+}
+
+.memory-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.memory-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.memory-modal-text {
+  margin: 14px 0 0;
+  line-height: 1.65;
+  opacity: .8;
+}
+
+@media (max-width: 640px) {
+  .memory-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .memory-panel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .memory-grid {
+    width: min(100%, 430px);
+    gap: 6px;
+  }
+
+  .memory-card {
+    font-size: clamp(22px, 7vw, 34px);
+  }
+}
+
+@media (max-height: 720px) {
+  .memory-panel {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .memory-stats {
+    margin: 7px 0;
+  }
+
+  .memory-grid {
+    width: min(88vw, 380px);
+    margin-top: 7px;
+    gap: 5px;
+  }
+
+  .memory-card {
+    font-size: clamp(20px, 5.5vw, 30px);
+  }
+
+  .memory-message {
+    min-height: 24px;
+    margin: 7px 0 2px;
+  }
+}
+
+@media (max-height: 620px) {
+  .memory-subtitle {
+    display: none;
+  }
+
+  .memory-topbar {
+    margin-bottom: 4px;
+  }
+
+  .memory-stats {
+    gap: 5px;
+    margin: 4px 0;
+  }
+
+  .memory-stat {
+    padding: 6px 8px;
+    font-size: .82rem;
+  }
+
+  .memory-grid {
+    width: min(76vh, 86vw, 340px);
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-app *,
+  .memory-app *::before,
+  .memory-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+
+<div class="memory-app">
+  <section class="memory-panel" aria-labelledby="memory-title">
+    <div class="memory-topbar">
+      <div class="memory-brand">
+        <div class="memory-logo" aria-hidden="true">🧠</div>
+        <div>
+          <h1 class="memory-title" id="memory-title">Memory</h1>
+          <p class="memory-subtitle">Match all eight pairs in as few moves as possible.</p>
+        </div>
+      </div>
+
+      <button class="memory-help" id="memory-help" type="button" aria-label="How to play">?</button>
+    </div>
+
+    <div class="memory-stats" aria-label="Game statistics">
+      <span class="memory-stat">Moves: <b id="memory-moves">0</b></span>
+      <span class="memory-stat">Time: <b id="memory-time">0</b>s</span>
+      <span class="memory-stat">Pairs: <b id="memory-pairs">0</b>/<span id="memory-total">8</span></span>
+      <span class="memory-stat">Best: <b id="memory-best">—</b></span>
+    </div>
+
+    <div class="memory-grid" id="memory-game" aria-label="Memory card grid"></div>
+
+    <div class="memory-message" id="memory-message" aria-live="polite"></div>
+
+    <div class="memory-actions">
+      <button class="memory-button" id="memory-restart" type="button">New Game</button>
+    </div>
+  </section>
+</div>
+
+<div class="memory-modal" id="memory-modal" role="dialog" aria-modal="true" aria-labelledby="memory-modal-title">
+  <div class="memory-modal-box">
+    <div class="memory-modal-head">
+      <h2 class="memory-modal-title" id="memory-modal-title">How to Play</h2>
+      <button class="memory-button" id="memory-close" type="button">Close</button>
+    </div>
+
+    <p class="memory-modal-text">
+      Open two cards at a time and try to find matching symbols.
+      Matched pairs stay visible. The game tracks your moves and elapsed time.
+      Each new game randomly selects one of four emoji themes.
+    </p>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const THEMES = [
+    ["🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐸"],
+    ["🍎", "🍌", "🍇", "🍉", "🍓", "🥕", "🍕", "🍔"],
+    ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏓", "🥊"],
+    ["🚀", "🛸", "🌍", "🌕", "🌟", "🌌", "🪐", "☄️"]
+  ];
+
+  const game = document.getElementById("memory-game");
+  const moves = document.getElementById("memory-moves");
+  const time = document.getElementById("memory-time");
+  const pairs = document.getElementById("memory-pairs");
+  const message = document.getElementById("memory-message");
+  const restart = document.getElementById("memory-restart");
+  const help = document.getElementById("memory-help");
+  const modal = document.getElementById("memory-modal");
+  const close = document.getElementById("memory-close");
+  const totalView = document.getElementById("memory-total");
+  const bestView = document.getElementById("memory-best");
+  const panel = document.querySelector(".memory-panel");
+
+  /* Blocking site data makes localStorage itself throw, which would abort this
+     whole script. Fall back to a memory store so the page still works. */
+  let store;
+  try { localStorage.getItem("_probe"); store = localStorage; }
+  catch { const mem = new Map(); store = {
+    getItem: k => (mem.has(k) ? mem.get(k) : null),
+    setItem: (k, v) => { mem.set(k, String(v)); }
+  }; }
+
+  const BEST_KEY = "memory-best-seconds";
+
+  let openCards = [];
+  let moveCount = 0;
+  let seconds = 0;
+  let pairCount = 0;
+  let timer = null;
+  let lock = false;
+  let started = false;
+  let startTime = 0;
+  let totalPairs = 0;
+
+  function shuffle(items) {
+    const copy = [...items];
+
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+
+    return copy;
+  }
+
+  function startTimer() {
+    if (started) return;
+    started = true;
+    startTime = performance.now();
+
+    /* Derived from a wall-clock start so a throttled tab cannot slow the timer. */
+    timer = window.setInterval(() => {
+      seconds = Math.floor((performance.now() - startTime) / 1000);
+      time.textContent = seconds;
+    }, 250);
+  }
+
+  function stopTimer() {
+    if (timer !== null) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function closeCards() {
+    for (const card of openCards) {
+      card.textContent = "?";
+      card.classList.remove("is-open");
+      card.setAttribute("aria-label", `Hidden card ${card.dataset.index}`);
+    }
+
+    openCards = [];
+    lock = false;
+  }
+
+  function getBest() {
+    const value = Number(store.getItem(BEST_KEY));
+    return value > 0 ? value : null;
+  }
+
+  function renderBest() {
+    const best = getBest();
+    bestView.textContent = best === null ? "—" : `${best}s`;
+  }
+
+  function finishGame() {
+    stopTimer();
+
+    const best = getBest();
+    const isRecord = best === null || seconds < best;
+
+    if (isRecord) {
+      store.setItem(BEST_KEY, seconds);
+      renderBest();
+    }
+
+    message.textContent = isRecord
+      ? `Completed in ${moveCount} moves and ${seconds} seconds. New best time.`
+      : `Completed in ${moveCount} moves and ${seconds} seconds. Best: ${best}s.`;
+  }
+
+  function flip(card) {
+    if (lock || card.disabled || openCards.includes(card)) return;
+
+    startTimer();
+
+    card.textContent = card.dataset.value;
+    card.classList.add("is-open");
+    card.setAttribute("aria-label", `Card ${card.dataset.value}`);
+    openCards.push(card);
+
+    if (openCards.length !== 2) return;
+
+    moveCount += 1;
+    moves.textContent = moveCount;
+
+    const [first, second] = openCards;
+
+    if (first.dataset.value === second.dataset.value) {
+      first.disabled = true;
+      second.disabled = true;
+      first.classList.remove("is-open");
+      second.classList.remove("is-open");
+      first.classList.add("is-matched");
+      second.classList.add("is-matched");
+
+      openCards = [];
+      pairCount += 1;
+      pairs.textContent = pairCount;
+
+      if (pairCount === totalPairs) {
+        finishGame();
+      }
+
+      return;
+    }
+
+    lock = true;
+    window.setTimeout(closeCards, 700);
+  }
+
+  function startGame() {
+    stopTimer();
+
+    openCards = [];
+    moveCount = 0;
+    seconds = 0;
+    pairCount = 0;
+    lock = false;
+    started = false;
+
+    moves.textContent = "0";
+    time.textContent = "0";
+    pairs.textContent = "0";
+    message.textContent = "";
+
+    const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+    totalPairs = theme.length;
+    totalView.textContent = String(totalPairs);
+    renderBest();
+    const cards = shuffle([...theme, ...theme]);
+
+    game.innerHTML = "";
+
+    cards.forEach((symbol, index) => {
+      const card = document.createElement("button");
+
+      card.type = "button";
+      card.className = "memory-card";
+      card.dataset.value = symbol;
+      card.dataset.index = String(index + 1);
+      card.textContent = "?";
+      card.setAttribute("aria-label", `Hidden card ${index + 1}`);
+
+      card.addEventListener("click", () => flip(card));
+      game.appendChild(card);
+    });
+  }
+
+  function openHelp() {
+    modal.classList.add("is-open");
+    panel.inert = true;
+    close.focus();
+  }
+
+  function closeHelp() {
+    modal.classList.remove("is-open");
+    panel.inert = false;
+    help.focus();
+  }
+
+  help.addEventListener("click", openHelp);
+  close.addEventListener("click", closeHelp);
+
+  modal.addEventListener("click", event => {
+    if (event.target === modal) closeHelp();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) {
+      closeHelp();
+    }
+  });
+
+  restart.addEventListener("click", startGame);
+
+  startGame();
+})();
+</script>

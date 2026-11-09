@@ -1,0 +1,742 @@
+---
+layout: without-sidebar
+title: "Disk Kolu Çizelgeleme Simülatörü"
+permalink: /files/os/slides/Bolum_11_Disk_Scheduling.html
+excerpt: "FCFS, SSTF, SCAN, C-SCAN, LOOK ve C-LOOK için animasyonlu kafa hareketi şeması, bekleyen istek kuyruğu ve toplam kafa hareketi karşılaştırması sunan etkileşimli disk kolu çizelgeleme simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+.osim,.osim-dlg{
+  --o-bg:var(--ds-bg);
+  --o-fg:var(--ds-text);
+  --o-link:var(--ds-link);
+  --o-muted:color-mix(in srgb,var(--o-fg) 78%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 58%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:var(--o-link);
+  --o-on:var(--o-bg);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,var(--o-link) 72%,var(--o-fg));
+  --o-flt:var(--ds-bad,var(--ds-accent));
+  --o-new:var(--ds-good,var(--o-hit));
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-new-bg:color-mix(in srgb,var(--o-new) 22%,var(--o-bg));
+  --o-shadow:color-mix(in srgb,var(--o-fg) 22%,transparent);
+}
+.osim{--o-dur:420ms;position:relative;display:flex;flex-direction:column;gap:6px;height:100%;color:var(--o-fg);font-size:14px;line-height:1.3;font-variant-numeric:tabular-nums}
+.osim *,.osim *::before,.osim *::after{transition:none}
+.osim p{margin:0}
+.osim button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:34px;min-height:0;padding:0 10px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font-weight:650;font-size:14px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim button:hover:not(:disabled){background:var(--o-cell);border-color:var(--o-line)}
+.osim button:disabled{opacity:.45;cursor:not-allowed}
+.osim button:focus-visible,.osim input:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim button.osim-pri,.osim button[aria-pressed="true"],.osim button.osim-pri:hover:not(:disabled),.osim button[aria-pressed="true"]:hover:not(:disabled){background:var(--o-pri);border-color:var(--o-pri);color:var(--o-on)}
+.osim .osim-ib{width:34px;padding:0}
+.osim svg{width:18px;height:18px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;flex:none;display:flex;flex-direction:column;gap:6px}
+.osim .osim-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.osim .osim-seg{display:inline-flex;flex:none;border:1px solid var(--o-line);border-radius:10px;padding:1px;gap:1px;background:var(--o-bg)}
+.osim .osim-seg button{border:0;height:30px;border-radius:8px;padding:0 9px}
+.osim .osim-seg-sm button{padding:0 8px;font-size:13px}
+.osim .osim-grp{display:inline-flex;flex:none;align-items:center;gap:3px}
+.osim .osim-spacer{flex:1}
+.osim input[type="range"]{width:70px;height:20px;min-height:0;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:13px;font-weight:700;min-width:32px}
+.osim .osim-num{min-width:22px;text-align:center;font-weight:800;font-size:16px}
+.agt-oyun .osim input.osim-text{flex:1;min-width:60px;height:34px;min-height:0;margin:0;padding:0 8px;font:inherit;font-weight:700;font-size:14px;letter-spacing:.02em;
+  color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;box-shadow:none}
+.agt-oyun .osim input.osim-text[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .osim-alert{position:absolute;left:0;top:calc(100% + 4px);z-index:30;max-width:90%;padding:6px 10px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13px;font-weight:650;box-shadow:0 6px 18px var(--o-shadow)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;gap:6px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-side{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:8px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:baseline;justify-content:space-between;gap:6px;flex:none}
+.osim .osim-sh b{font-size:14px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-state{position:relative;flex:1;min-height:0;overflow:hidden}
+.osim .osim-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--o-muted);font-size:13px;font-weight:650}
+.osim .osim-foot{flex:none;display:flex;align-items:center;gap:8px;min-height:32px;padding:0 10px;background:var(--o-bg);border-radius:10px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:0;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 6px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;gap:5px;flex:none}
+.osim .osim-stat{display:inline-flex;gap:5px;height:26px;align-items:center;padding:0 8px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12.5px;font-weight:650;color:var(--o-muted);white-space:nowrap}
+.osim .osim-stat b{font-size:14px;color:var(--o-fg)}
+.osim .osim-stat.x{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(360px,100%);display:flex;flex-direction:column;gap:8px;padding:10px 12px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px var(--o-shadow);overflow:hidden}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-cap{font-size:13px;font-weight:650}
+.osim-dlg dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 8px}
+.osim-dlg dt{font-weight:800}
+.osim-dlg dd{margin:0}
+.osim-dlg .osim-legend{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;font-size:14px;font-weight:650}
+.osim-dlg .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:7px}
+.osim-dlg kbd{font:inherit;font-size:13px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
+/* ---- disk scheduling specific ---- */
+.osim .osim-stage{grid-template-columns:minmax(0,1fr) 184px}
+.osim .ds-viz{padding:6px 8px 4px}
+.osim .ds-svg{display:block;width:100%;height:100%;overflow:visible;font-family:inherit}
+.osim .ds-svg .grid{stroke:var(--o-soft);stroke-width:1}
+.osim .ds-svg .axis{stroke:var(--o-line);stroke-width:1.5}
+.osim .ds-svg .tkl{fill:var(--o-muted);font-size:12px;font-weight:650;text-anchor:middle}
+.osim .ds-svg .tml{fill:var(--o-muted);font-size:12px;font-weight:700}
+.osim .ds-svg .seg{stroke:var(--o-acc);stroke-width:3;stroke-linecap:round;fill:none}
+.osim .ds-svg .seg.j{stroke:var(--o-line);stroke-width:2.5;stroke-dasharray:8 6}
+.osim .ds-svg .pt{fill:var(--o-acc);stroke:var(--o-bg);stroke-width:1.5}
+.osim .ds-svg .pt.edge,.osim .ds-svg .pt.jump{fill:var(--o-bg);stroke:var(--o-line);stroke-width:2}
+.osim .ds-svg .pt.start{fill:var(--o-fg);stroke:var(--o-bg)}
+.osim .ds-svg .pl{fill:var(--o-fg);font-size:12.5px;font-weight:750}
+.osim .ds-svg .pl.dim{fill:var(--o-muted);font-weight:650}
+.osim .ds-svg .rq circle{fill:var(--o-bg);stroke:var(--o-line);stroke-width:2}
+.osim .ds-svg .rq.done circle{fill:var(--o-hit);stroke:var(--o-hit)}
+.osim .ds-svg .rq.nxt circle{stroke:var(--o-flt);stroke-width:2.5;stroke-dasharray:3 2}
+.osim .ds-svg .rq text{fill:var(--o-bg);font-size:12px;font-weight:900;text-anchor:middle}
+.osim .ds-svg .head path{fill:var(--o-pri);stroke:var(--o-fg);stroke-width:1.2}
+.osim .ds-svg .head text{fill:var(--o-fg);font-size:12.5px;font-weight:800;text-anchor:middle}
+.osim .ds-svg .guide{stroke:var(--o-acc);stroke-width:1.2;stroke-dasharray:3 4;opacity:.8}
+.osim .ds-svg .cur{fill:var(--o-pri);stroke:var(--o-fg);stroke-width:2}
+.agt-oyun .osim .ds-in input{width:3.4em;height:34px;min-height:0;margin:0;padding:0 4px;text-align:center;font:inherit;font-weight:750;font-size:14px;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;box-shadow:none}
+.agt-oyun .osim .ds-in input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .ds-in{display:inline-flex;flex:none;align-items:center;gap:4px}
+.osim .osim-seg button[aria-disabled="true"]{opacity:.5}
+.osim .ds-tog[aria-pressed="false"]{border-style:dashed}
+.osim .it{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:5px;padding:0 5px;border-radius:8px;background:var(--o-surf)}
+.osim .it.mv{transition:transform var(--o-dur) ease}
+.osim .it .rk{font-size:12px;font-weight:750;color:var(--o-muted);min-width:14px;text-align:right}
+.osim .it .tile{flex:none;display:flex;align-items:center;justify-content:center;min-width:40px;padding:0 3px;height:calc(100% - 6px);max-height:30px;border-radius:6px;
+  font-weight:800;font-size:14px;background:var(--o-cell);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .it .track{flex:1;height:7px;border-radius:4px;background:var(--o-soft);overflow:hidden;min-width:14px}
+.osim .it .fill{display:block;height:100%;width:0;border-radius:4px;background:var(--o-acc)}
+.osim .it .fill.mv{transition:width var(--o-dur) ease}
+.osim .it .val{font-size:12.5px;font-weight:750;min-width:36px;text-align:right}
+.osim .it .tag{display:none;font-size:12px;font-weight:800;border:1.5px dashed var(--o-flt);border-radius:6px;padding:0 3px;white-space:nowrap}
+.osim .it.next{box-shadow:inset 0 0 0 2px var(--o-flt)}
+.osim .it.next .tag{display:inline-block}
+.osim .it.next .val{display:none}
+.osim .it.enter{animation:osim-enter var(--o-dur) ease-out both}
+@keyframes osim-enter{from{opacity:0;margin-left:-30px}to{opacity:1;margin-left:0}}
+.osim .it.leave{animation:ds-leave var(--o-dur) ease-in both;pointer-events:none}
+.osim .it.leave .tile{text-decoration:line-through;background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+@keyframes ds-leave{from{opacity:1;margin-left:0}to{opacity:0;margin-left:40px}}
+.osim .ds-more{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1.5px dashed var(--o-soft);font-size:12.5px;font-weight:700;color:var(--o-muted)}
+.osim .ds-side .osim-stats{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px}
+.osim #ds-algos button{padding:0 7px}
+.osim .ds-side .osim-stat{justify-content:space-between;min-width:0;overflow:hidden;padding:0 6px;font-size:12px}
+.osim .ds-side .osim-stat.w{grid-column:1 / -1}
+.osim .osim-bars{display:flex;flex-direction:column;gap:4px}
+.osim .osim-bars button{width:100%;height:30px;border:0;background:transparent;padding:0 4px;justify-content:flex-start;gap:8px;border-radius:8px}
+.osim .osim-bars button:hover:not(:disabled){background:var(--o-surf)}
+.osim .osim-bars button[aria-pressed="true"],.osim .osim-bars button[aria-pressed="true"]:hover:not(:disabled){background:var(--o-surf);color:var(--o-fg);box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .osim-bars .bl{width:56px;text-align:left;font-weight:750}
+.osim .osim-bars .bt{flex:1;height:14px;display:block}
+.osim .osim-bars .bf{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--o-line);min-width:3px}
+.osim .osim-bars button[aria-pressed="true"] .bf{background:var(--o-pri)}
+.osim .osim-bars .bv{width:48px;text-align:right;font-weight:800}
+.osim-dlg .lg-path{box-shadow:inset 0 -3px 0 var(--o-acc)}
+.osim-dlg .lg-jump{border-bottom:2.5px dashed var(--o-line)}
+.osim-dlg .lg-done{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim-dlg .lg-next{box-shadow:inset 0 0 0 1.5px var(--o-flt);outline:2px dashed var(--o-flt);outline-offset:-4px}
+</style>
+
+<div class="ds-sim agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 11 · Simülasyon</p><h1>Disk Kolu Çizelgeleme</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-help" aria-label="Simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_11_Giris_Cikis.html">← Bölüm 11</a>
+  </header>
+  <div class="agt-oyun__body">
+<div class="osim" id="osim-ds">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <div class="osim-seg" role="group" aria-label="Algoritma" id="ds-algos">
+        <button type="button" data-algo="fcfs" title="FCFS: istekleri geliş sırasıyla karşıla">FCFS</button>
+        <button type="button" data-algo="sstf" title="SSTF: önce en yakın bekleyen istek (eşitlikte kuyrukta önce olan)">SSTF</button>
+        <button type="button" data-algo="scan" title="SCAN: disk kenarına kadar tara, sonra yön değiştir">SCAN</button>
+        <button type="button" data-algo="cscan" title="C-SCAN: kenara kadar tara, öbür kenara atla, aynı yönde sürdür">C-SCAN</button>
+        <button type="button" data-algo="look" title="LOOK: SCAN gibi, ama son istekte yön değiştir">LOOK</button>
+        <button type="button" data-algo="clook" title="C-LOOK: C-SCAN gibi, ama son istekten öbür taraftaki ilk isteğe atla">C-LOOK</button>
+      </div>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Başlangıç yönü" id="ds-dir">
+        <button type="button" data-dir="down" aria-label="Küçük numaralı silindirlere doğru" title="Başlangıç yönü: küçük numaralı silindirlere doğru">&#8592; Alt</button>
+        <button type="button" data-dir="up" aria-label="Büyük numaralı silindirlere doğru" title="Başlangıç yönü: büyük numaralı silindirlere doğru">Üst &#8594;</button>
+      </div>
+      <button type="button" class="ds-tog" id="ds-jump" data-act="jump" aria-pressed="true" title="C-SCAN / C-LOOK geri dönüş atlamasını toplama kat"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 7H8a4 4 0 0 0 0 8h10" stroke-dasharray="3 2.5"/><path d="M15 12l3 3-3 3"/></svg>Atlama</button>
+      <span class="osim-spacer"></span>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Hazır senaryolar" id="ds-presets">
+        <button type="button" data-preset="classic" title="Kafa 53, kuyruk 98 183 37 122 14 124 65 67, silindirler 0–199">Klasik</button>
+        <button type="button" data-preset="random" title="8 rastgele istek">Rastgele</button>
+      </div>
+      <button type="button" class="osim-ib" data-act="compare" id="ds-cmpbtn" aria-label="Tüm algoritmaları karşılaştır" aria-expanded="false" aria-controls="ds-compare" title="Tüm algoritmaları karşılaştır"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg></button>
+    </div>
+    <div class="osim-row">
+      <div class="osim-grp" role="group" aria-label="Oynatma">
+        <button type="button" class="osim-ib" data-act="first" aria-label="İlk adım (Home)" title="İlk (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Önceki adım (Sol ok)" title="Geri (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="ds-play" aria-label="Oynat (Boşluk)" title="Oynat / duraklat (Boşluk)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="ds-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Sonraki adım (Sağ ok)" title="Adım (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Son adım (End)" title="Son (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp" title="Hız (saniyedeki adım sayısı)">
+        <input type="range" id="ds-speed" min="0" max="6" step="1" value="2" aria-label="Hız" aria-valuetext="saniyede 1.5 adım">
+        <span class="osim-speedv" id="ds-speedv">1.5/s</span>
+      </div>
+      <label class="ds-in"><span class="osim-lbl">Kafa</span><input type="text" inputmode="numeric" id="ds-head" maxlength="4" value="53" aria-label="Kafanın başlangıç silindiri" autocomplete="off"></label>
+      <label class="ds-in"><span class="osim-lbl">Maks</span><input type="text" inputmode="numeric" id="ds-max" maxlength="4" value="199" aria-label="En büyük silindir numarası" autocomplete="off"></label>
+      <label class="osim-lbl" for="ds-queue">Kuyruk</label>
+      <input type="text" class="osim-text" id="ds-queue" inputmode="numeric" autocomplete="off" spellcheck="false" title="İstek kuyruğu (geliş sırasıyla silindirler), boşluk ya da virgülle ayrılır">
+    </div>
+    <div class="osim-alert" id="ds-alert" role="alert"></div>
+  </div>
+
+  <div class="osim-stage">
+    <div class="osim-viz ds-viz" id="ds-viz"><svg class="ds-svg" id="ds-svg" role="img" aria-label="Kafa hareketi şeması: yatayda silindir, aşağı doğru zaman"></svg></div>
+    <aside class="osim-side ds-side" aria-label="Bekleyen istekler">
+      <div class="osim-sh"><b>Bekleyen</b><span id="ds-sides">karşılanma sırası</span></div>
+      <div class="osim-state" id="ds-state"></div>
+      <div class="osim-stats">
+        <span class="osim-stat h w" title="Şimdiye kadarki kafa hareketi (silindir)">Hareket <b id="ds-sm">0</b></span>
+        <span class="osim-stat" title="Karşılanan istekler">Biten <b id="ds-sv">0/0</b></span>
+        <span class="osim-stat" title="Karşılanan istek başına ortalama arama mesafesi">Ort. <b id="ds-sa">&#8211;</b></span>
+        <span class="osim-stat x w" title="Geri dönüş atlamasının uzunluğu (C-SCAN / C-LOOK)">Atlama <b id="ds-sj">&#8211;</b></span>
+        <span class="osim-stat" title="Şu anki adım">Adım <b id="ds-ss">0/0</b></span>
+      </div>
+    </aside>
+    <div class="osim-panel" id="ds-compare" hidden aria-label="Tüm algoritmaları karşılaştır"></div>
+  </div>
+
+  <div class="osim-foot">
+    <p class="osim-narr" id="ds-narr" aria-live="polite"></p>
+  </div>
+</div>
+  </div>
+  <dialog class="agt-oyun__dialog osim-dlg" id="ds-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Disk Kolu Çizelgeleme</h2>
+    <p>Bekleyen okuma/yazma istekleri silindir numaralarıdır. Disk kafası verilen bir silindirden başlar; disk kolu çizelgeleme algoritması isteklerin hangi sırayla karşılanacağına karar verir. Şema, kafanın konumunu (soldan sağa) zamana göre (yukarıdan aşağıya) gösterir; amaç toplam kafa hareketini (arama mesafesini) küçük tutmaktır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir algoritma seçilir; SCAN, C-SCAN, LOOK ve C-LOOK için başlangıç yönü de seçilir.</li>
+      <li>Kafa konumu, en büyük silindir numarası ve istek kuyruğu (boşlukla ayrılmış en çok 50 istek) girilir ya da hazır bir senaryo kullanılır.</li>
+      <li>Oynatılır ya da adım adım ilerlenir; yandaki liste bekleyen istekleri karşılanma sırasıyla gösterir.</li>
+      <li>Karşılaştırma düğmesi, altı algoritmanın toplam kafa hareketini gösterir.</li>
+    </ul>
+    <h3>Algoritmalar</h3>
+    <dl>
+      <dt>FCFS</dt><dd>Geliş sırası.</dd>
+      <dt>SSTF</dt><dd>En yakın bekleyen istek; eşitlikte kuyrukta önce olan.</dd>
+      <dt>SCAN</dt><dd>Disk kenarına kadar taranır, sonra yön değişir.</dd>
+      <dt>C-SCAN</dt><dd>Kenara kadar taranır, öbür kenara atlanır, aynı yönde sürdürülür.</dd>
+      <dt>LOOK</dt><dd>SCAN gibi, ama son istekte yön değişir.</dd>
+      <dt>C-LOOK</dt><dd>C-SCAN gibi, ama son istekten öbür taraftaki ilk isteğe atlanır.</dd>
+      <dt>Atlama</dt><dd>Geri dönüş atlaması hiçbir isteği karşılamaz; Atlama düğmesi bu mesafenin toplama katılıp katılmayacağını belirler.</dd>
+      <dt>Kafa</dt><dd>Kafanın bulunduğu silindirdeki istekler önce karşılanır.</dd>
+    </dl>
+    <h3>Gösterim</h3>
+    <div class="osim-legend">
+      <span class="lg-path">kafa yolu</span>
+      <span class="lg-jump">geri dönüş atlaması</span>
+      <span class="lg-done">&#10003; karşılandı</span>
+      <span class="lg-next">sıradaki hedef</span>
+      <span>&#9671; disk kenarı</span>
+    </div>
+    <h3>Tuşlar</h3>
+    <div class="osim-legend"><span><kbd>&#8592;</kbd><kbd>&#8594;</kbd> adım</span><span><kbd>Boşluk</kbd> oynat</span><span><kbd>Home</kbd><kbd>End</kbd> ilk / son</span><span><kbd>Esc</kbd> kapat</span></div>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.getElementById("osim-ds");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
+
+var ALGOS=["fcfs","sstf","scan","cscan","look","clook"];
+var NAMES={fcfs:"FCFS",sstf:"SSTF",scan:"SCAN",cscan:"C-SCAN",look:"LOOK",clook:"C-LOOK"};
+var CLASSIC=[98,183,37,122,14,124,65,67];
+var SPEEDS=[0.5,1,1.5,2,3,4,6];
+var MAX_CYL=9999,MAX_REQ=50;
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+
+var st={algo:"fcfs",dir:"down",countJump:true,head:53,max:199,req:CLASSIC.slice(),step:0,playing:false,timer:0,speed:1.5,order:[],preset:"classic"};
+
+/* ---------- schedulers (verified logic) ----------
+   A schedule is a list of stops {c, kind}: kind "start" | "req" | "edge" | "jump" | "jumpreq".
+   "jump"/"jumpreq" mark the stop reached by the non-serving return sweep of C-SCAN / C-LOOK. */
+function stop(c,kind){return {c:c,kind:kind};}
+function fcfs(head,req){return [stop(head,"start")].concat(req.map(function(c){return stop(c,"req");}));}
+function sstf(head,req){
+  var pending=req.slice(),order=[stop(head,"start")],cur=head;
+  while(pending.length){
+    var best=0;
+    for(var i=1;i<pending.length;i++){if(Math.abs(pending[i]-cur)<Math.abs(pending[best]-cur)){best=i;}}
+    cur=pending.splice(best,1)[0];
+    order.push(stop(cur,"req"));
+  }
+  return order;
+}
+function sides(req,head){
+  return {
+    low:req.filter(function(x){return x<head;}).sort(function(a,b){return a-b;}),
+    equal:req.filter(function(x){return x===head;}),
+    high:req.filter(function(x){return x>head;}).sort(function(a,b){return a-b;})
+  };
+}
+function reqs(a){return a.map(function(c){return stop(c,"req");});}
+function rev(a){return a.slice().reverse();}
+function scan(head,req,max,dir){
+  var s=sides(req,head),o=[stop(head,"start")].concat(reqs(s.equal));
+  if(dir==="up"){
+    o=o.concat(reqs(s.high));
+    if(o[o.length-1].c!==max){o.push(stop(max,"edge"));}
+    o=o.concat(reqs(rev(s.low)));
+  }else{
+    o=o.concat(reqs(rev(s.low)));
+    if(o[o.length-1].c!==0){o.push(stop(0,"edge"));}
+    o=o.concat(reqs(s.high));
+  }
+  return o;
+}
+function cscan(head,req,max,dir){
+  var s=sides(req,head),o=[stop(head,"start")].concat(reqs(s.equal));
+  if(dir==="up"){
+    o=o.concat(reqs(s.high));
+    if(o[o.length-1].c!==max){o.push(stop(max,"edge"));}
+    if(s.low.length){
+      if(s.low[0]!==0){o.push(stop(0,"jump"));o=o.concat(reqs(s.low));}
+      else{o.push(stop(0,"jumpreq"));o=o.concat(reqs(s.low.slice(1)));}
+    }
+  }else{
+    o=o.concat(reqs(rev(s.low)));
+    if(o[o.length-1].c!==0){o.push(stop(0,"edge"));}
+    if(s.high.length){
+      var hr=rev(s.high);
+      if(hr[0]!==max){o.push(stop(max,"jump"));o=o.concat(reqs(hr));}
+      else{o.push(stop(max,"jumpreq"));o=o.concat(reqs(hr.slice(1)));}
+    }
+  }
+  return o;
+}
+function look(head,req,dir){
+  var s=sides(req,head),o=[stop(head,"start")].concat(reqs(s.equal));
+  if(dir==="up"){o=o.concat(reqs(s.high),reqs(rev(s.low)));}
+  else{o=o.concat(reqs(rev(s.low)),reqs(s.high));}
+  return o;
+}
+function clook(head,req,dir){
+  var s=sides(req,head),o=[stop(head,"start")].concat(reqs(s.equal)),first=true;
+  var tail=dir==="up"?s.low:rev(s.high);
+  o=o.concat(reqs(dir==="up"?s.high:rev(s.low)));
+  tail.forEach(function(c){o.push(stop(c,first?"jumpreq":"req"));first=false;});
+  return o;
+}
+function schedule(mode,d){
+  if(mode==="fcfs"){return fcfs(d.head,d.req);}
+  if(mode==="sstf"){return sstf(d.head,d.req);}
+  if(mode==="scan"){return scan(d.head,d.req,d.max,d.dir);}
+  if(mode==="cscan"){return cscan(d.head,d.req,d.max,d.dir);}
+  if(mode==="look"){return look(d.head,d.req,d.dir);}
+  return clook(d.head,d.req,d.dir);
+}
+function isJump(s){return s.kind==="jump"||s.kind==="jumpreq";}
+function movement(order,countJump,upto){
+  var sum=0,jump=0,n=upto==null?order.length-1:upto;
+  for(var i=1;i<=n;i++){
+    var d=Math.abs(order[i].c-order[i-1].c);
+    if(isJump(order[i])){jump+=d;}else{sum+=d;}
+  }
+  return {total:countJump?sum+jump:sum,jump:jump};
+}
+function data(){return {head:st.head,req:st.req,max:st.max,dir:st.dir};}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(160,Math.min(620,interval()*0.75)));}
+function alertMsg(t){$("ds-alert").textContent=t||"";}
+function served(k){var n=0;for(var i=1;i<=k;i++){if(st.order[i].kind==="req"||st.order[i].kind==="jumpreq"){n++;}}return n;}
+
+/* ---------- chart ---------- */
+var svg=$("ds-svg"),viz=$("ds-viz"),raf=0;
+function niceStep(max){
+  var raw=max/6,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  return (m<1.5?1:m<3?2:m<7?5:10)*p;
+}
+var G=null;
+function geom(){
+  var W=Math.max(200,viz.clientWidth-16),H=Math.max(200,viz.clientHeight-10);
+  var L=18,R=22,T=72,B=14,n=Math.max(1,st.order.length-1);
+  return {W:W,H:H,L:L,R:R,T:T,B:B,rowH:(H-T-B)/n,x:function(c){return L+(W-L-R)*c/st.max;},y:function(i){return T+(H-T-B)*i/n;}};
+}
+function renderChart(anim){
+  cancelAnimationFrame(raf);
+  var g=geom(),o=st.order,k=st.step,h="",i;
+  G=g;
+  svg.setAttribute("viewBox","0 0 "+g.W+" "+g.H);
+  var step=niceStep(st.max);
+  for(var c=0;c<=st.max+0.001;c+=step){
+    var xx=g.x(c);
+    h+="<line class=\"grid\" x1=\""+xx.toFixed(1)+"\" x2=\""+xx.toFixed(1)+"\" y1=\""+(g.T-12)+"\" y2=\""+(g.H-g.B)+"\"/>";
+    if(g.x(st.max)-xx>28||c===st.max){h+="<text class=\"tkl\" x=\""+xx.toFixed(1)+"\" y=\"12\">"+Math.round(c)+"</text>";}
+  }
+  if((st.max%step)!==0){var xm=g.x(st.max);h+="<line class=\"grid\" x1=\""+xm.toFixed(1)+"\" x2=\""+xm.toFixed(1)+"\" y1=\""+(g.T-12)+"\" y2=\""+(g.H-g.B)+"\"/><text class=\"tkl\" x=\""+xm.toFixed(1)+"\" y=\"12\">"+st.max+"</text>";}
+  h+="<line class=\"axis\" x1=\""+g.L+"\" x2=\""+(g.W-g.R)+"\" y1=\""+(g.T-12)+"\" y2=\""+(g.T-12)+"\"/>";
+  h+="<text class=\"tml\" x=\"2\" y=\""+(g.H-g.B-2)+"\" transform=\"rotate(-90 2 "+(g.H-g.B-2)+")\" dx=\"0\" dy=\"11\">zaman ↓</text>";
+  var nextIdx=-1;
+  for(i=k+1;i<o.length;i++){if(o[i].kind==="req"||o[i].kind==="jumpreq"){nextIdx=i;break;}}
+  var doneSet={},pend={};
+  for(i=1;i<o.length;i++){if(o[i].kind==="req"||o[i].kind==="jumpreq"){if(i<=k){doneSet[i]=1;}}}
+  for(i=1;i<o.length;i++){
+    if(o[i].kind!=="req"&&o[i].kind!=="jumpreq"){continue;}
+    var cx=g.x(o[i].c),cls="rq"+(doneSet[i]?" done":"")+(i===nextIdx?" nxt":"");
+    h+="<g class=\""+cls+"\" data-i=\""+i+"\"><title>İstek "+o[i].c+(doneSet[i]?" (karşılandı)":i===nextIdx?" (sıradaki)":" (bekliyor)")+"</title><circle cx=\""+cx.toFixed(1)+"\" cy=\""+(g.T-12)+"\" r=\""+(i===nextIdx?8.5:7.5)+"\"/>"+(doneSet[i]?"<text x=\""+cx.toFixed(1)+"\" y=\""+(g.T-7.5)+"\">✓</text>":"")+"</g>";
+  }
+  for(i=1;i<o.length;i++){
+    var j=isJump(o[i]),fut=i>k;
+    var x1=g.x(o[i-1].c),y1=g.y(i-1),x2=g.x(o[i].c),y2=g.y(i);
+    var id=(i===k&&anim)?" id=\"ds-curseg\"":"";
+    if(i===k&&anim){x2=x1;y2=y1;}
+    if(fut){continue;}
+    h+="<line class=\"seg"+(j?" j":"")+"\""+id+" x1=\""+x1.toFixed(1)+"\" y1=\""+y1.toFixed(1)+"\" x2=\""+x2.toFixed(1)+"\" y2=\""+y2.toFixed(1)+"\"/>";
+  }
+  var showLab=g.rowH>=15;
+  for(i=0;i<o.length;i++){
+    var px=g.x(o[i].c),py=g.y(i),s=o[i],fut2=i>k;
+    if(fut2){continue;}
+    if(i===k&&anim&&i>0){continue;}
+    h+=ptHtml(s,px,py,i,showLab||i===0||i===k);
+  }
+  var hx=g.x(o[Math.max(0,k-(anim&&k>0?1:0))].c),hy=g.y(Math.max(0,k-(anim&&k>0?1:0)));
+  h+="<line class=\"guide\" id=\"ds-guide\" x1=\""+hx.toFixed(1)+"\" x2=\""+hx.toFixed(1)+"\" y1=\""+(g.T-12)+"\" y2=\""+hy.toFixed(1)+"\"/>";
+  h+="<circle class=\"cur\" id=\"ds-curpt\" cx=\""+hx.toFixed(1)+"\" cy=\""+hy.toFixed(1)+"\" r=\"7\"/>";
+  h+="<g class=\"head\" id=\"ds-head\" transform=\"translate("+hx.toFixed(1)+","+(g.T-12)+")\"><path d=\"M-9 -30h18v10l-9 10l-9-10z\"/><text y=\"-35\" id=\"ds-headl\">"+o[Math.max(0,k-(anim&&k>0?1:0))].c+"</text></g>";
+  svg.innerHTML=h;
+  svg.setAttribute("aria-label","Kafa hareketi şeması: "+o.slice(0,k+1).map(function(s){return s.c;}).join(" → "));
+  if(anim&&k>0){animateSeg(g,o[k-1].c,o[k].c,k);}
+}
+function ptHtml(s,px,py,i,lab){
+  var h="",t=(s.kind==="start"?"Başlangıç ":s.kind==="edge"?"Disk kenarı ":s.kind==="jump"?"Geri dönüş atlaması: ":s.kind==="jumpreq"?"Atlama, ardından istek ":"İstek ")+s.c;
+  if(s.kind==="edge"){h+="<path class=\"pt edge\" d=\"M"+px.toFixed(1)+" "+(py-6).toFixed(1)+"l6 6l-6 6l-6-6z\"><title>"+t+"</title></path>";}
+  else if(s.kind==="start"){h+="<rect class=\"pt start\" x=\""+(px-5).toFixed(1)+"\" y=\""+(py-5).toFixed(1)+"\" width=\"10\" height=\"10\" rx=\"2\"><title>"+t+"</title></rect>";}
+  else{h+="<circle class=\"pt"+(s.kind==="jump"?" jump":"")+"\" cx=\""+px.toFixed(1)+"\" cy=\""+py.toFixed(1)+"\" r=\""+(s.kind==="jump"?4.5:5.5)+"\"><title>"+t+"</title></circle>";}
+  if(lab){
+    var right=px<G.W-70;
+    h+="<text class=\"pl"+(s.kind==="edge"||s.kind==="jump"?" dim":"")+"\" x=\""+(right?px+10:px-10).toFixed(1)+"\" y=\""+(py+4.5).toFixed(1)+"\" text-anchor=\""+(right?"start":"end")+"\">"+s.c+(s.kind==="start"?" başlangıç":s.kind==="edge"?" kenar":"")+"</text>";
+  }
+  return h;
+}
+function animateSeg(g,c0,c1,k){
+  var seg=$("ds-curseg"),gd=$("ds-guide"),cp=$("ds-curpt"),hd=$("ds-head"),hl=$("ds-headl");
+  var x0=g.x(c0),y0=g.y(k-1),x1=g.x(c1),y1=g.y(k),t0=null,D=dur();
+  function frame(ts){
+    if(t0===null){t0=ts;}
+    var p=Math.min(1,(ts-t0)/D),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    var x=x0+(x1-x0)*e,y=y0+(y1-y0)*e;
+    if(seg){seg.setAttribute("x2",x.toFixed(1));seg.setAttribute("y2",y.toFixed(1));}
+    gd.setAttribute("x1",x.toFixed(1));gd.setAttribute("x2",x.toFixed(1));gd.setAttribute("y2",y.toFixed(1));
+    cp.setAttribute("cx",x.toFixed(1));cp.setAttribute("cy",y.toFixed(1));
+    hd.setAttribute("transform","translate("+x.toFixed(1)+","+(g.T-12)+")");
+    hl.textContent=Math.round(c0+(c1-c0)*e);
+    if(p<1){raf=requestAnimationFrame(frame);}
+    else{renderChart(false);}
+  }
+  raf=requestAnimationFrame(frame);
+}
+
+/* ---------- side: pending list ---------- */
+var stateBox=$("ds-state"),listItems=new Map();
+function renderSide(anim){
+  var o=st.order,k=st.step,head=o[k].c,pend=[];
+  for(var i=k+1;i<o.length;i++){if(o[i].kind==="req"||o[i].kind==="jumpreq"){pend.push({key:"i"+i,c:o[i].c});}}
+  var H=stateBox.clientHeight,gap=4,fitN=Math.max(2,Math.floor((H+gap)/(24+gap))),more=0;
+  if(pend.length>fitN){more=pend.length-(fitN-1);pend=pend.slice(0,fitN-1);}
+  var mo=stateBox.querySelector(".ds-more");if(mo){mo.remove();}
+  var empty=stateBox.querySelector(".osim-empty");
+  var keep={};pend.forEach(function(p){keep[p.key]=1;});
+  listItems.forEach(function(el,key){
+    if(keep[key]){return;}
+    listItems.delete(key);
+    if(anim&&!reduce.matches){el.classList.add("leave");el.classList.remove("next");setTimeout(function(){el.remove();},dur()+40);}else{el.remove();}
+  });
+  if(!pend.length){if(!empty){stateBox.insertAdjacentHTML("beforeend","<div class=\"osim-empty\">Tüm istekler karşılandı</div>");}return;}
+  if(empty){empty.remove();}
+  var n=pend.length+(more?1:0);
+  var rh=Math.max(22,Math.min(40,Math.floor((H-gap*(n-1))/n)));
+  var maxD=1;pend.forEach(function(p){var d=Math.abs(p.c-head);if(d>maxD){maxD=d;}});
+  pend.forEach(function(p,r){
+    var el=listItems.get(p.key),isNew=false;
+    if(!el){
+      isNew=true;el=document.createElement("div");el.className="it";
+      el.innerHTML="<span class=\"rk\"></span><span class=\"tile\"></span><span class=\"track\"><span class=\"fill\"></span></span><span class=\"val\"></span><span class=\"tag\">sıradaki</span>";
+      el.querySelector(".tile").textContent=p.c;
+      stateBox.appendChild(el);listItems.set(p.key,el);
+    }
+    var d=Math.abs(p.c-head);
+    el.style.height=rh+"px";
+    el.className="it"+(anim&&!isNew?" mv":"")+(r===0?" next":"");
+    el.querySelector(".fill").classList.toggle("mv",!!anim&&!isNew);
+    el.style.transform="translateY("+(r*(rh+gap))+"px)";
+    el.querySelector(".rk").textContent=r+1;
+    el.querySelector(".fill").style.width=Math.round(100*d/maxD)+"%";
+    el.querySelector(".val").textContent="Δ"+d;
+    el.title="Silindir "+p.c+": kafaya uzaklık "+d+(r===0?" (sıradaki)":"");
+  });
+  if(more){
+    mo=document.createElement("div");mo.className="ds-more";
+    mo.textContent="+"+more+" istek daha bekliyor";
+    mo.style.height=rh+"px";mo.style.transform="translateY("+(pend.length*(rh+gap))+"px)";
+    stateBox.appendChild(mo);
+  }
+  $("ds-sides").textContent=st.algo==="fcfs"?"geliş sırası":st.algo==="sstf"?"en yakın önce":"tarama sırası";
+}
+function resetSide(){listItems.forEach(function(el){el.remove();});listItems.clear();stateBox.innerHTML="";}
+
+/* ---------- narration + stats ---------- */
+function narration(){
+  var o=st.order,k=st.step;
+  if(k===0){return "Kafa konumu <b>"+o[0].c+"</b> · başlatmak için <b>▶</b> ya da <kbd>→</kbd>";}
+  var a=o[k-1],b=o[k],d=Math.abs(b.c-a.c),h="<b>"+a.c+" → "+b.c+"</b> · Δ"+d+" · ";
+  if(b.kind==="edge"){return h+"disk kenarı"+(st.algo==="scan"?", yön değişir":", ardından atlama");}
+  if(b.kind==="jump"){return h+"<span class=\"osim-k x\">↩ geri dönüş atlaması</span> "+(st.countJump?"toplama katılır":"toplama katılmaz");}
+  if(b.kind==="jumpreq"){return h+"<span class=\"osim-k x\">↩ atlama</span> "+(st.countJump?"toplama katılır":"toplama katılmaz")+", "+b.c+" karşılanır";}
+  if(st.algo==="fcfs"){return h+"<span class=\"osim-k h\">✓ karşılandı</span> geliş sırasındaki sonraki istek";}
+  if(st.algo==="sstf"){return h+"<span class=\"osim-k h\">✓ karşılandı</span> en yakın bekleyen istek";}
+  return h+"<span class=\"osim-k h\">✓ karşılandı</span> tarama "+(b.c>a.c?"yukarı →":b.c<a.c?"← aşağı":"yerinde");
+}
+function renderStats(){
+  var k=st.step,m=movement(st.order,st.countJump,k),full=movement(st.order,st.countJump),sv=served(k);
+  $("ds-sm").textContent=m.total;
+  $("ds-sv").textContent=sv+"/"+st.req.length;
+  $("ds-sa").textContent=sv?(m.total/sv).toFixed(1):"–";
+  $("ds-sj").textContent=full.jump?full.jump+(st.countJump?"":" (hariç)"):"–";
+  $("ds-ss").textContent=k+"/"+(st.order.length-1);
+  $("ds-narr").innerHTML=narration();
+}
+
+/* ---------- queue (one text field) + numeric inputs ---------- */
+var queueIn=$("ds-queue");
+function showQueue(){queueIn.value=st.req.join(" ");queueIn.setAttribute("aria-invalid","false");}
+function readInt(el,lo,hi,name){
+  var raw=el.value.trim();
+  if(!/^\d{1,4}$/.test(raw)||+raw<lo||+raw>hi){el.setAttribute("aria-invalid","true");throw new Error(name+" "+lo+"–"+hi+" arasında bir tam sayı olmalı.");}
+  el.setAttribute("aria-invalid","false");
+  return +raw;
+}
+function validate(){
+  try{
+    var max=readInt($("ds-max"),10,MAX_CYL,"En büyük silindir");
+    var head=readInt($("ds-head"),0,max,"Kafa konumu");
+    var vals=queueIn.value.trim().split(/[\s,;]+/).filter(Boolean),bad=-1;
+    queueIn.setAttribute("aria-invalid","true");
+    vals.forEach(function(s,i){if(bad<0&&!(/^\d{1,4}$/.test(s)&&+s<=max)){bad=i;}});
+    if(bad>=0){throw new Error((bad+1)+". istek: “"+vals[bad]+"”, 0–"+max+" arasında bir tam sayı olmalı.");}
+    var req=vals.map(Number);
+    if(!req.length){throw new Error("En az bir istek girilmeli.");}
+    if(req.length>MAX_REQ){throw new Error("En çok "+MAX_REQ+" istek girilebilir (şu an "+req.length+").");}
+    queueIn.setAttribute("aria-invalid","false");
+    alertMsg("");
+    return {max:max,head:head,req:req};
+  }catch(e){alertMsg(e.message);return null;}
+}
+function sameArr(a,b){return a.length===b.length&&a.every(function(x,i){return x===b[i];});}
+function apply(){
+  var v=validate();if(!v){return;}
+  if(v.max!==st.max||v.head!==st.head||!sameArr(v.req,st.req)){st.max=v.max;st.head=v.head;st.req=v.req;st.preset=null;recompute(false);}
+}
+queueIn.addEventListener("input",apply);
+queueIn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"){queueIn.blur();}});
+queueIn.addEventListener("blur",function(){if(!validate()){showQueue();$("ds-head").value=st.head;$("ds-max").value=st.max;["ds-head","ds-max"].forEach(function(id){$(id).setAttribute("aria-invalid","false");});alertMsg("");}});
+["ds-head","ds-max"].forEach(function(id){
+  var el=$(id);
+  el.addEventListener("input",apply);
+  el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"){el.blur();}});
+});
+
+/* ---------- compare panel ---------- */
+var cmp=$("ds-compare");
+function renderCompare(){
+  if(cmp.hidden){return;}
+  var d=data(),res=[],mx=1;
+  ALGOS.forEach(function(a){var m=movement(schedule(a,d),st.countJump);res.push({a:a,t:m.total,j:m.jump});if(m.total>mx){mx=m.total;}});
+  var best=Math.min.apply(null,res.map(function(r){return r.t;}));
+  var h="<div class=\"osim-ph\"><div><b>Tümünü karşılaştır</b> <span>kafa "+st.head+" · "+(st.dir==="down"?"← alt":"üst →")+" · atlama "+(st.countJump?"dahil":"hariç")+"</span></div><button type=\"button\" class=\"osim-ib\" data-act=\"compare\" aria-label=\"Karşılaştırmayı kapat\"><svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>";
+  h+="<div class=\"osim-sub\">Toplam kafa hareketi (az olan iyi)</div><div class=\"osim-bars\">";
+  res.forEach(function(r){
+    h+="<button type=\"button\" data-algo=\""+r.a+"\" aria-pressed=\""+(r.a===st.algo)+"\" title=\""+NAMES[r.a]+": "+r.t+" silindir"+(r.j?" (atlama "+r.j+(st.countJump?" dahil":" hariç")+")":"")+"\"><span class=\"bl\">"+NAMES[r.a]+"</span><span class=\"bt\"><span class=\"bf\" style=\"width:"+(100*r.t/mx).toFixed(1)+"%\"></span></span><span class=\"bv\">"+(r.t===best?"★":"")+r.t+"</span></button>";
+  });
+  h+="</div><p class=\"osim-cap\">★ en düşük toplam. Yön; SCAN, C-SCAN, LOOK ve C-LOOK’u etkiler.</p>";
+  cmp.innerHTML=h;
+}
+cmp.addEventListener("click",function(e){var b=e.target.closest("button[data-algo]");if(b){setAlgo(b.getAttribute("data-algo"));}});
+function togglePanel(id,force){
+  var p=$(id),open=force!=null?force:p.hidden;
+  p.hidden=!open;
+  $("ds-cmpbtn").setAttribute("aria-expanded",String(open));
+  if(open){renderCompare();}
+}
+
+/* ---------- controls + transport ---------- */
+function renderControls(){
+  root.querySelectorAll("#ds-algos button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-algo")===st.algo));});
+  var dirUsed=st.algo!=="fcfs"&&st.algo!=="sstf",jumpUsed=st.algo==="cscan"||st.algo==="clook";
+  root.querySelectorAll("#ds-dir button").forEach(function(b){
+    b.setAttribute("aria-pressed",String(b.getAttribute("data-dir")===st.dir));
+    b.setAttribute("aria-disabled",String(!dirUsed));
+  });
+  var jb=$("ds-jump");jb.setAttribute("aria-pressed",String(st.countJump));jb.setAttribute("aria-disabled",String(!jumpUsed));
+  jb.style.opacity=jumpUsed?"":"0.6";
+  root.querySelectorAll("#ds-presets button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-preset")===st.preset));});
+  var N=st.order.length-1,atEnd=st.step>=N;
+  root.querySelector("[data-act=prev]").disabled=st.step<=0;
+  root.querySelector("[data-act=first]").disabled=st.step<=0;
+  root.querySelector("[data-act=next]").disabled=atEnd;
+  root.querySelector("[data-act=last]").disabled=atEnd;
+  $("ds-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("ds-play").setAttribute("aria-label",st.playing?"Duraklat (Boşluk)":"Oynat (Boşluk)");
+}
+function draw(anim){
+  root.style.setProperty("--o-dur",dur()+"ms");
+  renderChart(anim);renderSide(anim);renderStats();renderControls();
+}
+function recompute(keepStep){
+  pause();
+  st.order=schedule(st.algo,data());
+  st.step=keepStep?Math.min(st.step,st.order.length-1):0;
+  resetSide();draw(false);renderCompare();
+}
+function go(step,anim){
+  var prev=st.step;
+  st.step=Math.max(0,Math.min(st.order.length-1,step));
+  draw(!!anim&&!reduce.matches&&st.step===prev+1);
+}
+function tick(){
+  if(!st.playing){return;}
+  var N=st.order.length-1;
+  if(st.step>=N){pause();return;}
+  go(st.step+1,true);
+  if(st.step>=N){st.playing=false;renderControls();return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){if(st.playing){return;}if(st.step>=st.order.length-1){go(0,false);}st.playing=true;renderControls();tick();}
+function pause(){st.playing=false;clearTimeout(st.timer);if(st.order.length){renderControls();}}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+function setAlgo(a){if(a===st.algo){return;}st.algo=a;recompute(false);}
+function setPreset(p){
+  pause();st.preset=p;
+  if(p==="classic"){st.head=53;st.max=199;st.dir="down";st.countJump=true;st.req=CLASSIC.slice();}
+  else{var mx=st.max;st.req=[];for(var i=0;i<8;i++){st.req.push(Math.floor(Math.random()*(mx+1)));}}
+  $("ds-head").value=st.head;$("ds-max").value=st.max;
+  $("ds-head").setAttribute("aria-invalid","false");$("ds-max").setAttribute("aria-invalid","false");
+  alertMsg("");showQueue();recompute(false);
+}
+
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.closest("#ds-compare")&&b.hasAttribute("data-algo")){return;}
+  if(b.hasAttribute("data-algo")&&b.closest("#ds-algos")){setAlgo(b.getAttribute("data-algo"));return;}
+  if(b.hasAttribute("data-dir")){var dv=b.getAttribute("data-dir");if(dv!==st.dir){st.dir=dv;st.preset=null;recompute(false);}return;}
+  if(b.hasAttribute("data-preset")){setPreset(b.getAttribute("data-preset"));return;}
+  switch(b.getAttribute("data-act")){
+    case "jump":st.countJump=!st.countJump;st.preset=null;draw(false);renderCompare();break;
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,false);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();go(st.order.length-1,false);break;
+    case "play":togglePlay();break;
+    case "compare":togglePanel("ds-compare");break;
+  }
+});
+var speed=$("ds-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("ds-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext","saniyede "+st.speed+" adım");
+  root.style.setProperty("--o-dur",dur()+"ms");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||document.querySelector("dialog[open]")){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(e.key==="Escape"){
+    if(!$("ds-compare").hidden){togglePanel("ds-compare",false);}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,false);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();go(st.order.length-1,false);break;
+  }
+});
+
+/* ---------- re-layout when the stage size changes (fonts, first paint) ---------- */
+var lastFit="";
+function fit(){
+  var key=viz.clientWidth+"x"+viz.clientHeight+"x"+stateBox.clientHeight;
+  if(key!==lastFit&&st.order.length){lastFit=key;renderChart(false);renderSide(false);}
+}
+window.addEventListener("load",fit);
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe(viz);}
+/* help dialog lives outside the stage: give it the stage's status colours */
+var helpBtn=document.querySelector(".agt-oyun__help[aria-controls=\"ds-help\"]");
+if(helpBtn){helpBtn.addEventListener("click",function(){var cs=getComputedStyle(root),d=$("ds-help");["--ds-good","--ds-bad"].forEach(function(p){d.style.setProperty(p,cs.getPropertyValue(p));});});}
+
+/* ---------- init ---------- */
+showQueue();
+recompute(false);
+fit();
+setTimeout(fit,400);
+})();
+</script>
+<script src="deck/oyun.js"></script>

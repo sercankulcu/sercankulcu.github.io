@@ -1,0 +1,942 @@
+---
+layout: without-sidebar
+title: "AVL Ağacı Simülatörü"
+permalink: /files/data_structures/slides/Bolum_10_AVL.html
+excerpt: "Ekleme, silme, arama, döndürmeler, denge faktörleri, doğrulama ve gezinmeleri SVG çizimiyle gösteren etkileşimli AVL ağacı simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* 800x600 agt-oyun sahnesi: ortak simülatör denetimleri */
+.ds-sim.agt-oyun { font-size: 15px; }
+.ds-sim .ds-sim__body { display: flex; flex-direction: column; gap: 8px; line-height: 1.3; }
+.ds-sim .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.ds-sim .ds-sim__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body button.is-danger {
+  border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border));
+  color: var(--ds-bad);
+}
+.ds-sim .ds-sim__body input,
+.ds-sim .ds-sim__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 8px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body input[type="checkbox"],
+.ds-sim .ds-sim__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+.ds-sim .ds-sim__body input[type="range"] { padding: 0; border: 0; background: none; }
+.ds-sim .ds-sim__body label {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-sim .ds-sim__status {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__status.is-ok { color: var(--ds-good); }
+.ds-sim .ds-sim__status.is-bad { color: var(--ds-bad); }
+.ds-sim .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.avl-sim {
+  position: relative;
+  height: 100%;
+  line-height: 1.35;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+}
+
+.avl-controls {
+  display: grid;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.avl-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.avl-row input[type="number"] {
+  width: 76px;
+}
+
+.avl-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 244px;
+  gap: 8px;
+}
+
+.avl-left {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.avl-visual {
+  min-height: 0;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.avl-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.avl-status {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avl-edge {
+  stroke: var(--ds-link);
+  stroke-width: 2;
+}
+
+.avl-edge.is-active {
+  stroke: var(--ds-warn);
+  stroke-width: 4;
+}
+
+.avl-node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 2;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.avl-node text.value {
+  fill: var(--ds-text);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.avl-node text.meta {
+  fill: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.avl-node.is-checking circle,
+.avl-node.is-visited circle {
+  fill: var(--ds-hot);
+  stroke: var(--ds-warn);
+}
+
+.avl-node.is-found circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+}
+
+.avl-node.is-bad circle {
+  fill: color-mix(in srgb, var(--ds-bad) 22%, var(--ds-bg));
+  stroke: var(--ds-bad);
+  stroke-width: 3;
+}
+
+.avl-empty {
+  fill: var(--ds-muted);
+  font-size: 15px;
+  text-anchor: middle;
+}
+
+.avl-side {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.avl-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.avl-stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.avl-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.avl-box {
+  min-height: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+.avl-path {
+  height: 58px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.avl-events {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+  list-style: decimal inside;
+}
+
+.avl-events li {
+  height: 20px;
+  margin: 0;
+  padding: 0 6px;
+  border: 1px solid var(--ds-border);
+  border-radius: 6px;
+  background: var(--ds-surface);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avl-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-sim agt-oyun agt-oyun--stage" id="ds-sim" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 10 · Simülasyon</p><h1>AVL Ağacı Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-avl-help" aria-label="Simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_10_Arama_Agaclari.html">← Bölüm 10</a>
+  </header>
+
+  <div class="agt-oyun__body ds-sim__body">
+    <div class="ds-sim__root avl-sim">
+      <div class="avl-controls">
+        <div class="avl-row">
+          <label for="ds-avl-value">Tam sayı değer</label>
+          <input id="ds-avl-value" type="number" value="42">
+          <button class="is-primary" id="ds-avl-insert" type="button">Ekle</button>
+          <button id="ds-avl-search" type="button">Ara</button>
+          <button class="is-danger" id="ds-avl-delete" type="button">Sil</button>
+          <button id="ds-avl-min" type="button">Minimum</button>
+          <button id="ds-avl-max" type="button">Maksimum</button>
+        </div>
+        <div class="avl-row">
+          <button id="ds-avl-inorder" type="button">Kök ortada</button>
+          <button id="ds-avl-preorder" type="button">Kök önde</button>
+          <button id="ds-avl-levelorder" type="button">Düzey sırası</button>
+          <button id="ds-avl-validate" type="button">Doğrula</button>
+          <button id="ds-avl-example" type="button">Örnek</button>
+          <button id="ds-avl-random" type="button">Rastgele</button>
+          <button class="is-danger" id="ds-avl-reset" type="button">Sıfırla</button>
+          <button class="is-danger" id="ds-avl-cancel" type="button">Durdur</button>
+        </div>
+      </div>
+
+      <div class="avl-main">
+        <div class="avl-left">
+          <div class="avl-visual ds-sim__panel">
+            <svg id="ds-avl-svg" class="avl-svg" viewBox="0 0 500 330" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Etkileşimli AVL ağacı"></svg>
+          </div>
+          <p id="ds-avl-status" class="ds-sim__status avl-status" role="status" aria-live="polite">Örnek AVL ağacı yüklendi. Bir işlem seçin.</p>
+        </div>
+
+        <div class="avl-side">
+          <div class="avl-stats">
+            <div class="avl-stat"><strong>Düğüm</strong><span id="ds-avl-nodes">0</span></div>
+            <div class="avl-stat"><strong>Yükseklik</strong><span id="ds-avl-height">0</span></div>
+            <div class="avl-stat"><strong>En büyük |DF|</strong><span id="ds-avl-max-bf">0</span></div>
+            <div class="avl-stat"><strong>Döndürme</strong><span id="ds-avl-rotations">0</span></div>
+          </div>
+          <div class="avl-box ds-sim__panel">
+            <p class="ds-sim__caption">İşlem yolu</p>
+            <div id="ds-avl-path" class="avl-path">—</div>
+          </div>
+          <div class="avl-box ds-sim__panel">
+            <p class="ds-sim__caption">Döndürme geçmişi</p>
+            <ol id="ds-avl-events" class="avl-events"><li>Döndürme gerekmedi.</li></ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-avl-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>AVL Ağacı Simülatörü</h2>
+    <p>AVL ağacı kendini dengeleyen bir ikili arama ağacıdır. Her düğüm alt ağacının yüksekliğini tutar ve denge faktörü (DF) yükseklik(sol) − yükseklik(sağ) her zaman −1, 0 ya da 1 olmalıdır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir tam sayı yazıp <b>Ekle</b>, <b>Ara</b> ya da <b>Sil</b> düğmesine basın. Önce yol vurgulanır, sonra dengeyi geri getirmek için gereken her döndürme canlandırılır ve döndürme geçmişine yazılır.</li>
+      <li>Her düğümün altında yüksekliği (h) ve denge faktörü (DF) görünür. <b>Doğrula</b> sıralamayı, tutulan yükseklikleri ve dengeyi denetler.</li>
+      <li><b>Örnek</b>, <b>Rastgele</b> ve <b>Sıfırla</b> ağacı değiştirir; <b>Durdur</b> çalışan animasyonu keser.</li>
+    </ul>
+    <h3>AVL kavramları</h3>
+    <ul>
+      <li><b>Tutulan yükseklikler:</b> yükseklikler özyinelemeli ekleme ve silmeden sonra ve her döndürmede güncellenir.</li>
+      <li><b>Tek döndürme:</b> LL dengesizliği sağa döndürmeyle, RR dengesizliği sola döndürmeyle giderilir.</li>
+      <li><b>Çift döndürme:</b> LR ve RL dengesizliklerinde ağır çocuk ters yöne yattığı için iki döndürme gerekir.</li>
+      <li><b>Silme sonrası onarım:</b> silme birden çok atayı dengesiz bırakabilir; bu yüzden denge denetimi köke kadar sürer.</li>
+    </ul>
+    <h3>AVL değişmezleri</h3>
+    <table>
+      <thead><tr><th>Değişmez</th><th>Koşul</th></tr></thead>
+      <tbody>
+        <tr><td>İkili arama ağacı sırası</td><td>Soldaki değerler küçük, sağdakiler büyüktür.</td></tr>
+        <tr><td>Doğru tutulan yükseklik</td><td>1 + max(sol yükseklik, sağ yükseklik)</td></tr>
+        <tr><td>Denge</td><td>Denge faktörünün mutlak değeri en çok 1'dir.</td></tr>
+        <tr><td>Tekrar politikası</td><td>Tekrarlanan anahtarlar reddedilir.</td></tr>
+      </tbody>
+    </table>
+    <p>Yükseklik O(log n) kaldığı için arama, ekleme ve silmenin tümü O(log n) sürer.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  function Node(value){this.value=value;this.left=null;this.right=null;this.height=1;}
+
+  /* every operation is computed at once and recorded as frames (snapshots with
+     marks and a message); the UI plays the frames, so Cancel never leaves a half-done tree */
+  function AVL(){this.root=null;this.rotations=0;this.events=[];this.frames=[];}
+
+  function marks(){
+    var m={};
+    for(var i=0;i<arguments.length;i+=2)if(arguments[i])m[String(arguments[i].value)]=arguments[i+1];
+    return m;
+  }
+
+  AVL.prototype.h=function(n){return n?n.height:0;};
+  AVL.prototype.bf=function(n){return n?this.h(n.left)-this.h(n.right):0;};
+  AVL.prototype.update=function(n){n.height=1+Math.max(this.h(n.left),this.h(n.right));};
+
+  AVL.prototype.copy=function(n){
+    if(!n)return null;
+    var c=new Node(n.value);c.height=n.height;c.left=this.copy(n.left);c.right=this.copy(n.right);
+    return c;
+  };
+
+  AVL.prototype.frame=function(msg,m,edge,path){
+    this.frames.push({root:this.copy(this.root),marks:m||{},edge:edge||"",msg:msg,path:path,events:this.events.length,rotations:this.rotations});
+  };
+
+  /* replaces the child pointer that pointed to old (or the root) with node */
+  AVL.prototype.link=function(parent,old,node){
+    if(!parent)this.root=node;
+    else if(parent.left===old)parent.left=node;
+    else parent.right=node;
+  };
+
+  AVL.prototype.rotateRight=function(y){
+    var x=y.left,t=x.right;
+    x.right=y;y.left=t;
+    this.update(y);this.update(x);
+    this.rotations++;
+    return x;
+  };
+
+  AVL.prototype.rotateLeft=function(x){
+    var y=x.right,t=y.left;
+    y.left=x;x.right=t;
+    this.update(x);this.update(y);
+    this.rotations++;
+    return y;
+  };
+
+  /* called bottom-up on every node of the access path: update the height, and if
+     |BF| = 2 apply the LL / RR / LR / RL repair at this (lowest unbalanced) node */
+  AVL.prototype.rebalance=function(n,parent){
+    this.update(n);
+    var b=this.bf(n);
+
+    if(b>=-1&&b<=1){
+      this.frame(n.value+" güncellendi: h="+n.height+", DF="+b+" (dengeli).",marks(n,"is-checking"));
+      return n;
+    }
+
+    var heavyLeft=b>1,c=heavyLeft?n.left:n.right,cb=this.bf(c);
+    var kind=heavyLeft?(cb<0?"LR":"LL"):(cb>0?"RL":"RR");
+    var inner=null;
+    if(kind==="LR")inner=c.right;
+    if(kind==="RL")inner=c.left;
+    this.frame(n.value+" dengesiz (DF="+b+"): "+kind+" durumu.",marks(n,"is-bad",c,"is-checking",inner,"is-checking"));
+
+    if(kind==="LR"){
+      n.left=this.rotateLeft(c);
+      this.events.push(n.value+" düğümünde LR: "+c.value+" düğümünde sola döndürme.");
+      this.frame("LR 1. adım: "+c.value+" düğümünde sola döndürme (artık LL biçimi).",marks(n,"is-bad",n.left,"is-checking"));
+    }else if(kind==="RL"){
+      n.right=this.rotateRight(c);
+      this.events.push(n.value+" düğümünde RL: "+c.value+" düğümünde sağa döndürme.");
+      this.frame("RL 1. adım: "+c.value+" düğümünde sağa döndürme (artık RR biçimi).",marks(n,"is-bad",n.right,"is-checking"));
+    }
+
+    var r=heavyLeft?this.rotateRight(n):this.rotateLeft(n);
+    this.link(parent,n,r);
+    var dir=heavyLeft?"sağa":"sola";
+    this.events.push(n.value+" düğümünde "+kind+": "+n.value+" düğümünde "+dir+" döndürme.");
+    this.frame((kind==="LR"||kind==="RL"?kind+" 2. adım: ":kind+": ")+n.value+" düğümünde "+dir+" döndürme → alt ağacın kökü artık "+r.value+".",marks(r,"is-found"));
+    return r;
+  };
+
+  /* BST descent shared by insert and delete; returns the visited nodes */
+  AVL.prototype.descend=function(value){
+    var path=[],n=this.root;
+    while(n){
+      var edge=path.length?path[path.length-1].value+"->"+n.value:"";
+      path.push(n);
+      var text=path.map(function(x){return x.value;}).join(" → ");
+      if(value===n.value){this.frame(value+" bulundu.",marks(n,"is-found"),edge,text);break;}
+      var goLeft=value<n.value;
+      this.frame(value+" ile "+n.value+" karşılaştırılır: "+(goLeft?"sola":"sağa")+" gidilir.",marks(n,"is-checking"),edge,text);
+      n=goLeft?n.left:n.right;
+    }
+    return path;
+  };
+
+  AVL.prototype.insert=function(value){
+    this.events=[];this.frames=[];
+    var path=this.descend(value);
+    var last=path[path.length-1]||null;
+    if(last&&last.value===value)return false;
+
+    var leaf=new Node(value);
+    if(!last)this.root=leaf;
+    else if(value<last.value)last.left=leaf;
+    else last.right=leaf;
+    this.frame(last?value+", "+last.value+" düğümünün "+(value<last.value?"sol":"sağ")+" çocuğu olarak eklenir; geri yukarı çıkılır.":value+" kök olarak eklenir.",marks(leaf,"is-found"),last?last.value+"->"+value:"");
+
+    for(var i=path.length-1;i>=0;i--)this.rebalance(path[i],path[i-1]||null);
+    return true;
+  };
+
+  AVL.prototype.delete=function(value){
+    this.events=[];this.frames=[];
+    var path=this.descend(value);
+    var n=path[path.length-1]||null;
+    if(!n||n.value!==value)return false;
+    path.pop();
+    var parent=path[path.length-1]||null,chain;
+
+    if(n.left&&n.right){
+      this.frame(value+" düğümünün iki çocuğu var: kök ortada ardılı bulunur.",marks(n,"is-found"));
+      var sp=[n],s=n.right;
+      while(true){
+        this.frame(s.left?"Ardıl araması: "+s.value+" düğümünden sola gidilir.":"Kök ortada ardılı "+s.value+" (sağ alt ağacın en solu).",marks(n,"is-found",s,"is-checking"),sp[sp.length-1].value+"->"+s.value);
+        if(!s.left)break;
+        sp.push(s);s=s.left;
+      }
+      var sParent=sp[sp.length-1];
+      n.value=s.value;
+      this.link(sParent,s,s.right);
+      this.frame(s.value+" değeri "+value+" düğümüne kopyalanır, eski "+s.value+" ayrılır; geri yukarı çıkılır.",marks(n,"is-found"));
+      chain=path.concat(sp);
+    }else{
+      var child=n.left||n.right;
+      this.link(parent,n,child);
+      this.frame(child?value+" silinir (tek çocuk): yerine "+child.value+" geçer; geri yukarı çıkılır.":"Yaprak "+value+" silinir; geri yukarı çıkılır.",marks(child,"is-found"));
+      chain=path;
+    }
+
+    for(var i=chain.length-1;i>=0;i--)this.rebalance(chain[i],chain[i-1]||null);
+    return true;
+  };
+
+  AVL.prototype.search=function(value){
+    var path=[],n=this.root;
+    while(n){
+      path.push(n);
+      if(value===n.value)return{found:true,node:n,path:path};
+      n=value<n.value?n.left:n.right;
+    }
+    return{found:false,node:null,path:path};
+  };
+
+  AVL.prototype.minimum=function(){
+    var path=[],n=this.root;
+    while(n){path.push(n);if(!n.left)break;n=n.left;}
+    return{node:n,path:path};
+  };
+
+  AVL.prototype.maximum=function(){
+    var path=[],n=this.root;
+    while(n){path.push(n);if(!n.right)break;n=n.right;}
+    return{node:n,path:path};
+  };
+
+  AVL.prototype.traverse=function(type){
+    var out=[];
+    if(type==="level"){
+      var q=this.root?[this.root]:[];
+      while(q.length){
+        var n=q.shift();out.push(n);
+        if(n.left)q.push(n.left);
+        if(n.right)q.push(n.right);
+      }
+      return out;
+    }
+
+    function walk(n){
+      if(!n)return;
+      if(type==="pre")out.push(n);
+      walk(n.left);
+      if(type==="in")out.push(n);
+      walk(n.right);
+    }
+
+    walk(this.root);
+    return out;
+  };
+
+  AVL.prototype.validate=function(){
+    var self=this;
+
+    function walk(n,min,max){
+      if(!n)return{valid:true,height:0,maxBf:0};
+
+      if(n.value<=min||n.value>=max)return{valid:false,message:n.value+" düğümünde ikili arama ağacı sırası bozuk."};
+
+      var l=walk(n.left,min,n.value);
+      if(!l.valid)return l;
+
+      var r=walk(n.right,n.value,max);
+      if(!r.valid)return r;
+
+      var expected=1+Math.max(l.height,r.height);
+      var b=l.height-r.height;
+
+      if(n.height!==expected)return{valid:false,message:n.value+" düğümünde tutulan yükseklik yanlış."};
+      if(Math.abs(b)>1)return{valid:false,message:n.value+" düğümünde denge faktörü "+b+" geçersiz."};
+
+      return{valid:true,height:expected,maxBf:Math.max(Math.abs(b),l.maxBf,r.maxBf)};
+    }
+
+    var result=walk(this.root,-Infinity,Infinity);
+    return result.valid?{valid:true,height:result.height,maxBf:result.maxBf,message:"Tüm AVL değişmezleri sağlanıyor."}:result;
+  };
+
+  var root=document.getElementById("ds-sim");if(!root)return;
+  function q(id){return root.querySelector("#"+id);}
+  var ns="http://www.w3.org/2000/svg";
+  var tree=new AVL();
+
+  var el={
+    value:q("ds-avl-value"),
+    svg:q("ds-avl-svg"),status:q("ds-avl-status"),nodes:q("ds-avl-nodes"),height:q("ds-avl-height"),
+    maxBf:q("ds-avl-max-bf"),rotations:q("ds-avl-rotations"),path:q("ds-avl-path"),events:q("ds-avl-events")
+  };
+
+  var btn={
+    insert:q("ds-avl-insert"),search:q("ds-avl-search"),delete:q("ds-avl-delete"),min:q("ds-avl-min"),max:q("ds-avl-max"),
+    inorder:q("ds-avl-inorder"),preorder:q("ds-avl-preorder"),levelorder:q("ds-avl-levelorder"),validate:q("ds-avl-validate"),
+    example:q("ds-avl-example"),random:q("ds-avl-random"),reset:q("ds-avl-reset"),cancel:q("ds-avl-cancel")
+  };
+
+  /* animation step in ms (the original slider default) */
+  var DELAY=400;
+
+  var token=0,marked={},activeEdge="";
+  /* frame being played (null = draw the live tree) */
+  var view=null;
+  function shownRoot(){return view?view.root:tree.root;}
+
+  /* drawing geometry (SVG user units); the viewBox follows the tree's extent,
+     so a large tree is scaled down instead of overflowing the panel */
+  var SX=54,SY=66,PAD=40,TOP=32,BOTTOM=52,MIN_W=500,MIN_H=330;
+  /* rows shown in the rotation history (fixed-height rows) */
+  var EVENT_ROWS=6;
+
+  function readValue(){
+    if(el.value.value.trim()==="")throw new Error("Bir değer girin.");
+    var value=Number(el.value.value);
+    if(!Number.isSafeInteger(value))throw new Error("Geçerli bir tam sayı girin.");
+    return value;
+  }
+
+  function setStatus(message,type){
+    el.status.textContent=message;
+    el.status.title=message;
+    el.status.classList.remove("is-ok","is-bad");
+    if(type)el.status.classList.add(type);
+  }
+
+  function delay(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});}
+
+  function disable(state){
+    Object.keys(btn).forEach(function(key){btn[key].disabled=state&&key!=="cancel";});
+    btn.cancel.disabled=!state;
+  }
+
+  function clearMarks(){marked={};activeEdge="";}
+
+  /* x = inorder rank, y = depth: nodes never overlap */
+  function layout(){
+    var nodes=[],edges=[],rank=0,maxDepth=0;
+    function place(node,depth,parentNode){
+      if(!node)return;
+      if(parentNode)edges.push({from:parentNode,to:node});
+      place(node.left,depth+1,node);
+      nodes.push({node:node,x:PAD+rank*SX,y:TOP+depth*SY,depth:depth});
+      rank++;
+      if(depth>maxDepth)maxDepth=depth;
+      place(node.right,depth+1,node);
+    }
+    place(shownRoot(),0,null);
+    return{nodes:nodes,edges:edges,width:PAD*2+Math.max(0,rank-1)*SX,height:TOP+maxDepth*SY+BOTTOM};
+  }
+
+  function metrics(){
+    var count=0,height=0,maxBf=0;
+    function walk(n,d){
+      if(!n)return;
+      count++;
+      if(d>height)height=d;
+      maxBf=Math.max(maxBf,Math.abs(tree.bf(n)));
+      walk(n.left,d+1);walk(n.right,d+1);
+    }
+    walk(shownRoot(),1);
+    el.nodes.textContent=String(count);
+    el.height.textContent=String(height);
+    el.maxBf.textContent=String(maxBf);
+    el.rotations.textContent=String(view?view.rotations:tree.rotations);
+  }
+
+  function render(){
+    while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
+
+    if(!shownRoot()){
+      el.svg.setAttribute("viewBox","0 0 "+MIN_W+" "+MIN_H);
+      var empty=document.createElementNS(ns,"text");
+      empty.setAttribute("x",String(MIN_W/2));empty.setAttribute("y",String(MIN_H/2));
+      empty.setAttribute("class","avl-empty");empty.textContent="Ağaç boş.";
+      el.svg.appendChild(empty);metrics();return;
+    }
+
+    var data=layout();
+    var vbW=Math.max(MIN_W,data.width),vbH=Math.max(MIN_H,data.height);
+    el.svg.setAttribute("viewBox",(-(vbW-data.width)/2)+" 0 "+vbW+" "+vbH);
+
+    data.edges.forEach(function(edge){
+      var a=data.nodes.find(function(x){return x.node===edge.from;});
+      var b=data.nodes.find(function(x){return x.node===edge.to;});
+      var line=document.createElementNS(ns,"line");
+      line.setAttribute("x1",String(a.x));line.setAttribute("y1",String(a.y));
+      line.setAttribute("x2",String(b.x));line.setAttribute("y2",String(b.y));
+      line.setAttribute("class","avl-edge"+(activeEdge===edge.from.value+"->"+edge.to.value?" is-active":""));
+      el.svg.appendChild(line);
+    });
+
+    data.nodes.forEach(function(item){
+      var g=document.createElementNS(ns,"g");
+      var state=marked[String(item.node.value)]||"";
+      g.setAttribute("class","avl-node"+(state?" "+state:""));
+      g.setAttribute("transform","translate("+item.x+" "+item.y+")");
+
+      var c=document.createElementNS(ns,"circle");c.setAttribute("r","20");
+
+      var value=document.createElementNS(ns,"text");
+      value.setAttribute("class","value");value.setAttribute("y","1");value.textContent=String(item.node.value);
+
+      var meta=document.createElementNS(ns,"text");
+      meta.setAttribute("class","meta");meta.setAttribute("y","35");
+      meta.textContent="h="+item.node.height+" · DF="+tree.bf(item.node);
+
+      g.appendChild(c);g.appendChild(value);g.appendChild(meta);el.svg.appendChild(g);
+    });
+
+    metrics();
+  }
+
+  function showEvents(count){
+    var events=count===undefined?tree.events:tree.events.slice(0,count);
+    el.events.innerHTML="";
+    if(!events.length){
+      var li=document.createElement("li");
+      li.textContent="Döndürme gerekmedi.";
+      el.events.appendChild(li);
+      return;
+    }
+
+    var shown=events.length>EVENT_ROWS?events.slice(0,EVENT_ROWS-1):events;
+    shown.forEach(function(event){
+      var li=document.createElement("li");
+      li.textContent=event;
+      li.title=event;
+      el.events.appendChild(li);
+    });
+    if(shown.length<events.length){
+      var more=document.createElement("li");
+      more.textContent="… "+(events.length-shown.length)+" tane daha";
+      el.events.appendChild(more);
+    }
+  }
+
+  async function animatePath(path,finalNode){
+    token++;
+    var t=token;
+    disable(true);
+
+    for(var i=0;i<path.length;i++){
+      clearMarks();
+      marked[String(path[i].value)]="is-checking";
+      if(i>0)activeEdge=path[i-1].value+"->"+path[i].value;
+      if(finalNode&&path[i]===finalNode&&i===path.length-1)marked[String(path[i].value)]="is-found";
+
+      el.path.textContent=path.slice(0,i+1).map(function(n){return n.value;}).join(" → ");
+      render();
+
+      if(!(await wait(delay(),t)))return false;
+    }
+
+    disable(false);
+    return true;
+  }
+
+  /* plays recorded frames; the tree itself is already in its final state */
+  async function play(frames,t){
+    for(var i=0;i<frames.length;i++){
+      var f=frames[i];
+      view=f;marked=f.marks;activeEdge=f.edge;
+      if(f.path!==undefined)el.path.textContent=f.path;
+      setStatus(f.msg);
+      showEvents(f.events);
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    view=null;
+    return true;
+  }
+
+  function finish(){
+    view=null;
+    showEvents();
+    disable(false);
+    render();
+  }
+
+  async function animateTraversal(nodes,label){
+    token++;
+    var t=token,visited=[];
+    disable(true);clearMarks();
+
+    for(var i=0;i<nodes.length;i++){
+      marked[String(nodes[i].value)]="is-visited";
+      visited.push(nodes[i].value);
+      el.path.textContent=visited.join(" → ");
+      render();
+
+      if(!(await wait(delay(),t)))return false;
+    }
+
+    disable(false);
+    setStatus("Gezinme tamamlandı ("+label+").","is-ok");
+    return true;
+  }
+
+  btn.insert.addEventListener("click",async function(){
+    try{
+      var value=readValue();
+      token++;
+      var t=token;
+      disable(true);
+      var inserted=tree.insert(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      marked[String(value)]="is-found";
+      finish();
+      setStatus(inserted?value+" eklendi; her DF artık {-1, 0, +1} içinde.":value+" zaten var.",inserted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
+  });
+
+  btn.search.addEventListener("click",async function(){
+    try{
+      var value=readValue(),r=tree.search(value);
+      if(!(await animatePath(r.path,r.found?r.node:null)))return;
+      setStatus(r.found?value+" bulundu.":value+" bulunamadı.",r.found?"is-ok":"is-bad");
+    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+  });
+
+  btn.delete.addEventListener("click",async function(){
+    try{
+      var value=readValue();
+      token++;
+      var t=token;
+      disable(true);
+      var deleted=tree.delete(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      finish();
+      setStatus(deleted?value+" silindi; yükseklikler ve DF'ler köke kadar yeniden denetlendi.":value+" bulunamadı.",deleted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
+  });
+
+  btn.min.addEventListener("click",async function(){
+    var r=tree.minimum();
+    if(!r.node){setStatus("Ağaç boş.","is-bad");return;}
+    if(!(await animatePath(r.path,r.node)))return;
+    setStatus("Minimum: "+r.node.value+".","is-ok");
+  });
+
+  btn.max.addEventListener("click",async function(){
+    var r=tree.maximum();
+    if(!r.node){setStatus("Ağaç boş.","is-bad");return;}
+    if(!(await animatePath(r.path,r.node)))return;
+    setStatus("Maksimum: "+r.node.value+".","is-ok");
+  });
+
+  btn.inorder.addEventListener("click",function(){animateTraversal(tree.traverse("in"),"kök ortada");});
+  btn.preorder.addEventListener("click",function(){animateTraversal(tree.traverse("pre"),"kök önde");});
+  btn.levelorder.addEventListener("click",function(){animateTraversal(tree.traverse("level"),"düzey sırası");});
+
+  btn.validate.addEventListener("click",function(){
+    var r=tree.validate();
+    el.path.textContent=r.valid?"Yükseklik = "+r.height+" · en büyük |DF| = "+r.maxBf:r.message;
+    setStatus(r.message,r.valid?"is-ok":"is-bad");
+  });
+
+  function load(values){
+    token++;
+    view=null;
+    tree=new AVL();
+    values.forEach(function(v){tree.insert(v);});
+    clearMarks();el.path.textContent="—";showEvents();disable(false);render();
+  }
+
+  btn.example.addEventListener("click",function(){
+    load([40,20,60,10,30,50,70,25,35,65,80]);
+    setStatus("Örnek AVL ağacı yüklendi.","is-ok");
+  });
+
+  btn.random.addEventListener("click",function(){
+    var values=[],used={};
+    while(values.length<12){
+      var v=Math.floor(Math.random()*90)+10;
+      if(!used[v]){used[v]=true;values.push(v);}
+    }
+    load(values);
+    setStatus("Rastgele AVL ağacı oluşturuldu.","is-ok");
+  });
+
+  btn.reset.addEventListener("click",function(){
+    token++;
+    view=null;
+    tree=new AVL();
+    clearMarks();
+    el.path.textContent="—";
+    showEvents();
+    disable(false);
+    render();
+    setStatus("Ağaç temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    var playing=view!==null;
+    token++;
+    clearMarks();
+    finish();
+    setStatus(playing?"Animasyon durduruldu; ağacın son hâli gösteriliyor.":"Animasyon durduruldu.");
+  });
+
+  load([40,20,60,10,30,50,70]);
+  btn.cancel.disabled=true;
+})();
+</script>
+<script src="deck/oyun.js"></script>

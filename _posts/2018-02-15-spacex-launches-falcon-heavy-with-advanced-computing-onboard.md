@@ -1,0 +1,15 @@
+---
+title: SpaceX Launches Falcon Heavy With Advanced Computing Onboard
+date: 2018-02-15
+permalink: /posts/2018/02/spacex-launches-falcon-heavy-with-advanced-computing-onboard/
+tags:
+  - technology
+  - computing-history
+  - history
+---
+
+SpaceX launched Falcon Heavy for the first time on February 6, 2018 from Kennedy Space Center's Launch Complex 39A — the same pad that launched Apollo 11 in 1969. The rocket combined three Falcon 9 first-stage cores (27 Merlin 1D engines total) and could deliver 63,800 kg to low Earth orbit, 26,700 kg to geostationary transfer orbit, and 16,800 kg to Mars — more than any operational rocket since NASA's Saturn V flew its last mission in 1973. The test payload was Elon Musk's personal 2010 Tesla Roadster, with a "Starman" mannequin in the driver's seat and a copy of The Hitchhiker's Guide to the Galaxy in the glovebox. The car was placed into a heliocentric solar orbit intended to reach Mars's orbit; it slightly overshot, entering an orbit with aphelion approximately 257 million kilometers from the Sun.
+
+Falcon Heavy's flight computer architecture exemplified the redundant embedded systems required for modern orbital rockets. Each Merlin 1D engine has its own dedicated controller monitoring chamber pressure, turbopump speed, propellant flow rates, and thermal state — 27 engine controllers providing real-time feedback to the vehicle avionics. The vehicle flight computers receive telemetry from inertial measurement units, GPS receivers, and engine health data at kilohertz rates, running closed-loop guidance and control algorithms that continuously update pitch, yaw, and roll commands to the engines' hydraulic gimbal actuators. Falcon 9 and Falcon Heavy use a triple-redundant avionics architecture: three independent flight computer strings run the guidance software simultaneously, with a voting system that detects and isolates a divergent computer's outputs. SpaceX's avionics software is written primarily in C++ running on Linux, developed in-house rather than using traditional aerospace-certified operating systems.
+
+The February 6 mission attempted to recover all three first-stage cores. The two side boosters separated at approximately T+2:31 and executed synchronized landing burns at Cape Canaveral's Landing Zones 1 and 2, touching down simultaneously — a visually dramatic demonstration of autonomous GN&C (guidance, navigation, and control) software executing identical landing sequences on two independent vehicles without ground control commands (the speed-of-light delay makes real-time ground control impossible at landing burn). The center core failed to land on the drone ship "Of Course I Still Love You" after only one of three required Merlin engines relit for the landing burn, resulting in impact with the ocean at approximately 480 km/h. SpaceX traced the failure to depleted ignition fluid (TEA-TEB, used to start the Merlin engines) on the center core after its more demanding ascent burn. Falcon Heavy flew its second mission in April 2019 (Arabsat-6A), successfully recovering all three cores for the first time.

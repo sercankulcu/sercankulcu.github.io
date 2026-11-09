@@ -1,0 +1,15 @@
+---
+title: Apple Announces the Move From Intel to Apple Silicon
+date: 2020-06-15
+permalink: /posts/2020/06/apple-announces-the-move-from-intel-to-apple-silicon/
+tags:
+  - hardware
+  - computing
+  - history
+---
+
+Apple announced at WWDC 2020 (June 22, 2020) that Macs would transition from Intel x86-64 processors to Apple-designed ARM-based silicon over a two-year period — the Mac's third major CPU architecture change after Motorola 68k to PowerPC (1994) and PowerPC to Intel (2005–2006). Apple CEO Tim Cook announced the transition alongside a Developer Transition Kit (a Mac mini with the A12Z Bionic chip from the iPad Pro, loaned to registered developers for $500) to allow software porting before consumer hardware arrived. Apple emphasized two compatibility layers: Universal 2 binaries (a fat binary format containing both ARM64 and x86-64 code in one application package, allowing one download to run natively on both architectures) and Rosetta 2 (a successor to the original Rosetta used during the PowerPC-to-Intel transition, now performing ahead-of-time translation of x86-64 code to ARM64 at app install time rather than interpreting at runtime, giving dramatically faster performance than runtime JIT translation). Virtualization of ARM Linux and Windows for ARM was also supported.
+
+The first Apple Silicon Mac hardware arrived on November 10, 2020 — just five months after the announcement — when Apple introduced the M1 chip alongside the MacBook Air (M1, $999), MacBook Pro 13-inch (M1, $1,299), and Mac mini (M1, $699). The M1 was manufactured on TSMC's N5 (5nm) process and contained 16 billion transistors, combining 4 high-performance "Firestorm" CPU cores (running at 3.2 GHz), 4 efficiency "Icestorm" CPU cores (running at 2.06 GHz), an 8-core GPU, a 16-core Neural Engine delivering 11 TOPS, and a unified memory architecture (8 or 16 GB LPDDR4X at 68.25 GB/s bandwidth) in one package — the same design philosophy as iPhone silicon but scaled for sustained power levels. Rosetta 2 performance on translated x86-64 apps was often faster than native execution on the Intel Mac hardware being replaced, which demonstrated the performance gap between M1 and the Intel Core i5/i7 chips Apple had been using.
+
+The strategic consequence was that Apple could align macOS features, compiler optimizations, GPU capabilities, and media processing (hardware encode/decode for ProRes video, the Neural Engine for Core ML workloads, the Secure Enclave for biometric authentication) across one chip family spanning iPhone, iPad, and Mac. Intel Macs received security updates but no new silicon partnerships; Apple stopped selling Intel Macs after June 2023 when the Mac Pro (M2 Ultra) completed the transition exactly within the announced two-year window. Apple's M-series chips demonstrated that consumer ARM designs could match or exceed x86 desktop-class performance, influencing Microsoft's Windows-on-ARM effort (Qualcomm Snapdragon X Elite, 2024) and accelerating ARM adoption in data center and server markets.

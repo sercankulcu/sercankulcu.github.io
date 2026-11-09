@@ -1,0 +1,15 @@
+---
+title: OpenAI Expands Agentic Research Tools
+date: 2025-02-15
+permalink: /posts/2025/02/openai-expands-agentic-research-tools/
+tags:
+  - artificial-intelligence
+  - software
+  - computing-history
+---
+
+OpenAI released Deep Research on February 2, 2025, initially for ChatGPT Pro subscribers ($200/month). The feature used an internal version of the o3 reasoning model to autonomously conduct multi-step research tasks: planning a search strategy, executing dozens of web searches, reading and synthesizing source documents, tracking intermediate findings, and producing a 2,000–5,000 word report with inline citations. A typical Deep Research task ran for 5–30 minutes without user intervention, producing outputs comparable in depth to what a research analyst might produce in a few hours. The model was given access to Bing web search and document reading tools; it could adapt its search plan based on what it found at each step, a form of “reflection” where the model assessed the quality of evidence and decided whether to investigate further or broaden scope. Google had launched Gemini Deep Research on December 9, 2024 (powered by Gemini 1.5 Pro with Google Search), making this the first major head-to-head competition between deep research agents within weeks of each other.
+
+The architecture of Deep Research reflected the core challenge of long-horizon agentic tasks: the model needed to maintain a structured scratchpad of findings across dozens of tool calls without losing context, avoid spinning into irrelevant tangents, and produce a synthesis that correctly attributed claims to sources rather than hallucinating. OpenAI's approach used chain-of-thought reasoning (visible to users as a “Thinking” trace showing the model's search queries and decision logic) to make the agent's intermediate steps inspectable. Users could see why the model decided to search for a particular term, what it concluded from a source, and where it changed direction. This transparency was partly a reliability mechanism — users could interrupt if the agent was pursuing the wrong angle — and partly a trust mechanism to show the research was grounded in real sources rather than generated from the model's training data.
+
+OpenAI had launched Operator on January 23, 2025 (two weeks earlier) — a separate agent that could control web browsers to complete tasks like filling out forms, booking reservations, and navigating multi-step workflows on websites. Together, Operator and Deep Research represented OpenAI's push to make 2025 the year of agentic AI products rather than pure chat assistants. Deep Research expanded to ChatGPT Plus and Team plans in March 2025 with a monthly usage quota (10 reports/month for Plus users). The product demonstrated the feasibility of an agent that could replace significant portions of knowledge-worker research time, though accuracy remained dependent on source quality — the model could synthesize misinformation from low-quality web sources into authoritative-sounding reports, making source inspection an essential habit for users.

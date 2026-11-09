@@ -1,0 +1,15 @@
+---
+title: Apple WWDC Expands On-Device AI Development
+date: 2025-06-15
+permalink: /posts/2025/06/apple-wwdc-expands-on-device-ai-development/
+tags:
+  - artificial-intelligence
+  - software
+  - computing-history
+---
+
+Apple's WWDC 2025 (June 9–13, Cupertino) introduced iOS 19, iPadOS 19, and macOS 16, with a significant portion of the developer keynote dedicated to expanding the Foundation Models framework that had debuted in iOS 18/macOS 15 (shipped September 2024). The Foundation Models framework allowed third-party applications to call Apple's on-device approximately-3-billion-parameter language model without packaging model weights in the app bundle or routing requests to external APIs. iOS 19's expansion added a Streaming API (returning partial tokens as they were generated rather than waiting for the full response), a multi-modal input API (accepting image and text prompts for the same model), and task-specific Adapter APIs — lightweight fine-tuned adapter layers (roughly 100 MB each) that developers could download and attach to the system model to specialize it for domain-specific tasks like legal document analysis or code review without replacing the base model.
+
+The on-device model ran on the Neural Engine in A-series and M-series chips — Apple Silicon required for Apple Intelligence, meaning devices prior to the A17 Pro (iPhone 15 Pro and later) or M1 (iPad and Mac) were excluded. On supported devices, inference latency for the system model was approximately 10–20ms for short prompts (consistent with interactive use in text fields), compared to 200–800ms round-trip times for API calls. Apple extended Private Cloud Compute — the server-side complement to on-device inference, running on Apple Silicon servers (M2 Ultra-class hardware) with cryptographic attestation preventing Apple from accessing request content — to handle requests that the on-device model could not complete within quality or context-length limits. Users could also opt in to route requests to third-party models (Gemini, Claude) for tasks explicitly chosen by the user, with no automatic fallback that sent data externally without user awareness.
+
+The approach changes application design because model availability and capability depend on the user's device. The Adapter API introduced a new distribution model — Apple-notarized adapter files downloadable from the App Store — parallel to how Metal shader caches and Core ML models were already distributed. For developers, Foundation Models shifted inference cost from per-request API billing to the device hardware already owned by the user, making AI features in apps with large user bases financially viable without metering. WWDC 2025's Foundation Models sessions were among the most-attended developer sessions of the conference, reflecting that on-device inference had moved from an experimental capability in iOS 18 to a production API surface that developers were actively building products around for the iOS 19 launch in September 2025.

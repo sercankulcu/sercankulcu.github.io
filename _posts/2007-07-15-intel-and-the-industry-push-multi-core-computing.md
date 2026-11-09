@@ -1,0 +1,15 @@
+---
+title: Intel and the Industry Push Multi-Core Computing
+date: 2007-07-15
+permalink: /posts/2007/07/intel-and-the-industry-push-multi-core-computing/
+tags:
+  - hardware
+  - computing
+  - history
+---
+
+Intel's Core 2 Duo launched July 27, 2006, marking the mainstream shift to dual-core x86 desktop processors. By mid-2007, Intel expanded to quad-core with the Core 2 Quad Q6600 (January 2007, $851 initially, reduced to $266 by July 2007) and the Core 2 Extreme QX6850 at 3.0 GHz ($999 at launch, July 2007). AMD had been first to mainstream dual-core with the Athlon 64 X2 in May 2005, but Intel's Core 2 microarchitecture (Conroe, 65nm) reclaimed performance leadership, and the move to quad-core in 2007 extended Intel's lead as AMD's Phenom quad-core didn't ship until November 2007. The clock-frequency race that had defined the PC industry since the 1980s had effectively ended: Intel's Pentium 4 Prescott (90nm, 2004) reached 3.8 GHz but generated over 100 watts of heat in high-performance configurations, making 4+ GHz architecturally untenable. Adding cores was the only remaining path to increased throughput within thermal limits — Steve Ballmer summarized this publicly: "core counts will double every two years" in place of clock frequency.
+
+The hardware shift created an immediate software challenge. Existing single-threaded programs saw no benefit from a second core — Amdahl's Law constrained speedup to the proportion of work that could run in parallel. Operating system schedulers (Windows Vista, Linux 2.6.x) already understood symmetric multiprocessing and distributed threads across available cores, so OS-level tasks (antivirus scans, Windows Update, background indexing) ran concurrently with foreground applications. But application-level parallelism required developers to explicitly create threads, communicate through shared memory or message queues, and manage race conditions. Java had added java.util.concurrent in Java 5 (2004) with higher-level constructs (ConcurrentHashMap, ExecutorService, atomic variables) that made thread-safe data structures easier to write correctly. Microsoft introduced the Task Parallel Library in .NET 4.0 (2010), and Intel's Threading Building Blocks (TBB) library provided parallel algorithms for C++.
+
+The multi-core transition was uneven across workloads. Games, multimedia encoding, compilation, and scientific computing could be parallelized with existing techniques; interactive GUI applications and database transaction processing required architectural rethinking to decompose serial workflows into concurrent stages. By 2007, the Intel Core 2 Quad Q6600 for $266 offered the highest single-dollar performance for multi-threaded workloads, making quad-core affordable for enthusiasts and developers. Intel's 45nm "Penryn" generation (announced August 2007, shipped November 2007) extended the Tick-Tock cadence to six-core server processors (Nehalem architecture, 2008), and desktop six-core chips arrived with Intel's Core i7-980X in March 2010.

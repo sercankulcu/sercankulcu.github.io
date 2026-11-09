@@ -1,0 +1,279 @@
+---
+layout: without-sidebar
+title: "İşlemci Simülatörü"
+permalink: /files/microprocessors/slides/CPU_Simulator.html
+excerpt: "8 bitlik eğitim amaçlı işlemci simülatörü: akümülatörlü küçük bir program yazılıp çevrilir; her komutun getir, çöz, işlenen, yürüt ve geri yaz adımları PC, IR, MAR, MDR, ACC, ALU, bayraklar ve RAM üzerinde izlenir."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cpu-sim, .cpu-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .cpu-sim, html[data-theme="dark"] .cpu-dlg { --ds-accent:#f07a7a; }
+.cpu-sim { --cs-mono:ui-monospace, "Cascadia Code", Consolas, monospace; }
+.cpu-sim .cs-toolbar { display:flex; align-items:center; gap:5px; height:32px; margin-bottom:6px; }
+.cpu-sim .cs-toolbar button { min-height:30px; padding:0 10px; font-size:13px; }
+.cpu-sim .cs-toolbar label { display:flex; align-items:center; gap:5px; margin-left:4px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cpu-sim .cs-toolbar input[type=range] { width:64px; }
+.cpu-sim .cs-toolbar #speedText { width:34px; color:var(--ds-muted); font-size:12px; }
+.cpu-sim .cs-toolbar select { min-height:30px; margin-left:auto; padding:0 6px; font-size:13px; }
+.cpu-sim .cs-main { display:grid; grid-template-columns:222px minmax(0, 1fr); gap:8px; height:calc(100% - 38px); }
+.cpu-sim .cs-left, .cpu-sim .cs-right { display:flex; flex-direction:column; gap:6px; min-width:0; min-height:0; }
+.cpu-sim .cs-card { min-width:0; padding:6px 8px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); }
+.cpu-sim .cs-cap { color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+.cpu-sim .cs-prog { display:flex; flex:1; flex-direction:column; gap:5px; min-height:0; }
+.cpu-sim .cs-prog select { width:100%; min-height:28px; padding:0 6px; font-size:13px; }
+.cpu-sim .cs-row { display:flex; gap:5px; }
+.cpu-sim .cs-row button { flex:1; min-height:28px; padding:0 8px; font-size:13px; }
+.cpu-sim #message { height:32px; margin:0; overflow:hidden; color:var(--ds-muted); font-size:12px; line-height:16px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.cpu-sim #message.error { color:var(--ds-bad); }
+.cpu-sim .cs-list { width:100%; border-collapse:collapse; font:13px/1 var(--cs-mono); }
+.cpu-sim .cs-list th, .cpu-sim .cs-list td { height:17px; padding:0 4px; border:0; border-bottom:1px solid color-mix(in srgb, var(--ds-border) 55%, transparent); background:none; text-align:left; white-space:pre; }
+.cpu-sim .cs-list thead, .cpu-sim .cs-list tr { background:none; }
+.cpu-sim .cs-list th { background:none !important; color:var(--ds-muted); font:800 12px/1 system-ui, sans-serif; }
+.cpu-sim .cs-list tr.current td { background:var(--ds-hot); }
+.cpu-sim .cs-list .break { width:18px; min-height:16px; height:16px; padding:0; border:0; border-radius:0; background:none; color:var(--ds-muted); font-size:12px; line-height:1; }
+.cpu-sim .cs-list .break.set { color:var(--ds-accent); }
+.cpu-sim .cs-prog > *, .cpu-sim .cs-io > * { flex-shrink:0; }
+.cpu-sim .cs-io { display:flex; flex-direction:column; gap:4px; }
+.cpu-sim .cs-io input { flex:1; min-width:0; min-height:28px; padding:0 6px; font:13px var(--cs-mono); }
+.cpu-sim .cs-io button { flex:none; }
+.cpu-sim #queued { margin:0; height:16px; overflow:hidden; color:var(--ds-muted); font-size:12px; line-height:16px; white-space:nowrap; text-overflow:ellipsis; }
+.cpu-sim #output { height:21px; white-space:nowrap; padding:2px 6px; overflow:hidden; border-radius:6px; background:var(--ds-surface-strong); color:var(--ds-link); font:13px/17px var(--cs-mono); overflow-wrap:anywhere; }
+.cpu-sim #trace { height:48px; margin:0; overflow:hidden; color:var(--ds-muted); font:12px/16px var(--cs-mono); white-space:pre; }
+.cpu-sim svg.cs-diag { display:block; flex:none; width:100%; height:250px; }
+.cpu-sim svg text { fill:var(--ds-text); font-family:system-ui, sans-serif; font-size:12px; }
+.cpu-sim svg .cap { fill:var(--ds-muted); font-size:12px; }
+.cpu-sim svg .ttl { font-size:13px; font-weight:800; }
+.cpu-sim svg .val { fill:var(--ds-link); font:14px var(--cs-mono); }
+.cpu-sim svg .mono { font:12px var(--cs-mono); }
+.cpu-sim svg .val.c1 { font-size:13px; }
+.cpu-sim svg .box { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1.5; }
+.cpu-sim svg .active .box { fill:var(--ds-hot); stroke:var(--ds-accent); stroke-width:2; }
+.cpu-sim svg .zone-mem { fill:var(--ds-surface-strong); stroke:var(--ds-link); stroke-width:1.5; }
+.cpu-sim svg .zone-cpu { fill:color-mix(in srgb, var(--ds-accent) 5%, var(--ds-bg)); stroke:var(--ds-accent); stroke-width:1.5; }
+.cpu-sim svg .ramrow { fill:var(--ds-bg); stroke:none; }
+.cpu-sim svg .ramrow.is-sel { fill:var(--ds-node); }
+.cpu-sim svg .ramrow.is-mar { fill:var(--ds-hot); }
+.cpu-sim svg .wire { fill:none; stroke:var(--ds-border); stroke-width:2.5; }
+.cpu-sim svg .wire.on { stroke:var(--ds-link); stroke-dasharray:7 5; animation:cs-flow .65s linear infinite; }
+.cpu-sim svg .ah { fill:var(--ds-link); }
+@keyframes cs-flow { to { stroke-dashoffset:-24; } }
+@media (prefers-reduced-motion: reduce) { .cpu-sim svg .wire.on { animation:none; } }
+.cpu-sim .cs-phaserow { display:flex; flex:none; gap:6px; align-items:center; }
+.cpu-sim .phasebar { display:grid; flex:1; grid-template-columns:repeat(5, 1fr); gap:4px; }
+.cpu-sim .phasebar span { padding:3px 2px; border-radius:6px; background:var(--ds-surface-strong); color:var(--ds-muted); font-size:12px; text-align:center; white-space:nowrap; }
+.cpu-sim .phasebar .active { color:var(--ds-link); font-weight:800; box-shadow:inset 0 -2px var(--ds-link); }
+.cpu-sim #status { flex:none; width:86px; padding:2px 0; border:1.5px solid var(--ds-border); border-radius:999px; color:var(--ds-link); font-size:12.5px; font-weight:700; text-align:center; }
+.cpu-sim .explain { flex:none; height:40px; margin:0; padding:3px 9px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:17px; }
+.cpu-sim .cs-mem { flex:none; }
+.cpu-sim .cs-memhead { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.cpu-sim .cs-memhead select { min-height:26px; padding:0 4px; font-size:12.5px; }
+.cpu-sim .cs-memhead #address { margin-left:auto; color:var(--ds-muted); font-size:12.5px; }
+.cpu-sim .cs-memhead input { width:58px; min-height:26px !important; padding:0 6px !important; font:13px var(--cs-mono) !important; }
+.cpu-sim .cs-memhead button { min-height:26px; padding:0 10px; font-size:13px; }
+.cpu-sim #memory { display:grid; grid-template-columns:40px repeat(8, minmax(0, 1fr)); gap:3px; }
+.cpu-sim #memory .rowlab { align-self:center; color:var(--ds-muted); font:12px var(--cs-mono); }
+.cpu-sim #memory .cell { min-width:0; min-height:19px; height:19px; padding:0; border:1px solid var(--ds-border); border-radius:5px; background:var(--ds-bg); font:500 13px var(--cs-mono); }
+.cpu-sim #memory.is-bin .cell { font-size:12px; letter-spacing:-.02em; }
+.cpu-sim #memory .cell.changed { border-color:var(--ds-link); background:var(--ds-node); }
+.cpu-sim #memory .cell.selected { border:2px solid var(--ds-accent); }
+.cpu-dlg.cpu-editor { width:min(560px, calc(100vw - 32px)); }
+.cpu-dlg textarea { display:block; width:100%; height:300px; margin:6px 0; padding:8px; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-bg); color:var(--ds-text); font:14px/1.6 ui-monospace, Consolas, monospace; tab-size:2; resize:vertical; }
+.cpu-dlg .cs-dlgrow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.cpu-dlg .cs-dlgrow button { min-height:32px; padding:0 12px; border:1.5px solid var(--ds-border); border-radius:999px; background:var(--ds-bg); color:var(--ds-text); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.cpu-dlg .cs-dlgrow button.is-primary { border-color:var(--ds-link); background:var(--ds-link); color:var(--ds-bg); }
+.cpu-dlg #editMsg { min-height:22px; margin:6px 0 0; color:var(--ds-muted); font-size:14px; }
+.cpu-dlg #editMsg.error { color:var(--ds-accent); }
+.cpu-dlg #exampleHelp { margin:0; color:var(--ds-muted); font-size:14px; }
+.cpu-dlg table { font-size:14px; }
+.cpu-dlg code { font-size:.95em; }
+</style>
+
+<div class="cpu-sim agt-oyun agt-oyun--stage" id="cpu-sim" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Simülasyon</p><h1>İşlemci Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="cpu-help" aria-label="Simülatör ve komut kümesi hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_01_Giris.html">← Bölüm 1</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="cs-toolbar">
+      <button type="button" class="is-primary" id="run" aria-label="Programı çalıştır">▶ Çalıştır</button>
+      <button type="button" id="pause" aria-label="Duraklat">Ⅱ Duraklat</button>
+      <button type="button" id="micro" aria-label="Bir mikro adım">Mikro adım →</button>
+      <button type="button" id="step" aria-label="Bir komutun tamamı">Komut →</button>
+      <button type="button" id="back" aria-label="Bir mikro adım geri al">← Geri</button>
+      <button type="button" id="reset" aria-label="İşlemciyi ve RAM'i sıfırla">↺ Sıfırla</button>
+      <label for="speed">Hız <input id="speed" type="range" min="1" max="10" value="5"></label><span id="speedText">5 / 10</span>
+      <select id="format" aria-label="Değer biçimi"><option value="dec">Onluk</option><option value="hex">Onaltılık</option><option value="bin">İkili</option></select>
+    </div>
+
+    <div class="cs-main">
+      <aside class="cs-left">
+        <section class="cs-card cs-prog" aria-label="Program">
+          <select id="example" aria-label="Örnek program yükle"><option value="sum">1'den 5'e toplam</option><option value="arithmetic">Aritmetik ve bellek</option><option value="overflow">Taşma ve elde</option><option value="multiply">Döngüyle çarpma</option><option value="input">Giriş ve karşılaştırma</option><option value="bits">Bit işlemleri</option></select>
+          <div class="cs-row"><button type="button" id="edit" aria-haspopup="dialog" aria-label="Kaynağı düzenle">Düzenle…</button><button type="button" id="assembleStage" aria-label="Kaynağı çevir ve sıfırla">Çevir</button></div>
+          <p id="message" role="status"></p>
+          <table class="cs-list"><thead><tr><th title="Kesme noktası">KN</th><th>PC</th><th id="listHead">Komut</th></tr></thead><tbody id="listing"></tbody></table>
+        </section>
+        <section class="cs-card cs-io" aria-label="Giriş ve çıkış">
+          <div class="cs-row"><input id="input" placeholder="ör. 7, 12" aria-label="Giriş baytları"><button type="button" id="queue" aria-label="Kuyruğa ekle">Ekle</button></div>
+          <p id="queued">Giriş kuyruğu: boş</p>
+          <div id="output" aria-label="Program çıktısı" aria-live="polite">Henüz çıktı yok.</div>
+        </section>
+        <section class="cs-card"><span class="cs-cap">Yürütme izi</span><pre id="trace">İlk komut bekleniyor.</pre></section>
+      </aside>
+
+      <div class="cs-right">
+        <svg class="cs-diag" viewBox="0 0 534 250" role="img" aria-labelledby="diagramTitle diagramDesc">
+          <title id="diagramTitle">Bellek ve işlemci blokları</title>
+          <desc id="diagramDesc">Soldaki bellek programı ve veri RAM'ini tutar. Sağdaki 8 bitlik işlemcide PC, IR, MAR, işlenen kilidi, MDR, kontrol birimi, akümülatör, ALU, bayraklar ve bir çıkış portu bulunur. Aktarım sırasında ilgili yol yanar.</desc>
+          <defs><marker id="cpuBusArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 Z"/></marker></defs>
+          <rect class="zone-mem" x="1" y="1" width="148" height="248" rx="10"/>
+          <text x="10" y="17" class="ttl" style="fill:var(--ds-link)">BELLEK</text>
+          <rect class="zone-cpu" x="232" y="1" width="301" height="248" rx="10"/>
+          <text x="242" y="17" class="ttl" style="fill:var(--ds-accent)">İŞLEMCİ</text>
+
+          <path id="wPC" class="wire" d="M242 40 H200 V46 H146" marker-end="url(#cpuBusArrow)"/>
+          <path id="wFetch" class="wire" d="M142 64 H214 V74 H238" marker-end="url(#cpuBusArrow)"/>
+          <path id="wDecode" class="wire" d="M378 74 H386 V45 H392" marker-end="url(#cpuBusArrow)"/>
+          <path id="wImmediate" class="wire" d="M378 82 H382 V142 H382" marker-end="url(#cpuBusArrow)"/>
+          <path id="wBranch" class="wire" d="M458 26 V21 H310 V22" marker-end="url(#cpuBusArrow)"/>
+          <path id="wAddress" class="wire" d="M242 108 H190 V130 H146" marker-end="url(#cpuBusArrow)"/>
+          <path id="wRead" class="wire" d="M142 170 H218 V142 H238" marker-end="url(#cpuBusArrow)"/>
+          <path id="wStore" class="wire" d="M396 98 H389 V198 H200 V214 H146" marker-end="url(#cpuBusArrow)"/>
+          <path id="wOperand" class="wire" d="M378 150 H384 V140 H400" marker-end="url(#cpuBusArrow)"/>
+          <path id="wAcc" class="wire" d="M434 108 V114" marker-end="url(#cpuBusArrow)"/>
+          <path id="wWrite" class="wire" d="M506 138 H526 V84 H524" marker-end="url(#cpuBusArrow)"/>
+          <path id="wOut" class="wire" d="M520 100 H531 V230 H524" marker-end="url(#cpuBusArrow)"/>
+          <path id="wFlags" class="wire" d="M458 158 V162" marker-end="url(#cpuBusArrow)"/>
+
+          <g id="nProgram"><rect class="box" x="8" y="26" width="134" height="50" rx="7"/><text class="cap" x="16" y="42">PROGRAM</text><text class="val" id="vProgram" x="16" y="66">—</text></g>
+          <g id="nRAM"><rect class="box" x="8" y="84" width="134" height="160" rx="7"/><text x="16" y="100" style="font-weight:800">RAM</text><text class="cap" x="50" y="100">256 bayt</text>
+            <rect id="ramRow0" class="ramrow" x="12" y="106" width="126" height="16"/><text id="ramAddress0" class="cap mono" x="18" y="118">00</text><text id="ramData0" class="mono" x="66" y="118">0</text>
+            <rect id="ramRow1" class="ramrow" x="12" y="123" width="126" height="16"/><text id="ramAddress1" class="cap mono" x="18" y="135">01</text><text id="ramData1" class="mono" x="66" y="135">0</text>
+            <rect id="ramRow2" class="ramrow" x="12" y="140" width="126" height="16"/><text id="ramAddress2" class="cap mono" x="18" y="152">02</text><text id="ramData2" class="mono" x="66" y="152">0</text>
+            <rect id="ramRow3" class="ramrow" x="12" y="157" width="126" height="16"/><text id="ramAddress3" class="cap mono" x="18" y="169">03</text><text id="ramData3" class="mono" x="66" y="169">0</text>
+            <rect id="ramRow4" class="ramrow" x="12" y="174" width="126" height="16"/><text id="ramAddress4" class="cap mono" x="18" y="186">04</text><text id="ramData4" class="mono" x="66" y="186">0</text>
+            <rect id="ramRow5" class="ramrow" x="12" y="191" width="126" height="16"/><text id="ramAddress5" class="cap mono" x="18" y="203">05</text><text id="ramData5" class="mono" x="66" y="203">0</text>
+            <rect id="ramRow6" class="ramrow" x="12" y="208" width="126" height="16"/><text id="ramAddress6" class="cap mono" x="18" y="220">06</text><text id="ramData6" class="mono" x="66" y="220">0</text>
+            <rect id="ramRow7" class="ramrow" x="12" y="225" width="126" height="16"/><text id="ramAddress7" class="cap mono" x="18" y="237">07</text><text id="ramData7" class="mono" x="66" y="237">0</text>
+          </g>
+
+          <g id="nPC"><rect class="box" x="242" y="26" width="136" height="28" rx="6"/><text class="cap" x="248" y="45">PC</text><text class="val c1" id="vPC" x="373" y="45" text-anchor="end">0</text></g>
+          <g id="nIR"><rect class="box" x="242" y="60" width="136" height="28" rx="6"/><text class="cap" x="248" y="79">IR</text><text class="val c1" id="vIR" x="373" y="79" text-anchor="end">—</text></g>
+          <g><rect class="box" x="242" y="94" width="136" height="28" rx="6"/><text class="cap" x="248" y="113">MAR</text><text class="val c1" id="vMAR" x="373" y="113" text-anchor="end">—</text></g>
+          <g id="nOperand"><rect class="box" x="242" y="128" width="136" height="28" rx="6"/><text class="cap" x="248" y="147">İŞLENEN</text><text class="val c1" id="vOperand" x="373" y="147" text-anchor="end">—</text></g>
+          <g><rect class="box" x="242" y="162" width="136" height="28" rx="6"/><text class="cap" x="248" y="181">MDR</text><text class="val c1" id="vMDR" x="373" y="181" text-anchor="end">—</text></g>
+          <text class="cap" x="242" y="215">Komut <tspan id="count" style="fill:var(--ds-text);font-weight:700">0</tspan></text>
+          <text class="cap" x="242" y="230">Mikro adım <tspan id="ticks" style="fill:var(--ds-text);font-weight:700">0</tspan></text>
+          <text class="cap" x="242" y="245">ACC işaretli <tspan id="signed" style="fill:var(--ds-text);font-weight:700">0</tspan></text>
+
+          <g id="nControl"><rect class="box" x="396" y="26" width="124" height="38" rx="6"/><text class="cap" x="404" y="40">KONTROL BİRİMİ</text><text class="val" id="vControl" x="404" y="58">HAZIR</text></g>
+          <g id="nACC"><rect class="box" x="396" y="68" width="124" height="40" rx="6"/><text class="cap" x="404" y="82">ACC</text><text class="cap mono" id="binary" x="512" y="82" text-anchor="end">00000000</text><text class="val" id="vACC" x="404" y="101">0</text></g>
+          <g id="nALU"><path class="box" d="M398 118 H446 L458 130 L470 118 H518 L500 158 H416 Z"/><text x="422" y="151" class="ttl" style="fill:var(--ds-accent)">ALU</text><text class="mono" id="vResult" x="494" y="151" text-anchor="end">—</text></g>
+          <g id="nFlags"><rect class="box" x="396" y="166" width="124" height="36" rx="6"/><text class="cap" x="404" y="180">DURUM BAYRAKLARI</text><text class="val" id="vFlags" x="404" y="197" style="font-size:13px">Z 0  N 0  C 0</text></g>
+          <g id="nOutput"><rect class="box" x="396" y="210" width="124" height="36" rx="6"/><text class="cap" x="404" y="224">ÇIKIŞ PORTU</text><text class="val" id="vOutput" x="404" y="241">—</text></g>
+        </svg>
+
+        <div class="cs-phaserow">
+          <div class="phasebar" id="phases"><span>1 Getir</span><span>2 Çöz</span><span>3 İşlenen</span><span>4 Yürüt</span><span>5 Geri yaz</span></div>
+          <span id="status" role="status">Hazır</span>
+        </div>
+        <p class="explain" id="explanation" aria-live="polite">Program çevrilince her aktarım Mikro adım ile izlenebilir.</p>
+
+        <section class="cs-card cs-mem" aria-label="Veri belleği">
+          <div class="cs-memhead">
+            <span class="cs-cap">Veri belleği</span>
+            <select id="page" aria-label="Bellek sayfası"></select>
+            <span id="address">Adres 0</span>
+            <input id="memValue" aria-label="Seçili adresin yeni değeri" value="0">
+            <button type="button" id="memWrite">Yaz</button>
+          </div>
+          <div id="memory"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cpu-dlg cpu-editor" id="cpu-editor" aria-label="Program kaynağı">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Program kaynağı</h2>
+    <p id="exampleHelp"></p>
+    <label for="source" class="cs-cap" style="font-size:13px">Assembly · <code>;</code> açıklama başlatır</label>
+    <textarea id="source" spellcheck="false" aria-label="Assembly kaynağı"></textarea>
+    <div class="cs-dlgrow">
+      <button type="button" id="assemble" class="is-primary">Çevir ve sıfırla</button>
+      <button type="button" id="save">.asm olarak dışa aktar</button>
+      <button type="button" id="load">İçe aktar</button>
+      <input type="file" id="file" accept=".asm,.txt" hidden style="display:none">
+    </div>
+    <p id="editMsg" role="status"></p>
+  </dialog>
+
+  <dialog class="agt-oyun__dialog cpu-dlg" id="cpu-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>İşlemci Simülatörü</h2>
+    <p>Tek akümülatörlü (ACC), 256 baytlık veri RAM'i ve üç bayrağı (Z, N, C) olan, eğitim amaçlı 8 bitlik bir işlemci. Her komut beş mikro adımda çalışır: <b>getir, çöz, işlenen, yürüt, geri yaz</b>. Böylece bellekle işlemci yazmaçları arasındaki her aktarım çizimde izlenebilir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir örnek seçilir ya da <b>Düzenle…</b> penceresinde yeni bir program yazılır; <b>Çevir ve sıfırla</b> programı yükler. Programlar <code>.asm</code> dosyasına aktarılabilir ve dosyadan geri alınabilir.</li>
+      <li><b>Mikro adım</b> bir aşama, <b>Komut</b> bir komutun tamamı kadar ilerler; <b>Çalıştır</b> seçilen hızla oynatır ve kesme noktalarında durur (kesme noktası, listedeki ○ simgesiyle konur). <b>Geri</b> mikro adımları geri alır. Klavye: → mikro adım, Shift + → komut, ← geri.</li>
+      <li><b>Veri belleği</b>: seçilen hücrenin değeri görünür; komut sınırında duraklatılmışken hücreye yeni değer yazılabilir. Sıfırla, <code>.DATA</code> değerlerini geri yükler. Sayfa menüsü 32 baytlık diğer sayfaları gösterir.</li>
+      <li><b>IN</b> kuyruktaki giriş baytlarını (0–255) sırayla alır, kuyruk boşsa bekler; <b>OUT</b> ACC'yi çıkışa yazar. Değer menüsü onluk, onaltılık ve ikili gösterim arasında geçiş yapar.</li>
+    </ul>
+    <h3>Komut kümesi</h3>
+    <table>
+      <thead><tr><th>Komut</th><th>Etkisi</th><th>Bayraklar</th></tr></thead>
+      <tbody>
+        <tr><td><code>LDI n</code></td><td>ACC ← n</td><td>Z N, C ← 0</td></tr>
+        <tr><td><code>LDA a</code></td><td>ACC ← RAM[a]</td><td>Z N, C ← 0</td></tr>
+        <tr><td><code>STA a</code></td><td>RAM[a] ← ACC</td><td>—</td></tr>
+        <tr><td><code>ADD n</code> · <code>ADDM a</code></td><td>ACC ← ACC + n / RAM[a] (mod 256)</td><td>Z N C (C = elde)</td></tr>
+        <tr><td><code>SUB n</code> · <code>SUBM a</code></td><td>ACC ← ACC − n / RAM[a] (mod 256)</td><td>Z N C (C = ödünç)</td></tr>
+        <tr><td><code>CMP n</code></td><td>ACC − n, sonuç saklanmaz</td><td>Z N C</td></tr>
+        <tr><td><code>AND n</code> · <code>OR n</code> · <code>XOR n</code></td><td>ACC ile bit düzeyinde işlem</td><td>Z N, C ← 0</td></tr>
+        <tr><td><code>NOT</code></td><td>ACC ← ~ACC</td><td>Z N, C ← 0</td></tr>
+        <tr><td><code>SHL</code> · <code>SHR</code></td><td>ACC'yi 1 bit sola / sağa kaydırır, boşalan bite 0 girer</td><td>Z N, C ← dışarı çıkan bit</td></tr>
+        <tr><td><code>JMP t</code></td><td>PC ← t</td><td>—</td></tr>
+        <tr><td><code>JZ t</code> · <code>JNZ t</code></td><td>Z = 1 / Z = 0 ise atla</td><td>—</td></tr>
+        <tr><td><code>JC t</code> · <code>JN t</code></td><td>C = 1 / N = 1 ise atla</td><td>—</td></tr>
+        <tr><td><code>IN</code></td><td>ACC ← kuyruktaki sıradaki giriş baytı (boşsa bekler)</td><td>Z N, C ← 0</td></tr>
+        <tr><td><code>OUT</code></td><td>ACC'yi çıkışa yazar</td><td>—</td></tr>
+        <tr><td><code>NOP</code> · <code>HLT</code></td><td>işlem yok / dur</td><td>—</td></tr>
+        <tr><td><code>.DATA a v</code></td><td>assembler direktifi: çalışmadan önce RAM[a] ← v</td><td></td></tr>
+      </tbody>
+    </table>
+    <p>Sayılar: onluk <code>42</code>, onaltılık <code>0x2A</code> ya da ikili <code>0b101010</code>; hepsi 0–255 aralığında. Atlama hedefi <code>t</code> bir etiket (<code>loop:</code>) ya da komut numarasıdır. Bayraklar yalnız geri yaz adımında değişir; bu yüzden <code>STA</code>, <code>OUT</code> ve atlamalar önceki ALU komutunun bayraklarını korur.</p>
+    <h3>Çizimde</h3>
+    <p>PC sıradaki komutun numarasını, IR getirilen komutu, MAR veri adresini, MDR ise RAM'den okunan ya da RAM'e yazılan baytı tutar. İşlenen kilidi ALU'yu besler; sonuç ACC'ye ve bayraklara ancak geri yaz adımında ulaşır. RAM penceresi o anki adresin çevresindeki sekiz baytı gösterir.</p>
+    <p>Bu bir eğitim makinesidir, 8086 değildir: gerçek 8086'nın 16 bitlik yazmaçları, kesimli belleği ve çok daha fazla bayrağı vardır. İlgili sunum: <a href="Bolum_01_Giris.html">Bölüm 1 · Giriş</a>.</p>
+  </dialog>
+</div>
+
+<script src="CPU_Simulator.js"></script>
+<script src="deck/oyun.js"></script>

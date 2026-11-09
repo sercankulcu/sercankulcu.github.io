@@ -1,0 +1,263 @@
+---
+layout: without-sidebar
+title: "Minimal Timer"
+permalink: /apps/minimal-timer/
+redirect_from:
+  - /apps/minimal-timer.html
+excerpt: "A minimal countdown timer with presets, keyboard shortcuts, fullscreen mode and browser notifications."
+---
+
+<style>
+.minimal-timer{--fg:var(--global-text-color);--muted:color-mix(in srgb,var(--global-text-color) 58%,transparent);--line:color-mix(in srgb,var(--global-text-color) 14%,transparent);--soft:color-mix(in srgb,var(--global-text-color) 6%,transparent);--panel:color-mix(in srgb,var(--global-bg-color) 92%,transparent);position:relative;width:min(1040px,calc(100% - 24px));min-height:760px;margin:.5rem auto 1.5rem;padding:26px 20px 36px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--global-border-color);border-radius:18px;background:var(--global-bg-color);color:var(--fg);user-select:none}
+.minimal-timer,.minimal-timer *,.minimal-timer *:before,.minimal-timer *:after{box-sizing:border-box}
+.minimal-timer button,.minimal-timer input{font:inherit;color:inherit}
+.minimal-timer button{border:0;background:none;cursor:pointer}
+.mt-topbar{position:absolute;top:18px;left:20px;right:20px;z-index:5;display:flex;justify-content:flex-end}
+.mt-actions{display:flex;gap:6px}
+.mt-icon{width:42px;height:42px;border-radius:999px;display:grid;place-items:center}
+.mt-icon:hover{background:var(--soft)}
+.mt-wrap{position:relative;width:min(72vw,62vh,640px);aspect-ratio:1;display:grid;place-items:center}
+.mt-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.mt-track{stroke:var(--line)}
+.mt-progress{stroke:var(--fg);stroke-linecap:round;transition:stroke-dashoffset .2s linear}
+.mt-time{position:relative;z-index:2;outline:none;cursor:pointer;font-variant-numeric:tabular-nums lining-nums;font-size:clamp(72px,13vw,190px);font-weight:650;letter-spacing:-.075em;line-height:.85}
+.mt-time.done{animation:mt-pulse .8s ease-in-out 3}
+@keyframes mt-pulse{50%{opacity:.25;transform:scale(.985)}}
+.mt-controls{position:absolute;left:50%;bottom:78px;z-index:4;transform:translateX(-50%);display:flex;gap:8px;opacity:.28;transition:opacity .2s}
+.minimal-timer:hover .mt-controls,.mt-controls:focus-within{opacity:1}
+.mt-control{height:42px;padding:0 15px!important;border-radius:999px!important;background:var(--soft)!important;color:var(--fg)!important;font-size:13px!important;font-weight:650}
+.mt-control.primary{min-width:82px;background:var(--fg)!important;color:var(--global-bg-color)!important}
+.mt-hint{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);color:var(--muted);white-space:nowrap;font-size:12px}
+.mt-overlay{position:absolute;inset:0;z-index:20;display:none;place-items:center;padding:24px;background:var(--panel);backdrop-filter:blur(20px)}
+.mt-overlay.open{display:grid}
+.mt-sheet{width:min(560px,100%)}
+.mt-field{display:flex;align-items:center;padding:8px 0 14px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+.mt-field input{width:100%;border:0;outline:0;background:transparent;font-size:54px;font-weight:650;letter-spacing:-.055em}
+.mt-field span{margin-left:12px;color:var(--muted);font-size:15px}
+.mt-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 28px}
+.mt-preset{padding:14px 10px!important;border-radius:14px!important;background:var(--soft)!important;color:var(--fg)!important;font-size:14px!important;font-weight:650}
+.mt-sheet-actions{display:flex;justify-content:flex-end}
+.mt-shortcuts{margin-top:32px;padding-top:22px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:11px 20px;color:var(--muted);font-size:12px}
+.mt-shortcuts kbd{padding:2px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--soft);color:var(--fg);font-family:inherit;font-size:11px}
+.mt-toast{position:fixed;left:50%;bottom:24px;z-index:999;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 15px;border-radius:12px;background:var(--global-text-color);color:var(--global-bg-color);font-size:13px;font-weight:750;transition:.22s}
+.mt-toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:700px){.minimal-timer{width:100%;min-height:680px;padding:18px 12px 28px}.mt-topbar{top:12px;left:12px;right:12px}.mt-wrap{width:min(88vw,56vh)}.mt-time{font-size:clamp(70px,23vw,145px)}.mt-controls{bottom:72px}.mt-hint{bottom:24px}.mt-presets{grid-template-columns:repeat(2,1fr)}}
+@media(max-height:560px){.minimal-timer{min-height:520px}.mt-wrap{width:min(58vw,70vh)}.mt-controls{bottom:18px}.mt-hint{display:none}}
+</style>
+
+<div class="minimal-timer" id="minimal-timer">
+  <header class="mt-topbar">
+    <div class="mt-actions">
+      <button class="mt-icon" id="mt-notify" type="button" aria-label="Toggle notifications">🔕</button>
+      <button class="mt-icon" id="mt-fullscreen" type="button" aria-label="Toggle fullscreen" title="Fullscreen (F)">↗</button>
+    </div>
+  </header>
+
+  <section class="mt-wrap" aria-live="polite">
+    <svg class="mt-ring" viewBox="0 0 100 100" aria-hidden="true">
+      <circle class="mt-track" cx="50" cy="50" r="47" fill="none" stroke-width=".7"/>
+      <circle class="mt-progress" id="mt-progress" cx="50" cy="50" r="47" fill="none" stroke-width=".9"/>
+    </svg>
+    <div class="mt-time" id="mt-time" role="button" tabindex="0" aria-label="Edit timer">05:00</div>
+  </section>
+
+  <div class="mt-controls">
+    <button class="mt-control" id="mt-minus" type="button">−1m</button>
+    <button class="mt-control primary" id="mt-toggle" type="button">Start</button>
+    <button class="mt-control" id="mt-plus" type="button">+1m</button>
+    <button class="mt-control" id="mt-reset" type="button">Reset</button>
+  </div>
+
+  <div class="mt-hint">Space start/pause · click time to edit</div>
+
+  <div class="mt-overlay" id="mt-overlay" role="dialog" aria-modal="true" aria-label="Edit timer">
+    <div class="mt-sheet">
+      <div class="mt-field">
+        <input id="mt-minutes" type="number" min="0" max="999" step="1" inputmode="numeric" aria-label="Minutes">
+        <span>minutes</span>
+      </div>
+      <div class="mt-presets" id="mt-presets"></div>
+      <div class="mt-sheet-actions">
+        <button class="mt-control" id="mt-cancel" type="button">Cancel</button>
+      </div>
+      <div class="mt-shortcuts">
+        <span>Start / pause</span><kbd>Space</kbd>
+        <span>Add / subtract a minute</span><span><kbd>↑</kbd> <kbd>↓</kbd></span>
+        <span>Reset timer</span><kbd>R</kbd>
+        <span>Fullscreen</span><kbd>F</kbd>
+        <span>Edit time</span><kbd>E</kbd>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-toast" id="mt-toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
+  const byId=id=>document.getElementById(id);
+  const app=byId("minimal-timer"),timeEl=byId("mt-time"),progressEl=byId("mt-progress"),toggleBtn=byId("mt-toggle");
+  const overlay=byId("mt-overlay"),minutesInput=byId("mt-minutes"),notifyBtn=byId("mt-notify"),toast=byId("mt-toast"),fullscreenBtn=byId("mt-fullscreen");
+  const CIRC=2*Math.PI*47;
+  progressEl.style.strokeDasharray=CIRC;
+
+  const params=new URLSearchParams(location.search);
+  const fromUrl=Number(params.get("s"));
+  let duration=Number.isFinite(fromUrl)&&fromUrl>0?Math.min(Math.round(fromUrl),359999):300;
+  let remaining=duration,running=false,endAt=0,raf=0;
+  let notificationsEnabled=(store.getItem("timer.notifications")??store.getItem("minute.notifications"))==="on";
+
+  function fmt(seconds){
+    seconds=Math.max(0,Math.ceil(seconds));
+    const h=Math.floor(seconds/3600),m=Math.floor((seconds%3600)/60),s=seconds%60;
+    return h>0?`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`:`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }
+  function render(){
+    timeEl.textContent=fmt(remaining);
+    const ratio=duration?Math.max(0,Math.min(1,remaining/duration)):0;
+    progressEl.style.strokeDashoffset=CIRC*(1-ratio);
+    toggleBtn.textContent=running?"Pause":remaining<=0?"Again":"Start";
+  }
+  function tick(){
+    if(!running)return;
+    remaining=Math.max(0,(endAt-performance.now())/1000);
+    render();
+    if(remaining<=0){finish();return}
+    raf=requestAnimationFrame(tick);
+  }
+  function start(){
+    if(remaining<=0)remaining=duration;
+    running=true;
+    endAt=performance.now()+remaining*1000;
+    render();
+    tick();
+  }
+  function pause(){
+    if(!running)return;
+    remaining=Math.max(0,(endAt-performance.now())/1000);
+    running=false;
+    cancelAnimationFrame(raf);
+    render();
+  }
+  function toggle(){running?pause():start()}
+  function syncEndAt(){if(running)endAt=performance.now()+remaining*1000}
+  function reset(){remaining=duration;timeEl.classList.remove("done");syncEndAt();render()}
+  function setDuration(seconds){
+    duration=Math.max(1,Math.min(Math.round(seconds),359999));
+    remaining=duration;
+    running=false;
+    cancelAnimationFrame(raf);
+    timeEl.classList.remove("done");
+    const u=new URL(location.href);
+    u.searchParams.set("s",duration);
+    history.replaceState({},"",u);
+    render();
+  }
+  function adjust(delta){
+    const wasRunning=running;
+    if(running)remaining=Math.max(0,(endAt-performance.now())/1000);
+    remaining=Math.max(1,Math.ceil(remaining)+delta);
+    duration=Math.max(duration,remaining);
+    const u=new URL(location.href);
+    u.searchParams.set("s",Math.round(duration));
+    history.replaceState({},"",u);
+    if(wasRunning){running=true;syncEndAt()}
+    timeEl.classList.remove("done");
+    render();
+  }
+  function beep(){
+    try{
+      const AudioCtx=window.AudioContext||window.webkitAudioContext,ctx=new AudioCtx();
+      [0,.22,.44].forEach((d,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.type="sine";o.frequency.value=660+i*110;
+        g.gain.setValueAtTime(.0001,ctx.currentTime+d);
+        g.gain.exponentialRampToValueAtTime(.18,ctx.currentTime+d+.02);
+        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+d+.16);
+        o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+.18);
+      });
+    }catch(_){}
+  }
+  function finish(){
+    running=false;remaining=0;render();beep();
+    timeEl.classList.remove("done");void timeEl.offsetWidth;timeEl.classList.add("done");
+    navigator.vibrate?.([180,100,180]);
+    if(notificationsEnabled&&"Notification"in window&&Notification.permission==="granted"){
+      try{new Notification("Timer",{body:"Time is up."})}catch(_){}
+    }
+  }
+  function openEdit(){pause();minutesInput.value=Math.max(1,Math.round(remaining/60));overlay.classList.add("open");setTimeout(()=>minutesInput.select(),20)}
+  function closeEdit(){overlay.classList.remove("open");timeEl.focus()}
+  function applyEdit(){const mins=Number(minutesInput.value);if(Number.isFinite(mins)&&mins>=0)setDuration(Math.max(1,mins*60));closeEdit()}
+  function showToast(message){toast.textContent=message;toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),1800)}
+  function renderNotify(){
+    notifyBtn.textContent=notificationsEnabled?"🔔":"🔕";
+    notifyBtn.title=notificationsEnabled?"Notifications: on":"Notifications: off";
+    notifyBtn.setAttribute("aria-pressed",notificationsEnabled?"true":"false");
+  }
+  async function toggleNotifications(){
+    if(notificationsEnabled){
+      notificationsEnabled=false;store.setItem("timer.notifications","off");renderNotify();showToast("Notifications off");return;
+    }
+    notificationsEnabled=true;store.setItem("timer.notifications","on");renderNotify();
+    if("Notification"in window&&Notification.permission==="default"){
+      try{
+        const permission=await Notification.requestPermission();
+        showToast(permission==="granted"?"Notifications on":"Alerts on · browser notifications blocked");
+      }catch(_){showToast("Alerts on")}
+    }else if("Notification"in window&&Notification.permission==="granted")showToast("Notifications on");
+    else showToast("Alerts on · browser notifications unavailable");
+    renderNotify();
+  }
+
+  [1,3,5,10,15,25].forEach(m=>{
+    const b=document.createElement("button");
+    b.type="button";b.className="mt-preset";b.textContent=`${m} min`;
+    b.addEventListener("click",()=>{setDuration(m*60);closeEdit()});
+    byId("mt-presets").appendChild(b);
+  });
+
+  toggleBtn.addEventListener("click",toggle);
+  byId("mt-reset").addEventListener("click",reset);
+  byId("mt-plus").addEventListener("click",()=>adjust(60));
+  byId("mt-minus").addEventListener("click",()=>adjust(-60));
+  timeEl.addEventListener("click",openEdit);
+  timeEl.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openEdit()}});
+  byId("mt-cancel").addEventListener("click",closeEdit);
+  minutesInput.addEventListener("keydown",e=>{if(e.key==="Enter")applyEdit();if(e.key==="Escape")closeEdit()});
+  overlay.addEventListener("click",e=>{if(e.target===overlay)closeEdit()});
+  fullscreenBtn.addEventListener("click",()=>document.fullscreenElement?document.exitFullscreen():app.requestFullscreen?.());
+  notifyBtn.addEventListener("click",toggleNotifications);
+
+  window.addEventListener("keydown",e=>{
+    if(overlay.classList.contains("open"))return;
+    if(e.code==="Space"){e.preventDefault();toggle()}
+    else if(e.key==="r"||e.key==="R")reset();
+    else if(e.key==="f"||e.key==="F")fullscreenBtn.click();
+    else if(e.key==="e"||e.key==="E")openEdit();
+    else if(e.key==="ArrowUp"){e.preventDefault();adjust(60)}
+    else if(e.key==="ArrowDown"){e.preventDefault();adjust(-60)}
+  });
+
+  document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden&&running){
+      remaining=Math.max(0,(endAt-performance.now())/1000);
+      if(remaining<=0)finish();else tick();
+    }
+  });
+
+  renderNotify();
+  render();
+})();
+</script>
