@@ -15,9 +15,9 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 ## Başlangıç Kaynakları
 
-* [Algoritmalarda Önemli İsimler (HTML)](../files/algorithms/Algorithms_Important_People.html)
-* [Algoritmalar İçin Ön Bilgiler (HTML)](../files/algorithms/Algorithms_Prerequisites.html)
-* [Terim Sözlüğü (HTML)](../files/algorithms/sozluk.html)
+* [Algoritmalarda Önemli İsimler (HTML)](/files/algorithms/Algorithms_Important_People.html)
+* [Algoritmalar İçin Ön Bilgiler (HTML)](/files/algorithms/Algorithms_Prerequisites.html)
+* [Terim Sözlüğü (HTML)](/files/algorithms/sozluk.html)
 
 ---
 
@@ -27,17 +27,17 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yöntemdir. Bölümün ilk kısmında algoritma kavramı gündelik örneklerle tanıtılır; sabit, doğrusal, karekök, kübik, faktöriyel ve üstel zaman alan örnekler üzerinden çalışma süresinin girdi boyutuyla nasıl büyüdüğü gösterilir ve Öklid algoritmasının neden hızlı olduğu açıklanır. İkinci kısımda adım sayma, en iyi, en kötü ve ortalama durum, alan karmaşıklığı ile Büyük O, Omega ve Teta gösterimleri ele alınır. Döngülerin toplam formülleriyle çözümlenmesi, yineleme bağıntılarının kurulup Ana Teorem ile çözülmesi örnek fonksiyonlar üzerinde işlenir; amortize analize de kısaca değinilir.
 
-- [🖼️Sunum-Giriş (HTML)](../files/algorithms/slides/Bolum_01_01_Giris.html)
-- [📄Sunum-Giriş (PDF)](../files/algorithms/pdf/Bolum_01_01_Giris.pdf)
-- [📖Ders Notu - Giriş (HTML)](../files/algorithms/notlar/Bolum_01_01_Giris_Ders_Notu.html)
-- [📝Çalışma Soruları - Giriş (HTML)](../files/algorithms/slides/Bolum_01_01_Giris_Calisma_Sorulari.html)
-  - [🕹️Algoritma Karmaşıklığı Analizi (HTML)](../files/algorithms/slides/Bolum_01_Algorithm_Complexity.html)
-- [🖼️Sunum-Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
-- [📄Sunum-Karmaşıklık (PDF)](../files/algorithms/pdf/Bolum_01_02_Karmasiklik.pdf)
-- [📖Ders Notu - Karmaşıklık (HTML)](../files/algorithms/notlar/Bolum_01_02_Karmasiklik_Ders_Notu.html)
-- [📝Çalışma Soruları - Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik_Calisma_Sorulari.html)
-  - [🕹️Asimptotik Büyüme Gezgini (HTML)](../files/algorithms/slides/Bolum_01_Asymptotic_Growth_Explorer.html)
-  - [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
+- [🖼️Sunum-Giriş (HTML)](/files/algorithms/slides/Bolum_01_01_Giris.html)
+- [📄Sunum-Giriş (PDF)](/files/algorithms/pdf/Bolum_01_01_Giris.pdf)
+- [📖Ders Notu - Giriş (HTML)](/files/algorithms/notlar/Bolum_01_01_Giris_Ders_Notu.html)
+- [📝Çalışma Soruları - Giriş (HTML)](/files/algorithms/slides/Bolum_01_01_Giris_Calisma_Sorulari.html)
+  - [🕹️Algoritma Karmaşıklığı Analizi (HTML)](/files/algorithms/slides/Bolum_01_Algorithm_Complexity.html)
+- [🖼️Sunum-Karmaşıklık (HTML)](/files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
+- [📄Sunum-Karmaşıklık (PDF)](/files/algorithms/pdf/Bolum_01_02_Karmasiklik.pdf)
+- [📖Ders Notu - Karmaşıklık (HTML)](/files/algorithms/notlar/Bolum_01_02_Karmasiklik_Ders_Notu.html)
+- [📝Çalışma Soruları - Karmaşıklık (HTML)](/files/algorithms/slides/Bolum_01_02_Karmasiklik_Calisma_Sorulari.html)
+  - [🕹️Asimptotik Büyüme Gezgini (HTML)](/files/algorithms/slides/Bolum_01_Asymptotic_Growth_Explorer.html)
+  - [🕹️Özyineleme ve Ana Teorem (HTML)](/files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum01/src)
 
 ---
@@ -46,15 +46,15 @@ Algoritma, bir problemi sonlu sayıda ve iyi tanımlanmış adımla çözen yön
 
 Sıralama, verinin belirli bir düzene sokulmasıdır ve pek çok algoritmanın ön adımını oluşturur. Bölümde kabarcık, eklemeli, seçimli ve Shell sıralaması gibi temel yöntemler ile birleştirme sıralaması, hızlı sıralama ve heap sort adım adım izlenir ve Java kodlarıyla çözümlenir. Karşılaştırmaya dayalı sıralamanın Ω(n log n) alt sınırı gösterilir; saymalı, basamak ve kova sıralaması gibi doğrusal zamanlı yöntemlerle gerçek kütüphanelerde kullanılan Timsort tanıtılır. Algoritmalar kararlılık, ek bellek ve karmaşıklık bakımından karşılaştırılır.
 
-- [🖼️Sunum-Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama.html)
-- [📄Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_02_Siralama.pdf)
-- [📖Ders Notu - Sıralama Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_02_Siralama_Ders_Notu.html)
-- [📝Çalışma Soruları - Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama_Calisma_Sorulari.html)
+- [🖼️Sunum-Sıralama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_02_Siralama.html)
+- [📄Sunum-Sıralama Algoritmaları (PDF)](/files/algorithms/pdf/Bolum_02_Siralama.pdf)
+- [📖Ders Notu - Sıralama Algoritmaları (HTML)](/files/algorithms/notlar/Bolum_02_Siralama_Ders_Notu.html)
+- [📝Çalışma Soruları - Sıralama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_02_Siralama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum02/src)
 
-- [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
-- [🕹️Sıralama Yarışı (HTML)](../files/algorithms/slides/Bolum_02_Sorting_Race.html)
-- [🕹️Sıralama Özellikleri Laboratuvarı (HTML)](../files/algorithms/slides/Bolum_02_Sorting_Properties_Lab.html)
+- [🕹️Sıralama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_02_Sorting.html)
+- [🕹️Sıralama Yarışı (HTML)](/files/algorithms/slides/Bolum_02_Sorting_Race.html)
+- [🕹️Sıralama Özellikleri Laboratuvarı (HTML)](/files/algorithms/slides/Bolum_02_Sorting_Properties_Lab.html)
 
 ---
 
@@ -62,15 +62,15 @@ Sıralama, verinin belirli bir düzene sokulmasıdır ve pek çok algoritmanın 
 
 Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde bekçili sürümüyle birlikte doğrusal arama, sıralı dizide ikili arama ve bu yöntemin örtük bir ikili arama ağacı olarak yorumu, tekrarlı öğelerde ilk konumun bulunması anlatılır. Hash fonksiyonları, doğrusal yoklama ve zincirleme ile hash tablosunda arama ve yük faktörünün maliyete etkisi incelenir. Ara değer arama, atlayarak arama ve üstel arama da ele alınır; algoritmalar aynı dizideki yoklama sayılarıyla karşılaştırılır ve hangi durumda hangisinin uygun olduğu tartışılır.
 
-- [🖼️Sunum-Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Arama.html)
-- [📄Sunum-Arama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_03_Arama.pdf)
-- [📖Ders Notu - Arama Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_03_Arama_Ders_Notu.html)
-- [📝Çalışma Soruları - Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Arama_Calisma_Sorulari.html)
+- [🖼️Sunum-Arama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_03_Arama.html)
+- [📄Sunum-Arama Algoritmaları (PDF)](/files/algorithms/pdf/Bolum_03_Arama.pdf)
+- [📖Ders Notu - Arama Algoritmaları (HTML)](/files/algorithms/notlar/Bolum_03_Arama_Ders_Notu.html)
+- [📝Çalışma Soruları - Arama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_03_Arama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum03/src)
 
-- [🕹️Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Search.html)
-- [🕹️Hash ve Ara Değer Arama (HTML)](../files/algorithms/slides/Bolum_03_Hash_Interpolation_Search.html)
-- [🕹️Üstel Arama (HTML)](../files/algorithms/slides/Bolum_03_Exponential_Search.html)
+- [🕹️Arama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_03_Search.html)
+- [🕹️Hash ve Ara Değer Arama (HTML)](/files/algorithms/slides/Bolum_03_Hash_Interpolation_Search.html)
+- [🕹️Üstel Arama (HTML)](/files/algorithms/slides/Bolum_03_Exponential_Search.html)
 
 ---
 
@@ -80,29 +80,29 @@ Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde 
 
 Çizgeler, yol ağlarından sosyal ağlara kadar düğümler ve bağlantılarla ifade edilebilen her yapıyı modellemekte kullanılır. Bölüm, çizgenin bellekte gösterimi, derinlik öncelikli (DFS) ve genişlik öncelikli (BFS) gezinme, Tarjan ve Kosaraju algoritmalarıyla güçlü bağlantılı bileşenler, topolojik sıralama ve iki parçalılık testiyle başlar. Ardından gevşetme işlemi üzerine kurulan Dijkstra, Bellman-Ford, Floyd-Warshall ve A* en kısa yol algoritmaları, kesim ve döngü özelliklerine dayanan Kruskal, Prim, Borůvka ve ters silme minimum kapsayan ağaç algoritmaları işlenir. Son kısımda artık ağ, artış yolu ve maksimum akış–minimum kesim teoremi ile Ford-Fulkerson, Edmonds-Karp, Dinic ve itme–yeniden etiketleme algoritmaları ele alınır.
 
-- [🖼️Sunum-Çizge Gezinme (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
-- [📄Sunum-Çizge Gezinme (PDF)](../files/algorithms/pdf/Bolum_04_01_Cizge_Gezinme.pdf)
-- [📖Ders Notu - Çizge Gezinme (HTML)](../files/algorithms/notlar/Bolum_04_01_Cizge_Gezinme_Ders_Notu.html)
-- [📝Çalışma Soruları - Çizge Gezinme (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme_Calisma_Sorulari.html)
-  - [🕹️Çizge Gezinme Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Graph_Traversal.html)
-  - [🕹️Çizge Yapısı Algoritmaları Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Graph_Structure_Algorithms.html)
-  - [🕹️İki Parçalılık, Döngü ve Köprü Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Bipartite_Cycle_Bridge.html)
-- [🖼️Sunum-Çizge En Kısa Yol (HTML)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.html)
-- [📄Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/pdf/Bolum_04_02_En_Kisa_Yol.pdf)
-- [📖Ders Notu - Çizge En Kısa Yol (HTML)](../files/algorithms/notlar/Bolum_04_02_En_Kisa_Yol_Ders_Notu.html)
-- [📝Çalışma Soruları - Çizge En Kısa Yol (HTML)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol_Calisma_Sorulari.html)
-  - [🕹️En Kısa Yol Algoritmaları Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Shortest_Path.html)
-  - [🕹️A* Yol Bulma Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_AStar.html)
-- [🖼️Sunum-Çizge Minimum Kapsayan (HTML)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.html)
-- [📄Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/pdf/Bolum_04_03_Min_Kapsayan.pdf)
-- [📖Ders Notu - Çizge Minimum Kapsayan (HTML)](../files/algorithms/notlar/Bolum_04_03_Min_Kapsayan_Ders_Notu.html)
-- [📝Çalışma Soruları - Çizge Minimum Kapsayan (HTML)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan_Calisma_Sorulari.html)
-  - [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_MST.html)
-- [🖼️Sunum-Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.html)
-- [📄Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/pdf/Bolum_04_04_Ag_Akis.pdf)
-- [📖Ders Notu - Çizge Ağ Akış (HTML)](../files/algorithms/notlar/Bolum_04_04_Ag_Akis_Ders_Notu.html)
-- [📝Çalışma Soruları - Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis_Calisma_Sorulari.html)
-  - [🕹️Ağ Akışı Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_Network_Flow.html)
+- [🖼️Sunum-Çizge Gezinme (HTML)](/files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
+- [📄Sunum-Çizge Gezinme (PDF)](/files/algorithms/pdf/Bolum_04_01_Cizge_Gezinme.pdf)
+- [📖Ders Notu - Çizge Gezinme (HTML)](/files/algorithms/notlar/Bolum_04_01_Cizge_Gezinme_Ders_Notu.html)
+- [📝Çalışma Soruları - Çizge Gezinme (HTML)](/files/algorithms/slides/Bolum_04_01_Cizge_Gezinme_Calisma_Sorulari.html)
+  - [🕹️Çizge Gezinme Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_Graph_Traversal.html)
+  - [🕹️Çizge Yapısı Algoritmaları Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_Graph_Structure_Algorithms.html)
+  - [🕹️İki Parçalılık, Döngü ve Köprü Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_Bipartite_Cycle_Bridge.html)
+- [🖼️Sunum-Çizge En Kısa Yol (HTML)](/files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.html)
+- [📄Sunum-Çizge En Kısa Yol (PDF)](/files/algorithms/pdf/Bolum_04_02_En_Kisa_Yol.pdf)
+- [📖Ders Notu - Çizge En Kısa Yol (HTML)](/files/algorithms/notlar/Bolum_04_02_En_Kisa_Yol_Ders_Notu.html)
+- [📝Çalışma Soruları - Çizge En Kısa Yol (HTML)](/files/algorithms/slides/Bolum_04_02_En_Kisa_Yol_Calisma_Sorulari.html)
+  - [🕹️En Kısa Yol Algoritmaları Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_Shortest_Path.html)
+  - [🕹️A* Yol Bulma Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_AStar.html)
+- [🖼️Sunum-Çizge Minimum Kapsayan (HTML)](/files/algorithms/slides/Bolum_04_03_Min_Kapsayan.html)
+- [📄Sunum-Çizge Minimum Kapsayan (PDF)](/files/algorithms/pdf/Bolum_04_03_Min_Kapsayan.pdf)
+- [📖Ders Notu - Çizge Minimum Kapsayan (HTML)](/files/algorithms/notlar/Bolum_04_03_Min_Kapsayan_Ders_Notu.html)
+- [📝Çalışma Soruları - Çizge Minimum Kapsayan (HTML)](/files/algorithms/slides/Bolum_04_03_Min_Kapsayan_Calisma_Sorulari.html)
+  - [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_MST.html)
+- [🖼️Sunum-Çizge Ağ Akış (HTML)](/files/algorithms/slides/Bolum_04_04_Ag_Akis.html)
+- [📄Sunum-Çizge Ağ Akış (PDF)](/files/algorithms/pdf/Bolum_04_04_Ag_Akis.pdf)
+- [📖Ders Notu - Çizge Ağ Akış (HTML)](/files/algorithms/notlar/Bolum_04_04_Ag_Akis_Ders_Notu.html)
+- [📝Çalışma Soruları - Çizge Ağ Akış (HTML)](/files/algorithms/slides/Bolum_04_04_Ag_Akis_Calisma_Sorulari.html)
+  - [🕹️Ağ Akışı Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_Network_Flow.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum04/src)
 
 ---
@@ -111,26 +111,26 @@ Arama, bir veri kümesinde istenen öğenin yerini bulma problemidir. Bölümde 
 
 Dizgi algoritmaları metin arama, veri sıkıştırma ve biyolojik dizi çözümlemesi gibi alanların temelini oluşturur. Bölümün ilk kısmında kaba kuvvet, Knuth-Morris-Pratt, Boyer-Moore ve Rabin-Karp örüntü eşleştirme algoritmaları ile RLE, LZW ve LZ78 sıkıştırma yöntemleri işlenir. İkinci kısım sözlüksel sıra ve LSD/MSD basamak sıralamasıyla dizgi sıralamayı, düzenli ifadeleri, sonlu durum makinelerini, Levenshtein düzenleme uzaklığını, sonek dizisini ve Burrows–Wheeler dönüşümünü kapsar. Üçüncü kısımda önek ağacı (trie) ekleme, arama, silme ve otomatik tamamlama işlemleriyle anlatılır; üçlü arama trie'si, sıkıştırılmış trie, sonek trie'si ve Aho–Corasick algoritması da tanıtılır.
 
-- [🖼️Sunum-Dizgi Algoritmaları (1) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi.html)
-- [📄Sunum-Dizgi Algoritmaları (1) (PDF)](../files/algorithms/pdf/Bolum_05_Dizgi.pdf)
-- [📖Ders Notu - Dizgi Algoritmaları (1) (HTML)](../files/algorithms/notlar/Bolum_05_Dizgi_Ders_Notu.html)
-- [📝Çalışma Soruları - Dizgi Algoritmaları (1) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Calisma_Sorulari.html)
-  - [🕹️Dizgi Eşleştirme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Matching.html)
-  - [🕹️Önek Fonksiyonu ve Z Algoritması (HTML)](../files/algorithms/slides/Bolum_05_Prefix_Z_Algorithms.html)
-  - [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Compression.html)
-- [🖼️Sunum-Dizgi Algoritmaları (2) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_2.html)
-- [📄Sunum-Dizgi Algoritmaları (2) (PDF)](../files/algorithms/pdf/Bolum_05_Dizgi_2.pdf)
-- [📖Ders Notu - Dizgi Algoritmaları (2) (HTML)](../files/algorithms/notlar/Bolum_05_Dizgi_2_Ders_Notu.html)
-- [📝Çalışma Soruları - Dizgi Algoritmaları (2) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_2_Calisma_Sorulari.html)
-  - [🕹️Dizgi Sıralama: LSD Basamak Sıralaması (HTML)](../files/algorithms/slides/Bolum_05_String_Sorting.html)
-  - [🕹️Sonlu Durum Makinesiyle Dizgi Ayrıştırma (HTML)](../files/algorithms/slides/Bolum_05_String_Parsing.html)
-  - [🕹️Dizgi Benzerliği: Levenshtein Uzaklığı (HTML)](../files/algorithms/slides/Bolum_05_String_Similarity.html)
-  - [🕹️Dizgi Dönüşümü: Burrows–Wheeler Dönüşümü (HTML)](../files/algorithms/slides/Bolum_05_String_Transformation.html)
-- [🖼️Sunum-Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries.html)
-- [📄Sunum-Trie (PDF)](../files/algorithms/pdf/Bolum_05_Tries.pdf)
-- [📖Ders Notu - Trie (HTML)](../files/algorithms/notlar/Bolum_05_Tries_Ders_Notu.html)
-- [📝Çalışma Soruları - Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries_Calisma_Sorulari.html)
-  - [🕹️Trie ve Sonek Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_Trie_Suffix_Algorithms.html)
+- [🖼️Sunum-Dizgi Algoritmaları (1) (HTML)](/files/algorithms/slides/Bolum_05_Dizgi.html)
+- [📄Sunum-Dizgi Algoritmaları (1) (PDF)](/files/algorithms/pdf/Bolum_05_Dizgi.pdf)
+- [📖Ders Notu - Dizgi Algoritmaları (1) (HTML)](/files/algorithms/notlar/Bolum_05_Dizgi_Ders_Notu.html)
+- [📝Çalışma Soruları - Dizgi Algoritmaları (1) (HTML)](/files/algorithms/slides/Bolum_05_Dizgi_Calisma_Sorulari.html)
+  - [🕹️Dizgi Eşleştirme Algoritmaları (HTML)](/files/algorithms/slides/Bolum_05_String_Matching.html)
+  - [🕹️Önek Fonksiyonu ve Z Algoritması (HTML)](/files/algorithms/slides/Bolum_05_Prefix_Z_Algorithms.html)
+  - [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](/files/algorithms/slides/Bolum_05_String_Compression.html)
+- [🖼️Sunum-Dizgi Algoritmaları (2) (HTML)](/files/algorithms/slides/Bolum_05_Dizgi_2.html)
+- [📄Sunum-Dizgi Algoritmaları (2) (PDF)](/files/algorithms/pdf/Bolum_05_Dizgi_2.pdf)
+- [📖Ders Notu - Dizgi Algoritmaları (2) (HTML)](/files/algorithms/notlar/Bolum_05_Dizgi_2_Ders_Notu.html)
+- [📝Çalışma Soruları - Dizgi Algoritmaları (2) (HTML)](/files/algorithms/slides/Bolum_05_Dizgi_2_Calisma_Sorulari.html)
+  - [🕹️Dizgi Sıralama: LSD Basamak Sıralaması (HTML)](/files/algorithms/slides/Bolum_05_String_Sorting.html)
+  - [🕹️Sonlu Durum Makinesiyle Dizgi Ayrıştırma (HTML)](/files/algorithms/slides/Bolum_05_String_Parsing.html)
+  - [🕹️Dizgi Benzerliği: Levenshtein Uzaklığı (HTML)](/files/algorithms/slides/Bolum_05_String_Similarity.html)
+  - [🕹️Dizgi Dönüşümü: Burrows–Wheeler Dönüşümü (HTML)](/files/algorithms/slides/Bolum_05_String_Transformation.html)
+- [🖼️Sunum-Trie (HTML)](/files/algorithms/slides/Bolum_05_Tries.html)
+- [📄Sunum-Trie (PDF)](/files/algorithms/pdf/Bolum_05_Tries.pdf)
+- [📖Ders Notu - Trie (HTML)](/files/algorithms/notlar/Bolum_05_Tries_Ders_Notu.html)
+- [📝Çalışma Soruları - Trie (HTML)](/files/algorithms/slides/Bolum_05_Tries_Calisma_Sorulari.html)
+  - [🕹️Trie ve Sonek Algoritmaları (HTML)](/files/algorithms/slides/Bolum_05_Trie_Suffix_Algorithms.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum05/src)
 
 ---
@@ -141,14 +141,14 @@ Dizgi algoritmaları metin arama, veri sıkıştırma ve biyolojik dizi çözüm
 
 Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt problemlere böler, bunları özyinelemeli olarak çözer ve sonuçları birleştirir. Bölümde genel şablon ile buna karşılık gelen yineleme bağıntısı, Ana Teorem ile çözümleme, birleştirme sıralaması, hızlı sıralama ve hızlı üs alma örnekleri ele alınır; alt problemler örtüştüğünde yaklaşımın neden verimsizleştiği gösterilir. Geometriden Quickhull ile dışbükey örtü ve en yakın nokta çifti, aritmetikten Karatsuba tam sayı çarpımı ve Strassen matris çarpımı ayrıntılı biçimde incelenir.
 
-- [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet.html)
-- [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_06_Bol_Fethet.pdf)
-- [📖Ders Notu - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/notlar/Bolum_06_Bol_Fethet_Ders_Notu.html)
-- [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet_Calisma_Sorulari.html)
+- [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](/files/algorithms/slides/Bolum_06_Bol_Fethet.html)
+- [📄Sunum-Böl Fethet Yaklaşımı (PDF)](/files/algorithms/pdf/Bolum_06_Bol_Fethet.pdf)
+- [📖Ders Notu - Böl Fethet Yaklaşımı (HTML)](/files/algorithms/notlar/Bolum_06_Bol_Fethet_Ders_Notu.html)
+- [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](/files/algorithms/slides/Bolum_06_Bol_Fethet_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum06/src)
 
-- [🕹️Özyineleme ve Ana Teorem (HTML)](../files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
-- [🕹️Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
+- [🕹️Özyineleme ve Ana Teorem (HTML)](/files/algorithms/slides/Bolum_01_Recurrence_Master_Theorem.html)
+- [🕹️Sıralama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_02_Sorting.html)
 
 ---
 
@@ -156,14 +156,14 @@ Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt proble
 
 Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi görünen seçimi yapar ve bu seçimi sonradan değiştirmez. Bölümde açgözlü seçim özelliği ile en iyi alt yapı koşulları anlatılır; para üstü problemi üzerinden yaklaşımın hangi durumda en iyi sonucu verdiği, hangi durumda yanıldığı gösterilir. Etkinlik seçimi, son tarihli iş sıralama ve kesirli sırt çantası problemleri, kesim özelliğine dayanan minimum kapsayan ağaç algoritmaları ve Huffman kodlaması işlenir; Huffman kodunun neden en iyi önek kodu olduğu da gerekçelendirilir.
 
-- [🖼️Sunum-Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_07_Acgozlu.html)
-- [📄Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_07_Acgozlu.pdf)
-- [📖Ders Notu - Açgözlü Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_07_Acgozlu_Ders_Notu.html)
-- [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_07_Acgozlu_Calisma_Sorulari.html)
+- [🖼️Sunum-Açgözlü Algoritmalar (HTML)](/files/algorithms/slides/Bolum_07_Acgozlu.html)
+- [📄Sunum-Açgözlü Algoritmalar (PDF)](/files/algorithms/pdf/Bolum_07_Acgozlu.pdf)
+- [📖Ders Notu - Açgözlü Algoritmalar (HTML)](/files/algorithms/notlar/Bolum_07_Acgozlu_Ders_Notu.html)
+- [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](/files/algorithms/slides/Bolum_07_Acgozlu_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum07/src)
 
-- [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](../files/algorithms/slides/Bolum_04_MST.html)
-- [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_05_String_Compression.html)
+- [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](/files/algorithms/slides/Bolum_04_MST.html)
+- [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](/files/algorithms/slides/Bolum_05_String_Compression.html)
 
 ---
 
@@ -171,10 +171,10 @@ Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi g�
 
 Dinamik programlama, örtüşen alt problemleri bir kez çözüp sonuçlarını saklayarak üstel maliyetli özyinelemeleri polinom zamana indirir. Bölümde en iyi alt yapı ve örtüşen alt problemler özellikleri, bir DP çözümü tasarlamanın adımları, bellekleme ile tablolama arasındaki fark ve yaklaşımın böl ve fethet ile açgözlü yöntemlerden ayrıldığı noktalar Fibonacci örneği üzerinden açıklanır. Ardından 0/1 ve sınırsız sırt çantası, alt küme toplamı, en uzun artan alt dizi, en uzun ortak alt dizgi ve en uzun ortak alt dizi problemleri tablolar adım adım doldurularak çözülür. En uzun artan alt dizi için ikili aramaya dayanan O(n log n) çözüm de verilir.
 
-- [🖼️Sunum-Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_08_Dinamik.html)
-- [📄Sunum-Dinamik Programlama (PDF)](../files/algorithms/pdf/Bolum_08_Dinamik.pdf)
-- [📖Ders Notu - Dinamik Programlama (HTML)](../files/algorithms/notlar/Bolum_08_Dinamik_Ders_Notu.html)
-- [📝Çalışma Soruları - Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_08_Dinamik_Calisma_Sorulari.html)
+- [🖼️Sunum-Dinamik Programlama (HTML)](/files/algorithms/slides/Bolum_08_Dinamik.html)
+- [📄Sunum-Dinamik Programlama (PDF)](/files/algorithms/pdf/Bolum_08_Dinamik.pdf)
+- [📖Ders Notu - Dinamik Programlama (HTML)](/files/algorithms/notlar/Bolum_08_Dinamik_Ders_Notu.html)
+- [📝Çalışma Soruları - Dinamik Programlama (HTML)](/files/algorithms/slides/Bolum_08_Dinamik_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum08/src)
 
 ---
@@ -185,10 +185,10 @@ Dinamik programlama, örtüşen alt problemleri bir kez çözüp sonuçlarını 
 
 Geri izleme, kısmi çözümleri adım adım genişleten ve geçerli bir çözüme ulaşamayacağı anlaşılan daldan vazgeçip önceki karar noktasına dönen sistematik bir arama yöntemidir. Bölüm P, NP ve NP-zor problemlere kısa bir girişle başlar; durum uzayı ağacı ve seç–keşfet–geri al şablonu labirent ve permütasyon örnekleriyle tanıtılır. n-vezir, Sudoku, çizge boyama, Hamilton yolu ve kelime arama problemleri Java kodlarıyla çözülür; en az çakışma sezgiseli yerel onarıma dayalı bir seçenek olarak gösterilir. Geri izlemenin en kötü durum maliyeti ve budamayı güçlendiren sezgiseller de tartışılır.
 
-- [🖼️Sunum-Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_09_Geri_Donuslu.html)
-- [📄Sunum-Geri İzleme Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_09_Geri_Donuslu.pdf)
-- [📖Ders Notu - Geri İzleme Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_09_Geri_Donuslu_Ders_Notu.html)
-- [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_09_Geri_Donuslu_Calisma_Sorulari.html)
+- [🖼️Sunum-Geri İzleme Algoritmaları (HTML)](/files/algorithms/slides/Bolum_09_Geri_Donuslu.html)
+- [📄Sunum-Geri İzleme Algoritmaları (PDF)](/files/algorithms/pdf/Bolum_09_Geri_Donuslu.pdf)
+- [📖Ders Notu - Geri İzleme Algoritmaları (HTML)](/files/algorithms/notlar/Bolum_09_Geri_Donuslu_Ders_Notu.html)
+- [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](/files/algorithms/slides/Bolum_09_Geri_Donuslu_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum09/src)
 
 ---
@@ -197,13 +197,13 @@ Geri izleme, kısmi çözümleri adım adım genişleten ve geçerli bir çözü
 
 Dal sınır yöntemi, durum uzayı ağacını tararken her düğüm için bir sınır hesaplar ve en iyi çözümü içeremeyeceği kesinleşen dalları budar. Bölümde sınırın seçimi, budama koşulları ve FIFO, LIFO ve en düşük maliyetli (LC) arama stratejileri anlatılır; yöntemin geri izlemeden farkı ortaya konur. 0/1 sırt çantası problemi kesirli gevşetmeyle, gezgin satıcı problemi giderek sıkılaşan üç alt sınırla çözülür; atama problemi, tam sayılı doğrusal programlama ve maksimum klik de örnek olarak işlenir. Dal sınırın A* ile ilişkisi kurulur ve tasarım paradigmaları birlikte karşılaştırılır.
 
-- [🖼️Sunum-Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_10_Dal_Sinir.html)
-- [📄Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_10_Dal_Sinir.pdf)
-- [📖Ders Notu - Dal Sınır Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_10_Dal_Sinir_Ders_Notu.html)
-- [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_10_Dal_Sinir_Calisma_Sorulari.html)
+- [🖼️Sunum-Dal Sınır Algoritmaları (HTML)](/files/algorithms/slides/Bolum_10_Dal_Sinir.html)
+- [📄Sunum-Dal Sınır Algoritmaları (PDF)](/files/algorithms/pdf/Bolum_10_Dal_Sinir.pdf)
+- [📖Ders Notu - Dal Sınır Algoritmaları (HTML)](/files/algorithms/notlar/Bolum_10_Dal_Sinir_Ders_Notu.html)
+- [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](/files/algorithms/slides/Bolum_10_Dal_Sinir_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum10/src)
 
-- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Bolum_10_TSP.html)
+- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](/files/algorithms/slides/Bolum_10_TSP.html)
 
 ---
 
@@ -211,13 +211,13 @@ Dal sınır yöntemi, durum uzayı ağacını tararken her düğüm için bir s�
 
 Yaklaşım algoritmaları, en iyi çözümü bulmanın çok pahalı olduğu NP-zor problemlerde polinom zamanda ve kanıtlanmış bir oran içinde en iyiye yakın çözümler üretir. Bölümde yaklaşım oranı kavramı ve yaklaşım algoritmasının sezgiselden ve yaklaşım şemalarından farkı açıklanır. Gezgin satıcı problemi için en yakın komşu sezgiseli, metrik TSP'de MST tabanlı 2-yaklaşım ve 2-opt yerel arama; iş çizelgelemede liste çizelgeleme ve en uzun iş önce (LPT) kuralı; düğüm kapsama için 2-yaklaşım algoritması ve 3-SAT'tan indirgeme işlenir. Sırt çantası için oran sıralı açgözlü yaklaşım ve baskın özvektörü bulan kuvvet yinelemesi (power iteration) de ele alınır.
 
-- [🖼️Sunum-Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_11_Yakinsama.html)
-- [📄Sunum-Yaklaşım Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_11_Yakinsama.pdf)
-- [📖Ders Notu - Yaklaşım Algoritmaları (HTML)](../files/algorithms/notlar/Bolum_11_Yakinsama_Ders_Notu.html)
-- [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_11_Yakinsama_Calisma_Sorulari.html)
+- [🖼️Sunum-Yaklaşım Algoritmaları (HTML)](/files/algorithms/slides/Bolum_11_Yakinsama.html)
+- [📄Sunum-Yaklaşım Algoritmaları (PDF)](/files/algorithms/pdf/Bolum_11_Yakinsama.pdf)
+- [📖Ders Notu - Yaklaşım Algoritmaları (HTML)](/files/algorithms/notlar/Bolum_11_Yakinsama_Ders_Notu.html)
+- [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](/files/algorithms/slides/Bolum_11_Yakinsama_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum11/src)
 
-- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](../files/algorithms/slides/Bolum_10_TSP.html)
+- [🕹️Gezgin Satıcı Problemi Simülatörü (HTML)](/files/algorithms/slides/Bolum_10_TSP.html)
 
 ---
 
@@ -227,13 +227,13 @@ Yaklaşım algoritmaları, en iyi çözümü bulmanın çok pahalı olduğu NP-z
 
 Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha yalın bir tasarıma, daha iyi bir beklenen çalışma süresine ya da kötü girdilere karşı dayanıklılığa ulaşır. Bölümde Las Vegas ve Monte Carlo türleri ile hata olasılığının tekrarlı çalıştırmayla küçültülmesi anlatılır. Fisher–Yates karıştırması ve saf karıştırmanın yanlılığı, BogoSort, rastgele pivotlu hızlı sıralama ve beklenen karşılaştırma sayısı ile QuickSelect incelenir. Monte Carlo yöntemiyle π tahmini, Miller–Rabin asallık testi, Karger minimum kesim algoritması ve sözde rastgele sayı üretimi de bölümün konuları arasındadır.
 
-- [🖼️Sunum-Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Rastgele.html)
-- [📄Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_12_Rastgele.pdf)
-- [📖Ders Notu - Rastgele Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_12_Rastgele_Ders_Notu.html)
-- [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Rastgele_Calisma_Sorulari.html)
+- [🖼️Sunum-Rastgele Algoritmalar (HTML)](/files/algorithms/slides/Bolum_12_Rastgele.html)
+- [📄Sunum-Rastgele Algoritmalar (PDF)](/files/algorithms/pdf/Bolum_12_Rastgele.pdf)
+- [📖Ders Notu - Rastgele Algoritmalar (HTML)](/files/algorithms/notlar/Bolum_12_Rastgele_Ders_Notu.html)
+- [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](/files/algorithms/slides/Bolum_12_Rastgele_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum12/src)
 
-- [🕹️Monte Carlo ile π Tahmini (HTML)](../files/algorithms/slides/Bolum_12_Monte_Carlo_Pi.html)
+- [🕹️Monte Carlo ile π Tahmini (HTML)](/files/algorithms/slides/Bolum_12_Monte_Carlo_Pi.html)
 
 ---
 
@@ -241,10 +241,10 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 
 Çevrim içi algoritmalar girdiyi parça parça alır ve geleceği bilmeden geri alınamaz kararlar verir. Bu algoritmaların başarısı, tüm girdiyi önceden bilen en iyi çevrim dışı algoritmayla karşılaştıran rekabetçi analiz ve düşman modeliyle ölçülür. Bölümde kayak kiralama problemi ve alt sınırı, FIFO, LRU ve OPT politikalarıyla sayfalama, Belady anomalisi ve rastgele işaretleme algoritması, liste güncellemede öne taşı (MTF) kuralı ele alınır. Veri akışı modelinde hareketli ortalama, çevrim içi ortanca, rezervuar örnekleme ve kayan hash ile örüntü arama, son olarak da artımlı öğrenme incelenir.
 
-- [🖼️Sunum-Çevrim İçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici.html)
-- [📄Sunum-Çevrim İçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Cevrimici.pdf)
-- [📖Ders Notu - Çevrim İçi Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_13_Cevrimici_Ders_Notu.html)
-- [📝Çalışma Soruları - Çevrim İçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici_Calisma_Sorulari.html)
+- [🖼️Sunum-Çevrim İçi Algoritmalar (HTML)](/files/algorithms/slides/Bolum_13_Cevrimici.html)
+- [📄Sunum-Çevrim İçi Algoritmalar (PDF)](/files/algorithms/pdf/Bolum_13_Cevrimici.pdf)
+- [📖Ders Notu - Çevrim İçi Algoritmalar (HTML)](/files/algorithms/notlar/Bolum_13_Cevrimici_Ders_Notu.html)
+- [📝Çalışma Soruları - Çevrim İçi Algoritmalar (HTML)](/files/algorithms/slides/Bolum_13_Cevrimici_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum13/src)
 
 ---
@@ -253,8 +253,8 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 
 Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalışma süresini kısaltmayı ve büyük veri kümelerini işlenebilir kılmayı amaçlar. Bölümde Flynn sınıflandırması, bellek mimarileri ve PRAM modeli ile hızlanma, verimlilik, maliyet, Amdahl yasası ve iş–derinlik ölçütleri tanıtılır. Paralel toplama ve önek toplamı (Hillis–Steele ve Blelloch), boru hattı ve boru hatlı ağaç, paralel birleştirme sıralaması, MapReduce ve veri paralelliğiyle matris çarpımı örnekleri işlenir. Yarış durumu, eşzamanlı çizge gezinme ve Java'daki paralellik araçları da ele alınır.
 
-- [🖼️Sunum-Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_14_Paralel.html)
-- [📄Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_14_Paralel.pdf)
-- [📖Ders Notu - Paralel Algoritmalar (HTML)](../files/algorithms/notlar/Bolum_14_Paralel_Ders_Notu.html)
-- [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_14_Paralel_Calisma_Sorulari.html)
+- [🖼️Sunum-Paralel Algoritmalar (HTML)](/files/algorithms/slides/Bolum_14_Paralel.html)
+- [📄Sunum-Paralel Algoritmalar (PDF)](/files/algorithms/pdf/Bolum_14_Paralel.pdf)
+- [📖Ders Notu - Paralel Algoritmalar (HTML)](/files/algorithms/notlar/Bolum_14_Paralel_Ders_Notu.html)
+- [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](/files/algorithms/slides/Bolum_14_Paralel_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/algorithms-java/tree/main/Bolum14/src)
