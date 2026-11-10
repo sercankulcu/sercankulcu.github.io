@@ -3,7 +3,6 @@ layout: single
 permalink: /bookmarks/
 title: "Bookmarks"
 author_profile: true
-redirect_from: 
 ---
 
 Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, belge düzenleme ve üretkenlik araçları.

@@ -3,8 +3,6 @@ layout: archive
 permalink: /games/
 title: "Games"
 author_profile: true
-redirect_from:
-  - /game/
 ---
 
 <style>
@@ -15,52 +13,52 @@ redirect_from:
 
 <h3>🎮 ARCADE & ACTION</h3>
 
-<button onclick="location.href='../game/car-race.html'">🏁🏎️💨 CAR RACE</button>
-<button onclick="location.href='../game/basketball.html'">🏀 BASKETBALL</button>
-<button onclick="location.href='../game/fastreflex.html'">⚡ HIZLI OL</button>
-<button onclick="location.href='../game/squid.html'">🟢🔴 RED LIGHT GREEN LIGHT</button>
-<button onclick="location.href='../game/pong.html'">🏓 PONG</button>
-<button onclick="location.href='../game/flappy-bird.html'">🐦 FLOPPY KUŞ</button>
+<button onclick="location.href='/game/car-race/'">🏁🏎️💨 CAR RACE</button>
+<button onclick="location.href='/game/basketball/'">🏀 BASKETBALL</button>
+<button onclick="location.href='/game/fastreflex/'">⚡ HIZLI OL</button>
+<button onclick="location.href='/game/squid/'">🟢🔴 RED LIGHT GREEN LIGHT</button>
+<button onclick="location.href='/game/pong/'">🏓 PONG</button>
+<button onclick="location.href='/game/flappy-bird/'">🐦 FLOPPY KUŞ</button>
 
 
 <h3>🧠 PUZZLE & LOGIC</h3>
 
-<button onclick="location.href='../game/minesweeper.html'">💣 MINESWEEPER</button>
-<button onclick="location.href='../game/sudoku.html'">🔢 SUDOKU</button>
-<button onclick="location.href='../game/connections.html'">🧩 CONNECTIONS</button>
-<button onclick="location.href='../game/strands.html'">🧶 STRANDS</button>
-<button onclick="location.href='../game/memory.html'">🧠 MEMORY</button>
+<button onclick="location.href='/game/minesweeper/'">💣 MINESWEEPER</button>
+<button onclick="location.href='/game/sudoku/'">🔢 SUDOKU</button>
+<button onclick="location.href='/game/connections/'">🧩 CONNECTIONS</button>
+<button onclick="location.href='/game/strands/'">🧶 STRANDS</button>
+<button onclick="location.href='/game/memory/'">🧠 MEMORY</button>
 <button onclick="location.href='../game/bulls-and-cows/'">🐂🐄 BULLS & COWS</button>
-<button onclick="location.href='../game/sliding-puzzle.html'">🔢 SLİDİNG PUZZLE</button>
-<button onclick="location.href='../game/battleship.html'">⚓ AMİRAL BATTI</button>
+<button onclick="location.href='/game/sliding-puzzle/'">🔢 SLİDİNG PUZZLE</button>
+<button onclick="location.href='/game/battleship/'">⚓ AMİRAL BATTI</button>
 
 
 <h3>🔤 WORD GAMES</h3>
 
-<button onclick="location.href='../game/fiveletters.html'">5️⃣ FIVE LETTERS</button>
-<button onclick="location.href='../game/sixletters.html'">6️⃣ SIX LETTERS</button>
-<button onclick="location.href='../game/oneword.html'">🔤 ONE WORD</button>
-<button onclick="location.href='../game/spellbee.html'">🐝 SPELL BEE</button>
-<button onclick="location.href='../game/hangman.html'">🎯 HANGMAN</button>
-<button onclick="location.href='../game/boggle.html'">🔡 BOGGLE</button>
+<button onclick="location.href='/game/fiveletters/'">5️⃣ FIVE LETTERS</button>
+<button onclick="location.href='/game/sixletters/'">6️⃣ SIX LETTERS</button>
+<button onclick="location.href='/game/oneword/'">🔤 ONE WORD</button>
+<button onclick="location.href='/game/spellbee/'">🐝 SPELL BEE</button>
+<button onclick="location.href='/game/hangman/'">🎯 HANGMAN</button>
+<button onclick="location.href='/game/boggle/'">🔡 BOGGLE</button>
 
 
 <h3>🎓 QUIZ & BRAIN TRAINING</h3>
 
-<button onclick="location.href='../game/flagquiz.html'">🏳️ FLAG QUIZ</button>
-<button onclick="location.href='../game/mathmaster.html'">➗ MATH MASTER</button>
-<button onclick="location.href='../game/millionaire.html'">💰 MILLIONAIRE</button>
-<button onclick="location.href='../game/capital-city-quiz.html'">🌍 CAPITAL CITY QUIZ</button>
-<button onclick="location.href='../game/movie-quiz.html'">🎬 MOVIE QUIZ</button>
-<button onclick="location.href='../game/pixar-color-millionaire.html'">🎬 PIXAR COLOR MILLIONAIRE</button>
-<button onclick="location.href='../game/emoji-quiz.html'">🎭 EMOJİ QUİZ</button>
-<button onclick="location.href='../game/turkiye-cografya-quiz.html'">🇹🇷 TÜRKİYE COĞRAFYA QUİZ</button>
+<button onclick="location.href='/game/flagquiz/'">🏳️ FLAG QUIZ</button>
+<button onclick="location.href='/game/mathmaster/'">➗ MATH MASTER</button>
+<button onclick="location.href='/game/millionaire/'">💰 MILLIONAIRE</button>
+<button onclick="location.href='/game/capital-city-quiz/'">🌍 CAPITAL CITY QUIZ</button>
+<button onclick="location.href='/game/movie-quiz/'">🎬 MOVIE QUIZ</button>
+<button onclick="location.href='/game/pixar-color-millionaire/'">🎬 PIXAR COLOR MILLIONAIRE</button>
+<button onclick="location.href='/game/emoji-quiz/'">🎭 EMOJİ QUİZ</button>
+<button onclick="location.href='/game/turkiye-cografya-quiz/'">🇹🇷 TÜRKİYE COĞRAFYA QUİZ</button>
 
 
 <h3>🎲 CLASSIC & CASUAL</h3>
 
-<button onclick="location.href='../game/yazitura.html'">🪙 YAZI TURA</button>
-<button onclick="location.href='../game/connectfour.html'">🔴🔵 CONNECT4</button>
-<button onclick="location.href='../game/tictactoe.html'">❌⭕ TIC TAC TOE</button>
+<button onclick="location.href='/game/yazitura/'">🪙 YAZI TURA</button>
+<button onclick="location.href='/game/connectfour/'">🔴🔵 CONNECT4</button>
+<button onclick="location.href='/game/tictactoe/'">❌⭕ TIC TAC TOE</button>
 
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sercankulc" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting!" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>

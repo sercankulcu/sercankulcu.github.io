@@ -3,9 +3,6 @@ title: "Programming with C"
 collection: teaching
 type: "Undergraduate"
 permalink: /teaching/programming-with-c
-redirect_from:
-  - /teaching/procedural-programming-with-c/
-  - /teaching/procedural-programming-with-c
 venue: "Giresun University, Computer Engineering"
 date: 2024-09-19
 location: "Giresun, Turkey"

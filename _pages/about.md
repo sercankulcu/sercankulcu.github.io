@@ -3,8 +3,6 @@ layout: archive
 permalink: /
 title: "About Me"
 author_profile: true
-redirect_from:
-  - /about/
 ---
 
 <!--  <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp"> -->

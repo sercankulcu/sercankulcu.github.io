@@ -2,8 +2,6 @@
 permalink: /reading/
 title: "Reading"
 author_profile: false
-redirect_from: 
-  - /reading.html
 ---
 
 .. / J. Yorgo Wiestmich

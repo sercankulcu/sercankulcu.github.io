@@ -2,8 +2,6 @@
 permalink: /ataturk/
 title: "Atatürk"
 author_profile: false
-redirect_from: 
-  - /ataturk.html
 ---
 
 [//]: # (This may be the most platform independent comment)
