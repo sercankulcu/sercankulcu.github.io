@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Ders notlarindan tek parca PDF kitabi uretir ve files/c/ altina koyar.
+"""Ders notlarindan tek parca PDF kitabi uretir ve courses-pdfs/c/ altina koyar.
 
     python tools/make_book.py
 
@@ -15,7 +15,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 BOOK = os.path.join(HERE, 'book')
 BUILD = os.path.join(BOOK, 'build')
-FINAL = os.path.join(REPO, 'files', 'c', 'Programming-with-C.pdf')
+# PDF ayri depoda: GitHub/courses-pdfs (bu deponun yaninda klonlanmis olmali)
+FINAL = os.path.join(os.path.dirname(REPO), 'courses-pdfs', 'c', 'Programming-with-C.pdf')
 
 CHROME_CANDIDATES = [
     r'C:\Program Files\Google\Chrome\Application\chrome.exe',
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     try:
         from pypdf import PdfReader
         pages = len(PdfReader(FINAL).pages)
-        print('\nbitti: files/c/Programming-with-C.pdf  %d sayfa, %.1f MB' % (pages, mb))
+        print('\nbitti: courses-pdfs/c/Programming-with-C.pdf  %d sayfa, %.1f MB' % (pages, mb))
         print('ders sayfasindaki sayfa sayisi ve boyutu elle guncelleyin.')
     except Exception:
-        print('\nbitti: files/c/Programming-with-C.pdf  %.1f MB' % mb)
+        print('\nbitti: courses-pdfs/c/Programming-with-C.pdf  %.1f MB' % mb)

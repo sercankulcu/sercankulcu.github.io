@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""HTML sunumlardan (deck.js) PDF uretir ve files/<ders>/pdf/ altina koyar.
+"""HTML sunumlardan (deck.js) PDF uretir ve courses-pdfs/<ders>/pdf/ altina koyar.
+
+PDF'ler ayri depodadir (GitHub/courses-pdfs, bu deponun yaninda klonlanmis olmali);
+sitede https://sercankulcu.github.io/courses-pdfs/<ders>/pdf/ adresinden yayimlanir.
 
     python tools/make_slide_pdf.py computer                  # dersin tum sunumlari
     python tools/make_slide_pdf.py computer Bolum_10_Diziler # yalnizca verilenler
@@ -20,6 +23,7 @@ import argparse, os, re, subprocess, sys
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
+PDF_REPO = os.path.join(os.path.dirname(REPO), 'courses-pdfs')
 SITE = 'https://sercankulcu.github.io'
 # sayfa duzeni (tema, .page__content sarmalayicisi, MathJax) bu yayimlanmis sunumdan alinir
 SHELL_URL = SITE + '/files/computer/slides/Bolum_01_Bilgisayarlar.html'
@@ -180,14 +184,14 @@ def main():
     ap.add_argument('course', help='files/ altindaki ders klasoru, ornegin computer, data_structures, agt')
     ap.add_argument('names', nargs='*', help='sunum dosya adlari (.html olmadan); verilmezse tumu')
     ap.add_argument('--stale', action='store_true', help='yalnizca PDF\'i olmayan ya da sunumundan eski olanlar')
-    ap.add_argument('--out', help='cikti klasoru (varsayilan files/<ders>/pdf)')
+    ap.add_argument('--out', help='cikti klasoru (varsayilan ../courses-pdfs/<ders>/pdf)')
     ap.add_argument('--no-theme', action='store_true', help='canli site duzenini kullanma (cevrimdisi)')
     a = ap.parse_args()
 
     slides = os.path.join(REPO, 'files', a.course, 'slides')
     if not os.path.isdir(slides):
         sys.exit('Klasor yok: ' + slides)
-    pdfdir = a.out or os.path.join(REPO, 'files', a.course, 'pdf')
+    pdfdir = a.out or os.path.join(PDF_REPO, a.course, 'pdf')
     os.makedirs(pdfdir, exist_ok=True)
     names = a.names or decks(slides)
     for n in names:

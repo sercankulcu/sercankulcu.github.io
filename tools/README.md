@@ -24,7 +24,7 @@ konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
 python tools/make_book.py
 ```
 
-56 notu tek bir A4 PDF'e dönüştürür ve `files/c/Programming-with-C.pdf`
+56 notu tek bir A4 PDF'e dönüştürür ve `../courses-pdfs/c/Programming-with-C.pdf`
 üzerine yazar. 10–20 dakika sürer, Chrome (veya Edge) gerekir. Dört aşama:
 
 | Aşama | Dosya | İş |
@@ -49,7 +49,7 @@ python tools/make_slide_pdf.py computer Bolum_10_Diziler    # yalnızca verilenl
 python tools/make_slide_pdf.py data_structures --stale      # PDF'i sunumundan eski olanlar
 ```
 
-`files/<ders>/slides/` altındaki `deck.js` sunumlarını `files/<ders>/pdf/`
+`files/<ders>/slides/` altındaki `deck.js` sunumlarını `../courses-pdfs/<ders>/pdf/`
 altına PDF olarak basar; çalışma soruları ve simülatörler atlanır. Her slayt ve
 her animasyon adımı ayrı bir sayfadır (800×600). Chrome ya da Edge gerekir
 (`playwright` sistemdeki tarayıcıyı kullanır).
@@ -139,3 +139,14 @@ adımlar görünür, `prefers-reduced-motion` geçişleri kapatır.
 ```bash
 git diff --stat files/
 ```
+
+## PDF'lerin yeri
+
+Bütün PDF'ler (slayt PDF'leri, C kitabı, makaleler, sunumlar, CV) ayrı
+[`courses-pdfs`](https://github.com/sercankulcu/courses-pdfs) deposundadır ve
+`https://sercankulcu.github.io/courses-pdfs/` adresinden yayımlanır. Klasör
+düzeni eski `files/` düzeninin aynısıdır: `files/algorithms/pdf/X.pdf` →
+`courses-pdfs/algorithms/pdf/X.pdf`. Üreteçler o depoya yazar; iki depo
+yan yana klonlanmış olmalıdır (`GitHub/courses-pdfs`). PDF'i güncelledikten
+sonra o depoda commit ve push yapın. `check_site.py` sitedeki PDF
+bağlantılarını o klasörde arar.

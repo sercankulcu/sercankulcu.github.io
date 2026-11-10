@@ -29,7 +29,7 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 Derste gerçekten kullanılan matematik, oyun örnekleri üzerinden yeniden ele alınır: küme ve fonksiyon gösterimi, toplam sembolü, max ve argmax, olasılık ve beklenen değer, karışık strateji fikri, kazanç matrisinin okunması, en iyi tepki, kayıtsızlık denkleminin çözümü ve oyun ağacında geriye doğru çıkarım.
 
 - [🖼️Sunum-Hazırlık (HTML)](/files/agt/slides/Bolum_00_Hazirlik.html)
-- [📄Sunum-Hazırlık (PDF)](/files/agt/pdf/Bolum_00_Hazirlik.pdf)
+- [📄Sunum-Hazırlık (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_00_Hazirlik.pdf)
 - [📖Ders Notu - Hazırlık (HTML)](/files/agt/notlar/Bolum_00_Hazirlik_Ders_Notu.html)
 - [📝Çalışma Soruları - Hazırlık (HTML)](/files/agt/slides/Bolum_00_Hazirlik_Calisma_Sorulari.html)
 
@@ -40,7 +40,7 @@ Derste gerçekten kullanılan matematik, oyun örnekleri üzerinden yeniden ele 
 Stratejik etkileşimden önce tek bir karar verici incelenir. Beklenen fayda ve von Neumann–Morgenstern aksiyomları, fayda ölçeğinin hangi dönüşümlere kadar tek olduğu, Allais ve Ellsberg paradoksları, risk tutumları ve kesinlik eşdeğeri, belirsizlik altında karar ölçütleri, Bayesçi karar, karar ağaçlarında geriye doğru çıkarım ve bilginin değeri bu bölümün konularıdır.
 
 - [🖼️Sunum-Karar Kuramı (HTML)](/files/agt/slides/Bolum_01_Karar_Kurami.html)
-- [📄Sunum-Karar Kuramı (PDF)](/files/agt/pdf/Bolum_01_Karar_Kurami.pdf)
+- [📄Sunum-Karar Kuramı (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_01_Karar_Kurami.pdf)
 - [📖Ders Notu - Karar Kuramı (HTML)](/files/agt/notlar/Bolum_01_Karar_Kurami_Ders_Notu.html)
 - [📝Çalışma Soruları - Karar Kuramı (HTML)](/files/agt/slides/Bolum_01_Karar_Kurami_Calisma_Sorulari.html)
 
@@ -59,11 +59,11 @@ Stratejik etkileşimden önce tek bir karar verici incelenir. Beklenen fayda ve 
 Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançlar ve bilgi; normal form ve genişletilmiş form; oyunların sınıflandırılması; Mahkûmun İkilemi ve Pareto optimallik; klasik 2×2 oyunlar; 2/3 ortalaması oyunu ve seviye-k düşünme; kombinatoryal oyunlar ve minimaks; minimaksı hızlandıran alfa-beta budaması, derinlik sınırlı arama ve değerlendirme fonksiyonları; sıralı oyunlar, geriye doğru çıkarım, alt oyun mükemmel denge ve tetik stratejisi.
 
 - [🖼️Sunum-Oyunlar ve Temsiller (HTML)](/files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller.html)
-- [📄Sunum-Oyunlar ve Temsiller (PDF)](/files/agt/pdf/Bolum_02_Oyunlar_ve_Temsiller.pdf)
+- [📄Sunum-Oyunlar ve Temsiller (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_02_Oyunlar_ve_Temsiller.pdf)
 - [📖Ders Notu - Oyunlar ve Temsiller (HTML)](/files/agt/notlar/Bolum_02_Oyunlar_ve_Temsiller_Ders_Notu.html)
 - [📝Çalışma Soruları - Oyunlar ve Temsiller (HTML)](/files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller_Calisma_Sorulari.html)
 - [🖼️Sunum-Minimaks ve Alfa-Beta Budaması (HTML)](/files/agt/slides/Bolum_02_Minimaks_ve_Budama.html)
-- [📄Sunum-Minimaks ve Alfa-Beta Budaması (PDF)](/files/agt/pdf/Bolum_02_Minimaks_ve_Budama.pdf)
+- [📄Sunum-Minimaks ve Alfa-Beta Budaması (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_02_Minimaks_ve_Budama.pdf)
 - [📝Çalışma Soruları - Minimaks ve Alfa-Beta Budaması (HTML)](/files/agt/slides/Bolum_02_Minimaks_ve_Budama_Calisma_Sorulari.html)
 
 - [🕹️2/3 Ortalaması Oyunu (HTML)](/files/agt/slides/Bolum_02_Guess_Average.html)
@@ -86,7 +86,7 @@ Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançla
 Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı strateji profilidir. Bölümde en iyi tepki, Cournot ve Bertrand rekabeti, baskın stratejilerin art arda elenmesi, karışık strateji dengeleri ve kayıtsızlık ilkesi, Nash'in varlık teoremi, denge seçimi, korelasyonlu denge, sıfır toplamlı oyunlarda minimaks, güvenlik oyunları ve denge hesaplamanın PPAD karmaşıklığı ele alınır.
 
 - [🖼️Sunum-Nash Dengesi (HTML)](/files/agt/slides/Bolum_03_Nash_Dengesi.html)
-- [📄Sunum-Nash Dengesi (PDF)](/files/agt/pdf/Bolum_03_Nash_Dengesi.pdf)
+- [📄Sunum-Nash Dengesi (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_03_Nash_Dengesi.pdf)
 - [📖Ders Notu - Nash Dengesi (HTML)](/files/agt/notlar/Bolum_03_Nash_Dengesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Nash Dengesi (HTML)](/files/agt/slides/Bolum_03_Nash_Dengesi_Calisma_Sorulari.html)
 
@@ -104,7 +104,7 @@ Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı
 Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çıkarını gözeten katılımcıları bu hedefe doğru davranmaya hangi kurallar yöneltir? Sosyal seçim fonksiyonları, açıklama ilkesi, teşvik uyumluluğu ve bireysel rasyonellik, Myerson lemması, VCG mekanizması, Gale–Shapley kararlı eşleştirme, medyan mekanizması, en iyi takas döngüleri (TTC) ve Bayesçi oyunlar.
 
 - [🖼️Sunum-Mekanizma Tasarımı (HTML)](/files/agt/slides/Bolum_04_Mekanizma.html)
-- [📄Sunum-Mekanizma Tasarımı (PDF)](/files/agt/pdf/Bolum_04_Mekanizma.pdf)
+- [📄Sunum-Mekanizma Tasarımı (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_04_Mekanizma.pdf)
 - [📖Ders Notu - Mekanizma Tasarımı (HTML)](/files/agt/notlar/Bolum_04_Mekanizma_Ders_Notu.html)
 - [📝Çalışma Soruları - Mekanizma Tasarımı (HTML)](/files/agt/slides/Bolum_04_Mekanizma_Calisma_Sorulari.html)
 
@@ -119,7 +119,7 @@ Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çı
 Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde en yaygın kullanılan mekanizmalardır. Dört temel biçim (İngiliz, Hollanda, birinci fiyat ve ikinci fiyat kapalı zarf), denge teklif stratejileri, gelir eşdeğerliği ve bilginin rolü, alıcıların da satıcıların da teklif verdiği çift taraflı açık artırma piyasaları.
 
 - [🖼️Sunum-Açık Artırmalar (HTML)](/files/agt/slides/Bolum_05_Acik_Arttirma.html)
-- [📄Sunum-Açık Artırmalar (PDF)](/files/agt/pdf/Bolum_05_Acik_Arttirma.pdf)
+- [📄Sunum-Açık Artırmalar (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_05_Acik_Arttirma.pdf)
 - [📖Ders Notu - Açık Artırmalar (HTML)](/files/agt/notlar/Bolum_05_Acik_Arttirma_Ders_Notu.html)
 - [📝Çalışma Soruları - Açık Artırmalar (HTML)](/files/agt/slides/Bolum_05_Acik_Arttirma_Calisma_Sorulari.html)
 
@@ -137,7 +137,7 @@ Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde 
 Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getirir ve aralarındaki oyunun kurallarını koyar. İki taraflı pazarlar, ağ etkisi ve kritik kitle, iki taraflı fiyatlandırma, sponsorlu arama açık artırmaları (GSP ve VCG), bütçe kısıtlı çevrim içi tahsis, itibar sistemleri ve platformlar arası rekabet.
 
 - [🖼️Sunum-Çevrim İçi Platformlar (HTML)](/files/agt/slides/Bolum_06_Cevrimici_Platform.html)
-- [📄Sunum-Çevrim İçi Platformlar (PDF)](/files/agt/pdf/Bolum_06_Cevrimici_Platform.pdf)
+- [📄Sunum-Çevrim İçi Platformlar (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_06_Cevrimici_Platform.pdf)
 - [📖Ders Notu - Çevrim İçi Platformlar (HTML)](/files/agt/notlar/Bolum_06_Cevrimici_Platform_Ders_Notu.html)
 - [📝Çalışma Soruları - Çevrim İçi Platformlar (HTML)](/files/agt/slides/Bolum_06_Cevrimici_Platform_Calisma_Sorulari.html)
 
@@ -151,7 +151,7 @@ Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getir
 Sosyal seçim, bireysel tercihlerin ortak bir karara nasıl dönüştürüldüğünü inceler. Aynı tercih profili üzerinde sayılan çoğunluk, çoğulluk, Borda, onay, anında ikinci tur ve Condorcet kuralları, Condorcet döngüsü, stratejik oy ile Arrow, Gibbard–Satterthwaite ve May teoremleri.
 
 - [🖼️Sunum-Oylama (HTML)](/files/agt/slides/Bolum_07_Oylama.html)
-- [📄Sunum-Oylama (PDF)](/files/agt/pdf/Bolum_07_Oylama.pdf)
+- [📄Sunum-Oylama (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_07_Oylama.pdf)
 - [📖Ders Notu - Oylama (HTML)](/files/agt/notlar/Bolum_07_Oylama_Ders_Notu.html)
 - [📝Çalışma Soruları - Oylama (HTML)](/files/agt/slides/Bolum_07_Oylama_Calisma_Sorulari.html)
 
@@ -168,7 +168,7 @@ Sosyal seçim, bireysel tercihlerin ortak bir karara nasıl dönüştürüldüğ
 Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merkezî bir planlayıcının seçeceğinden farklı olabilir. Yönlendirmenin temelleri, bencil yönlendirme, Wardrop dengesi ile sistem optimumunun karşılaştırılması, Braess paradoksu, tıkanıklık oyunları ve Rosenthal potansiyeli, ağ oluşturma oyunları.
 
 - [🖼️Sunum-Ağ Tasarımı ve Yönlendirme (HTML)](/files/agt/slides/Bolum_08_Ag_Tasarimi.html)
-- [📄Sunum-Ağ Tasarımı ve Yönlendirme (PDF)](/files/agt/pdf/Bolum_08_Ag_Tasarimi.pdf)
+- [📄Sunum-Ağ Tasarımı ve Yönlendirme (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_08_Ag_Tasarimi.pdf)
 - [📖Ders Notu - Ağ Tasarımı ve Yönlendirme (HTML)](/files/agt/notlar/Bolum_08_Ag_Tasarimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağ Tasarımı ve Yönlendirme (HTML)](/files/agt/slides/Bolum_08_Ag_Tasarimi_Calisma_Sorulari.html)
 
@@ -183,7 +183,7 @@ Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merke
 Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davranış yüzünden ne kadar verim kaybedildiğini ölçer; İstikrarın Bedeli aynı karşılaştırmayı en iyi denge için yapar. İki yollu ağda ve Pigou ağında bu oranlar, doğrusal gecikmelerde 4/3 sınırı, pürüzsüzlük, Braess ağı, yük dengeleme, İstikrarın Bedeli için logaritmik sınır, tıkanıklık ücreti ve öteki müdahaleler.
 
 - [🖼️Sunum-Anarşinin Bedeli (HTML)](/files/agt/slides/Bolum_09_Anarsi.html)
-- [📄Sunum-Anarşinin Bedeli (PDF)](/files/agt/pdf/Bolum_09_Anarsi.pdf)
+- [📄Sunum-Anarşinin Bedeli (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_09_Anarsi.pdf)
 - [📖Ders Notu - Anarşinin Bedeli (HTML)](/files/agt/notlar/Bolum_09_Anarsi_Ders_Notu.html)
 - [📝Çalışma Soruları - Anarşinin Bedeli (HTML)](/files/agt/slides/Bolum_09_Anarsi_Calisma_Sorulari.html)
 
@@ -198,7 +198,7 @@ Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davran
 Çoklu ajan sistemleri, ortak bir ortamda işbirliği yapan ya da birbiriyle rekabet eden özerk ajanlardan oluşur. Ajanların özellikleri, işbirliği ve rekabet, sözleşme ağıyla görev dağıtımı, koalisyon oyunları, Shapley değeri, çekirdek ve kamu mallarında beleşçilik.
 
 - [🖼️Sunum-Çoklu Ajan Sistemleri (HTML)](/files/agt/slides/Bolum_10_Coklu_Ajan.html)
-- [📄Sunum-Çoklu Ajan Sistemleri (PDF)](/files/agt/pdf/Bolum_10_Coklu_Ajan.pdf)
+- [📄Sunum-Çoklu Ajan Sistemleri (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_10_Coklu_Ajan.pdf)
 - [📖Ders Notu - Çoklu Ajan Sistemleri (HTML)](/files/agt/notlar/Bolum_10_Coklu_Ajan_Ders_Notu.html)
 - [📝Çalışma Soruları - Çoklu Ajan Sistemleri (HTML)](/files/agt/slides/Bolum_10_Coklu_Ajan_Calisma_Sorulari.html)
 
@@ -211,7 +211,7 @@ Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davran
 Algoritmik kararlar ve dağıtımlar bireyleri ve grupları farklı biçimlerde etkiler. Karışıklık matrisinden hesaplanan adalet ölçütleri (demografik eşitlik, eşitlenmiş olasılıklar, tahmin eşitliği, kalibrasyon) ve bu ölçütlerin neden aynı anda sağlanamadığı; kes-ve-seç, orantılılık ve kıskançsızlık ile adil bölüşüm; etik ilkeler ve algoritmik denetim.
 
 - [🖼️Sunum-Algoritmik Adalet ve Etik (HTML)](/files/agt/slides/Bolum_11_Algoritmik_Etik.html)
-- [📄Sunum-Algoritmik Adalet ve Etik (PDF)](/files/agt/pdf/Bolum_11_Algoritmik_Etik.pdf)
+- [📄Sunum-Algoritmik Adalet ve Etik (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_11_Algoritmik_Etik.pdf)
 - [📖Ders Notu - Algoritmik Adalet ve Etik (HTML)](/files/agt/notlar/Bolum_11_Algoritmik_Etik_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritmik Adalet ve Etik (HTML)](/files/agt/slides/Bolum_11_Algoritmik_Etik_Calisma_Sorulari.html)
 
@@ -224,7 +224,7 @@ Algoritmik kararlar ve dağıtımlar bireyleri ve grupları farklı biçimlerde 
 Gerçek insanlar rasyonel modelden sapar; gruplar da tek tek bireylerin karşılaşmadığı ikilemlerle yüz yüze gelir. Sınırlı rasyonellik, beklenti kuramı, kayıptan kaçınma ve çerçeveleme, ortak mallar trajedisi ve en iyi tepki dinamiği, vergi, kota ve yaptırım gibi kurumsal çözümler, kamu malı deneyleri ve sosyal refah ölçütleri.
 
 - [🖼️Sunum-Davranışsal ve Kolektif Karar (HTML)](/files/agt/slides/Bolum_12_Kolektif_Karar.html)
-- [📄Sunum-Davranışsal ve Kolektif Karar (PDF)](/files/agt/pdf/Bolum_12_Kolektif_Karar.pdf)
+- [📄Sunum-Davranışsal ve Kolektif Karar (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_12_Kolektif_Karar.pdf)
 - [📖Ders Notu - Davranışsal ve Kolektif Karar (HTML)](/files/agt/notlar/Bolum_12_Kolektif_Karar_Ders_Notu.html)
 - [📝Çalışma Soruları - Davranışsal ve Kolektif Karar (HTML)](/files/agt/slides/Bolum_12_Kolektif_Karar_Calisma_Sorulari.html)
 
@@ -239,7 +239,7 @@ Gerçek insanlar rasyonel modelden sapar; gruplar da tek tek bireylerin karşıl
 Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En iyi tepki dinamiği, kurgusal oyun, pişmanlık ve çarpımsal ağırlıklar, çok kollu haydut problemleri (ε-açgözlü ve UCB), replikatör dinamiği ve tekrarlı Mahkûmun İkilemi.
 
 - [🖼️Sunum-Öğrenme ve Adaptasyon (HTML)](/files/agt/slides/Bolum_13_Ogrenme.html)
-- [📄Sunum-Öğrenme ve Adaptasyon (PDF)](/files/agt/pdf/Bolum_13_Ogrenme.pdf)
+- [📄Sunum-Öğrenme ve Adaptasyon (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_13_Ogrenme.pdf)
 - [📖Ders Notu - Öğrenme ve Adaptasyon (HTML)](/files/agt/notlar/Bolum_13_Ogrenme_Ders_Notu.html)
 - [📝Çalışma Soruları - Öğrenme ve Adaptasyon (HTML)](/files/agt/slides/Bolum_13_Ogrenme_Calisma_Sorulari.html)
 
@@ -254,7 +254,7 @@ Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En 
 Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik danışıklılık, veriden öğrenilen mekanizmalar ve örneklem karmaşıklıkları, diferansiyel mahremiyet, blokzincirlerde işlem ücreti mekanizmaları ve MEV. Bölüm, dersin genel haritasıyla kapanır.
 
 - [🖼️Sunum-Gelecek Yönelimler (HTML)](/files/agt/slides/Bolum_14_Gelecek.html)
-- [📄Sunum-Gelecek Yönelimler (PDF)](/files/agt/pdf/Bolum_14_Gelecek.pdf)
+- [📄Sunum-Gelecek Yönelimler (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_14_Gelecek.pdf)
 - [📖Ders Notu - Gelecek Yönelimler (HTML)](/files/agt/notlar/Bolum_14_Gelecek_Ders_Notu.html)
 - [📝Çalışma Soruları - Gelecek Yönelimler (HTML)](/files/agt/slides/Bolum_14_Gelecek_Calisma_Sorulari.html)
 

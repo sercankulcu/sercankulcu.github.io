@@ -260,7 +260,7 @@ This study evaluates SGDM, ADAM, and RMSprop optimizers with ShuffleNet for clas
 
 **How to cite:** Tomak, Ö., Dikbaş, M. C., & Külcü, S. (2025). Selection of the Most Suitable Parameters for Classification of Hazelnut Fruit Using ShuffleNet Deep Learning Algorithm. In *11th International Azerbaijan Congress on Life, Engineering, Mathematical, and Applied Sciences, Congress Proceedings Book, Vol. I*, pp. 64–73. BZT Turan Publishing House.
 
-[Paper](/files/papers/2025-hazelnut-shufflenet-parameter-selection.pdf) · [Presentation](/files/presentations/slides/Selection_of_the_Presentation.html)
+[Paper](https://sercankulcu.github.io/courses-pdfs/papers/2025-hazelnut-shufflenet-parameter-selection.pdf) · [Presentation](/files/presentations/slides/Selection_of_the_Presentation.html)
 
 </details>
 
@@ -276,7 +276,7 @@ This study compares ResNet-50 and ShuffleNet on a 15,770-image hazelnut dataset 
 
 **How to cite:** Tomak, Ö., Dikbaş, M. C., & Külcü, S. (2025). Comparison of the Performance of ResNet-50 and ShuffleNet Deep Learning Algorithms in Classification of Hazelnut Fruit. In *11th International Azerbaijan Congress on Life, Engineering, Mathematical, and Applied Sciences, Congress Proceedings Book, Vol. I*, pp. 55–63. BZT Turan Publishing House.
 
-[Paper](/files/papers/2025-hazelnut-resnet50-vs-shufflenet.pdf) · [Presentation](/files/presentations/slides/Comparison_of_the_Presentation.html)
+[Paper](https://sercankulcu.github.io/courses-pdfs/papers/2025-hazelnut-resnet50-vs-shufflenet.pdf) · [Presentation](/files/presentations/slides/Comparison_of_the_Presentation.html)
 
 </details>
 
@@ -358,6 +358,6 @@ This PhD thesis investigates the integration of smart and directional antennas w
 
 **How to cite:** Külcü, S. (2022). *Analysis of Smart Antenna Based Scheduling Algorithms for IoT Networks* [PhD thesis, Karadeniz Technical University].
 
-[Thesis](/files/presentations/766420.pdf) · [Presentation EN](/files/presentations/slides/IoT_Smart_Antenna_PhD_Defense.html) · [Presentation TR](/files/presentations/slides/IoT_Akilli_Anten_Tez_Savunmasi.html) · [PhD Research](/files/research/Directional_6TiSCH_PhD_Research.html)
+[Thesis](https://sercankulcu.github.io/courses-pdfs/presentations/766420.pdf) · [Presentation EN](/files/presentations/slides/IoT_Smart_Antenna_PhD_Defense.html) · [Presentation TR](/files/presentations/slides/IoT_Akilli_Anten_Tez_Savunmasi.html) · [PhD Research](/files/research/Directional_6TiSCH_PhD_Research.html)
 
 </details>

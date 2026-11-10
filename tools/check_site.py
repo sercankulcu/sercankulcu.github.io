@@ -30,6 +30,9 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 FILES = os.path.join(REPO, 'files')
+# PDF'ler ayri depoda: https://sercankulcu.github.io/courses-pdfs/<yol> -> GitHub/courses-pdfs/<yol>
+PDF_URL = 'https://sercankulcu.github.io/courses-pdfs/'
+PDF_REPO = os.path.join(os.path.dirname(REPO), 'courses-pdfs')
 DEF_TAGS = r'(?:marker|linearGradient|radialGradient|pattern|clipPath|filter|mask|symbol)'
 
 errors, warnings = [], []
@@ -204,6 +207,11 @@ def browser_checks(courses):
             if pg.evaluate("getComputedStyle(document.documentElement).visibility === 'hidden'"):
                 err(where, 'ds-guard sayfayi gizledi')
             for h in pg.evaluate("[...document.querySelectorAll('section.page__content a[href]')].map(a => a.getAttribute('href'))"):
+                if h.startswith(PDF_URL) and os.path.isdir(PDF_REPO):
+                    pdf = urllib.parse.unquote(urllib.parse.urlsplit(h).path)[len('/courses-pdfs/'):]
+                    if not os.path.exists(os.path.join(PDF_REPO, pdf)):
+                        err(where, 'kirik PDF baglantisi: ' + h)
+                    continue
                 if h.startswith(('http://', 'https://', '#', 'mailto:', 'javascript:')):
                     continue
                 path = urllib.parse.unquote(urllib.parse.urlsplit(h).path)

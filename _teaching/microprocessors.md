@@ -35,12 +35,12 @@ Microprocessors execute instructions, process data, and coordinate the operation
 Mikroişlemci, komutları bellekten getirip çözen ve yürüten bir bilgisayar sisteminin merkezidir. Bölüm mikroişlemci ile mikrodenetleyici ayrımı, getir–çöz–yürüt döngüsü, işlemcinin iç yapısı ve saat hızıyla başlar; CISC, RISC ve EPIC tasarımları, özel amaçlı işlemciler ve 4004'ten günümüze Intel x86 ailesinin gelişimi ele alınır. Sayı sistemleri kısmında onluk, ikili ve onaltılık tabanlar, taban dönüşümleri, bire ve ikiye tümleyen ile işaretli sayılar ve ikili aritmetik işlenir. IEEE 754 kayan nokta biçimi, BCD, Gray kodu ve bayt sıralaması gibi kodlamalarla bölüm tamamlanır.
 
 - [🖼️Sunum-Giriş (HTML)](/files/microprocessors/slides/Bolum_01_Giris.html)
-- [📄Sunum-Giriş (PDF)](/files/microprocessors/pdf/Bolum_01_Giris.pdf)
+- [📄Sunum-Giriş (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_01_Giris.pdf)
 - [📖Ders Notu - Giriş (HTML)](/files/microprocessors/notlar/Bolum_01_Giris_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş (HTML)](/files/microprocessors/slides/Bolum_01_Giris_Calisma_Sorulari.html)
   - [🕹️İşlemci Simülatörü (HTML)](/files/microprocessors/slides/CPU_Simulator.html)
 - [🖼️Sunum-Sayı Sistemleri (HTML)](/files/microprocessors/slides/Bolum_01_Sayi_Sistemleri.html)
-- [📄Sunum-Sayı Sistemleri (PDF)](/files/microprocessors/pdf/Bolum_01_Sayi_Sistemleri.pdf)
+- [📄Sunum-Sayı Sistemleri (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_01_Sayi_Sistemleri.pdf)
 - [📖Ders Notu - Sayı Sistemleri (HTML)](/files/microprocessors/notlar/Bolum_01_Sayi_Sistemleri_Ders_Notu.html)
 - [📝Çalışma Soruları - Sayı Sistemleri (HTML)](/files/microprocessors/slides/Bolum_01_Sayi_Sistemleri_Calisma_Sorulari.html)
   - [🕹️İkiye Tümleyen Laboratuvarı (HTML)](/files/microprocessors/slides/Bolum_01_Twos-Complement-Lab.html)
@@ -52,11 +52,11 @@ Mikroişlemci, komutları bellekten getirip çözen ve yürüten bir bilgisayar 
 Intel 8086, 1978'de tanıtılan ve x86 ailesini başlatan 16 bitlik bir mikroişlemcidir. Bölümde sistem yolları, yol arabirim birimi (BIU) ile yürütme birimi (EU), önden getirme kuyruğu ve kesimli bellek düzeninde 20 bitlik fiziksel adresin hesaplanması anlatılır. Ardından 8086'nın on dört yazmacı gruplarıyla incelenir: AX, BX, CX ve DX genel amaçlı yazmaçları, SP, BP, SI ve DI işaretçi ve indis yazmaçları, kesim yazmaçları ve IP. Durum ve kontrol bayraklarını taşıyan bayrak yazmacı ile bu bayrakları değiştiren komutlar da ele alınır.
 
 - [🖼️Sunum-8086 Mimarisi (HTML)](/files/microprocessors/slides/Bolum_02_8086_Mimarisi.html)
-- [📄Sunum-8086 Mimarisi (PDF)](/files/microprocessors/pdf/Bolum_02_8086_Mimarisi.pdf)
+- [📄Sunum-8086 Mimarisi (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_02_8086_Mimarisi.pdf)
 - [📖Ders Notu - 8086 Mimarisi (HTML)](/files/microprocessors/notlar/Bolum_02_8086_Mimarisi_Ders_Notu.html)
 - [📝Çalışma Soruları - 8086 Mimarisi (HTML)](/files/microprocessors/slides/Bolum_02_8086_Mimarisi_Calisma_Sorulari.html)
 - [🖼️Sunum-8086 Yazmaçlar (HTML)](/files/microprocessors/slides/Bolum_02_8086_Yazmaclar.html)
-- [📄Sunum-8086 Yazmaçlar (PDF)](/files/microprocessors/pdf/Bolum_02_8086_Yazmaclar.pdf)
+- [📄Sunum-8086 Yazmaçlar (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_02_8086_Yazmaclar.pdf)
 - [📖Ders Notu - 8086 Yazmaçlar (HTML)](/files/microprocessors/notlar/Bolum_02_8086_Yazmaclar_Ders_Notu.html)
 - [📝Çalışma Soruları - 8086 Yazmaçlar (HTML)](/files/microprocessors/slides/Bolum_02_8086_Yazmaclar_Calisma_Sorulari.html)
   - [🕹️Yazmaç Gezgini (HTML)](/files/microprocessors/slides/Bolum_02_Register-Explorer.html)
@@ -68,11 +68,11 @@ Intel 8086, 1978'de tanıtılan ve x86 ailesini başlatan 16 bitlik bir mikroiş
 Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama düzeylerinde yazılabilir. Bölümde makine dili ve komut biçimi, assembler ile bağlayıcının rolü, farklı platformlardaki assembly dilleri ile derlenen ve yorumlanan diller karşılaştırılır. Assembly kısmında komut satırının etiket, komut, işlenen ve açıklamadan oluşan yapısı, komut ile direktif ayrımı, işlenen türleri ve örtük işlenenler işlenir. Komut süreleri, IP'nin ilerleyişi, bayraklar ve emu8086 ile yazılan ilk programla bölüm tamamlanır.
 
 - [🖼️Sunum-Programlama Dilleri (HTML)](/files/microprocessors/slides/Bolum_03_Programlama_Dilleri.html)
-- [📄Sunum-Programlama Dilleri (PDF)](/files/microprocessors/pdf/Bolum_03_Programlama_Dilleri.pdf)
+- [📄Sunum-Programlama Dilleri (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_03_Programlama_Dilleri.pdf)
 - [📖Ders Notu - Programlama Dilleri (HTML)](/files/microprocessors/notlar/Bolum_03_Programlama_Dilleri_Ders_Notu.html)
 - [📝Çalışma Soruları - Programlama Dilleri (HTML)](/files/microprocessors/slides/Bolum_03_Programlama_Dilleri_Calisma_Sorulari.html)
 - [🖼️Sunum-Assembly (HTML)](/files/microprocessors/slides/Bolum_03_Assembly.html)
-- [📄Sunum-Assembly (PDF)](/files/microprocessors/pdf/Bolum_03_Assembly.pdf)
+- [📄Sunum-Assembly (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_03_Assembly.pdf)
 - [📖Ders Notu - Assembly (HTML)](/files/microprocessors/notlar/Bolum_03_Assembly_Ders_Notu.html)
 - [📝Çalışma Soruları - Assembly (HTML)](/files/microprocessors/slides/Bolum_03_Assembly_Calisma_Sorulari.html)
 
@@ -85,13 +85,13 @@ Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama dü
 8086 belleğe kesim ve bağıl konum değerlerinin birleşimiyle erişir. Bölümde BX, SI, DI ve BP yazmaçlarıyla kurulan adresleme modları, etkin adres ve fiziksel adres hesabı, byte ptr ve word ptr ile veri boyutunun belirtilmesi anlatılır; MOV ve XCHG komutlarının geçerli işlenen bileşimleri örneklerle işlenir. Değişkenler kısmında DB, DW ve DD tanımları, bellek yerleşimi, ORG 100h ve .COM programları, DUP ile diziler, LEA ve OFFSET ile adres alma ve EQU sabitleri ele alınır. Değişkenler üzerinde taşıma, toplama ve karşılaştırma yapan örnek programlarla bölüm tamamlanır.
 
 - [🖼️Sunum-Bellek Erişimi (HTML)](/files/microprocessors/slides/Bolum_04_Bellek_Erisimi.html)
-- [📄Sunum-Bellek Erişimi (PDF)](/files/microprocessors/pdf/Bolum_04_Bellek_Erisimi.pdf)
+- [📄Sunum-Bellek Erişimi (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_04_Bellek_Erisimi.pdf)
 - [📖Ders Notu - Bellek Erişimi (HTML)](/files/microprocessors/notlar/Bolum_04_Bellek_Erisimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Bellek Erişimi (HTML)](/files/microprocessors/slides/Bolum_04_Bellek_Erisimi_Calisma_Sorulari.html)
   - [🕹️Kesim:Bağıl Konum Hesaplayıcı (HTML)](/files/microprocessors/slides/Bolum_04_Segment-Offset.html)
   - [🕹️Adresleme Modları (HTML)](/files/microprocessors/slides/Bolum_04_Addressing-Modes.html)
 - [🖼️Sunum-Değişkenler (HTML)](/files/microprocessors/slides/Bolum_04_Degiskenler.html)
-- [📄Sunum-Değişkenler (PDF)](/files/microprocessors/pdf/Bolum_04_Degiskenler.pdf)
+- [📄Sunum-Değişkenler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_04_Degiskenler.pdf)
 - [📖Ders Notu - Değişkenler (HTML)](/files/microprocessors/notlar/Bolum_04_Degiskenler_Ders_Notu.html)
 - [📝Çalışma Soruları - Değişkenler (HTML)](/files/microprocessors/slides/Bolum_04_Degiskenler_Calisma_Sorulari.html)
 
@@ -102,12 +102,12 @@ Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama dü
 Kesme, işlemcinin o anki işini geçici olarak bırakıp özel bir hizmet yordamını çalıştırmasını sağlayan olaydır. Bölümde kesme türleri, kesme vektör tablosu, INT ve IRET sırasında FLAGS, CS ve IP'nin yığına yazılıp geri alınması, işlemci istisnaları ve 8259A ile donanım kesmelerinin maskelenmesi anlatılır. BIOS ve DOS hizmetleri kısmında INT 10h ile ekran çıktısı, INT 16h ile klavye girişi, INT 21h ile karakter ve dizgi işlemleri, tarih ve saat okuma ile INT 1Ah işlenir. Programın doğru biçimde sonlandırılması ve hizmetleri bir araya getiren bir uygulama ile bölüm tamamlanır.
 
 - [🖼️Sunum-Kesmeler (HTML)](/files/microprocessors/slides/Bolum_05_Kesmeler.html)
-- [📄Sunum-Kesmeler (PDF)](/files/microprocessors/pdf/Bolum_05_Kesmeler.pdf)
+- [📄Sunum-Kesmeler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_05_Kesmeler.pdf)
 - [📖Ders Notu - Kesmeler (HTML)](/files/microprocessors/notlar/Bolum_05_Kesmeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Kesmeler (HTML)](/files/microprocessors/slides/Bolum_05_Kesmeler_Calisma_Sorulari.html)
   - [🕹️Kesme Vektör Tablosu (HTML)](/files/microprocessors/slides/Bolum_05_Interrupt-Vector.html)
 - [🖼️Sunum-Kesme Fonksiyonları (HTML)](/files/microprocessors/slides/Bolum_05_Kesme_Fonksiyonlari.html)
-- [📄Sunum-Kesme Fonksiyonları (PDF)](/files/microprocessors/pdf/Bolum_05_Kesme_Fonksiyonlari.pdf)
+- [📄Sunum-Kesme Fonksiyonları (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_05_Kesme_Fonksiyonlari.pdf)
 - [📖Ders Notu - Kesme Fonksiyonları (HTML)](/files/microprocessors/notlar/Bolum_05_Kesme_Fonksiyonlari_Ders_Notu.html)
 - [📝Çalışma Soruları - Kesme Fonksiyonları (HTML)](/files/microprocessors/slides/Bolum_05_Kesme_Fonksiyonlari_Calisma_Sorulari.html)
 
@@ -120,7 +120,7 @@ Kesme, işlemcinin o anki işini geçici olarak bırakıp özel bir hizmet yorda
 Aritmetik ve mantık komutları, işlemcinin veri üzerinde hesap yapmasını ve sonuca göre bayrakları kurmasını sağlar. Bölüm CF, ZF, SF, OF, PF ve AF bayraklarının hangi sonuçta kurulduğuyla başlar; iki işlenenli ADD, SUB, CMP, AND, OR, XOR ve TEST komutları, MUL, IMUL, DIV ve IDIV ile çarpma ve bölme ve INC, DEC, NOT ve NEG gibi tek işlenenli komutlar gruplar hâlinde incelenir. Kaydırma ve döndürme komutlarının bitlere ve CF bayrağına etkisi adım adım gösterilir. BCD aritmetiği, dizi toplama ve sıcaklık dönüşümü örnekleriyle bölüm tamamlanır.
 
 - [🖼️Sunum-Aritmetik ve Mantıksal İşlemler (HTML)](/files/microprocessors/slides/Bolum_06_Aritmetik_Mantik.html)
-- [📄Sunum-Aritmetik ve Mantıksal İşlemler (PDF)](/files/microprocessors/pdf/Bolum_06_Aritmetik_Mantik.pdf)
+- [📄Sunum-Aritmetik ve Mantıksal İşlemler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_06_Aritmetik_Mantik.pdf)
 - [📖Ders Notu - Aritmetik ve Mantıksal İşlemler (HTML)](/files/microprocessors/notlar/Bolum_06_Aritmetik_Mantik_Ders_Notu.html)
 - [📝Çalışma Soruları - Aritmetik ve Mantıksal İşlemler (HTML)](/files/microprocessors/slides/Bolum_06_Aritmetik_Mantik_Calisma_Sorulari.html)
 
@@ -134,7 +134,7 @@ Aritmetik ve mantık komutları, işlemcinin veri üzerinde hesap yapmasını ve
 Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla değiştirilmesiyle yönlendirilir. Bölümde JMP ile koşulsuz atlama, bağıl konumun hesaplanması ve tek bir bayrağı test eden koşullu atlamalar anlatılır. CMP ile karşılaştırmanın ardından işaretsiz sayılar için JA/JB, işaretli sayılar için JG/JL ailesinin seçimi işlenir. LOOP ailesi, JCXZ ve iç içe döngüler örnek programlar üzerinde izlenir.
 
 - [🖼️Sunum-Akış Kontrolü (HTML)](/files/microprocessors/slides/Bolum_07_Akis_Kontrol.html)
-- [📄Sunum-Akış Kontrolü (PDF)](/files/microprocessors/pdf/Bolum_07_Akis_Kontrol.pdf)
+- [📄Sunum-Akış Kontrolü (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_07_Akis_Kontrol.pdf)
 - [📖Ders Notu - Akış Kontrolü (HTML)](/files/microprocessors/notlar/Bolum_07_Akis_Kontrol_Ders_Notu.html)
 - [📝Çalışma Soruları - Akış Kontrolü (HTML)](/files/microprocessors/slides/Bolum_07_Akis_Kontrol_Calisma_Sorulari.html)
 
@@ -147,12 +147,12 @@ Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla
 8086 yığını SS:SP çifti ile adreslenir ve bellekte aşağı doğru büyüyen bir LIFO yapısıdır. Bölümde PUSH ve POP komutları, SP'nin değişimi, yazmaçların saklanması ve takası, PUSHF ve POPF ile bayrakların korunması ve yığın güvenliği anlatılır. Prosedürler kısmında PROC ve ENDP ile tanımlama, CALL ve RET sırasında dönüş adresinin yığına yazılıp geri alınması, yazmaçlar, bellek ve yığın üzerinden parametre geçirme ve BP ile kurulan yığın çerçevesi işlenir. Özyineleme örnekleri ve sık yapılan hatalarla bölüm tamamlanır.
 
 - [🖼️Sunum-Yığın (HTML)](/files/microprocessors/slides/Bolum_08_Yigin.html)
-- [📄Sunum-Yığın (PDF)](/files/microprocessors/pdf/Bolum_08_Yigin.pdf)
+- [📄Sunum-Yığın (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_08_Yigin.pdf)
 - [📖Ders Notu - Yığın (HTML)](/files/microprocessors/notlar/Bolum_08_Yigin_Ders_Notu.html)
 - [📝Çalışma Soruları - Yığın (HTML)](/files/microprocessors/slides/Bolum_08_Yigin_Calisma_Sorulari.html)
   - [🕹️Yığın, CALL ve RET (HTML)](/files/microprocessors/slides/Bolum_08_Stack-Call.html)
 - [🖼️Sunum-Prosedürler (HTML)](/files/microprocessors/slides/Bolum_08_Prosedurler.html)
-- [📄Sunum-Prosedürler (PDF)](/files/microprocessors/pdf/Bolum_08_Prosedurler.pdf)
+- [📄Sunum-Prosedürler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_08_Prosedurler.pdf)
 - [📖Ders Notu - Prosedürler (HTML)](/files/microprocessors/notlar/Bolum_08_Prosedurler_Ders_Notu.html)
 - [📝Çalışma Soruları - Prosedürler (HTML)](/files/microprocessors/slides/Bolum_08_Prosedurler_Calisma_Sorulari.html)
 
@@ -163,11 +163,11 @@ Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla
 Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olarak derleyici tarafından kullanıldıkları her noktada metin olarak açılır. Bölümde MACRO ve ENDM ile parametreli makro tanımı, genişletme, parametre tuzakları, LOCAL ile etiket çakışmalarının önlenmesi ve makro ile prosedürün boyut ve hız açısından karşılaştırılması anlatılır; PUTC ve POWER makroları adım adım çalıştırılır. emu8086.inc kütüphanesi kısmında INCLUDE direktifi, PUTC, GOTOXY, PRINT ve PRINTN gibi makrolar ile sayı okuma ve yazma prosedürleri işlenir. Kütüphane makro ve prosedürleriyle yazılmış örnek programlarla bölüm tamamlanır.
 
 - [🖼️Sunum-Makrolar (HTML)](/files/microprocessors/slides/Bolum_09_Makrolar.html)
-- [📄Sunum-Makrolar (PDF)](/files/microprocessors/pdf/Bolum_09_Makrolar.pdf)
+- [📄Sunum-Makrolar (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_09_Makrolar.pdf)
 - [📖Ders Notu - Makrolar (HTML)](/files/microprocessors/notlar/Bolum_09_Makrolar_Ders_Notu.html)
 - [📝Çalışma Soruları - Makrolar (HTML)](/files/microprocessors/slides/Bolum_09_Makrolar_Calisma_Sorulari.html)
 - [🖼️Sunum-emu8086.inc Kütüphanesi (HTML)](/files/microprocessors/slides/Bolum_09_Kutuphane.html)
-- [📄Sunum-emu8086.inc Kütüphanesi (PDF)](/files/microprocessors/pdf/Bolum_09_Kutuphane.pdf)
+- [📄Sunum-emu8086.inc Kütüphanesi (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_09_Kutuphane.pdf)
 - [📖Ders Notu - emu8086.inc Kütüphanesi (HTML)](/files/microprocessors/notlar/Bolum_09_Kutuphane_Ders_Notu.html)
 - [📝Çalışma Soruları - emu8086.inc Kütüphanesi (HTML)](/files/microprocessors/slides/Bolum_09_Kutuphane_Calisma_Sorulari.html)
 
@@ -180,11 +180,11 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 8086, 40 pinli bir DIP paket içinde adres, veri, kontrol, durum ve kesme sinyallerini taşır. Bölümde adres ve veri hatlarının çoklanması, ALE ve adres kilitleri, BHE' ile bellek bankaları, T1–T4 durumlarından oluşan okuma ve yazma döngüleri, minimum ve maksimum mod ile 8284A ve 8288 yongaları anlatılır. Aygıt kontrolü kısmında IN ve OUT komutları, yoklama, INT 15h ile bekleme ve yazılımla gecikme işlenir. Trafik ışıkları, step motor, LED ekran, termometre, yazıcı ve robot gibi emu8086 aygıtlarının programlanmasıyla bölüm tamamlanır.
 
 - [🖼️Sunum-8086 Pinler (HTML)](/files/microprocessors/slides/Bolum_10_8086_Pinler.html)
-- [📄Sunum-8086 Pinler (PDF)](/files/microprocessors/pdf/Bolum_10_8086_Pinler.pdf)
+- [📄Sunum-8086 Pinler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_10_8086_Pinler.pdf)
 - [📖Ders Notu - 8086 Pinler (HTML)](/files/microprocessors/notlar/Bolum_10_8086_Pinler_Ders_Notu.html)
 - [📝Çalışma Soruları - 8086 Pinler (HTML)](/files/microprocessors/slides/Bolum_10_8086_Pinler_Calisma_Sorulari.html)
 - [🖼️Sunum-Aygıt Kontrolü (HTML)](/files/microprocessors/slides/Bolum_10_Aygit_Kontrolu.html)
-- [📄Sunum-Aygıt Kontrolü (PDF)](/files/microprocessors/pdf/Bolum_10_Aygit_Kontrolu.pdf)
+- [📄Sunum-Aygıt Kontrolü (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_10_Aygit_Kontrolu.pdf)
 - [📖Ders Notu - Aygıt Kontrolü (HTML)](/files/microprocessors/notlar/Bolum_10_Aygit_Kontrolu_Ders_Notu.html)
 - [📝Çalışma Soruları - Aygıt Kontrolü (HTML)](/files/microprocessors/slides/Bolum_10_Aygit_Kontrolu_Calisma_Sorulari.html)
   - [🕹️Port ile Aygıt Kontrolü (HTML)](/files/microprocessors/slides/Bolum_10_IO-Ports.html)
@@ -196,7 +196,7 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 8086 komut kümesi veri taşıma, aritmetik ve mantık, kontrol aktarma, dizgi işleme ve işlemci kontrolü gibi işlevsel sınıflara ayrılır. Bölümde bir komutun makine kodunun işlem kodu, D ve W bitleri ve ModR/M baytından nasıl oluştuğu MOV biçimleri ve JMP kodlaması üzerinden anlatılır. MOVS, CMPS, SCAS, LODS ve STOS dizgi komutları REP önekleriyle birlikte DF, SI, DI ve CX değişimi izlenerek işlenir. XLAT, LEA, LDS ve LES komutları, işlemci kontrol komutları ve bayrak etkileri tablosuyla bölüm tamamlanır.
 
 - [🖼️Sunum-Komut Kodlama ve Dizgi Komutları (HTML)](/files/microprocessors/slides/Bolum_11_Komut_Kumesi.html)
-- [📄Sunum-Komut Kodlama ve Dizgi Komutları (PDF)](/files/microprocessors/pdf/Bolum_11_Komut_Kumesi.pdf)
+- [📄Sunum-Komut Kodlama ve Dizgi Komutları (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_11_Komut_Kumesi.pdf)
 - [📖Ders Notu - Komut Kodlama ve Dizgi Komutları (HTML)](/files/microprocessors/notlar/Bolum_11_Komut_Kumesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Komut Kodlama ve Dizgi Komutları (HTML)](/files/microprocessors/slides/Bolum_11_Komut_Kumesi_Calisma_Sorulari.html)
 
