@@ -1,0 +1,51 @@
+---
+layout: null
+sitemap: false
+---
+{%- comment -%}
+  Replaces the sitemap that jekyll-sitemap would generate (the plugin skips
+  its own when this file exists). Same URL set as the plugin, but <lastmod> is
+  only written when the date is real:
+  - collection documents: only when the date differs from the build time
+    (documents without a date, e.g. _nature and _poems, default to site.time)
+  - static files (PDFs, verification files): never, because their file
+    modification time is the checkout time on every GitHub Pages build
+{%- endcomment -%}
+{%- assign build_time = site.time | date_to_xmlschema -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- assign collections = site.collections | where_exp: "collection", "collection.output != false" -%}
+{%- for collection in collections -%}
+{%- assign docs = collection.docs | where_exp: "doc", "doc.sitemap != false" -%}
+{%- for doc in docs %}
+<url>
+<loc>{{ doc.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+{%- if doc.last_modified_at %}
+<lastmod>{{ doc.last_modified_at | date_to_xmlschema }}</lastmod>
+{%- elsif doc.date -%}
+{%- assign doc_date = doc.date | date_to_xmlschema -%}
+{%- if doc_date != build_time %}
+<lastmod>{{ doc_date }}</lastmod>
+{%- endif -%}
+{%- endif %}
+</url>
+{%- endfor -%}
+{%- endfor -%}
+{%- assign pages = site.html_pages | where_exp: "doc", "doc.sitemap != false" | where_exp: "doc", "doc.url != '/404.html'" -%}
+{%- for page in pages %}
+<url>
+<loc>{{ page.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+{%- if page.last_modified_at %}
+<lastmod>{{ page.last_modified_at | date_to_xmlschema }}</lastmod>
+{%- endif %}
+</url>
+{%- endfor -%}
+{%- assign static_files = site.static_files | where_exp: "file", "file.sitemap != false" | where_exp: "file", "file.name != '404.html'" -%}
+{%- for file in static_files -%}
+{%- if file.extname == '.html' or file.extname == '.htm' or file.extname == '.xhtml' or file.extname == '.pdf' %}
+<url>
+<loc>{{ file.path | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+</url>
+{%- endif -%}
+{%- endfor %}
+</urlset>
