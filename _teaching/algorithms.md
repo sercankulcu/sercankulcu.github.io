@@ -2,7 +2,7 @@
 title: "Algorithms"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/algorithms
+permalink: /teaching/algorithms/
 venue: "Giresun University, Computer Engineering"
 date: 2026-01-07
 location: "Giresun, Turkey"

@@ -2,7 +2,7 @@
 title: "Operating Systems"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/operating-systems
+permalink: /teaching/operating-systems/
 venue: "Giresun University, Computer Engineering"
 date: 2026-01-06
 location: "Giresun, Turkey"

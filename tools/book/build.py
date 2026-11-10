@@ -102,7 +102,7 @@ FRONT = '''
   <p>Programming with C</p>
   <p>Sercan K&uuml;lc&uuml;<br>Giresun University, Department of Computer Engineering<br>Giresun, T&uuml;rkiye</p>
   <p>This book is the printed form of the course notes published at<br>
-     <span class="u">sercankulcu.github.io/teaching/programming-with-c</span></p>
+     <span class="u">sercankulcu.github.io/teaching/programming-with-c/</span></p>
   <p>Every program in it is in the companion repository at<br>
      <span class="u">github.com/sercankulcu/programming-with-c</span>, where continuous integration
      compiles it on Linux, macOS and Windows so the listings here stay honest.</p>

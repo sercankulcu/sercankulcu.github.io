@@ -2,7 +2,7 @@
 title: "Computer Fundamentals and Introduction to Programming"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/computer-and-introduction-to-programming
+permalink: /teaching/computer-and-introduction-to-programming/
 venue: "Giresun University, Electrical Electronics Engineering"
 date: 2026-07-13
 location: "Giresun, Turkey"

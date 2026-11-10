@@ -146,7 +146,7 @@ NOISE = ('ervice', 'google', 'bad HTTP response code (404) was received when fet
 
 
 def site_permalinks():
-    """Jekyll sayfalarinin yayimdaki adresleri (on bilgideki permalink), ornegin /teaching/programming-with-c."""
+    """Jekyll sayfalarinin yayimdaki adresleri (on bilgideki permalink), ornegin /teaching/programming-with-c/."""
     out = set()
     for d, dirs, fs in os.walk(REPO):
         dirs[:] = [x for x in dirs if x not in ('_site', '.git', 'node_modules', 'files')]

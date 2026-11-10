@@ -2,7 +2,7 @@
 title: "Algorithmic Game Theory"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/algorithmic-game-theory
+permalink: /teaching/algorithmic-game-theory/
 venue: "Giresun University, Computer Engineering"
 date: 2026-07-12
 location: "Giresun, Turkey"

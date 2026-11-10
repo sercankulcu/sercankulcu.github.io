@@ -2,7 +2,7 @@
 title: "Object Oriented Programming with Java"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/object-oriented-programming-with-java
+permalink: /teaching/object-oriented-programming-with-java/
 venue: "Giresun University, Electrical Electronics Engineering"
 date: 2026-01-04
 location: "Giresun, Turkey"

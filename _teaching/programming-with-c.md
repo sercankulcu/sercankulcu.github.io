@@ -2,7 +2,7 @@
 title: "Programming with C"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/programming-with-c
+permalink: /teaching/programming-with-c/
 venue: "Giresun University, Computer Engineering"
 date: 2024-09-19
 location: "Giresun, Turkey"
