@@ -23,15 +23,23 @@ konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
 ```bash
 python tools/make_book.py c      # Programming with C     -> courses-pdfs/c/Programming-with-C.pdf
 python tools/make_book.py agt    # Algoritmik Oyun Kuramı -> courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf
+python tools/make_book.py ds     # Veri Yapıları          -> courses-pdfs/data_structures/Veri-Yapilari.pdf
 ```
 
 Bir dersin notlarını tek bir A4 PDF'e dönüştürür. Chrome (veya Edge) gerekir; C kitabı
-10–20, AGT kitabı ~10 dakika sürer. Her ders `book/course_<ders>.py` içinde tanımlıdır:
+10–20, AGT ve Veri Yapıları kitapları ~10'ar dakika sürer. Her ders `book/course_<ders>.py` içinde tanımlıdır:
 not sırası ve kısımlar, dil, etiketler (Chapter/Bölüm, Part/Kısım…), ön kısım (kapak,
 künye, önsöz), CSS dosyaları, PDF künyesi ve çıktı yolu. Yeni ders için bir
 `course_<ders>.py` yazmak yeter; `load()` fonksiyonunun döndürdüğü yapı `book/build.py`
-başında anlatılır. AGT kısımları ve bölüm sırasını ders sayfasından
-(`_teaching/algorithmic-game-theory.md`) okur, kitap o sırayla kalır.
+başında anlatılır.
+
+Türkçe "ders notu" kalıbındaki dersler (AGT, Veri Yapıları: `files/<ders>/notlar/`,
+ortak `notlar.css`, `sozluk.html`) için ortak tanım `book/notes_book.py` içindedir;
+`course_agt.py` ve `course_ds.py` yalnızca derse özgü ayarları (başlık, önsöz, künye,
+ek betikler) verir. Kısımlar ve bölüm sırası ders sayfasındaki `## Kısım …` /
+`### Bölüm N: …` başlıklarından okunur, kitap o sırayla kalır. Terim sözlüğü Ek A
+olur. Veri Yapıları'nda her bölümün başına ders sayfasındaki "Kod Örnekleri"
+bağlantısından kod klasörü yazılır.
 
 | Aşama | Dosya | İş |
 |---|---|---|
@@ -68,10 +76,11 @@ Dikkat edilecekler (hepsi denendi):
   `system-ui` Windows'ta değişken yazı tipine gidiyor ve Chrome onu Type3 olarak gömüyor;
   kitap CSS'i SVG'lerde Segoe UI, kodda Consolas kullanır.
 - **Sayfa akışı:** `notlar.css` baskıda her `h2.nt-pb` başlığını yeni sayfaya atıyor ve
-  bütün kutuları bölünmez yapıyor; kitapta bunlar `book/book_agt.css` ile gevşetilir.
+  bütün kutuları bölünmez yapıyor; kitapta bunlar `book/book_notes.css` ile gevşetilir.
+  Çok adımlı şekiller (birden çok SVG) adımlar arasından bölünebilir.
 
 Ortak ön kısım ve içindekiler düzeni `book/book-front.css`, C bölüm gövdesi
-`book/book.css`, AGT bölüm gövdesi `files/agt/notlar/notlar.css` + `book/book_agt.css`
+`book/book.css`, AGT ve Veri Yapıları bölüm gövdesi `files/<ders>/notlar/notlar.css` + `book/book_notes.css`
 içindedir.
 
 ## Sunum PDF'leri
