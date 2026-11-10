@@ -1,7 +1,7 @@
 # tools
 
-*Programming with C* ders notlarından **türetilmiş çıktıları** üreten betikler:
-PDF kitap ve notların içindeki adımlayıcı figürler. Ayrıca
+Ders notlarından **türetilmiş çıktıları** üreten betikler: PDF kitaplar (C, AGT) ve
+*Programming with C* notlarının içindeki adımlayıcı figürler. Ayrıca
 `deck.js` kullanan HTML sunumlardan (computer, data_structures, agt) PDF üreten
 betik.
 
@@ -21,25 +21,58 @@ konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
 ## Kitap
 
 ```bash
-python tools/make_book.py
+python tools/make_book.py c      # Programming with C     -> courses-pdfs/c/Programming-with-C.pdf
+python tools/make_book.py agt    # Algoritmik Oyun Kuramı -> courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf
 ```
 
-56 notu tek bir A4 PDF'e dönüştürür ve `../courses-pdfs/c/Programming-with-C.pdf`
-üzerine yazar. 10–20 dakika sürer, Chrome (veya Edge) gerekir. Dört aşama:
+Bir dersin notlarını tek bir A4 PDF'e dönüştürür. Chrome (veya Edge) gerekir; C kitabı
+10–20, AGT kitabı ~10 dakika sürer. Her ders `book/course_<ders>.py` içinde tanımlıdır:
+not sırası ve kısımlar, dil, etiketler (Chapter/Bölüm, Part/Kısım…), ön kısım (kapak,
+künye, önsöz), CSS dosyaları, PDF künyesi ve çıktı yolu. Yeni ders için bir
+`course_<ders>.py` yazmak yeter; `load()` fonksiyonunun döndürdüğü yapı `book/build.py`
+başında anlatılır. AGT kısımları ve bölüm sırasını ders sayfasından
+(`_teaching/algorithmic-game-theory.md`) okur, kitap o sırayla kalır.
 
 | Aşama | Dosya | İş |
 |---|---|---|
-| 1 | `book/build.py` | 56 notu tek `book.html` içinde birleştirir; başlıkları bölüm/kısım hiyerarşisine çevirir, `book.css` gömer |
-| 2 | `book/finalize.py` | Chrome ile iki kez basar: ilk baskı sayfa haritasını çıkarır, ikincisi içindekiler tablosunu gerçek sayfa numaralarıyla doldurur |
-| 3 | `book/overlay.py` | reportlab ile sayfa numarası, üst bilgi ve PDF yer imlerini bindirir |
-| 4 | `book/compress.py` | İçerik akışlarını yeniden sıkıştırır (136 MB → ~10 MB) |
+| 1 | `book/build.py` | Notları tek `book.html` içinde birleştirir; kısım sayfalarını ve içindekileri kurar, CSS'i gömer |
+| 2 | `book/finalize.py` | Chrome ile iki kez basar: ilk baskının sayfa haritasından içindekiler gerçek sayfa numaralarıyla dolar |
+| 3 | `book/overlay.py` | reportlab ile sayfa numarası, üst bilgi, PDF yer imleri ve sayfa etiketleri (i, ii… / 1, 2…) |
+| 4 | `book/compress.py` | İçerik akışlarını yeniden sıkıştırır (C: 143 MB → ~10 MB) |
 
-Ara çıktılar `tools/book/build/` altında kalır ve git'e girmez. Sayfa sayısı
-değişirse ders sayfasındaki "781 pages, 9.7 MB" ifadesini elle güncelleyin.
+Ara çıktılar `tools/book/build/<ders>/` altında kalır ve git'e girmez. Sayfa sayısı
+değişirse ders sayfasındaki sayfa sayısını ve boyutu elle güncelleyin.
 
-Sayfa düzeni `book/book.css` içindedir. Bölüm tespiti PDF metninden yapıldığı
-için `letter-spacing` kullanan başlıklarda karşılaştırmadan önce boşluklar
-atılır — `finalize.py` içindeki normalizasyonu kaldırmayın.
+Sayfa numaraları PDF metninden değil **adlandırılmış hedeflerden** okunur: içindekilerdeki
+her satır hedefine (`#ch3`, `#part2`, `#c3-s3-1` …) bağ verir, Chrome da bağ verilen her
+kimlik için PDF'e bir hedef yazar. Bağ verilmeyen kimliğin hedefi olmaz; bölümü
+içindekilerden çıkarırsanız sayfası da bulunmaz.
+
+Dikkat edilecekler (hepsi denendi):
+
+- **Türkçe heceleme:** Chrome'un Windows sürümü `lang="tr"` için heceleme sözlüğü
+  taşımıyor, `hyphens: auto` Türkçe metinde hiçbir sözcüğü bölmüyor.
+  `book/hyphenate_tr.py` hece sınırlarına yumuşak tire (`&shy;`) koyar; kitap
+  `hyphens: manual` ve iki yana yaslı basılır. Kod, formül (`class="m"`), SVG,
+  başlıklar ve `lang="en"` metin bölünmez.
+- **Kimlikler:** AGT notlarında aynı `id` (ör. `ciktilar`, SVG `marker`) birden çok notta
+  geçiyor. Tek belgede çakışmasınlar diye her bölümün kimlikleri `c<N>-` ile öneklenir;
+  bölüm içi bağlar, `url(#…)` ve notlar arası bağlar buna göre yeniden yazılır. Sözlüğe
+  bağlar kitabın Ek A'sına, sunum ve oyun bağları sitedeki mutlak adrese gider.
+- **Betikler:** Kitap `file:///` üzerinden basılır. `ds-guard` bloğu atılır; AGT'nin
+  `kaydirici.js` betiği satır içine alınır ve adres denetimi satırı çıkarılır, yoksa
+  etkileşimli şekiller çizilmez.
+- **Yazı tipleri:** Üst bilgi için reportlab'in Helvetica'sı Türkçe harflerin bir kısmını
+  basamaz; ders `FONT` ile bir TTF verir. Bütün bindirmeler tek tuvalde çizilir: sayfa
+  başına ayrı tuval, TTF'yi her sayfaya ayrıca gömüyordu (AGT'de 800 kopya, 15 MB).
+  `system-ui` Windows'ta değişken yazı tipine gidiyor ve Chrome onu Type3 olarak gömüyor;
+  kitap CSS'i SVG'lerde Segoe UI, kodda Consolas kullanır.
+- **Sayfa akışı:** `notlar.css` baskıda her `h2.nt-pb` başlığını yeni sayfaya atıyor ve
+  bütün kutuları bölünmez yapıyor; kitapta bunlar `book/book_agt.css` ile gevşetilir.
+
+Ortak ön kısım ve içindekiler düzeni `book/book-front.css`, C bölüm gövdesi
+`book/book.css`, AGT bölüm gövdesi `files/agt/notlar/notlar.css` + `book/book_agt.css`
+içindedir.
 
 ## Sunum PDF'leri
 

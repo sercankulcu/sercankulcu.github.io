@@ -1,15 +1,16 @@
+# -*- coding: utf-8 -*-
+"""book-overlay.pdf -> book-final.pdf: icerik akislarini yeniden sikistirir."""
 import os, sys, time
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
+import common
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-OUTDIR = os.path.join(HERE, 'build')          # ara ciktilar; .gitignore'da
-os.makedirs(OUTDIR, exist_ok=True)
-SRC = os.path.join(OUTDIR, 'Programming-with-C.pdf')
+C = common.course()
+OUTDIR = common.build_dir(C)
+SRC = os.path.join(OUTDIR, 'book-overlay.pdf')
 DST = os.path.join(OUTDIR, 'book-final.pdf')
 
-r = PdfReader(SRC)
-w = PdfWriter(clone_from=SRC)          # yer imleri ve kunye korunur
+w = PdfWriter(clone_from=SRC)          # yer imleri, sayfa etiketleri ve kunye korunur
 t0 = time.time()
 for i, p in enumerate(w.pages):
     p.compress_content_streams()       # merge_page akislari acik birakmisti

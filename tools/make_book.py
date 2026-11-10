@@ -1,44 +1,29 @@
 # -*- coding: utf-8 -*-
-"""Ders notlarindan tek parca PDF kitabi uretir ve courses-pdfs/c/ altina koyar.
+"""Bir dersin notlarindan tek parca PDF kitap uretir ve courses-pdfs/ altina koyar.
 
-    python tools/make_book.py
+    python tools/make_book.py c       # Programming with C   -> courses-pdfs/c/Programming-with-C.pdf
+    python tools/make_book.py agt     # Algoritmik Oyun Kurami -> courses-pdfs/agt/...
 
-Dort asama: kitap HTML'i -> Chrome ile iki baski (ikincisi icindekiler sayfa
-numaralariyla) -> sayfa numarasi/ust bilgi/yer imi bindirmesi -> sikistirma.
-Ara ciktilar tools/book/build/ altinda kalir; yalnizca son PDF kopyalanir.
-Toplam 10-20 dakika surer.
+Ders tanimlari tools/book/course_<ders>.py icindedir. Dort asama: kitap HTML'i ->
+Chrome ile iki baski (ikincisi icindekiler sayfa numaralariyla) -> sayfa numarasi/
+ust bilgi/yer imi bindirmesi -> sikistirma. Ara ciktilar tools/book/build/<ders>/
+altinda kalir; yalnizca son PDF kopyalanir.
 """
-import io, json, os, re, glob, shutil, subprocess, sys, time
+import os, shutil, subprocess, sys, time
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.dirname(HERE)
 BOOK = os.path.join(HERE, 'book')
-BUILD = os.path.join(BOOK, 'build')
-# PDF ayri depoda: GitHub/courses-pdfs (bu deponun yaninda klonlanmis olmali)
-FINAL = os.path.join(os.path.dirname(REPO), 'courses-pdfs', 'c', 'Programming-with-C.pdf')
-
-CHROME_CANDIDATES = [
-    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
-    r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
-    '/usr/bin/google-chrome', '/usr/bin/chromium',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-]
+sys.path.insert(0, BOOK)
+import common
 
 
-def need_chrome():
-    for c in CHROME_CANDIDATES:
-        if os.path.exists(c):
-            return c
-    sys.exit('Chrome bulunamadi. tools/book/finalize.py icindeki CHROME yolunu duzeltin.')
-
-
-def run(script):
+def run(script, key):
     t0 = time.time()
+    env = dict(os.environ, BOOK_COURSE=key)
     r = subprocess.run([sys.executable, '-u', os.path.join(BOOK, script)],
-                       cwd=REPO, capture_output=True, text=True, encoding='utf-8',
-                       errors='replace')
+                       cwd=common.SITE, capture_output=True, text=True, encoding='utf-8',
+                       errors='replace', env=env)
     for l in (r.stdout or '').splitlines():
         if l.strip():
             print('    ' + l.strip())
@@ -48,39 +33,28 @@ def run(script):
     print('    (%.0f sn)' % (time.time() - t0))
 
 
-def write_titles():
-    """overlay.py ust bilgide bolum adlarini kullanir."""
-    t = {}
-    for f in glob.glob(os.path.join(REPO, 'files', 'c', 'Week_*.html')):
-        n = int(re.search(r'Week_(\d+)', f).group(1))
-        s = io.open(f, encoding='utf-8').read()
-        t[n] = re.sub('<[^>]+>', '', re.search(r'<h1>(.+?)</h1>', s, re.S).group(1)).strip()
-    os.makedirs(BUILD, exist_ok=True)
-    json.dump(t, io.open(os.path.join(BUILD, 'titles.json'), 'w', encoding='utf-8'),
-              ensure_ascii=False, indent=0)
-    return len(t)
-
-
 if __name__ == '__main__':
-    need_chrome()
-    print('1/5  bolum basliklari')
-    print('    %d bolum' % write_titles())
-    print('2/5  kitap HTML\'i')
-    run('build.py')
-    print('3/5  iki baski ve icindekiler sayfa numaralari')
-    run('finalize.py')
-    print('4/5  sayfa numarasi, ust bilgi, yer imleri')
-    run('overlay.py')
-    print('5/5  sikistirma')
-    run('compress.py')
+    if len(sys.argv) != 2 or sys.argv[1] not in common.courses():
+        sys.exit('kullanim: python tools/make_book.py <ders>\ndersler: %s'
+                 % ', '.join(common.courses()))
+    key = sys.argv[1]
+    C = common.course(key)
+    if not common.CHROME:
+        sys.exit('Chrome/Edge bulunamadi; tools/book/common.py icindeki CHROME_CANDIDATES listesine ekleyin.')
+    print('1/4  kitap HTML\'i')
+    run('build.py', key)
+    print('2/4  iki baski ve icindekiler sayfa numaralari')
+    run('finalize.py', key)
+    print('3/4  sayfa numarasi, ust bilgi, yer imleri')
+    run('overlay.py', key)
+    print('4/4  sikistirma')
+    run('compress.py', key)
 
-    src = os.path.join(BUILD, 'book-final.pdf')
-    shutil.copyfile(src, FINAL)
-    mb = os.path.getsize(FINAL) / 1048576
-    try:
-        from pypdf import PdfReader
-        pages = len(PdfReader(FINAL).pages)
-        print('\nbitti: courses-pdfs/c/Programming-with-C.pdf  %d sayfa, %.1f MB' % (pages, mb))
-        print('ders sayfasindaki sayfa sayisi ve boyutu elle guncelleyin.')
-    except Exception:
-        print('\nbitti: courses-pdfs/c/Programming-with-C.pdf  %.1f MB' % mb)
+    final = common.final_pdf(C)
+    os.makedirs(os.path.dirname(final), exist_ok=True)
+    shutil.copyfile(os.path.join(common.build_dir(C), 'book-final.pdf'), final)
+    mb = os.path.getsize(final) / 1048576
+    from pypdf import PdfReader
+    pages = len(PdfReader(final).pages)
+    print('\nbitti: courses-pdfs/%s  %d sayfa, %.1f MB' % (C.OUTPUT, pages, mb))
+    print('ders sayfasindaki sayfa sayisi ve boyutu elle guncelleyin.')

@@ -1,82 +1,84 @@
-"""book.html -> Chrome -> sayfa numarasi/ust bilgi/ic kapak numaralari/yer imleri."""
-import io, os, re, sys, subprocess, json
+# -*- coding: utf-8 -*-
+"""book.html -> Chrome ile iki baski; ikincisinde icindekiler gercek sayfa numaralariyla.
+
+Sayfa numaralari PDF metninden degil, Chrome'un yazdigi adlandirilmis hedeflerden
+okunur: icindekilerdeki her satir hedefine bag verdigi icin her bolumun, kismin ve
+alt bolumun basladigi sayfa PDF'te kayitlidir. Cikti: raw2.pdf ve pages.json.
+"""
+import io, os, re, sys, subprocess
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-HERE = os.path.dirname(os.path.abspath(__file__))
-OUTDIR = os.path.join(HERE, 'build')          # ara ciktilar; .gitignore'da
-os.makedirs(OUTDIR, exist_ok=True)
-CHROME = next((c for c in (
-    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
-    r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
-    '/usr/bin/google-chrome', '/usr/bin/chromium',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-) if os.path.exists(c)), None)
+import common
+
+C = common.course()
+OUTDIR = common.build_dir(C)
 HTML = os.path.join(OUTDIR, 'book.html')
 
 
 def render(out):
-    subprocess.run([CHROME, '--headless', '--disable-gpu', '--no-pdf-header-footer',
+    if os.path.exists(out):
+        os.remove(out)
+    subprocess.run([common.CHROME, '--headless', '--disable-gpu', '--no-pdf-header-footer',
                     '--print-to-pdf=' + out, 'file:///' + HTML.replace('\\', '/')],
                    capture_output=True)
+    if not os.path.exists(out):
+        sys.exit('Chrome PDF uretmedi: %s' % out)
     return out
 
 
-def page_text(pdf):
+def analyse(pdf, book):
+    dests, n = common.dest_pages(pdf)
+    want = [p['id'] for p in book['parts']] + [c['id'] for c in book['chapters']] + \
+           [a['id'] for a in book['appendices']]
+    missing = [w for w in want if w not in dests]
+    if missing:
+        sys.exit('PDF hedefi bulunamadi: %s' % ', '.join(missing[:10]))
+    first_body = min(dests[w] for w in want)
+    return dests, n, first_body
+
+
+def front_pages(pdf, first_body):
+    """On kisimdaki onsoz ve icindekiler sayfalari (yer imleri icin)."""
     from pypdf import PdfReader
     r = PdfReader(pdf)
-    return [(p.extract_text() or '') for p in r.pages]
+    found = {}
+    for i in range(first_body):
+        t = (r.pages[i].extract_text() or '').strip()
+        for key in ('preface', 'contents'):
+            if key not in found and L.get(key) and t.startswith(L[key]):
+                found[key] = i
+    return found
 
 
-CHAP_RE = re.compile(r'(?:BASIC|INTERMEDIATE|ADVANCED|PROFESSIONAL)·CHAPTER(\d+)')
-PART_RE = re.compile(r'PART([1-4])')
-
-
-def analyse(texts):
-    """Her bolumun ve kismin basladigi sayfa; govdenin ilk sayfasi.
-
-    Baslik satirlarinda letter-spacing var, cikarimda 'B A S I C  ·  C H A P T E R  1'
-    olarak geliyor; bu yuzden eslestirmeden once butun bosluklar atiliyor.
-    """
-    chap_start, part_start = {}, {}
-    for i, t in enumerate(texts):
-        head = re.sub(r'\s+', '', t[:140])
-        m = CHAP_RE.search(head)
-        if m:
-            chap_start.setdefault(int(m.group(1)), i)
-        p = PART_RE.match(head)
-        if p and 'Chapters' in t:
-            part_start.setdefault(int(p.group(1)), i)
-    if not chap_start:
-        raise SystemExit('bolum basligi bulunamadi; ornek metin: %r' % texts[6][:120])
-    first_body = min(list(chap_start.values()) + list(part_start.values()))
-    return chap_start, part_start, first_body
-
+L = C.LABELS
 
 if __name__ == '__main__':
-    # overlay.py'nin ihtiyaci; 10 dakikalik baskiya girmeden once var mi diye bak
-    json.load(io.open(os.path.join(OUTDIR, 'titles.json'), encoding='utf-8'))
+    book = common.read_json(C, 'book.json')
 
-    print('  1/4 ilk baski...')
+    print('  1/3 ilk baski...')
     raw = render(os.path.join(OUTDIR, 'raw1.pdf'))
-    print('  2/4 sayfa haritasi...')
-    page_texts = page_text(raw)
-    chap_start, part_start, first_body = analyse(page_texts)
-    print('      %d bolum, %d kisim bulundu, govde s%d' %
-          (len(chap_start), len(part_start), first_body + 1))
+    dests, n, first_body = analyse(raw, book)
+    print('      %d sayfa, %d hedef, govde s%d' % (n, len(dests), first_body + 1))
 
-    # icindekiler sayfa numaralari
     doc = io.open(HTML, encoding='utf-8').read()
     def fill(m):
-        ch = int(m.group(1))
-        pg = chap_start.get(ch)
-        return '<span class="p" data-ch="%d">%s</span>' % (ch, (pg - first_body + 1) if pg is not None else '')
-    doc = re.sub(r'<span class="p" data-ch="(\d+)">.*?</span>', fill, doc)
+        pg = dests.get(m.group(1))
+        return '<span class="p" data-dest="%s">%s</span>' % (
+            m.group(1), (pg - first_body + 1) if pg is not None else '')
+    doc = re.sub(r'<span class="p" data-dest="([^"]+)">.*?</span>', fill, doc)
     io.open(HTML, 'w', encoding='utf-8', newline='\n').write(doc)
 
-    print('  3/4 ikinci baski...')
+    print('  2/3 ikinci baski...')
     raw2 = render(os.path.join(OUTDIR, 'raw2.pdf'))
-    page_texts = page_text(raw2)
-    chap_start, part_start, first_body = analyse(page_texts)
+    dests2, n2, first_body2 = analyse(raw2, book)
+    moved = [k for k in dests if dests2.get(k, -1) - first_body2 != dests[k] - first_body]
+    if moved:
+        # numaralar sayfa akisini degistirmez; degistirirse icindekiler yanlis olur
+        sys.exit('ikinci baskida %d hedef kaydi (or. %s); icindekiler tutarsiz' %
+                 (len(moved), moved[:5]))
 
-    print('  hazir: raw2.pdf (bindirmeyi overlay.py yapar)')
+    print('  3/3 sayfa haritasi')
+    common.write_json(C, 'pages.json', {'pages': n2, 'first_body': first_body2,
+                                        'dests': dests2,
+                                        'front': front_pages(raw2, first_body2)})
+    print('  hazir: raw2.pdf, %d sayfa (bindirmeyi overlay.py yapar)' % n2)
