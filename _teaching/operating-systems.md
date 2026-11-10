@@ -13,6 +13,12 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 
 ---
 
+## Ders Kitabı
+
+[📕 İşletim Sistemleri (PDF, 30 MB)](https://sercankulcu.github.io/courses-pdfs/os/Isletim-Sistemleri.pdf)
+
+---
+
 ## Başlangıç Kaynakları
 
 * [İşletim Sistemlerinin Öncüleri (HTML)](/files/os/Pioneers_of_Operating_Systems.html)
@@ -40,10 +46,10 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 
 İşletim sistemi uygulamalara hizmetlerini sistem çağrıları üzerinden sunar. Bölüm; süreç, adres alanı, dosya ve boru gibi temel kavramları, çift kipli çalışma ve zamanlayıcıyla korumayı, sistem çağrılarının işleyişini ve POSIX ile Win32 arayüzlerini, standart C kütüphanesini anlatır. Monolitik, katmanlı, mikro çekirdekli, modüler, hibrit ve exokernel yapılar karşılaştırılır; sanal makinelere kısa bir giriş yapılır ve sistemin açılış süreci adım adım izlenir.
 
-- [🖼️Sunum-İşletim Sistemi Yapıları (HTML)](/files/os/slides/Bolum_02_Yapilar.html)
-- [📄Sunum-İşletim Sistemi Yapıları (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_02_Yapilar.pdf)
-- [📖Ders Notu - İşletim Sistemi Yapıları (HTML)](/files/os/notlar/Bolum_02_Yapilar_Ders_Notu.html)
-- [📝Çalışma Soruları - İşletim Sistemi Yapıları (HTML)](/files/os/slides/Bolum_02_Yapilar_Calisma_Sorulari.html)
+- [🖼️Sunum-İşletim Sistemi Yapıları (HTML)](/files/os/slides/Bolum_02_Isletim_Sistemi_Yapilari.html)
+- [📄Sunum-İşletim Sistemi Yapıları (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_02_Isletim_Sistemi_Yapilari.pdf)
+- [📖Ders Notu - İşletim Sistemi Yapıları (HTML)](/files/os/notlar/Bolum_02_Isletim_Sistemi_Yapilari_Ders_Notu.html)
+- [📝Çalışma Soruları - İşletim Sistemi Yapıları (HTML)](/files/os/slides/Bolum_02_Isletim_Sistemi_Yapilari_Calisma_Sorulari.html)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum02)
 - [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02)
 
@@ -82,10 +88,10 @@ Süreç, çalışmakta olan bir programdır. Bu bölümde sürecin bellekteki ye
 
 Çizelgeleyici, hazır süreçlerden hangisinin işlemciyi alacağına karar verir. Bu bölümde çizelgeleme ölçütleri, FCFS, SJF, SRTF, öncelik ve Round Robin algoritmaları Gantt şemaları ve bekleme süresi hesaplarıyla, çok düzeyli geri beslemeli kuyruklar, piyango ve stride çizelgeleme anlatılır. Çok işlemcili çizelgelemede afinite ve yük dengeleme, gerçek zamanlı çizelgelemede hız monoton ve EDF ile Liu–Layland testi, son olarak Linux CFS/EEVDF ve Windows çizelgeleyicisi incelenir.
 
-- [🖼️Sunum-CPU Çizelgeleme (HTML)](/files/os/slides/Bolum_05_Cizelgeleme.html)
-- [📄Sunum-CPU Çizelgeleme (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_05_Cizelgeleme.pdf)
-- [📖Ders Notu - CPU Çizelgeleme (HTML)](/files/os/notlar/Bolum_05_Cizelgeleme_Ders_Notu.html)
-- [📝Çalışma Soruları - CPU Çizelgeleme (HTML)](/files/os/slides/Bolum_05_Cizelgeleme_Calisma_Sorulari.html)
+- [🖼️Sunum-CPU Çizelgeleme (HTML)](/files/os/slides/Bolum_05_CPU_Cizelgeleme.html)
+- [📄Sunum-CPU Çizelgeleme (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_05_CPU_Cizelgeleme.pdf)
+- [📖Ders Notu - CPU Çizelgeleme (HTML)](/files/os/notlar/Bolum_05_CPU_Cizelgeleme_Ders_Notu.html)
+- [📝Çalışma Soruları - CPU Çizelgeleme (HTML)](/files/os/slides/Bolum_05_CPU_Cizelgeleme_Calisma_Sorulari.html)
 - [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/Bolum05)
 - [🧪Laboratuvar Çalışması, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05)
 

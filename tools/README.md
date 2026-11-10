@@ -24,6 +24,7 @@ konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
 python tools/make_book.py c      # Programming with C     -> courses-pdfs/c/Programming-with-C.pdf
 python tools/make_book.py agt    # Algoritmik Oyun Kuramı -> courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf
 python tools/make_book.py ds     # Veri Yapıları          -> courses-pdfs/data_structures/Veri-Yapilari.pdf
+python tools/make_book.py os     # İşletim Sistemleri     -> courses-pdfs/os/Isletim-Sistemleri.pdf
 ```
 
 Bir dersin notlarını tek bir A4 PDF'e dönüştürür. Chrome (veya Edge) gerekir; C kitabı
@@ -33,13 +34,13 @@ künye, önsöz), CSS dosyaları, PDF künyesi ve çıktı yolu. Yeni ders için
 `course_<ders>.py` yazmak yeter; `load()` fonksiyonunun döndürdüğü yapı `book/build.py`
 başında anlatılır.
 
-Türkçe "ders notu" kalıbındaki dersler (AGT, Veri Yapıları: `files/<ders>/notlar/`,
+Türkçe "ders notu" kalıbındaki dersler (AGT, Veri Yapıları, İşletim Sistemleri: `files/<ders>/notlar/`,
 ortak `notlar.css`, `sozluk.html`) için ortak tanım `book/notes_book.py` içindedir;
-`course_agt.py` ve `course_ds.py` yalnızca derse özgü ayarları (başlık, önsöz, künye,
+`course_agt.py`, `course_ds.py` ve `course_os.py` yalnızca derse özgü ayarları (başlık, önsöz, künye,
 ek betikler) verir. Kısımlar ve bölüm sırası ders sayfasındaki `## Kısım …` /
 `### Bölüm N: …` başlıklarından okunur, kitap o sırayla kalır. Terim sözlüğü Ek A
-olur. Veri Yapıları'nda her bölümün başına ders sayfasındaki "Kod Örnekleri"
-bağlantısından kod klasörü yazılır.
+olur. Veri Yapıları ve İşletim Sistemleri'nde her bölümün başına ders sayfasındaki
+"Kod Örnekleri" / "Laboratuvar Çalışması" bağlantılarından klasörler yazılır.
 
 | Aşama | Dosya | İş |
 |---|---|---|

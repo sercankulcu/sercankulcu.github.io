@@ -183,6 +183,8 @@ class _Course:
         for ch, en, tr in rows:
             # DS sozlugu bazi terimlere kisa bir baglam notu ekliyor (soz__ctx)
             tr = tr.replace('<span class="soz__ctx">', '<span class="bk-gloss-ctx">')
+            # IS sozlugu her terime bir tanim cumlesi ekliyor (soz__def)
+            tr = tr.replace('<span class="soz__def">', '<span class="bk-gloss-def">')
             letter = strip_tags(en)[:1].upper()
             letter = letter if letter.isalpha() else '#'
             if letter != cur:
@@ -200,8 +202,10 @@ class _Course:
         for letter, items in groups:
             out.append('<h3 class="bk-gloss-l">%s</h3>' % letter)
             for ch, en, tr in items:
+                # bolum numarasi terimin yaninda; varsa tanim cumlesi alt satirda
+                term, sep, rest = tr.partition('<span class="bk-gloss-def">')
                 out.append('<p class="bk-g"><span lang="en">%s</span> &rarr; %s'
-                           ' <span class="bk-gloss-ch">%d</span></p>' % (en, tr, ch))
+                           ' <span class="bk-gloss-ch">%d</span>%s</p>' % (en, term, ch, sep + rest))
         out.append('</div></article></section>')
         return '\n'.join(out), len(rows)
 
