@@ -15,8 +15,6 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ## Ders Kitabı
 
-Dersin bütün notları tek bir PDF'te: 794 sayfa, beş kısımda on beş bölüm ve terim sözlüğü; tanımlar, teoremler, çözülmüş örnekler, şekiller ve cevaplarıyla birlikte Kendini Dene soruları yerinde. Kitap bu sitedeki notlardan üretilir, bu yüzden ikisi birbirinden ayrılmaz. Etkileşimli şekiller kitapta varsayılan değerleriyle basılıdır.
-
 [📕 Algoritmik Oyun Kuramı (PDF, 24 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf)
 
 ---
