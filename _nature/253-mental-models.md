@@ -1,5 +1,6 @@
 ---
 title: 'Mental Models'
+date: 2026-02-19
 permalink: /nature/253-mental-models/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

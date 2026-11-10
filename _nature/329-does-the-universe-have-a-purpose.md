@@ -1,5 +1,6 @@
 ---
 title: 'Does the Universe Have a Purpose?'
+date: 2026-05-06
 permalink: /nature/329-does-the-universe-have-a-purpose/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

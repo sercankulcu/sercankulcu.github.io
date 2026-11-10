@@ -1,5 +1,6 @@
 ---
 title: 'From Atoms to Stars and Galaxies'
+date: 2025-07-27
 permalink: /nature/046-from-atoms-to-stars-and-galaxies/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

@@ -1,5 +1,6 @@
 ---
 title: 'Propositions, Predicates, Qualifiers, and Descriptors'
+date: 2025-12-11
 permalink: /nature/183-propositions-predicates-qualifiers-and-descriptors/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

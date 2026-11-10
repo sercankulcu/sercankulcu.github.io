@@ -1,5 +1,6 @@
 ---
 title: 'Information Is Not Meaning'
+date: 2025-10-27
 permalink: /nature/138-information-is-not-meaning/
 chapter: 8
 chapter_title: 'Information and Representation'

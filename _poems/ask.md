@@ -1,5 +1,6 @@
 ---
 title: "Aşk"
+date: 2026-06-03
 order: 3
 ---
 içerimde üç kişi,  

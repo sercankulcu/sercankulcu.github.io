@@ -1,5 +1,6 @@
 ---
 title: 'Why Is There Something Rather Than Nothing?'
+date: 2025-06-15
 permalink: /nature/004-why-is-there-something-rather-than-nothing/
 chapter: 1
 chapter_title: 'The First Questions'

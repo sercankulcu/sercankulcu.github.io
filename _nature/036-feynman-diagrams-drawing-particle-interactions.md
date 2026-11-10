@@ -1,5 +1,6 @@
 ---
 title: 'Feynman Diagrams: Drawing Particle Interactions'
+date: 2025-07-17
 permalink: /nature/036-feynman-diagrams-drawing-particle-interactions/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

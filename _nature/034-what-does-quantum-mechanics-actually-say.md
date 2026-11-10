@@ -1,5 +1,6 @@
 ---
 title: 'What Does Quantum Mechanics Actually Say?'
+date: 2025-07-15
 permalink: /nature/034-what-does-quantum-mechanics-actually-say/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

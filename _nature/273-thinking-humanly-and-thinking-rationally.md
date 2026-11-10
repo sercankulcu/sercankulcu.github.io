@@ -1,5 +1,6 @@
 ---
 title: 'Thinking Humanly and Thinking Rationally'
+date: 2026-03-11
 permalink: /nature/273-thinking-humanly-and-thinking-rationally/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

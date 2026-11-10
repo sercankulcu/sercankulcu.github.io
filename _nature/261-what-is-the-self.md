@@ -1,5 +1,6 @@
 ---
 title: 'What Is the Self?'
+date: 2026-02-27
 permalink: /nature/261-what-is-the-self/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

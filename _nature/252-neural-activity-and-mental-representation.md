@@ -1,5 +1,6 @@
 ---
 title: 'Neural Activity and Mental Representation'
+date: 2026-02-18
 permalink: /nature/252-neural-activity-and-mental-representation/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

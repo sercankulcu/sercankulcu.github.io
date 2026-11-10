@@ -1,5 +1,6 @@
 ---
 title: 'What Is a Concept?'
+date: 2026-02-17
 permalink: /nature/251-what-is-a-concept/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

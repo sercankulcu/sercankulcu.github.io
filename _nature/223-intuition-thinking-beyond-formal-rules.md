@@ -1,5 +1,6 @@
 ---
 title: 'Intuition: Thinking Beyond Formal Rules'
+date: 2026-01-20
 permalink: /nature/223-intuition-thinking-beyond-formal-rules/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

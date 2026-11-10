@@ -1,5 +1,6 @@
 ---
 title: 'Obligation and Deontic Logic'
+date: 2025-12-25
 permalink: /nature/197-obligation-and-deontic-logic/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

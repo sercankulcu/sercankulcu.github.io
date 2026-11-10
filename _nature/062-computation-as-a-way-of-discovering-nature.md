@@ -1,5 +1,6 @@
 ---
 title: 'Computation as a Way of Discovering Nature'
+date: 2025-08-12
 permalink: /nature/062-computation-as-a-way-of-discovering-nature/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

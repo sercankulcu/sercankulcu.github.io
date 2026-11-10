@@ -1,5 +1,6 @@
 ---
 title: 'Machine Learning'
+date: 2026-03-23
 permalink: /nature/285-machine-learning/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

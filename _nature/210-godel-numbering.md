@@ -1,5 +1,6 @@
 ---
 title: 'Gödel Numbering'
+date: 2026-01-07
 permalink: /nature/210-godel-numbering/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

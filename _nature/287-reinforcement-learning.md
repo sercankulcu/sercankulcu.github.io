@@ -1,5 +1,6 @@
 ---
 title: 'Reinforcement Learning'
+date: 2026-03-25
 permalink: /nature/287-reinforcement-learning/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

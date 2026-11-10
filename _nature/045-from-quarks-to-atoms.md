@@ -1,5 +1,6 @@
 ---
 title: 'From Quarks to Atoms'
+date: 2025-07-26
 permalink: /nature/045-from-quarks-to-atoms/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

@@ -1,5 +1,6 @@
 ---
 title: 'Predicate Calculus'
+date: 2025-12-31
 permalink: /nature/203-predicate-calculus/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

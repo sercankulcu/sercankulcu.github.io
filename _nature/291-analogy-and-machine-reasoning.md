@@ -1,5 +1,6 @@
 ---
 title: 'Analogy and Machine Reasoning'
+date: 2026-03-29
 permalink: /nature/291-analogy-and-machine-reasoning/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

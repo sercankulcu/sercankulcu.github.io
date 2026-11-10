@@ -1,5 +1,6 @@
 ---
 title: 'Abstraction and Representation'
+date: 2026-02-05
 permalink: /nature/239-abstraction-and-representation/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

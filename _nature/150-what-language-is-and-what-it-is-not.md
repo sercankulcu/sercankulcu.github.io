@@ -1,5 +1,6 @@
 ---
 title: 'What Language Is—and What It Is Not'
+date: 2025-11-08
 permalink: /nature/150-what-language-is-and-what-it-is-not/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

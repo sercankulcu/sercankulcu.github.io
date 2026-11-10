@@ -1,5 +1,6 @@
 ---
 title: 'Order Hidden Inside Chaos'
+date: 2025-10-03
 permalink: /nature/114-order-hidden-inside-chaos/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

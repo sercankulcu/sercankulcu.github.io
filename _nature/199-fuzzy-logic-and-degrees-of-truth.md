@@ -1,5 +1,6 @@
 ---
 title: 'Fuzzy Logic and Degrees of Truth'
+date: 2025-12-27
 permalink: /nature/199-fuzzy-logic-and-degrees-of-truth/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

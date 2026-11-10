@@ -1,5 +1,6 @@
 ---
 title: 'Choice, Intention, and Agency'
+date: 2026-05-03
 permalink: /nature/326-choice-intention-and-agency/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

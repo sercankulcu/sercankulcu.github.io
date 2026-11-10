@@ -1,5 +1,6 @@
 ---
 title: 'Could Space, Time, and Gravity Be Emergent?'
+date: 2025-09-24
 permalink: /nature/105-could-space-time-and-gravity-be-emergent/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

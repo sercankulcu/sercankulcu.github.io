@@ -1,5 +1,6 @@
 ---
 title: 'The Mind–Body Problem'
+date: 2026-03-03
 permalink: /nature/265-the-mind-body-problem/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

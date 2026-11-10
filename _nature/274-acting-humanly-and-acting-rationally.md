@@ -1,5 +1,6 @@
 ---
 title: 'Acting Humanly and Acting Rationally'
+date: 2026-03-12
 permalink: /nature/274-acting-humanly-and-acting-rationally/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

@@ -1,5 +1,6 @@
 ---
 title: 'Computational Thinking'
+date: 2026-02-04
 permalink: /nature/238-computational-thinking/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

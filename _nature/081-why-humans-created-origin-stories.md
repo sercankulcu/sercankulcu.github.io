@@ -1,5 +1,6 @@
 ---
 title: 'Why Humans Created Origin Stories'
+date: 2025-08-31
 permalink: /nature/081-why-humans-created-origin-stories/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

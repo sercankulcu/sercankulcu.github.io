@@ -1,5 +1,6 @@
 ---
 title: 'Chomsky and the Structure of Mind'
+date: 2025-11-16
 permalink: /nature/158-chomsky-and-the-structure-of-mind/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

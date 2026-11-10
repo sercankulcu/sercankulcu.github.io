@@ -1,5 +1,6 @@
 ---
 title: 'What Is Belief?'
+date: 2026-05-08
 permalink: /nature/331-what-is-belief/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

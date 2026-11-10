@@ -1,5 +1,6 @@
 ---
 title: 'Is the Self an Illusion?'
+date: 2026-02-28
 permalink: /nature/262-is-the-self-an-illusion/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

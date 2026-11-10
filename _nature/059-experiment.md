@@ -1,5 +1,6 @@
 ---
 title: 'Experiment'
+date: 2025-08-09
 permalink: /nature/059-experiment/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

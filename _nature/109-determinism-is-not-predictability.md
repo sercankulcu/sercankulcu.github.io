@@ -1,5 +1,6 @@
 ---
 title: 'Determinism Is Not Predictability'
+date: 2025-09-28
 permalink: /nature/109-determinism-is-not-predictability/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

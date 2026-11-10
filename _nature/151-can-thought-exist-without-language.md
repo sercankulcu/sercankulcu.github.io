@@ -1,5 +1,6 @@
 ---
 title: 'Can Thought Exist Without Language?'
+date: 2025-11-09
 permalink: /nature/151-can-thought-exist-without-language/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

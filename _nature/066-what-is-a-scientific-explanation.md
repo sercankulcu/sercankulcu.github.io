@@ -1,5 +1,6 @@
 ---
 title: 'What Is a Scientific Explanation?'
+date: 2025-08-16
 permalink: /nature/066-what-is-a-scientific-explanation/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

@@ -1,5 +1,6 @@
 ---
 title: 'What Is Reductionism?'
+date: 2025-09-08
 permalink: /nature/089-what-is-reductionism/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

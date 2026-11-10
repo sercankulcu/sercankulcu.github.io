@@ -1,5 +1,6 @@
 ---
 title: 'Alphabets, Strings, and Codes'
+date: 2025-10-21
 permalink: /nature/132-alphabets-strings-and-codes/
 chapter: 8
 chapter_title: 'Information and Representation'

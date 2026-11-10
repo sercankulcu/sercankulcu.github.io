@@ -1,5 +1,6 @@
 ---
 title: 'Grammar and the Structure of Language'
+date: 2025-11-11
 permalink: /nature/153-grammar-and-the-structure-of-language/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

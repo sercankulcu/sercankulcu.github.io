@@ -1,5 +1,6 @@
 ---
 title: 'Fields: The Invisible Architecture of Nature'
+date: 2025-07-13
 permalink: /nature/032-fields-the-invisible-architecture-of-nature/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

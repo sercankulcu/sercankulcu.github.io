@@ -1,5 +1,6 @@
 ---
 title: 'Natural Languages and Formal Languages'
+date: 2025-11-14
 permalink: /nature/156-natural-languages-and-formal-languages/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

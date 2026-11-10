@@ -1,5 +1,6 @@
 ---
 title: 'Machine Consciousness: Could Software Wake Up?'
+date: 2026-04-24
 permalink: /nature/317-machine-consciousness-could-software-wake-up/
 chapter: 16
 chapter_title: 'Consciousness'

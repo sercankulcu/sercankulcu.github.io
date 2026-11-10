@@ -1,5 +1,6 @@
 ---
 title: 'The Mandelbrot Set'
+date: 2025-10-11
 permalink: /nature/122-the-mandelbrot-set/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

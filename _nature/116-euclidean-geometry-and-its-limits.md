@@ -1,5 +1,6 @@
 ---
 title: 'Euclidean Geometry and Its Limits'
+date: 2025-10-05
 permalink: /nature/116-euclidean-geometry-and-its-limits/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

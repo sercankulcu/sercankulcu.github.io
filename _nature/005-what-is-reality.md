@@ -1,5 +1,6 @@
 ---
 title: 'What Is Reality?'
+date: 2025-06-16
 permalink: /nature/005-what-is-reality/
 chapter: 1
 chapter_title: 'The First Questions'

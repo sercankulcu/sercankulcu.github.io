@@ -1,5 +1,6 @@
 ---
 title: 'Artificial General Intelligence and Superintelligence'
+date: 2026-04-04
 permalink: /nature/297-artificial-general-intelligence-and-superintelligence/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

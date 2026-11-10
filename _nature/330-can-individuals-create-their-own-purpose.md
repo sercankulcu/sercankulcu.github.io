@@ -1,5 +1,6 @@
 ---
 title: 'Can Individuals Create Their Own Purpose?'
+date: 2026-05-07
 permalink: /nature/330-can-individuals-create-their-own-purpose/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

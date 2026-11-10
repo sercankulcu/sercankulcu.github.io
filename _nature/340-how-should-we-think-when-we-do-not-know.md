@@ -1,5 +1,6 @@
 ---
 title: 'How Should We Think When We Do Not Know?'
+date: 2026-05-17
 permalink: /nature/340-how-should-we-think-when-we-do-not-know/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

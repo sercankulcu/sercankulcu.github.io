@@ -1,5 +1,6 @@
 ---
 title: 'Encoding and Decoding'
+date: 2025-10-23
 permalink: /nature/134-encoding-and-decoding/
 chapter: 8
 chapter_title: 'Information and Representation'

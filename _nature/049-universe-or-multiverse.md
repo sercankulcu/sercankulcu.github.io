@@ -1,5 +1,6 @@
 ---
 title: 'Universe or Multiverse?'
+date: 2025-07-30
 permalink: /nature/049-universe-or-multiverse/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

@@ -1,5 +1,6 @@
 ---
 title: 'Global Workspace Theory'
+date: 2026-04-19
 permalink: /nature/312-global-workspace-theory/
 chapter: 16
 chapter_title: 'Consciousness'

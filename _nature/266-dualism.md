@@ -1,5 +1,6 @@
 ---
 title: 'Dualism'
+date: 2026-03-04
 permalink: /nature/266-dualism/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

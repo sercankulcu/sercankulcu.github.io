@@ -1,5 +1,6 @@
 ---
 title: 'The Butterfly Effect'
+date: 2025-09-30
 permalink: /nature/111-the-butterfly-effect/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

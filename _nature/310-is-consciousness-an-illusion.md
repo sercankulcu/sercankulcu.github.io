@@ -1,5 +1,6 @@
 ---
 title: 'Is Consciousness an Illusion?'
+date: 2026-04-17
 permalink: /nature/310-is-consciousness-an-illusion/
 chapter: 16
 chapter_title: 'Consciousness'

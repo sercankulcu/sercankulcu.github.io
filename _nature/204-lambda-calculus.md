@@ -1,5 +1,6 @@
 ---
 title: 'Lambda Calculus'
+date: 2026-01-01
 permalink: /nature/204-lambda-calculus/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

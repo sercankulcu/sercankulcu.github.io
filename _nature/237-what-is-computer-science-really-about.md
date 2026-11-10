@@ -1,5 +1,6 @@
 ---
 title: 'What Is Computer Science Really About?'
+date: 2026-02-03
 permalink: /nature/237-what-is-computer-science-really-about/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

@@ -1,5 +1,6 @@
 ---
 title: 'What Is Logic?'
+date: 2025-12-07
 permalink: /nature/179-what-is-logic/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

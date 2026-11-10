@@ -1,5 +1,6 @@
 ---
 title: 'The Final Question: Why Is There Anything at All?'
+date: 2026-05-31
 permalink: /nature/354-the-final-question-why-is-there-anything-at-all/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

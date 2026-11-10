@@ -1,5 +1,6 @@
 ---
 title: 'Our Place in the Cosmic Scale'
+date: 2025-07-07
 permalink: /nature/026-our-place-in-the-cosmic-scale/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

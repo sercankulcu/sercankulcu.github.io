@@ -1,5 +1,6 @@
 ---
 title: 'Shannon Information'
+date: 2025-11-03
 permalink: /nature/145-shannon-information/
 chapter: 8
 chapter_title: 'Information and Representation'

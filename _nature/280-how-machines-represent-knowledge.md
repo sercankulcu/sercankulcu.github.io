@@ -1,5 +1,6 @@
 ---
 title: 'How Machines Represent Knowledge'
+date: 2026-03-18
 permalink: /nature/280-how-machines-represent-knowledge/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

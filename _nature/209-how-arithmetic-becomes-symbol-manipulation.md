@@ -1,5 +1,6 @@
 ---
 title: 'How Arithmetic Becomes Symbol Manipulation'
+date: 2026-01-06
 permalink: /nature/209-how-arithmetic-becomes-symbol-manipulation/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

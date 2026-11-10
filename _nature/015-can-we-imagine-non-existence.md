@@ -1,5 +1,6 @@
 ---
 title: 'Can We Imagine Non-Existence?'
+date: 2025-06-26
 permalink: /nature/015-can-we-imagine-non-existence/
 chapter: 2
 chapter_title: 'Nothing'

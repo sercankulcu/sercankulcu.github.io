@@ -1,5 +1,6 @@
 ---
 title: 'Is Nature Organized in Layers?'
+date: 2025-09-25
 permalink: /nature/106-is-nature-organized-in-layers/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

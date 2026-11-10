@@ -1,5 +1,6 @@
 ---
 title: 'Is a Computer a Brain?'
+date: 2026-02-15
 permalink: /nature/249-is-a-computer-a-brain/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

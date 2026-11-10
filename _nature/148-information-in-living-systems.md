@@ -1,5 +1,6 @@
 ---
 title: 'Information in Living Systems'
+date: 2025-11-06
 permalink: /nature/148-information-in-living-systems/
 chapter: 8
 chapter_title: 'Information and Representation'

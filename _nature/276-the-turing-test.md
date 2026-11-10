@@ -1,5 +1,6 @@
 ---
 title: 'The Turing Test'
+date: 2026-03-14
 permalink: /nature/276-the-turing-test/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

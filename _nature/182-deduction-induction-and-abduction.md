@@ -1,5 +1,6 @@
 ---
 title: 'Deduction, Induction, and Abduction'
+date: 2025-12-10
 permalink: /nature/182-deduction-induction-and-abduction/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

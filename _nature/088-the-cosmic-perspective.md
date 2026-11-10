@@ -1,5 +1,6 @@
 ---
 title: 'The Cosmic Perspective'
+date: 2025-09-07
 permalink: /nature/088-the-cosmic-perspective/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

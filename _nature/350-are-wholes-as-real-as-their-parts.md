@@ -1,5 +1,6 @@
 ---
 title: 'Are Wholes as Real as Their Parts?'
+date: 2026-05-27
 permalink: /nature/350-are-wholes-as-real-as-their-parts/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

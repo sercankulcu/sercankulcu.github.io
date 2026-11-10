@@ -1,5 +1,6 @@
 ---
 title: 'Can Machines Use Language?'
+date: 2025-11-20
 permalink: /nature/162-can-machines-use-language/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

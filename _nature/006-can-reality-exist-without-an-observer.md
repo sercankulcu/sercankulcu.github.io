@@ -1,5 +1,6 @@
 ---
 title: 'Can Reality Exist Without an Observer?'
+date: 2025-06-17
 permalink: /nature/006-can-reality-exist-without-an-observer/
 chapter: 1
 chapter_title: 'The First Questions'

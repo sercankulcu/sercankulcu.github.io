@@ -1,5 +1,6 @@
 ---
 title: 'Belief and Doxastic Logic'
+date: 2025-12-24
 permalink: /nature/196-belief-and-doxastic-logic/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

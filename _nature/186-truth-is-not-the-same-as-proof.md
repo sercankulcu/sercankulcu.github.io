@@ -1,5 +1,6 @@
 ---
 title: 'Truth Is Not the Same as Proof'
+date: 2025-12-14
 permalink: /nature/186-truth-is-not-the-same-as-proof/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

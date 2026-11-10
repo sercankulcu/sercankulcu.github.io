@@ -1,5 +1,6 @@
 ---
 title: 'Animal Consciousness'
+date: 2026-04-23
 permalink: /nature/316-animal-consciousness/
 chapter: 16
 chapter_title: 'Consciousness'

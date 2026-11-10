@@ -1,5 +1,6 @@
 ---
 title: 'Linear and Nonlinear Worlds'
+date: 2025-09-27
 permalink: /nature/108-linear-and-nonlinear-worlds/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

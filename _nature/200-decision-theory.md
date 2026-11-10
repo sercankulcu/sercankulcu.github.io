@@ -1,5 +1,6 @@
 ---
 title: 'Decision Theory'
+date: 2025-12-28
 permalink: /nature/200-decision-theory/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

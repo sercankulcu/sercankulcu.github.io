@@ -1,5 +1,6 @@
 ---
 title: 'Biomorphs and Evolutionary Forms'
+date: 2025-10-13
 permalink: /nature/124-biomorphs-and-evolutionary-forms/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

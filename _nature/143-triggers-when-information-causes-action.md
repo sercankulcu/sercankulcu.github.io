@@ -1,5 +1,6 @@
 ---
 title: 'Triggers: When Information Causes Action'
+date: 2025-11-01
 permalink: /nature/143-triggers-when-information-causes-action/
 chapter: 8
 chapter_title: 'Information and Representation'

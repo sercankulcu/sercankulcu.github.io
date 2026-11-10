@@ -1,5 +1,6 @@
 ---
 title: 'Does Science Move Toward Truth?'
+date: 2025-08-28
 permalink: /nature/078-does-science-move-toward-truth/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

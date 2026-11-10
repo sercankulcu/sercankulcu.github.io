@@ -1,5 +1,6 @@
 ---
 title: 'Can Science Investigate the Supernatural?'
+date: 2025-09-04
 permalink: /nature/085-can-science-investigate-the-supernatural/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

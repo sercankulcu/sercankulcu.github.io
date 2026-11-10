@@ -1,5 +1,6 @@
 ---
 title: 'Natural Computation'
+date: 2026-01-30
 permalink: /nature/233-natural-computation/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

@@ -1,5 +1,6 @@
 ---
 title: 'How Can We Know a Program Is Correct?'
+date: 2026-02-07
 permalink: /nature/241-how-can-we-know-a-program-is-correct/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

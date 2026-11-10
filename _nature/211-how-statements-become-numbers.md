@@ -1,5 +1,6 @@
 ---
 title: 'How Statements Become Numbers'
+date: 2026-01-08
 permalink: /nature/211-how-statements-become-numbers/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

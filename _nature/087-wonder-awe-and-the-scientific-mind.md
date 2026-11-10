@@ -1,5 +1,6 @@
 ---
 title: 'Wonder, Awe, and the Scientific Mind'
+date: 2025-09-06
 permalink: /nature/087-wonder-awe-and-the-scientific-mind/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

@@ -1,5 +1,6 @@
 ---
 title: 'AI Alignment: What Should Intelligent Machines Want?'
+date: 2026-04-05
 permalink: /nature/298-ai-alignment-what-should-intelligent-machines-want/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

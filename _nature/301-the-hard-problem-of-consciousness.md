@@ -1,5 +1,6 @@
 ---
 title: 'The Hard Problem of Consciousness'
+date: 2026-04-08
 permalink: /nature/301-the-hard-problem-of-consciousness/
 chapter: 16
 chapter_title: 'Consciousness'

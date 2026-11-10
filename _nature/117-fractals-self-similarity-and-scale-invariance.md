@@ -1,5 +1,6 @@
 ---
 title: 'Fractals, Self-Similarity, and Scale Invariance'
+date: 2025-10-06
 permalink: /nature/117-fractals-self-similarity-and-scale-invariance/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

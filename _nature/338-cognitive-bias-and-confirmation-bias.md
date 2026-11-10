@@ -1,5 +1,6 @@
 ---
 title: 'Cognitive Bias and Confirmation Bias'
+date: 2026-05-15
 permalink: /nature/338-cognitive-bias-and-confirmation-bias/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

@@ -1,5 +1,6 @@
 ---
 title: 'Iterated Function Systems'
+date: 2025-10-09
 permalink: /nature/120-iterated-function-systems/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

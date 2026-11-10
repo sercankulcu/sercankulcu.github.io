@@ -1,5 +1,6 @@
 ---
 title: 'Is Consciousness Fundamental?'
+date: 2026-04-16
 permalink: /nature/309-is-consciousness-fundamental/
 chapter: 16
 chapter_title: 'Consciousness'

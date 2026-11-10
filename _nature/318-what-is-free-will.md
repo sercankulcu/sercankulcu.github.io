@@ -1,5 +1,6 @@
 ---
 title: 'What Is Free Will?'
+date: 2026-04-25
 permalink: /nature/318-what-is-free-will/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

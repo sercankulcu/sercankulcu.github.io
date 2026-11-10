@@ -1,5 +1,6 @@
 ---
 title: 'Dennett and Chalmers'
+date: 2026-04-18
 permalink: /nature/311-dennett-and-chalmers/
 chapter: 16
 chapter_title: 'Consciousness'

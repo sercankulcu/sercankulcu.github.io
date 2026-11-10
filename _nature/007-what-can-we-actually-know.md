@@ -1,5 +1,6 @@
 ---
 title: 'What Can We Actually Know?'
+date: 2025-06-18
 permalink: /nature/007-what-can-we-actually-know/
 chapter: 1
 chapter_title: 'The First Questions'

@@ -1,5 +1,6 @@
 ---
 title: "Gödel's Second Incompleteness Theorem"
+date: 2026-01-17
 permalink: /nature/220-godels-second-incompleteness-theorem/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

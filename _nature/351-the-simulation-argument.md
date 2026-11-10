@@ -1,5 +1,6 @@
 ---
 title: 'The Simulation Argument'
+date: 2026-05-28
 permalink: /nature/351-the-simulation-argument/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

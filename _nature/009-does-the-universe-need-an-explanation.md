@@ -1,5 +1,6 @@
 ---
 title: 'Does the Universe Need an Explanation?'
+date: 2025-06-20
 permalink: /nature/009-does-the-universe-need-an-explanation/
 chapter: 1
 chapter_title: 'The First Questions'

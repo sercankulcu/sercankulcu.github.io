@@ -1,5 +1,6 @@
 ---
 title: 'Reality and Appearance'
+date: 2026-05-19
 permalink: /nature/342-reality-and-appearance/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

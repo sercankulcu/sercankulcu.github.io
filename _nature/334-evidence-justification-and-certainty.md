@@ -1,5 +1,6 @@
 ---
 title: 'Evidence, Justification, and Certainty'
+date: 2026-05-11
 permalink: /nature/334-evidence-justification-and-certainty/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

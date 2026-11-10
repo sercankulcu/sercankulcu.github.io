@@ -1,5 +1,6 @@
 ---
 title: 'Are People and Consciousness as Real as Atoms?'
+date: 2026-05-24
 permalink: /nature/347-are-people-and-consciousness-as-real-as-atoms/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

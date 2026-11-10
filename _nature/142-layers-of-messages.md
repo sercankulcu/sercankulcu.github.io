@@ -1,5 +1,6 @@
 ---
 title: 'Layers of Messages'
+date: 2025-10-31
 permalink: /nature/142-layers-of-messages/
 chapter: 8
 chapter_title: 'Information and Representation'

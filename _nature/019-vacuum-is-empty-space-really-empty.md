@@ -1,5 +1,6 @@
 ---
 title: 'Vacuum: Is Empty Space Really Empty?'
+date: 2025-06-30
 permalink: /nature/019-vacuum-is-empty-space-really-empty/
 chapter: 2
 chapter_title: 'Nothing'

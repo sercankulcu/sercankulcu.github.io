@@ -1,5 +1,6 @@
 ---
 title: 'Integrated Information Theory'
+date: 2026-04-20
 permalink: /nature/313-integrated-information-theory/
 chapter: 16
 chapter_title: 'Consciousness'

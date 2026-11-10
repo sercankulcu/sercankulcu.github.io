@@ -1,5 +1,6 @@
 ---
 title: 'Ambiguity and Context'
+date: 2025-11-17
 permalink: /nature/159-ambiguity-and-context/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

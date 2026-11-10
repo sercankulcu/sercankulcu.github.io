@@ -1,5 +1,6 @@
 ---
 title: 'Information Processing'
+date: 2026-01-23
 permalink: /nature/226-information-processing/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

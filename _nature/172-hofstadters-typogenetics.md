@@ -1,5 +1,6 @@
 ---
 title: "Hofstadter's Typogenetics"
+date: 2025-11-30
 permalink: /nature/172-hofstadters-typogenetics/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

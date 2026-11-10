@@ -1,5 +1,6 @@
 ---
 title: 'What Is Nature?'
+date: 2025-06-12
 permalink: /nature/001-what-is-nature/
 chapter: 1
 chapter_title: 'The First Questions'

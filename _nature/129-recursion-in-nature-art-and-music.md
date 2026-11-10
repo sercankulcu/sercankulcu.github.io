@@ -1,5 +1,6 @@
 ---
 title: 'Recursion in Nature, Art, and Music'
+date: 2025-10-18
 permalink: /nature/129-recursion-in-nature-art-and-music/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

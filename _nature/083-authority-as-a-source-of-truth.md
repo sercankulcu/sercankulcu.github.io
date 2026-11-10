@@ -1,5 +1,6 @@
 ---
 title: 'Authority as a Source of Truth'
+date: 2025-09-02
 permalink: /nature/083-authority-as-a-source-of-truth/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

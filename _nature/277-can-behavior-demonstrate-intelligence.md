@@ -1,5 +1,6 @@
 ---
 title: 'Can Behavior Demonstrate Intelligence?'
+date: 2026-03-15
 permalink: /nature/277-can-behavior-demonstrate-intelligence/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

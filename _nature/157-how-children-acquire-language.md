@@ -1,5 +1,6 @@
 ---
 title: 'How Children Acquire Language'
+date: 2025-11-15
 permalink: /nature/157-how-children-acquire-language/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

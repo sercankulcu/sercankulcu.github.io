@@ -1,5 +1,6 @@
 ---
 title: 'What Does It Mean to Exist?'
+date: 2025-06-14
 permalink: /nature/003-what-does-it-mean-to-exist/
 chapter: 1
 chapter_title: 'The First Questions'

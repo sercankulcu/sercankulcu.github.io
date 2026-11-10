@@ -1,5 +1,6 @@
 ---
 title: 'Typographical Number Theory'
+date: 2026-01-05
 permalink: /nature/208-typographical-number-theory/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

@@ -1,5 +1,6 @@
 ---
 title: 'The Cosmic Microwave Background'
+date: 2025-07-25
 permalink: /nature/044-the-cosmic-microwave-background/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

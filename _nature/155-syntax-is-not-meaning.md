@@ -1,5 +1,6 @@
 ---
 title: 'Syntax Is Not Meaning'
+date: 2025-11-13
 permalink: /nature/155-syntax-is-not-meaning/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

@@ -1,5 +1,6 @@
 ---
 title: "Güzel Havalar"
+date: 2026-06-07
 poet: "Orhan Veli"
 order: 7
 ---

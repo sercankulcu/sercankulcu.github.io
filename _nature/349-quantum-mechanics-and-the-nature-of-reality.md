@@ -1,5 +1,6 @@
 ---
 title: 'Quantum Mechanics and the Nature of Reality'
+date: 2026-05-26
 permalink: /nature/349-quantum-mechanics-and-the-nature-of-reality/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

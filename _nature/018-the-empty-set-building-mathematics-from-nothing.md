@@ -1,5 +1,6 @@
 ---
 title: 'The Empty Set: Building Mathematics from Nothing'
+date: 2025-06-29
 permalink: /nature/018-the-empty-set-building-mathematics-from-nothing/
 chapter: 2
 chapter_title: 'Nothing'

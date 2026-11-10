@@ -1,5 +1,6 @@
 ---
 title: 'Use and Mention'
+date: 2025-11-23
 permalink: /nature/165-use-and-mention/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

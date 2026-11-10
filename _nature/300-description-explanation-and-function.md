@@ -1,5 +1,6 @@
 ---
 title: 'Description, Explanation, and Function'
+date: 2026-04-07
 permalink: /nature/300-description-explanation-and-function/
 chapter: 16
 chapter_title: 'Consciousness'

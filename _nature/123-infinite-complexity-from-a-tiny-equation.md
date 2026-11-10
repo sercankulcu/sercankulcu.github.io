@@ -1,5 +1,6 @@
 ---
 title: 'Infinite Complexity from a Tiny Equation'
+date: 2025-10-12
 permalink: /nature/123-infinite-complexity-from-a-tiny-equation/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

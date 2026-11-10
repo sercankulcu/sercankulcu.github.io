@@ -1,5 +1,6 @@
 ---
 title: 'Causality: Why Correlation Is Not Enough'
+date: 2025-08-17
 permalink: /nature/067-causality-why-correlation-is-not-enough/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

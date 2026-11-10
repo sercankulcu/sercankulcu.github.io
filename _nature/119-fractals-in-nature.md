@@ -1,5 +1,6 @@
 ---
 title: 'Fractals in Nature'
+date: 2025-10-08
 permalink: /nature/119-fractals-in-nature/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

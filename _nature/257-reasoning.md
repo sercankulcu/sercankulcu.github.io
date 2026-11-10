@@ -1,5 +1,6 @@
 ---
 title: 'Reasoning'
+date: 2026-02-23
 permalink: /nature/257-reasoning/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

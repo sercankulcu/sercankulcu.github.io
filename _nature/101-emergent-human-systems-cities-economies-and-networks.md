@@ -1,5 +1,6 @@
 ---
 title: 'Emergent Human Systems: Cities, Economies, and Networks'
+date: 2025-09-20
 permalink: /nature/101-emergent-human-systems-cities-economies-and-networks/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

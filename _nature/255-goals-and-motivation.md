@@ -1,5 +1,6 @@
 ---
 title: 'Goals and Motivation'
+date: 2026-02-21
 permalink: /nature/255-goals-and-motivation/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

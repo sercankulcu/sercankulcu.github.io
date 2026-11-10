@@ -1,5 +1,6 @@
 ---
 title: 'Being, Non-Being, and Nothing'
+date: 2025-06-22
 permalink: /nature/011-being-non-being-and-nothing/
 chapter: 2
 chapter_title: 'Nothing'

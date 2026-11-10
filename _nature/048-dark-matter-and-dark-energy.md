@@ -1,5 +1,6 @@
 ---
 title: 'Dark Matter and Dark Energy'
+date: 2025-07-29
 permalink: /nature/048-dark-matter-and-dark-energy/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

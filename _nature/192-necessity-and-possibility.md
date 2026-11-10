@@ -1,5 +1,6 @@
 ---
 title: 'Necessity and Possibility'
+date: 2025-12-20
 permalink: /nature/192-necessity-and-possibility/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

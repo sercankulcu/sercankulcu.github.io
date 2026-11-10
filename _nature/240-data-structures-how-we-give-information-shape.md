@@ -1,5 +1,6 @@
 ---
 title: 'Data Structures: How We Give Information Shape'
+date: 2026-02-06
 permalink: /nature/240-data-structures-how-we-give-information-shape/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

@@ -1,5 +1,6 @@
 ---
 title: "From Newton's Universe to Einstein's Spacetime"
+date: 2025-07-09
 permalink: /nature/028-from-newtons-universe-to-einsteins-spacetime/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

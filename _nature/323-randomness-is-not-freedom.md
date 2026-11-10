@@ -1,5 +1,6 @@
 ---
 title: 'Randomness Is Not Freedom'
+date: 2026-04-30
 permalink: /nature/323-randomness-is-not-freedom/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

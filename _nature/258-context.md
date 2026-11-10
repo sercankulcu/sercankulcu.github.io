@@ -1,5 +1,6 @@
 ---
 title: 'Context'
+date: 2026-02-24
 permalink: /nature/258-context/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

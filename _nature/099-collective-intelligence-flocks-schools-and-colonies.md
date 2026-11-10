@@ -1,5 +1,6 @@
 ---
 title: 'Collective Intelligence: Flocks, Schools, and Colonies'
+date: 2025-09-18
 permalink: /nature/099-collective-intelligence-flocks-schools-and-colonies/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

@@ -1,5 +1,6 @@
 ---
 title: 'Panpsychism'
+date: 2026-04-21
 permalink: /nature/314-panpsychism/
 chapter: 16
 chapter_title: 'Consciousness'

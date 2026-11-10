@@ -1,5 +1,6 @@
 ---
 title: 'Frames and Conceptual Dependency'
+date: 2026-03-19
 permalink: /nature/281-frames-and-conceptual-dependency/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

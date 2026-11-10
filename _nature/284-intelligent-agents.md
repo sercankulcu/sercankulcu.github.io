@@ -1,5 +1,6 @@
 ---
 title: 'Intelligent Agents'
+date: 2026-03-22
 permalink: /nature/284-intelligent-agents/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

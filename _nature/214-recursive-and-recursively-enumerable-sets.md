@@ -1,5 +1,6 @@
 ---
 title: 'Recursive and Recursively Enumerable Sets'
+date: 2026-01-11
 permalink: /nature/214-recursive-and-recursively-enumerable-sets/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

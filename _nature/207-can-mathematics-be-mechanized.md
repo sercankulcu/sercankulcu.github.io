@@ -1,5 +1,6 @@
 ---
 title: 'Can Mathematics Be Mechanized?'
+date: 2026-01-04
 permalink: /nature/207-can-mathematics-be-mechanized/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

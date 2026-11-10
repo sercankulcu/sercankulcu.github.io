@@ -1,5 +1,6 @@
 ---
 title: 'When the Whole Has Properties the Parts Do Not'
+date: 2025-09-15
 permalink: /nature/096-when-the-whole-has-properties-the-parts-do-not/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

@@ -1,5 +1,6 @@
 ---
 title: 'Are Brains Hardware?'
+date: 2026-02-13
 permalink: /nature/247-are-brains-hardware/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

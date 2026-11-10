@@ -1,5 +1,6 @@
 ---
 title: 'Zero: When Nothing Became a Number'
+date: 2025-06-28
 permalink: /nature/017-zero-when-nothing-became-a-number/
 chapter: 2
 chapter_title: 'Nothing'

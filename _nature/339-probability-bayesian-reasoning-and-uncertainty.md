@@ -1,5 +1,6 @@
 ---
 title: 'Probability, Bayesian Reasoning, and Uncertainty'
+date: 2026-05-16
 permalink: /nature/339-probability-bayesian-reasoning-and-uncertainty/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

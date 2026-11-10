@@ -1,5 +1,6 @@
 ---
 title: 'Do Language Models Understand?'
+date: 2026-04-03
 permalink: /nature/296-do-language-models-understand/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

@@ -1,5 +1,6 @@
 ---
 title: 'Quantum Computation'
+date: 2026-01-31
 permalink: /nature/234-quantum-computation/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

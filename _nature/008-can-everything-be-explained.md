@@ -1,5 +1,6 @@
 ---
 title: 'Can Everything Be Explained?'
+date: 2025-06-19
 permalink: /nature/008-can-everything-be-explained/
 chapter: 1
 chapter_title: 'The First Questions'

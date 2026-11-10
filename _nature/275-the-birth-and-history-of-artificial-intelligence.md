@@ -1,5 +1,6 @@
 ---
 title: 'The Birth and History of Artificial Intelligence'
+date: 2026-03-13
 permalink: /nature/275-the-birth-and-history-of-artificial-intelligence/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

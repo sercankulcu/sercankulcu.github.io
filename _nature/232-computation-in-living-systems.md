@@ -1,5 +1,6 @@
 ---
 title: 'Computation in Living Systems'
+date: 2026-01-29
 permalink: /nature/232-computation-in-living-systems/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

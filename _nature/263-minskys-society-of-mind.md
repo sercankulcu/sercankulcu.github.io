@@ -1,5 +1,6 @@
 ---
 title: 'Minsky''s Society of Mind'
+date: 2026-03-01
 permalink: /nature/263-minskys-society-of-mind/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

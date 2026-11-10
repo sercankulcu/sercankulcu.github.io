@@ -1,5 +1,6 @@
 ---
 title: 'Qualia'
+date: 2026-04-09
 permalink: /nature/302-qualia/
 chapter: 16
 chapter_title: 'Consciousness'

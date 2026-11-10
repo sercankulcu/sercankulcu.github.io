@@ -1,5 +1,6 @@
 ---
 title: 'Why Does the Universe Have These Laws?'
+date: 2025-08-01
 permalink: /nature/051-why-does-the-universe-have-these-laws/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

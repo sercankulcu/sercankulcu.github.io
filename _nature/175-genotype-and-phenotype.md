@@ -1,5 +1,6 @@
 ---
 title: 'Genotype and Phenotype'
+date: 2025-12-03
 permalink: /nature/175-genotype-and-phenotype/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

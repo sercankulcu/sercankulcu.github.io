@@ -1,5 +1,6 @@
 ---
 title: 'Validity and Soundness'
+date: 2025-12-09
 permalink: /nature/181-validity-and-soundness/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

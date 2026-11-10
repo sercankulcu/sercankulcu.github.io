@@ -1,5 +1,6 @@
 ---
 title: 'Programming Language Syntax and Semantics'
+date: 2025-11-18
 permalink: /nature/160-programming-language-syntax-and-semantics/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

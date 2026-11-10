@@ -1,5 +1,6 @@
 ---
 title: "Böyle bir sevmek"
+date: 2026-06-06
 poet: "Attila İlhan"
 order: 6
 ---

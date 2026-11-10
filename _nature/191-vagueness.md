@@ -1,5 +1,6 @@
 ---
 title: 'Vagueness'
+date: 2025-12-19
 permalink: /nature/191-vagueness/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

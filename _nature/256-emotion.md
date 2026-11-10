@@ -1,5 +1,6 @@
 ---
 title: 'Emotion'
+date: 2026-02-22
 permalink: /nature/256-emotion/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

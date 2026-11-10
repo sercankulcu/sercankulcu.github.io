@@ -1,5 +1,6 @@
 ---
 title: 'Recursion in Language'
+date: 2025-10-17
 permalink: /nature/128-recursion-in-language/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

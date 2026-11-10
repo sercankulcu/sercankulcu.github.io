@@ -1,5 +1,6 @@
 ---
 title: 'Subjective Experience'
+date: 2026-04-11
 permalink: /nature/304-subjective-experience/
 chapter: 16
 chapter_title: 'Consciousness'

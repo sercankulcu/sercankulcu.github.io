@@ -1,5 +1,6 @@
 ---
 title: 'Variables and Quantifiers'
+date: 2025-12-12
 permalink: /nature/184-variables-and-quantifiers/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

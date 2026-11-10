@@ -1,5 +1,6 @@
 ---
 title: 'General Relativity: Gravity as Geometry'
+date: 2025-07-11
 permalink: /nature/030-general-relativity-gravity-as-geometry/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

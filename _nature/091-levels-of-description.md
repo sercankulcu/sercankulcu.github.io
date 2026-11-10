@@ -1,5 +1,6 @@
 ---
 title: 'Levels of Description'
+date: 2025-09-10
 permalink: /nature/091-levels-of-description/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

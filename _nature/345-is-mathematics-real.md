@@ -1,5 +1,6 @@
 ---
 title: 'Is Mathematics Real?'
+date: 2026-05-22
 permalink: /nature/345-is-mathematics-real/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

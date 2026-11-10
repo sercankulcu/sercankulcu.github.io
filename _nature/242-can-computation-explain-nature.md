@@ -1,5 +1,6 @@
 ---
 title: 'Can Computation Explain Nature?'
+date: 2026-02-08
 permalink: /nature/242-can-computation-explain-nature/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

@@ -1,5 +1,6 @@
 ---
 title: 'Levels of Organization in the Brain'
+date: 2026-02-12
 permalink: /nature/246-levels-of-organization-in-the-brain/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

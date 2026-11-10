@@ -1,5 +1,6 @@
 ---
 title: 'Physicalism and Materialism'
+date: 2026-03-05
 permalink: /nature/267-physicalism-and-materialism/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

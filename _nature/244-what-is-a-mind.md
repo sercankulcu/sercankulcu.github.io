@@ -1,5 +1,6 @@
 ---
 title: 'What Is a Mind?'
+date: 2026-02-10
 permalink: /nature/244-what-is-a-mind/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

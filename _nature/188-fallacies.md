@@ -1,5 +1,6 @@
 ---
 title: 'Fallacies'
+date: 2025-12-16
 permalink: /nature/188-fallacies/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

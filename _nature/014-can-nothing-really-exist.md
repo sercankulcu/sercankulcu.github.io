@@ -1,5 +1,6 @@
 ---
 title: 'Can Nothing Really Exist?'
+date: 2025-06-25
 permalink: /nature/014-can-nothing-really-exist/
 chapter: 2
 chapter_title: 'Nothing'

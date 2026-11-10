@@ -1,5 +1,6 @@
 ---
 title: 'Embodied, Extended, and Predictive Minds'
+date: 2026-03-08
 permalink: /nature/270-embodied-extended-and-predictive-minds/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

@@ -1,5 +1,6 @@
 ---
 title: 'Theories of Everything: Can One Theory Explain the Universe?'
+date: 2025-08-02
 permalink: /nature/052-theories-of-everything-can-one-theory-explain-the-universe/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

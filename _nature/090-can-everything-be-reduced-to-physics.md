@@ -1,5 +1,6 @@
 ---
 title: 'Can Everything Be Reduced to Physics?'
+date: 2025-09-09
 permalink: /nature/090-can-everything-be-reduced-to-physics/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

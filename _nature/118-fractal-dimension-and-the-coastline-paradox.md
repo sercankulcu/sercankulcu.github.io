@@ -1,5 +1,6 @@
 ---
 title: 'Fractal Dimension and the Coastline Paradox'
+date: 2025-10-07
 permalink: /nature/118-fractal-dimension-and-the-coastline-paradox/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

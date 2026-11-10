@@ -1,5 +1,6 @@
 ---
 title: 'Computation as a Principle, Not Just a Tool'
+date: 2026-01-24
 permalink: /nature/227-computation-as-a-principle-not-just-a-tool/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

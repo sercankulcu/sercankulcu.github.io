@@ -1,5 +1,6 @@
 ---
 title: 'Figure and Ground'
+date: 2026-01-10
 permalink: /nature/213-figure-and-ground/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

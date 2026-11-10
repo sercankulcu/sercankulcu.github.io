@@ -1,5 +1,6 @@
 ---
 title: 'Evidence'
+date: 2025-08-06
 permalink: /nature/056-evidence/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

@@ -1,5 +1,6 @@
 ---
 title: 'Free Will and Moral Responsibility'
+date: 2026-05-04
 permalink: /nature/327-free-will-and-moral-responsibility/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

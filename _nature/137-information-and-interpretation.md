@@ -1,5 +1,6 @@
 ---
 title: 'Information and Interpretation'
+date: 2025-10-26
 permalink: /nature/137-information-and-interpretation/
 chapter: 8
 chapter_title: 'Information and Representation'

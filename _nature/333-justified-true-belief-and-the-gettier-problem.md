@@ -1,5 +1,6 @@
 ---
 title: 'Justified True Belief and the Gettier Problem'
+date: 2026-05-10
 permalink: /nature/333-justified-true-belief-and-the-gettier-problem/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

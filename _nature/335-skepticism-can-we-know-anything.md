@@ -1,5 +1,6 @@
 ---
 title: 'Skepticism: Can We Know Anything?'
+date: 2026-05-12
 permalink: /nature/335-skepticism-can-we-know-anything/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

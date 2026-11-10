@@ -1,5 +1,6 @@
 ---
 title: 'Hard Determinism and Hard Incompatibilism'
+date: 2026-04-27
 permalink: /nature/320-hard-determinism-and-hard-incompatibilism/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

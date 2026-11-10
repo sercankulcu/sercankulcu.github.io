@@ -1,5 +1,6 @@
 ---
 title: 'Memory'
+date: 2026-02-20
 permalink: /nature/254-memory/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

@@ -1,5 +1,6 @@
 ---
 title: 'Can Animals Have Language?'
+date: 2025-11-19
 permalink: /nature/161-can-animals-have-language/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

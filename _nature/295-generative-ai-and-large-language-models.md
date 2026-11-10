@@ -1,5 +1,6 @@
 ---
 title: 'Generative AI and Large Language Models'
+date: 2026-04-02
 permalink: /nature/295-generative-ai-and-large-language-models/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

@@ -1,5 +1,6 @@
 ---
 title: 'Perception Is Not Reality'
+date: 2026-05-20
 permalink: /nature/343-perception-is-not-reality/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

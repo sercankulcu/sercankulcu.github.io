@@ -1,5 +1,6 @@
 ---
 title: 'Bits and Binary Representation'
+date: 2025-10-24
 permalink: /nature/135-bits-and-binary-representation/
 chapter: 8
 chapter_title: 'Information and Representation'

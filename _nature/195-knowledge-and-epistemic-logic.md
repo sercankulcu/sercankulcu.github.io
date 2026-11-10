@@ -1,5 +1,6 @@
 ---
 title: 'Knowledge and Epistemic Logic'
+date: 2025-12-23
 permalink: /nature/195-knowledge-and-epistemic-logic/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

@@ -1,5 +1,6 @@
 ---
 title: 'Uncomputable Functions'
+date: 2026-01-27
 permalink: /nature/230-uncomputable-functions/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

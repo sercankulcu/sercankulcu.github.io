@@ -1,5 +1,6 @@
 ---
 title: 'How Big Is the Universe?'
+date: 2025-07-06
 permalink: /nature/025-how-big-is-the-universe/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

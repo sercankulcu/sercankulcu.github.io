@@ -1,5 +1,6 @@
 ---
 title: 'Does Quantum Uncertainty Leave Room for Free Will?'
+date: 2026-05-01
 permalink: /nature/324-does-quantum-uncertainty-leave-room-for-free-will/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

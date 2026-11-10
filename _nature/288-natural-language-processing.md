@@ -1,5 +1,6 @@
 ---
 title: 'Natural Language Processing'
+date: 2026-03-26
 permalink: /nature/288-natural-language-processing/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

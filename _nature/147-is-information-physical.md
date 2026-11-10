@@ -1,5 +1,6 @@
 ---
 title: 'Is Information Physical?'
+date: 2025-11-05
 permalink: /nature/147-is-information-physical/
 chapter: 8
 chapter_title: 'Information and Representation'

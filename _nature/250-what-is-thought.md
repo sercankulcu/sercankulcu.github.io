@@ -1,5 +1,6 @@
 ---
 title: 'What Is Thought?'
+date: 2026-02-16
 permalink: /nature/250-what-is-thought/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

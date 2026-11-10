@@ -1,5 +1,6 @@
 ---
 title: 'Quines: Programs That Reproduce Their Own Description'
+date: 2025-11-28
 permalink: /nature/170-quines-programs-that-reproduce-their-own-description/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

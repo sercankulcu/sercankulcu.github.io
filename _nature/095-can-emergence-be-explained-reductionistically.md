@@ -1,5 +1,6 @@
 ---
 title: 'Can Emergence Be Explained Reductionistically?'
+date: 2025-09-14
 permalink: /nature/095-can-emergence-be-explained-reductionistically/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

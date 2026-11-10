@@ -1,5 +1,6 @@
 ---
 title: 'Myth as an Explanation of the World'
+date: 2025-08-30
 permalink: /nature/080-myth-as-an-explanation-of-the-world/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

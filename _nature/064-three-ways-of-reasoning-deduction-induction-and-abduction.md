@@ -1,5 +1,6 @@
 ---
 title: 'Three Ways of Reasoning: Deduction, Induction, and Abduction'
+date: 2025-08-14
 permalink: /nature/064-three-ways-of-reasoning-deduction-induction-and-abduction/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

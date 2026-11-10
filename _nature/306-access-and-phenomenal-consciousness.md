@@ -1,5 +1,6 @@
 ---
 title: 'Access and Phenomenal Consciousness'
+date: 2026-04-13
 permalink: /nature/306-access-and-phenomenal-consciousness/
 chapter: 16
 chapter_title: 'Consciousness'

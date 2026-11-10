@@ -1,5 +1,6 @@
 ---
 title: 'DNA as Information'
+date: 2025-12-01
 permalink: /nature/173-dna-as-information/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

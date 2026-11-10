@@ -1,5 +1,6 @@
 ---
 title: 'Neuroscience and the Libet Experiments'
+date: 2026-05-02
 permalink: /nature/325-neuroscience-and-the-libet-experiments/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

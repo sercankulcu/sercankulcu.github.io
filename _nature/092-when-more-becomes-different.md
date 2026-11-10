@@ -1,5 +1,6 @@
 ---
 title: 'When More Becomes Different'
+date: 2025-09-11
 permalink: /nature/092-when-more-becomes-different/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

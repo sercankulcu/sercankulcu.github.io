@@ -1,5 +1,6 @@
 ---
 title: 'Neural Networks and Deep Learning'
+date: 2026-03-24
 permalink: /nature/286-neural-networks-and-deep-learning/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

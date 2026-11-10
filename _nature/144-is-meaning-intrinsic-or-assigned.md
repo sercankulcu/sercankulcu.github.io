@@ -1,5 +1,6 @@
 ---
 title: 'Is Meaning Intrinsic or Assigned?'
+date: 2025-11-02
 permalink: /nature/144-is-meaning-intrinsic-or-assigned/
 chapter: 8
 chapter_title: 'Information and Representation'

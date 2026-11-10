@@ -1,5 +1,6 @@
 ---
 title: 'Can a System Contain a Model of Itself?'
+date: 2025-12-06
 permalink: /nature/178-can-a-system-contain-a-model-of-itself/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

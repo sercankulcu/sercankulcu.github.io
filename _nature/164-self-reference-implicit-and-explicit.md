@@ -1,5 +1,6 @@
 ---
 title: 'Self-Reference: Implicit and Explicit'
+date: 2025-11-22
 permalink: /nature/164-self-reference-implicit-and-explicit/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

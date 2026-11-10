@@ -1,5 +1,6 @@
 ---
 title: 'Inviolate Levels: Can One Level of Reality Explain Another?'
+date: 2025-09-23
 permalink: /nature/104-inviolate-levels-can-one-level-of-reality-explain-another/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

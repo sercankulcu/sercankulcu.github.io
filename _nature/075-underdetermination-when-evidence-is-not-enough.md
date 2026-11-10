@@ -1,5 +1,6 @@
 ---
 title: 'Underdetermination: When Evidence Is Not Enough'
+date: 2025-08-25
 permalink: /nature/075-underdetermination-when-evidence-is-not-enough/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

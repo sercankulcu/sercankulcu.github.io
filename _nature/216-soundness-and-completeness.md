@@ -1,5 +1,6 @@
 ---
 title: 'Soundness and Completeness'
+date: 2026-01-13
 permalink: /nature/216-soundness-and-completeness/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

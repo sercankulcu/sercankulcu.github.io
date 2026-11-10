@@ -1,5 +1,6 @@
 ---
 title: 'Is Consciousness Emergent?'
+date: 2026-04-15
 permalink: /nature/308-is-consciousness-emergent/
 chapter: 16
 chapter_title: 'Consciousness'

@@ -1,5 +1,6 @@
 ---
 title: 'Brain, Mind, and Behavior'
+date: 2026-02-11
 permalink: /nature/245-brain-mind-and-behavior/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

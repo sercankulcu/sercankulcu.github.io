@@ -1,5 +1,6 @@
 ---
 title: 'Object Language and Metalanguage'
+date: 2025-11-25
 permalink: /nature/167-object-language-and-metalanguage/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

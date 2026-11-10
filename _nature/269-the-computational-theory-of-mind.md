@@ -1,5 +1,6 @@
 ---
 title: 'The Computational Theory of Mind'
+date: 2026-03-07
 permalink: /nature/269-the-computational-theory-of-mind/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

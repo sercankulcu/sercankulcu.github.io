@@ -1,5 +1,6 @@
 ---
 title: 'Why Does Red Feel Like Red?'
+date: 2026-04-10
 permalink: /nature/303-why-does-red-feel-like-red/
 chapter: 16
 chapter_title: 'Consciousness'

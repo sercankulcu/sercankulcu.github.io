@@ -1,5 +1,6 @@
 ---
 title: "Dumanlar Arasında Sensiz"
+date: 2026-06-12
 poet: "tcd"
 order: 12
 ---

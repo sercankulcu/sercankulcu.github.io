@@ -1,5 +1,6 @@
 ---
 title: 'Science and Anti-Science'
+date: 2025-08-21
 permalink: /nature/071-science-and-anti-science/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

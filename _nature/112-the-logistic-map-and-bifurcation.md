@@ -1,5 +1,6 @@
 ---
 title: 'The Logistic Map and Bifurcation'
+date: 2025-10-01
 permalink: /nature/112-the-logistic-map-and-bifurcation/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

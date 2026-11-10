@@ -1,5 +1,6 @@
 ---
 title: 'Morphogenesis: How Form Builds Itself'
+date: 2025-12-04
 permalink: /nature/176-morphogenesis-how-form-builds-itself/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

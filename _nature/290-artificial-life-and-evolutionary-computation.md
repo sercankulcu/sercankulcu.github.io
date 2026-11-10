@@ -1,5 +1,6 @@
 ---
 title: 'Artificial Life and Evolutionary Computation'
+date: 2026-03-28
 permalink: /nature/290-artificial-life-and-evolutionary-computation/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

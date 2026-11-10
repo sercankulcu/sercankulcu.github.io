@@ -1,5 +1,6 @@
 ---
 title: 'What Are Space and Time?'
+date: 2025-07-08
 permalink: /nature/027-what-are-space-and-time/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

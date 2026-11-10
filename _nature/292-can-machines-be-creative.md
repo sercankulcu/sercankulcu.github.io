@@ -1,5 +1,6 @@
 ---
 title: 'Can Machines Be Creative?'
+date: 2026-03-30
 permalink: /nature/292-can-machines-be-creative/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

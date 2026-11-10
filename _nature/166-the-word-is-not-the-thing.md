@@ -1,5 +1,6 @@
 ---
 title: 'The Word Is Not the Thing'
+date: 2025-11-24
 permalink: /nature/166-the-word-is-not-the-thing/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

@@ -1,5 +1,6 @@
 ---
 title: "Seni Düşünmek"
+date: 2026-06-10
 poet: "Nazım Hikmet"
 order: 10
 ---

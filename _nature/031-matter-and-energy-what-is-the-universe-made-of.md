@@ -1,5 +1,6 @@
 ---
 title: 'Matter and Energy: What Is the Universe Made Of?'
+date: 2025-07-12
 permalink: /nature/031-matter-and-energy-what-is-the-universe-made-of/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

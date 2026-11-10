@@ -1,5 +1,6 @@
 ---
 title: 'Why Is There No Center of the Universe?'
+date: 2025-07-24
 permalink: /nature/043-why-is-there-no-center-of-the-universe/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

@@ -1,5 +1,6 @@
 ---
 title: 'Why Humans Believe Strange Things'
+date: 2026-05-13
 permalink: /nature/336-why-humans-believe-strange-things/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

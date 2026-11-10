@@ -1,5 +1,6 @@
 ---
 title: 'Chaos'
+date: 2025-09-29
 permalink: /nature/110-chaos/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

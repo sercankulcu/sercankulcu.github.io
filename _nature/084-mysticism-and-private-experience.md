@@ -1,5 +1,6 @@
 ---
 title: 'Mysticism and Private Experience'
+date: 2025-09-03
 permalink: /nature/084-mysticism-and-private-experience/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

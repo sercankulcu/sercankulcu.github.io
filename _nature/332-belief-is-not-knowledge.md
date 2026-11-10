@@ -1,5 +1,6 @@
 ---
 title: 'Belief Is Not Knowledge'
+date: 2026-05-09
 permalink: /nature/332-belief-is-not-knowledge/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

@@ -1,5 +1,6 @@
 ---
 title: 'Why Science Changes Its Mind'
+date: 2025-08-27
 permalink: /nature/077-why-science-changes-its-mind/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

@@ -1,5 +1,6 @@
 ---
 title: 'Search, Problem Solving, and Planning'
+date: 2026-03-16
 permalink: /nature/278-search-problem-solving-and-planning/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

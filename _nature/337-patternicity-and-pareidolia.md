@@ -1,5 +1,6 @@
 ---
 title: 'Patternicity and Pareidolia'
+date: 2026-05-14
 permalink: /nature/337-patternicity-and-pareidolia/
 chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'

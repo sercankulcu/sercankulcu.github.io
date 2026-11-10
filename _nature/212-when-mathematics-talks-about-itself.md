@@ -1,5 +1,6 @@
 ---
 title: 'When Mathematics Talks About Itself'
+date: 2026-01-09
 permalink: /nature/212-when-mathematics-talks-about-itself/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

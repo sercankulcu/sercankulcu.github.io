@@ -1,5 +1,6 @@
 ---
 title: 'Will Knowledge Ever Be Complete?'
+date: 2026-05-30
 permalink: /nature/353-will-knowledge-ever-be-complete/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

@@ -1,5 +1,6 @@
 ---
 title: 'Propositional Calculus'
+date: 2025-12-30
 permalink: /nature/202-propositional-calculus/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

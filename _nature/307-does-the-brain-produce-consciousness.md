@@ -1,5 +1,6 @@
 ---
 title: 'Does the Brain Produce Consciousness?'
+date: 2026-04-14
 permalink: /nature/307-does-the-brain-produce-consciousness/
 chapter: 16
 chapter_title: 'Consciousness'

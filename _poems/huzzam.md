@@ -1,5 +1,6 @@
 ---
 title: "Hüzzam"
+date: 2026-06-08
 poet: "Emre Ekinci"
 order: 8
 ---

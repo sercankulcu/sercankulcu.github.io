@@ -1,5 +1,6 @@
 ---
 title: 'Playing Checkers and Chess'
+date: 2026-03-17
 permalink: /nature/279-playing-checkers-and-chess/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

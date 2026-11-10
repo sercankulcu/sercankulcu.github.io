@@ -1,5 +1,6 @@
 ---
 title: 'Can the Universe Understand Itself?'
+date: 2025-06-21
 permalink: /nature/010-can-the-universe-understand-itself/
 chapter: 1
 chapter_title: 'The First Questions'

@@ -1,5 +1,6 @@
 ---
 title: 'Can a Machine Understand Meaning?'
+date: 2025-11-21
 permalink: /nature/163-can-a-machine-understand-meaning/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

@@ -1,5 +1,6 @@
 ---
 title: 'Does Everything Need a Cause?'
+date: 2025-08-18
 permalink: /nature/068-does-everything-need-a-cause/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

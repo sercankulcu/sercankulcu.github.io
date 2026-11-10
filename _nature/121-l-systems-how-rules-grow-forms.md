@@ -1,5 +1,6 @@
 ---
 title: 'L-Systems: How Rules Grow Forms'
+date: 2025-10-10
 permalink: /nature/121-l-systems-how-rules-grow-forms/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

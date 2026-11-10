@@ -1,5 +1,6 @@
 ---
 title: 'What Does Physics Say Is Real?'
+date: 2026-05-23
 permalink: /nature/346-what-does-physics-say-is-real/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

@@ -1,5 +1,6 @@
 ---
 title: 'Order Without a Designer'
+date: 2025-09-17
 permalink: /nature/098-order-without-a-designer/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

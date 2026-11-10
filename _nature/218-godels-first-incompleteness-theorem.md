@@ -1,5 +1,6 @@
 ---
 title: "Gödel's First Incompleteness Theorem"
+date: 2026-01-15
 permalink: /nature/218-godels-first-incompleteness-theorem/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

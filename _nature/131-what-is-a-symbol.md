@@ -1,5 +1,6 @@
 ---
 title: 'What Is a Symbol?'
+date: 2025-10-20
 permalink: /nature/131-what-is-a-symbol/
 chapter: 8
 chapter_title: 'Information and Representation'

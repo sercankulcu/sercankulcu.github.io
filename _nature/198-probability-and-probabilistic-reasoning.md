@@ -1,5 +1,6 @@
 ---
 title: 'Probability and Probabilistic Reasoning'
+date: 2025-12-26
 permalink: /nature/198-probability-and-probabilistic-reasoning/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

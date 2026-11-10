@@ -1,5 +1,6 @@
 ---
 title: 'Morphology, Syntax, Semantics, and Pragmatics'
+date: 2025-11-12
 permalink: /nature/154-morphology-syntax-semantics-and-pragmatics/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

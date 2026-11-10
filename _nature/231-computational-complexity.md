@@ -1,5 +1,6 @@
 ---
 title: 'Computational Complexity'
+date: 2026-01-28
 permalink: /nature/231-computational-complexity/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

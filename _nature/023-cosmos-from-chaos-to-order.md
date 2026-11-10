@@ -1,5 +1,6 @@
 ---
 title: 'Cosmos: From Chaos to Order'
+date: 2025-07-04
 permalink: /nature/023-cosmos-from-chaos-to-order/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

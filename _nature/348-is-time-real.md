@@ -1,5 +1,6 @@
 ---
 title: 'Is Time Real?'
+date: 2026-05-25
 permalink: /nature/348-is-time-real/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

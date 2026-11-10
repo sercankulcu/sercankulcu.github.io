@@ -1,5 +1,6 @@
 ---
 title: 'Contradictions'
+date: 2025-12-15
 permalink: /nature/187-contradictions/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

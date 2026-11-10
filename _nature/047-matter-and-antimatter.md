@@ -1,5 +1,6 @@
 ---
 title: 'Matter and Antimatter'
+date: 2025-07-28
 permalink: /nature/047-matter-and-antimatter/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

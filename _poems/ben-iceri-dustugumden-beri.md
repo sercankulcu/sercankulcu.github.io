@@ -1,5 +1,6 @@
 ---
 title: "Ben içeri düştüğümden beri"
+date: 2026-06-04
 poet: "Nazım Hikmet"
 order: 4
 ---

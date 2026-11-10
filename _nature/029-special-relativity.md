@@ -1,5 +1,6 @@
 ---
 title: 'Special Relativity'
+date: 2025-07-10
 permalink: /nature/029-special-relativity/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

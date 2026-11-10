@@ -1,5 +1,6 @@
 ---
 title: 'Theory, Experiment, and Computation'
+date: 2025-08-11
 permalink: /nature/061-theory-experiment-and-computation/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

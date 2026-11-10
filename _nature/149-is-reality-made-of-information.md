@@ -1,5 +1,6 @@
 ---
 title: 'Is Reality Made of Information?'
+date: 2025-11-07
 permalink: /nature/149-is-reality-made-of-information/
 chapter: 8
 chapter_title: 'Information and Representation'

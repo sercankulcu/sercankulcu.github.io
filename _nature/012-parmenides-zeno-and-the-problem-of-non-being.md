@@ -1,5 +1,6 @@
 ---
 title: 'Parmenides, Zeno, and the Problem of Non-Being'
+date: 2025-06-23
 permalink: /nature/012-parmenides-zeno-and-the-problem-of-non-being/
 chapter: 2
 chapter_title: 'Nothing'

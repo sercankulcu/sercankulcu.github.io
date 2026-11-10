@@ -1,5 +1,6 @@
 ---
 title: 'What Is Real?'
+date: 2026-05-18
 permalink: /nature/341-what-is-real/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

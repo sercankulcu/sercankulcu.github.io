@@ -1,5 +1,6 @@
 ---
 title: 'Can Life Emerge from Non-Life?'
+date: 2025-09-21
 permalink: /nature/102-can-life-emerge-from-non-life/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

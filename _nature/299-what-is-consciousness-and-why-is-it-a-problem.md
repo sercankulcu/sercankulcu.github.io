@@ -1,5 +1,6 @@
 ---
 title: 'What Is Consciousness, and Why Is It a Problem?'
+date: 2026-04-06
 permalink: /nature/299-what-is-consciousness-and-why-is-it-a-problem/
 chapter: 16
 chapter_title: 'Consciousness'

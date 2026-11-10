@@ -1,5 +1,6 @@
 ---
 title: 'Self-Reproducing Machines'
+date: 2025-11-29
 permalink: /nature/171-self-reproducing-machines/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

@@ -1,5 +1,6 @@
 ---
 title: 'Computer Vision and Robotics'
+date: 2026-03-27
 permalink: /nature/289-computer-vision-and-robotics/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

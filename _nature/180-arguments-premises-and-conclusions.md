@@ -1,5 +1,6 @@
 ---
 title: 'Arguments, Premises, and Conclusions'
+date: 2025-12-08
 permalink: /nature/180-arguments-premises-and-conclusions/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

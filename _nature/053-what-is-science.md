@@ -1,5 +1,6 @@
 ---
 title: 'What Is Science?'
+date: 2025-08-03
 permalink: /nature/053-what-is-science/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

@@ -1,5 +1,6 @@
 ---
 title: 'Church, Tarski, and the Limits of Formal Systems'
+date: 2026-01-18
 permalink: /nature/221-church-tarski-and-the-limits-of-formal-systems/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

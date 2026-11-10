@@ -1,5 +1,6 @@
 ---
 title: 'The Four Fundamental Interactions'
+date: 2025-07-16
 permalink: /nature/035-the-four-fundamental-interactions/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

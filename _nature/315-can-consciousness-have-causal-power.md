@@ -1,5 +1,6 @@
 ---
 title: 'Can Consciousness Have Causal Power?'
+date: 2026-04-22
 permalink: /nature/315-can-consciousness-have-causal-power/
 chapter: 16
 chapter_title: 'Consciousness'

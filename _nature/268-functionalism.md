@@ -1,5 +1,6 @@
 ---
 title: 'Functionalism'
+date: 2026-03-06
 permalink: /nature/268-functionalism/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

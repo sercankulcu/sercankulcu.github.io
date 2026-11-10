@@ -1,5 +1,6 @@
 ---
 title: 'Set Theory'
+date: 2026-01-02
 permalink: /nature/205-set-theory/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

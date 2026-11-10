@@ -1,5 +1,6 @@
 ---
 title: 'Measurement: Turning Nature into Numbers'
+date: 2025-08-05
 permalink: /nature/055-measurement-turning-nature-into-numbers/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

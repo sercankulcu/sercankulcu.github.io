@@ -1,5 +1,6 @@
 ---
 title: 'True but Unprovable'
+date: 2026-01-16
 permalink: /nature/219-true-but-unprovable/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

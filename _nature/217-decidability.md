@@ -1,5 +1,6 @@
 ---
 title: 'Decidability'
+date: 2026-01-14
 permalink: /nature/217-decidability/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

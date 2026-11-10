@@ -1,5 +1,6 @@
 ---
 title: 'What Is a Brain?'
+date: 2026-02-09
 permalink: /nature/243-what-is-a-brain/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

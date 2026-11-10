@@ -1,5 +1,6 @@
 ---
 title: 'Cosmic Inflation'
+date: 2025-07-22
 permalink: /nature/041-cosmic-inflation/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

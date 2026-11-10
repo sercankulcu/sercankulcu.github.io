@@ -1,5 +1,6 @@
 ---
 title: 'Hypotheses, Theories, and Models'
+date: 2025-08-07
 permalink: /nature/057-hypotheses-theories-and-models/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

@@ -1,5 +1,6 @@
 ---
 title: 'Observation and the Limits of Observation'
+date: 2025-08-04
 permalink: /nature/054-observation-and-the-limits-of-observation/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

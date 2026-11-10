@@ -1,5 +1,6 @@
 ---
 title: 'Nothingness in Philosophy, Religion, and Mysticism'
+date: 2025-06-27
 permalink: /nature/016-nothingness-in-philosophy-religion-and-mysticism/
 chapter: 2
 chapter_title: 'Nothing'

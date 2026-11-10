@@ -1,5 +1,6 @@
 ---
 title: 'Can Something Come from Nothing?'
+date: 2025-07-03
 permalink: /nature/022-can-something-come-from-nothing/
 chapter: 2
 chapter_title: 'Nothing'

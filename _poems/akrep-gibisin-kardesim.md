@@ -1,5 +1,6 @@
 ---
 title: "Akrep gibisin kardeşim"
+date: 2026-06-01
 poet: "Nazım Hikmet RAN"
 order: 1
 ---

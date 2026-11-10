@@ -1,5 +1,6 @@
 ---
 title: 'Temporal Logic'
+date: 2025-12-22
 permalink: /nature/194-temporal-logic/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

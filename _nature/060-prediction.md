@@ -1,5 +1,6 @@
 ---
 title: 'Prediction'
+date: 2025-08-10
 permalink: /nature/060-prediction/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

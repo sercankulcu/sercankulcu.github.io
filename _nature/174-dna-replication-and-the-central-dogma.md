@@ -1,5 +1,6 @@
 ---
 title: 'DNA Replication and the Central Dogma'
+date: 2025-12-02
 permalink: /nature/174-dna-replication-and-the-central-dogma/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

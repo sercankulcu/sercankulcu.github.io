@@ -1,5 +1,6 @@
 ---
 title: 'Consistency'
+date: 2026-01-12
 permalink: /nature/215-consistency/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

@@ -1,5 +1,6 @@
 ---
 title: "Japon Balıkçısı"
+date: 2026-06-09
 poet: "Nazım Hikmet"
 order: 9
 ---

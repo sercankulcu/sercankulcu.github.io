@@ -1,5 +1,6 @@
 ---
 title: 'Faith, Evidence, and Revelation'
+date: 2025-09-01
 permalink: /nature/082-faith-evidence-and-revelation/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

@@ -1,5 +1,6 @@
 ---
 title: 'What Is Information?'
+date: 2025-10-19
 permalink: /nature/130-what-is-information/
 chapter: 8
 chapter_title: 'Information and Representation'

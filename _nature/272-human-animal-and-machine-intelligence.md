@@ -1,5 +1,6 @@
 ---
 title: 'Human, Animal, and Machine Intelligence'
+date: 2026-03-10
 permalink: /nature/272-human-animal-and-machine-intelligence/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

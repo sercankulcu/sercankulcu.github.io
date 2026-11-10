@@ -1,5 +1,6 @@
 ---
 title: 'The Liar Paradox'
+date: 2025-11-26
 permalink: /nature/168-the-liar-paradox/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

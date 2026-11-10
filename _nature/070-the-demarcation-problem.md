@@ -1,5 +1,6 @@
 ---
 title: 'The Demarcation Problem'
+date: 2025-08-20
 permalink: /nature/070-the-demarcation-problem/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

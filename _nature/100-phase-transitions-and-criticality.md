@@ -1,5 +1,6 @@
 ---
 title: 'Phase Transitions and Criticality'
+date: 2025-09-19
 permalink: /nature/100-phase-transitions-and-criticality/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

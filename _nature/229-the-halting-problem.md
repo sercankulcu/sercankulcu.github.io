@@ -1,5 +1,6 @@
 ---
 title: 'The Halting Problem'
+date: 2026-01-26
 permalink: /nature/229-the-halting-problem/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

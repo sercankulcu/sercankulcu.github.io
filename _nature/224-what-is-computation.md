@@ -1,5 +1,6 @@
 ---
 title: 'What Is Computation?'
+date: 2026-01-21
 permalink: /nature/224-what-is-computation/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

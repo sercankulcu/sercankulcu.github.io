@@ -1,5 +1,6 @@
 ---
 title: 'Verificationism'
+date: 2025-08-23
 permalink: /nature/073-verificationism/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

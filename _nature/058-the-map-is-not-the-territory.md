@@ -1,5 +1,6 @@
 ---
 title: 'The Map Is Not the Territory'
+date: 2025-08-08
 permalink: /nature/058-the-map-is-not-the-territory/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

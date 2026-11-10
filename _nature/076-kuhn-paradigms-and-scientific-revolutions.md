@@ -1,5 +1,6 @@
 ---
 title: 'Kuhn, Paradigms, and Scientific Revolutions'
+date: 2025-08-26
 permalink: /nature/076-kuhn-paradigms-and-scientific-revolutions/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

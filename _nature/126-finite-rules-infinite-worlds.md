@@ -1,5 +1,6 @@
 ---
 title: 'Finite Rules, Infinite Worlds'
+date: 2025-10-15
 permalink: /nature/126-finite-rules-infinite-worlds/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

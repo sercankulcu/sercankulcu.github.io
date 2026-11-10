@@ -1,5 +1,6 @@
 ---
 title: 'Information and Entropy'
+date: 2025-11-04
 permalink: /nature/146-information-and-entropy/
 chapter: 8
 chapter_title: 'Information and Representation'

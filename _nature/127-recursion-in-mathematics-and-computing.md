@@ -1,5 +1,6 @@
 ---
 title: 'Recursion in Mathematics and Computing'
+date: 2025-10-16
 permalink: /nature/127-recursion-in-mathematics-and-computing/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

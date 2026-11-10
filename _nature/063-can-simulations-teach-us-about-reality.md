@@ -1,5 +1,6 @@
 ---
 title: 'Can Simulations Teach Us About Reality?'
+date: 2025-08-13
 permalink: /nature/063-can-simulations-teach-us-about-reality/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

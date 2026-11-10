@@ -1,5 +1,6 @@
 ---
 title: 'Is the Universe Computing?'
+date: 2026-02-01
 permalink: /nature/235-is-the-universe-computing/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

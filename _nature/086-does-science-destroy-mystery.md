@@ -1,5 +1,6 @@
 ---
 title: 'Does Science Destroy Mystery?'
+date: 2025-09-05
 permalink: /nature/086-does-science-destroy-mystery/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

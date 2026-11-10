@@ -1,5 +1,6 @@
 ---
 title: 'Finite Rules and Infinite Sentences'
+date: 2025-11-10
 permalink: /nature/152-finite-rules-and-infinite-sentences/
 chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'

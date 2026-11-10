@@ -1,5 +1,6 @@
 ---
 title: 'Why the Same Bits Can Mean Different Things'
+date: 2025-10-25
 permalink: /nature/136-why-the-same-bits-can-mean-different-things/
 chapter: 8
 chapter_title: 'Information and Representation'

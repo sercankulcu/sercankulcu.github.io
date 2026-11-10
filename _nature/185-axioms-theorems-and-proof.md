@@ -1,5 +1,6 @@
 ---
 title: 'Axioms, Theorems, and Proof'
+date: 2025-12-13
 permalink: /nature/185-axioms-theorems-and-proof/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

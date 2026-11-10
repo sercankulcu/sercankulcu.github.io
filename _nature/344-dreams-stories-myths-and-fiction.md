@@ -1,5 +1,6 @@
 ---
 title: 'Dreams, Stories, Myths, and Fiction'
+date: 2026-05-21
 permalink: /nature/344-dreams-stories-myths-and-fiction/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

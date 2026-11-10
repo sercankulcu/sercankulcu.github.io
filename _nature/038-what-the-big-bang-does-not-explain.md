@@ -1,5 +1,6 @@
 ---
 title: 'What the Big Bang Does Not Explain'
+date: 2025-07-19
 permalink: /nature/038-what-the-big-bang-does-not-explain/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

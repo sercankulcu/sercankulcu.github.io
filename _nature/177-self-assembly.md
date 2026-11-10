@@ -1,5 +1,6 @@
 ---
 title: 'Self-Assembly'
+date: 2025-12-05
 permalink: /nature/177-self-assembly/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

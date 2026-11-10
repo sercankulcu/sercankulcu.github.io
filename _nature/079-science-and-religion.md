@@ -1,5 +1,6 @@
 ---
 title: 'Science and Religion'
+date: 2025-08-29
 permalink: /nature/079-science-and-religion/
 chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'

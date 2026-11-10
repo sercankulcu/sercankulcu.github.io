@@ -1,5 +1,6 @@
 ---
 title: 'Does Meaning Exist Inside a Message?'
+date: 2025-10-28
 permalink: /nature/139-does-meaning-exist-inside-a-message/
 chapter: 8
 chapter_title: 'Information and Representation'

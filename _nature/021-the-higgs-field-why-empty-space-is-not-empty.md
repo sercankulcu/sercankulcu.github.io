@@ -1,5 +1,6 @@
 ---
 title: 'The Higgs Field: Why Empty Space Is Not Empty'
+date: 2025-07-02
 permalink: /nature/021-the-higgs-field-why-empty-space-is-not-empty/
 chapter: 2
 chapter_title: 'Nothing'

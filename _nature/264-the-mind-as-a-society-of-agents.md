@@ -1,5 +1,6 @@
 ---
 title: 'The Mind as a Society of Agents'
+date: 2026-03-02
 permalink: /nature/264-the-mind-as-a-society-of-agents/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

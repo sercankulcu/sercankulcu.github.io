@@ -1,5 +1,6 @@
 ---
 title: 'Weak and Strong Emergence'
+date: 2025-09-13
 permalink: /nature/094-weak-and-strong-emergence/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

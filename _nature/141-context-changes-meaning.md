@@ -1,5 +1,6 @@
 ---
 title: 'Context Changes Meaning'
+date: 2025-10-30
 permalink: /nature/141-context-changes-meaning/
 chapter: 8
 chapter_title: 'Information and Representation'

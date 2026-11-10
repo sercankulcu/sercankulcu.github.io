@@ -1,5 +1,6 @@
 ---
 title: 'Why Nature Is Not Made of Perfect Shapes'
+date: 2025-10-04
 permalink: /nature/115-why-nature-is-not-made-of-perfect-shapes/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

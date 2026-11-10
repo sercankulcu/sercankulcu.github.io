@@ -1,5 +1,6 @@
 ---
 title: 'The Atomists and the Discovery of the Void'
+date: 2025-06-24
 permalink: /nature/013-the-atomists-and-the-discovery-of-the-void/
 chapter: 2
 chapter_title: 'Nothing'

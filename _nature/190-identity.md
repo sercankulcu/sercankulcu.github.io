@@ -1,5 +1,6 @@
 ---
 title: 'Identity'
+date: 2025-12-18
 permalink: /nature/190-identity/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

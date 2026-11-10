@@ -1,5 +1,6 @@
 ---
 title: 'Determinism'
+date: 2026-04-26
 permalink: /nature/319-determinism/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

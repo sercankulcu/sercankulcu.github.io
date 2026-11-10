@@ -1,5 +1,6 @@
 ---
 title: 'What Is a Dynamical System?'
+date: 2025-09-26
 permalink: /nature/107-what-is-a-dynamical-system/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

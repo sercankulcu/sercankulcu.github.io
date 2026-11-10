@@ -1,5 +1,6 @@
 ---
 title: 'Are There Limits to Reason?'
+date: 2026-01-19
 permalink: /nature/222-are-there-limits-to-reason/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

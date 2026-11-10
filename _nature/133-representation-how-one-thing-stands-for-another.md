@@ -1,5 +1,6 @@
 ---
 title: 'Representation: How One Thing Stands for Another'
+date: 2025-10-22
 permalink: /nature/133-representation-how-one-thing-stands-for-another/
 chapter: 8
 chapter_title: 'Information and Representation'

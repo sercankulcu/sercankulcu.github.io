@@ -1,5 +1,6 @@
 ---
 title: 'Can Machines Have Agency or Responsibility?'
+date: 2026-05-05
 permalink: /nature/328-can-machines-have-agency-or-responsibility/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

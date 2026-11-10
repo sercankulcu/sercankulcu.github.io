@@ -1,5 +1,6 @@
 ---
 title: 'Paradoxes'
+date: 2025-12-17
 permalink: /nature/189-paradoxes/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

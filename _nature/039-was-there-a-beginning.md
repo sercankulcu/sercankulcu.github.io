@@ -1,5 +1,6 @@
 ---
 title: 'Was There a Beginning?'
+date: 2025-07-20
 permalink: /nature/039-was-there-a-beginning/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

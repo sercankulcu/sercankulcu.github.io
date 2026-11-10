@@ -1,5 +1,6 @@
 ---
 title: 'Modal Logic'
+date: 2025-12-21
 permalink: /nature/193-modal-logic/
 chapter: 11
 chapter_title: 'Logic and Reasoning'

@@ -1,5 +1,6 @@
 ---
 title: 'Could We Be Living in a Simulation?'
+date: 2026-05-29
 permalink: /nature/352-could-we-be-living-in-a-simulation/
 chapter: 19
 chapter_title: 'Reality and the Final Questions'

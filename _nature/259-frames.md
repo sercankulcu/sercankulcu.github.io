@@ -1,5 +1,6 @@
 ---
 title: 'Frames'
+date: 2026-02-25
 permalink: /nature/259-frames/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

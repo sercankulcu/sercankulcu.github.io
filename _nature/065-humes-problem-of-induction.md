@@ -1,5 +1,6 @@
 ---
 title: "Hume's Problem of Induction"
+date: 2025-08-15
 permalink: /nature/065-humes-problem-of-induction/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

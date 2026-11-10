@@ -1,5 +1,6 @@
 ---
 title: 'Compatibilism'
+date: 2026-04-28
 permalink: /nature/321-compatibilism/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

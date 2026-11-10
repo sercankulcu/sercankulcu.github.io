@@ -1,5 +1,6 @@
 ---
 title: 'What Could Have Happened Before the Big Bang?'
+date: 2025-07-21
 permalink: /nature/040-what-could-have-happened-before-the-big-bang/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

@@ -1,5 +1,6 @@
 ---
 title: 'Introspection'
+date: 2026-02-26
 permalink: /nature/260-introspection/
 chapter: 14
 chapter_title: 'Brain, Mind, and Self'

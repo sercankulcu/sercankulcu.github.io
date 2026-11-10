@@ -1,5 +1,6 @@
 ---
 title: 'What Is the Universe?'
+date: 2025-06-13
 permalink: /nature/002-what-is-the-universe/
 chapter: 1
 chapter_title: 'The First Questions'

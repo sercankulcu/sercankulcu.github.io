@@ -1,5 +1,6 @@
 ---
 title: 'What Can Be Computed?'
+date: 2026-01-25
 permalink: /nature/228-what-can-be-computed/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

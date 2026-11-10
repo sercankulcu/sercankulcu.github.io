@@ -1,5 +1,6 @@
 ---
 title: 'How Might the Universe End?'
+date: 2025-07-31
 permalink: /nature/050-how-might-the-universe-end/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

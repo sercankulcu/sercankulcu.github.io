@@ -1,5 +1,6 @@
 ---
 title: 'What Is an Algorithm?'
+date: 2026-01-22
 permalink: /nature/225-what-is-an-algorithm/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

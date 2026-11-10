@@ -1,5 +1,6 @@
 ---
 title: 'Scientific Realism and Instrumentalism'
+date: 2025-08-24
 permalink: /nature/074-scientific-realism-and-instrumentalism/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

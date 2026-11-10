@@ -1,5 +1,6 @@
 ---
 title: 'Why Is the Universe Expanding?'
+date: 2025-07-23
 permalink: /nature/042-why-is-the-universe-expanding/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

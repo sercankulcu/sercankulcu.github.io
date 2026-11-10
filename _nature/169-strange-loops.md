@@ -1,5 +1,6 @@
 ---
 title: 'Strange Loops'
+date: 2025-11-27
 permalink: /nature/169-strange-loops/
 chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'

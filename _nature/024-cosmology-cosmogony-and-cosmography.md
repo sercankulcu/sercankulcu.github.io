@@ -1,5 +1,6 @@
 ---
 title: 'Cosmology, Cosmogony, and Cosmography'
+date: 2025-07-05
 permalink: /nature/024-cosmology-cosmogony-and-cosmography/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

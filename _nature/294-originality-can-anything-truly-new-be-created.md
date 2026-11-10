@@ -1,5 +1,6 @@
 ---
 title: 'Originality: Can Anything Truly New Be Created?'
+date: 2026-04-01
 permalink: /nature/294-originality-can-anything-truly-new-be-created/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

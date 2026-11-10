@@ -1,5 +1,6 @@
 ---
 title: 'Number Theory'
+date: 2026-01-03
 permalink: /nature/206-number-theory/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

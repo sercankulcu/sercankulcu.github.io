@@ -1,5 +1,6 @@
 ---
 title: 'Formal Systems: Symbols, Syntax, and Rules'
+date: 2025-12-29
 permalink: /nature/201-formal-systems-symbols-syntax-and-rules/
 chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'

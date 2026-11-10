@@ -1,5 +1,6 @@
 ---
 title: 'Sentience and Self-Awareness'
+date: 2026-04-12
 permalink: /nature/305-sentience-and-self-awareness/
 chapter: 16
 chapter_title: 'Consciousness'

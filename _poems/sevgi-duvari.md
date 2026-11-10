@@ -1,5 +1,6 @@
 ---
 title: "Sevgi Duvarı"
+date: 2026-06-11
 poet: "Can Yücel"
 order: 11
 ---

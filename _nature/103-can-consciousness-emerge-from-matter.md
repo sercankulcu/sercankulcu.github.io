@@ -1,5 +1,6 @@
 ---
 title: 'Can Consciousness Emerge from Matter?'
+date: 2025-09-22
 permalink: /nature/103-can-consciousness-emerge-from-matter/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

@@ -1,5 +1,6 @@
 ---
 title: "Ockham's Razor"
+date: 2025-08-19
 permalink: /nature/069-ockhams-razor/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

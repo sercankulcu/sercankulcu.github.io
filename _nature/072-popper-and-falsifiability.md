@@ -1,5 +1,6 @@
 ---
 title: 'Popper and Falsifiability'
+date: 2025-08-22
 permalink: /nature/072-popper-and-falsifiability/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'

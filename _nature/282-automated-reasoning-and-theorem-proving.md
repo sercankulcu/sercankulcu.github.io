@@ -1,5 +1,6 @@
 ---
 title: 'Automated Reasoning and Theorem Proving'
+date: 2026-03-20
 permalink: /nature/282-automated-reasoning-and-theorem-proving/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

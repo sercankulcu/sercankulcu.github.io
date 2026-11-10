@@ -1,5 +1,6 @@
 ---
 title: 'What Is Intelligence? Sensing, Thinking, and Acting'
+date: 2026-03-09
 permalink: /nature/271-what-is-intelligence-sensing-thinking-and-acting/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

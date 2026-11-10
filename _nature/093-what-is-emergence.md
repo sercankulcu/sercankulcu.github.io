@@ -1,5 +1,6 @@
 ---
 title: 'What Is Emergence?'
+date: 2025-09-12
 permalink: /nature/093-what-is-emergence/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

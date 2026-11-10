@@ -1,5 +1,6 @@
 ---
 title: 'Digital Physics'
+date: 2026-02-02
 permalink: /nature/236-digital-physics/
 chapter: 13
 chapter_title: 'Computation and Computer Science'

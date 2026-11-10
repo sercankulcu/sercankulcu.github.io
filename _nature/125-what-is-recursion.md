@@ -1,5 +1,6 @@
 ---
 title: 'What Is Recursion?'
+date: 2025-10-14
 permalink: /nature/125-what-is-recursion/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

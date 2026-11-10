@@ -1,5 +1,6 @@
 ---
 title: 'Expert Systems'
+date: 2026-03-21
 permalink: /nature/283-expert-systems/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

@@ -1,5 +1,6 @@
 ---
 title: 'Self-Organization'
+date: 2025-09-16
 permalink: /nature/097-self-organization/
 chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'

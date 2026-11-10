@@ -1,5 +1,6 @@
 ---
 title: 'The Big Bang'
+date: 2025-07-18
 permalink: /nature/037-the-big-bang/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

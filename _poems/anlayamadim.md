@@ -1,5 +1,6 @@
 ---
 title: "Anlayamadım"
+date: 2026-06-02
 poet: "Menderes Samancılar"
 order: 2
 ---

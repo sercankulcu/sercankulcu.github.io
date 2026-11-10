@@ -1,5 +1,6 @@
 ---
 title: "Bence Şimdi Sen De Herkes Gibisin"
+date: 2026-06-05
 poet: "Nazım Hikmet"
 order: 5
 ---

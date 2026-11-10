@@ -1,5 +1,6 @@
 ---
 title: 'Particles and the Quantum World'
+date: 2025-07-14
 permalink: /nature/033-particles-and-the-quantum-world/
 chapter: 3
 chapter_title: 'Cosmos and Origins'

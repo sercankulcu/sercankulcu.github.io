@@ -1,5 +1,6 @@
 ---
 title: 'The Quantum Vacuum and Fields'
+date: 2025-07-01
 permalink: /nature/020-the-quantum-vacuum-and-fields/
 chapter: 2
 chapter_title: 'Nothing'

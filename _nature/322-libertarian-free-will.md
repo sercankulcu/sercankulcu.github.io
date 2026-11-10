@@ -1,5 +1,6 @@
 ---
 title: 'Libertarian Free Will'
+date: 2026-04-29
 permalink: /nature/322-libertarian-free-will/
 chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'

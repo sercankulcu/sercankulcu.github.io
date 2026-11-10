@@ -1,5 +1,6 @@
 ---
 title: 'Attractors and Strange Attractors'
+date: 2025-10-02
 permalink: /nature/113-attractors-and-strange-attractors/
 chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'

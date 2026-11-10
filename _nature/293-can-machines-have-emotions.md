@@ -1,5 +1,6 @@
 ---
 title: 'Can Machines Have Emotions?'
+date: 2026-03-31
 permalink: /nature/293-can-machines-have-emotions/
 chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'

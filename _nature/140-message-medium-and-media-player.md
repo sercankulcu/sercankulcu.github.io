@@ -1,5 +1,6 @@
 ---
 title: 'Message, Medium, and Media Player'
+date: 2025-10-29
 permalink: /nature/140-message-medium-and-media-player/
 chapter: 8
 chapter_title: 'Information and Representation'
