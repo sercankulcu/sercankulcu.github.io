@@ -23,6 +23,7 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 * [Bilgisayar ve Programlamada Önemli İsimler (HTML)](/files/computer/Computer_and_Programming_Important_People.html)
 * [Bilgisayar ve Programlamaya Giriş İçin Ön Bilgiler (HTML)](/files/computer/Computer_and_Programming_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/computer/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/computer/sozluk.html)
 
 ---

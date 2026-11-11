@@ -23,6 +23,8 @@ notes_book.setup(
     globals(),
     folder='dsa_c',
     course_page='data-structures-and-algorithms-with-c.md',
+    # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
+    intro=[('ders_haritasi.html', 'harita')],
     title='C ile Veri Yapıları ve Algoritmalar',
     subtitle='',
     output='dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf',   # courses-pdfs/ altinda

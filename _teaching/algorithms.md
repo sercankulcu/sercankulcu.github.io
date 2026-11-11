@@ -23,6 +23,7 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 * [Algoritmalarda Önemli İsimler (HTML)](/files/algorithms/Algorithms_Important_People.html)
 * [Algoritmalar İçin Ön Bilgiler (HTML)](/files/algorithms/Algorithms_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/algorithms/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/algorithms/sozluk.html)
 
 ---

@@ -26,6 +26,8 @@ notes_book.setup(
     globals(),
     folder='algorithms',
     course_page='algorithms.md',
+    # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
+    intro=[('ders_haritasi.html', 'harita')],
     title='Algoritmalar',
     subtitle='',
     output='algorithms/Algoritmalar.pdf',           # courses-pdfs/ altinda

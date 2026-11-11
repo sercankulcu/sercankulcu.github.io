@@ -23,6 +23,7 @@ This course studies data structures and algorithms through their memory represen
 
 * [C ile Veri Yapılarında Önemli İsimler (HTML)](/files/dsa_c/DSA_C_Important_People.html)
 * [C ile Veri Yapıları İçin Ön Bilgiler (HTML)](/files/dsa_c/DSA_C_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/dsa_c/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/dsa_c/sozluk.html)
 
 ---

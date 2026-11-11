@@ -23,6 +23,7 @@ Microprocessors execute instructions, process data, and coordinate the operation
 
 * [Mikroişlemcilerde Önemli İsimler (HTML)](/files/microprocessors/Microprocessors_Important_People.html)
 * [Mikroişlemciler İçin Ön Bilgiler (HTML)](/files/microprocessors/Microprocessors_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/microprocessors/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/microprocessors/sozluk.html)
 
 ---

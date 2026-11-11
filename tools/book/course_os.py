@@ -41,6 +41,8 @@ notes_book.setup(
     globals(),
     folder='os',
     course_page=COURSE_PAGE,
+    # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
+    intro=[('ders_haritasi.html', 'harita')],
     title='İşletim Sistemleri',
     subtitle='',
     output='os/Isletim-Sistemleri.pdf',             # courses-pdfs/ altinda

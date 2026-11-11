@@ -23,6 +23,7 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 
 * [İşletim Sistemlerinin Öncüleri (HTML)](/files/os/Pioneers_of_Operating_Systems.html)
 * [İşletim Sistemleri İçin Ön Bilgiler (HTML)](/files/os/Prerequisites_for_Operating_Systems.html)
+* [Dersin Haritası (HTML)](/files/os/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/os/sozluk.html)
 
 ---

@@ -23,6 +23,7 @@ Data structures provide systematic ways to organize, store, and access data. Cho
 
 * [Veri Yapılarında Önemli İsimler (HTML)](/files/data_structures/Data_Structures_Important_People.html)
 * [Veri Yapıları İçin Ön Bilgiler (HTML)](/files/data_structures/Data_Structures_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/data_structures/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/data_structures/sozluk.html)
 
 ---

@@ -27,6 +27,8 @@ notes_book.setup(
     globals(),
     folder='computer',
     course_page='computer-and-programming.md',
+    # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
+    intro=[('ders_haritasi.html', 'harita')],
     title='Bilgisayar ve Programlamaya Giriş',
     subtitle='',
     output='computer/Bilgisayar-ve-Programlamaya-Giris.pdf',   # courses-pdfs/ altinda

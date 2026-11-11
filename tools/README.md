@@ -60,8 +60,8 @@ etkileşimli sayfalardır; kitapta arama, süzgeç, sıralama ve düğmeler atı
 Appendix A/B olur (`course_c.py`, `_appendix`).
 
 İsteğe bağlı giriş sayfaları (`notes_book.setup(..., intro=[('dosya.html', 'kimlik')])`)
-Kısım I'den önce basılır ve içindekilerin en üstünde yer alır; AGT'de dersin haritası
-(`files/agt/ders_haritasi.html`) böyledir.
+Kısım I'den önce basılır ve içindekilerin en üstünde yer alır; Türkçe derslerin hepsinde
+dersin haritası (`files/<ders>/ders_haritasi.html`) böyledir.
 
 | Aşama | Dosya | İş |
 |---|---|---|
@@ -107,6 +107,21 @@ Dikkat edilecekler (hepsi denendi):
 Ortak ön kısım ve içindekiler düzeni `book/book-front.css`, C bölüm gövdesi
 `book/book.css`, AGT ve Veri Yapıları bölüm gövdesi `files/<ders>/notlar/notlar.css` + `book/book_notes.css`
 içindedir.
+
+## Ders haritaları
+
+```bash
+python tools/course_map.py               # bütün dersler
+python tools/course_map.py os java       # yalnızca verilenler
+```
+
+`files/<ders>/ders_haritasi.html` sayfalarını `tools/course_maps.py` içindeki tanımlardan
+üretir: satır satır bölüm numaraları, oklar ve bağ tablosu. Bölüm adları ders sayfasındaki
+`### Bölüm N: Ad` başlıklarından okunur; bölüm adı değişirse haritayı yeniden üretin. Oklar
+yalnızca aynı satırdaki komşu iki kutu ya da ardışık iki satır arasında çizilir, böylece
+hiçbir ok bir kutunun üstünden geçmez; daha uzak bağlar tabloda yazılır. Ders sayfasında
+olup haritada ya da tabloda olmayan bölüm derlemeyi durdurur. AGT haritası elle
+yazılmıştır ve üreteçte yoktur.
 
 ## Sunum PDF'leri
 

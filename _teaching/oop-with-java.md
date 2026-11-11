@@ -23,6 +23,7 @@ Java is one of the most popular programming languages, extensively used in vario
 
 * [Java ve Nesne Yönelimli Programlamada Önemli İsimler (HTML)](/files/java/Java_Important_People.html)
 * [Java ile Nesne Yönelimli Programlama İçin Ön Bilgiler (HTML)](/files/java/Java_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/java/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/java/sozluk.html)
 
 ---
