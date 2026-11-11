@@ -127,7 +127,9 @@ class _Course:
         self.notes = os.path.join(self.dir, 'notlar')
         self.notes_url = '/files/%s/notlar' % folder
         self.course_page = os.path.join(SITE, '_teaching', course_page)
-        self.course_url = 'sercankulcu.github.io/teaching/%s/' % course_page[:-3]
+        # kunyedeki adres: ders sayfasinin permalink'i (dosya adi her zaman ayni degil)
+        fm = io.open(self.course_page, encoding='utf-8').read().split('---', 2)[1]
+        self.course_url = 'sercankulcu.github.io' + re.search(r'^permalink:\s*(\S+)', fm, re.M).group(1)
         self.title, self.subtitle, self.output = title, subtitle, output
         self.meta, self.preface, self.colophon = meta, preface, colophon
         self.extra_css = [os.path.join(self.dir, p) for p in extra_css]
