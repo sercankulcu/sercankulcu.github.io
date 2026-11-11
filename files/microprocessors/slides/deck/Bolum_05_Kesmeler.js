@@ -1,4 +1,4 @@
-/* Bölüm 5: Kesmeler sunumu demoları */
+/* Bölüm 5.1: Kesmeler sunumu demoları */
 (function () {
   function hex(n, w) { return n.toString(16).toUpperCase().padStart(w, "0"); }
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }

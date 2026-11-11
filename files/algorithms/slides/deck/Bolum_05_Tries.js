@@ -1,4 +1,4 @@
-/* Bölüm 5: Trie deneme alanı (ekle, ara, önek / tamamla, sil) */
+/* Bölüm 5.3: Trie Veri Yapısı deneme alanı (ekle, ara, önek / tamamla, sil) */
 (function () {
   document.querySelectorAll('.ds-deck [data-demo="a053-trie"]').forEach(function (demo) {
     var view = demo.querySelector(".a053-lab__view");

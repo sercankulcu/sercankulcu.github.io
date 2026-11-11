@@ -1,4 +1,4 @@
-/* Bölüm 1: Algoritmalar - arama ve sıralama deneme alanları */
+/* Bölüm 1.3: Algoritmalar - arama ve sıralama deneme alanları */
 (function () {
   function rnd(n) { return Math.floor(Math.random() * n); }
   function draw(box, vals, kinds, marks) {

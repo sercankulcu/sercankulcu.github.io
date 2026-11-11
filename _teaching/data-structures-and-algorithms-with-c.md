@@ -33,10 +33,10 @@ This course studies data structures and algorithms through their memory represen
 
 Bir yazılımın gereksinimlerden doğrulamaya uzanan yaşam döngüsü, algoritma kavramı ve soyut veri tiplerinin C'de başlık dosyalarıyla nasıl ifade edildiği ele alınır. Seçimli sıralama, C kodu ve SWAP makrosuyla birlikte ilk örnek olarak işlenir. Programların başarımı alan ve zaman karmaşıklığı üzerinden incelenir; adım sayma, en iyi, ortalama ve en kötü durum ile O, Ω ve Θ gösterimleri örneklerle açıklanır. Sihirli kare problemi ve sıralama ile doğrusal aramanın çalışma süresinin ölçülmesi, kuramsal analizi uygulamayla buluşturur.
 
-- [🖼️Sunum-Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/slides/Bolum_01_Giris_Algoritma_Analizi.html)
-- [📄Sunum-Giriş ve Algoritma Analizi (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_01_Giris_Algoritma_Analizi.pdf)
-- [📖Ders Notu - Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/notlar/Bolum_01_Giris_Algoritma_Analizi_Ders_Notu.html)
-- [📝Çalışma Soruları - Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/slides/Bolum_01_Giris_Algoritma_Analizi_Calisma_Sorulari.html)
+- [🖼️Sunum-Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/slides/Bolum_01_Giris_ve_Algoritma_Analizi.html)
+- [📄Sunum-Giriş ve Algoritma Analizi (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_01_Giris_ve_Algoritma_Analizi.pdf)
+- [📖Ders Notu - Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/notlar/Bolum_01_Giris_ve_Algoritma_Analizi_Ders_Notu.html)
+- [📝Çalışma Soruları - Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/slides/Bolum_01_Giris_ve_Algoritma_Analizi_Calisma_Sorulari.html)
 
 ---
 

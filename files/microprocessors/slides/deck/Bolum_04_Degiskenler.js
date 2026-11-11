@@ -1,4 +1,4 @@
-/* Bölüm 4: Değişkenler — veri tanımından bellek baytlarına (DB / DW / DD, DUP, ?, 'metin') */
+/* Bölüm 4.2: Değişkenler — veri tanımından bellek baytlarına (DB / DW / DD, DUP, ?, 'metin') */
 (function () {
   function hex(v, n) { var s = v.toString(16).toUpperCase(); while (s.length < n) s = "0" + s; return s; }
 

@@ -26,7 +26,9 @@ REPO = os.path.dirname(HERE)
 PDF_REPO = os.path.join(os.path.dirname(REPO), 'courses-pdfs')
 SITE = 'https://sercankulcu.github.io'
 # sayfa duzeni (tema, .page__content sarmalayicisi, MathJax) bu yayimlanmis sunumdan alinir
-SHELL_URL = SITE + '/files/computer/slides/Bolum_01_Bilgisayarlar.html'
+# duzeni alinan ornek sunum: adi degismeyen bir sunum secin (yeniden adlandirilan sunum
+# yayina cikana kadar 404 verir)
+SHELL_URL = SITE + '/files/os/slides/Bolum_01_Giris.html'
 
 PRINT_CSS = """
 @page { size: 800px 600px; margin: 0; }

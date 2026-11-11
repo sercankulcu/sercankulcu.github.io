@@ -1,4 +1,4 @@
-/* Bölüm 1: Bilgisayarlar - bit ve karakter kodu deneme alanları */
+/* Bölüm 1.1: Bilgisayarlar - bit ve karakter kodu deneme alanları */
 (function () {
   /* ---------- 8 bit deneme alanı ---------- */
   document.querySelectorAll('.ds-deck [data-demo="j011-bits"]').forEach(function (demo) {

@@ -1,4 +1,4 @@
-/* Bölüm 4: Sarmalama - setter koruması deneme alanı */
+/* Bölüm 4.2: Sarmalama - setter koruması deneme alanı */
 (function () {
   document.querySelectorAll('.ds-deck [data-demo="j042-saat"]').forEach(function (demo) {
     var LIMIT = { saat: 24, dakika: 60, saniye: 60 };

@@ -1,4 +1,4 @@
-/* Bölüm 4: Bellek Erişimi — etkin adres hesaplayıcı */
+/* Bölüm 4.1: Bellek Erişimi — etkin adres hesaplayıcı */
 (function () {
   function hex(v, n) { var s = v.toString(16).toUpperCase(); while (s.length < n) s = "0" + s; return s; }
   function parseHex(s) {
