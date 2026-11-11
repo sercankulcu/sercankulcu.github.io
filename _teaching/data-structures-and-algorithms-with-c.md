@@ -38,6 +38,7 @@ Bir yazılımın gereksinimlerden doğrulamaya uzanan yaşam döngüsü, algorit
 - [📄Sunum-Giriş ve Algoritma Analizi (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_01_Giris_ve_Algoritma_Analizi.pdf)
 - [📖Ders Notu - Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/notlar/Bolum_01_Giris_ve_Algoritma_Analizi_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş ve Algoritma Analizi (HTML)](/files/dsa_c/slides/Bolum_01_Giris_ve_Algoritma_Analizi_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum01)
 
 ---
 
@@ -49,6 +50,7 @@ Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki 
 - [📄Sunum-Diziler ve Yapılar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_02_Diziler_ve_Yapilar.pdf)
 - [📖Ders Notu - Diziler ve Yapılar (HTML)](/files/dsa_c/notlar/Bolum_02_Diziler_ve_Yapilar_Ders_Notu.html)
 - [📝Çalışma Soruları - Diziler ve Yapılar (HTML)](/files/dsa_c/slides/Bolum_02_Diziler_ve_Yapilar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum02)
 
 ---
 
@@ -60,6 +62,7 @@ Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki 
 - [📄Sunum-Özyineleme, İkili Arama ve Geri İzleme (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.pdf)
 - [📖Ders Notu - Özyineleme, İkili Arama ve Geri İzleme (HTML)](/files/dsa_c/notlar/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme_Ders_Notu.html)
 - [📝Çalışma Soruları - Özyineleme, İkili Arama ve Geri İzleme (HTML)](/files/dsa_c/slides/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum03)
 
 ---
 
@@ -73,6 +76,7 @@ Dizinin yetersiz kaldığı durumlardan yola çıkılarak düğümlerden oluşan
 - [📄Sunum-Bağlı Listeler (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_04_Bagli_Listeler.pdf)
 - [📖Ders Notu - Bağlı Listeler (HTML)](/files/dsa_c/notlar/Bolum_04_Bagli_Listeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Bağlı Listeler (HTML)](/files/dsa_c/slides/Bolum_04_Bagli_Listeler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum04)
 
 ---
 
@@ -84,6 +88,7 @@ Polinom soyut veri tipi, katsayı dizisi ve terim dizisi gösterimleriyle tanıt
 - [📄Sunum-Polinomlar ve Seyrek Matrisler (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_05_Polinomlar_ve_Seyrek_Matrisler.pdf)
 - [📖Ders Notu - Polinomlar ve Seyrek Matrisler (HTML)](/files/dsa_c/notlar/Bolum_05_Polinomlar_ve_Seyrek_Matrisler_Ders_Notu.html)
 - [📝Çalışma Soruları - Polinomlar ve Seyrek Matrisler (HTML)](/files/dsa_c/slides/Bolum_05_Polinomlar_ve_Seyrek_Matrisler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum05)
 
 ---
 
@@ -95,6 +100,7 @@ Son giren ilk çıkar (LIFO) ilkesiyle çalışan yığın, soyut veri tipi ve k
 - [📄Sunum-Yığınlar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_06_Yiginlar.pdf)
 - [📖Ders Notu - Yığınlar (HTML)](/files/dsa_c/notlar/Bolum_06_Yiginlar_Ders_Notu.html)
 - [📝Çalışma Soruları - Yığınlar (HTML)](/files/dsa_c/slides/Bolum_06_Yiginlar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum06)
 
 ---
 
@@ -106,6 +112,7 @@ Son giren ilk çıkar (LIFO) ilkesiyle çalışan yığın, soyut veri tipi ve k
 - [📄Sunum-Kuyruklar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_07_Kuyruklar.pdf)
 - [📖Ders Notu - Kuyruklar (HTML)](/files/dsa_c/notlar/Bolum_07_Kuyruklar_Ders_Notu.html)
 - [📝Çalışma Soruları - Kuyruklar (HTML)](/files/dsa_c/slides/Bolum_07_Kuyruklar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum07)
 
 ---
 
@@ -117,6 +124,7 @@ Yığın ve kuyruğun gerçek problemlerdeki kullanımı iki büyük uygulama ü
 - [📄Sunum-Yığın ve Kuyruk Uygulamaları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari.pdf)
 - [📖Ders Notu - Yığın ve Kuyruk Uygulamaları (HTML)](/files/dsa_c/notlar/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari_Ders_Notu.html)
 - [📝Çalışma Soruları - Yığın ve Kuyruk Uygulamaları (HTML)](/files/dsa_c/slides/Bolum_08_Yigin_ve_Kuyruk_Uygulamalari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum08)
 
 ---
 
@@ -128,6 +136,7 @@ Liste soyut veri tipinin sözleşmesi ile dizi ve bağlı liste gerçeklemeleri 
 - [📄Sunum-Liste ADT ve Genelleştirilmiş Listeler (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_09_Liste_ADT_ve_Genellestirilmis_Listeler.pdf)
 - [📖Ders Notu - Liste ADT ve Genelleştirilmiş Listeler (HTML)](/files/dsa_c/notlar/Bolum_09_Liste_ADT_ve_Genellestirilmis_Listeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Liste ADT ve Genelleştirilmiş Listeler (HTML)](/files/dsa_c/slides/Bolum_09_Liste_ADT_ve_Genellestirilmis_Listeler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum09)
 
 ---
 
@@ -141,6 +150,7 @@ Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve mük
 - [📄Sunum-Ağaçlar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_10_Agaclar.pdf)
 - [📖Ders Notu - Ağaçlar (HTML)](/files/dsa_c/notlar/Bolum_10_Agaclar_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağaçlar (HTML)](/files/dsa_c/slides/Bolum_10_Agaclar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum10)
 
 ---
 
@@ -152,6 +162,7 @@ Ağaç terminolojisi ve derinlik tanımlarından sonra ikili ağaç, tam ve mük
 - [📄Sunum-Arama Ağaçları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_11_Arama_Agaclari.pdf)
 - [📖Ders Notu - Arama Ağaçları (HTML)](/files/dsa_c/notlar/Bolum_11_Arama_Agaclari_Ders_Notu.html)
 - [📝Çalışma Soruları - Arama Ağaçları (HTML)](/files/dsa_c/slides/Bolum_11_Arama_Agaclari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum11)
 
 ---
 
@@ -163,6 +174,7 @@ n düğümlü bir ikili ağaçta boş kalan n+1 NULL işaretçinin kılavuz olar
 - [📄Sunum-Kılavuzlu İkili Ağaçlar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_12_Kilavuzlu_Ikili_Agaclar.pdf)
 - [📖Ders Notu - Kılavuzlu İkili Ağaçlar (HTML)](/files/dsa_c/notlar/Bolum_12_Kilavuzlu_Ikili_Agaclar_Ders_Notu.html)
 - [📝Çalışma Soruları - Kılavuzlu İkili Ağaçlar (HTML)](/files/dsa_c/slides/Bolum_12_Kilavuzlu_Ikili_Agaclar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum12)
 
 ---
 
@@ -174,6 +186,7 @@ n düğümlü bir ikili ağaçta boş kalan n+1 NULL işaretçinin kılavuz olar
 - [📄Sunum-Öncelikli Kuyruk ve Heap (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_13_Oncelikli_Kuyruk_ve_Heap.pdf)
 - [📖Ders Notu - Öncelikli Kuyruk ve Heap (HTML)](/files/dsa_c/notlar/Bolum_13_Oncelikli_Kuyruk_ve_Heap_Ders_Notu.html)
 - [📝Çalışma Soruları - Öncelikli Kuyruk ve Heap (HTML)](/files/dsa_c/slides/Bolum_13_Oncelikli_Kuyruk_ve_Heap_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum13)
 
 ---
 
@@ -187,6 +200,7 @@ Doğrudan adreslemeden yola çıkılarak hash fikri ve sözlük soyut veri tipi 
 - [📄Sunum-Hash Tabloları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_14_Hash_Tablolari.pdf)
 - [📖Ders Notu - Hash Tabloları (HTML)](/files/dsa_c/notlar/Bolum_14_Hash_Tablolari_Ders_Notu.html)
 - [📝Çalışma Soruları - Hash Tabloları (HTML)](/files/dsa_c/slides/Bolum_14_Hash_Tablolari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum14)
 
 ---
 
@@ -198,6 +212,7 @@ Königsberg köprüleri probleminden başlanarak çizge tanımı, komşuluk, yol
 - [📄Sunum-Çizgeler (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_15_Cizgeler.pdf)
 - [📖Ders Notu - Çizgeler (HTML)](/files/dsa_c/notlar/Bolum_15_Cizgeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizgeler (HTML)](/files/dsa_c/slides/Bolum_15_Cizgeler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum15)
 
 ---
 
@@ -209,6 +224,7 @@ Ayrık kümeler ile birleşim ve küme bulma işlemleri, ata dizisine dayanan ge
 - [📄Sunum-Kümeler ve Union-Find (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_16_Kumeler_ve_Union_Find.pdf)
 - [📖Ders Notu - Kümeler ve Union-Find (HTML)](/files/dsa_c/notlar/Bolum_16_Kumeler_ve_Union_Find_Ders_Notu.html)
 - [📝Çalışma Soruları - Kümeler ve Union-Find (HTML)](/files/dsa_c/slides/Bolum_16_Kumeler_ve_Union_Find_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum16)
 
 ---
 
@@ -220,6 +236,7 @@ Kapsayan ağaç kavramı, ağaç ve ağaç dışı kenarlar ile kapsayan ağaçl
 - [📄Sunum-Minimum Kapsayan Ağaçlar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_17_Minimum_Kapsayan_Agaclar.pdf)
 - [📖Ders Notu - Minimum Kapsayan Ağaçlar (HTML)](/files/dsa_c/notlar/Bolum_17_Minimum_Kapsayan_Agaclar_Ders_Notu.html)
 - [📝Çalışma Soruları - Minimum Kapsayan Ağaçlar (HTML)](/files/dsa_c/slides/Bolum_17_Minimum_Kapsayan_Agaclar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum17)
 
 ---
 
@@ -231,6 +248,7 @@ Tek kaynaklı en kısa yol problemi kaba kuvvet analiziyle başlar ve açgözlü
 - [📄Sunum-En Kısa Yol ve Aktivite Ağları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari.pdf)
 - [📖Ders Notu - En Kısa Yol ve Aktivite Ağları (HTML)](/files/dsa_c/notlar/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari_Ders_Notu.html)
 - [📝Çalışma Soruları - En Kısa Yol ve Aktivite Ağları (HTML)](/files/dsa_c/slides/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum18)
 
 ---
 
@@ -244,6 +262,7 @@ Sıralama problemi, kararlılık ve yerinde sıralama kavramlarıyla birlikte or
 - [📄Sunum-Temel Sıralama Algoritmaları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_19_Temel_Siralama_Algoritmalari.pdf)
 - [📖Ders Notu - Temel Sıralama Algoritmaları (HTML)](/files/dsa_c/notlar/Bolum_19_Temel_Siralama_Algoritmalari_Ders_Notu.html)
 - [📝Çalışma Soruları - Temel Sıralama Algoritmaları (HTML)](/files/dsa_c/slides/Bolum_19_Temel_Siralama_Algoritmalari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum19)
 
 ---
 
@@ -255,3 +274,4 @@ Hızlı sıralama bölümleme değişmezi üzerinden anlatılır; en kötü, en 
 - [📄Sunum-İleri Sıralama Algoritmaları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_20_Ileri_Siralama_Algoritmalari.pdf)
 - [📖Ders Notu - İleri Sıralama Algoritmaları (HTML)](/files/dsa_c/notlar/Bolum_20_Ileri_Siralama_Algoritmalari_Ders_Notu.html)
 - [📝Çalışma Soruları - İleri Sıralama Algoritmaları (HTML)](/files/dsa_c/slides/Bolum_20_Ileri_Siralama_Algoritmalari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, C (GitHub)](https://github.com/sercankulcu/data-structures-and-algorithms-c/tree/main/Bolum20)
