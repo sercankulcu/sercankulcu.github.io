@@ -51,6 +51,7 @@ Mikroişlemci, komutları bellekten getirip çözen ve yürüten bir bilgisayar 
 - [📖Ders Notu - Sayı Sistemleri (HTML)](/files/microprocessors/notlar/Bolum_01_02_Sayi_Sistemleri_Ders_Notu.html)
 - [📝Çalışma Soruları - Sayı Sistemleri (HTML)](/files/microprocessors/slides/Bolum_01_02_Sayi_Sistemleri_Calisma_Sorulari.html)
   - [🕹️İkiye Tümleyen Laboratuvarı (HTML)](/files/microprocessors/slides/Bolum_01_Twos-Complement-Lab.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum01)
 
 ---
 
@@ -67,6 +68,7 @@ Intel 8086, 1978'de tanıtılan ve x86 ailesini başlatan 16 bitlik bir mikroiş
 - [📖Ders Notu - 8086 Yazmaçları (HTML)](/files/microprocessors/notlar/Bolum_02_02_8086_Yazmaclari_Ders_Notu.html)
 - [📝Çalışma Soruları - 8086 Yazmaçları (HTML)](/files/microprocessors/slides/Bolum_02_02_8086_Yazmaclari_Calisma_Sorulari.html)
   - [🕹️Yazmaç Gezgini (HTML)](/files/microprocessors/slides/Bolum_02_Register-Explorer.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum02)
 
 ---
 
@@ -82,6 +84,7 @@ Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama dü
 - [📄Sunum-Assembly (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_03_02_Assembly.pdf)
 - [📖Ders Notu - Assembly (HTML)](/files/microprocessors/notlar/Bolum_03_02_Assembly_Ders_Notu.html)
 - [📝Çalışma Soruları - Assembly (HTML)](/files/microprocessors/slides/Bolum_03_02_Assembly_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum03)
 
 ---
 
@@ -101,6 +104,7 @@ Yazılım, makine dilinden yüksek düzeyli dillere uzanan farklı soyutlama dü
 - [📄Sunum-Değişkenler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_04_02_Degiskenler.pdf)
 - [📖Ders Notu - Değişkenler (HTML)](/files/microprocessors/notlar/Bolum_04_02_Degiskenler_Ders_Notu.html)
 - [📝Çalışma Soruları - Değişkenler (HTML)](/files/microprocessors/slides/Bolum_04_02_Degiskenler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum04)
 
 ---
 
@@ -117,6 +121,7 @@ Kesme, işlemcinin o anki işini geçici olarak bırakıp özel bir hizmet yorda
 - [📄Sunum-Kesme Fonksiyonları (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_05_02_Kesme_Fonksiyonlari.pdf)
 - [📖Ders Notu - Kesme Fonksiyonları (HTML)](/files/microprocessors/notlar/Bolum_05_02_Kesme_Fonksiyonlari_Ders_Notu.html)
 - [📝Çalışma Soruları - Kesme Fonksiyonları (HTML)](/files/microprocessors/slides/Bolum_05_02_Kesme_Fonksiyonlari_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum05)
 
 ---
 
@@ -133,6 +138,7 @@ Aritmetik ve mantık komutları, işlemcinin veri üzerinde hesap yapmasını ve
 
 - [🕹️Bayrak Laboratuvarı (HTML)](/files/microprocessors/slides/Bolum_06_Flags-Lab.html)
 - [🕹️Kaydırma ve Döndürme (HTML)](/files/microprocessors/slides/Bolum_06_Shift-Rotate.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum06)
 
 ---
 
@@ -146,6 +152,7 @@ Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla
 - [📝Çalışma Soruları - Akış Kontrolü (HTML)](/files/microprocessors/slides/Bolum_07_Akis_Kontrolu_Calisma_Sorulari.html)
 
 - [🕹️Koşullu Atlamalar (HTML)](/files/microprocessors/slides/Bolum_07_Jump-Conditions.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum07)
 
 ---
 
@@ -162,6 +169,7 @@ Program akışı, IP'nin sıralı ilerleyişinin atlama ve döngü komutlarıyla
 - [📄Sunum-Prosedürler (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_08_02_Prosedurler.pdf)
 - [📖Ders Notu - Prosedürler (HTML)](/files/microprocessors/notlar/Bolum_08_02_Prosedurler_Ders_Notu.html)
 - [📝Çalışma Soruları - Prosedürler (HTML)](/files/microprocessors/slides/Bolum_08_02_Prosedurler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum08)
 
 ---
 
@@ -177,6 +185,7 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 - [📄Sunum-emu8086.inc Kütüphanesi (PDF)](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Bolum_09_02_emu8086_inc_Kutuphanesi.pdf)
 - [📖Ders Notu - emu8086.inc Kütüphanesi (HTML)](/files/microprocessors/notlar/Bolum_09_02_emu8086_inc_Kutuphanesi_Ders_Notu.html)
 - [📝Çalışma Soruları - emu8086.inc Kütüphanesi (HTML)](/files/microprocessors/slides/Bolum_09_02_emu8086_inc_Kutuphanesi_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum09)
 
 ---
 
@@ -195,6 +204,7 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 - [📖Ders Notu - Aygıt Kontrolü (HTML)](/files/microprocessors/notlar/Bolum_10_02_Aygit_Kontrolu_Ders_Notu.html)
 - [📝Çalışma Soruları - Aygıt Kontrolü (HTML)](/files/microprocessors/slides/Bolum_10_02_Aygit_Kontrolu_Calisma_Sorulari.html)
   - [🕹️Port ile Aygıt Kontrolü (HTML)](/files/microprocessors/slides/Bolum_10_IO-Ports.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum10)
 
 ---
 
@@ -208,3 +218,4 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 - [📝Çalışma Soruları - Komut Kodlama ve Dizgi Komutları (HTML)](/files/microprocessors/slides/Bolum_11_Komut_Kodlama_ve_Dizgi_Komutlari_Calisma_Sorulari.html)
 
 - [🕹️Komut Kodlama (HTML)](/files/microprocessors/slides/Bolum_11_Instruction-Encoding.html)
+- [💻Kod Örnekleri, 8086 (GitHub)](https://github.com/sercankulcu/microprocessors-8086/tree/main/Bolum11)
