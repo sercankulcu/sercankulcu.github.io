@@ -1613,7 +1613,7 @@
       Tr.at("init", "Her düğüm ayrı bir küme: <code>ata[i] = -1</code> (kökte −düğüm sayısı tutulur).");
       Tr.at("s", "<code>sayi = " + n + "</code>.");
       function find(x) {
-        Tr.fn("Kume_bul_2");
+        Tr.fn("Kume_Bul_2");
         var r = x; V.i = String(x); hl = {}; hl[x] = "is-look";
         while (ata[r] >= 0) { Tr.at("f", "<code>ata[" + r + "] = " + ata[r] + "</code> ≥ 0: " + r + " kök değil, ebeveyni " + ata[r] + "."); r = ata[r]; hl[r] = "is-look"; }
         V.r = String(r);
@@ -1635,10 +1635,10 @@
       for (var e = 0; e < G.E.length; e++) {
         Tr.fn("bilesen_say"); V = { e: String(e) }; hl = {};
         Tr.at("for", "<code>e = " + e + "</code>: kenar (" + G.E[e].u + ", " + G.E[e].v + ").");
-        Tr.at("a", "<code>a = Kume_bul_2(" + G.E[e].u + ")</code> çağrılır.");
+        Tr.at("a", "<code>a = Kume_Bul_2(" + G.E[e].u + ")</code> çağrılır.");
         var a = find(G.E[e].u);
         Tr.fn("bilesen_say"); V.a = String(a);
-        Tr.at("b", "<code>a = " + a + "</code>; <code>b = Kume_bul_2(" + G.E[e].v + ")</code> çağrılır.");
+        Tr.at("b", "<code>a = " + a + "</code>; <code>b = Kume_Bul_2(" + G.E[e].v + ")</code> çağrılır.");
         var b = find(G.E[e].v);
         Tr.fn("bilesen_say"); V.b = String(b); hl = {}; hl[a] = "is-look"; hl[b] = "is-look";
         if (a === b) { Tr.at("if", "<code>a == b</code> (" + a + "): iki uç zaten aynı kümede, birleştirme yok."); continue; }
