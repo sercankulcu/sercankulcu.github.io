@@ -39,6 +39,7 @@ Derste gerçekten kullanılan matematik, oyun örnekleri üzerinden yeniden ele 
 - [📄Sunum-Hazırlık (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_00_Hazirlik.pdf)
 - [📖Ders Notu - Hazırlık (HTML)](/files/agt/notlar/Bolum_00_Hazirlik_Ders_Notu.html)
 - [📝Çalışma Soruları - Hazırlık (HTML)](/files/agt/slides/Bolum_00_Hazirlik_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum00)
 
 ---
 
@@ -50,6 +51,7 @@ Stratejik etkileşimden önce tek bir karar verici incelenir. Beklenen fayda ve 
 - [📄Sunum-Karar Kuramı (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_01_Karar_Kurami.pdf)
 - [📖Ders Notu - Karar Kuramı (HTML)](/files/agt/notlar/Bolum_01_Karar_Kurami_Ders_Notu.html)
 - [📝Çalışma Soruları - Karar Kuramı (HTML)](/files/agt/slides/Bolum_01_Karar_Kurami_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum01)
 
 - [🕹️Bayesçi Karar Laboratuvarı (HTML)](/files/agt/slides/Bolum_01_Bayesian-Decision-Lab.html)
 - [🕹️Blackjack Karar Laboratuvarı (HTML)](/files/agt/slides/Bolum_01_Blackjack.html)
@@ -69,6 +71,7 @@ Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançla
 - [📄Sunum-Oyunlar ve Temsiller (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_02_Oyunlar_ve_Temsiller.pdf)
 - [📖Ders Notu - Oyunlar ve Temsiller (HTML)](/files/agt/notlar/Bolum_02_Oyunlar_ve_Temsiller_Ders_Notu.html)
 - [📝Çalışma Soruları - Oyunlar ve Temsiller (HTML)](/files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum02)
 - [🖼️Sunum-Minimaks ve Alfa-Beta Budaması (HTML)](/files/agt/slides/Bolum_02_Minimaks_ve_Budama.html)
 - [📄Sunum-Minimaks ve Alfa-Beta Budaması (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_02_Minimaks_ve_Budama.pdf)
 - [📝Çalışma Soruları - Minimaks ve Alfa-Beta Budaması (HTML)](/files/agt/slides/Bolum_02_Minimaks_ve_Budama_Calisma_Sorulari.html)
@@ -96,6 +99,7 @@ Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı
 - [📄Sunum-Nash Dengesi (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_03_Nash_Dengesi.pdf)
 - [📖Ders Notu - Nash Dengesi (HTML)](/files/agt/notlar/Bolum_03_Nash_Dengesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Nash Dengesi (HTML)](/files/agt/slides/Bolum_03_Nash_Dengesi_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum03)
 
 - [🕹️Mahkûmun İkilemi Simülatörü (HTML)](/files/agt/slides/Bolum_03_Prisoners_Dilemma.html)
 - [🕹️Matris Oyunu ve Nash Dengesi Laboratuvarı (HTML)](/files/agt/slides/Bolum_03_Matrix-Nash.html)
@@ -114,6 +118,7 @@ Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çı
 - [📄Sunum-Mekanizma Tasarımı (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_04_Mekanizma_Tasarimi.pdf)
 - [📖Ders Notu - Mekanizma Tasarımı (HTML)](/files/agt/notlar/Bolum_04_Mekanizma_Tasarimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Mekanizma Tasarımı (HTML)](/files/agt/slides/Bolum_04_Mekanizma_Tasarimi_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum04)
 
 - [🕹️Ültimatom Oyunu (HTML)](/files/agt/slides/Bolum_04_Ultimatum-Game.html)
 - [🕹️Kararlı Eşleştirme Simülatörü (HTML)](/files/agt/slides/Bolum_04_Stable-Matching.html)
@@ -129,6 +134,7 @@ Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde 
 - [📄Sunum-Açık Artırmalar (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_05_Acik_Artirmalar.pdf)
 - [📖Ders Notu - Açık Artırmalar (HTML)](/files/agt/notlar/Bolum_05_Acik_Artirmalar_Ders_Notu.html)
 - [📝Çalışma Soruları - Açık Artırmalar (HTML)](/files/agt/slides/Bolum_05_Acik_Artirmalar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum05)
 
 - [🕹️Vickrey Açık Artırması (HTML)](/files/agt/slides/Bolum_05_second-price-sealed-bid-auction.html)
 - [🕹️İngiliz Açık Artırması (HTML)](/files/agt/slides/Bolum_05_english-auction-simulator.html)
@@ -147,6 +153,7 @@ Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getir
 - [📄Sunum-Çevrim İçi Platformlar (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_06_Cevrim_Ici_Platformlar.pdf)
 - [📖Ders Notu - Çevrim İçi Platformlar (HTML)](/files/agt/notlar/Bolum_06_Cevrim_Ici_Platformlar_Ders_Notu.html)
 - [📝Çalışma Soruları - Çevrim İçi Platformlar (HTML)](/files/agt/slides/Bolum_06_Cevrim_Ici_Platformlar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum06)
 
 - [🕹️İki Taraflı Platform Fiyatlama (HTML)](/files/agt/slides/Bolum_06_Two-Sided-Platform-Pricing.html)
 - [🕹️Sponsorlu Arama Açık Artırması (HTML)](/files/agt/slides/Bolum_06_Sponsored-Search-Ad-Auction-Game.html)
@@ -161,6 +168,7 @@ Sosyal seçim, bireysel tercihlerin ortak bir karara nasıl dönüştürüldüğ
 - [📄Sunum-Sosyal Seçim ve Oylama (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_07_Sosyal_Secim_ve_Oylama.pdf)
 - [📖Ders Notu - Sosyal Seçim ve Oylama (HTML)](/files/agt/notlar/Bolum_07_Sosyal_Secim_ve_Oylama_Ders_Notu.html)
 - [📝Çalışma Soruları - Sosyal Seçim ve Oylama (HTML)](/files/agt/slides/Bolum_07_Sosyal_Secim_ve_Oylama_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum07)
 
 - [🕹️Oylama Kuralları ve Manipülasyon (HTML)](/files/agt/slides/Bolum_07_Voting-Rules.html)
 - [🕹️Condorcet Paradoksu (HTML)](/files/agt/slides/Bolum_07_Condorcet-Voting-Paradox.html)
@@ -178,6 +186,7 @@ Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merke
 - [📄Sunum-Ağ Tasarımı ve Yönlendirme (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_08_Ag_Tasarimi_ve_Yonlendirme.pdf)
 - [📖Ders Notu - Ağ Tasarımı ve Yönlendirme (HTML)](/files/agt/notlar/Bolum_08_Ag_Tasarimi_ve_Yonlendirme_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağ Tasarımı ve Yönlendirme (HTML)](/files/agt/slides/Bolum_08_Ag_Tasarimi_ve_Yonlendirme_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum08)
 
 - [🕹️Braess Paradoksu (HTML)](/files/agt/slides/Bolum_08_Braess-Paradox-Visualizer.html)
 - [🕹️Bencil Yönlendirme ve PoA (HTML)](/files/agt/slides/Bolum_08_Selfish-Routing.html)
@@ -193,6 +202,7 @@ Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davran
 - [📄Sunum-Anarşinin Bedeli (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_09_Anarsinin_Bedeli.pdf)
 - [📖Ders Notu - Anarşinin Bedeli (HTML)](/files/agt/notlar/Bolum_09_Anarsinin_Bedeli_Ders_Notu.html)
 - [📝Çalışma Soruları - Anarşinin Bedeli (HTML)](/files/agt/slides/Bolum_09_Anarsinin_Bedeli_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum09)
 
 - [🕹️Yük Dengeleme ve PoA (HTML)](/files/agt/slides/Bolum_09_Load-Balancing-Price-of-Anarchy-Game.html)
 
@@ -208,6 +218,7 @@ Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davran
 - [📄Sunum-Çoklu Ajan Sistemleri (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_10_Coklu_Ajan_Sistemleri.pdf)
 - [📖Ders Notu - Çoklu Ajan Sistemleri (HTML)](/files/agt/notlar/Bolum_10_Coklu_Ajan_Sistemleri_Ders_Notu.html)
 - [📝Çalışma Soruları - Çoklu Ajan Sistemleri (HTML)](/files/agt/slides/Bolum_10_Coklu_Ajan_Sistemleri_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum10)
 
 - [🕹️Shapley Koalisyon Oyunu (HTML)](/files/agt/slides/Bolum_10_Shapley-Coalition-Game.html)
 
@@ -221,6 +232,7 @@ Algoritmik kararlar ve dağıtımlar bireyleri ve grupları farklı biçimlerde 
 - [📄Sunum-Algoritmik Adalet ve Etik (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_11_Algoritmik_Adalet_ve_Etik.pdf)
 - [📖Ders Notu - Algoritmik Adalet ve Etik (HTML)](/files/agt/notlar/Bolum_11_Algoritmik_Adalet_ve_Etik_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritmik Adalet ve Etik (HTML)](/files/agt/slides/Bolum_11_Algoritmik_Adalet_ve_Etik_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum11)
 
 - [🕹️Adil Bölüşüm Oyunu (HTML)](/files/agt/slides/Bolum_11_Fair-Division-Game.html)
 
@@ -234,6 +246,7 @@ Gerçek insanlar rasyonel modelden sapar; gruplar da tek tek bireylerin karşıl
 - [📄Sunum-Davranışsal ve Kolektif Karar (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_12_Davranissal_ve_Kolektif_Karar.pdf)
 - [📖Ders Notu - Davranışsal ve Kolektif Karar (HTML)](/files/agt/notlar/Bolum_12_Davranissal_ve_Kolektif_Karar_Ders_Notu.html)
 - [📝Çalışma Soruları - Davranışsal ve Kolektif Karar (HTML)](/files/agt/slides/Bolum_12_Davranissal_ve_Kolektif_Karar_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum12)
 
 - [🕹️Kamu Malı Oyunu (HTML)](/files/agt/slides/Bolum_12_Public-Goods-Game.html)
 
@@ -249,6 +262,7 @@ Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En 
 - [📄Sunum-Öğrenme ve Adaptasyon (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_13_Ogrenme_ve_Adaptasyon.pdf)
 - [📖Ders Notu - Öğrenme ve Adaptasyon (HTML)](/files/agt/notlar/Bolum_13_Ogrenme_ve_Adaptasyon_Ders_Notu.html)
 - [📝Çalışma Soruları - Öğrenme ve Adaptasyon (HTML)](/files/agt/slides/Bolum_13_Ogrenme_ve_Adaptasyon_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum13)
 
 - [🕹️Çok Kollu Haydut Öğrenme Oyunu (HTML)](/files/agt/slides/Bolum_13_Multi-Armed-Bandit.html)
 - [🕹️Tekrarlı Mahkûmun İkilemi Turnuvası (HTML)](/files/agt/slides/Bolum_13_Repeated-Prisoners-Dilemma-Tournament.html)
@@ -264,6 +278,7 @@ Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik da
 - [📄Sunum-Gelecek Yönelimler (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_14_Gelecek_Yonelimler.pdf)
 - [📖Ders Notu - Gelecek Yönelimler (HTML)](/files/agt/notlar/Bolum_14_Gelecek_Yonelimler_Ders_Notu.html)
 - [📝Çalışma Soruları - Gelecek Yönelimler (HTML)](/files/agt/slides/Bolum_14_Gelecek_Yonelimler_Calisma_Sorulari.html)
+- [💻Kod Örnekleri, Python (GitHub)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum14)
 
 - [🕹️YZ Ajanı Strateji Turnuvası (HTML)](/files/agt/slides/Bolum_14_Ai-Agent-Strategy-Tournament.html)
 - [🕹️Age of Çotanak (isteğe bağlı) (HTML)](/files/agt/slides/Bolum_14_Age-of-Cotanak.html)

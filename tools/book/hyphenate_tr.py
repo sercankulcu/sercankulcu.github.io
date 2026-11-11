@@ -9,7 +9,7 @@ Kural: bir unluden once gelen son unsuz yeni heceyi baslatir (ka-rar, Turk-ce,
 kont-rol); yan yana iki unlu arasindan da bolunur (sa-at). Bolmeden sonra basta en
 az 2, sonda en az 2 harf kalir. Dokunulmayanlar: buyuk harfle baslayan sozcukler
 (ozel adlar, cogu yabanci), q/w/x iceren sozcukler, ve su ogelerin icindeki her
-sey: basliklar, pre, code, svg, script, style, sub, sup, kbd, lang="en" ya da class="m" (formul)
+sey: basliklar, pre, code, svg, script, style, sub, sup, kbd, lang="en" ya da class="m" (formul), class="u" (adres)
 tasiyan ogeler. Etiketler ve ozellik degerleri hic degismez.
 """
 import re
@@ -59,7 +59,8 @@ def _skips(tag, name):
     if re.search(r'\blang\s*=\s*["\']en', tag):
         return True
     m = re.search(r'\bclass\s*=\s*"([^"]*)"', tag)
-    return bool(m and 'm' in m.group(1).split())
+    # m: formul, u: adres (adres tireyle bolunmesin)
+    return bool(m and {'m', 'u'} & set(m.group(1).split()))
 
 
 def hyphenate_html(s):
