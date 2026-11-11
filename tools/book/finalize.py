@@ -29,7 +29,7 @@ def render(out):
 def analyse(pdf, book):
     dests, n = common.dest_pages(pdf)
     want = [p['id'] for p in book['parts']] + [c['id'] for c in book['chapters']] + \
-           [a['id'] for a in book['appendices']]
+           [a['id'] for a in book['appendices']] + [u['id'] for u in book.get('intro', [])]
     missing = [w for w in want if w not in dests]
     if missing:
         sys.exit('PDF hedefi bulunamadi: %s' % ', '.join(missing[:10]))

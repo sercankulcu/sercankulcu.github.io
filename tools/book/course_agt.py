@@ -46,6 +46,8 @@ notes_book.setup(
     colophon='''<p>Sunumlar, çalışma soruları, canlı sınıf oyunları ve notlardaki etkileşimli
      şekillerin çalışan hâlleri o sayfadadır. Kitaptaki etkileşimli şekiller varsayılan
      değerleriyle basılmıştır.</p>''',
+    # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
+    intro=[('ders_haritasi.html', 'harita')],
     # etkilesimli sekiller (data-widget) bu betikle cizilir
     extra_css=['slides/deck/kaydirici.css'],
     scripts=['slides/deck/kaydirici.js'],

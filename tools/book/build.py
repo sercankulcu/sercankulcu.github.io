@@ -7,6 +7,8 @@ Dersin kendisi course_<ders>.py icindedir ve load() su yapiyi dondurur:
   parts       [{id, num, name, sub, chapters: [bolum no, ...]}]
   chapters    [{id, num, title, header, html, sections: [{id, num, title}]}]
               html kendi <section id="<id>"> sarmalayicisini tasir
+  intro       [{id, title, header, html}]  istege bagli: Kisim I'den once gelen sayfalar
+              (or. AGT ders haritasi); icindekilerin en ustunde listelenir
   appendices  [{id, label, title, header, html}]
   tail        govdenin sonuna eklenen HTML (or. sekilleri cizen betik)
 
@@ -41,6 +43,8 @@ def toc_row(cls, n, title, dest):
 
 
 toc = []
+for u in book.get('intro', []):
+    toc.append(toc_row('bk-toc-ch bk-toc-intro', '', u['title'], u['id']))
 for p in book['parts']:
     sub = (' <em>%s</em>' % p['sub']) if p.get('sub') else ''
     label = C.toc_part(p) if hasattr(C, 'toc_part') else p['name']
@@ -60,7 +64,7 @@ if book['appendices']:
 front = book['front'].replace('__TOC__', '\n'.join(toc)) \
                      .replace('__DATE__', C.date_text(datetime.date.today()))
 
-body = []
+body = [u['html'] for u in book.get('intro', [])]
 for p in book['parts']:
     nums = p['chapters']
     rng = '%s %s&ndash;%s' % (L['chapters'], nums[0], nums[-1]) if len(nums) > 1 \
@@ -86,5 +90,6 @@ common.write_json(C, 'book.json', {
                  for c in book['chapters']],
     'appendices': [{k: a[k] for k in ('id', 'label', 'title', 'header')}
                    for a in book['appendices']],
+    'intro': [{k: u[k] for k in ('id', 'title', 'header')} for u in book.get('intro', [])],
 })
 print('  book.html: %.1f MB' % (len(doc) / 1048576))

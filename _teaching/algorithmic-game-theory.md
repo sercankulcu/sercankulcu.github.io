@@ -23,6 +23,7 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 * [Algoritmik Oyun Kuramında Önemli İsimler (HTML)](/files/agt/Algorithmic_Game_Theory_Important_People.html)
 * [Algoritmik Oyun Kuramı İçin Ön Bilgiler (HTML)](/files/agt/Algorithmic_Game_Theory_Prerequisites.html)
+* [Dersin Haritası (HTML)](/files/agt/ders_haritasi.html)
 * [Terim Sözlüğü (HTML)](/files/agt/sozluk.html)
 * [Canlı Sınıf Oyunları (HTML)](/files/agt/canli/)
 

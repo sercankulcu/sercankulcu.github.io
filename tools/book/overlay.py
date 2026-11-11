@@ -38,7 +38,8 @@ n = len(reader.pages)
 
 # her sayfanin sahibi olan bolum/ek (ust bilgi icin)
 units = [(dests[c['id']], c['header']) for c in book['chapters']] + \
-        [(dests[a['id']], a['header']) for a in book['appendices']]
+        [(dests[a['id']], a['header']) for a in book['appendices']] + \
+        [(dests[u['id']], u['header']) for u in book.get('intro', [])]
 starts = {p for p, _ in units}
 partp = {dests[p['id']] for p in book['parts']}
 owner, cur = {}, None
@@ -92,6 +93,8 @@ for key in ('preface', 'contents'):
     if key in pg['front']:
         writer.add_outline_item(L[key], pg['front'][key])
 chap = {c['num']: c for c in book['chapters']}
+for u in book.get('intro', []):
+    writer.add_outline_item(u['title'], dests[u['id']])
 for p in book['parts']:
     parent = writer.add_outline_item('%s %s — %s' % (L['part'], C.part_number(p['num']), p['name']),
                                      dests[p['id']])

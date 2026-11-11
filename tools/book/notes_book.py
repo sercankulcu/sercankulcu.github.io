@@ -122,7 +122,7 @@ def parts_sentence(parts):
 
 class _Course:
     def __init__(self, folder, course_page, title, subtitle, output, meta, preface,
-                 colophon, extra_css=(), scripts=(), code_note=None):
+                 colophon, extra_css=(), scripts=(), code_note=None, intro=()):
         self.dir = os.path.join(SITE, 'files', folder)
         self.notes = os.path.join(self.dir, 'notlar')
         self.notes_url = '/files/%s/notlar' % folder
@@ -134,6 +134,8 @@ class _Course:
         self.meta, self.preface, self.colophon = meta, preface, colophon
         self.extra_css = [os.path.join(self.dir, p) for p in extra_css]
         self.scripts = [os.path.join(self.dir, p) for p in scripts]
+        # Kisim I'den once, icindekilerin en ustunde: [(ders klasorundeki dosya, kimlik)]
+        self.intro = list(intro)
         if code_note is None:               # varsayilan: ders sayfasindaki GitHub baglantilari
             links = code_links(self.course_page)
             code_note = lambda n: ' &middot; '.join(
@@ -326,6 +328,8 @@ class _Course:
             for k, f in enumerate(c['notes'], 1):
                 self.note_ids[f] = ('c%d' % n, 'ch%d' % n) if len(c['notes']) == 1 \
                     else ('c%dn%d' % (n, k), 'ch%d-%d' % (n, k))
+        for f, uid in self.intro:
+            self.note_ids[os.path.basename(f)] = (uid, uid)
         stray = sorted(os.path.basename(f) for f in glob.glob(os.path.join(self.notes, 'Bolum_*_Ders_Notu.html'))
                        if os.path.basename(f) not in self.note_ids)
         if stray:
@@ -338,6 +342,12 @@ class _Course:
                 title, page, secs = self.chapter(n, k, course_title, info[n])
                 chapters.append({'id': 'ch%d' % n, 'num': n, 'title': title,
                                  'header': '%d · %s' % (n, title), 'html': page, 'sections': secs})
+        intro = []
+        for f, uid in self.intro:
+            src = io.open(os.path.join(self.dir, f), encoding='utf-8').read()
+            title = strip_tags(re.search(r'<h1>(.+?)</h1>', src, re.S).group(1))
+            page, _ = self.transform(src, uid, html.escape(self.title), title, uid, 'bk-chapter bk-intro', '')
+            intro.append({'id': uid, 'title': title, 'header': title, 'html': page})
         gloss, nterms = self.glossary()
         preface = self.preface.replace('__PARTS__', parts_sentence(parts))
         sub = '<p class="bk-sub">%s</p>' % self.subtitle if self.subtitle else ''
@@ -351,7 +361,7 @@ class _Course:
             js = HOST_GUARD_RE.sub('', js, count=1)
             js = js.replace('</script', '<\\/script')    # yorumdaki etiket betigi erken kapatmasin
             tail.append('<script>\n%s\n</script>' % js)
-        return {'front': front, 'parts': parts, 'chapters': chapters,
+        return {'front': front, 'parts': parts, 'chapters': chapters, 'intro': intro,
                 'appendices': [{'id': 'ek-sozluk', 'label': 'Ek A', 'title': 'Terim Sözlüğü',
                                 'header': 'Ek A · Terim Sözlüğü', 'html': gloss}],
                 'tail': '\n'.join(tail), 'outline': outline, 'terms': nterms}
