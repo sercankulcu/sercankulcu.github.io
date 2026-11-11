@@ -13,6 +13,12 @@ This course studies data structures and algorithms through their memory represen
 
 ---
 
+## Ders Kitabı
+
+[📕 C ile Veri Yapıları ve Algoritmalar (PDF, 20 MB)](https://sercankulcu.github.io/courses-pdfs/dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf)
+
+---
+
 ## Başlangıç Kaynakları
 
 * [C ile Veri Yapılarında Önemli İsimler (HTML)](/files/dsa_c/DSA_C_Important_People.html)

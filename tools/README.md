@@ -25,6 +25,11 @@ python tools/make_book.py c      # Programming with C     -> courses-pdfs/c/Prog
 python tools/make_book.py agt    # Algoritmik Oyun Kuramı -> courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf
 python tools/make_book.py ds     # Veri Yapıları          -> courses-pdfs/data_structures/Veri-Yapilari.pdf
 python tools/make_book.py os     # İşletim Sistemleri     -> courses-pdfs/os/Isletim-Sistemleri.pdf
+python tools/make_book.py dsa_c           # C ile Veri Yapıları ve Algoritmalar
+python tools/make_book.py algorithms      # Algoritmalar
+python tools/make_book.py computer        # Bilgisayar ve Programlamaya Giriş
+python tools/make_book.py java            # Java ile Nesne Yönelimli Programlama
+python tools/make_book.py microprocessors # Mikroişlemciler
 ```
 
 Bir dersin notlarını tek bir A4 PDF'e dönüştürür. Chrome (veya Edge) gerekir; C kitabı
@@ -34,13 +39,19 @@ künye, önsöz), CSS dosyaları, PDF künyesi ve çıktı yolu. Yeni ders için
 `course_<ders>.py` yazmak yeter; `load()` fonksiyonunun döndürdüğü yapı `book/build.py`
 başında anlatılır.
 
-Türkçe "ders notu" kalıbındaki dersler (AGT, Veri Yapıları, İşletim Sistemleri: `files/<ders>/notlar/`,
+Türkçe "ders notu" kalıbındaki dersler (C dışındaki bütün dersler: `files/<ders>/notlar/`,
 ortak `notlar.css`, `sozluk.html`) için ortak tanım `book/notes_book.py` içindedir;
-`course_agt.py`, `course_ds.py` ve `course_os.py` yalnızca derse özgü ayarları (başlık, önsöz, künye,
+`course_<ders>.py` dosyaları yalnızca derse özgü ayarları (başlık, önsöz, künye,
 ek betikler) verir. Kısımlar ve bölüm sırası ders sayfasındaki `## Kısım …` /
 `### Bölüm N: …` başlıklarından okunur, kitap o sırayla kalır. Terim sözlüğü Ek A
-olur. Veri Yapıları ve İşletim Sistemleri'nde her bölümün başına ders sayfasındaki
-"Kod Örnekleri" / "Laboratuvar Çalışması" bağlantılarından klasörler yazılır.
+olur. Her bölümün başına ders sayfasındaki "💻 Kod Örnekleri" / "🧪 Laboratuvar Çalışması"
+bağlantılarından klasörler yazılır.
+
+Bir bölüm birden çok nottan oluşabilir (Algoritmalar 4.1–4.4, Java 4.1–4.5 gibi). Hangi
+notun hangi bölüme ait olduğu ders sayfasındaki "📖 Ders Notu" bağlantılarından okunur;
+ders sayfasında bağı olmayan not kitaba girmez ve derleme uyarı verir. Çok notlu bölüm,
+ders sayfasındaki ad ve açıklamayla bir açılış sayfası alır; notlar onun altında yeni
+sayfada başlayan alt bölümler olur ve içindekilerde alt bölüm olarak listelenir.
 
 | Aşama | Dosya | İş |
 |---|---|---|
@@ -76,6 +87,9 @@ Dikkat edilecekler (hepsi denendi):
   başına ayrı tuval, TTF'yi her sayfaya ayrıca gömüyordu (AGT'de 800 kopya, 15 MB).
   `system-ui` Windows'ta değişken yazı tipine gidiyor ve Chrome onu Type3 olarak gömüyor;
   kitap CSS'i SVG'lerde Segoe UI, kodda Consolas kullanır.
+- **Noktalı çizgiler:** İçindekilerdeki noktalı çizgide `transform` kullanmayın. Chrome
+  transform'lu öğeyi her sayfaya yeniden çiziyor; AGT kitabında sayfa başına 21.000 nokta
+  vardı. `position: relative; top: …` aynı görünümü bu bedel olmadan verir.
 - **Sayfa akışı:** `notlar.css` baskıda her `h2.nt-pb` başlığını yeni sayfaya atıyor ve
   bütün kutuları bölünmez yapıyor; kitapta bunlar `book/book_notes.css` ile gevşetilir.
   Çok adımlı şekiller (birden çok SVG) adımlar arasından bölünebilir.

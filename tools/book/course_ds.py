@@ -4,35 +4,9 @@
 Ortak kalip notes_book.py'de; burada yalnizca bu derse ozgu olanlar var. Her bolumun
 basina, ders sayfasindaki "Kod Ornekleri" baglantisindan kod klasoru yazilir.
 """
-import io, os, re
-
 import notes_book
-from common import SITE
 
 COURSE_PAGE = 'data-structures.md'
-
-
-def _code_dirs():
-    """bolum no -> github.com/... klasoru, ders sayfasindaki 'Kod Ornekleri' baglantisindan."""
-    out, cur = {}, None
-    for line in io.open(os.path.join(SITE, '_teaching', COURSE_PAGE), encoding='utf-8'):
-        m = re.match(r'###\s+Bölüm\s+(\d+):', line)
-        if m:
-            cur = int(m.group(1))
-        m = re.search(r'Kod Örnekleri \(GitHub\)\]\(https://(github\.com/[^)\s]+)\)', line)
-        if m and cur is not None:
-            out[cur] = re.sub(r'/tree/main/', '/', m.group(1))
-    return out
-
-
-CODE = _code_dirs()
-
-
-def code_note(n):
-    d = CODE.get(n)
-    if not d:
-        return ''
-    return '<strong>Bu bölümün kodu:</strong> <span class="u">%s</span>' % d
 
 
 # Taslak: icerik ders sayfasindaki kisim duzeninden ve notlarin ortak yapisindan
@@ -75,5 +49,4 @@ notes_book.setup(
     preface=PREFACE,
     colophon='''<p>Sunumlar, çalışma soruları ve simülatörler o sayfadadır. Bölümlerin kodu
      <span class="u">github.com/sercankulcu/data-structures-java</span> deposundadır.</p>''',
-    code_note=code_note,
 )

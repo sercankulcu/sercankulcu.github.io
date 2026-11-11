@@ -29,6 +29,19 @@ MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağ
 DS_GUARD_RE = re.compile(r'<!-- ds-guard:begin -->.*?<!-- ds-guard:end -->\n*', re.S)
 HOST_GUARD_RE = re.compile(r'^\s*if \(\[[^\]]*"sercankulcu\.github\.io"[^\n]*return;\n', re.M)
 
+# Notlarin ortak duzenini anlatan onsoz paragrafi; ders modulleri onsozde kullanir.
+STRUCTURE = '''<p>Her bölüm aynı düzeni izler. Başta öğrenme çıktıları yer alır. Biçimsel tanımlar,
+teoremler ve çözülmüş örnekler adlandırılmış kutulardadır. <em>Sık yapılan hata</em>
+kutuları, öğrencilerin en sık düştüğü yanılgıları gösterir. Kod izlemeleri, bir programın
+ya da algoritmanın adım adım nasıl çalıştığını gösterir. Bölüm; bir özet, bir kavram
+listesi, cevaplarıyla birlikte <em>Kendini Dene</em> soruları, ileri okuma önerileri ve
+kaynakçayla kapanır. Kitabın sonundaki terim sözlüğü, her İngilizce terim için notlarda
+kullanılan tek Türkçe karşılığı verir.</p>'''
+
+# Cok notlu bolumleri olan dersler icin onsoz cumlesi
+MULTI_NOTE = '''<p>Bazı bölümler birden çok ders notundan oluşur. Bu bölümler kısa bir açılış
+sayfasıyla başlar; notlar ardından 4.1, 4.2 gibi numaralı alt bölümler olarak gelir.</p>'''
+
 FRONT = '''
 <section class="bk-title">
   <p class="bk-kicker">Ders kitabı</p>
@@ -73,6 +86,32 @@ def date_text(d):
     return '%d %s %d' % (d.day, MONTHS[d.month - 1], d.year)
 
 
+def code_links(course_page):
+    """bolum no -> [(etiket, klasor)], ders sayfasindaki GitHub baglantilarindan.
+
+    "[💻Kod Örnekleri (GitHub)](…)" -> "Bu bölümün kodu", "[💻Kod Örnekleri, Java (GitHub)](…)" -> "Kod (Java)",
+    "[🧪Laboratuvar Çalışması, C (GitHub)](…)" -> "Laboratuvar"; ötekiler kendi adlarıyla.
+    """
+    out, cur = {}, None
+    for line in io.open(course_page, encoding='utf-8'):
+        m = re.match(r'###\s+Bölüm\s+(\d+):', line)
+        if m:
+            cur = int(m.group(1))
+            continue
+        m = re.search(r'\[(?:💻|🧪)\s*([^\]]+?) \(GitHub\)\]\(https://(github\.com/[^)\s]+)\)', line)
+        if m and cur is not None:
+            name = m.group(1)
+            lang = re.search(r', (\w+)$', name)
+            if name.startswith('Kod Örnekleri'):
+                label = 'Kod (%s)' % lang.group(1) if lang else 'Bu bölümün kodu'
+            elif name.startswith('Laboratuvar'):
+                label = 'Laboratuvar'
+            else:
+                label = re.sub(r', \w+$', '', name)
+            out.setdefault(cur, []).append((label, m.group(2).replace('/tree/main/', '/')))
+    return out
+
+
 def parts_sentence(parts):
     """'Kısımlar sırasıyla şunlardır: A (Bölüm 1–4), ... ve E (Bölüm 13–14).'"""
     names = ['<strong>%s</strong> (Bölüm %d&ndash;%d)' % (p['name'], p['chapters'][0], p['chapters'][-1])
@@ -93,8 +132,12 @@ class _Course:
         self.meta, self.preface, self.colophon = meta, preface, colophon
         self.extra_css = [os.path.join(self.dir, p) for p in extra_css]
         self.scripts = [os.path.join(self.dir, p) for p in scripts]
-        self.code_note = code_note          # bolum no -> HTML (or. kod deposundaki klasor)
-        self.note_num = {}                  # not dosya adi -> bolum no
+        if code_note is None:               # varsayilan: ders sayfasindaki GitHub baglantilari
+            links = code_links(self.course_page)
+            code_note = lambda n: ' &middot; '.join(
+                '<strong>%s:</strong> <span class="u">%s</span>' % x for x in links.get(n, []))
+        self.code_note = code_note          # bolum no -> HTML (bos ise satir yazilmaz)
+        self.note_ids = {}                  # not dosya adi -> (kimlik oneki, notun capasi); load() doldurur
 
     # ------------------------------------------------------------ ders sayfasi
     def outline(self):
@@ -113,30 +156,57 @@ class _Course:
         return parts
 
     # ------------------------------------------------------------ bolumler
-    def note_file(self, n):
-        f = glob.glob(os.path.join(self.notes, 'Bolum_%02d_*_Ders_Notu.html' % n))
-        if len(f) != 1:
-            raise SystemExit('Bolum %d icin tek not bekleniyordu: %r' % (n, f))
-        return f[0]
+    def chapter_info(self):
+        """bolum no -> {'notes': [not dosya adi, ...], 'lead': aciklama}, ders sayfasindan.
 
-    def link(self, href, n):
+        Bir bolum birden cok nottan olusabilir (Algoritmalar 4.1-4.4 gibi); notlar ders
+        sayfasindaki "Ders Notu" baglantilarinin sirasiyla alinir. Baglanti yoksa
+        Bolum_NN_*_Ders_Notu.html aranir.
+        """
+        info, cur = {}, None
+        for line in io.open(self.course_page, encoding='utf-8'):
+            m = re.match(r'###\s+Bölüm\s+(\d+):', line)
+            if m:
+                cur = info.setdefault(int(m.group(1)), {'notes': [], 'lead': ''})
+                continue
+            if line.startswith('#'):
+                cur = None
+                continue
+            if cur is None:
+                continue
+            m = re.search(r'/notlar/(Bolum_[^)#\s]+_Ders_Notu\.html)', line)
+            if m:
+                if m.group(1) not in cur['notes']:
+                    cur['notes'].append(m.group(1))
+            elif line.strip() and not line.lstrip().startswith(('-', '*', '!', '<')) and not cur['lead']:
+                cur['lead'] = line.strip()
+        for n, c in info.items():
+            if not c['notes']:
+                c['notes'] = [os.path.basename(f) for f in
+                              sorted(glob.glob(os.path.join(self.notes, 'Bolum_%02d_*_Ders_Notu.html' % n)))]
+            for f in c['notes']:
+                if not os.path.exists(os.path.join(self.notes, f)):
+                    raise SystemExit('ders sayfasindaki not yok: %s' % f)
+        return info
+
+    def link(self, href, prefix):
         """Notun icindeki bir bagi kitapta gecerli hale getirir."""
         if href.startswith('#'):
-            return '#c%d-%s' % (n, href[1:])
+            return '#%s-%s' % (prefix, href[1:])
         if re.match(r'(https?:|mailto:)', href):
             return href
         path, _, frag = href.partition('#')
         base = os.path.basename(path)
         if base == 'sozluk.html':
             return '#ek-sozluk'
-        if base in self.note_num:
-            k = self.note_num[base]
-            return '#c%d-%s' % (k, frag) if frag else '#ch%d' % k
+        if base in self.note_ids:
+            pre, anchor = self.note_ids[base]
+            return '#%s-%s' % (pre, frag) if frag else '#' + anchor
         # sunumlar, oyunlar, on bilgiler: sitedeki adres
         absp = os.path.normpath(os.path.join(self.notes_url, path)).replace('\\', '/')
         return SITE_URL + absp + ('#' + frag if frag else '')
 
-    def transform(self, src, n, part_num, title):
+    def transform(self, src, prefix, kicker, title, wrap_id, wrap_class, code_html):
         b = src.split('---', 2)[-1]
         # ds-guard yalnizca izinli adreste gosterir; kitap file:/// uzerinden basilir.
         b = DS_GUARD_RE.sub('', b)
@@ -151,29 +221,65 @@ class _Course:
         b = re.sub(r'<nav class="nt-toc".*?</nav>\s*', '', b, count=1, flags=re.S)
         b = re.sub(r'<p class="nt-foot">.*?</p>\s*', '', b, flags=re.S)
         # baslik: ust satir "Kisim I · Bolum 3", h1 yalnizca ad
-        b = re.sub(r'<p class="nt-kicker">.*?</p>',
-                   '<p class="nt-kicker">Kısım %s · Bölüm %d</p>' % (ROMAN[part_num], n), b, count=1, flags=re.S)
+        b = re.sub(r'<p class="nt-kicker">.*?</p>', '<p class="nt-kicker">%s</p>' % kicker,
+                   b, count=1, flags=re.S)
         b = re.sub(r'<h1>.*?</h1>', '<h1>%s</h1>' % html.escape(title), b, count=1, flags=re.S)
-        if self.code_note:
-            b = re.sub(r'(</header>)', r'\1\n<p class="bk-code-note">%s</p>' % self.code_note(n),
-                       b, count=1)
+        if code_html:
+            b = re.sub(r'(</header>)', r'\1\n<p class="bk-code-note">%s</p>' % code_html, b, count=1)
         # kitapta cevaplar acik
         b = re.sub(r'<details>', '<details open>', b)
-        # kimlikler bolume ozgu olsun: ayni id (ciktilar, sekil-..., SVG marker'lari)
+        # kimlikler nota ozgu olsun: ayni id (ciktilar, sekil-..., SVG marker'lari)
         # birden cok notta geciyor; tek belgede cakisirlarsa bag ve ok uclari sasar
-        b = re.sub(r'\bid="([^"]+)"', lambda m: 'id="c%d-%s"' % (n, m.group(1)), b)
-        b = re.sub(r'url\(#([^)]+)\)', lambda m: 'url(#c%d-%s)' % (n, m.group(1)), b)
+        b = re.sub(r'\bid="([^"]+)"', lambda m: 'id="%s-%s"' % (prefix, m.group(1)), b)
+        b = re.sub(r'url\(#([^)]+)\)', lambda m: 'url(#%s-%s)' % (prefix, m.group(1)), b)
         b = re.sub(r'\b((?:xlink:)?href)="([^"]*)"',
-                   lambda m: '%s="%s"' % (m.group(1), self.link(m.group(2), n)), b)
-        b = re.sub(r'\baria-labelledby="([^"]+)"', lambda m: 'aria-labelledby="c%d-%s"' % (n, m.group(1)), b)
+                   lambda m: '%s="%s"' % (m.group(1), self.link(m.group(2), prefix)), b)
+        b = re.sub(r'\baria-labelledby="([^"]+)"',
+                   lambda m: 'aria-labelledby="%s-%s"' % (prefix, m.group(1)), b)
         b = hyphenate_html(b)
-        secs = [{'id': 'c%d-%s' % (n, m.group(1)), 'num': m.group(2),
-                 'title': strip_tags(m.group(3)).replace('\u00ad', '')}
-                for m in re.finditer(r'<h2 [^>]*id="c\d+-([^"]+)"[^>]*><span class="nt-num">([^<]+)</span>(.*?)</h2>',
-                                     b, re.S)]
-        page = ('<section class="bk-chapter" id="ch%d">\n<article class="ds-notes" lang="tr">\n%s\n'
-                '</article>\n</section>' % (n, b))
+        secs = [{'id': '%s-%s' % (prefix, m.group(1)), 'num': m.group(2),
+                 'title': strip_tags(m.group(3)).replace('­', '')}
+                for m in re.finditer(r'<h2 [^>]*id="%s-([^"]+)"[^>]*><span class="nt-num">([^<]+)</span>(.*?)</h2>'
+                                     % re.escape(prefix), b, re.S)]
+        page = ('<section class="%s" id="%s">\n<article class="ds-notes" lang="tr">\n%s\n'
+                '</article>\n</section>' % (wrap_class, wrap_id, b))
         return page, secs
+
+    def chapter(self, n, part_num, course_title, info):
+        """Bir bolumun kitap HTML'i: (baslik, HTML, icindekiler satirlari).
+
+        Tek notlu bolum notun kendisidir. Cok notlu bolumde once ders sayfasindaki ad ve
+        aciklamayla bir acilis gelir, ardindan her not yeni sayfada bir alt bolum
+        (4.1, 4.2 ...) olur; icindekiler ve yer imleri alt bolumleri listeler."""
+        code = self.code_note(n) if self.code_note else ''
+        notes = info['notes']
+        kick = 'Kısım %s · Bölüm %%s' % ROMAN[part_num]
+        if len(notes) == 1:
+            src = io.open(os.path.join(self.notes, notes[0]), encoding='utf-8').read()
+            h1 = strip_tags(re.search(r'<h1>(.+?)</h1>', src, re.S).group(1))
+            title = re.sub(r'^Bölüm\s+\d+:\s*', '', h1)
+            page, secs = self.transform(src, 'c%d' % n, kick % n, title, 'ch%d' % n, 'bk-chapter', code)
+            return title, page, secs
+        subs, pages = [], []
+        for k, f in enumerate(notes, 1):
+            src = io.open(os.path.join(self.notes, f), encoding='utf-8').read()
+            h1 = strip_tags(re.search(r'<h1>(.+?)</h1>', src, re.S).group(1))
+            m = re.match(r'Bölüm\s+(\d+\.\d+):\s*(.+)$', h1)
+            num, title = (m.group(1), m.group(2)) if m else ('%d.%d' % (n, k), h1)
+            page, _ = self.transform(src, 'c%dn%d' % (n, k), kick % num, title,
+                                     'ch%d-%d' % (n, k), 'bk-chapter bk-note', '')
+            subs.append({'id': 'ch%d-%d' % (n, k), 'num': num, 'title': title})
+            pages.append(page)
+        items = ''.join('<li><span class="bk-subs-n">%s</span> %s</li>' % (s['num'], html.escape(s['title']))
+                        for s in subs)
+        lead = ('<p class="nt-lead">%s</p>' % hyphenate_html(html.escape(info['lead']))) if info['lead'] else ''
+        opener = ('<section class="bk-chapter bk-opener" id="ch%d">\n<article class="ds-notes" lang="tr">\n'
+                  '<header class="nt-head"><p class="nt-kicker">%s</p><h1>%s</h1>%s</header>\n%s'
+                  '<div class="bk-subs"><p class="bk-subs-t">Bu bölümün notları</p><ol>%s</ol></div>\n'
+                  '</article>\n</section>' % (n, kick % n, html.escape(course_title), lead,
+                                              ('<p class="bk-code-note">%s</p>\n' % code) if code else '',
+                                              items))
+        return course_title, opener + '\n' + '\n'.join(pages), subs
 
     # ------------------------------------------------------------ sozluk eki
     def glossary(self):
@@ -211,18 +317,23 @@ class _Course:
 
     # ------------------------------------------------------------ butun kitap
     def load(self):
-        for f in glob.glob(os.path.join(self.notes, 'Bolum_*_Ders_Notu.html')):
-            self.note_num[os.path.basename(f)] = int(re.search(r'Bolum_(\d+)', f).group(1))
         outline = self.outline()
+        info = self.chapter_info()
+        self.note_ids = {}                  # not dosya adi -> (kimlik oneki, notun capasi)
+        for n, c in info.items():
+            for k, f in enumerate(c['notes'], 1):
+                self.note_ids[f] = ('c%d' % n, 'ch%d' % n) if len(c['notes']) == 1 \
+                    else ('c%dn%d' % (n, k), 'ch%d-%d' % (n, k))
+        stray = sorted(os.path.basename(f) for f in glob.glob(os.path.join(self.notes, 'Bolum_*_Ders_Notu.html'))
+                       if os.path.basename(f) not in self.note_ids)
+        if stray:
+            print('  UYARI: ders sayfasinda bagi olmayan not(lar) kitaba girmedi: %s' % ', '.join(stray))
         chapters, parts = [], []
         for k, pname, chs in outline:
             parts.append({'id': 'part%d' % k, 'num': k, 'name': pname, 'sub': '',
                           'chapters': [n for n, _ in chs]})
-            for n, _course_title in chs:
-                src = io.open(self.note_file(n), encoding='utf-8').read()
-                h1 = strip_tags(re.search(r'<h1>(.+?)</h1>', src, re.S).group(1))
-                title = re.sub(r'^Bölüm\s+\d+:\s*', '', h1)
-                page, secs = self.transform(src, n, k, title)
+            for n, course_title in chs:
+                title, page, secs = self.chapter(n, k, course_title, info[n])
                 chapters.append({'id': 'ch%d' % n, 'num': n, 'title': title,
                                  'header': '%d · %s' % (n, title), 'html': page, 'sections': secs})
         gloss, nterms = self.glossary()

@@ -13,6 +13,12 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 ---
 
+## Ders Kitabı
+
+[📕 Bilgisayar ve Programlamaya Giriş (PDF, 24 MB)](https://sercankulcu.github.io/courses-pdfs/computer/Bilgisayar-ve-Programlamaya-Giris.pdf)
+
+---
+
 ## Başlangıç Kaynakları
 
 * [Bilgisayar ve Programlamada Önemli İsimler (HTML)](/files/computer/Computer_and_Programming_Important_People.html)

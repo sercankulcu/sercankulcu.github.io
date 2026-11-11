@@ -13,6 +13,12 @@ Java is one of the most popular programming languages, extensively used in vario
 
 ---
 
+## Ders Kitabı
+
+[📕 Java ile Nesne Yönelimli Programlama (PDF, 29 MB)](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf)
+
+---
+
 ## Başlangıç Kaynakları
 
 * [Java ve Nesne Yönelimli Programlamada Önemli İsimler (HTML)](/files/java/Java_Important_People.html)

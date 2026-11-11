@@ -5,38 +5,9 @@ Ortak kalip notes_book.py'de; burada yalnizca bu derse ozgu olanlar var. Her bol
 basina, ders sayfasindaki "Kod Ornekleri" ve "Laboratuvar Calismasi" baglantilarindan
 kod ve laboratuvar klasorleri yazilir.
 """
-import io, os, re
-
 import notes_book
-from common import SITE
 
 COURSE_PAGE = 'operating-systems.md'
-
-
-def _code_dirs():
-    """bolum no -> [(etiket, klasor), ...], ders sayfasindaki GitHub baglantilarindan.
-
-    Bir bolumde C ve Java kodu ile laboratuvar ayri baglantilar olabilir:
-    "[💻Kod Örnekleri, C (GitHub)](...)", "[🧪Laboratuvar Çalışması, C (GitHub)](...)".
-    """
-    out, cur = {}, None
-    for line in io.open(os.path.join(SITE, '_teaching', COURSE_PAGE), encoding='utf-8'):
-        m = re.match(r'###\s+Bölüm\s+(\d+):', line)
-        if m:
-            cur = int(m.group(1))
-        m = re.search(r'(Kod Örnekleri|Laboratuvar Çalışması), (\w+) \(GitHub\)\]\(https://(github\.com/[^)\s]+)\)', line)
-        if m and cur is not None:
-            label = ('Kod (%s)' % m.group(2)) if m.group(1).startswith('Kod') else 'Laboratuvar'
-            out.setdefault(cur, []).append((label, m.group(3).replace('/tree/main/', '/')))
-    return out
-
-
-CODE = _code_dirs()
-
-
-def code_note(n):
-    return ' &middot; '.join('<strong>%s:</strong> <span class="u">%s</span>' % x
-                             for x in CODE.get(n, []))
 
 
 # Taslak: icerik ders sayfasindaki kisim duzeninden ve notlarin ortak yapisindan
@@ -82,5 +53,4 @@ notes_book.setup(
     colophon='''<p>Sunumlar ve çalışma soruları o sayfadadır. Bölümlerin kodu ve laboratuvar
      çalışmaları <span class="u">github.com/sercankulcu/operating-systems-labs</span>, Java örnekleri
      <span class="u">github.com/sercankulcu/operating-systems-java</span> deposundadır.</p>''',
-    code_note=code_note,
 )
