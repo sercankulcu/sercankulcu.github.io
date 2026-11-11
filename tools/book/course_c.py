@@ -12,7 +12,7 @@ FONT = None                                   # bindirme: reportlab Helvetica
 META = {'/Author': 'Sercan Külcü',
         '/Subject': 'A complete course in C, in fifty-six chapters',
         '/Keywords': 'C, programming, systems, embedded, course'}
-LABELS = {'chapter': 'Chapter', 'chapters': 'Chapters', 'part': 'Part',
+LABELS = {'chapter': 'Chapter', 'chapters': 'Chapters', 'part': 'Part', 'appendices': 'Appendices',
           'title_page': 'Title page', 'preface': 'Preface', 'contents': 'Contents'}
 TOC_SECTIONS = False                          # icindekilerde yalnizca bolumler
 BOOKMARK_SECTIONS = False
@@ -145,6 +145,31 @@ FRONT = '''
 '''
 
 
+def _appendix(fname, uid, label):
+    """files/c altindaki "Prerequisites" / "Important People" sayfasi ek olarak: arama,
+    suzgec ve dugmeler atilir, gizli ayrintilar acilir; sayfanin kendi <style> blogu kalir."""
+    src = io.open(os.path.join(SITE, 'files', 'c', fname), encoding='utf-8').read()
+    b = DS_GUARD_RE.sub('', src.split('---', 2)[-1])
+    b = re.sub(r'<link[^>]*>\s*', '', b)
+    for rx in (r'<script.*?</script>\s*', r'<button\b.*?</button>', r'<select\b.*?</select>',
+               r'<dialog\b.*?</dialog>'):
+        b = re.sub(rx, '', b, flags=re.S)
+    b = re.sub(r'<input\b[^>]*>', '', b)
+    b = re.sub(r'<(span|p|div)[^>]*class="[^"]*__(?:count|empty)\b[^"]*"[^>]*>.*?</\1>', '', b, flags=re.S)
+    b = re.sub(r'\shidden(?=[\s>/])', '', b)
+    for _ in range(3):
+        b = re.sub(r'<div[^>]*>\s*</div>\s*', '', b)
+    title = strip_tags(re.search(r'<h1[^>]*>(.*?)</h1>', b, re.S).group(1))
+    b = re.sub(r'<h1[^>]*>.*?</h1>', '', b, count=1, flags=re.S)
+    b = re.sub(r'\bid="([^"]+)"', lambda m: 'id="%s-%s"' % (uid, m.group(1)), b)
+    # goreli baglar sitedeki adrese
+    b = re.sub(r'\bhref="(?!https?:|#|mailto:)([^"]*)"',
+               lambda m: 'href="https://sercankulcu.github.io/files/c/%s"' % m.group(1), b)
+    page = ('<section class="bk-chapter bk-extra" id="%s">\n<p class="bk-part">%s</p>\n<h1>%s</h1>\n%s\n'
+            '</section>' % (uid, label, html.escape(title), b))
+    return {'id': uid, 'label': label, 'title': title, 'header': title, 'html': page}
+
+
 def date_text(d):
     return d.strftime('%d %B %Y')
 
@@ -161,4 +186,6 @@ def load():
               'chapters': list(range(a, b + 1))}
              for k, (a, b, name, sub) in enumerate(PARTS)]
     return {'front': FRONT, 'parts': parts, 'chapters': chapters,
-            'appendices': [], 'tail': ''}
+            'appendices': [_appendix('C_Procedural_Programming_Prerequisites.html', 'app-prereq', 'Appendix A'),
+                           _appendix('C_Procedural_Programming_Important_People.html', 'app-people', 'Appendix B')],
+            'tail': ''}

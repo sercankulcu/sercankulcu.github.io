@@ -193,8 +193,9 @@ class _Course:
                     raise SystemExit('ders sayfasindaki not yok: %s' % f)
         return info
 
-    def link(self, href, prefix):
-        """Notun icindeki bir bagi kitapta gecerli hale getirir."""
+    def link(self, href, prefix, base_url=None):
+        """Notun icindeki bir bagi kitapta gecerli hale getirir. base_url: goreli baglarin
+        cozuldugu site klasoru (varsayilan: notlar klasoru)."""
         if href.startswith('#'):
             return '#%s-%s' % (prefix, href[1:])
         if re.match(r'(https?:|mailto:)', href):
@@ -207,7 +208,7 @@ class _Course:
             pre, anchor = self.note_ids[base]
             return '#%s-%s' % (pre, frag) if frag else '#' + anchor
         # sunumlar, oyunlar, on bilgiler: sitedeki adres
-        absp = os.path.normpath(os.path.join(self.notes_url, path)).replace('\\', '/')
+        absp = os.path.normpath(os.path.join(base_url or self.notes_url, path)).replace('\\', '/')
         return SITE_URL + absp + ('#' + frag if frag else '')
 
     def transform(self, src, prefix, kicker, title, wrap_id, wrap_class, code_html):
@@ -285,6 +286,54 @@ class _Course:
                                               items))
         return course_title, opener + '\n' + '\n'.join(pages), subs
 
+    # ------------------------------------------------------------ on bilgiler / onemli isimler eki
+    def extra_page(self, fname, uid, label):
+        """Dersin "Ön Bilgiler" ya da "Önemli İsimler" sayfasini ek olarak basilir hale getirir.
+
+        Bu sayfalar etkilesimli: arama, suzgec, siralama, "Ayrintilar" dugmesi ve gizli
+        ayrintilar. Kitapta dugmeler ve araclar atilir, gizli ayrintilar acilir; sayfanin
+        kendi <style> blogu kalir.
+        """
+        src = io.open(os.path.join(self.dir, fname), encoding='utf-8').read()
+        b = src.split('---', 2)[-1]
+        b = DS_GUARD_RE.sub('', b)
+        b = re.sub(r'<link[^>]*>\s*', '', b)
+        b = re.sub(r'<script.*?</script>\s*', '', b, flags=re.S)
+        b = re.sub(r'<button\b.*?</button>', '', b, flags=re.S)
+        b = re.sub(r'<select\b.*?</select>', '', b, flags=re.S)
+        b = re.sub(r'<input\b[^>]*>', '', b)
+        b = re.sub(r'<dialog\b.*?</dialog>', '', b, flags=re.S)
+        # sayac ve "sonuc yok" satirlari
+        b = re.sub(r'<(span|p|div)[^>]*class="[^"]*__(?:count|empty)\b[^"]*"[^>]*>.*?</\1>', '', b, flags=re.S)
+        b = re.sub(r'\shidden(?=[\s>/])', '', b)
+        # araclar atilinca bos kalan kutular (arama/suzgec cubugu)
+        for _ in range(3):
+            b = re.sub(r'<div[^>]*>\s*</div>\s*', '', b)
+        title = strip_tags(re.search(r'<h1[^>]*>(.*?)</h1>', b, re.S).group(1))
+        b = re.sub(r'<h1[^>]*>.*?</h1>', '', b, count=1, flags=re.S)
+        b = re.sub(r'\bid="([^"]+)"', lambda m: 'id="%s-%s"' % (uid, m.group(1)), b)
+        b = re.sub(r'url\(#([^)]+)\)', lambda m: 'url(#%s-%s)' % (uid, m.group(1)), b)
+        base = '/files/' + os.path.basename(self.dir)
+        b = re.sub(r'\b((?:xlink:)?href)="([^"]*)"',
+                   lambda m: '%s="%s"' % (m.group(1), self.link(m.group(2), uid, base)), b)
+        b = hyphenate_html(b)
+        page = ('<section class="bk-chapter bk-appendix bk-extra" id="%s">\n<article class="ds-notes" lang="tr">\n'
+                '<header class="nt-head"><p class="nt-kicker">%s</p><h1>%s</h1></header>\n%s\n'
+                '</article>\n</section>' % (uid, label, html.escape(title), b))
+        return {'id': uid, 'label': label, 'title': title, 'header': '%s · %s' % (label, title), 'html': page}
+
+    def extra_files(self):
+        """[(dosya, kimlik, etiket)]: Ek B Ön Bilgiler, Ek C Önemli İsimler (sayfa varsa)."""
+        names = os.listdir(self.dir)
+        pre = sorted(f for f in names if re.search(r'Prerequisites.*\.html$', f))
+        ppl = sorted(f for f in names if re.search(r'(Important_People|Pioneers).*\.html$', f))
+        out = []
+        if pre:
+            out.append((pre[0], 'ek-onbilgi', 'Ek B'))
+        if ppl:
+            out.append((ppl[0], 'ek-isimler', 'Ek C' if pre else 'Ek B'))
+        return out
+
     # ------------------------------------------------------------ sozluk eki
     def glossary(self):
         s = io.open(os.path.join(self.dir, 'sozluk.html'), encoding='utf-8').read()
@@ -330,6 +379,8 @@ class _Course:
                     else ('c%dn%d' % (n, k), 'ch%d-%d' % (n, k))
         for f, uid in self.intro:
             self.note_ids[os.path.basename(f)] = (uid, uid)
+        for f, uid, label in self.extra_files():
+            self.note_ids[f] = (uid, uid)
         stray = sorted(os.path.basename(f) for f in glob.glob(os.path.join(self.notes, 'Bolum_*_Ders_Notu.html'))
                        if os.path.basename(f) not in self.note_ids)
         if stray:
@@ -363,7 +414,8 @@ class _Course:
             tail.append('<script>\n%s\n</script>' % js)
         return {'front': front, 'parts': parts, 'chapters': chapters, 'intro': intro,
                 'appendices': [{'id': 'ek-sozluk', 'label': 'Ek A', 'title': 'Terim Sözlüğü',
-                                'header': 'Ek A · Terim Sözlüğü', 'html': gloss}],
+                                'header': 'Ek A · Terim Sözlüğü', 'html': gloss}]
+                          + [self.extra_page(f, uid, label) for f, uid, label in self.extra_files()],
                 'tail': '\n'.join(tail), 'outline': outline, 'terms': nterms}
 
 

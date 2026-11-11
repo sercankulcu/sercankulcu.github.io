@@ -53,6 +53,16 @@ ders sayfasında bağı olmayan not kitaba girmez ve derleme uyarı verir. Çok 
 ders sayfasındaki ad ve açıklamayla bir açılış sayfası alır; notlar onun altında yeni
 sayfada başlayan alt bölümler olur ve içindekilerde alt bölüm olarak listelenir.
 
+Ekler: Ek A terim sözlüğü (`sozluk.html`), Ek B "Ön Bilgiler" (`*Prerequisites*.html`),
+Ek C "Önemli İsimler" (`*Important_People*.html` / `Pioneers*.html`). B ve C web'de
+etkileşimli sayfalardır; kitapta arama, süzgeç, sıralama ve düğmeler atılır, gizli
+"Ayrıntılar" açılır, sayfanın kendi `<style>` bloğu kalır. C kitabında aynı iki sayfa
+Appendix A/B olur (`course_c.py`, `_appendix`).
+
+İsteğe bağlı giriş sayfaları (`notes_book.setup(..., intro=[('dosya.html', 'kimlik')])`)
+Kısım I'den önce basılır ve içindekilerin en üstünde yer alır; AGT'de dersin haritası
+(`files/agt/ders_haritasi.html`) böyledir.
+
 | Aşama | Dosya | İş |
 |---|---|---|
 | 1 | `book/build.py` | Notları tek `book.html` içinde birleştirir; kısım sayfalarını ve içindekileri kurar, CSS'i gömer |

@@ -15,7 +15,7 @@ Data structures provide systematic ways to organize, store, and access data. Cho
 
 ## Ders Kitabı
 
-[📕 Veri Yapıları (PDF, 28 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf)
+[📕 Veri Yapıları (PDF, 19 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf)
 
 ---
 

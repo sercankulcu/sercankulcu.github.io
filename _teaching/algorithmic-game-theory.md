@@ -15,7 +15,7 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ## Ders Kitabı
 
-[📕 Algoritmik Oyun Kuramı (PDF, 24 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf)
+[📕 Algoritmik Oyun Kuramı (PDF, 15 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf)
 
 ---
 
