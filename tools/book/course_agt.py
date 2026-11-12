@@ -13,7 +13,7 @@ gözüyle inceler: oyun kuramının modellerini algoritmalar ve karmaşıklık �
 birleştirir. Bu kitap, Giresun Üniversitesi Bilgisayar Mühendisliği Bölümü'nde verilen
 Algoritmik Oyun Kuramı dersinin notlarından oluşur ve bölümleri dersteki sırayla izler.</p>
 
-<p>Kitap beş kısımdır. __PARTS__ Bölüm 0, derste gerçekten kullanılan matematiği oyun
+<p>Kitap beş kısımdan oluşur. __PARTS__ Bölüm 0, derste gerçekten kullanılan matematiği oyun
 örnekleri üzerinden yeniden kurar; bu konulara hâkim okur doğrudan Bölüm 1'den
 başlayabilir.</p>
 
@@ -26,7 +26,7 @@ ve kaynakçayla kapanır. Kitabın sonundaki terim sözlüğü, her İngilizce t
 kullanılan tek Türkçe karşılığı verir.</p>
 
 <p>Bazı şekiller web sayfasında kaydırıcıyla değiştirilebilen etkileşimli çizimlerdir;
-kitapta varsayılan değerleriyle basılmışlardır. Sunumlar, çalışma soruları ve sınıfta
+kitapta varsayılan değerleriyle basılmıştır. Sunumlar, çalışma soruları ve sınıfta
 oynanan oyunlar ders sayfasındadır.</p>
 '''
 
