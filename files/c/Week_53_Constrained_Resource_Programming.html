@@ -144,7 +144,7 @@ void pool_free(void *p)                      /* O(1), always */
 <section>
   <h2><span class="c-wk-num">3</span>Fixed-point arithmetic</h2>
 
-  <p>Many microcontrollers have no floating-point unit, so a single <code>float</code> multiplication becomes a library call of hundreds of cycles and several kilobytes of linked code.</p>
+  <p>Many microcontrollers have no floating-point unit, so a single <code>float</code> multiplication becomes a library call of around a hundred cycles and several kilobytes of linked code.</p>
 
   <p>Fixed point represents a fraction as an integer with an implied binary point. <em>Q16.16</em> uses 32 bits: 16 for the integer part, 16 for the fraction.</p>
 
@@ -169,7 +169,7 @@ static inline q16_t q16_div(q16_t a, q16_t b)
     return (q16_t)((((int64_t)a) &lt;&lt; Q16_SHIFT) / b);
 }</code></pre>
 
-  <p>Addition and subtraction are plain integer operations. Multiplication needs the 64-bit intermediate: two Q16.16 values multiply to Q32.32, and the shift brings it back. Omit the cast and the product overflows 32 bits for any operands above about 128.</p>
+  <p>Addition and subtraction are plain integer operations. Multiplication needs the 64-bit intermediate: two Q16.16 values multiply to Q32.32, and the shift brings it back. Omit the cast and the product overflows 32 bits as soon as the true product reaches 0.5, that is, for operands above about 0.7.</p>
 
   <table>
     <thead><tr><th></th><th>Fixed point</th><th><code>float</code> without an FPU</th></tr></thead>
@@ -246,7 +246,7 @@ for (;;) {
 {
     /* The processor stacked eight registers; recover the PC. */
     uint32_t *frame;
-    __asm__ volatile ("mrs %0, msp" : "=r"(frame));
+    __asm__ volatile ("mrs %0, msp" : "=r"(frame)); /* only valid if nothing was pushed yet; real code uses a naked asm stub */
 
     crash_log.magic    = CRASH_MAGIC;
     crash_log.pc       = frame[6];      /* where it faulted */
@@ -388,7 +388,7 @@ static bool ring_pop(Ring *r, uint8_t *out)
 
 /* ---------- a lookup table, in flash ---------- */
 
-/* sin(x) scaled to Q16.16, 16 entries over a quarter turn.
+/* sin(x) scaled to Q16.16, 17 entries over a quarter turn.
    const keeps it in .rodata — week 52. */
 static const q16_t sine_table[17] = {
         0,  6423, 12785, 19024, 25079, 30893, 36409, 41575,
@@ -590,12 +590,12 @@ puts_raw("200 * 200 = "); put_q16(q16_mul(big, big));</code></pre>
 
   <details>
     <summary>Why does <code>q16_mul</code> need a 64-bit intermediate?</summary>
-    <p>Because multiplying two Q16.16 values produces a Q32.32 result, which needs 64 bits before the shift brings it back to Q16.16. Doing the multiplication in 32 bits overflows for operands above roughly 128, long before the format's nominal range is reached — and it overflows silently.</p>
+    <p>Because multiplying two Q16.16 values produces a Q32.32 result, which needs 64 bits before the shift brings it back to Q16.16. Doing the multiplication in 32 bits overflows as soon as the product reaches 0.5, long before the format's nominal range is reached — and it overflows silently.</p>
   </details>
 
   <details>
     <summary>When is fixed point preferable to floating point?</summary>
-    <p>When the processor has no FPU and the range of values is known in advance. It avoids a soft-float library of several kilobytes, runs in a few cycles instead of a hundred, and has constant timing. Its uniform absolute precision is also an advantage for sensor and control values, where a float's relative precision is wasted at large magnitudes.</p>
+    <p>When the processor has no FPU and the range of values is known in advance. It avoids a soft-float library of several kilobytes, runs in a few cycles instead of a hundred, and has constant timing. Its uniform absolute precision is also an advantage for sensor and control values, where a float's extra precision near zero is not needed and its precision at large magnitudes is coarser.</p>
   </details>
 
   <details>

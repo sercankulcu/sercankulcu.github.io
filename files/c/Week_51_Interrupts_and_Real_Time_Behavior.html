@@ -105,7 +105,7 @@ void (* const vector_table[])(void) = {
 NVIC_IPR(5) = 0x40;            /* set a priority for IRQ 5 */
 NVIC_ISER0  = (1u &lt;&lt; 5);       /* enable it */</code></pre>
 
-  <p><strong>Latency</strong> is the time from the hardware event to the first instruction of your handler. It is the sum of three things:</p>
+  <p><strong>Latency</strong> is the time from the hardware event to the first instruction of your handler. It is the sum of three things, or four if a critical section is in the way:</p>
 
 <div class="c-wk-step" role="group" aria-label="What interrupt latency is made of, step by step">
   <input type="radio" name="w51lat" id="w51lat-1" checked>
@@ -484,7 +484,7 @@ qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
 
   <p>Comment out <code>UART0-&gt;ICR = ICR_RXIC;</code> and rerun. The moment a byte arrives, the system appears to freeze: the peripheral still asserts the request, so the handler returns and is immediately re-entered, forever. The main loop never runs again.</p>
 
-  <p>This is the most common interrupt bug and the symptom — a hang with no crash — gives no clue. Add <code>isr_entries</code> to a watchpoint in GDB and you will see it climbing at millions per second.</p>
+  <p>This is the most common interrupt bug and the symptom — a hang with no crash — gives no clue. Set a watchpoint on <code>isr_entries</code> in GDB and you will see it climbing at millions per second.</p>
 
   <h3>Remove <code>volatile</code> from <code>tick_count</code></h3>
 
@@ -511,7 +511,7 @@ exit_critical(s);</code></pre>
 
   <h3>Overflow the ring buffer</h3>
 
-<pre><code>printf 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' \
+<pre><code>printf 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq' \
     | qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
 
   <p><code>rx_dropped</code> becomes non-zero. The buffer is 64 bytes and the main loop consumed slowly, so the ISR had to discard. Dropping is a deliberate choice — the alternatives are blocking in the ISR, which is never acceptable, or an unbounded buffer, which is not available. Choosing and reporting the drop is the correct design; silently overwriting is not.</p>

@@ -83,7 +83,7 @@ excerpt: "The peripheral memory map, why registers require volatile, register ac
 
 while (UART_FR &amp; (1u &lt;&lt; 5)) { }                /* wait while FIFO full */</code></pre>
 
-  <p>The compiler reasons: the loop body is empty, nothing in it modifies <code>UART_FR</code>, so the value cannot change. It loads the register once into a register and tests that copy forever. At <code>-O0</code> this often works by accident; at <code>-O2</code> the program hangs on the first full FIFO and never recovers.</p>
+  <p>The compiler reasons: the loop body is empty, nothing in it modifies <code>UART_FR</code>, so the value cannot change. It loads the hardware register once into a CPU register and tests that copy forever. At <code>-O0</code> this often works by accident; at <code>-O2</code> the program hangs on the first full FIFO and never recovers.</p>
 
 <pre><code>#define UART_FR (*(volatile uint32_t *)0x4000C018)   /* correct */</code></pre>
 
@@ -171,7 +171,7 @@ while (UART0-&gt;FR &amp; UART_FR_TXFF) { }</code></pre>
     </tbody>
   </table>
 
-  <p>Two of those deserve care. <strong>W1C</strong> inverts the usual read-modify-write: to clear a flag you write a 1 to it, and the read-modify-write idiom below would clear every other pending flag as a side effect — so W1C registers are written directly with just the bit you mean.</p>
+  <p>One of those deserves care. <strong>W1C</strong> inverts the usual read-modify-write: to clear a flag you write a 1 to it, and the read-modify-write idiom below would clear every other pending flag as a side effect — so W1C registers are written directly with just the bit you mean.</p>
 
   <p><strong>Reserved bits</strong> must usually be preserved. Writing zeros to them can change undocumented behavior, which is the other reason read-modify-write exists.</p>
 
@@ -182,7 +182,7 @@ v |= LCRH_WLEN_8;               /* set the new value */
 UART0-&gt;LCRH = v;                /* write */
 
 /* Write-one-to-clear: do NOT read-modify-write. */
-UART0-&gt;ICR = ICR_RXIC;          /* clears only this flag */</code></pre>
+UART0-&gt;ICR = ICR_RXIC;          /* ICR is at 0x044, past the members shown above */          /* clears only this flag */</code></pre>
 </section>
 
 <section>
@@ -235,7 +235,7 @@ void uart_init(void)
 {
     UART0-&gt;CTL = 0;                     /* disable before configuring */
 
-    UART0-&gt;IBRD = 10;                   /* 115200 baud at 18.432 MHz  */
+    UART0-&gt;IBRD = 10;                   /* 115200 baud at 20 MHz  */
     UART0-&gt;FBRD = 54;
 
     /* Read-modify-write: set the word length, preserve everything else. */
@@ -374,7 +374,7 @@ qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
 }</code></pre>
 
 <pre><code>arm-none-eabi-gcc … -O0 … &amp;&amp; qemu-system-arm …   # usually still works
-arm-none-eabi-gcc … -O2 … &amp;&amp; qemu-system-arm …   # hangs, or garbles output</code></pre>
+arm-none-eabi-gcc … -O2 … &amp;&amp; qemu-system-arm …   # hangs on real hardware; QEMU may not show it</code></pre>
 
   <p>At <code>-O0</code> every access goes to memory anyway, so the bug is invisible. At <code>-O2</code> the load is hoisted out of the loop and the driver waits forever on a stale value. This is the single most common embedded bug, and the reason it is so confusing is that the debug build is fine.</p>
 
@@ -389,9 +389,9 @@ gdb-multiarch firmware.elf
 (gdb) break uart_putc
 (gdb) continue
 (gdb) print/x *(UART_Type *)0x4000C000      # the whole peripheral
-(gdb) print/x UART0-&gt;FR
-(gdb) print/t UART0-&gt;FR                     # binary: read the bits
-(gdb) set var UART0-&gt;DR = 0x41              # write 'A' by hand
+(gdb) print/x ((UART_Type *)0x4000C000)-&gt;FR
+(gdb) print/t ((UART_Type *)0x4000C000)-&gt;FR                     # binary: read the bits
+(gdb) set var ((UART_Type *)0x4000C000)-&gt;DR = 0x41              # write 'A' by hand
 </code></pre>
 
   <p>The struct overlay pays for itself here: GDB prints the peripheral as a named structure rather than a block of hex. Setting <code>DR</code> from the debugger transmits a character — the hardware responds to a write from any source, which is the clearest possible demonstration that a register is not a variable.</p>
@@ -400,7 +400,7 @@ gdb-multiarch firmware.elf
 
   <p>An overlay with a wrong <code>reserved</code> array silently addresses the wrong registers. Verify it rather than trusting it:</p>
 
-<pre><code>/* add to main, temporarily */
+<pre><code>/* add temporarily, in a file that sees UART_Type and includes &lt;stddef.h&gt; */
 uart_puts("offsetof FR  : "); put_hex((uint32_t)offsetof(UART_Type, FR));
 uart_puts("\noffsetof CTL : "); put_hex((uint32_t)offsetof(UART_Type, CTL));
 uart_puts("\nsizeof        : "); put_hex((uint32_t)sizeof(UART_Type));</code></pre>

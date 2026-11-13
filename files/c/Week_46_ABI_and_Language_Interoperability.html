@@ -73,7 +73,7 @@ excerpt: "Calling conventions and the platform ABI, name mangling and extern C, 
     </tbody>
   </table>
 
-  <p>Windows x64 uses different registers entirely — <code>rcx rdx r8 r9</code> — which is why a library compiled for one does not link against the other. You rarely need the details, but two facts matter in practice: <strong>a small struct may be passed in registers while a large one is passed by hidden pointer</strong>, and that threshold is part of the ABI. Changing a struct from 16 to 24 bytes can change how every function taking it is called, which is week 45's ABI break in its least obvious form.</p>
+  <p>Windows x64 assigns arguments to different registers — <code>rcx rdx r8 r9</code> — which is why a library compiled for one does not link against the other. You rarely need the details, but two facts matter in practice: <strong>a small struct may be passed in registers while a large one is passed by hidden pointer</strong>, and that threshold is part of the ABI. Changing a struct from 16 to 24 bytes can change how every function taking it is called, which is week 45's ABI break in its least obvious form.</p>
 
   <p>Read it yourself with week 34's technique:</p>
 
@@ -429,17 +429,17 @@ LD_LIBRARY_PATH=. ./cppapp</code></pre>
 
   <p>Plain names. Now compile the same source as C++ without the guard and look again:</p>
 
-<pre><code>g++ -fPIC -shared -x c++ mathlib.c -o libmangled.so 2&gt;/dev/null
+<pre><code>g++ -fpermissive -fPIC -shared -x c++ mathlib.c -o libmangled.so 2&gt;/dev/null
 nm -D libmangled.so | grep ' T ' | head -3
 nm -D libmangled.so | grep ' T ' | head -3 | c++filt</code></pre>
 
-  <p><code>_Z6ml_addii</code> rather than <code>ml_add</code>. No FFI in any language would find it, and that single difference is what the four lines of <code>extern "C"</code> prevent.</p>
+  <p><code>_Z6ml_addii</code> rather than <code>ml_add</code>. No FFI in any language would find it, and that single difference is what the six lines of <code>extern "C"</code> prevent.</p>
 
   <h3>Break the ownership rule on purpose</h3>
 
   <p>In the Python script, replace <code>lib.ml_free(p)</code> with nothing and run under a leak checker; then try freeing C's pointer from Python's side. On Linux with one shared libc it may appear to work; on Windows, where the library and the interpreter can use different runtimes, it corrupts the heap. The exported <code>ml_free</code> exists precisely so the caller never has to know which allocator produced the block.</p>
 
-  <p>Then delete the <code>callback = VISITOR(on_value)</code> binding and pass <code>VISITOR(on_value)</code> inline. Python may collect the temporary while C still holds the pointer, and the call jumps into freed memory. Keeping the reference alive for the duration of the call is the FFI equivalent of week 13's dangling pointer.</p>
+  <p>Then delete the <code>callback = VISITOR(on_value)</code> binding and pass <code>VISITOR(on_value)</code> inline. For this call it still works, because ctypes keeps the argument alive until the call returns; the temporary is freed only afterwards, so a C library that stored the pointer and called it later would jump into freed memory. Keeping the reference alive for the duration of the call is the FFI equivalent of week 13's dangling pointer.</p>
 </section>
 
 <section>

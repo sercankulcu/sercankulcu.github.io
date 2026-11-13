@@ -96,7 +96,7 @@ vTaskStartScheduler();                          /* never returns */</code></pre>
     <thead><tr><th>Task state</th><th>Means</th></tr></thead>
     <tbody>
       <tr><td>Running</td><td>Executing now — one per core</td></tr>
-      <tr><td>Ready</td><td>Could run; a higher priority is running</td></tr>
+      <tr><td>Ready</td><td>Could run; a task of higher or equal priority is running</td></tr>
       <tr><td>Blocked</td><td>Waiting for a queue, a semaphore, or a delay</td></tr>
       <tr><td>Suspended</td><td>Explicitly stopped</td></tr>
     </tbody>
@@ -123,7 +123,7 @@ vTaskStartScheduler();                          /* never returns */</code></pre>
 
   <p>"Real-time" means <em>predictable</em>, not fast. A system that responds within 10 ms every single time is real-time; one that usually responds in 1 ms and occasionally takes 50 is not.</p>
 
-  <p>Assign priorities by deadline, not by importance. A task that must respond in 1 ms outranks one that must respond in 100 ms, even if the second is doing something more valuable — that is rate-monotonic scheduling, and it is provably optimal for fixed priorities.</p>
+  <p>Assign priorities by deadline, not by importance. A task that must respond in 1 ms outranks one that must respond in 100 ms, even if the second is doing something more valuable — that is deadline-monotonic scheduling (rate-monotonic when each deadline equals the period), and it is provably optimal for fixed priorities.</p>
 
   <p><strong>Starvation</strong> is the failure mode: a high-priority task that never blocks prevents every lower one from running at all. Every task must block on something — a delay, a queue, a semaphore.</p>
 </section>
@@ -163,7 +163,7 @@ xQueueSendFromISR(q, &amp;reading, &amp;woken);        /* the ISR variant */</co
 <section>
   <h2><span class="c-wk-num">5</span>Priority inversion</h2>
 
-  <p>The classic real-time failure, and the one that famously reset the Mars Pathfinder rover repeatedly in 1997.</p>
+  <p>The classic real-time failure, and the one that famously reset the Mars Pathfinder lander repeatedly in 1997.</p>
 
 <pre><code>Low  priority: takes mutex M, starts working
 Mid  priority: becomes ready, preempts Low  ← Low never finishes
@@ -259,7 +259,7 @@ int main(void)
   log runs         : 37
   WORST sensor gap : 54 ticks  (wanted 10)</code></pre>
 
-  <p>Thirty-seven samples where two hundred were wanted, and a worst-case gap of 54 ticks — the sum of every other task. No amount of tuning fixes this; the structure causes it.</p>
+  <p>Thirty-seven samples where two hundred were wanted, and a worst-case gap of 54 ticks — the sum of every task in the loop. No amount of tuning fixes this; the structure causes it.</p>
 
   <h3>With FreeRTOS</h3>
 
@@ -449,7 +449,7 @@ static void greedy_task(void *arg)
 }
 xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
 
-  <p>The sensor task now blocks waiting for the low-priority log task to release the semaphore, while the medium-priority greedy task prevents the log task from running. The worst sensor gap jumps from 10 ticks to 40 or more.</p>
+  <p>The sensor task now blocks waiting for the low-priority log task to release the semaphore, while the medium-priority greedy task prevents the log task from running. With the code as written, though, <code>sensor_task</code> takes the semaphore with a 5 ms timeout and records the gap only when the take succeeds, so the reported gap stays near 10; take it with <code>portMAX_DELAY</code> to see the gap jump to 40 or more.</p>
 
   <p>Change one line back — <code>xSemaphoreCreateMutex()</code> — and the gap returns to 10. Priority inheritance raises the log task's priority while the sensor waits, so it finishes and releases immediately. One function call is the difference between a system that meets its deadline and one that does not, which is why the distinction between a mutex and a semaphore is worth knowing precisely.</p>
 
@@ -502,7 +502,7 @@ xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
 
   <details>
     <summary>What exactly does a superloop get wrong?</summary>
-    <p>Response time. Every task's period is the sum of all the others' execution times, so one slow operation degrades everything — the measurement above showed a 10 ms sensor deadline stretching to 54 ms because a 50 ms log write sat in front of it. Nothing about the individual functions is wrong; the structure imposes the coupling.</p>
+    <p>Response time. Every task's period is the sum of all the tasks' execution times, so one slow operation degrades everything — the measurement above showed a 10 ms sensor deadline stretching to 54 ms because a 50 ms log write sat in front of it. Nothing about the individual functions is wrong; the structure imposes the coupling.</p>
   </details>
 
   <details>
@@ -528,7 +528,7 @@ xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
 
 <section>
   <h2><span class="c-wk-num">10</span>Where this leads</h2>
-  <p>Week 55 is about finding out what went wrong on a device you cannot attach a debugger to: on-chip debugging, tracing on a constrained target, hardware abstraction layers that let firmware be tested on a host, and the simulator-in-the-loop setup this whole block has been using.</p>
+  <p>Week 55 is about finding out what went wrong on a device where most host tools are missing: on-chip debugging, tracing on a constrained target, hardware abstraction layers that let firmware be tested on a host, and the simulator-in-the-loop setup this whole block has been using.</p>
 </section>
 
 <div class="c-wk-next">

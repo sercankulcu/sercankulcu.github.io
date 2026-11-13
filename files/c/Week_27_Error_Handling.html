@@ -229,7 +229,7 @@ cleanup:
     return ok;
 }</code></pre>
 
-  <p>What makes it work: every resource variable is initialized to a null value at the top, so the single cleanup block can unconditionally attempt to release all of them. <code>free(NULL)</code> is defined to do nothing, and the <code>NULL</code> guards handle the file pointers. There is exactly one exit, and adding a fifth resource means adding one acquisition and one release.</p>
+  <p>What makes it work: every resource variable is initialized to a null value at the top, so the single cleanup block can unconditionally attempt to release all of them. <code>free(NULL)</code> is defined to do nothing, and the <code>NULL</code> guards handle the file pointers. There is exactly one exit, and adding a fourth resource means adding one acquisition and one release.</p>
 
   <p>For several resources with distinct cleanup, use cascading labels in reverse order of acquisition:</p>
 
@@ -320,7 +320,7 @@ static const char *fc_status_name(FcStatus s)
     return "unknown";
 }
 
-/* ---------- the function with four resources ---------- */
+/* ---------- the function with three resources ---------- */
 
 /* Copies in_path to out_path, doubling every number it finds.
    Returns FC_OK on success. On failure, out_path may exist but
@@ -479,7 +479,7 @@ int main(void)
 
   <p><strong>Every failure path is exercised</strong> and none of them leaks. Run it under the leak checker and there is no output — including on the paths that failed after opening two files and allocating a buffer. That is the point of the single cleanup block.</p>
 
-  <p><strong><code>lines_out</code> is untouched on failure.</strong> The output shows <code>-1</code> for every failing case, because the assignment happens only on the success path. A caller that ignores the status still cannot mistake stale data for a result.</p>
+  <p><strong><code>lines_out</code> is untouched on failure.</strong> The output shows <code>-1</code> for every failing case except the missing file (which prints the <code>errno</code> message instead), because the assignment happens only on the success path. A caller that ignores the status still cannot mistake stale data for a result.</p>
 
   <p><strong>Adding a resource is one line in two places.</strong> Try it: add a second buffer, initialize it to <code>NULL</code>, allocate it after the first, and add one <code>free</code> to the cleanup block. Compare that with the early-return version, where you would edit five places.</p>
 
@@ -530,7 +530,7 @@ Aborted (core dumped)</code></pre>
 
   <details>
     <summary>What is wrong with duplicating cleanup code in each early return?</summary>
-    <p>Each duplicate is an independent opportunity to forget one release, and error paths are precisely the paths least likely to be tested. Adding a fifth resource means editing every branch. One cleanup label makes correctness structural rather than a matter of vigilance.</p>
+    <p>Each duplicate is an independent opportunity to forget one release, and error paths are precisely the paths least likely to be tested. Adding a fourth resource means editing every branch. One cleanup label makes correctness structural rather than a matter of vigilance.</p>
   </details>
 
   <details>

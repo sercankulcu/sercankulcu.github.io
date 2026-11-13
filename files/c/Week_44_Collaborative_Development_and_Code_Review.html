@@ -240,7 +240,7 @@ Good:  Line 47: if parse() fails we return without freeing buf.
 
 <pre><code>--- a/src/config.c
 +++ b/src/config.c
-@@ -40,6 +40,38 @@ static Config *global_config = NULL;
+@@ -39,0 +40,28 @@ static Config *global_config = NULL;
 +/* Load a configuration file and install it. */
 +int config_reload(const char *path)
 +{
@@ -272,9 +272,9 @@ Good:  Line 47: if parse() fails we return without freeing buf.
 
   <h3>The review</h3>
 
-  <p><strong>blocking — line 45: unchecked allocation.</strong> <code>malloc(8192)</code> is not checked, and <code>fread</code> writes to <code>buf</code> immediately. On failure this is a null dereference. Same on line 50 for the <code>Config</code>.</p>
+  <p><strong>blocking — line 46: unchecked allocation.</strong> <code>malloc(8192)</code> is not checked, and <code>fread</code> writes to <code>buf</code> immediately. On failure this is a null dereference. Same on line 50 for the <code>Config</code>.</p>
 
-  <p><strong>blocking — line 46: <code>buf</code> is not null-terminated.</strong> <code>fread</code> returns a count that is ignored, and nothing writes a <code>'\0'</code>. <code>strtok</code> then reads past the end of the allocation. Capture the return value and terminate:</p>
+  <p><strong>blocking — line 47: <code>buf</code> is not null-terminated.</strong> <code>fread</code> returns a count that is ignored, and nothing writes a <code>'\0'</code>. <code>strtok</code> then reads past the end of the allocation. Capture the return value and terminate:</p>
 
 <pre><code>size_t n = fread(buf, 1, 8191, f);
 buf[n] = '\0';</code></pre>
@@ -287,15 +287,15 @@ Config *old = global_config;
 global_config = fresh;
 free(old);</code></pre>
 
-  <p><strong>blocking — line 55: <code>strcmp</code> used backwards.</strong> <code>if (strcmp(key, "timeout"))</code> is true when the strings <em>differ</em>. Every non-timeout key sets the timeout. Week 14's trap, and the compiler cannot help.</p>
+  <p><strong>blocking — line 57: <code>strcmp</code> used backwards.</strong> <code>if (strcmp(key, "timeout"))</code> is true when the strings <em>differ</em>. Every non-timeout key sets the timeout. Week 14's trap, and the compiler cannot help.</p>
 
-  <p><strong>blocking — line 54: unbounded <code>sscanf</code>.</strong> <code>%s</code> into <code>char key[32]</code> with no width is a stack buffer overflow from a config file. Use <code>%31s</code> and <code>%63s</code>, and check the return value — a malformed line currently leaves both buffers uninitialized and they are used anyway.</p>
+  <p><strong>blocking — line 55: unbounded <code>sscanf</code>.</strong> <code>%s</code> into <code>char key[32]</code> with no width is a stack buffer overflow from a config file. Use <code>%31s</code> and <code>%63s</code>, and check the return value — a malformed line currently leaves both buffers uninitialized and they are used anyway.</p>
 
-  <p><strong>blocking — line 58: <code>strcpy</code> into a fixed buffer.</strong> Unbounded copy of attacker-controlled text. <code>snprintf(global_config-&gt;name, sizeof global_config-&gt;name, "%s", value)</code>.</p>
+  <p><strong>blocking — line 60: <code>strcpy</code> into a fixed buffer.</strong> Unbounded copy of attacker-controlled text. <code>snprintf(global_config-&gt;name, sizeof global_config-&gt;name, "%s", value)</code>.</p>
 
-  <p><strong>blocking — <code>buf</code> is leaked.</strong> Allocated on line 45, never freed on any path.</p>
+  <p><strong>blocking — <code>buf</code> is leaked.</strong> Allocated on line 46, never freed on any path.</p>
 
-  <p><strong>blocking — <code>f</code> is leaked on the early return</strong> at line 43? No — the return precedes the <code>fopen</code> succeeding. But if the <code>malloc</code> check is added as suggested, that new path must close <code>f</code>. This is exactly why week 27 prefers one cleanup label over scattered returns.</p>
+  <p><strong>blocking — <code>f</code> is leaked on the early return</strong> at line 44? No — the return precedes the <code>fopen</code> succeeding. But if the <code>malloc</code> check is added as suggested, that new path must close <code>f</code>. This is exactly why week 27 prefers one cleanup label over scattered returns.</p>
 
   <p><strong>question — is this called from more than one thread?</strong> <code>strtok</code> keeps hidden static state and <code>global_config</code> is swapped without synchronization. If reloads can be concurrent with requests, both are races. <code>strtok_r</code> at minimum.</p>
 

@@ -242,7 +242,7 @@ EOF
 chmod +x check.sh
 git add . &amp;&amp; git commit -qm "Add stats tool"</code></pre>
 
-  <p>Now ten commits of ordinary churn, with the bug introduced in the middle:</p>
+  <p>Now seven commits of ordinary churn, with the bug introduced in the middle:</p>
 
 <pre><code>for i in 1 2 3; do
   echo "/* comment $i */" &gt;&gt; stats.c
@@ -258,7 +258,7 @@ for i in 4 5 6; do
   git commit -qam "Document internals, part $i"
 done</code></pre>
 
-  <p>Confirm it is broken, then bisect:</p>
+  <p>Confirm it is broken, then bisect (with the sanitizer check from the next subsection; the plain check usually passes):</p>
 
 <pre><code>./check.sh; echo "check says $?"      # non-zero under a sanitizer build
 
@@ -277,7 +277,7 @@ git bisect run ./check.sh</code></pre>
 
   <h3>Make the sanitizer do the detecting</h3>
 
-  <p>The bug reads one element past the end. Without instrumentation the output is often still correct, because the byte past the array happens to be small — the silent case from week 12. Strengthen the check:</p>
+  <p>The bug reads one element past the end. Without instrumentation the output is often still correct, because the <code>int</code> past the array happens to be small — the silent case from week 12. Strengthen the check:</p>
 
 <pre><code>cat &gt; check.sh &lt;&lt;'EOF'
 #!/bin/sh
@@ -303,7 +303,7 @@ git blame -L 12,20 stats.c             # who wrote the surrounding lines</code><
 
 <pre><code>sed -i 's/i &lt;= n; i++) if (v\[i\]/i &lt; n; i++) if (v[i]/' stats.c</code></pre>
 
-  <p>One character. Now resist the four other things you noticed: <code>atoi</code> should be <code>strtol</code> (week 23), <code>mean</code>'s precondition is undocumented, the error message could name the program, and the comments are noise. Every one is a real improvement and none belongs in this commit.</p>
+  <p>One character. Now resist the four other things you noticed: <code>atoi</code> should be <code>strtol</code> (week 23), <code>maximum</code>'s precondition is undocumented, the allocation failure is reported silently, and the comments are noise. Every one is a real improvement and none belongs in this commit.</p>
 
 <pre><code>git add stats.c
 git commit -q -F - &lt;&lt;'EOF'

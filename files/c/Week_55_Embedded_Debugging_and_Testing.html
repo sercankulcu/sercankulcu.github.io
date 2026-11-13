@@ -115,7 +115,7 @@ openocd -f interface/stlink.cfg -f target/stm32f4x.cfg</code></pre>
     </tbody>
   </table>
 
-  <p>The trace buffer is the workhorse: write timestamped events into a circular array in RAM and read it afterwards with the debugger. It is fast enough to leave enabled in production, and it survives a crash if you place it in a region the startup code does not clear — week 52's retained RAM.</p>
+  <p>The trace buffer is the workhorse: write timestamped events into a circular array in RAM and read it afterwards with the debugger. It is fast enough to leave enabled in production, and it survives a crash if you place it in a region the startup code does not clear — week 53's retained RAM.</p>
 
 <pre><code>typedef struct { uint32_t tick; uint16_t id; uint16_t value; } TraceEvent;
 
@@ -438,7 +438,7 @@ int main(void)
 
   <h3>What the host build buys</h3>
 
-  <p><strong>Sanitizers on firmware logic.</strong> Change the bound to <code>p-&gt;used &gt; PROTO_MAX_LINE - 1</code> — an off-by-one — and rerun. On the device this would silently corrupt whatever follows <code>line</code> in the structure. On the host:</p>
+  <p><strong>Sanitizers on firmware logic.</strong> Change the bound to <code>p-&gt;used &gt; PROTO_MAX_LINE - 1</code> — an off-by-one — and add a test that sends exactly 64 characters and a newline. On the device this would silently corrupt whatever follows <code>line</code> in the structure. On the host, UBSan's bounds check reports it (AddressSanitizer cannot, because the write stays inside the <code>Protocol</code> object):</p>
 
 <pre><code>ERROR: AddressSanitizer: stack-buffer-overflow
 WRITE of size 1 at 0x7ffd… in protocol_poll protocol.c:41</code></pre>
@@ -485,11 +485,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 <pre><code>#!/bin/sh
 # run_target_test.sh — exit 0 if the firmware behaves
 set -e
-arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib -O2 -g \
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -ffreestanding -O2 -g --specs=nano.specs --specs=nosys.specs \
     -T firmware.ld -o firmware.elf startup.c hal_device.c protocol.c main.c
 
 OUT=$(printf 'hello\nworld\nquit\n' | timeout 10 \
-      qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf)
+      qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf) || true
 
 echo "$OUT" | grep -q '1:hello' || { echo "FAIL: first line";  exit 1; }
 echo "$OUT" | grep -q '2:world' || { echo "FAIL: second line"; exit 1; }
@@ -535,7 +535,7 @@ gdb-multiarch firmware.elf
       <tr><td>Testing only on hardware</td><td>Slow cycles; no sanitizers</td><td>Host tests for the logic.</td></tr>
       <tr><td>A fake that does not model the awkward cases</td><td>Tests pass, the device fails</td><td>Model partial reads, timeouts, errors.</td></tr>
       <tr><td>No size check in CI</td><td>Discovered when it will not flash</td><td>Fail the build on the budget.</td></tr>
-      <tr><td>Running out of hardware breakpoints</td><td>GDB refuses silently</td><td>Six on Cortex-M; delete unused ones.</td></tr>
+      <tr><td>Running out of hardware breakpoints</td><td>GDB cannot insert the extra breakpoints and reports an error on resume</td><td>Six on Cortex-M; delete unused ones.</td></tr>
       <tr><td>Clearing retained RAM at startup</td><td>The crash log is gone</td><td><code>NOLOAD</code>, and skip it in the startup loop.</td></tr>
     </tbody>
   </table>

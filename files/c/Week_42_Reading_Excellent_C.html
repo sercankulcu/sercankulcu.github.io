@@ -59,7 +59,7 @@ excerpt: "Why C looks the way it does, why undefined behavior exists, and how to
     <thead><tr><th>Oddity</th><th>Reason</th></tr></thead>
     <tbody>
       <tr><td>Arrays decay to pointers</td><td>Copying an array on every call was unaffordable. Passing an address was one word.</td></tr>
-      <tr><td>Strings end in <code>'\0'</code></td><td>A length prefix costs a byte per string and caps the length. The PDP-11 had a string instruction that stopped on zero.</td></tr>
+      <tr><td>Strings end in <code>'\0'</code></td><td>A length prefix costs a byte per string and caps the length. On the PDP-11 a byte load set the condition codes, so a copy loop could stop on zero without a separate comparison.</td></tr>
       <tr><td>No bounds checking</td><td>A check per access was a measurable fraction of runtime on a machine executing a few hundred thousand instructions per second.</td></tr>
       <tr><td>Declaration mimics use</td><td><code>int *p</code> means "<code>*p</code> is an int". Elegant in principle; the reason week 16 needed a rule.</td></tr>
       <tr><td>The preprocessor is textual</td><td>It was a separate program bolted on, not part of the language.</td></tr>
@@ -99,7 +99,7 @@ excerpt: "Why C looks the way it does, why undefined behavior exists, and how to
       <tr><td><strong>Lua</strong></td><td>~25k lines</td><td>A complete language implementation small enough to read entirely. Exceptional clarity.</td></tr>
       <tr><td><strong>Redis</strong></td><td>~150k lines</td><td>Data structures and an event loop under real load. <code>sds.c</code> and <code>dict.c</code> are directly comparable to weeks 19 and 33.</td></tr>
       <tr><td><strong>git</strong></td><td>~250k lines</td><td>A large codebase that grew organically — including the parts that show it.</td></tr>
-      <tr><td><strong>Linux kernel</strong></td><td>millions</td><td>Not for reading whole. Pick one driver, or <code>lib/list.h</code>, which is week 32's sentinel list.</td></tr>
+      <tr><td><strong>Linux kernel</strong></td><td>millions</td><td>Not for reading whole. Pick one driver, or <code>include/linux/list.h</code>, which is week 32's sentinel list.</td></tr>
     </tbody>
   </table>
 
@@ -146,7 +146,7 @@ gdb ./prog  → break f  → run  → bt         # who calls this, actually</cod
     </tbody>
   </table>
 
-  <p>Answer these five questions and you can make a change that looks like it belongs. Ignore them and your patch will be rejected on style before anyone reads the logic.</p>
+  <p>Answer these six questions and you can make a change that looks like it belongs. Ignore them and your patch will be rejected on style before anyone reads the logic.</p>
 </section>
 
 <section>
@@ -257,12 +257,12 @@ int main(void)
 
     clock_t t0 = clock();
     volatile size_t a = 0;
-    for (int i = 0; i &lt; 200; i++) a += naive_strlen(big);
+    for (int i = 0; i &lt; 200; i++) a += naive_strlen(big + i % 8);
     double naive = (double)(clock() - t0) / CLOCKS_PER_SEC;
 
     t0 = clock();
     volatile size_t b = 0;
-    for (int i = 0; i &lt; 200; i++) b += strlen(big);
+    for (int i = 0; i &lt; 200; i++) b += strlen(big + i % 8);
     double library = (double)(clock() - t0) / CLOCKS_PER_SEC;
 
     printf("naive   %.3f s\nlibrary %.3f s\nratio   %.1fx\n",
@@ -273,7 +273,7 @@ int main(void)
 
 <pre><code>gcc -O2 -o bench bench.c &amp;&amp; ./bench</code></pre>
 
-  <p>The library version is typically several times faster on a long string, and glibc's is faster still because it uses SIMD instructions. The lesson is not to write your own — it is that the standard library is not a convenience wrapper, and the gap between "correct" and "correct and fast" is real.</p>
+  <p>The library version is typically several times faster on a long string. On a glibc system the strlen you just measured is glibc's, which goes further than musl's word-at-a-time loop and uses SIMD instructions. The lesson is not to write your own — it is that the standard library is not a convenience wrapper, and the gap between "correct" and "correct and fast" is real.</p>
 
   <h3>Then read something with a design in it</h3>
 
@@ -281,13 +281,13 @@ int main(void)
 sed -n '1,120p' redis/src/sds.h        # a length-prefixed string type
 sed -n '1,80p'  redis/src/dict.h       # an incrementally rehashing hash table</code></pre>
 
-  <p><code>sds</code> is Redis's answer to week 14's null-terminated strings: it stores the length in a header immediately before the characters, so <code>strlen</code> is O(1) and the pointer can still be passed to any C function expecting <code>char *</code>. Read the header and work out how that dual nature is achieved before reading the implementation.</p>
+  <p><code>sds</code> is Redis's answer to week 14's null-terminated strings: it stores the length in a header immediately before the characters, so <code>sdslen</code> is O(1) and the pointer can still be passed to any C function expecting <code>char *</code>. Read the header and work out how that dual nature is achieved before reading the implementation.</p>
 
   <p><code>dict.c</code> is week 33's hash table with one addition: rehashing happens incrementally, a few buckets per operation, so no single insertion ever pauses for a full rehash. That matters for a server with latency guarantees — and it is a design consideration your version had no reason to have.</p>
 
   <h3>Reconstruct the conventions</h3>
 
-  <p>For whichever project you choose, answer section 5's five questions from the code alone, writing the answers down:</p>
+  <p>For whichever project you choose, answer section 5's six questions from the code alone, writing the answers down:</p>
 
 <pre><code>grep -rn "goto cleanup\|goto fail\|goto err" src/ | head
 grep -rn "_create\|_free\|_destroy\|_new\|_release" src/*.h | head
@@ -332,8 +332,8 @@ ls include/ 2&gt;/dev/null || grep -l "^[a-z].*(" src/*.h | head</code></pre>
   </details>
 
   <details>
-    <summary>What five things should you determine before changing unfamiliar C?</summary>
-    <p>How errors are reported, who owns and frees memory, the naming conventions, whether cleanup is centralized with <code>goto</code>, and which headers constitute the public interface. C supplies none of these, so every project invents its own — consistently, and usually without documenting it.</p>
+    <summary>What six things should you determine before changing unfamiliar C?</summary>
+    <p>How errors are reported, who owns and frees memory, the naming conventions, whether cleanup is centralized with <code>goto</code>, whether allocation goes through a wrapper, and which headers constitute the public interface. C supplies none of these, so every project invents its own — consistently, and usually without documenting it.</p>
   </details>
 
   <details>

@@ -397,7 +397,7 @@ qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
 <pre><code>   text    data     bss     dec     hex filename
    1632       8    1028    2668     a6c firmware.elf</code></pre>
 
-  <p>Eight bytes of <code>.data</code> — the <code>uint32_t</code> and the <code>uint16_t</code> with padding — and 1028 of <code>.bss</code>, which is the 1024-byte <code>scratch</code> plus <code>counter</code>. The <code>.data</code> figure appears in <em>both</em> flash and RAM; the <code>.bss</code> figure only in RAM. Add <code>= {1}</code> to <code>scratch</code> and watch <code>text</code> grow by a kilobyte as it moves into <code>.data</code>.</p>
+  <p>Eight bytes of <code>.data</code> — the <code>uint32_t</code> and the <code>uint16_t</code> with padding — and 1028 of <code>.bss</code>, which is the 1024-byte <code>scratch</code> plus <code>counter</code>. The <code>.data</code> figure appears in <em>both</em> flash and RAM; the <code>.bss</code> figure only in RAM. Add <code>= {1}</code> to <code>scratch</code> and watch <code>data</code> grow by a kilobyte as it moves into <code>.data</code>.</p>
 
 <pre><code>arm-none-eabi-objdump -h firmware.elf</code></pre>
 <pre><code>Idx Name      Size      VMA       LMA       File off  Algn
@@ -430,13 +430,13 @@ grep -B2 -A8 '_stack_top' firmware.map</code></pre>
 <pre><code>arm-none-eabi-ld: RAM overflow
 collect2: error: ld returned 1 exit status</code></pre>
 
-  <p>The <code>ASSERT</code> turned a device that would have corrupted itself at run time into a build failure. Remove the assertion and the same configuration links cleanly, producing firmware whose stack overlaps <code>.bss</code> — and the symptom would be variables changing value for no reason.</p>
+  <p>The <code>ASSERT</code> turned a device that would have corrupted itself at run time into a build failure. Here the stack is its own section placed in <code>RAM</code>, so even without the assertion GNU ld refuses with “region `RAM' overflowed”; the <code>ASSERT</code> earns its place when the stack top is a symbol (such as the end of RAM) rather than a section, where nothing else checks that <code>.bss</code> and the stack fit.</p>
 
   <h3>Watch the stack grow into the danger zone</h3>
 
   <p>Raise the recursion depth until the high-water mark approaches the reserved size:</p>
 
-<pre><code>(void)consume(60);   /* 60 frames of 64 bytes plus overhead */</code></pre>
+<pre><code>(void)consume(50);   /* 50 frames of 64 bytes plus overhead */</code></pre>
 
   <p>The reported headroom shrinks toward zero. Push past it and variables in <code>.bss</code> start changing — silently, because nothing is watching. That is the failure this week's painting and <code>ASSERT</code> exist to make visible, and it is why embedded projects size the stack from a measurement rather than a guess.</p>
 </section>
@@ -483,7 +483,7 @@ collect2: error: ld returned 1 exit status</code></pre>
 
   <details>
     <summary>How do you size a stack with evidence rather than a guess?</summary>
-    <p>Fill the reserved region with a known pattern at startup, run the worst-case workload, then find the lowest address whose pattern is still intact. The distance from there to the top is the high-water mark. Combined with an <code>ASSERT</code> in the linker script that the regions fit, that converts a guess into a measurement and a build-time check.</p>
+    <p>Fill the reserved region with a known pattern at startup, run the worst-case workload, then find the lowest address whose pattern has been overwritten. The distance from there to the top is the high-water mark. Combined with an <code>ASSERT</code> in the linker script that the regions fit, that converts a guess into a measurement and a build-time check.</p>
   </details>
 </section>
 

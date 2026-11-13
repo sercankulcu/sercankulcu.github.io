@@ -69,7 +69,7 @@ excerpt: "The memory hierarchy and cache behavior, data layout and structure pac
 
   <h3>Cache lines</h3>
 
-  <p>Memory is not fetched a byte at a time. The hardware transfers a whole <em>cache line</em>, almost universally 64 bytes. Read one <code>int</code> and the sixteen around it arrive for free.</p>
+  <p>Memory is not fetched a byte at a time. The hardware transfers a whole <em>cache line</em>, almost universally 64 bytes. Read one <code>int</code> and the fifteen around it arrive for free.</p>
 
   <p>That single fact explains week 32's result. Walking an array touches consecutive addresses, so one miss serves sixteen elements. Walking a linked list follows pointers to scattered allocations, so nearly every step is a fresh miss — sixteen times the memory traffic for the same arithmetic.</p>
 
@@ -114,7 +114,7 @@ for (size_t c = 0; c &lt; COLS; c++)
 typedef struct { int id; char name[32]; double score; } Student;
 Student students[N];
 for (size_t i = 0; i &lt; N; i++) total += students[i].score;
-/* each 64-byte line carries one score and 40 bytes you did not want */
+/* each 48-byte record carries one score and 40 bytes you did not want */
 
 /* structure of arrays — one array per field */
 typedef struct {
@@ -150,7 +150,7 @@ for (size_t i = 0; i &lt; N; i++) total += s.score[i];
   <p>An unoptimized build is commonly three to ten times slower than <code>-O2</code>. <strong>Never benchmark at <code>-O0</code></strong>: you are measuring the compiler's debugging output, not your program.</p>
 
   <div class="c-wk-trap">
-    <p><strong>Optimization exposes undefined behavior.</strong> A program relying on signed overflow, strict-aliasing violations, or uninitialized reads can work at <code>-O0</code> and fail at <code>-O2</code>, because the optimizer reasons from the assumption that UB never happens. The bug was always there. Week 37 builds a program that demonstrates exactly this.</p>
+    <p><strong>Optimization exposes undefined behavior.</strong> A program relying on signed overflow, strict-aliasing violations, or uninitialized reads can work at <code>-O0</code> and fail at <code>-O2</code>, because the optimizer reasons from the assumption that UB never happens. The bug was always there. Week 36 builds a program that demonstrates exactly this.</p>
   </div>
 </section>
 
@@ -171,7 +171,7 @@ objdump -d --demangle prog.o | less          # disassemble an object file</code>
     <tbody>
       <tr><td>No <code>call</code> to your small function</td><td>It was inlined</td></tr>
       <tr><td><code>mov</code> of a constant where you wrote arithmetic</td><td>Computed at compile time</td></tr>
-      <tr><td><code>xmm</code> registers, <code>addps</code>, <code>vpaddd</code></td><td>The loop was vectorized</td></tr>
+      <tr><td>Packed instructions such as <code>addpd</code>, <code>addps</code>, <code>vpaddd</code></td><td>The loop was vectorized</td></tr>
       <tr><td>The loop body appearing several times</td><td>It was unrolled</td></tr>
     </tbody>
   </table>
@@ -284,7 +284,7 @@ static double sum_soa(const Columns *c, size_t n)
 
 /* ---------- 3. what the optimizer can and cannot see ---------- */
 
-static long sum_to(long n)
+__attribute__((noinline)) static long sum_to(long n)
 {
     long total = 0;
     for (long i = 1; i &lt;= n; i++) total += i;
@@ -362,7 +362,7 @@ int main(void)
     <thead><tr><th>Comparison</th><th>Ratio</th><th>Cause</th></tr></thead>
     <tbody>
       <tr><td>Column-major versus row-major</td><td>4–10×</td><td>One cache line used per access instead of eight</td></tr>
-      <tr><td>Array of structures versus columns</td><td>2–4×</td><td>48-byte records; 40 bytes per line wasted</td></tr>
+      <tr><td>Array of structures versus columns</td><td>2–4×</td><td>48-byte records; 40 of every 48 bytes wasted</td></tr>
       <tr><td><code>-O0</code> versus <code>-O2</code></td><td>3–10×</td><td>No inlining, no vectorization, everything spilled</td></tr>
     </tbody>
   </table>
@@ -390,7 +390,7 @@ sed -n '/^sum_to:/,/ret/p' perf0.s      # a literal loop, everything in memory</
 <pre><code>perf record -g ./perf
 perf report --stdio | head -20</code></pre>
 
-  <p>The report ranks functions by the share of samples they consumed. Optimize the top entry; everything below it is noise. Amdahl's law is the arithmetic behind that advice: making a function that takes 5% of the runtime twice as fast improves the program by 2.5%, while the same effort on a function taking 60% is worth ten times more.</p>
+  <p>The report ranks functions by the share of samples they consumed. Optimize the top entry; everything below it is noise. Amdahl's law is the arithmetic behind that advice: making a function that takes 5% of the runtime twice as fast improves the program by 2.5%, while the same effort on a function taking 60% is worth twelve times more.</p>
 
   <h3>When to stop</h3>
 

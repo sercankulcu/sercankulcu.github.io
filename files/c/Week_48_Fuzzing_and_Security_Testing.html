@@ -182,7 +182,7 @@ xxd crash-a1b2c3d4 | head</code></pre>
 
   <ol>
     <li><strong>What is worth protecting?</strong> Credentials, user data, the ability to execute code, availability.</li>
-    <li><strong>Where does untrusted input enter?</strong> Command-line arguments, environment, files, the network, and — as week 31 noted — the environment counts.</li>
+    <li><strong>Where does untrusted input enter?</strong> Command-line arguments, files, the network, and — as week 31 noted — the environment.</li>
     <li><strong>What can go wrong?</strong> For C specifically: memory corruption, integer overflow, injection, resource exhaustion.</li>
     <li><strong>What stops it?</strong> Validation at the boundary, bounded copies, checked arithmetic, limits on allocation.</li>
   </ol>
@@ -197,7 +197,7 @@ xxd crash-a1b2c3d4 | head</code></pre>
       <tr><td>Format string</td><td><code>printf("%s", user)</code>, <code>-Wformat-security</code></td><td>36</td></tr>
       <tr><td>Use after free</td><td><code>NULL</code> after <code>free</code>, clear ownership</td><td>19, 20</td></tr>
       <tr><td>Unbounded allocation</td><td>Cap sizes from untrusted sources</td><td>40</td></tr>
-      <tr><td>Path traversal</td><td>Canonicalize, then verify the prefix</td><td>this week</td></tr>
+      <tr><td>Path traversal</td><td>Canonicalize, then verify the prefix</td><td>—</td></tr>
       <tr><td>Hash collision denial of service</td><td>Randomized hash seed</td><td>33</td></tr>
     </tbody>
   </table>
@@ -323,18 +323,18 @@ printf 'values = 4\n'                  &gt; corpus/values
 
   <h3>What it finds, and how quickly</h3>
 
-  <p><strong>Within seconds — the stack overflow.</strong></p>
+  <p><strong>Within seconds — the name overflow.</strong></p>
 
-<pre><code>==12345==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffd…
+<pre><code>==12345==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602…
 WRITE of size 45 at 0x7ffd… thread T0
     #0 0x… in strcpy
     #1 0x… in config_parse parser.c:44
 
-Address is located in stack of thread T0 at offset 32 in frame
+0x602… is located 0 bytes after 56-byte region
   'c' … 'name' (line 12) &lt;== overflows this variable
 artifact_written: crash-3f2a1b…</code></pre>
 
-  <p><code>strcpy</code> into <code>char name[32]</code> with no bound — week 14's defect, found in the time it takes to generate a long line. It is a classic stack smash: on a real target the return address is next.</p>
+  <p><code>strcpy</code> into <code>char name[32]</code> with no bound — week 14's defect, found in the time it takes to generate a long line. It is a classic heap overflow: the next thing overwritten is the <code>values</code> pointer, which <code>config_free</code> then passes to <code>free</code>.</p>
 
   <p><strong>Within a minute — the allocation overflow.</strong></p>
 
@@ -343,7 +343,7 @@ exceeds maximum supported size</code></pre>
 
   <p>Or, worse on some platforms, no error at all: <code>atoi</code> returns a negative number, the conversion to <code>size_t</code> makes it enormous, the multiplication wraps, <code>malloc</code> succeeds with a tiny block, and the loop writes past it. Week 36's integer-overflow-to-heap-overflow chain, discovered automatically.</p>
 
-  <p><strong>The silent one.</strong> <code>atoi</code> cannot report failure, so <code>timeout = abc</code> becomes 0. No crash, so the fuzzer is blind to it — which is the limitation worth naming. Add an assertion and it becomes findable:</p>
+  <p><strong>The silent one.</strong> <code>atoi</code> cannot report failure, so <code>timeout = abc</code> becomes 0. No crash, so the fuzzer is blind to it — which is the limitation worth naming. Add an assertion and out-of-range values become findable (though <code>abc</code> → 0 still passes it):</p>
 
 <pre><code>assert(c-&gt;timeout &gt;= 0 &amp;&amp; c-&gt;timeout &lt;= 3600);</code></pre>
 
@@ -356,7 +356,7 @@ xxd minimized-from-3f2a1b…</code></pre>
 00000010: 4141 4141 4141 4141 4141 4141 4141 4141  AAAAAAAAAAAAAAAA
 00000020: 4141 0a                                  AA.</code></pre>
 
-  <p>Thirty-five bytes, and the defect is unmistakable from the input alone.</p>
+  <p>Fifty-five bytes, and the defect is unmistakable from the input alone.</p>
 
   <h3>The fixed parser</h3>
 
