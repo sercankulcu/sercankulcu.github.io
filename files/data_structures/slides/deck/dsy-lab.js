@@ -1067,7 +1067,7 @@
           var aciklama;
           if (rank[kx] < rank[ky]) { par[kx] = ky; deg.push(kx); aciklama = "sira[" + HARF[kx] + "] < sira[" + HARF[ky] + "] olduğundan ebeveyn[" + HARF[kx] + "] = " + HARF[ky]; }
           else if (rank[kx] > rank[ky]) { par[ky] = kx; deg.push(ky); aciklama = "sira[" + HARF[kx] + "] > sira[" + HARF[ky] + "] olduğundan ebeveyn[" + HARF[ky] + "] = " + HARF[kx]; }
-          else { par[kx] = ky; rank[ky]++; deg.push(kx); aciklama = "sıralar eşit; ebeveyn[" + HARF[kx] + "] = " + HARF[ky] + " ve sira[" + HARF[ky] + "] = " + rank[ky]; }
+          else { par[kx] = ky; rank[ky]++; deg.push(kx); aciklama = "rütbeler eşit; ebeveyn[" + HARF[kx] + "] = " + HARF[ky] + " ve sira[" + HARF[ky] + "] = " + rank[ky]; }
           A("if (uf.union(e[0], e[1]))", "find(" + HARF[e[0]] + ") = " + HARF[kx] + ", find(" + HARF[e[1]] + ") = " + HARF[ky] + ": kökler farklı, union true döner; " + aciklama + "." + not,
             null, deg);
           T.push(e); top += e[2]; durum[e[3]] = "is-tree";
@@ -1082,7 +1082,7 @@
       cur = null;
       Z.cikti = "T = [" + T.map(function (e) { return kAd(e) + " " + e[2]; }).join(", ") + "], ağırlık " + top;
       A("return T", T.length === n - 1 ? "T döndürülür: " + T.length + " kenar, toplam ağırlık " + top + " (minimum kapsayan ağaç)." :
-        "Bütün kenarlar denendi ama |T| = " + T.length + " < n − 1: çizge bağlı değil, T bir minimum kapsayan ormandır (ağırlık " + top + ").", "T " + top);
+        "Bütün kenarlar denendi ama |T| = " + T.length + " < n − 1: çizge bağlantılı değil, T bir minimum kapsayan ormandır (ağırlık " + top + ").", "T " + top);
     }
   };
   MODELLER.prim = {
@@ -1121,7 +1121,7 @@
         if (!pq.q.length || T.length >= n - 1) {
           cur = null;
           A("while (!pq.isEmpty() && T.size() < n - 1)", T.length >= n - 1 ? "|T| = n − 1 = " + (n - 1) + ": bütün düğümler ağaçta, döngü biter." :
-            "Kuyruk boş ama |T| = " + T.length + " < n − 1: A düğümünün bileşeni bitti, çizge bağlı değil.");
+            "Kuyruk boş ama |T| = " + T.length + " < n − 1: A düğümünün bileşeni bitti, çizge bağlantılı değil.");
           break;
         }
         cur = null;
@@ -1146,7 +1146,7 @@
       }
       cur = null;
       Z.cikti = "T = [" + T.map(function (e) { return kAd(e) + " " + e[2]; }).join(", ") + "], ağırlık " + top;
-      A("return T", "T döndürülür: " + T.length + " kenar, toplam ağırlık " + top + (T.length === n - 1 ? " (minimum kapsayan ağaç)." : "; çizge bağlı olmadığından yalnız A düğümünün bileşeni kapsandı."), "T " + top);
+      A("return T", "T döndürülür: " + T.length + " kenar, toplam ağırlık " + top + (T.length === n - 1 ? " (minimum kapsayan ağaç)." : "; çizge bağlantılı olmadığından yalnız A düğümünün bileşeni kapsandı."), "T " + top);
     }
   };
 
