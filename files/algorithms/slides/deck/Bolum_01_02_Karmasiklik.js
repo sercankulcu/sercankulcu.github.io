@@ -24,7 +24,7 @@
     ];
     var prev = null;
 
-    function fmt(b) { return b.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+    function fmt(b) { return b.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
     function lg(b) { var s = b.toString(); return (s.length - 1) + Math.log10(Number(s.slice(0, 15)) / Math.pow(10, Math.min(15, s.length) - 1)); }
 
     function draw() {
@@ -43,7 +43,7 @@
       if (prev && prev.n * 2 === n) {
         var r1 = Number(vals[0]) / Number(prev.v[0]);
         var r2 = Number(vals[1]) / Math.max(1, Number(prev.v[1]));
-        status.innerHTML = "n iki katına çıktı: f1 × <b>" + r1.toFixed(1) + "</b>, f2 × <b>" + r2.toFixed(1) + "</b>, f3 × <b>" + fmt(vals[2] / (prev.v[2] || 1n)) + "</b>.";
+        status.innerHTML = "n iki katına çıktı: f1 × <b>" + r1.toFixed(1).replace(".", ",") + "</b>, f2 × <b>" + r2.toFixed(1).replace(".", ",") + "</b>, f3 × <b>" + fmt(vals[2] / (prev.v[2] || 1n)) + "</b>.";
       } else {
         status.innerHTML = "n = <b>" + n + "</b>: f3 tek başına <b>" + fmt(vals[2]) + "</b> çağrı yapar.";
       }

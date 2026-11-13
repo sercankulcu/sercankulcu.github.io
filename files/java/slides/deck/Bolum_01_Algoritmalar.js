@@ -114,7 +114,7 @@
       dizi = bas.slice();
       st = { i: 0, j: modeSel.value === "sec" ? 1 : 0, enk: 0, tur: 0, degisti: false, kars: 0, takas: 0, bitti: false };
       goster({}, {});
-      status.innerHTML = (modeSel.value === "sec" ? "Seçmeli" : "Kabarcık") + " sıralama hazır. \"bir adım\" ile ilerleyin.";
+      status.innerHTML = (modeSel.value === "sec" ? "Seçimli sıralama" : "Kabarcık sıralaması") + " hazır. \"bir adım\" ile ilerleyin.";
     }
     function yerinde() {
       var k = {};
@@ -138,7 +138,7 @@
       } else {
         var g = dizi[st.i]; dizi[st.i] = dizi[st.enk]; dizi[st.enk] = g;
         if (st.enk !== st.i) st.takas++;
-        msg = (st.i + 1) + ". adım bitti: en küçük " + dizi[st.i] + " konum " + st.i + "'e yerleşti";
+        msg = (st.i + 1) + ". adım bitti: en küçük " + dizi[st.i] + ", dizi[" + st.i + "] konumuna yerleşti";
         st.i++; st.enk = st.i; st.j = st.i + 1;
         k = yerinde();
         if (st.i >= N - 1) { st.bitti = true; k = yerinde(); msg += "; dizi sıralı"; }

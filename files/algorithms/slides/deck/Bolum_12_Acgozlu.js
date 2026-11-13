@@ -56,7 +56,7 @@
       if (!coins) { status.innerHTML = "Paralar: virgülle ayrılmış 1–999 arası tam sayılar (en fazla 8 tür)."; return; }
       if (!(t >= 1 && t <= 999)) { status.innerHTML = "Tutar 1 ile 999 arasında olmalı."; return; }
       var g = greedy(coins, t), b = best(coins, t);
-      var gtxt = g.rest ? "<b>" + g.rest + "</b> ödenemedi (çözüm yok)" : "<b>" + g.list.length + "</b> para";
+      var gtxt = g.rest ? "<b>" + g.rest + "</b> ödenemedi (açgözlü takıldı)" : "<b>" + g.list.length + "</b> para";
       var btxt = b ? "<b>" + b.length + "</b> para" : "tutar bu paralarla ödenemez";
       var ok = b && !g.rest && g.list.length === b.length;
       view.innerHTML = box("Açgözlü", g.list, gtxt, ok ? "a12-win" : "a12-lose") + box("En iyi (DP)", b || [], btxt, "a12-win");

@@ -1013,7 +1013,7 @@
           p = N[p].next; V.p = nm(p); P.p = p;
           Tr.at("d5", "<code>p = p-&gt;bag</code> (" + nm(p) + "): p, bağ değişmeden önce ilerletildi.");
           N[q].next = r;
-          Tr.at("d6", "<code>q-&gt;bag = r</code>: " + N[q].v + " artık " + (r == null ? "NULL" : r && N[r].v) + " gösteriyor.", { look: q });
+          Tr.at("d6", "<code>q-&gt;bag = r</code>: " + N[q].v + " düğümü artık " + (r == null ? "NULL" : r && N[r].v + " düğümünü") + " gösteriyor.", { look: q });
         }
         bas = q; V["*list"] = nm(bas);
         Tr.at("d7", "<code>*list = q</code>: eski son düğüm (" + (q == null ? "NULL" : N[q].v) + ") listenin başı oldu.");
@@ -1067,7 +1067,7 @@
           }
           Tr.at("s5", "<code>p</code> NULL değil.", { look: q });
           if (on2 == null) { bas = N[q].next; V.bas = nm(bas); Tr.at("s6", "<code>onceki == NULL</code>: silinen baştaki düğüm; <code>*bas = p-&gt;bag</code> (" + nm(bas) + ").", { dim: q }); }
-          else { Tr.at("s6", "<code>onceki</code> NULL değil.", { look: on2 }); N[on2].next = N[q].next; Tr.at("s7", "<code>onceki-&gt;bag = p-&gt;bag</code>: " + N[on2].v + " artık " + nm(N[q].next) + " gösteriyor; " + x + " atlandı.", { dim: q }); }
+          else { Tr.at("s6", "<code>onceki</code> NULL değil.", { look: on2 }); N[on2].next = N[q].next; Tr.at("s7", "<code>onceki-&gt;bag = p-&gt;bag</code>: " + N[on2].v + " düğümünün bağı artık " + nm(N[q].next) + "; " + x + " atlandı.", { dim: q }); }
           var g = q; delete P.p; delete N[g]; V.p = "(serbest)";
           Tr.at("s8", "<code>free(p)</code>: düğümün belleği geri verildi.");
           Tr.at("s9", "<code>true</code> döner.");
@@ -1648,11 +1648,11 @@
         var p = ata[a] + ata[b]; V.p = String(p);
         Tr.at("p", "<code>p = ata[" + a + "] + ata[" + b + "] = " + ata[a] + " + " + ata[b] + " = " + p + "</code>: birleşik kümenin −düğüm sayısı.");
         if (ata[a] > ata[b]) {
-          Tr.at("if", "<code>ata[" + a + "] &gt; ata[" + b + "]</code>: " + a + " kümesinde daha az düğüm var; " + a + ", " + b + "'ye bağlanır.");
+          Tr.at("if", "<code>ata[" + a + "] &gt; ata[" + b + "]</code>: " + a + " kümesinde daha az düğüm var; " + a + " kökü " + b + " kökünün altına bağlanır.");
           ata[a] = b; Tr.at("i1", "<code>ata[" + a + "] = " + b + "</code>.");
           ata[b] = p; Tr.at("j1", "<code>ata[" + b + "] = " + p + "</code>.");
         } else {
-          Tr.at("if", "<code>ata[" + a + "] ≤ ata[" + b + "]</code>: " + b + " kümesinde daha az ya da eşit düğüm var; " + b + ", " + a + "'ya bağlanır.");
+          Tr.at("if", "<code>ata[" + a + "] ≤ ata[" + b + "]</code>: " + b + " kümesinde daha az ya da eşit düğüm var; " + b + " kökü " + a + " kökünün altına bağlanır.");
           ata[b] = a; Tr.at("i2", "<code>ata[" + b + "] = " + a + "</code>.");
           ata[a] = p; Tr.at("j2", "<code>ata[" + a + "] = " + p + "</code>.");
         }
@@ -1707,7 +1707,7 @@
           Tr.at("take", "<code>T[" + (t - 1) + "] = k[" + i + "]</code>: (" + c.u + ", " + c.v + ") ağaca eklendi; toplam " + toplam + ".");
           res.push(c.u + "-" + c.v + ":" + c.w);
           if (ata[a] <= ata[b]) { ata[a] += ata[b]; ata[b] = a; } else { ata[b] += ata[a]; ata[a] = b; }
-          Tr.at("un", "<code>birlestir(ata, " + a + ", " + b + ")</code>: büyük küme köke alındı.");
+          Tr.at("un", "<code>birlestir(ata, " + a + ", " + b + ")</code>: küçük kümenin kökü büyük kümenin köküne bağlandı.");
         }
         look = null;
         if (t < n - 1) { Tr.print("agac yok\n"); Tr.at("end", "<code>t = " + t + "</code> &lt; n − 1: çizge bağlı değil, kapsayan ağaç yok."); res.push("agac yok"); }
@@ -1856,7 +1856,7 @@
         shell: "Shell sıralaması: önce birbirinden h uzak öğeler eklemeli sıralanır; h her turda yarıya iner, h = 1 son turdur.",
         quick: "Hızlı sıralama: <code>bol</code>, pivotu (a[R]) son yerine koyar; küçükler solda, büyükler sağda kalır. İki yan özyinelemeyle sıralanır.",
         merge: "Birleştirme sıralaması: dizi yarılara bölünür, her yarı sıralanır, <code>merge</code> iki sıralı yarıyı yardımcı dizi <code>b</code> üzerinden birleştirir.",
-        heap: "Heap sıralaması: <code>a[1..n]</code> önce aşağıdan yukarıya maksimum heap yapılır; sonra kök sona alınıp heap küçültülür."
+        heap: "Heap sort: <code>a[1..n]</code> önce aşağıdan yukarıya maksimum heap yapılır; sonra kök sona alınıp heap küçültülür."
       }[mode || "selection"]);
       var L = 0, R = n - 1, i, j, v;
       if (mode === "insertion") {
@@ -1917,7 +1917,7 @@
               if (!(a[j - h] > v)) { Tr.at("w", "a[" + (j - h) + "] = " + a[j - h] + " &gt; " + v + " değil."); break; }
               Tr.at("w", "a[" + (j - h) + "] = " + a[j - h] + " &gt; " + v + ".");
               a[j] = a[j - h]; j -= h; V.j = String(j); P.j = j;
-              Tr.at("sh", "<code>a[" + (j + h) + "] = a[" + j + "]</code>: " + h + " geri kaydı; <code>j = " + j + "</code>.");
+              Tr.at("sh", "<code>a[" + (j + h) + "] = a[" + j + "]</code>: " + a[j + h] + ", " + h + " konum sağa kaydı; <code>j = " + j + "</code>.");
             }
             a[j] = v; look = {}; look[j] = "is-done";
             Tr.at("put", "<code>a[" + j + "] = " + v + "</code>.");

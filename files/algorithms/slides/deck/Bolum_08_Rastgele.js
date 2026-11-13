@@ -32,7 +32,7 @@
         set("pi", fmt(est, 4));
         set("err", fmt(Math.abs(est - Math.PI), 4));
         set("sd", fmt(1.642 / Math.sqrt(n), 4));
-        status.innerHTML = "π ≈ 4 · " + inside + " / " + n + " = <b>" + fmt(est, 4) + "</b>" + (drawn >= MAXDRAW ? " (çizim 3000 noktada durdu)" : "");
+        status.innerHTML = "π ≈ 4 · " + inside.toLocaleString("tr-TR") + " / " + n.toLocaleString("tr-TR") + " = <b>" + fmt(est, 4) + "</b>" + (drawn >= MAXDRAW ? " (çizim 3.000 noktada durdu)" : "");
       } else {
         set("pi", "—"); set("err", "—"); set("sd", "—");
         status.textContent = "Nokta eklemek için bir düğmeye basın.";

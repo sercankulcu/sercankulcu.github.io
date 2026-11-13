@@ -50,7 +50,7 @@
         res.innerHTML = html + "<br>rel8 = " + hex(d & 0xFF, 2) + "h → makine kodu <b>" + code + " " + hex(d & 0xFF, 2) + "</b>";
       } else {
         var r = d & 0xFFFF;
-        res.innerHTML = html + "<br>rel16 = " + hex(r, 4) + "h → makine kodu <b>" + code + " " + hex(r & 0xFF, 2) + " " + hex(r >> 8, 2) + "</b> (küçük uçlu)";
+        res.innerHTML = html + "<br>rel16 = " + hex(r, 4) + "h → makine kodu <b>" + code + " " + hex(r & 0xFF, 2) + " " + hex(r >> 8, 2) + "</b> (little-endian)";
       }
       status.innerHTML = name + " " + hex(a, 4) + "h adresinde, hedef " + hex(t, 4) + "h.";
     }

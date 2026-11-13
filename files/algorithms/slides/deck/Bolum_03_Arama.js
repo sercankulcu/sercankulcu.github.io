@@ -89,7 +89,7 @@
     }
     function run(op) {
       var x = parseInt(input.value, 10);
-      if (isNaN(x)) { status.textContent = "Bir tamsayı girin."; return; }
+      if (isNaN(x)) { status.textContent = "Bir tam sayı girin."; return; }
       var res = F[op](dizi, x);
       render(res);
       table(x);

@@ -45,13 +45,13 @@
           cell(u8, false) + cell(u16, false) + "</tr>";
       });
       body.innerHTML = rows;
-      footCells[2].textContent = tA + " byte";
-      footCells[3].textContent = tL + " byte";
-      footCells[4].textContent = t8 + " byte";
-      footCells[5].textContent = t16 + " byte";
+      footCells[2].textContent = tA + " bayt";
+      footCells[3].textContent = tL + " bayt";
+      footCells[4].textContent = t8 + " bayt";
+      footCells[5].textContent = t16 + " bayt";
       if (!chars.length) status.innerHTML = "Bir metin yazın.";
       else if (kayip) status.innerHTML = "<b>" + kayip + "</b> karakter ASCII dışında: ASCII ile kaydedilirse <b>kaybolur</b>. UTF-8 hepsini korur.";
-      else status.innerHTML = "Tümü ASCII: ASCII, ISO-8859-9 ve UTF-8 <b>aynı byte'ları</b> üretir.";
+      else status.innerHTML = "Tümü ASCII: ASCII, ISO-8859-9 ve UTF-8 <b>aynı baytları</b> üretir.";
     }
     input.addEventListener("input", ciz);
     ciz();
@@ -110,13 +110,13 @@
       } else if (op === "clear") {
         code.textContent = "b.clear();";
         pos = 0; lim = CAP; mark = -1;
-        msg = "Yazma moduna geçildi: position = 0, limit = capacity. Byte'lar <b>silinmedi</b>, üzerine yazılacak.";
+        msg = "Yazma moduna geçildi: position = 0, limit = capacity. Baytlar <b>silinmedi</b>, üzerine yazılacak.";
       } else if (op === "compact") {
         code.textContent = "b.compact();";
         var kalan = lim - pos;
         for (var k = 0; k < kalan; k++) data[k] = data[pos + k];
         pos = kalan; lim = CAP; mark = -1;
-        msg = "Okunmamış " + kalan + " byte başa taşındı; position = " + kalan + ", limit = capacity. Yazmaya devam edilebilir.";
+        msg = "Okunmamış " + kalan + " bayt başa taşındı; position = " + kalan + ", limit = capacity. Yazmaya devam edilebilir.";
       } else if (op === "reset") {
         data = []; for (var r = 0; r < CAP; r++) data.push(null);
         pos = 0; lim = CAP; mark = -1;

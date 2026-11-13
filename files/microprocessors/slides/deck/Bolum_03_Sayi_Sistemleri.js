@@ -14,8 +14,8 @@
       var t = inp.value.trim().replace(/[hbod]$/i, function (m) { return (b === 16 && /[bd]/i.test(m)) ? m : ""; });
       if (!t || !PAT[b].test(t)) { status.innerHTML = "Bu tabanda geçersiz rakam var."; out.innerHTML = ""; lad.textContent = ""; return; }
       var v = parseInt(t, b);
-      if (!isFinite(v) || v > 4294967295) { status.innerHTML = "En fazla 32 bit (4 294 967 295) desteklenir."; return; }
-      out.innerHTML = '<div>ondalık<b>' + v + '</b></div><div>onaltılı<b>' + hexTxt(v) + '</b></div><div>sekizli<b>' + v.toString(8) + 'o</b></div><div>ikili<b>' + group4(v.toString(2)) + "b</b></div>";
+      if (!isFinite(v) || v > 4294967295) { status.innerHTML = "En fazla 32 bit (4.294.967.295) desteklenir."; return; }
+      out.innerHTML = '<div>onluk<b>' + v + '</b></div><div>onaltılık<b>' + hexTxt(v) + '</b></div><div>sekizli<b>' + v.toString(8) + 'o</b></div><div>ikili<b>' + group4(v.toString(2)) + "b</b></div>";
       var tb = parseInt(to.value, 10), q = v, rows = [], digits = [];
       do {
         var nq = Math.floor(q / tb), r = q % tb;
@@ -61,8 +61,8 @@
       var g = v ^ (v >> 1);
       var ones = 0; for (var t = v; t; t >>= 1) ones += t & 1;
       var cells = [
-        ["onaltılı", hexTxt(v)], ["işaretsiz", String(v)], ["2'ye tümleyen", String(s).replace("-", "−")], ["işaret-büyüklük", sm],
-        ["1'e tümleyen", oc], ["paketli BCD", bcd], ["Gray kodu", pad(g.toString(2), 8)], ["PF (1 sayısı)", (ones % 2 ? "0" : "1") + " (" + ones + ")"]
+        ["onaltılık", hexTxt(v)], ["işaretsiz", String(v)], ["ikiye tümleyen", String(s).replace("-", "−")], ["işaret-büyüklük", sm],
+        ["birler tümleyeni", oc], ["paketli BCD", bcd], ["Gray kodu", pad(g.toString(2), 8)], ["PF (1 sayısı)", (ones % 2 ? "0" : "1") + " (" + ones + ")"]
       ];
       out.innerHTML = cells.map(function (c) { return "<div>" + c[0] + "<b>" + c[1] + "</b></div>"; }).join("");
       status.innerHTML = msg || "Bitlere tıkla ya da bir işlem seç.";
@@ -70,8 +70,8 @@
     demo.querySelectorAll("[data-op]").forEach(function (b) {
       b.addEventListener("click", function () {
         var op = b.dataset.op, old = v;
-        if (op === "not") { v = ~v & 0xFF; render("<b>NOT</b>: tüm bitler terslendi (1'e tümleyen)"); }
-        else if (op === "neg") { v = (256 - v) & 0xFF; render("<b>NEG</b>: tersle + 1 → " + hexTxt(old) + " → " + hexTxt(v) + (old === 0x80 ? " (−128'in karşılığı 8 bite sığmaz!)" : "")); }
+        if (op === "not") { v = ~v & 0xFF; render("<b>NOT</b>: tüm bitler terslendi (birler tümleyeni)"); }
+        else if (op === "neg") { v = (256 - v) & 0xFF; render("<b>NEG</b>: tersle + 1 → " + hexTxt(old) + " → " + hexTxt(v) + (old === 0x80 ? " (+128 8 bite sığmaz; −128'in negatifi yine −128!)" : "")); }
         else if (op === "inc") { v = (v + 1) & 0xFF; render("<b>+1</b>" + (old === 0xFF ? " · FFh + 1 = 00h: elde (CF)" : (old === 0x7F ? " · +127 + 1 = −128: işaretli taşma (OF)" : ""))); }
         else if (op === "shl") { v = (v << 1) & 0xFF; render("<b>SHL</b>: sola kaydırma = ×2" + ((old & 0x80) ? " · dışarı atılan 1 CF'ye gider" : "")); }
         else { v = 0; render("sıfırlandı"); }

@@ -56,7 +56,7 @@ Dizi soyut veri tipi ve C'de dizilerle işaretçiler arasındaki yakın ilişki 
 
 ### Bölüm 3: Özyineleme, İkili Arama ve Geri İzleme
 
-Özyinelemeli algoritmalar yığın çerçeveleri üzerinden izlenir; özyineleme ile döngü arasındaki ilişki ve kuyruk özyinelemesi açıklanır. İkili aramanın yinelemeli ve özyinelemeli sürümleri ile logaritmik karmaşıklığı adım adım gösterilir. Hanoi kuleleri ve permütasyon üretimi özyinelemeli düşünmenin klasik örnekleri olarak çözümlenir. Geri izleme ise satisfiability, n-vezir, alt küme üretimi ve Warnsdorff kuralıyla at gezisi problemleri üzerinde işlenir.
+Özyinelemeli algoritmalar yığın çerçeveleri üzerinden izlenir; özyineleme ile döngü arasındaki ilişki ve kuyruk özyinelemesi açıklanır. İkili aramanın yinelemeli ve özyinelemeli sürümleri ile logaritmik karmaşıklığı adım adım gösterilir. Hanoi kuleleri ve permütasyon üretimi özyinelemeli düşünmenin klasik örnekleri olarak çözümlenir. Geri izleme ise sağlanabilirlik (SAT), n-vezir, alt küme üretimi ve Warnsdorff kuralıyla at gezisi problemleri üzerinde işlenir.
 
 - [🖼️Sunum-Özyineleme, İkili Arama ve Geri İzleme (HTML)](/files/dsa_c/slides/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.html)
 - [📄Sunum-Özyineleme, İkili Arama ve Geri İzleme (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_03_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.pdf)
@@ -230,7 +230,7 @@ Ayrık kümeler ile birleşim ve küme bulma işlemleri, ata dizisine dayanan ge
 
 ### Bölüm 17: Minimum Kapsayan Ağaçlar
 
-Kapsayan ağaç kavramı, ağaç ve ağaç dışı kenarlar ile kapsayan ağaçların özellikleri üzerinden tanıtılır; eşbiçimlilik ve düzlemsellik konusuna da değinilir. Minimum maliyetli kapsayan ağaç problemi açgözlü yaklaşımla ele alınır. Kruskal algoritması kenarların sıralanması ve union-find ile, Prim algoritması ise ağacı tek düğümden büyüterek kodlanır ve adım adım izlenir; Prim'in heap ile gerçeklemesi de gösterilir. Sollin (Borůvka) algoritması, minimum kapsayan ağaç ile en kısa yol ağacı arasındaki fark ve Kruskal ile Prim'in karşılaştırılması konuyu tamamlar.
+Kapsayan ağaç kavramı, ağaç ve ağaç dışı kenarlar ile kapsayan ağaçların özellikleri üzerinden tanıtılır; eş biçimlilik ve düzlemsellik konusuna da değinilir. Minimum maliyetli kapsayan ağaç problemi açgözlü yaklaşımla ele alınır. Kruskal algoritması kenarların sıralanması ve union-find ile, Prim algoritması ise ağacı tek düğümden büyüterek kodlanır ve adım adım izlenir; Prim'in heap ile gerçeklemesi de gösterilir. Sollin (Borůvka) algoritması, minimum kapsayan ağaç ile en kısa yol ağacı arasındaki fark ve Kruskal ile Prim'in karşılaştırılması konuyu tamamlar.
 
 - [🖼️Sunum-Minimum Kapsayan Ağaçlar (HTML)](/files/dsa_c/slides/Bolum_17_Minimum_Kapsayan_Agaclar.html)
 - [📄Sunum-Minimum Kapsayan Ağaçlar (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_17_Minimum_Kapsayan_Agaclar.pdf)
@@ -242,7 +242,7 @@ Kapsayan ağaç kavramı, ağaç ve ağaç dışı kenarlar ile kapsayan ağaçl
 
 ### Bölüm 18: En Kısa Yol ve Aktivite Ağları
 
-Tek kaynaklı en kısa yol problemi kaba kuvvet analiziyle başlar ve açgözlü fikre dayanan Dijkstra algoritmasıyla çözülür; önceller dizisiyle yolun kendisi de bulunur. Negatif kenarlar için Bellman-Ford, tüm düğüm çiftleri için Floyd-Warshall algoritması adım adım işlenir. AoV ağlarında topolojik sıra, sayaçlı başlıklar kullanan bir yordamla bulunur. AoE ağlarında en erken ve en geç zamanlar, bolluklar ve kritik yol hesaplanır.
+Tek kaynaklı en kısa yol problemi kaba kuvvet analiziyle başlar ve açgözlü fikre dayanan Dijkstra algoritmasıyla çözülür; öncül dizisiyle yolun kendisi de bulunur. Negatif kenarlar için Bellman-Ford, tüm düğüm çiftleri için Floyd-Warshall algoritması adım adım işlenir. AoV ağlarında topolojik sıra, sayaçlı başlıklar kullanan bir yordamla bulunur. AoE ağlarında en erken ve en geç zamanlar, bolluklar ve kritik yol hesaplanır.
 
 - [🖼️Sunum-En Kısa Yol ve Aktivite Ağları (HTML)](/files/dsa_c/slides/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari.html)
 - [📄Sunum-En Kısa Yol ve Aktivite Ağları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari.pdf)
@@ -268,7 +268,7 @@ Sıralama problemi, kararlılık ve yerinde sıralama kavramlarıyla birlikte or
 
 ### Bölüm 20: İleri Sıralama Algoritmaları
 
-Hızlı sıralama bölümleme değişmezi üzerinden anlatılır; en kötü, en iyi ve ortalama durum analizleri yapılır. Özyinelemesiz sürüm, medyan-3 ve küçük alt diziler için eşik kullanan iyileştirilmiş hızlı sıralama ile C kitaplığındaki qsort ve hibrit sıralamalar ele alınır. Birleştirme sıralamasının dizi ve bağlı liste sürümleri, heap sıralaması ve çok anahtarlı verilerde basamağa göre sıralama adım adım izlenir ve analiz edilir. Algoritmaların hangi durumda tercih edileceği karşılaştırmalı olarak tartışılır.
+Hızlı sıralama bölümleme değişmezi üzerinden anlatılır; en kötü, en iyi ve ortalama durum analizleri yapılır. Özyinelemesiz sürüm, medyan-3 ve küçük alt diziler için eşik kullanan iyileştirilmiş hızlı sıralama ile C kitaplığındaki qsort ve hibrit sıralamalar ele alınır. Birleştirme sıralamasının dizi ve bağlı liste sürümleri, heap sort ve çok anahtarlı verilerde basamak sıralaması adım adım izlenir ve analiz edilir. Algoritmaların hangi durumda tercih edileceği karşılaştırmalı olarak tartışılır.
 
 - [🖼️Sunum-İleri Sıralama Algoritmaları (HTML)](/files/dsa_c/slides/Bolum_20_Ileri_Siralama_Algoritmalari.html)
 - [📄Sunum-İleri Sıralama Algoritmaları (PDF)](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Bolum_20_Ileri_Siralama_Algoritmalari.pdf)

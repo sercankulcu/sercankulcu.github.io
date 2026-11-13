@@ -74,7 +74,7 @@ Bir programlama dili, belirli söz dizimi ve anlam kurallarına uyan ifadelerden
 
 ### Bölüm 3: Kontrol Yapıları, Fonksiyonlar, Diziler ve Dizgiler
 
-Programın akışı karar yapıları ve döngülerle yönlendirilir. Bölümde if ve switch yapıları, iç içe döngüler, break ve continue komutları ile metotların tanımlanması, çağrılması, kapsam kuralları ve soyutlamadaki rolü anlatılır. Dizilerin bellekteki yerleşimi, sık görülen dizi hataları, temel dizi algoritmaları ve çok boyutlu diziler Tic Tac Toe uygulamasıyla pekiştirilir. Dizgilerde değiştirilemezlik, karşılaştırma ve biçimli çıktı incelenir; özyineleme ise faktöriyel ve seri örnekleriyle başlayıp verimlilik, kuyruk özyinelemesi ve bellekleme konularıyla tamamlanır.
+Programın akışı karar yapıları ve döngülerle yönlendirilir. Bölümde if ve switch yapıları, iç içe döngüler, break ve continue deyimleri ile metotların tanımlanması, çağrılması, kapsam kuralları ve soyutlamadaki rolü anlatılır. Dizilerin bellekteki yerleşimi, sık görülen dizi hataları, temel dizi algoritmaları ve çok boyutlu diziler Tic Tac Toe uygulamasıyla pekiştirilir. Dizgilerde değiştirilemezlik, karşılaştırma ve biçimli çıktı incelenir; özyineleme ise faktöriyel ve seri örnekleriyle başlayıp verimlilik, kuyruk özyinelemesi ve bellekleme konularıyla tamamlanır.
 
 - [🖼️Sunum-Kontrol Yapıları (HTML)](/files/java/slides/Bolum_03_01_Kontrol_Yapilari.html)
 - [📄Sunum-Kontrol Yapıları (PDF)](https://sercankulcu.github.io/courses-pdfs/java/pdf/Bolum_03_01_Kontrol_Yapilari.pdf)

@@ -72,7 +72,7 @@
   });
 
   /* ---------- thermostat (ports 125 / 127) ---------- */
-  var LINES = ["in  al, 125", "cmp al, 60", "jl  low", "cmp al, 80", "jle ok", "jg  high", "low:  mov al, 1", "      out 127, al", "high: mov al, 0", "      out 127, al", "ok:   jmp start"];
+  var LINES = ["in  al, 125", "cmp al, 60", "jl  low", "cmp al, 80", "jle ok", "jg  high", "low:  mov al, 1", "      out 127, al", "      jmp ok", "high: mov al, 0", "      out 127, al", "ok:   jmp start"];
 
   function thermoSvg(t, heater) {
     var h = Math.max(0, Math.min(170, (t + 40) * 1.0625));
@@ -104,10 +104,10 @@
     /* one pass of the program loop; returns executed line indices */
     function step(t) {
       var ex = [0, 1];
-      if (t < 60) { ex.push(2, 6, 7, 10); heater = 1; return [ex, "JL alındı: " + t + " &lt; 60 → ısıtıcı <b>açık</b>."]; }
+      if (t < 60) { ex.push(2, 6, 7, 8, 11); heater = 1; return [ex, "JL alındı: " + t + " &lt; 60 → ısıtıcı <b>açık</b>."]; }
       ex.push(2, 3, 4);
-      if (t <= 80) { ex.push(10); return [ex, "60 ≤ " + t + " ≤ 80 → JLE alındı, ısıtıcıya dokunulmadı (" + (heater ? "açık" : "kapalı") + " kalır)."]; }
-      ex.push(5, 8, 9, 10); heater = 0;
+      if (t <= 80) { ex.push(11); return [ex, "60 ≤ " + t + " ≤ 80 → JLE alındı, ısıtıcıya dokunulmadı (" + (heater ? "açık" : "kapalı") + " kalır)."]; }
+      ex.push(5, 9, 10, 11); heater = 0;
       return [ex, "JG alındı: " + t + " &gt; 80 → ısıtıcı <b>kapalı</b>."];
     }
     function show(t) {

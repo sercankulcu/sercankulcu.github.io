@@ -1300,8 +1300,8 @@
   };
   Assembler.prototype.immBytes = function (v, w, st, o) {
     if (!o.unknown && !o.reloc) {
-      if (w === 1 && !(v >= -128 && v <= 255)) throw new AsmError("anında değer bayta sığmıyor: " + o.text, st.line, st.text);
-      if (w === 2 && !(v >= -32768 && v <= 65535)) throw new AsmError("anında değer sözcüğe sığmıyor: " + o.text, st.line, st.text);
+      if (w === 1 && !(v >= -128 && v <= 255)) throw new AsmError("anlık değer bayta sığmıyor: " + o.text, st.line, st.text);
+      if (w === 2 && !(v >= -32768 && v <= 65535)) throw new AsmError("anlık değer sözcüğe sığmıyor: " + o.text, st.line, st.text);
     }
     v &= 0xFFFF;
     return w === 1 ? [v & 0xFF] : [v & 0xFF, v >> 8];
@@ -1353,7 +1353,7 @@
     if (has(ALU, mn)) {
       need(2); a = ops[0]; b = ops[1];
       var code = ALU[mn];
-      if (a.kind === "imm") throw new AsmError("hedef anında değer olamaz", st.line, st.text);
+      if (a.kind === "imm") throw new AsmError("hedef anlık değer olamaz", st.line, st.text);
       if (a.kind === "sreg" || b.kind === "sreg") throw new AsmError("kesim yazmacı aritmetik/mantık komutunda kullanılamaz", st.line, st.text);
       if (b.kind === "imm") {
         w = this.opsize(st, a);
@@ -1383,7 +1383,7 @@
     }
     if (has(GRP3, mn)) {
       need(1); a = ops[0];
-      if (a.kind === "imm") throw new AsmError(mn + " anında değer alamaz (8086)", st.line, st.text);
+      if (a.kind === "imm") throw new AsmError(mn + " anlık değer alamaz (8086)", st.line, st.text);
       w = this.opsize(st, a);
       return cat(this.segpfx(st, a), [0xF6 + w - 1], this.modrm(GRP3[mn], a, st));
     }
@@ -1400,15 +1400,15 @@
       if (b.kind === "r8" && b.reg === "CL") return cat(this.segpfx(st, a), [0xD2 + w - 1], this.modrm(sc, a, st));
       if (b.kind !== "imm") throw new AsmError("kaydırma sayısı 1 ya da CL olmalı", st.line, st.text);
       if (b.val === 1) return cat(this.segpfx(st, a), [0xD0 + w - 1], this.modrm(sc, a, st));
-      this.warn(st, "kaydırma sayısı " + b.val + " anında değer: 8086'da yok (80186+ C0/C1); emu8086 kabul eder");
+      this.warn(st, "kaydırma sayısı " + b.val + " anlık değer: 8086'da yok (80186+ C0/C1); emu8086 kabul eder");
       return cat(this.segpfx(st, a), [0xC0 + w - 1], this.modrm(sc, a, st), [b.val & 0xFF]);
     }
     if (mn === "MOV") {
       need(2); a = ops[0]; b = ops[1];
-      if (a.kind === "imm" || a.kind === "farimm") throw new AsmError("MOV hedefi anında değer olamaz", st.line, st.text);
+      if (a.kind === "imm" || a.kind === "farimm") throw new AsmError("MOV hedefi anlık değer olamaz", st.line, st.text);
       if (a.kind === "mem" && b.kind === "mem") throw new AsmError("MOV bellekten belleğe yapılamaz", st.line, st.text);
       if (a.kind === "sreg") {
-        if (b.kind === "imm") throw new AsmError("kesim yazmacına anında değer yüklenemez (önce AX'e yüklenmeli)", st.line, st.text);
+        if (b.kind === "imm") throw new AsmError("kesim yazmacına anlık değer yüklenemez (önce AX'e yüklenmeli)", st.line, st.text);
         if (b.kind === "sreg") throw new AsmError("kesim yazmacından kesim yazmacına MOV yok", st.line, st.text);
         if (a.reg === "CS") throw new AsmError("MOV CS, ... kullanılamaz", st.line, st.text);
         if (b.kind === "r8" || (b.kind === "mem" && b.size === 1 && b.ptr)) throw new AsmError("kesim yazmacı 16 bittir", st.line, st.text);
@@ -1459,7 +1459,7 @@
         return cat(this.segpfx(st, a), [0xFF], this.modrm(6, a, st));
       }
       if (a.kind === "imm") {
-        this.warn(st, "PUSH anında değer 8086'da yok (80186+); emu8086 kabul eder");
+        this.warn(st, "PUSH ile anlık değer 8086'da yok (80186+); emu8086 kabul eder");
         var pv = s16(a.val);
         if (pv >= -128 && pv <= 127 && !a.reloc && !has(st.wide, "i16")) return [0x6A, pv & 0xFF];
         return cat([0x68], this.immBytes(a.val, 2, st, a));
@@ -2411,7 +2411,7 @@
     }
     if (kind !== "logic") { if (f.OF) p.push("işaretli taşma olduğu için OF = 1"); else zero.push("OF"); }
     if (f.ZF) p.push("sonuç sıfır olduğu için ZF = 1"); else zero.push("ZF");
-    if (f.SF) p.push("sonuç negatif görüldüğü için SF = 1"); else zero.push("SF");
+    if (f.SF) p.push("sonucun en anlamlı biti 1 olduğu için SF = 1"); else zero.push("SF");
     var t = p.join(", ");
     if (!p.length) t = zero.join(" = ") + " = 0";
     else if (zero.length && kind !== "add" && kind !== "sub") t += "; " + zero.join(" = ") + " = 0";

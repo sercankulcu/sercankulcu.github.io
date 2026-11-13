@@ -32,7 +32,7 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 
 ### Bölüm 1: Giriş
 
-İşletim sistemi donanım ile uygulamalar arasında duran ve ikisini birbirine bağlayan yazılımdır. Bu bölümde işletim sisteminin iki rolü (genişletilmiş makine ve kaynak yöneticisi), çekirdek ve kullanıcı kipi ile kip geçişi, biriktirme ve kaynak paylaşımı, işletim sistemlerinin nesilden nesile tarihi, işletim sistemi için gereken donanım özeti, G/Ç yöntemlerine genel bakış ve işletim sistemi çeşitleri ele alınır.
+İşletim sistemi donanım ile uygulamalar arasında duran ve ikisini birbirine bağlayan yazılımdır. Bu bölümde işletim sisteminin iki rolü (genişletilmiş makine ve kaynak yöneticisi), çekirdek ve kullanıcı modu ile mod geçişi, biriktirme ve kaynak paylaşımı, işletim sistemlerinin nesilden nesile tarihi, işletim sistemi için gereken donanım özeti, G/Ç yöntemlerine genel bakış ve işletim sistemi çeşitleri ele alınır.
 
 - [🖼️Sunum-Giriş (HTML)](/files/os/slides/Bolum_01_Giris.html)
 - [📄Sunum-Giriş (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_01_Giris.pdf)
@@ -45,7 +45,7 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 
 ### Bölüm 2: İşletim Sistemi Yapıları
 
-İşletim sistemi uygulamalara hizmetlerini sistem çağrıları üzerinden sunar. Bölüm; süreç, adres alanı, dosya ve boru gibi temel kavramları, çift kipli çalışma ve zamanlayıcıyla korumayı, sistem çağrılarının işleyişini ve POSIX ile Win32 arayüzlerini, standart C kütüphanesini anlatır. Monolitik, katmanlı, mikro çekirdekli, modüler, hibrit ve exokernel yapılar karşılaştırılır; sanal makinelere kısa bir giriş yapılır ve sistemin açılış süreci adım adım izlenir.
+İşletim sistemi uygulamalara hizmetlerini sistem çağrıları üzerinden sunar. Bölüm; süreç, adres alanı, dosya ve boru gibi temel kavramları, çift modlu çalışma ve zamanlayıcıyla korumayı, sistem çağrılarının işleyişini ve POSIX ile Win32 arayüzlerini, standart C kütüphanesini anlatır. Monolitik, katmanlı, mikro çekirdekli, modüler, hibrit ve exokernel yapılar karşılaştırılır; sanal makinelere kısa bir giriş yapılır ve sistemin açılış süreci adım adım izlenir.
 
 - [🖼️Sunum-İşletim Sistemi Yapıları (HTML)](/files/os/slides/Bolum_02_Isletim_Sistemi_Yapilari.html)
 - [📄Sunum-İşletim Sistemi Yapıları (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_02_Isletim_Sistemi_Yapilari.pdf)
@@ -214,7 +214,7 @@ Birden çok işlemci, işletim sistemine yeni sorunlar getirir. Bölüm; UMA ve 
 
 ### Bölüm 13: Güvenlik
 
-Güvenlik; gizlilik, bütünlük ve erişilebilirliği tehditlere karşı korumaktır. Bu bölümde kriptografinin temelleri ve TLS, koruma etki alanları, erişim denetim listeleri ve yetenekler, Bell-LaPadula ve Biba modelleri, parola saklama, çok faktörlü kimlik doğrulama ve geçiş anahtarları, tampon taşması ve savunmaları, kötü amaçlı yazılımlar, korumalı alan ve SELinux, güvenli önyükleme, TPM ve Spectre gibi yan kanal saldırıları incelenir.
+Güvenlik; gizlilik, bütünlük ve erişilebilirliği tehditlere karşı korumaktır. Bu bölümde kriptografinin temelleri ve TLS, koruma etki alanları, erişim denetim listeleri ve yetenekler, Bell-LaPadula ve Biba modelleri, parola saklama, çok etkenli kimlik doğrulama ve geçiş anahtarları, tampon taşması ve savunmaları, kötü amaçlı yazılımlar, korumalı alan ve SELinux, güvenli önyükleme, TPM ve Spectre gibi yan kanal saldırıları incelenir.
 
 - [🖼️Sunum-Güvenlik (HTML)](/files/os/slides/Bolum_13_Guvenlik.html)
 - [📄Sunum-Güvenlik (PDF)](https://sercankulcu.github.io/courses-pdfs/os/pdf/Bolum_13_Guvenlik.pdf)

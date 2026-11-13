@@ -93,7 +93,7 @@ Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançla
 
 ### Bölüm 3: Nash Dengesi
 
-Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı strateji profilidir. Bölümde en iyi tepki, Cournot ve Bertrand rekabeti, baskın stratejilerin art arda elenmesi, karışık strateji dengeleri ve kayıtsızlık ilkesi, Nash'in varlık teoremi, denge seçimi, korelasyonlu denge, sıfır toplamlı oyunlarda minimaks, güvenlik oyunları ve denge hesaplamanın PPAD karmaşıklığı ele alınır.
+Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı strateji profilidir. Bölümde en iyi tepki, Cournot ve Bertrand rekabeti, baskılanan stratejilerin art arda elenmesi, karışık strateji dengeleri ve kayıtsızlık ilkesi, Nash'in varlık teoremi, denge seçimi, korelasyonlu denge, sıfır toplamlı oyunlarda minimaks, güvenlik oyunları ve denge hesaplamanın PPAD karmaşıklığı ele alınır.
 
 - [🖼️Sunum-Nash Dengesi (HTML)](/files/agt/slides/Bolum_03_Nash_Dengesi.html)
 - [📄Sunum-Nash Dengesi (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_03_Nash_Dengesi.pdf)
@@ -112,7 +112,7 @@ Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı
 
 ### Bölüm 4: Mekanizma Tasarımı
 
-Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çıkarını gözeten katılımcıları bu hedefe doğru davranmaya hangi kurallar yöneltir? Sosyal seçim fonksiyonları, açıklama ilkesi, teşvik uyumluluğu ve bireysel rasyonellik, Myerson lemması, VCG mekanizması, Gale–Shapley kararlı eşleştirme, medyan mekanizması, en iyi takas döngüleri (TTC) ve Bayesçi oyunlar.
+Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çıkarını gözeten katılımcıları bu hedefe doğru davranmaya hangi kurallar yöneltir? Sosyal seçim fonksiyonları, açıklama ilkesi, teşvik uyumluluğu ve bireysel rasyonellik, Myerson lemması, VCG mekanizması, Gale–Shapley kararlı eşleştirme, medyan mekanizması, En İyi Takas Döngüleri (TTC) ve Bayesçi oyunlar.
 
 - [🖼️Sunum-Mekanizma Tasarımı (HTML)](/files/agt/slides/Bolum_04_Mekanizma_Tasarimi.html)
 - [📄Sunum-Mekanizma Tasarımı (PDF)](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_04_Mekanizma_Tasarimi.pdf)

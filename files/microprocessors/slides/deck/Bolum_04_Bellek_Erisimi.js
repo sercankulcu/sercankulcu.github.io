@@ -32,7 +32,7 @@
         if (v === null) bad.push(r);
         regs[r] = v;
       });
-      if (disp === null) bad.push("kaydırma");
+      if (disp === null) bad.push("yer değiştirme");
       if (bad.length) { out.innerHTML = ""; status.innerHTML = "Geçersiz değer: " + bad.join(", "); return; }
       var parts = [], terms = [], ea = 0;
       if (base) { parts.push(base); terms.push(base + " (" + hex(regs[base], 4) + "h)"); ea += regs[base]; }
@@ -49,14 +49,14 @@
       var phys = (regs[seg] * 16 + ea) & 0xFFFFF;
       var mode;
       if (!base && !index) mode = "doğrudan (direct)";
-      else if (base && index) mode = "tabanlı-indisli" + (hasDisp ? " + kaydırma" : "");
+      else if (base && index) mode = "tabanlı-indisli" + (hasDisp ? " + yer değiştirme" : "");
       else if (base) mode = hasDisp ? "tabanlı (based)" : "yazmaç dolaylı";
       else mode = hasDisp ? "indisli (indexed)" : "yazmaç dolaylı";
       var dsize = !hasDisp || (!base && !index) ? (!base && !index ? "d16" : "") : (disp >= -128 && disp <= 127 ? "d8" : "d16");
       var txt = (ovr ? ovr + ":" : "") + "[" + parts.join(" + ").replace("+ -", "- ") + "]";
       out.innerHTML = "<b>" + txt + "</b><br>EA = " + terms.join(" + ") + " = <b>" + hex(ea, 4) + "h</b><br>" +
         seg + " × 10h + EA = " + hex(regs[seg] * 16, 5) + "h + " + hex(ea, 4) + "h = <b>" + hex(phys, 5) + "h</b>";
-      status.innerHTML = "Mod: <b>" + mode + "</b>" + (dsize ? " · kaydırma: " + dsize : "") +
+      status.innerHTML = "Mod: <b>" + mode + "</b>" + (dsize ? " · yer değiştirme: " + dsize : "") +
         " · kesim: <b>" + seg + "</b>" + (ovr ? " (önek)" : base === "BP" ? " (BP → SS)" : " (varsayılan DS)");
     }
     demo.querySelectorAll("input, select").forEach(function (e) {

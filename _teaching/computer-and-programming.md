@@ -32,7 +32,7 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 ### Bölüm 1: Bilgisayar Temelleri ve Hesaplamalı Düşünme
 
-Bilgisayar, veriyi kesin talimatlarla işleyerek problem çözen bir makinedir. Bölüm beş sunumdan oluşur. Temel Kavramlar verinin bitlerle nasıl temsil edildiğini ve bilgisayarın temel çalışma döngüsünü anlatır. Donanım işlemci, bellek hiyerarşisi, depolama, giriş ve çıkış birimlerini tanıtır. Bilgisayarlar ikiye tümleyen, kayan noktalı sayılar, karakter kodlamaları, mantık kapıları ve getir–çöz–yürüt döngüsüyle bilgisayar mimarisini ele alır. İnternet sunumu IP adresi, DNS, HTTP/HTTPS ve güvenli kullanımı; Hesaplama sunumu ise hesaplama kavramını, Turing makinesini ve hesaplamalı düşünmeyi anlatır.
+Bilgisayar, veriyi kesin talimatlarla işleyerek problem çözen bir makinedir. Bölüm beş sunumdan oluşur. Temel Kavramlar verinin bitlerle nasıl temsil edildiğini ve bilgisayarın temel çalışma döngüsünü anlatır. Bilgisayar Donanımı sunumu işlemciyi, bellek hiyerarşisini, depolamayı, giriş ve çıkış birimlerini tanıtır. Bilgisayarlar ikiye tümleyen, kayan noktalı sayılar, karakter kodlamaları, mantık kapıları ve getir–çöz–yürüt döngüsüyle bilgisayar mimarisini ele alır. İnternet sunumu IP adresi, DNS, HTTP/HTTPS ve güvenli kullanımı; Hesaplama sunumu ise hesaplama kavramını, Turing makinesini ve hesaplamalı düşünmeyi anlatır.
 
 - [🖼️Sunum-Temel Kavramlar (HTML)](/files/computer/slides/Bolum_01_01_Temel_Kavramlar.html)
 - [📄Sunum-Temel Kavramlar (PDF)](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Bolum_01_01_Temel_Kavramlar.pdf)
@@ -82,7 +82,7 @@ Bilgisayar, veriyi kesin talimatlarla işleyerek problem çözen bir makinedir. 
 
 ### Bölüm 3: Ofis Uygulamaları
 
-Ofis uygulamaları belge hazırlamayı, veri çözümlemeyi ve bilgi sunmayı kolaylaştırır. Word sunumu stilleri, sayfa düzenini, bölüm sonlarını, içindekiler tablosunu, kaynakçayı ve adres mektup birleştirmeyi anlatır. Excel sunumu hücre başvurularını, formül ve işlevleri, sıralama ve filtrelemeyi, özet tabloyu ve grafikleri ele alır. PowerPoint sunumu ise sunu planlamayı, asıl slaytı, görsel tasarımı, geçiş ve animasyonları ve etkili sunum yapmayı gösterir.
+Ofis uygulamaları belge hazırlamayı, veri çözümlemeyi ve bilgi sunmayı kolaylaştırır. Word sunumu stilleri, sayfa düzenini, bölüm sonlarını, içindekiler tablosunu, kaynakçayı ve adres mektup birleştirmeyi anlatır. Excel sunumu hücre başvurularını, formül ve işlevleri, sıralama ve filtrelemeyi, özet tabloyu ve grafikleri ele alır. PowerPoint sunumu ise sunu planlamayı, asıl slaydı, görsel tasarımı, geçiş ve animasyonları ve etkili sunum yapmayı gösterir.
 
 - [🖼️Sunum-Microsoft Word (HTML)](/files/computer/slides/Bolum_03_01_Microsoft_Word.html)
 - [📄Sunum-Microsoft Word (PDF)](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Bolum_03_01_Microsoft_Word.pdf)
@@ -107,7 +107,7 @@ Ofis uygulamaları belge hazırlamayı, veri çözümlemeyi ve bilgi sunmayı ko
 
 ### Bölüm 4: Algoritmalar ve Programlamaya Giriş
 
-Programlama, problem çözme adımlarını bilgisayarın yürütebileceği talimatlara dönüştürmektir. Algoritmalar sunumu problem tanımını, sözde kodu, iyi bir algoritmanın özelliklerini, faktöriyel, Fibonacci ve asal sayı gibi örnekleri, doğrusal ve ikili aramayı, seçimli, kabarcık ve eklemeli sıralamayı izleme tablolarıyla anlatır. Akış Diyagramları sıralı, koşullu ve tekrarlı akışı, sayaç ve biriktiriciyi gösterir. Programlamaya Giriş ise programlama dillerini, derleyici ve yorumlayıcıyı, programlama paradigmalarını, yazılım geliştirme sürecini ve hata ayıklamayı tanıtır.
+Programlama, problem çözme adımlarını bilgisayarın yürütebileceği talimatlara dönüştürmektir. Algoritmalar sunumu problem tanımını, sözde kodu, iyi bir algoritmanın özelliklerini, faktöriyel, Fibonacci ve asal sayı gibi örnekleri, doğrusal ve ikili aramayı, seçimli, kabarcık, eklemeli ve birleştirme sıralamasını izleme tablolarıyla anlatır. Akış Diyagramları sıralı, koşullu ve tekrarlı akışı, sayaç ve biriktiriciyi gösterir. Programlamaya Giriş ise programlama dillerini, derleyici ve yorumlayıcıyı, programlama paradigmalarını, yazılım geliştirme sürecini ve hata ayıklamayı tanıtır.
 
 - [🖼️Sunum-Algoritmalar (HTML)](/files/computer/slides/Bolum_04_01_Algoritmalar.html)
 - [📄Sunum-Algoritmalar (PDF)](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Bolum_04_01_Algoritmalar.pdf)
@@ -230,7 +230,7 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 
 ### Bölüm 12: Özyineleme
 
-Özyinelemeli bir metot, problemi daha küçük bir girdiyle kendini çağırarak çözer. Bölüm taban durumunu ve özyinelemeli adımı, çağrı yığınının davranışını, özyinelemeli çalışmaların izlenmesini, faktöriyel, EBOB, Hanoi kuleleri ve ikili arama gibi örnekleri, özyineleme ile döngünün karşılaştırılmasını ve belleklemeyi ele alır.
+Özyinelemeli bir metot, problemi daha küçük bir girdiyle kendini çağırarak çözer. Bölüm taban durumunu ve özyinelemeli durumu, çağrı yığınının davranışını, özyinelemeli çalışmaların izlenmesini, faktöriyel, EBOB, Hanoi kuleleri ve ikili arama gibi örnekleri, özyineleme ile döngünün karşılaştırılmasını ve belleklemeyi ele alır.
 
 - [🖼️Sunum-Özyineleme (HTML)](/files/computer/slides/Bolum_12_Ozyineleme.html)
 - [📄Sunum-Özyineleme (PDF)](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Bolum_12_Ozyineleme.pdf)

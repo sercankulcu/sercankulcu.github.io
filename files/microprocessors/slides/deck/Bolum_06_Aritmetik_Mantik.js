@@ -102,7 +102,7 @@
         var qt = Math.trunc(av / bv), rm = av - qt * bv;
         var ok = sg ? (qt >= -bMax / 2 && qt < bMax / 2) : qt < bMax;
         html = '<div class="m06-bits">' + av + " / " + bv + " → bölüm <b>" + qt + "</b>, kalan <b>" + rm + "</b></div>";
-        if (!ok) { out.innerHTML = html + '<div class="m06-bits"><b>Bölme hatası → INT 0</b></div>'; status.innerHTML = "Bölüm " + (n === 8 ? "AL" : "AX") + "'ye sığmıyor."; return; }
+        if (!ok) { out.innerHTML = html + '<div class="m06-bits"><b>Bölme hatası → INT 0</b></div>'; status.innerHTML = "Bölüm " + (n === 8 ? "AL'ye" : "AX'e") + " sığmıyor."; return; }
         var qu = ((qt % bMax) + bMax) % bMax, ru = ((rm % bMax) + bMax) % bMax, w = n / 4;
         html += '<div class="m06-chips">' + reg(n === 8 ? "AL" : "AX", qu, w) + reg(n === 8 ? "AH" : "DX", ru, w) + "<span>bayraklar tanımsız</span></div>";
         msg = sg ? "IDIV sıfıra doğru keser; kalan bölünenle aynı işaretli." : "Bölüm " + (n === 8 ? "AL" : "AX") + ", kalan " + (n === 8 ? "AH" : "DX") + ".";
@@ -147,7 +147,7 @@
     }
     inV.addEventListener("input", function () {
       var x = parseHex(inV.value);
-      if (x === null) { status.innerHTML = "Geçerli değer: 00–FF arası onaltılı sayı."; return; }
+      if (x === null) { status.innerHTML = "Geçerli değer: 00–FF arası onaltılık sayı."; return; }
       v = x; render(null); status.innerHTML = "AL = <b>" + hex2(v) + "</b>. Bir komut düğmesi seçilince sonuç burada görünür.";
     });
     demo.addEventListener("click", function (e) {

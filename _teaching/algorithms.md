@@ -161,7 +161,7 @@ Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt proble
 
 ### Bölüm 7: Açgözlü Algoritmalar
 
-Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi görünen seçimi yapar ve bu seçimi sonradan değiştirmez. Bölümde açgözlü seçim özelliği ile en iyi alt yapı koşulları anlatılır; para üstü problemi üzerinden yaklaşımın hangi durumda en iyi sonucu verdiği, hangi durumda yanıldığı gösterilir. Etkinlik seçimi, son tarihli iş sıralama ve kesirli sırt çantası problemleri, kesim özelliğine dayanan minimum kapsayan ağaç algoritmaları ve Huffman kodlaması işlenir; Huffman kodunun neden en iyi önek kodu olduğu da gerekçelendirilir.
+Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi görünen seçimi yapar ve bu seçimi sonradan değiştirmez. Bölümde açgözlü seçim özelliği ile optimal alt yapı koşulları anlatılır; para üstü problemi üzerinden yaklaşımın hangi durumda en iyi sonucu verdiği, hangi durumda yanıldığı gösterilir. Etkinlik seçimi, son tarihli iş sıralama ve kesirli sırt çantası problemleri, kesim özelliğine dayanan minimum kapsayan ağaç algoritmaları ve Huffman kodlaması işlenir; Huffman kodunun neden en iyi önek kodu olduğu da gerekçelendirilir.
 
 - [🖼️Sunum-Açgözlü Algoritmalar (HTML)](/files/algorithms/slides/Bolum_07_Acgozlu_Algoritmalar.html)
 - [📄Sunum-Açgözlü Algoritmalar (PDF)](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Bolum_07_Acgozlu_Algoritmalar.pdf)
@@ -176,7 +176,7 @@ Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi g�
 
 ### Bölüm 8: Dinamik Programlama
 
-Dinamik programlama, örtüşen alt problemleri bir kez çözüp sonuçlarını saklayarak üstel maliyetli özyinelemeleri polinom zamana indirir. Bölümde en iyi alt yapı ve örtüşen alt problemler özellikleri, bir DP çözümü tasarlamanın adımları, bellekleme ile tablolama arasındaki fark ve yaklaşımın böl ve fethet ile açgözlü yöntemlerden ayrıldığı noktalar Fibonacci örneği üzerinden açıklanır. Ardından 0/1 ve sınırsız sırt çantası, alt küme toplamı, en uzun artan alt dizi, en uzun ortak alt dizgi ve en uzun ortak alt dizi problemleri tablolar adım adım doldurularak çözülür. En uzun artan alt dizi için ikili aramaya dayanan O(n log n) çözüm de verilir.
+Dinamik programlama, örtüşen alt problemleri bir kez çözüp sonuçlarını saklayarak üstel maliyetli özyinelemeleri polinom zamana indirir. Bölümde optimal alt yapı ve örtüşen alt problemler özellikleri, bir DP çözümü tasarlamanın adımları, bellekleme ile tablolama arasındaki fark ve yaklaşımın böl ve fethet ile açgözlü yöntemlerden ayrıldığı noktalar Fibonacci örneği üzerinden açıklanır. Ardından 0/1 ve sınırsız sırt çantası, alt küme toplamı, en uzun artan alt dizi, en uzun ortak alt dizgi ve en uzun ortak alt dizi problemleri tablolar adım adım doldurularak çözülür. En uzun artan alt dizi için ikili aramaya dayanan O(n log n) çözüm de verilir.
 
 - [🖼️Sunum-Dinamik Programlama (HTML)](/files/algorithms/slides/Bolum_08_Dinamik_Programlama.html)
 - [📄Sunum-Dinamik Programlama (PDF)](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Bolum_08_Dinamik_Programlama.pdf)
@@ -258,7 +258,7 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 
 ### Bölüm 14: Paralel Algoritmalar
 
-Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalışma süresini kısaltmayı ve büyük veri kümelerini işlenebilir kılmayı amaçlar. Bölümde Flynn sınıflandırması, bellek mimarileri ve PRAM modeli ile hızlanma, verimlilik, maliyet, Amdahl yasası ve iş–derinlik ölçütleri tanıtılır. Paralel toplama ve önek toplamı (Hillis–Steele ve Blelloch), boru hattı ve boru hatlı ağaç, paralel birleştirme sıralaması, MapReduce ve veri paralelliğiyle matris çarpımı örnekleri işlenir. Yarış durumu, eşzamanlı çizge gezinme ve Java'daki paralellik araçları da ele alınır.
+Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalışma süresini kısaltmayı ve büyük veri kümelerini işlenebilir kılmayı amaçlar. Bölümde Flynn sınıflandırması, bellek mimarileri ve PRAM modeli ile hızlanma, verimlilik, maliyet, Amdahl yasası ve iş–derinlik ölçütleri tanıtılır. Paralel toplama ve önek toplamı (Hillis–Steele ve Blelloch), boru hattı ve boru hatlı ağaç, paralel birleştirme sıralaması, MapReduce ve veri paralelliğiyle matris çarpımı örnekleri işlenir. Yarış durumu, eş zamanlı çizge gezinme ve Java'daki paralellik araçları da ele alınır.
 
 - [🖼️Sunum-Paralel Algoritmalar (HTML)](/files/algorithms/slides/Bolum_14_Paralel_Algoritmalar.html)
 - [📄Sunum-Paralel Algoritmalar (PDF)](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Bolum_14_Paralel_Algoritmalar.pdf)

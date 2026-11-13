@@ -42,7 +42,7 @@
       } else if (m === "sub") {
         for (var t = 0; t < best; t++) on[(bi - t) + "," + (bj - t)] = true;
         res = x.substring(bj - best, bj);
-        msg = best ? "En uzun ortak alt dizgi <b>" + best + "</b>: \"" + esc(res) + "\" (tablonun maksimumu)." : "Ortak karakter yok: cevap 0.";
+        msg = best ? "En uzun ortak alt dizgi <b>" + best + "</b>: \"" + esc(res) + "\" (tablonun en büyük değeri)." : "Ortak karakter yok: cevap 0.";
       } else {
         i = n; j = k;
         on[i + "," + j] = true;

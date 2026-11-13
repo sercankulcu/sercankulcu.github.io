@@ -918,7 +918,7 @@
       status.innerHTML = statusText();
     }
     function statusText() {
-      if (editing) return "Kod düzenlenebilir. Bitti düğmesi programı yeniden assemble eder; Çalıştır düğmesi programı sonuna kadar yürütür.";
+      if (editing) return "Kod düzenlenebilir. Bitti düğmesi programı yeniden çevirir; Çalıştır düğmesi programı sonuna kadar yürütür.";
       if (err && err.asm) return "<b>Assembly hatası" + (err.line ? " (satır " + err.line + ")" : "") + ":</b> " + esc(err.msg) + ".";
       var s = rec ? esc(rec.text) + esc(devNote()) : "";
       if (waiting) {

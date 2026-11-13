@@ -365,7 +365,7 @@
     var rt = xTehdit(b, r);
     var hamle = ceza ? 10 - Math.abs(deg[i]) : 0;
     if (kazandi) return ad + " üçlüyü tamamlar: hemen kazanır.";
-    if (rt.indexOf(i) >= 0 && rt.length > 1) return "Rakibin iki ayrı kazanma tehdidi var; biri kapatılsa da kayıp önlenemez. " + ad + " kaybı en çok geciktiren seçenektir.";
+    if (rt.indexOf(i) >= 0 && rt.length > 1) return "Rakibin iki ayrı kazanma tehdidi var; biri kapatılsa da kayıp önlenemez. " + bas(ad) + " kaybı en çok geciktiren seçenektir.";
     if (rt.indexOf(i) >= 0) return ad + " rakibin kazanacağı kareyi kapatır: engellemezse " + r + " bir sonraki hamlede kazanır." + (v > 0 ? " Engellerken kazanmayı da zorlar." : "") + ek2;
     if (tehdit >= 2) return ad + " çatal kurar: iki ayrı kazanma tehdidi oluşur, rakip ikisini birden kapatamaz." + ek2;
     if (v > 0) return ad + " kazanmayı zorlar: rakip ne yaparsa yapsın" + (ceza ? " en geç " + sayi(hamle) + " hamle içinde" : "") + " kazanılır." + ek2;
@@ -715,7 +715,7 @@
     });
     function bitis() {
       var w = xKazanan(b);
-      if (w) { bitti = true; st.innerHTML = "<b>" + (w === yz ? "YZ kazandı." : "İnsan oyuncu kazandı.") + "</b> " + (w === yz ? "Rakibin hatası minimaks değerlerinde hemen görünür: kaybettiren karelerin değeri eksiydi." : "Tam ağacı arayan YZ'ye karşı bu sonuç beklenmez."); xTahtaCiz(hucre, b, null, null, 1, kazCizgisi(b)); return true; }
+      if (w) { bitti = true; st.innerHTML = "<b>" + (w === yz ? "YZ kazandı." : "İnsan oyuncu kazandı.") + "</b> " + (w === yz ? "Rakibin hatası minimaks değerlerinde hemen görünür: hatadan sonra YZ'nin seçtiği karenin değeri artıya döndü." : "Tam ağacı arayan YZ'ye karşı bu sonuç beklenmez."); xTahtaCiz(hucre, b, null, null, 1, kazCizgisi(b)); return true; }
       if (xDolu(b)) { bitti = true; st.innerHTML = "<b>Berabere.</b> İki taraf da hatasız oynadığında XOX'un sonucu budur."; xTahtaCiz(hucre, b, null, null, 1); return true; }
       return false;
     }

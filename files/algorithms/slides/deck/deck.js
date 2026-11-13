@@ -467,7 +467,7 @@
       } else if (op === "pop") {
         if (!items.length) { status.innerHTML = "Yığın boş: pop yapılamaz."; return; }
         const v = items.pop(); render(false);
-        status.innerHTML = "<b>pop() → " + v + "</b> · son giren ilk çıktı";
+        status.innerHTML = "<b>pop() → " + v + "</b> · son giren ilk çıkar";
       } else reset();
     });
     reset();
@@ -503,7 +503,7 @@
       } else if (op === "dequeue") {
         if (!items.length) { status.innerHTML = "Kuyruk boş: dequeue yapılamaz."; return; }
         const v = items.shift(); render(-1);
-        status.innerHTML = "<b>dequeue() → " + v + "</b> · ilk giren ilk çıktı";
+        status.innerHTML = "<b>dequeue() → " + v + "</b> · ilk giren ilk çıkar";
       } else reset();
     });
     reset();
