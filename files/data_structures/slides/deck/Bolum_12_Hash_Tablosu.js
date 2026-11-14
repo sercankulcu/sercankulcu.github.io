@@ -1,6 +1,8 @@
 /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
 /* Bölüm 12: açık adresleme deneme alanı */
 (function () {
+  var EN = (function(){ var d = document.getElementById("ds-deck"); return !!d && String(d.getAttribute("lang")).toLowerCase().indexOf("en") === 0; })();
+  function tx(tr, en) { return EN ? en : tr; }
   document.querySelectorAll('[data-demo="b09-probe"]').forEach(function (demo) {
     var N = 11, DEL = {};
     var box = demo.querySelector(".b09-lab__cells");
@@ -9,6 +11,7 @@
     var keyIn = demo.querySelector(".b09-lab__key");
     var table, n;
     function de(j) {
+      if (EN) return String(j);
       var ek = ["da", "de", "de", "te", "te", "te", "da", "de", "de", "da", "da"];
       return j + "'" + (j < ek.length ? ek[j] : "de");
     }
@@ -32,7 +35,7 @@
         box.appendChild(c);
       }
     }
-    function lam() { return " · λ = " + n + "/" + N + " = " + (n / N).toFixed(2).replace(".", ","); }
+    function lam() { return " · λ = " + n + "/" + N + " = " + (EN ? (n / N).toFixed(2) : (n / N).toFixed(2).replace(".", ",")); }
     function head(k) {
       var s = "h(" + k + ") = " + k + " mod " + N + " = <b>" + (k % N) + "</b>";
       if (modeSel.value === "dbl") s += ", h₂ = 7 − " + (k % 7) + " = " + h2(k);
@@ -54,42 +57,42 @@
     }
     function readKey() {
       var k = parseInt(keyIn.value, 10);
-      if (!(k >= 0 && k <= 999)) { status.innerHTML = "0 ile 999 arasında bir tam sayı girin."; return null; }
+      if (!(k >= 0 && k <= 999)) { status.innerHTML = tx("0 ile 999 arasında bir tam sayı girin.", "Enter an integer from 0 to 999."); return null; }
       return k;
     }
     function insert(k, quiet) {
       var r = search(k);
-      if (r.found >= 0) { if (!quiet) { render(r.seq, r.found); status.innerHTML = head(k) + " → " + k + " zaten yuva " + de(r.found) + " (güncelleme)."; } return; }
-      if (r.avail < 0) { if (!quiet) { render(r.seq, -1); status.innerHTML = head(k) + " → denenen: " + r.seq.join(", ") + " → <b>boş yuva bulunamadı!</b>" + (modeSel.value === "quad" ? " (karesel yoklama her yuvayı denemez)" : " (tablo dolu)"); } return; }
+      if (r.found >= 0) { if (!quiet) { render(r.seq, r.found); status.innerHTML = head(k) + " → " + k + tx(" zaten yuva " + de(r.found) + " (güncelleme).", " is already in slot " + r.found + " (update)."); } return; }
+      if (r.avail < 0) { if (!quiet) { render(r.seq, -1); status.innerHTML = head(k) + tx(" → denenen: ", " → probed: ") + r.seq.join(", ") + tx(" → <b>boş yuva bulunamadı!</b>", " → <b>no free slot found!</b>") + (modeSel.value === "quad" ? tx(" (karesel yoklama her yuvayı denemez)", " (quadratic probing does not try every slot)") : tx(" (tablo dolu)", " (table full)")); } return; }
       table[r.avail] = k; n++;
       if (!quiet) {
         render(r.seq, r.avail);
-        status.innerHTML = head(k) + " → denenen: " + r.seq.join(", ") + " → <b>yuva " + r.avail + "</b> (" + r.seq.length + " yoklama)" + lam();
+        status.innerHTML = head(k) + tx(" → denenen: ", " → probed: ") + r.seq.join(", ") + tx(" → <b>yuva ", " → <b>slot ") + r.avail + "</b> (" + r.seq.length + tx(" yoklama)", r.seq.length === 1 ? " probe)" : " probes)") + lam();
       }
     }
     function reset() { table = []; for (var j = 0; j < N; j++) table.push(null); n = 0; }
     demo.addEventListener("click", function (e) {
       var op = e.target.dataset && e.target.dataset.op;
       if (!op) return;
-      if (op === "reset") { reset(); render(); status.innerHTML = "Tablo boş" + lam(); return; }
+      if (op === "reset") { reset(); render(); status.innerHTML = tx("Tablo boş", "Table empty") + lam(); return; }
       if (op === "demo") {
         reset();
         [18, 41, 22, 44, 59, 32].forEach(function (k) { insert(k, true); });
-        render(); status.innerHTML = "18, 41, 22, 44, 59, 32 eklendi (" + modeSel.options[modeSel.selectedIndex].text + ")" + lam(); return;
+        render(); status.innerHTML = "18, 41, 22, 44, 59, 32" + tx(" eklendi (", " inserted (") + modeSel.options[modeSel.selectedIndex].text + ")" + lam(); return;
       }
       var k = readKey();
       if (k === null) return;
       if (op === "ins") insert(k);
       else {
         var r = search(k);
-        if (r.found < 0) { render(r.seq, -1); status.innerHTML = head(k) + " → denenen: " + r.seq.join(", ") + " → <b>bulunamadı</b>"; return; }
-        if (op === "get") { render(r.seq, r.found); status.innerHTML = head(k) + " → denenen: " + r.seq.join(", ") + " → <b>yuva " + de(r.found) + " bulundu</b>"; }
-        else { table[r.found] = DEL; n--; render(r.seq, r.found); status.innerHTML = head(k) + " → yuva " + r.found + " <b>silindi (✗)</b>: arama zinciri kopmasın diye boşaltılmaz" + lam(); }
+        if (r.found < 0) { render(r.seq, -1); status.innerHTML = head(k) + tx(" → denenen: ", " → probed: ") + r.seq.join(", ") + tx(" → <b>bulunamadı</b>", " → <b>not found</b>"); return; }
+        if (op === "get") { render(r.seq, r.found); status.innerHTML = head(k) + tx(" → denenen: ", " → probed: ") + r.seq.join(", ") + tx(" → <b>yuva " + de(r.found) + " bulundu</b>", " → <b>found in slot " + r.found + "</b>"); }
+        else { table[r.found] = DEL; n--; render(r.seq, r.found); status.innerHTML = head(k) + tx(" → yuva " + r.found + " <b>silindi (✗)</b>: arama zinciri kopmasın diye boşaltılmaz", " → slot " + r.found + " <b>deleted (✗)</b>: it is not emptied, so probe sequences stay intact") + lam(); }
       }
     });
     keyIn.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); var k = readKey(); if (k !== null) insert(k); } });
-    modeSel.addEventListener("change", function () { reset(); render(); status.innerHTML = "Yöntem değişti, tablo sıfırlandı" + lam(); });
+    modeSel.addEventListener("change", function () { reset(); render(); status.innerHTML = tx("Yöntem değişti, tablo sıfırlandı", "Method changed; table reset") + lam(); });
     reset(); render();
-    status.innerHTML = "Bir anahtar girip <b>ekle</b>'ye basın ya da <b>örnek doldur</b> ile başlayın.";
+    status.innerHTML = tx("Bir anahtar girip <b>ekle</b>'ye basın ya da <b>örnek doldur</b> ile başlayın.", "Enter a key and press <b>insert</b>, or start with <b>fill sample</b>.");
   });
 })();
