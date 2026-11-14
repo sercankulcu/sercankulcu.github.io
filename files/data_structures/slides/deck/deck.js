@@ -16,6 +16,9 @@
   const sectionLabel = document.getElementById("ds-deck-section");
   /* Turkish casing for text-transform (i → İ, ı → I) even if the page itself is lang="en" */
   if (!deck.getAttribute("lang")) deck.setAttribute("lang", "tr");
+  /* English edition: decks with lang="en" get English interface text */
+  const EN = String(deck.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = function (tr, en) { return EN ? en : tr; };
   const W = 800, H = 600, FLUID_BELOW = 560;
   let current = 0;
 
@@ -116,7 +119,7 @@
     clearInterval(playing.timer);
     const btn = playing.set.nav.querySelector("[data-play]");
     btn.textContent = "▶";
-    btn.setAttribute("aria-label", "Adımları otomatik oynat");
+    btn.setAttribute("aria-label", tx("Adımları otomatik oynat", "Play the steps automatically"));
     playing = null;
   }
 
@@ -125,7 +128,7 @@
     if (set.index >= set.steps.length - 1) setStep(set, 0);
     const btn = set.nav.querySelector("[data-play]");
     btn.textContent = "❚❚";
-    btn.setAttribute("aria-label", "Otomatik oynatmayı durdur");
+    btn.setAttribute("aria-label", tx("Otomatik oynatmayı durdur", "Stop autoplay"));
     playing = { set: set, timer: setInterval(function () {
       if (set.index >= set.steps.length - 1) { stopPlay(); return; }
       setStep(set, set.index + 1);
@@ -186,20 +189,20 @@
       const now = parseVars(step.dataset.vars);
       const before = {};
       parseVars(prevStep && prevStep.dataset.vars).forEach(function (v) { before[v[0]] = v[1]; });
-      t.vars.innerHTML = '<div class="ds-trace__title">Değişkenler</div>' + (now.length ? now.map(function (v) {
+      t.vars.innerHTML = '<div class="ds-trace__title">' + tx("Değişkenler", "Variables") + '</div>' + (now.length ? now.map(function (v) {
         const changed = prevStep && before[v[0]] !== v[1];
         return '<div class="ds-trace__var' + (changed ? " is-changed" : "") + '"><span>' + esc(v[0]) + "</span><b>" + esc(v[1]) + "</b></div>";
       }).join("") : '<div class="ds-trace__empty">—</div>');
     }
     if (t.stack) {
       const frames = (step.dataset.stack || "").split("|").map(function (f) { return f.trim(); }).filter(Boolean);
-      t.stack.innerHTML = '<div class="ds-trace__title">Çağrı yığını</div>' + (frames.length ? frames.slice().reverse().map(function (f, k) {
+      t.stack.innerHTML = '<div class="ds-trace__title">' + tx("Çağrı yığını", "Call stack") + '</div>' + (frames.length ? frames.slice().reverse().map(function (f, k) {
         return '<div class="ds-trace__frame' + (k === 0 ? " is-top" : "") + '">' + esc(f) + "</div>";
-      }).join("") : '<div class="ds-trace__empty">boş</div>');
+      }).join("") : '<div class="ds-trace__empty">' + tx("boş", "empty") + '</div>');
     }
     if (t.out) {
       const txt = (step.dataset.out || "").replace(/\\n/g, "\n");
-      t.out.innerHTML = '<div class="ds-trace__title">Çıktı</div><pre>' + (txt ? esc(txt) : " ") + "</pre>";
+      t.out.innerHTML = '<div class="ds-trace__title">' + tx("Çıktı", "Output") + '</div><pre>' + (txt ? esc(txt) : " ") + "</pre>";
     }
   }
 
@@ -208,10 +211,10 @@
       const steps = Array.from(box.children).filter(function (c) { return c.classList.contains("ds-deck__step"); });
       const nav = document.createElement("div");
       nav.className = "ds-deck__stepnav";
-      nav.innerHTML = '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="-1" aria-label="Önceki adım">‹</button>' +
+      nav.innerHTML = '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="-1" aria-label="' + tx("Önceki adım", "Previous step") + '">‹</button>' +
         '<span class="ds-deck__stepcount" aria-live="polite"></span>' +
-        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="1" aria-label="Sonraki adım">›</button>' +
-        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-play aria-label="Adımları otomatik oynat">▶</button>';
+        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="1" aria-label="' + tx("Sonraki adım", "Next step") + '">›</button>' +
+        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-play aria-label="' + tx("Adımları otomatik oynat", "Play the steps automatically") + '">▶</button>';
       box.appendChild(nav);
       const tr = box.closest(".ds-trace");
       const set = { box: box, steps: steps, nav: nav, index: 0, build: box.dataset.mode === "build", trace: tr ? initTrace(tr) : null };
@@ -236,7 +239,7 @@
       st.classList.toggle("is-on", on);
       st.classList.toggle("is-current", k === set.index);
     });
-    set.nav.querySelector(".ds-deck__stepcount").textContent = "Adım " + (set.index + 1) + " / " + set.steps.length;
+    set.nav.querySelector(".ds-deck__stepcount").textContent = tx("Adım ", "Step ") + (set.index + 1) + " / " + set.steps.length;
     set.nav.querySelector('[data-step="-1"]').disabled = set.index === 0;
     set.nav.querySelector('[data-step="1"]').disabled = set.index === set.steps.length - 1;
     if (set.trace) updateTrace(set.trace, set.steps[set.index], set.index > 0 ? set.steps[set.index - 1] : null);
@@ -273,7 +276,7 @@
     prev.disabled = current === 0;
     next.disabled = current === slides.length - 1;
     jump.value = current;
-    sectionLabel.textContent = slides[current].dataset.section || "Sercan KÜLCÜ, Tüm hakları saklıdır.";
+    sectionLabel.textContent = slides[current].dataset.section || tx("Sercan KÜLCÜ, Tüm hakları saklıdır.", "Sercan KÜLCÜ, all rights reserved.");
     if (updateHash !== false) history.replaceState(null, "", "#" + slugs[current]);
   }
 
@@ -398,8 +401,8 @@
     }
     for (let y = 20; y <= YMAX; y += 20) el("path", { class: "grid", d: "M" + L + " " + sy(y) + " H" + R });
     el("path", { class: "axis", d: "M" + L + " " + T + " V" + B + " H" + R });
-    el("text", { class: "lbl", x: R - 4, y: B + 20, "text-anchor": "end" }, "girdi boyutu n →");
-    el("text", { class: "lbl", x: L - 6, y: T + 4, "text-anchor": "end" }, "iş");
+    el("text", { class: "lbl", x: R - 4, y: B + 20, "text-anchor": "end" }, tx("girdi boyutu n →", "input size n →"));
+    el("text", { class: "lbl", x: L - 6, y: T + 4, "text-anchor": "end" }, tx("iş", "work"));
     const series = [
       { f: function () { return 1; }, label: "O(1)", color: "#2a9d8f", dy: 7 },
       { f: function (n) { return Math.log2(n); }, label: "O(log n)", color: "#3b82f6", dy: -5 },
@@ -430,11 +433,11 @@
     values.forEach(function (v, i) {
       const b = document.createElement("button");
       b.type = "button";
-      b.setAttribute("aria-label", "İndis " + i + ", değer " + v);
+      b.setAttribute("aria-label", tx("İndis ", "Index ") + i + tx(", değer ", ", value ") + v);
       b.innerHTML = "<span>" + i + "</span><span>" + v + "</span>";
       b.addEventListener("click", function () {
         row.querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-hot", x === b); });
-        status.innerHTML = "<b>A[" + i + "] = " + v + "</b> · adres = başlangıç + " + i + " × 4 bayt → tek adımda erişim, <b>O(1)</b>";
+        status.innerHTML = "<b>A[" + i + "] = " + v + tx("</b> · adres = başlangıç + ", "</b> · address = base + ") + i + tx(" × 4 bayt → tek adımda erişim, <b>O(1)</b>", " × 4 bytes → one-step access, <b>O(1)</b>");
       });
       row.appendChild(b);
     });
@@ -446,14 +449,14 @@
     const status = demo.querySelector(".ds-deck__status");
     const MAX = 6;
     let items, nextVal;
-    function reset() { items = [1, 2, 3, 4]; nextVal = 5; render(null); status.innerHTML = "Üstteki öğe: <b>4</b>"; }
+    function reset() { items = [1, 2, 3, 4]; nextVal = 5; render(null); status.innerHTML = tx("Üstteki öğe: <b>4</b>", "Top item: <b>4</b>"); }
     function render(hot) {
       box.innerHTML = "";
       items.forEach(function (v, i) {
         const d = document.createElement("div");
         d.className = "ds-deck__item" + (i === items.length - 1 && hot ? " is-hot" : "");
         d.textContent = v;
-        if (i === items.length - 1) d.dataset.label = "← üst";
+        if (i === items.length - 1) d.dataset.label = tx("← üst", "← top");
         box.appendChild(d);
       });
     }
@@ -461,13 +464,13 @@
       const op = e.target.dataset && e.target.dataset.op;
       if (!op) return;
       if (op === "push") {
-        if (items.length >= MAX) { status.innerHTML = "Yığın dolu (en fazla " + MAX + " öğe)."; return; }
+        if (items.length >= MAX) { status.innerHTML = tx("Yığın dolu (en fazla " + MAX + " öğe).", "The stack is full (at most " + MAX + " items)."); return; }
         items.push(nextVal); render(true);
-        status.innerHTML = "<b>push(" + nextVal + ")</b> → en üste eklendi"; nextVal++;
+        status.innerHTML = "<b>push(" + nextVal + tx(")</b> → en üste eklendi", ")</b> → added on top"); nextVal++;
       } else if (op === "pop") {
-        if (!items.length) { status.innerHTML = "Yığın boş: pop yapılamaz."; return; }
+        if (!items.length) { status.innerHTML = tx("Yığın boş: pop yapılamaz.", "The stack is empty: nothing to pop."); return; }
         const v = items.pop(); render(false);
-        status.innerHTML = "<b>pop() → " + v + "</b> · son giren ilk çıktı";
+        status.innerHTML = "<b>pop() → " + v + tx("</b> · son giren ilk çıktı", "</b> · last in, first out");
       } else reset();
     });
     reset();
@@ -479,7 +482,7 @@
     const status = demo.querySelector(".ds-deck__status");
     const MAX = 6;
     let items, nextVal;
-    function reset() { items = [7, 2, 9, 5]; nextVal = 1; render(-1); status.innerHTML = "Ön: <b>7</b> · Arka: <b>5</b>"; }
+    function reset() { items = [7, 2, 9, 5]; nextVal = 1; render(-1); status.innerHTML = tx("Ön: <b>7</b> · Arka: <b>5</b>", "Front: <b>7</b> · Rear: <b>5</b>"); }
     function render(hot) {
       box.innerHTML = "";
       items.forEach(function (v, i) {
@@ -487,8 +490,8 @@
         d.className = "ds-deck__item" + (i === hot ? " is-hot" : "");
         d.textContent = v;
         const labels = [];
-        if (i === 0) labels.push("ön");
-        if (i === items.length - 1) labels.push("arka");
+        if (i === 0) labels.push(tx("ön", "front"));
+        if (i === items.length - 1) labels.push(tx("arka", "rear"));
         if (labels.length) d.dataset.label = labels.join(" / ");
         box.appendChild(d);
       });
@@ -497,13 +500,13 @@
       const op = e.target.dataset && e.target.dataset.op;
       if (!op) return;
       if (op === "enqueue") {
-        if (items.length >= MAX) { status.innerHTML = "Kuyruk dolu (en fazla " + MAX + " öğe)."; return; }
+        if (items.length >= MAX) { status.innerHTML = tx("Kuyruk dolu (en fazla " + MAX + " öğe).", "The queue is full (at most " + MAX + " items)."); return; }
         items.push(nextVal); render(items.length - 1);
-        status.innerHTML = "<b>enqueue(" + nextVal + ")</b> → arkaya eklendi"; nextVal++;
+        status.innerHTML = "<b>enqueue(" + nextVal + tx(")</b> → arkaya eklendi", ")</b> → added at the rear"); nextVal++;
       } else if (op === "dequeue") {
-        if (!items.length) { status.innerHTML = "Kuyruk boş: dequeue yapılamaz."; return; }
+        if (!items.length) { status.innerHTML = tx("Kuyruk boş: dequeue yapılamaz.", "The queue is empty: nothing to dequeue."); return; }
         const v = items.shift(); render(-1);
-        status.innerHTML = "<b>dequeue() → " + v + "</b> · ilk giren ilk çıktı";
+        status.innerHTML = "<b>dequeue() → " + v + tx("</b> · ilk giren ilk çıktı", "</b> · first in, first out");
       } else reset();
     });
     reset();
