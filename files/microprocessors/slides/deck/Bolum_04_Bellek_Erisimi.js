@@ -41,7 +41,7 @@
       if (hasDisp) {
         var d16 = disp & 0xFFFF;
         parts.push(disp < 0 ? String(disp) : hex(d16, 4) + "h");
-        terms.push(disp < 0 ? "(" + disp + ")" : hex(d16, 4) + "h");
+        terms.push(disp < 0 ? "(−" + -disp + ")" : hex(d16, 4) + "h");
         ea += disp;
       }
       ea = ((ea % 65536) + 65536) % 65536;

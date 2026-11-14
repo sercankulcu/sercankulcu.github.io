@@ -843,7 +843,7 @@
         yeni = null;
         veri[boyut++] = v;
         Tr.at("w", "<code>d-&gt;veri[" + (boyut - 1) + "] = " + v + "</code>, ardından <code>boyut</code> " + boyut + " oldu.", { look: boyut - 1 });
-        Tr.at("ret", "1 döner. Şimdiye dek " + boyut + " ekleme için toplam " + kopya + " öğe kopyalandı; ekleme başına ortalama " + fmtF(kopya / boyut) + ".");
+        Tr.at("ret", "1 döner. Şimdiye dek " + boyut + " ekleme için toplam " + kopya + " öğe kopyalandı; ekleme başına ortalama " + fmtF(kopya / boyut).replace(".", ",") + ".");
         Tr.print("ekle(" + v + "): boyut " + boyut + ", kap " + kap + "\n");
         res.push("ekle " + v + " boyut " + boyut + " kap " + kap + " kopya " + kopya);
       });

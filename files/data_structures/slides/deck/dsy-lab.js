@@ -24,6 +24,7 @@
     if (Number.isInteger(v)) return v.toFixed(1);
     return String(v);
   }
+  function trEksi(x) { return String(x).replace("-", "−"); }
   function kisa(v) {
     if (Number.isInteger(v)) return String(v);
     var t = (Math.round(v * 100) / 100).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
@@ -35,7 +36,7 @@
     return p.map(function (x) {
       if (!/^[-+]?\d+$/.test(x)) hata("“" + x + "” bir tam sayı değil; sayılar virgülle ayrılmalı.");
       var v = parseInt(x, 10);
-      if (v < alt || v > ust) hata("Sayılar " + alt + " ile " + ust + " arasında olmalı (" + v + " uygun değil).");
+      if (v < alt || v > ust) hata("Sayılar " + trEksi(alt) + " ile " + ust + " arasında olmalı (" + trEksi(v) + " uygun değil).");
       return v;
     });
   }

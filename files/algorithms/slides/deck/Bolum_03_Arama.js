@@ -79,7 +79,7 @@
       view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + (8 + n * cw) + ' 78" role="img" aria-label="Dizi ve yoklama sırası">' + out.join("") + "</svg>";
     }
     function table(x) {
-      var h = '<table class="ds-deck__table"><thead><tr><th>aranan ' + x + '</th>';
+      var h = '<table class="ds-deck__table"><thead><tr><th>aranan ' + String(x).replace("-", "−") + '</th>';
       var b = "<tr><td>yoklama</td>";
       Object.keys(F).forEach(function (k) {
         h += '<th class="c">' + NAMES[k] + "</th>";

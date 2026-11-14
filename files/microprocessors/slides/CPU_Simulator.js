@@ -177,6 +177,10 @@ function flags(n, c = 0) {
   };
 }
 
+function sd(n) {
+  return n < 0 ? '−' + -n : String(n);
+}
+
 function fmt(n) {
   if (n === null || n === undefined) return '—';
   const f = $('format').value;
@@ -390,7 +394,7 @@ function micro() {
         unary = ['NOT', 'SHL', 'SHR'].includes(op);
       s.active = load ? ['Operand', 'ALU'] : unary ? ['ACC', 'ALU'] : ['ACC', 'Operand', 'ALU'];
       s.wires = load ? ['Operand'] : unary ? ['Acc'] : ['Acc', 'Operand'];
-      s.text = op + ': sonuç = ' + p.result + (raw !== p.result ? ' (' + raw + ' değerinden sarıldı)' : '') + '; bekleyen bayraklar Z=' + p.flags.z + ', N=' + p.flags.n + ', C=' + p.flags.c + '.';
+      s.text = op + ': sonuç = ' + p.result + (raw !== p.result ? ' (' + sd(raw) + ' değerinden sarıldı)' : '') + '; bekleyen bayraklar Z=' + p.flags.z + ', N=' + p.flags.n + ', C=' + p.flags.c + '.';
     } else if (OPS[op] === 'jump') {
       s.active = ['Control', 'Flags'];
       s.text = op + ': ' + (p.taken ? 'atlanır → ' + arg : 'atlanmaz') + '.';
@@ -525,7 +529,7 @@ function render() {
   $('count').textContent = s.count;
   $('ticks').textContent = s.ticks;
   $('binary').textContent = s.acc.toString(2).padStart(8, '0');
-  $('signed').textContent = s.acc > 127 ? s.acc - 256 : s.acc;
+  $('signed').textContent = sd(s.acc > 127 ? s.acc - 256 : s.acc);
   $('output').textContent = s.output.length ? tail(s.output.map(fmt), 24) : 'Henüz çıktı yok.';
   $('output').title = s.output.map(fmt).join('  ');
   $('queued').textContent = 'Giriş kuyruğu: ' + (s.input.length ? s.input.map(fmt).join(', ') : 'boş');

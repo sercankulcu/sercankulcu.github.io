@@ -15,6 +15,7 @@
     return neg ? -v : v;
   }
   function signed(v, n) { return v >= (1 << (n - 1)) ? v - (1 << n) : v; }
+  function sd(n) { return n < 0 ? "−" + -n : String(n); }
 
   /* Bayrak hesaplayıcı */
   document.querySelectorAll('.ds-deck [data-demo="m06-flags"]').forEach(function (demo) {
@@ -56,7 +57,7 @@
       var w = n / 4;
       var rows = '<div class="m06-bits">hedef  ' + bin(a, n) + "  = " + hex(a, w) + "h</div>";
       if (!one) rows += '<div class="m06-bits">kaynak ' + bin(b, n) + "  = " + hex(b, w) + "h</div>";
-      rows += '<div class="m06-bits"><b>sonuç  ' + bin(r, n) + "  = " + hex(r, w) + "h</b>  (işaretsiz " + r + ", işaretli " + signed(r, n) + ")</div>";
+      rows += '<div class="m06-bits"><b>sonuç  ' + bin(r, n) + "  = " + hex(r, w) + "h</b>  (işaretsiz " + r + ", işaretli " + sd(signed(r, n)) + ")</div>";
       var chips = Object.keys(f).map(function (k) {
         return '<span class="' + (f[k] === 1 ? "is-on" : "") + '">' + k + " = " + f[k] + "</span>";
       }).join("");
@@ -93,7 +94,7 @@
         var p = av * bv, P = Math.pow(2, 2 * n), pu = ((p % P) + P) % P;
         var hi = Math.floor(pu / bMax), lo = pu % bMax;
         var fits = sg ? (p >= -bMax / 2 && p < bMax / 2) : p < bMax;
-        html = '<div class="m06-bits">' + av + " × " + bv + " = <b>" + p + "</b></div>";
+        html = '<div class="m06-bits">' + sd(av) + " × " + sd(bv) + " = <b>" + sd(p) + "</b></div>";
         html += '<div class="m06-chips">' + (n === 8 ? reg("AX", pu, 4) + "<span>AH = " + hex(hi, 2) + "h</span><span>AL = " + hex(lo, 2) + "h</span>" :
           reg("DX", hi, 4) + reg("AX", lo, 4)) + '<span class="' + (fits ? "" : "is-on") + '">CF = OF = ' + (fits ? 0 : 1) + "</span></div>";
         msg = fits ? "Sonuç alt yarıya sığdı; üst yarı yalnızca " + (sg ? "işaret uzantısı" : "sıfır") + "." : "Sonuç üst yarıya taştı → CF = OF = 1.";
@@ -101,7 +102,7 @@
         if (bv === 0) { out.innerHTML = '<div class="m06-bits"><b>Bölme hatası → INT 0</b></div>'; status.innerHTML = "Sıfıra bölme."; return; }
         var qt = Math.trunc(av / bv), rm = av - qt * bv;
         var ok = sg ? (qt >= -bMax / 2 && qt < bMax / 2) : qt < bMax;
-        html = '<div class="m06-bits">' + av + " / " + bv + " → bölüm <b>" + qt + "</b>, kalan <b>" + rm + "</b></div>";
+        html = '<div class="m06-bits">' + sd(av) + " / " + sd(bv) + " → bölüm <b>" + sd(qt) + "</b>, kalan <b>" + sd(rm) + "</b></div>";
         if (!ok) { out.innerHTML = html + '<div class="m06-bits"><b>Bölme hatası → INT 0</b></div>'; status.innerHTML = "Bölüm " + (n === 8 ? "AL'ye" : "AX'e") + " sığmıyor."; return; }
         var qu = ((qt % bMax) + bMax) % bMax, ru = ((rm % bMax) + bMax) % bMax, w = n / 4;
         html += '<div class="m06-chips">' + reg(n === 8 ? "AL" : "AX", qu, w) + reg(n === 8 ? "AH" : "DX", ru, w) + "<span>bayraklar tanımsız</span></div>";
@@ -120,6 +121,7 @@
   function hex2(v) { return ("0" + (v & 0xFF).toString(16).toUpperCase()).slice(-2) + "h"; }
   function bin8(v) { return ("0000000" + (v & 0xFF).toString(2)).slice(-8); }
   function signed8(v) { v &= 0xFF; return v > 127 ? v - 256 : v; }
+  function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function parseHex(s) {
     s = String(s || "").trim().replace(/h$/i, "");
     if (!/^[0-9a-fA-F]{1,2}$/.test(s)) return null;
@@ -142,7 +144,7 @@
 
     function render(prev, hot) {
       out.innerHTML = (prev !== null ? bitsRow("önce", prev, hex2(prev)) : "") +
-        bitsRow("AL", v, hex2(v) + " = " + v + " / " + signed8(v), hot) +
+        bitsRow("AL", v, hex2(v) + " = " + v + " / " + sd(signed8(v)), hot) +
         "<div class=\"m10-chips\"><span class=\"" + (cf ? "on" : "") + "\">CF = " + cf + "</span></div>";
     }
     inV.addEventListener("input", function () {
@@ -157,7 +159,7 @@
       if (o === "cf") { cf ^= 1; render(null); status.innerHTML = "CF = <b>" + cf + "</b> (RCL/RCR bu biti içeri alır)."; return; }
       if (o === "shl") { cf = msb; v = (v << 1) & 255; hot[7] = 1; msg = "Sola kaydırıldı, sağdan 0 girdi; çıkan b7 = " + msb + " → CF. Değer ×2 (mod 256)."; }
       if (o === "shr") { cf = lsb; v = v >> 1; hot[0] = 1; msg = "Sağa kaydırıldı, soldan 0 girdi; çıkan b0 = " + lsb + " → CF. İşaretsiz ÷2."; }
-      if (o === "sar") { cf = lsb; v = (v >> 1) | (v & 0x80); hot[0] = 1; msg = "Aritmetik sağa kaydırma: işaret biti (" + msb + ") korundu. İşaretli ÷2: " + signed8(prev) + " → " + signed8(v) + "."; }
+      if (o === "sar") { cf = lsb; v = (v >> 1) | (v & 0x80); hot[0] = 1; msg = "Aritmetik sağa kaydırma: işaret biti (" + msb + ") korundu. İşaretli ÷2: " + sd(signed8(prev)) + " → " + sd(signed8(v)) + "."; }
       if (o === "rol") { cf = msb; v = ((v << 1) | msb) & 255; hot[7] = 1; msg = "b7 = " + msb + " hem b0'a hem CF'ye gitti."; }
       if (o === "ror") { cf = lsb; v = (v >> 1) | (lsb << 7); hot[0] = 1; msg = "b0 = " + lsb + " hem b7'ye hem CF'ye gitti."; }
       if (o === "rcl") { var c1 = cf; cf = msb; v = ((v << 1) | c1) & 255; hot[7] = 1; msg = "Eski CF (" + c1 + ") b0'a girdi, b7 (" + msb + ") CF'ye çıktı."; }

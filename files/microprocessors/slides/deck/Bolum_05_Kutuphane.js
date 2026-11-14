@@ -1,5 +1,6 @@
 /* Bölüm 5: emu8086.inc Kütüphanesi sunumu demoları */
 (function () {
+  function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function hex(n, w) { return n.toString(16).toUpperCase().padStart(w, "0"); }
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
@@ -63,7 +64,7 @@
       out.innerHTML = "<div><b>AX</b><code>" + hex(ax, 4) + "h</code><br><span class='ds-deck__muted' style='font-size:12.5px'>" + bin + "</span></div>" +
         "<div><b>PRINT_NUM</b><code>" + signed + "</code></div>" +
         "<div><b>PRINT_NUM_UNS</b><code>" + ax + "</code></div>";
-      status.innerHTML = ax >= 0x8000 ? "Bit 15 = 1: işaretli yorumda negatif (" + ax + " − 65536 = " + signed + ")." :
+      status.innerHTML = ax >= 0x8000 ? "Bit 15 = 1: işaretli yorumda negatif (" + ax + " − 65536 = " + sd(signed) + ")." :
         "Bit 15 = 0: iki yorum aynı sonucu verir.";
     }
     input.addEventListener("input", calc);

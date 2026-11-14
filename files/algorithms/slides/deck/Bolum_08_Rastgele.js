@@ -25,8 +25,8 @@
     function fmt(x, d) { return x.toFixed(d).replace(".", ","); }
     function set(k, v) { demo.querySelector('[data-k="' + k + '"]').textContent = v; }
     function show() {
-      set("n", String(n));
-      set("in", String(inside));
+      set("n", n.toLocaleString("tr-TR"));
+      set("in", inside.toLocaleString("tr-TR"));
       if (n) {
         var est = 4 * inside / n;
         set("pi", fmt(est, 4));

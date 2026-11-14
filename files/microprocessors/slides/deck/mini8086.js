@@ -2530,10 +2530,10 @@
   var VGA16 = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
     "koyu gri", "açık mavi", "açık yeşil", "açık camgöbeği", "açık kırmızı", "açık eflatun", "sarı", "beyaz"];
   function colorName(c) { return c < 16 ? VGA16[c] : c < 32 ? "gri ton " + (c - 16) : c >= 248 ? "siyah" : "palet rengi " + c; }
-  /* Türkçe sayı yazımı: binlik ayırıcı boşluk, ondalık virgül (5 000 000; 0,5) */
+  /* Türkçe sayı yazımı: binlik ayırıcı nokta, ondalık virgül (5.000.000; 0,5) */
   function trNum(x, frac) {
     var k = Math.pow(10, frac || 0), p = String(Math.round(x * k) / k).split(".");
-    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return p.join(",");
   }
   function secText(us) {

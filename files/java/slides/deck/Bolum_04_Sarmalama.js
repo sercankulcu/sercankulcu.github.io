@@ -12,6 +12,7 @@
 
     function gecerli(a, v) { return v >= 0 && v < LIMIT[a]; }
     function iki(v) { var s = String(Math.abs(v)); if (s.length < 2) s = "0" + s; return (v < 0 ? "-" : "") + s; }
+    function trSayi(x) { return String(x).replace("-", "\u2212"); }
     function buyuk(a) { return a.charAt(0).toUpperCase() + a.slice(1); }
 
     function ciz(son) {
@@ -42,10 +43,10 @@
       if (gecerli(a, v)) {
         deger[a] = v;
         ciz(a);
-        status.innerHTML = "Koşul <b>doğru</b> (0 ≤ " + v + " &lt; " + LIMIT[a] + "): setter değeri atadı.";
+        status.innerHTML = "Koşul <b>doğru</b> (0 ≤ " + trSayi(v) + " &lt; " + LIMIT[a] + "): setter değeri atadı.";
       } else {
         ciz(null);
-        status.innerHTML = "Koşul <b>yanlış</b>: setter " + v + " değerini <b>reddetti</b>, nesne geçerli kaldı.";
+        status.innerHTML = "Koşul <b>yanlış</b>: setter " + trSayi(v) + " değerini <b>reddetti</b>, nesne geçerli kaldı.";
       }
     }
     function dogrudan() {

@@ -65,6 +65,7 @@
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   function h4(v) { return hx(v).slice(0, 4); }
   function h2(v) { return hx(v, 1).slice(0, 2); }
+  function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function hp(v) { return v > 255 ? hx(v) : hx(v, 1); }
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function btn(act, text, label) {
@@ -136,8 +137,8 @@
     var sv = v & 0x8000 ? v - 0x10000 : v, txt = String(sv), p = ['<rect class="m-lab-panel" x="0" y="0" width="300" height="96" rx="10"/>'];
     while (txt.length < 6) txt = " " + txt;
     for (var i = 0; i < 6; i++) p.push(digitSvg(16 + i * 46, 14, 1.6, SEG7[txt.charAt(i)] || 0));
-    p.push('<text class="lbl mono" x="150" y="120" text-anchor="middle">port 199 = ' + hx(v) + " (" + sv + ")</text>");
-    return svgWrap("0 0 300 126", "LED gösterge: " + sv, p.join(""), h);
+    p.push('<text class="lbl mono" x="150" y="120" text-anchor="middle">port 199 = ' + hx(v) + " (" + sd(sv) + ")</text>");
+    return svgWrap("0 0 300 126", "LED gösterge: " + sd(sv), p.join(""), h);
   }
   function gaugeSvg(st, h) {
     var p = ['<rect class="m-lab-panel" x="0" y="0" width="300" height="96" rx="10"/>'];
@@ -156,16 +157,16 @@
       '<circle cx="53" cy="200" r="14" class="m-lab-lamp-r"/>'];
     [-40, 0, 40, 80, 120].forEach(function (v) {
       var y = 186 - (v + 40) * 1.0625;
-      p.push('<path class="axis" d="M70 ' + y.toFixed(0) + ' H80"/><text class="lbl mono" x="84" y="' + (y + 4).toFixed(0) + '">' + v + "</text>");
+      p.push('<path class="axis" d="M70 ' + y.toFixed(0) + ' H80"/><text class="lbl mono" x="84" y="' + (y + 4).toFixed(0) + '">' + sd(v) + "</text>");
     });
     [60, 80].forEach(function (v) {
       var y = 186 - (v + 40) * 1.0625;
       p.push('<path class="line" d="M30 ' + y.toFixed(0) + ' H76" style="stroke:var(--ds-good);stroke-dasharray:4 3"/>');
     });
-    p.push('<text class="txt" x="130" y="60">port 125: <tspan class="mono">' + t + " °C</tspan></text>");
+    p.push('<text class="txt" x="130" y="60">port 125: <tspan class="mono">' + sd(t) + " °C</tspan></text>");
     p.push('<rect x="130" y="96" width="140" height="44" rx="8" class="' + (heater ? "m-lab-lamp-y" : "m-lab-lamp-off") + '"/><text class="txt" x="200" y="124" text-anchor="middle">ısıtıcı ' + (heater ? "AÇIK" : "KAPALI") + "</text>");
     p.push('<text class="lbl mono" x="130" y="166">port 127 = ' + heater + "</text>");
-    return svgWrap("0 0 280 220", "Termometre " + t + " derece, ısıtıcı " + (heater ? "açık" : "kapalı"), p.join(""), h);
+    return svgWrap("0 0 280 220", "Termometre " + sd(t) + " derece, ısıtıcı " + (heater ? "açık" : "kapalı"), p.join(""), h);
   }
   function deg(half) {
     var d = ((half * 11.25) % 360 + 360) % 360;
@@ -383,10 +384,10 @@
         var rng = el("input");
         rng.type = "range"; rng.min = a.v.min != null ? a.v.min : -40; rng.max = a.v.max != null ? a.v.max : 120; rng.value = adj[a.port];
         rng.setAttribute("aria-label", (a.v.ad || "port " + a.port) + " değeri");
-        var val = el("b", "m-lab__mono", String(adj[a.port]));
+        var val = el("b", "m-lab__mono", sd(adj[a.port]));
         rng.addEventListener("input", function () {
           adj[a.port] = parseInt(rng.value, 10);
-          val.textContent = rng.value;
+          val.textContent = sd(adj[a.port]);
           var log = inLog[a.port];
           if (log) log.length = inIdx[a.port] || 0;   /* sonraki IN okumaları yeni değeri alır */
           render();
@@ -809,14 +810,14 @@
       }
       if (rec.st.op === "OUT") {
         if (p === 4 && ex.dev.indexOf("trafik") >= 0) return " " + trafficText(rec.info.v);
-        if (p === 199 && ex.dev.indexOf("led") >= 0) { var v = rec.info.v; return " LED göstergede " + (v & 0x8000 ? v - 0x10000 : v) + " görünür (işaretli onluk)."; }
+        if (p === 199 && ex.dev.indexOf("led") >= 0) { var v = rec.info.v; return " LED göstergede " + sd(v & 0x8000 ? v - 0x10000 : v) + " görünür (işaretli onluk)."; }
         if (p === 127 && ex.dev.indexOf("termometre") >= 0) return " Isıtıcı " + (rec.info.v ? "açılır." : "kapanır.");
         if (p === 0x310 && ex.dev.indexOf("gosterge") >= 0) return " Port A bölüt desenini (" + h2(rec.info.v) + "h) taşır; hane seçimi açık olan hanede görünür.";
         if (p === 0x312 && ex.dev.indexOf("gosterge") >= 0) return rec.info.v & 15 ? " Port C'de bit " + Math.log2(rec.info.v & 15) + " = 1: yalnız o hane yanar." : " Port C = 0: bütün haneler sönük.";
       }
       if (rec.st.op === "IN" && p === 125 && ex.dev.indexOf("termometre") >= 0) {
         var t = rec.info.v & 0x80 ? rec.info.v - 256 : rec.info.v;
-        return " Termometre " + t + " °C gösteriyor" + (t < 0 ? " (işaretli bayt " + h2(rec.info.v) + "h)" : "") + ".";
+        return " Termometre " + sd(t) + " °C gösteriyor" + (t < 0 ? " (işaretli bayt " + h2(rec.info.v) + "h)" : "") + ".";
       }
       return tn;
     }

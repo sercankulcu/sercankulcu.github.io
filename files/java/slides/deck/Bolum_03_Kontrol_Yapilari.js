@@ -36,6 +36,7 @@
       if (u === "x2") return i * 2;
       return i + parseInt(u, 10);
     }
+    function trSayi(x) { return String(x).replace("-", "\u2212"); }
     function esc(s) {
       return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
@@ -68,9 +69,9 @@
         vals.appendChild(more);
       }
       if (n === 0) {
-        status.innerHTML = "İlk kontrolde " + a + " " + esc(o) + " " + b + " <b>yanlış</b>: gövde <b>hiç</b> çalışmadı.";
+        status.innerHTML = "İlk kontrolde " + trSayi(a) + " " + esc(o) + " " + trSayi(b) + " <b>yanlış</b>: gövde <b>hiç</b> çalışmadı.";
       } else {
-        status.innerHTML = "Gövde <b>" + n + "</b> kez çalıştı · toplam = <b>" + toplam + "</b> · çıkışta i = <b>" + i + "</b> (" + i + " " + esc(o) + " " + b + " yanlış).";
+        status.innerHTML = "Gövde <b>" + n + "</b> kez çalıştı · toplam = <b>" + trSayi(toplam) + "</b> · çıkışta i = <b>" + trSayi(i) + "</b> (" + trSayi(i) + " " + esc(o) + " " + trSayi(b) + " yanlış).";
       }
     }
     demo.querySelector('[data-op="run"]').addEventListener("click", run);

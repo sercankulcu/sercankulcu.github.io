@@ -59,7 +59,7 @@
       }
       var v = parseNum(it);
       var max = Math.pow(2, 8 * size);
-      if (v < -max / 2 || v >= max) throw new Error(v + " değeri " + size + " bayta sığmaz");
+      if (v < -max / 2 || v >= max) throw new Error(String(v).replace("-", "−") + " değeri " + size + " bayta sığmaz");
       if (v < 0) v += max;
       for (var b = 0; b < size; b++) { out.push({ v: Math.floor(v / Math.pow(256, b)) % 256 }); }
     });

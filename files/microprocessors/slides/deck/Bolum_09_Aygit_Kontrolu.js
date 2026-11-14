@@ -1,6 +1,7 @@
 /* Bölüm 9 Aygıt Kontrolü: trafik lambası bit düzenleyici, termostat simülatörü ve 8255 kontrol sözcüğü oluşturucu */
 (function () {
   var NS = "http://www.w3.org/2000/svg";
+  function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function hex4(v) { return ("0000" + (v & 0xFFFF).toString(16).toUpperCase()).slice(-4) + "h"; }
   function bin16(v) {
     var s = ("0000000000000000" + (v & 0xFFFF).toString(2)).slice(-16);
@@ -81,16 +82,16 @@
       '<circle cx="53" cy="200" r="14" class="lamp-r"/>'];
     [-40, 0, 40, 80, 120].forEach(function (v) {
       var y = 186 - (v + 40) * 1.0625;
-      p.push('<path class="axis" d="M70 ' + y.toFixed(0) + ' H80"/><text class="lbl mono" x="84" y="' + (y + 4).toFixed(0) + '">' + v + "</text>");
+      p.push('<path class="axis" d="M70 ' + y.toFixed(0) + ' H80"/><text class="lbl mono" x="84" y="' + (y + 4).toFixed(0) + '">' + sd(v) + "</text>");
     });
     [60, 80].forEach(function (v) {
       var y = 186 - (v + 40) * 1.0625;
       p.push('<path class="line" d="M30 ' + y.toFixed(0) + ' H76" style="stroke:var(--ds-good);stroke-dasharray:4 3"/>');
     });
-    p.push('<text class="txt" x="130" y="60">port 125: <tspan class="mono">' + t + " °C</tspan></text>");
+    p.push('<text class="txt" x="130" y="60">port 125: <tspan class="mono">' + sd(t) + " °C</tspan></text>");
     p.push('<rect x="130" y="100" width="120" height="40" rx="8" class="' + (heater ? "lamp-y" : "lamp-off") + '"/><text class="txt" x="190" y="126" text-anchor="middle">ısıtıcı ' + (heater ? "AÇIK" : "KAPALI") + "</text>");
     p.push('<text class="lbl" x="130" y="160">port 127 = ' + heater + "</text>");
-    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 270 220" role="img" aria-label="Termometre ' + t + ' derece" style="max-width:280px;width:100%">' + p.join("") + "</svg>";
+    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 270 220" role="img" aria-label="Termometre ' + sd(t) + ' derece" style="max-width:280px;width:100%">' + p.join("") + "</svg>";
   }
 
   document.querySelectorAll('.ds-deck [data-demo="m09-thermo"]').forEach(function (demo) {
@@ -104,7 +105,7 @@
     /* one pass of the program loop; returns executed line indices */
     function step(t) {
       var ex = [0, 1];
-      if (t < 60) { ex.push(2, 6, 7, 8, 11); heater = 1; return [ex, "JL alındı: " + t + " &lt; 60 → ısıtıcı <b>açık</b>."]; }
+      if (t < 60) { ex.push(2, 6, 7, 8, 11); heater = 1; return [ex, "JL alındı: " + sd(t) + " &lt; 60 → ısıtıcı <b>açık</b>."]; }
       ex.push(2, 3, 4);
       if (t <= 80) { ex.push(11); return [ex, "60 ≤ " + t + " ≤ 80 → JLE alındı, ısıtıcıya dokunulmadı (" + (heater ? "açık" : "kapalı") + " kalır)."]; }
       ex.push(5, 9, 10, 11); heater = 0;
@@ -114,9 +115,9 @@
       var r = step(t);
       spans.forEach(function (s, i) { s.classList.toggle("is-on", r[0].indexOf(i) >= 0); s.classList.toggle("is-off", r[0].indexOf(i) < 0); });
       svgBox.innerHTML = thermoSvg(t, heater);
-      tOut.textContent = t;
+      tOut.textContent = sd(t);
       var b = t < 0 ? (t + 256) : t;
-      status.innerHTML = r[1] + "<br>AL = " + ("0" + b.toString(16).toUpperCase()).slice(-2) + "h" + (t < 0 ? " (işaretli: " + t + "; işaretsiz JB/JA kullanılsaydı " + b + " sanılırdı)" : "");
+      status.innerHTML = r[1] + "<br>AL = " + ("0" + b.toString(16).toUpperCase()).slice(-2) + "h" + (t < 0 ? " (işaretli: " + sd(t) + "; işaretsiz JB/JA kullanılsaydı " + b + " sanılırdı)" : "");
     }
     function stop() { if (timer) { clearInterval(timer); timer = null; runBtn.textContent = "▶ zamanı akıt"; } }
     slider.addEventListener("input", function () { stop(); show(parseInt(slider.value, 10)); });

@@ -18,6 +18,7 @@
     return v & 0xFF;
   }
   function sgn(v) { return v >= 128 ? v - 256 : v; }
+  function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function bits(v) { var b = v.toString(2).padStart(8, "0"); return b.slice(0, 4) + " " + b.slice(4); }
 
   /* ---------- atlama kodu ---------- */
@@ -101,8 +102,8 @@
         PF: ones % 2 === 0 ? 1 : 0,
         AF: (a & 0xF) < (b & 0xF) ? 1 : 0
       };
-      res.innerHTML = "A = " + bits(a) + " (" + hex(a, 2) + "h: " + a + " / " + sgn(a) + ")<br>" +
-        "B = " + bits(b) + " (" + hex(b, 2) + "h: " + b + " / " + sgn(b) + ")<br>" +
+      res.innerHTML = "A = " + bits(a) + " (" + hex(a, 2) + "h: " + a + " / " + sd(sgn(a)) + ")<br>" +
+        "B = " + bits(b) + " (" + hex(b, 2) + "h: " + b + " / " + sd(sgn(b)) + ")<br>" +
         "A − B = " + bits(r) + " = <b>" + hex(r, 2) + "h</b>";
       flags.innerHTML = ["CF", "ZF", "SF", "OF", "PF", "AF"].map(function (k) {
         return '<span class="' + (f[k] ? "is-set" : "") + '">' + k + "=" + f[k] + "</span>";
@@ -113,7 +114,7 @@
       }).join("");
       var u = a > b ? "&gt;" : a < b ? "&lt;" : "=";
       var s = sgn(a) > sgn(b) ? "&gt;" : sgn(a) < sgn(b) ? "&lt;" : "=";
-      status.innerHTML = "işaretsiz: " + a + " " + u + " " + b + " · işaretli: " + sgn(a) + " " + s + " " + sgn(b);
+      status.innerHTML = "işaretsiz: " + a + " " + u + " " + b + " · işaretli: " + sd(sgn(a)) + " " + s + " " + sd(sgn(b));
     }
     [ia, ib].forEach(function (el) { el.addEventListener("input", run); });
     run();
