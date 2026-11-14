@@ -301,6 +301,7 @@ class _Course:
         b = re.sub(r'<script.*?</script>\s*', '', b, flags=re.S)
         b = re.sub(r'<button\b.*?</button>', '', b, flags=re.S)
         b = re.sub(r'<select\b.*?</select>', '', b, flags=re.S)
+        b = re.sub(r'<label\b[^>]*class="[^"]*search[^"]*"[^>]*>.*?</label>', '', b, flags=re.S)
         b = re.sub(r'<input\b[^>]*>', '', b)
         b = re.sub(r'<dialog\b.*?</dialog>', '', b, flags=re.S)
         # sayac ve "sonuc yok" satirlari

@@ -69,7 +69,17 @@ def _transform(body, n, title):
     b = re.sub(r'<div class="c-wk">|</div>\s*$', '', b)
     # bolum numaralarini basliga yedir
     b = re.sub(r'<span class="c-wk-num">(\d+)</span>', r'<span class="bk-num">\1</span>', b)
-    lead = re.search(r'<p class="c-wk-lead">(.*?)</p>', b, re.S)
+    # uzun listelemeler (yaklasik ucte bir sayfadan uzun) sayfa arasinda bolunebilsin;
+    # yoksa butun blok sonraki sayfaya itilip arkasinda yari bos sayfa birakiyordu
+    def _long(m):
+        if m.group(2).count('\n') < 18 or 'bk-long' in m.group(1):
+            return m.group(0)
+        tag = m.group(1)
+        tag = (tag.replace('class="', 'class="bk-long ', 1) if 'class="' in tag
+               else tag[:-1] + ' class="bk-long">')
+        return tag + m.group(2) + '</pre>'
+    b = re.sub(r'(<pre\b[^>]*>)(.*?)</pre>', _long, b, flags=re.S)
+    lead =re.search(r'<p class="c-wk-lead">(.*?)</p>', b, re.S)
     goals = re.search(r'<div class="c-wk-goals">(.*?)</div>', b, re.S)
     b = re.sub(r'<header class="c-wk-hero">.*?</header>', '', b, flags=re.S)
     head = ['<section class="bk-chapter" id="ch%d">' % n,
