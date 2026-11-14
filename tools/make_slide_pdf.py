@@ -123,7 +123,7 @@ def decks(slides):
     """deck.js kullanan ana sunumlar (calisma sorulari ve simulatorler haric)."""
     out = []
     for f in sorted(os.listdir(slides)):
-        if not re.match(r'Bolum_\d\d_.*\.html$', f) or f.endswith('_Calisma_Sorulari.html'):
+        if not re.match(r'Bolum_\d\d_.*\.html$', f) or '_Calisma_Sorulari' in f:
             continue
         with open(os.path.join(slides, f), encoding='utf-8') as h:
             if 'id="ds-deck-next"' in h.read():

@@ -243,14 +243,14 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 <div data-lt="en" lang="en" markdown="1">
 
-*Everything on this page is in English except the textbook and the slide PDFs, which are still in Turkish; English versions are on the way.*
+*The whole course is available in English: the textbook, lecture notes, slides (HTML and PDF), study questions and simulators. The code repository still uses Turkish identifiers.*
 
 
 ---
 
 ## Textbook
 
-[📕 Veri Yapıları — the course book (PDF, in Turkish, 19 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf)
+[📕 Data Structures — the course book (PDF, 17 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Data-Structures.pdf)
 
 ---
 
@@ -270,7 +270,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 Data structures determine how data is laid out in memory and how it is accessed. This chapter covers how data is represented digitally, Java's primitive and reference types, reference copying and generics. The distinction between an abstract data type (which operations are offered) and a data structure (how those operations are implemented) is shown with a stack example. The chapter closes with choosing a data structure and a short comparison table of the course's core structures.
 
 - [🖼️Slides – Introduction (HTML)](/files/data_structures/slides/Bolum_01_Giris_en.html)
-- [📄Slides – Introduction (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_01_Giris.pdf)
+- [📄Slides – Introduction (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_01_Giris_en.pdf)
 - [📖Lecture Notes – Introduction (HTML)](/files/data_structures/notlar/Bolum_01_Giris_Ders_Notu_en.html)
 - [📝Study Questions – Introduction (HTML)](/files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari_en.html)
 - [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum01/src)
@@ -282,7 +282,7 @@ Data structures determine how data is laid out in memory and how it is accessed.
 Algorithm analysis lets us compare solutions before implementing them. Empirical timing and the doubling experiment show how running time grows in practice; counting primitive operations gives a machine-independent measure. Big O, Big Omega and Big Theta describe upper, lower and tight bounds, and the best, average and worst cases are studied separately. Loop patterns, linear and binary search, and prefix averages show how the structure of code determines its complexity. Space complexity, correctness and robustness are also covered.
 
 - [🖼️Slides – Algorithm Analysis (HTML)](/files/data_structures/slides/Bolum_02_Algoritma_Analizi_en.html)
-- [📄Slides – Algorithm Analysis (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_02_Algoritma_Analizi.pdf)
+- [📄Slides – Algorithm Analysis (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_02_Algoritma_Analizi_en.pdf)
 - [📖Lecture Notes – Algorithm Analysis (HTML)](/files/data_structures/notlar/Bolum_02_Algoritma_Analizi_Ders_Notu_en.html)
 - [📝Study Questions – Algorithm Analysis (HTML)](/files/data_structures/slides/Bolum_02_Algoritma_Analizi_Calisma_Sorulari_en.html)
 - [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum02/src)
@@ -294,7 +294,7 @@ Algorithm analysis lets us compare solutions before implementing them. Empirical
 An array is the most basic data structure, with its elements stored contiguously in memory; each element is reached by its index in constant time. The chapter covers declaring and copying arrays in Java, java.util.Arrays and multidimensional arrays; basic array algorithms such as mean, median, mode and reversal; matrix operations and a small tic-tac-toe game. It shows that access is O(1) while inserting and deleting in the middle are O(n) because elements must shift; selection sort and insertion sort are also studied on arrays.
 
 - [🖼️Slides – Arrays (HTML)](/files/data_structures/slides/Bolum_03_Diziler_en.html)
-- [📄Slides – Arrays (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_03_Diziler.pdf)
+- [📄Slides – Arrays (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_03_Diziler_en.pdf)
 - [📖Lecture Notes – Arrays (HTML)](/files/data_structures/notlar/Bolum_03_Diziler_Ders_Notu_en.html)
 - [📝Study Questions – Arrays (HTML)](/files/data_structures/slides/Bolum_03_Diziler_Calisma_Sorulari_en.html)
 - [🕹️Array Simulator (HTML)](/files/data_structures/slides/Bolum_03_Arrays_en.html)
@@ -307,7 +307,7 @@ An array is the most basic data structure, with its elements stored contiguously
 Recursion reduces a problem to smaller instances of the same problem until it reaches a base case. Each recursive call gets its own frame on the call stack; tracing a recursive method means following frames as they are pushed and popped. Linear recursion (sum, reversal, fast exponentiation), binary recursion (Fibonacci, binary search), the Towers of Hanoi and backtracking examples (subsets, permutations) are worked step by step. Recurrence relations give the time and space cost of recursive algorithms; tail recursion and conversion to loops complete the chapter.
 
 - [🖼️Slides – Recursion (HTML)](/files/data_structures/slides/Bolum_04_Ozyineleme_en.html)
-- [📄Slides – Recursion (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_04_Ozyineleme.pdf)
+- [📄Slides – Recursion (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_04_Ozyineleme_en.pdf)
 - [📖Lecture Notes – Recursion (HTML)](/files/data_structures/notlar/Bolum_04_Ozyineleme_Ders_Notu_en.html)
 - [📝Study Questions – Recursion (HTML)](/files/data_structures/slides/Bolum_04_Ozyineleme_Calisma_Sorulari_en.html)
 - [🕹️Tower of Hanoi Simulator (HTML)](/files/data_structures/slides/Bolum_04_Tower_of_Hanoi_en.html)
@@ -322,7 +322,7 @@ Recursion reduces a problem to smaller instances of the same problem until it re
 A linked list is made of nodes, each holding data and a reference to the next node. Because it needs no contiguous memory, inserting and deleting at the head take constant time; in exchange there is no random access, and reaching an element means walking from the head. Traversal, insertion, deletion, reversal, removing duplicates and merging sorted lists in a singly linked list; sentinel nodes in a doubly linked list; and cycle detection and rotation in a circular list are the topics of this chapter.
 
 - [🖼️Slides – Linked Lists (HTML)](/files/data_structures/slides/Bolum_05_Bagli_Listeler_en.html)
-- [📄Slides – Linked Lists (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_05_Bagli_Listeler.pdf)
+- [📄Slides – Linked Lists (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_05_Bagli_Listeler_en.pdf)
 - [📖Lecture Notes – Linked Lists (HTML)](/files/data_structures/notlar/Bolum_05_Bagli_Listeler_Ders_Notu_en.html)
 - [📝Study Questions – Linked Lists (HTML)](/files/data_structures/slides/Bolum_05_Bagli_Listeler_Calisma_Sorulari_en.html)
 - [🕹️Linked List Simulator (HTML)](/files/data_structures/slides/Bolum_05_Linked_List_en.html)
@@ -337,7 +337,7 @@ A linked list is made of nodes, each holding data and a reference to the next no
 A list is an abstract data type for an ordered sequence of elements; it can grow and shrink and supports insertion, deletion, access and traversal. The chapter covers Java's collection hierarchy (Iterable, Collection, List), traversal with Iterator and ListIterator, and safe removal during traversal. It also studies how ArrayList grows as a dynamic array and its amortized analysis, its comparison with LinkedList, the positional list ADT, Vector, CopyOnWriteArrayList and Arrays.asList.
 
 - [🖼️Slides – The List ADT and Java Collections (HTML)](/files/data_structures/slides/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari_en.html)
-- [📄Slides – The List ADT and Java Collections (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari.pdf)
+- [📄Slides – The List ADT and Java Collections (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari_en.pdf)
 - [📖Lecture Notes – The List ADT and Java Collections (HTML)](/files/data_structures/notlar/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari_Ders_Notu_en.html)
 - [📝Study Questions – The List ADT and Java Collections (HTML)](/files/data_structures/slides/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari_Calisma_Sorulari_en.html)
 - [🕹️List ADT Simulator (HTML)](/files/data_structures/slides/Bolum_06_List_ADT_en.html)
@@ -350,7 +350,7 @@ A list is an abstract data type for an ordered sequence of elements; it can grow
 A stack works last in, first out (LIFO): insertion (push) and removal (pop) happen only at the top. The stack ADT, its implementation with an array and with a linked list, and the cost of its operations are covered. Back/forward navigation, the call stack, bracket matching, the next greater element, a stack that tracks its minimum, solving the Towers of Hanoi with a stack and the stock span problem are applications. Conversion between infix, prefix and postfix notations and evaluating postfix expressions complete the chapter.
 
 - [🖼️Slides – Stacks (HTML)](/files/data_structures/slides/Bolum_07_Yiginlar_en.html)
-- [📄Slides – Stacks (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_07_Yiginlar.pdf)
+- [📄Slides – Stacks (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_07_Yiginlar_en.pdf)
 - [📖Lecture Notes – Stacks (HTML)](/files/data_structures/notlar/Bolum_07_Yiginlar_Ders_Notu_en.html)
 - [📝Study Questions – Stacks (HTML)](/files/data_structures/slides/Bolum_07_Yiginlar_Calisma_Sorulari_en.html)
 - [🕹️Stack Simulator (HTML)](/files/data_structures/slides/Bolum_07_Stack_en.html)
@@ -366,7 +366,7 @@ A stack works last in, first out (LIFO): insertion (push) and removal (pop) happ
 A queue works first in, first out (FIFO): elements are added at one end (enqueue) and removed at the other (dequeue). The problem with a simple array queue, the circular queue and its index formulas, telling full from empty, growing the queue and a linked-list implementation are covered. The deque, which allows insertion and removal at both ends, is used in problems such as the sliding-window maximum. Round-robin scheduling, the Josephus problem, generating binary numbers and a queue built from two stacks are examples.
 
 - [🖼️Slides – Queues and Deques (HTML)](/files/data_structures/slides/Bolum_08_Kuyruklar_ve_Deque_en.html)
-- [📄Slides – Queues and Deques (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_08_Kuyruklar_ve_Deque.pdf)
+- [📄Slides – Queues and Deques (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_08_Kuyruklar_ve_Deque_en.pdf)
 - [📖Lecture Notes – Queues and Deques (HTML)](/files/data_structures/notlar/Bolum_08_Kuyruklar_ve_Deque_Ders_Notu_en.html)
 - [📝Study Questions – Queues and Deques (HTML)](/files/data_structures/slides/Bolum_08_Kuyruklar_ve_Deque_Calisma_Sorulari_en.html)
 - [🕹️Queue Simulator (HTML)](/files/data_structures/slides/Bolum_08_Queue_en.html)
@@ -384,7 +384,7 @@ A queue works first in, first out (FIFO): elements are added at one end (enqueue
 A tree is a hierarchical structure of nodes connected by edges: it starts at a root, and each node has one parent and may have several children. File systems, organization charts and HTML documents are represented as trees. Basic notions such as degree, depth and height, the kinds of binary trees (full, complete, perfect) and their properties, and array and linked representations are studied. Preorder, inorder, postorder and level-order traversals are implemented both recursively and with a stack and a queue; expression trees and recursive tree functions (size, height, leaf count) are applications.
 
 - [🖼️Slides – Trees (HTML)](/files/data_structures/slides/Bolum_09_Agaclar_en.html)
-- [📄Slides – Trees (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_09_Agaclar.pdf)
+- [📄Slides – Trees (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_09_Agaclar_en.pdf)
 - [📖Lecture Notes – Trees (HTML)](/files/data_structures/notlar/Bolum_09_Agaclar_Ders_Notu_en.html)
 - [📝Study Questions – Trees (HTML)](/files/data_structures/slides/Bolum_09_Agaclar_Calisma_Sorulari_en.html)
 - [🕹️General Tree Simulator (HTML)](/files/data_structures/slides/Bolum_09_General_Tree_en.html)
@@ -397,7 +397,7 @@ A tree is a hierarchical structure of nodes connected by edges: it starts at a r
 In a binary search tree (BST), the keys in each node's left subtree are smaller than its key and those in the right subtree are larger. Search, insertion and deletion take O(h), where h is the height of the tree: O(log n) when the tree is balanced, degrading to O(n) in the worst case. After search, insertion, successor and predecessor, three-case deletion and range queries in a BST, the AVL, red-black and splay trees, which keep the height bounded, are covered. For data on disk, multiway search trees such as the B-tree and the B+ tree keep many keys per node so the tree stays shallow.
 
 - [🖼️Slides – Search Trees (HTML)](/files/data_structures/slides/Bolum_10_Arama_Agaclari_en.html)
-- [📄Slides – Search Trees (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_10_Arama_Agaclari.pdf)
+- [📄Slides – Search Trees (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_10_Arama_Agaclari_en.pdf)
 - [📖Lecture Notes – Search Trees (HTML)](/files/data_structures/notlar/Bolum_10_Arama_Agaclari_Ders_Notu_en.html)
 - [📝Study Questions – Search Trees (HTML)](/files/data_structures/slides/Bolum_10_Arama_Agaclari_Calisma_Sorulari_en.html)
 - [🕹️Binary Search Tree Simulator (HTML)](/files/data_structures/slides/Bolum_10_BST_en.html)
@@ -416,7 +416,7 @@ In a binary search tree (BST), the keys in each node's left subtree are smaller 
 A priority queue is an abstract data type that always removes the element with the highest (or lowest) priority. After comparing the costs of unsorted and sorted list implementations, the binary heap is studied: in a max-heap every parent is greater than or equal to its children. The array representation, insertion and removal with up-heap and down-heap, the adaptable priority queue, building a heap in O(n) and heap sort are in this chapter. Java's PriorityQueue class, the k-th largest element and a priority scheduler are example applications.
 
 - [🖼️Slides – Priority Queues and Heaps (HTML)](/files/data_structures/slides/Bolum_11_Oncelikli_Kuyruklar_ve_Heap_en.html)
-- [📄Slides – Priority Queues and Heaps (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_11_Oncelikli_Kuyruklar_ve_Heap.pdf)
+- [📄Slides – Priority Queues and Heaps (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_11_Oncelikli_Kuyruklar_ve_Heap_en.pdf)
 - [📖Lecture Notes – Priority Queues and Heaps (HTML)](/files/data_structures/notlar/Bolum_11_Oncelikli_Kuyruklar_ve_Heap_Ders_Notu_en.html)
 - [📝Study Questions – Priority Queues and Heaps (HTML)](/files/data_structures/slides/Bolum_11_Oncelikli_Kuyruklar_ve_Heap_Calisma_Sorulari_en.html)
 - [🕹️Binary Heap Simulator (HTML)](/files/data_structures/slides/Bolum_11_Heap_en.html)
@@ -433,7 +433,7 @@ A priority queue is an abstract data type that always removes the element with t
 A map is an abstract data type that associates keys with values. A hash table computes a bucket index from a key with a hash function and, with well-distributed keys, performs insertion, deletion and lookup in O(1) on average; in the worst case this can rise to O(n). The properties of a good hash function, Java's equals/hashCode contract, separate chaining and open addressing (linear probing, quadratic probing, double hashing) for resolving collisions, the load factor and resizing are the topics of this chapter. It ends with the internals of Java's HashMap and applications such as two-sum.
 
 - [🖼️Slides – Maps and Hash Tables (HTML)](/files/data_structures/slides/Bolum_12_Eslemeler_ve_Hash_Tablolari_en.html)
-- [📄Slides – Maps and Hash Tables (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_12_Eslemeler_ve_Hash_Tablolari.pdf)
+- [📄Slides – Maps and Hash Tables (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_12_Eslemeler_ve_Hash_Tablolari_en.pdf)
 - [📖Lecture Notes – Maps and Hash Tables (HTML)](/files/data_structures/notlar/Bolum_12_Eslemeler_ve_Hash_Tablolari_Ders_Notu_en.html)
 - [📝Study Questions – Maps and Hash Tables (HTML)](/files/data_structures/slides/Bolum_12_Eslemeler_ve_Hash_Tablolari_Calisma_Sorulari_en.html)
 - [🕹️Hash Table Simulator (HTML)](/files/data_structures/slides/Bolum_12_Hash_Table_en.html)
@@ -448,7 +448,7 @@ A map is an abstract data type that associates keys with values. A hash table co
 A set is an unordered collection of distinct elements; it contains no duplicates. Union, intersection and difference, Java's Set interface, and hash-based, tree-based and bit-vector implementations are compared; multisets and multimaps are also covered. The disjoint-set (union-find) structure, with union by size or rank and path compression, answers connectivity queries in nearly constant amortized time; counting connected components is one application.
 
 - [🖼️Slides – Sets and Disjoint Sets (HTML)](/files/data_structures/slides/Bolum_13_Kumeler_ve_Ayrik_Kumeler_en.html)
-- [📄Slides – Sets and Disjoint Sets (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_13_Kumeler_ve_Ayrik_Kumeler.pdf)
+- [📄Slides – Sets and Disjoint Sets (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_13_Kumeler_ve_Ayrik_Kumeler_en.pdf)
 - [📖Lecture Notes – Sets and Disjoint Sets (HTML)](/files/data_structures/notlar/Bolum_13_Kumeler_ve_Ayrik_Kumeler_Ders_Notu_en.html)
 - [📝Study Questions – Sets and Disjoint Sets (HTML)](/files/data_structures/slides/Bolum_13_Kumeler_ve_Ayrik_Kumeler_Calisma_Sorulari_en.html)
 - [🕹️Set ADT Simulator (HTML)](/files/data_structures/slides/Bolum_13_Set_ADT_en.html)
@@ -462,7 +462,7 @@ A set is an unordered collection of distinct elements; it contains no duplicates
 A graph represents relationships between objects with vertices and edges. Unlike trees, it may contain cycles and several paths between two vertices; it may be directed or undirected, weighted or unweighted. Social networks, road maps and computer networks are modeled as graphs. Adjacency-matrix and adjacency-list representations, breadth-first search (BFS) and depth-first search (DFS), connected components, bipartite graphs, topological sorting and directed cycle detection are studied. After unweighted shortest paths and Dijkstra's algorithm, the minimum spanning tree problem is solved with Kruskal's algorithm using disjoint sets and Prim's algorithm using a priority queue.
 
 - [🖼️Slides – Graphs (HTML)](/files/data_structures/slides/Bolum_14_Cizgeler_en.html)
-- [📄Slides – Graphs (PDF, in Turkish)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_14_Cizgeler.pdf)
+- [📄Slides – Graphs (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_14_Cizgeler_en.pdf)
 - [📖Lecture Notes – Graphs (HTML)](/files/data_structures/notlar/Bolum_14_Cizgeler_Ders_Notu_en.html)
 - [📝Study Questions – Graphs (HTML)](/files/data_structures/slides/Bolum_14_Cizgeler_Calisma_Sorulari_en.html)
 - [🕹️Undirected Graph Simulator (HTML)](/files/data_structures/slides/Bolum_14_Graph_en.html)
