@@ -1,21 +1,18 @@
 ---
 title: "Data Structures"
-title_tr: "Veri Yapıları"
+lang_toggle: true
 collection: teaching
 type: "Undergraduate"
-type_tr: "Lisans"
 permalink: /teaching/data-structures/
 venue: "Giresun University, Computer Engineering"
-venue_tr: "Giresun Üniversitesi, Bilgisayar Mühendisliği"
 date: 2026-07-14
 location: "Giresun, Turkey"
 ---
 
-<div data-lt="tr" lang="tr" markdown="1">
-
 ![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Veri yapıları, veriyi düzenlemenin, saklamanın ve ona erişmenin sistemli yollarını sunar. Uygun yapıyı seçmek arama, ekleme, silme ve gezinme gibi işlemlerin verimini doğrudan etkiler. Bu ders algoritma analizini, dizileri, özyinelemeyi, bağlı listeleri, listeleri, yığınları, kuyrukları, ağaçları, arama ağaçlarını, öncelikli kuyrukları ve heap'i, hash tablolarını, kümeleri ve ayrık kümeleri ve çizgeleri; gerçeklemelerine, karmaşıklıklarına ve uygulamalarına ağırlık vererek inceler.
+Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines algorithm analysis, arrays, recursion, linked lists, lists, stacks, queues, trees, search trees, priority queues and heaps, hash tables, sets and disjoint sets, and graphs, with an emphasis on their implementations, complexity, and practical applications.
 
+<div data-lt="tr" lang="tr" markdown="1">
 
 ---
 
@@ -245,9 +242,6 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 </div>
 
 <div data-lt="en" lang="en" markdown="1">
-
-![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines algorithm analysis, arrays, recursion, linked lists, lists, stacks, queues, trees, search trees, priority queues and heaps, hash tables, sets and disjoint sets, and graphs, with an emphasis on their implementations, complexity, and practical applications.
 
 *The course is taught in Turkish: the book, lecture notes, slides, study questions and simulators are in Turkish. This page summarizes them in English.*
 
