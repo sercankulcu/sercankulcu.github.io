@@ -15,7 +15,7 @@ Microprocessors execute instructions, process data, and coordinate the operation
 
 ## Ders Kitabı
 
-[📕 Mikroişlemciler (PDF, 17 MB)](https://sercankulcu.github.io/courses-pdfs/microprocessors/Mikroislemciler.pdf)
+[📕 Mikroişlemciler (PDF, 16 MB)](https://sercankulcu.github.io/courses-pdfs/microprocessors/Mikroislemciler.pdf)
 
 ---
 

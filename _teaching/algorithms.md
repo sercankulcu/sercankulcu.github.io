@@ -15,7 +15,7 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 ## Ders Kitabı
 
-[📕 Algoritmalar (PDF, 20 MB)](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf)
+[📕 Algoritmalar (PDF, 19 MB)](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf)
 
 ---
 
