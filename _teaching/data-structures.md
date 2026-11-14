@@ -243,7 +243,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 <div data-lt="en" lang="en" markdown="1">
 
-*The lecture notes, slides, study questions and simulators are in English. The textbook, the slide PDFs and the getting-started pages are still in Turkish; English versions are on the way.*
+*Everything on this page is in English except the textbook and the slide PDFs, which are still in Turkish; English versions are on the way.*
 
 
 ---
@@ -256,9 +256,9 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 ## Getting Started
 
-* [Important People in Data Structures (HTML, in Turkish)](/files/data_structures/Data_Structures_Important_People.html)
-* [Prerequisites for Data Structures (HTML, in Turkish)](/files/data_structures/Data_Structures_Prerequisites.html)
-* [Course Map (HTML, in Turkish)](/files/data_structures/ders_haritasi.html)
+* [Important People in Data Structures (HTML)](/files/data_structures/Data_Structures_Important_People_en.html)
+* [Prerequisites for Data Structures (HTML)](/files/data_structures/Data_Structures_Prerequisites_en.html)
+* [Course Map (HTML)](/files/data_structures/ders_haritasi_en.html)
 * [Glossary of Terms (HTML, English–Turkish)](/files/data_structures/sozluk.html)
 
 ---
