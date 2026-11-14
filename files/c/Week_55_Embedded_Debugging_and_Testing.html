@@ -264,10 +264,10 @@ ProtoStatus protocol_poll(Protocol *p)
 
 <pre><code>/* hal_device.c — only this file knows about registers */
 #include "hal.h"
+#include &lt;stddef.h&gt;
 
 #define UART0_DR (*(volatile uint32_t *)0x4000C000u)
 #define UART0_FR (*(volatile uint32_t *)0x4000C018u)
-#define SYST_CVR (*(volatile uint32_t *)0xE000E018u)
 
 static bool dev_read(void *ctx, uint8_t *out)
 {
@@ -284,7 +284,13 @@ static void dev_write(void *ctx, uint8_t byte)
     UART0_DR = byte;
 }
 
-static uint32_t dev_ticks(void *ctx) { (void)ctx; return SYST_CVR; }
+/* Counted up by the SysTick interrupt (week 51). SYST_CVR itself counts
+   down and reloads, so now - last would be meaningless across a reload. */
+static volatile uint32_t tick_count;
+
+void SysTick_Handler(void) { tick_count++; }
+
+static uint32_t dev_ticks(void *ctx) { (void)ctx; return tick_count; }
 
 const Hal device_hal = {
     .uart_read  = dev_read,
@@ -295,22 +301,15 @@ const Hal device_hal = {
 
   <h3>The fake, and the tests</h3>
 
-<pre><code>/* test_protocol.c — builds and runs on the host */
-#include "protocol.h"
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
+  <p>The fake gets a file of its own, so that the unit tests and the fuzzer further down can both use it.</p>
 
-static int checks = 0, failures = 0;
+<pre><code>/* fake_hal.h — a scripted hardware layer for host builds */
+#ifndef FAKE_HAL_H
+#define FAKE_HAL_H
+#include "hal.h"
+#include &lt;stddef.h&gt;
 
-#define CHECK(cond) do {                                          \
-    checks++;                                                     \
-    if (!(cond)) { failures++;                                    \
-        printf("  FAIL %s:%d: %s\n", __FILE__, __LINE__, #cond); }\
-    else printf("  ok   %s\n", #cond);                            \
-} while (0)
-
-/* A scripted hardware layer: input from a string, output captured. */
+/* Input from a string, output captured, time set by the test. */
 typedef struct {
     const char *input;
     size_t      input_pos;
@@ -318,6 +317,14 @@ typedef struct {
     size_t      output_len;
     uint32_t    now;                 /* time we control exactly */
 } Fake;
+
+void fake_init(Fake *f, const char *input, Hal *hal);
+
+#endif</code></pre>
+
+<pre><code>/* fake_hal.c — shared by test_protocol.c and fuzz_protocol.c */
+#include "fake_hal.h"
+#include &lt;string.h&gt;
 
 static bool fake_read(void *ctx, uint8_t *out)
 {
@@ -338,7 +345,7 @@ static void fake_write(void *ctx, uint8_t byte)
 
 static uint32_t fake_ticks(void *ctx) { return ((Fake *)ctx)-&gt;now; }
 
-static void fake_init(Fake *f, const char *input, Hal *hal)
+void fake_init(Fake *f, const char *input, Hal *hal)
 {
     memset(f, 0, sizeof *f);
     f-&gt;input = input;
@@ -346,7 +353,23 @@ static void fake_init(Fake *f, const char *input, Hal *hal)
     hal-&gt;uart_write = fake_write;
     hal-&gt;ticks      = fake_ticks;
     hal-&gt;ctx        = f;
-}
+}</code></pre>
+
+<pre><code>/* test_protocol.c — builds and runs on the host */
+#include "protocol.h"
+#include "fake_hal.h"
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+static int checks = 0, failures = 0;
+
+#define CHECK(cond) do {                                          \
+    checks++;                                                     \
+    if (!(cond)) { failures++;                                    \
+        printf("  FAIL %s:%d: %s\n", __FILE__, __LINE__, #cond); }\
+    else printf("  ok   %s\n", #cond);                            \
+} while (0)
 
 static void test_single_line(void)
 {
@@ -433,7 +456,7 @@ int main(void)
 }</code></pre>
 
 <pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address,undefined \
-    -o test_protocol test_protocol.c protocol.c
+    -o test_protocol test_protocol.c fake_hal.c protocol.c
 ./test_protocol ; echo "status $?"</code></pre>
 
   <h3>What the host build buys</h3>
@@ -453,6 +476,7 @@ WRITE of size 1 at 0x7ffd… in protocol_poll protocol.c:41</code></pre>
 
 <pre><code>/* fuzz_protocol.c */
 #include "protocol.h"
+#include "fake_hal.h"
 #include &lt;string.h&gt;
 #include &lt;stdlib.h&gt;
 
@@ -473,7 +497,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 }</code></pre>
 
 <pre><code>clang -g -O1 -fsanitize=fuzzer,address,undefined \
-      -o fuzz_protocol fuzz_protocol.c protocol.c
+      -o fuzz_protocol fuzz_protocol.c fake_hal.c protocol.c
 ./fuzz_protocol corpus/</code></pre>
 
   <p>A fuzzer on firmware. That is the payoff of the abstraction layer, and it is not available to code that reads registers inline.</p>
