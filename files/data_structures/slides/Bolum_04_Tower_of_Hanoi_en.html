@@ -1,0 +1,641 @@
+---
+layout: without-sidebar
+title: "Towers of Hanoi Simulator"
+permalink: /files/data_structures/slides/Bolum_04_Tower_of_Hanoi_en.html
+excerpt: "An interactive Towers of Hanoi simulator: play by hand, step through the optimal solution, or let it solve itself."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* shared simulator controls (agt-oyun stage) */
+.ds-st { font-size: 15px; }
+.ds-st .agt-oyun__body { display: flex; flex-direction: column; }
+.ds-st .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+:where(.ds-st) .agt-oyun__body label { margin: 0; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.ds-st .ds-sim__panel { min-height: 0; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.ds-st .ds-sim__caption { margin: 0 0 4px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+.hanoi-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.hanoi-controls {
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.hanoi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.hanoi-field {
+  display: grid;
+  gap: 2px;
+  width: 72px;
+}
+
+.hanoi-field input { width: 100%; }
+
+.hanoi-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.hanoi-board {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+}
+
+.hanoi-tower-area {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 4px;
+}
+
+.hanoi-tower-name {
+  color: var(--ds-link);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.hanoi-tower {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 9px 7px 12px;
+  border: 1.5px solid var(--ds-border);
+  border-bottom: 7px solid color-mix(in srgb, var(--ds-text) 50%, var(--ds-border));
+  border-radius: 10px 10px 5px 5px;
+  background: var(--ds-surface);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+.hanoi-tower::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  z-index: 0;
+  width: 7px;
+  height: calc(100% - 22px);
+  border-radius: 7px 7px 0 0;
+  background: color-mix(in srgb, var(--ds-text) 40%, var(--ds-border));
+  transform: translateX(-50%);
+}
+
+.hanoi-tower:hover { background: var(--ds-surface-strong); }
+
+.hanoi-tower.selected {
+  background: var(--ds-surface-strong);
+  box-shadow: inset 0 0 0 2px var(--ds-link);
+}
+
+.hanoi-tower.target { box-shadow: inset 0 0 0 2px var(--ds-good); }
+
+.hanoi-disk {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 32px;
+  height: 32px;
+  min-width: 42px;
+  max-width: 92%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ds-link);
+  border-radius: 16px;
+  background: var(--ds-node);
+  color: var(--ds-text);
+  font-size: 14px;
+  font-weight: 800;
+  transition: transform .18s ease, opacity .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.hanoi-disk.moving {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  opacity: .7;
+  transform: translateY(-7px);
+}
+
+.hanoi-disk.just-moved {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateY(-3px);
+}
+
+.hanoi-status {
+  padding: 8px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hanoi-status.success { color: var(--ds-good); }
+.hanoi-status.error { color: var(--ds-bad); }
+.hanoi-status.warning { color: color-mix(in srgb, var(--ds-warn) 70%, var(--ds-text)); }
+
+.hanoi-footer {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.hanoi-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hanoi-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hanoi-sim *,
+  .hanoi-sim *::before,
+  .hanoi-sim *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="ds-st hanoi-st agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 4 · Simulation</p><h1>Towers of Hanoi Simulator</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="hanoi-help" aria-label="Help">?</button>
+    <a class="agt-oyun__back" href="Bolum_04_Ozyineleme_en.html">← Chapter 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+    <div class="ds-sim__root hanoi-sim">
+      <div class="hanoi-controls">
+        <div class="hanoi-row">
+          <div class="hanoi-field">
+            <label for="hanoi-disks">Disks</label>
+            <input id="hanoi-disks" type="number" min="1" max="6" value="3" inputmode="numeric">
+          </div>
+          <button id="hanoi-new" type="button">New Puzzle</button>
+          <button id="hanoi-prev" type="button">Previous</button>
+          <button id="hanoi-next" type="button">Next</button>
+          <button class="is-primary" id="hanoi-auto" type="button">Auto-Solve</button>
+          <button class="is-danger" id="hanoi-cancel" type="button">Cancel</button>
+        </div>
+      </div>
+
+      <div class="hanoi-stage ds-sim__panel">
+        <div class="hanoi-board">
+          <div class="hanoi-tower-area">
+            <div class="hanoi-tower-name">A</div>
+            <div class="hanoi-tower" id="hanoi-tower-0" data-tower="0"></div>
+          </div>
+
+          <div class="hanoi-tower-area">
+            <div class="hanoi-tower-name">B</div>
+            <div class="hanoi-tower" id="hanoi-tower-1" data-tower="1"></div>
+          </div>
+
+          <div class="hanoi-tower-area">
+            <div class="hanoi-tower-name">C</div>
+            <div class="hanoi-tower" id="hanoi-tower-2" data-tower="2"></div>
+          </div>
+        </div>
+
+        <div class="hanoi-status" id="hanoi-status" aria-live="polite">
+          Click a source tower, then a target tower.
+        </div>
+      </div>
+
+      <div class="hanoi-footer">
+        <div class="hanoi-stat"><strong>Mode</strong><span id="hanoi-mode">Manual</span></div>
+        <div class="hanoi-stat"><strong>Moves</strong><span id="hanoi-moves">0</span></div>
+        <div class="hanoi-stat"><strong>Minimum</strong><span id="hanoi-minimum">7</span></div>
+        <div class="hanoi-stat"><strong>Progress</strong><span id="hanoi-progress">0 / 7</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="hanoi-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>Towers of Hanoi Simulator</h2>
+    <p>Move every disk from tower A to tower C. You may move only one disk at a time, and only the top disk of a tower; a larger disk may never sit on a smaller one. Each tower behaves like a stack.</p>
+    <h3>How to use it</h3>
+    <ul>
+      <li>Choose 1–6 <b>Disks</b> and press <b>New Puzzle</b>.</li>
+      <li>To play by hand, click a source tower and then a target tower.</li>
+      <li><b>Next</b> / <b>Previous</b> step through the optimal solution; <b>Auto-Solve</b> plays it back and <b>Cancel</b> stops it.</li>
+    </ul>
+    <h3>The recursive solution</h3>
+    <p><code>hanoi(n, from, via, to)</code>: move n − 1 disks onto <code>via</code>, move the largest disk to <code>to</code>, then move the n − 1 disks on top of it.</p>
+    <p>The number of moves is T(n) = 2·T(n − 1) + 1 = 2<sup>n</sup> − 1, so the running time is O(2<sup>n</sup>) while the recursion depth is only n.</p>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    disks: $("hanoi-disks"),
+    newPuzzle: $("hanoi-new"),
+    prev: $("hanoi-prev"),
+    next: $("hanoi-next"),
+    auto: $("hanoi-auto"),
+    cancel: $("hanoi-cancel"),
+    towers: [
+      $("hanoi-tower-0"),
+      $("hanoi-tower-1"),
+      $("hanoi-tower-2")
+    ],
+    status: $("hanoi-status"),
+    mode: $("hanoi-mode"),
+    moves: $("hanoi-moves"),
+    minimum: $("hanoi-minimum"),
+    progress: $("hanoi-progress")
+  };
+
+  const DELAY = 300;
+  const names = ["A", "B", "C"];
+
+  let diskCount = 3;
+  let towers = [[], [], []];
+  let solution = [];
+  let solutionIndex = 0;
+  let moveCount = 0;
+  let selectedTower = null;
+  let token = 0;
+  let running = false;
+  let lastMoved = null;
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "hanoi-status" + (type ? " " + type : "");
+  }
+
+  function minimumMoves() {
+    return Math.pow(2, diskCount) - 1;
+  }
+
+  function updateStats() {
+    const min = minimumMoves();
+    el.moves.textContent = moveCount;
+    el.minimum.textContent = min;
+    el.progress.textContent = `${Math.min(solutionIndex, min)} / ${min}`;
+    el.prev.disabled = running || solutionIndex <= 0;
+    el.next.disabled = running || solutionIndex >= solution.length;
+    el.cancel.disabled = !running;
+  }
+
+  function diskWidth(size) {
+    if (diskCount <= 1) return 74;
+    const min = 42;
+    const max = 172;
+    return min + ((size - 1) / (diskCount - 1)) * (max - min);
+  }
+
+  function render(states = {}) {
+    el.towers.forEach((towerEl, towerIndex) => {
+      towerEl.innerHTML = "";
+      towerEl.classList.toggle("selected", selectedTower === towerIndex);
+      towerEl.classList.toggle("target", states.target === towerIndex);
+
+      towers[towerIndex].forEach((disk, diskIndex) => {
+        const node = document.createElement("div");
+        node.className = "hanoi-disk";
+        node.style.width = `${diskWidth(disk)}px`;
+        node.textContent = disk;
+
+        const key = `${towerIndex}:${diskIndex}`;
+        if (states.moving === key) node.classList.add("moving");
+
+        const isTop = diskIndex === towers[towerIndex].length - 1;
+        if (
+          lastMoved &&
+          lastMoved.tower === towerIndex &&
+          lastMoved.disk === disk &&
+          isTop
+        ) {
+          node.classList.add("just-moved");
+        }
+
+        towerEl.appendChild(node);
+      });
+    });
+
+    updateStats();
+  }
+
+  function buildSolution(n, from, aux, to, out) {
+    if (n <= 0) return;
+    buildSolution(n - 1, from, to, aux, out);
+    out.push([from, to]);
+    buildSolution(n - 1, aux, from, to, out);
+  }
+
+  function resetPuzzle() {
+    token++;
+    running = false;
+    diskCount = Math.max(1, Math.min(6, Math.floor(Number(el.disks.value)) || 3));
+    el.disks.value = diskCount;
+
+    towers = [[], [], []];
+    for (let disk = diskCount; disk >= 1; disk--) {
+      towers[0].push(disk);
+    }
+
+    solution = [];
+    buildSolution(diskCount, 0, 1, 2, solution);
+    solutionIndex = 0;
+    moveCount = 0;
+    selectedTower = null;
+    lastMoved = null;
+    el.mode.textContent = "Manual";
+    render();
+    setStatus("Click a source tower, then a target tower.");
+  }
+
+  function validMove(from, to) {
+    if (from === to) return false;
+    if (!towers[from].length) return false;
+
+    const disk = towers[from][towers[from].length - 1];
+    const targetTop = towers[to][towers[to].length - 1];
+
+    return targetTop === undefined || disk < targetTop;
+  }
+
+  function performMove(from, to, countMove = true) {
+    if (!validMove(from, to)) return false;
+
+    const disk = towers[from].pop();
+    towers[to].push(disk);
+    lastMoved = { tower: to, disk };
+
+    if (countMove) moveCount++;
+
+    render();
+
+    if (towers[2].length === diskCount) {
+      setStatus(`Solved in ${moveCount} move${moveCount === 1 ? "" : "s"}.`, "success");
+    } else {
+      setStatus(`Moved disk ${disk}: ${names[from]} → ${names[to]}.`, "success");
+    }
+
+    return true;
+  }
+
+  async function animateMove(from, to, localToken) {
+    if (!validMove(from, to)) return false;
+
+    const diskIndex = towers[from].length - 1;
+    render({ moving: `${from}:${diskIndex}`, target: to });
+    setStatus(`Move ${solutionIndex + 1}: disk ${towers[from][diskIndex]}, ${names[from]} → ${names[to]}...`);
+    await wait(DELAY);
+
+    if (localToken !== token) throw new Error("cancelled");
+    return performMove(from, to, true);
+  }
+
+  function towerClicked(index) {
+    if (running) return;
+
+    el.mode.textContent = "Manual";
+
+    if (selectedTower === null) {
+      if (!towers[index].length) {
+        setStatus(`Tower ${names[index]} is empty.`, "warning");
+        return;
+      }
+
+      selectedTower = index;
+      render();
+      setStatus(`Tower ${names[index]} selected. Now pick the target tower.`);
+      return;
+    }
+
+    const from = selectedTower;
+    selectedTower = null;
+
+    if (from === index) {
+      render();
+      setStatus("Selection cancelled.");
+      return;
+    }
+
+    if (!performMove(from, index, true)) {
+      render();
+      setStatus("Illegal move: a larger disk cannot go on a smaller one.", "error");
+      return;
+    }
+
+    solutionIndex = 0;
+    updateStats();
+  }
+
+  function stateAtStep(step) {
+    const state = [[], [], []];
+    for (let disk = diskCount; disk >= 1; disk--) state[0].push(disk);
+
+    for (let i = 0; i < step; i++) {
+      const [from, to] = solution[i];
+      const disk = state[from].pop();
+      state[to].push(disk);
+    }
+
+    return state;
+  }
+
+  function setSolutionStep(step) {
+    solutionIndex = Math.max(0, Math.min(solution.length, step));
+    towers = stateAtStep(solutionIndex);
+    moveCount = solutionIndex;
+    selectedTower = null;
+    lastMoved = null;
+    el.mode.textContent = "Solution steps";
+    render();
+
+    if (solutionIndex === solution.length) {
+      setStatus(`Solved in the minimum ${solution.length} move${solution.length === 1 ? "" : "s"}.`, "success");
+    } else if (solutionIndex === 0) {
+      setStatus("Back at the starting position.");
+    } else {
+      setStatus(`Solution step ${solutionIndex} / ${solution.length}.`);
+    }
+  }
+
+  function previousStep() {
+    if (running || solutionIndex <= 0) return;
+    setSolutionStep(solutionIndex - 1);
+  }
+
+  function nextStep() {
+    if (running || solutionIndex >= solution.length) return;
+    setSolutionStep(solutionIndex + 1);
+  }
+
+  async function autoSolve() {
+    token++;
+    const localToken = token;
+    running = true;
+    selectedTower = null;
+    el.mode.textContent = "Auto-solve";
+
+    /* manual moves are not part of the solution sequence; tell the student so explicitly */
+    const expected = stateAtStep(solutionIndex);
+    const offPath = towers.some((t, i) => t.join(",") !== expected[i].join(","));
+    towers = expected;
+    moveCount = solutionIndex;
+    lastMoved = null;
+    render();
+
+    if (offPath) {
+      setStatus("Manual moves discarded: restarting from the starting position.", "warning");
+      await wait(DELAY * 3);
+      if (localToken !== token) return;
+    }
+
+    try {
+      while (solutionIndex < solution.length) {
+        const [from, to] = solution[solutionIndex];
+        await animateMove(from, to, localToken);
+        solutionIndex++;
+        updateStats();
+      }
+
+      if (localToken !== token) return;
+      running = false;
+      el.mode.textContent = "Solved";
+      render();
+      setStatus(`Solved in the minimum ${solution.length} move${solution.length === 1 ? "" : "s"}.`, "success");
+    } catch (error) {
+      if (error?.message !== "cancelled") {
+        running = false;
+        el.mode.textContent = "Manual";
+        render();
+        setStatus("Operation stopped.", "error");
+      }
+    }
+  }
+
+  function cancel() {
+    if (!running) return;
+    token++;
+    running = false;
+    el.mode.textContent = "Solution steps";
+    render();
+    setStatus("Auto-solve cancelled.");
+  }
+
+  el.newPuzzle.addEventListener("click", resetPuzzle);
+  el.prev.addEventListener("click", previousStep);
+  el.next.addEventListener("click", nextStep);
+  el.auto.addEventListener("click", autoSolve);
+  el.cancel.addEventListener("click", cancel);
+
+  el.towers.forEach((towerEl, index) => {
+    towerEl.addEventListener("click", () => towerClicked(index));
+  });
+
+  resetPuzzle();
+})();
+</script>
+<script src="deck/oyun.js"></script>
