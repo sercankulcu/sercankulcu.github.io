@@ -127,7 +127,7 @@ def page(key):
     out = '''---
 layout: without-sidebar
 title: "%(title)s: Dersin Haritası"
-permalink: /files/%(folder)s/ders_haritasi.html
+permalink: /files/%(folder)s/%(fname)s
 excerpt: "%(title)s dersinin bütün bölümlerini tek bir haritada birleştiren sayfa: her bölümün hangi bölümün üzerine kurulduğu ve aralarındaki bağ."
 ---
 
@@ -164,10 +164,11 @@ excerpt: "%(title)s dersinin bütün bölümlerini tek bir haritada birleştiren
 <p class="nt-foot">Ders sayfası: <a href="%(permalink)s">%(title)s</a> · <a href="sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
 </article>
 ''' % dict(title=title, folder=folder, guard=GUARD, lead=LEAD, w=W, svg=body, caption=m['caption'],
-           rows='\n'.join(rows), spine=m['spine'], permalink=permalink)
+           rows='\n'.join(rows), spine=m['spine'], permalink=permalink,
+           fname=m.get('file', 'ders_haritasi.html'))
     covered = {r[0] for r in m['table']}
     assert covered == set(names), ('tabloda eksik', set(names) - covered)
-    p = os.path.join(SITE, 'files', folder, 'ders_haritasi.html')
+    p = os.path.join(SITE, 'files', folder, m.get('file', 'ders_haritasi.html'))
     io.open(p, 'w', encoding='utf-8', newline='\n').write(out)
     print('%-16s %2d bolum, %d satir, yukseklik %d' % (key, len(names), len(m['rows']), H))
 

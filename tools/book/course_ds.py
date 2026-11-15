@@ -39,7 +39,7 @@ notes_book.setup(
     folder='data_structures',
     course_page=COURSE_PAGE,
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
-    intro=[('ders_haritasi.html', 'harita')],
+    intro=[('Ders_Haritasi.html', 'harita')],
     title='Veri Yapıları',
     subtitle='',
     output='data_structures/Veri-Yapilari.pdf',     # courses-pdfs/ altinda

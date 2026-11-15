@@ -13,6 +13,7 @@ MAPS = {}
 
 MAPS['ds'] = dict(
     title='Veri Yapıları', folder='data_structures', page='data-structures.md',
+    file='Ders_Haritasi.html',
     rows=[[1, 2], [3, 4], [5, 9], [6, 7, 8, 10, 11], [12, 13, 14]],
     cols={0: [1.5, 2.5], 1: [1.5, 2.5], 2: [1.5, 3], 4: [0.5, 1.5, 3]},
     edges=[(1, 2), (2, 3), (3, 4), (3, 5), (4, 9), (5, 6), (5, 7), (5, 8), (9, 10), (9, 11),
@@ -20,7 +21,7 @@ MAPS['ds'] = dict(
     table=[
         (1, [], 'Verinin bellekte temsili, ilkel ve referans tipler, soyut veri tipi; bütün yapılar bu dille anlatılır.'),
         (2, [1], 'Bir yapıyı seçmek için işlemlerin maliyetini ölçmek gerekir: Büyük O, Omega ve Teta.'),
-        (3, [2], 'İlk yapı: bitişik bellek ve indisle O(1) erişim; ekleme ve silmenin bedeli analizle görülür.'),
+        (3, [2], 'İlk yapı: ardışık bellek ve indisle O(1) erişim; ekleme ve silmenin bedeli analizle görülür.'),
         (4, [2, 3], 'Problemi daha küçük örneklerine indirmek; çağrı yığını ve yineleme bağıntısıyla analiz.'),
         (5, [3], 'Dizinin sabit boyu ve kaydırma maliyeti düğümlerle aşılır: başa ekleme O(1), rastgele erişim yok.'),
         (6, [3, 5], 'Dizi ve bağlı liste aynı Liste ADT\'sinin iki gerçeklemesidir; Java koleksiyonları ve Iterator.'),
@@ -45,7 +46,7 @@ MAPS['os'] = dict(
            (6, 7), (10, 13), (10, 11), (7, 14), (13, 14), (14, 15, 'ana'), (11, 15, 'ana')],
     hot=[15],
     table=[
-        (1, [], 'İşletim sisteminin iki rolü: genişletilmiş makine ve kaynak yöneticisi; çekirdek ve kullanıcı kipi.'),
+        (1, [], 'İşletim sisteminin iki rolü: genişletilmiş makine ve kaynak yöneticisi; çekirdek ve kullanıcı modu.'),
         (2, [1], 'Hizmetler sistem çağrılarıyla sunulur: süreç, adres alanı, dosya ve boru kavramları.'),
         (3, [2], 'Çalışan program: fork, exec ve wait; süreç durumları ve süreç kontrol bloğu.'),
         (4, [3], 'Aynı adres alanında birden çok yürütme akışı; kullanıcı ve çekirdek düzeyi iş parçacıkları.'),
