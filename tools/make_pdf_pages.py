@@ -7,8 +7,8 @@ Her kitap, makale ve tez icin _pages/scholar/ altina sitenin without-sidebar duz
 sayfa yazar: kitaplar /books/<pdf-adi>/, makaleler /publications/<pdf-adi>/, tez
 /publications/2022-phd-thesis/. citation_* etiketleri on bilgideki scholar_meta listesinden
 _includes/head/custom.html ile <head>'e girer; JSON-LD (Book, ScholarlyArticle, Thesis) on
-bilgideki json_ld'den ayni yolla girer. og:image icin PDF'in ilk sayfasi courses-pdfs/covers/
-altina JPEG olarak yazilir (ders sayfalari da kitabin kapagini og_image olarak kullanir). Sayfada baslik,
+bilgideki json_ld'den ayni yolla girer. og:image icin 1200x630 bir paylasim karti (kitaplarda dersin gorseli,
+makale ve tezde PDF'in ilk sayfasi) courses-pdfs/covers/ altina JPEG olarak yazilir (ders sayfalari da kitabin kapagini og_image olarak kullanir). Sayfada baslik,
 yazarlar, tarih, ozet ve PDF baglantisi vardir. Makale ve tez PDF'lerinin baslik,
 yazar ve konu bilgisini de doldurur. Son olarak courses-pdfs/sitemap.xml'i butun
 PDF'lerle yeniden yazar (sitenin robots.txt dosyasi onu gosterir).
@@ -27,8 +27,8 @@ BASE = SITE + '/courses-pdfs/'
 OUT_DIR = os.path.join(REPO, '_pages', 'scholar')
 ME = ('Sercan', 'Külcü')
 YEAR_BOOKS = '2026'
-COVER_DIR = 'covers'      # courses-pdfs/covers/<pdf-adi>.jpg: PDF'in ilk sayfasi, og:image ve JSON-LD image icin
-COVER_WIDTH = 600
+COVER_DIR = 'covers'      # courses-pdfs/covers/<pdf-adi>.jpg: 1200x630 paylasim karti (og:image, JSON-LD image)
+CARDS = []                # build() sirasinda toplanir, render_cards() hepsini tek tarayici oturumunda cizer
 PERSON = {'@type': 'Person', 'name': 'Sercan Külcü', 'url': SITE + '/',
           'affiliation': {'@type': 'CollegeOrUniversity', 'name': 'Giresun University'}}
 
@@ -45,6 +45,20 @@ BOOKS = [
     ('os/Isletim-Sistemleri.pdf', 'tr', '/teaching/operating-systems/'),
     ('c/Programming-with-C.pdf', 'en', '/teaching/programming-with-c/'),
 ]
+
+# kitap PDF'i -> (ders sayfasindaki gorsel, kartin vurgu rengi)
+ART = {
+    'agt/Algoritmik-Oyun-Kurami.pdf': ('teaching-algorithmic-game-theory.webp', '#7b3fa0'),
+    'algorithms/Algoritmalar.pdf': ('teaching-algorithms.webp', '#e08a00'),
+    'computer/Bilgisayar-ve-Programlamaya-Giris.pdf': ('teaching-computer-and-programming.webp', '#1f6fb2'),
+    'data_structures/Veri-Yapilari.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
+    'data_structures/Data-Structures.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
+    'dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf': ('teaching-data-structures.webp', '#c0563b'),
+    'java/Java-ile-Nesne-Yonelimli-Programlama.pdf': ('teaching-object-oriented-programming.webp', '#c0392b'),
+    'microprocessors/Mikroislemciler.pdf': ('teaching-microprocessors.webp', '#2d6a4f'),
+    'os/Isletim-Sistemleri.pdf': ('teaching-operating-systems.webp', '#34508f'),
+    'c/Programming-with-C.pdf': ('teaching-procedural-programming-c.webp', '#355c9a'),
+}
 
 HAZEL_AUTHORS = [('Özgür', 'Tomak'), ('Mehmet Cem', 'Dikbaş'), ME]
 HAZEL_CONF = ('11th International Azerbaijan Congress on Life, Engineering, Mathematical, '
@@ -137,22 +151,82 @@ def set_info(rel, title, author, subject, keywords):
     d.close()
 
 
-def cover(rel):
-    """PDF'in ilk sayfasini courses-pdfs/covers/ altina JPEG olarak yazar (PDF degismediyse dokunmaz)."""
-    import pymupdf
-    src = os.path.join(PDF_REPO, rel)
-    name = slug(rel) + '.jpg'
-    out = os.path.join(PDF_REPO, COVER_DIR, name)
-    if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(src):
-        d = pymupdf.open(src)
-        pg = d[0]
-        z = COVER_WIDTH / pg.rect.width
-        pix = pg.get_pixmap(matrix=pymupdf.Matrix(z, z))
-        os.makedirs(os.path.dirname(out), exist_ok=True)
-        pix.save(out, jpg_quality=82)
+def cover(rel, card):
+    """Paylasim kartini siraya koyar (render_cards cizer) ve adresini dondurur.
+    card: kicker, title, lines (alt satirlar), accent, art (ders gorseli) ya da yoksa PDF'in ilk sayfasi."""
+    CARDS.append((rel, card))
+    return BASE + COVER_DIR + '/' + slug(rel) + '.jpg'
+
+
+CARD_HTML = """<!doctype html><html lang="%(lang)s"><head><meta charset="utf-8"><style>
+html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+body { display: flex; background: #fbfaf7; font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif; color: #1d1d1f; }
+.txt { position: relative; width: 640px; box-sizing: border-box; padding: 70px 40px 64px 76px; display: flex; flex-direction: column; }
+.bar { width: 72px; height: 8px; border-radius: 4px; background: %(accent)s; margin-bottom: 26px; }
+.kick { font-size: 22px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: %(accent)s; }
+h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size: %(size)dpx; line-height: 1.08; margin: 18px 0 0; letter-spacing: -.01em; }
+.lines { margin-top: auto; }
+.l1 { font-size: %(l1size)dpx; font-weight: 600; }
+.l2 { font-size: 23px; color: #6e6e73; margin-top: 6px; }
+.site { margin-top: 22px; font-size: 21px; color: #8e8e93; letter-spacing: .02em; }
+.art { flex: 1; position: relative; overflow: hidden; background: %(artbg)s; }
+.art img.ill { position: absolute; left: 50%%; top: 50%%; width: 100%%; transform: translate(-50%%, -50%%); }
+.art img.pg { position: absolute; left: 50%%; top: 50%%; height: 520px; transform: translate(-50%%, -50%%) rotate(3deg);
+  box-shadow: 0 18px 40px rgba(0,0,0,.25); border-radius: 3px; background: #fff; }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: %(accent)s; }
+</style></head><body>
+<div class="txt"><div class="bar"></div><div class="kick">%(kicker)s</div><h1>%(title)s</h1>
+<div class="lines"><div class="l1">%(l1)s</div><div class="l2">%(l2)s</div><div class="site">sercankulcu.github.io</div></div></div>
+<div class="art">%(img)s</div><div class="foot"></div>
+</body></html>"""
+
+
+def card_html(rel, c):
+    import pathlib, pymupdf
+    if c.get('art'):
+        img = '<img class="ill" src="%s">' % pathlib.Path(REPO, 'images', 'teaching', c['art']).as_uri()
+        artbg = '#ffffff'
+    else:
+        d = pymupdf.open(os.path.join(PDF_REPO, rel))
+        png = os.path.join(os.environ.get('TEMP', '/tmp'), 'card-page-%s.png' % slug(rel))
+        d[0].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).save(png)
         d.close()
-        print('yazildi', COVER_DIR + '/' + name)
-    return BASE + COVER_DIR + '/' + name
+        img = '<img class="pg" src="%s">' % pathlib.Path(png).as_uri()
+        artbg = c['accent'] + '1f'
+    n = len(c['title'])
+    size = 76 if n <= 16 else 64 if n <= 28 else 54 if n <= 45 else 44 if n <= 80 else 34
+    longest = max(len(w) for w in c['title'].split())
+    size = min(size, int(524 / (0.64 * longest)))
+    return CARD_HTML % dict(lang=c.get('lang', 'tr'), l1size=30 if len(c['lines'][0]) <= 30 else 24, accent=c['accent'], artbg=artbg, kicker=e(c['kicker']), title=e(c['title']),
+                            size=size, l1=e(c['lines'][0]), l2=e(c['lines'][1]), img=img)
+
+
+def render_cards():
+    """Siradaki kartlari 1200x630 JPEG olarak courses-pdfs/covers/ altina yazar; ayni cikan dosyaya dokunmaz."""
+    if not CARDS:
+        return
+    import pathlib
+    sys.path.insert(0, HERE)
+    import make_slide_pdf
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        br = make_slide_pdf.launch(p)
+        pg = br.new_page(viewport={'width': 1200, 'height': 630})
+        for rel, c in CARDS:
+            tmp = os.path.join(os.environ.get('TEMP', '/tmp'), 'og-card.html')
+            with open(tmp, 'w', encoding='utf-8') as f:
+                f.write(card_html(rel, c))
+            pg.goto(pathlib.Path(tmp).as_uri(), wait_until='load')
+            data = pg.screenshot(type='jpeg', quality=88)
+            out = os.path.join(PDF_REPO, COVER_DIR, slug(rel) + '.jpg')
+            old = open(out, 'rb').read() if os.path.exists(out) else None
+            if old != data:
+                os.makedirs(os.path.dirname(out), exist_ok=True)
+                with open(out, 'wb') as f:
+                    f.write(data)
+                print('yazildi', COVER_DIR + '/' + slug(rel) + '.jpg')
+        br.close()
+    del CARDS[:]
 
 
 def ld(obj):
@@ -164,7 +238,7 @@ def pdf_media(rel):
     return {'@type': 'MediaObject', 'contentUrl': BASE + rel, 'encodingFormat': 'application/pdf'}
 
 
-def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink, json_ld=None, og_type='article'):
+def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink, json_ld=None, og_type='article', card=None):
     """Sitenin without-sidebar duzeninde bir Jekyll sayfasi. citation_* etiketleri on bilgideki
     scholar_meta listesinden, JSON-LD json_ld'den _includes/head/custom.html ile <head>'e yazilir;
     og_image (PDF'in ilk sayfasi) ve og_type _includes/seo.html'de okunur."""
@@ -174,7 +248,7 @@ def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink, json_ld=N
           'title: ' + json.dumps(title, ensure_ascii=False),
           'description: ' + json.dumps(dict(meta_tags).get('description', title), ensure_ascii=False),
           'permalink: ' + permalink, 'lang: ' + lang,
-          'og_image: ' + cover(rel_pdf), 'og_type: ' + og_type]
+          'og_image: ' + cover(rel_pdf, card), 'og_type: ' + og_type]
     if json_ld:
         fm.append('json_ld: ' + json.dumps(json.dumps(ld(json_ld), ensure_ascii=False), ensure_ascii=False))
     fm.append('scholar_meta:')
@@ -219,7 +293,10 @@ def book_page(rel, lang, course):
             'url': SITE + url, 'image': BASE + COVER_DIR + '/' + slug(rel) + '.jpg',
             'description': desc[:1].upper() + desc[1:] if desc else title,
             'keywords': kw, 'encoding': pdf_media(rel)}
-    return page(lang, title, t['book'], tags, body, rel, YEAR_BOOKS, url, book, 'book')
+    art, accent = ART.get(rel, (None, '#34508f'))
+    card = dict(kicker=t['book'], title=title, accent=accent, art=art, lang=lang,
+                lines=(full(ME), '%s · %s' % (t['pages'] % n, 'Ücretsiz PDF' if lang == 'tr' else 'Free PDF')))
+    return page(lang, title, t['book'], tags, body, rel, YEAR_BOOKS, url, book, 'book', card)
 
 
 def paper_page(p):
@@ -263,7 +340,9 @@ def paper_page(p):
                         'publisher': {'@type': 'Organization', 'name': p['publisher']}},
            'url': SITE + url, 'image': BASE + COVER_DIR + '/' + slug(p['pdf']) + '.jpg',
            'encoding': pdf_media(p['pdf'])}
-    return page(p['lang'], p['title'], 'Conference paper', tags, body, p['pdf'], p['date'][:4], url, art)
+    card = dict(kicker='Conference paper', title=p['title'], accent='#b5651d', art=None, lang='en',
+                lines=(', '.join(full(a) for a in p['authors']), '%s · pp. %d–%d' % (p['date'][:4], p['pages'][0], p['pages'][1])))
+    return page(p['lang'], p['title'], 'Conference paper', tags, body, p['pdf'], p['date'][:4], url, art, card=card)
 
 
 def thesis_page(p):
@@ -309,7 +388,9 @@ def thesis_page(p):
           'sourceOrganization': {'@type': 'CollegeOrUniversity', 'name': p['institution']},
           'url': SITE + p['permalink'], 'image': BASE + COVER_DIR + '/' + slug(p['pdf']) + '.jpg',
           'encoding': pdf_media(p['pdf'])}
-    return page('tr', p['title'], 'Doktora tezi', tags, body, p['pdf'], '2022', p['permalink'], th)
+    card = dict(kicker='Doktora tezi', title=p['title'], accent='#1f5f8b', art=None,
+                lines=(full(ME), '%s · 2022' % p['institution']))
+    return page('tr', p['title'], 'Doktora tezi', tags, body, p['pdf'], '2022', p['permalink'], th, card=card)
 
 
 def slug(rel):
@@ -354,6 +435,7 @@ def build():
     for p in PAPERS:
         write('paper-' + slug(p['pdf']), paper_page(p))
     write('thesis-2022', thesis_page(THESIS))
+    render_cards()
     write_sitemap()
 
 

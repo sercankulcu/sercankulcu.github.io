@@ -36,8 +36,9 @@ bilgisi (başlık, konu, sayfa sayısı) PDF'in künyesinden okunur. Makale ve t
 betiğin başındaki `PAPERS` ve `THESIS` içindedir; yeni yayın oraya eklenir, yayınlar
 sayfasındaki "Paper" bağlantısı da o sayfaya verilir. `_pages/scholar/` dosyalarını
 elle düzenlemeyin, betik üzerine yazar.
-Her sayfanın ön bilgisinde ayrıca `og_image` (PDF'in ilk sayfası; betik onu
-`courses-pdfs/covers/<pdf-adı>.jpg` olarak yazar) ve hazır bir schema.org `json_ld`
+Her sayfanın ön bilgisinde ayrıca `og_image` (1200×630 paylaşım kartı: kitaplarda
+dersin görseli ve vurgu rengi `ART` içinde, makale ve tezde PDF'in ilk sayfası; betik
+kartları Chrome/Edge ile çizip `courses-pdfs/covers/<pdf-adı>.jpg` olarak yazar) ve hazır bir schema.org `json_ld`
 (Book, ScholarlyArticle, Thesis) bulunur; `_includes/seo.html` ile `head/custom.html`
 bunları okur. Ders sayfaları (`_teaching/*.md`) kitabın kapağını `og_image` olarak
 kullanır; `course_language` ve `textbook` alanlarından `head/custom.html` bir Course
