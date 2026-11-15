@@ -29,11 +29,11 @@ GROUPS = [
         ('🚦', 'squid', 'en'), ('🏓', 'pong', 'en'), ('🐦', 'flappy-bird', 'tr')]),
     ('🧠', 'Puzzle & logic', '#2f8a6b', 'Puzzle', [
         ('💣', 'minesweeper', 'en'), ('🔢', 'sudoku', 'en'), ('🧩', 'connections', 'en'),
-        ('🧶', 'strands', 'en'), ('🃏', 'memory', 'en'), ('🐂', 'bulls-and-cows', 'en'),
+        ('🧶', 'strands', 'tr'), ('🃏', 'memory', 'en'), ('🐂', 'bulls-and-cows', 'en'),
         ('🔀', 'sliding-puzzle', 'en'), ('⚓', 'battleship', 'tr')]),
     ('🔤', 'Word games', '#1f6fb2', 'Word game', [
-        ('5️⃣', 'fiveletters', 'en'), ('6️⃣', 'sixletters', 'en'), ('🔤', 'oneword', 'tr'),
-        ('🐝', 'spellbee', 'tr'), ('🎯', 'hangman', 'en'), ('🔡', 'boggle', 'tr')]),
+        ('5️⃣', 'fiveletters', 'tr'), ('6️⃣', 'sixletters', 'tr'), ('🔤', 'oneword', 'tr'),
+        ('🐝', 'spellbee', 'tr'), ('🎯', 'hangman', 'tr'), ('🔡', 'boggle', 'tr')]),
     ('🎓', 'Quiz & brain training', '#e08a00', 'Quiz', [
         ('🏳️', 'flagquiz', 'en'), ('➗', 'mathmaster', 'en'), ('💰', 'millionaire', 'tr'),
         ('🌍', 'capital-city-quiz', 'en'), ('🎬', 'movie-quiz', 'en'), ('🎨', 'pixar-color-millionaire', 'tr'),
@@ -44,10 +44,10 @@ GROUPS = [
 
 # arama basligi: genel kalip yerine daha aranir bir ifade
 SEO = {
-    'fiveletters': 'Five Letters · Turkish Wordle-Style Word Game',
-    'sixletters': 'Six Letters · Turkish Wordle-Style Word Game, 6 Letters',
-    'hangman': 'Hangman · Turkish Word Guessing Game',
-    'strands': 'Strands · Turkish Themed Word Search Game',
+    'fiveletters': 'Beş Harf · Türkçe Wordle, Kelime Tahmin Oyunu',
+    'sixletters': 'Altı Harf · 6 Harfli Türkçe Wordle',
+    'hangman': 'Adam Asmaca · Türkçe Kelime Tahmin Oyunu',
+    'strands': 'Strands · Türkçe Temalı Kelime Avı',
     'oneword': 'Bir Kelime · Türkçe Kelime Türetme Oyunu',
     'spellbee': 'Spell Bee · Türkçe Kelime Oyunu',
     'boggle': 'Boggle · Türkçe Kelime Bulma Oyunu',
