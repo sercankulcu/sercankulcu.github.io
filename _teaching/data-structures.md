@@ -352,8 +352,8 @@ A stack is last in, first out (LIFO): items are added (push) and removed (pop) o
 - [📝Study Questions – Stacks (HTML)](/files/data_structures/slides/Chapter_07_Stacks_Study_Questions.html)
 - [🕹️Stack Simulator (HTML)](/files/data_structures/slides/Chapter_07_Stack_Simulator.html)
 - [🕹️Stock Span Simulator (HTML)](/files/data_structures/slides/Chapter_07_Stock_Span_Simulator.html)
-- [🕹️Infix → Prefix Converter (HTML)](/files/data_structures/slides/Chapter_07_Infix_to_Prefix_Converter.html)
-- [🕹️Infix → Postfix Converter (HTML)](/files/data_structures/slides/Chapter_07_Infix_to_Postfix_Converter.html)
+- [🕹️Infix → Prefix Simulator (HTML)](/files/data_structures/slides/Chapter_07_Infix_to_Prefix_Simulator.html)
+- [🕹️Infix → Postfix Simulator (HTML)](/files/data_structures/slides/Chapter_07_Infix_to_Postfix_Simulator.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter07/src)
 
 ---
@@ -369,7 +369,7 @@ A queue is first in, first out (FIFO): items join at one end (enqueue) and leave
 - [🕹️Queue Simulator (HTML)](/files/data_structures/slides/Chapter_08_Queue_Simulator.html)
 - [🕹️Deque Simulator (HTML)](/files/data_structures/slides/Chapter_08_Deque_Simulator.html)
 - [🕹️Circular Queue Simulator (HTML)](/files/data_structures/slides/Chapter_08_Circular_Queue_Simulator.html)
-- [🕹️Round-Robin Scheduler (HTML)](/files/data_structures/slides/Chapter_08_Round_Robin_Scheduler.html)
+- [🕹️Round-Robin Scheduler Simulator (HTML)](/files/data_structures/slides/Chapter_08_Round_Robin_Scheduler_Simulator.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter08/src)
 
 ---
@@ -465,7 +465,7 @@ A graph models relationships between objects with vertices and edges. Unlike a t
 - [🕹️Undirected Graph Simulator (HTML)](/files/data_structures/slides/Chapter_14_Undirected_Graph_Simulator.html)
 - [🕹️Directed Graph Simulator (HTML)](/files/data_structures/slides/Chapter_14_Directed_Graph_Simulator.html)
 - [🕹️Dijkstra's Algorithm Simulator (HTML)](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html)
-- [🕹️Course Prerequisite Planner (HTML)](/files/data_structures/slides/Chapter_14_Course_Prerequisite_Planner.html)
+- [🕹️Course Prerequisite Planner Simulator (HTML)](/files/data_structures/slides/Chapter_14_Course_Prerequisite_Planner_Simulator.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter14/src)
 
 </div>
