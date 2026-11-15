@@ -123,8 +123,8 @@ Yığın, son giren ilk çıkar (LIFO) ilkesiyle çalışır: ekleme (push) ve �
 - [📝Çalışma Soruları - Yığınlar (HTML)](/files/data_structures/sunumlar/Bolum_07_Yiginlar_Calisma_Sorulari.html)
 - [🕹️Yığın Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_07_Yigin_Simulatoru.html)
 - [🕹️Stock Span Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_07_Stock_Span_Simulatoru.html)
-- [🕹️Infix → Prefix Dönüştürücü (HTML)](/files/data_structures/sunumlar/Bolum_07_Infix_Prefix_Donusturucu.html)
-- [🕹️Infix → Postfix Dönüştürücü (HTML)](/files/data_structures/sunumlar/Bolum_07_Infix_Postfix_Donusturucu.html)
+- [🕹️Infix → Prefix Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_07_Infix_Prefix_Simulatoru.html)
+- [🕹️Infix → Postfix Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_07_Infix_Postfix_Simulatoru.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum07/src)
 
 ---
@@ -140,7 +140,7 @@ Kuyruk, ilk giren ilk çıkar (FIFO) ilkesiyle çalışır: öğeler bir uçtan 
 - [🕹️Kuyruk Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_08_Kuyruk_Simulatoru.html)
 - [🕹️Deque Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_08_Deque_Simulatoru.html)
 - [🕹️Dairesel Kuyruk Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_08_Dairesel_Kuyruk_Simulatoru.html)
-- [🕹️Round Robin Çizelgeleyici (HTML)](/files/data_structures/sunumlar/Bolum_08_Round_Robin_Cizelgeleyici.html)
+- [🕹️Round Robin Çizelgeleyici Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_08_Round_Robin_Cizelgeleyici_Simulatoru.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum08/src)
 
 ---
@@ -236,7 +236,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 - [🕹️Yönsüz Çizge Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_14_Yonsuz_Cizge_Simulatoru.html)
 - [🕹️Yönlü Çizge Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_14_Yonlu_Cizge_Simulatoru.html)
 - [🕹️Dijkstra Algoritması Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_14_Dijkstra_Algoritmasi_Simulatoru.html)
-- [🕹️Ders Ön Koşul Planlayıcısı (HTML)](/files/data_structures/sunumlar/Bolum_14_Ders_On_Kosul_Planlayicisi.html)
+- [🕹️Ders Ön Koşul Planlayıcı Simülatörü (HTML)](/files/data_structures/sunumlar/Bolum_14_Ders_On_Kosul_Planlayici_Simulatoru.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum14/src)
 
 </div>
