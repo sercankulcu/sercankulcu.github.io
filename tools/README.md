@@ -53,8 +53,8 @@ ders sayfasında bağı olmayan not kitaba girmez ve derleme uyarı verir. Çok 
 ders sayfasındaki ad ve açıklamayla bir açılış sayfası alır; notlar onun altında yeni
 sayfada başlayan alt bölümler olur ve içindekilerde alt bölüm olarak listelenir.
 
-Ekler: Ek A terim sözlüğü (`sozluk.html`), Ek B "Ön Bilgiler" (`*Prerequisites*.html`),
-Ek C "Önemli İsimler" (`*Important_People*.html` / `Pioneers*.html`). B ve C web'de
+Ekler: Ek A terim sözlüğü (`sozluk.html`; ders modülünde `glossary=` ile başka dosya, ör. Veri Yapıları `Sozluk.html` / `Dictionary.html`), Ek B "Ön Bilgiler" (`*Prerequisites*.html`, `On_Bilgiler.html`),
+Ek C "Önemli İsimler" (`*Important_People*.html` / `Pioneers*.html` / `Onemli_Isimler.html`). B ve C web'de
 etkileşimli sayfalardır; kitapta arama, süzgeç, sıralama ve düğmeler atılır, gizli
 "Ayrıntılar" açılır, sayfanın kendi `<style>` bloğu kalır. C kitabında aynı iki sayfa
 Appendix A/B olur (`course_c.py`, `_appendix`).

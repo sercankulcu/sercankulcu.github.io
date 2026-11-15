@@ -3,7 +3,7 @@
 
 Ayni ders sayfasinin <div data-lt="en"> blogundan okunur: "## Part I: ..." /
 "### Chapter N: ..." duzeni, notes/Chapter_NN_*_Lecture_Notes.html notlari, Prerequisites.html ve Important_People.html
-ekleri ve Course_Map.html. Sozluk (sozluk.html) iki dilli, iki kitapta da ayni dosya.
+ekleri ve Course_Map.html. Sozluk: Dictionary.html (Ingilizce tanimli; Turkce kitap Sozluk.html).
 """
 import notes_book
 
@@ -23,8 +23,8 @@ definitions, theorems and worked examples are set in named boxes. <em>Common mis
 boxes point out the misconceptions students fall into most often. Code traces show, step by
 step, how an operation changes the structure. Each chapter closes with a summary, a list of
 key terms, <em>Test Yourself</em> questions with their answers, suggestions for further
-reading and a bibliography. The glossary at the end of the book gives, for each English
-term, the Turkish equivalent used in the Turkish edition of these notes.</p>
+reading and a bibliography. The glossary at the end of the book defines each key term in a
+sentence and names the chapter that explains it.</p>
 
 <p>The code for each chapter is in its own folder in the companion repository,
 <span class="u">github.com/sercankulcu/data-structures-java-en</span>; the folder name is given
@@ -40,6 +40,7 @@ notes_book.setup(
     course_page=COURSE_PAGE,
     # course map: at the top of the contents, before Part I
     intro=[('Course_Map.html', 'harita')],
+    glossary='Dictionary.html',
     title='Data Structures',
     subtitle='',
     output='data_structures/Data-Structures.pdf',     # under courses-pdfs/

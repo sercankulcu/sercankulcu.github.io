@@ -173,9 +173,9 @@ TEXT = {
         'subs_title': 'Notes in this chapter',
         'appendix': 'Appendix %s',
         'gloss_title': 'Glossary of Terms',
-        'gloss_lead': 'The English terms used in the book, each with the Turkish equivalent used in '
-                      'the Turkish edition. The number on the right is the chapter where the term is '
-                      'explained in detail. A searchable version of the glossary is on the course page.',
+        'gloss_lead': 'The terms used in the book, each with a short definition. The number next to '
+                      'a term is the chapter where it is explained in detail. A searchable version of '
+                      'the glossary is on the course page.',
         'front': FRONT_EN,
     },
 }
@@ -251,9 +251,11 @@ def parts_sentence(parts, lang='tr'):
 
 class _Course:
     def __init__(self, folder, course_page, title, subtitle, output, meta, preface,
-                 colophon, extra_css=(), scripts=(), code_note=None, intro=(), lang='tr'):
+                 colophon, extra_css=(), scripts=(), code_note=None, intro=(), lang='tr',
+                 glossary='sozluk.html'):
         self.lang = lang
         self.T = TEXT[lang]
+        self.gloss_file = glossary          # terim sozlugu: files/<ders>/<glossary>
         # Turkce heceleme yalnizca Turkce kitapta; Ingilizcede CSS (hyphens: auto) karar verir
         self.hy = hyphenate_html if lang == 'tr' else (lambda s: s)
         self.dir = os.path.join(SITE, 'files', folder)
@@ -335,7 +337,7 @@ class _Course:
             return href
         path, _, frag = href.partition('#')
         base = os.path.basename(path)
-        if base == 'sozluk.html':
+        if base == self.gloss_file:
             return '#ek-sozluk'
         if base in self.note_ids:
             pre, anchor = self.note_ids[base]
@@ -462,8 +464,8 @@ class _Course:
         en_pages = ('Prerequisites.html', 'Important_People.html')
         names = [f for f in os.listdir(self.dir)
                  if (f in en_pages) == (self.lang == 'en') and not f.endswith('_en.html')]
-        pre = sorted(f for f in names if re.search(r'Prerequisites.*\.html$', f))
-        ppl = sorted(f for f in names if re.search(r'(Important_People|Pioneers).*\.html$', f))
+        pre = sorted(f for f in names if re.search(r'(Prerequisites|On_Bilgiler).*\.html$', f))
+        ppl = sorted(f for f in names if re.search(r'(Important_People|Pioneers|Onemli_Isimler).*\.html$', f))
         out, ap = [], self.T['appendix']
         if pre:
             out.append((pre[0], 'ek-onbilgi', ap % 'B'))
@@ -473,7 +475,7 @@ class _Course:
 
     # ------------------------------------------------------------ sozluk eki
     def glossary(self):
-        s = io.open(os.path.join(self.dir, 'sozluk.html'), encoding='utf-8').read()
+        s = io.open(os.path.join(self.dir, self.gloss_file), encoding='utf-8').read()
         rows = re.findall(r'<tr data-ch="(\d+)"><td lang="en">(.*?)</td><td>(.*?)</td>', s)
         groups, cur = [], None
         for ch, en, tr in rows:
@@ -497,9 +499,12 @@ class _Course:
             out.append('<h3 class="bk-gloss-l">%s</h3>' % letter)
             for ch, en, tr in items:
                 # bolum numarasi terimin yaninda; varsa tanim cumlesi alt satirda
+                if self.lang == 'en':           # Ingilizce sozluk: ikinci sutun Ingilizce tanim
+                    out.append('<p class="bk-g"><span lang="en"><strong>%s</strong></span>'
+                               ' <span class="bk-gloss-ch">%d</span><span class="bk-gloss-def">%s</span></p>'
+                               % (en, ch, tr))
+                    continue
                 term, sep, rest = tr.partition('<span class="bk-gloss-def">')
-                if self.lang == 'en':           # Ingilizce kitapta Turkce karsilik isaretli
-                    term = '<span lang="tr">%s</span>' % term.strip()
                 out.append('<p class="bk-g"><span lang="en">%s</span> &rarr; %s'
                            ' <span class="bk-gloss-ch">%d</span>%s</p>' % (en, term, ch, sep + rest))
         out.append('</div></article></section>')

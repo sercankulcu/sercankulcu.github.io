@@ -24,10 +24,10 @@ Data structures provide systematic ways to organize, store, and access data. Cho
 
 ## Başlangıç Kaynakları
 
-* [Veri Yapılarında Önemli İsimler (HTML)](/files/data_structures/Data_Structures_Important_People.html)
-* [Veri Yapıları İçin Ön Bilgiler (HTML)](/files/data_structures/Data_Structures_Prerequisites.html)
+* [Veri Yapılarında Önemli İsimler (HTML)](/files/data_structures/Onemli_Isimler.html)
+* [Veri Yapıları İçin Ön Bilgiler (HTML)](/files/data_structures/On_Bilgiler.html)
 * [Dersin Haritası (HTML)](/files/data_structures/Ders_Haritasi.html)
-* [Terim Sözlüğü (HTML)](/files/data_structures/sozluk.html)
+* [Terim Sözlüğü (HTML)](/files/data_structures/Sozluk.html)
 
 ---
 
@@ -256,7 +256,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 * [Important People in Data Structures (HTML)](/files/data_structures/Important_People.html)
 * [Prerequisites for Data Structures (HTML)](/files/data_structures/Prerequisites.html)
 * [Course Map (HTML)](/files/data_structures/Course_Map.html)
-* [Glossary of Terms (HTML, English–Turkish)](/files/data_structures/sozluk.html)
+* [Dictionary of Terms (HTML)](/files/data_structures/Dictionary.html)
 
 ---
 
