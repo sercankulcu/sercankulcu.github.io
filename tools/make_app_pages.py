@@ -33,7 +33,7 @@ GROUPS = [
         ('✂️', '/apps/image-background-remover/'), ('🗜️', '/apps/image-compressor-resizer/'),
         ('🕵️', '/apps/image-redactor/'), ('🔄', '/apps/image-format-converter/'), ('🎨', '/apps/image-color-palette/')]),
     ('🛠️', 'Utilities', '#1f6fb2', 'UtilitiesApplication', False, [
-        ('🔳', '/apps/qr-code-generator/'), ('🔐', '/apps/password-generator/'), ('📏', '/apps/unit-converter/'),
+        ('📲', '/apps/qr-code-generator/'), ('🔐', '/apps/password-generator/'), ('📏', '/apps/unit-converter/'),
         ('🌐', '/apps/favicon-generator/'), ('⏱️', '/apps/minimal-timer/'), ('🍅', '/apps/pomodoro-timer/')]),
     ('🔍', 'Document & metadata tools', '#7b3fa0', 'BusinessApplication', True, [
         ('📝', '/apps/word-document-diff/'), ('🔎', '/apps/pdf-metadata-viewer/'),

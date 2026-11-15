@@ -50,7 +50,7 @@ your files are processed on your own device and are never uploaded to a server. 
 </div>
 <h2 class="apps-group">🛠️ Utilities</h2>
 <div class="apps-grid">
-<a class="app-card" href="/apps/qr-code-generator/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔳</span>QR Code Generator</span><span class="app-desc">Create QR codes for URLs, text, Wi-Fi networks and email.</span></a>
+<a class="app-card" href="/apps/qr-code-generator/"><span class="app-head"><span class="app-ico" aria-hidden="true">📲</span>QR Code Generator</span><span class="app-desc">Create QR codes for URLs, text, Wi-Fi networks and email.</span></a>
 <a class="app-card" href="/apps/password-generator/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔐</span>Password Generator</span><span class="app-desc">Generate strong passwords and memorable passphrases.</span></a>
 <a class="app-card" href="/apps/unit-converter/"><span class="app-head"><span class="app-ico" aria-hidden="true">📏</span>Unit Converter</span><span class="app-desc">Convert length, mass, temperature, area, volume, speed, time and digital storage units.</span></a>
 <a class="app-card" href="/apps/favicon-generator/"><span class="app-head"><span class="app-ico" aria-hidden="true">🌐</span>Favicon Generator</span><span class="app-desc">Generate favicon PNG files and a ready-to-use favicon package.</span></a>
