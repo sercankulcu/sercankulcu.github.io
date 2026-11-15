@@ -43,7 +43,25 @@ html, body { margin: 0 !important; padding: 0 !important; background: #fff !impo
 .pdf-page .ds-deck__stage { position: absolute !important; top: 0; left: 0; transform: none !important;
   border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
 .pdf-page .ds-deck__stepnav button { display: none !important; }
+.pdf-note { position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; padding: 4px 12px 5px;
+  font: 10.5px/1.3 system-ui, "Segoe UI", Arial, sans-serif; color: #555; text-align: center;
+  background: rgba(255, 255, 255, .92); border-top: 1px solid #ddd; }
+.pdf-note a { color: #1a5fb4; text-decoration: none; }
 """
+
+# ilk sayfanin altindaki not: telif satiri ve sunumun HTML surumunun adresi (sunum diline gore)
+NOTE = {
+    'tr': '&copy; Sercan K\u00fclc\u00fc. T\u00fcm haklar\u0131 sakl\u0131d\u0131r. &middot; '
+          'Sunumun etkile\u015fimli HTML s\u00fcr\u00fcm\u00fc: <a href="%s">%s</a>',
+    'en': '&copy; Sercan K\u00fclc\u00fc. All rights reserved. &middot; '
+          'Interactive HTML version of these slides: <a href="%s">%s</a>',
+}
+
+
+def note_html(lang, url):
+    import html as _h
+    u = _h.escape(url, quote=True)
+    return '<div class="pdf-note">' + NOTE['en' if lang == 'en' else 'tr'] % (u, _h.escape(url)) + '</div>'
 
 # etkin slaydin anlik hali (form ogelerinin degerleri isaretlemeye yazilir)
 SNAP = """() => {
@@ -156,7 +174,7 @@ def launch(p):
     sys.exit('Chrome ya da Edge bulunamadi (ya da "playwright install chromium" calistirin).')
 
 
-def render(page, url):
+def render(page, url, public_url=None):
     page.goto(url, wait_until='networkidle')
     page.wait_for_selector('#ds-deck-next', state='attached')
     page.add_style_tag(content='*,*::before,*::after{animation:none!important;transition:none!important}')
@@ -168,6 +186,10 @@ def render(page, url):
         if page.evaluate(DONE) or len(snaps) > expected + 5:
             break
         page.evaluate("document.getElementById('ds-deck-next').click()")
+    if public_url and snaps:
+        lang = page.evaluate("(document.getElementById('ds-deck').getAttribute('lang') || 'tr')")
+        assert snaps[0].endswith('</div>')
+        snaps[0] = snaps[0][:-len('</div>')] + note_html(lang, public_url) + '</div>'
     # sayfayi statik durum kopyalariyla degistir: stiller head'e alinir, betikler yeniden calismaz
     page.evaluate("""(html) => {
         document.querySelectorAll('body link[rel="stylesheet"], body style').forEach(s => document.head.appendChild(s));
@@ -227,7 +249,8 @@ def main():
             for attempt in range(3):
                 page = context.new_page()
                 try:
-                    snaps, expected = render(page, '%s/%s/%s.html#1' % (BASE, where[n], n))
+                    snaps, expected = render(page, '%s/%s/%s.html#1' % (BASE, where[n], n),
+                                             '%s/files/%s/%s/%s.html' % (SITE, a.course, where[n], n))
                     break
                 except Exception as e:
                     page.close()
