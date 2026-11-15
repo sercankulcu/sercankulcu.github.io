@@ -5,7 +5,7 @@
 
 Her kitap, makale ve tez icin _pages/scholar/ altina sitenin without-sidebar duzeninde bir
 sayfa yazar: kitaplar /books/<pdf-adi>/, makaleler /publications/<pdf-adi>/, tez
-/publications/2022-phd-thesis/. citation_* etiketleri on bilgideki citation listesinden
+/publications/2022-phd-thesis/. citation_* etiketleri on bilgideki scholar_meta listesinden
 _includes/head/custom.html ile <head>'e girer. Sayfada baslik,
 yazarlar, tarih, ozet ve PDF baglantisi vardir. Makale ve tez PDF'lerinin baslik,
 yazar ve konu bilgisini de doldurur. Son olarak courses-pdfs/sitemap.xml'i butun
@@ -133,13 +133,13 @@ def set_info(rel, title, author, subject, keywords):
 
 def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink):
     """Sitenin without-sidebar duzeninde bir Jekyll sayfasi. citation_* etiketleri on bilgideki
-    citation listesinden _includes/head/custom.html ile <head>'e yazilir."""
+    scholar_meta listesinden _includes/head/custom.html ile <head>'e yazilir."""
     t = L[lang]
     tags = [(k, v) for k, v in meta_tags if k != 'description']
     fm = ['---', 'layout: without-sidebar', 'author_profile: false',
           'title: ' + json.dumps(title, ensure_ascii=False),
           'description: ' + json.dumps(dict(meta_tags).get('description', title), ensure_ascii=False),
-          'permalink: ' + permalink, 'lang: ' + lang, 'citation:']
+          'permalink: ' + permalink, 'lang: ' + lang, 'scholar_meta:']
     fm += ['  - [%s, %s]' % (k, json.dumps(v, ensure_ascii=False)) for k, v in tags]
     fm += ['---', '']
     html_body = """<style>%(css)s</style>

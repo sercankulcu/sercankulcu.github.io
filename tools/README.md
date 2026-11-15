@@ -28,7 +28,7 @@ Her kitap, makale ve doktora tezi için `_pages/scholar/` altına sitenin
 `without-sidebar` düzeninde bir sayfa yazar: kitaplar `/books/<pdf-adı>/`, makaleler
 `/publications/<pdf-adı>/`, tez `/publications/2022-phd-thesis/`. Sayfada başlık,
 yazarlar, özet ve courses-pdfs'teki PDF'in bağlantısı vardır; Google Scholar'ın okuduğu
-`citation_*` etiketleri ön bilgideki `citation:` listesindedir ve
+`citation_*` etiketleri ön bilgideki `scholar_meta:` listesindedir (tema `citation` anahtarını "Recommended citation" satırı için kullanıyor) ve
 `_includes/head/custom.html` onları `<head>`'e yazar. Makale ve tez PDF'lerinin
 başlık/yazar bilgisini de doldurur ve `courses-pdfs/sitemap.xml` dosyasını (yalnız
 PDF'ler) yeniden yazar; sitenin kökündeki `robots.txt` bu haritayı gösterir. Kitap
