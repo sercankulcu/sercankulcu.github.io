@@ -361,3 +361,179 @@ This PhD thesis investigates the integration of smart and directional antennas w
 [Thesis](/publications/2022-phd-thesis/) · [Presentation EN](/files/presentations/slides/IoT_Smart_Antenna_PhD_Defense.html) · [Presentation TR](/files/presentations/slides/IoT_Akilli_Anten_Tez_Savunmasi.html) · [PhD Research](/files/research/Directional_6TiSCH_PhD_Research.html)
 
 </details>
+
+## Books
+
+<div class="publication-title">2026 - Algorithmic Game Theory</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on algorithmic game theory: decision theory, games and their representations, Nash equilibrium, mechanism design, auctions, online platforms, social choice and voting, network design and routing, the price of anarchy, multi-agent systems, algorithmic fairness, and learning in games.
+
+**Original title:** Algoritmik Oyun Kuramı
+
+**How to cite:** Külcü, S. (2026). *Algoritmik Oyun Kuramı* [Course textbook, 936 pages]. https://sercankulcu.github.io/books/algoritmik-oyun-kurami/
+
+[Book](/books/algoritmik-oyun-kurami/) · [PDF](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf) · [Course](/teaching/algorithmic-game-theory/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Algorithms</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on algorithm design and analysis: complexity, sorting, searching, graph and string algorithms, divide and conquer, greedy methods, dynamic programming, backtracking, and approximation, randomized, online and parallel algorithms.
+
+**Original title:** Algoritmalar
+
+**How to cite:** Külcü, S. (2026). *Algoritmalar* [Course textbook, 1142 pages]. https://sercankulcu.github.io/books/algoritmalar/
+
+[Book](/books/algoritmalar/) · [PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf) · [Course](/teaching/algorithms/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Introduction to Computers and Programming</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language introductory textbook covering computer hardware, operating systems, the Internet, office applications, algorithms, and programming with Java.
+
+**Original title:** Bilgisayar ve Programlamaya Giriş
+
+**How to cite:** Külcü, S. (2026). *Bilgisayar ve Programlamaya Giriş* [Course textbook, 1353 pages]. https://sercankulcu.github.io/books/bilgisayar-ve-programlamaya-giris/
+
+[Book](/books/bilgisayar-ve-programlamaya-giris/) · [PDF](https://sercankulcu.github.io/courses-pdfs/computer/Bilgisayar-ve-Programlamaya-Giris.pdf) · [Course](/teaching/computer-and-introduction-to-programming/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Data Structures (Turkish edition)</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on data structures in Java: algorithm analysis, arrays, recursion, linked lists, stacks and queues, trees, priority queues, hash tables, sets, and graphs.
+
+**Original title:** Veri Yapıları
+
+**How to cite:** Külcü, S. (2026). *Veri Yapıları* [Course textbook, 926 pages]. https://sercankulcu.github.io/books/veri-yapilari/
+
+[Book](/books/veri-yapilari/) · [PDF](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf) · [Course](/teaching/data-structures/?lang=tr)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Data Structures</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Course textbook on data structures in Java: algorithm analysis, arrays, recursion, linked lists, stacks and queues, trees, priority queues, hash tables, sets, and graphs.
+
+**How to cite:** Külcü, S. (2026). *Data Structures* [Course textbook, 868 pages]. https://sercankulcu.github.io/books/data-structures/
+
+[Book](/books/data-structures/) · [PDF](https://sercankulcu.github.io/courses-pdfs/data_structures/Data-Structures.pdf) · [Course](/teaching/data-structures/?lang=en)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Data Structures and Algorithms with C</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language textbook implementing classic data structures and algorithms in C: arrays, linked lists, stacks, queues, trees, heaps, hashing, graphs, union-find, shortest paths, and sorting.
+
+**Original title:** C ile Veri Yapıları ve Algoritmalar
+
+**How to cite:** Külcü, S. (2026). *C ile Veri Yapıları ve Algoritmalar* [Course textbook, 1019 pages]. https://sercankulcu.github.io/books/c-ile-veri-yapilari-ve-algoritmalar/
+
+[Book](/books/c-ile-veri-yapilari-ve-algoritmalar/) · [PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf) · [Course](/teaching/data-structures-and-algorithms-with-c/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Object-Oriented Programming with Java</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on object-oriented programming in Java: classes, inheritance, polymorphism, collections, exceptions, testing, I/O, graphics, threads, and databases.
+
+**Original title:** Java ile Nesne Yönelimli Programlama
+
+**How to cite:** Külcü, S. (2026). *Java ile Nesne Yönelimli Programlama* [Course textbook, 1621 pages]. https://sercankulcu.github.io/books/java-ile-nesne-yonelimli-programlama/
+
+[Book](/books/java-ile-nesne-yonelimli-programlama/) · [PDF](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf) · [Course](/teaching/object-oriented-programming-with-java/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Microprocessors</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on the 8086 microprocessor: architecture, registers, assembly language, memory access, interrupts, the instruction set, stack and procedures, macros, hardware interfacing, and instruction encoding.
+
+**Original title:** Mikroişlemciler
+
+**How to cite:** Külcü, S. (2026). *Mikroişlemciler* [Course textbook, 983 pages]. https://sercankulcu.github.io/books/mikroislemciler/
+
+[Book](/books/mikroislemciler/) · [PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/Mikroislemciler.pdf) · [Course](/teaching/microprocessors/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Operating Systems</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on operating systems: processes, threads, scheduling, synchronization, deadlock, memory and virtual memory, file systems, I/O, security, and Linux.
+
+**Original title:** İşletim Sistemleri
+
+**How to cite:** Külcü, S. (2026). *İşletim Sistemleri* [Course textbook, 1095 pages]. https://sercankulcu.github.io/books/isletim-sistemleri/
+
+[Book](/books/isletim-sistemleri/) · [PDF](https://sercankulcu.github.io/courses-pdfs/os/Isletim-Sistemleri.pdf) · [Course](/teaching/operating-systems/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - Programming with C</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+A complete course in the C programming language, in fifty-six chapters.
+
+**How to cite:** Külcü, S. (2026). *Programming with C* [Course textbook, 760 pages]. https://sercankulcu.github.io/books/programming-with-c/
+
+[Book](/books/programming-with-c/) · [PDF](https://sercankulcu.github.io/courses-pdfs/c/Programming-with-C.pdf) · [Course](/teaching/programming-with-c/)
+
+</details>
