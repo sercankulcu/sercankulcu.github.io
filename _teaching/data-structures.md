@@ -243,9 +243,6 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 <div data-lt="en" lang="en" markdown="1">
 
-*The whole course is available in English: the textbook, lecture notes, slides (HTML and PDF), study questions, simulators and the Java code.*
-
-
 ---
 
 ## Textbook
