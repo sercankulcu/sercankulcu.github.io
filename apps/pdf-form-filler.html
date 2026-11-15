@@ -800,6 +800,41 @@ clearBtn.addEventListener("click", () => {
   drop.focus();
 });
 
+/* Helvetica (standard PDF font) only covers WinAnsi, so text with letters such as ş, ğ, İ, ı
+   is drawn with embedded Noto Sans; fontkit and the font are fetched only when such text is present.
+   The whole font is embedded (about 280 KB): fontkit 1.1.1 subsetting drops glyphs of this font. */
+const NON_WINANSI = /[^ -~ -ÿ]/;
+const FONTKIT_URL = "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js";
+const UNICODE_FONT_URL = "https://cdn.jsdelivr.net/npm/@expo-google-fonts/noto-sans@0.2.3/NotoSans_400Regular.ttf";
+let fontkitPromise = null;
+let unicodeFontPromise = null;
+
+function loadFontkit() {
+  if (window.fontkit) return Promise.resolve(window.fontkit);
+  if (!fontkitPromise) {
+    fontkitPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = FONTKIT_URL;
+      script.onload = () => window.fontkit ? resolve(window.fontkit) : reject(new Error("fontkit missing"));
+      script.onerror = () => reject(new Error("fontkit could not be loaded"));
+      document.head.appendChild(script);
+    }).catch(error => { fontkitPromise = null; throw error; });
+  }
+  return fontkitPromise;
+}
+
+function loadUnicodeFont() {
+  if (!unicodeFontPromise) {
+    unicodeFontPromise = fetch(UNICODE_FONT_URL)
+      .then(response => {
+        if (!response.ok) throw new Error("font HTTP " + response.status);
+        return response.arrayBuffer();
+      })
+      .catch(error => { unicodeFontPromise = null; throw error; });
+  }
+  return unicodeFontPromise;
+}
+
 saveBtn.addEventListener("click", async () => {
   if (!sourceBytes) return;
 
@@ -816,7 +851,18 @@ saveBtn.addEventListener("click", async () => {
     setStatus("Creating filled PDF…");
 
     const documentPdf = await PDFLib.PDFDocument.load(sourceBytes);
-    const font = await documentPdf.embedFont(PDFLib.StandardFonts.Helvetica);
+    const needsUnicode = items.some(item => NON_WINANSI.test(item.value));
+    let font;
+
+    if (needsUnicode) {
+      setStatus("Loading a font for special characters…");
+      const [fontkit, fontBytes] = await Promise.all([loadFontkit(), loadUnicodeFont()]);
+      documentPdf.registerFontkit(fontkit);
+      font = await documentPdf.embedFont(fontBytes);
+      setStatus("Creating filled PDF…");
+    } else {
+      font = await documentPdf.embedFont(PDFLib.StandardFonts.Helvetica);
+    }
 
     for (const item of items) {
       const page = documentPdf.getPage(item.page - 1);
@@ -865,7 +911,9 @@ saveBtn.addEventListener("click", async () => {
     setStatus("Filled PDF downloaded.");
   } catch (error) {
     console.error(error);
-    setStatus("The filled PDF could not be created.", true);
+    setStatus(/font/i.test(String(error && error.message))
+      ? "The font for special characters (ş, ğ, İ, ı) could not be loaded. Check your connection and try again."
+      : "The filled PDF could not be created.", true);
   } finally {
     updateButtons();
   }
