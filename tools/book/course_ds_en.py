@@ -2,8 +2,8 @@
 """Data Structures: Veri Yapilari kitabinin Ingilizce surumu (lang='en').
 
 Ayni ders sayfasinin <div data-lt="en"> blogundan okunur: "## Part I: ..." /
-"### Chapter N: ..." duzeni, *_Ders_Notu_en.html notlari, *_en.html ekleri ve
-ders_haritasi_en.html. Sozluk (sozluk.html) iki dilli, iki kitapta da ayni dosya.
+"### Chapter N: ..." duzeni, notes/Chapter_NN_*_Lecture_Notes.html notlari, Prerequisites.html ve Important_People.html
+ekleri ve Course_Map.html. Sozluk (sozluk.html) iki dilli, iki kitapta da ayni dosya.
 """
 import notes_book
 
@@ -39,7 +39,7 @@ notes_book.setup(
     folder='data_structures',
     course_page=COURSE_PAGE,
     # course map: at the top of the contents, before Part I
-    intro=[('ders_haritasi_en.html', 'harita')],
+    intro=[('Course_Map.html', 'harita')],
     title='Data Structures',
     subtitle='',
     output='data_structures/Data-Structures.pdf',     # under courses-pdfs/

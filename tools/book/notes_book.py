@@ -14,7 +14,7 @@ sayfayla ayni sirada kalir.
 
 lang='en' (Veri Yapilari Ingilizce): etiketler Ingilizce, ders sayfasinin
 <div data-lt="en"> blogundaki "## Part I: ..." / "### Chapter N: ..." duzeni okunur,
-notlar ve ekler *_en.html dosyalarindan gelir, Turkce heceleme uygulanmaz. Ders
+notlar notes/Chapter_NN_*_Lecture_Notes.html, ekler Prerequisites.html ve Important_People.html dosyalarindan gelir, Turkce heceleme uygulanmaz. Ders
 sayfasinda dil bloklari varsa Turkce kip de yalnizca <div data-lt="tr"> icini okur.
 """
 import glob, html, io, os, re
@@ -146,7 +146,10 @@ TEXT = {
         'chapter_title_re': r'###\s+Bölüm\s+(\d+):\s*(.+?)\s*$',
         'h1_prefix_re': r'^Bölüm\s+\d+:\s*',
         'h1_sub_re': r'Bölüm\s+(\d+\.\d+):\s*(.+)$',
-        'note_suffix': '',
+        'notes_dir': 'notlar',
+        'note_link_re': r'/notlar/(Bolum_[^)#\s]+_Ders_Notu\.html)',
+        'note_glob': 'Bolum_%02d_*_Ders_Notu.html',
+        'note_glob_all': 'Bolum_*_Ders_Notu.html',
         'kicker': 'Kısım %s · Bölüm %%s',
         'subs_title': 'Bu bölümün notları',
         'appendix': 'Ek %s',
@@ -162,7 +165,10 @@ TEXT = {
         'chapter_title_re': r'###\s+Chapter\s+(\d+):\s*(.+?)\s*$',
         'h1_prefix_re': r'^Chapter\s+\d+:\s*',
         'h1_sub_re': r'Chapter\s+(\d+\.\d+):\s*(.+)$',
-        'note_suffix': '_en',
+        'notes_dir': 'notes',
+        'note_link_re': r'/notes/(Chapter_[^)#\s]+_Lecture_Notes\.html)',
+        'note_glob': 'Chapter_%02d_*_Lecture_Notes.html',
+        'note_glob_all': 'Chapter_*_Lecture_Notes.html',
         'kicker': 'Part %s · Chapter %%s',
         'subs_title': 'Notes in this chapter',
         'appendix': 'Appendix %s',
@@ -251,8 +257,8 @@ class _Course:
         # Turkce heceleme yalnizca Turkce kitapta; Ingilizcede CSS (hyphens: auto) karar verir
         self.hy = hyphenate_html if lang == 'tr' else (lambda s: s)
         self.dir = os.path.join(SITE, 'files', folder)
-        self.notes = os.path.join(self.dir, 'notlar')
-        self.notes_url = '/files/%s/notlar' % folder
+        self.notes = os.path.join(self.dir, self.T['notes_dir'])
+        self.notes_url = '/files/%s/%s' % (folder, self.T['notes_dir'])
         self.course_page = os.path.join(SITE, '_teaching', course_page)
         # kunyedeki adres: ders sayfasinin permalink'i (dosya adi her zaman ayni degil)
         fm = io.open(self.course_page, encoding='utf-8').read().split('---', 2)[1]
@@ -295,7 +301,6 @@ class _Course:
         Bolum_NN_*_Ders_Notu.html aranir.
         """
         info, cur = {}, None
-        sfx = self.T['note_suffix']
         for line in page_lines(self.course_page, self.lang):
             m = re.match(self.T['chapter_re'], line)
             if m:
@@ -306,7 +311,7 @@ class _Course:
                 continue
             if cur is None:
                 continue
-            m = re.search(r'/notlar/(Bolum_[^)#\s]+_Ders_Notu%s\.html)' % sfx, line)
+            m = re.search(self.T['note_link_re'], line)
             if m:
                 if m.group(1) not in cur['notes']:
                     cur['notes'].append(m.group(1))
@@ -315,7 +320,7 @@ class _Course:
         for n, c in info.items():
             if not c['notes']:
                 c['notes'] = [os.path.basename(f) for f in
-                              sorted(glob.glob(os.path.join(self.notes, 'Bolum_%02d_*_Ders_Notu%s.html' % (n, sfx))))]
+                              sorted(glob.glob(os.path.join(self.notes, self.T['note_glob'] % n)))]
             for f in c['notes']:
                 if not os.path.exists(os.path.join(self.notes, f)):
                     raise SystemExit('ders sayfasindaki not yok: %s' % f)
@@ -453,8 +458,10 @@ class _Course:
 
     def extra_files(self):
         """[(dosya, kimlik, etiket)]: Ek B Ön Bilgiler, Ek C Önemli İsimler (sayfa varsa)."""
-        # Ingilizce kitap *_en.html sayfalarini, Turkce kitap otekileri alir
-        names = [f for f in os.listdir(self.dir) if f.endswith('_en.html') == (self.lang == 'en')]
+        # Ingilizce kitap Ingilizce adli ekleri (Prerequisites.html, Important_People.html), Turkce kitap otekileri alir
+        en_pages = ('Prerequisites.html', 'Important_People.html')
+        names = [f for f in os.listdir(self.dir)
+                 if (f in en_pages) == (self.lang == 'en') and not f.endswith('_en.html')]
         pre = sorted(f for f in names if re.search(r'Prerequisites.*\.html$', f))
         ppl = sorted(f for f in names if re.search(r'(Important_People|Pioneers).*\.html$', f))
         out, ap = [], self.T['appendix']
@@ -511,7 +518,7 @@ class _Course:
             self.note_ids[os.path.basename(f)] = (uid, uid)
         for f, uid, label in self.extra_files():
             self.note_ids[f] = (uid, uid)
-        stray = sorted(os.path.basename(f) for f in glob.glob(os.path.join(self.notes, 'Bolum_*_Ders_Notu%s.html' % self.T['note_suffix']))
+        stray = sorted(os.path.basename(f) for f in glob.glob(os.path.join(self.notes, self.T['note_glob_all']))
                        if os.path.basename(f) not in self.note_ids)
         if stray:
             print('  UYARI: ders sayfasinda bagi olmayan not(lar) kitaba girmedi: %s' % ', '.join(stray))
@@ -556,7 +563,7 @@ def setup(g, **cfg):
     en = c.lang == 'en'
     g.update(TITLE=c.title, LANG=c.lang, OUTPUT=c.output, FONT=FONT, META=c.meta,
              LABELS=LABELS_EN if en else LABELS, TOC_SECTIONS=True, BOOKMARK_SECTIONS=True,
-             CSS_FILES=['book-front.css', os.path.join(c.notes, 'notlar.css')] + c.extra_css
+             CSS_FILES=['book-front.css', os.path.join(c.dir, 'notlar', 'notlar.css')] + c.extra_css
                        + ['book_notes.css'] + (['book_notes_en.css'] if en else []),
              part_number=part_number, toc_part=toc_part_en if en else toc_part,
              date_text=date_text_en if en else date_text,

@@ -123,7 +123,7 @@ def decks(slides):
     """deck.js kullanan ana sunumlar (calisma sorulari ve simulatorler haric)."""
     out = []
     for f in sorted(os.listdir(slides)):
-        if not re.match(r'Bolum_\d\d_.*\.html$', f) or '_Calisma_Sorulari' in f:
+        if not re.match(r'(Bolum|Chapter)_\d\d_.*\.html$', f) or '_Calisma_Sorulari' in f or '_Study_Questions' in f:
             continue
         with open(os.path.join(slides, f), encoding='utf-8') as h:
             if 'id="ds-deck-next"' in h.read():
@@ -190,17 +190,27 @@ def main():
     ap.add_argument('--no-theme', action='store_true', help='canli site duzenini kullanma (cevrimdisi)')
     a = ap.parse_args()
 
-    slides = os.path.join(REPO, 'files', a.course, 'slides')
-    if not os.path.isdir(slides):
-        sys.exit('Klasor yok: ' + slides)
+    # sunumlar files/<ders>/slides altinda; Veri Yapilari'nda Turkce sunumlar sunumlar/,
+    # Ingilizceler slides/ altindadir (ortak deck/ betikleri slides/deck'te)
+    course_dir = os.path.join(REPO, 'files', a.course)
+    folders = [d for d in ('slides', 'sunumlar') if os.path.isdir(os.path.join(course_dir, d))]
+    if not folders:
+        sys.exit('Klasor yok: ' + os.path.join(course_dir, 'slides'))
     pdfdir = a.out or os.path.join(PDF_REPO, a.course, 'pdf')
     os.makedirs(pdfdir, exist_ok=True)
-    names = a.names or decks(slides)
+    where = {}
+    for d in folders:
+        for n in decks(os.path.join(course_dir, d)):
+            where[n] = d
+    names = a.names or sorted(where)
     for n in names:
-        if not os.path.exists(os.path.join(slides, n + '.html')):
-            sys.exit('Sunum yok: ' + n)
+        if n not in where:
+            found = [d for d in folders if os.path.exists(os.path.join(course_dir, d, n + '.html'))]
+            if not found:
+                sys.exit('Sunum yok: ' + n)
+            where[n] = found[0]
     if a.stale:
-        names = [n for n in names if is_stale(slides, pdfdir, n)]
+        names = [n for n in names if is_stale(os.path.join(course_dir, where[n]), pdfdir, n)]
     if not names:
         print('Guncel olmayan PDF yok.')
         return
@@ -211,13 +221,13 @@ def main():
     with sync_playwright() as p:
         browser = launch(p)
         context = browser.new_context(viewport={'width': 1280, 'height': 900})
-        serve(context, slides, shell)
+        serve(context, course_dir, shell)
         for n in names:
             # buyuk sunumlar ara sira yuklenemiyor (zaman asimi): birkac kez dene
             for attempt in range(3):
                 page = context.new_page()
                 try:
-                    snaps, expected = render(page, '%s/%s.html#1' % (BASE, n))
+                    snaps, expected = render(page, '%s/%s/%s.html#1' % (BASE, where[n], n))
                     break
                 except Exception as e:
                     page.close()
