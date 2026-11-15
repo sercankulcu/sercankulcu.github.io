@@ -47,6 +47,20 @@ JSON-LD'si kurar.
 Sunum PDF'lerinde başlıktaki site adını atıp yazarı yazan adımı `make_slide_pdf.py`
 kendisi yapar (`set_pdf_info`).
 
+## Uygulamalar sayfası
+
+```
+python tools/make_app_pages.py
+```
+
+`/apps/` sayfasını (`_pages/apps.md`) kart düzeniyle yeniden yazar; gruplar, sıra ve
+emojiler betiğin başındaki `GROUPS` listesindedir, kart açıklaması her uygulamanın kendi
+`excerpt`'inden gelir. Her uygulama sayfasının ön bilgisine `seo_title`, `og_image` ve
+`web_app` (schema.org applicationCategory; `head/custom.html` bundan WebApplication
+JSON-LD'si kurar) yazar ve 1200×630 paylaşım kartlarını `images/apps/` altına
+çizer (kart başına ~50 KB). Yeni uygulama: sayfasını `apps/` altına koyun, `GROUPS`'a ekleyin, betiği
+çalıştırın.
+
 ## Kitap
 
 ```bash
