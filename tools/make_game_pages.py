@@ -30,7 +30,7 @@ GROUPS = [
     ('🧠', 'Puzzle & logic', '#2f8a6b', 'Puzzle', [
         ('💣', 'minesweeper', 'en'), ('🔢', 'sudoku', 'en'), ('🧩', 'connections', 'en'),
         ('🧶', 'strands', 'tr'), ('🃏', 'memory', 'en'), ('🐂', 'bulls-and-cows', 'en'),
-        ('🔀', 'sliding-puzzle', 'en'), ('⚓', 'battleship', 'tr')]),
+        ('🔀', 'sliding-puzzle', 'tr'), ('⚓', 'battleship', 'tr')]),
     ('🔤', 'Word games', '#1f6fb2', 'Word game', [
         ('5️⃣', 'fiveletters', 'tr'), ('6️⃣', 'sixletters', 'tr'), ('🔤', 'oneword', 'tr'),
         ('🐝', 'spellbee', 'tr'), ('🎯', 'hangman', 'tr'), ('🔡', 'boggle', 'tr')]),
@@ -48,6 +48,7 @@ SEO = {
     'sixletters': 'Altı Harf · 6 Harfli Türkçe Wordle',
     'hangman': 'Adam Asmaca · Türkçe Kelime Tahmin Oyunu',
     'strands': 'Strands · Türkçe Temalı Kelime Avı',
+    'sliding-puzzle': 'Kaydırmalı Bulmaca · 15 Bulmacası Oyna',
     'oneword': 'Bir Kelime · Türkçe Kelime Türetme Oyunu',
     'spellbee': 'Spell Bee · Türkçe Kelime Oyunu',
     'boggle': 'Boggle · Türkçe Kelime Bulma Oyunu',
