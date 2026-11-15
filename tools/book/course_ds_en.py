@@ -27,9 +27,9 @@ reading and a bibliography. The glossary at the end of the book gives, for each 
 term, the Turkish equivalent used in the Turkish edition of these notes.</p>
 
 <p>The code for each chapter is in its own folder in the companion repository,
-<span class="u">github.com/sercankulcu/data-structures-java</span>; the folder name is given
-at the start of the chapter. The repository code uses Turkish identifiers, while the
-listings in this book use English names. Slides, study questions and simulators that run
+<span class="u">github.com/sercankulcu/data-structures-java-en</span>; the folder name is given
+at the start of the chapter, and the programs use the same names as the listings in this
+book. Slides, study questions and simulators that run
 the structures step by step are on the course page.</p>
 '''
 
@@ -50,6 +50,6 @@ notes_book.setup(
                        'graph, textbook'},
     preface=PREFACE,
     colophon='''<p>Slides, study questions and simulators are on that page. The code for each
-     chapter is in the <span class="u">github.com/sercankulcu/data-structures-java</span>
-     repository (with Turkish identifiers; the book uses English names).</p>''',
+     chapter is in the <span class="u">github.com/sercankulcu/data-structures-java-en</span>
+     repository.</p>''',
 )

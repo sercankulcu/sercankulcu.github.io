@@ -243,7 +243,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 <div data-lt="en" lang="en" markdown="1">
 
-*The whole course is available in English: the textbook, lecture notes, slides (HTML and PDF), study questions and simulators. The code repository still uses Turkish identifiers.*
+*The whole course is available in English: the textbook, lecture notes, slides (HTML and PDF), study questions, simulators and the Java code.*
 
 
 ---
@@ -273,7 +273,7 @@ Data structures determine how data is laid out in memory and how it is accessed.
 - [📄Slides – Introduction (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_01_Giris_en.pdf)
 - [📖Lecture Notes – Introduction (HTML)](/files/data_structures/notlar/Bolum_01_Giris_Ders_Notu_en.html)
 - [📝Study Questions – Introduction (HTML)](/files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum01/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter01/src)
 
 ---
 
@@ -285,7 +285,7 @@ Algorithm analysis lets us compare solutions before implementing them. Empirical
 - [📄Slides – Algorithm Analysis (PDF)](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_02_Algoritma_Analizi_en.pdf)
 - [📖Lecture Notes – Algorithm Analysis (HTML)](/files/data_structures/notlar/Bolum_02_Algoritma_Analizi_Ders_Notu_en.html)
 - [📝Study Questions – Algorithm Analysis (HTML)](/files/data_structures/slides/Bolum_02_Algoritma_Analizi_Calisma_Sorulari_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum02/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter02/src)
 
 ---
 
@@ -298,7 +298,7 @@ An array is the most basic data structure, with its elements stored contiguously
 - [📖Lecture Notes – Arrays (HTML)](/files/data_structures/notlar/Bolum_03_Diziler_Ders_Notu_en.html)
 - [📝Study Questions – Arrays (HTML)](/files/data_structures/slides/Bolum_03_Diziler_Calisma_Sorulari_en.html)
 - [🕹️Array Simulator (HTML)](/files/data_structures/slides/Bolum_03_Arrays_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum03/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter03/src)
 
 ---
 
@@ -311,7 +311,7 @@ Recursion reduces a problem to smaller instances of the same problem until it re
 - [📖Lecture Notes – Recursion (HTML)](/files/data_structures/notlar/Bolum_04_Ozyineleme_Ders_Notu_en.html)
 - [📝Study Questions – Recursion (HTML)](/files/data_structures/slides/Bolum_04_Ozyineleme_Calisma_Sorulari_en.html)
 - [🕹️Tower of Hanoi Simulator (HTML)](/files/data_structures/slides/Bolum_04_Tower_of_Hanoi_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum04/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter04/src)
 
 ---
 
@@ -328,7 +328,7 @@ A linked list is made of nodes, each holding data and a reference to the next no
 - [🕹️Linked List Simulator (HTML)](/files/data_structures/slides/Bolum_05_Linked_List_en.html)
 - [🕹️Doubly Linked List Simulator (HTML)](/files/data_structures/slides/Bolum_05_Doubly_Linked_List_en.html)
 - [🕹️Circular Linked List Simulator (HTML)](/files/data_structures/slides/Bolum_05_Circular_Linked_List_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum05/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter05/src)
 
 ---
 
@@ -341,7 +341,7 @@ A list is an abstract data type for an ordered sequence of elements; it can grow
 - [📖Lecture Notes – The List ADT and Java Collections (HTML)](/files/data_structures/notlar/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari_Ders_Notu_en.html)
 - [📝Study Questions – The List ADT and Java Collections (HTML)](/files/data_structures/slides/Bolum_06_Liste_ADT_ve_Java_Koleksiyonlari_Calisma_Sorulari_en.html)
 - [🕹️List ADT Simulator (HTML)](/files/data_structures/slides/Bolum_06_List_ADT_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum06/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter06/src)
 
 ---
 
@@ -357,7 +357,7 @@ A stack works last in, first out (LIFO): insertion (push) and removal (pop) happ
 - [🕹️Stock Span Simulator (HTML)](/files/data_structures/slides/Bolum_07_Stock_Span_en.html)
 - [🕹️Infix → Prefix Converter (HTML)](/files/data_structures/slides/Bolum_07_Infix_to_Prefix_en.html)
 - [🕹️Infix → Postfix Converter (HTML)](/files/data_structures/slides/Bolum_07_Infix_to_Postfix_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum07/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter07/src)
 
 ---
 
@@ -373,7 +373,7 @@ A queue works first in, first out (FIFO): elements are added at one end (enqueue
 - [🕹️Deque Simulator (HTML)](/files/data_structures/slides/Bolum_08_Deque_en.html)
 - [🕹️Circular Queue Simulator (HTML)](/files/data_structures/slides/Bolum_08_Circular_Queue_en.html)
 - [🕹️Round-Robin Scheduler (HTML)](/files/data_structures/slides/Bolum_08_Scheduler_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum08/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter08/src)
 
 ---
 
@@ -388,7 +388,7 @@ A tree is a hierarchical structure of nodes connected by edges: it starts at a r
 - [📖Lecture Notes – Trees (HTML)](/files/data_structures/notlar/Bolum_09_Agaclar_Ders_Notu_en.html)
 - [📝Study Questions – Trees (HTML)](/files/data_structures/slides/Bolum_09_Agaclar_Calisma_Sorulari_en.html)
 - [🕹️General Tree Simulator (HTML)](/files/data_structures/slides/Bolum_09_General_Tree_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum09/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter09/src)
 
 ---
 
@@ -407,7 +407,7 @@ In a binary search tree (BST), the keys in each node's left subtree are smaller 
 - [🕹️Splay Tree Simulator (HTML)](/files/data_structures/slides/Bolum_10_Splay_en.html)
 - [🕹️B-Tree Simulator (HTML)](/files/data_structures/slides/Bolum_10_BTree_en.html)
 - [🕹️B+ Tree Simulator (HTML)](/files/data_structures/slides/Bolum_10_BPlusTree_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum10/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter10/src)
 
 ---
 
@@ -422,7 +422,7 @@ A priority queue is an abstract data type that always removes the element with t
 - [🕹️Binary Heap Simulator (HTML)](/files/data_structures/slides/Bolum_11_Heap_en.html)
 - [🕹️Priority Queue Simulator (HTML)](/files/data_structures/slides/Bolum_11_Priority_Queue_en.html)
 - [🕹️Priority Scheduler Simulator (HTML)](/files/data_structures/slides/Bolum_11_Priority_Scheduler_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum11/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter11/src)
 
 ---
 
@@ -439,7 +439,7 @@ A map is an abstract data type that associates keys with values. A hash table co
 - [🕹️Hash Table Simulator (HTML)](/files/data_structures/slides/Bolum_12_Hash_Table_en.html)
 - [🕹️Map Simulator (HTML)](/files/data_structures/slides/Bolum_12_Map_en.html)
 - [🕹️Open Addressing Simulator (HTML)](/files/data_structures/slides/Bolum_12_Open_Addressing_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum12/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter12/src)
 
 ---
 
@@ -453,7 +453,7 @@ A set is an unordered collection of distinct elements; it contains no duplicates
 - [📝Study Questions – Sets and Disjoint Sets (HTML)](/files/data_structures/slides/Bolum_13_Kumeler_ve_Ayrik_Kumeler_Calisma_Sorulari_en.html)
 - [🕹️Set ADT Simulator (HTML)](/files/data_structures/slides/Bolum_13_Set_ADT_en.html)
 - [🕹️Disjoint Sets Simulator (HTML)](/files/data_structures/slides/Bolum_13_Disjoint_Set_Union_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum13/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter13/src)
 
 ---
 
@@ -469,6 +469,6 @@ A graph represents relationships between objects with vertices and edges. Unlike
 - [🕹️Directed Graph Simulator (HTML)](/files/data_structures/slides/Bolum_14_Directed_Graph_en.html)
 - [🕹️Dijkstra's Algorithm Simulator (HTML)](/files/data_structures/slides/Bolum_14_Dijkstra_en.html)
 - [🕹️Course Prerequisite Planner (HTML)](/files/data_structures/slides/Bolum_14_Course_Planner_en.html)
-- [💻Code Examples (GitHub, Turkish identifiers)](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum14/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java-en/tree/main/Chapter14/src)
 
 </div>

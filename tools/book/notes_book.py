@@ -198,7 +198,7 @@ def code_links(course_page, lang='tr'):
 
     "[💻Kod Örnekleri (GitHub)](…)" -> "Bu bölümün kodu", "[💻Kod Örnekleri, Java (GitHub)](…)" -> "Kod (Java)",
     "[🧪Laboratuvar Çalışması, C (GitHub)](…)" -> "Laboratuvar"; ötekiler kendi adlarıyla.
-    Ingilizce: "[💻Code Examples (GitHub, Turkish identifiers)](…)" -> "Code for this chapter".
+    Ingilizce: "[💻Code Examples (GitHub)](…)" -> "Code for this chapter".
     """
     out, cur = {}, None
     chapter_re = TEXT[lang]['chapter_re']
