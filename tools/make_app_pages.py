@@ -86,11 +86,11 @@ def seo_title(title, files):
     return '%s · Free Online%s' % (title, ', No Upload' if files else '')
 
 
-def update_front_matter(url, add):
-    path = page_file(url)
+def update_front_matter(url, add, path=None, managed=MANAGED):
+    path = path or page_file(url)
     s = io.open(path, encoding='utf-8').read()
     end = s.index('\n---\n', 4)
-    lines = [l for l in s[4:end].split('\n') if not l.startswith(tuple(k + ':' for k in MANAGED))]
+    lines = [l for l in s[4:end].split('\n') if not l.startswith(tuple(k + ':' for k in managed))]
     new = '---\n' + '\n'.join(lines + add) + s[end:]
     if new != s:
         io.open(path, 'w', encoding='utf-8', newline='').write(new)
@@ -133,19 +133,20 @@ h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size
 </body></html>"""
 
 
-def card_html(title, desc, ico, accent, files):
+def card_html(title, desc, ico, accent, files, kicker='Free browser tool', l2=None, lang='en'):
     n = len(title)
     size = 72 if n <= 14 else 62 if n <= 22 else 52 if n <= 32 else 44
     longest = max(len(w) for w in title.split())
     size = min(size, int(584 / (0.62 * longest)))
     if len(desc) > 140:
         desc = desc[:desc.rfind(' ', 0, 137)].rstrip(',;:—') + '…'
-    l2 = 'Free · Runs in your browser · No upload' if files else 'Free · Runs in your browser'
-    return CARD_HTML % dict(accent=accent, kicker='Free browser tool', title=e(title), desc=e(desc),
-                            l2=l2, ico=ico, size=size)
+    if l2 is None:
+        l2 = 'Free · Runs in your browser · No upload' if files else 'Free · Runs in your browser'
+    return (CARD_HTML % dict(accent=accent, kicker=e(kicker), title=e(title), desc=e(desc),
+                             l2=e(l2), ico=ico, size=size)).replace('<html lang="en">', '<html lang="%s">' % lang)
 
 
-def render_cards(cards):
+def render_cards(cards, card_dir=CARD_DIR):
     sys.path.insert(0, HERE)
     import make_slide_pdf
     from playwright.sync_api import sync_playwright
@@ -165,13 +166,13 @@ def render_cards(cards):
                     if attempt == 2:
                         raise
                     pg.wait_for_timeout(500)
-            out = os.path.join(REPO, CARD_DIR, name + '.jpg')
+            out = os.path.join(REPO, card_dir, name + '.jpg')
             old = open(out, 'rb').read() if os.path.exists(out) else None
             if old != data:
                 os.makedirs(os.path.dirname(out), exist_ok=True)
                 with open(out, 'wb') as f:
                     f.write(data)
-                print('yazildi', CARD_DIR + '/' + name + '.jpg')
+                print('yazildi', card_dir + '/' + name + '.jpg')
         br.close()
 
 

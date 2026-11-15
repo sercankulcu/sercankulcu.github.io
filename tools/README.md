@@ -61,6 +61,19 @@ JSON-LD'si kurar) yazar ve 1200×630 paylaşım kartlarını `images/apps/` alt�
 çizer (kart başına ~50 KB). Yeni uygulama: sayfasını `apps/` altına koyun, `GROUPS`'a ekleyin, betiği
 çalıştırın.
 
+## Oyunlar sayfası
+
+```
+python tools/make_game_pages.py
+```
+
+`make_app_pages.py` ile aynı işi `/games/` için yapar: `_pages/games.md`'yi kartlarla
+yazar, her oyun sayfasına `lang`, `seo_title`, `og_image` ve `game_genre` (VideoGame
+JSON-LD için) ekler, kartları `images/games/` altına çizer. Oyunun arayüz dili `GROUPS`
+içinde (`tr`/`en`); ad ve açıklama oyun sayfasının `title` ve `excerpt`'inden gelir, o
+yüzden bir oyunun adını değiştirmek için sayfasındaki `title`'ı değiştirip betiği
+çalıştırın.
+
 ## Kitap
 
 ```bash
