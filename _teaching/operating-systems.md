@@ -6,6 +6,11 @@ permalink: /teaching/operating-systems/
 venue: "Giresun University, Computer Engineering"
 date: 2026-01-06
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/isletim-sistemleri.jpg
+course_language: tr
+textbook:
+  name: "İşletim Sistemleri"
+  url: /books/isletim-sistemleri/
 ---
 
 ![operating systems](/images/teaching/teaching-operating-systems.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

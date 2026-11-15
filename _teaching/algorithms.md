@@ -6,6 +6,11 @@ permalink: /teaching/algorithms/
 venue: "Giresun University, Computer Engineering"
 date: 2026-01-07
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmalar.jpg
+course_language: tr
+textbook:
+  name: "Algoritmalar"
+  url: /books/algoritmalar/
 ---
 
 ![algorithms](/images/teaching/teaching-algorithms.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

@@ -6,6 +6,11 @@ permalink: /teaching/microprocessors/
 venue: "Giresun University, Electrical Electronics Engineering"
 date: 2024-01-05
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+course_language: tr
+textbook:
+  name: "Mikroişlemciler"
+  url: /books/mikroislemciler/
 ---
 
 ![microprocessor](/images/teaching/teaching-microprocessors.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

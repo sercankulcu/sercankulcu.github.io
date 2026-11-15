@@ -6,7 +6,9 @@
 Her kitap, makale ve tez icin _pages/scholar/ altina sitenin without-sidebar duzeninde bir
 sayfa yazar: kitaplar /books/<pdf-adi>/, makaleler /publications/<pdf-adi>/, tez
 /publications/2022-phd-thesis/. citation_* etiketleri on bilgideki scholar_meta listesinden
-_includes/head/custom.html ile <head>'e girer. Sayfada baslik,
+_includes/head/custom.html ile <head>'e girer; JSON-LD (Book, ScholarlyArticle, Thesis) on
+bilgideki json_ld'den ayni yolla girer. og:image icin PDF'in ilk sayfasi courses-pdfs/covers/
+altina JPEG olarak yazilir (ders sayfalari da kitabin kapagini og_image olarak kullanir). Sayfada baslik,
 yazarlar, tarih, ozet ve PDF baglantisi vardir. Makale ve tez PDF'lerinin baslik,
 yazar ve konu bilgisini de doldurur. Son olarak courses-pdfs/sitemap.xml'i butun
 PDF'lerle yeniden yazar (sitenin robots.txt dosyasi onu gosterir).
@@ -25,6 +27,10 @@ BASE = SITE + '/courses-pdfs/'
 OUT_DIR = os.path.join(REPO, '_pages', 'scholar')
 ME = ('Sercan', 'Külcü')
 YEAR_BOOKS = '2026'
+COVER_DIR = 'covers'      # courses-pdfs/covers/<pdf-adi>.jpg: PDF'in ilk sayfasi, og:image ve JSON-LD image icin
+COVER_WIDTH = 600
+PERSON = {'@type': 'Person', 'name': 'Sercan Külcü', 'url': SITE + '/',
+          'affiliation': {'@type': 'CollegeOrUniversity', 'name': 'Giresun University'}}
 
 # kitap PDF'i -> (dil, ders sayfasi)
 BOOKS = [
@@ -131,15 +137,47 @@ def set_info(rel, title, author, subject, keywords):
     d.close()
 
 
-def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink):
+def cover(rel):
+    """PDF'in ilk sayfasini courses-pdfs/covers/ altina JPEG olarak yazar (PDF degismediyse dokunmaz)."""
+    import pymupdf
+    src = os.path.join(PDF_REPO, rel)
+    name = slug(rel) + '.jpg'
+    out = os.path.join(PDF_REPO, COVER_DIR, name)
+    if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(src):
+        d = pymupdf.open(src)
+        pg = d[0]
+        z = COVER_WIDTH / pg.rect.width
+        pix = pg.get_pixmap(matrix=pymupdf.Matrix(z, z))
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        pix.save(out, jpg_quality=82)
+        d.close()
+        print('yazildi', COVER_DIR + '/' + name)
+    return BASE + COVER_DIR + '/' + name
+
+
+def ld(obj):
+    """JSON-LD nesnesi: on bilgide json_ld olarak durur, _includes/head/custom.html <head>'e yazar."""
+    return dict({'@context': 'https://schema.org'}, **obj)
+
+
+def pdf_media(rel):
+    return {'@type': 'MediaObject', 'contentUrl': BASE + rel, 'encodingFormat': 'application/pdf'}
+
+
+def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink, json_ld=None, og_type='article'):
     """Sitenin without-sidebar duzeninde bir Jekyll sayfasi. citation_* etiketleri on bilgideki
-    scholar_meta listesinden _includes/head/custom.html ile <head>'e yazilir."""
+    scholar_meta listesinden, JSON-LD json_ld'den _includes/head/custom.html ile <head>'e yazilir;
+    og_image (PDF'in ilk sayfasi) ve og_type _includes/seo.html'de okunur."""
     t = L[lang]
     tags = [(k, v) for k, v in meta_tags if k != 'description']
     fm = ['---', 'layout: without-sidebar', 'author_profile: false',
           'title: ' + json.dumps(title, ensure_ascii=False),
           'description: ' + json.dumps(dict(meta_tags).get('description', title), ensure_ascii=False),
-          'permalink: ' + permalink, 'lang: ' + lang, 'scholar_meta:']
+          'permalink: ' + permalink, 'lang: ' + lang,
+          'og_image: ' + cover(rel_pdf), 'og_type: ' + og_type]
+    if json_ld:
+        fm.append('json_ld: ' + json.dumps(json.dumps(ld(json_ld), ensure_ascii=False), ensure_ascii=False))
+    fm.append('scholar_meta:')
     fm += ['  - [%s, %s]' % (k, json.dumps(v, ensure_ascii=False)) for k, v in tags]
     fm += ['---', '']
     html_body = """<style>%(css)s</style>
@@ -164,7 +202,7 @@ def book_page(rel, lang, course):
             ('citation_title', title), ('citation_author', '%s, %s' % (ME[1], ME[0])),
             ('citation_publication_date', YEAR_BOOKS), ('citation_language', lang),
             ('citation_pdf_url', BASE + rel), ('citation_keywords', kw.replace(',', ';')),
-            ('DC.type', 'Text.Book'), ('og:title', title), ('og:type', 'book')]
+            ('DC.type', 'Text.Book')]
     body = """<h1>%s</h1>
 <p class="sch-authors">%s</p>
 <p class="sch-meta">%s &middot; %s</p>
@@ -174,7 +212,14 @@ def book_page(rel, lang, course):
          SITE, e(course), e(t['course']),
          '<h2>%s</h2>\n<p>%s</p>' % (e(t['about']), e(desc[:1].upper() + desc[1:] + '.')) if desc else '',
          '<p class="sch-meta">%s: %s</p>' % (e(t['keywords']), e(kw)) if kw else '')
-    return page(lang, title, t['book'], tags, body, rel, YEAR_BOOKS, '/books/%s/' % slug(rel))
+    url = '/books/%s/' % slug(rel)
+    book = {'@type': 'Book', 'name': title, 'author': PERSON, 'datePublished': YEAR_BOOKS,
+            'inLanguage': lang, 'numberOfPages': n, 'bookFormat': 'https://schema.org/EBook',
+            'learningResourceType': 'Textbook', 'isAccessibleForFree': True,
+            'url': SITE + url, 'image': BASE + COVER_DIR + '/' + slug(rel) + '.jpg',
+            'description': desc[:1].upper() + desc[1:] if desc else title,
+            'keywords': kw, 'encoding': pdf_media(rel)}
+    return page(lang, title, t['book'], tags, body, rel, YEAR_BOOKS, url, book, 'book')
 
 
 def paper_page(p):
@@ -209,8 +254,16 @@ def paper_page(p):
 <p class="sch-cite">%s</p>""" % (e(p['title']), e(authors), e(p['book']), p['pages'][0], p['pages'][1],
                              e(p['publisher']), e(p['isbn']), e(BASE + p['pdf']), e(t['pdf']),
                              e(t['abstract']), e(abstract), e(t['keywords']), e(kw), e(t['cite']), cite)
-    return page(p['lang'], p['title'], 'Conference paper', tags, body, p['pdf'], p['date'][:4],
-                '/publications/%s/' % slug(p['pdf']))
+    url = '/publications/%s/' % slug(p['pdf'])
+    art = {'@type': 'ScholarlyArticle', 'headline': p['title'], 'name': p['title'],
+           'author': [PERSON if a == ME else {'@type': 'Person', 'name': full(a)} for a in p['authors']],
+           'datePublished': p['date'], 'inLanguage': p['lang'], 'abstract': abstract, 'keywords': kw,
+           'pageStart': str(p['pages'][0]), 'pageEnd': str(p['pages'][1]),
+           'isPartOf': {'@type': 'Book', 'name': p['book'], 'isbn': p['isbn'],
+                        'publisher': {'@type': 'Organization', 'name': p['publisher']}},
+           'url': SITE + url, 'image': BASE + COVER_DIR + '/' + slug(p['pdf']) + '.jpg',
+           'encoding': pdf_media(p['pdf'])}
+    return page(p['lang'], p['title'], 'Conference paper', tags, body, p['pdf'], p['date'][:4], url, art)
 
 
 def thesis_page(p):
@@ -250,7 +303,13 @@ def thesis_page(p):
         e(p['title']), e(p['title_en']), e(full(ME)), e(p['institution']),
         e(p['supervisor']), m['pages'], e(BASE + p['pdf']), e(ozet), e(kw_tr), e(summary),
         e(kw_en), e(p['title']), e(p['institution']))
-    return page('tr', p['title'], 'Doktora tezi', tags, body, p['pdf'], '2022', p['permalink'])
+    th = {'@type': 'Thesis', 'name': p['title'], 'alternateName': p['title_en'], 'author': PERSON,
+          'datePublished': p['date'].replace('/', '-'), 'inLanguage': 'tr', 'inSupportOf': 'PhD',
+          'abstract': ozet, 'keywords': kw_tr,
+          'sourceOrganization': {'@type': 'CollegeOrUniversity', 'name': p['institution']},
+          'url': SITE + p['permalink'], 'image': BASE + COVER_DIR + '/' + slug(p['pdf']) + '.jpg',
+          'encoding': pdf_media(p['pdf'])}
+    return page('tr', p['title'], 'Doktora tezi', tags, body, p['pdf'], '2022', p['permalink'], th)
 
 
 def slug(rel):

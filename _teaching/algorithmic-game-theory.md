@@ -6,6 +6,11 @@ permalink: /teaching/algorithmic-game-theory/
 venue: "Giresun University, Computer Engineering"
 date: 2026-07-12
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+course_language: tr
+textbook:
+  name: "Algoritmik Oyun Kuramı"
+  url: /books/algoritmik-oyun-kurami/
 ---
 
 ![algorithmic game theory](/images/teaching/teaching-algorithmic-game-theory.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

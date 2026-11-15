@@ -7,6 +7,11 @@ permalink: /teaching/data-structures/
 venue: "Giresun University, Computer Engineering"
 date: 2026-07-14
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/veri-yapilari.jpg
+course_language: [tr, en]
+textbook:
+  name: "Veri Yapıları"
+  url: /books/veri-yapilari/
 ---
 
 ![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

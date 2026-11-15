@@ -6,6 +6,11 @@ permalink: /teaching/programming-with-c/
 venue: "Giresun University, Computer Engineering"
 date: 2024-09-19
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/programming-with-c.jpg
+course_language: en
+textbook:
+  name: "Programming with C"
+  url: /books/programming-with-c/
 ---
 
 ![procedural programming with c](/images/teaching/teaching-procedural-programming-c.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}

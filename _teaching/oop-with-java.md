@@ -6,6 +6,11 @@ permalink: /teaching/object-oriented-programming-with-java/
 venue: "Giresun University, Electrical Electronics Engineering"
 date: 2026-01-04
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/java-ile-nesne-yonelimli-programlama.jpg
+course_language: tr
+textbook:
+  name: "Java ile Nesne Yönelimli Programlama"
+  url: /books/java-ile-nesne-yonelimli-programlama/
 ---
 
 ![object oriented programming](/images/teaching/teaching-object-oriented-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

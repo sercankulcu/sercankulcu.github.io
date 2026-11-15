@@ -6,6 +6,11 @@ permalink: /teaching/data-structures-and-algorithms-with-c/
 venue: "Giresun University, Computer Engineering"
 date: 2025-09-28
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/c-ile-veri-yapilari-ve-algoritmalar.jpg
+course_language: tr
+textbook:
+  name: "C ile Veri Yapıları ve Algoritmalar"
+  url: /books/c-ile-veri-yapilari-ve-algoritmalar/
 ---
 
 ![data structures and algorithms with c](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 

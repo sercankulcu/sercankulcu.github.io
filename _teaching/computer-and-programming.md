@@ -6,6 +6,11 @@ permalink: /teaching/computer-and-introduction-to-programming/
 venue: "Giresun University, Electrical Electronics Engineering"
 date: 2026-07-13
 location: "Giresun, Turkey"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/bilgisayar-ve-programlamaya-giris.jpg
+course_language: tr
+textbook:
+  name: "Bilgisayar ve Programlamaya Giriş"
+  url: /books/bilgisayar-ve-programlamaya-giris/
 ---
 
 ![computer and programming](/images/teaching/teaching-computer-and-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
