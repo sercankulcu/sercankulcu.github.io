@@ -14,6 +14,13 @@ Dosya denetimleri (saniyeler surer):
            uclari kaybolur) ya da baska SVG'deki tanima url(#...) ile basvuru
   guard    ds-guard blogu eksik sayfa
   yonerge  "Once kendiniz ..." gibi istenmeyen yonerge cumleleri
+  betik    satir ici <script>'lerde // satir yorumu: canli sitenin compress duzeni satirlari
+           birlestirir ve yorum betigin geri kalanini yutar (yerelde calisir, canlida kirilir);
+           ayrica satirlari birlestirilmis her betik node ile ayristirilir (node yoksa atlanir).
+           Kod ornegi tasiyan text/x-asm, text/x-java ... betikleri denetlenmez.
+  uygulama ders verilmediginde apps/, game/, mantra/ sayfalari da: betik ve Liquid denetimi,
+           make_app_pages.py / make_game_pages.py'nin yazdigi on bilgi (title, excerpt,
+           permalink, seo_title, og_image, web_app ya da game_genre) ve og_image dosyasi
 
 Tarayici denetimleri (--browser; Chrome/Edge + playwright, ag gerekir):
   tasma    her sunum/calisma sayfasinin her slayti, tum adimlar ve cevaplar acikken: alt cubuga
@@ -236,6 +243,169 @@ def browser_checks(courses):
         b.close()
 
 
+# ---------- satir ici betikler ve on bilgi ----------
+
+SCRIPT_RE = re.compile(r'<script([^>]*)>(.*?)</script>', re.S)
+scripts = []          # (rel, satir, modul mu, satirlari birlestirilmis kod) -> node ile toplu denetim
+REGEX_BEFORE = set('(,=:[!&|?{};+-*%<>~^')
+
+
+def line_comment_lines(code):
+    """Gercek // satir yorumlarinin bulundugu satir numaralari (0'dan). Dizeleri, ic ice sablon
+    dizelerini (`...${ `...` }...`), /* */ yorumlarini ve duzenli ifade sabitlerini atlayan
+    dogrusal bir tarayici."""
+    found, i, n, line, prev = [], 0, len(code), 0, ''
+    tpl = []            # her acik ${ ... } icin o ifadedeki { derinligi
+    in_tpl = False      # sablon dizesinin metin kisminda miyiz
+    while i < n:
+        ch = code[i]
+        nx = code[i + 1] if i + 1 < n else ''
+        if ch == '\n':
+            line += 1; i += 1; continue
+        if in_tpl:
+            if ch == '\\':
+                i += 2; continue
+            if ch == '`':
+                in_tpl = False; prev = 'a'; i += 1; continue
+            if ch == '$' and nx == '{':
+                tpl.append(0); in_tpl = False; prev = '('; i += 2; continue
+            i += 1; continue
+        if ch == '`':
+            in_tpl = True; i += 1; continue
+        if tpl and ch == '{':
+            tpl[-1] += 1
+        elif tpl and ch == '}':
+            if tpl[-1] == 0:
+                tpl.pop(); in_tpl = True; i += 1; continue
+            tpl[-1] -= 1
+        if ch in '"\'':
+            q = ch; i += 1
+            while i < n and code[i] != q and code[i] != '\n':
+                i += 2 if code[i] == '\\' else 1
+            if i < n and code[i] == q:
+                i += 1
+            prev = 'a'; continue
+        if ch == '/' and nx == '*':
+            j = code.find('*/', i + 2)
+            j = n if j < 0 else j + 2
+            line += code.count('\n', i, j); i = j; continue
+        if ch == '/' and nx == '/':
+            found.append(line)
+            j = code.find('\n', i)
+            i = n if j < 0 else j
+            continue
+        if ch == '/' and (prev in REGEX_BEFORE or prev == ''):
+            i += 1; cls = False
+            while i < n and code[i] != '\n' and (cls or code[i] != '/'):
+                if code[i] == '\\':
+                    i += 1
+                elif code[i] == '[':
+                    cls = True
+                elif code[i] == ']':
+                    cls = False
+                i += 1
+            if i < n and code[i] == '/':
+                i += 1
+            prev = 'a'; continue
+        if not ch.isspace():
+            prev = ch if not (ch.isalnum() or ch in '_$') else 'a'
+            if ch.isalpha() or ch in '_$':
+                m = re.match(r'[A-Za-z_$][\w$]*', code[i:i + 40])
+                if m and m.group(0) in ('return', 'typeof', 'case', 'do', 'else', 'in', 'of', 'void', 'yield', 'await'):
+                    prev = '('
+                i += len(m.group(0)) if m else 1
+                continue
+        i += 1
+    return found
+
+
+def check_scripts(path, rel, s):
+    """Canli site compress duzeniyle satirlari birlestirir: bir // yorumu betigin geri kalanini yutar
+    (yerelde calisir, canlida kirilir). Ayrica birlestirilmis kodu ayristirma icin node'a biriktirir."""
+    for m in SCRIPT_RE.finditer(s):
+        attrs, code = m.group(1), m.group(2)
+        t = re.search(r'type="([^"]*)"', attrs)
+        if 'src=' in attrs or not code.strip() or (t and t.group(1) not in ('module', 'text/javascript')):
+            continue   # dis betik, JSON-LD ya da kod ornegi (text/x-asm, text/x-java, ...)
+        start = s[:m.start(2)].count('\n') + 1
+        for i in line_comment_lines(code):
+            err(rel, 'satir %d: satir ici betikte // yorumu (canlida betigi kirar; /* */ kullanin)' % (start + i))
+        joined = ' '.join(l.strip() for l in code.split('\n'))
+        scripts.append((rel, start, 'module' in attrs, joined))
+
+
+def node_syntax_check():
+    """Biriken betikleri tek bir node surecinde derler (calistirmadan)."""
+    import json, shutil, subprocess, tempfile
+    if not scripts:
+        return
+    if not shutil.which('node'):
+        warn('betik', 'node bulunamadi; birlestirilmis betik ayristirma denetimi atlandi')
+        return
+    tmp = tempfile.mkdtemp()
+    data = os.path.join(tmp, 'scripts.json')
+    with open(data, 'w', encoding='utf-8') as f:
+        json.dump([[i, mod, code] for i, (_, _, mod, code) in enumerate(scripts)], f)
+    js = os.path.join(tmp, 'check.js')
+    with open(js, 'w', encoding='utf-8') as f:
+        f.write("const vm=require('vm'),fs=require('fs');const out=[];"
+                "for(const [i,mod,code] of JSON.parse(fs.readFileSync(process.argv[2],'utf8'))){"
+                "try{mod?new vm.SourceTextModule(code):new vm.Script(code);}catch(e){out.push([i,String(e.message)]);}}"
+                "console.log(JSON.stringify(out));")
+    r = subprocess.run(['node', '--experimental-vm-modules', '--no-warnings', js, data],
+                       capture_output=True, text=True, encoding='utf-8')
+    try:
+        bad = json.loads(r.stdout.strip().splitlines()[-1])
+    except Exception:
+        warn('betik', 'node denetimi calismadi: ' + (r.stderr.strip()[:200] or 'cikti yok'))
+        return
+    for i, msg in bad:
+        rel, line, _, _ = scripts[i]
+        err(rel, 'satir %d: betik, satirlari birlestirilince ayristirilamiyor (%s)' % (line, msg[:120]))
+
+
+APP_KEYS = ('title', 'excerpt', 'permalink', 'seo_title', 'og_image')
+
+
+def front_matter(s):
+    if not s.startswith('---'):
+        return None
+    end = s.find('\n---', 3)
+    return dict(re.findall(r'^([A-Za-z_]+):\s*(.*)$', s[4:end], re.M)) if end > 0 else None
+
+
+def check_app_page(path):
+    """apps/, game/ ve mantra/ sayfalari: betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
+    rel = os.path.relpath(path, REPO).replace('\\', '/')
+    s = open(path, encoding='utf-8').read()
+    fm = front_matter(s)
+    if fm is None:
+        return
+    body = s[s.find('\n---', 3) + 4:]
+    for m in re.finditer(r'\{\{|\{%', body):
+        err(rel, 'satir %d: Liquid "%s"' % (s[:s.find('\n---', 3) + 4 + m.start()].count('\n') + 1, m.group(0)))
+    for k in APP_KEYS:
+        if not fm.get(k, '').strip():
+            err(rel, 'on bilgide %s yok (tools/make_app_pages.py ya da make_game_pages.py calistirin)' % k)
+    kind = 'game_genre' if rel.startswith('game/') else 'web_app'
+    if not fm.get(kind):
+        err(rel, 'on bilgide %s yok' % kind)
+    img = fm.get('og_image', '')
+    if img.startswith('https://sercankulcu.github.io/images/'):
+        local = os.path.join(REPO, *img.split('sercankulcu.github.io/', 1)[1].split('/'))
+        if not os.path.exists(local):
+            err(rel, 'og_image dosyasi yok: ' + img)
+    check_scripts(path, rel, s)
+
+
+def app_pages():
+    for d in ('apps', 'game', 'mantra'):
+        for dirpath, _, names in os.walk(os.path.join(REPO, d)):
+            for n in sorted(names):
+                if n.endswith('.html'):
+                    yield os.path.join(dirpath, n)
+
+
 def main():
     ap = argparse.ArgumentParser(description='Ders sayfalarini gondermeden once denetler.')
     ap.add_argument('courses', nargs='*', help='files/ altindaki ders klasorleri (verilmezse slides/ klasoru olan tumu)')
@@ -249,7 +419,17 @@ def main():
     for c in courses:
         for p in html_files(c):
             check_file(p); n += 1
+            rel = os.path.relpath(p, REPO).replace('\\', '/')
+            s = open(p, encoding='utf-8').read()
+            if s.startswith('---'):
+                check_scripts(p, rel, s)
     print('%d dosya denetlendi (%s).' % (n, ', '.join(courses)))
+    if not a.courses:
+        k = 0
+        for p in app_pages():
+            check_app_page(p); k += 1
+        print('%d uygulama/oyun sayfasi denetlendi.' % k)
+    node_syntax_check()
     if a.browser:
         browser_checks(courses)
     for w in warnings:

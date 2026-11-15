@@ -237,6 +237,13 @@ Hata varsa çıkış kodu 1'dir; uyarılar çıkış kodunu değiştirmez.
   - **SVG kimlikleri:** Aynı `<marker>` kimliği birden çok çizimde tanımlanmışsa ok uçları
     kaybolur, çünkü tarayıcı tanımı gizli adımdaki çizimden alır.
   - **ds-guard** ve istenmeyen yönerge cümleleri.
+  - **Satır içi betikler:** `//` satır yorumu hata sayılır, çünkü canlı sitenin compress
+    düzeni satırları birleştirir ve yorum betiğin geri kalanını yutar (yerelde çalışır,
+    canlıda kırılır); `/* */` kullanın. Satırları birleştirilmiş her betik ayrıca `node`
+    ile ayrıştırılır. Kod örneği taşıyan `text/x-asm`, `text/x-java` vb. betikler atlanır.
+  - **Uygulamalar ve oyunlar:** Ders verilmezse `apps/`, `game/` ve `mantra/` sayfaları da
+    denetlenir: betik ve Liquid kuralları, üreteç betiklerinin yazdığı ön bilgi (`seo_title`,
+    `og_image`, `web_app`/`game_genre` …) ve paylaşım kartı dosyasının varlığı.
 - **`--browser` ile ek olarak:** Sayfalar `make_slide_pdf.py` gibi canlı site düzeninin
   içinde açılır.
   - Her slayt, bütün adımları ve cevapları açıkken taşma için ölçülür. Otomatik
