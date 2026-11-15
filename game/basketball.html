@@ -37,7 +37,7 @@ game_genre: "Arcade"
 .basketball-stage {
   position:relative;
   height:min(72vh,680px);
-  min-height:500px;
+  min-height:min(500px,calc(100svh - 80px));
   overflow:hidden;
   border:1px solid var(--global-border-color);
   border-radius:18px;
@@ -284,6 +284,18 @@ game_genre: "Arcade"
   100%{opacity:0;transform:translate(-50%,-73%) scale(.94)}
 }
 
+.basketball-sr {
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+}
+
 .basketball-hint {
   position:absolute;
   left:50%;
@@ -333,6 +345,17 @@ game_genre: "Arcade"
 :root[data-theme="dark"] .basketball-modal h2 { color:var(--global-text-color); }
 :root[data-theme="dark"] .basketball-modal p { color:rgba(200,200,200,.7); }
 :root[data-theme="dark"] .basketball-modal-label { color:#f6875f !important; }
+:root[data-theme="dark"] .basketball-primary { background:#f3f4f6; color:#16181b; }
+:root[data-theme="dark"] .basketball-result-meta { color:rgba(220,220,220,.8); }
+
+.basketball-app button:focus-visible {
+  outline:3px solid var(--bb-orange);
+  outline-offset:3px;
+}
+
+.basketball-modal h1,
+.basketball-modal h2 { border:0; padding:0; }
+
 
 .basketball-modal h1,
 .basketball-modal h2 {
@@ -436,8 +459,8 @@ game_genre: "Arcade"
   }
 
   .basketball-stage {
-    height:min(72vh,650px);
-    min-height:520px;
+    height:min(72vh,72svh,650px);
+    min-height:min(520px,calc(100svh - 80px));
     border-radius:14px;
   }
 
@@ -509,7 +532,8 @@ game_genre: "Arcade"
       </g>
     </svg>
 
-    <div class="basketball-feedback" id="basketball-feedback" aria-live="polite"></div>
+    <div class="basketball-feedback" id="basketball-feedback" aria-hidden="true"></div>
+    <div class="basketball-sr" id="basketball-live" role="status" aria-live="polite"></div>
     <div class="basketball-hint" id="basketball-hint">Drag or swipe the ball toward the hoop</div>
 
     <div class="basketball-overlay is-visible" id="basketball-start">
@@ -518,6 +542,15 @@ game_genre: "Arcade"
         <h1>Basketball</h1>
         <p>Swipe or drag the ball toward the hoop. Score as many baskets as you can before time runs out.</p>
         <button class="basketball-primary" id="basketball-start-btn" type="button">Start Game</button>
+      </div>
+    </div>
+
+    <div class="basketball-overlay" id="basketball-paused">
+      <div class="basketball-modal" role="dialog" aria-modal="true" aria-labelledby="basketball-paused-title">
+        <p class="basketball-modal-label">Paused</p>
+        <h2 id="basketball-paused-title">Time Out</h2>
+        <p>The clock stopped when you left this tab.</p>
+        <button class="basketball-primary" id="basketball-resume" type="button">Resume</button>
       </div>
     </div>
 
@@ -580,6 +613,11 @@ game_genre: "Arcade"
   const playAgainButton = document.getElementById("basketball-again");
   const finalScore = document.getElementById("basketball-final");
   const resultMeta = document.getElementById("basketball-result-meta");
+  const pausedOverlay = document.getElementById("basketball-paused");
+  const resumeButton = document.getElementById("basketball-resume");
+  const liveRegion = document.getElementById("basketball-live");
+  let paused = false;
+  let remainingOnPause = 0;
 
   let running = false;
   let dragging = false;
@@ -744,7 +782,7 @@ game_genre: "Arcade"
   }
 
   function onPointerDown(event) {
-    if (!running || inFlight || dragging) return;
+    if (!running || paused || inFlight || dragging) return;
 
     dragging = true;
     pointerId = event.pointerId;
@@ -857,6 +895,7 @@ game_genre: "Arcade"
     if (streak >= 3) text += ` · ${streak} STREAK`;
 
     showFeedback(text);
+    liveRegion.textContent = `Basket, +${points}. Score ${score}.`;
     animateNet();
   }
 
@@ -866,6 +905,11 @@ game_genre: "Arcade"
 
   function tick(now) {
     if (!inFlight) return;
+    if (paused) {
+      lastFrameTime = now;
+      animationId = requestAnimationFrame(tick);
+      return;
+    }
 
     const dt = Math.min((now - lastFrameTime) / 1000, .025);
     lastFrameTime = now;
@@ -927,7 +971,7 @@ game_genre: "Arcade"
   }
 
   function updateTimer() {
-    if (!running) return;
+    if (!running || paused) return;
 
     const remaining = Math.max(
       0,
@@ -948,9 +992,12 @@ game_genre: "Arcade"
     scoredThisShot = false;
     gameEndTime = performance.now() + GAME_DURATION * 1000;
 
+    paused = false;
     startOverlay.classList.remove("is-visible");
     gameOverOverlay.classList.remove("is-visible");
+    pausedOverlay.classList.remove("is-visible");
     startHint.style.opacity = "1";
+    liveRegion.textContent = "Game started. 30 seconds.";
 
     updateHud();
     timeDisplay.textContent = String(GAME_DURATION);
@@ -983,6 +1030,8 @@ game_genre: "Arcade"
       finalScore.textContent = String(score);
       resultMeta.textContent = `Best: ${best}`;
       gameOverOverlay.classList.add("is-visible");
+      liveRegion.textContent = `Time's up. Score ${score}. Best ${best}.`;
+      playAgainButton.focus({ preventScroll: true });
     }, 250);
   }
 
@@ -993,6 +1042,34 @@ game_genre: "Arcade"
       resetBall(true);
     }
   }
+
+  /* The 30-second clock is wall-clock time, so leaving the tab used to burn the round. */
+  function pauseGame() {
+    if (!running || paused) return;
+    paused = true;
+    remainingOnPause = Math.max(0, gameEndTime - performance.now());
+    if (dragging) {
+      dragging = false;
+      aimGuide.classList.remove("is-visible");
+      resetBall(true);
+    }
+    pausedOverlay.classList.add("is-visible");
+    if (!document.hidden) resumeButton.focus({ preventScroll: true });
+  }
+
+  function resumeGame() {
+    if (!running || !paused) return;
+    paused = false;
+    gameEndTime = performance.now() + remainingOnPause;
+    pausedOverlay.classList.remove("is-visible");
+    lastFrameTime = performance.now();
+    updateTimer();
+  }
+
+  resumeButton.addEventListener("click", resumeGame);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseGame();
+  });
 
   ball.addEventListener("pointerdown", onPointerDown);
   stage.addEventListener("pointermove", onPointerMove);

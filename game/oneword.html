@@ -54,9 +54,9 @@ game_genre: "Word game"
 }
 
 .oneword-help {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   border: 1px solid var(--global-border-color);
   border-radius: 12px;
   background: transparent;
@@ -127,10 +127,10 @@ game_genre: "Word game"
 }
 
 .oneword-letter {
-  width: min(12vw, 58px);
-  height: min(12vw, 58px);
-  min-width: 38px;
-  min-height: 38px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 58px;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,12 +143,22 @@ game_genre: "Word game"
   box-shadow: 0 3px 0 #1b5e20;
   cursor: pointer;
   user-select: none;
-  transition: transform .12s, box-shadow .12s;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform .12s, box-shadow .12s, opacity .12s;
+}
+
+/* Tiles already spent on the word being typed. */
+.oneword-letter.is-used {
+  opacity: .35;
+  box-shadow: none;
+  transform: translateY(3px);
+  cursor: default;
 }
 
 :root[data-theme="dark"] .oneword-letter { background: #2d8632; box-shadow: 0 3px 0 #1b5e20; }
 
-.oneword-letter:active {
+.oneword-letter:active:not(.is-used) {
   transform: translateY(2px);
   box-shadow: 0 1px 0 #1b5e20;
 }
@@ -252,17 +262,36 @@ game_genre: "Word game"
 }
 
 .oneword-small {
-  min-height: 42px;
+  min-height: 44px;
   padding: 9px 13px;
   border-radius: 10px;
   background: transparent;
   color: var(--global-text-color);
 }
 
-.oneword-small:hover,
-.oneword-icon:hover,
-.oneword-help:hover {
-  background: rgba(127,127,127,.08);
+@media (hover: hover) {
+  .oneword-small:hover:not(:disabled),
+  .oneword-icon:hover:not(:disabled),
+  .oneword-help:hover,
+  .oneword-close:hover {
+    background: rgba(127,127,127,.08);
+  }
+}
+
+.oneword-app button,
+.oneword-overlay button {
+  touch-action: manipulation;
+}
+
+.oneword-app button:disabled {
+  cursor: progress;
+  opacity: .55;
+}
+
+.oneword-app button:focus-visible,
+.oneword-overlay button:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
 }
 
 .oneword-overlay {
@@ -310,8 +339,8 @@ game_genre: "Word game"
 }
 
 .oneword-close {
-  min-width: 42px;
-  height: 42px;
+  min-width: 44px;
+  height: 44px;
   border: 1px solid var(--global-border-color);
   border-radius: 11px;
   background: transparent;
@@ -344,10 +373,7 @@ game_genre: "Word game"
   }
 
   .oneword-letter {
-    width: 12vw;
-    height: 12vw;
-    min-width: 0;
-    min-height: 0;
+    font-size: clamp(1.05rem, 6vw, 1.5rem);
   }
 
   .oneword-bottom {
@@ -384,15 +410,15 @@ game_genre: "Word game"
 
     <div class="oneword-progress"><span id="oneword-timebar"></span></div>
 
-    <div class="oneword-letters" id="oneword-letters"></div>
+    <div class="oneword-letters" id="oneword-letters" role="group" aria-label="Harfler"></div>
 
     <div class="oneword-input-wrap">
-      <input class="oneword-input" type="text" id="oneword-input" placeholder="Kelimenizi yazın" maxlength="7" autocomplete="off" inputmode="text">
-      <button class="oneword-icon" id="oneword-backspace" type="button" title="Son harfi sil">⌫</button>
+      <input class="oneword-input" type="text" id="oneword-input" placeholder="Kelimenizi yazın" maxlength="7" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" inputmode="text" aria-label="Kelimeniz">
+      <button class="oneword-icon" id="oneword-backspace" type="button" title="Son harfi sil" aria-label="Son harfi sil">⌫</button>
     </div>
 
     <button class="oneword-check" id="oneword-check" type="button">Kontrol Et</button>
-    <div class="oneword-message" id="oneword-message" aria-live="polite"></div>
+    <div class="oneword-message" id="oneword-message" role="status" aria-live="polite"></div>
 
     <div class="oneword-found">
       <b>Bu turda bulduğun kelimeler</b>
@@ -410,7 +436,7 @@ game_genre: "Word game"
   <div class="oneword-modal">
     <div class="oneword-modal-head">
       <h2 id="oneword-help-title">Bir Kelime Nasıl Oynanır?</h2>
-      <button class="oneword-close" id="oneword-close" type="button">X</button>
+      <button class="oneword-close" id="oneword-close" type="button" aria-label="Kapat">✕</button>
     </div>
     <p>Ekranda <b>7 harf</b> görünür. Bu harfleri, her harfi ekranda bulunduğu sayı kadar kullanarak anlamlı Türkçe kelimeler türetmeye çalışın.</p>
     <ul>
@@ -453,6 +479,26 @@ game_genre: "Word game"
   const infoBtn = document.getElementById("oneword-info");
   const closeBtn = document.getElementById("oneword-close");
   const app = document.querySelector(".oneword-app");
+
+  /* On touch screens, focusing the field after a tile tap would pop up the
+     system keyboard over the tiles, so only refocus with a fine pointer. */
+  const coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+
+  function focusInput() {
+    if (!coarsePointer) input.focus();
+  }
+
+  function markUsed() {
+    const pending = [...trUpper(input.value)];
+
+    for (const tile of lettersEl.children) {
+      const index = pending.indexOf(tile.dataset.letter);
+      const used = index !== -1;
+      if (used) pending.splice(index, 1);
+      tile.classList.toggle("is-used", used);
+      tile.setAttribute("aria-disabled", used ? "true" : "false");
+    }
+  }
 
   function shuffle(array) {
     const copy = [...array];
@@ -520,9 +566,12 @@ game_genre: "Word game"
       button.type = "button";
       button.className = "oneword-letter";
       button.textContent = letter;
+      button.dataset.letter = letter;
       button.addEventListener("click", () => appendLetter(letter));
       lettersEl.appendChild(button);
     });
+
+    markUsed();
   }
 
   function appendLetter(letter) {
@@ -531,7 +580,8 @@ game_genre: "Word game"
     const proposed = trUpper(input.value + letter);
     if (canBuild(proposed)) {
       input.value += letter;
-      input.focus();
+      markUsed();
+      focusInput();
     }
   }
 
@@ -597,18 +647,21 @@ game_genre: "Word game"
     if (upper.length < 2) {
       showMessage("❌ En az 2 harf kullanmalısınız.", "error");
       input.value = "";
+      markUsed();
       return;
     }
 
     if (!canBuild(upper)) {
       showMessage("❌ Yalnızca verilen harfleri kullanabilirsiniz.", "error");
       input.value = "";
+      markUsed();
       return;
     }
 
     if (foundWords.map(trLower).includes(lower)) {
       showMessage("❌ Bu kelimeyi zaten kullandınız.", "error");
       input.value = "";
+      markUsed();
       return;
     }
 
@@ -624,7 +677,8 @@ game_genre: "Word game"
     }
 
     input.value = "";
-    input.focus();
+    markUsed();
+    focusInput();
   }
 
   /* The site has no prefers-color-scheme rules at all: light simply means the
@@ -643,6 +697,7 @@ game_genre: "Word game"
     letters = generateLetters();
     foundWords = [];
     input.value = "";
+    markUsed();
     updateLetters();
     renderFound();
     startTimer();
@@ -658,7 +713,8 @@ game_genre: "Word game"
 
   document.getElementById("oneword-backspace").addEventListener("click", () => {
     input.value = input.value.slice(0,-1);
-    input.focus();
+    markUsed();
+    focusInput();
   });
 
   document.getElementById("oneword-shuffle").addEventListener("click", () => {
@@ -680,6 +736,7 @@ game_genre: "Word game"
     }
 
     event.target.value = value;
+    markUsed();
   });
 
   document.addEventListener("keydown", event => {
@@ -696,6 +753,15 @@ game_genre: "Word game"
       return;
     }
 
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (input.disabled) return;
+
+    /* Enter on a focused button keeps its own action. */
+    if (event.target && event.target.closest && event.target.closest("button, a, select, textarea, input")) {
+      if (event.key === "Enter" || event.key === " ") return;
+      if (event.target.closest("a, select, textarea, input")) return;
+    }
+
     if (event.key === "Enter") {
       event.preventDefault();
       checkWord();
@@ -705,7 +771,8 @@ game_genre: "Word game"
     if (event.key === "Backspace") {
       event.preventDefault();
       input.value = input.value.slice(0,-1);
-      input.focus();
+      markUsed();
+      focusInput();
       return;
     }
 
@@ -719,6 +786,7 @@ game_genre: "Word game"
 
       if (input.value.length < 7 && canBuild(proposed)) {
         input.value += key;
+        markUsed();
         input.focus();
         event.preventDefault();
       }

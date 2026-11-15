@@ -20,7 +20,7 @@ game_genre: "Arcade"
 .pong-app button{font:inherit;cursor:pointer}
 .pong-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .pong-title{margin:0;font-size:clamp(1.6rem,5vw,2.3rem);font-weight:750;letter-spacing:-.04em}
-.pong-icon-btn{width:40px;height:40px;border:1px solid var(--global-border-color);border-radius:11px;background:transparent;color:var(--global-text-color)}
+.pong-icon-btn{width:44px;height:44px;font-size:1.2rem;border:1px solid var(--global-border-color);border-radius:11px;background:transparent;color:var(--global-text-color)}
 .pong-scorebar{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
 .pong-score{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center}
 .pong-score small{display:block;opacity:.8;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
@@ -34,10 +34,19 @@ game_genre: "Arcade"
 .pong-overlay .pong-start-btn{padding:12px 32px;border:none;border-radius:12px;background:#fff;color:#000;font:inherit;font-size:.95rem;font-weight:750;cursor:pointer}
 .pong-overlay .pong-start-btn:hover{opacity:.88}
 .pong-controls-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.pong-ctrl-btn{padding:9px 6px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.78rem;font-weight:700;transition:background .15s}
+.pong-ctrl-btn{min-height:44px;padding:9px 6px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.78rem;font-weight:700;transition:background .15s}
 .pong-ctrl-btn.active{background:var(--global-text-color);color:var(--global-bg-color)}
 .pong-ctrl-btn:hover:not(.active){background:rgba(127,127,127,.14)}
-.pong-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.8}
+.pong-hint{text-align:center;margin-top:8px;font-size:.78rem;opacity:.85}
+.pong-overlay h2{border:0;padding:0}
+.pong-overlay .pong-start-btn{min-height:44px}
+.pong-app .pong-icon-btn:focus-visible,.pong-app .pong-ctrl-btn:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.pong-overlay .pong-start-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media (max-width:600px){
+  .pong-app{width:calc(100% - 16px)}
+  .pong-score{padding:6px 6px}
+  .pong-score strong{font-size:1.35rem}
+}
 </style>
 
 <div class="pong-app">
@@ -62,17 +71,17 @@ game_genre: "Arcade"
     <canvas id="pong-canvas" width="800" height="450" role="img" aria-label="Pong court. Your paddle is on the left, the computer paddle on the right. The score is shown above the court."></canvas>
     <div class="pong-overlay" id="pong-overlay">
       <h2>🏓 Pong</h2>
-      <p>Move your mouse, or use W/S or ↑/↓,<br>to control the left paddle.</p>
-      <button class="pong-start-btn" id="pong-start-btn">Start Game</button>
+      <p>Move your mouse, drag on the court, or use W/S or ↑/↓,<br>to control the left paddle.</p>
+      <button class="pong-start-btn" id="pong-start-btn" type="button">Start Game</button>
     </div>
   </div>
 
-  <div class="pong-controls-bar">
+  <div class="pong-controls-bar" role="group" aria-label="Computer difficulty">
     <button class="pong-ctrl-btn active" id="diff-easy" type="button" data-diff="0" aria-pressed="true">Easy</button>
     <button class="pong-ctrl-btn" id="diff-med" type="button" data-diff="1" aria-pressed="false">Medium</button>
     <button class="pong-ctrl-btn" id="diff-hard" type="button" data-diff="2" aria-pressed="false">Hard</button>
   </div>
-  <div class="pong-hint">Mouse / touch &nbsp;·&nbsp; W / S or ↑ / ↓ keys &nbsp;·&nbsp; first to 7 points wins</div>
+  <div class="pong-hint">Mouse / drag on the court &nbsp;·&nbsp; W / S or ↑ / ↓ keys &nbsp;·&nbsp; P pauses &nbsp;·&nbsp; first to 7 points wins</div>
 </div>
 
 <script>
@@ -287,8 +296,43 @@ function mouseMove(e) {
 }
 wrap.addEventListener("mousemove", mouseMove);
 wrap.addEventListener("touchmove", e => { e.preventDefault(); mouseMove(e); }, { passive: false });
+/* A tap on the court moves the paddle there too; taps on the overlay buttons are left alone. */
+wrap.addEventListener("touchstart", e => { if (state === "playing" && e.target === canvas) { e.preventDefault(); mouseMove(e); } }, { passive: false });
+
+/* Pause: leaving the tab (or pressing P) freezes the rally and shows a Resume button. */
+let pausedFrom = "";
+function pauseGame() {
+  if (state !== "playing" && state !== "scored") return;
+  pausedFrom = state;
+  state = "paused";
+  cancelAnimationFrame(raf);
+  clearTimeout(resumeTimer);
+  keysDown = {};
+  const ov = document.getElementById("pong-overlay");
+  ov.innerHTML = `<h2>⏸ Paused</h2><p>Score ${scores[0]} – ${scores[1]}</p><button class="pong-start-btn" type="button">Resume</button>`;
+  ov.style.display = "";
+  const btn = ov.querySelector("button");
+  btn.addEventListener("click", resumeGame);
+  document.getElementById("pong-status").textContent = "Paused";
+  if (!document.hidden) btn.focus();
+}
+function resumeGame() {
+  if (state !== "paused") return;
+  document.getElementById("pong-overlay").style.display = "none";
+  /* A point that was in its serve pause just serves straight away. */
+  if (pausedFrom === "scored") initBall(ball.vx > 0 ? 1 : -1);
+  state = "playing";
+  document.getElementById("pong-status").textContent = "Playing";
+  lastTime = performance.now();
+  raf = requestAnimationFrame(loop);
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
 
 window.addEventListener("keydown", e => {
+  if ((e.key === "p" || e.key === "P") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (state === "paused") resumeGame(); else pauseGame();
+    return;
+  }
   keysDown[e.key] = true;
   /* Otherwise the arrow keys scroll the page out from under the player. */
   if ((state === "playing" || state === "scored") &&

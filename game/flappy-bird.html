@@ -12,14 +12,17 @@ game_genre: "Arcade"
 <style>
 .fb-app,.fb-app *,.fb-app *::before,.fb-app *::after{box-sizing:border-box}
 .fb-app{
-  width:min(480px,calc(100% - 24px));
+  /* Never taller than the screen: the 340x600 court shrinks to fit below the site header. */
+  width:min(480px,calc(100% - 24px),calc((100vh - 150px) * .5667));
+  width:min(480px,calc(100% - 24px),calc((100svh - 150px) * .5667));
   margin:.5rem auto 1.5rem;
   color:var(--global-text-color);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
+.fb-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .fb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .fb-title{margin:0;font-size:clamp(1.5rem,5vw,2rem);font-weight:750;letter-spacing:-.04em}
-.fb-best{font-size:.82rem;font-weight:700;opacity:.55}
+.fb-best{font-size:.85rem;font-weight:700;opacity:.8}
 .fb-canvas-wrap{
   position:relative;
   border:1px solid var(--global-border-color);
@@ -35,30 +38,33 @@ game_genre: "Arcade"
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   background:rgba(0,0,0,.45);color:#fff;text-align:center;padding:20px;
 }
-.fb-overlay h2{margin:0;font-size:1.8rem;font-weight:800}
+.fb-overlay h2{margin:0;padding:0;border:0;font-size:1.8rem;font-weight:800;color:#fff}
 .fb-overlay p{margin:0;opacity:.8;font-size:.88rem}
 .fb-overlay .fb-play-btn{
   padding:12px 34px;border:none;border-radius:12px;
   background:#fff;color:#333;font:inherit;font-size:1rem;font-weight:750;cursor:pointer;
 }
 .fb-overlay .fb-play-btn:hover{opacity:.88}
-.fb-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.45}
+.fb-overlay .fb-play-btn{min-height:44px}
+.fb-overlay .fb-play-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.fb-hint{text-align:center;margin-top:8px;font-size:.78rem;opacity:.8}
 </style>
 
 <div class="fb-app">
   <div class="fb-header">
     <h1 class="fb-title">Floppy Kuş 🐦</h1>
     <span class="fb-best">En İyi: <strong id="fb-best">0</strong></span>
+    <span class="fb-sr" id="fb-live" role="status" aria-live="polite"></span>
   </div>
   <div class="fb-canvas-wrap" id="fb-wrap">
-    <canvas id="fb-canvas" width="340" height="600"></canvas>
+    <canvas id="fb-canvas" width="340" height="600" role="img" aria-label="Floppy Kuş oyun alanı"></canvas>
     <div class="fb-overlay" id="fb-overlay">
       <h2>🐦 Floppy Kuş</h2>
       <p>Boşluktan geç, borulara çarpma!<br>Tıkla veya Space tuşuna bas.</p>
-      <button class="fb-play-btn" id="fb-play-btn">Başla</button>
+      <button class="fb-play-btn" id="fb-play-btn" type="button">Başla</button>
     </div>
   </div>
-  <div class="fb-hint">Tıkla &nbsp;·&nbsp; Dokun &nbsp;·&nbsp; Space</div>
+  <div class="fb-hint">Tıkla &nbsp;·&nbsp; Dokun &nbsp;·&nbsp; Space &nbsp;·&nbsp; P: duraklat</div>
 </div>
 
 <script>
@@ -91,7 +97,8 @@ const PIPE_EVERY    = 95 / 60;   /* seconds between new pipes */
 const SPEEDUP_EVERY = 200 / 60;  /* seconds between speed-ups */
 const MAX_DT        = 0.05;      /* clamp so a background tab cannot teleport the bird */
 
-let state = "idle"; /* idle | playing | dead */
+let state = "idle"; /* idle | playing | paused | dead */
+let deadAt = 0;
 let bird, pipes, score, pipeSpd, pipeTimer, speedTimer, lastTime;
 let bestScore = +(store.getItem("fb.best") || 0);
 document.getElementById("fb-best").textContent = bestScore;
@@ -112,6 +119,7 @@ function init() {
 }
 
 function flap() {
+  if (state === "paused") { resumeGame(); return; }
   if (state === "dead") return;
   if (state === "idle") { startGame(); return; }
   bird.vy = FLAP;
@@ -235,8 +243,36 @@ function update(dt) {
 
 function die() {
   state = "dead";
+  deadAt = performance.now();
   showOverlay();
+  document.getElementById("fb-live").textContent = `Oyun bitti. Skor ${score}, en iyi ${bestScore}.`;
 }
+
+/* Leaving the tab (or pressing P) freezes the bird instead of letting it fall unseen. */
+function pauseGame() {
+  if (state !== "playing") return;
+  state = "paused";
+  cancelAnimationFrame(rafId);
+  const ov = document.getElementById("fb-overlay");
+  ov.innerHTML = `
+    <h2>⏸ Duraklatıldı</h2>
+    <p>Skor: <strong>${score}</strong></p>
+    <button class="fb-play-btn" id="fb-play-btn" type="button">Devam Et</button>
+  `;
+  ov.style.display = "";
+  const btn = document.getElementById("fb-play-btn");
+  btn.addEventListener("click", e => { e.stopPropagation(); resumeGame(); });
+  if (!document.hidden) btn.focus();
+}
+function resumeGame() {
+  if (state !== "paused") return;
+  state = "playing";
+  document.getElementById("fb-overlay").style.display = "none";
+  bird.vy = FLAP;
+  lastTime = performance.now();
+  rafId = requestAnimationFrame(loop);
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
 
 function showOverlay() {
   const ov = document.getElementById("fb-overlay");
@@ -246,7 +282,9 @@ function showOverlay() {
     <button class="fb-play-btn" id="fb-play-btn">Tekrar Oyna</button>
   `;
   ov.style.display = "";
-  document.getElementById("fb-play-btn").addEventListener("click", startGame);
+  const again = document.getElementById("fb-play-btn");
+  again.addEventListener("click", e => { e.stopPropagation(); startGame(); });
+  again.focus();
 }
 
 let rafId = 0;
@@ -273,8 +311,21 @@ draw();
 /* Controls */
 const wrap = document.getElementById("fb-wrap");
 wrap.addEventListener("click", flap);
-wrap.addEventListener("touchstart", e => { e.preventDefault(); flap(); }, { passive: false });
-window.addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); flap(); } });
-document.getElementById("fb-play-btn").addEventListener("click", startGame);
+/* Taps on the overlay button are left to become a normal click; otherwise the
+   preventDefault swallowed them and "Tekrar Oyna" did nothing on phones. */
+wrap.addEventListener("touchstart", e => {
+  if (e.target.closest && e.target.closest("button")) return;
+  e.preventDefault(); flap();
+}, { passive: false });
+window.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.code === "KeyP") { if (state === "playing") pauseGame(); else if (state === "paused") resumeGame(); return; }
+  if (e.code !== "Space") return;
+  e.preventDefault();
+  /* Space also restarts after a crash, with a short delay so a held flap does not skip the result. */
+  if (state === "dead") { if (performance.now() - deadAt > 500) startGame(); return; }
+  flap();
+});
+document.getElementById("fb-play-btn").addEventListener("click", e => { e.stopPropagation(); startGame(); });
 })();
 </script>

@@ -54,9 +54,9 @@ game_genre: "Casual"
 }
 
 .coinflip-icon-btn {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -236,10 +236,47 @@ game_genre: "Casual"
   font-size: .64rem;
 }
 
-.coinflip-choice.is-selected {
+/* The selected side used light-blue text on a light tint (about 2.4:1); the
+   check mark also keeps the state from resting on colour alone. */
+.coinflip-choice.is-selected,
+.coinflip-bet.is-selected {
   border-color: var(--global-link-color);
-  background: rgba(90,140,190,.12);
-  color: var(--global-link-color);
+  background: color-mix(in srgb, var(--global-link-color) 14%, transparent);
+  color: color-mix(in srgb, var(--global-link-color) 55%, #000);
+}
+
+:root[data-theme="dark"] .coinflip-choice.is-selected,
+:root[data-theme="dark"] .coinflip-bet.is-selected {
+  color: color-mix(in srgb, var(--global-link-color) 45%, #fff);
+}
+
+.coinflip-choice.is-selected::before,
+.coinflip-bet.is-selected::before {
+  content: "\2713\00A0";
+}
+
+.coinflip-app button:focus-visible,
+.coinflip-custom input:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.coinflip-keys {
+  margin: 8px 0 0;
+  text-align: center;
+  color: var(--global-text-color);
+  opacity: .7;
+  font-size: .76rem;
+}
+
+.coinflip-secondary.is-confirm {
+  border-color: #c53030;
+  color: #c53030;
+}
+
+:root[data-theme="dark"] .coinflip-secondary.is-confirm {
+  border-color: #fc8181;
+  color: #fc8181;
 }
 
 .coinflip-bet-row {
@@ -249,18 +286,12 @@ game_genre: "Casual"
 }
 
 .coinflip-bet {
-  min-height: 43px;
+  min-height: 44px;
   border: 1px solid var(--global-border-color);
   border-radius: 11px;
   background: rgba(127,127,127,.045);
   color: var(--global-text-color);
   font-weight: 850;
-}
-
-.coinflip-bet.is-selected {
-  border-color: var(--global-link-color);
-  color: var(--global-link-color);
-  background: rgba(90,140,190,.11);
 }
 
 .coinflip-custom {
@@ -273,13 +304,13 @@ game_genre: "Casual"
 .coinflip-custom input {
   width: 100%;
   min-width: 0;
-  height: 43px;
+  height: 44px;
   padding: 0 12px;
   border: 1px solid var(--global-border-color);
   border-radius: 11px;
-  outline: 0;
   background: transparent;
   color: var(--global-text-color);
+  font-size: 16px;
 }
 
 .coinflip-set {
@@ -295,9 +326,9 @@ game_genre: "Casual"
   width: 100%;
   min-height: 53px;
   margin-top: 14px;
-  border: 1px solid var(--global-link-color);
+  border: 1px solid transparent;
   border-radius: 14px;
-  background: var(--global-link-color);
+  background: color-mix(in srgb, var(--global-link-color) 72%, #000);
   color: #fff;
   font-weight: 900;
   letter-spacing: .04em;
@@ -466,15 +497,16 @@ game_genre: "Casual"
   font-weight: 800;
 }
 
+/* At the top it slid in underneath the site's fixed header. */
 .coinflip-toast {
   position: fixed;
   z-index: 1000;
-  top: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   width: max-content;
   max-width: calc(100vw - 32px);
   padding: 9px 13px;
-  transform: translate(-50%, -15px);
+  transform: translate(-50%, 15px);
   opacity: 0;
   border: 1px solid var(--global-link-color);
   border-radius: 999px;
@@ -564,7 +596,7 @@ game_genre: "Casual"
   </section>
 
   <section class="coinflip-game-card" id="coinflip-card">
-    <div class="coinflip-stage" aria-live="polite">
+    <div class="coinflip-stage">
       <div class="coinflip-coin" id="coinflip-coin">
         <img id="coinflip-image" src="/game/coin-head.png" alt="Heads side of the coin">
       </div>
@@ -590,11 +622,12 @@ game_genre: "Casual"
     </div>
 
     <div class="coinflip-custom">
-      <input id="coinflip-custom" type="number" min="1" step="1" inputmode="numeric" placeholder="Custom amount">
+      <input id="coinflip-custom" type="number" min="1" step="1" inputmode="numeric" placeholder="Custom amount" aria-label="Custom bet amount">
       <button class="coinflip-set" id="coinflip-set" type="button">Set</button>
     </div>
 
     <button class="coinflip-flip" id="coinflip-flip" type="button">Flip Coin · Bet 10</button>
+    <p class="coinflip-keys">Keyboard: H heads, T tails, Space or Enter to flip.</p>
   </section>
 
   <section class="coinflip-block">
@@ -1143,7 +1176,26 @@ catch { const mem = new Map(); store = {
 
   flipButton.addEventListener("click", flipCoin);
   soundButton.addEventListener("click", toggleSound);
-  document.getElementById("coinflip-reset").addEventListener("click", resetGame);
+  /* Reset wipes the saved balance and statistics, so it asks for a second tap. */
+  const resetButton = document.getElementById("coinflip-reset");
+  let resetArmed = 0;
+  function disarmReset() {
+    window.clearTimeout(resetArmed);
+    resetArmed = 0;
+    resetButton.classList.remove("is-confirm");
+    resetButton.textContent = "↻ Reset Game";
+  }
+  resetButton.addEventListener("click", () => {
+    if (flipping) return;
+    if (resetArmed || wins + losses === 0) {
+      disarmReset();
+      resetGame();
+      return;
+    }
+    resetButton.classList.add("is-confirm");
+    resetButton.textContent = "Tap again to reset";
+    resetArmed = window.setTimeout(disarmReset, 3000);
+  });
   document.getElementById("coinflip-home").addEventListener("click", () => {
     location.href = "/games/";
   });

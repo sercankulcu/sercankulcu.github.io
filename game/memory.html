@@ -81,9 +81,9 @@ game_genre: "Puzzle"
 }
 
 .memory-help {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   border: 1px solid var(--global-border-color);
   border-radius: 50%;
   background: transparent;
@@ -129,25 +129,54 @@ game_genre: "Puzzle"
   padding: 0;
   display: grid;
   place-items: center;
-  border: 1px solid var(--global-border-color);
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--global-text-color) 28%, transparent);
   border-radius: 14px;
-  background: rgba(127, 127, 127, .07);
+  background: rgba(127, 127, 127, .1);
   color: var(--global-text-color);
   font-size: clamp(24px, 6vw, 38px);
+  touch-action: manipulation;
   font-weight: 900;
   cursor: pointer;
   transition: transform .15s ease, background .15s ease, border-color .15s ease;
 }
 
-.memory-card:hover:not(:disabled) {
+.memory-card:hover:not([aria-disabled="true"]) {
   transform: translateY(-1px);
   border-color: var(--global-link-color);
 }
 
 .memory-card.is-open {
-  background: var(--global-link-color);
+  background: color-mix(in srgb, var(--global-link-color) 72%, #000);
   color: #fff;
-  border-color: var(--global-link-color);
+  border-color: transparent;
+}
+
+/* Matched must not rest on the green tint alone. */
+.memory-card.is-matched::after {
+  content: "\2713";
+  position: absolute;
+  top: 4px;
+  right: 7px;
+  color: #2f855a;
+  font-size: .8rem;
+  line-height: 1;
+}
+
+:root[data-theme="dark"] .memory-card.is-matched::after { color: #68d391; }
+
+.memory-app button:focus-visible,
+.memory-modal button:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.memory-hint {
+  margin: 0;
+  text-align: center;
+  color: var(--global-text-color);
+  opacity: .7;
+  font-size: .8rem;
 }
 
 .memory-card.is-matched {
@@ -155,7 +184,7 @@ game_genre: "Puzzle"
   border-color: rgba(47, 133, 90, .45);
 }
 
-.memory-card:disabled {
+.memory-card[aria-disabled="true"] {
   cursor: default;
 }
 
@@ -338,6 +367,7 @@ game_genre: "Puzzle"
     <div class="memory-grid" id="memory-game" aria-label="Memory card grid"></div>
 
     <div class="memory-message" id="memory-message" aria-live="polite"></div>
+    <p class="memory-hint">Tap a card to flip it. The timer starts on your first flip.</p>
 
     <div class="memory-actions">
       <button class="memory-button" id="memory-restart" type="button">New Game</button>
@@ -473,7 +503,7 @@ game_genre: "Puzzle"
   }
 
   function flip(card) {
-    if (lock || card.disabled || openCards.includes(card)) return;
+    if (lock || card.getAttribute("aria-disabled") === "true" || openCards.includes(card)) return;
 
     startTimer();
 
@@ -490,8 +520,12 @@ game_genre: "Puzzle"
     const [first, second] = openCards;
 
     if (first.dataset.value === second.dataset.value) {
-      first.disabled = true;
-      second.disabled = true;
+      /* aria-disabled rather than disabled: disabling the focused card threw
+         keyboard focus back to the top of the page. */
+      first.setAttribute("aria-disabled", "true");
+      second.setAttribute("aria-disabled", "true");
+      first.setAttribute("aria-label", `Card ${first.dataset.value}, matched`);
+      second.setAttribute("aria-label", `Card ${second.dataset.value}, matched`);
       first.classList.remove("is-open");
       second.classList.remove("is-open");
       first.classList.add("is-matched");

@@ -80,9 +80,9 @@ game_genre: "Puzzle"
 }
 
 .strands-help {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   border: 1px solid var(--global-border-color);
   border-radius: 50%;
   background: transparent;
@@ -128,6 +128,21 @@ game_genre: "Puzzle"
   overflow-wrap: anywhere;
 }
 
+.strands-current:empty::before {
+  content: "Harflere dokun ya da yaz";
+  color: var(--global-text-color);
+  opacity: .55;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.strands-app button:focus-visible,
+.strands-modal button:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
 .strands-board {
   width: min(100%, 320px);
   margin: 18px auto;
@@ -142,11 +157,12 @@ game_genre: "Puzzle"
   min-width: 0;
   display: grid;
   place-items: center;
-  border: 1px solid var(--global-border-color);
+  border: 1px solid color-mix(in srgb, var(--global-text-color) 28%, transparent);
   border-radius: 12px;
-  background: rgba(127, 127, 127, .07);
+  background: rgba(127, 127, 127, .1);
   color: var(--global-text-color);
   font-size: clamp(17px, 4vw, 21px);
+  touch-action: manipulation;
   font-weight: 900;
   cursor: pointer;
   transition: transform .15s ease, border-color .15s ease, background .15s ease;
@@ -210,9 +226,13 @@ game_genre: "Puzzle"
 }
 
 .strands-button.primary {
-  border-color: var(--global-link-color);
-  background: var(--global-link-color);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--global-link-color) 72%, #000);
   color: #fff;
+}
+
+.strands-button.primary:hover {
+  background: color-mix(in srgb, var(--global-link-color) 62%, #000);
 }
 
 .strands-message {
@@ -611,6 +631,7 @@ game_genre: "Puzzle"
       button.className = "strands-tile";
       button.textContent = letter;
       button.dataset.index = String(index);
+      button.setAttribute("aria-pressed", "false");
 
       button.addEventListener("click", () => selectTile(index));
       boardView.appendChild(button);
@@ -649,6 +670,7 @@ game_genre: "Puzzle"
     path.push(index);
     currentWord += button.textContent;
     button.classList.add("is-selected");
+    button.setAttribute("aria-pressed", "true");
 
     currentView.textContent = currentWord;
     message.textContent = "";
@@ -689,6 +711,7 @@ game_genre: "Puzzle"
     currentWord = currentWord.slice(0, -1);
 
     boardView.children[last].classList.remove("is-selected");
+    boardView.children[last].setAttribute("aria-pressed", "false");
     currentView.textContent = currentWord;
     message.textContent = "";
   }
@@ -697,6 +720,7 @@ game_genre: "Puzzle"
     for (const index of path) {
       if (!solvedTiles.has(index)) {
         boardView.children[index].classList.remove("is-selected");
+        boardView.children[index].setAttribute("aria-pressed", "false");
       }
     }
 
@@ -741,6 +765,8 @@ game_genre: "Puzzle"
       const button = boardView.children[index];
       button.classList.remove("is-selected");
       button.classList.add("is-found");
+      button.removeAttribute("aria-pressed");
+      button.setAttribute("aria-label", `${button.textContent}, bulundu`);
       button.disabled = true;
     }
 
@@ -819,6 +845,14 @@ game_genre: "Puzzle"
     }
 
     if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (modal.classList.contains("is-open")) return;
+
+    /* Typing into a field (e.g. site search) must stay typing, and Enter on a
+       focused control button must press it, not submit the word (on letter
+       tiles Enter still submits; Space selects the tile). */
+    const tag = event.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || event.target.isContentEditable) return;
+    if (event.key === "Enter" && tag === "BUTTON" && !event.target.classList.contains("strands-tile")) return;
 
     if (event.key === "Backspace") {
       event.preventDefault();

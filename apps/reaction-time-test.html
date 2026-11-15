@@ -114,6 +114,9 @@ web_app: EducationalApplication
 
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 
   transition:
     background .16s ease,
@@ -128,6 +131,27 @@ web_app: EducationalApplication
 
 .rt-zone:active {
   transform: scale(.995);
+}
+
+.rt-zone:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 3px;
+}
+
+.rt-zone.rt-done {
+  border-color: var(--global-link-color);
+}
+
+.rt-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .rt-zone.rt-wait {
@@ -223,9 +247,9 @@ web_app: EducationalApplication
 
   color: var(--global-text-color);
 
-  opacity: .55;
+  opacity: .78;
 
-  font-size: .65rem;
+  font-size: .72rem;
   font-weight: 750;
 
   letter-spacing: .03em;
@@ -236,11 +260,11 @@ web_app: EducationalApplication
 
   color: var(--global-text-color);
 
-  opacity: .55;
+  opacity: .75;
 
   text-align: center;
 
-  font-size: .68rem;
+  font-size: .78rem;
 }
 
 @media (max-width: 700px) {
@@ -327,8 +351,8 @@ web_app: EducationalApplication
       id="rt-zone"
       role="button"
       tabindex="0"
-      aria-live="polite"
       aria-label="Reaction time test area"
+      aria-describedby="rt-main rt-sub"
     >
       <div>
         <h2
@@ -394,6 +418,13 @@ web_app: EducationalApplication
     >
       Attempt 0 / 5
     </p>
+
+    <p
+      class="rt-sr"
+      id="rt-status"
+      role="status"
+      aria-live="polite"
+    ></p>
   </section>
 </div>
 
@@ -427,6 +458,13 @@ web_app: EducationalApplication
   const progress =
     byId("rt-progress");
 
+  const status =
+    byId("rt-status");
+
+  const announce = text => {
+    status.textContent = text;
+  };
+
   let state = "idle";
   let timer = null;
   let startTime = 0;
@@ -455,6 +493,9 @@ web_app: EducationalApplication
 
       sub.textContent =
         "Your five-attempt average is shown below.";
+
+      zone.className =
+        "rt-zone rt-done";
     } else {
       main.textContent =
         "Click to Start";
@@ -507,6 +548,8 @@ web_app: EducationalApplication
     sub.textContent =
       "That attempt does not count. Click to try again.";
 
+    announce("Too soon. That attempt does not count.");
+
     state = "idle";
   }
 
@@ -541,6 +584,23 @@ web_app: EducationalApplication
 
     progress.textContent =
       `Attempt ${times.length} / ${TOTAL_ATTEMPTS}`;
+
+    zone.className =
+      "rt-zone";
+
+    main.textContent =
+      `${milliseconds} ms`;
+
+    sub.textContent =
+      times.length >= TOTAL_ATTEMPTS
+        ? ""
+        : "Get ready for the next one…";
+
+    announce(
+      times.length >= TOTAL_ATTEMPTS
+        ? `Attempt ${times.length}: ${milliseconds} ms. Test complete. Average ${mean} ms, best ${fastest} ms.`
+        : `Attempt ${times.length}: ${milliseconds} ms.`
+    );
 
     state = "locked";
 
@@ -577,9 +637,44 @@ web_app: EducationalApplication
     }
   }
 
+  /* pointerdown reacts on touch/press instead of release, so the measured time is not inflated */
+  let skipClick = false;
+
+  zone.addEventListener(
+    "pointerdown",
+    event => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      skipClick = true;
+      handleAction();
+    }
+  );
+
   zone.addEventListener(
     "click",
-    handleAction
+    () => {
+      if (skipClick) {
+        skipClick = false;
+        return;
+      }
+
+      handleAction();
+    }
+  );
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (
+        document.hidden &&
+        (state === "wait" || state === "go")
+      ) {
+        window.clearTimeout(timer);
+        showIdle();
+      }
+    }
   );
 
   zone.addEventListener(

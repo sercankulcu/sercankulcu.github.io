@@ -211,6 +211,17 @@ game_genre: "Arcade"
 :root[data-theme="dark"] .fastreflex-modal { background:rgba(28,34,38,.97); color:var(--global-text-color); }
 :root[data-theme="dark"] .fastreflex-modal p { color:rgba(200,210,210,.7); }
 :root[data-theme="dark"] .fastreflex-eyebrow { color:#4ade80 !important; }
+:root[data-theme="dark"] .fastreflex-primary { background:#f1f5f2; color:#14181b; }
+:root[data-theme="dark"] .fastreflex-mode-button { border-color:rgba(255,255,255,.16); background:rgba(255,255,255,.06); color:#e5ebe7; }
+:root[data-theme="dark"] .fastreflex-mode-button.active { border-color:#4ade80; background:rgba(74,222,128,.14); color:#86efac; box-shadow:inset 0 0 0 1px rgba(74,222,128,.5); }
+:root[data-theme="dark"] .fastreflex-result-card { border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.05); }
+:root[data-theme="dark"] .fastreflex-result-label { color:rgba(210,220,215,.75); }
+
+.fastreflex-modal h1,.fastreflex-modal h2 { border:0; padding:0; }
+.fastreflex-mode-button,.fastreflex-primary { min-height:44px; }
+.fastreflex-mode-button.active::after { content:" ✓"; }
+.fastreflex-app button:focus-visible { outline:3px solid #2f9d67; outline-offset:3px; }
+.fastreflex-sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
 .fastreflex-modal h1,.fastreflex-modal h2 { margin:0; letter-spacing:-.045em; }
 .fastreflex-modal h1 { font-size:clamp(2.4rem,10vw,3.6rem); }
@@ -337,16 +348,17 @@ game_genre: "Arcade"
 
     <div class="fastreflex-mode-chip" id="fastreflex-mode-chip">EASY MODE</div>
     <div class="fastreflex-playfield" id="fastreflex-playfield"></div>
-    <div class="fastreflex-feedback" id="fastreflex-feedback" aria-live="polite"></div>
+    <div class="fastreflex-feedback" id="fastreflex-feedback" aria-hidden="true"></div>
+    <div class="fastreflex-sr" id="fastreflex-live" role="status" aria-live="polite"></div>
 
     <div class="fastreflex-overlay visible" id="fastreflex-start">
       <div class="fastreflex-modal">
         <p class="fastreflex-eyebrow">30 Second Challenge</p>
         <h1>Fast Reflex</h1>
-        <p>Tap the good animals quickly. Avoid the bad ones and build the highest score you can.</p>
-        <div class="fastreflex-mode-buttons">
-          <button class="fastreflex-mode-button active" id="fastreflex-easy" type="button">🌕 Easy</button>
-          <button class="fastreflex-mode-button" id="fastreflex-hard" type="button">🔥 Hard</button>
+        <p>Tap the good animals quickly. Avoid the bad ones and build the highest score you can. With a keyboard, Tab to the animal and press Enter.</p>
+        <div class="fastreflex-mode-buttons" role="group" aria-label="Difficulty">
+          <button class="fastreflex-mode-button active" id="fastreflex-easy" type="button" aria-pressed="true">🌕 Easy</button>
+          <button class="fastreflex-mode-button" id="fastreflex-hard" type="button" aria-pressed="false">🔥 Hard</button>
         </div>
         <button class="fastreflex-primary" id="fastreflex-start-btn" type="button">Start Game</button>
       </div>
@@ -375,9 +387,9 @@ game_genre: "Arcade"
           <div class="fastreflex-result-card"><span class="fastreflex-result-label">WRONG / MISS</span><span class="fastreflex-result-value" id="fastreflex-final-mistakes">0 / 0</span></div>
         </div>
 
-        <div class="fastreflex-mode-buttons">
-          <button class="fastreflex-mode-button" id="fastreflex-easy-end" type="button">🌕 Easy</button>
-          <button class="fastreflex-mode-button" id="fastreflex-hard-end" type="button">🔥 Hard</button>
+        <div class="fastreflex-mode-buttons" role="group" aria-label="Difficulty">
+          <button class="fastreflex-mode-button" id="fastreflex-easy-end" type="button" aria-pressed="false">🌕 Easy</button>
+          <button class="fastreflex-mode-button" id="fastreflex-hard-end" type="button" aria-pressed="false">🔥 Hard</button>
         </div>
 
         <button class="fastreflex-primary" id="fastreflex-again" type="button">Play Again</button>
@@ -476,6 +488,8 @@ game_genre: "Arcade"
     hardButton.classList.toggle("active", !easy);
     easyButtonEnd.classList.toggle("active", easy);
     hardButtonEnd.classList.toggle("active", !easy);
+    [easyButton, easyButtonEnd].forEach(b => b.setAttribute("aria-pressed", String(easy)));
+    [hardButton, hardButtonEnd].forEach(b => b.setAttribute("aria-pressed", String(!easy)));
 
     modeChip.textContent = easy ? "EASY MODE" : "HARD MODE";
     bestDisplay.textContent = formatScore(getBest());
@@ -550,6 +564,7 @@ game_genre: "Arcade"
     feedback.classList.add("show");
   }
 
+  let keyboardPlay = false;
   function spawnTarget() {
     clearTarget();
     if (!gameActive) return;
@@ -598,7 +613,14 @@ game_genre: "Arcade"
 
     const createdAt = performance.now();
 
-    target.addEventListener("pointerdown", event => {
+    /* Keyboard users activate the target with Enter/Space (a click with detail 0). */
+    target.addEventListener("click", event => {
+      if (event.detail === 0) { keyboardPlay = true; hit(event); }
+    });
+    target.addEventListener("pointerdown", event => { keyboardPlay = false; hit(event); });
+    target.addEventListener("focus", () => { if (!target.matches(":focus-visible")) return; keyboardPlay = true; });
+
+    function hit(event) {
       event.preventDefault();
 
       if (!gameActive || target !== currentTarget) return;
@@ -643,10 +665,12 @@ game_genre: "Arcade"
         target.remove();
         if (gameActive) spawnTarget();
       }, 115);
-    });
+    }
 
     playfield.appendChild(target);
     currentTarget = target;
+    /* Keyboard players keep focus on the live target as targets come and go. */
+    if (keyboardPlay) target.focus({ preventScroll: true });
 
     targetTimeout = window.setTimeout(() => {
       if (!gameActive || target !== currentTarget) return;
@@ -686,8 +710,9 @@ game_genre: "Arcade"
     }
   }
 
-  function startGame() {
+  function startGame(event) {
     clearTarget();
+    keyboardPlay = !!(event && event.detail === 0);
 
     score = 0;
     fastestReaction = Infinity;
@@ -746,8 +771,12 @@ game_genre: "Arcade"
     updateHud();
     updateModeUI();
 
+    document.getElementById("fastreflex-live").textContent =
+      `Time's up. Score ${score}. Best ${getBest()}. Accuracy ${accuracy}%.`;
+
     window.setTimeout(() => {
       gameOverOverlay.classList.add("visible");
+      playAgainButton.focus({ preventScroll: true });
     }, 220);
   }
 
@@ -767,6 +796,7 @@ game_genre: "Arcade"
     timerInterval = null;
     clearTarget();
     pausedOverlay.classList.add("visible");
+    if (!document.hidden) resumeButton.focus({ preventScroll: true });
   }
 
   function resumeGame() {

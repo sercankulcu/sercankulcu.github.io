@@ -97,8 +97,8 @@ game_genre: "Arcade"
 }
 
 .carrace-icon-btn {
-  width:42px;
-  height:38px;
+  width:44px;
+  height:44px;
   margin:0;
   padding:0;
   border:1px solid rgba(41,255,90,.75);
@@ -296,6 +296,25 @@ game_genre: "Arcade"
   pointer-events:auto;
 }
 
+.carrace-shell:focus { outline:none; }
+
+.carrace-app button:focus-visible {
+  outline:3px solid var(--race-yellow, #ffe45c);
+  outline-offset:2px;
+}
+
+.carrace-sr {
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+}
+
 .carrace-flash {
   position:absolute;
   inset:0;
@@ -360,10 +379,10 @@ game_genre: "Arcade"
 </style>
 
 <div class="carrace-app">
-  <main class="carrace-shell" id="carrace-shell" aria-label="Retro Car Race game">
+  <main class="carrace-shell" id="carrace-shell" aria-label="Retro Car Race game" tabindex="-1">
     <canvas class="carrace-canvas" id="carrace-canvas"></canvas>
 
-    <div class="carrace-hud" aria-live="polite">
+    <div class="carrace-hud">
       <div class="carrace-hud-box">
         <span class="carrace-hud-label">SCORE</span>
         <span class="carrace-hud-value" id="carrace-score">00000</span>
@@ -444,6 +463,7 @@ game_genre: "Arcade"
     </div>
 
     <div class="carrace-flash" id="carrace-flash"></div>
+    <div class="carrace-sr" id="carrace-live" role="status" aria-live="polite"></div>
   </main>
 </div>
 
@@ -488,6 +508,8 @@ catch { const mem = new Map(); store = {
   const highScoresList = document.getElementById("carrace-highscores");
   const comboToast = document.getElementById("carrace-combo");
   const flash = document.getElementById("carrace-flash");
+  const liveRegion = document.getElementById("carrace-live");
+  function announce(text) { liveRegion.textContent = text; }
 
   const LANE_COUNT = 3;
   const INITIAL_SPEED = 90;
@@ -615,6 +637,9 @@ catch { const mem = new Map(); store = {
     pauseOverlay.classList.add("is-hidden");
     gameOverOverlay.classList.add("is-hidden");
     pauseButton.textContent = "Ⅱ";
+    pauseButton.setAttribute("aria-label", "Pause game");
+    announce("");
+    if (shell.contains(document.activeElement)) shell.focus({ preventScroll: true });
     lastTime = performance.now();
     cancelAnimationFrame(animationId);
     animationId = requestAnimationFrame(loop);
@@ -626,6 +651,9 @@ catch { const mem = new Map(); store = {
     state = "paused";
     pauseOverlay.classList.remove("is-hidden");
     pauseButton.textContent = "▶";
+    pauseButton.setAttribute("aria-label", "Resume game");
+    announce("Paused. Score " + Math.floor(score) + ".");
+    if (!document.hidden) resumeButton.focus();
     beep(300, .05, .025);
   }
 
@@ -634,6 +662,8 @@ catch { const mem = new Map(); store = {
     state = "playing";
     pauseOverlay.classList.add("is-hidden");
     pauseButton.textContent = "Ⅱ";
+    pauseButton.setAttribute("aria-label", "Pause game");
+    announce("");
     lastTime = performance.now();
     animationId = requestAnimationFrame(loop);
     beep(520, .05, .025);
@@ -900,8 +930,12 @@ catch { const mem = new Map(); store = {
     displayHighScores();
     updateBestHUD();
 
+    announce("Game over. Score " + finalScore + ". Best " + best + ".");
+
     setTimeout(() => {
+      if (state !== "over") return;
       gameOverOverlay.classList.remove("is-hidden");
+      restartButton.focus({ preventScroll: true });
     }, 260);
   }
 
@@ -1079,11 +1113,22 @@ catch { const mem = new Map(); store = {
   }
 
   document.addEventListener("keydown", event => {
+    const t = event.target;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
     const key = event.key.toLowerCase();
 
-    if (["arrowleft","arrowright","a","d","p"," "].includes(key)) {
+    /* Only swallow keys the game is using right now, so the page still scrolls normally otherwise. */
+    if (state === "playing" && ["arrowleft","arrowright","a","d","p"," "].includes(key)) {
+      event.preventDefault();
+    } else if (state === "paused" && (key === "p" || key === " ")) {
+      event.preventDefault();
+    } else if ((state === "menu" || state === "over") && key === " " && !(t && t.tagName === "BUTTON")) {
       event.preventDefault();
     }
+
+    /* Enter/Space on a focused button already clicks it; don't also handle it here. */
+    if ((key === "enter" || key === " ") && t && t.tagName === "BUTTON") return;
 
     if (key === "arrowleft" || key === "a") moveCar(-1);
     if (key === "arrowright" || key === "d") moveCar(1);

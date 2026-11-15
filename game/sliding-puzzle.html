@@ -25,7 +25,7 @@ game_genre: "Puzzle"
 .sp-stat small{display:block;opacity:.8;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .sp-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
 .sp-size-tabs{display:flex;gap:6px;margin-bottom:12px}
-.sp-size-btn{flex:1;padding:9px;border:1px solid var(--global-border-color);border-radius:10px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.82rem;font-weight:700;transition:background .15s}
+.sp-size-btn{flex:1;min-height:44px;padding:9px;border:1px solid var(--global-border-color);border-radius:10px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.82rem;font-weight:700;transition:background .15s}
 .sp-size-btn.active{background:var(--global-text-color);color:var(--global-bg-color)}
 .sp-board{
   display:grid;
@@ -34,8 +34,14 @@ game_genre: "Puzzle"
   border:1px solid var(--global-border-color);
   border-radius:18px;
   background:color-mix(in srgb,var(--global-text-color) 5%,transparent);
-  touch-action:none;
+  /* Tap-only board: "none" stopped the page from scrolling when a swipe
+     started on the board, which on a phone is most of the screen. */
+  touch-action:manipulation;
   user-select:none;
+  /* Keeps the whole board and the New Game button above the fold on a
+     laptop-height window; on phones the width is the limit. */
+  width:min(100%,max(260px,calc(100svh - 400px)));
+  margin-inline:auto;
 }
 .sp-tile{
   position:relative;
@@ -57,7 +63,11 @@ game_genre: "Puzzle"
   position:absolute;top:3px;right:5px;
   font-size:.6rem;font-weight:900;line-height:1;opacity:.75;
 }
-.sp-tile:not(.blank):hover{transform:scale(.96)}
+.sp-tile:not(.blank):not([aria-disabled]):hover{transform:scale(.96)}
+.sp-tile[aria-disabled]{cursor:default}
+.sp-size-btn:focus-visible,.sp-btn:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.sp-btn{min-height:44px}
+@media(prefers-reduced-motion:reduce){.sp-app *{transition-duration:.001ms!important}}
 .sp-tile.blank{background:transparent;border-color:transparent;cursor:default}
 .sp-tile:not(.blank){background:var(--global-bg-color);box-shadow:0 3px 10px rgba(0,0,0,.1)}
 .sp-tile.correct{background:color-mix(in srgb,#3aaa6f 18%,var(--global-bg-color))}
@@ -196,7 +206,9 @@ function canMove(idx) {
 function render(focusIdx = -1) {
   const keepFocus = board.contains(document.activeElement);
   board.style.gridTemplateColumns = `repeat(${N},1fr)`;
-  const size = Math.min(520, board.clientWidth || 480) - 20;
+  /* Measured from the board's real width (minus padding and border) so the
+     tiles stay square however the CSS sizes the board. */
+  const size = (board.clientWidth || 480) - 20;
   /* A transiently collapsed board (mid-resize, or a hidden tab) would otherwise
      compute a negative height and drop the style entirely. */
   const tileSize = Math.max(24, Math.floor((size - (N-1)*6) / N));
@@ -267,6 +279,8 @@ function newGame() {
 /* Arrow keys */
 window.addEventListener("keydown", e => {
   if (won) return;
+  const tag = e.target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
   const brow = Math.floor(blankIdx / N), bcol = blankIdx % N;
   let target = -1;
   if (e.key === "ArrowUp"    && brow < N-1) target = blankIdx + N;
