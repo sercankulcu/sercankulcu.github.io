@@ -3,17 +3,18 @@
 
     python tools/make_pdf_pages.py
 
-Her kitap, makale ve tez icin PDF'in yanina ayni adla bir HTML sayfasi yazar
-(ornegin data_structures/Veri-Yapilari.pdf -> data_structures/Veri-Yapilari.html).
-Sayfada Google Scholar'in okudugu citation_* etiketleri (Highwire Press), baslik,
+Her kitap, makale ve tez icin _pages/scholar/ altina sitenin without-sidebar duzeninde bir
+sayfa yazar: kitaplar /books/<pdf-adi>/, makaleler /publications/<pdf-adi>/, tez
+/publications/2022-phd-thesis/. citation_* etiketleri on bilgideki citation listesinden
+_includes/head/custom.html ile <head>'e girer. Sayfada baslik,
 yazarlar, tarih, ozet ve PDF baglantisi vardir. Makale ve tez PDF'lerinin baslik,
 yazar ve konu bilgisini de doldurur. Son olarak courses-pdfs/sitemap.xml'i butun
-PDF'ler ve bu sayfalarla yeniden yazar (sitenin robots.txt dosyasi onu gosterir).
+PDF'lerle yeniden yazar (sitenin robots.txt dosyasi onu gosterir).
 
 make_book.py ve make_slide_pdf.py is bitince bunu kendiliginden calistirir.
 Kitaplarin baslik, konu ve sayfa sayisi PDF'in kendisinden okunur.
 """
-import glob, html, os, re, sys
+import glob, html, json, os, re, sys
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -21,6 +22,7 @@ REPO = os.path.dirname(HERE)
 PDF_REPO = os.path.join(os.path.dirname(REPO), 'courses-pdfs')
 SITE = 'https://sercankulcu.github.io'
 BASE = SITE + '/courses-pdfs/'
+OUT_DIR = os.path.join(REPO, '_pages', 'scholar')
 ME = ('Sercan', 'Külcü')
 YEAR_BOOKS = '2026'
 
@@ -61,7 +63,7 @@ THESIS = dict(
     title='IoT Ağlar İçin Akıllı Anten Tabanlı Çizelgeleme '
           'Algoritmalarının İncelenmesi',
     title_en='Analysis of Smart Antenna Based Scheduling Algorithms for IoT Networks',
-    authors=[ME], date='2022/09',
+    authors=[ME], date='2022/09', permalink='/publications/2022-phd-thesis/',
     institution='Karadeniz Teknik Üniversitesi',
     institution_en='Karadeniz Technical University',
     degree='Doktora Tezi', supervisor='Doç. Dr. Sedat Görmüş')
@@ -78,27 +80,15 @@ L = {
 }
 
 CSS = """
-:root { --bg: #fff; --fg: #1d1f21; --muted: #5b6168; --line: #dde1e5; --link: #1a5fb4; --btn: #1a5fb4; --btnfg: #fff; }
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #16181b; --fg: #e6e8ea; --muted: #a2a9b0; --line: #2c3036; --link: #8ab4f8; --btn: #8ab4f8; --btnfg: #111; }
-}
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg);
-  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-main { max-width: 760px; margin: 0 auto; padding: 40px 16px 56px; }
-a { color: var(--link); }
-.kind { margin: 0 0 6px; color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .06em; }
-h1 { margin: 0 0 12px; font-size: 30px; line-height: 1.25; }
-.sub { margin: -4px 0 14px; color: var(--muted); font-style: italic; }
-.authors { margin: 0 0 4px; font-size: 18px; }
-.meta { margin: 0 0 22px; color: var(--muted); font-size: 15px; }
-.btn { display: inline-block; padding: 10px 18px; border-radius: 6px; background: var(--btn); color: var(--btnfg);
-  font-weight: 600; text-decoration: none; }
-.links { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 0 0 30px; }
-h2 { margin: 30px 0 8px; font-size: 19px; }
-@media (min-width: 640px) { .abstract { text-align: justify; hyphens: auto; } }
-.cite { padding: 12px 14px; border-left: 3px solid var(--line); color: var(--muted); font-size: 15px; }
-footer { margin-top: 44px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+.sch-kind { margin: 0 0 .3em; color: var(--global-text-color-light); font-size: .8em; text-transform: uppercase; letter-spacing: .06em; }
+.sch h1 { margin: 0 0 .4em; }
+.sch-sub { margin: -.2em 0 .8em; color: var(--global-text-color-light); font-style: italic; }
+.sch-authors { margin: 0 0 .2em; font-size: 1.1em; }
+.sch-meta { margin: 0 0 1.2em; color: var(--global-text-color-light); font-size: .9em; }
+.sch-links { display: flex; flex-wrap: wrap; gap: .6em 1.2em; align-items: center; margin: 0 0 1.6em; }
+.sch-btn { display: inline-block; padding: .5em 1.1em; border: 1px solid var(--global-link-color); border-radius: 6px; font-weight: 600; text-decoration: none; }
+.sch-cite { padding: .7em .9em; border-left: 3px solid var(--global-border-color); color: var(--global-text-color-light); font-size: .9em; }
+@media (min-width: 640px) { .sch-abstract { text-align: justify; hyphens: auto; } }
 """
 
 
@@ -141,32 +131,27 @@ def set_info(rel, title, author, subject, keywords):
     d.close()
 
 
-def page(lang, title, kind, meta_tags, body, rel_pdf, year):
+def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink):
+    """Sitenin without-sidebar duzeninde bir Jekyll sayfasi. citation_* etiketleri on bilgideki
+    citation listesinden _includes/head/custom.html ile <head>'e yazilir."""
     t = L[lang]
-    url = BASE + rel_pdf[:-4] + '.html'
-    tags = '\n'.join('<meta name="%s" content="%s">' % (k, e(v)) for k, v in meta_tags)
-    return """<!doctype html>
-<html lang="%(lang)s">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>%(title)s</title>
-<link rel="canonical" href="%(url)s">
-<meta name="description" content="%(desc)s">
-%(tags)s
-<style>%(css)s</style>
-</head>
-<body>
-<main>
-<p class="kind">%(kind)s</p>
+    tags = [(k, v) for k, v in meta_tags if k != 'description']
+    fm = ['---', 'layout: without-sidebar', 'author_profile: false',
+          'title: ' + json.dumps(title, ensure_ascii=False),
+          'description: ' + json.dumps(dict(meta_tags).get('description', title), ensure_ascii=False),
+          'permalink: ' + permalink, 'lang: ' + lang, 'citation:']
+    fm += ['  - [%s, %s]' % (k, json.dumps(v, ensure_ascii=False)) for k, v in tags]
+    fm += ['---', '']
+    html_body = """<style>%(css)s</style>
+<div class="sch">
+<p class="sch-kind">%(kind)s</p>
 %(body)s
-<footer>%(rights)s &middot; <a href="%(site)s/">sercankulcu.github.io</a> &middot; <a href="%(site)s/publications/">%(pubs)s</a></footer>
-</main>
-</body>
-</html>
-""" % dict(lang=lang, title=e(title), url=e(url), desc=e(dict(meta_tags).get('description', title)),
-           tags=tags, css=CSS, kind=e(kind), body=body, rights=e(t['rights'] % year), site=SITE,
-           pubs=e(t['pubs']))
+<p class="sch-meta" style="margin-top:2.4em">%(rights)s</p>
+</div>
+""" % dict(css=CSS.strip(), kind=e(kind), body=body, rights=e(t['rights'] % year))
+    out = '\n'.join(fm) + html_body
+    assert '{{' not in out and '{%' not in out
+    return out
 
 
 def book_page(rel, lang, course):
@@ -181,15 +166,15 @@ def book_page(rel, lang, course):
             ('citation_pdf_url', BASE + rel), ('citation_keywords', kw.replace(',', ';')),
             ('DC.type', 'Text.Book'), ('og:title', title), ('og:type', 'book')]
     body = """<h1>%s</h1>
-<p class="authors">%s</p>
-<p class="meta">%s &middot; %s</p>
-<div class="links"><a class="btn" href="%s">%s</a> <a href="%s%s">%s</a></div>
+<p class="sch-authors">%s</p>
+<p class="sch-meta">%s &middot; %s</p>
+<div class="sch-links"><a class="sch-btn" href="%s">%s</a> <a href="%s%s">%s</a></div>
 %s
-%s""" % (e(title), e(full(ME)), YEAR_BOOKS, e(t['pages'] % n), e(os.path.basename(rel)), e(t['pdf']),
+%s""" % (e(title), e(full(ME)), YEAR_BOOKS, e(t['pages'] % n), e(BASE + rel), e(t['pdf']),
          SITE, e(course), e(t['course']),
          '<h2>%s</h2>\n<p>%s</p>' % (e(t['about']), e(desc[:1].upper() + desc[1:] + '.')) if desc else '',
-         '<p class="meta">%s: %s</p>' % (e(t['keywords']), e(kw)) if kw else '')
-    return page(lang, title, t['book'], tags, body, rel, YEAR_BOOKS)
+         '<p class="sch-meta">%s: %s</p>' % (e(t['keywords']), e(kw)) if kw else '')
+    return page(lang, title, t['book'], tags, body, rel, YEAR_BOOKS, '/books/%s/' % slug(rel))
 
 
 def paper_page(p):
@@ -214,17 +199,18 @@ def paper_page(p):
     cite = '%s (%s). %s. In <em>%s</em>, pp. %d&ndash;%d. %s.' % (
         e(short), p['date'][:4], e(p['title']), e(p['book']), p['pages'][0], p['pages'][1], e(p['publisher']))
     body = """<h1>%s</h1>
-<p class="authors">%s</p>
-<p class="meta">%s, pp. %d&ndash;%d &middot; %s &middot; ISBN %s</p>
-<div class="links"><a class="btn" href="%s">%s</a></div>
+<p class="sch-authors">%s</p>
+<p class="sch-meta">%s, pp. %d&ndash;%d &middot; %s &middot; ISBN %s</p>
+<div class="sch-links"><a class="sch-btn" href="%s">%s</a></div>
 <h2>%s</h2>
-<p class="abstract">%s</p>
-<p class="meta">%s: %s</p>
+<p class="sch-abstract">%s</p>
+<p class="sch-meta">%s: %s</p>
 <h2>%s</h2>
-<p class="cite">%s</p>""" % (e(p['title']), e(authors), e(p['book']), p['pages'][0], p['pages'][1],
-                             e(p['publisher']), e(p['isbn']), e(os.path.basename(p['pdf'])), e(t['pdf']),
+<p class="sch-cite">%s</p>""" % (e(p['title']), e(authors), e(p['book']), p['pages'][0], p['pages'][1],
+                             e(p['publisher']), e(p['isbn']), e(BASE + p['pdf']), e(t['pdf']),
                              e(t['abstract']), e(abstract), e(t['keywords']), e(kw), e(t['cite']), cite)
-    return page(p['lang'], p['title'], 'Conference paper', tags, body, p['pdf'], p['date'][:4])
+    return page(p['lang'], p['title'], 'Conference paper', tags, body, p['pdf'], p['date'][:4],
+                '/publications/%s/' % slug(p['pdf']))
 
 
 def thesis_page(p):
@@ -247,40 +233,45 @@ def thesis_page(p):
             ('citation_dissertation_institution', p['institution']), ('citation_language', 'tr'),
             ('citation_keywords', kw_tr.replace(',', ';')), ('citation_pdf_url', BASE + p['pdf'])]
     body = """<h1>%s</h1>
-<p class="sub" lang="en">%s</p>
-<p class="authors">%s</p>
-<p class="meta">%s &middot; Danışman: %s &middot; Eylül 2022 &middot; %d sayfa</p>
-<div class="links"><a class="btn" href="%s">PDF'i indir</a></div>
+<p class="sch-sub" lang="en">%s</p>
+<p class="sch-authors">%s</p>
+<p class="sch-meta">%s &middot; Danışman: %s &middot; Eylül 2022 &middot; %d sayfa</p>
+<div class="sch-links"><a class="sch-btn" href="%s">PDF'i indir</a></div>
 <h2>Özet</h2>
-<p class="abstract">%s</p>
-<p class="meta">Anahtar kelimeler: %s</p>
+<p class="sch-abstract">%s</p>
+<p class="sch-meta">Anahtar kelimeler: %s</p>
 <div lang="en">
 <h2>Summary</h2>
-<p class="abstract">%s</p>
-<p class="meta">Keywords: %s</p>
+<p class="sch-abstract">%s</p>
+<p class="sch-meta">Keywords: %s</p>
 </div>
 <h2>Atıf</h2>
-<p class="cite">Külcü, S. (2022). <em>%s</em> [Doktora tezi, %s].</p>""" % (
+<p class="sch-cite">Külcü, S. (2022). <em>%s</em> [Doktora tezi, %s].</p>""" % (
         e(p['title']), e(p['title_en']), e(full(ME)), e(p['institution']),
-        e(p['supervisor']), m['pages'], e(os.path.basename(p['pdf'])), e(ozet), e(kw_tr), e(summary),
+        e(p['supervisor']), m['pages'], e(BASE + p['pdf']), e(ozet), e(kw_tr), e(summary),
         e(kw_en), e(p['title']), e(p['institution']))
-    return page('tr', p['title'], 'Doktora tezi', tags, body, p['pdf'], '2022')
+    return page('tr', p['title'], 'Doktora tezi', tags, body, p['pdf'], '2022', p['permalink'])
 
 
-def write(rel_pdf, content):
-    out = os.path.join(PDF_REPO, rel_pdf[:-4] + '.html')
+def slug(rel):
+    return os.path.basename(rel)[:-4].lower()
+
+
+def write(name, content):
+    out = os.path.join(OUT_DIR, name + '.html')
     old = open(out, encoding='utf-8').read() if os.path.exists(out) else None
     if old != content:
+        os.makedirs(OUT_DIR, exist_ok=True)
         with open(out, 'w', encoding='utf-8', newline='\n') as f:
             f.write(content)
-        print('yazildi', os.path.relpath(out, PDF_REPO))
+        print('yazildi', os.path.relpath(out, REPO))
 
 
 def write_sitemap():
     urls = []
     for f in sorted(glob.glob(os.path.join(PDF_REPO, '**', '*.*'), recursive=True)):
         rel = os.path.relpath(f, PDF_REPO).replace(os.sep, '/')
-        if rel.startswith('.') or rel == 'index.html' or not rel.endswith(('.pdf', '.html')):
+        if rel.startswith('.') or not rel.endswith('.pdf'):
             continue
         urls.append(BASE + '/'.join(map(lambda s: __import__('urllib.parse').parse.quote(s), rel.split('/'))))
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -300,10 +291,10 @@ def build():
         return
     for rel, lang, course in BOOKS:
         if os.path.exists(os.path.join(PDF_REPO, rel)):
-            write(rel, book_page(rel, lang, course))
+            write('book-' + slug(rel), book_page(rel, lang, course))
     for p in PAPERS:
-        write(p['pdf'], paper_page(p))
-    write(THESIS['pdf'], thesis_page(THESIS))
+        write('paper-' + slug(p['pdf']), paper_page(p))
+    write('thesis-2022', thesis_page(THESIS))
     write_sitemap()
 
 

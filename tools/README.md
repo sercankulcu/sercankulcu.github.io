@@ -24,14 +24,18 @@ konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
 python tools/make_pdf_pages.py
 ```
 
-courses-pdfs içindeki her kitap, makale ve doktora tezi için PDF'in yanına aynı adla
-bir HTML sayfası yazar (`data_structures/Veri-Yapilari.pdf` → `Veri-Yapilari.html`).
-Sayfada Google Scholar'ın okuduğu `citation_*` etiketleri, başlık, yazarlar, özet ve PDF
-bağlantısı vardır. Makale ve tez PDF'lerinin başlık/yazar bilgisini de doldurur ve
-`courses-pdfs/sitemap.xml` dosyasını yeniden yazar. Sitenin kökündeki `robots.txt` bu
-haritayı gösterir. Kitap bilgisi (başlık, konu, sayfa sayısı) PDF'in künyesinden okunur.
-Makale ve tez bilgisi betiğin başındaki `PAPERS` ve `THESIS` içindedir; yeni yayın
-oraya eklenir, yayınlar sayfasındaki "Paper" bağlantısı da `.html` sayfasına verilir.
+Her kitap, makale ve doktora tezi için `_pages/scholar/` altına sitenin
+`without-sidebar` düzeninde bir sayfa yazar: kitaplar `/books/<pdf-adı>/`, makaleler
+`/publications/<pdf-adı>/`, tez `/publications/2022-phd-thesis/`. Sayfada başlık,
+yazarlar, özet ve courses-pdfs'teki PDF'in bağlantısı vardır; Google Scholar'ın okuduğu
+`citation_*` etiketleri ön bilgideki `citation:` listesindedir ve
+`_includes/head/custom.html` onları `<head>`'e yazar. Makale ve tez PDF'lerinin
+başlık/yazar bilgisini de doldurur ve `courses-pdfs/sitemap.xml` dosyasını (yalnız
+PDF'ler) yeniden yazar; sitenin kökündeki `robots.txt` bu haritayı gösterir. Kitap
+bilgisi (başlık, konu, sayfa sayısı) PDF'in künyesinden okunur. Makale ve tez bilgisi
+betiğin başındaki `PAPERS` ve `THESIS` içindedir; yeni yayın oraya eklenir, yayınlar
+sayfasındaki "Paper" bağlantısı da o sayfaya verilir. `_pages/scholar/` dosyalarını
+elle düzenlemeyin, betik üzerine yazar.
 `make_book.py` ve `make_slide_pdf.py` iş bitince bunu kendiliğinden çalıştırır.
 Sunum PDF'lerinde başlıktaki site adını atıp yazarı yazan adımı `make_slide_pdf.py`
 kendisi yapar (`set_pdf_info`).
