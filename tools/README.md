@@ -18,6 +18,24 @@ pip install -r tools/requirements.txt
 Bütün betikler depo kökünden çalıştırılmak üzere yazılmıştır ve kendi
 konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
 
+## Google Scholar açılış sayfaları ve PDF site haritası
+
+```bash
+python tools/make_pdf_pages.py
+```
+
+courses-pdfs içindeki her kitap, makale ve doktora tezi için PDF'in yanına aynı adla
+bir HTML sayfası yazar (`data_structures/Veri-Yapilari.pdf` → `Veri-Yapilari.html`).
+Sayfada Google Scholar'ın okuduğu `citation_*` etiketleri, başlık, yazarlar, özet ve PDF
+bağlantısı vardır. Makale ve tez PDF'lerinin başlık/yazar bilgisini de doldurur ve
+`courses-pdfs/sitemap.xml` dosyasını yeniden yazar. Sitenin kökündeki `robots.txt` bu
+haritayı gösterir. Kitap bilgisi (başlık, konu, sayfa sayısı) PDF'in künyesinden okunur.
+Makale ve tez bilgisi betiğin başındaki `PAPERS` ve `THESIS` içindedir; yeni yayın
+oraya eklenir, yayınlar sayfasındaki "Paper" bağlantısı da `.html` sayfasına verilir.
+`make_book.py` ve `make_slide_pdf.py` iş bitince bunu kendiliğinden çalıştırır.
+Sunum PDF'lerinde başlıktaki site adını atıp yazarı yazan adımı `make_slide_pdf.py`
+kendisi yapar (`set_pdf_info`).
+
 ## Kitap
 
 ```bash

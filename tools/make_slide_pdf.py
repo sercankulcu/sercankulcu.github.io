@@ -203,6 +203,28 @@ def render(page, url, public_url=None):
     return snaps, expected
 
 
+AUTHOR = 'Sercan Külcü'
+
+
+def set_pdf_info(path):
+    """PDF bilgisini duzeltir: baslik sayfa basligindan site adi (" - Point Zero") atilarak,
+    yazar AUTHOR. Arama motorlari (Google, Google Scholar) bu alanlari okur."""
+    import pymupdf
+    d = pymupdf.open(path)
+    m = dict(d.metadata)
+    title = re.sub(r'\s+-\s+Point Zero\s*$', '', m.get('title') or '')
+    if m.get('title') == title and m.get('author') == AUTHOR:
+        d.close()
+        return False
+    d.set_metadata({'title': title, 'author': AUTHOR, 'subject': m.get('subject') or '',
+                    'keywords': m.get('keywords') or '', 'creator': m.get('creator') or '',
+                    'producer': m.get('producer') or '', 'creationDate': m.get('creationDate') or '',
+                    'modDate': m.get('modDate') or ''})
+    d.saveIncr()
+    d.close()
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser(description='HTML sunumlardan PDF uretir.')
     ap.add_argument('course', help='files/ altindaki ders klasoru, ornegin computer, data_structures, agt')
@@ -260,12 +282,16 @@ def main():
             out = os.path.join(pdfdir, n + '.pdf')
             page.pdf(path=out, width='800px', height='600px', print_background=True,
                      margin={'top': '0', 'right': '0', 'bottom': '0', 'left': '0'}, prefer_css_page_size=True)
+            set_pdf_info(out)
             ok = len(snaps) == expected
             bad += not ok
             print('%-45s %4d sayfa%s  %5d KB' % (n, len(snaps), '' if ok else ' (beklenen %d!)' % expected,
                                                  os.path.getsize(out) // 1024))
             page.close()
         browser.close()
+    if not a.out:
+        import make_pdf_pages
+        make_pdf_pages.write_sitemap()
     if bad:
         sys.exit('%d sunumda sayfa sayisi adim sayisiyla tutmadi.' % bad)
 

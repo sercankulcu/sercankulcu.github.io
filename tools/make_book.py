@@ -58,3 +58,7 @@ if __name__ == '__main__':
     pages = len(PdfReader(final).pages)
     print('\nbitti: courses-pdfs/%s  %d sayfa, %.1f MB' % (C.OUTPUT, pages, mb))
     print('ders sayfasindaki sayfa sayisi ve boyutu elle guncelleyin.')
+    # kitabin Google Scholar acilis sayfasi (sayfa sayisi PDF'ten okunur) ve site haritasi
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import make_pdf_pages
+    make_pdf_pages.build()
