@@ -30,6 +30,7 @@ Sayfalar make_slide_pdf.py ile ayni sekilde, canli site duzeninin icinde acilir.
 
 Hata varsa cikis kodu 1'dir. Uyarilar (sik dengesi, %90'a yakin kucultme) cikis kodunu degistirmez.
 """
+import subprocess
 import argparse, html, os, re, sys, urllib.parse
 from collections import Counter
 
@@ -375,7 +376,7 @@ def front_matter(s):
 
 
 def check_app_page(path):
-    """apps/, game/ ve mantra/ sayfalari: betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
+    """apps/, game/, mantra/ ve tr/ (Turkce kopyalar) sayfalari: betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
     rel = os.path.relpath(path, REPO).replace('\\', '/')
     s = open(path, encoding='utf-8').read()
     fm = front_matter(s)
@@ -387,7 +388,7 @@ def check_app_page(path):
     for k in APP_KEYS:
         if not fm.get(k, '').strip():
             err(rel, 'on bilgide %s yok (tools/make_app_pages.py ya da make_game_pages.py calistirin)' % k)
-    kind = 'game_genre' if rel.startswith('game/') else 'web_app'
+    kind = 'game_genre' if rel.startswith(('game/', 'tr/oyunlar/')) else 'web_app'
     if not fm.get(kind):
         err(rel, 'on bilgide %s yok' % kind)
     img = fm.get('og_image', '')
@@ -399,7 +400,7 @@ def check_app_page(path):
 
 
 def app_pages():
-    for d in ('apps', 'game', 'mantra'):
+    for d in ('apps', 'game', 'mantra', 'tr'):
         for dirpath, _, names in os.walk(os.path.join(REPO, d)):
             for n in sorted(names):
                 if n.endswith('.html'):
@@ -429,6 +430,11 @@ def main():
         for p in app_pages():
             check_app_page(p); k += 1
         print('%d uygulama/oyun sayfasi denetlendi.' % k)
+        # Turkish-address copies must match their English page (tools/make_tr_pages.py)
+        r = subprocess.run([sys.executable, os.path.join(REPO, 'tools', 'make_tr_pages.py'), '--check'],
+                           capture_output=True, text=True, encoding='utf-8')
+        if r.returncode:
+            err('tr/', (r.stdout or r.stderr).strip())
     node_syntax_check()
     if a.browser:
         browser_checks(courses)

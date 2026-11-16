@@ -86,6 +86,20 @@ için aynı gruptan sıradaki dört sayfa ve hub adresi. `_includes/related-tool
 İngilizcelerde "More games / More tools"). Grup ya da ad değişince, hub betiklerinden sonra
 bunu da çalıştırın.
 
+## Türkçe adresli kopyalar
+
+```
+python tools/make_tr_pages.py
+python tools/make_related.py
+```
+
+İngilizce 36 araç ve 17 oyunun `/tr/araclar/<ad>/` ve `/tr/oyunlar/<ad>/` adresli Türkçe kopyalarını
+`tr/` altına yazar. Adres, arama başlığı ve açıklama `tools/tr_pages.py`'de, görünen Türkçe ad
+`make_related.TR_TITLES`'ta. Gövde İngilizce sayfanınkiyle aynı; ön bilgideki `ui_lang: tr`
+arayüzü Türkçe açar. İki sayfa birbirini `hreflang` ile gösterir. `_pages/araclar.md` ve
+`_pages/oyunlar.md` Türkçe hub'lardır. **Kopyaları elle değiştirmeyin:** İngilizce sayfayı
+değiştirip betiği çalıştırın. `check_site.py`, kopya eskiyse hata verir.
+
 Dosya araçları sonucu birbirine `assets/js/tool-handoff.js` ile aktarır: sonuç dosyası
 tarayıcının IndexedDB'sinde en çok 10 dakika bekler, hedef sayfa `?handoff=1` ile açılınca
 alınıp silinir. Hiçbir şey sunucuya gitmez.

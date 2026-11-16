@@ -121,6 +121,9 @@
     opts = opts || {};
     if (!el || !TOOLS[kind]) return;
     var here = location.pathname.replace(/\/?$/, '/');
+    /* on a Turkish-address page the targets are the Turkish copies (map from the page head) */
+    var trMap = window.PZ_PAGE_LANG === 'tr' && window.PZ_TR_URLS ? window.PZ_TR_URLS : null;
+    var target = function (path) { return (trMap && trMap[path]) || path; };
     var skip = (opts.exclude || []).concat([here]);
     el.innerHTML = '';
     el.classList.add('tool-next');
@@ -130,7 +133,7 @@
     var row = document.createElement('div');
     row.className = 'tool-next-row';
     TOOLS[kind].forEach(function (t) {
-      if (skip.indexOf(t[0]) !== -1) return;
+      if (skip.indexOf(t[0]) !== -1 || target(t[0]) === here) return;
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'tool-next-btn';
@@ -141,10 +144,10 @@
           files = [].concat(files || []).filter(Boolean);
           if (!files.length) { b.disabled = false; return; }
           return put(files).then(function () {
-            location.href = t[0] + '?handoff=1';
+            location.href = target(t[0]) + '?handoff=1';
           }, function () {
             /* no IndexedDB (private mode): open the tool without the file */
-            location.href = t[0];
+            location.href = target(t[0]);
           });
         }, function () { b.disabled = false; });
       });

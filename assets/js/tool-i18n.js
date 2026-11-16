@@ -30,7 +30,12 @@
     return 'en';
   }
 
-  function current() { return saved() || browser(); }
+  /* A Turkish-address copy (/tr/araclar/..., /tr/oyunlar/...) sets window.PZ_PAGE_LANG = "tr" in the
+     head: it opens in Turkish whatever was chosen before; the switch still changes it. */
+  function current() {
+    var p = window.PZ_PAGE_LANG;
+    return (p === 'tr' || p === 'en') ? p : (saved() || browser());
+  }
 
   var RELATED = {
     tr: { 'More tools': 'Diğer araçlar', 'All tools': 'Tüm araçlar', 'More games': 'Diğer oyunlar', 'All games': 'Tüm oyunlar' },

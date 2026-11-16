@@ -1,0 +1,1085 @@
+---
+# tools/make_tr_pages.py writes this copy of apps/unit-converter.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Birim Dönüştürücü"
+permalink: /tr/araclar/birim-donustur/
+excerpt: "Uzunluk, kütle, sıcaklık, alan, hacim, hız, zaman ve veri birimlerini anında dönüştürün."
+lang: tr
+ui_lang: tr
+seo_title: "Birim Dönüştürücü · Uzunluk, Ağırlık, Sıcaklık Çevirme"
+og_image: https://sercankulcu.github.io/images/apps/unit-converter.jpg
+web_app: UtilitiesApplication
+hreflang: {en: "/apps/unit-converter/", tr: "/tr/araclar/birim-donustur/"}
+---
+
+<style>
+.unit-converter-app,
+.unit-converter-app *,
+.unit-converter-app *::before,
+.unit-converter-app *::after {
+  box-sizing: border-box;
+}
+
+.unit-converter-app {
+  --uc-accent: var(--tool-primary);
+  --uc-accent-fg: #fff;
+  width: min(820px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+
+  color: var(--global-text-color);
+
+  font-family: inherit;
+}
+
+.uc-panel {
+  padding: clamp(18px, 4vw, 30px);
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+
+  background: var(--global-bg-color);
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, .07);
+}
+
+:root[data-theme="dark"] .unit-converter-app {
+  --uc-accent: var(--global-link-color);
+  --uc-accent-fg: #111;
+}
+
+.uc-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.uc-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.uc-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.uc-hero-actions{display:flex;gap:8px}
+.uc-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.uc-help:focus-visible,.uc-lang:focus-visible,.uc-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.uc-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.uc-dialog::backdrop{background:rgba(0,0,0,.45)}
+.uc-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.uc-dialog-head h2{margin:0;font-size:1.1rem}
+.uc-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.uc-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.uc-dialog-body p{margin:0 0 .6em}
+.uc-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.uc-dialog-body ul,.uc-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.uc-dialog[open]{animation:uc-pop .16s ease-out}
+  @keyframes uc-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.uc-categories {
+  display: flex;
+  justify-content: center;
+
+  gap: 8px;
+
+  flex-wrap: wrap;
+
+  margin-top: 18px;
+}
+
+.uc-category {
+  min-height: 44px;
+  padding: 0 16px;
+
+  border:
+    1px solid
+    rgba(45, 45, 45, .42);
+
+  border-radius: 999px;
+
+  background:
+    rgba(45, 45, 45, .08);
+
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.uc-category.active {
+  border-color: transparent;
+
+  background: var(--uc-accent);
+
+  color: var(--uc-accent-fg);
+}
+
+.uc-category:focus-visible,
+.uc-swap:focus-visible,
+.uc-btn:focus-visible,
+.uc-side input:focus-visible,
+.uc-side select:focus-visible {
+  outline: 2px solid var(--global-text-color);
+  outline-offset: 2px;
+}
+
+html[data-theme="dark"] .uc-category {
+  border-color:
+    rgba(255, 255, 255, .22);
+
+  background:
+    rgba(255, 255, 255, .06);
+}
+
+html[data-theme="dark"] .uc-category.active {
+  border-color: transparent;
+
+  background: var(--uc-accent);
+
+  color: var(--uc-accent-fg);
+}
+
+.uc-converter {
+  display: grid;
+
+  grid-template-columns:
+    1fr 54px 1fr;
+
+  gap: 12px;
+
+  align-items: end;
+
+  margin-top: 22px;
+}
+
+.uc-side {
+  display: grid;
+
+  gap: 8px;
+}
+
+.uc-side label {
+  color: var(--global-text-color);
+
+  opacity: .85;
+
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.uc-side input,
+.uc-side select {
+  width: 100%;
+  min-height: 46px;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 11px;
+
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: 16px;
+}
+
+.uc-side input.uc-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.uc-side input[readonly] {
+  opacity: 1;
+  color: var(--global-text-color);
+  -webkit-text-fill-color: var(--global-text-color);
+  background: rgba(127, 127, 127, .06);
+}
+
+.uc-swap {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 0;
+
+  border:
+    1px solid
+    rgba(45, 45, 45, .42);
+
+  border-radius: 999px;
+
+  background:
+    rgba(45, 45, 45, .08);
+
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: 1.05rem;
+
+  cursor: pointer;
+}
+
+.uc-swap:hover {
+  background:
+    rgba(45, 45, 45, .14);
+}
+
+html[data-theme="dark"] .uc-swap {
+  border-color:
+    rgba(255, 255, 255, .22);
+
+  background:
+    rgba(255, 255, 255, .06);
+}
+
+.uc-result {
+  margin-top: 20px;
+  padding: 15px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 13px;
+
+  background:
+    rgba(127, 127, 127, .035);
+
+  text-align: center;
+}
+
+.uc-result-big {
+  color: var(--global-text-color);
+
+  font-size:
+    clamp(1.35rem, 5vw, 2rem);
+
+  font-weight: 900;
+
+  overflow-wrap: anywhere;
+}
+
+.uc-result-small {
+  margin-top: 5px;
+
+  color: var(--global-text-color);
+
+  opacity: .8;
+
+  font-size: .78rem;
+}
+
+.uc-result-big:empty::before {
+  content: "Enter a number to convert";
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: .75;
+}
+
+.uc-actions {
+  display: flex;
+  justify-content: center;
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.uc-btn {
+  min-height: 44px;
+  min-width: 96px;
+
+  padding: 0 18px;
+
+  border:
+    1px solid
+    rgba(45, 45, 45, .42);
+
+  border-radius: 999px;
+
+  background:
+    rgba(45, 45, 45, .08);
+
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.uc-btn:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.uc-btn:hover {
+  background:
+    rgba(45, 45, 45, .14);
+}
+
+html[data-theme="dark"] .uc-btn {
+  border-color:
+    rgba(255, 255, 255, .22);
+
+  background:
+    rgba(255, 255, 255, .06);
+}
+
+.uc-note {
+  margin: 16px 0 0;
+
+  color: var(--global-text-color);
+
+  opacity: .45;
+
+  text-align: center;
+
+  font-size: .65rem;
+}
+
+.uc-toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 24px;
+  z-index: 999;
+
+  transform:
+    translate(-50%, 20px);
+
+  opacity: 0;
+  pointer-events: none;
+
+  padding: 10px 14px;
+
+  border-radius: 12px;
+
+  background: var(--global-text-color);
+  color: var(--global-bg-color);
+
+  font-size: .8rem;
+  font-weight: 750;
+  max-width: calc(100vw - 24px);
+
+  transition: .2s ease;
+}
+
+.uc-toast.show {
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+}
+
+@media (max-width: 620px) {
+  .unit-converter-app {
+    width: 100%;
+  }
+
+  .uc-panel {
+    padding: 16px 12px;
+  }
+
+  .uc-converter {
+    grid-template-columns: 1fr;
+  }
+
+  .uc-swap {
+    margin: auto;
+
+    transform: rotate(90deg);
+  }
+
+  .uc-actions {
+    flex-wrap: wrap;
+  }
+
+  .uc-actions .uc-btn {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unit-converter-app *,
+  .unit-converter-app *::before,
+  .unit-converter-app *::after {
+    transition-duration:
+      .001ms !important;
+  }
+}
+</style>
+
+<div class="unit-converter-app">
+  <section
+    class="uc-panel"
+    aria-labelledby="uc-title"
+  >
+    <header class="uc-hero">
+      <h1 class="uc-title" id="uc-title" data-i18n="title">Unit Converter</h1>
+      <div class="uc-hero-actions">
+      <button class="uc-lang" data-lang-toggle></button>
+      <button class="uc-help" id="uc-help" type="button" aria-haspopup="dialog" aria-controls="uc-help-dialog"
+              data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+      </div>
+    </header>
+
+    <div
+      class="uc-categories"
+      id="uc-categories"
+      role="group"
+      data-i18n-attr="aria-label:categories"
+      aria-label="Conversion categories"
+    ></div>
+
+    <div class="uc-converter">
+      <div class="uc-side">
+        <label for="uc-from-value" data-i18n="from">
+          From
+        </label>
+
+        <input
+          id="uc-from-value"
+          type="number"
+          value="1"
+          step="any"
+          inputmode="decimal"
+        >
+
+        <select
+          id="uc-from-unit"
+          data-i18n-attr="aria-label:fromUnit"
+          aria-label="From unit"
+        ></select>
+      </div>
+
+      <button
+        class="uc-swap"
+        id="uc-swap"
+        type="button"
+        data-i18n-attr="aria-label:swap; title:swap"
+        aria-label="Swap units"
+        title="Swap units"
+      >
+        ⇄
+      </button>
+
+      <div class="uc-side">
+        <label for="uc-to-value" data-i18n="to">
+          To
+        </label>
+
+        <input
+          id="uc-to-value"
+          class="uc-value"
+          type="text"
+          readonly
+        >
+
+        <select
+          id="uc-to-unit"
+          data-i18n-attr="aria-label:toUnit"
+          aria-label="To unit"
+        ></select>
+      </div>
+    </div>
+
+    <div class="uc-result" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="uc-result-big"
+        id="uc-result"
+      ></div>
+
+      <div
+        class="uc-result-small"
+        id="uc-formula"
+      ></div>
+    </div>
+
+    <div class="uc-actions">
+      <button
+        class="uc-btn"
+        id="uc-copy"
+        type="button"
+        title="Copy the conversion"
+        data-i18n="copy"
+      >
+        Copy Result
+      </button>
+
+      <button
+        class="uc-btn"
+        id="uc-reset"
+        type="button"
+        data-i18n="reset"
+      >
+        Reset
+      </button>
+    </div>
+
+  </section>
+</div>
+
+<dialog class="uc-dialog" id="uc-help-dialog" aria-labelledby="uc-help-title">
+  <div class="uc-dialog-head">
+    <h2 id="uc-help-title" data-i18n="howTo">How to use</h2>
+    <button class="uc-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
+  </div>
+  <div class="uc-dialog-body" data-i18n-html="help">
+    <p>Utility tool: fast browser-based conversions for everyday and technical units.</p>
+    <h3>Steps</h3>
+    <ol>
+      <li>Pick a category: length, mass, area, volume, speed, time, data or temperature.</li>
+      <li>Type a value in <b>From</b> and choose the two units. The result updates as you type.</li>
+      <li>Press <b>⇄</b> to swap the units, <b>Copy Result</b> to copy the conversion, and <b>Reset</b> to start over.</li>
+    </ol>
+    <h3>Notes</h3>
+    <ul>
+      <li>Non-temperature units are converted through the category's base unit; temperatures use their own formulas.</li>
+      <li>All conversions run in your browser; nothing is sent anywhere.</li>
+      <li>TR / EN switches the interface language; the choice is remembered for all tools.</li>
+    </ul>
+  </div>
+</dialog>
+
+<div
+  class="uc-toast"
+  id="uc-toast"
+  role="status"
+  aria-live="polite"
+></div>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const byId = id =>
+    document.getElementById(id);
+
+  const DATA = {
+    Length: {
+      m: ["Meter", 1],
+      km: ["Kilometer", 1000],
+      cm: ["Centimeter", .01],
+      mm: ["Millimeter", .001],
+      mi: ["Mile", 1609.344],
+      yd: ["Yard", .9144],
+      ft: ["Foot", .3048],
+      in: ["Inch", .0254]
+    },
+
+    Mass: {
+      kg: ["Kilogram", 1],
+      g: ["Gram", .001],
+      mg: ["Milligram", 1e-6],
+      lb: ["Pound", .45359237],
+      oz: ["Ounce", .028349523125],
+      t: ["Metric ton", 1000]
+    },
+
+    Area: {
+      m2: ["Square meter", 1],
+      km2: ["Square kilometer", 1e6],
+      cm2: ["Square centimeter", 1e-4],
+      ha: ["Hectare", 10000],
+      acre: ["Acre", 4046.8564224],
+      ft2: ["Square foot", .09290304],
+      in2: ["Square inch", .00064516]
+    },
+
+    Volume: {
+      l: ["Liter", 1],
+      ml: ["Milliliter", .001],
+      m3: ["Cubic meter", 1000],
+      cup: ["US cup", .2365882365],
+      tbsp: ["US tablespoon", .01478676478],
+      tsp: ["US teaspoon", .004928921594],
+      gal: ["US gallon", 3.785411784],
+      floz: ["US fluid ounce", .02957352956]
+    },
+
+    Speed: {
+      ms: ["Meter/second", 1],
+      kmh: ["Kilometer/hour", .2777777778],
+      mph: ["Mile/hour", .44704],
+      knot: ["Knot", .5144444444]
+    },
+
+    Time: {
+      s: ["Second", 1],
+      min: ["Minute", 60],
+      h: ["Hour", 3600],
+      day: ["Day", 86400],
+      week: ["Week", 604800],
+      year: ["Year", 31557600]
+    },
+
+    Data: {
+      B: ["Byte", 1],
+      KB: ["Kilobyte", 1000],
+      MB: ["Megabyte", 1e6],
+      GB: ["Gigabyte", 1e9],
+      TB: ["Terabyte", 1e12],
+      KiB: ["Kibibyte", 1024],
+      MiB: ["Mebibyte", 1048576],
+      GiB: ["Gibibyte", 1073741824]
+    },
+
+    Temperature: {
+      C: ["Celsius", null],
+      F: ["Fahrenheit", null],
+      K: ["Kelvin", null]
+    }
+  };
+
+  let category =
+    "Length";
+
+  const categoryBox =
+    byId("uc-categories");
+
+  const fromValue =
+    byId("uc-from-value");
+
+  const fromUnit =
+    byId("uc-from-unit");
+
+  const toValue =
+    byId("uc-to-value");
+
+  const toUnit =
+    byId("uc-to-unit");
+
+  const result =
+    byId("uc-result");
+
+  const formula =
+    byId("uc-formula");
+
+  const toast =
+    byId("uc-toast");
+
+  function i18nHarvest(en){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in en))en[k]=el.textContent;});
+    document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in en))en[k]=el.innerHTML;});
+    document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in en)&&el.hasAttribute(a))en[k]=el.getAttribute(a);}));
+    return en;
+  }
+  const I18N = {
+    en: i18nHarvest({
+      invalid: "That is not a valid number.", enterFirst: "Enter a number first", copyTitle: "Copy the conversion",
+      tempConv: "Temperature conversion", baseConv: "Converted through the category base unit",
+      copiedToast: "Result copied", copiedBtn: "Copied ✓", copyFail: "Copy failed"
+    }),
+    tr: {
+      title: "Birim Dönüştürücü", howTo: "Nasıl kullanılır", categories: "Dönüşüm kategorileri", from: "Kaynak", fromUnit: "Kaynak birim",
+      swap: "Birimlerin yerini değiştir", to: "Hedef", toUnit: "Hedef birim", copy: "Sonucu kopyala", reset: "Sıfırla", close: "Kapat",
+      help: `
+    <p>Gündelik ve teknik birimler için tarayıcıda çalışan hızlı dönüştürmeler.</p>
+    <h3>Adımlar</h3>
+    <ol>
+      <li>Bir kategori seçin: uzunluk, kütle, alan, hacim, hız, zaman, veri ya da sıcaklık.</li>
+      <li><b>Kaynak</b> alanına bir değer yazın ve iki birimi seçin. Sonuç siz yazarken güncellenir.</li>
+      <li>Birimlerin yerini değiştirmek için <b>⇄</b>'e, dönüşümü kopyalamak için <b>Sonucu kopyala</b>'ya, baştan başlamak için <b>Sıfırla</b>'ya basın.</li>
+    </ol>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Sıcaklık dışındaki birimler kategorinin temel birimi üzerinden dönüştürülür; sıcaklıklar kendi formülleriyle hesaplanır.</li>
+      <li>Bütün dönüşümler tarayıcınızda yapılır; hiçbir şey bir yere gönderilmez.</li>
+      <li>Arayüz dilini TR / EN düğmesiyle değiştirebilirsiniz; seçim bütün araçlar için hatırlanır.</li>
+    </ul>
+  `,
+      invalid: "Bu geçerli bir sayı değil.", enterFirst: "Önce bir sayı girin", copyTitle: "Dönüşümü kopyala",
+      tempConv: "Sıcaklık dönüşümü", baseConv: "Kategorinin temel birimi üzerinden dönüştürüldü",
+      copiedToast: "Sonuç kopyalandı", copiedBtn: "Kopyalandı ✓", copyFail: "Kopyalanamadı"
+    }
+  };
+  const CAT_TR = { Length: "Uzunluk", Mass: "Kütle", Area: "Alan", Volume: "Hacim", Speed: "Hız", Time: "Zaman", Data: "Veri", Temperature: "Sıcaklık" };
+  const UNIT_TR = {
+    m: "Metre", km: "Kilometre", cm: "Santimetre", mm: "Milimetre", mi: "Mil", yd: "Yarda", ft: "Fit", in: "İnç",
+    kg: "Kilogram", g: "Gram", mg: "Miligram", lb: "Libre", oz: "Ons", t: "Metrik ton",
+    m2: "Metrekare", km2: "Kilometrekare", cm2: "Santimetrekare", ha: "Hektar", acre: "Akre", ft2: "Fit kare", in2: "İnç kare",
+    l: "Litre", ml: "Mililitre", m3: "Metreküp", cup: "ABD su bardağı", tbsp: "ABD yemek kaşığı", tsp: "ABD çay kaşığı", gal: "ABD galonu", floz: "ABD sıvı onsu",
+    ms: "Metre/saniye", kmh: "Kilometre/saat", mph: "Mil/saat", knot: "Knot (deniz mili/saat)",
+    s: "Saniye", min: "Dakika", h: "Saat", day: "Gün", week: "Hafta", year: "Yıl",
+    B: "Bayt", KB: "Kilobayt", MB: "Megabayt", GB: "Gigabayt", TB: "Terabayt", KiB: "Kibibayt", MiB: "Mebibayt", GiB: "Gibibayt",
+    C: "Celsius", F: "Fahrenheit", K: "Kelvin"
+  };
+  let i18n = null;
+  const catName = name => (i18n.lang === "tr" && CAT_TR[name]) || name;
+  const unitName = key => (i18n.lang === "tr" && UNIT_TR[key]) || DATA[category][key][0];
+  function relabelUnits() {
+    [fromUnit, toUnit].forEach(sel => [].forEach.call(sel.options, o => { o.textContent = `${unitName(o.value)} (${o.value})`; }));
+  }
+
+  function buildCategories() {
+    categoryBox.innerHTML =
+      "";
+
+    Object.keys(DATA)
+      .forEach(name => {
+        const button =
+          document.createElement(
+            "button"
+          );
+
+        button.type =
+          "button";
+
+        button.className =
+          "uc-category" +
+          (
+            name === category
+              ? " active"
+              : ""
+          );
+
+        button.textContent =
+          catName(name);
+
+        button.setAttribute(
+          "aria-pressed",
+          name === category
+            ? "true"
+            : "false"
+        );
+
+        button.addEventListener(
+          "click",
+          () => {
+            category =
+              name;
+
+            buildCategories();
+            buildUnits();
+            convert();
+          }
+        );
+
+        categoryBox.appendChild(
+          button
+        );
+      });
+  }
+
+  function buildUnits() {
+    const keys =
+      Object.keys(
+        DATA[category]
+      );
+
+    const optionHtml =
+      keys.map(
+        key =>
+          `<option value="${key}">` +
+          `${unitName(key)} (${key})` +
+          `</option>`
+      ).join("");
+
+    fromUnit.innerHTML =
+      optionHtml;
+
+    toUnit.innerHTML =
+      optionHtml;
+
+    if (
+      keys.length > 1
+    ) {
+      toUnit.selectedIndex =
+        1;
+    }
+  }
+
+  function convertTemperature(
+    value,
+    from,
+    to
+  ) {
+    const celsius =
+      from === "C"
+        ? value
+        : from === "F"
+          ? (
+              value - 32
+            ) * 5 / 9
+          : value - 273.15;
+
+    return to === "C"
+      ? celsius
+      : to === "F"
+        ? celsius * 9 / 5 + 32
+        : celsius + 273.15;
+  }
+
+  function formatNumber(
+    number
+  ) {
+    if (
+      !Number.isFinite(
+        number
+      )
+    ) {
+      return "";
+    }
+
+    const absolute =
+      Math.abs(number);
+
+    if (
+      (
+        absolute !== 0 &&
+        absolute < 1e-6
+      ) ||
+      absolute >= 1e12
+    ) {
+      return number
+        .toExponential(8);
+    }
+
+    return Number(
+      number.toPrecision(12)
+    ).toString();
+  }
+
+  function convert() {
+    const value =
+      parseFloat(
+        fromValue.value
+      );
+
+    const source =
+      fromUnit.value;
+
+    const target =
+      toUnit.value;
+
+    if (
+      Number.isNaN(value)
+    ) {
+      toValue.value =
+        "";
+
+      result.textContent =
+        "";
+
+      formula.textContent =
+        fromValue.value.trim() ? i18n.t("invalid") : "";
+
+      byId("uc-copy").disabled = true;
+      byId("uc-copy").title = i18n.t("enterFirst");
+
+      return;
+    }
+
+    let output;
+
+    if (
+      category ===
+      "Temperature"
+    ) {
+      output =
+        convertTemperature(
+          value,
+          source,
+          target
+        );
+    } else {
+      output =
+        value *
+        DATA[category][source][1] /
+        DATA[category][target][1];
+    }
+
+    const formatted =
+      formatNumber(
+        output
+      );
+
+    toValue.value =
+      formatted;
+
+    result.textContent =
+      `${formatNumber(value)} ${source} = ` +
+      `${formatted} ${target}`;
+
+    byId("uc-copy").disabled = false;
+    byId("uc-copy").title = i18n.t("copyTitle");
+
+    formula.textContent =
+      category ===
+        "Temperature"
+        ? i18n.t("tempConv")
+        : i18n.t("baseConv");
+  }
+
+  function showToast(
+    message
+  ) {
+    toast.textContent =
+      message;
+
+    toast.classList
+      .add("show");
+
+    clearTimeout(
+      showToast.timer
+    );
+
+    showToast.timer =
+      window.setTimeout(
+        () =>
+          toast.classList
+            .remove("show"),
+        1600
+      );
+  }
+
+  async function copyResult() {
+    const text =
+      result.textContent;
+
+    if (
+      !text
+    ) {
+      return;
+    }
+
+    try {
+      if (
+        navigator.clipboard &&
+        window.isSecureContext
+      ) {
+        await navigator
+          .clipboard
+          .writeText(text);
+      } else {
+        const textarea =
+          document.createElement(
+            "textarea"
+          );
+
+        textarea.value =
+          text;
+
+        textarea.setAttribute(
+          "readonly",
+          ""
+        );
+
+        textarea.style.position =
+          "fixed";
+
+        textarea.style.opacity =
+          "0";
+
+        document.body
+          .appendChild(
+            textarea
+          );
+
+        textarea.select();
+
+        document.execCommand(
+          "copy"
+        );
+
+        textarea.remove();
+      }
+
+      showToast(
+        i18n.t("copiedToast")
+      );
+
+      const copyBtn = byId("uc-copy");
+      copyBtn.textContent = i18n.t("copiedBtn");
+      clearTimeout(copyBtn._t);
+      copyBtn._t = setTimeout(() => {
+        copyBtn.textContent = i18n.t("copy");
+      }, 1500);
+    } catch (error) {
+      showToast(
+        i18n.t("copyFail")
+      );
+    }
+  }
+
+  byId("uc-swap")
+    .addEventListener(
+      "click",
+      () => {
+        const source =
+          fromUnit.value;
+
+        const target =
+          toUnit.value;
+
+        fromUnit.value =
+          target;
+
+        toUnit.value =
+          source;
+
+        const current =
+          toValue.value;
+
+        fromValue.value =
+          current || 1;
+
+        convert();
+      }
+    );
+
+  [
+    fromValue,
+    fromUnit,
+    toUnit
+  ].forEach(element => {
+    element.addEventListener(
+      "input",
+      convert
+    );
+  });
+
+  byId("uc-copy")
+    .addEventListener(
+      "click",
+      copyResult
+    );
+
+  byId("uc-reset")
+    .addEventListener(
+      "click",
+      () => {
+        fromValue.value =
+          1;
+
+        buildUnits();
+        convert();
+      }
+    );
+
+  const helpDialog = byId("uc-help-dialog");
+  byId("uc-help").addEventListener("click", () => helpDialog.showModal());
+  helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+
+  i18n = ToolI18n.setup(I18N, () => {
+    if (!i18n) return;
+    buildCategories();
+    relabelUnits();
+    convert();
+  });
+
+  buildCategories();
+  buildUnits();
+  convert();
+})();
+</script>

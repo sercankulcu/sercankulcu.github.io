@@ -13,6 +13,7 @@ import io, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import make_app_pages as A
 import make_game_pages as G
+import tr_pages as T
 
 N = 4
 
@@ -94,6 +95,11 @@ def build():
                         break
                     picks += [x for x in gs[j] if x not in picks and x[1] != url][:N - len(picks)]
                 out[url] = {'hub': hub, 'items': [[u, ic, title(u), TR_TITLES.get(u, title(u))] for ic, u in picks]}
+                tr = T.tr_url(url)
+                if tr:
+                    # the Turkish-address copy links to the Turkish copies (Turkish-only games keep their own page)
+                    out[tr] = {'hub': T.TOOLS_HUB if hub == '/apps/' else T.GAMES_HUB,
+                               'items': [[T.tr_url(u) or u, ic, title(u), TR_TITLES.get(u, title(u))] for ic, u in picks]}
     lines = ['# make_related.py yazar; elle degistirmeyin.']
     for url in sorted(out):
         lines.append('%s:' % json.dumps(url))
