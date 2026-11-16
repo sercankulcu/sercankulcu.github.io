@@ -100,6 +100,13 @@ arayüzü Türkçe açar. İki sayfa birbirini `hreflang` ile gösterir. `_pages
 `_pages/oyunlar.md` Türkçe hub'lardır. **Kopyaları elle değiştirmeyin:** İngilizce sayfayı
 değiştirip betiği çalıştırın. `check_site.py`, kopya eskiyse hata verir.
 
+Aynı betik ters yönde de çalışır: 14 Türkçe oyunun İngilizce kopyalarını `en/games/<ad>.html`
+(`/en/games/<ad>/`, `ui_lang: en`) olarak yazar. Adres ve metinler `tools/en_pages.py`'de. Türkçe asıl
+`/game/<ad>/` adresinde kalır ve `ui_lang: tr` ile her zaman Türkçe açılır. `/games/` hub'ı İngilizce
+kopyaları listeler, `/tr/oyunlar/` Türkçe asılları. Kelime oyunlarında kelimeler iki dilde de Türkçedir.
+Hub betiklerini çalıştırdıktan sonra bu betiği yeniden çalıştırın; hub betikleri ön bilgi satırlarının
+yerini değiştirir.
+
 Dosya araçları sonucu birbirine `assets/js/tool-handoff.js` ile aktarır: sonuç dosyası
 tarayıcının IndexedDB'sinde en çok 10 dakika bekler, hedef sayfa `?handoff=1` ile açılınca
 alınıp silinir. Hiçbir şey sunucuya gitmez.

@@ -1,0 +1,1051 @@
+---
+# tools/make_tr_pages.py writes this copy of game/oneword.html; edit that page, then run the script.
+layout: without-sidebar
+title: "One Word"
+permalink: /en/games/one-word/
+excerpt: "Build as many Turkish words as you can from seven letters before the time runs out."
+lang: en
+ui_lang: en
+seo_title: "One Word · Turkish Word Building Game"
+og_image: https://sercankulcu.github.io/images/games/oneword.jpg
+game_genre: "Word game"
+hreflang: {en: "/en/games/one-word/", tr: "/game/oneword/"}
+---
+
+<style>
+.oneword-app,
+.oneword-app *,
+.oneword-app *::before,
+.oneword-app *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.oneword-app {
+  width: min(680px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Arial, system-ui, sans-serif;
+}
+
+.oneword-app button,
+.oneword-app input {
+  font: inherit;
+}
+
+.oneword-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.oneword-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  letter-spacing: -.04em;
+  line-height: 1.1;
+}
+
+.oneword-help {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.oneword-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.oneword-app .oneword-lang {
+  font-size: .8rem;
+}
+
+.oneword-card {
+  padding: clamp(14px, 4vw, 20px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+  text-align: center;
+}
+
+.oneword-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.oneword-stat {
+  padding: 11px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 13px;
+  background: rgba(127,127,127,.045);
+  color: var(--global-text-color);
+  font-size: clamp(1rem, 4vw, 1.35rem);
+  font-weight: 900;
+}
+
+.oneword-stat.time {
+  color: #c2491c;
+}
+
+.oneword-reset {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--global-link-text-color);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.oneword-progress {
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(127,127,127,.12);
+}
+
+.oneword-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #c2491c;
+  transition: width 1s linear;
+}
+
+:root[data-theme="dark"] .oneword-stat.time { color: #ffb194; }
+:root[data-theme="dark"] .oneword-progress span { background: #f6875f; }
+
+.oneword-letters {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  margin: 12px 0 18px;
+  padding: 14px 6px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+  background: rgba(127,127,127,.035);
+}
+
+.oneword-letter {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 58px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: clamp(1.15rem, 5vw, 1.75rem);
+  font-weight: 900;
+  box-shadow: 0 3px 0 #1b5e20;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform .12s, box-shadow .12s, opacity .12s;
+}
+
+/* Tiles already spent on the word being typed. */
+.oneword-letter.is-used {
+  opacity: .35;
+  box-shadow: none;
+  transform: translateY(3px);
+  cursor: default;
+}
+
+:root[data-theme="dark"] .oneword-letter { background: #2d8632; box-shadow: 0 3px 0 #1b5e20; }
+
+.oneword-letter:active:not(.is-used) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #1b5e20;
+}
+
+.oneword-input-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.oneword-input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 12px;
+  border: 2px solid var(--global-border-color);
+  border-radius: 12px;
+  outline: 0;
+  background: transparent;
+  color: var(--global-text-color);
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.oneword-input:focus {
+  border-color: var(--global-link-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--global-link-color) 12%, transparent);
+}
+
+.oneword-icon,
+.oneword-small,
+.oneword-check {
+  border: 1px solid var(--global-border-color);
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.oneword-icon {
+  min-height: 48px;
+  padding: 0 15px;
+  border-radius: 999px;
+  background: rgba(127,127,127,.06);
+  color: var(--global-text-color);
+}
+
+.oneword-check {
+  width: 100%;
+  min-height: 48px;
+  border-color: var(--tool-primary);
+  border-radius: 999px;
+  background: var(--tool-primary);
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.oneword-message {
+  min-height: 30px;
+  margin: 12px 0 6px;
+  color: var(--global-text-color);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.oneword-message.is-error { color: #c53030; }
+.oneword-message.is-ok    { color: #2f855a; }
+.oneword-message.is-time  { color: #c2491c; }
+.oneword-message.is-info  { color: var(--global-link-color); }
+
+:root[data-theme="dark"] .oneword-message.is-error { color: #fc8181; }
+:root[data-theme="dark"] .oneword-message.is-ok    { color: #48bb78; }
+:root[data-theme="dark"] .oneword-message.is-time  { color: #f6875f; }
+
+.oneword-found {
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 12px;
+  background: rgba(127,127,127,.035);
+  text-align: left;
+}
+
+.oneword-found b {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--global-text-color);
+}
+
+.oneword-found-list {
+  color: var(--global-text-color-light);
+  
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.oneword-bottom {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.oneword-small {
+  min-height: 44px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+}
+
+@media (hover: hover) {
+  .oneword-small:hover:not(:disabled),
+  .oneword-icon:hover:not(:disabled),
+  .oneword-help:hover,
+  .oneword-dialog-close:hover {
+    background: rgba(127,127,127,.08);
+  }
+}
+
+.oneword-app button,
+.oneword-dialog button {
+  touch-action: manipulation;
+}
+
+.oneword-app button:disabled {
+  cursor: progress;
+  opacity: .55;
+}
+
+.oneword-app button:focus-visible,
+.oneword-dialog button:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.oneword-dialog {
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid var(--global-border-color);
+  border-radius: 16px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+
+.oneword-dialog::backdrop {
+  background: rgba(0, 0, 0, .45);
+}
+
+.oneword-dialog-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--global-border-color);
+  background: var(--global-bg-color);
+}
+
+.oneword-dialog-head h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--global-text-color);
+  font-size: 1.1rem;
+}
+
+.oneword-dialog-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.oneword-help:focus-visible,
+.oneword-dialog-close:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.oneword-dialog-body {
+  padding: 14px 18px 18px;
+  overflow: auto;
+  line-height: 1.55;
+}
+
+.oneword-dialog-body p {
+  margin: 0 0 .6em;
+}
+
+.oneword-dialog-body h3 {
+  margin: 1em 0 .35em;
+  color: var(--global-text-color);
+  font-size: .95rem;
+}
+
+.oneword-dialog-body ul,
+.oneword-dialog-body ol {
+  margin: .2em 0 .6em;
+  padding-left: 1.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .oneword-dialog[open] {
+    animation: oneword-pop .16s ease-out;
+  }
+
+  @keyframes oneword-pop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@media(max-width:520px) {
+  .oneword-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .oneword-card {
+    padding: 13px;
+  }
+
+  .oneword-stats {
+    gap: 6px;
+  }
+
+  .oneword-stat {
+    padding: 9px 5px;
+    font-size: 1rem;
+  }
+
+  .oneword-letters {
+    gap: 4px;
+    padding: 10px 3px;
+  }
+
+  .oneword-letter {
+    font-size: clamp(1.05rem, 6vw, 1.5rem);
+  }
+
+  .oneword-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .oneword-app *,
+  .oneword-app *::before,
+  .oneword-app *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="oneword-app">
+  <header class="oneword-header">
+    <div>
+      <h1 class="oneword-title" data-i18n="title">Bir Kelime</h1>
+    </div>
+    <div class="oneword-head-actions">
+      <button class="oneword-help oneword-lang" data-lang-toggle></button>
+      <button class="oneword-help" id="oneword-info" type="button" aria-haspopup="dialog" aria-controls="oneword-help-dialog" aria-label="Nasıl oynanır" data-i18n-attr="aria-label:howTo">?</button>
+    </div>
+  </header>
+
+  <section class="oneword-card">
+    <div class="oneword-stats">
+      <div class="oneword-stat" id="oneword-score">Puan: 0</div>
+      <div class="oneword-stat time" id="oneword-timer">Süre: 30</div>
+      <div class="oneword-stat" id="oneword-best" title="Bir turda en yüksek puan" data-i18n-attr="title:bestTitle">Rekor: 0</div>
+    </div>
+
+    <div class="oneword-progress"><span id="oneword-timebar"></span></div>
+
+    <div class="oneword-letters" id="oneword-letters" role="group" aria-label="Harfler" data-i18n-attr="aria-label:lettersL"></div>
+
+    <div class="oneword-input-wrap">
+      <input class="oneword-input" type="text" id="oneword-input" placeholder="Kelimenizi yazın" maxlength="7" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" inputmode="text" aria-label="Kelimeniz" data-i18n-attr="placeholder:typeWord; aria-label:yourWord">
+      <button class="oneword-icon" id="oneword-backspace" type="button" title="Son harfi sil" aria-label="Son harfi sil" data-i18n-attr="title:delLast; aria-label:delLast">⌫</button>
+    </div>
+
+    <button class="oneword-check" id="oneword-check" type="button" data-i18n="check">Kontrol Et</button>
+    <div class="oneword-message" id="oneword-message" role="status" aria-live="polite"></div>
+
+    <div class="oneword-found">
+      <b data-i18n="foundTitle">Bu turda bulduğun kelimeler</b>
+      <div class="oneword-found-list" id="oneword-found">Henüz kelime yok.</div>
+    </div>
+
+    <div class="oneword-bottom">
+      <button class="oneword-small" id="oneword-shuffle" type="button" data-i18n="shuffle">Harfleri Karıştır</button>
+      <button class="oneword-small" id="oneword-newletters" type="button" data-i18n="newLetters">Yeni Harfler</button>
+    </div>
+  </section>
+</div>
+
+<dialog class="oneword-dialog" id="oneword-help-dialog" aria-labelledby="oneword-help-title">
+  <div class="oneword-dialog-head">
+    <h2 id="oneword-help-title" data-i18n="howTo">Nasıl oynanır</h2>
+    <button class="oneword-dialog-close" type="button" data-close aria-label="Kapat" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="oneword-dialog-body" data-i18n-html="help">
+    <p>Yedi harften olabildiğince çok Türkçe kelime türet.</p>
+    <p>Ekranda <b>7 harf</b> görünür. Bu harfleri, her harfi ekranda bulunduğu sayı kadar kullanarak anlamlı Türkçe kelimeler türetmeye çalışın.</p>
+
+    <h3>Kurallar</h3>
+    <ul>
+      <li>Her turda 3 sesli ve 4 sessiz harf üretilir.</li>
+      <li>En az 2 harfli kelimeler kabul edilir.</li>
+      <li>Aynı kelime aynı harf setinde yalnızca bir kez puan getirir.</li>
+      <li>Puan: kelime uzunluğu × 10.</li>
+      <li>30 saniye dolunca otomatik olarak yeni harfler gelir.</li>
+    </ul>
+
+    <h3>Kontroller</h3>
+    <ul>
+      <li>Harflerin üzerine dokunarak kelimeyi yazabilirsiniz.</li>
+      <li>Fiziksel klavyede harfler, Backspace ve Enter da çalışır.</li>
+      <li>Süre, bu pencere açıkken ve sekme arka plandayken durur.</li>
+    </ul>
+
+    <h3>Rekor</h3>
+    <p><b>Rekor</b>, süresi dolan bir turda topladığın en yüksek puandır; yalnızca bu cihazda saklanır. Süre dolmadan <b>Yeni Harfler</b> ile geçilen tur sayılmaz. <button class="oneword-reset" id="oneword-reset" type="button">Rekoru sıfırla</button></p>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  /* Interface text: the Turkish strings come from the markup, English is written out here.
+     The letters and the word list stay Turkish in both languages. */
+  function i18nHarvest(tb){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in tb))tb[k]=el.textContent;});
+    document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in tb))tb[k]=el.innerHTML;});
+    document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in tb)&&el.hasAttribute(a))tb[k]=el.getAttribute(a);}));
+    return tb;
+  }
+
+  const I18N = {
+    tr: i18nHarvest({
+      score: "Puan: {n}",
+      time: "Süre: {n}",
+      best: "Rekor: {n}",
+      noWords: "Henüz kelime yok.",
+      timeUpWords: "⏱️ Süre doldu — {n} kelime buldun.{best} Yeni harfler geldi.",
+      timeUp: "⏱️ Süre doldu, yeni harfler geldi.",
+      newBest: " 🏆 Yeni rekor!",
+      min2: "❌ En az 2 harf kullanmalısınız.",
+      onlyGiven: "❌ Yalnızca verilen harfleri kullanabilirsiniz.",
+      used: "❌ Bu kelimeyi zaten kullandınız.",
+      gain: "🎉 +{n} puan kazandınız!",
+      invalid: "❌ Geçersiz kelime!",
+      newCame: "Yeni harfler geldi.",
+      loading: "Kelime listesi yükleniyor...",
+      loadFail: "Kelime listesi yüklenemedi.",
+      confirmReset: "Bu cihazdaki Bir Kelime rekoru silinsin mi?"
+    }),
+    en: {
+      title: "One Word", howTo: "How to play", close: "Close",
+      bestTitle: "Highest score in one round", lettersL: "Letters",
+      typeWord: "Type your word", yourWord: "Your word", delLast: "Delete last letter",
+      check: "Check", foundTitle: "Words found this round", shuffle: "Shuffle", newLetters: "New letters",
+      score: "Score: {n}",
+      time: "Time: {n}",
+      best: "Best: {n}",
+      noWords: "No words yet.",
+      timeUpWords: "⏱️ Time's up — words found: {n}.{best} Here are new letters.",
+      timeUp: "⏱️ Time's up, here are new letters.",
+      newBest: " 🏆 New best!",
+      min2: "❌ Use at least 2 letters.",
+      onlyGiven: "❌ Use only the letters given.",
+      used: "❌ You already used this word.",
+      gain: "🎉 +{n} points!",
+      invalid: "❌ Not a valid word!",
+      newCame: "Here are new letters.",
+      loading: "Loading the word list...",
+      loadFail: "Couldn't load the word list.",
+      confirmReset: "Delete the One Word best score on this device?",
+      help: '<p>Make as many <b>Turkish</b> words as you can from seven letters.</p>'
+        + '<p>You get <b>7 letters</b>. Make real Turkish words from them, using each letter as many times as it appears.</p>'
+        + '<h3>Rules</h3><ul>'
+        + '<li>Each round has 3 vowels and 4 consonants.</li>'
+        + '<li>Words of 2 letters or more count.</li>'
+        + '<li>A word scores only once per letter set.</li>'
+        + '<li>Score: word length × 10.</li>'
+        + '<li>When the 30 seconds run out, new letters come automatically.</li></ul>'
+        + '<h3>Turkish letters</h3><ul>'
+        + '<li>The letters can include Ç, Ğ, I, İ, Ö, Ş and Ü. Dotless I and dotted İ are two different letters, as are C/Ç, G/Ğ, O/Ö, S/Ş and U/Ü.</li>'
+        + '<li>On a non-Turkish keyboard, i types İ and Shift+I types I; tap the tiles for the other special letters.</li></ul>'
+        + '<h3>Controls</h3><ul>'
+        + '<li>Tap the letters to type the word.</li>'
+        + '<li>On a physical keyboard, the letters, Backspace and Enter work too.</li>'
+        + '<li>The clock stops while this window is open and while the tab is in the background.</li></ul>'
+        + '<h3>Best</h3>'
+        + '<p><b>Best</b> is your highest score in a round that ran out of time; it is stored on this device only. A round skipped with <b>New letters</b> before the time is up does not count. <button class="oneword-reset" id="oneword-reset" type="button">Reset best</button></p>'
+    }
+  };
+  let i18n = null;
+  const t = (k, v) => i18n ? i18n.t(k, v) : k;
+
+  let dictionary = new Set();
+  let playableWords = [];
+
+  let score = 0;
+  let letters = [];
+  let timer = null;
+  let timeLeft = 30;
+  let paused = false;
+  let foundWords = [];
+  let roundScore = 0;
+
+  /* Records live on this device only; blocked storage simply means no records. */
+  const STATS_KEY = "pz:oneword:stats";
+  function loadStats() {
+    try {
+      const v = JSON.parse(localStorage.getItem(STATS_KEY));
+      if (v && typeof v === "object") return { played: +v.played || 0, best: +v.best || 0, bestWords: +v.bestWords || 0 };
+    } catch (e) {}
+    return { played: 0, best: 0, bestWords: 0 };
+  }
+  let stats = loadStats();
+  function saveStats() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+  }
+  function renderBest() {
+    document.getElementById("oneword-best").textContent = t("best", { n: stats.best });
+  }
+
+  /* Called when a round's 30 seconds run out; returns true for a new best. */
+  function recordRound() {
+    const isBest = roundScore > stats.best;
+    stats.played++;
+    if (isBest) stats.best = roundScore;
+    if (foundWords.length > stats.bestWords) stats.bestWords = foundWords.length;
+    saveStats();
+    renderBest();
+    return isBest;
+  }
+
+  const vowels = ["A","A","A","E","E","E","İ","İ","İ","I","I","O","O","U","U","Ö","Ü"];
+  const consonants = ["N","N","N","R","R","R","L","L","L","K","K","K","T","T","T","S","S","S","M","M","M","B","B","D","D","Y","Y","P","P","C","C","Ç","Ç","Ş","Ş","F","G","H","V","Z","Ğ","J"];
+
+  const scoreEl = document.getElementById("oneword-score");
+  const timerEl = document.getElementById("oneword-timer");
+  const timeBar = document.getElementById("oneword-timebar");
+  const lettersEl = document.getElementById("oneword-letters");
+  const input = document.getElementById("oneword-input");
+  const messageEl = document.getElementById("oneword-message");
+  const foundEl = document.getElementById("oneword-found");
+  const helpDialog = document.getElementById("oneword-help-dialog");
+  const infoBtn = document.getElementById("oneword-info");
+
+  /* On touch screens, focusing the field after a tile tap would pop up the
+     system keyboard over the tiles, so only refocus with a fine pointer. */
+  const coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+
+  function focusInput() {
+    if (!coarsePointer) input.focus();
+  }
+
+  function markUsed() {
+    const pending = [...trUpper(input.value)];
+
+    for (const tile of lettersEl.children) {
+      const index = pending.indexOf(tile.dataset.letter);
+      const used = index !== -1;
+      if (used) pending.splice(index, 1);
+      tile.classList.toggle("is-used", used);
+      tile.setAttribute("aria-disabled", used ? "true" : "false");
+    }
+  }
+
+  function shuffle(array) {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function trUpper(value) {
+    return value.toLocaleUpperCase("tr-TR");
+  }
+
+  function trLower(value) {
+    return value.toLocaleLowerCase("tr-TR");
+  }
+
+  function drawLetters() {
+    return shuffle([
+      ...shuffle(vowels).slice(0,3),
+      ...shuffle(consonants).slice(0,4)
+    ]);
+  }
+
+  /* Stops as soon as the limit is reached, so an ordinary set costs a single
+     early-exit pass rather than a full scan of the word list. */
+  function countWords(source, limit) {
+    const pool = new Set(source);
+    let found = 0;
+
+    for (const word of playableWords) {
+      if (word.length > source.length) continue;
+
+      let possible = true;
+      for (const ch of word) {
+        if (!pool.has(ch)) { possible = false; break; }
+      }
+
+      if (possible && canBuild(word, source)) {
+        found++;
+        if (found >= limit) return found;
+      }
+    }
+
+    return found;
+  }
+
+  function generateLetters() {
+    /* A blind draw occasionally yields a set with no valid word at all, which
+       hands the player a dead 30 seconds. Re-draw instead. */
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const candidate = drawLetters();
+      if (countWords(candidate, 3) >= 3) return candidate;
+    }
+
+    return drawLetters();
+  }
+
+  function updateLetters() {
+    lettersEl.innerHTML = "";
+
+    letters.forEach(letter => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "oneword-letter";
+      button.textContent = letter;
+      button.dataset.letter = letter;
+      button.addEventListener("click", () => appendLetter(letter));
+      lettersEl.appendChild(button);
+    });
+
+    markUsed();
+  }
+
+  function appendLetter(letter) {
+    if (input.value.length >= 7) return;
+
+    const proposed = trUpper(input.value + letter);
+    if (canBuild(proposed)) {
+      input.value += letter;
+      markUsed();
+      focusInput();
+    }
+  }
+
+  function canBuild(word, source = letters) {
+    const available = [...source];
+
+    for (const ch of [...trUpper(word)]) {
+      const index = available.indexOf(ch);
+      if (index === -1) return false;
+      available.splice(index,1);
+    }
+
+    return true;
+  }
+
+  function startTimer() {
+    clearInterval(timer);
+    timeLeft = 30;
+    syncPaused();
+    updateTimer();
+
+    timer = setInterval(() => {
+      if (paused) return;
+
+      timeLeft--;
+      updateTimer();
+
+      if (timeLeft <= 0) {
+        /* newRound() wipes the list, so read the count before it runs. */
+        const total = foundWords.length;
+        const isBest = recordRound();
+        newRound();
+        showMessage(total ? "timeUpWords" : "timeUp", { n: total, best: isBest ? "newBest" : "" }, "time");
+      }
+    },1000);
+  }
+
+  /* The round is a 30 second budget, not a stopwatch: it must not drain while
+     the player is reading the rules or the tab is in the background. */
+  function syncPaused() {
+    paused = document.hidden || helpDialog.open;
+  }
+
+  document.addEventListener("visibilitychange", syncPaused);
+
+  function updateTimer() {
+    timerEl.textContent = t("time", { n: timeLeft });
+    timeBar.style.width = (timeLeft / 30 * 100) + "%";
+  }
+
+  function renderFound() {
+    foundEl.textContent = foundWords.length
+      ? foundWords.join(" · ")
+      : t("noWords");
+  }
+
+  function checkWord() {
+    const raw = input.value.trim();
+    const upper = trUpper(raw);
+    const lower = trLower(raw);
+
+    if (upper.length < 2) {
+      showMessage("min2", null, "error");
+      input.value = "";
+      markUsed();
+      return;
+    }
+
+    if (!canBuild(upper)) {
+      showMessage("onlyGiven", null, "error");
+      input.value = "";
+      markUsed();
+      return;
+    }
+
+    if (foundWords.map(trLower).includes(lower)) {
+      showMessage("used", null, "error");
+      input.value = "";
+      markUsed();
+      return;
+    }
+
+    if (dictionary.has(lower)) {
+      foundWords.push(upper);
+      const gain = upper.length * 10;
+      score += gain;
+      roundScore += gain;
+      renderScore();
+      renderFound();
+      showMessage("gain", { n: gain }, "ok");
+    } else {
+      showMessage("invalid", null, "error");
+    }
+
+    input.value = "";
+    markUsed();
+    focusInput();
+  }
+
+  /* The site has no prefers-color-scheme rules at all: light simply means the
+     data-theme attribute is absent. Let CSS decide instead of guessing here. */
+  /* The message is kept as a key so a language switch can rewrite it; a "best"
+     variable holding a key is translated too. */
+  let msgState = null;
+  function messageText(state) {
+    const vars = Object.assign({}, state.vars);
+    if (vars.best) vars.best = t(vars.best);
+    return t(state.key, vars);
+  }
+
+  function showMessage(key, vars, tone, keep) {
+    msgState = { key, vars: vars || {} };
+    messageEl.textContent = messageText(msgState);
+    messageEl.className = tone ? `oneword-message is-${tone}` : "oneword-message";
+    clearTimeout(showMessage.timer);
+    if (keep) return;
+    showMessage.timer = setTimeout(() => {
+      msgState = null;
+      messageEl.textContent = "";
+      messageEl.className = "oneword-message";
+    },1800);
+  }
+
+  function renderScore() {
+    scoreEl.textContent = t("score", { n: score });
+  }
+
+  function newRound() {
+    letters = generateLetters();
+    foundWords = [];
+    roundScore = 0;
+    input.value = "";
+    markUsed();
+    updateLetters();
+    renderFound();
+    startTimer();
+  }
+
+  function newGame() {
+    score = 0;
+    renderScore();
+    newRound();
+  }
+
+  document.getElementById("oneword-check").addEventListener("click", checkWord);
+
+  document.getElementById("oneword-backspace").addEventListener("click", () => {
+    input.value = input.value.slice(0,-1);
+    markUsed();
+    focusInput();
+  });
+
+  document.getElementById("oneword-shuffle").addEventListener("click", () => {
+    letters = shuffle(letters);
+    updateLetters();
+  });
+
+  document.getElementById("oneword-newletters").addEventListener("click", () => {
+    newRound();
+    showMessage("newCame", null, "info");
+  });
+
+  input.addEventListener("input", event => {
+    let value = trUpper(event.target.value)
+      .replace(/[^ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ]/g,"");
+
+    while (value && !canBuild(value)) {
+      value = value.slice(0,-1);
+    }
+
+    event.target.value = value;
+    markUsed();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (helpDialog.open) return;
+
+    if (event.target === input) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        checkWord();
+      }
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (input.disabled) return;
+
+    /* Enter on a focused button keeps its own action. */
+    if (event.target && event.target.closest && event.target.closest("button, a, select, textarea, input")) {
+      if (event.key === "Enter" || event.key === " ") return;
+      if (event.target.closest("a, select, textarea, input")) return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      checkWord();
+      return;
+    }
+
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      input.value = input.value.slice(0,-1);
+      markUsed();
+      focusInput();
+      return;
+    }
+
+    const key = trUpper(event.key);
+
+    if (
+      key.length === 1 &&
+      "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ".includes(key)
+    ) {
+      const proposed = trUpper(input.value + key);
+
+      if (input.value.length < 7 && canBuild(proposed)) {
+        input.value += key;
+        markUsed();
+        input.focus();
+        event.preventDefault();
+      }
+    }
+  });
+
+  /* The help body is rewritten on a language switch, so its reset button is reached by delegation. */
+  helpDialog.addEventListener("click", event => {
+    if (!event.target.closest || !event.target.closest("#oneword-reset")) return;
+    if (!window.confirm(t("confirmReset"))) return;
+    stats = { played: 0, best: 0, bestWords: 0 };
+    saveStats();
+    renderBest();
+  });
+
+  function relabel() {
+    if (!i18n) return;
+    renderBest();
+    renderScore();
+    updateTimer();
+    renderFound();
+    if (msgState) messageEl.textContent = messageText(msgState);
+  }
+  i18n = ToolI18n.setup(I18N, relabel);
+  relabel();
+
+  infoBtn.addEventListener("click", () => {
+    helpDialog.showModal();
+    syncPaused();
+  });
+
+  helpDialog.addEventListener("close", syncPaused);
+
+  helpDialog.addEventListener("click", event => {
+    if (event.target === helpDialog || event.target.closest("[data-close]")) {
+      helpDialog.close();
+    }
+  });
+
+  async function loadDictionary() {
+    input.disabled = true;
+    document.getElementById("oneword-check").disabled = true;
+    document.getElementById("oneword-newletters").disabled = true;
+    document.getElementById("oneword-shuffle").disabled = true;
+    showMessage("loading", null, "", true);
+
+    try {
+      const response = await fetch("/game/oneword-words.json", {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || !Array.isArray(data.words) || data.words.length === 0) {
+        throw new Error("Kelime verisi eksik veya geçersiz.");
+      }
+
+      dictionary = new Set(data.words.map(word => trLower(String(word).trim())));
+      playableWords = [...dictionary]
+        .filter(word => word.length >= 2 && word.length <= 7)
+        .map(trUpper);
+
+      input.disabled = false;
+      document.getElementById("oneword-check").disabled = false;
+      document.getElementById("oneword-newletters").disabled = false;
+      document.getElementById("oneword-shuffle").disabled = false;
+      msgState = null;
+      messageEl.textContent = "";
+      newGame();
+    } catch (error) {
+      console.error("One Word kelime listesi yüklenemedi:", error);
+      lettersEl.innerHTML = "";
+      showMessage("loadFail", null, "error", true);
+    }
+  }
+
+  loadDictionary();
+})();
+</script>

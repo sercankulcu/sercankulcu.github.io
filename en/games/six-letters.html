@@ -1,0 +1,1612 @@
+---
+# tools/make_tr_pages.py writes this copy of game/sixletters.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Six Letters"
+permalink: /en/games/six-letters/
+excerpt: "Guess the hidden six-letter Turkish word in six tries, with a daily puzzle and shareable results."
+lang: en
+ui_lang: en
+seo_title: "Six Letters · 6-Letter Turkish Wordle"
+og_image: https://sercankulcu.github.io/images/games/sixletters.jpg
+game_genre: "Word game"
+hreflang: {en: "/en/games/six-letters/", tr: "/game/sixletters/"}
+---
+
+<style>
+.sixletters-app,
+.sixletters-app *,
+.sixletters-app *::before,
+.sixletters-app *::after {
+  box-sizing: border-box;
+}
+
+.sixletters-app {
+  width: min(820px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.sixletters-panel {
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.sixletters-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sixletters-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sixletters-logo {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--global-link-color);
+  color: #fff;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.sixletters-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 3.5vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+
+.sixletters-help,
+.sixletters-button,
+.sixletters-key {
+  font: inherit;
+}
+
+.sixletters-help {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.sixletters-top-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.sixletters-lang {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sixletters-help:hover,
+.sixletters-lang:hover,
+.sixletters-button:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.sixletters-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.sixletters-stat {
+  padding: 9px 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .06);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.sixletters-board {
+  /* Leave room for the header, stats and keyboard so the board and the keys
+     are on screen together on short displays. */
+  width: max(220px, min(100%, 390px, calc(100vh - 520px)));
+  width: max(220px, min(100%, 390px, calc(100svh - 520px)));
+  margin: 10px auto;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.sixletters-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--global-border-color);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-size: clamp(18px, 4vw, 27px);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sixletters-cell.is-filled {
+  border-color: var(--global-text-color-light, #8a8f98);
+}
+
+/* The result is also carried by a corner mark so it does not rely on colour. */
+.sixletters-cell.is-correct::after,
+.sixletters-cell.is-present::after,
+.sixletters-cell.is-absent::after {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: .62rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: .9;
+}
+.sixletters-cell.is-correct::after { content: "\2713"; }
+.sixletters-cell.is-present::after { content: "\25CF"; }
+.sixletters-cell.is-absent::after  { content: "\2715"; }
+
+.sixletters-cell.is-correct {
+  border-color: #2f855a;
+  background: #2f855a;
+  color: #fff;
+}
+
+.sixletters-cell.is-present {
+  border-color: #9c6210;
+  background: #9c6210;
+  color: #fff;
+}
+
+.sixletters-cell.is-absent {
+  border-color: #667085;
+  background: #667085;
+  color: #fff;
+}
+
+:root[data-theme="dark"] .sixletters-cell.is-correct { border-color: #38a169; background: #38a169; color: #10151c; }
+:root[data-theme="dark"] .sixletters-cell.is-present { border-color: #d69e2e; background: #d69e2e; color: #10151c; }
+:root[data-theme="dark"] .sixletters-cell.is-absent  { border-color: #718096; background: #718096; color: #10151c; }
+:root[data-theme="dark"] .sixletters-key.is-correct  { border-color: #38a169; background: #38a169; color: #10151c; }
+:root[data-theme="dark"] .sixletters-key.is-present  { border-color: #d69e2e; background: #d69e2e; color: #10151c; }
+:root[data-theme="dark"] .sixletters-key.is-absent   { border-color: #718096; background: #718096; color: #10151c; }
+
+.sixletters-keyboard {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  display: grid;
+  gap: 6px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Turkish Q layout without Q, W and X: 10 / 11 / 8 + two action keys.
+   Each row is a 22-column grid; letters span 2 columns, action keys 3. */
+.sixletters-krow {
+  display: grid;
+  grid-template-columns: repeat(22, minmax(0, 1fr));
+}
+
+.sixletters-krow > .sixletters-key { grid-column: span 2; }
+.sixletters-krow > .sixletters-key.is-action { grid-column: span 3; }
+.sixletters-krow.is-first > .sixletters-key:first-child { grid-column: 2 / span 2; }
+
+.sixletters-key {
+  position: relative;
+  min-width: 0;
+  min-height: 52px;
+  margin: 0 3px;
+  padding: 0;
+  border: 1px solid var(--global-border-color);
+  border-radius: 8px;
+  background: rgba(127, 127, 127, .10);
+  color: var(--global-text-color);
+  font-size: 1rem;
+  font-weight: 850;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sixletters-key.is-correct::after,
+.sixletters-key.is-present::after,
+.sixletters-key.is-absent::after {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: .55rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: .9;
+}
+.sixletters-key.is-correct::after { content: "\2713"; }
+.sixletters-key.is-present::after { content: "\25CF"; }
+.sixletters-key.is-absent::after  { content: "\2715"; }
+
+@media (hover: hover) {
+  .sixletters-key:hover:not(:disabled) {
+    border-color: var(--global-link-color);
+  }
+}
+
+.sixletters-key:active {
+  transform: translateY(1px);
+}
+
+.sixletters-help:focus-visible,
+.sixletters-lang:focus-visible,
+.sixletters-button:focus-visible,
+.sixletters-key:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.sixletters-key.is-correct {
+  border-color: #2f855a;
+  background: #2f855a;
+  color: #fff;
+}
+
+.sixletters-key.is-present {
+  border-color: #9c6210;
+  background: #9c6210;
+  color: #fff;
+}
+
+.sixletters-key.is-absent {
+  border-color: #667085;
+  background: #667085;
+  color: #fff;
+}
+
+.sixletters-key.is-action {
+  border-color: var(--global-link-color);
+  font-size: .78rem;
+  letter-spacing: .02em;
+}
+
+.sixletters-message {
+  min-height: 1.5em;
+  margin: 0 0 10px;
+  color: var(--global-text-color);
+  text-align: center;
+  font-weight: 800;
+}
+
+.sixletters-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.sixletters-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sixletters-actions {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.sixletters-mode {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+}
+
+.sixletters-mode .sixletters-button {
+  border-color: transparent;
+  padding: 0 14px;
+}
+
+.sixletters-mode .sixletters-button[aria-pressed="true"],
+.sixletters-button.is-primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.sixletters-mode .sixletters-button[aria-pressed="true"]:hover,
+.sixletters-button.is-primary:hover {
+  background: var(--tool-primary-hover);
+}
+
+.sixletters-end {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.sixletters-end-title {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  color: var(--global-text-color);
+  font-size: 1rem;
+}
+
+.sixletters-dstats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.sixletters-dstats div {
+  display: flex;
+  flex-direction: column-reverse;
+  margin: 0;
+}
+
+.sixletters-dstats dd {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.sixletters-dstats dt {
+  color: var(--global-text-color-light);
+  font-size: .76rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sixletters-dist {
+  display: grid;
+  gap: 4px;
+  max-width: 320px;
+  margin: 0 auto 12px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.sixletters-dist li {
+  display: grid;
+  grid-template-columns: 1.2em 1fr;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+.sixletters-dist-bar {
+  display: block;
+  min-width: 1.8em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(127, 127, 127, .18);
+  color: var(--global-text-color);
+  text-align: right;
+}
+
+.sixletters-dist li.is-today .sixletters-dist-bar {
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.sixletters-next {
+  margin: 10px 0 0;
+  color: var(--global-text-color-light);
+  font-size: .88rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sixletters-copied {
+  min-height: 1.3em;
+  margin: 4px 0 0;
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.sixletters-dialog {
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid var(--global-border-color);
+  border-radius: 16px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+
+.sixletters-dialog::backdrop {
+  background: rgba(0, 0, 0, .45);
+}
+
+.sixletters-dialog-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--global-border-color);
+  background: var(--global-bg-color);
+}
+
+.sixletters-dialog-head h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--global-text-color);
+  font-size: 1.1rem;
+}
+
+.sixletters-dialog-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.sixletters-help:focus-visible,
+.sixletters-dialog-close:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.sixletters-dialog-body {
+  padding: 14px 18px 18px;
+  overflow: auto;
+  line-height: 1.55;
+}
+
+.sixletters-dialog-body p {
+  margin: 0 0 .6em;
+}
+
+.sixletters-dialog-body h3 {
+  margin: 1em 0 .35em;
+  font-size: .95rem;
+}
+
+.sixletters-dialog-body ul {
+  margin: .2em 0 .6em;
+  padding-left: 1.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sixletters-dialog[open] {
+    animation: sixletters-pop .16s ease-out;
+  }
+
+  @keyframes sixletters-pop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+.sixletters-rules {
+  line-height: 1.6;
+}
+
+.sixletters-rules li + li {
+  margin-top: .35rem;
+}
+
+@media (max-width: 640px) {
+  .sixletters-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .sixletters-panel {
+    padding: 12px 8px;
+    border-radius: 14px;
+  }
+
+  .sixletters-topbar {
+    align-items: center;
+    margin-bottom: 6px;
+    padding: 0 4px;
+  }
+
+  .sixletters-logo {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border-radius: 11px;
+    font-size: 19px;
+  }
+
+  .sixletters-title {
+    font-size: 1.35rem;
+  }
+
+  .sixletters-help {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .sixletters-stats {
+    margin: 6px 0;
+  }
+
+  .sixletters-stat {
+    padding: 5px 12px;
+    font-size: .82rem;
+  }
+
+  .sixletters-board {
+    width: max(150px, min(100% - 16px, 348px, calc(100vh - 400px)));
+    width: max(150px, min(100% - 16px, 348px, calc(100svh - 400px)));
+    gap: 4px;
+    margin: 8px auto;
+  }
+
+  .sixletters-cell {
+    border-radius: 8px;
+    font-size: clamp(16px, 5vw, 24px);
+  }
+
+  .sixletters-keyboard {
+    gap: 5px;
+  }
+
+  .sixletters-key {
+    min-height: 50px;
+    margin: 0 2px;
+    font-size: .9rem;
+  }
+
+  .sixletters-key.is-action {
+    font-size: .68rem;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 620px) {
+  .sixletters-key {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .sixletters-key {
+    margin: 0 1.5px;
+    font-size: .82rem;
+  }
+
+  .sixletters-key.is-action {
+    font-size: .6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sixletters-key:active {
+    transform: none;
+  }
+
+  .sixletters-app *,
+  .sixletters-app *::before,
+  .sixletters-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+
+<div class="sixletters-app">
+  <section class="sixletters-panel" aria-labelledby="sixletters-title">
+    <div class="sixletters-topbar">
+      <div class="sixletters-brand">
+        <div class="sixletters-logo" aria-hidden="true">6️⃣</div>
+        <div>
+          <h1 class="sixletters-title" id="sixletters-title" data-i18n="title">Altı Harf</h1>
+        </div>
+      </div>
+
+      <div class="sixletters-top-actions">
+        <button class="sixletters-lang" data-lang-toggle></button>
+        <button class="sixletters-help" id="sixletters-help" type="button" aria-haspopup="dialog" aria-controls="sixletters-help-dialog" aria-label="Nasıl oynanır" data-i18n-attr="aria-label:helpLabel">?</button>
+      </div>
+    </div>
+
+    <div class="sixletters-stats" aria-label="Oyun istatistikleri" data-i18n-attr="aria-label:statsLabel">
+      <span class="sixletters-stat"><span data-i18n="attempt">Deneme</span>: <b id="sixletters-attempt">1</b>/6</span>
+      <span class="sixletters-stat"><span data-i18n="streak">Seri</span>: <b id="sixletters-streak">0</b></span>
+    </div>
+
+    <div class="sixletters-board" id="sixletters-board" role="group" aria-label="Tahmin tablosu" data-i18n-attr="aria-label:boardLabel"></div>
+
+    <div class="sixletters-message" id="sixletters-message" role="status" aria-live="polite"></div>
+
+    <div class="sixletters-keyboard" id="sixletters-keyboard" role="group" aria-label="Türkçe klavye" data-i18n-attr="aria-label:keyboardLabel"></div>
+
+    <div class="sixletters-actions">
+      <div class="sixletters-mode" role="group" aria-label="Oyun modu" data-i18n-attr="aria-label:modeLabel">
+        <button class="sixletters-button" id="sixletters-mode-daily" type="button" aria-pressed="true" data-i18n="daily">Günlük</button>
+        <button class="sixletters-button" id="sixletters-mode-free" type="button" aria-pressed="false" data-i18n="free">Serbest</button>
+      </div>
+      <button class="sixletters-button" id="sixletters-restart" type="button" hidden data-i18n="newWord">Yeni Kelime</button>
+    </div>
+
+    <div class="sixletters-end" id="sixletters-end" hidden>
+      <h2 class="sixletters-end-title"><span data-i18n="dailyTitle">Günün bulmacası</span> #<span id="sixletters-end-day"></span></h2>
+      <dl class="sixletters-dstats">
+        <div><dt data-i18n="played">Oynanan</dt><dd id="sixletters-s-played">0</dd></div>
+        <div><dt data-i18n="winPct">Kazanma %</dt><dd id="sixletters-s-win">0</dd></div>
+        <div><dt data-i18n="streak">Seri</dt><dd id="sixletters-s-streak">0</dd></div>
+        <div><dt data-i18n="bestStreak">En iyi seri</dt><dd id="sixletters-s-best">0</dd></div>
+      </dl>
+      <ol class="sixletters-dist" id="sixletters-dist" aria-label="Tahmin dağılımı" data-i18n-attr="aria-label:distLabel"></ol>
+      <button class="sixletters-button is-primary" id="sixletters-share" type="button" data-i18n="share">Sonucu paylaş</button>
+      <p class="sixletters-copied" id="sixletters-copied" role="status" aria-live="polite"></p>
+      <p class="sixletters-next" id="sixletters-next"></p>
+    </div>
+  </section>
+</div>
+
+<dialog class="sixletters-dialog" id="sixletters-help-dialog" aria-labelledby="sixletters-help-title">
+  <div class="sixletters-dialog-head">
+    <h2 id="sixletters-help-title" data-i18n="helpTitle">Nasıl oynanır</h2>
+    <button class="sixletters-dialog-close" type="button" data-close aria-label="Kapat" data-i18n-attr="aria-label:closeLabel">×</button>
+  </div>
+  <div class="sixletters-dialog-body">
+    <p data-i18n-html="h_intro">Gizli altı harfli Türkçe kelimeyi altı denemede bul.</p>
+
+    <h3 data-i18n="h_rules">Kurallar</h3>
+    <ul class="sixletters-rules">
+      <li data-i18n-html="r1">Altı harfli Türkçe kelimeyi altı denemede bul.</li>
+      <li data-i18n-html="r2">Her tahmin, listede bulunan geçerli bir kelime olmalıdır.</li>
+      <li data-i18n-html="r3"><b>Yeşil:</b> harf doğru ve doğru yerde.</li>
+      <li data-i18n-html="r4"><b>Turuncu:</b> harf kelimede var ama başka bir yerde.</li>
+      <li data-i18n-html="r5"><b>Gri:</b> harf kelimenin kalan yerlerinde yok.</li>
+    </ul>
+
+    <h3 data-i18n="h_controls">Kontroller</h3>
+    <ul class="sixletters-rules">
+      <li data-i18n-html="c1">Ekrandaki klavyeyi ya da bilgisayarınızın klavyesini kullanabilirsiniz.</li>
+      <li data-i18n-html="c2"><b>GİR</b> ya da Enter tahmini gönderir; <b>⌫</b> ya da Backspace son harfi siler.</li>
+      <li data-i18n-html="c3"><b>Serbest</b> modda <b>Yeni Kelime</b> yeni bir tur başlatır; süren bir turu bırakmak seriyi sıfırlar.</li>
+      <li data-i18n-html="c4"><b>EN</b> düğmesi arayüzü İngilizceye çevirir; kelimeler yine Türkçedir.</li>
+    </ul>
+
+    <h3 data-i18n="h_daily">Günün bulmacası</h3>
+    <ul class="sixletters-rules">
+      <li data-i18n-html="d1">Sayfa <b>Günlük</b> modda açılır: o gün herkes aynı kelimeyi çözer, kelime Türkiye saatiyle gece yarısı değişir. Her güne tek deneme hakkı vardır.</li>
+      <li data-i18n-html="d2">Bitirince <b>Sonucu paylaş</b> renkli kareleri kelimeyi vermeden paylaşır ya da panoya kopyalar.</li>
+      <li data-i18n-html="d3">Günlük istatistikler (oynanan, kazanma, seri, dağılım) yalnızca bu cihazda saklanır.</li>
+      <li data-i18n-html="d4"><b>Serbest</b> modda rastgele kelimelerle istediğiniz kadar oynayabilirsiniz.</li>
+    </ul>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  let WORDS = [];
+  let VALID_WORDS = new Set();
+
+  const SIZE = 6;
+  const MAX_ATTEMPTS = 6;
+  const ALPHABET = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ";
+  const STREAK_KEY = "six-letters-streak";
+  const DAILY_KEY = "pz:sixletters:daily";
+  const STATS_KEY = "pz:sixletters:stats";
+  const SHARE_URL = "https://sercankulcu.github.io/game/sixletters/";
+  const SALT = 6061;
+
+  const boardView = document.getElementById("sixletters-board");
+  const keyboard = document.getElementById("sixletters-keyboard");
+  const attemptView = document.getElementById("sixletters-attempt");
+  const streakView = document.getElementById("sixletters-streak");
+  const message = document.getElementById("sixletters-message");
+  const restart = document.getElementById("sixletters-restart");
+  const help = document.getElementById("sixletters-help");
+  const helpDialog = document.getElementById("sixletters-help-dialog");
+  const modeDaily = document.getElementById("sixletters-mode-daily");
+  const modeFree = document.getElementById("sixletters-mode-free");
+  const endPanel = document.getElementById("sixletters-end");
+  const endDay = document.getElementById("sixletters-end-day");
+  const statPlayed = document.getElementById("sixletters-s-played");
+  const statWin = document.getElementById("sixletters-s-win");
+  const statStreak = document.getElementById("sixletters-s-streak");
+  const statBest = document.getElementById("sixletters-s-best");
+  const distView = document.getElementById("sixletters-dist");
+  const shareButton = document.getElementById("sixletters-share");
+  const nextView = document.getElementById("sixletters-next");
+  const copiedView = document.getElementById("sixletters-copied");
+
+  let secret = "";
+  let currentGuess = "";
+  let row = 0;
+  let gameOver = false;
+  let streak = loadStreak();
+  let history = [];
+  let lastSecret = "";
+  let mode = "daily";
+  let today = 0;
+  let freeState = null;
+  let countdownTimer = 0;
+  let msg = null;
+  let LANG = "tr";
+
+  const I18N = {
+    tr: {
+      title: "Altı Harf",
+      helpLabel: "Nasıl oynanır",
+      statsLabel: "Oyun istatistikleri",
+      attempt: "Deneme",
+      streak: "Seri",
+      boardLabel: "Tahmin tablosu",
+      keyboardLabel: "Türkçe klavye",
+      modeLabel: "Oyun modu",
+      daily: "Günlük",
+      free: "Serbest",
+      newWord: "Yeni Kelime",
+      dailyTitle: "Günün bulmacası",
+      played: "Oynanan",
+      winPct: "Kazanma %",
+      bestStreak: "En iyi seri",
+      distLabel: "Tahmin dağılımı",
+      share: "Sonucu paylaş",
+      helpTitle: "Nasıl oynanır",
+      closeLabel: "Kapat",
+      h_intro: "Gizli altı harfli Türkçe kelimeyi altı denemede bul.",
+      h_rules: "Kurallar",
+      r1: "Altı harfli Türkçe kelimeyi altı denemede bul.",
+      r2: "Her tahmin, listede bulunan geçerli bir kelime olmalıdır.",
+      r3: "<b>Yeşil:</b> harf doğru ve doğru yerde.",
+      r4: "<b>Turuncu:</b> harf kelimede var ama başka bir yerde.",
+      r5: "<b>Gri:</b> harf kelimenin kalan yerlerinde yok.",
+      h_controls: "Kontroller",
+      c1: "Ekrandaki klavyeyi ya da bilgisayarınızın klavyesini kullanabilirsiniz.",
+      c2: "<b>GİR</b> ya da Enter tahmini gönderir; <b>⌫</b> ya da Backspace son harfi siler.",
+      c3: "<b>Serbest</b> modda <b>Yeni Kelime</b> yeni bir tur başlatır; süren bir turu bırakmak seriyi sıfırlar.",
+      c4: "<b>EN</b> düğmesi arayüzü İngilizceye çevirir; kelimeler yine Türkçedir.",
+      h_daily: "Günün bulmacası",
+      d1: "Sayfa <b>Günlük</b> modda açılır: o gün herkes aynı kelimeyi çözer, kelime Türkiye saatiyle gece yarısı değişir. Her güne tek deneme hakkı vardır.",
+      d2: "Bitirince <b>Sonucu paylaş</b> renkli kareleri kelimeyi vermeden paylaşır ya da panoya kopyalar.",
+      d3: "Günlük istatistikler (oynanan, kazanma, seri, dağılım) yalnızca bu cihazda saklanır.",
+      d4: "<b>Serbest</b> modda rastgele kelimelerle istediğiniz kadar oynayabilirsiniz.",
+      st0: "kelimede yok",
+      st1: "kelimede var, yeri yanlış",
+      st2: "doğru yerde",
+      won: "{n}. denemede bildiniz.",
+      lost: "Kelime {word} idi.",
+      dailyMsg: "Günün bulmacası #{n}",
+      needLetters: "{n} harf girin.",
+      notWord: "Kelime listesinde yok.",
+      loading: "Kelimeler yükleniyor...",
+      loadError: "Kelime listesi yüklenemedi.",
+      distItem: "{n}. denemede: {v}",
+      next: "Yarın yeni bulmaca · {time} kaldı",
+      abandon: "Bu turu bırakırsanız {n} kelimelik seriniz sıfırlanacak. Yeni kelimeye geçilsin mi?",
+      copied: "Kopyalandı",
+      copyFail: "Kopyalanamadı",
+      enterKey: "GİR",
+      enterLabel: "Tahmini gönder",
+      deleteLabel: "Harfi sil",
+      gameName: "Altı Harf"
+    },
+    en: {
+      title: "Six Letters",
+      helpLabel: "How to play",
+      statsLabel: "Game stats",
+      attempt: "Guess",
+      streak: "Streak",
+      boardLabel: "Guess board",
+      keyboardLabel: "Turkish keyboard",
+      modeLabel: "Game mode",
+      daily: "Daily",
+      free: "Free play",
+      newWord: "New word",
+      dailyTitle: "Puzzle of the day",
+      played: "Played",
+      winPct: "Win %",
+      bestStreak: "Best streak",
+      distLabel: "Guess distribution",
+      share: "Share result",
+      helpTitle: "How to play",
+      closeLabel: "Close",
+      h_intro: "Guess the hidden six-letter <b>Turkish</b> word in six tries. It is a Turkish Wordle: the words are Turkish in both languages.",
+      h_rules: "Rules",
+      r1: "Find the six-letter Turkish word in six guesses.",
+      r2: "Each guess must be a valid word from the list.",
+      r3: "<b>Green:</b> right letter in the right spot.",
+      r4: "<b>Orange:</b> the letter is in the word, but in another spot.",
+      r5: "<b>Grey:</b> the letter is not in the rest of the word.",
+      h_controls: "Controls",
+      c1: "Use the on-screen keyboard or your own keyboard.",
+      c2: "<b>ENTER</b> or Enter submits a guess; <b>⌫</b> or Backspace deletes the last letter.",
+      c3: "In <b>Free play</b>, <b>New word</b> starts a new round; leaving a round under way resets your streak.",
+      c4: "The Turkish alphabet has no Q, W or X and adds Ç, Ğ, I, İ, Ö, Ş and Ü. Dotless <b>I</b> and dotted <b>İ</b> are different letters. On a non-Turkish keyboard the i key types İ; use the on-screen keys for I, Ç, Ğ, Ö, Ş and Ü. <b>TR</b> switches the interface to Turkish.",
+      h_daily: "Puzzle of the day",
+      d1: "The page opens in <b>Daily</b> mode: everyone gets the same word that day, and it changes at midnight Turkey time. You get one try per day.",
+      d2: "When you finish, <b>Share result</b> shares or copies the coloured squares without giving the word away.",
+      d3: "Daily stats (played, wins, streak, distribution) are stored only on this device.",
+      d4: "In <b>Free play</b> you can play random words as long as you like.",
+      st0: "not in the word",
+      st1: "in the word, wrong spot",
+      st2: "right spot",
+      won: "You got it on guess {n}!",
+      lost: "The word was {word}.",
+      dailyMsg: "Puzzle of the day #{n}",
+      needLetters: "Enter {n} letters.",
+      notWord: "Not in the word list.",
+      loading: "Loading words...",
+      loadError: "The word list could not be loaded.",
+      distItem: "Guess {n}: {v}",
+      next: "New puzzle tomorrow · {time} left",
+      abandon: "Leaving this round resets your streak of {n}. Start a new word?",
+      copied: "Copied",
+      copyFail: "Could not copy",
+      enterKey: "ENTER",
+      enterLabel: "Submit guess",
+      deleteLabel: "Delete letter",
+      gameName: "Six Letters"
+    }
+  };
+
+  function t(key, vars) {
+    let text = (I18N[LANG] || I18N.tr)[key];
+    if (text == null) text = I18N.tr[key];
+    if (text == null) text = key;
+    if (vars) text = String(text).replace(/\{(\w+)\}/g, (all, name) => vars[name] != null ? vars[name] : all);
+    return text;
+  }
+
+  /* The status line is kept as a key, so a language switch can re-render it. */
+  function say(key, vars) {
+    msg = key ? { key, vars } : null;
+    message.textContent = key ? t(key, vars) : "";
+  }
+
+  /* Puzzle of the day: the day number comes from the calendar date in
+     Istanbul, so everyone gets the same puzzle and it changes at midnight. */
+  const DAILY_EPOCH = Date.UTC(2026, 0, 1);
+
+  function istanbulParts(now) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Istanbul",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+      }).formatToParts(now);
+      const get = type => Number((parts.find(part => part.type === type) || {}).value);
+      const out = { y: get("year"), m: get("month"), d: get("day"), h: get("hour") % 24, min: get("minute"), s: get("second") };
+      if (Object.values(out).every(Number.isFinite)) return out;
+    } catch (error) {}
+    const shifted = new Date(now.getTime() + 3 * 3600000);
+    return {
+      y: shifted.getUTCFullYear(), m: shifted.getUTCMonth() + 1, d: shifted.getUTCDate(),
+      h: shifted.getUTCHours(), min: shifted.getUTCMinutes(), s: shifted.getUTCSeconds()
+    };
+  }
+
+  function dayNumber() {
+    const p = istanbulParts(new Date());
+    return Math.max(0, Math.round((Date.UTC(p.y, p.m - 1, p.d) - DAILY_EPOCH) / 86400000));
+  }
+
+  function secondsToMidnight() {
+    const p = istanbulParts(new Date());
+    return Math.max(0, 86400 - (p.h * 3600 + p.min * 60 + p.s));
+  }
+
+  function clockText(total) {
+    const pad = value => String(value).padStart(2, "0");
+    return `${pad(Math.floor(total / 3600))}:${pad(Math.floor(total / 60) % 60)}:${pad(total % 60)}`;
+  }
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function seededShuffle(items, rng) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  /* Walks a fresh seeded permutation of the list in each cycle, so nothing
+     repeats until the whole list has been used and the order is not the
+     file order. The first item of a cycle never repeats the day before. */
+  function dailyIndex(count, day, salt) {
+    const order = cycle => seededShuffle([...Array(count).keys()], mulberry32(salt + cycle * 7919));
+    const cycle = Math.floor(day / count);
+    const list = order(cycle);
+    if (cycle > 0 && count > 2 && list[0] === order(cycle - 1)[count - 1]) {
+      [list[0], list[1]] = [list[1], list[0]];
+    }
+    return list[day % count];
+  }
+
+  let memory = {};
+
+  function readJSON(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) return JSON.parse(raw);
+    } catch (error) {}
+    return memory[key] || null;
+  }
+
+  function writeJSON(key, value) {
+    memory[key] = value;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {}
+  }
+
+  function count(value) {
+    return Math.max(0, Math.floor(Number(value) || 0));
+  }
+
+  function loadStats(distLength) {
+    const s = readJSON(STATS_KEY) || {};
+    const stats = {
+      played: count(s.played), wins: count(s.wins), streak: count(s.streak), best: count(s.best),
+      lastDay: typeof s.lastDay === "number" ? s.lastDay : -10,
+      lastWinDay: typeof s.lastWinDay === "number" ? s.lastWinDay : -10
+    };
+    if (distLength) {
+      stats.dist = Array.isArray(s.dist) && s.dist.length === distLength
+        ? s.dist.map(count)
+        : Array(distLength).fill(0);
+    }
+    return stats;
+  }
+
+  function currentStreak(stats, day) {
+    return stats.lastWinDay >= day - 1 ? stats.streak : 0;
+  }
+
+  /* Counts a finished daily puzzle once; a reload of the same day is a no-op. */
+  function recordDaily(day, won, distLength, slot) {
+    const stats = loadStats(distLength);
+    if (stats.lastDay === day) return stats;
+    stats.played += 1;
+    stats.lastDay = day;
+    if (won) {
+      stats.wins += 1;
+      stats.streak = stats.lastWinDay === day - 1 ? stats.streak + 1 : 1;
+      stats.lastWinDay = day;
+      stats.best = Math.max(stats.best, stats.streak);
+      if (stats.dist && slot >= 0 && slot < stats.dist.length) stats.dist[slot] += 1;
+    } else {
+      stats.streak = 0;
+    }
+    writeJSON(STATS_KEY, stats);
+    return stats;
+  }
+
+  function copyFallback(text) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    document.body.appendChild(area);
+    area.select();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch (error) {}
+    area.remove();
+    return ok;
+  }
+
+  async function shareText(text, feedback, labels) {
+    feedback.textContent = "";
+    let coarse = false;
+    try {
+      coarse = window.matchMedia("(pointer: coarse)").matches;
+    } catch (error) {}
+    if (navigator.share && coarse) {
+      try {
+        await navigator.share({ text });
+        return;
+      } catch (error) {
+        if (error && error.name === "AbortError") return;
+      }
+    }
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch (error) {
+      ok = copyFallback(text);
+    }
+    feedback.textContent = ok ? labels[0] : labels[1];
+  }
+
+  function loadStreak() {
+    try {
+      return Math.max(0, Number(localStorage.getItem(STREAK_KEY)) || 0);
+    } catch {
+      return 0;
+    }
+  }
+
+  function saveStreak(value) {
+    try {
+      localStorage.setItem(STREAK_KEY, String(value));
+    } catch {}
+  }
+
+  function normalize(text) {
+    return text.toLocaleUpperCase("tr-TR");
+  }
+
+  function dailySecret(day) {
+    return WORDS[dailyIndex(WORDS.length, day, SALT)];
+  }
+
+  function chooseSecret() {
+    /* Free play never hands out today's daily word. */
+    const daily = dailySecret(dayNumber());
+    const available = WORDS.length > 2
+      ? WORDS.filter(word => word !== lastSecret && word !== daily)
+      : WORDS;
+
+    const selected = available[Math.floor(Math.random() * available.length)];
+    lastSecret = selected;
+    return selected;
+  }
+
+  function evaluate(word) {
+    const secretLetters = [...secret];
+    const used = Array(SIZE).fill(false);
+    const result = Array(SIZE).fill(0);
+    const guessLetters = [...word];
+
+    guessLetters.forEach((letter, index) => {
+      if (letter === secretLetters[index]) {
+        result[index] = 2;
+        used[index] = true;
+      }
+    });
+
+    guessLetters.forEach((letter, index) => {
+      if (result[index] !== 0) return;
+
+      const matchIndex = secretLetters.findIndex(
+        (candidate, candidateIndex) =>
+          candidate === letter && !used[candidateIndex]
+      );
+
+      if (matchIndex >= 0) {
+        result[index] = 1;
+        used[matchIndex] = true;
+      }
+    });
+
+    return result;
+  }
+
+  function stateLabel(state) {
+    return t("st" + state);
+  }
+
+  function renderBoard() {
+    boardView.innerHTML = "";
+
+    for (let r = 0; r < MAX_ATTEMPTS; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement("div");
+        cell.className = "sixletters-cell";
+
+        if (r < history.length) {
+          const entry = history[r];
+          cell.textContent = entry.word[c];
+          cell.setAttribute(
+            "aria-label",
+            `${entry.word[c]}, ${stateLabel(entry.result[c])}`
+          );
+
+          if (entry.result[c] === 2) {
+            cell.classList.add("is-correct");
+          } else if (entry.result[c] === 1) {
+            cell.classList.add("is-present");
+          } else {
+            cell.classList.add("is-absent");
+          }
+        } else if (r === row && currentGuess[c]) {
+          cell.textContent = currentGuess[c];
+          cell.classList.add("is-filled");
+        }
+
+        boardView.appendChild(cell);
+      }
+    }
+  }
+
+  function keyStates() {
+    const states = {};
+
+    for (const entry of history) {
+      [...entry.word].forEach((letter, index) => {
+        states[letter] = Math.max(
+          states[letter] ?? -1,
+          entry.result[index]
+        );
+      });
+    }
+
+    return states;
+  }
+
+  function renderKeyStates() {
+    const states = keyStates();
+
+    for (const button of keyboard.querySelectorAll("[data-letter]")) {
+      button.classList.remove("is-correct", "is-present", "is-absent");
+
+      const state = states[button.dataset.letter];
+
+      if (state === undefined) {
+        button.removeAttribute("aria-label");
+      } else {
+        button.setAttribute(
+          "aria-label",
+          `${button.dataset.letter}, ${stateLabel(state)}`
+        );
+      }
+
+      if (state === 2) {
+        button.classList.add("is-correct");
+      } else if (state === 1) {
+        button.classList.add("is-present");
+      } else if (state === 0) {
+        button.classList.add("is-absent");
+      }
+    }
+  }
+
+  function isWon() {
+    return history.length > 0 && history[history.length - 1].word === secret;
+  }
+
+  function refresh() {
+    attemptView.textContent = String(Math.min(row + 1, MAX_ATTEMPTS));
+    streakView.textContent = String(
+      mode === "daily" ? currentStreak(loadStats(MAX_ATTEMPTS), today) : streak
+    );
+    modeDaily.setAttribute("aria-pressed", String(mode === "daily"));
+    modeFree.setAttribute("aria-pressed", String(mode === "free"));
+    restart.hidden = mode !== "free";
+    renderBoard();
+    renderKeyStates();
+    renderEnd();
+  }
+
+  function saveDaily() {
+    writeJSON(DAILY_KEY, {
+      day: today,
+      guesses: history.map(entry => entry.word),
+      done: gameOver,
+      won: gameOver && isWon()
+    });
+  }
+
+  function startDaily() {
+    today = dayNumber();
+    secret = dailySecret(today);
+    currentGuess = "";
+    history = [];
+
+    const saved = readJSON(DAILY_KEY);
+
+    if (saved && saved.day === today && Array.isArray(saved.guesses)) {
+      for (const word of saved.guesses.slice(0, MAX_ATTEMPTS)) {
+        if (typeof word !== "string" || !VALID_WORDS.has(word)) break;
+        history.push({ word, result: evaluate(word) });
+        if (word === secret) break;
+      }
+    }
+
+    const won = isWon();
+    gameOver = won || history.length >= MAX_ATTEMPTS;
+    row = won ? history.length - 1 : history.length;
+
+    if (won) {
+      say("won", { n: row + 1 });
+    } else if (gameOver) {
+      say("lost", { word: secret });
+    } else {
+      say("dailyMsg", { n: today + 1 });
+    }
+
+    if (gameOver) recordDaily(today, won, MAX_ATTEMPTS, history.length - 1);
+    refresh();
+  }
+
+  function finishDaily(won) {
+    saveDaily();
+    recordDaily(today, won, MAX_ATTEMPTS, history.length - 1);
+  }
+
+  function renderEnd() {
+    if (mode !== "daily" || !gameOver) {
+      endPanel.hidden = true;
+      window.clearInterval(countdownTimer);
+      countdownTimer = 0;
+      return;
+    }
+
+    const stats = loadStats(MAX_ATTEMPTS);
+    endDay.textContent = String(today + 1);
+    statPlayed.textContent = String(stats.played);
+    statWin.textContent = String(stats.played ? Math.round(stats.wins / stats.played * 100) : 0);
+    statStreak.textContent = String(currentStreak(stats, today));
+    statBest.textContent = String(stats.best);
+
+    const top = Math.max(1, ...stats.dist);
+    distView.innerHTML = "";
+    stats.dist.forEach((value, index) => {
+      const item = document.createElement("li");
+      const label = document.createElement("span");
+      const track = document.createElement("span");
+      const bar = document.createElement("span");
+      label.textContent = String(index + 1);
+      label.setAttribute("aria-hidden", "true");
+      track.className = "sixletters-dist-track";
+      bar.className = "sixletters-dist-bar";
+      bar.textContent = String(value);
+      bar.style.width = `${Math.max(8, Math.round(value / top * 100))}%`;
+      item.setAttribute("aria-label", t("distItem", { n: index + 1, v: value }));
+      if (isWon() && index === history.length - 1) item.className = "is-today";
+      track.appendChild(bar);
+      item.append(label, track);
+      distView.appendChild(item);
+    });
+
+    copiedView.textContent = "";
+    endPanel.hidden = false;
+    tick();
+    if (!countdownTimer) countdownTimer = window.setInterval(tick, 1000);
+  }
+
+  function tick() {
+    if (dayNumber() !== today) {
+      window.clearInterval(countdownTimer);
+      countdownTimer = 0;
+      if (mode === "daily") startDaily();
+      return;
+    }
+    nextView.textContent = t("next", { time: clockText(secondsToMidnight()) });
+  }
+
+  function resultText() {
+    const score = isWon() ? history.length : "X";
+    const rows = history.map(entry =>
+      entry.result.map(value => value === 2 ? "🟩" : value === 1 ? "🟨" : "⬜").join("")
+    );
+    return `${t("gameName")} #${today + 1} ${score}/${MAX_ATTEMPTS}\n\n${rows.join("\n")}\n\n${SHARE_URL}`;
+  }
+
+  function addLetter(letter) {
+    if (gameOver || currentGuess.length >= SIZE) return;
+    currentGuess += letter;
+    say(null);
+    renderBoard();
+  }
+
+  function deleteLetter() {
+    if (gameOver || currentGuess.length === 0) return;
+    currentGuess = currentGuess.slice(0, -1);
+    say(null);
+    renderBoard();
+  }
+
+  function submitGuess() {
+    if (gameOver || !secret) return;
+
+    if (currentGuess.length !== SIZE) {
+      say("needLetters", { n: SIZE });
+      return;
+    }
+
+    if (!VALID_WORDS.has(currentGuess)) {
+      say("notWord");
+      return;
+    }
+
+    const result = evaluate(currentGuess);
+
+    history.push({
+      word: currentGuess,
+      result
+    });
+
+    if (currentGuess === secret) {
+      if (mode === "free") {
+        streak += 1;
+        saveStreak(streak);
+      }
+      say("won", { n: row + 1 });
+      gameOver = true;
+      if (mode === "daily") finishDaily(true);
+      refresh();
+      return;
+    }
+
+    row += 1;
+    currentGuess = "";
+
+    if (row >= MAX_ATTEMPTS) {
+      if (mode === "free") {
+        streak = 0;
+        saveStreak(streak);
+      }
+      say("lost", { word: secret });
+      gameOver = true;
+      if (mode === "daily") finishDaily(false);
+    } else {
+      say(null);
+      if (mode === "daily") saveDaily();
+    }
+
+    refresh();
+  }
+
+  const KEY_ROWS = ["ERTYUIOPĞÜ", "ASDFGHJKLŞİ", "ZCVBNMÖÇ"];
+
+  function makeKey(label, className, onPress) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.textContent = label;
+    button.addEventListener("click", onPress);
+    return button;
+  }
+
+  function buildKeyboard() {
+    keyboard.innerHTML = "";
+
+    KEY_ROWS.forEach((letters, index) => {
+      const rowView = document.createElement("div");
+      rowView.className = "sixletters-krow" + (index === 0 ? " is-first" : "");
+
+      if (index === 2) {
+        const enterButton = makeKey(t("enterKey"), "sixletters-key is-action", submitGuess);
+        enterButton.dataset.action = "enter";
+        enterButton.setAttribute("aria-label", t("enterLabel"));
+        rowView.appendChild(enterButton);
+      }
+
+      for (const letter of letters) {
+        const button = makeKey(letter, "sixletters-key", () => addLetter(letter));
+        button.dataset.letter = letter;
+        rowView.appendChild(button);
+      }
+
+      if (index === 2) {
+        const deleteButton = makeKey("⌫", "sixletters-key is-action", deleteLetter);
+        deleteButton.dataset.action = "delete";
+        deleteButton.setAttribute("aria-label", t("deleteLabel"));
+        rowView.appendChild(deleteButton);
+      }
+
+      keyboard.appendChild(rowView);
+    });
+  }
+
+  function startGame() {
+    secret = chooseSecret();
+    currentGuess = "";
+    row = 0;
+    gameOver = false;
+    history = [];
+    say(null);
+    refresh();
+  }
+
+  function setMode(next) {
+    if (next === mode || WORDS.length === 0) return;
+
+    if (next === "free") {
+      mode = "free";
+      if (freeState) {
+        ({ secret, currentGuess, row, gameOver } = freeState);
+        history = freeState.history;
+        say(freeState.msg && freeState.msg.key, freeState.msg && freeState.msg.vars);
+        refresh();
+      } else {
+        startGame();
+      }
+    } else {
+      /* The free round is kept as it is, so switching modes cannot be used
+         to reroll a hard word without losing the streak. */
+      freeState = { secret, currentGuess, row, gameOver, history, msg };
+      mode = "daily";
+      startDaily();
+    }
+  }
+
+  document.addEventListener("keydown", event => {
+    if (helpDialog.open) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    /* Leave typing in other fields, and Enter on other buttons/links, alone. */
+    const target = event.target;
+    if (target && target.closest) {
+      if (target.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (event.key === "Enter" && target.closest("button, a") && !keyboard.contains(target)) return;
+    }
+
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      deleteLetter();
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitGuess();
+      return;
+    }
+
+    if (event.key.length !== 1) return;
+
+    const letter = normalize(event.key);
+
+    if (ALPHABET.includes(letter)) {
+      addLetter(letter);
+    }
+  });
+
+  restart.addEventListener("click", () => {
+    if (mode !== "free") return;
+
+    /* Abandoning a round that is already under way must cost the streak, or a
+       player can reroll past every hard word without ever losing one. */
+    if (!gameOver && history.length > 0) {
+      if (streak > 0 && !window.confirm(t("abandon", { n: streak }))) {
+        return;
+      }
+      streak = 0;
+      saveStreak(streak);
+    }
+
+    startGame();
+  });
+  modeDaily.addEventListener("click", () => setMode("daily"));
+  modeFree.addEventListener("click", () => setMode("free"));
+  shareButton.addEventListener("click", () => {
+    shareText(resultText(), copiedView, [t("copied"), t("copyFail")]);
+  });
+  help.addEventListener("click", () => helpDialog.showModal());
+
+  helpDialog.addEventListener("click", event => {
+    if (event.target === helpDialog || event.target.closest("[data-close]")) {
+      helpDialog.close();
+    }
+  });
+
+  async function loadWords() {
+    restart.disabled = true;
+    say("loading");
+
+    try {
+      const response = await fetch("/game/words-six-letters.json", {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (
+        !data ||
+        !Array.isArray(data.wordsSixLetters) ||
+        !Array.isArray(data.allwordsSixLetters) ||
+        data.wordsSixLetters.length === 0 ||
+        data.allwordsSixLetters.length === 0
+      ) {
+        throw new Error("Six-letter word data is missing or invalid.");
+      }
+
+      VALID_WORDS = new Set(data.allwordsSixLetters.map(normalize));
+      /* Only answers that are also accepted as guesses, once each, in file order. */
+      WORDS = [...new Set(data.wordsSixLetters.map(normalize))].filter(word => [...word].length === SIZE && VALID_WORDS.has(word));
+
+      restart.disabled = false;
+      say(null);
+      buildKeyboard();
+      startDaily();
+    } catch (error) {
+      console.error("Six-letter word list could not be loaded:", error);
+      restart.disabled = true;
+      keyboard.innerHTML = "";
+      boardView.innerHTML = "";
+      say("loadError");
+    }
+  }
+
+  /* Interface language (TR/EN); the words and the keyboard stay Turkish.
+     Re-labels everything in place, so a switch keeps the round as it is. */
+  ToolI18n.setup(I18N, lang => {
+    LANG = lang;
+    if (msg) message.textContent = t(msg.key, msg.vars);
+    for (const button of keyboard.querySelectorAll("[data-action]")) {
+      if (button.dataset.action === "enter") {
+        button.textContent = t("enterKey");
+        button.setAttribute("aria-label", t("enterLabel"));
+      } else {
+        button.setAttribute("aria-label", t("deleteLabel"));
+      }
+    }
+    if (WORDS.length) {
+      renderBoard();
+      renderKeyStates();
+      if (!endPanel.hidden) renderEnd();
+    }
+  });
+
+  loadWords();
+})();
+</script>

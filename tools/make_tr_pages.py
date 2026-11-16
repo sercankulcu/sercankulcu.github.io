@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Turkish addresses for the English apps and games.
+"""Turkish addresses for the English apps and games, English addresses for the Turkish games.
 
     python tools/make_tr_pages.py           # write
     python tools/make_tr_pages.py --check   # exit 1 if a copy is out of date (check_site runs this)
@@ -12,6 +12,8 @@ For every page in tools/tr_pages.py:
 2. hreflang {en, tr} in the front matter of both pages (head/custom.html prints the alternates).
 3. _pages/araclar.md and _pages/oyunlar.md: Turkish hubs. Turkish-only games link to their own page.
 4. _data/tr_urls.yml: English URL -> Turkish URL, used on Turkish pages for "Continue with" links.
+5. en/games/<slug>.html: English copies of the Turkish games (tools/en_pages.py, ui_lang: en); the
+   Turkish page gets ui_lang: tr and hreflang. The /games/ hub links the English copies.
 Then run tools/make_related.py (the strip under each page also covers the Turkish pages).
 """
 import io, json, os, sys
@@ -21,6 +23,7 @@ import make_app_pages as A
 import make_game_pages as G
 import make_related as M
 import tr_pages as T
+import en_pages as E
 
 REPO = A.REPO
 SITE = A.SITE
@@ -87,11 +90,45 @@ def copies():
         write('%s/%s.html' % (folder, slug), text)
 
         # the English page points back at its Turkish address
-        en_lines = [l for l in fm.splitlines() if not l.startswith('hreflang:')]
-        en_lines.append(hreflang(en_url, tr_url))
-        s = io.open(src, encoding='utf-8', newline='').read()
-        new = '---' + nl + nl.join(en_lines) + nl + '---' + nl + body
-        if new != s:
+        want = [hreflang(en_url, tr_url)]
+        if [l for l in fm.splitlines() if l.startswith('hreflang:')] != want:
+            en_lines = [l for l in fm.splitlines() if not l.startswith('hreflang:')] + want
+            new = '---' + nl + nl.join(en_lines) + nl + '---' + nl + body
+            changed.append(os.path.relpath(src, REPO).replace(os.sep, '/'))
+            if not CHECK:
+                io.open(src, 'w', encoding='utf-8', newline='').write(new)
+
+
+def en_copies():
+    """English-address copies of the Turkish games (tools/en_pages.py); the Turkish page keeps opening in Turkish."""
+    for tr_page, (slug, title, seo, excerpt) in E.GAMES.items():
+        en = E.en_url(tr_page)
+        src = A.page_file(tr_page)
+        fm, body, nl = split(src)
+        lines = ['---',
+                 '# tools/make_tr_pages.py writes this copy of %s; edit that page, then run the script.'
+                 % os.path.relpath(src, REPO).replace(os.sep, '/'),
+                 'layout: without-sidebar',
+                 'title: ' + json.dumps(title, ensure_ascii=False),
+                 'permalink: ' + en,
+                 'excerpt: ' + json.dumps(excerpt, ensure_ascii=False),
+                 'lang: en',
+                 'ui_lang: en',
+                 'seo_title: ' + json.dumps(seo, ensure_ascii=False)]
+        for key in ('og_image', 'game_genre'):
+            v = fm_value(fm, key)
+            if v:
+                lines.append('%s: %s' % (key, v))
+        lines.append(hreflang(en, tr_page))
+        lines.append('---')
+        assert '{{' not in body and '{%' not in body, tr_page
+        write('en/games/%s.html' % slug, nl.join(lines) + nl + body)
+
+        # the Turkish page: opens in Turkish and points at its English address
+        want = ['ui_lang: tr', hreflang(en, tr_page)]
+        if sorted(l for l in fm.splitlines() if l.startswith(('hreflang:', 'ui_lang:'))) != sorted(want):
+            tr_lines = [l for l in fm.splitlines() if not l.startswith(('hreflang:', 'ui_lang:'))] + want
+            new = '---' + nl + nl.join(tr_lines) + nl + '---' + nl + body
             changed.append(os.path.relpath(src, REPO).replace(os.sep, '/'))
             if not CHECK:
                 io.open(src, 'w', encoding='utf-8', newline='').write(new)
@@ -186,6 +223,7 @@ def urls_data():
 
 if __name__ == '__main__':
     copies()
+    en_copies()
     hubs()
     urls_data()
     if CHECK:

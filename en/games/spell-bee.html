@@ -1,0 +1,967 @@
+---
+# tools/make_tr_pages.py writes this copy of game/spellbee.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Spell Bee"
+permalink: /en/games/spell-bee/
+excerpt: "Make Turkish words from seven letters; every word must use the centre letter."
+lang: en
+ui_lang: en
+seo_title: "Spell Bee · Turkish Word Puzzle"
+og_image: https://sercankulcu.github.io/images/games/spellbee.jpg
+game_genre: "Word game"
+hreflang: {en: "/en/games/spell-bee/", tr: "/game/spellbee/"}
+---
+
+<style>
+.spellbee-app,
+.spellbee-app *,
+.spellbee-app *::before,
+.spellbee-app *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.spellbee-app {
+  --sb-honey: #f7c948;
+  --sb-honey-active: #f28c28;
+  --sb-good: #2e7d32;
+  --sb-bad: #c62828;
+  --sb-outer: #e8e2d4;
+  width: min(740px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Arial, system-ui, sans-serif;
+}
+
+.spellbee-app button {
+  font: inherit;
+}
+
+:root[data-theme="dark"] .spellbee-app {
+  --sb-good: #7ddc9a;
+  --sb-bad: #ff9a9a;
+  --sb-outer: #cfc7b4;
+}
+
+.sb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sb-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spellbee-app .sb-lang {
+  font-size: .8rem;
+}
+
+.sb-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.05;
+  letter-spacing: -.04em;
+}
+
+.sb-help {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.sb-game {
+  padding: clamp(14px, 4vw, 20px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 20px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+  text-align: center;
+}
+
+.sb-stats {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 2px 0 10px;
+}
+
+.sb-stat {
+  padding: 8px 12px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 11px;
+  background: rgba(127,127,127,.045);
+  color: var(--global-text-color);
+  font-weight: 800;
+}
+
+.sb-word {
+  min-height: 52px;
+  margin: 10px 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.75rem, 8vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: .08em;
+  overflow-wrap: anywhere;
+}
+
+.sb-hive-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 16px;
+}
+
+/* The hive scales with the space available (and with the screen height, so
+   the action buttons stay in view); cells are placed in percentages of it. */
+.sb-hive {
+  position: relative;
+  width: max(210px, min(330px, 100%, calc((100vh - 360px) * 1.1)));
+  width: max(210px, min(330px, 100%, calc((100svh - 360px) * 1.1)));
+  aspect-ratio: 330 / 300;
+  container-type: inline-size;
+  touch-action: manipulation;
+}
+
+.sb-hex {
+  position: absolute;
+  width: 31.52%;
+  height: 30%;
+  padding: 0;
+  border: 0;
+  background: var(--sb-outer);
+  color: #161616;
+  clip-path: polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform .1s, filter .1s;
+}
+
+@media (hover: hover) {
+  .sb-hex:hover:not(:disabled) {
+    filter: brightness(.97);
+  }
+
+  .sb-button:hover:not(:disabled) {
+    background: rgba(127,127,127,.07);
+  }
+
+  .sb-button.primary:hover:not(:disabled) {
+    background: var(--sb-honey);
+    filter: brightness(.96);
+  }
+}
+
+/* Beats the generic ".spellbee-app button { font: inherit }" rule. */
+.spellbee-app .sb-hex {
+  font-size: 2.1rem;
+  font-size: clamp(1.3rem, 10cqi, 2.1rem);
+}
+
+/* clip-path hides an outline, so focus is drawn inside the hexagon. */
+.sb-hex:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 5px var(--global-link-color);
+}
+
+.sb-hex:disabled {
+  cursor: progress;
+}
+
+.sb-button:focus-visible,
+.sb-help:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.sb-button:disabled {
+  cursor: progress;
+  opacity: .55;
+}
+
+.sb-hex:active {
+  transform: scale(.96);
+}
+
+.sb-hex.center {
+  background: var(--sb-honey);
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.22);
+}
+
+.sb-hex.selected {
+  background: var(--sb-honey-active) !important;
+  color: #161616;
+  filter: brightness(.98);
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.sb-h0 { left: 34.24%; top: 35%; }
+.sb-h1 { left: 34.24%; top: 5%; }
+.sb-h2 { left: 57.88%; top: 20%; }
+.sb-h3 { left: 57.88%; top: 50%; }
+.sb-h4 { left: 34.24%; top: 65%; }
+.sb-h5 { left: 10.61%; top: 50%; }
+.sb-h6 { left: 10.61%; top: 20%; }
+
+.sb-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sb-button {
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sb-button.primary {
+  border-color: #d9a514;
+  background: var(--sb-honey);
+  color: #161616;
+}
+
+.sb-message.is-ok { color: var(--sb-good); }
+.sb-message.is-bad { color: var(--sb-bad); }
+
+.sb-message {
+  min-height: 30px;
+  margin: 12px 0 6px;
+  color: var(--global-text-color);
+  font-weight: 800;
+}
+
+.sb-reset {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--global-link-text-color);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sb-found {
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 13px;
+  background: rgba(127,127,127,.035);
+  text-align: left;
+}
+
+.sb-found b {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--global-text-color);
+}
+
+.sb-found-words {
+  color: var(--global-text-color-light);
+  
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.sb-new-row {
+  margin-top: 12px;
+}
+
+.sb-dialog {
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid var(--global-border-color);
+  border-radius: 16px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+
+.sb-dialog::backdrop {
+  background: rgba(0, 0, 0, .45);
+}
+
+.sb-dialog-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--global-border-color);
+  background: var(--global-bg-color);
+}
+
+.sb-dialog-head h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--global-text-color);
+  font-size: 1.1rem;
+}
+
+.sb-dialog-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.sb-help:focus-visible,
+.sb-dialog-close:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.sb-dialog-body {
+  padding: 14px 18px 18px;
+  overflow: auto;
+  line-height: 1.55;
+}
+
+.sb-dialog-body p {
+  margin: 0 0 .6em;
+}
+
+.sb-dialog-body h3 {
+  margin: 1em 0 .35em;
+  color: var(--global-text-color);
+  font-size: .95rem;
+}
+
+.sb-dialog-body ul,
+.sb-dialog-body ol {
+  margin: .2em 0 .6em;
+  padding-left: 1.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sb-dialog[open] {
+    animation: sb-pop .16s ease-out;
+  }
+
+  @keyframes sb-pop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@media(max-width:520px) {
+  .spellbee-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .sb-game {
+    padding: 13px;
+  }
+
+  .sb-word {
+    min-height: 44px;
+  }
+
+  /* Three chips (score, found, record) stay on one row at 360 px. */
+  .sb-stats {
+    gap: 6px;
+  }
+
+  .sb-stat {
+    padding: 8px 8px;
+    font-size: .88rem;
+  }
+
+  .sb-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .sb-new-row {
+    display: block;
+  }
+
+  .sb-new-row .sb-button {
+    width: 100%;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .sb-hex:active {
+    transform: none;
+  }
+
+  .spellbee-app *,
+  .spellbee-app *::before,
+  .spellbee-app *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="spellbee-app">
+  <header class="sb-header">
+    <div>
+      <h1 class="sb-title">Spell Bee</h1>
+    </div>
+    <div class="sb-head-actions">
+      <button class="sb-help sb-lang" data-lang-toggle></button>
+      <button class="sb-help" id="sb-help" type="button" aria-haspopup="dialog" aria-controls="sb-help-dialog" aria-label="Nasıl oynanır" data-i18n-attr="aria-label:howTo">?</button>
+    </div>
+  </header>
+
+  <section class="sb-game">
+    <div class="sb-stats">
+      <span class="sb-stat"><span data-i18n="scoreL">Puan:</span> <b id="sb-score">0</b></span>
+      <span class="sb-stat"><span data-i18n="foundL">Bulunan:</span> <b id="sb-count">0</b></span>
+      <span class="sb-stat" title="Bu petekte en yüksek puan" data-i18n-attr="title:bestTitle"><span data-i18n="bestL">Rekor:</span> <b id="sb-best">0</b></span>
+    </div>
+
+    <div id="sb-word" class="sb-word" aria-live="polite"></div>
+
+    <div class="sb-hive-wrap">
+      <div class="sb-hive" id="sb-hive" role="group" aria-label="Petek harfleri" data-i18n-attr="aria-label:hiveL">
+        <button class="sb-hex center sb-h0" data-pos="0" type="button" disabled></button>
+        <button class="sb-hex sb-h1" data-pos="1" type="button" disabled></button>
+        <button class="sb-hex sb-h2" data-pos="2" type="button" disabled></button>
+        <button class="sb-hex sb-h3" data-pos="3" type="button" disabled></button>
+        <button class="sb-hex sb-h4" data-pos="4" type="button" disabled></button>
+        <button class="sb-hex sb-h5" data-pos="5" type="button" disabled></button>
+        <button class="sb-hex sb-h6" data-pos="6" type="button" disabled></button>
+      </div>
+    </div>
+
+    <div class="sb-actions">
+      <button class="sb-button" id="sb-delete" type="button" data-i18n="del">⌫ Sil</button>
+      <button class="sb-button" id="sb-shuffle" type="button" data-i18n="shuffle">Karıştır</button>
+      <button class="sb-button primary" id="sb-submit" type="button" data-i18n="enter">Kelimeyi Ekle</button>
+    </div>
+
+    <div id="sb-message" class="sb-message" role="status" aria-live="polite"></div>
+
+    <div class="sb-found">
+      <b data-i18n="foundTitle">Bulduğun kelimeler</b>
+      <div id="sb-found-words" class="sb-found-words">Henüz kelime yok.</div>
+    </div>
+
+    <div class="sb-actions sb-new-row">
+      <button class="sb-button" id="sb-new" type="button" data-i18n="newHive">Yeni Petek</button>
+    </div>
+  </section>
+</div>
+
+<dialog class="sb-dialog" id="sb-help-dialog" aria-labelledby="sb-help-title">
+  <div class="sb-dialog-head">
+    <h2 id="sb-help-title" data-i18n="howTo">Nasıl oynanır</h2>
+    <button class="sb-dialog-close" type="button" data-close aria-label="Kapat" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="sb-dialog-body" data-i18n-html="help">
+    <p>Arı peteğindeki harflerle Türkçe kelimeler oluştur.</p>
+
+    <h3>Kurallar</h3>
+    <ul>
+      <li>Ortadaki sarı peteğin harfi <b>zorunludur</b>.</li>
+      <li>Çevredeki altı petekle birlikte toplam 7 harf kullanılır.</li>
+      <li>Bir harfi kelimede birden fazla kez kullanabilirsiniz.</li>
+      <li>En az 3 harfli Türkçe kelimeler kabul edilir.</li>
+    </ul>
+
+    <h3>Puanlama</h3>
+    <ul>
+      <li>Kelime uzunluğu kadar puan kazanılır; 6 veya daha uzun kelimelere 3 bonus puan eklenir.</li>
+      <li>Kelime yedi farklı harfin tamamını içerirse 7 bonus puan daha kazanılır.</li>
+    </ul>
+
+    <h3>Kontroller</h3>
+    <ul>
+      <li>Peteklere dokunabilir veya fiziksel klavyeyi kullanabilirsiniz.</li>
+      <li>Enter kelimeyi ekler, Backspace son harfi siler.</li>
+    </ul>
+
+    <h3>Rekor</h3>
+    <p><b>Rekor</b>, o petekte ulaştığın en yüksek puandır; her petek için ayrı tutulur ve yalnızca bu cihazda saklanır. <button class="sb-reset" id="sb-reset" type="button">Rekorları sıfırla</button></p>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  /* Interface text: the Turkish strings come from the markup, English is written out here.
+     The letters and the word list stay Turkish in both languages. */
+  function i18nHarvest(tb){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in tb))tb[k]=el.textContent;});
+    document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in tb))tb[k]=el.innerHTML;});
+    document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in tb)&&el.hasAttribute(a))tb[k]=el.getAttribute(a);}));
+    return tb;
+  }
+
+  const I18N = {
+    tr: i18nHarvest({
+      centerL: "{c}, zorunlu merkez harf",
+      noWords: "Henüz kelime yok.",
+      min3: "En az 3 harfli bir kelime yazın.",
+      needCenter: "Ortadaki sarı harfi kullanmalısınız.",
+      onlyHive: "Yalnızca peteklerdeki harfleri kullanabilirsiniz.",
+      already: "Bu kelimeyi zaten buldunuz.",
+      notInDict: "Bu kelime sözlükte bulunamadı.",
+      gain: "+{n} puan",
+      newBest: " · 🏆 Yeni rekor!",
+      loading: "Kelime listesi yükleniyor...",
+      loadFail: "Kelime listesi yüklenemedi.",
+      confirmNew: "Yeni petekte puanın sıfırlanır ({s} puan, {w} kelime). Devam edilsin mi?",
+      confirmReset: "Bu cihazdaki Spell Bee rekorları silinsin mi?"
+    }),
+    en: {
+      howTo: "How to play", close: "Close",
+      scoreL: "Score:", foundL: "Found:", bestL: "Best:", bestTitle: "Highest score on this hive",
+      hiveL: "Hive letters", del: "⌫ Delete", shuffle: "Shuffle", enter: "Enter",
+      foundTitle: "Your words", newHive: "New hive",
+      centerL: "{c}, required center letter",
+      noWords: "No words yet.",
+      min3: "Type a word of at least 3 letters.",
+      needCenter: "Use the yellow center letter.",
+      onlyHive: "Use only the letters in the hive.",
+      already: "You already found this word.",
+      notInDict: "This word is not in the dictionary.",
+      gain: "+{n} points",
+      newBest: " · 🏆 New best!",
+      loading: "Loading the word list...",
+      loadFail: "Couldn't load the word list.",
+      confirmNew: "A new hive resets your score ({s} points, {w} {wu}). Continue?",
+      confirmReset: "Delete the Spell Bee records on this device?",
+      help: '<p>Make <b>Turkish</b> words with the letters of the honeycomb.</p>'
+        + '<h3>Rules</h3><ul>'
+        + '<li>The letter in the yellow center cell is <b>required</b>.</li>'
+        + '<li>With the six outer cells there are 7 letters in all.</li>'
+        + '<li>You can use a letter more than once in a word.</li>'
+        + '<li>Turkish words of at least 3 letters count.</li></ul>'
+        + '<h3>Turkish letters</h3><ul>'
+        + '<li>The hive can include Ç, Ğ, I, İ, Ö, Ş and Ü. Dotless I and dotted İ are two different letters, as are C/Ç, G/Ğ, O/Ö, S/Ş and U/Ü.</li>'
+        + '<li>On a non-Turkish keyboard, i types İ and Shift+I types I; tap the cells for the other special letters.</li></ul>'
+        + '<h3>Scoring</h3><ul>'
+        + '<li>A word scores one point per letter; words of 6 letters or more get 3 bonus points.</li>'
+        + '<li>A word that uses all seven letters earns 7 more bonus points.</li></ul>'
+        + '<h3>Controls</h3><ul>'
+        + '<li>Tap the cells or use a physical keyboard.</li>'
+        + '<li>Enter adds the word, Backspace deletes the last letter.</li></ul>'
+        + '<h3>Best</h3>'
+        + '<p><b>Best</b> is the highest score you reached on that hive; it is kept for each hive separately and stored on this device only. <button class="sb-reset" id="sb-reset" type="button">Reset records</button></p>'
+    }
+  };
+  let i18n = null;
+  const t = (k, v) => i18n ? i18n.t(k, v) : k;
+
+  let DICTIONARY = new Set();
+
+  /* Every set below is checked against the shipped word list: 83-110 valid
+     words and at least six pangrams each, so the seven-letter bonus is real. */
+  const PUZZLES = [
+    {center:"D", outer:["A","I","K","L","M","R"]},
+    {center:"O", outer:["A","K","L","M","N","U"]},
+    {center:"O", outer:["A","B","K","L","M","Ş"]},
+    {center:"Z", outer:["E","K","L","M","S","İ"]},
+    {center:"B", outer:["A","I","K","M","R","T"]},
+    {center:"Y", outer:["A","D","I","K","M","R"]},
+    {center:"Z", outer:["A","I","K","M","R","S"]},
+    {center:"C", outer:["A","I","K","L","N","Y"]},
+    {center:"Ç", outer:["E","K","M","R","T","İ"]},
+    {center:"P", outer:["E","K","L","M","T","İ"]}
+  ];
+
+  let puzzle = null;
+  let lastPuzzleIndex = -1;
+  let current = "";
+  let found = [];
+  let scoreVal = 0;
+  let outerOrder = [];
+  let clickHistory = [];
+  let puzzleKey = "";
+  let beatAnnounced = false;
+
+  /* Records live on this device only; blocked storage simply means no records.
+     A hive has no end, so it counts as played once a first word is found in it,
+     and its best score is saved as the score grows. */
+  const STATS_KEY = "pz:spellbee:stats";
+  function loadStats() {
+    try {
+      const v = JSON.parse(localStorage.getItem(STATS_KEY));
+      if (v && typeof v === "object") {
+        return {
+          played: +v.played || 0,
+          bestAll: +v.bestAll || 0,
+          best: v.best && typeof v.best === "object" ? v.best : {}
+        };
+      }
+    } catch (e) {}
+    return { played: 0, bestAll: 0, best: {} };
+  }
+  let stats = loadStats();
+  function saveStats() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+  }
+  function hiveBest() {
+    return +stats.best[puzzleKey] || 0;
+  }
+  function renderBest() {
+    document.getElementById("sb-best").textContent = hiveBest();
+  }
+
+  /* Returns true the first time this visit beats an earlier record for the hive. */
+  function recordScore() {
+    const prev = hiveBest();
+    if (found.length === 1) stats.played++;
+    if (scoreVal > prev) stats.best[puzzleKey] = scoreVal;
+    if (scoreVal > stats.bestAll) stats.bestAll = scoreVal;
+    saveStats();
+    renderBest();
+    if (prev > 0 && scoreVal > prev && !beatAnnounced) {
+      beatAnnounced = true;
+      return true;
+    }
+    return false;
+  }
+
+  const scoreEl = document.getElementById("sb-score");
+  const countEl = document.getElementById("sb-count");
+  const wordEl = document.getElementById("sb-word");
+  const messageEl = document.getElementById("sb-message");
+  const foundWordsEl = document.getElementById("sb-found-words");
+  const deleteBtn = document.getElementById("sb-delete");
+  const shuffleBtn = document.getElementById("sb-shuffle");
+  const submitBtn = document.getElementById("sb-submit");
+  const newBtn = document.getElementById("sb-new");
+  const helpBtn = document.getElementById("sb-help");
+  const helpDialog = document.getElementById("sb-help-dialog");
+  const hexes = [...document.querySelectorAll(".sb-hex")];
+
+  function pickPuzzle() {
+    /* Without this, "Yeni Petek" hands back the board you just left often
+       enough to look broken. */
+    let index = Math.floor(Math.random() * PUZZLES.length);
+    if (PUZZLES.length > 1 && index === lastPuzzleIndex) {
+      index = (index + 1 + Math.floor(Math.random() * (PUZZLES.length - 1))) % PUZZLES.length;
+    }
+    lastPuzzleIndex = index;
+    puzzle = PUZZLES[index];
+    puzzleKey = puzzle.center + "-" + puzzle.outer.join("");
+    beatAnnounced = false;
+    renderBest();
+    outerOrder = [...puzzle.outer];
+    found = [];
+    current = "";
+    scoreVal = 0;
+    clickHistory = [];
+    scoreEl.textContent = "0";
+    countEl.textContent = "0";
+    messageEl.textContent = "";
+    msgState = null;
+    renderHive();
+    renderWord();
+    renderFound();
+    clearSelections();
+  }
+
+  function renderHive() {
+    hexes[0].textContent = puzzle.center;
+    hexes[0].setAttribute("aria-label", t("centerL", { c: puzzle.center }));
+    outerOrder.forEach((ch,index) => {
+      hexes[index + 1].textContent = ch;
+      hexes[index + 1].setAttribute("aria-label", ch);
+    });
+  }
+
+  function renderWord() {
+    wordEl.textContent = current || " ";
+  }
+
+  function renderFound() {
+    foundWordsEl.textContent = found.length
+      ? found.join(" · ")
+      : t("noWords");
+  }
+
+  function clearSelections() {
+    hexes.forEach(hex => hex.classList.remove("selected"));
+    clickHistory = [];
+  }
+
+  function appendLetter(ch, hexIndex = null) {
+    if (current.length >= 15) return;
+
+    if (hexIndex === null) {
+      if (ch === puzzle.center) {
+        hexIndex = 0;
+      } else {
+        const outerIndex = outerOrder.indexOf(ch);
+        if (outerIndex >= 0) hexIndex = outerIndex + 1;
+      }
+    }
+
+    current += ch;
+
+    if (hexIndex !== null) {
+      clickHistory.push(hexIndex);
+      hexes[hexIndex].classList.add("selected");
+    }
+
+    renderWord();
+  }
+
+  function submitWord() {
+    const candidate = current.toLocaleUpperCase("tr-TR");
+    current = "";
+    renderWord();
+    clearSelections();
+
+    if (candidate.length < 3) {
+      showMessage("min3", null, false);
+      return;
+    }
+
+    if (!candidate.includes(puzzle.center)) {
+      showMessage("needCenter", null, false);
+      return;
+    }
+
+    const allowed = new Set([puzzle.center, ...puzzle.outer]);
+
+    if ([...candidate].some(ch => !allowed.has(ch))) {
+      showMessage("onlyHive", null, false);
+      return;
+    }
+
+    if (found.includes(candidate)) {
+      showMessage("already", null, false);
+      return;
+    }
+
+    if (!DICTIONARY.has(candidate)) {
+      showMessage("notInDict", null, false);
+      return;
+    }
+
+    found.push(candidate);
+
+    let points = candidate.length;
+    if (candidate.length >= 6) points += 3;
+    if (new Set(candidate).size === 7) points += 7;
+
+    scoreVal += points;
+    scoreEl.textContent = scoreVal;
+    countEl.textContent = found.length;
+    renderFound();
+    const isBest = recordScore();
+    showMessage("gain", { n: points, best: isBest }, true);
+  }
+
+  /* The message is kept as a key so a language switch can rewrite it. */
+  let msgState = null;
+  function messageText(state) {
+    return t(state.key, state.vars) + (state.vars && state.vars.best ? t("newBest") : "");
+  }
+
+  function showMessage(key, vars, good, keep) {
+    msgState = { key, vars };
+    messageEl.textContent = messageText(msgState);
+    messageEl.className = good ? "sb-message is-ok" : "sb-message is-bad";
+    clearTimeout(showMessage.timer);
+    if (keep) return;
+    showMessage.timer = setTimeout(() => {
+      msgState = null;
+      messageEl.textContent = "";
+      messageEl.className = "sb-message";
+    },1600);
+  }
+
+  hexes.forEach((hex,index) => {
+    hex.addEventListener("click", () => {
+      const ch = index === 0 ? puzzle.center : outerOrder[index - 1];
+      appendLetter(ch,index);
+    });
+  });
+
+  function deleteLastLetter() {
+    if (!current.length) return;
+
+    current = current.slice(0,-1);
+
+    const last = clickHistory.pop();
+    if (last !== undefined && !clickHistory.includes(last)) {
+      hexes[last].classList.remove("selected");
+    }
+
+    renderWord();
+  }
+
+  deleteBtn.addEventListener("click", deleteLastLetter);
+
+  function syncSelections() {
+    hexes.forEach(hex => hex.classList.remove("selected"));
+    clickHistory = [...current].map(ch =>
+      ch === puzzle.center ? 0 : outerOrder.indexOf(ch) + 1
+    ).filter(index => index > 0 || index === 0);
+    clickHistory.forEach(index => hexes[index].classList.add("selected"));
+  }
+
+  shuffleBtn.addEventListener("click", () => {
+    outerOrder.sort(() => Math.random() - .5);
+    renderHive();
+    /* Rebuilt against the new order instead of thrown away: shuffling used to
+       wipe the word you were part-way through typing. */
+    syncSelections();
+    renderWord();
+  });
+
+  submitBtn.addEventListener("click", submitWord);
+  newBtn.addEventListener("click", () => {
+    /* A new hive starts the score from zero, so ask before throwing it away. */
+    if (found.length > 0 && !window.confirm(t("confirmNew", { s: scoreVal, w: found.length, wu: found.length === 1 ? "word" : "words" }))) {
+      return;
+    }
+    pickPuzzle();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (helpDialog.open) return;
+
+    if (!puzzle) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    /* Fields keep their typing; focused buttons keep Enter and Space. */
+    const target = event.target;
+    if (target && target.closest) {
+      if (target.closest("input, textarea, select, [contenteditable='true']")) return;
+      if ((event.key === "Enter" || event.key === " ") && target.closest("button, a") && !target.closest(".sb-hex")) return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitWord();
+      return;
+    }
+
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      deleteLastLetter();
+      return;
+    }
+
+    const ch = event.key.toLocaleUpperCase("tr-TR");
+    const allowed = [puzzle.center, ...puzzle.outer];
+
+    if (ch.length === 1 && allowed.includes(ch)) {
+      appendLetter(ch);
+      event.preventDefault();
+    }
+  });
+
+  helpBtn.addEventListener("click", () => helpDialog.showModal());
+
+  /* The help body is rewritten on a language switch, so its reset button is reached by delegation. */
+  helpDialog.addEventListener("click", event => {
+    if (!event.target.closest || !event.target.closest("#sb-reset")) return;
+    if (!window.confirm(t("confirmReset"))) return;
+    stats = { played: 0, bestAll: 0, best: {} };
+    saveStats();
+    renderBest();
+  });
+
+  helpDialog.addEventListener("click", event => {
+    if (event.target === helpDialog || event.target.closest("[data-close]")) {
+      helpDialog.close();
+    }
+  });
+
+  async function loadDictionary() {
+    submitBtn.disabled = true;
+    newBtn.disabled = true;
+    shuffleBtn.disabled = true;
+    deleteBtn.disabled = true;
+    showMessage("loading", null, true, true);
+    messageEl.className = "sb-message";
+
+    try {
+      const response = await fetch("/game/oneword-words.json", {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || !Array.isArray(data.words) || data.words.length === 0) {
+        throw new Error("Kelime verisi eksik veya geçersiz.");
+      }
+
+      DICTIONARY = new Set(
+        data.words.map(word => String(word).trim().toLocaleUpperCase("tr-TR"))
+      );
+
+      submitBtn.disabled = false;
+      newBtn.disabled = false;
+      shuffleBtn.disabled = false;
+      deleteBtn.disabled = false;
+      hexes.forEach(hex => { hex.disabled = false; });
+      msgState = null;
+      messageEl.textContent = "";
+      messageEl.className = "sb-message";
+      pickPuzzle();
+    } catch (error) {
+      console.error("Spell Bee kelime listesi yüklenemedi:", error);
+      showMessage("loadFail", null, false, true);
+      hexes.forEach(hex => {
+        hex.textContent = "";
+        hex.disabled = true;
+      });
+    }
+  }
+
+  function relabel() {
+    if (!i18n) return;
+    if (puzzle) { renderHive(); renderFound(); }
+    if (msgState) messageEl.textContent = messageText(msgState);
+  }
+  i18n = ToolI18n.setup(I18N, relabel);
+
+  loadDictionary();
+})();
+</script>

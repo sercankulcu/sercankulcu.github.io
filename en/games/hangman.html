@@ -1,0 +1,1027 @@
+---
+# tools/make_tr_pages.py writes this copy of game/hangman.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Hangman"
+permalink: /en/games/hangman/
+excerpt: "Find the hidden word before six wrong letters; play in Turkish or five other languages."
+lang: en
+ui_lang: en
+seo_title: "Hangman · Word Guessing Game in Turkish and Five More Languages"
+og_image: https://sercankulcu.github.io/images/games/hangman.jpg
+game_genre: "Word game"
+hreflang: {en: "/en/games/hangman/", tr: "/game/hangman/"}
+---
+
+<style>
+.hangman-app,
+.hangman-app *,
+.hangman-app *::before,
+.hangman-app *::after {
+  box-sizing: border-box;
+}
+
+.hangman-app {
+  width: min(860px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.hangman-panel {
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.hangman-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.hangman-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.hangman-logo {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--global-link-color);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.hangman-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 3.5vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.hangman-help,
+.hangman-button,
+.hangman-key {
+  font: inherit;
+}
+
+.hangman-help {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+
+.hangman-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.hangman-stat {
+  padding: 9px 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .06);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.hangman-figure {
+  display: block;
+  width: max(96px, min(230px, 58%, calc(100vh - 580px)));
+  width: max(96px, min(230px, 58%, calc(100svh - 580px)));
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  margin: 10px auto;
+}
+
+/* The drawings are black strokes on a transparent background. */
+:root[data-theme="dark"] .hangman-figure {
+  filter: invert(1);
+}
+
+.hangman-word {
+  min-height: 52px;
+  margin: 12px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--global-text-color);
+  text-align: center;
+  font-size: clamp(22px, 6vw, 38px);
+  font-weight: 900;
+  letter-spacing: .18em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* Keys wrap ten to a row and the last row
+   stays centred, whatever the length of the selected alphabet. */
+.hangman-keyboard {
+  --hangman-cols: 10;
+  --hangman-gap: 7px;
+  width: min(100%, 640px);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--hangman-gap);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hangman-key {
+  position: relative;
+  flex: 0 0 calc((100% - (var(--hangman-cols) - 1) * var(--hangman-gap)) / var(--hangman-cols));
+  min-width: 0;
+  min-height: 46px;
+  padding: 0;
+  font-size: 1rem;
+  -webkit-tap-highlight-color: transparent;
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  background: rgba(127, 127, 127, .07);
+  color: var(--global-text-color);
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+@media (hover: hover) {
+  .hangman-key:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: var(--global-link-color);
+  }
+
+  .hangman-help:hover,
+  .hangman-button:hover {
+    background: rgba(127, 127, 127, .10);
+  }
+}
+
+.hangman-help:focus-visible,
+.hangman-button:focus-visible,
+.hangman-lang:focus-visible,
+.hangman-key:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+/* A corner mark so a used letter's result does not rely on colour alone. */
+.hangman-key.is-correct::after,
+.hangman-key.is-wrong::after {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: .6rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.hangman-key.is-correct::after { content: "\2713"; color: #276749; }
+.hangman-key.is-wrong::after { content: "\2715"; color: #c53030; }
+:root[data-theme="dark"] .hangman-key.is-correct::after { color: #68d391; }
+:root[data-theme="dark"] .hangman-key.is-wrong::after { color: #fc8181; }
+
+.hangman-key.is-correct {
+  background: rgba(47, 133, 90, .14);
+  border-color: rgba(47, 133, 90, .45);
+}
+
+.hangman-key.is-wrong {
+  background: rgba(197, 48, 48, .12);
+  border-color: rgba(197, 48, 48, .42);
+}
+
+.hangman-key:disabled {
+  cursor: default;
+}
+
+.hangman-key.is-wrong {
+  text-decoration: line-through;
+}
+
+.hangman-message {
+  min-height: 1.5em;
+  margin: 0 0 12px;
+  color: var(--global-text-color);
+  text-align: center;
+  font-weight: 800;
+}
+
+.hangman-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.hangman-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+.hangman-dialog {
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid var(--global-border-color);
+  border-radius: 16px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+
+.hangman-dialog::backdrop {
+  background: rgba(0, 0, 0, .45);
+}
+
+.hangman-dialog-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--global-border-color);
+  background: var(--global-bg-color);
+}
+
+.hangman-dialog-head h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--global-text-color);
+  font-size: 1.1rem;
+}
+
+.hangman-dialog-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.hangman-help:focus-visible,
+.hangman-dialog-close:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.hangman-dialog-body {
+  padding: 14px 18px 18px;
+  overflow: auto;
+  line-height: 1.55;
+}
+
+.hangman-dialog-body p {
+  margin: 0 0 .6em;
+}
+
+.hangman-dialog-body h3 {
+  margin: 1em 0 .35em;
+  color: var(--global-text-color);
+  font-size: .95rem;
+}
+
+.hangman-dialog-body ul,
+.hangman-dialog-body ol {
+  margin: .2em 0 .6em;
+  padding-left: 1.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hangman-dialog[open] {
+    animation: hangman-pop .16s ease-out;
+  }
+
+  @keyframes hangman-pop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+.hangman-rules {
+  line-height: 1.6;
+}
+
+.hangman-rules li + li {
+  margin-top: .35rem;
+}
+
+
+.hangman-lang {
+  min-height: 44px;
+  font-size: 16px;
+  padding: 0 10px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hangman-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .hangman-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .hangman-panel {
+    padding: 12px 10px;
+    border-radius: 14px;
+  }
+
+  .hangman-topbar {
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .hangman-brand {
+    gap: 10px;
+    flex-basis: 160px;
+  }
+
+  .hangman-logo {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border-radius: 11px;
+    font-size: 19px;
+  }
+
+  .hangman-title {
+    font-size: 1.35rem;
+  }
+
+  .hangman-stats {
+    gap: 6px;
+    margin: 6px 0;
+  }
+
+  .hangman-stat {
+    padding: 5px 11px;
+    font-size: .82rem;
+  }
+
+  .hangman-figure {
+    width: max(96px, min(220px, 58%, calc(100vh - 470px)));
+    width: max(96px, min(220px, 58%, calc(100svh - 470px)));
+    margin: 4px auto;
+  }
+
+  .hangman-word {
+    min-height: 44px;
+    margin: 6px 0 10px;
+    letter-spacing: .12em;
+  }
+
+  .hangman-keyboard {
+    --hangman-cols: 10;
+    --hangman-gap: 5px;
+  }
+
+  .hangman-key {
+    min-height: 46px;
+    border-radius: 8px;
+    font-size: .92rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .hangman-logo {
+    display: none;
+  }
+
+  .hangman-brand {
+    flex-basis: 120px;
+  }
+
+  .hangman-title {
+    font-size: 1.3rem;
+  }
+
+  .hangman-keyboard {
+    --hangman-gap: 4px;
+  }
+
+  .hangman-key {
+    font-size: .85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hangman-key:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .hangman-app *,
+  .hangman-app *::before,
+  .hangman-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+
+<div class="hangman-app">
+  <section class="hangman-panel" aria-labelledby="hangman-title">
+    <div class="hangman-topbar">
+      <div class="hangman-brand">
+        <div class="hangman-logo" aria-hidden="true">🎯</div>
+        <div>
+          <h1 class="hangman-title" id="hangman-title">Adam Asmaca</h1>
+        </div>
+      </div>
+
+      <div class="hangman-top-actions">
+        <select class="hangman-lang" id="hangman-language" aria-label="Dil">
+          <option value="tr" selected>TR</option>
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+          <option value="fr">FR</option>
+          <option value="es">ES</option>
+          <option value="ru">RU</option>
+        </select>
+        <button class="hangman-help" id="hangman-help" type="button" aria-haspopup="dialog" aria-controls="hangman-help-dialog" aria-label="Nasıl Oynanır">?</button>
+      </div>
+    </div>
+
+    <div class="hangman-stats" id="hangman-stats" aria-label="Oyun istatistikleri">
+      <span class="hangman-stat"><span id="hangman-score-label">Skor</span>: <b id="hangman-score">0</b></span>
+      <span class="hangman-stat"><span id="hangman-lives-label">Can</span>: <b id="hangman-lives">6</b></span>
+      <span class="hangman-stat"><span id="hangman-streak-label">Seri</span>: <b id="hangman-streak">0</b></span>
+    </div>
+
+    <img
+      class="hangman-figure"
+      id="hangman-figure"
+      src="/game/hangman/hangman-0.png"
+      alt="Adam asmaca çizimi"
+      width="230"
+      height="230"
+      onerror="this.style.visibility='hidden'"
+    >
+
+    <div class="hangman-word" id="hangman-word"></div>
+
+    <div class="hangman-message" id="hangman-message" role="status" aria-live="polite"></div>
+
+    <div class="hangman-keyboard" id="hangman-keyboard" role="group" aria-label="Türkçe alfabe klavyesi"></div>
+
+    <div class="hangman-actions">
+      <button class="hangman-button" id="hangman-restart" type="button">Yeni Kelime</button>
+    </div>
+  </section>
+</div>
+
+<dialog class="hangman-dialog" id="hangman-help-dialog" aria-labelledby="hangman-help-title">
+  <div class="hangman-dialog-head">
+    <h2 id="hangman-help-title">Nasıl Oynanır</h2>
+    <button class="hangman-dialog-close" id="hangman-close" type="button" data-close aria-label="Kapat">×</button>
+  </div>
+  <div class="hangman-dialog-body">
+    <p id="hangman-subtitle">Altı yanlış harften önce gizli kelimeyi bul.</p>
+
+    <ul class="hangman-rules">
+      <li id="hangman-rule-1">Ekrandaki bir harfi seç veya klavyeden yaz.</li>
+      <li id="hangman-rule-2">Doğru harfler gizli kelimede açılır.</li>
+      <li id="hangman-rule-3">Her yanlış harf bir can götürür.</li>
+      <li id="hangman-rule-4">Tur altı yanlış tahminden sonra biter.</li>
+      <li id="hangman-rule-5">Kazanmak skorunu ve serini artırır.</li>
+      <li id="hangman-rule-6">Üstteki listeden kelimelerin dilini seç; arayüz de o dile geçer. Seçim hatırlanır.</li>
+    </ul>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
+
+  let WORDS = [];
+  let allWords = {};
+  let currentLanguage = "tr";
+
+  const LANGUAGE_CONFIG = {
+    tr: {
+      title: "Adam Asmaca",
+      alphabet: "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ",
+      locale: "tr-TR",
+      keyboardLabel: "Türkçe alfabe klavyesi",
+      languageLabel: "Dil",
+      statsLabel: "Oyun istatistikleri",
+      figureAlt: stage => `Adam asmaca çizimi, 6 aşamadan ${stage}. aşama`,
+      subtitle: "Altı yanlış harften önce gizli kelimeyi bul.",
+      score: "Skor",
+      lives: "Can",
+      streak: "Seri",
+      newWord: "Yeni Kelime",
+      help: "Nasıl Oynanır",
+      close: "Kapat",
+      rules: [
+        "Ekrandaki bir harfi seç veya klavyeden yaz.",
+        "Doğru harfler gizli kelimede açılır.",
+        "Her yanlış harf bir can götürür.",
+        "Tur altı yanlış tahminden sonra biter.",
+        "Kazanmak skorunu ve serini artırır.",
+        "Üstteki listeden kelimelerin dilini seç; arayüz de o dile geçer. Seçim hatırlanır."
+      ],
+      correct: word => `Doğru! Kelime ${word} idi.`,
+      lost: word => `Kelime ${word} idi.`,
+      loading: "Kelimeler yükleniyor...",
+      loadError: "Kelime listesi yüklenemedi.",
+      abandon: n => `Bu turu bırakırsan ${n} kelimelik serin sıfırlanacak. Yeni kelimeye geçilsin mi?`
+    },
+    en: {
+      title: "Hangman",
+      alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      locale: "en-US",
+      keyboardLabel: "Alphabet keyboard",
+      languageLabel: "Language",
+      statsLabel: "Game stats",
+      figureAlt: stage => `Hangman drawing, stage ${stage} of 6`,
+      subtitle: "Guess the hidden word before six incorrect letters.",
+      score: "Score",
+      lives: "Lives",
+      streak: "Streak",
+      newWord: "New Word",
+      help: "How to Play",
+      close: "Close",
+      rules: [
+        "Select a letter on screen or type it on your keyboard.",
+        "Correct letters are revealed in the hidden word.",
+        "Each incorrect letter costs one life.",
+        "The round ends after six incorrect guesses.",
+        "Winning increases both your score and streak.",
+        "The list at the top picks the language of the words; the interface follows it. Your choice is remembered."
+      ],
+      correct: word => `Correct! The word was ${word}.`,
+      lost: word => `The word was ${word}.`,
+      loading: "Loading words...",
+      loadError: "Word list could not be loaded.",
+      abandon: n => `Leaving this round resets your streak of ${n}. Start a new word?`
+    },
+    de: {
+      title: "Galgenmännchen",
+      alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",
+      locale: "de-DE",
+      keyboardLabel: "Buchstabentastatur",
+      languageLabel: "Sprache",
+      statsLabel: "Spielstatistik",
+      figureAlt: stage => `Galgenmännchen-Zeichnung, Stufe ${stage} von 6`,
+      subtitle: "Errate das versteckte Wort vor sechs falschen Buchstaben.",
+      score: "Punkte",
+      lives: "Leben",
+      streak: "Serie",
+      newWord: "Neues Wort",
+      help: "Spielanleitung",
+      close: "Schließen",
+      rules: [
+        "Wähle einen Buchstaben auf dem Bildschirm oder tippe ihn auf der Tastatur.",
+        "Richtige Buchstaben werden im versteckten Wort angezeigt.",
+        "Jeder falsche Buchstabe kostet ein Leben.",
+        "Die Runde endet nach sechs falschen Versuchen.",
+        "Ein Sieg erhöht Punkte und Serie.",
+        "Die Liste oben wählt die Sprache der Wörter; die Oberfläche folgt ihr. Die Wahl wird gespeichert."
+      ],
+      correct: word => `Richtig! Das Wort war ${word}.`,
+      lost: word => `Das Wort war ${word}.`,
+      loading: "Wörter werden geladen...",
+      loadError: "Wortliste konnte nicht geladen werden.",
+      abandon: n => `Wenn du diese Runde abbrichst, wird deine Serie von ${n} zurückgesetzt. Neues Wort?`
+    },
+    fr: {
+      title: "Le Pendu",
+      alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      locale: "fr-FR",
+      keyboardLabel: "Clavier alphabétique",
+      languageLabel: "Langue",
+      statsLabel: "Statistiques de jeu",
+      figureAlt: stage => `Dessin du pendu, étape ${stage} sur 6`,
+      subtitle: "Devinez le mot caché avant six lettres incorrectes.",
+      score: "Score",
+      lives: "Vies",
+      streak: "Série",
+      newWord: "Nouveau mot",
+      help: "Comment jouer",
+      close: "Fermer",
+      rules: [
+        "Choisissez une lettre à l'écran ou tapez-la au clavier.",
+        "Les bonnes lettres sont révélées dans le mot caché.",
+        "Chaque mauvaise lettre coûte une vie.",
+        "La manche se termine après six erreurs.",
+        "Une victoire augmente le score et la série.",
+        "La liste en haut choisit la langue des mots ; l'interface suit. Votre choix est mémorisé."
+      ],
+      correct: word => `Correct ! Le mot était ${word}.`,
+      lost: word => `Le mot était ${word}.`,
+      loading: "Chargement des mots...",
+      loadError: "Impossible de charger la liste de mots.",
+      abandon: n => `Abandonner cette manche remet votre série de ${n} à zéro. Nouveau mot ?`
+    },
+    es: {
+      title: "El Ahorcado",
+      alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
+      locale: "es-ES",
+      keyboardLabel: "Teclado alfabético",
+      languageLabel: "Idioma",
+      statsLabel: "Estadísticas del juego",
+      figureAlt: stage => `Dibujo del ahorcado, etapa ${stage} de 6`,
+      subtitle: "Adivina la palabra oculta antes de seis letras incorrectas.",
+      score: "Puntos",
+      lives: "Vidas",
+      streak: "Racha",
+      newWord: "Nueva palabra",
+      help: "Cómo jugar",
+      close: "Cerrar",
+      rules: [
+        "Selecciona una letra en pantalla o escríbela con el teclado.",
+        "Las letras correctas se revelan en la palabra oculta.",
+        "Cada letra incorrecta cuesta una vida.",
+        "La ronda termina después de seis errores.",
+        "Ganar aumenta tu puntuación y tu racha.",
+        "La lista de arriba elige el idioma de las palabras; la interfaz lo sigue. Tu elección se recuerda."
+      ],
+      correct: word => `¡Correcto! La palabra era ${word}.`,
+      lost: word => `La palabra era ${word}.`,
+      loading: "Cargando palabras...",
+      loadError: "No se pudo cargar la lista de palabras.",
+      abandon: n => `Si abandonas esta ronda, tu racha de ${n} se reinicia. ¿Nueva palabra?`
+    },
+    ru: {
+      title: "Виселица",
+      alphabet: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+      locale: "ru-RU",
+      keyboardLabel: "Алфавитная клавиатура",
+      languageLabel: "Язык",
+      statsLabel: "Статистика игры",
+      figureAlt: stage => `Рисунок висельницы, этап ${stage} из 6`,
+      subtitle: "Угадайте скрытое слово до шести неверных букв.",
+      score: "Счёт",
+      lives: "Жизни",
+      streak: "Серия",
+      newWord: "Новое слово",
+      help: "Как играть",
+      close: "Закрыть",
+      rules: [
+        "Выберите букву на экране или введите её с клавиатуры.",
+        "Правильные буквы открываются в скрытом слове.",
+        "Каждая неверная буква отнимает одну жизнь.",
+        "Раунд заканчивается после шести ошибок.",
+        "Победа увеличивает счёт и серию.",
+        "Список вверху выбирает язык слов; интерфейс переключается вместе с ним. Выбор запоминается."
+      ],
+      correct: word => `Верно! Слово было ${word}.`,
+      lost: word => `Слово было ${word}.`,
+      loading: "Загрузка слов...",
+      loadError: "Не удалось загрузить список слов.",
+      abandon: n => `Если бросить этот раунд, серия из ${n} обнулится. Новое слово?`
+    }
+  };
+
+  function getConfig() {
+    return LANGUAGE_CONFIG[currentLanguage];
+  }
+
+  const score = document.getElementById("hangman-score");
+  const lives = document.getElementById("hangman-lives");
+  const streak = document.getElementById("hangman-streak");
+  const figure = document.getElementById("hangman-figure");
+  const wordView = document.getElementById("hangman-word");
+  const keyboard = document.getElementById("hangman-keyboard");
+  const message = document.getElementById("hangman-message");
+  const restart = document.getElementById("hangman-restart");
+  const help = document.getElementById("hangman-help");
+  const helpDialog = document.getElementById("hangman-help-dialog");
+  const close = document.getElementById("hangman-close");
+  const language = document.getElementById("hangman-language");
+  const titleEl = document.getElementById("hangman-title");
+  const statsEl = document.getElementById("hangman-stats");
+  const subtitle = document.getElementById("hangman-subtitle");
+  const scoreLabel = document.getElementById("hangman-score-label");
+  const livesLabel = document.getElementById("hangman-lives-label");
+  const streakLabel = document.getElementById("hangman-streak-label");
+  const modalTitle = document.getElementById("hangman-help-title");
+  const ruleEls = [
+    document.getElementById("hangman-rule-1"),
+    document.getElementById("hangman-rule-2"),
+    document.getElementById("hangman-rule-3"),
+    document.getElementById("hangman-rule-4"),
+    document.getElementById("hangman-rule-5"),
+    document.getElementById("hangman-rule-6")
+  ];
+
+  let word = "";
+  let guessed = new Set();
+  let livesLeft = 6;
+  let scoreValue = Number(store.getItem("hangman-score")) || 0;
+  let streakValue = Number(store.getItem("hangman-streak")) || 0;
+  let ended = false;
+  let lastWord = "";
+
+  function chooseWord() {
+    const available = WORDS.length > 1
+      ? WORDS.filter(item => item !== lastWord)
+      : WORDS;
+
+    const selected = available[Math.floor(Math.random() * available.length)];
+    lastWord = selected;
+    return selected;
+  }
+
+  function renderWord() {
+    wordView.textContent = [...word]
+      .map(letter => letter === " " ? " " : (guessed.has(letter) ? letter : "_"))
+      .join(" ");
+  }
+
+  function renderFigure() {
+    const stage = 6 - livesLeft;
+    figure.src = `/game/hangman/hangman-${stage}.png`;
+    figure.alt = getConfig().figureAlt(stage);
+  }
+
+  function buildKeyboard() {
+    keyboard.innerHTML = "";
+
+    for (const letter of getConfig().alphabet) {
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "hangman-key";
+      button.textContent = letter;
+      button.dataset.letter = letter;
+
+      button.addEventListener("click", () => guess(letter, button));
+      keyboard.appendChild(button);
+    }
+  }
+
+  function saveProgress() {
+    store.setItem("hangman-score", scoreValue);
+    store.setItem("hangman-streak", streakValue);
+  }
+
+  function finishWin() {
+    ended = true;
+    streakValue += 1;
+    scoreValue += word.length * 10 + livesLeft * 5;
+    saveProgress();
+
+    score.textContent = scoreValue;
+    streak.textContent = streakValue;
+    message.textContent = getConfig().correct(word);
+  }
+
+  function finishLoss() {
+    ended = true;
+    streakValue = 0;
+    saveProgress();
+    streak.textContent = "0";
+    message.textContent = getConfig().lost(word);
+  }
+
+  function guess(letter, button) {
+    if (ended || guessed.has(letter)) return;
+
+    guessed.add(letter);
+    button.disabled = true;
+
+    if (word.includes(letter)) {
+      button.classList.add("is-correct");
+    } else {
+      livesLeft -= 1;
+      lives.textContent = livesLeft;
+      button.classList.add("is-wrong");
+    }
+
+    renderWord();
+    renderFigure();
+
+    const solved = [...word].every(letter => letter === " " || guessed.has(letter));
+
+    if (solved) {
+      finishWin();
+    } else if (livesLeft === 0) {
+      finishLoss();
+    }
+  }
+
+  function startRound() {
+    word = chooseWord();
+    guessed = new Set();
+    livesLeft = 6;
+    ended = false;
+
+    lives.textContent = "6";
+    message.textContent = "";
+
+    buildKeyboard();
+    renderWord();
+    renderFigure();
+  }
+
+  function applyLanguage(lang) {
+    if (!LANGUAGE_CONFIG[lang] || !Array.isArray(allWords[lang])) return;
+
+    currentLanguage = lang;
+    const config = getConfig();
+
+    WORDS = allWords[lang]
+      .map(item => String(item).trim().toLocaleUpperCase(config.locale))
+      .filter(Boolean);
+
+    document.documentElement.lang = lang;
+    if (titleEl) titleEl.textContent = config.title;
+    subtitle.textContent = config.subtitle;
+    scoreLabel.textContent = config.score;
+    livesLabel.textContent = config.lives;
+    streakLabel.textContent = config.streak;
+    restart.textContent = config.newWord;
+    modalTitle.textContent = config.help;
+    close.setAttribute("aria-label", config.close);
+    help.setAttribute("aria-label", config.help);
+    language.setAttribute("aria-label", config.languageLabel);
+    keyboard.setAttribute("aria-label", config.keyboardLabel);
+    statsEl.setAttribute("aria-label", config.statsLabel);
+    score.textContent = scoreValue;
+    streak.textContent = streakValue;
+
+    ruleEls.forEach((el, index) => {
+      el.textContent = config.rules[index];
+    });
+
+    startRound();
+  }
+
+  help.addEventListener("click", () => helpDialog.showModal());
+
+  helpDialog.addEventListener("click", event => {
+    if (event.target === helpDialog || event.target.closest("[data-close]")) {
+      helpDialog.close();
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (helpDialog.open) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    /* Typing in the language list or another field is not a guess. */
+    const target = event.target;
+    if (target && target.closest && target.closest("input, textarea, select, [contenteditable='true']")) return;
+    if (event.key.length !== 1) return;
+
+    const letter = event.key.toLocaleUpperCase(getConfig().locale);
+
+    if (!getConfig().alphabet.includes(letter)) return;
+
+    const button = [...keyboard.children]
+      .find(item => item.dataset.letter === letter);
+
+    if (button) {
+      guess(letter, button);
+    }
+  });
+
+  restart.addEventListener("click", () => {
+    /* Abandoning a started round must not shelter the streak from a loss. */
+    if (!ended && guessed.size > 0) {
+      if (streakValue > 0 && !window.confirm(getConfig().abandon(streakValue))) {
+        return;
+      }
+      streakValue = 0;
+      saveProgress();
+      streak.textContent = "0";
+    }
+
+    startRound();
+  });
+
+  language.addEventListener("change", () => {
+    store.setItem("hangman-language", language.value);
+    /* Turkish and English are also the shared interface language of the site. */
+    if (language.value === "tr" || language.value === "en") {
+      store.setItem(window.ToolI18n ? ToolI18n.KEY : "pz:lang", language.value);
+    }
+    applyLanguage(language.value);
+  });
+
+  /* Opening language: the page address (an /en/ copy sets PZ_PAGE_LANG) first; then a
+     German, French, Spanish or Russian word list chosen here before; otherwise the
+     TR/EN choice shared with the other games and tools (Turkish browsers get Turkish). */
+  function initialLanguage() {
+    const page = window.PZ_PAGE_LANG;
+    if (page === "tr" || page === "en") return page;
+    const own = store.getItem("hangman-language");
+    if (own && own !== "tr" && own !== "en" && LANGUAGE_CONFIG[own]) return own;
+    const shared = window.ToolI18n ? ToolI18n.current() : own;
+    return shared === "en" || shared === "tr" ? shared : "tr";
+  }
+
+  currentLanguage = initialLanguage();
+  language.value = currentLanguage;
+  document.documentElement.lang = currentLanguage;
+
+  async function loadWords() {
+    restart.disabled = true;
+    message.textContent = getConfig().loading;
+
+    try {
+      const response = await fetch("/game/hangman/hangman-words.json", {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || typeof data !== "object") {
+        throw new Error("Word data is missing.");
+      }
+
+      allWords = data;
+
+      const preferred = currentLanguage;
+
+      const initial = LANGUAGE_CONFIG[preferred] && Array.isArray(allWords[preferred])
+        ? preferred
+        : "tr";
+
+      language.value = initial;
+      restart.disabled = false;
+      message.textContent = "";
+      applyLanguage(initial);
+    } catch (error) {
+      console.error("Hangman word list could not be loaded:", error);
+      restart.disabled = true;
+      keyboard.innerHTML = "";
+      wordView.textContent = "—";
+      message.textContent = getConfig().loadError;
+    }
+  }
+
+  loadWords();
+})();
+</script>

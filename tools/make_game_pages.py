@@ -16,6 +16,7 @@ import io, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import make_app_pages as A
+import en_pages as E
 
 REPO, SITE, e = A.REPO, A.SITE, A.e
 CARD_DIR = 'images/games'
@@ -86,9 +87,13 @@ def build():
             url = '/game/%s/' % name
             n += 1
             items.append({'@type': 'ListItem', 'position': n, 'url': SITE + url, 'name': title})
-            la = ' lang="tr"' if lang == 'tr' else ''
-            out.append('<a class="app-card" href="%s"%s><span class="app-head"><span class="app-ico" aria-hidden="true">'
-                       '%s</span>%s</span><span class="app-desc">%s</span></a>' % (url, la, ico, e(title), e(excerpt)))
+            # a Turkish game is listed with its English-address copy (tools/en_pages.py)
+            en = E.GAMES.get(url)
+            href, name_, desc_ = (E.en_url(url), en[1], en[3]) if en else (url, title, excerpt)
+            if en:
+                items[-1].update(url=SITE + href, name=name_)
+            out.append('<a class="app-card" href="%s"><span class="app-head"><span class="app-ico" aria-hidden="true">'
+                       '%s</span>%s</span><span class="app-desc">%s</span></a>' % (href, ico, e(name_), e(desc_)))
             t = TXT[lang]
             A.update_front_matter(url, ['lang: ' + lang,
                                         'seo_title: ' + json.dumps(SEO.get(name, t['seo'] % title), ensure_ascii=False),
@@ -116,7 +121,7 @@ hreflang: {en: "/games/", tr: "/tr/oyunlar/"}
 <style>%s</style>
 
 <p class="games-intro">%d free games that play right in your browser, on a phone or a computer.
-No download, no sign-up. Some of the word games and quizzes are in Turkish.
+No download, no sign-up. The word games use Turkish words.
 <a href="/tr/oyunlar/" hreflang="tr" lang="tr">Türkçe</a></p>
 
 %s

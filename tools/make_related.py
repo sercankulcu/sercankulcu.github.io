@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import make_app_pages as A
 import make_game_pages as G
 import tr_pages as T
+import en_pages as E
 
 N = 4
 
@@ -75,6 +76,24 @@ def title(url):
     return A.read_meta(url)[0]
 
 
+def en_ver(u):
+    """English version of a page: the /en/games/ copy of a Turkish game, else the page itself."""
+    return E.en_url(u) or u
+
+
+def tr_ver(u):
+    """Turkish version: the /tr/ copy of an English page, else the page itself (Turkish games)."""
+    return T.tr_url(u) or u
+
+
+def en_title(u):
+    return E.GAMES[u][1] if u in E.GAMES else title(u)
+
+
+def tr_title(u):
+    return title(u) if u in E.GAMES else TR_TITLES.get(u, title(u))
+
+
 def groups():
     apps = [[(ico, url) for ico, url in g[5] if url.startswith('/')] for g in A.GROUPS]
     games = [[(ico, '/game/%s/' % name) for ico, name, _ in g[4]] for g in G.GROUPS]
@@ -94,12 +113,11 @@ def build():
                     if j == gi:
                         break
                     picks += [x for x in gs[j] if x not in picks and x[1] != url][:N - len(picks)]
-                out[url] = {'hub': hub, 'items': [[u, ic, title(u), TR_TITLES.get(u, title(u))] for ic, u in picks]}
-                tr = T.tr_url(url)
-                if tr:
-                    # the Turkish-address copy links to the Turkish copies (Turkish-only games keep their own page)
-                    out[tr] = {'hub': T.TOOLS_HUB if hub == '/apps/' else T.GAMES_HUB,
-                               'items': [[T.tr_url(u) or u, ic, title(u), TR_TITLES.get(u, title(u))] for ic, u in picks]}
+                tr_hub = T.TOOLS_HUB if hub == '/apps/' else T.GAMES_HUB
+                # every page has an English and a Turkish version; each links to the versions in its own language
+                en_page, tr_page = en_ver(url), tr_ver(url)
+                out[en_page] = {'hub': hub, 'items': [[en_ver(u), ic, en_title(u), tr_title(u)] for ic, u in picks]}
+                out[tr_page] = {'hub': tr_hub, 'items': [[tr_ver(u), ic, en_title(u), tr_title(u)] for ic, u in picks]}
     lines = ['# make_related.py yazar; elle degistirmeyin.']
     for url in sorted(out):
         lines.append('%s:' % json.dumps(url))
