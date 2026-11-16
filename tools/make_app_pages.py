@@ -214,14 +214,14 @@ seo_title: "Free Browser-Based PDF, Image and Utility Tools"
 description: %s
 author_profile: true
 json_ld: %s
-hreflang: {en: "/apps/", tr: "/tr/araclar/"}
+hreflang: {en: "/apps/", tr: "/apps/tr/"}
 ---
 
 <style>%s</style>
 
 <p class="apps-intro">%d free tools for everyday PDF, image and document work. Everything runs in your browser:
 your files are processed on your own device and are never uploaded to a server. No sign-up, no limits.
-<a href="/tr/araclar/" hreflang="tr" lang="tr">Türkçe</a></p>
+<a href="/apps/tr/" hreflang="tr" lang="tr">Türkçe</a></p>
 
 %s
 """ % (json.dumps(desc, ensure_ascii=False), json.dumps(json.dumps(ld, ensure_ascii=False), ensure_ascii=False),

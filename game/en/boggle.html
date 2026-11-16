@@ -1,0 +1,649 @@
+---
+# tools/make_tr_pages.py writes this copy of game/boggle.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Boggle"
+permalink: /game/en/boggle/
+excerpt: "Find as many Turkish words as you can on a 4×4 letter grid before the time runs out."
+lang: en
+ui_lang: en
+seo_title: "Boggle · Turkish Word Search Game"
+og_image: https://sercankulcu.github.io/images/games/boggle.jpg
+game_genre: "Word game"
+hreflang: {en: "/game/en/boggle/", tr: "/game/boggle/"}
+---
+
+<style>
+.bg-app,.bg-app *,.bg-app *::before,.bg-app *::after{box-sizing:border-box}
+.bg-app{
+  --bg-ok:#217a4b;--bg-err:#c53030;--bg-dup:#7a5d00;
+  width:min(720px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family: inherit;
+}
+:root[data-theme="dark"] .bg-app{--bg-ok:#68d391;--bg-err:#fc8181;--bg-dup:#f6c945}
+.bg-app button{font:inherit;cursor:pointer}
+.bg-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.bg-title{margin:0;font-size:clamp(1.35rem,4vw,1.6rem);font-weight:750;letter-spacing:-.04em}
+.bg-head-actions{display:flex;align-items:center;gap:8px}
+.bg-app .bg-lang{font-size:.8rem}
+.bg-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.bg-topbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.bg-stat{padding:8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
+.bg-stat small{display:block;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase; color: var(--global-text-color-light);}
+.bg-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
+.bg-stat strong.low{color:var(--bg-err)}
+.bg-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bg-left{display:flex;flex-direction:column;gap:12px}
+.bg-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  width:100%;max-width:360px;max-width:max(260px,min(360px,calc(100svh - 480px)));margin:0 auto;
+  padding:10px;border:1px solid var(--global-border-color);border-radius:18px;
+  background:color-mix(in srgb,var(--global-text-color) 4%,transparent);
+  user-select:none;-webkit-user-select:none;touch-action:none;
+}
+.bg-app .bg-cell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  min-width:0;padding:0;
+  border-radius:12px;font-size:clamp(1.2rem,6vw,1.7rem);font-weight:750;
+  border:2px solid var(--global-border-color);
+  background:var(--global-bg-color);color:var(--global-text-color);
+  cursor:pointer;transition:background .12s,border-color .12s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.bg-app .bg-cell:disabled{cursor:default}
+.bg-cell.selected{background:var(--global-link-color);color:#fff;border-color:var(--global-link-color);transform:scale(.94)}
+.bg-cell.path{background:color-mix(in srgb,var(--global-link-color) 30%,var(--global-bg-color));border-color:var(--global-link-color);border-style:dashed}
+.bg-word-input{
+  display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;
+  border:1px solid var(--global-border-color);border-radius:12px;
+  background:rgba(127,127,127,.04);min-height:50px;
+}
+.bg-word-input span{flex:1;font-size:1.1rem;font-weight:700;letter-spacing:.08em;min-height:1em;color:var(--global-text-color)}
+.bg-word-input span:empty::before{content:attr(data-empty);letter-spacing:0;font-size:.9rem;font-weight:600;opacity:.65}
+.bg-word-input .bg-submit{
+  min-height:40px;padding:0 16px;border:none;border-radius: 999px;
+  background: var(--tool-primary);color:#fff;font:inherit;font-size:.85rem;font-weight: 800;
+}
+.bg-word-input .bg-submit:disabled{opacity:.4;cursor:default}
+.bg-msg{min-height:1.4em;font-size:.9rem;font-weight:700;padding:0 2px}
+.bg-msg.ok{color:var(--bg-ok)}.bg-msg.err{color:var(--bg-err)}.bg-msg.dup{color:var(--bg-dup)}
+.bg-controls{display:flex;gap:8px}
+.bg-btn{flex:1;min-height:44px;padding:10px;border:1px solid var(--global-border-color);border-radius:999px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.88rem;font-weight:800;transition:background .15s,opacity .15s}
+.bg-btn.primary{background:var(--tool-primary);color:#fff;border-color:var(--tool-primary)}
+.bg-btn:disabled{opacity:.45;cursor:default}
+@media(hover:hover){
+  .bg-btn:hover:not(:disabled){opacity:.82}
+  .bg-app .bg-cell:hover:not(:disabled){border-color:var(--global-link-color)}
+}
+.bg-app button:focus-visible,.bg-overlay button:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.bg-right{display:flex;flex-direction:column;gap:8px}
+.bg-words-header{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin:0; color: var(--global-text-color-light);}
+.bg-words-list{
+  flex:1;overflow-y:auto;max-height:340px;min-height:44px;
+  padding:8px;border:1px solid var(--global-border-color);border-radius:12px;
+  display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;
+}
+.bg-words-list:empty::before{content:attr(data-empty);font-size:.85rem;opacity:.65;padding:4px}
+.bg-word-tag{
+  padding:4px 10px;border-radius:999px;
+  background:color-mix(in srgb,var(--global-link-color) 15%,transparent);
+  color:var(--global-text-color);font-size:.8rem;font-weight:700;
+}
+.bg-word-tag span{opacity:.7;font-size:.72rem}
+.bg-overlay{
+  position:fixed;inset:0;z-index:1000;display:none;
+  align-items:center;justify-content:center;padding:16px;
+  background:rgba(0,0,0,.55);
+}
+.bg-overlay.open{display:flex}
+.bg-over-card{
+  background:var(--global-bg-color);color:var(--global-text-color);border:1px solid var(--global-border-color);border-radius:20px;
+  padding:28px 24px;max-width:360px;width:100%;text-align:center;
+}
+.bg-over-card h2{margin:0 0 10px;font-size:1.6rem;font-weight:750}
+.bg-over-card p{margin:0 0 18px;opacity:.8;font-size:.92rem}
+.bg-over-card strong{font-size:1.2rem}
+.bg-over-card .bg-record{margin:-8px 0 18px;opacity:1;font-weight:800;color:var(--global-link-text-color)}
+.bg-over-card .bg-record:empty{display:none}
+.bg-reset{min-height:44px;padding:0;border:0;background:none;color:var(--global-link-text-color);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.bg-reset:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.bg-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.bg-dialog::backdrop{background:rgba(0,0,0,.45)}
+.bg-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.bg-dialog-head h2{margin:0;padding:0;border:0;color:var(--global-text-color);font-size:1.1rem}
+.bg-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font:inherit;font-size:1.5rem;cursor:pointer}
+.bg-help:focus-visible,.bg-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.bg-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.bg-dialog-body p{margin:0 0 .6em}
+.bg-dialog-body h3{margin:1em 0 .35em;color:var(--global-text-color);font-size:.95rem}
+.bg-dialog-body ul{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.bg-dialog[open]{animation:bg-pop .16s ease-out}
+  @keyframes bg-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+@media(max-width:500px){
+  .bg-app{width:calc(100% - 16px)}
+  .bg-layout{grid-template-columns:1fr;gap:12px}
+  .bg-left{gap:10px}
+  .bg-right{max-height:220px}
+  .bg-grid{gap:6px;padding:8px;max-width:100%;max-width:max(240px,min(100%,calc(100svh - 400px)))}
+}
+@media(prefers-reduced-motion:reduce){
+  .bg-app *,.bg-overlay *{transition:none !important}
+  .bg-cell.selected{transform:none}
+}
+</style>
+
+<div class="bg-app">
+  <div class="bg-header">
+    <h1 class="bg-title">Boggle</h1>
+    <div class="bg-head-actions">
+      <button class="bg-btn" id="bg-new-btn" type="button" style="flex:0 0 auto;padding:8px 16px" data-i18n="newGame">Yeni Oyun</button>
+      <button class="bg-help bg-lang" data-lang-toggle></button>
+      <button class="bg-help" id="bg-help" type="button" aria-haspopup="dialog" aria-controls="bg-help-dialog" aria-label="Nasıl oynanır" data-i18n-attr="aria-label:howTo">?</button>
+    </div>
+  </div>
+
+  <div class="bg-topbar">
+    <div class="bg-stat"><small data-i18n="scoreL">Puan</small><strong id="bg-score">0</strong></div>
+    <div class="bg-stat"><small data-i18n="wordsL">Kelime</small><strong id="bg-count">0</strong></div>
+    <div class="bg-stat"><small data-i18n="timeL">Süre</small><strong id="bg-time">3:00</strong></div>
+    <div class="bg-stat"><small data-i18n="bestL">Rekor</small><strong id="bg-best">0</strong></div>
+  </div>
+
+  <div class="bg-layout">
+    <div class="bg-left">
+      <div class="bg-grid" id="bg-grid" role="group" aria-label="Harf tablosu" data-i18n-attr="aria-label:gridL"></div>
+      <div class="bg-word-input">
+        <span id="bg-current" aria-live="polite" data-empty="En az 3 harf seç" data-i18n-attr="data-empty:pick3"></span>
+        <button class="bg-submit" id="bg-submit" type="button" disabled data-i18n="add">Ekle</button>
+      </div>
+      <div class="bg-msg" id="bg-msg" role="status" aria-live="polite"></div>
+      <div class="bg-controls">
+        <button class="bg-btn" id="bg-clear-btn" type="button" data-i18n="clear">Temizle</button>
+        <button class="bg-btn primary" id="bg-submit2" type="button" data-i18n="addWord">Kelime Ekle</button>
+      </div>
+    </div>
+    <div class="bg-right">
+      <h2 class="bg-words-header" id="bg-words-title" data-i18n="foundTitle">Bulunan kelimeler</h2>
+      <div class="bg-words-list" id="bg-words-list" role="group" aria-labelledby="bg-words-title" data-empty="Henüz kelime yok." data-i18n-attr="data-empty:noWords"></div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-overlay" id="bg-overlay" role="dialog" aria-modal="true" aria-labelledby="bg-over-title">
+  <div class="bg-over-card">
+    <h2 id="bg-over-title" data-i18n="timeUp">⏰ Süre Doldu!</h2>
+    <p><span data-i18n="totalL">Toplam puan:</span> <strong id="bg-final-score">0</strong><br><span data-i18n="foundL">Bulunan kelime:</span> <strong id="bg-final-count">0</strong></p>
+    <p class="bg-record" id="bg-record" aria-live="polite"></p>
+    <button class="bg-btn primary" id="bg-play-again" type="button" style="width:100%;padding:12px" data-i18n="again">Tekrar Oyna</button>
+  </div>
+</div>
+
+<dialog class="bg-dialog" id="bg-help-dialog" aria-labelledby="bg-help-title">
+  <div class="bg-dialog-head">
+    <h2 id="bg-help-title" data-i18n="howTo">Nasıl oynanır</h2>
+    <button class="bg-dialog-close" type="button" data-close aria-label="Kapat" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="bg-dialog-body" data-i18n-html="help">
+    <p>4×4 harf tablosunda üç dakika içinde olabildiğince çok Türkçe kelime bul.</p>
+
+    <h3>Nasıl oynanır</h3>
+    <ul>
+      <li>Yan yana ya da çapraz komşu harfleri sürükleyerek veya tek tek dokunarak en az 3 harfli kelime kur.</li>
+      <li>Aynı harf kutusu bir kelimede yalnızca bir kez kullanılır; seçilen son harfe yeniden dokunmak onu geri alır.</li>
+      <li>Dokunmatik ekranda sürükleyerek kurduğun kelime parmağını kaldırınca eklenir; öteki durumlarda kelimeyi <b>Ekle</b> ile gönder.</li>
+      <li>Aynı kelime bir oyunda yalnızca bir kez puan getirir.</li>
+    </ul>
+
+    <h3>Puanlama</h3>
+    <ul>
+      <li>3 harf: 1 puan · 4 harf: 2 · 5 harf: 4 · 6 harf: 6 · 7 ve daha uzun: 11 puan.</li>
+    </ul>
+
+    <h3>Klavye</h3>
+    <ul>
+      <li>Klavyede harfleri yaz, Enter ile ekle, Backspace ile sil, Esc ile temizle.</li>
+      <li>Süre, bu pencere açıkken ve sekme arka plandayken durur.</li>
+    </ul>
+
+    <h3>Rekorlar</h3>
+    <p>Süresi dolan her oyun sayılır; en yüksek puan, en çok kelime ve oynanan oyun sayısı yalnızca bu cihazda saklanır. <button class="bg-reset" id="bg-reset" type="button">Rekorları sıfırla</button></p>
+  </div>
+</dialog>
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+"use strict";
+
+/* Interface text: the Turkish strings come from the markup, English is written out here.
+   The words, the grid and the dictionary stay Turkish in both languages. */
+function i18nHarvest(tb){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in tb))tb[k]=el.textContent;});
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in tb))tb[k]=el.innerHTML;});
+  document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in tb)&&el.hasAttribute(a))tb[k]=el.getAttribute(a);}));
+  return tb;
+}
+
+const I18N = {
+  tr: i18nHarvest({
+    cell: "{l}, satır {r}, sütun {c}",
+    cellEmpty: "boş",
+    noDict: "Sözlük henüz yüklenmedi",
+    min3: "En az 3 harf!",
+    dup: "\"{w}\" zaten bulundu",
+    notWord: "\"{w}\" sözlükte yok",
+    gain: "+{n} puan — {w}!",
+    loading: "Sözlük yükleniyor…",
+    ready: "Sözlük hazır — {n} kelime",
+    loadFail: "Sözlük yüklenemedi, sayfayı yenileyin",
+    newScore: "Yeni puan rekoru!",
+    newWords: "Yeni kelime rekoru!",
+    recLine: "Rekor: {s} puan, {w} kelime · {p}. oyun",
+    confirmNew: "Yeni oyunda {s} puan ve {w} kelime silinecek. Devam edilsin mi?",
+    confirmReset: "Bu cihazdaki Boggle rekorları silinsin mi?"
+  }),
+  en: {
+    newGame: "New game", howTo: "How to play", close: "Close",
+    scoreL: "Score", wordsL: "Words", timeL: "Time", bestL: "Best",
+    gridL: "Letter grid", pick3: "Pick at least 3 letters", add: "Add",
+    clear: "Clear", addWord: "Add word", foundTitle: "Words found", noWords: "No words yet.",
+    timeUp: "⏰ Time's up!", totalL: "Total score:", foundL: "Words found:", again: "Play again",
+    cell: "{l}, row {r}, column {c}",
+    cellEmpty: "empty",
+    noDict: "The dictionary is not loaded yet",
+    min3: "At least 3 letters!",
+    dup: "\"{w}\" is already found",
+    notWord: "\"{w}\" is not in the dictionary",
+    gain: "+{n} points — {w}!",
+    gain1: "+1 point — {w}!",
+    loading: "Loading the dictionary…",
+    ready: "Dictionary ready: {n} Turkish words",
+    loadFail: "Couldn't load the dictionary. Please reload the page.",
+    newScore: "New best score!",
+    newWords: "New most words!",
+    recLine: "Best: {s} {pu}, {w} {wu} · game {p}",
+    confirmNew: "A new game discards {s} {pu} and {w} {wu}. Continue?",
+    confirmReset: "Delete the Boggle records on this device?",
+    help: '<p>Find as many <b>Turkish</b> words as you can in the 4×4 letter grid within three minutes.</p>'
+      + '<h3>How to play</h3><ul>'
+      + '<li>Build words of at least 3 letters from neighbouring letters (side by side or diagonal): drag across them or tap them one by one.</li>'
+      + '<li>Each letter box can be used only once in a word; tapping the last letter again takes it back.</li>'
+      + '<li>On a touch screen a dragged word is added when you lift your finger; otherwise send it with <b>Add</b>.</li>'
+      + '<li>A word scores only once per game.</li></ul>'
+      + '<h3>Turkish letters</h3><ul>'
+      + '<li>The words are Turkish, so the grid also has Ç, Ğ, I, İ, Ö, Ş and Ü. Dotless I and dotted İ are two different letters, as are C/Ç, G/Ğ, O/Ö, S/Ş and U/Ü.</li>'
+      + '<li>On a non-Turkish keyboard, i types İ and Shift+I types I; tap the grid for the other special letters.</li></ul>'
+      + '<h3>Scoring</h3><ul>'
+      + '<li>3 letters: 1 point · 4 letters: 2 · 5 letters: 4 · 6 letters: 6 · 7 or more: 11 points.</li></ul>'
+      + '<h3>Keyboard</h3><ul>'
+      + '<li>Type the letters, Enter adds the word, Backspace deletes, Esc clears.</li>'
+      + '<li>The clock stops while this window is open and while the tab is in the background.</li></ul>'
+      + '<h3>Records</h3>'
+      + '<p>Every game that runs out of time counts; the best score, the most words and the games played are stored on this device only. <button class="bg-reset" id="bg-reset" type="button">Reset records</button></p>'
+  }
+};
+let i18n = null;
+const t = (k, v) => i18n ? i18n.t(k, v) : k;
+const isEn = () => Boolean(i18n) && i18n.lang === "en";
+/* English plural words for the {pu} / {wu} placeholders (Turkish needs none). */
+const units = (s, w) => ({ s, w, pu: s === 1 ? "point" : "points", wu: w === 1 ? "word" : "words" });
+
+let WORDS = null;
+
+const LETTERS = "AAAAAABBBCÇCDDDDEEEEEFFGGĞHİİİİIIIJKKKKKLLLMMMNNNOÖOÖPPRRRSŞSSTTTUÜUÜVVYYYZ".split("");
+const N = 4;
+let grid = [];
+let selected = [];
+let foundWords = new Map(); /* word -> score */
+let totalScore = 0;
+let timeLeft = 180;
+let timerInt = null;
+let playing = false;
+let dragActive = false;
+
+const app = document.querySelector(".bg-app");
+const overlay = document.getElementById("bg-overlay");
+const playAgain = document.getElementById("bg-play-again");
+const newBtn = document.getElementById("bg-new-btn");
+const helpDialog = document.getElementById("bg-help-dialog");
+
+/* Records live on this device only; blocked storage simply means no records. */
+const STATS_KEY = "pz:boggle:stats";
+function loadStats() {
+  try {
+    const v = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (v && typeof v === "object") return { played: +v.played || 0, best: +v.best || 0, bestWords: +v.bestWords || 0 };
+  } catch (e) {}
+  return { played: 0, best: 0, bestWords: 0 };
+}
+let stats = loadStats();
+function saveStats() { try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {} }
+function renderBest() { document.getElementById("bg-best").textContent = stats.best; }
+
+/* Called once per finished game (the timer ran out). */
+function recordGame() {
+  const prevBest = stats.best, prevWords = stats.bestWords;
+  stats.played++;
+  if (totalScore > stats.best) stats.best = totalScore;
+  if (foundWords.size > stats.bestWords) stats.bestWords = foundWords.size;
+  saveStats();
+  renderBest();
+  recState = { score: totalScore > prevBest, words: foundWords.size > prevWords };
+  renderRecord();
+}
+let recState = null;
+function renderRecord() {
+  if (!recState) return;
+  const parts = [];
+  if (recState.score) parts.push(t("newScore"));
+  if (recState.words) parts.push(t("newWords"));
+  document.getElementById("bg-record").textContent = parts.length
+    ? "🏆 " + parts.join(" ")
+    : t("recLine", Object.assign(units(stats.best, stats.bestWords), { p: stats.played }));
+}
+
+function wordScore(w) { const l = w.length; return l < 3 ? 0 : l === 3 ? 1 : l === 4 ? 2 : l === 5 ? 4 : l === 6 ? 6 : 11; }
+
+function randomGrid() {
+  grid = [];
+  for (let i = 0; i < N*N; i++) {
+    grid.push(LETTERS[Math.floor(Math.random() * LETTERS.length)]);
+  }
+}
+
+function adjacent(a, b) {
+  const ar = Math.floor(a/N), ac = a%N, br = Math.floor(b/N), bc = b%N;
+  return Math.abs(ar-br) <= 1 && Math.abs(ac-bc) <= 1 && a !== b;
+}
+
+/* Cells are real buttons so they can be reached and pressed from the keyboard.
+   They are built once per game and only their state is updated afterwards, so
+   focus is not lost while a word is being built. */
+function buildGrid() {
+  const gridEl = document.getElementById("bg-grid");
+  gridEl.innerHTML = "";
+  for (let i = 0; i < N*N; i++) {
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = "bg-cell";
+    cell.dataset.i = i;
+    cell.addEventListener("click", e => {
+      /* Mouse and touch are handled by the pointer code below; only a
+         keyboard press (detail 0) arrives here. */
+      if (e.detail === 0) selectCell(i);
+    });
+    gridEl.appendChild(cell);
+  }
+}
+
+function renderGrid() {
+  const cells = document.getElementById("bg-grid").children;
+  for (let i = 0; i < cells.length; i++) {
+    const cell = cells[i];
+    const letter = grid[i] || "";
+    const pos = selected.indexOf(i);
+    cell.textContent = letter;
+    cell.classList.toggle("selected", pos >= 0 && pos === selected.length - 1);
+    cell.classList.toggle("path", pos >= 0 && pos !== selected.length - 1);
+    cell.setAttribute("aria-pressed", pos >= 0 ? "true" : "false");
+    cell.setAttribute("aria-label", letter ? t("cell", { l: letter, r: Math.floor(i/N) + 1, c: i%N + 1 }) : t("cellEmpty"));
+    cell.disabled = !playing;
+  }
+}
+
+function currentWord() { return selected.map(i => grid[i]).join(""); }
+
+function updateWordInput() {
+  const w = currentWord();
+  document.getElementById("bg-current").textContent = w;
+  const blocked = w.length < 3 || !playing || !WORDS;
+  document.getElementById("bg-submit").disabled = blocked;
+  document.getElementById("bg-submit2").disabled = blocked;
+  document.getElementById("bg-clear-btn").disabled = !w.length;
+}
+
+function selectCell(i) {
+  if (!playing) return;
+  if (selected.includes(i)) {
+    /* Allow deselect last only */
+    if (selected[selected.length-1] === i) { selected.pop(); updateWordInput(); renderGrid(); }
+    return;
+  }
+  if (selected.length === 0 || adjacent(selected[selected.length-1], i)) {
+    selected.push(i);
+    updateWordInput();
+    renderGrid();
+  }
+}
+
+function clearSelection() { selected = []; renderGrid(); updateWordInput(); }
+
+/* The message is kept as a key so a language switch can rewrite it. */
+let msgState = null;
+function showMsg(key, vars, type, keep) {
+  const el = document.getElementById("bg-msg");
+  msgState = { key, vars };
+  el.textContent = t(key, vars); el.className = "bg-msg " + type;
+  clearTimeout(showMsg._t);
+  if (!keep) showMsg._t = setTimeout(() => { msgState = null; el.textContent = ""; el.className = "bg-msg"; }, 1600);
+}
+
+/* Turkish casing: I lowercases to ı and İ to i, which the default rules get wrong. */
+const lower = s => s.toLocaleLowerCase("tr");
+const upper = s => s.toLocaleUpperCase("tr");
+
+function submitWord() {
+  if (!playing) return;
+  const w = lower(currentWord());
+  selected = [];
+  renderGrid();
+  updateWordInput();
+
+  if (!WORDS) { showMsg("noDict", null, "err"); return; }
+  if (w.length < 3) { showMsg("min3", null, "err"); return; }
+  if (foundWords.has(w)) { showMsg("dup", { w: upper(w) }, "dup"); return; }
+  if (!WORDS.has(w)) { showMsg("notWord", { w: upper(w) }, "err"); return; }
+
+  const sc = wordScore(w);
+  totalScore += sc;
+  foundWords.set(w, sc);
+  document.getElementById("bg-score").textContent = totalScore;
+  document.getElementById("bg-count").textContent = foundWords.size;
+  renderWords();
+  showMsg(sc === 1 && isEn() ? "gain1" : "gain", { n: sc, w: upper(w) }, "ok");
+}
+
+async function loadWords() {
+  showMsg("loading", null, "", true);
+  try {
+    const res = await fetch("/game/boggle-words.json", { cache: "no-cache" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data || !Array.isArray(data.words) || !data.words.length) {
+      throw new Error("Sözlük verisi geçersiz.");
+    }
+    WORDS = new Set(data.words);
+    newBtn.disabled = false;
+    /* The three minutes start only once the dictionary is ready. */
+    newGame();
+    showMsg("ready", { n: WORDS.size.toLocaleString(isEn() ? "en" : "tr") }, "ok");
+  } catch (err) {
+    showMsg("loadFail", null, "err", true);
+  }
+}
+
+function renderWords() {
+  const list = document.getElementById("bg-words-list");
+  list.innerHTML = "";
+  [...foundWords.entries()].sort((a,b) => b[1]-a[1]).forEach(([w, sc]) => {
+    const tag = document.createElement("div");
+    tag.className = "bg-word-tag";
+    tag.innerHTML = `${upper(w)} <span>+${sc}</span>`;
+    list.appendChild(tag);
+  });
+}
+
+function renderTime() {
+  const el = document.getElementById("bg-time");
+  el.textContent = `${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`;
+  el.className = timeLeft <= 15 ? "low" : "";
+}
+
+function startTimer() {
+  clearInterval(timerInt);
+  timerInt = setInterval(() => {
+    /* The clock stops while the tab is in the background or the help is open. */
+    if (document.hidden || helpDialog.open) return;
+    timeLeft--;
+    renderTime();
+    if (timeLeft <= 0) { clearInterval(timerInt); endGame(); }
+  }, 1000);
+}
+
+function endGame() {
+  playing = false;
+  selected = [];
+  renderGrid();
+  updateWordInput();
+  document.getElementById("bg-final-score").textContent = totalScore;
+  document.getElementById("bg-final-count").textContent = foundWords.size;
+  recordGame();
+  overlay.classList.add("open");
+  app.inert = true;
+  playAgain.focus();
+}
+
+function newGame() {
+  clearInterval(timerInt);
+  selected = []; foundWords = new Map(); totalScore = 0; timeLeft = 180; playing = true;
+  document.getElementById("bg-score").textContent = "0";
+  document.getElementById("bg-count").textContent = "0";
+  renderTime();
+  document.getElementById("bg-msg").textContent = "";
+  msgState = null;
+  document.getElementById("bg-words-list").innerHTML = "";
+  const wasOpen = overlay.classList.contains("open");
+  overlay.classList.remove("open");
+  app.inert = false;
+  randomGrid();
+  renderGrid();
+  updateWordInput();
+  startTimer();
+  if (wasOpen) newBtn.focus();
+}
+
+/* Touch/mouse drag selection */
+const gridEl = document.getElementById("bg-grid");
+
+function cellFromPoint(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (el && el.classList.contains("bg-cell")) return +el.dataset.i;
+  return -1;
+}
+
+/* Pressing a cell next to the end of the word extends it, otherwise a new word starts. */
+function pressCell(i) {
+  const last = selected[selected.length - 1];
+  if (selected.length && (selected.includes(i) || adjacent(last, i))) selectCell(i);
+  else { selected = []; selectCell(i); }
+}
+
+gridEl.addEventListener("mousedown", e => {
+  const i = cellFromPoint(e.clientX, e.clientY);
+  if (i < 0) return;
+  dragActive = true;
+  pressCell(i);
+});
+gridEl.addEventListener("mousemove", e => {
+  if (!dragActive) return;
+  const i = cellFromPoint(e.clientX, e.clientY);
+  if (i >= 0) selectCell(i);
+});
+window.addEventListener("mouseup", () => { dragActive = false; });
+
+/* A drag across cells submits on release; single taps build the word letter
+   by letter and are submitted with the button. */
+let touchStartLen = 0;
+let touchMoved = false;
+gridEl.addEventListener("touchstart", e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const i = cellFromPoint(t.clientX, t.clientY);
+  touchMoved = false;
+  if (i >= 0) { pressCell(i); }
+  touchStartLen = selected.length;
+}, { passive: false });
+gridEl.addEventListener("touchmove", e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const i = cellFromPoint(t.clientX, t.clientY);
+  if (i >= 0) { selectCell(i); if (selected.length !== touchStartLen) touchMoved = true; }
+}, { passive: false });
+gridEl.addEventListener("touchend", () => {
+  if (touchMoved && selected.length >= 3) submitWord();
+  else if (touchMoved) clearSelection();
+});
+
+/* Physical keyboard: a typed letter extends the word with a neighbouring cell
+   that shows it (or starts on the first such cell). */
+document.addEventListener("keydown", e => {
+  if (helpDialog.open) return;
+  if (overlay.classList.contains("open")) {
+    if (e.key === "Escape") newGame();
+    return;
+  }
+  if (!playing || e.ctrlKey || e.metaKey || e.altKey) return;
+  const target = e.target;
+  if (target && target.closest) {
+    if (target.closest("input, textarea, select, [contenteditable='true']")) return;
+    if ((e.key === "Enter" || e.key === " ") && target.closest("button, a")) {
+      if (e.key === " " || !target.classList.contains("bg-cell")) return;
+    }
+  }
+  if (e.key === "Enter") { e.preventDefault(); submitWord(); return; }
+  if (e.key === "Backspace") { e.preventDefault(); if (selected.length) { selected.pop(); renderGrid(); updateWordInput(); } return; }
+  if (e.key === "Escape") { clearSelection(); return; }
+  if (e.key.length !== 1) return;
+  const ch = upper(e.key);
+  const last = selected[selected.length - 1];
+  let next = -1;
+  for (let i = 0; i < N*N; i++) {
+    if (grid[i] !== ch || selected.includes(i)) continue;
+    if (!selected.length || adjacent(last, i)) { next = i; break; }
+  }
+  if (next >= 0) { e.preventDefault(); selectCell(next); }
+});
+
+document.getElementById("bg-help").addEventListener("click", () => helpDialog.showModal());
+helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+document.getElementById("bg-submit").addEventListener("click", submitWord);
+document.getElementById("bg-submit2").addEventListener("click", submitWord);
+document.getElementById("bg-clear-btn").addEventListener("click", clearSelection);
+newBtn.addEventListener("click", () => {
+  if (playing && foundWords.size > 0 && !window.confirm(t("confirmNew", units(totalScore, foundWords.size)))) return;
+  newGame();
+});
+playAgain.addEventListener("click", newGame);
+/* The help body is rewritten on a language switch, so its reset button is reached by delegation. */
+helpDialog.addEventListener("click", e => {
+  if (!e.target.closest || !e.target.closest("#bg-reset")) return;
+  if (!window.confirm(t("confirmReset"))) return;
+  stats = { played: 0, best: 0, bestWords: 0 };
+  saveStats();
+  renderBest();
+});
+renderBest();
+
+buildGrid();
+i18n = ToolI18n.setup(I18N, () => {
+  if (!i18n) return;
+  renderGrid();
+  renderRecord();
+  if (msgState) document.getElementById("bg-msg").textContent = t(msgState.key, msgState.vars);
+});
+newBtn.disabled = true;
+renderGrid();
+updateWordInput();
+loadWords();
+})();
+</script>

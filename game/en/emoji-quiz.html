@@ -1,0 +1,575 @@
+---
+# tools/make_tr_pages.py writes this copy of game/emoji-quiz.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Emoji Quiz"
+permalink: /game/en/emoji-quiz/
+excerpt: "Guess the film, country or food from emoji clues against the clock; how many can you get?"
+lang: en
+ui_lang: en
+seo_title: "Emoji Quiz · Guess Films and Countries from Emojis"
+og_image: https://sercankulcu.github.io/images/games/emoji-quiz.jpg
+game_genre: "Quiz"
+hreflang: {en: "/game/en/emoji-quiz/", tr: "/game/emoji-quiz/"}
+---
+
+<style>
+.eq-app,.eq-app *,.eq-app *::before,.eq-app *::after{box-sizing:border-box}
+.eq-app{
+  width:min(680px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family: inherit;
+}
+.eq-app button{font:inherit;cursor:pointer}
+.eq-app button:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.eq-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.eq-help.eq-lang{font-size:.8rem}
+.eq-head-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.eq-help:focus-visible,.eq-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.eq-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.eq-dialog::backdrop{background:rgba(0,0,0,.45)}
+.eq-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.eq-dialog-head h2{margin:0;padding:0;border:0;font-size:1.1rem;color:var(--global-text-color)}
+.eq-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.eq-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.eq-dialog-body h3{margin:1em 0 .35em;font-size:.95rem;color:var(--global-text-color)}
+.eq-dialog-body ul,.eq-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.eq-dialog[open]{animation:eq-pop .16s ease-out}
+  @keyframes eq-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+.eq-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.eq-title{margin:0;font-size:clamp(1.35rem,4.5vw,1.6rem);font-weight:750;letter-spacing:-.04em}
+.eq-topbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.eq-stat{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
+.eq-stat small{display:block;opacity:.78;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.eq-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
+.eq-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.eq-cat-btn{min-height:44px;padding:8px 16px;border:1px solid var(--global-border-color);border-radius:999px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.78rem;font-weight:700;transition:background .15s}
+.eq-cat-btn.active{background:var(--tool-primary);color:#fff;border-color:var(--tool-primary)}
+.eq-cat-btn:hover{opacity:.8}
+.eq-card{
+  padding:clamp(20px,4vw,32px);border:1px solid var(--global-border-color);border-radius:18px;
+  background:var(--global-bg-color);box-shadow:0 12px 35px rgba(0,0,0,.07);
+  margin-bottom:14px;text-align:center;
+}
+.eq-progress-bar{height:4px;border-radius:999px;background:color-mix(in srgb,var(--global-text-color) 10%,transparent);margin-bottom:20px;overflow:hidden}
+.eq-progress-fill{height:100%;border-radius:999px;background:var(--global-link-color);transition:width .4s}
+.eq-category-tag{display:inline-block;padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--global-link-color) 12%,transparent);font-size:.72rem;font-weight:700;margin-bottom:16px}
+.eq-emoji{font-size:clamp(2.5rem,10vw,4rem);letter-spacing:.1em;margin-bottom:16px;line-height:1.2}
+.eq-timer-ring{display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.eq-timer-text{font-size:.85rem;font-weight:700;opacity:.8}
+.eq-timer-text.low{opacity:1;color:#c53030}
+:root[data-theme="dark"] .eq-timer-text.low{color:#ff9a9a}
+.eq-timer-text span{font-variant-numeric:tabular-nums}
+.eq-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.eq-choices.is-long{grid-template-columns:1fr}
+.eq-choice{
+  min-height:52px;padding:12px;border:2px solid var(--global-border-color);border-radius:13px;line-height:1.3;
+  background:var(--global-bg-color);color:var(--global-text-color);font-size:.9rem;font-weight:700;
+  transition:background .15s,border-color .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.eq-choice:hover:not(:disabled){border-color:var(--global-link-color);background:color-mix(in srgb,var(--global-link-color) 6%,transparent);transform:scale(.98)}
+.eq-choice.correct{border-color:#3aaa6f;background:color-mix(in srgb,#3aaa6f 15%,transparent);color:#2a7a4f}
+.eq-choice.wrong{border-color:#e05252;background:color-mix(in srgb,#e05252 12%,transparent);color:#b03030}
+:root[data-theme="dark"] .eq-choice.correct{color:#7fd6a6}
+:root[data-theme="dark"] .eq-choice.wrong{color:#ff9a9a}
+.eq-choice:disabled{cursor:default;opacity:.75}
+.eq-choice.correct:disabled,.eq-choice.wrong:disabled{opacity:1}
+.eq-choice.correct::after{content:" \2713";font-weight:900}
+.eq-choice.wrong::after{content:" \2717";font-weight:900}
+.eq-feedback{min-height:26px;margin-top:14px;color:var(--global-text-color);font-size:.88rem;font-weight:800;text-align:center}
+.eq-end-card{padding:clamp(24px,5vw,40px);border:1px solid var(--global-border-color);border-radius:18px;background:var(--global-bg-color);box-shadow:0 12px 35px rgba(0,0,0,.07);text-align:center;display:none}
+.eq-end-card h2{margin:0 0 8px;font-size:1.8rem;font-weight:750}
+.eq-end-card p{margin:0 0 20px;opacity:.8;font-size:.88rem}
+/* Records kept on this device. */
+.eq-end-card p.eq-end-record{margin:-12px 0 20px;opacity:1;color:var(--global-text-color-light);font-size:.88rem}
+.eq-new-best{color:var(--global-link-text-color);font-weight:800}
+.eq-end-score{font-size:2.8rem;font-weight:800;margin:12px 0}
+.eq-btn{min-height:46px;padding:12px 30px;border:none;border-radius:12px;background:var(--global-text-color);color:var(--global-bg-color);font:inherit;font-size:.9rem;font-weight:750}
+.eq-btn:hover{opacity:.85}
+.eq-next-btn{margin-top:14px;width:100%;min-height:46px;padding:12px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.05);color:var(--global-text-color);font:inherit;font-size:.88rem;font-weight:700;display:none}
+.eq-next-btn:hover{background:color-mix(in srgb,var(--global-text-color) 8%,transparent)}
+@media(max-width:620px){
+  .eq-app{width:100%;margin:0 auto 1rem}
+  .eq-card{padding:18px 14px}
+  .eq-emoji{margin-bottom:12px}
+  .eq-category-tag{margin-bottom:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .eq-app *,.eq-app *::before,.eq-app *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+
+<div class="eq-app">
+  <div class="eq-header">
+    <h1 class="eq-title" data-i18n="title">🎭 Emoji Quiz</h1>
+    <div class="eq-head-actions">
+      <button class="eq-help eq-lang" data-lang-toggle></button>
+      <button class="eq-help" id="eq-help" type="button" aria-haspopup="dialog" aria-controls="eq-help-dialog" aria-label="Nasıl oynanır" data-i18n-attr="aria-label:howTo">?</button>
+    </div>
+  </div>
+
+  <div class="eq-topbar">
+    <div class="eq-stat"><small data-i18n="sScore">Puan</small><strong id="eq-score">0</strong></div>
+    <div class="eq-stat"><small data-i18n="sCorrect">Doğru</small><strong id="eq-correct">0</strong></div>
+    <div class="eq-stat"><small data-i18n="sQuestion">Soru</small><strong id="eq-qnum">0/0</strong></div>
+    <div class="eq-stat"><small data-i18n="sRecord">Rekor</small><strong id="eq-record">0</strong></div>
+  </div>
+
+  <div class="eq-cats" id="eq-cats" role="group" aria-label="Kategori" data-i18n-attr="aria-label:category"></div>
+
+  <div class="eq-card" id="eq-card">
+    <div class="eq-progress-bar"><div class="eq-progress-fill" id="eq-progress" style="width:0%"></div></div>
+    <div class="eq-category-tag" id="eq-cat-tag">Film</div>
+    <div class="eq-emoji" id="eq-emoji">🎬</div>
+    <div class="eq-timer-text" id="eq-timer-box">⏱ <span id="eq-timer">15</span>s</div>
+    <div class="eq-choices" id="eq-choices" role="group" aria-label="Cevap seçenekleri" data-i18n-attr="aria-label:options"></div>
+    <div class="eq-feedback" id="eq-feedback" role="status" aria-live="polite"></div>
+    <button class="eq-next-btn" id="eq-next-btn" type="button">Sonraki Soru →</button>
+  </div>
+
+  <div class="eq-end-card" id="eq-end-card">
+    <h2 id="eq-end-title">Tebrikler! 🎉</h2>
+    <div class="eq-end-score" id="eq-end-score">0</div>
+    <p id="eq-end-sub">puan</p>
+    <p class="eq-end-record" id="eq-end-record"></p>
+    <button class="eq-btn" id="eq-restart-btn" type="button" data-i18n="restart">Tekrar Oyna</button>
+  </div>
+</div>
+
+<dialog class="eq-dialog" id="eq-help-dialog" aria-labelledby="eq-help-title">
+  <div class="eq-dialog-head">
+    <h2 id="eq-help-title" data-i18n="howTo">Nasıl oynanır</h2>
+    <button class="eq-dialog-close" type="button" data-close aria-label="Kapat" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="eq-dialog-body" data-i18n-html="helpBody">
+    <p>Emoji ipuçlarından filmi, ülkeyi, yiyeceği ya da deyimi tahmin et.</p>
+    <ol>
+      <li>Bir kategori seç ya da <b>Tümü</b> ile karışık oyna; her turda 15 soru gelir.</li>
+      <li>Emojilerin anlattığını 15 saniyede bul ve dört seçenekten birine dokun.</li>
+      <li><b>Sonraki Soru</b> ile devam et.</li>
+    </ol>
+    <h3>Puan</h3>
+    <p>Doğru cevap 10 puan ve kalan her saniye için 1 puan daha getirir.</p>
+    <h3>Klavye</h3>
+    <p>Klavyede 1–4 tuşlarıyla da cevap verebilirsin.</p>
+    <h3>Not</h3>
+    <p>Bu pencere açıkken de süre işlemeye devam eder. Kategori değiştirmek turu baştan başlatır.</p>
+    <p><b>Rekor</b>, seçili kategorideki en yüksek puanındır. Rekorlar ve oynanan oyun sayısı yalnızca bu cihazda saklanır.</p>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+"use strict";
+
+/* Each question lists its choices in both languages in the same order; the
+   first choice is the answer, and answers are checked by position, so both
+   languages score alike. */
+const ALL_QUESTIONS = [
+  /* Films (English: official titles) */
+  { emoji:"🦁👑", cat:"Film", tr:["Aslan Kral", "Bambi", "Kral Arthur", "Orman Kitabı"], en:["The Lion King", "Bambi", "King Arthur", "The Jungle Book"] },
+  { emoji:"❄️👸🏰", cat:"Film", tr:["Karlar Ülkesi", "Pamuk Prenses", "Uyuyan Güzel", "Rapunzel"], en:["Frozen", "Snow White", "Sleeping Beauty", "Tangled"] },
+  { emoji:"🕷️🧔", cat:"Film", tr:["Örümcek Adam", "Batman", "Superman", "Ant-Man"], en:["Spider-Man", "Batman", "Superman", "Ant-Man"] },
+  { emoji:"🧙‍♂️💍⚔️", cat:"Film", tr:["Yüzüklerin Efendisi", "Narnia", "Harry Potter", "Eragon"], en:["The Lord of the Rings", "The Chronicles of Narnia", "Harry Potter", "Eragon"] },
+  { emoji:"🐠🌊🔍", cat:"Film", tr:["Kayıp Balık Nemo", "Moana", "Deniz Altında", "Dori"], en:["Finding Nemo", "Moana", "Under the Sea", "Finding Dory"] },
+  { emoji:"🤖🌹", cat:"Film", tr:["WALL-E", "Transformers", "Interstellar", "A.I."], en:["WALL-E", "Transformers", "Interstellar", "A.I."] },
+  { emoji:"🦖🏝️🧬", cat:"Film", tr:["Jurassic Park", "Dünya'nın Sonu", "Avatar", "Prometheus"], en:["Jurassic Park", "The World's End", "Avatar", "Prometheus"] },
+  { emoji:"🚀⭐🌌", cat:"Film", tr:["Yıldız Savaşları", "Guardians", "Interstellar", "Apollo 13"], en:["Star Wars", "Guardians of the Galaxy", "Interstellar", "Apollo 13"] },
+  { emoji:"👸🏰😴", cat:"Film", tr:["Uyuyan Güzel", "Sindirella", "Rapunzel", "Pamuk Prenses"], en:["Sleeping Beauty", "Cinderella", "Tangled", "Snow White"] },
+  { emoji:"🦇🌃🃏", cat:"Film", tr:["Batman", "Joker", "Shazam", "Green Lantern"], en:["Batman", "Joker", "Shazam!", "Green Lantern"] },
+  { emoji:"🧊🚢💔", cat:"Film", tr:["Titanic", "Cast Away", "Life of Pi", "The Revenant"], en:["Titanic", "Cast Away", "Life of Pi", "The Revenant"] },
+  { emoji:"👦🧙🏫", cat:"Film", tr:["Harry Potter", "Percy Jackson", "Merlin", "Doctor Strange"], en:["Harry Potter", "Percy Jackson", "Merlin", "Doctor Strange"] },
+  { emoji:"🐻🍯🌿", cat:"Film", tr:["Winnie Pooh", "Bambi", "Dumbo", "Peter Pan"], en:["Winnie the Pooh", "Bambi", "Dumbo", "Peter Pan"] },
+  { emoji:"🏋️🔨⚡", cat:"Film", tr:["Thor", "Hulk", "Iron Man", "Captain America"], en:["Thor", "Hulk", "Iron Man", "Captain America"] },
+  { emoji:"🦸‍♀️🌟👊", cat:"Film", tr:["Wonder Woman", "Black Widow", "Catwoman", "Supergirl"], en:["Wonder Woman", "Black Widow", "Catwoman", "Supergirl"] },
+  { emoji:"🎭🎪🃏", cat:"Film", tr:["Joker", "Batman", "Scarecrow", "Riddler"], en:["Joker", "Batman", "Scarecrow", "Riddler"] },
+  { emoji:"🏎️💨🔥", cat:"Film", tr:["Hızlı ve Öfkeli", "Drive", "Gone in 60 Seconds", "Rush"], en:["The Fast and the Furious", "Drive", "Gone in 60 Seconds", "Rush"] },
+  { emoji:"🕺☂️🌧️", cat:"Film", tr:["Yağmur Altında", "La La Land", "Mary Poppins", "Moulin Rouge!"], en:["Singin' in the Rain", "La La Land", "Mary Poppins", "Moulin Rouge!"] },
+  { emoji:"🦁🐺🐻", cat:"Film", tr:["Orman Kitabı", "Brother Bear", "Bambi", "Zootopia"], en:["The Jungle Book", "Brother Bear", "Bambi", "Zootopia"] },
+  { emoji:"🐧❄️🏔️", cat:"Film", tr:["Happy Feet", "Ice Age", "Madagascar", "Open Season"], en:["Happy Feet", "Ice Age", "Madagascar", "Open Season"] },
+  /* Countries */
+  { emoji:"🗼🥐☕", cat:"Ülke", tr:["Fransa", "Belçika", "İsviçre", "Hollanda"], en:["France", "Belgium", "Switzerland", "Netherlands"] },
+  { emoji:"🍕🏛️🤌", cat:"Ülke", tr:["İtalya", "Yunanistan", "İspanya", "Portekiz"], en:["Italy", "Greece", "Spain", "Portugal"] },
+  { emoji:"🍣🗻🌸", cat:"Ülke", tr:["Japonya", "Çin", "Kore", "Vietnam"], en:["Japan", "China", "Korea", "Vietnam"] },
+  { emoji:"🧊🌋♨️", cat:"Ülke", tr:["İzlanda", "Norveç", "Grönland", "Finlandiya"], en:["Iceland", "Norway", "Greenland", "Finland"] },
+  { emoji:"🍜🐉🀄", cat:"Ülke", tr:["Çin", "Vietnam", "Japonya", "Tayvan"], en:["China", "Vietnam", "Japan", "Taiwan"] },
+  { emoji:"🦘🪃🌞", cat:"Ülke", tr:["Avustralya", "Yeni Zelanda", "Papua Yeni Gine", "Fiji"], en:["Australia", "New Zealand", "Papua New Guinea", "Fiji"] },
+  { emoji:"☘️🍺🎸", cat:"Ülke", tr:["İrlanda", "İskoçya", "Galler", "İngiltere"], en:["Ireland", "Scotland", "Wales", "England"] },
+  { emoji:"🌷👑🧀", cat:"Ülke", tr:["Hollanda", "Belçika", "Lüksemburg", "Danimarka"], en:["Netherlands", "Belgium", "Luxembourg", "Denmark"] },
+  { emoji:"🏔️🍫⌚", cat:"Ülke", tr:["İsviçre", "Avusturya", "Almanya", "Norveç"], en:["Switzerland", "Austria", "Germany", "Norway"] },
+  { emoji:"🎸💃🌹", cat:"Ülke", tr:["İspanya", "Portekiz", "Arjantin", "Brezilya"], en:["Spain", "Portugal", "Argentina", "Brazil"] },
+  { emoji:"🦁🌍☀️", cat:"Ülke", tr:["Güney Afrika", "Kenya", "Etiyopya", "Nijerya"], en:["South Africa", "Kenya", "Ethiopia", "Nigeria"] },
+  { emoji:"🏰🍺🥨", cat:"Ülke", tr:["Almanya", "Avusturya", "İsviçre", "Hollanda"], en:["Germany", "Austria", "Switzerland", "Netherlands"] },
+  { emoji:"🏔️❄️🎿", cat:"Ülke", tr:["Norveç", "İsveç", "Finlandiya", "Danimarka"], en:["Norway", "Sweden", "Finland", "Denmark"] },
+  { emoji:"🍁🏒🐻", cat:"Ülke", tr:["Kanada", "ABD", "Grönland", "Alaska"], en:["Canada", "USA", "Greenland", "Alaska"] },
+  { emoji:"🌮🌶️🎺", cat:"Ülke", tr:["Meksika", "Venezuela", "Ekvador", "Küba"], en:["Mexico", "Venezuela", "Ecuador", "Cuba"] },
+  /* Food (Turkish dishes keep their Turkish names) */
+  { emoji:"🍞🥑🧂", cat:"Yiyecek", tr:["Tost", "Sandviç", "Pizza", "Burger"], en:["Toast", "Sandwich", "Pizza", "Burger"] },
+  { emoji:"🍝🧀🥩", cat:"Yiyecek", tr:["Lazanya", "Bolonez", "Makarna", "Cannelloni"], en:["Lasagna", "Bolognese", "Pasta", "Cannelloni"] },
+  { emoji:"🌶️🧅🍅", cat:"Yiyecek", tr:["Acı Sos", "Salsa", "Domates Sos", "Ketchup"], en:["Hot sauce", "Salsa", "Tomato sauce", "Ketchup"] },
+  { emoji:"🍌🥛🍦", cat:"Yiyecek", tr:["Muz Dondurma", "Milkshake", "Smoothie", "Sütlaç"], en:["Banana ice cream", "Milkshake", "Smoothie", "Sütlaç"] },
+  { emoji:"🥚🧈🍳", cat:"Yiyecek", tr:["Omlet", "Scrambled Egg", "Krep", "Waffle"], en:["Omelette", "Scrambled eggs", "Crêpe", "Waffle"] },
+  { emoji:"🧆🥙🥗", cat:"Yiyecek", tr:["Falafel", "Döner", "Köfte", "Şiş"], en:["Falafel", "Döner", "Köfte", "Şiş"] },
+  { emoji:"🍫🥜🍯", cat:"Yiyecek", tr:["Fıstıklı Çikolata", "Krokant", "Pralin", "Truffle"], en:["Peanut chocolate", "Brittle", "Praline", "Truffle"] },
+  { emoji:"🥦🧄🫒", cat:"Yiyecek", tr:["Salata", "Meze", "Çorba", "Kavurma"], en:["Salad", "Meze", "Soup", "Kavurma"] },
+  { emoji:"🍚🐟🥢", cat:"Yiyecek", tr:["Suşi", "Sashimi", "Ramen", "Tempura"], en:["Sushi", "Sashimi", "Ramen", "Tempura"] },
+  { emoji:"🥞🍯🧈", cat:"Yiyecek", tr:["Krep", "Waffle", "Gözleme", "Kek"], en:["Crêpe", "Waffle", "Gözleme", "Cake"] },
+  { emoji:"🥔🔥🧂", cat:"Yiyecek", tr:["Patates Kızartması", "Cips", "Kumpir", "Rosti"], en:["French fries", "Potato chips", "Kumpir", "Rösti"] },
+  { emoji:"🍆🧄🫒", cat:"Yiyecek", tr:["İmam Bayıldı", "Karnıyarık", "Musakka", "Türlü"], en:["İmam Bayıldı", "Karnıyarık", "Musakka", "Türlü"] },
+  { emoji:"🥛🍚🍮", cat:"Yiyecek", tr:["Sütlaç", "Muhallebi", "Keşkül", "Kazandibi"], en:["Sütlaç", "Muhallebi", "Keşkül", "Kazandibi"] },
+  { emoji:"🌰🍯🥮", cat:"Yiyecek", tr:["Baklava", "Künefe", "Şöbiyet", "Revani"], en:["Baklava", "Künefe", "Şöbiyet", "Revani"] },
+  { emoji:"🍅🧀🌿", cat:"Yiyecek", tr:["Margarita Pizza", "Lahmacun", "Pide", "Focaccia"], en:["Pizza Margherita", "Lahmacun", "Pide", "Focaccia"] },
+  /* Turkish idioms (Turkish only: hidden in English mode) */
+  { emoji:"🐓⏰🌅", cat:"Deyim", tr:["Erken kalkan yol alır", "Sabah havası güzeldir", "Gün doğmadan", "Tan yeri ağarmadan"] },
+  { emoji:"🌊💧🪨", cat:"Deyim", tr:["Damlaya damlaya göl olur", "Su akar taş oyar", "Dereden tepeye", "Yağmur seli getirir"] },
+  { emoji:"🐺🐑😱", cat:"Deyim", tr:["Kurt gibi acıkmak", "Tilki gibi kurnaz", "Aslan gibi güçlü", "Kartal gibi bakmak"] },
+  { emoji:"🎯🏹✅", cat:"Deyim", tr:["Hedefi tutturmak", "Ok atmak", "Nişan almak", "İsabet etmek"] },
+  { emoji:"💡🧠🔍", cat:"Deyim", tr:["Kafa yormak", "Akıl yürütmek", "Beyin fırtınası", "Düşünmek"] },
+  { emoji:"🔥🚫💨", cat:"Deyim", tr:["Ateş olmayan yerden duman çıkmaz", "Yanan ateşe körükle gitmek", "Dumanı üstünde", "Ateşle oynamak"] },
+  { emoji:"🐦✋🌳", cat:"Deyim", tr:["Eldeki bir kuş daldaki iki kuştan iyidir", "Kuş kadar canı var", "Kuş uçmaz kervan geçmez", "Kuşa benzemek"] },
+  { emoji:"🍯🖐️👅", cat:"Deyim", tr:["Bal tutan parmağını yalar", "Bal gibi bilmek", "Ağzına bal çalmak", "Tatlı dil yılanı deliğinden çıkarır"] },
+  { emoji:"🐜🌰❄️", cat:"Deyim", tr:["Sakla samanı gelir zamanı", "Karınca kararınca", "Ayağını yorganına göre uzat", "Damlaya damlaya"] },
+  { emoji:"🐘🐜🔍", cat:"Deyim", tr:["Pireyi deve yapmak", "Dağ fare doğurdu", "Devede kulak", "Fil hafızalı"] },
+  { emoji:"🌊🐍🤲", cat:"Deyim", tr:["Denize düşen yılana sarılır", "Sudan çıkmış balık", "Yılanın başını küçükken ezmek", "Boğulan saman çöpüne"] },
+  { emoji:"👁️🚫💭", cat:"Deyim", tr:["Gözden ırak olan gönülden de ırak olur", "Göz görmeyince gönül katlanır", "Gözü kara olmak", "Göze girmek"] },
+  { emoji:"🪡⛏️🕳️", cat:"Deyim", tr:["İğneyle kuyu kazmak", "Taş üstüne taş koymak", "Dağ delmek", "Sabırla koruk helva olur"] },
+  { emoji:"🐎🚪🏃", cat:"Deyim", tr:["At çalındıktan sonra ahırın kapısını kapatmak", "Atı alan Üsküdar'ı geçti", "Geç kalmış olmak", "Son pişmanlık fayda etmez"] },
+  { emoji:"🌱🌳⏳", cat:"Deyim", tr:["Ağaç yaşken eğilir", "Armut dibine düşer", "Ne ekersen onu biçersin", "Meyve veren ağaç taşlanır"] },
+];
+
+const I18N = {
+  tr: {
+    title: "🎭 Emoji Quiz", howTo: "Nasıl oynanır", close: "Kapat",
+    sScore: "Puan", sCorrect: "Doğru", sQuestion: "Soru", sRecord: "Rekor",
+    category: "Kategori", options: "Cevap seçenekleri",
+    next: "Sonraki Soru →", result: "Sonucu Gör", restart: "Tekrar Oyna",
+    right: "✓ Doğru! +{n} puan", wrong: "✗ Yanlış — doğrusu: {answer}", timeUp: "⏱ Süre doldu — doğrusu: {answer}",
+    over: "{emoji} Oyun Bitti!", endSub: "puan · {right}/{total} doğru ({pct}%)",
+    newBest: "Yeni rekor!", prevBest: " Önceki rekor: {n} · ", catBest: "{cat} rekoru: {n} · ", played: "Oynanan oyun: {n}",
+    confirm: "Kategori değişirse bu oyundaki ilerleme silinir. Devam edilsin mi?",
+    "cat:Tümü": "Tümü", "cat:Film": "Film", "cat:Ülke": "Ülke", "cat:Yiyecek": "Yiyecek", "cat:Deyim": "Deyim",
+    "tag:Film": "Film", "tag:Ülke": "Ülke", "tag:Yiyecek": "Yiyecek", "tag:Deyim": "Deyim"
+  },
+  en: {
+    title: "🎭 Emoji Quiz", howTo: "How to play", close: "Close",
+    sScore: "Score", sCorrect: "Right", sQuestion: "Question", sRecord: "Record",
+    category: "Category", options: "Answer options",
+    next: "Next question →", result: "See result", restart: "Play again",
+    right: "✓ Correct! +{n} points", wrong: "✗ Wrong — the answer: {answer}", timeUp: "⏱ Time's up — the answer: {answer}",
+    over: "{emoji} Game over!", endSub: "points · {right}/{total} right ({pct}%)",
+    newBest: "New best!", prevBest: " Previous best: {n} · ", catBest: "Best in {cat}: {n} · ", played: "Games played: {n}",
+    confirm: "Changing the category discards this round. Continue?",
+    "cat:Tümü": "All", "cat:Film": "Movies", "cat:Ülke": "Countries", "cat:Yiyecek": "Food", "cat:Deyim": "Idioms",
+    "tag:Film": "Movie", "tag:Ülke": "Country", "tag:Yiyecek": "Food", "tag:Deyim": "Turkish idiom",
+    helpBody:
+      "<p>Guess the movie, country or food from the emoji clues.</p>" +
+      "<ol>" +
+      "<li>Pick a category or play a mix with <b>All</b>; each round has 15 questions.</li>" +
+      "<li>Work out what the emojis describe within 15 seconds and tap one of the four options.</li>" +
+      "<li>Go on with <b>Next question</b>.</li>" +
+      "</ol>" +
+      "<h3>Score</h3>" +
+      "<p>A correct answer gives 10 points plus 1 point for every second left.</p>" +
+      "<h3>Keyboard</h3>" +
+      "<p>You can also answer with the 1–4 keys.</p>" +
+      "<h3>Note</h3>" +
+      "<p>Movies have their English titles; Turkish dishes keep their Turkish names. The Turkish page also has a category of Turkish idioms (Deyim); it is not shown in English, because the idioms only work in Turkish.</p>" +
+      "<p>The clock keeps running while this window is open. Changing the category restarts the round.</p>" +
+      "<p>Your <b>record</b> is your best score in the selected category. Records and the number of games played are stored only on this device.</p>"
+  }
+};
+
+const helpDialog = document.getElementById("eq-help-dialog");
+const helpBody = helpDialog.querySelector(".eq-dialog-body");
+/* The Turkish help text is the page's own markup. */
+I18N.tr.helpBody = helpBody.innerHTML;
+document.getElementById("eq-help").addEventListener("click", () => helpDialog.showModal());
+helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+
+let i18n = null;
+const t = (key, vars) => i18n ? i18n.t(key, vars) : I18N.tr[key];
+const isEn = () => !!i18n && i18n.lang === "en";
+/* Turkish idioms have no English version; in English they keep their Turkish text. */
+const choicesOf = q => (isEn() && q.en) ? q.en : q.tr;
+
+/* Category keys stay Turkish: they are also the record keys. */
+const CATS = ["Tümü", "Film", "Ülke", "Yiyecek", "Deyim"];
+const visibleCats = () => isEn() ? CATS.filter(c => c !== "Deyim") : CATS;
+let selectedCat = "Tümü";
+let questions = [];
+let qIdx = 0;
+let score = 0;
+let correctCount = 0;
+let timerInt = null;
+let timeLeft = 15;
+let answered = false;
+/* What the feedback line says, kept so a language switch can redraw it. */
+let feedback = null;
+let lastRecord = null;
+
+/* Records live only in this browser. Blocked storage (private mode) just
+   means nothing is remembered; the quiz itself must keep working. */
+const STATS_KEY = "pz:emoji-quiz:stats";
+
+function loadStats() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (raw && typeof raw === "object") {
+      return {
+        played: Number(raw.played) || 0,
+        best: raw.best && typeof raw.best === "object" ? raw.best : {}
+      };
+    }
+  } catch (e) {}
+  return { played: 0, best: {} };
+}
+
+function saveStats() {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+}
+
+const stats = loadStats();
+let roundCat = selectedCat;
+const bestFor = cat => Number(stats.best[cat]) || 0;
+
+/* Rounds of one category are scored alike, so each category has its own record. */
+function saveRecord() {
+  const previous = bestFor(roundCat);
+  const isNewBest = score > previous;
+  stats.played += 1;
+  if (isNewBest) stats.best[roundCat] = score;
+  saveStats();
+  document.getElementById("eq-record").textContent = String(Math.max(previous, score));
+  lastRecord = { isNewBest, previous, played: stats.played, cat: roundCat };
+  drawRecord();
+}
+
+function drawRecord() {
+  const r = lastRecord;
+  const line = document.getElementById("eq-end-record");
+  line.textContent = "";
+  if (!r) return;
+  if (r.isNewBest) {
+    const badge = document.createElement("span");
+    badge.className = "eq-new-best";
+    badge.textContent = t("newBest");
+    line.append(badge, r.previous ? t("prevBest", { n: r.previous }) : " ");
+  } else {
+    line.append(t("catBest", { cat: t("cat:" + r.cat), n: r.previous }));
+  }
+  line.append(t("played", { n: r.played }));
+}
+
+function filteredQuestions() {
+  let q = selectedCat === "Tümü" ? ALL_QUESTIONS : ALL_QUESTIONS.filter(q => q.cat === selectedCat);
+  if (isEn()) q = q.filter(x => x.en);
+  return shuffle([...q]).slice(0, 15);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function renderCats() {
+  const wrap = document.getElementById("eq-cats");
+  wrap.innerHTML = "";
+  visibleCats().forEach(cat => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "eq-cat-btn" + (selectedCat === cat ? " active" : "");
+    btn.setAttribute("aria-pressed", String(selectedCat === cat));
+    btn.textContent = t("cat:" + cat);
+    btn.addEventListener("click", () => {
+      /* Switching category restarts the round, so ask before throwing away progress. */
+      const inProgress = document.getElementById("eq-end-card").style.display === "none" && (qIdx > 0 || answered);
+      if (inProgress && !window.confirm(t("confirm"))) return;
+      selectedCat = cat;
+      startGame();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function startGame() {
+  /* The idiom category has no English round. */
+  if (isEn() && selectedCat === "Deyim") selectedCat = "Tümü";
+  questions = filteredQuestions();
+  roundCat = selectedCat;
+  document.getElementById("eq-record").textContent = String(bestFor(roundCat));
+  qIdx = 0; score = 0; correctCount = 0; answered = false; lastRecord = null;
+  document.getElementById("eq-score").textContent = "0";
+  document.getElementById("eq-correct").textContent = "0";
+  document.getElementById("eq-end-card").style.display = "none";
+  document.getElementById("eq-card").style.display = "";
+  renderCats();
+  showQuestion();
+}
+
+function drawFeedback() {
+  const el = document.getElementById("eq-feedback");
+  if (!feedback) { el.textContent = ""; return; }
+  const q = questions[qIdx];
+  el.textContent = t(feedback.key, { n: feedback.n, answer: q ? choicesOf(q)[0] : "" });
+}
+
+/* Writes texts into the existing choice buttons; marks, the lock and the clock stay. */
+function labelChoices() {
+  const q = questions[qIdx];
+  if (!q) return;
+  const choiceEls = document.getElementById("eq-choices");
+  const labels = choicesOf(q);
+  /* Long proverbs read badly squeezed into two narrow columns. */
+  choiceEls.classList.toggle("is-long", labels.some(c => c.length > 22));
+  choiceEls.querySelectorAll(".eq-choice").forEach(btn => {
+    btn.textContent = labels[Number(btn.dataset.i)];
+  });
+  document.getElementById("eq-cat-tag").textContent = t("tag:" + q.cat);
+}
+
+function showQuestion() {
+  if (qIdx >= questions.length) { endGame(); return; }
+  const q = questions[qIdx];
+  answered = false;
+  timeLeft = 15;
+  feedback = null;
+
+  document.getElementById("eq-progress").style.width = `${(qIdx/questions.length)*100}%`;
+  document.getElementById("eq-qnum").textContent = `${qIdx+1}/${questions.length}`;
+  document.getElementById("eq-emoji").textContent = q.emoji;
+  document.getElementById("eq-timer").textContent = timeLeft;
+  document.getElementById("eq-timer-box").classList.remove("low");
+  document.getElementById("eq-next-btn").style.display = "none";
+  drawFeedback();
+
+  const choiceEls = document.getElementById("eq-choices");
+  choiceEls.innerHTML = "";
+  shuffle([0, 1, 2, 3]).forEach(i => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "eq-choice";
+    btn.dataset.i = String(i);
+    btn.addEventListener("click", () => selectAnswer(i));
+    choiceEls.appendChild(btn);
+  });
+  labelChoices();
+
+  clearInterval(timerInt);
+  timerInt = setInterval(() => {
+    timeLeft--;
+    document.getElementById("eq-timer").textContent = timeLeft;
+    document.getElementById("eq-timer-box").classList.toggle("low", timeLeft <= 5);
+    if (timeLeft <= 0) { clearInterval(timerInt); if (helpDialog.open) helpDialog.close(); timeUp(); }
+  }, 1000);
+}
+
+function selectAnswer(chosen) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInt);
+
+  const isCorrect = chosen === 0;
+  if (isCorrect) { score += 10 + timeLeft; correctCount++; }
+
+  document.getElementById("eq-score").textContent = score;
+  document.getElementById("eq-correct").textContent = correctCount;
+
+  document.querySelectorAll(".eq-choice").forEach(btn => {
+    const i = Number(btn.dataset.i);
+    btn.disabled = true;
+    if (i === 0) btn.classList.add("correct");
+    else if (i === chosen && !isCorrect) btn.classList.add("wrong");
+  });
+
+  feedback = isCorrect ? { key: "right", n: 10 + timeLeft } : { key: "wrong" };
+  drawFeedback();
+
+  showNext();
+}
+
+/* After an answer the next step is the Next button, so keyboard focus goes there. */
+function labelNext() {
+  document.getElementById("eq-next-btn").textContent = qIdx + 1 < questions.length ? t("next") : t("result");
+}
+
+function showNext() {
+  const nextBtn = document.getElementById("eq-next-btn");
+  nextBtn.style.display = "block";
+  labelNext();
+  nextBtn.focus();
+}
+
+function focusFirstChoice() {
+  const first = document.querySelector(".eq-choice");
+  if (first) first.focus({ preventScroll: true });
+}
+
+function timeUp() {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll(".eq-choice").forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.i === "0") btn.classList.add("correct");
+  });
+  feedback = { key: "timeUp" };
+  drawFeedback();
+  showNext();
+}
+
+function drawEnd() {
+  const pct = Math.round((correctCount / questions.length) * 100);
+  const emoji = pct >= 80 ? "🏆" : pct >= 60 ? "🎉" : pct >= 40 ? "👍" : "💪";
+  document.getElementById("eq-end-title").textContent = t("over", { emoji });
+  document.getElementById("eq-end-score").textContent = score;
+  document.getElementById("eq-end-sub").textContent = t("endSub", { right: correctCount, total: questions.length, pct });
+  drawRecord();
+}
+
+function endGame() {
+  clearInterval(timerInt);
+  document.getElementById("eq-card").style.display = "none";
+  document.getElementById("eq-end-card").style.display = "block";
+  saveRecord();
+  drawEnd();
+  document.getElementById("eq-restart-btn").focus();
+}
+
+document.getElementById("eq-next-btn").addEventListener("click", () => { qIdx++; showQuestion(); focusFirstChoice(); });
+document.getElementById("eq-restart-btn").addEventListener("click", () => { startGame(); focusFirstChoice(); });
+
+/* Keys 1-4 pick an answer while a question is open. */
+document.addEventListener("keydown", event => {
+  if (helpDialog.open || answered || document.getElementById("eq-card").style.display === "none") return;
+  if (event.ctrlKey || event.metaKey || event.altKey || !event.key || event.key.length !== 1) return;
+  const target = event.target;
+  if (target && target.closest && target.closest("input, textarea, select, [contenteditable]")) return;
+  const choice = "1234".indexOf(event.key);
+  if (choice < 0) return;
+  const btn = document.querySelectorAll(".eq-choice")[choice];
+  if (btn && !btn.disabled) { event.preventDefault(); btn.click(); }
+});
+
+/* A language switch only relabels: the round, the clock and the marks stay.
+   A running idiom round goes on in Turkish; the next round in English leaves idioms out. */
+function relabel() {
+  renderCats();
+  if (!questions.length) return;
+  labelChoices();
+  drawFeedback();
+  if (document.getElementById("eq-next-btn").style.display !== "none") labelNext();
+  if (document.getElementById("eq-end-card").style.display === "block") drawEnd();
+}
+
+/* setup() calls back before it returns, so the first run happens after it. */
+i18n = ToolI18n.setup(I18N, () => { if (i18n) relabel(); });
+startGame();
+})();
+</script>

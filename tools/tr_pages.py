@@ -5,8 +5,8 @@ Used by tools/make_tr_pages.py (the copies) and tools/make_related.py (the strip
 Turkish name comes from make_related.TR_TITLES (each page's own Turkish h1).
 """
 
-TOOLS_HUB = '/tr/araclar/'
-GAMES_HUB = '/tr/oyunlar/'
+TOOLS_HUB = '/apps/tr/'
+GAMES_HUB = '/game/tr/'
 
 # English URL: (Turkish slug, seo_title, excerpt)
 APPS = {

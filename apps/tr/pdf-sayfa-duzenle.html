@@ -1,0 +1,843 @@
+---
+# tools/make_tr_pages.py writes this copy of apps/pdf-page-organizer.html; edit that page, then run the script.
+layout: without-sidebar
+title: "PDF Sayfa Düzenleyici"
+permalink: /apps/tr/pdf-sayfa-duzenle/
+excerpt: "PDF sayfalarını yeniden sıralayın, silin ya da döndürün ve yeni PDF'yi indirin. Tarayıcıda çalışır."
+lang: tr
+ui_lang: tr
+seo_title: "PDF Sayfa Düzenleme · Sırala, Sil, Döndür"
+og_image: https://sercankulcu.github.io/images/apps/pdf-page-organizer.jpg
+web_app: BusinessApplication
+hreflang: {en: "/apps/pdf-page-organizer/", tr: "/apps/tr/pdf-sayfa-duzenle/"}
+---
+
+<style>
+.pdf-organizer-app,
+.pdf-organizer-app *,
+.pdf-organizer-app *::before,
+.pdf-organizer-app *::after {
+  box-sizing: border-box;
+}
+
+.pdf-organizer-app {
+  width: min(980px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.po-panel {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.po-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.po-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.po-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.po-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.po-hero-actions{display:flex;gap:8px;flex:0 0 auto}
+.po-help:focus-visible,.po-lang:focus-visible,.po-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.po-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.po-dialog::backdrop{background:rgba(0,0,0,.45)}
+.po-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.po-dialog-head h2{margin:0;font-size:1.1rem;border:0;padding:0}
+.po-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.po-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.po-dialog-body p{margin:0 0 .6em}
+.po-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.po-dialog-body ul,.po-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.po-dialog[open]{animation:po-pop .16s ease-out}
+  @keyframes po-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.po-drop {
+  margin-top: 0;
+  padding: 20px 16px;
+  border: 1px dashed rgba(127,127,127,.52);
+  border-radius: 14px;
+  background: rgba(127,127,127,.04);
+  color: var(--global-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+.po-drop:hover,
+.po-drop.drag {
+  border-color: var(--global-link-color);
+  background: rgba(80,120,200,.08);
+}
+
+.pdf-organizer-app [hidden] {
+  display: none !important;
+}
+
+.po-drop {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  border-width: 2px;
+}
+
+.po-drop.drag {
+  border-style: solid;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--global-link-color) 22%, transparent);
+}
+
+.po-drop.has-file {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--global-link-color) 55%, transparent);
+}
+
+.po-drop-icon {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.po-drop-title {
+  max-width: 100%;
+  font-size: .95rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.po-drop-hint {
+  color: color-mix(in srgb, var(--global-text-color) 80%, transparent);
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
+.pdf-organizer-app .po-drop:focus-visible,
+.pdf-organizer-app button:focus-visible,
+.pdf-organizer-app input:focus-visible,
+.pdf-organizer-app select:focus-visible,
+.pdf-organizer-app canvas:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.po-card {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 13px;
+  background: rgba(127,127,127,.035);
+}
+
+.po-field {
+  display: grid;
+  gap: 6px;
+}
+
+.po-field + .po-field {
+  margin-top: 12px;
+}
+
+.po-hint {
+  margin: 0;
+  color: var(--global-text-color);
+  opacity: .78;
+  font-size: .76rem;
+  line-height: 1.4;
+}
+
+.po-field label {
+  margin: 0;
+  color: var(--global-text-color);
+  opacity: .85;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.po-field input,
+.po-field select {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--global-text-color) 35%, transparent);
+  border-radius: 10px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .8rem;
+}
+
+.po-meta {
+  margin: 12px 0 0;
+  color: var(--global-text-color);
+  opacity: .85;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.po-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.po-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(45,45,45,.42);
+  border-radius: 999px;
+  background: rgba(45,45,45,.08);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.po-btn:hover:not(:disabled) {
+  background: rgba(45,45,45,.14);
+}
+
+.po-btn.primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.po-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.pdf-organizer-app .po-btn.primary:disabled {
+  border: 1px dashed color-mix(in srgb, var(--global-text-color) 45%, transparent);
+  background: transparent;
+  color: var(--global-text-color);
+  opacity: .8;
+}
+
+html[data-theme="dark"] .po-btn {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .po-btn.primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.po-status {
+  margin-top: 10px;
+  color: var(--global-text-color);
+  opacity: .85;
+  text-align: center;
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
+.po-status.error {
+  color: #b42318;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .po-status.error {
+  color: #ff9f9f;
+}
+
+@media (max-width: 680px) {
+  .pdf-organizer-app {
+    width: 100%;
+  }
+
+  .po-panel {
+    padding: 14px 10px;
+  }
+}
+
+@media (max-width: 760px) {
+  .pdf-organizer-app .po-field input,
+  .pdf-organizer-app .po-field select {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdf-organizer-app *,
+  .pdf-organizer-app *::before,
+  .pdf-organizer-app *::after {
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="pdf-organizer-app">
+  <section class="po-panel" aria-labelledby="po-title">
+    <header class="po-hero">
+      <h1 class="po-title" id="po-title" data-i18n="title">PDF Page Organizer</h1>
+      <div class="po-hero-actions">
+        <button class="po-lang" data-lang-toggle></button>
+        <button class="po-help" id="po-help" type="button" aria-haspopup="dialog" aria-controls="po-help-dialog"
+                data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+      </div>
+    </header>
+
+    <div
+      class="po-drop"
+      id="po-drop"
+      role="button"
+      tabindex="0"
+      aria-describedby="po-drop-hint"
+    >
+      <span class="po-drop-icon" aria-hidden="true">📄</span>
+      <span class="po-drop-title" id="po-drop-title">Drop a PDF here or click to choose</span>
+      <span class="po-drop-hint" id="po-drop-hint">Processed in your browser — nothing is uploaded</span>
+    </div>
+    <input
+      id="po-file"
+      type="file"
+      accept=".pdf,application/pdf"
+      hidden
+    >
+
+    <div class="po-card">
+      <div class="po-field">
+        <label for="po-order" data-i18n="order">Output page order</label>
+        <input
+          id="po-order"
+          placeholder="1,2,3"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="po-order-hint"
+        >
+        <div class="po-hint" id="po-order-hint" data-i18n="orderHint">Comma-separated page numbers. Leave a page out to delete it; repeat it to duplicate it.</div>
+      </div>
+
+      <div class="po-field">
+        <label for="po-rotate-pages" data-i18n="rotPages">Rotate selected output pages</label>
+        <input
+          id="po-rotate-pages"
+          placeholder="e.g. 2,4"
+          data-i18n-attr="placeholder:rotPh"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="po-rotate-hint"
+        >
+        <div class="po-hint" id="po-rotate-hint" data-i18n="rotHint">Positions in the output order, not the original page numbers.</div>
+      </div>
+
+      <div class="po-field">
+        <label for="po-rotation" data-i18n="rotation">Rotation</label>
+        <select id="po-rotation">
+          <option value="90" data-i18n="cw90">90° clockwise</option>
+          <option value="180">180°</option>
+          <option value="270" data-i18n="cw270">270° clockwise</option>
+        </select>
+      </div>
+
+      <p class="po-meta" id="po-info" aria-live="polite">Choose a PDF.</p>
+
+      <div class="po-actions">
+        <button
+          class="po-btn primary"
+          id="po-download"
+          type="button"
+          disabled
+          data-i18n="download"
+        >
+          Download Organized PDF
+        </button>
+
+        <button
+          class="po-btn"
+          id="po-clear"
+          type="button"
+          disabled
+          data-i18n="clear"
+        >
+          Clear
+        </button>
+      </div>
+
+      <div
+        class="po-status"
+        id="po-status"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <div id="po-next" hidden></div>
+    </div>
+  </section>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="/assets/js/tool-handoff.js"></script>
+<script src="/assets/js/tool-i18n.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+
+  const drop = byId("po-drop");
+  const fileInput = byId("po-file");
+  const orderInput = byId("po-order");
+  const rotatePagesInput = byId("po-rotate-pages");
+  const rotationInput = byId("po-rotation");
+  const info = byId("po-info");
+  const downloadBtn = byId("po-download");
+  const clearBtn = byId("po-clear");
+  const status = byId("po-status");
+const dropTitle = byId("po-drop-title");
+const dropHint = byId("po-drop-hint");
+
+  function i18nHarvest(en) {
+    document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (!(k in en)) en[k] = el.textContent.trim(); });
+    document.querySelectorAll("[data-i18n-html]").forEach(el => { const k = el.getAttribute("data-i18n-html"); if (!(k in en)) en[k] = el.innerHTML; });
+    document.querySelectorAll("[data-i18n-attr]").forEach(el => el.getAttribute("data-i18n-attr").split(";").forEach(p => { const q = p.split(":"); if (q.length !== 2) return; const a = q[0].trim(), k = q[1].trim(); if (a && !(k in en) && el.hasAttribute(a)) en[k] = el.getAttribute(a); }));
+    return en;
+  }
+  const EN = {
+    dropTitle: "Drop a PDF here or click to choose", dropHint: "Processed in your browser — nothing is uploaded",
+    replace: "Click or drop to replace", choose: "Choose a PDF.", pages1: "1 page", pagesN: "{n} pages",
+    fileInfo: "{name} · {pages}",
+    notPdf: "Please choose a PDF file.", noLib: "PDF library could not be loaded.", ready: "PDF ready.",
+    openFail: "The PDF could not be opened. It may be encrypted, damaged or unsupported.",
+    badOrder: "Output page order is empty or invalid.", creating: "Creating organized PDF...",
+    done1: "Done. 1 page in the output PDF.", doneN: "Done. {n} pages in the output PDF.",
+    fail: "The organized PDF could not be created.", loadedFrom: "Loaded {name} from the previous tool."
+  };
+  const TR = {
+    title: "PDF Sayfa Düzenleyici", howTo: "Nasıl kullanılır", close: "Kapat",
+    dropTitle: "PDF'yi buraya bırakın ya da seçin", dropHint: "Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez",
+    replace: "Değiştirmek için tıklayın ya da yeni dosya bırakın",
+    order: "Çıktı sayfa sırası",
+    orderHint: "Virgülle ayrılmış sayfa numaraları. Silmek istediğiniz sayfayı yazmayın; çoğaltmak için tekrar yazın.",
+    rotPages: "Döndürülecek çıktı sayfaları", rotPh: "ör. 2,4",
+    rotHint: "Özgün sayfa numaraları değil, çıktı sırasındaki konumlar.",
+    rotation: "Döndürme", cw90: "Saat yönünde 90°", cw270: "Saat yönünde 270°",
+    download: "Düzenlenmiş PDF'yi indir", clear: "Temizle",
+    choose: "Bir PDF seçin.", pages1: "1 sayfa", pagesN: "{n} sayfa", fileInfo: "{name} · {pages}",
+    notPdf: "Lütfen bir PDF dosyası seçin.", noLib: "PDF kitaplığı yüklenemedi.", ready: "PDF hazır.",
+    openFail: "PDF açılamadı. Şifreli, bozuk ya da desteklenmeyen bir dosya olabilir.",
+    badOrder: "Çıktı sayfa sırası boş ya da geçersiz.", creating: "Düzenlenmiş PDF hazırlanıyor...",
+    done1: "Bitti. Çıktı PDF'de 1 sayfa var.", doneN: "Bitti. Çıktı PDF'de {n} sayfa var.",
+    fail: "Düzenlenmiş PDF oluşturulamadı.", loadedFrom: "{name} önceki araçtan alındı.",
+    help: `
+    <p>PDF sayfalarını yeniden sıralayın, silin ve döndürün. 3,1,2,5 gibi basit bir çıktı listesi kullanın.</p>
+    <h3>Nasıl kullanılır</h3>
+    <ol>
+      <li>PDF'yi kutuya bırakın ya da kutuya tıklayıp bir dosya seçin.</li>
+      <li>Çıktı sayfa sırasını virgülle ayrılmış sayfa numaraları olarak yazın. Bir sayfayı çoğaltmak için numarasını tekrar yazın.</li>
+      <li>Sayfa silmek için o sayfayı çıktı sırasına yazmayın.</li>
+      <li>Sayfa döndürmek için çıktı sırasındaki konumlarını yazıp döndürme açısını seçin.</li>
+      <li><strong>Düzenlenmiş PDF'yi indir</strong>'e basın.</li>
+      <li><strong>Şununla devam et</strong> düzenlenmiş PDF'yi doğrudan başka bir araca aktarır.</li>
+    </ol>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Her şey tarayıcınızda işlenir. PDF hiçbir yere yüklenmez.</li>
+    </ul>
+    <p>TR / EN düğmesi arayüz dilini değiştirir; seçim bütün araçlar için hatırlanır.</p>
+  `
+  };
+  let i18n = null;
+  const T = (k, v) => i18n ? i18n.t(k, v) : String(EN[k] != null ? EN[k] : k).replace(/\{(\w+)\}/g, (m, x) => v && v[x] != null ? v[x] : m);
+  let lastStatus = null;
+  let lastInfo = ["choose"];
+  let dropFile = null;
+  let fileName = "";
+
+  const pagesText = n => n === 1 ? T("pages1") : T("pagesN", { n });
+  const infoText = () => lastInfo[0] === "fileInfo" ? T("fileInfo", { name: lastInfo[1].name, pages: pagesText(lastInfo[1].n) }) : T(lastInfo[0], lastInfo[1]);
+  function setInfo(key, vars) {
+    lastInfo = [key, vars];
+    info.textContent = infoText();
+  }
+
+  function showDropFile(file) {
+    dropFile = file || null;
+    drop.classList.toggle("has-file", !!file);
+
+    if (!file) {
+      dropTitle.textContent = T("dropTitle");
+      dropHint.textContent = T("dropHint");
+      return;
+    }
+
+    const kb = file.size / 1024;
+    const size = kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb / 1024).toFixed(2)} MB`;
+
+    dropTitle.textContent = file.name;
+    dropHint.textContent = `${size} · ${pagesText(pageCount)} · ${T("replace")}`;
+  }
+
+  let bytes = null;
+  let pageCount = 0;
+  let outputUrl = null;
+  let lastResult = null;
+  const nextBox = byId("po-next");
+
+  function showNext(result) {
+    lastResult = result || null;
+    if (!lastResult || !window.ToolHandoff) {
+      nextBox.hidden = true;
+      nextBox.innerHTML = "";
+      return;
+    }
+    ToolHandoff.renderNext(nextBox, "pdf", () => [lastResult]);
+    nextBox.hidden = false;
+  }
+
+  function setStatus(key, error = false, vars) {
+    lastStatus = key ? [key, vars] : null;
+    status.textContent = key ? T(key, vars) : "";
+    status.classList.toggle("error", error);
+  }
+
+  function parseList(text) {
+    return text
+      .split(",")
+      .map(value => Number.parseInt(value.trim(), 10))
+      .filter(number =>
+        Number.isInteger(number) &&
+        number >= 1 &&
+        number <= pageCount
+      );
+  }
+
+  function clearAll() {
+    bytes = null;
+    pageCount = 0;
+
+    fileInput.value = "";
+    orderInput.value = "";
+    rotatePagesInput.value = "";
+    rotationInput.value = "90";
+
+    setInfo("choose");
+    showDropFile(null);
+    downloadBtn.disabled = true;
+    clearBtn.disabled = true;
+
+    if (outputUrl) {
+      URL.revokeObjectURL(outputUrl);
+      outputUrl = null;
+    }
+
+    setStatus("");
+    showNext(null);
+  }
+
+  async function loadFile(file) {
+    if (
+      !file ||
+      (
+        file.type !== "application/pdf" &&
+        !file.name.toLowerCase().endsWith(".pdf")
+      )
+    ) {
+      setStatus("notPdf", true);
+      return;
+    }
+
+    if (!window.PDFLib) {
+      setStatus("noLib", true);
+      return;
+    }
+
+    try {
+      showNext(null);
+      bytes = new Uint8Array(await file.arrayBuffer());
+
+      const documentPdf =
+        await PDFLib.PDFDocument.load(bytes);
+
+      pageCount =
+        documentPdf.getPageCount();
+
+      orderInput.value =
+        Array.from(
+          { length: pageCount },
+          (_, index) => index + 1
+        ).join(",");
+
+      rotatePagesInput.value = "";
+
+      fileName = file.name;
+      setInfo("fileInfo", { name: file.name, n: pageCount });
+
+      showDropFile(file);
+
+      downloadBtn.disabled = false;
+      clearBtn.disabled = false;
+
+      fileInput.value = "";
+
+      setStatus("ready");
+    } catch (error) {
+      console.error(error);
+
+      bytes = null;
+      pageCount = 0;
+
+      showDropFile(null);
+      fileInput.value = "";
+      downloadBtn.disabled = true;
+      clearBtn.disabled = true;
+
+      setStatus("openFail", true);
+    }
+  }
+
+  drop.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  drop.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener("change", event => {
+    loadFile(event.target.files[0]);
+  });
+
+  ["dragenter", "dragover"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      drop.classList.add("drag");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      drop.classList.remove("drag");
+    });
+  });
+
+  drop.addEventListener("drop", event => {
+    loadFile(event.dataTransfer.files[0]);
+  });
+
+  clearBtn.addEventListener("click", clearAll);
+
+  downloadBtn.addEventListener("click", async () => {
+    if (!bytes || !pageCount) {
+      return;
+    }
+
+    if (!window.PDFLib) {
+      setStatus("noLib", true);
+      return;
+    }
+
+    const order = parseList(orderInput.value);
+
+    if (!order.length) {
+      setStatus("badOrder", true);
+      return;
+    }
+
+    try {
+      downloadBtn.disabled = true;
+      clearBtn.disabled = true;
+
+      setStatus("creating");
+
+      const sourcePdf =
+        await PDFLib.PDFDocument.load(bytes);
+
+      const outputPdf =
+        await PDFLib.PDFDocument.create();
+
+      const copiedPages =
+        await outputPdf.copyPages(
+          sourcePdf,
+          order.map(number => number - 1)
+        );
+
+      copiedPages.forEach(page => {
+        outputPdf.addPage(page);
+      });
+
+      const rotatePages =
+        new Set(
+          parseList(
+            rotatePagesInput.value
+          )
+        );
+
+      const degrees =
+        Number(rotationInput.value);
+
+      outputPdf
+        .getPages()
+        .forEach((page, index) => {
+          if (
+            rotatePages.has(index + 1)
+          ) {
+            page.setRotation(
+              PDFLib.degrees(
+                (
+                  page.getRotation().angle +
+                  degrees
+                ) % 360
+              )
+            );
+          }
+        });
+
+      const outputBytes =
+        await outputPdf.save();
+
+      if (outputUrl) {
+        URL.revokeObjectURL(outputUrl);
+      }
+
+      const outputBlob =
+        new Blob(
+          [outputBytes],
+          {
+            type:
+              "application/pdf"
+          }
+        );
+
+      outputUrl =
+        URL.createObjectURL(outputBlob);
+
+      const anchor =
+        document.createElement("a");
+
+      anchor.href =
+        outputUrl;
+
+      anchor.download =
+        "organized.pdf";
+
+      document.body
+        .appendChild(anchor);
+
+      anchor.click();
+      anchor.remove();
+
+      showNext({ blob: outputBlob, name: anchor.download });
+
+      window.setTimeout(
+        () => {
+          if (
+            outputUrl
+          ) {
+            URL.revokeObjectURL(
+              outputUrl
+            );
+
+            outputUrl =
+              null;
+          }
+        },
+        1500
+      );
+
+      setStatus(order.length === 1 ? "done1" : "doneN", false, { n: order.length });
+    } catch (error) {
+      console.error(error);
+
+      setStatus("fail", true);
+    } finally {
+      downloadBtn.disabled =
+        !bytes;
+
+      clearBtn.disabled =
+        !bytes;
+    }
+  });
+
+  clearAll();
+
+  if (window.ToolHandoff) {
+    ToolHandoff.take().then(async files => {
+      const file = (files || []).find(f => f.type === "application/pdf" || /\.pdf$/i.test(f.name));
+      if (!file) return;
+      if (!window.PDFLib && document.readyState !== "complete") {
+        await new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+      }
+      await loadFile(file);
+      if (bytes) setStatus("loadedFrom", false, { name: file.name });
+    }).catch(() => {});
+  }
+
+  function rerender() {
+    showDropFile(dropFile);
+    info.textContent = infoText();
+    if (lastStatus) status.textContent = T(lastStatus[0], lastStatus[1]);
+  }
+  function startI18n() {
+    i18n = ToolI18n.setup({ en: i18nHarvest(EN), tr: TR }, () => {
+      if (!i18n) return;
+      rerender();
+      if (lastResult && window.ToolHandoff && !nextBox.hidden) ToolHandoff.renderNext(nextBox, "pdf", () => [lastResult]);
+    });
+    rerender();
+  }
+  /* the help dialog and the related-tools strip come after this script */
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startI18n); else startI18n();
+})();
+</script>
+
+<dialog class="po-dialog" id="po-help-dialog" aria-labelledby="po-help-title">
+  <div class="po-dialog-head">
+    <h2 id="po-help-title" data-i18n="howTo">How to use</h2>
+    <button class="po-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
+  </div>
+  <div class="po-dialog-body" data-i18n-html="help">
+    <p>Reorder, remove and rotate PDF pages. Use a simple output list such as 3,1,2,5.</p>
+    <h3>How to use</h3>
+    <ol>
+      <li>Drop a PDF on the drop zone, or click it to choose a file.</li>
+      <li>Type the output page order as comma-separated page numbers. Repeat a number to duplicate a page.</li>
+      <li>To delete pages, simply omit them from the output page order.</li>
+      <li>To rotate pages, list their positions in the output order and choose the rotation.</li>
+      <li>Press <strong>Download Organized PDF</strong>.</li>
+      <li><strong>Continue with</strong> passes the organized PDF straight to another tool.</li>
+    </ol>
+    <h3>Notes</h3>
+    <ul>
+      <li>Everything is processed in your browser. The PDF is never uploaded.</li>
+    </ul>
+    <p>TR / EN switches the interface language; the choice is remembered for all tools.</p>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  const helpDialog = document.getElementById("po-help-dialog");
+  document.getElementById("po-help").addEventListener("click", () => helpDialog.showModal());
+  helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+})();
+</script>

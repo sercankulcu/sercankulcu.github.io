@@ -93,17 +93,17 @@ python tools/make_tr_pages.py
 python tools/make_related.py
 ```
 
-İngilizce 36 araç ve 17 oyunun `/tr/araclar/<ad>/` ve `/tr/oyunlar/<ad>/` adresli Türkçe kopyalarını
-`tr/` altına yazar. Adres, arama başlığı ve açıklama `tools/tr_pages.py`'de, görünen Türkçe ad
+İngilizce 36 araç ve 17 oyunun `/apps/tr/<ad>/` ve `/game/tr/<ad>/` adresli Türkçe kopyalarını
+`apps/tr/` ve `game/tr/` altına yazar (adres, dosyanın yeridir). Adres, arama başlığı ve açıklama `tools/tr_pages.py`'de, görünen Türkçe ad
 `make_related.TR_TITLES`'ta. Gövde İngilizce sayfanınkiyle aynı; ön bilgideki `ui_lang: tr`
-arayüzü Türkçe açar. İki sayfa birbirini `hreflang` ile gösterir. `_pages/araclar.md` ve
-`_pages/oyunlar.md` Türkçe hub'lardır. **Kopyaları elle değiştirmeyin:** İngilizce sayfayı
+arayüzü Türkçe açar. İki sayfa birbirini `hreflang` ile gösterir. `_pages/araclar.md` (`/apps/tr/`) ve
+`_pages/oyunlar.md` (`/game/tr/`) Türkçe hub'lardır. **Kopyaları elle değiştirmeyin:** İngilizce sayfayı
 değiştirip betiği çalıştırın. `check_site.py`, kopya eskiyse hata verir.
 
-Aynı betik ters yönde de çalışır: 14 Türkçe oyunun İngilizce kopyalarını `en/games/<ad>.html`
-(`/en/games/<ad>/`, `ui_lang: en`) olarak yazar. Adres ve metinler `tools/en_pages.py`'de. Türkçe asıl
+Aynı betik ters yönde de çalışır: 14 Türkçe oyunun İngilizce kopyalarını `game/en/<ad>.html`
+(`/game/en/<ad>/`, `ui_lang: en`) olarak yazar. Adres ve metinler `tools/en_pages.py`'de. Türkçe asıl
 `/game/<ad>/` adresinde kalır ve `ui_lang: tr` ile her zaman Türkçe açılır. `/games/` hub'ı İngilizce
-kopyaları listeler, `/tr/oyunlar/` Türkçe asılları. Kelime oyunlarında kelimeler iki dilde de Türkçedir.
+kopyaları listeler, `/game/tr/` Türkçe asılları. Kelime oyunlarında kelimeler iki dilde de Türkçedir.
 Hub betiklerini çalıştırdıktan sonra bu betiği yeniden çalıştırın; hub betikleri ön bilgi satırlarının
 yerini değiştirir.
 

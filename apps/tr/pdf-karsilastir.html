@@ -1,0 +1,1096 @@
+---
+# tools/make_tr_pages.py writes this copy of apps/pdf-diff.html; edit that page, then run the script.
+layout: without-sidebar
+title: "PDF Karşılaştırma"
+permalink: /apps/tr/pdf-karsilastir/
+excerpt: "İki PDF dosyasını sayfa sayfa karşılaştırın; metin ve görünüm farklarını işaretli olarak görün."
+lang: tr
+ui_lang: tr
+seo_title: "PDF Karşılaştırma · İki PDF Arasındaki Farkları Bul"
+og_image: https://sercankulcu.github.io/images/apps/pdf-diff.jpg
+web_app: BusinessApplication
+hreflang: {en: "/apps/pdf-diff/", tr: "/apps/tr/pdf-karsilastir/"}
+---
+
+<style>
+.pdf-diff-app,
+.pdf-diff-app *,
+.pdf-diff-app *::before,
+.pdf-diff-app *::after { box-sizing:border-box; }
+
+.pdf-diff-app {
+  width:min(1500px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family: inherit;
+}
+
+.pd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.pd-title {
+  margin:0;
+  color:var(--global-text-color);
+  font-size:clamp(1.35rem,4vw,1.6rem);
+  line-height:1.2;
+}
+
+.pd-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.pd-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.pd-head-btns{display:flex;gap:8px;flex:0 0 auto}
+.pd-help:focus-visible,.pd-lang:focus-visible,.pd-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.pd-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.pd-dialog::backdrop{background:rgba(0,0,0,.45)}
+.pd-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.pd-dialog-head h2{margin:0;font-size:1.1rem}
+.pd-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.pd-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.pd-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.pd-dialog-body ul,.pd-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.pd-dialog[open]{animation:pd-pop .16s ease-out}
+  @keyframes pd-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.pd-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px;
+}
+
+.pd-drop,
+.pd-panel,
+.pd-status,
+.pd-card {
+  border:1px solid rgba(127,127,127,.3);
+  border-radius:14px;
+  background:var(--global-bg-color);
+}
+
+.pd-drop {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
+  margin:0;
+  padding:18px;
+  border:2px dashed rgba(127,127,127,.5);
+  cursor:pointer;
+  transition:border-color .18s ease, background .18s ease;
+}
+
+.pd-drop:hover,
+.pd-drop.drag,
+.pd-drop:focus-within {
+  border-color:var(--global-link-color);
+  background:rgba(80,120,200,.06);
+}
+
+.pd-drop:focus-within {
+  outline:3px solid var(--global-link-color);
+  outline-offset:2px;
+}
+
+.pd-drop.has-file { border-style:solid; }
+
+.pd-drop strong { display:block; color:var(--global-text-color); }
+.pd-drop small {
+  display:block;
+  color:var(--global-text-color);
+  opacity:.8;
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+
+.pd-drop .pd-file-input {
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+  opacity:0;
+}
+
+.pd-pick {
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  padding:0 16px;
+  border:1px solid rgba(127,127,127,.55);
+  border-radius:999px;
+  background:rgba(127,127,127,.08);
+  color:var(--global-text-color);
+  font-weight:700;
+  font-size:.9rem;
+}
+
+.pd-drop-help {
+  color:var(--global-text-color-light);
+  
+  font-size:13px;
+}
+
+.pd-actions {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  justify-content:center;
+}
+
+.pd-btn,
+.pd-select {
+  min-height:44px;
+  padding:0 13px;
+  border:1px solid rgba(45,45,45,.42);
+  border-radius:999px;
+  background:rgba(45,45,45,.08);
+  color:var(--global-text-color);
+  font:inherit;
+  font-weight:800;
+}
+
+.pd-btn { cursor:pointer; }
+.pd-btn:hover:not(:disabled) { background:rgba(45,45,45,.14); }
+
+.pd-btn.primary {
+  border-color:transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.pd-btn.primary:hover:not(:disabled) {
+  background: var(--tool-primary-hover);
+}
+
+.pdf-diff-app button:focus-visible,
+.pdf-diff-app select:focus-visible,
+.pdf-diff-app input:focus-visible,
+.pdf-diff-app tr:focus-visible {
+  outline:3px solid var(--global-link-color);
+  outline-offset:2px;
+}
+
+.pd-btn:disabled { opacity:.45; cursor:not-allowed; }
+
+html[data-theme="dark"] .pd-btn,
+html[data-theme="dark"] .pd-select {
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .pd-btn.primary {
+  border-color:transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.pd-opts {
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin:14px 0;
+  padding:12px;
+  border:1px solid var(--global-border-color);
+  border-radius:12px;
+  background:rgba(127,127,127,.025);
+}
+
+.pdf-diff-app .pd-opts label {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:44px;
+  margin:0;
+  color:var(--global-text-color);
+}
+
+.pd-opts input[type="checkbox"] {
+  width:20px;
+  height:20px;
+  margin:0;
+  accent-color:var(--global-link-color);
+}
+
+.pd-status {
+  padding:12px;
+  margin:14px 0;
+  color:var(--global-text-color);
+  opacity:.85;
+}
+
+.pd-status.ok { color:#067647; opacity:1; }
+.pd-status.err { color:#b42318; opacity:1; }
+html[data-theme="dark"] .pd-status.ok { color:#83d7ae; }
+html[data-theme="dark"] .pd-status.err { color:#ff9f9f; }
+
+.pd-summary {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin:14px 0;
+}
+
+.pd-card { padding:14px; }
+.pd-number { color:var(--global-text-color); font-size:25px; font-weight:800; }
+.pd-label { margin-top:4px; color:var(--global-text-color); opacity:.78; font-size:13px; }
+
+.pd-tabs {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:14px 0;
+}
+
+.pd-tabs .pd-btn.active {
+  border-color:var(--global-link-color);
+  box-shadow:inset 0 -3px 0 var(--global-link-color);
+}
+
+.pd-panel { overflow:hidden; }
+
+.pd-panel-title,
+.pd-bar {
+  padding:11px 13px;
+  border-bottom:1px solid rgba(127,127,127,.3);
+}
+
+.pd-panel-title { color:var(--global-text-color); font-weight:700; }
+
+.pd-bar {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.pd-diff-grid,
+.pd-visual-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+.pd-side {
+  min-width:0;
+  border-right:1px solid var(--global-border-color);
+}
+
+.pd-side:last-child { border-right:0; }
+
+.pd-side-head {
+  padding:10px;
+  background:rgba(127,127,127,.04);
+  color:var(--global-text-color);
+  font-weight:700;
+}
+
+.pd-diff {
+  padding:12px;
+  color:var(--global-text-color);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+.pd-add {
+  background:rgba(34,197,94,.18);
+  color:inherit;
+}
+
+.pd-del {
+  background:rgba(239,68,68,.22);
+  color:inherit;
+  text-decoration:line-through;
+}
+
+.pd-table-wrap { overflow:auto; }
+
+.pd-table {
+  width:100%;
+  border-collapse:collapse;
+}
+
+.pd-table th,
+.pd-table td {
+  padding:10px 12px;
+  border-bottom:1px solid var(--global-border-color);
+  color:var(--global-text-color);
+  text-align:left;
+  font-size:13px;
+}
+
+.pd-table tbody tr:hover,
+.pd-table tbody tr:focus-visible {
+  background:rgba(127,127,127,.04);
+  cursor:pointer;
+}
+
+.pd-badge {
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.pd-changed { background:rgba(245,158,11,.18); }
+.pd-same { background:rgba(34,197,94,.18); }
+.pd-missing { background:rgba(239,68,68,.18); }
+
+.pd-canvas-cell {
+  padding:12px;
+  overflow:auto;
+  border-right:1px solid var(--global-border-color);
+  background:rgba(127,127,127,.025);
+}
+
+.pd-canvas-cell:last-child { border-right:0; }
+
+.pd-canvas-cell canvas {
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:auto;
+  background:#fff;
+}
+
+.pd-hidden { display:none!important; }
+
+@media(max-width:900px) {
+  .pdf-diff-app { width:100%; }
+  .pd-grid,.pd-diff-grid,.pd-visual-grid { grid-template-columns:1fr; }
+  .pd-actions { flex-direction:row; }
+  .pd-summary { grid-template-columns:repeat(2,1fr); }
+  .pd-side,.pd-canvas-cell {
+    border-right:0;
+    border-bottom:1px solid var(--global-border-color);
+  }
+  .pd-actions .pd-btn { flex:1 1 0; }
+}
+
+@media(max-width:600px) {
+  .pd-select { font-size:16px; }
+  .pd-bar .pd-btn { flex:1 1 0; }
+  .pd-bar .pd-select { flex:1 1 100%; }
+  .pd-summary { grid-template-columns:repeat(2,1fr); }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .pdf-diff-app *,
+  .pdf-diff-app *::before,
+  .pdf-diff-app *::after { transition-duration:.001ms!important; scroll-behavior:auto!important; }
+}
+</style>
+
+<div class="pdf-diff-app">
+  <header class="pd-header">
+    <h1 class="pd-title" data-i18n="title">PDF Diff</h1>
+    <div class="pd-head-btns">
+      <button class="pd-lang" data-lang-toggle></button>
+      <button class="pd-help" id="pd-help" type="button" aria-haspopup="dialog" aria-controls="pd-help-dialog"
+              data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+    </div>
+  </header>
+
+  <div class="pd-grid">
+    <label class="pd-drop" id="pd-drop-a">
+      <strong data-i18n="dropA">PDF A — Original</strong>
+      <input id="pd-a" class="pd-file-input" type="file" accept=".pdf,application/pdf" aria-describedby="pd-an">
+      <span class="pd-pick" aria-hidden="true" data-i18n="choose">Choose PDF</span>
+      <span class="pd-drop-help" aria-hidden="true" data-i18n="orDrop">or drop it here</span>
+      <small id="pd-an">No file selected</small>
+    </label>
+
+    <label class="pd-drop" id="pd-drop-b">
+      <strong data-i18n="dropB">PDF B — Revised</strong>
+      <input id="pd-b" class="pd-file-input" type="file" accept=".pdf,application/pdf" aria-describedby="pd-bn">
+      <span class="pd-pick" aria-hidden="true" data-i18n="choose">Choose PDF</span>
+      <span class="pd-drop-help" aria-hidden="true" data-i18n="orDrop">or drop it here</span>
+      <small id="pd-bn">No file selected</small>
+    </label>
+
+    <div class="pd-actions">
+      <button id="pd-go" class="pd-btn primary" type="button" disabled aria-describedby="pd-status" data-i18n="compare">COMPARE PDFs</button>
+      <button id="pd-reset" class="pd-btn" type="button" data-i18n="reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="pd-opts">
+    <label><input id="pd-ic" type="checkbox"> <span data-i18n="ignoreCase">Ignore case</span></label>
+    <label><input id="pd-iw" type="checkbox" checked> <span data-i18n="normWs">Normalize whitespace</span></label>
+    <label><input id="pd-ip" type="checkbox"> <span data-i18n="ignorePn">Ignore page numbers</span></label>
+    <label>
+      <span data-i18n="diffMode">Diff mode</span>
+      <select id="pd-mode" class="pd-select">
+        <option value="words" data-i18n="words">Words</option>
+        <option value="lines" data-i18n="lines">Lines</option>
+        <option value="chars" data-i18n="chars">Characters</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="pd-status" class="pd-status" role="status" aria-live="polite">Select two PDF files.</div>
+
+  <div id="pd-summary" class="pd-summary pd-hidden">
+    <div class="pd-card"><div class="pd-number" id="pd-pa">0</div><div class="pd-label" data-i18n="lbl_pa">Pages in PDF A</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-pb">0</div><div class="pd-label" data-i18n="lbl_pb">Pages in PDF B</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-pc">0</div><div class="pd-label" data-i18n="lbl_pc">Changed pages</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-aa">0</div><div class="pd-label" data-i18n="lbl_aa">Added tokens</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-rr">0</div><div class="pd-label" data-i18n="lbl_rr">Removed tokens</div></div>
+  </div>
+
+  <div id="pd-results" class="pd-hidden">
+    <div class="pd-tabs" role="group" data-i18n-attr="aria-label:resultView" aria-label="Result view">
+      <button id="pd-tt" class="pd-btn active" type="button" aria-pressed="true" data-i18n="tabText">Text Diff</button>
+      <button id="pd-ts" class="pd-btn" type="button" aria-pressed="false" data-i18n="tabSummary">Page Summary</button>
+      <button id="pd-tv" class="pd-btn" type="button" aria-pressed="false" data-i18n="tabVisual">Visual Compare</button>
+    </div>
+
+    <section id="pd-text" class="pd-panel">
+      <div class="pd-panel-title"><span data-i18n="textDiffTitle">Text Difference — Page</span> <span id="pd-pl">1</span></div>
+
+      <div class="pd-bar">
+        <button id="pd-prev" class="pd-btn" type="button" data-i18n="prev">← Previous</button>
+        <button id="pd-next" class="pd-btn" type="button" data-i18n="next">Next →</button>
+        <select id="pd-pages" class="pd-select" data-i18n-attr="aria-label:page" aria-label="Page"></select>
+      </div>
+
+      <div class="pd-diff-grid">
+        <div class="pd-side">
+          <div class="pd-side-head">PDF A</div>
+          <div id="pd-da" class="pd-diff"></div>
+        </div>
+
+        <div class="pd-side">
+          <div class="pd-side-head">PDF B</div>
+          <div id="pd-db" class="pd-diff"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pd-summary-panel" class="pd-panel pd-hidden">
+      <div class="pd-panel-title" data-i18n="tabSummary">Page Summary</div>
+
+      <div class="pd-table-wrap">
+        <table class="pd-table">
+          <thead>
+            <tr>
+              <th data-i18n="page">Page</th>
+              <th data-i18n="thStatus">Status</th>
+              <th data-i18n="thAdded">Added</th>
+              <th data-i18n="thRemoved">Removed</th>
+              <th data-i18n="thSim">Similarity</th>
+            </tr>
+          </thead>
+          <tbody id="pd-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="pd-visual" class="pd-panel pd-hidden">
+      <div class="pd-panel-title" data-i18n="visualTitle">Visual Page Comparison</div>
+
+      <div class="pd-bar">
+        <button id="pd-vprev" class="pd-btn" type="button" data-i18n="prev">← Previous</button>
+        <button id="pd-vnext" class="pd-btn" type="button" data-i18n="next">Next →</button>
+        <select id="pd-vpages" class="pd-select" data-i18n-attr="aria-label:page" aria-label="Page"></select>
+
+        <label>
+          <span data-i18n="scale">Scale</span>
+          <select id="pd-scale" class="pd-select">
+            <option value="1">100%</option>
+            <option value="1.25" selected>125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="pd-visual-grid">
+        <div class="pd-canvas-cell"><canvas id="pd-ca" role="img" data-i18n-attr="aria-label:renderA" aria-label="PDF A page render"></canvas></div>
+        <div class="pd-canvas-cell"><canvas id="pd-cb" role="img" data-i18n-attr="aria-label:renderB" aria-label="PDF B page render"></canvas></div>
+      </div>
+    </section>
+  </div>
+
+  <dialog class="pd-dialog" id="pd-help-dialog" aria-labelledby="pd-help-title">
+    <div class="pd-dialog-head">
+      <h2 id="pd-help-title" data-i18n="howTo">How to use</h2>
+      <button class="pd-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
+    </div>
+    <div class="pd-dialog-body" data-i18n-html="help">
+      <p>Compare two PDF files page by page. Added and removed text is highlighted,
+        and pages can also be viewed side by side.</p>
+
+      <h3>How to use</h3>
+      <ol>
+        <li>Choose or drop the original file as <strong>PDF A</strong> and the revised file as <strong>PDF B</strong>.</li>
+        <li>Set the options (ignore case, normalize whitespace, ignore page numbers) and the diff mode.</li>
+        <li>Press <strong>Compare PDFs</strong>.</li>
+        <li>Switch between <strong>Text Diff</strong>, <strong>Page Summary</strong> and <strong>Visual Compare</strong>
+          and step through the pages.</li>
+      </ol>
+
+      <h3>Privacy</h3>
+      <p>Text extraction and comparison run locally in your browser.</p>
+      <p>TR / EN switches the interface language; the choice is remembered for all tools.</p>
+    </div>
+  </dialog>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+<script src="/assets/js/tool-i18n.js"></script>
+
+<script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.mjs";
+
+const byId = id => document.getElementById(id);
+
+const pdHelpDialog = document.getElementById("pd-help-dialog");
+document.getElementById("pd-help").addEventListener("click", () => pdHelpDialog.showModal());
+pdHelpDialog.addEventListener("click", e => { if (e.target === pdHelpDialog || e.target.closest("[data-close]")) pdHelpDialog.close(); });
+
+
+function i18nHarvest(en) {
+  document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (!(k in en)) en[k] = el.textContent; });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { const k = el.getAttribute("data-i18n-html"); if (!(k in en)) en[k] = el.innerHTML; });
+  document.querySelectorAll("[data-i18n-attr]").forEach(el => el.getAttribute("data-i18n-attr").split(";").forEach(p => { const q = p.split(":"); if (q.length !== 2) return; const a = q[0].trim(), k = q[1].trim(); if (a && !(k in en) && el.hasAttribute(a)) en[k] = el.getAttribute(a); }));
+  return en;
+}
+const I18N = {
+  en: i18nHarvest({
+    noFile: "No file selected", selectTwo: "Select two PDF files.", bothSel: "Both files selected. Press Compare PDFs.",
+    nowB: "Now select PDF B (revised).", nowA: "Now select PDF A (original).", dropPdf: "Please drop a PDF file.",
+    extracting: "Extracting {label}: page {n} / {total}", pageN: "Page {n}", missing: "Missing page", changed: "Changed", same: "Same",
+    rowAria: "Page {n}: {status}. Open text diff", done: "Done. {n} changed page(s) detected.", noText: "(No text)",
+    notAvail: "Page not available", rendering: "Rendering page {n}...", visualReady: "Visual comparison ready for page {n}.",
+    loadingA: "Loading PDF A...", loadingB: "Loading PDF B...", error: "Error: {msg}"
+  }),
+  tr: {
+    title: "PDF Karşılaştırma", howTo: "Nasıl kullanılır", close: "Kapat",
+    dropA: "PDF A — Özgün", dropB: "PDF B — Düzeltilmiş", choose: "PDF seçin", orDrop: "ya da buraya bırakın",
+    compare: "PDF'LERİ KARŞILAŞTIR", reset: "Sıfırla",
+    ignoreCase: "Büyük/küçük harfi yok say", normWs: "Boşlukları eşitle", ignorePn: "Sayfa numaralarını yok say",
+    diffMode: "Karşılaştırma birimi", words: "Sözcük", lines: "Satır", chars: "Karakter",
+    lbl_pa: "PDF A'daki sayfa", lbl_pb: "PDF B'deki sayfa", lbl_pc: "Değişen sayfa", lbl_aa: "Eklenen parça", lbl_rr: "Silinen parça",
+    resultView: "Sonuç görünümü", tabText: "Metin farkı", tabSummary: "Sayfa özeti", tabVisual: "Görsel karşılaştırma",
+    textDiffTitle: "Metin farkı — Sayfa", prev: "← Önceki", next: "Sonraki →", page: "Sayfa",
+    thStatus: "Durum", thAdded: "Eklenen", thRemoved: "Silinen", thSim: "Benzerlik",
+    visualTitle: "Sayfaların görsel karşılaştırması", scale: "Ölçek",
+    renderA: "PDF A sayfa görüntüsü", renderB: "PDF B sayfa görüntüsü",
+    noFile: "Dosya seçilmedi", selectTwo: "İki PDF dosyası seçin.", bothSel: "İki dosya da seçildi. PDF'leri karşılaştır'a basın.",
+    nowB: "Şimdi PDF B'yi (düzeltilmiş) seçin.", nowA: "Şimdi PDF A'yı (özgün) seçin.", dropPdf: "Lütfen bir PDF dosyası bırakın.",
+    extracting: "{label} metni çıkarılıyor: sayfa {n} / {total}", pageN: "Sayfa {n}", missing: "Sayfa yok", changed: "Değişti", same: "Aynı",
+    rowAria: "Sayfa {n}: {status}. Metin farkını aç", done: "Bitti. {n} sayfada değişiklik bulundu.", noText: "(Metin yok)",
+    notAvail: "Sayfa yok", rendering: "{n}. sayfa çiziliyor...", visualReady: "{n}. sayfanın görsel karşılaştırması hazır.",
+    loadingA: "PDF A yükleniyor...", loadingB: "PDF B yükleniyor...", error: "Hata: {msg}",
+    help: `
+      <p>İki PDF dosyasını sayfa sayfa karşılaştırın. Eklenen ve silinen metin vurgulanır,
+        sayfalar yan yana da görüntülenebilir.</p>
+
+      <h3>Nasıl kullanılır</h3>
+      <ol>
+        <li>Özgün dosyayı <strong>PDF A</strong>, düzeltilmiş dosyayı <strong>PDF B</strong> olarak seçin ya da bırakın.</li>
+        <li>Seçenekleri (büyük/küçük harfi yok say, boşlukları eşitle, sayfa numaralarını yok say) ve karşılaştırma birimini ayarlayın.</li>
+        <li><strong>PDF'leri karşılaştır</strong>'a basın.</li>
+        <li><strong>Metin farkı</strong>, <strong>Sayfa özeti</strong> ve <strong>Görsel karşılaştırma</strong> arasında geçin
+          ve sayfalar arasında gezinin.</li>
+      </ol>
+
+      <h3>Gizlilik</h3>
+      <p>Metin çıkarma ve karşılaştırma tarayıcınızda yapılır; dosyalarınız hiçbir yere yüklenmez.</p>
+      <p>TR / EN düğmesi arayüz dilini değiştirir; seçim bütün araçlar için hatırlanır.</p>
+    `
+  }
+};
+let i18n = null;
+const T = (k, v) => i18n ? i18n.t(k, v) : I18N.en[k].replace(/\{(\w+)\}/g, (m, x) => v && v[x] != null ? v[x] : m);
+let lastStatus = ["selectTwo", null, ""];
+
+let fileA = null;
+let fileB = null;
+let pdfA = null;
+let pdfB = null;
+let textA = [];
+let textB = [];
+let results = [];
+let currentPage = 1;
+let visualPage = 1;
+
+function setStatus(key, vars, className = "") {
+  lastStatus = [key, vars, className];
+  const element = byId("pd-status");
+  element.textContent = T(key, vars);
+  element.className = "pd-status" + (className ? " " + className : "");
+}
+
+function updateCompareButton() {
+  byId("pd-go").disabled = !(fileA && fileB);
+}
+
+function resetApp() {
+  fileA = null;
+  fileB = null;
+  pdfA = null;
+  pdfB = null;
+  textA = [];
+  textB = [];
+  results = [];
+  currentPage = 1;
+  visualPage = 1;
+
+  byId("pd-a").value = "";
+  byId("pd-b").value = "";
+  byId("pd-an").textContent = T("noFile");
+  byId("pd-bn").textContent = T("noFile");
+  byId("pd-drop-a").classList.remove("has-file");
+  byId("pd-drop-b").classList.remove("has-file");
+
+  byId("pd-ic").checked = false;
+  byId("pd-iw").checked = true;
+  byId("pd-ip").checked = false;
+  byId("pd-mode").value = "words";
+  byId("pd-scale").value = "1.25";
+
+  byId("pd-summary").classList.add("pd-hidden");
+  byId("pd-results").classList.add("pd-hidden");
+
+  byId("pd-da").innerHTML = "";
+  byId("pd-db").innerHTML = "";
+  byId("pd-tbody").innerHTML = "";
+  byId("pd-pages").innerHTML = "";
+  byId("pd-vpages").innerHTML = "";
+
+  const canvasA = byId("pd-ca");
+  const canvasB = byId("pd-cb");
+  canvasA.width = canvasA.height = 0;
+  canvasB.width = canvasB.height = 0;
+
+  updateCompareButton();
+  setStatus("selectTwo");
+}
+
+function fileLabel(file) {
+  if (!file) return T("noFile");
+  const size = file.size < 1024 * 1024
+    ? (file.size / 1024).toFixed(1) + " KB"
+    : (file.size / (1024 * 1024)).toFixed(1) + " MB";
+  return file.name + " · " + size;
+}
+
+function afterPick() {
+  updateCompareButton();
+  if (fileA && fileB) {
+    setStatus("bothSel");
+  } else if (fileA || fileB) {
+    setStatus(fileA ? "nowB" : "nowA");
+  } else {
+    setStatus("selectTwo");
+  }
+}
+
+byId("pd-a").addEventListener("change", event => {
+  fileA = event.target.files[0] || null;
+  byId("pd-an").textContent = fileLabel(fileA);
+  byId("pd-drop-a").classList.toggle("has-file", !!fileA);
+  afterPick();
+});
+
+byId("pd-b").addEventListener("change", event => {
+  fileB = event.target.files[0] || null;
+  byId("pd-bn").textContent = fileLabel(fileB);
+  byId("pd-drop-b").classList.toggle("has-file", !!fileB);
+  afterPick();
+});
+
+[["pd-drop-a", "pd-a"], ["pd-drop-b", "pd-b"]].forEach(([zoneId, inputId]) => {
+  const zone = byId(zoneId);
+  const input = byId(inputId);
+
+  ["dragenter", "dragover"].forEach(type => {
+    zone.addEventListener(type, event => {
+      event.preventDefault();
+      zone.classList.add("drag");
+    });
+  });
+
+  zone.addEventListener("dragleave", event => {
+    if (!zone.contains(event.relatedTarget)) zone.classList.remove("drag");
+  });
+
+  zone.addEventListener("drop", event => {
+    event.preventDefault();
+    zone.classList.remove("drag");
+    const file = event.dataTransfer.files[0];
+    if (!file) return;
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      setStatus("dropPdf", null, "err");
+      return;
+    }
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    input.dispatchEvent(new Event("change"));
+  });
+});
+
+byId("pd-reset").addEventListener("click", resetApp);
+
+async function loadPdf(file) {
+  return await pdfjsLib.getDocument({
+    data: new Uint8Array(await file.arrayBuffer())
+  }).promise;
+}
+
+async function extractText(pdf, label) {
+  const output = [];
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    setStatus("extracting", { label, n: pageNumber, total: pdf.numPages });
+
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+
+    let previousY = null;
+    let text = "";
+
+    for (const item of content.items) {
+      const y = Math.round(item.transform[5]);
+
+      if (previousY !== null && Math.abs(y - previousY) > 3) {
+        text += "\n";
+      } else if (text && !text.endsWith("\n")) {
+        text += " ";
+      }
+
+      text += item.str;
+      previousY = y;
+    }
+
+    output.push(text);
+  }
+
+  return output;
+}
+
+function normalizeText(text) {
+  if (byId("pd-iw").checked) {
+    text = text
+      .replace(/\u00a0/g, " ")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\s*\n\s*/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  if (byId("pd-ic").checked) {
+    text = text.toLowerCase();
+  }
+
+  if (byId("pd-ip").checked) {
+    text = text
+      .replace(/^\s*\d+\s*$/gm, "")
+      .replace(/^\s*page\s+\d+\s*$/gim, "")
+      .replace(/^\s*\d+\s*\/\s*\d+\s*$/gm, "");
+  }
+
+  return text;
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    "\"":"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function diffParts(a, b) {
+  const mode = byId("pd-mode").value;
+
+  return mode === "lines"
+    ? Diff.diffLines(a, b)
+    : mode === "chars"
+      ? Diff.diffChars(a, b)
+      : Diff.diffWordsWithSpace(a, b);
+}
+
+function compareOne(a, b) {
+  const parts = diffParts(
+    normalizeText(a || ""),
+    normalizeText(b || "")
+  );
+
+  let htmlA = "";
+  let htmlB = "";
+  let added = 0;
+  let removed = 0;
+  let same = 0;
+
+  for (const part of parts) {
+    const value = escapeHtml(part.value);
+    const count = part.count || 0;
+
+    if (part.added) {
+      htmlB += `<span class="pd-add">${value}</span>`;
+      added += count;
+    } else if (part.removed) {
+      htmlA += `<span class="pd-del">${value}</span>`;
+      removed += count;
+    } else {
+      htmlA += value;
+      htmlB += value;
+      same += count;
+    }
+  }
+
+  const total = added + removed + same;
+  const similarity = total ? 100 * same / total : 100;
+
+  return {
+    htmlA,
+    htmlB,
+    added,
+    removed,
+    similarity,
+    changed: added > 0 || removed > 0
+  };
+}
+
+function buildResults() {
+  const pageCount = Math.max(textA.length, textB.length);
+  results = [];
+
+  for (let index = 0; index < pageCount; index++) {
+    results.push(compareOne(textA[index], textB[index]));
+  }
+
+  byId("pd-pa").textContent = textA.length;
+  byId("pd-pb").textContent = textB.length;
+  byId("pd-pc").textContent = results.filter(item => item.changed).length;
+  byId("pd-aa").textContent = results.reduce((sum,item) => sum + item.added, 0);
+  byId("pd-rr").textContent = results.reduce((sum,item) => sum + item.removed, 0);
+
+  byId("pd-summary").classList.remove("pd-hidden");
+  byId("pd-results").classList.remove("pd-hidden");
+
+  renderResultLabels();
+  showText(1);
+
+  setStatus("done", { n: results.filter(item => item.changed).length }, "ok");
+}
+
+function renderResultLabels() {
+  const pageCount = results.length;
+  byId("pd-pages").innerHTML = "";
+  byId("pd-vpages").innerHTML = "";
+
+  for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+    byId("pd-pages").add(new Option(T("pageN", { n: pageNumber }), pageNumber));
+    byId("pd-vpages").add(new Option(T("pageN", { n: pageNumber }), pageNumber));
+  }
+  byId("pd-pages").value = currentPage;
+  byId("pd-vpages").value = visualPage;
+
+  const tbody = byId("pd-tbody");
+  tbody.innerHTML = "";
+
+  results.forEach((result,index) => {
+    const missing = index >= textA.length || index >= textB.length;
+    const statusText = T(missing ? "missing" : result.changed ? "changed" : "same");
+    const badgeClass = missing ? "pd-missing" : result.changed ? "pd-changed" : "pd-same";
+
+    const row = document.createElement("tr");
+    row.tabIndex = 0;
+    row.setAttribute("aria-label", T("rowAria", { n: index + 1, status: statusText }));
+
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td><span class="pd-badge ${badgeClass}">${statusText}</span></td>
+      <td>${result.added}</td>
+      <td>${result.removed}</td>
+      <td>${i18n && i18n.lang === "tr" ? "%" + result.similarity.toFixed(1).replace(".", ",") : result.similarity.toFixed(1) + "%"}</td>`;
+
+    row.addEventListener("click", () => {
+      showPanel("text");
+      showText(index + 1);
+    });
+
+    row.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        showPanel("text");
+        showText(index + 1);
+        byId("pd-tt").focus();
+      }
+    });
+
+    tbody.appendChild(row);
+  });
+}
+
+function showText(pageNumber) {
+  if (!results.length) {
+    return;
+  }
+
+  currentPage = Math.max(1, Math.min(results.length, pageNumber));
+
+  const result = results[currentPage - 1];
+
+  byId("pd-da").innerHTML = result.htmlA || escapeHtml(T("noText"));
+  byId("pd-db").innerHTML = result.htmlB || escapeHtml(T("noText"));
+  byId("pd-pl").textContent = currentPage;
+  byId("pd-pages").value = currentPage;
+  byId("pd-prev").disabled = currentPage === 1;
+  byId("pd-next").disabled = currentPage === results.length;
+}
+
+byId("pd-prev").addEventListener("click", () => showText(currentPage - 1));
+byId("pd-next").addEventListener("click", () => showText(currentPage + 1));
+byId("pd-pages").addEventListener("change", event => showText(Number(event.target.value)));
+
+function showPanel(panel) {
+  byId("pd-text").classList.toggle("pd-hidden", panel !== "text");
+  byId("pd-summary-panel").classList.toggle("pd-hidden", panel !== "summary");
+  byId("pd-visual").classList.toggle("pd-hidden", panel !== "visual");
+
+  byId("pd-tt").classList.toggle("active", panel === "text");
+  byId("pd-ts").classList.toggle("active", panel === "summary");
+  byId("pd-tv").classList.toggle("active", panel === "visual");
+
+  byId("pd-tt").setAttribute("aria-pressed", String(panel === "text"));
+  byId("pd-ts").setAttribute("aria-pressed", String(panel === "summary"));
+  byId("pd-tv").setAttribute("aria-pressed", String(panel === "visual"));
+}
+
+byId("pd-tt").addEventListener("click", () => showPanel("text"));
+byId("pd-ts").addEventListener("click", () => showPanel("summary"));
+byId("pd-tv").addEventListener("click", () => {
+  showPanel("visual");
+  renderVisual(visualPage);
+});
+
+async function renderOne(pdf, pageNumber, canvas, scale) {
+  const context = canvas.getContext("2d");
+
+  if (!pdf || pageNumber > pdf.numPages) {
+    canvas.width = 600;
+    canvas.height = 180;
+
+    const _isDark = document.documentElement.dataset.theme === "dark" ||
+      (!document.documentElement.dataset.theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    context.fillStyle = _isDark ? "#1e1e1e" : "#ffffff";
+    context.fillRect(0,0,600,180);
+    context.fillStyle = _isDark ? "#e0e0e0" : "#111111";
+    context.font = "24px Arial";
+    context.fillText(T("notAvail"),30,90);
+    return;
+  }
+
+  const page = await pdf.getPage(pageNumber);
+  const viewport = page.getViewport({scale});
+
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  await page.render({
+    canvasContext: context,
+    viewport
+  }).promise;
+}
+
+async function renderVisual(pageNumber) {
+  if (!results.length) {
+    return;
+  }
+
+  visualPage = Math.max(1, Math.min(results.length, pageNumber));
+
+  byId("pd-vpages").value = visualPage;
+  byId("pd-vprev").disabled = visualPage === 1;
+  byId("pd-vnext").disabled = visualPage === results.length;
+
+  setStatus("rendering", { n: visualPage });
+
+  const scale = Number(byId("pd-scale").value);
+
+  await Promise.all([
+    renderOne(pdfA, visualPage, byId("pd-ca"), scale),
+    renderOne(pdfB, visualPage, byId("pd-cb"), scale)
+  ]);
+
+  setStatus("visualReady", { n: visualPage }, "ok");
+}
+
+byId("pd-vprev").addEventListener("click", () => renderVisual(visualPage - 1));
+byId("pd-vnext").addEventListener("click", () => renderVisual(visualPage + 1));
+byId("pd-vpages").addEventListener("change", event => renderVisual(Number(event.target.value)));
+byId("pd-scale").addEventListener("change", () => renderVisual(visualPage));
+
+byId("pd-go").addEventListener("click", async () => {
+  try {
+    byId("pd-go").disabled = true;
+    showPanel("text");
+
+    setStatus("loadingA");
+    pdfA = await loadPdf(fileA);
+
+    setStatus("loadingB");
+    pdfB = await loadPdf(fileB);
+
+    textA = await extractText(pdfA, "PDF A");
+    textB = await extractText(pdfB, "PDF B");
+
+    buildResults();
+  } catch (error) {
+    console.error(error);
+    setStatus("error", { msg: error.message || error }, "err");
+  } finally {
+    updateCompareButton();
+  }
+});
+
+["pd-ic","pd-iw","pd-ip","pd-mode"].forEach(id => {
+  byId(id).addEventListener("change", () => {
+    if (textA.length || textB.length) {
+      buildResults();
+    }
+  });
+});
+
+resetApp();
+
+i18n = ToolI18n.setup(I18N, () => {
+  if (!i18n) return;
+  relabel();
+});
+function relabel() {
+  setStatus(lastStatus[0], lastStatus[1], lastStatus[2]);
+  byId("pd-an").textContent = fileLabel(fileA);
+  byId("pd-bn").textContent = fileLabel(fileB);
+  if (results.length) {
+    renderResultLabels();
+    showText(currentPage);
+    if (!byId("pd-visual").classList.contains("pd-hidden")) {
+      const keep = lastStatus.slice();
+      renderVisual(visualPage).then(() => setStatus(keep[0], keep[1], keep[2]));
+    }
+  }
+}
+relabel();
+</script>

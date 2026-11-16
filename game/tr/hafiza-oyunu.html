@@ -1,0 +1,634 @@
+---
+# tools/make_tr_pages.py writes this copy of game/memory.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Hafıza Oyunu"
+permalink: /game/tr/hafiza-oyunu/
+excerpt: "Kartların eşini bulun; hamle sayınızı ve sürenizi takip edin."
+lang: tr
+ui_lang: tr
+seo_title: "Hafıza Oyunu · Kart Eşleştirme, Ücretsiz"
+og_image: https://sercankulcu.github.io/images/games/memory.jpg
+game_genre: "Puzzle"
+hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
+---
+
+<style>
+.memory-app,
+.memory-app *,
+.memory-app *::before,
+.memory-app *::after {
+  box-sizing: border-box;
+}
+
+.memory-app {
+  width: min(860px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.memory-panel {
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.memory-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.memory-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.memory-help,
+.memory-button,
+.memory-card {
+  font: inherit;
+}
+
+.memory-help {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.memory-lang {
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.memory-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memory-help:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.memory-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.memory-stat {
+  padding: 9px 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .06);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.memory-grid {
+  width: min(100%, 520px);
+  margin: 12px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.memory-card {
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--global-text-color) 28%, transparent);
+  border-radius: 14px;
+  background: rgba(127, 127, 127, .1);
+  color: var(--global-text-color);
+  font-size: clamp(24px, 6vw, 38px);
+  touch-action: manipulation;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.memory-card:hover:not([aria-disabled="true"]) {
+  transform: translateY(-1px);
+  border-color: var(--global-link-color);
+}
+
+.memory-card.is-open {
+  background: var(--tool-primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Matched must not rest on the green tint alone. */
+.memory-card.is-matched::after {
+  content: "\2713";
+  position: absolute;
+  top: 4px;
+  right: 7px;
+  color: #2f855a;
+  font-size: .8rem;
+  line-height: 1;
+}
+
+:root[data-theme="dark"] .memory-card.is-matched::after { color: #68d391; }
+
+.memory-app button:focus-visible,
+.memory-dialog-close:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.memory-card.is-matched {
+  background: rgba(47, 133, 90, .14);
+  border-color: rgba(47, 133, 90, .45);
+}
+
+.memory-card[aria-disabled="true"] {
+  cursor: default;
+}
+
+.memory-message {
+  min-height: 34px;
+  margin: 14px 0 2px;
+  color: var(--global-text-color);
+  text-align: center;
+  font-weight: 800;
+}
+
+.memory-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.memory-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.memory-button:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.memory-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.memory-dialog::backdrop{background:rgba(0,0,0,.45)}
+.memory-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.memory-dialog-head h2{margin:0;font-size:1.1rem}
+.memory-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.memory-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.memory-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.memory-dialog-body ul,.memory-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.memory-dialog[open]{animation:memory-pop .16s ease-out}
+  @keyframes memory-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+@media (max-width: 640px) {
+  .memory-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .memory-panel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .memory-grid {
+    width: min(100%, 430px);
+    gap: 6px;
+  }
+
+  .memory-card {
+    font-size: clamp(22px, 7vw, 34px);
+  }
+}
+
+@media (max-height: 720px) {
+  .memory-panel {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .memory-stats {
+    margin: 7px 0;
+  }
+
+  .memory-grid {
+    width: min(88vw, 380px);
+    margin-top: 7px;
+    gap: 5px;
+  }
+
+  .memory-card {
+    font-size: clamp(20px, 5.5vw, 30px);
+  }
+
+  .memory-message {
+    min-height: 24px;
+    margin: 7px 0 2px;
+  }
+}
+
+@media (max-height: 620px) {
+  .memory-subtitle {
+    display: none;
+  }
+
+  .memory-topbar {
+    margin-bottom: 4px;
+  }
+
+  .memory-stats {
+    gap: 5px;
+    margin: 4px 0;
+  }
+
+  .memory-stat {
+    padding: 6px 8px;
+    font-size: .82rem;
+  }
+
+  .memory-grid {
+    width: min(76vh, 86vw, 340px);
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-app *,
+  .memory-app *::before,
+  .memory-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+
+<div class="memory-app">
+  <section class="memory-panel" aria-labelledby="memory-title">
+    <div class="memory-topbar">
+      <h1 class="memory-title" id="memory-title" data-i18n="title">Memory</h1>
+      <div class="memory-head-actions">
+        <button class="memory-help memory-lang" data-lang-toggle></button>
+        <button class="memory-help" id="memory-help" type="button" aria-haspopup="dialog" aria-controls="memory-help-dialog" aria-label="How to play" data-i18n-attr="aria-label:howTo">?</button>
+      </div>
+    </div>
+
+    <div class="memory-stats" aria-label="Game statistics" data-i18n-attr="aria-label:stats">
+      <span class="memory-stat"><span data-i18n="movesL">Moves:</span> <b id="memory-moves">0</b></span>
+      <span class="memory-stat"><span data-i18n="timeL">Time:</span> <b id="memory-time">0</b><span data-i18n="secUnit">s</span></span>
+      <span class="memory-stat"><span data-i18n="pairsL">Pairs:</span> <b id="memory-pairs">0</b>/<span id="memory-total">8</span></span>
+      <span class="memory-stat"><span data-i18n="bestL">Best:</span> <b id="memory-best">—</b></span>
+    </div>
+
+    <div class="memory-grid" id="memory-game" aria-label="Memory card grid" data-i18n-attr="aria-label:grid"></div>
+
+    <div class="memory-message" id="memory-message" aria-live="polite"></div>
+
+    <div class="memory-actions">
+      <button class="memory-button" id="memory-restart" type="button" data-i18n="newGame">New Game</button>
+    </div>
+  </section>
+</div>
+
+<dialog class="memory-dialog" id="memory-help-dialog" aria-labelledby="memory-help-title">
+  <div class="memory-dialog-head">
+    <h2 id="memory-help-title" data-i18n="howTo">How to play</h2>
+    <button class="memory-dialog-close" type="button" data-close aria-label="Close" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="memory-dialog-body" data-i18n-html="help">
+    <p>Match all eight pairs in as few moves as possible.</p>
+    <h3>How to play</h3>
+    <ul>
+      <li>Tap a card to flip it. The timer starts on your first flip.</li>
+      <li>Open two cards at a time and try to find matching symbols.</li>
+      <li>Matched pairs stay visible. The game tracks your moves and elapsed time.</li>
+      <li>Your best time is kept in this browser.</li>
+      <li>Each new game randomly selects one of four emoji themes.</li>
+    </ul>
+    <h3>Controls</h3>
+    <ul>
+      <li>Mouse or touch: tap a card.</li>
+      <li>Keyboard: Tab to a card, then Enter or Space.</li>
+      <li>TR / EN switches the interface language.</li>
+    </ul>
+    <p>The timer pauses while this window is open.</p>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  function i18nHarvest(en){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in en))en[k]=el.textContent;});
+    document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in en))en[k]=el.innerHTML;});
+    document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in en)&&el.hasAttribute(a))en[k]=el.getAttribute(a);}));
+    return en;
+  }
+
+  const I18N = {
+    en: i18nHarvest({
+      hidden: "Hidden card {n}",
+      card: "Card {v}",
+      matched: "Card {v}, matched",
+      bestVal: "{n}s",
+      doneBest: "Completed in {m} moves and {s} seconds. New best time.",
+      done: "Completed in {m} moves and {s} seconds. Best: {b}s."
+    }),
+    tr: {
+      title: "Hafıza Oyunu",
+      howTo: "Nasıl oynanır",
+      close: "Kapat",
+      stats: "Oyun istatistikleri",
+      movesL: "Hamle:",
+      timeL: "Süre:",
+      secUnit: " sn",
+      pairsL: "Çift:",
+      bestL: "Rekor:",
+      grid: "Hafıza kartları",
+      newGame: "Yeni oyun",
+      hidden: "Kapalı kart {n}",
+      card: "Kart {v}",
+      matched: "Kart {v}, eşleşti",
+      bestVal: "{n} sn",
+      doneBest: "{m} hamlede, {s} saniyede bitirdin. Yeni rekor!",
+      done: "{m} hamlede, {s} saniyede bitirdin. Rekor: {b} sn.",
+      help: `
+    <p>Sekiz çiftin hepsini olabildiğince az hamlede eşleştir.</p>
+    <h3>Nasıl oynanır</h3>
+    <ul>
+      <li>Çevirmek için bir karta dokun. Süre ilk kartı çevirdiğinde başlar.</li>
+      <li>Aynı anda iki kart aç ve eş simgeleri bulmaya çalış.</li>
+      <li>Eşleşen çiftler açık kalır. Oyun hamlelerini ve geçen süreyi sayar.</li>
+      <li>En iyi süren bu tarayıcıda saklanır.</li>
+      <li>Her yeni oyun dört emoji temasından birini rastgele seçer.</li>
+    </ul>
+    <h3>Kontroller</h3>
+    <ul>
+      <li>Fare ya da dokunmatik: bir karta dokun.</li>
+      <li>Klavye: Tab ile karta git, sonra Enter ya da Boşluk.</li>
+      <li>TR / EN düğmesi arayüz dilini değiştirir.</li>
+    </ul>
+    <p>Bu pencere açıkken süre durur.</p>
+  `
+    }
+  };
+  let i18n = null;
+  let msg = null;
+  function setMessage(key, vars) {
+    msg = key ? { key, vars } : null;
+    message.textContent = msg ? i18n.t(key, vars) : "";
+  }
+  function cardLabel(card) {
+    if (card.getAttribute("aria-disabled") === "true") return i18n.t("matched", { v: card.dataset.value });
+    if (card.classList.contains("is-open")) return i18n.t("card", { v: card.dataset.value });
+    return i18n.t("hidden", { n: card.dataset.index });
+  }
+
+  const THEMES = [
+    ["🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐸"],
+    ["🍎", "🍌", "🍇", "🍉", "🍓", "🥕", "🍕", "🍔"],
+    ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏓", "🥊"],
+    ["🚀", "🛸", "🌍", "🌕", "🌟", "🌌", "🪐", "☄️"]
+  ];
+
+  const game = document.getElementById("memory-game");
+  const moves = document.getElementById("memory-moves");
+  const time = document.getElementById("memory-time");
+  const pairs = document.getElementById("memory-pairs");
+  const message = document.getElementById("memory-message");
+  const restart = document.getElementById("memory-restart");
+  const help = document.getElementById("memory-help");
+  const helpDialog = document.getElementById("memory-help-dialog");
+  const totalView = document.getElementById("memory-total");
+  const bestView = document.getElementById("memory-best");
+
+  /* Blocking site data makes localStorage itself throw, which would abort this
+     whole script. Fall back to a memory store so the page still works. */
+  let store;
+  try { localStorage.getItem("_probe"); store = localStorage; }
+  catch { const mem = new Map(); store = {
+    getItem: k => (mem.has(k) ? mem.get(k) : null),
+    setItem: (k, v) => { mem.set(k, String(v)); }
+  }; }
+
+  const BEST_KEY = "memory-best-seconds";
+
+  let openCards = [];
+  let moveCount = 0;
+  let seconds = 0;
+  let pairCount = 0;
+  let timer = null;
+  let lock = false;
+  let started = false;
+  let startTime = 0;
+  let pausedAt = 0;
+  let totalPairs = 0;
+
+  function shuffle(items) {
+    const copy = [...items];
+
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+
+    return copy;
+  }
+
+  function startTimer() {
+    if (started) return;
+    started = true;
+    startTime = performance.now();
+
+    /* Derived from a wall-clock start so a throttled tab cannot slow the timer. */
+    timer = window.setInterval(() => {
+      if (pausedAt) return;
+      seconds = Math.floor((performance.now() - startTime) / 1000);
+      time.textContent = seconds;
+    }, 250);
+  }
+
+  function stopTimer() {
+    if (timer !== null) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function closeCards() {
+    for (const card of openCards) {
+      card.textContent = "?";
+      card.classList.remove("is-open");
+      card.setAttribute("aria-label", cardLabel(card));
+    }
+
+    openCards = [];
+    lock = false;
+  }
+
+  function getBest() {
+    const value = Number(store.getItem(BEST_KEY));
+    return value > 0 ? value : null;
+  }
+
+  function renderBest() {
+    const best = getBest();
+    bestView.textContent = best === null ? "—" : i18n.t("bestVal", { n: best });
+  }
+
+  function finishGame() {
+    stopTimer();
+
+    const best = getBest();
+    const isRecord = best === null || seconds < best;
+
+    if (isRecord) {
+      store.setItem(BEST_KEY, seconds);
+      renderBest();
+    }
+
+    if (isRecord) setMessage("doneBest", { m: moveCount, s: seconds });
+    else setMessage("done", { m: moveCount, s: seconds, b: best });
+  }
+
+  function flip(card) {
+    if (lock || card.getAttribute("aria-disabled") === "true" || openCards.includes(card)) return;
+
+    startTimer();
+
+    card.textContent = card.dataset.value;
+    card.classList.add("is-open");
+    card.setAttribute("aria-label", cardLabel(card));
+    openCards.push(card);
+
+    if (openCards.length !== 2) return;
+
+    moveCount += 1;
+    moves.textContent = moveCount;
+
+    const [first, second] = openCards;
+
+    if (first.dataset.value === second.dataset.value) {
+      /* aria-disabled rather than disabled: disabling the focused card threw
+         keyboard focus back to the top of the page. */
+      first.setAttribute("aria-disabled", "true");
+      second.setAttribute("aria-disabled", "true");
+      first.setAttribute("aria-label", cardLabel(first));
+      second.setAttribute("aria-label", cardLabel(second));
+      first.classList.remove("is-open");
+      second.classList.remove("is-open");
+      first.classList.add("is-matched");
+      second.classList.add("is-matched");
+
+      openCards = [];
+      pairCount += 1;
+      pairs.textContent = pairCount;
+
+      if (pairCount === totalPairs) {
+        finishGame();
+      }
+
+      return;
+    }
+
+    lock = true;
+    window.setTimeout(closeCards, 700);
+  }
+
+  function startGame() {
+    stopTimer();
+
+    openCards = [];
+    moveCount = 0;
+    seconds = 0;
+    pairCount = 0;
+    lock = false;
+    started = false;
+
+    moves.textContent = "0";
+    time.textContent = "0";
+    pairs.textContent = "0";
+    setMessage(null);
+
+    const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+    totalPairs = theme.length;
+    totalView.textContent = String(totalPairs);
+    renderBest();
+    const cards = shuffle([...theme, ...theme]);
+
+    game.innerHTML = "";
+
+    cards.forEach((symbol, index) => {
+      const card = document.createElement("button");
+
+      card.type = "button";
+      card.className = "memory-card";
+      card.dataset.value = symbol;
+      card.dataset.index = String(index + 1);
+      card.textContent = "?";
+      card.setAttribute("aria-label", cardLabel(card));
+
+      card.addEventListener("click", () => flip(card));
+      game.appendChild(card);
+    });
+  }
+
+  help.addEventListener("click", () => {
+    if (timer !== null) pausedAt = performance.now();
+    helpDialog.showModal();
+  });
+  helpDialog.addEventListener("click", event => {
+    if (event.target === helpDialog || event.target.closest("[data-close]")) helpDialog.close();
+  });
+  helpDialog.addEventListener("close", () => {
+    if (pausedAt) {
+      startTime += performance.now() - pausedAt;
+      pausedAt = 0;
+    }
+  });
+
+  restart.addEventListener("click", startGame);
+
+  i18n = ToolI18n.setup(I18N, () => {
+    if (!i18n) return;
+    renderBest();
+    if (msg) message.textContent = i18n.t(msg.key, msg.vars);
+    [...game.children].forEach(card => card.setAttribute("aria-label", cardLabel(card)));
+  });
+
+  startGame();
+})();
+</script>

@@ -1,0 +1,879 @@
+---
+# tools/make_tr_pages.py writes this copy of apps/pdf-to-a4.html; edit that page, then run the script.
+layout: without-sidebar
+title: "PDF'yi A4'e Sığdır"
+permalink: /apps/tr/pdf-a4/
+excerpt: "Bütün PDF sayfalarını içeriği bozmadan standart A4 boyutuna getirin. Dosya cihazınızda işlenir."
+lang: tr
+ui_lang: tr
+seo_title: "PDF'yi A4'e Çevir · Sayfa Boyutu Ayarlama, Ücretsiz"
+og_image: https://sercankulcu.github.io/images/apps/pdf-to-a4.jpg
+web_app: BusinessApplication
+hreflang: {en: "/apps/pdf-to-a4/", tr: "/apps/tr/pdf-a4/"}
+---
+
+<style>
+.pdf-a4-app,
+.pdf-a4-app *,
+.pdf-a4-app *::before,
+.pdf-a4-app *::after {
+  box-sizing: border-box;
+}
+
+.pdf-a4-app {
+  width: min(760px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.pa4-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pa4-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.2;
+}
+
+.pa4-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.pa4-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.pa4-tools{display:flex;gap:8px;flex:none}
+.pa4-help:focus-visible,.pa4-lang:focus-visible,.pa4-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.pa4-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.pa4-dialog::backdrop{background:rgba(0,0,0,.45)}
+.pa4-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.pa4-dialog-head h2{margin:0;font-size:1.1rem}
+.pa4-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.pa4-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.pa4-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.pa4-dialog-body ul,.pa4-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.pa4-dialog[open]{animation:pa4-pop .16s ease-out}
+  @keyframes pa4-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.pa4-card {
+  padding: clamp(16px, 3vw, 26px);
+  border: 1px solid rgba(127,127,127,.28);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.pa4-drop {
+  min-height: 185px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border: 2px dashed rgba(127,127,127,.5);
+  border-radius: 14px;
+  background: rgba(127,127,127,.025);
+  color: var(--global-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.pa4-drop:hover,
+.pa4-drop.dragover,
+.pa4-drop:focus-visible {
+  border-color: var(--global-link-color);
+  background: rgba(80,120,200,.06);
+}
+
+.pa4-drop-icon {
+  margin-bottom: 10px;
+  font-size: 44px;
+}
+
+.pa4-drop-title {
+  margin-bottom: 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.pa4-drop-info {
+  color: var(--global-text-color-light);
+  
+  font-size: 14px;
+}
+
+.pa4-file-info {
+  display: none;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 11px;
+  background: rgba(127,127,127,.025);
+}
+
+.pa4-file-name {
+  color: var(--global-text-color);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.pa4-file-size {
+  margin-top: 4px;
+  color: var(--global-text-color);
+  opacity: .75;
+  font-size: 12px;
+}
+
+.pa4-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.pa4-option {
+  display: grid;
+  gap: 6px;
+}
+
+.pa4-option label {
+  color: var(--global-text-color);
+  opacity: .82;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.pa4-option select,
+.pa4-option input[type="number"] {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid rgba(127,127,127,.55);
+  border-radius: 10px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .9rem;
+}
+
+.pa4-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 12px;
+  color: var(--global-text-color);
+  font-size: .88rem;
+}
+
+.pa4-checkbox-row input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--global-link-color);
+}
+
+.pa4-checkbox-row label {
+  cursor: pointer;
+}
+
+.pa4-btn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 22px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tool-primary);
+  color: #fff;
+  font: inherit;
+  font-size: .95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pa4-btn:hover:not(:disabled) {
+  background: var(--tool-primary-hover);
+}
+
+.pa4-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.pa4-hint {
+  margin: 8px 0 0;
+  color: var(--global-text-color);
+  opacity: .78;
+  text-align: center;
+  font-size: .82rem;
+}
+
+.pa4-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+
+.pa4-file-info {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pa4-file-info.is-visible {
+  display: flex;
+}
+
+.pa4-change {
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(127,127,127,.55);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pdf-a4-app button:focus-visible,
+.pdf-a4-app select:focus-visible,
+.pdf-a4-app input:focus-visible,
+.pdf-a4-app .pa4-drop:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.pa4-status {
+  display: none;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  background: rgba(127,127,127,.025);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pa4-status.processing {
+  display: block;
+  color: var(--global-link-color);
+}
+
+.pa4-status.success {
+  display: block;
+  color: #067647;
+}
+
+.pa4-status.error {
+  display: block;
+  color: #b42318;
+}
+
+html[data-theme="dark"] .pa4-status.success {
+  color: #83d7ae;
+}
+
+html[data-theme="dark"] .pa4-status.error {
+  color: #ff9f9f;
+}
+
+.pa4-progress {
+  display: none;
+  height: 8px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(127,127,127,.12);
+}
+
+.pa4-progress-bar {
+  width: 0;
+  height: 100%;
+  background: var(--global-link-color);
+  transition: width .2s ease;
+}
+
+@media (max-width: 600px) {
+  .pdf-a4-app {
+    width: 100%;
+  }
+
+  .pa4-card {
+    padding: 16px 12px;
+  }
+
+  .pa4-options {
+    grid-template-columns: 1fr;
+  }
+
+  .pa4-option select,
+  .pa4-option input[type="number"] {
+    font-size: 16px;
+  }
+
+  .pa4-drop {
+    min-height: 150px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdf-a4-app *,
+  .pdf-a4-app *::before,
+  .pdf-a4-app *::after {
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="pdf-a4-app">
+  <header class="pa4-header">
+    <h1 class="pa4-title" data-i18n="title">PDF to A4 Converter</h1>
+    <div class="pa4-tools">
+      <button class="pa4-lang" data-lang-toggle></button>
+      <button class="pa4-help" id="pa4-help" type="button" aria-haspopup="dialog" aria-controls="pa4-help-dialog"
+              data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+    </div>
+  </header>
+
+  <section class="pa4-card">
+    <div
+      class="pa4-drop"
+      id="pa4-drop-zone"
+      role="button"
+      tabindex="0"
+      aria-label="Choose PDF file"
+      data-i18n-attr="aria-label:dropAria"
+    >
+      <div class="pa4-drop-icon" aria-hidden="true">📄</div>
+      <div class="pa4-drop-title" data-i18n="dropTitle">Drop your PDF here</div>
+      <div class="pa4-drop-info" data-i18n="dropInfo">or click to select a PDF file</div>
+    </div>
+
+    <input
+      type="file"
+      id="pa4-file-input"
+      accept=".pdf,application/pdf"
+      class="pa4-file-input"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+
+    <div class="pa4-file-info" id="pa4-file-info">
+      <div style="min-width:0">
+        <div class="pa4-file-name" id="pa4-file-name"></div>
+        <div class="pa4-file-size" id="pa4-file-size"></div>
+      </div>
+      <button class="pa4-change" id="pa4-change-btn" type="button" data-i18n="change">Change file</button>
+    </div>
+
+    <div class="pa4-options">
+      <div class="pa4-option">
+        <label for="pa4-orientation" data-i18n="orientation">A4 orientation</label>
+        <select id="pa4-orientation">
+          <option value="auto" data-i18n="auto">Automatic</option>
+          <option value="portrait" data-i18n="portrait">Portrait</option>
+          <option value="landscape" data-i18n="landscape">Landscape</option>
+        </select>
+      </div>
+
+      <div class="pa4-option">
+        <label for="pa4-margin" data-i18n="margin">Page margin (mm)</label>
+        <input
+          type="number"
+          id="pa4-margin"
+          value="10"
+          min="0"
+          max="40"
+          step="1"
+        >
+      </div>
+    </div>
+
+    <div class="pa4-checkbox-row">
+      <input type="checkbox" id="pa4-allow-upscale" checked>
+      <label for="pa4-allow-upscale" data-i18n="upscale">Enlarge small pages to fill the available A4 area</label>
+    </div>
+
+    <button
+      class="pa4-btn"
+      id="pa4-convert-btn"
+      type="button"
+      disabled
+      aria-describedby="pa4-hint"
+      data-i18n="convert"
+    >Convert to A4 PDF</button>
+
+    <p class="pa4-hint" id="pa4-hint" data-i18n="hint">Choose a PDF file first.</p>
+
+    <div class="pa4-progress" id="pa4-progress">
+      <div class="pa4-progress-bar" id="pa4-progress-bar" role="progressbar" aria-label="Conversion progress" data-i18n-attr="aria-label:progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    </div>
+
+    <div
+      class="pa4-status"
+      id="pa4-status"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+    <div id="pa4-next" hidden></div>
+
+  </section>
+
+  <dialog class="pa4-dialog" id="pa4-help-dialog" aria-labelledby="pa4-help-title">
+    <div class="pa4-dialog-head">
+      <h2 id="pa4-help-title" data-i18n="howTo">How to use</h2>
+      <button class="pa4-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
+    </div>
+    <div class="pa4-dialog-body" data-i18n-html="help">
+      <p>Convert every page of a PDF to standard A4 size while preserving the original page content.</p>
+
+      <h3>How to use</h3>
+      <ol>
+        <li>Drop a PDF on the box or click it to choose a file.</li>
+        <li>Pick the A4 orientation and a page margin.</li>
+        <li>Press <strong>Convert to A4 PDF</strong>; the new file downloads automatically.</li>
+        <li><strong>Continue with</strong> passes the A4 PDF straight to another tool.</li>
+      </ol>
+
+      <h3>How does it work?</h3>
+      <p>This tool creates a new PDF in which every page uses the standard A4 paper size.</p>
+      <ul>
+        <li>Standard A4 size: 210 × 297 mm.</li>
+        <li>The original page proportions are preserved.</li>
+        <li>Content is automatically centered on each A4 page.</li>
+        <li>Pages are scaled so that no content is cropped.</li>
+        <li>Automatic mode keeps landscape pages landscape.</li>
+        <li>You can add a safety margin around page content.</li>
+      </ul>
+      <p>Useful for mixed page sizes, scanned pages, presentation slides,
+        or PDFs that need to print cleanly on standard A4 paper.</p>
+
+      <h3>Privacy</h3>
+      <p>Your PDF is processed locally in your browser. The document is not uploaded to a server.</p>
+      <p>TR / EN switches the interface language; the choice is remembered for all tools.</p>
+    </div>
+  </dialog>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="/assets/js/tool-handoff.js"></script>
+<script src="/assets/js/tool-i18n.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+
+  function i18nHarvest(en) {
+    document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (!(k in en)) en[k] = el.textContent.trim(); });
+    document.querySelectorAll("[data-i18n-html]").forEach(el => { const k = el.getAttribute("data-i18n-html"); if (!(k in en)) en[k] = el.innerHTML; });
+    document.querySelectorAll("[data-i18n-attr]").forEach(el => el.getAttribute("data-i18n-attr").split(";").forEach(p => { const q = p.split(":"); if (q.length !== 2) return; const a = q[0].trim(), k = q[1].trim(); if (a && !(k in en) && el.hasAttribute(a)) en[k] = el.getAttribute(a); }));
+    return en;
+  }
+
+  const I18N = {
+    en: i18nHarvest({
+      notPdf: "Please select a PDF file.", noLib: "PDF library could not be loaded.",
+      reading: "Reading PDF...", converting: "Converting page {i} of {n}...", saving: "Saving A4 PDF...",
+      marginLarge: "The selected margin is too large.", failMsg: "{msg}", fail: "The PDF could not be converted.",
+      done1: "Done. 1 page converted to A4.", doneN: "Done. {n} pages converted to A4.",
+      loadedFrom: "Loaded {name} from the previous tool."
+    }),
+    tr: {
+      title: "PDF'yi A4'e Sığdır", howTo: "Nasıl kullanılır", close: "Kapat",
+      dropAria: "PDF dosyası seçin", dropTitle: "PDF'yi buraya bırakın", dropInfo: "ya da tıklayıp bir PDF dosyası seçin",
+      change: "Dosyayı değiştir", orientation: "A4 yönü", auto: "Otomatik", portrait: "Dikey", landscape: "Yatay",
+      margin: "Sayfa kenar boşluğu (mm)", upscale: "Küçük sayfaları A4 alanını dolduracak şekilde büyüt",
+      convert: "A4 PDF'e dönüştür", hint: "Önce bir PDF dosyası seçin.", progress: "Dönüştürme ilerlemesi",
+      notPdf: "Lütfen bir PDF dosyası seçin.", noLib: "PDF kitaplığı yüklenemedi.",
+      reading: "PDF okunuyor...", converting: "Sayfa {i} / {n} dönüştürülüyor...", saving: "A4 PDF kaydediliyor...",
+      marginLarge: "Seçilen kenar boşluğu çok büyük.", failMsg: "PDF dönüştürülemedi. Dosya şifreli ya da bozuk olabilir.",
+      fail: "PDF dönüştürülemedi.",
+      done1: "Bitti. 1 sayfa A4'e dönüştürüldü.", doneN: "Bitti. {n} sayfa A4'e dönüştürüldü.",
+      loadedFrom: "{name} önceki araçtan alındı.",
+      help: `
+      <p>PDF'nin her sayfasını, özgün içeriği koruyarak standart A4 boyutuna getirir.</p>
+
+      <h3>Nasıl kullanılır</h3>
+      <ol>
+        <li>PDF'yi kutuya bırakın ya da kutuya tıklayıp bir dosya seçin.</li>
+        <li>A4 yönünü ve sayfa kenar boşluğunu seçin.</li>
+        <li><strong>A4 PDF'e dönüştür</strong>'e basın; yeni dosya kendiliğinden iner.</li>
+        <li><strong>Şununla devam et</strong> düğmeleri A4 PDF'yi doğrudan başka bir araca aktarır.</li>
+      </ol>
+
+      <h3>Nasıl çalışır?</h3>
+      <p>Araç, her sayfası standart A4 kâğıt boyutunda olan yeni bir PDF oluşturur.</p>
+      <ul>
+        <li>Standart A4 boyutu: 210 × 297 mm.</li>
+        <li>Sayfaların özgün oranları korunur.</li>
+        <li>İçerik her A4 sayfada kendiliğinden ortalanır.</li>
+        <li>Sayfalar hiçbir içerik kırpılmayacak şekilde ölçeklenir.</li>
+        <li>Otomatik kipte yatay sayfalar yatay kalır.</li>
+        <li>Sayfa içeriğinin çevresine güvenlik boşluğu ekleyebilirsiniz.</li>
+      </ul>
+      <p>Karışık sayfa boyutları, taranmış sayfalar, sunum slaytları ya da standart A4 kâğıda düzgün
+        basılması gereken PDF'ler için kullanışlıdır.</p>
+
+      <h3>Gizlilik</h3>
+      <p>PDF'niz tarayıcınızda işlenir; belge hiçbir sunucuya yüklenmez.</p>
+      <p>TR / EN düğmesi arayüz dilini değiştirir; seçim bütün araçlar için hatırlanır.</p>
+    `
+    }
+  };
+  let i18n = null;
+  const T = (k, v) => i18n ? i18n.t(k, v) : String(I18N.en[k] != null ? I18N.en[k] : k).replace(/\{(\w+)\}/g, (m, x) => v && v[x] != null ? v[x] : m);
+  let lastStatus = null;
+
+  const dropZone = byId("pa4-drop-zone");
+  const fileInput = byId("pa4-file-input");
+  const fileInfo = byId("pa4-file-info");
+  const fileName = byId("pa4-file-name");
+  const fileSize = byId("pa4-file-size");
+  const convertBtn = byId("pa4-convert-btn");
+  const orientation = byId("pa4-orientation");
+  const marginInput = byId("pa4-margin");
+  const allowUpscale = byId("pa4-allow-upscale");
+  const status = byId("pa4-status");
+  const progress = byId("pa4-progress");
+  const progressBar = byId("pa4-progress-bar");
+  const hint = byId("pa4-hint");
+  const helpDialog = byId("pa4-help-dialog");
+
+  byId("pa4-help").addEventListener("click", () => helpDialog.showModal());
+  helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+
+  let selectedFile = null;
+  let outputUrl = null;
+  let lastResult = null;
+  const nextBox = byId("pa4-next");
+
+  function showNext(result) {
+    lastResult = result || null;
+    if (!lastResult || !window.ToolHandoff) {
+      nextBox.hidden = true;
+      nextBox.innerHTML = "";
+      return;
+    }
+    ToolHandoff.renderNext(nextBox, "pdf", () => [lastResult]);
+    nextBox.hidden = false;
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
+  function showStatus(key, type, vars) {
+    lastStatus = [key, type, vars];
+    status.textContent = T(key, vars);
+    status.className = `pa4-status ${type}`;
+  }
+
+  function hideStatus() {
+    lastStatus = null;
+    status.textContent = "";
+    status.className = "pa4-status";
+  }
+
+  function selectFile(file) {
+    if (
+      !file ||
+      (
+        file.type !== "application/pdf" &&
+        !file.name.toLowerCase().endsWith(".pdf")
+      )
+    ) {
+      showStatus("notPdf", "error");
+      return;
+    }
+
+    selectedFile = file;
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.classList.add("is-visible");
+    convertBtn.disabled = false;
+    hint.hidden = true;
+    progress.style.display = "none";
+    fileInput.value = "";
+    hideStatus();
+    showNext(null);
+  }
+
+  dropZone.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  byId("pa4-change-btn").addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  dropZone.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener("change", () => {
+    selectFile(fileInput.files[0]);
+  });
+
+  ["dragenter", "dragover"].forEach(type => {
+    dropZone.addEventListener(type, event => {
+      event.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(type => {
+    dropZone.addEventListener(type, event => {
+      event.preventDefault();
+      if (type === "dragleave" && dropZone.contains(event.relatedTarget)) {
+        return;
+      }
+      dropZone.classList.remove("dragover");
+    });
+  });
+
+  dropZone.addEventListener("drop", event => {
+    selectFile(event.dataTransfer.files[0]);
+  });
+
+  convertBtn.addEventListener("click", async () => {
+    if (!selectedFile) {
+      return;
+    }
+
+    if (!window.PDFLib) {
+      showStatus("noLib", "error");
+      return;
+    }
+
+    convertBtn.disabled = true;
+    progress.style.display = "block";
+    progressBar.style.width = "0%";
+
+    showStatus("reading", "processing");
+
+    try {
+      const {
+        PDFDocument,
+        PageSizes
+      } = window.PDFLib;
+
+      const bytes = await selectedFile.arrayBuffer();
+
+      const sourcePdf = await PDFDocument.load(
+        bytes,
+        {
+          ignoreEncryption: false
+        }
+      );
+
+      const outputPdf = await PDFDocument.create();
+
+      const totalPages = sourcePdf.getPageCount();
+
+      const marginMM = Math.max(
+        0,
+        Math.min(
+          40,
+          Number(marginInput.value) || 0
+        )
+      );
+
+      marginInput.value = marginMM;
+
+      const margin = marginMM * 72 / 25.4;
+
+      for (
+        let pageIndex = 0;
+        pageIndex < totalPages;
+        pageIndex++
+      ) {
+        showStatus("converting", "processing", { i: pageIndex + 1, n: totalPages });
+
+        const sourcePage = sourcePdf.getPage(pageIndex);
+        const sourceSize = sourcePage.getSize();
+
+        let targetWidth = PageSizes.A4[0];
+        let targetHeight = PageSizes.A4[1];
+
+        if (orientation.value === "landscape") {
+          [targetWidth, targetHeight] =
+            [targetHeight, targetWidth];
+        } else if (
+          orientation.value === "auto" &&
+          sourceSize.width > sourceSize.height
+        ) {
+          [targetWidth, targetHeight] =
+            [targetHeight, targetWidth];
+        }
+
+        const availableWidth =
+          targetWidth - margin * 2;
+
+        const availableHeight =
+          targetHeight - margin * 2;
+
+        if (
+          availableWidth <= 0 ||
+          availableHeight <= 0
+        ) {
+          throw Object.assign(new Error(I18N.en.marginLarge), { i18nKey: "marginLarge" });
+        }
+
+        const embeddedPage =
+          await outputPdf.embedPage(sourcePage);
+
+        let scale = Math.min(
+          availableWidth / sourceSize.width,
+          availableHeight / sourceSize.height
+        );
+
+        if (
+          !allowUpscale.checked &&
+          scale > 1
+        ) {
+          scale = 1;
+        }
+
+        const drawWidth =
+          sourceSize.width * scale;
+
+        const drawHeight =
+          sourceSize.height * scale;
+
+        const x =
+          (targetWidth - drawWidth) / 2;
+
+        const y =
+          (targetHeight - drawHeight) / 2;
+
+        const outputPage =
+          outputPdf.addPage([
+            targetWidth,
+            targetHeight
+          ]);
+
+        outputPage.drawPage(
+          embeddedPage,
+          {
+            x,
+            y,
+            width: drawWidth,
+            height: drawHeight
+          }
+        );
+
+        progressBar.style.width =
+          `${Math.round(
+            ((pageIndex + 1) / totalPages) * 100
+          )}%`;
+
+        progressBar.setAttribute(
+          "aria-valuenow",
+          String(Math.round(((pageIndex + 1) / totalPages) * 100))
+        );
+      }
+
+      showStatus("saving", "processing");
+
+      const outputBytes =
+        await outputPdf.save();
+
+      if (outputUrl) {
+        URL.revokeObjectURL(outputUrl);
+      }
+
+      const outputBlob = new Blob(
+        [outputBytes],
+        { type: "application/pdf" }
+      );
+
+      outputUrl = URL.createObjectURL(outputBlob);
+
+      const anchor =
+        document.createElement("a");
+
+      anchor.href = outputUrl;
+      anchor.download =
+        selectedFile.name.replace(/\.pdf$/i, "") +
+        "-a4.pdf";
+
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      showNext({ blob: outputBlob, name: anchor.download });
+
+      window.setTimeout(() => {
+        if (outputUrl) {
+          URL.revokeObjectURL(outputUrl);
+          outputUrl = null;
+        }
+      }, 1500);
+
+      showStatus(totalPages === 1 ? "done1" : "doneN", "success", { n: totalPages });
+    } catch (error) {
+      console.error(error);
+
+      if (error && error.i18nKey) showStatus(error.i18nKey, "error");
+      else if (error && error.message) showStatus("failMsg", "error", { msg: error.message });
+      else showStatus("fail", "error");
+    } finally {
+      convertBtn.disabled = !selectedFile;
+    }
+  });
+
+  if (window.ToolHandoff) {
+    ToolHandoff.take().then(files => {
+      const file = (files || []).find(f => f.type === "application/pdf" || /\.pdf$/i.test(f.name));
+      if (!file) return;
+      selectFile(file);
+      if (selectedFile === file) showStatus("loadedFrom", "processing", { name: file.name });
+    }).catch(() => {});
+  }
+
+  function relabel() {
+    if (lastStatus) status.textContent = T(lastStatus[0], lastStatus[2]);
+    if (lastResult && window.ToolHandoff && !nextBox.hidden) ToolHandoff.renderNext(nextBox, "pdf", () => [lastResult]);
+  }
+  const startI18n = () => {
+    i18n = ToolI18n.setup(I18N, () => { if (i18n) relabel(); });
+    relabel();
+  };
+  /* wait for the related-tools strip below the page so the helper can relabel it */
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startI18n); else startI18n();
+})();
+</script>

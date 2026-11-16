@@ -115,14 +115,14 @@ seo_title: "Free Browser Games: Puzzles, Turkish Word Games and Quizzes"
 description: %s
 author_profile: true
 json_ld: %s
-hreflang: {en: "/games/", tr: "/tr/oyunlar/"}
+hreflang: {en: "/games/", tr: "/game/tr/"}
 ---
 
 <style>%s</style>
 
 <p class="games-intro">%d free games that play right in your browser, on a phone or a computer.
 No download, no sign-up. The word games use Turkish words.
-<a href="/tr/oyunlar/" hreflang="tr" lang="tr">Türkçe</a></p>
+<a href="/game/tr/" hreflang="tr" lang="tr">Türkçe</a></p>
 
 %s
 """ % (json.dumps(desc, ensure_ascii=False), json.dumps(json.dumps(ld, ensure_ascii=False), ensure_ascii=False),

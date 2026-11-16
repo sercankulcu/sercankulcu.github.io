@@ -30,7 +30,7 @@
     return 'en';
   }
 
-  /* A Turkish-address copy (/tr/araclar/..., /tr/oyunlar/...) sets window.PZ_PAGE_LANG = "tr" in the
+  /* A Turkish-address copy (/apps/tr/..., /game/tr/...) sets window.PZ_PAGE_LANG = "tr" in the
      head: it opens in Turkish whatever was chosen before; the switch still changes it. */
   function current() {
     var p = window.PZ_PAGE_LANG;

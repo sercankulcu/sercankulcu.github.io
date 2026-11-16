@@ -1,0 +1,855 @@
+---
+# tools/make_tr_pages.py writes this copy of apps/document-scanner.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Belge Tarayıcı"
+permalink: /apps/tr/belge-tarayici/
+excerpt: "Belge fotoğraflarını düzeltip netleştirin, JPG ya da A4 PDF olarak kaydedin. Tarayıcıda çalışır."
+lang: tr
+ui_lang: tr
+seo_title: "Belge Tarayıcı · Fotoğraftan PDF, Ücretsiz Online"
+og_image: https://sercankulcu.github.io/images/apps/document-scanner.jpg
+web_app: BusinessApplication
+hreflang: {en: "/apps/document-scanner/", tr: "/apps/tr/belge-tarayici/"}
+---
+
+<style>
+.document-scanner-app,
+.document-scanner-app *,
+.document-scanner-app *::before,
+.document-scanner-app *::after {
+  box-sizing: border-box;
+}
+
+.document-scanner-app {
+  width: min(980px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.ds-panel {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid rgba(127,127,127,.28);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.ds-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.ds-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.2;
+}
+
+.ds-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.ds-hero-actions{display:flex;gap:8px;flex:0 0 auto}
+.ds-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.ds-help:focus-visible,.ds-lang:focus-visible,.ds-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.ds-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.ds-dialog::backdrop{background:rgba(0,0,0,.45)}
+.ds-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.ds-dialog-head h2{margin:0;font-size:1.1rem}
+.ds-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.ds-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.ds-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.ds-dialog-body ul,.ds-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.ds-dialog[open]{animation:ds-pop .16s ease-out}
+  @keyframes ds-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.ds-drop {
+  margin-top: 18px;
+  padding: 20px 16px;
+  border: 1px dashed rgba(127,127,127,.52);
+  border-radius: 14px;
+  background: rgba(127,127,127,.04);
+  color: var(--global-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+.ds-drop:hover,
+.ds-drop.drag {
+  border-color: var(--global-link-color);
+  background: rgba(80,120,200,.08);
+}
+
+.ds-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: start;
+}
+
+.ds-card {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(127,127,127,.28);
+  border-radius: 13px;
+  background: rgba(127,127,127,.035);
+}
+
+.ds-canvas-wrap {
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  min-height: 420px;
+}
+
+.ds-canvas-wrap canvas[hidden],
+.ds-empty[hidden] {
+  display: none;
+}
+
+.ds-empty {
+  max-width: 260px;
+  color: var(--global-text-color);
+  opacity: .78;
+  text-align: center;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.ds-empty-icon {
+  margin-bottom: 8px;
+  font-size: 44px;
+}
+
+.ds-canvas-wrap canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: white;
+  border-radius: 8px;
+}
+
+.ds-field {
+  display: grid;
+  gap: 6px;
+}
+
+.ds-field + .ds-field {
+  margin-top: 10px;
+}
+
+.ds-field label {
+  margin: 0;
+  color: var(--global-text-color);
+  opacity: .85;
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.ds-field select,
+.ds-field input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid rgba(127,127,127,.55);
+  border-radius: 10px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .9rem;
+}
+
+.ds-field input[type="range"] {
+  min-height: 28px;
+  padding: 0;
+}
+
+.ds-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.ds-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(45,45,45,.42);
+  border-radius: 999px;
+  background: rgba(45,45,45,.08);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ds-btn:hover:not(:disabled) {
+  background: rgba(45,45,45,.14);
+}
+
+.ds-btn.primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.ds-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+html[data-theme="dark"] .ds-btn {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .ds-btn.primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.document-scanner-app button:focus-visible,
+.document-scanner-app select:focus-visible,
+.document-scanner-app input:focus-visible,
+.document-scanner-app .ds-drop:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.ds-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+
+.ds-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 96px;
+  border-width: 2px;
+}
+
+.ds-drop-title {
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.ds-drop-help {
+  
+  font-size: .85rem; color: var(--global-text-color-light);}
+
+.ds-drop:focus-visible {
+  border-color: var(--global-link-color);
+}
+
+.ds-btn.primary:hover:not(:disabled) {
+  background: var(--tool-primary-hover);
+}
+
+.ds-status.error {
+  color: #b42318;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .ds-status.error {
+  color: #ff9f9f;
+}
+
+.document-scanner-app .ds-field input[type="range"] {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  accent-color: var(--global-link-color);
+}
+
+.ds-label-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ds-value {
+  color: var(--global-text-color);
+  font-size: .8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+
+.ds-status {
+  margin-top: 10px;
+  color: var(--global-text-color);
+  opacity: .85;
+  text-align: center;
+  font-size: .88rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .document-scanner-app {
+    width: 100%;
+  }
+
+  .ds-panel {
+    padding: 14px 10px;
+  }
+
+  .ds-field select {
+    font-size: 16px;
+  }
+
+  .ds-actions .ds-btn {
+    flex: 1 1 140px;
+  }
+
+  .ds-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-canvas-wrap {
+    min-height: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .document-scanner-app *,
+  .document-scanner-app *::before,
+  .document-scanner-app *::after {
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="document-scanner-app">
+  <section class="ds-panel" aria-labelledby="ds-title">
+    <header class="ds-hero">
+      <h1 class="ds-title" id="ds-title" data-i18n="title">Document Scanner</h1>
+      <div class="ds-hero-actions">
+        <button class="ds-lang" data-lang-toggle></button>
+        <button class="ds-help" id="ds-help" type="button" aria-haspopup="dialog" aria-controls="ds-help-dialog"
+              data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+      </div>
+    </header>
+
+    <div
+      class="ds-drop"
+      id="ds-drop"
+      role="button"
+      tabindex="0"
+      aria-label="Take or choose a document photo"
+      data-i18n-attr="aria-label:dropAria"
+    >
+      <span class="ds-drop-title" data-i18n="dropTitle">📷 Take / Choose Photo</span>
+      <span class="ds-drop-help" data-i18n="dropHint">or drop an image here</span>
+    </div>
+
+    <input
+      id="ds-file"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      class="ds-file-input"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+
+    <div class="ds-row">
+      <div class="ds-card ds-canvas-wrap">
+        <div class="ds-empty" id="ds-empty">
+          <div class="ds-empty-icon" aria-hidden="true">📄</div>
+          <span data-i18n="empty">Your scanned page will appear here.</span>
+        </div>
+        <canvas id="ds-canvas" width="600" height="800" role="img" aria-label="Scanned document preview" data-i18n-attr="aria-label:canvasAria" hidden></canvas>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-field">
+          <label for="ds-filter" data-i18n="filter">Filter</label>
+          <select id="ds-filter">
+            <option value="Original" data-i18n="fOriginal">Original</option>
+            <option value="Document" data-i18n="fDocument">Document</option>
+            <option value="Grayscale" data-i18n="fGray">Grayscale</option>
+            <option value="Black & White" data-i18n="fBw">Black &amp; White</option>
+          </select>
+        </div>
+
+        <div class="ds-field">
+          <div class="ds-label-row">
+            <label for="ds-bright" data-i18n="bright">Brightness</label>
+            <output class="ds-value" id="ds-bright-value" for="ds-bright">105%</output>
+          </div>
+          <input
+            id="ds-bright"
+            type="range"
+            min="70"
+            max="150"
+            value="105"
+          >
+        </div>
+
+        <div class="ds-field">
+          <div class="ds-label-row">
+            <label for="ds-contrast" data-i18n="contrast">Contrast</label>
+            <output class="ds-value" id="ds-contrast-value" for="ds-contrast">125%</output>
+          </div>
+          <input
+            id="ds-contrast"
+            type="range"
+            min="70"
+            max="180"
+            value="125"
+          >
+        </div>
+
+        <div class="ds-actions">
+          <button class="ds-btn" id="ds-rotate" type="button" disabled aria-describedby="ds-status" data-i18n="rotate">Rotate 90°</button>
+          <button class="ds-btn" id="ds-jpg" type="button" disabled aria-describedby="ds-status" data-i18n="jpg">Download JPG</button>
+          <button class="ds-btn primary" id="ds-pdf" type="button" disabled aria-describedby="ds-status" data-i18n="pdf">Download A4 PDF</button>
+        </div>
+
+        <div
+          class="ds-status"
+          id="ds-status"
+          role="status"
+          aria-live="polite"
+        >
+          Choose a document photo to begin.
+        </div>
+
+        <div id="ds-next" hidden></div>
+      </div>
+    </div>
+
+  </section>
+
+  <dialog class="ds-dialog" id="ds-help-dialog" aria-labelledby="ds-help-title">
+    <div class="ds-dialog-head">
+      <h2 id="ds-help-title" data-i18n="howTo">How to use</h2>
+      <button class="ds-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
+    </div>
+    <div class="ds-dialog-body" data-i18n-html="help">
+      <p>A mobile camera tool: take or choose a document photo, rotate it, enhance contrast,
+        switch to grayscale or black &amp; white, then save as image or A4 PDF.</p>
+
+      <h3>How to use</h3>
+      <ol>
+        <li>Tap <strong>Take / Choose Photo</strong> (on a phone this opens the camera), or drop an image on the box.</li>
+        <li>Pick a filter and adjust brightness and contrast; use <strong>Rotate 90°</strong> if needed.</li>
+        <li>Save with <strong>Download JPG</strong> or <strong>Download A4 PDF</strong>.</li>
+        <li>After the PDF download, <strong>Continue with</strong> passes the PDF straight to another PDF tool.</li>
+      </ol>
+
+      <h3>Tip</h3>
+      <p>For best results, photograph the page straight-on with good lighting.</p>
+
+      <h3>Privacy</h3>
+      <p>The photo is processed in your browser; it is not uploaded to a server.</p>
+      <p>TR / EN switches the interface language; the choice is remembered for all tools.</p>
+    </div>
+  </dialog>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="/assets/js/tool-handoff.js"></script>
+<script src="/assets/js/tool-i18n.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+
+  function i18nHarvest(en) {
+    document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (!(k in en)) en[k] = el.textContent; });
+    document.querySelectorAll("[data-i18n-html]").forEach(el => { const k = el.getAttribute("data-i18n-html"); if (!(k in en)) en[k] = el.innerHTML; });
+    document.querySelectorAll("[data-i18n-attr]").forEach(el => el.getAttribute("data-i18n-attr").split(";").forEach(p => { const q = p.split(":"); if (q.length !== 2) return; const a = q[0].trim(), k = q[1].trim(); if (a && !(k in en) && el.hasAttribute(a)) en[k] = el.getAttribute(a); }));
+    return en;
+  }
+  const I18N = {
+    en: i18nHarvest({
+      start: "Choose a document photo to begin.",
+      invalid: "Please choose a valid image.",
+      info: "{name} · {w} × {h}",
+      loadFail: "The image could not be loaded.",
+      jpgDone: "JPG downloaded.",
+      libFail: "PDF library could not be loaded.",
+      creating: "Creating PDF…",
+      pdfDone: "PDF downloaded.",
+      pdfFail: "The PDF could not be created.", pct: "{n}%"
+    }),
+    tr: {
+      title: "Belge Tarayıcı", howTo: "Nasıl kullanılır", close: "Kapat",
+      dropAria: "Belge fotoğrafı çekin ya da seçin", dropTitle: "📷 Fotoğraf çekin / seçin",
+      dropHint: "ya da bir görseli buraya bırakın",
+      empty: "Taranan sayfanız burada görünür.", canvasAria: "Taranan belgenin önizlemesi",
+      filter: "Filtre", fOriginal: "Özgün", fDocument: "Belge", fGray: "Gri tonlama", fBw: "Siyah beyaz",
+      bright: "Parlaklık", contrast: "Karşıtlık",
+      rotate: "90° döndür", jpg: "JPG indir", pdf: "A4 PDF indir",
+      start: "Başlamak için bir belge fotoğrafı seçin.",
+      invalid: "Lütfen geçerli bir görsel seçin.",
+      loadFail: "Görsel yüklenemedi.",
+      jpgDone: "JPG indirildi.",
+      libFail: "PDF kitaplığı yüklenemedi.",
+      creating: "PDF oluşturuluyor…",
+      pdfDone: "PDF indirildi.",
+      pdfFail: "PDF oluşturulamadı.", pct: "%{n}",
+      help: `
+      <p>Telefon kamerasına uygun bir araç: belge fotoğrafı çekin ya da seçin, döndürün, karşıtlığı artırın,
+        gri tonlamaya ya da siyah beyaza geçin, sonra görsel ya da A4 PDF olarak kaydedin.</p>
+
+      <h3>Nasıl kullanılır</h3>
+      <ol>
+        <li><strong>Fotoğraf çekin / seçin</strong>'e dokunun (telefonda kamera açılır) ya da bir görseli kutuya bırakın.</li>
+        <li>Bir filtre seçin, parlaklık ve karşıtlığı ayarlayın; gerekirse <strong>90° döndür</strong>'ü kullanın.</li>
+        <li><strong>JPG indir</strong> ya da <strong>A4 PDF indir</strong> ile kaydedin.</li>
+        <li>PDF indirildikten sonra <strong>Şununla devam et</strong> PDF'yi doğrudan başka bir PDF aracına aktarır.</li>
+      </ol>
+
+      <h3>İpucu</h3>
+      <p>En iyi sonuç için sayfayı iyi ışıkta, tam karşıdan çekin.</p>
+
+      <h3>Gizlilik</h3>
+      <p>Fotoğraf tarayıcınızda işlenir; hiçbir sunucuya yüklenmez.</p>
+      <p>TR / EN düğmesi arayüz dilini değiştirir; seçim bütün araçlar için hatırlanır.</p>
+    `
+    }
+  };
+  let i18n = null;
+  const T = (k, v) => i18n ? i18n.t(k, v) : String(I18N.en[k] != null ? I18N.en[k] : k).replace(/\{(\w+)\}/g, (m, x) => v && v[x] != null ? v[x] : m);
+  let lastStatus = ["start"];
+  let lastResult = null;
+
+  const dsHelpDialog = document.getElementById("ds-help-dialog");
+  document.getElementById("ds-help").addEventListener("click", () => dsHelpDialog.showModal());
+  dsHelpDialog.addEventListener("click", e => { if (e.target === dsHelpDialog || e.target.closest("[data-close]")) dsHelpDialog.close(); });
+
+  const drop = byId("ds-drop");
+  const fileInput = byId("ds-file");
+  const canvas = byId("ds-canvas");
+  const filter = byId("ds-filter");
+  const brightness = byId("ds-bright");
+  const contrast = byId("ds-contrast");
+  const rotateBtn = byId("ds-rotate");
+  const jpgBtn = byId("ds-jpg");
+  const pdfBtn = byId("ds-pdf");
+  const status = byId("ds-status");
+
+  const image = new Image();
+
+  let rotation = 0;
+  let loaded = false;
+  let sourceUrl = null;
+  let pdfUrl = null;
+
+  function showNext(result) {
+    const nextBox = byId("ds-next");
+    lastResult = result || null;
+    if (!result || !window.ToolHandoff) {
+      nextBox.hidden = true;
+      nextBox.innerHTML = "";
+      return;
+    }
+    ToolHandoff.renderNext(nextBox, "pdf", () => [result]);
+    nextBox.hidden = false;
+  }
+
+  function setStatus(key, isError, vars) {
+    lastStatus = [key, vars];
+    status.textContent = T(key, vars);
+    status.classList.toggle("error", !!isError);
+  }
+
+  function showValues() {
+    byId("ds-bright-value").textContent = T("pct", { n: brightness.value });
+    byId("ds-contrast-value").textContent = T("pct", { n: contrast.value });
+  }
+
+  function updateButtons() {
+    rotateBtn.disabled = !loaded;
+    jpgBtn.disabled = !loaded;
+    pdfBtn.disabled = !loaded;
+  }
+
+  function draw() {
+    if (!loaded) {
+      return;
+    }
+
+    const swapped = rotation % 180 !== 0;
+    const maxDimension = 1000;
+
+    const sourceWidth =
+      swapped
+        ? image.naturalHeight
+        : image.naturalWidth;
+
+    const sourceHeight =
+      swapped
+        ? image.naturalWidth
+        : image.naturalHeight;
+
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(sourceWidth, sourceHeight)
+    );
+
+    canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+    canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+
+    const context = canvas.getContext("2d");
+
+    context.save();
+    context.translate(canvas.width / 2, canvas.height / 2);
+    context.rotate(rotation * Math.PI / 180);
+
+    const drawWidth =
+      swapped
+        ? canvas.height
+        : canvas.width;
+
+    const drawHeight =
+      swapped
+        ? canvas.width
+        : canvas.height;
+
+    let canvasFilter =
+      `brightness(${brightness.value}%) contrast(${contrast.value}%)`;
+
+    if (filter.value === "Grayscale") {
+      canvasFilter += " grayscale(1)";
+    }
+
+    if (filter.value === "Black & White") {
+      canvasFilter += " grayscale(1) contrast(180%)";
+    }
+
+    if (filter.value === "Document") {
+      canvasFilter += " saturate(.2) contrast(145%)";
+    }
+
+    context.filter = canvasFilter;
+
+    context.drawImage(
+      image,
+      -drawWidth / 2,
+      -drawHeight / 2,
+      drawWidth,
+      drawHeight
+    );
+
+    context.restore();
+  }
+
+  function loadFile(file) {
+    if (!file || !file.type.startsWith("image/")) {
+      setStatus("invalid", true);
+      return;
+    }
+
+    if (sourceUrl) {
+      URL.revokeObjectURL(sourceUrl);
+    }
+
+    sourceUrl = URL.createObjectURL(file);
+    showNext(null);
+
+    image.onload = () => {
+      loaded = true;
+      rotation = 0;
+      canvas.hidden = false;
+      byId("ds-empty").hidden = true;
+
+      draw();
+      updateButtons();
+
+      setStatus("info", false, { name: file.name, w: image.naturalWidth, h: image.naturalHeight });
+
+      fileInput.value = "";
+    };
+
+    image.onerror = () => {
+      loaded = false;
+      updateButtons();
+      setStatus("loadFail", true);
+    };
+
+    image.src = sourceUrl;
+  }
+
+  drop.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  drop.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener("change", event => {
+    loadFile(event.target.files[0]);
+  });
+
+  ["dragenter", "dragover"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      drop.classList.add("drag");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      if (type === "dragleave" && drop.contains(event.relatedTarget)) {
+        return;
+      }
+      drop.classList.remove("drag");
+    });
+  });
+
+  drop.addEventListener("drop", event => {
+    loadFile(event.dataTransfer.files[0]);
+  });
+
+  [filter, brightness, contrast].forEach(control => {
+    control.addEventListener("input", () => {
+      showValues();
+      draw();
+    });
+  });
+
+  filter.addEventListener("change", draw);
+
+  rotateBtn.addEventListener("click", () => {
+    rotation = (rotation + 90) % 360;
+    draw();
+  });
+
+  jpgBtn.addEventListener("click", () => {
+    if (!loaded) {
+      return;
+    }
+
+    const anchor = document.createElement("a");
+    anchor.href = canvas.toDataURL("image/jpeg", .9);
+    anchor.download = "scanned-document.jpg";
+    anchor.click();
+
+    setStatus("jpgDone");
+  });
+
+  pdfBtn.addEventListener("click", async () => {
+    if (!loaded) {
+      return;
+    }
+
+    if (!window.PDFLib) {
+      setStatus("libFail", true);
+      return;
+    }
+
+    try {
+      setStatus("creating");
+
+      const { PDFDocument } = window.PDFLib;
+
+      const documentPdf = await PDFDocument.create();
+
+      const page = documentPdf.addPage([
+        595.28,
+        841.89
+      ]);
+
+      const jpg = await documentPdf.embedJpg(
+        canvas.toDataURL("image/jpeg", .9)
+      );
+
+      const margin = 28;
+      const maxWidth = 595.28 - 2 * margin;
+      const maxHeight = 841.89 - 2 * margin;
+
+      const scale = Math.min(
+        maxWidth / jpg.width,
+        maxHeight / jpg.height
+      );
+
+      const width = jpg.width * scale;
+      const height = jpg.height * scale;
+
+      page.drawImage(jpg, {
+        x: (595.28 - width) / 2,
+        y: (841.89 - height) / 2,
+        width,
+        height
+      });
+
+      const bytes = await documentPdf.save();
+
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+
+      const pdfBlob = new Blob(
+        [bytes],
+        { type: "application/pdf" }
+      );
+
+      pdfUrl = URL.createObjectURL(pdfBlob);
+
+      const anchor = document.createElement("a");
+      anchor.href = pdfUrl;
+      anchor.download = "scanned-document.pdf";
+      anchor.click();
+
+      window.setTimeout(() => {
+        if (pdfUrl) {
+          URL.revokeObjectURL(pdfUrl);
+          pdfUrl = null;
+        }
+      }, 1000);
+
+      setStatus("pdfDone");
+      showNext({ blob: pdfBlob, name: anchor.download });
+    } catch (error) {
+      setStatus("pdfFail", true);
+    }
+  });
+
+  updateButtons();
+
+  function relabel() {
+    status.textContent = T(lastStatus[0], lastStatus[1]);
+    showValues();
+    const nextBox = byId("ds-next");
+    if (lastResult && !nextBox.hidden && nextBox.childNodes.length) showNext(lastResult);
+  }
+  const startI18n = () => {
+    i18n = ToolI18n.setup(I18N, () => { if (i18n) relabel(); });
+    relabel();
+  };
+  /* wait for the related-tools strip below the page so the helper can relabel it */
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startI18n); else startI18n();
+})();
+</script>

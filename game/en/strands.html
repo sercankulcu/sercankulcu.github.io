@@ -1,0 +1,1472 @@
+---
+# tools/make_tr_pages.py writes this copy of game/strands.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Strands"
+permalink: /game/en/strands/
+excerpt: "Find five hidden Turkish words on a common theme in a letter grid, with a new theme every day."
+lang: en
+ui_lang: en
+seo_title: "Strands · Turkish Themed Word Search"
+og_image: https://sercankulcu.github.io/images/games/strands.jpg
+game_genre: "Puzzle"
+hreflang: {en: "/game/en/strands/", tr: "/game/strands/"}
+---
+
+<style>
+.strands-app,
+.strands-app *,
+.strands-app *::before,
+.strands-app *::after {
+  box-sizing: border-box;
+}
+
+.strands-app {
+  width: min(820px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: inherit;
+}
+
+.strands-panel {
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.strands-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.strands-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.strands-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.strands-app .strands-lang {
+  font-size: .8rem;
+}
+
+.strands-help,
+.strands-button,
+.strands-tile {
+  font: inherit;
+}
+
+.strands-help {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.strands-help:hover,
+.strands-button:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.strands-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.strands-stat {
+  padding: 9px 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .06);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+/* long theme names (BİLGİSAYAR, MATEMATİK) keep both chips on one row on narrow phones */
+@media (max-width: 380px) {
+  .strands-stats { gap: 6px; }
+  .strands-stat { padding: 9px 10px; font-size: .8rem; }
+}
+
+.strands-current {
+  min-height: 48px;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--global-text-color);
+  font-size: clamp(22px, 6vw, 34px);
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.strands-current:empty::before {
+  content: attr(data-empty);
+  color: var(--global-text-color-light);
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.strands-app button:focus-visible,
+.strands-dialog-close:focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.strands-board {
+  width: min(100%, 320px);
+  margin: 18px auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+.strands-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--global-text-color) 28%, transparent);
+  border-radius: 12px;
+  background: rgba(127, 127, 127, .1);
+  color: var(--global-text-color);
+  font-size: clamp(17px, 4vw, 21px);
+  touch-action: manipulation;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.strands-tile:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--global-link-color);
+}
+
+.strands-tile.is-selected {
+  border-color: #9c6210;
+  background: #9c6210;
+  color: #fff;
+}
+
+.strands-tile.is-found {
+  border-color: #2f855a;
+  background: #2f855a;
+  color: #fff;
+}
+
+:root[data-theme="dark"] .strands-tile.is-selected { border-color: #d69e2e; background: #d69e2e; color: #10151c; }
+:root[data-theme="dark"] .strands-tile.is-found    { border-color: #38a169; background: #38a169; color: #10151c; }
+
+/* Selected and solved must not rest on background colour alone. */
+.strands-tile.is-selected::after,
+.strands-tile.is-found::after {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: .58rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: .9;
+}
+.strands-tile.is-selected::after { content: "\25CF"; }
+.strands-tile.is-found::after    { content: "\2713"; }
+
+.strands-tile:disabled {
+  cursor: default;
+}
+
+.strands-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.strands-button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.strands-button.primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.strands-button.primary:hover {
+  background: var(--tool-primary-hover);
+}
+
+.strands-message {
+  min-height: 38px;
+  margin: 14px 0 8px;
+  color: var(--global-text-color);
+  text-align: center;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.strands-found {
+  padding: 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+  background: rgba(127, 127, 127, .04);
+}
+
+.strands-found-title {
+  display: block;
+  color: var(--global-text-color);
+  font-weight: 900;
+}
+
+.strands-found-words {
+  margin-top: 5px;
+  color: var(--global-text-color-light);
+  
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.strands-actions {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.strands-mode {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+}
+
+.strands-mode .strands-button {
+  border-color: transparent;
+  padding: 0 14px;
+}
+
+.strands-mode .strands-button[aria-pressed="true"],
+.strands-button.is-primary {
+  border-color: transparent;
+  background: var(--tool-primary);
+  color: #fff;
+}
+
+.strands-mode .strands-button[aria-pressed="true"]:hover,
+.strands-button.is-primary:hover {
+  background: var(--tool-primary-hover);
+}
+
+.strands-end {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.strands-end-title {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  color: var(--global-text-color);
+  font-size: 1rem;
+}
+
+.strands-dstats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.strands-dstats div {
+  display: flex;
+  flex-direction: column-reverse;
+  margin: 0;
+}
+
+.strands-dstats dd {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.strands-dstats dt {
+  color: var(--global-text-color-light);
+  font-size: .76rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.strands-next {
+  margin: 10px 0 0;
+  color: var(--global-text-color-light);
+  font-size: .88rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.strands-copied {
+  min-height: 1.3em;
+  margin: 4px 0 0;
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.strands-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.strands-dialog::backdrop{background:rgba(0,0,0,.45)}
+.strands-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.strands-dialog-head h2{margin:0;font-size:1.1rem}
+.strands-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.strands-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.strands-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.strands-dialog-body ul,.strands-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.strands-dialog[open]{animation:strands-pop .16s ease-out}
+  @keyframes strands-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+@media (max-width: 640px) {
+  .strands-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .strands-panel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .strands-board {
+    width: min(86vw, 300px);
+    gap: 6px;
+  }
+
+  .strands-actions {
+    gap: 7px;
+  }
+
+  .strands-button {
+    padding: 0 13px;
+    font-size: .86rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strands-app *,
+  .strands-app *::before,
+  .strands-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+
+<div class="strands-app">
+  <section class="strands-panel" aria-labelledby="strands-title">
+    <div class="strands-topbar">
+      <h1 class="strands-title" id="strands-title">Strands</h1>
+      <div class="strands-head-actions">
+        <button class="strands-help strands-lang" data-lang-toggle></button>
+        <button class="strands-help" id="strands-help" type="button" aria-haspopup="dialog" aria-controls="strands-help-dialog" aria-label="Nasıl oynanır" data-i18n-attr="aria-label:howTo">?</button>
+      </div>
+    </div>
+
+    <div class="strands-stats" aria-label="Oyun istatistikleri" data-i18n-attr="aria-label:statsL">
+      <span class="strands-stat"><span data-i18n="themeL">Tema:</span> <b id="strands-theme"></b></span>
+      <span class="strands-stat"><span data-i18n="foundL">Bulunan:</span> <b id="strands-count">0</b>/5</span>
+    </div>
+
+    <div class="strands-current" id="strands-current" aria-live="polite" data-empty="Harflere dokun ya da yaz" data-i18n-attr="data-empty:tapOrType"></div>
+
+    <div class="strands-board" id="strands-board" aria-label="Harf tablosu" data-i18n-attr="aria-label:boardL" lang="tr"></div>
+
+    <div class="strands-actions">
+      <button class="strands-button" id="strands-delete" type="button" data-i18n="del">⌫ Sil</button>
+      <button class="strands-button primary" id="strands-check" type="button" data-i18n="check">Kontrol Et</button>
+      <button class="strands-button" id="strands-hint" type="button" data-i18n="hint">İpucu</button>
+      <div class="strands-mode" role="group" aria-label="Oyun modu" data-i18n-attr="aria-label:modeL">
+        <button class="strands-button" id="strands-mode-daily" type="button" aria-pressed="true" data-i18n="daily">Günlük</button>
+        <button class="strands-button" id="strands-mode-free" type="button" aria-pressed="false" data-i18n="free">Serbest</button>
+      </div>
+      <button class="strands-button" id="strands-new" type="button" hidden data-i18n="newTheme">Yeni Tema</button>
+    </div>
+
+    <div class="strands-message" id="strands-message" aria-live="polite"></div>
+
+    <div class="strands-found">
+      <span class="strands-found-title" data-i18n="foundTitle">Bulunan kelimeler</span>
+      <div class="strands-found-words" id="strands-found">Henüz kelime yok.</div>
+    </div>
+
+    <div class="strands-end" id="strands-end" hidden>
+      <h2 class="strands-end-title"><span data-i18n="endTitle">Günün bulmacası #</span><span id="strands-end-day"></span></h2>
+      <dl class="strands-dstats">
+        <div><dt data-i18n="solved">Çözülen</dt><dd id="strands-s-played">0</dd></div>
+        <div><dt data-i18n="streak">Seri</dt><dd id="strands-s-streak">0</dd></div>
+        <div><dt data-i18n="bestStreak">En iyi seri</dt><dd id="strands-s-best">0</dd></div>
+        <div><dt data-i18n="hints">İpucu</dt><dd id="strands-s-hints">0</dd></div>
+      </dl>
+      <button class="strands-button is-primary" id="strands-share" type="button" data-i18n="share">Sonucu paylaş</button>
+      <p class="strands-copied" id="strands-copied" role="status" aria-live="polite"></p>
+      <p class="strands-next" id="strands-next"></p>
+    </div>
+  </section>
+</div>
+
+<dialog class="strands-dialog" id="strands-help-dialog" aria-labelledby="strands-help-title">
+  <div class="strands-dialog-head">
+    <h2 id="strands-help-title" data-i18n="howTo">Nasıl oynanır</h2>
+    <button class="strands-dialog-close" type="button" data-close aria-label="Kapat" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="strands-dialog-body" data-i18n-html="help">
+    <p>Temaya bağlı beş gizli kelimeyi bul.</p>
+    <h3>Kurallar</h3>
+    <ul>
+      <li>Gösterilen temaya bağlı beş Türkçe kelimeyi bul.</li>
+      <li>Bir kelimenin harfleri çaprazlar dahil komşu karelerden gelmelidir.</li>
+      <li>Bir kare aynı kelimede iki kez kullanılamaz.</li>
+      <li>Bulunan kelimelerin kareleri artık kullanılamaz.</li>
+      <li>İpucu, bulunmamış bir kelimenin ilk harfini ve uzunluğunu gösterir.</li>
+    </ul>
+    <h3>Kontroller</h3>
+    <ul>
+      <li>Harflere sırayla dokunarak kelimeyi oluştur, sonra Kontrol Et'e bas.</li>
+      <li>Harfleri klavyeden de yazabilir, Backspace ile silip Enter ile kontrol edebilirsiniz.</li>
+    </ul>
+    <h3>Günün bulmacası</h3>
+    <ul>
+      <li>Sayfa <b>Günlük</b> modda açılır: o gün herkes aynı temayı aynı tabloda çözer, bulmaca Türkiye saatiyle gece yarısı değişir. Her güne tek bulmaca vardır; ilerlemeniz kaydedilir.</li>
+      <li>Bitirince <b>Sonucu paylaş</b> her bulunan kelime için 🔵, her ipucu için 💡 paylaşır ya da panoya kopyalar; kelimeler paylaşılmaz.</li>
+      <li>Günlük istatistikler (çözülen gün, seri) yalnızca bu cihazda saklanır.</li>
+      <li><b>Serbest</b> modda <b>Yeni Tema</b> rastgele bir bulmaca açar.</li>
+    </ul>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const PUZZLES = [
+    { theme: "UZAY", words: ["YILDIZ", "GEZEGEN", "ROKET", "AY", "GÜNEŞ"] },
+    { theme: "DENİZ", words: ["BALIK", "DALGA", "GEMİ", "KUM", "MERCAN"] },
+    { theme: "OKUL", words: ["KALEM", "DEFTER", "SINIF", "DERS", "TAHTA"] },
+    { theme: "MÜZİK", words: ["GİTAR", "KEMAN", "DAVUL", "NOTA", "ŞARKI"] },
+    { theme: "MEYVE", words: ["ELMA", "ARMUT", "ÇİLEK", "KİRAZ", "ÜZÜM"] },
+    { theme: "SEBZE", words: ["HAVUÇ", "BİBER", "SOĞAN", "BAMYA", "KABAK"] },
+    { theme: "ÇİFTLİK", words: ["İNEK", "KOYUN", "TAVUK", "KEÇİ", "ÖRDEK"] },
+    { theme: "RENKLER", words: ["KIRMIZI", "MAVİ", "YEŞİL", "SARI", "MOR"] },
+    { theme: "MUTFAK", words: ["TABAK", "ÇATAL", "KAŞIK", "BIÇAK", "TAVA"] },
+    { theme: "HAVA", words: ["YAĞMUR", "KAR", "RÜZGAR", "BULUT", "SİS"] },
+    { theme: "SPOR", words: ["FUTBOL", "TENİS", "YÜZME", "KOŞU", "GÜREŞ"] },
+    { theme: "VÜCUT", words: ["KOL", "BACAK", "GÖZ", "KULAK", "BURUN"] },
+    { theme: "GİYSİ", words: ["GÖMLEK", "ETEK", "CEKET", "ÇORAP", "ŞAPKA"] },
+    { theme: "ZAMAN", words: ["SABAH", "ÖĞLE", "AKŞAM", "GECE", "GÜN"] },
+    { theme: "ULAŞIM", words: ["OTOBÜS", "TREN", "UÇAK", "GEMİ", "TAKSİ"] },
+    { theme: "MESLEK", words: ["DOKTOR", "AŞÇI", "PİLOT", "HAKİM", "TERZİ"] },
+    { theme: "EV", words: ["MUTFAK", "SALON", "BANYO", "BALKON", "ODA"] },
+    { theme: "KAHVALTI", words: ["PEYNİR", "ZEYTİN", "BAL", "YUMURTA", "ÇAY"] },
+    { theme: "ORMAN", words: ["AĞAÇ", "YAPRAK", "AYI", "TİLKİ", "KURT"] },
+    { theme: "ÇİÇEK", words: ["GÜL", "LALE", "NERGİS", "ZAMBAK", "ORKİDE"] },
+    { theme: "BİLGİSAYAR", words: ["EKRAN", "FARE", "KLAVYE", "KABLO", "DOSYA"] },
+    { theme: "KUŞLAR", words: ["KARTAL", "SERÇE", "BAYKUŞ", "KAZ", "MARTI"] },
+    { theme: "ŞEHİR", words: ["SOKAK", "KÖPRÜ", "PARK", "CADDE", "MEYDAN"] },
+    { theme: "MATEMATİK", words: ["SAYI", "TOPLAM", "KESİR", "AÇI", "ÜÇGEN"] },
+    { theme: "TATLI", words: ["BAKLAVA", "LOKUM", "HELVA", "KEK", "PASTA"] },
+    { theme: "İÇECEK", words: ["AYRAN", "KAHVE", "SALEP", "BOZA", "SU"] },
+    { theme: "ALETLER", words: ["ÇEKİÇ", "VİDA", "MATKAP", "PENSE", "ÇİVİ"] },
+    { theme: "İLLER", words: ["İZMİR", "BURSA", "ADANA", "SİVAS", "RİZE"] },
+    { theme: "DOĞA", words: ["NEHİR", "GÖL", "DAĞ", "VADİ", "ŞELALE"] },
+    { theme: "SAFARİ", words: ["ASLAN", "ZEBRA", "FİL", "ZÜRAFA", "MAYMUN"] },
+    { theme: "OYUNCAK", words: ["TOP", "BEBEK", "UÇURTMA", "YOYO", "BALON"] },
+    { theme: "TAKI", words: ["YÜZÜK", "KOLYE", "KÜPE", "BİLEZİK", "İNCİ"] },
+    { theme: "KİTAPLIK", words: ["KİTAP", "RAF", "SAYFA", "YAZAR", "ROMAN"] },
+    { theme: "SİNEMA", words: ["FİLM", "BİLET", "PERDE", "OYUNCU", "SAHNE"] },
+    { theme: "HASTANE", words: ["HEMŞİRE", "İLAÇ", "SEDYE", "SERUM", "ATEŞ"] },
+    { theme: "KAMP", words: ["ÇADIR", "FENER", "ODUN", "KİBRİT", "ÇANTA"] },
+    { theme: "SAYILAR", words: ["DÖRT", "BEŞ", "ALTI", "YEDİ", "SEKİZ"] },
+    { theme: "BÖCEKLER", words: ["ARI", "KARINCA", "SİNEK", "PİRE", "BİT"] },
+    { theme: "YEMEK", words: ["KEBAP", "PİLAV", "DOLMA", "ÇORBA", "MANTI"] },
+    { theme: "AİLE", words: ["ANNE", "BABA", "DEDE", "TEYZE", "AMCA"] },
+    { theme: "BAHÇE", words: ["ÇİM", "TOHUM", "TIRMIK", "HORTUM", "SAKSI"] },
+    { theme: "PLAJ", words: ["ŞEMSİYE", "HAVLU", "KUMSAL", "MAYO", "TOP"] },
+    { theme: "KIŞ", words: ["KAR", "BUZ", "ATKI", "ELDİVEN", "KIZAK"] },
+    { theme: "YAZ", words: ["SICAK", "TATİL", "GÜNEŞ", "KAMP", "KARPUZ"] },
+    { theme: "OKYANUS", words: ["YUNUS", "VATOZ", "MÜREN", "BALİNA", "ORKA"] },
+    { theme: "EVCİL", words: ["KEDİ", "KÖPEK", "KUŞ", "HAMSTER", "BALIK"] },
+    { theme: "ATLAR", words: ["EYER", "NAL", "YELE", "TAY", "AHIR"] },
+    { theme: "BAHARAT", words: ["NANE", "KEKİK", "SUMAK", "TARÇIN", "İSOT"] },
+    { theme: "PAZAR", words: ["TEZGAH", "FİYAT", "FİLE", "SATICI", "KASA"] },
+    { theme: "FIRIN", words: ["EKMEK", "SİMİT", "POĞAÇA", "BÖREK", "PİDE"] },
+    { theme: "KAFE", words: ["FİNCAN", "KÖPÜK", "ŞEKER", "PASTA", "MENÜ"] },
+    { theme: "MASA", words: ["TUZ", "BİBER", "PEÇETE", "BARDAK", "TABAK"] },
+    { theme: "BANYO", words: ["SABUN", "HAVLU", "DUŞ", "AYNA", "TARAK"] },
+    { theme: "ODA", words: ["YASTIK", "PERDE", "DOLAP", "LAMBA", "HALI"] },
+    { theme: "OFİS", words: ["DOSYA", "MASA", "ZIMBA", "KAĞIT", "YAZICI"] },
+    { theme: "TELEFON", words: ["ARAMA", "MESAJ", "ŞARJ", "KAMERA", "ZİL"] },
+    { theme: "İNTERNET", words: ["SİTE", "ŞİFRE", "BAĞLANTI", "SUNUCU", "AĞ"] },
+    { theme: "OYUN", words: ["ZAR", "KART", "SATRANÇ", "TAVLA", "OKEY"] },
+    { theme: "SATRANÇ", words: ["ŞAH", "VEZİR", "KALE", "FİL", "PİYON"] },
+    { theme: "FUTBOL", words: ["GOL", "KALECİ", "HAKEM", "TAÇ", "KORNER"] },
+    { theme: "OLİMPİYAT", words: ["ALTIN", "REKOR", "KOŞU", "ATLET", "KÜRSÜ"] },
+    { theme: "TİYATRO", words: ["SAHNE", "PERDE", "KOSTÜM", "OYUN", "ROL"] },
+    { theme: "RESİM", words: ["FIRÇA", "BOYA", "TUVAL", "PALET", "ŞÖVALE"] },
+    { theme: "ÇALGI", words: ["BAĞLAMA", "UD", "NEY", "ZURNA", "KANUN"] },
+    { theme: "DİL", words: ["HARF", "KELİME", "CÜMLE", "HECE", "SÖZLÜK"] },
+    { theme: "TARİH", words: ["SAVAŞ", "KRAL", "MÜZE", "ANTİK", "ÇAĞ"] },
+    { theme: "COĞRAFYA", words: ["HARİTA", "KITA", "ADA", "OVA", "ENLEM"] },
+    { theme: "FİZİK", words: ["KUVVET", "HIZ", "KÜTLE", "ENERJİ", "IŞIK"] },
+    { theme: "KİMYA", words: ["ATOM", "ASİT", "TUZ", "ELEMENT", "GAZ"] },
+    { theme: "BİYOLOJİ", words: ["HÜCRE", "GEN", "KAN", "KEMİK", "KAS"] },
+    { theme: "GÖKYÜZÜ", words: ["BULUT", "KUŞ", "YILDIZ", "UÇAK", "AY"] },
+    { theme: "İNŞAAT", words: ["TUĞLA", "BETON", "VİNÇ", "ÇİMENTO", "KUM"] },
+    { theme: "ARABA", words: ["TEKER", "MOTOR", "VİTES", "FREN", "KORNA"] },
+    { theme: "SEYAHAT", words: ["PİST", "BAVUL", "KAPI", "PASAPORT", "VİZE"] },
+    { theme: "TATİL", words: ["OTEL", "BAVUL", "BİLET", "PLAJ", "TUR"] },
+    { theme: "DÜĞÜN", words: ["GELİN", "DAMAT", "NİKAH", "YÜZÜK", "PASTA"] },
+    { theme: "DUYGULAR", words: ["SEVGİ", "KORKU", "ÖFKE", "NEŞE", "HÜZÜN"] },
+    { theme: "KARAKTER", words: ["CESUR", "NAZİK", "DÜRÜST", "İYİ", "SAKİN"] },
+    { theme: "İKLİM", words: ["DERECE", "NEM", "BASINÇ", "AYAZ", "DOLU"] },
+    { theme: "MADENLER", words: ["ALTIN", "GÜMÜŞ", "BAKIR", "DEMİR", "KÖMÜR"] },
+    { theme: "AĞAÇLAR", words: ["ÇAM", "MEŞE", "ÇINAR", "KAVAK", "SÖĞÜT"] },
+    { theme: "KURUYEMİŞ", words: ["CEVİZ", "BADEM", "KAJU", "FISTIK", "ÜZÜM"] },
+    { theme: "PEYNİRLER", words: ["KAŞAR", "LOR", "TULUM", "ÇÖKELEK", "BEYAZ"] },
+    { theme: "KIRTASİYE", words: ["SİLGİ", "CETVEL", "KİTAP", "BOYA", "MAKAS"] },
+    { theme: "YÖNLER", words: ["KUZEY", "GÜNEY", "DOĞU", "BATI", "SAĞ"] },
+    { theme: "ŞEKİLLER", words: ["KARE", "DAİRE", "ÜÇGEN", "KÜP", "KÜRE"] }
+  ];
+
+  /* English gloss of each theme name for the English interface; the hidden words stay Turkish.
+     Keyed by the Turkish name so the PUZZLES order (which drives the daily puzzle) never changes. */
+  const THEME_EN = {
+    "UZAY": "SPACE", "DENİZ": "SEA", "OKUL": "SCHOOL", "MÜZİK": "MUSIC",
+    "MEYVE": "FRUIT", "SEBZE": "VEGETABLES", "ÇİFTLİK": "FARM", "RENKLER": "COLORS",
+    "MUTFAK": "KITCHEN", "HAVA": "WEATHER", "SPOR": "SPORTS", "VÜCUT": "BODY",
+    "GİYSİ": "CLOTHES", "ZAMAN": "TIME", "ULAŞIM": "TRANSPORT", "MESLEK": "JOBS",
+    "EV": "HOME", "KAHVALTI": "BREAKFAST", "ORMAN": "FOREST", "ÇİÇEK": "FLOWERS",
+    "BİLGİSAYAR": "COMPUTER", "KUŞLAR": "BIRDS", "ŞEHİR": "CITY", "MATEMATİK": "MATH",
+    "TATLI": "DESSERTS", "İÇECEK": "DRINKS", "ALETLER": "TOOLS", "İLLER": "PROVINCES",
+    "DOĞA": "NATURE", "SAFARİ": "SAFARI", "OYUNCAK": "TOYS", "TAKI": "JEWELRY",
+    "KİTAPLIK": "BOOKSHELF", "SİNEMA": "CINEMA", "HASTANE": "HOSPITAL", "KAMP": "CAMPING",
+    "SAYILAR": "NUMBERS", "BÖCEKLER": "INSECTS", "YEMEK": "FOOD", "AİLE": "FAMILY",
+    "BAHÇE": "GARDEN", "PLAJ": "BEACH", "KIŞ": "WINTER", "YAZ": "SUMMER",
+    "OKYANUS": "OCEAN", "EVCİL": "PETS", "ATLAR": "HORSES", "BAHARAT": "SPICES",
+    "PAZAR": "MARKET", "FIRIN": "BAKERY", "KAFE": "CAFE", "MASA": "TABLE",
+    "BANYO": "BATHROOM", "ODA": "BEDROOM", "OFİS": "OFFICE", "TELEFON": "PHONE",
+    "İNTERNET": "INTERNET", "OYUN": "GAMES", "SATRANÇ": "CHESS", "FUTBOL": "FOOTBALL",
+    "OLİMPİYAT": "OLYMPICS", "TİYATRO": "THEATER", "RESİM": "PAINTING", "ÇALGI": "INSTRUMENT",
+    "DİL": "LANGUAGE", "TARİH": "HISTORY", "COĞRAFYA": "GEOGRAPHY", "FİZİK": "PHYSICS",
+    "KİMYA": "CHEMISTRY", "BİYOLOJİ": "BIOLOGY", "GÖKYÜZÜ": "SKY", "İNŞAAT": "BUILDING",
+    "ARABA": "CAR", "SEYAHAT": "TRAVEL", "TATİL": "HOLIDAY", "DÜĞÜN": "WEDDING",
+    "DUYGULAR": "FEELINGS", "KARAKTER": "CHARACTER", "İKLİM": "CLIMATE", "MADENLER": "MINERALS",
+    "AĞAÇLAR": "TREES", "KURUYEMİŞ": "NUTS", "PEYNİRLER": "CHEESES", "KIRTASİYE": "STATIONERY",
+    "YÖNLER": "DIRECTIONS", "ŞEKİLLER": "SHAPES"
+  };
+
+  /* Interface text: the Turkish strings come from the markup, English is written out here. */
+  function i18nHarvest(tb){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in tb))tb[k]=el.textContent;});
+    document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in tb))tb[k]=el.innerHTML;});
+    document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in tb)&&el.hasAttribute(a))tb[k]=el.getAttribute(a);}));
+    return tb;
+  }
+
+  const I18N = {
+    tr: i18nHarvest({
+      noWords: "Henüz kelime yok.",
+      tileFound: "{l}, bulundu",
+      tileUsed: "Bu kare bulunmuş bir kelimeye ait.",
+      twice: "Bir kare aynı kelimede iki kez kullanılamaz.",
+      notNext: "Sonraki harf komşu bir karede olmalı.",
+      notNear: "Bu harf komşu karelerde yok.",
+      notOnBoard: "Bu harf tabloda yok.",
+      pickFirst: "Önce birkaç harf seçin.",
+      already: "Bu kelimeyi zaten buldunuz.",
+      notTheme: "Bu, temanın kelimelerinden biri değil.",
+      wrongTiles: "Kelime doğru ama kareler yanlış; tablonun başka bir yerinde saklı.",
+      allFound: "Temanın {n} kelimesinin hepsini buldunuz.",
+      correct: "Doğru.",
+      allDone: "Bütün kelimeler zaten bulundu.",
+      hintMsg: "İpucu: {l} harfiyle başlıyor ve {n} harfli.",
+      dailyN: "Günün bulmacası #{n}",
+      next: "Yarın yeni bulmaca · {t} kaldı",
+      copied: "Kopyalandı",
+      copyFail: "Kopyalanamadı"
+    }),
+    en: {
+      howTo: "How to play", close: "Close", statsL: "Game statistics", themeL: "Theme:", foundL: "Found:",
+      tapOrType: "Tap or type the letters", boardL: "Letter grid",
+      del: "⌫ Delete", check: "Check", hint: "Hint", modeL: "Game mode", daily: "Daily", free: "Free play",
+      newTheme: "New theme", foundTitle: "Words found", endTitle: "Puzzle of the day #",
+      solved: "Solved", streak: "Streak", bestStreak: "Best streak", hints: "Hints", share: "Share result",
+      noWords: "No words yet.",
+      tileFound: "{l}, found",
+      tileUsed: "This tile belongs to a word you found.",
+      twice: "A tile can't be used twice in the same word.",
+      notNext: "The next letter must be on a neighbouring tile.",
+      notNear: "This letter is not on a neighbouring tile.",
+      notOnBoard: "This letter is not on the board.",
+      pickFirst: "Pick some letters first.",
+      already: "You already found this word.",
+      notTheme: "That's not one of the theme's words.",
+      wrongTiles: "Right word, wrong tiles: it's hidden somewhere else on the board.",
+      allFound: "You found all {n} words of the theme.",
+      correct: "Correct.",
+      allDone: "All the words are already found.",
+      hintMsg: "Hint: it starts with {l} and has {n} letters.",
+      dailyN: "Puzzle of the day #{n}",
+      next: "New puzzle tomorrow · {t} left",
+      copied: "Copied",
+      copyFail: "Couldn't copy",
+      help: '<p>Find the five hidden words that fit the theme.</p>'
+        + '<h3>Rules</h3><ul>'
+        + '<li>Find five <b>Turkish</b> words that fit the theme shown. The theme name is translated; the words on the board stay Turkish.</li>'
+        + '<li>The letters of a word must come from neighbouring tiles, diagonals included.</li>'
+        + '<li>A tile can\'t be used twice in the same word.</li>'
+        + '<li>The tiles of words you found can\'t be used again.</li>'
+        + '<li>A hint shows the first letter and the length of a word you haven\'t found.</li></ul>'
+        + '<h3>Turkish letters</h3><ul>'
+        + '<li>The board can include Ç, Ğ, I, İ, Ö, Ş and Ü. Dotless I and dotted İ are two different letters, as are C/Ç, G/Ğ, O/Ö, S/Ş and U/Ü.</li>'
+        + '<li>On a non-Turkish keyboard, i types İ and Shift+I types I; tap the tiles for the other special letters.</li></ul>'
+        + '<h3>Controls</h3><ul>'
+        + '<li>Tap the letters in order to build the word, then press Check.</li>'
+        + '<li>You can also type the letters, delete with Backspace and check with Enter.</li></ul>'
+        + '<h3>Puzzle of the day</h3><ul>'
+        + '<li>The page opens in <b>Daily</b> mode: that day everyone solves the same theme on the same board, and the puzzle changes at midnight Turkey time. There is one puzzle per day; your progress is saved.</li>'
+        + '<li>When you finish, <b>Share result</b> shares or copies 🔵 for each word found and 💡 for each hint; the words are not shared.</li>'
+        + '<li>Daily stats (days solved, streak) are stored on this device only.</li>'
+        + '<li>In <b>Free play</b>, <b>New theme</b> opens a random puzzle.</li></ul>'
+    }
+  };
+  let i18n = null;
+  const t = (k, v) => i18n ? i18n.t(k, v) : k;
+  const isEn = () => Boolean(i18n) && i18n.lang === "en";
+
+  /* Status lines are kept as a key so a language switch can rewrite them. */
+  let msgState = null;
+  function say(key, vars) {
+    msgState = key ? { key, vars } : null;
+    message.textContent = key ? t(key, vars) : "";
+  }
+
+  const ALPHABET = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ";
+  const SIZE = 5;
+  const DAILY_KEY = "pz:strands:daily";
+  const STATS_KEY = "pz:strands:stats";
+  const SHARE_URL = "https://sercankulcu.github.io/game/strands/";
+  const SALT = 7071;
+
+  const themeView = document.getElementById("strands-theme");
+  const countView = document.getElementById("strands-count");
+  const currentView = document.getElementById("strands-current");
+  const boardView = document.getElementById("strands-board");
+  const message = document.getElementById("strands-message");
+  const foundView = document.getElementById("strands-found");
+  const deleteButton = document.getElementById("strands-delete");
+  const checkButton = document.getElementById("strands-check");
+  const hintButton = document.getElementById("strands-hint");
+  const newButton = document.getElementById("strands-new");
+  const help = document.getElementById("strands-help");
+  const helpDialog = document.getElementById("strands-help-dialog");
+  const modeDaily = document.getElementById("strands-mode-daily");
+  const modeFree = document.getElementById("strands-mode-free");
+  const endPanel = document.getElementById("strands-end");
+  const endDay = document.getElementById("strands-end-day");
+  const statPlayed = document.getElementById("strands-s-played");
+  const statStreak = document.getElementById("strands-s-streak");
+  const statBest = document.getElementById("strands-s-best");
+  const statHints = document.getElementById("strands-s-hints");
+  const shareButton = document.getElementById("strands-share");
+  const nextView = document.getElementById("strands-next");
+  const copiedView = document.getElementById("strands-copied");
+
+  let puzzle = null;
+  let foundWords = [];
+  let currentWord = "";
+  let path = [];
+  let solvedTiles = new Set();
+  let placements = {};
+  let lastTheme = "";
+  let board = [];
+  let events = [];
+  let mode = "daily";
+  let today = 0;
+  let freeState = null;
+  let countdownTimer = 0;
+  /* Board layout randomness; seeded for the daily puzzle so everyone gets the same board. */
+  let rand = Math.random;
+
+  /* Puzzle of the day: the day number comes from the calendar date in
+     Istanbul, so everyone gets the same puzzle and it changes at midnight. */
+  const DAILY_EPOCH = Date.UTC(2026, 0, 1);
+
+  function istanbulParts(now) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Istanbul",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+      }).formatToParts(now);
+      const get = type => Number((parts.find(part => part.type === type) || {}).value);
+      const out = { y: get("year"), m: get("month"), d: get("day"), h: get("hour") % 24, min: get("minute"), s: get("second") };
+      if (Object.values(out).every(Number.isFinite)) return out;
+    } catch (error) {}
+    const shifted = new Date(now.getTime() + 3 * 3600000);
+    return {
+      y: shifted.getUTCFullYear(), m: shifted.getUTCMonth() + 1, d: shifted.getUTCDate(),
+      h: shifted.getUTCHours(), min: shifted.getUTCMinutes(), s: shifted.getUTCSeconds()
+    };
+  }
+
+  function dayNumber() {
+    const p = istanbulParts(new Date());
+    return Math.max(0, Math.round((Date.UTC(p.y, p.m - 1, p.d) - DAILY_EPOCH) / 86400000));
+  }
+
+  function secondsToMidnight() {
+    const p = istanbulParts(new Date());
+    return Math.max(0, 86400 - (p.h * 3600 + p.min * 60 + p.s));
+  }
+
+  function clockText(total) {
+    const pad = value => String(value).padStart(2, "0");
+    return `${pad(Math.floor(total / 3600))}:${pad(Math.floor(total / 60) % 60)}:${pad(total % 60)}`;
+  }
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function seededShuffle(items, rng) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  /* Walks a fresh seeded permutation of the list in each cycle, so nothing
+     repeats until the whole list has been used and the order is not the
+     file order. The first item of a cycle never repeats the day before. */
+  function dailyIndex(count, day, salt) {
+    const order = cycle => seededShuffle([...Array(count).keys()], mulberry32(salt + cycle * 7919));
+    const cycle = Math.floor(day / count);
+    const list = order(cycle);
+    if (cycle > 0 && count > 2 && list[0] === order(cycle - 1)[count - 1]) {
+      [list[0], list[1]] = [list[1], list[0]];
+    }
+    return list[day % count];
+  }
+
+  let memory = {};
+
+  function readJSON(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) return JSON.parse(raw);
+    } catch (error) {}
+    return memory[key] || null;
+  }
+
+  function writeJSON(key, value) {
+    memory[key] = value;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {}
+  }
+
+  function count(value) {
+    return Math.max(0, Math.floor(Number(value) || 0));
+  }
+
+  function loadStats(distLength) {
+    const s = readJSON(STATS_KEY) || {};
+    const stats = {
+      played: count(s.played), wins: count(s.wins), streak: count(s.streak), best: count(s.best),
+      lastDay: typeof s.lastDay === "number" ? s.lastDay : -10,
+      lastWinDay: typeof s.lastWinDay === "number" ? s.lastWinDay : -10
+    };
+    if (distLength) {
+      stats.dist = Array.isArray(s.dist) && s.dist.length === distLength
+        ? s.dist.map(count)
+        : Array(distLength).fill(0);
+    }
+    return stats;
+  }
+
+  function currentStreak(stats, day) {
+    return stats.lastWinDay >= day - 1 ? stats.streak : 0;
+  }
+
+  /* Counts a finished daily puzzle once; a reload of the same day is a no-op. */
+  function recordDaily(day, won, distLength, slot) {
+    const stats = loadStats(distLength);
+    if (stats.lastDay === day) return stats;
+    stats.played += 1;
+    stats.lastDay = day;
+    if (won) {
+      stats.wins += 1;
+      stats.streak = stats.lastWinDay === day - 1 ? stats.streak + 1 : 1;
+      stats.lastWinDay = day;
+      stats.best = Math.max(stats.best, stats.streak);
+      if (stats.dist && slot >= 0 && slot < stats.dist.length) stats.dist[slot] += 1;
+    } else {
+      stats.streak = 0;
+    }
+    writeJSON(STATS_KEY, stats);
+    return stats;
+  }
+
+  function copyFallback(text) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    document.body.appendChild(area);
+    area.select();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch (error) {}
+    area.remove();
+    return ok;
+  }
+
+  async function shareText(text, feedback, labels) {
+    feedback.textContent = "";
+    delete feedback.dataset.key;
+    let coarse = false;
+    try {
+      coarse = window.matchMedia("(pointer: coarse)").matches;
+    } catch (error) {}
+    if (navigator.share && coarse) {
+      try {
+        await navigator.share({ text });
+        return;
+      } catch (error) {
+        if (error && error.name === "AbortError") return;
+      }
+    }
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch (error) {
+      ok = copyFallback(text);
+    }
+    feedback.dataset.key = ok ? labels[0] : labels[1];
+    feedback.textContent = t(feedback.dataset.key);
+  }
+
+  const NEIGHBOURS = [...Array(SIZE * SIZE).keys()].map(index => {
+    const row = Math.floor(index / SIZE);
+    const column = index % SIZE;
+    const list = [];
+
+    for (let rowStep = -1; rowStep <= 1; rowStep++) {
+      for (let columnStep = -1; columnStep <= 1; columnStep++) {
+        if (rowStep === 0 && columnStep === 0) continue;
+
+        const nextRow = row + rowStep;
+        const nextColumn = column + columnStep;
+
+        if (nextRow >= 0 && nextRow < SIZE && nextColumn >= 0 && nextColumn < SIZE) {
+          list.push(nextRow * SIZE + nextColumn);
+        }
+      }
+    }
+
+    return list;
+  });
+
+  function shuffle(items) {
+    const copy = [...items];
+
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+
+    return copy;
+  }
+
+  function choosePuzzle() {
+    /* Free play skips today's daily theme while another one is available. */
+    const daily = PUZZLES[dailyIndex(PUZZLES.length, dayNumber(), SALT)].theme;
+    const available = PUZZLES.length > 2
+      ? PUZZLES.filter(item => item.theme !== lastTheme && item.theme !== daily)
+      : PUZZLES;
+
+    const selected = available[Math.floor(Math.random() * available.length)];
+    lastTheme = selected.theme;
+    return selected;
+  }
+
+  function coordinates(index) {
+    return {
+      row: Math.floor(index / SIZE),
+      column: index % SIZE
+    };
+  }
+
+  function areNeighbors(firstIndex, secondIndex) {
+    const first = coordinates(firstIndex);
+    const second = coordinates(secondIndex);
+    const rowDistance = Math.abs(first.row - second.row);
+    const columnDistance = Math.abs(first.column - second.column);
+
+    return (
+      rowDistance <= 1 &&
+      columnDistance <= 1 &&
+      !(rowDistance === 0 && columnDistance === 0)
+    );
+  }
+
+  function snakePath() {
+    const path = [];
+
+    for (let row = 0; row < SIZE; row++) {
+      if (row % 2 === 0) {
+        for (let column = 0; column < SIZE; column++) {
+          path.push(row * SIZE + column);
+        }
+      } else {
+        for (let column = SIZE - 1; column >= 0; column--) {
+          path.push(row * SIZE + column);
+        }
+      }
+    }
+
+    if (rand() < .5) {
+      path.reverse();
+    }
+
+    return path;
+  }
+
+  /* Lays each word along its own randomly chosen snake of adjacent tiles,
+     backtracking when a choice paints a later word into a corner. */
+  function layOutWords(words, budget) {
+    const used = new Set();
+    const result = {};
+    let steps = 0;
+
+    function walk(letters, position, cell, path) {
+      if (++steps > budget) return false;
+      if (used.has(cell) || path.includes(cell)) return false;
+
+      path.push(cell);
+      if (position === letters.length - 1) return true;
+
+      for (const next of shuffle(NEIGHBOURS[cell])) {
+        if (walk(letters, position + 1, next, path)) return true;
+      }
+
+      path.pop();
+      return false;
+    }
+
+    function place(wordIndex) {
+      if (steps > budget) return false;
+      if (wordIndex === words.length) return true;
+
+      const letters = [...words[wordIndex]];
+      const starts = shuffle(
+        [...Array(SIZE * SIZE).keys()].filter(index => !used.has(index))
+      );
+
+      for (const start of starts) {
+        const path = [];
+
+        if (walk(letters, 0, start, path)) {
+          path.forEach(cell => used.add(cell));
+          result[words[wordIndex]] = [...path];
+
+          if (place(wordIndex + 1)) return true;
+
+          path.forEach(cell => used.delete(cell));
+          delete result[words[wordIndex]];
+        }
+
+        if (steps > budget) return false;
+      }
+
+      return false;
+    }
+
+    return place(0) ? result : null;
+  }
+
+  function buildBoard() {
+    const board = Array(SIZE * SIZE).fill("");
+    let layout = null;
+
+    for (let attempt = 0; attempt < 8 && layout === null; attempt++) {
+      layout = layOutWords(shuffle(puzzle.words), 60000);
+    }
+
+    if (layout === null) {
+      /* Serpentine fallback: readable, but always solvable. */
+      layout = {};
+      const path = snakePath();
+      let cursor = 0;
+
+      for (const word of shuffle(puzzle.words)) {
+        layout[word] = [];
+        for (const letter of word) {
+          if (cursor >= path.length) break;
+          layout[word].push(path[cursor]);
+          cursor += 1;
+        }
+      }
+    }
+
+    placements = layout;
+
+    for (const [word, cells] of Object.entries(layout)) {
+      [...word].forEach((letter, position) => {
+        board[cells[position]] = letter;
+      });
+    }
+
+    for (let index = 0; index < board.length; index++) {
+      if (!board[index]) {
+        board[index] = ALPHABET[Math.floor(rand() * ALPHABET.length)];
+      }
+    }
+
+    return board;
+  }
+
+  function renderBoard(board) {
+    boardView.innerHTML = "";
+
+    board.forEach((letter, index) => {
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "strands-tile";
+      button.textContent = letter;
+      button.dataset.index = String(index);
+      button.setAttribute("aria-pressed", "false");
+
+      button.addEventListener("click", () => selectTile(index));
+      boardView.appendChild(button);
+    });
+
+    for (const word of foundWords) markFound(placements[word] || []);
+  }
+
+  function markFound(cells) {
+    for (const index of cells) {
+      solvedTiles.add(index);
+      const button = boardView.children[index];
+      button.classList.remove("is-selected");
+      button.classList.add("is-found");
+      button.removeAttribute("aria-pressed");
+      button.setAttribute("aria-label", t("tileFound", { l: button.textContent }));
+      button.disabled = true;
+    }
+  }
+
+  function selectTile(index) {
+    if (solvedTiles.has(index)) {
+      say("tileUsed");
+      return;
+    }
+
+    /* Tapping the tile you just added takes it back, which is the obvious
+       gesture and saves a trip to the Delete button. */
+    if (path.length > 0 && path[path.length - 1] === index) {
+      deleteLast();
+      return;
+    }
+
+    if (path.includes(index)) {
+      say("twice");
+      return;
+    }
+
+    if (path.length > 0) {
+      const last = path[path.length - 1];
+
+      if (!areNeighbors(last, index)) {
+        say("notNext");
+        return;
+      }
+    }
+
+    const button = boardView.children[index];
+
+    path.push(index);
+    currentWord += button.textContent;
+    button.classList.add("is-selected");
+    button.setAttribute("aria-pressed", "true");
+
+    currentView.textContent = currentWord;
+    say(null);
+  }
+
+  function addFromKeyboard(letter) {
+    const candidates = [...boardView.children]
+      .map((button, index) => ({ button, index }))
+      .filter(item =>
+        item.button.textContent === letter &&
+        !path.includes(item.index) &&
+        !solvedTiles.has(item.index)
+      );
+
+    let target = null;
+
+    if (path.length === 0) {
+      target = candidates[0] || null;
+    } else {
+      const last = path[path.length - 1];
+      target = candidates.find(item => areNeighbors(last, item.index)) || null;
+    }
+
+    if (!target) {
+      say(path.length ? "notNear" : "notOnBoard");
+      return;
+    }
+
+    selectTile(target.index);
+  }
+
+  function deleteLast() {
+    if (path.length === 0) return;
+
+    const last = path.pop();
+    currentWord = currentWord.slice(0, -1);
+
+    boardView.children[last].classList.remove("is-selected");
+    boardView.children[last].setAttribute("aria-pressed", "false");
+    currentView.textContent = currentWord;
+    say(null);
+  }
+
+  function clearCurrent() {
+    for (const index of path) {
+      if (!solvedTiles.has(index)) {
+        boardView.children[index].classList.remove("is-selected");
+        boardView.children[index].setAttribute("aria-pressed", "false");
+      }
+    }
+
+    path = [];
+    currentWord = "";
+    currentView.textContent = "";
+  }
+
+  function renderFound() {
+    foundView.textContent = foundWords.length
+      ? foundWords.join(" · ")
+      : t("noWords");
+  }
+
+  function submit() {
+    const word = currentWord.trim().toLocaleUpperCase("tr-TR");
+
+    if (!word) {
+      say("pickFirst");
+      return;
+    }
+
+    if (foundWords.includes(word)) {
+      say("already");
+      return;
+    }
+
+    if (!puzzle.words.includes(word)) {
+      say("notTheme");
+      return;
+    }
+
+    if ((placements[word] || []).join(",") !== path.join(",")) {
+      say("wrongTiles");
+      return;
+    }
+
+    foundWords.push(word);
+    events.push("w");
+    markFound(path);
+
+    countView.textContent = String(foundWords.length);
+    renderFound();
+    clearCurrent();
+
+    if (isDone()) say("allFound", { n: puzzle.words.length });
+    else say("correct");
+
+    if (mode === "daily") {
+      saveDaily();
+      if (isDone()) recordDaily(today, true, 0, -1);
+      renderEnd();
+    }
+  }
+
+  function isDone() {
+    return Boolean(puzzle) && foundWords.length === puzzle.words.length;
+  }
+
+  function showHint() {
+    const remaining = puzzle.words.filter(
+      word => !foundWords.includes(word)
+    );
+
+    if (remaining.length === 0) {
+      say("allDone");
+      return;
+    }
+
+    const word = remaining[Math.floor(Math.random() * remaining.length)];
+
+    say("hintMsg", { l: word[0], n: word.length });
+    events.push("h");
+    if (mode === "daily") saveDaily();
+  }
+
+  function resetRound(chosen) {
+    puzzle = chosen;
+    foundWords = [];
+    events = [];
+    currentWord = "";
+    path = [];
+    solvedTiles = new Set();
+    say(null);
+    board = buildBoard();
+  }
+
+  function renderAll() {
+    renderTheme();
+    countView.textContent = String(foundWords.length);
+    currentWord = "";
+    path = [];
+    currentView.textContent = "";
+    solvedTiles = new Set();
+    renderBoard(board);
+    renderFound();
+    modeDaily.setAttribute("aria-pressed", String(mode === "daily"));
+    modeFree.setAttribute("aria-pressed", String(mode === "free"));
+    newButton.hidden = mode !== "free";
+    renderEnd();
+  }
+
+  /* English mode shows the gloss and keeps the Turkish name as a tooltip. */
+  function renderTheme() {
+    if (!puzzle) return;
+    if (isEn() && THEME_EN[puzzle.theme]) {
+      themeView.textContent = THEME_EN[puzzle.theme];
+      themeView.title = puzzle.theme;
+    } else {
+      themeView.textContent = puzzle.theme;
+      themeView.removeAttribute("title");
+    }
+  }
+
+  function startGame() {
+    rand = Math.random;
+    resetRound(choosePuzzle());
+    renderAll();
+  }
+
+  function saveDaily() {
+    writeJSON(DAILY_KEY, { day: today, found: [...foundWords], events: events.join(""), done: isDone() });
+  }
+
+  function startDaily() {
+    today = dayNumber();
+    rand = mulberry32(SALT * 31 + today);
+    resetRound(PUZZLES[dailyIndex(PUZZLES.length, today, SALT)]);
+    rand = Math.random;
+
+    const saved = readJSON(DAILY_KEY);
+
+    if (saved && saved.day === today && Array.isArray(saved.found)) {
+      foundWords = saved.found.filter((word, index, list) =>
+        puzzle.words.includes(word) && list.indexOf(word) === index);
+      events = String(saved.events || "").split("").filter(item => item === "w" || item === "h");
+      if (events.filter(item => item === "w").length !== foundWords.length) {
+        events = foundWords.map(() => "w");
+      }
+    }
+
+    if (isDone()) {
+      say("allFound", { n: puzzle.words.length });
+      recordDaily(today, true, 0, -1);
+    } else {
+      say("dailyN", { n: today + 1 });
+    }
+
+    renderAll();
+  }
+
+  function renderEnd() {
+    if (mode !== "daily" || !isDone()) {
+      endPanel.hidden = true;
+      window.clearInterval(countdownTimer);
+      countdownTimer = 0;
+      return;
+    }
+
+    const stats = loadStats(0);
+    endDay.textContent = String(today + 1);
+    statPlayed.textContent = String(stats.wins);
+    statStreak.textContent = String(currentStreak(stats, today));
+    statBest.textContent = String(stats.best);
+    statHints.textContent = String(events.filter(item => item === "h").length);
+    copiedView.textContent = "";
+    delete copiedView.dataset.key;
+    endPanel.hidden = false;
+    tick();
+    if (!countdownTimer) countdownTimer = window.setInterval(tick, 1000);
+  }
+
+  function tick() {
+    if (dayNumber() !== today) {
+      window.clearInterval(countdownTimer);
+      countdownTimer = 0;
+      if (mode === "daily") startDaily();
+      return;
+    }
+    nextView.textContent = t("next", { t: clockText(secondsToMidnight()) });
+  }
+
+  function resultText() {
+    const line = events.map(item => item === "h" ? "💡" : "🔵").join("");
+    return `Strands #${today + 1}\n${line}\n\n${SHARE_URL}`;
+  }
+
+  function setMode(next) {
+    if (next === mode) return;
+
+    if (next === "free") {
+      mode = "free";
+      if (freeState) {
+        ({ puzzle, board, placements, foundWords, events } = freeState);
+        renderAll();
+        say(freeState.msg && freeState.msg.key, freeState.msg && freeState.msg.vars);
+      } else {
+        startGame();
+      }
+    } else {
+      freeState = { puzzle, board, placements, foundWords, events, msg: msgState };
+      mode = "daily";
+      startDaily();
+    }
+  }
+
+  deleteButton.addEventListener("click", deleteLast);
+  checkButton.addEventListener("click", submit);
+  hintButton.addEventListener("click", showHint);
+  newButton.addEventListener("click", () => {
+    if (mode === "free") startGame();
+  });
+  modeDaily.addEventListener("click", () => setMode("daily"));
+  modeFree.addEventListener("click", () => setMode("free"));
+  shareButton.addEventListener("click", () => {
+    shareText(resultText(), copiedView, ["copied", "copyFail"]);
+  });
+  help.addEventListener("click", () => helpDialog.showModal());
+  helpDialog.addEventListener("click", event => {
+    if (event.target === helpDialog || event.target.closest("[data-close]")) helpDialog.close();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (helpDialog.open) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    /* Typing into a field (e.g. site search) must stay typing, and Enter on a
+       focused control button must press it, not submit the word (on letter
+       tiles Enter still submits; Space selects the tile). */
+    const tag = event.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || event.target.isContentEditable) return;
+    if (event.key === "Enter" && tag === "BUTTON" && !event.target.classList.contains("strands-tile")) return;
+
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      deleteLast();
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submit();
+      return;
+    }
+
+    if (event.key.length !== 1) return;
+
+    const letter = event.key.toLocaleUpperCase("tr-TR");
+
+    if (ALPHABET.includes(letter)) {
+      event.preventDefault();
+      addFromKeyboard(letter);
+    }
+  });
+
+  i18n = ToolI18n.setup(I18N, () => {
+    if (!i18n) return;
+    renderTheme();
+    if (puzzle) renderFound();
+    for (const index of solvedTiles) {
+      const button = boardView.children[index];
+      if (button) button.setAttribute("aria-label", t("tileFound", { l: button.textContent }));
+    }
+    if (msgState) message.textContent = t(msgState.key, msgState.vars);
+    if (copiedView.dataset.key && copiedView.textContent) copiedView.textContent = t(copiedView.dataset.key);
+    if (!endPanel.hidden) tick();
+  });
+
+  startDaily();
+})();
+</script>

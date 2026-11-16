@@ -2,12 +2,12 @@
 """English-address copies of the Turkish games: slug, title, search title and description.
 
 Used by tools/make_tr_pages.py (the copies, the /games/ hub links) and tools/make_related.py.
-The Turkish page stays at /game/<name>/ and opens in Turkish; the copy at /en/games/<slug>/ opens
+The Turkish page stays at /game/<name>/ and opens in Turkish; the copy at /game/en/<slug>/ opens
 in English (ui_lang: en).
 """
 
 GAMES_HUB = '/games/'
-PREFIX = '/en/games/'
+PREFIX = '/game/en/'
 
 # Turkish page URL: (English slug, English title, seo_title, excerpt)
 GAMES = {

@@ -77,7 +77,7 @@ def title(url):
 
 
 def en_ver(u):
-    """English version of a page: the /en/games/ copy of a Turkish game, else the page itself."""
+    """English version of a page: the /game/en/ copy of a Turkish game, else the page itself."""
     return E.en_url(u) or u
 
 

@@ -1,0 +1,557 @@
+---
+# tools/make_tr_pages.py writes this copy of game/pong.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Pong"
+permalink: /game/tr/pong/
+excerpt: "Bilgisayara karşı klasik Pong: üç zorluk seviyesi, 7 sayıya ilk ulaşan kazanır."
+lang: tr
+ui_lang: tr
+seo_title: "Pong · Ücretsiz Online Oyna"
+og_image: https://sercankulcu.github.io/images/games/pong.jpg
+game_genre: "Arcade"
+hreflang: {en: "/game/pong/", tr: "/game/tr/pong/"}
+---
+
+<style>
+.pong-app,.pong-app *,.pong-app *::before,.pong-app *::after{box-sizing:border-box}
+.pong-app{
+  width:min(860px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family: inherit;
+}
+.pong-app button{font:inherit;cursor:pointer}
+.pong-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.pong-title{margin:0;font-size:clamp(1.35rem,4vw,1.6rem);font-weight:750;letter-spacing:-.03em}
+.pong-header-actions{display:flex;gap:8px}
+.pong-icon-btn{width:44px;height:44px;font-size:1.2rem;border:1px solid var(--global-border-color);border-radius:11px;background:transparent;color:var(--global-text-color)}
+.pong-scorebar{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
+.pong-score{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center}
+.pong-score small{display:block;opacity:.8;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.pong-score strong{display:block;font-size:1.6rem;font-weight:750;margin-top:2px}
+.pong-status{padding:9px 14px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center;font-weight:700;font-size:.82rem}
+.pong-canvas-wrap{position:relative;border:1px solid var(--global-border-color);border-radius:16px;overflow:hidden;background:#000;touch-action:none}
+#pong-canvas{display:block;width:100%;height:auto;cursor:none}
+.pong-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(0,0,0,.7);color:#fff}
+.pong-overlay h2{margin:0;font-size:clamp(1.4rem,4vw,2rem);font-weight:750;text-align:center}
+.pong-overlay p{margin:0;opacity:.7;font-size:.85rem;text-align:center}
+.pong-overlay .pong-start-btn{padding:12px 32px;border:none;border-radius:12px;background:#fff;color:#000;font:inherit;font-size:.95rem;font-weight:750;cursor:pointer}
+.pong-overlay .pong-start-btn:hover{opacity:.88}
+.pong-overlay p.pong-record{opacity:1;color:#e6e6e6;font-size:.8rem;font-weight:700;padding:0 12px}
+.pong-overlay p.pong-record:empty{display:none}
+.pong-reset{min-height:44px;padding:0;border:0;background:none;color:var(--global-link-text-color);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.pong-controls-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.pong-ctrl-btn{min-height:44px;padding:9px 6px;border:1px solid var(--global-border-color);border-radius:999px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.78rem;font-weight:700;transition:background .15s}
+.pong-ctrl-btn.active{background:var(--tool-primary);color:#fff;border-color:var(--tool-primary)}
+.pong-ctrl-btn:hover:not(.active){background:rgba(127,127,127,.14)}
+.pong-overlay h2{border:0;padding:0}
+.pong-overlay .pong-start-btn{min-height:44px}
+.pong-app .pong-icon-btn:focus-visible,.pong-app .pong-ctrl-btn:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.pong-overlay .pong-start-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.pong-app .pong-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.pong-app .pong-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.pong-help:focus-visible,.pong-lang:focus-visible,.pong-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.pong-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.pong-dialog::backdrop{background:rgba(0,0,0,.45)}
+.pong-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.pong-dialog-head h2{margin:0;font-size:1.1rem;border:0;padding:0}
+.pong-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.pong-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.pong-dialog-body p{margin:0 0 .6em}
+.pong-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.pong-dialog-body ul,.pong-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.pong-dialog[open]{animation:pong-pop .16s ease-out}
+  @keyframes pong-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+@media (max-width:600px){
+  .pong-app{width:calc(100% - 16px)}
+  .pong-score{padding:6px 6px}
+  .pong-score strong{font-size:1.35rem}
+}
+</style>
+
+<div class="pong-app">
+  <div class="pong-header">
+    <h1 class="pong-title" data-i18n="title">Pong</h1>
+    <div class="pong-header-actions">
+      <button class="pong-icon-btn" id="pong-new" type="button" title="New game" aria-label="New game" data-i18n-attr="title:newGame; aria-label:newGame">↺</button>
+      <button class="pong-lang" data-lang-toggle></button>
+      <button class="pong-help" id="pong-help" type="button" aria-haspopup="dialog" aria-controls="pong-help-dialog" aria-label="How to play" data-i18n-attr="aria-label:help">?</button>
+    </div>
+  </div>
+
+  <div class="pong-scorebar">
+    <div class="pong-score">
+      <small data-i18n="player">Player</small>
+      <strong id="pong-score-player">0</strong>
+    </div>
+    <div class="pong-status" id="pong-status" role="status" aria-live="polite">First to 7 wins</div>
+    <div class="pong-score">
+      <small data-i18n="computer">Computer</small>
+      <strong id="pong-score-ai">0</strong>
+    </div>
+  </div>
+
+  <div class="pong-canvas-wrap" id="pong-wrap">
+    <canvas id="pong-canvas" width="800" height="450" role="img" aria-label="Pong court. Your paddle is on the left, the computer paddle on the right. The score is shown above the court." data-i18n-attr="aria-label:court"></canvas>
+    <div class="pong-overlay" id="pong-overlay">
+      <h2>🏓 Pong</h2>
+      <button class="pong-start-btn" id="pong-start-btn" type="button">Start Game</button>
+      <p class="pong-record" id="pong-record"></p>
+    </div>
+  </div>
+
+  <div class="pong-controls-bar" role="group" aria-label="Computer difficulty" data-i18n-attr="aria-label:diffGroup">
+    <button class="pong-ctrl-btn active" id="diff-easy" type="button" data-diff="0" aria-pressed="true" data-i18n="d0">Easy</button>
+    <button class="pong-ctrl-btn" id="diff-med" type="button" data-diff="1" aria-pressed="false" data-i18n="d1">Medium</button>
+    <button class="pong-ctrl-btn" id="diff-hard" type="button" data-diff="2" aria-pressed="false" data-i18n="d2">Hard</button>
+  </div>
+</div>
+
+<dialog class="pong-dialog" id="pong-help-dialog" aria-labelledby="pong-help-title">
+  <div class="pong-dialog-head">
+    <h2 id="pong-help-title" data-i18n="help">How to play</h2>
+    <button class="pong-dialog-close" type="button" data-close aria-label="Close" data-i18n-attr="aria-label:close">×</button>
+  </div>
+  <div class="pong-dialog-body">
+    <p data-i18n-html="h_intro">Classic Pong against the computer: keep the ball in play with your paddle and get it past the computer's.</p>
+    <h3 data-i18n="help">How to play</h3>
+    <ol data-i18n-html="h_steps">
+      <li>Pick a computer difficulty under the court: Easy, Medium or Hard.</li>
+      <li>Press Start Game. You control the left paddle.</li>
+      <li>Where the ball meets your paddle sets its angle; every hit makes it a little faster.</li>
+      <li>First to 7 points wins.</li>
+    </ol>
+    <h3 data-i18n="h_controls">Controls</h3>
+    <ul data-i18n-html="h_ctrl">
+      <li>Mouse: move it over the court.</li>
+      <li>Touch: drag or tap on the court.</li>
+      <li>Keyboard: W / S or ↑ / ↓.</li>
+      <li>P pauses and resumes; ↺ starts a new game.</li>
+    </ul>
+    <h3 data-i18n="h_notes">Notes</h3>
+    <ul>
+      <li data-i18n="h_pause">The game pauses when you switch tabs or open this help.</li>
+      <li data-i18n="h_lang">TR / EN switches the interface language; the choice is remembered for all games and tools.</li>
+      <li><span data-i18n="h_records">Wins per difficulty and your longest rally (paddle hits in one point) are kept for finished games, on this device only.</span> <button class="pong-reset" id="pong-reset" type="button" data-i18n="reset">Reset records</button></li>
+    </ul>
+  </div>
+</dialog>
+
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+"use strict";
+const canvas = document.getElementById("pong-canvas");
+const ctx = canvas.getContext("2d");
+const W = 800, H = 450;
+const PW = 12, PH = 88, BR = 8;
+const WINNING = 7;
+/* Per-second units so the game plays the same on 60Hz and 144Hz screens.
+   dt is capped at one 60Hz frame: a slow machine runs in slow motion rather
+   than letting the ball jump straight through a paddle. */
+const AI_SPEED = [192, 330, 480]; /* easy, medium, hard - px/s */
+const PLAYER_SPEED = 420;         /* px/s */
+const BALL_SPEED_INIT = 300;      /* px/s */
+const BALL_SPEED_STEP = 21;       /* px/s per paddle hit */
+const BALL_SPEED_MAX = 1080;      /* px/s */
+const MAX_DT = 1 / 60;
+let difficulty = 0;
+let scores = [0, 0];
+let state = "idle"; /* idle | playing | scored | over */
+let raf = 0;
+
+let ball, player, ai;
+let keysDown = {};
+let lastTime = 0;
+let resumeTimer = 0;
+let rally = 0;      /* paddle hits since the last serve */
+let gameRally = 0;  /* longest rally in the current game */
+
+/* Records live on this device only; blocked storage simply means no records.
+   A game counts once someone reaches 7; abandoned games are not counted. */
+const STATS_KEY = "pz:pong:stats";
+const I18N = {
+  en: {
+    title: "Pong", newGame: "New game", help: "How to play", close: "Close", player: "Player", computer: "Computer",
+    court: "Pong court. Your paddle is on the left, the computer paddle on the right. The score is shown above the court.",
+    diffGroup: "Computer difficulty", d0: "Easy", d1: "Medium", d2: "Hard",
+    firstTo: "First to 7 wins", playing: "Playing", playerScores: "Player scores!", computerScores: "Computer scores!",
+    paused: "Paused", youWinStatus: "You win {a}–{b}", aiWinStatus: "Computer wins {a}–{b}",
+    start: "Start Game", again: "Play Again", resume: "Resume", youWin: "🎉 You Win!", aiWin: "💻 Computer Wins",
+    finalScore: "Final score:", score: "Score", pausedTitle: "⏸ Paused",
+    record: "{diff}: {w} of {n} won", bestRally: "Best rally {n}", newRally: "🏆 New best rally: {n}!",
+    reset: "Reset records", confirmReset: "Delete the Pong records stored on this device?",
+    h_intro: "Classic Pong against the computer: keep the ball in play with your paddle and get it past the computer's.",
+    h_steps: "<li>Pick a computer difficulty under the court: Easy, Medium or Hard.</li><li>Press Start Game. You control the left paddle.</li><li>Where the ball meets your paddle sets its angle; every hit makes it a little faster.</li><li>First to 7 points wins.</li>",
+    h_controls: "Controls",
+    h_ctrl: "<li>Mouse: move it over the court.</li><li>Touch: drag or tap on the court.</li><li>Keyboard: W / S or ↑ / ↓.</li><li>P pauses and resumes; ↺ starts a new game.</li>",
+    h_notes: "Notes", h_pause: "The game pauses when you switch tabs or open this help.",
+    h_lang: "TR / EN switches the interface language; the choice is remembered for all games and tools.",
+    h_records: "Wins per difficulty and your longest rally (paddle hits in one point) are kept for finished games, on this device only."
+  },
+  tr: {
+    title: "Pong", newGame: "Yeni oyun", help: "Nasıl oynanır", close: "Kapat", player: "Sen", computer: "Bilgisayar",
+    court: "Pong sahası. Senin raketin solda, bilgisayarın raketi sağda. Skor sahanın üstünde.",
+    diffGroup: "Bilgisayarın zorluğu", d0: "Kolay", d1: "Orta", d2: "Zor",
+    firstTo: "7 sayıya ulaşan kazanır", playing: "Oyun sürüyor", playerScores: "Sayı senin!", computerScores: "Sayı bilgisayarın!",
+    paused: "Duraklatıldı", youWinStatus: "Kazandın: {a}–{b}", aiWinStatus: "Bilgisayar kazandı: {a}–{b}",
+    start: "Başla", again: "Yeniden oyna", resume: "Devam", youWin: "🎉 Kazandın!", aiWin: "💻 Bilgisayar kazandı",
+    finalScore: "Son skor:", score: "Skor", pausedTitle: "⏸ Duraklatıldı",
+    record: "{diff}: {n} oyunda {w} galibiyet", bestRally: "En uzun ralli {n}", newRally: "🏆 Yeni rekor ralli: {n}!",
+    reset: "Rekorları sıfırla", confirmReset: "Bu cihazdaki Pong rekorları silinsin mi?",
+    h_intro: "Bilgisayara karşı klasik Pong: topu raketinle oyunda tut ve bilgisayarın raketini geçir.",
+    h_steps: "<li>Sahanın altından bilgisayarın zorluğunu seç: Kolay, Orta ya da Zor.</li><li>Başla düğmesine bas. Soldaki raket senin.</li><li>Topun rakete değdiği yer gidiş açısını belirler; her vuruşta top biraz hızlanır.</li><li>7 sayıya ilk ulaşan kazanır.</li>",
+    h_controls: "Kontroller",
+    h_ctrl: "<li>Fare: sahanın üzerinde gezdir.</li><li>Dokunmatik: sahada sürükle ya da dokun.</li><li>Klavye: W / S ya da ↑ / ↓.</li><li>P duraklatır ve devam ettirir; ↺ yeni oyun başlatır.</li>",
+    h_notes: "Notlar", h_pause: "Sekme değiştirdiğinde ya da bu yardımı açtığında oyun duraklar.",
+    h_lang: "TR / EN arayüz dilini değiştirir; seçim tüm oyunlar ve araçlar için hatırlanır.",
+    h_records: "Biten oyunlarda zorluk başına galibiyetlerin ve en uzun rallin (bir sayıdaki raket vuruşları) yalnızca bu cihazda saklanır."
+  }
+};
+let LANG = window.ToolI18n ? ToolI18n.current() : "en";
+const T = (k, v) => { let s = I18N[LANG][k]; if (s == null) s = I18N.en[k]; if (s == null) s = k; if (v) s = String(s).replace(/\{(\w+)\}/g, (m, x) => v[x] != null ? v[x] : m); return s; };
+let statusKey = "firstTo", statusVars = null;
+function setStatus(k, v) { statusKey = k; statusVars = v || null; document.getElementById("pong-status").textContent = T(k, statusVars); }
+let overlayMode = "idle", lastOver = null;
+function loadStats() {
+  const fresh = { played: [0, 0, 0], wins: [0, 0, 0], bestRally: 0 };
+  try {
+    const v = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (v && typeof v === "object") {
+      for (let i = 0; i < 3; i++) {
+        fresh.played[i] = Array.isArray(v.played) ? +v.played[i] || 0 : 0;
+        fresh.wins[i] = Array.isArray(v.wins) ? +v.wins[i] || 0 : 0;
+      }
+      fresh.bestRally = +v.bestRally || 0;
+    }
+  } catch (e) {}
+  return fresh;
+}
+let stats = loadStats();
+function saveStats() { try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {} }
+function recordText() {
+  const d = difficulty, n = stats.played[d];
+  if (!n && !stats.bestRally) return "";
+  return T("record", { diff: T("d" + d), w: stats.wins[d], n }) + (stats.bestRally ? " · " + T("bestRally", { n: stats.bestRally }) : "");
+}
+function renderRecord() {
+  const el = document.getElementById("pong-record");
+  if (el) el.textContent = recordText();
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function initBall(dir = 1) {
+  const ang = (Math.random() * 0.6 - 0.3);
+  const speed = BALL_SPEED_INIT;
+  ball = { x: W/2, y: H/2, vx: dir * speed * Math.cos(ang), vy: speed * Math.sin(ang), speed };
+  rally = 0;
+}
+
+function initPaddles() {
+  player = { x: 20, y: H/2 - PH/2 };
+  ai     = { x: W - 20 - PW, y: H/2 - PH/2 };
+}
+
+function startGame() {
+  clearTimeout(resumeTimer);
+  scores = [0, 0];
+  gameRally = 0;
+  updateScoreUI();
+  initPaddles();
+  initBall(Math.random() > 0.5 ? 1 : -1);
+  state = "playing";
+  document.getElementById("pong-overlay").style.display = "none";
+  overlayMode = "";
+  setStatus("playing");
+  cancelAnimationFrame(raf);
+  lastTime = performance.now();
+  raf = requestAnimationFrame(loop);
+}
+
+function updateScoreUI() {
+  document.getElementById("pong-score-player").textContent = scores[0];
+  document.getElementById("pong-score-ai").textContent = scores[1];
+}
+
+function movePlayerByKeys(dt) {
+  const speed = PLAYER_SPEED * dt;
+  if (keysDown["w"] || keysDown["W"] || keysDown["ArrowUp"])
+    player.y = clamp(player.y - speed, 0, H - PH);
+  if (keysDown["s"] || keysDown["S"] || keysDown["ArrowDown"])
+    player.y = clamp(player.y + speed, 0, H - PH);
+}
+
+function moveAI(dt) {
+  const spd = AI_SPEED[difficulty] * dt;
+  const target = ball.y - PH/2;
+  ai.y += clamp(target - ai.y, -spd, spd);
+  ai.y = clamp(ai.y, 0, H - PH);
+}
+
+function ballHitsPaddle(paddle) {
+  return ball.x - BR < paddle.x + PW &&
+         ball.x + BR > paddle.x &&
+         ball.y - BR < paddle.y + PH &&
+         ball.y + BR > paddle.y;
+}
+
+function update(dt) {
+  if (state !== "playing") return;
+  movePlayerByKeys(dt);
+  moveAI(dt);
+
+  ball.x += ball.vx * dt;
+  ball.y += ball.vy * dt;
+
+  /* Top / bottom wall */
+  if (ball.y - BR <= 0) { ball.y = BR; ball.vy = Math.abs(ball.vy); }
+  if (ball.y + BR >= H) { ball.y = H - BR; ball.vy = -Math.abs(ball.vy); }
+
+  /* Player paddle hit */
+  if (ball.vx < 0 && ballHitsPaddle(player)) {
+    ball.x = player.x + PW + BR;
+    const rel = ((ball.y - player.y) / PH) - 0.5;
+    ball.speed = Math.min(ball.speed + BALL_SPEED_STEP, BALL_SPEED_MAX);
+    const ang = rel * Math.PI * 0.6;
+    ball.vx = ball.speed * Math.cos(ang);
+    ball.vy = ball.speed * Math.sin(ang);
+    if (ball.vx < 0) ball.vx = -ball.vx;
+    rally++;
+  }
+  /* AI paddle hit */
+  if (ball.vx > 0 && ballHitsPaddle(ai)) {
+    ball.x = ai.x - BR;
+    const rel = ((ball.y - ai.y) / PH) - 0.5;
+    ball.speed = Math.min(ball.speed + BALL_SPEED_STEP, BALL_SPEED_MAX);
+    const ang = rel * Math.PI * 0.6;
+    ball.vx = -(ball.speed * Math.cos(ang));
+    ball.vy = ball.speed * Math.sin(ang);
+    if (ball.vx > 0) ball.vx = -ball.vx;
+    rally++;
+  }
+
+  /* Scoring */
+  if (ball.x + BR < 0) { scored(1); return; }
+  if (ball.x - BR > W) { scored(0); return; }
+}
+
+function scored(winner) {
+  scores[winner]++;
+  if (rally > gameRally) gameRally = rally;
+  updateScoreUI();
+  state = "scored";
+  if (scores[winner] >= WINNING) {
+    gameOver(winner);
+  } else {
+    setStatus(winner === 0 ? "playerScores" : "computerScores");
+    /* Guarded: pressing New game during the serve pause used to let this fire
+       afterwards and drop the game into "playing" with no loop running. */
+    resumeTimer = setTimeout(() => {
+      if (state !== "scored") return;
+      initBall(winner === 0 ? 1 : -1);
+      state = "playing";
+      setStatus("playing");
+    }, 900);
+  }
+}
+
+function gameOver(winner) {
+  state = "over";
+  cancelAnimationFrame(raf);
+  clearTimeout(resumeTimer);
+  stats.played[difficulty]++;
+  if (winner === 0) stats.wins[difficulty]++;
+  const newRally = gameRally > stats.bestRally;
+  if (newRally) stats.bestRally = gameRally;
+  saveStats();
+  lastOver = { winner, newRally, rally: gameRally, a: scores[0], b: scores[1] };
+  renderOverlay("over").focus();
+  setStatus(winner === 0 ? "youWinStatus" : "aiWinStatus", winner === 0 ? { a: scores[0], b: scores[1] } : { a: scores[1], b: scores[0] });
+}
+
+/* Builds the court overlay (idle / over / paused) in the current language; returns its button. */
+function renderOverlay(mode) {
+  overlayMode = mode;
+  const ov = document.getElementById("pong-overlay");
+  if (mode === "over") {
+    const o = lastOver;
+    ov.innerHTML = `
+    <h2>${o.winner === 0 ? T("youWin") : T("aiWin")}</h2>
+    <p>${T("finalScore")} <strong>${o.a} – ${o.b}</strong></p>
+    <button class="pong-start-btn" type="button">${T("again")}</button>
+    <p class="pong-record" id="pong-record">${o.newRally ? T("newRally", { n: o.rally }) : recordText()}</p>
+  `;
+  } else if (mode === "paused") {
+    ov.innerHTML = `<h2>${T("pausedTitle")}</h2><p>${T("score")} ${scores[0]} – ${scores[1]}</p><button class="pong-start-btn" type="button">${T("resume")}</button>`;
+  } else {
+    ov.innerHTML = `<h2>🏓 Pong</h2><button class="pong-start-btn" id="pong-start-btn" type="button">${T("start")}</button><p class="pong-record" id="pong-record"></p>`;
+    renderRecord();
+  }
+  ov.style.display = "";
+  const btn = ov.querySelector("button");
+  btn.addEventListener("click", mode === "paused" ? resumeGame : startGame);
+  return btn;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+
+  /* Center line */
+  ctx.setLineDash([8, 10]);
+  ctx.strokeStyle = "rgba(255,255,255,.18)";
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* Paddles */
+  ctx.fillStyle = "#fff";
+  ctx.beginPath(); roundRect(ctx, player.x, player.y, PW, PH, 4); ctx.fill();
+  ctx.beginPath(); roundRect(ctx, ai.x, ai.y, PW, PH, 4); ctx.fill();
+
+  /* Ball */
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, BR, 0, Math.PI * 2);
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function loop(now) {
+  const dt = Math.min((now - lastTime) / 1000, MAX_DT);
+  lastTime = now;
+  update(dt);
+  draw();
+  if (state === "playing" || state === "scored") raf = requestAnimationFrame(loop);
+}
+
+/* Mouse / touch control */
+const wrap = document.getElementById("pong-wrap");
+function mouseMove(e) {
+  if (state !== "playing") return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleY = H / rect.height;
+  const cy = (e.clientY ?? e.touches[0].clientY) - rect.top;
+  player.y = clamp(cy * scaleY - PH/2, 0, H - PH);
+}
+wrap.addEventListener("mousemove", mouseMove);
+wrap.addEventListener("touchmove", e => { e.preventDefault(); mouseMove(e); }, { passive: false });
+/* A tap on the court moves the paddle there too; taps on the overlay buttons are left alone. */
+wrap.addEventListener("touchstart", e => { if (state === "playing" && e.target === canvas) { e.preventDefault(); mouseMove(e); } }, { passive: false });
+
+/* Pause: leaving the tab (or pressing P) freezes the rally and shows a Resume button. */
+let pausedFrom = "";
+function pauseGame() {
+  if (state !== "playing" && state !== "scored") return;
+  pausedFrom = state;
+  state = "paused";
+  cancelAnimationFrame(raf);
+  clearTimeout(resumeTimer);
+  keysDown = {};
+  const btn = renderOverlay("paused");
+  setStatus("paused");
+  if (!document.hidden) btn.focus();
+}
+function resumeGame() {
+  if (state !== "paused") return;
+  document.getElementById("pong-overlay").style.display = "none";
+  overlayMode = "";
+  /* A point that was in its serve pause just serves straight away. */
+  if (pausedFrom === "scored") initBall(ball.vx > 0 ? 1 : -1);
+  state = "playing";
+  setStatus("playing");
+  lastTime = performance.now();
+  raf = requestAnimationFrame(loop);
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
+
+const helpDialog = document.getElementById("pong-help-dialog");
+document.getElementById("pong-help").addEventListener("click", () => { pauseGame(); keysDown = {}; helpDialog.showModal(); });
+helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+helpDialog.addEventListener("close", () => {
+  const resumeBtn = state === "paused" ? document.querySelector("#pong-overlay button") : null;
+  if (resumeBtn) setTimeout(() => resumeBtn.focus(), 0);
+});
+
+window.addEventListener("keydown", e => {
+  if (helpDialog.open) return;
+  if ((e.key === "p" || e.key === "P") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (state === "paused") resumeGame(); else pauseGame();
+    return;
+  }
+  keysDown[e.key] = true;
+  /* Otherwise the arrow keys scroll the page out from under the player. */
+  if ((state === "playing" || state === "scored") &&
+      (e.key === "ArrowUp" || e.key === "ArrowDown")) e.preventDefault();
+});
+window.addEventListener("keyup", e => { keysDown[e.key] = false; });
+/* A key held while the window loses focus never sends its keyup, which left the
+   paddle gliding into the wall on return. */
+window.addEventListener("blur", () => { keysDown = {}; });
+
+document.getElementById("pong-new").addEventListener("click", () => {
+  cancelAnimationFrame(raf);
+  clearTimeout(resumeTimer);
+  state = "idle";
+  scores = [0, 0];
+  updateScoreUI();
+  setStatus("firstTo");
+  renderOverlay("idle");
+});
+
+/* Difficulty buttons */
+document.querySelectorAll("[data-diff]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    difficulty = +btn.dataset.diff;
+    document.querySelectorAll("[data-diff]").forEach(b => {
+      b.classList.toggle("active", b === btn);
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
+    if (state === "idle" || state === "over") renderRecord();
+  });
+});
+
+document.getElementById("pong-reset").addEventListener("click", () => {
+  if (!window.confirm(T("confirmReset"))) return;
+  stats = { played: [0, 0, 0], wins: [0, 0, 0], bestRally: 0 };
+  saveStats();
+  renderRecord();
+});
+renderOverlay("idle");
+
+/* Language switch: relabel the status line and the overlay in place; the game state is untouched. */
+ToolI18n.setup(I18N, lang => {
+  LANG = lang;
+  setStatus(statusKey, statusVars);
+  if (overlayMode) {
+    const ov = document.getElementById("pong-overlay");
+    const hadFocus = ov.contains(document.activeElement);
+    const btn = renderOverlay(overlayMode);
+    if (hadFocus) btn.focus();
+  }
+});
+
+/* Initial draw */
+initPaddles();
+initBall();
+draw();
+})();
+</script>

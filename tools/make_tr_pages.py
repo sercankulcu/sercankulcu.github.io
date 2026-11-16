@@ -5,14 +5,14 @@
     python tools/make_tr_pages.py --check   # exit 1 if a copy is out of date (check_site runs this)
 
 For every page in tools/tr_pages.py:
-1. tr/araclar/<slug>.html or tr/oyunlar/<slug>.html: the English page's body unchanged, with Turkish
+1. apps/tr/<slug>.html or game/tr/<slug>.html (address = the file's place): the English page's body unchanged, with Turkish
    front matter (title, excerpt, seo_title, lang: tr, ui_lang: tr). ui_lang makes the interface open
    in Turkish (head/custom.html sets window.PZ_PAGE_LANG; assets/js/tool-i18n.js reads it).
    The copies are generated: edit the English page, then run this script.
 2. hreflang {en, tr} in the front matter of both pages (head/custom.html prints the alternates).
 3. _pages/araclar.md and _pages/oyunlar.md: Turkish hubs. Turkish-only games link to their own page.
 4. _data/tr_urls.yml: English URL -> Turkish URL, used on Turkish pages for "Continue with" links.
-5. en/games/<slug>.html: English copies of the Turkish games (tools/en_pages.py, ui_lang: en); the
+5. game/en/<slug>.html: English copies of the Turkish games (tools/en_pages.py, ui_lang: en); the
    Turkish page gets ui_lang: tr and hreflang. The /games/ hub links the English copies.
 Then run tools/make_related.py (the strip under each page also covers the Turkish pages).
 """
@@ -86,7 +86,7 @@ def copies():
         lines.append('---')
         text = nl.join(lines) + nl + body
         assert '{{' not in body and '{%' not in body, en_url
-        folder = 'tr/araclar' if hub == T.TOOLS_HUB else 'tr/oyunlar'
+        folder = T.TOOLS_HUB.strip('/') if hub == T.TOOLS_HUB else T.GAMES_HUB.strip('/')
         write('%s/%s.html' % (folder, slug), text)
 
         # the English page points back at its Turkish address
@@ -122,7 +122,7 @@ def en_copies():
         lines.append(hreflang(en, tr_page))
         lines.append('---')
         assert '{{' not in body and '{%' not in body, tr_page
-        write('en/games/%s.html' % slug, nl.join(lines) + nl + body)
+        write(E.PREFIX.strip('/') + '/%s.html' % slug, nl.join(lines) + nl + body)
 
         # the Turkish page: opens in Turkish and points at its English address
         want = ['ui_lang: tr', hreflang(en, tr_page)]

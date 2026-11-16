@@ -1,0 +1,1144 @@
+---
+# tools/make_tr_pages.py writes this copy of apps/image-metadata-viewer.html; edit that page, then run the script.
+layout: without-sidebar
+title: "Görsel Meta Verisi"
+permalink: /apps/tr/exif-goruntule/
+excerpt: "Fotoğrafların boyutlarını, dosya özelliklerini ve EXIF bilgilerini görün. Görsel yüklenmez."
+lang: tr
+ui_lang: tr
+seo_title: "EXIF Görüntüleyici · Fotoğraf Meta Verisi"
+og_image: https://sercankulcu.github.io/images/apps/image-metadata-viewer.jpg
+web_app: BusinessApplication
+hreflang: {en: "/apps/image-metadata-viewer/", tr: "/apps/tr/exif-goruntule/"}
+---
+
+<style>
+.metadata-app,
+.metadata-app *,
+.metadata-app *::before,
+.metadata-app *::after {
+  box-sizing: border-box;
+}
+
+.metadata-app {
+  --metadata-accent: var(--tool-primary);
+  --metadata-accent-text: var(--metadata-accent);
+  width: min(900px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+
+  color: var(--global-text-color);
+
+  font-family: inherit;
+}
+
+.metadata-panel {
+  padding: 22px 24px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+
+  background: var(--global-bg-color);
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, .07);
+}
+
+:root[data-theme="dark"] .metadata-app {
+  --metadata-accent-text: color-mix(in srgb, var(--global-link-color) 55%, #fff);
+}
+
+.metadata-app input[type="file"][hidden] {
+  display: none !important;
+}
+
+.metadata-app :focus-visible {
+  outline: 3px solid var(--global-link-color);
+  outline-offset: 2px;
+}
+
+.metadata-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.metadata-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.metadata-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.metadata-actions{display:flex;gap:8px;flex:0 0 auto}
+.metadata-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.metadata-help:focus-visible,.metadata-lang:focus-visible,.metadata-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.metadata-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.metadata-dialog::backdrop{background:rgba(0,0,0,.45)}
+.metadata-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.metadata-dialog-head h2{margin:0;font-size:1.1rem}
+.metadata-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.metadata-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.metadata-dialog-body p{margin:0 0 .6em}
+.metadata-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.metadata-dialog-body ul,.metadata-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.metadata-dialog[open]{animation:metadata-pop .16s ease-out}
+  @keyframes metadata-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.metadata-drop {
+  margin-top: 18px;
+  padding: 24px 16px;
+
+  border:
+    2px dashed
+    rgba(127, 127, 127, .52);
+
+  border-radius: 14px;
+
+  background:
+    rgba(127, 127, 127, .045);
+
+  color: var(--global-text-color);
+
+  text-align: center;
+
+  cursor: pointer;
+
+  transition:
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.metadata-drop:hover,
+.metadata-drop.drag {
+  border-color:
+    var(--global-link-color);
+
+  background:
+    rgba(80, 120, 200, .08);
+}
+
+.metadata-drop.drag {
+  border-style: solid;
+}
+
+.metadata-drop strong {
+  display: block;
+
+  font-size: .92rem;
+}
+
+.metadata-drop span {
+  display: block;
+
+  margin-top: 4px;
+
+  opacity: .8;
+
+  font-size: .76rem;
+}
+
+.metadata-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.metadata-stat {
+  min-width: 0;
+
+  padding: 11px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 12px;
+
+  background:
+    rgba(127, 127, 127, .035);
+}
+
+.metadata-stat strong {
+  display: block;
+
+  overflow-wrap: anywhere;
+
+  color: var(--global-text-color);
+
+  font-size: .9rem;
+  line-height: 1.3;
+}
+
+.metadata-stat span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--global-text-color);
+
+  opacity: .78;
+
+  font-size: .7rem;
+}
+
+.metadata-table-wrap {
+  margin-top: 12px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+
+  background:
+    rgba(127, 127, 127, .025);
+}
+
+.metadata-toolbar {
+  display: grid;
+
+  grid-template-columns:
+    1fr auto;
+
+  gap: 8px;
+
+  padding: 9px;
+
+  border-bottom:
+    1px solid
+    var(--global-border-color);
+}
+
+.metadata-search {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 9px;
+
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: .85rem;
+}
+
+.metadata-search:focus {
+  outline:
+    2px solid
+    var(--global-link-color);
+
+  outline-offset: 2px;
+}
+
+.metadata-btn {
+  min-height: 44px;
+
+  padding: 0 16px;
+
+  border:
+    1px solid
+    rgba(45, 45, 45, .42);
+
+  border-radius: 999px;
+
+  background:
+    rgba(45, 45, 45, .10);
+
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.metadata-btn:hover {
+  background:
+    rgba(45, 45, 45, .17);
+}
+
+html[data-theme="dark"] .metadata-btn {
+  border-color:
+    rgba(255, 255, 255, .22);
+
+  background:
+    rgba(255, 255, 255, .07);
+}
+
+html[data-theme="dark"] .metadata-btn:hover {
+  border-color:
+    rgba(255, 255, 255, .34);
+
+  background:
+    rgba(255, 255, 255, .12);
+}
+
+.metadata-output {
+  overflow-x: auto;
+}
+
+.metadata-table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+.metadata-table th,
+.metadata-table td {
+  padding: 9px 11px;
+
+  border-top:
+    1px solid
+    var(--global-border-color);
+
+  color: var(--global-text-color);
+
+  vertical-align: top;
+
+  overflow-wrap: anywhere;
+
+  font-size: .76rem;
+  line-height: 1.4;
+}
+
+.metadata-table tr:first-child th,
+.metadata-table tr:first-child td {
+  border-top: 0;
+}
+
+.metadata-table th {
+  width: 34%;
+
+  opacity: .82;
+
+  text-align: left;
+
+  font-weight: 800;
+}
+
+.metadata-table tr.is-error th,
+.metadata-table tr.is-error td {
+  color: #c62828;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .metadata-table tr.is-error th,
+html[data-theme="dark"] .metadata-table tr.is-error td {
+  color: #ff9a9a;
+}
+
+.metadata-empty {
+  padding: 28px 14px;
+
+  color: var(--global-text-color);
+
+  opacity: .78;
+
+  text-align: center;
+
+  font-size: .82rem;
+}
+
+.metadata-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.metadata-toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 20px;
+  z-index: 999;
+
+  transform:
+    translate(-50%, 12px);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  padding: 9px 13px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, .18);
+
+  font-size: .72rem;
+
+  transition: .25s;
+}
+
+.metadata-toast.show {
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+}
+
+@media (max-width: 700px) {
+  .metadata-app {
+    width: 100%;
+
+    margin: 0 auto 1rem;
+  }
+
+  .metadata-panel {
+    padding: 16px 12px;
+
+    border-radius: 14px;
+  }
+
+  .metadata-summary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .metadata-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .metadata-search {
+    font-size: 16px;
+  }
+
+  .metadata-table th {
+    width: 42%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metadata-app *,
+  .metadata-app *::before,
+  .metadata-app *::after {
+    transition-duration:
+      .001ms !important;
+  }
+}
+
+/* The site's reset gives input[type=search] content-box sizing, which pushed the field
+   past its toolbar on phones. */
+input.metadata-search[type="search"] { box-sizing: border-box; }
+</style>
+
+<div class="metadata-app">
+  <section
+    class="metadata-panel"
+    aria-labelledby="metadata-title"
+  >
+    <header class="metadata-header">
+      <h1 class="metadata-title" id="metadata-title" data-i18n="title">Image Metadata Viewer</h1>
+      <div class="metadata-actions">
+        <button class="metadata-lang" data-lang-toggle></button>
+        <button class="metadata-help" id="metadata-help" type="button" aria-haspopup="dialog" aria-controls="metadata-help-dialog"
+                data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+      </div>
+    </header>
+
+    <div
+      class="metadata-drop"
+      id="metadata-drop"
+      role="button"
+      tabindex="0"
+      data-i18n-attr="aria-label:dropAria"
+      aria-label="Choose an image or drop one here"
+    >
+      <strong data-i18n="dropTitle">Drop an image here or click to choose</strong>
+
+      <span data-i18n="dropHint">
+        JPEG, PNG, WebP, HEIC, HEIF, TIFF and other supported image formats, or paste with Ctrl+V
+      </span>
+
+      <input
+        id="metadata-file"
+        type="file"
+        accept="image/*,.heic,.heif,.tif,.tiff"
+        hidden
+      >
+    </div>
+
+    <div class="metadata-summary">
+      <div class="metadata-stat">
+        <strong id="metadata-name">
+          —
+        </strong>
+
+        <span data-i18n="file">File</span>
+      </div>
+
+      <div class="metadata-stat">
+        <strong id="metadata-size">
+          —
+        </strong>
+
+        <span data-i18n="size">Size</span>
+      </div>
+
+      <div class="metadata-stat">
+        <strong id="metadata-type">
+          —
+        </strong>
+
+        <span data-i18n="type">Type</span>
+      </div>
+
+      <div class="metadata-stat">
+        <strong id="metadata-dims">
+          —
+        </strong>
+
+        <span data-i18n="dims">Dimensions</span>
+      </div>
+    </div>
+
+    <div class="metadata-table-wrap">
+      <div class="metadata-toolbar">
+        <input
+          class="metadata-search"
+          id="metadata-search"
+          type="search"
+          placeholder="Filter metadata…"
+          aria-label="Filter metadata"
+          data-i18n-attr="placeholder:filterPh; aria-label:filterAria"
+        >
+
+        <button
+          class="metadata-btn"
+          id="metadata-copy"
+          type="button"
+          data-i18n="copyJson"
+        >Copy JSON</button>
+      </div>
+
+      <div
+        class="metadata-output"
+        id="metadata-output"
+      >
+        <div class="metadata-empty">
+          No image selected yet. Choose one above to see its metadata.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dialog class="metadata-dialog" id="metadata-help-dialog" aria-labelledby="metadata-help-title">
+    <div class="metadata-dialog-head">
+      <h2 id="metadata-help-title" data-i18n="howTo">How to use</h2>
+      <button class="metadata-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
+    </div>
+    <div class="metadata-dialog-body" data-i18n-html="help">
+      <p>Metadata tool: inspect image dimensions, file properties and available EXIF metadata, including camera, exposure and GPS fields.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Drop a JPEG, PNG, WebP, HEIC, HEIF or TIFF image on the box or click it to choose one.</li>
+        <li>The summary cards show the main facts; the table below lists every field found in the file.</li>
+        <li>Type in <b>Filter metadata…</b> to narrow the table, and press <b>Copy JSON</b> to copy all fields.</li>
+      </ol>
+      <h3>Notes</h3>
+      <ul>
+        <li>Metadata is read locally in your browser.</li>
+        <li>GPS information is shown only when it exists in the file.</li>
+        <li>You can paste an image with Ctrl+V, but pasted screenshots and copied images usually carry no camera metadata; drop the original file for that.</li>
+        <li>TR / EN switches the interface language; the choice is remembered for all tools.</li>
+      </ul>
+    </div>
+  </dialog>
+</div>
+
+<div
+  class="metadata-toast"
+  id="metadata-toast"
+  role="status"
+  aria-live="polite"
+></div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+
+<script src="/assets/js/tool-handoff.js"></script>
+<script src="/assets/js/tool-i18n.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  function i18nHarvest(en){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(!(k in en))en[k]=el.textContent.trim().replace(/\s+/g," ");});
+    document.querySelectorAll("[data-i18n-html]").forEach(el=>{const k=el.getAttribute("data-i18n-html");if(!(k in en))en[k]=el.innerHTML;});
+    document.querySelectorAll("[data-i18n-attr]").forEach(el=>el.getAttribute("data-i18n-attr").split(";").forEach(p=>{const q=p.split(":");if(q.length!==2)return;const a=q[0].trim(),k=q[1].trim();if(a&&!(k in en)&&el.hasAttribute(a))en[k]=el.getAttribute(a);}));
+    return en;
+  }
+
+  const I18N = {
+    en: i18nHarvest({
+      noMatch: "No matching metadata.",
+      noImage: "No image selected yet. Choose one above to see its metadata.",
+      caption: "Metadata fields",
+      reading: "Reading…",
+      notAvail: "Not available",
+      unknown: "Unknown",
+      libFail: "The EXIF library could not be loaded. Check your connection and reload the page.",
+      noCopy: "No metadata to copy",
+      copied: "JSON copied",
+      loaded: "Loaded {name} from the previous tool"
+    }),
+    tr: {
+      title: "Görsel Meta Verisi",
+      howTo: "Nasıl kullanılır",
+      close: "Kapat",
+      dropAria: "Bir görsel seçin ya da buraya bırakın",
+      dropTitle: "Görseli buraya bırakın ya da seçmek için tıklayın",
+      dropHint: "JPEG, PNG, WebP, HEIC, HEIF, TIFF ve desteklenen diğer görsel biçimleri · Ctrl+V ile de yapıştırabilirsiniz",
+      file: "Dosya",
+      size: "Boyut",
+      type: "Tür",
+      dims: "Ölçüler",
+      filterPh: "Meta veride ara…",
+      filterAria: "Meta veriyi süz",
+      copyJson: "JSON'u kopyala",
+      noMatch: "Eşleşen meta veri yok.",
+      noImage: "Henüz görsel seçilmedi. Meta verisini görmek için yukarıdan bir görsel seçin.",
+      caption: "Meta veri alanları",
+      reading: "Okunuyor…",
+      notAvail: "Yok",
+      unknown: "Bilinmiyor",
+      libFail: "EXIF kitaplığı yüklenemedi. Bağlantınızı denetleyip sayfayı yenileyin.",
+      noCopy: "Kopyalanacak meta veri yok",
+      copied: "JSON kopyalandı",
+      loaded: "{name} önceki araçtan yüklendi",
+      help: "<p>Meta veri aracı: görselin ölçülerini, dosya özelliklerini ve varsa fotoğraf makinesi, pozlama ve GPS dahil EXIF bilgilerini gösterir.</p>" +
+        "<h3>Adımlar</h3><ol>" +
+        "<li>JPEG, PNG, WebP, HEIC, HEIF ya da TIFF görseli kutuya bırakın veya kutuya tıklayıp seçin.</li>" +
+        "<li>Özet kartları temel bilgileri gösterir; alttaki tablo dosyada bulunan bütün alanları listeler.</li>" +
+        "<li>Tabloyu daraltmak için <b>Meta veride ara…</b> kutusuna yazın; bütün alanları kopyalamak için <b>JSON'u kopyala</b> düğmesine basın.</li>" +
+        "</ol><h3>Notlar</h3><ul>" +
+        "<li>Meta veri tarayıcınızda okunur; dosyanız hiçbir yere yüklenmez.</li>" +
+        "<li>GPS bilgisi yalnızca dosyada varsa gösterilir.</li>" +
+        "<li>Ctrl+V ile görsel yapıştırabilirsiniz; ancak ekran görüntülerinde ve kopyalanan görsellerde genellikle fotoğraf makinesi bilgisi bulunmaz. Bunun için özgün dosyayı bırakın.</li>" +
+        "<li>Alan adları (EXIF/XMP etiketleri) özgün adlarıyla gösterilir.</li>" +
+        "<li>TR / EN düğmesi arayüz dilini değiştirir; seçim bütün araçlar için hatırlanır.</li></ul>"
+    }
+  };
+  let i18n = null;
+  let dimsState = "";
+  let typeUnknown = false;
+
+  const byId = id =>
+    document.getElementById(id);
+
+  const helpDialog = document.getElementById("metadata-help-dialog");
+  document.getElementById("metadata-help").addEventListener("click", () => helpDialog.showModal());
+  helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+
+  const drop =
+    byId("metadata-drop");
+
+  const fileInput =
+    byId("metadata-file");
+
+  const searchInput =
+    byId("metadata-search");
+
+  const output =
+    byId("metadata-output");
+
+  const copyButton =
+    byId("metadata-copy");
+
+  const toast =
+    byId("metadata-toast");
+
+  let metadata = {};
+  let toastTimer = null;
+
+  function formatBytes(bytes) {
+    if (
+      bytes < 1024
+    ) {
+      return `${bytes} B`;
+    }
+
+    if (
+      bytes < 1048576
+    ) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / 1048576).toFixed(2)} MB`;
+  }
+
+  function displayValue(value) {
+    if (
+      value == null
+    ) {
+      return "";
+    }
+
+    if (
+      value instanceof Date
+    ) {
+      return value.toISOString();
+    }
+
+    if (
+      Array.isArray(value)
+    ) {
+      return value.join(", ");
+    }
+
+    if (
+      typeof value === "object"
+    ) {
+      try {
+        return JSON.stringify(value);
+      } catch (error) {
+        return String(value);
+      }
+    }
+
+    return String(value);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(
+        /[&<>"]/g,
+        character => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;"
+        })[character]
+      );
+  }
+
+  function render() {
+    const query =
+      searchInput.value
+        .trim()
+        .toLowerCase();
+
+    const rows =
+      Object.entries(metadata)
+        .filter(
+          ([key, value]) =>
+            key
+              .toLowerCase()
+              .includes(query) ||
+            displayValue(value)
+              .toLowerCase()
+              .includes(query)
+        )
+        .sort(
+          (a, b) =>
+            a[0]
+              .localeCompare(b[0])
+        );
+
+    if (
+      !rows.length
+    ) {
+      output.innerHTML = `
+        <div class="metadata-empty">
+          ${
+            Object.keys(metadata).length
+              ? i18n.t("noMatch")
+              : i18n.t("noImage")
+          }
+        </div>
+      `;
+
+      return;
+    }
+
+    output.innerHTML = `
+      <table class="metadata-table">
+        <caption class="metadata-sr">${i18n.t("caption")}</caption>
+        <tbody>
+          ${
+            rows
+              .map(
+                ([key, value]) => `
+                  <tr${/Error$/.test(key) ? ' class="is-error"' : ""}>
+                    <th scope="row">
+                      ${escapeHtml(key)}
+                    </th>
+
+                    <td>
+                      ${escapeHtml(displayValue(value))}
+                    </td>
+                  </tr>
+                `
+              )
+              .join("")
+          }
+        </tbody>
+      </table>
+    `;
+  }
+
+  function showToast(message) {
+    clearTimeout(
+      toastTimer
+    );
+
+    toast.textContent =
+      message;
+
+    toast
+      .classList
+      .add("show");
+
+    toastTimer =
+      window.setTimeout(
+        () => {
+          toast
+            .classList
+            .remove("show");
+        },
+        1500
+      );
+  }
+
+  function readDimensions(file) {
+    dimsState = "reading";
+    byId("metadata-dims")
+      .textContent =
+        i18n.t("reading");
+
+    const image =
+      new Image();
+
+    const url =
+      URL.createObjectURL(file);
+
+    image.onload = () => {
+      const width =
+        image.naturalWidth;
+
+      const height =
+        image.naturalHeight;
+
+      dimsState = "";
+      byId("metadata-dims")
+        .textContent =
+          `${width} × ${height}`;
+
+      metadata.Width =
+        width;
+
+      metadata.Height =
+        height;
+
+      render();
+
+      URL.revokeObjectURL(
+        url
+      );
+    };
+
+    image.onerror = () => {
+      dimsState = "notAvail";
+      byId("metadata-dims")
+        .textContent =
+          i18n.t("notAvail");
+
+      URL.revokeObjectURL(
+        url
+      );
+    };
+
+    image.src =
+      url;
+  }
+
+  async function loadFile(file) {
+    if (
+      !file
+    ) {
+      return;
+    }
+
+    byId("metadata-name")
+      .textContent =
+        file.name;
+
+    byId("metadata-size")
+      .textContent =
+        formatBytes(
+          file.size
+        );
+
+    typeUnknown = !file.type;
+    byId("metadata-type")
+      .textContent =
+        file.type ||
+        i18n.t("unknown");
+
+    metadata = {
+      FileName:
+        file.name,
+      FileSize:
+        file.size,
+      FileType:
+        file.type || "",
+      LastModified:
+        new Date(
+          file.lastModified
+        )
+    };
+
+    searchInput.value = "";
+
+    render();
+    readDimensions(file);
+
+    try {
+      if (
+        !window.exifr
+      ) {
+        throw new Error(
+          i18n.t("libFail")
+        );
+      }
+
+      const exif =
+        await window.exifr.parse(
+          file,
+          {
+            tiff: true,
+            exif: true,
+            gps: true,
+            icc: true,
+            iptc: true,
+            xmp: true,
+            translateValues: true,
+            reviveValues: true
+          }
+        );
+
+      if (
+        exif
+      ) {
+        Object.assign(
+          metadata,
+          exif
+        );
+      }
+
+      render();
+    } catch (error) {
+      metadata.MetadataError =
+        error.message;
+
+      render();
+    }
+  }
+
+  async function copyJson() {
+    if (
+      !Object.keys(metadata).length
+    ) {
+      showToast(
+        i18n.t("noCopy")
+      );
+
+      return;
+    }
+
+    const json =
+      JSON.stringify(
+        metadata,
+        (
+          key,
+          value
+        ) =>
+          value instanceof Date
+            ? value.toISOString()
+            : value,
+        2
+      );
+
+    try {
+      await navigator
+        .clipboard
+        .writeText(json);
+    } catch (error) {
+      const textarea =
+        document.createElement(
+          "textarea"
+        );
+
+      textarea.value =
+        json;
+
+      textarea.style.position =
+        "fixed";
+
+      textarea.style.opacity =
+        "0";
+
+      document.body
+        .appendChild(
+          textarea
+        );
+
+      textarea.select();
+
+      document.execCommand(
+        "copy"
+      );
+
+      textarea.remove();
+    }
+
+    showToast(
+      i18n.t("copied")
+    );
+  }
+
+  function openFilePicker() {
+    fileInput.click();
+  }
+
+  drop.addEventListener(
+    "click",
+    openFilePicker
+  );
+
+  drop.addEventListener(
+    "keydown",
+    event => {
+      if (
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+        event.preventDefault();
+        openFilePicker();
+      }
+    }
+  );
+
+  fileInput.addEventListener(
+    "change",
+    event => {
+      loadFile(
+        event.target.files[0]
+      );
+
+      event.target.value = "";
+    }
+  );
+
+  [
+    "dragover",
+    "dragenter"
+  ].forEach(type => {
+    drop.addEventListener(
+      type,
+      event => {
+        event.preventDefault();
+
+        drop
+          .classList
+          .add("drag");
+      }
+    );
+  });
+
+  [
+    "dragleave",
+    "drop"
+  ].forEach(type => {
+    drop.addEventListener(
+      type,
+      event => {
+        event.preventDefault();
+
+        drop
+          .classList
+          .remove("drag");
+      }
+    );
+  });
+
+  drop.addEventListener(
+    "drop",
+    event => {
+      loadFile(
+        event.dataTransfer
+          .files[0]
+      );
+    }
+  );
+
+  searchInput.addEventListener(
+    "input",
+    render
+  );
+
+  copyButton.addEventListener(
+    "click",
+    copyJson
+  );
+
+  i18n = ToolI18n.setup(I18N, () => {
+    if (!i18n) return;
+    if (dimsState) byId("metadata-dims").textContent = i18n.t(dimsState);
+    if (typeUnknown) byId("metadata-type").textContent = i18n.t("unknown");
+    render();
+  });
+  render();
+
+  function whenReady(fn) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", fn, { once: true });
+    } else {
+      fn();
+    }
+  }
+
+  if (window.ToolHandoff) {
+    ToolHandoff.onPaste(
+      files => whenReady(() => loadFile(files[0]))
+    );
+
+    ToolHandoff.take().then(
+      files => {
+        const file =
+          files && files.find(f => f.type.startsWith("image/"));
+        if (file) {
+          whenReady(() => {
+            loadFile(file);
+            showToast(i18n.t("loaded", { name: file.name }));
+          });
+        }
+      }
+    );
+  }
+})();
+</script>

@@ -376,7 +376,7 @@ def front_matter(s):
 
 
 def check_app_page(path):
-    """apps/, game/ ve tr/ (Turkce kopyalar) sayfalari: betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
+    """apps/ ve game/ sayfalari (apps/tr, game/tr, game/en kopyalari dahil): betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
     rel = os.path.relpath(path, REPO).replace('\\', '/')
     s = open(path, encoding='utf-8').read()
     fm = front_matter(s)
@@ -388,7 +388,7 @@ def check_app_page(path):
     for k in APP_KEYS:
         if not fm.get(k, '').strip():
             err(rel, 'on bilgide %s yok (tools/make_app_pages.py ya da make_game_pages.py calistirin)' % k)
-    kind = 'game_genre' if rel.startswith(('game/', 'tr/oyunlar/', 'en/games/')) else 'web_app'
+    kind = 'game_genre' if rel.startswith('game/') else 'web_app'
     if not fm.get(kind):
         err(rel, 'on bilgide %s yok' % kind)
     img = fm.get('og_image', '')
@@ -400,7 +400,7 @@ def check_app_page(path):
 
 
 def app_pages():
-    for d in ('apps', 'game', 'tr', 'en'):
+    for d in ('apps', 'game'):
         for dirpath, _, names in os.walk(os.path.join(REPO, d)):
             for n in sorted(names):
                 if n.endswith('.html'):
@@ -434,7 +434,7 @@ def main():
         r = subprocess.run([sys.executable, os.path.join(REPO, 'tools', 'make_tr_pages.py'), '--check'],
                            capture_output=True, text=True, encoding='utf-8')
         if r.returncode:
-            err('tr/', (r.stdout or r.stderr).strip())
+            err('apps/tr, game/tr, game/en', (r.stdout or r.stderr).strip())
     node_syntax_check()
     if a.browser:
         browser_checks(courses)
