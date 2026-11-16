@@ -36,6 +36,7 @@ PERSON = {'@type': 'Person', 'name': 'Sercan Külcü', 'url': SITE + '/',
 BOOKS = [
     ('agt/Algoritmik-Oyun-Kurami.pdf', 'tr', '/teaching/algorithmic-game-theory/'),
     ('algorithms/Algoritmalar.pdf', 'tr', '/teaching/algorithms/'),
+    ('advanced_algorithms/Ileri-Algoritmalar.pdf', 'tr', '/teaching/advanced-algorithms/'),
     ('computer/Bilgisayar-ve-Programlamaya-Giris.pdf', 'tr', '/teaching/computer-and-introduction-to-programming/'),
     ('data_structures/Veri-Yapilari.pdf', 'tr', '/teaching/data-structures/?lang=tr'),
     ('data_structures/Data-Structures.pdf', 'en', '/teaching/data-structures/?lang=en'),
@@ -50,6 +51,7 @@ BOOKS = [
 ART = {
     'agt/Algoritmik-Oyun-Kurami.pdf': ('teaching-algorithmic-game-theory.webp', '#7b3fa0'),
     'algorithms/Algoritmalar.pdf': ('teaching-algorithms.webp', '#e08a00'),
+    'advanced_algorithms/Ileri-Algoritmalar.pdf': ('teaching-algorithms.webp', '#a34e1a'),
     'computer/Bilgisayar-ve-Programlamaya-Giris.pdf': ('teaching-computer-and-programming.webp', '#1f6fb2'),
     'data_structures/Veri-Yapilari.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
     'data_structures/Data-Structures.pdf': ('teaching-data-structures.webp', '#2f8a6b'),

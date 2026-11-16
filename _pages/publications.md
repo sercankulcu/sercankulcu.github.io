@@ -386,11 +386,27 @@ Turkish-language course textbook on algorithmic game theory: decision theory, ga
 
 <summary>Details</summary>
 
-Turkish-language course textbook on algorithm design and analysis: complexity, sorting, searching, graph and string algorithms, divide and conquer, greedy methods, dynamic programming, backtracking, and approximation, randomized, online and parallel algorithms.
+Turkish-language course textbook on the analysis of algorithms and fundamental problems: complexity, sorting, searching, and graph and string algorithms. Its continuation is İleri Algoritmalar.
 
-**How to cite:** Külcü, S. (2026). *Algoritmalar* [Course textbook, 1142 pages]. https://sercankulcu.github.io/books/algoritmalar/
+**How to cite:** Külcü, S. (2026). *Algoritmalar* [Course textbook, 658 pages]. https://sercankulcu.github.io/books/algoritmalar/
 
 [Book](/books/algoritmalar/) · [PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf) · [Course](/teaching/algorithms/)
+
+</details>
+
+---
+
+<div class="publication-title">2026 - İleri Algoritmalar</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+Turkish-language course textbook on algorithm-design paradigms and hard problems, the continuation of Algoritmalar: divide and conquer, greedy algorithms, dynamic programming, backtracking, branch and bound, and approximation, randomized, online and parallel algorithms.
+
+**How to cite:** Külcü, S. (2026). *İleri Algoritmalar* [Course textbook, 508 pages]. https://sercankulcu.github.io/books/ileri-algoritmalar/
+
+[Book](/books/ileri-algoritmalar/) · [PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Ileri-Algoritmalar.pdf) · [Course](/teaching/advanced-algorithms/)
 
 </details>
 

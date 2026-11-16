@@ -100,28 +100,39 @@ MAPS['dsa_c'] = dict(
 
 MAPS['algorithms'] = dict(
     title='Algoritmalar', folder='algorithms', page='algorithms.md',
-    rows=[[1], [2, 3], [6, 4, 5], [12, 14, 8, 7, 9], [13, 11, 10]],
-    cols={0: [2], 1: [1.5, 2.5], 2: [0.5, 2, 3.5], 4: [2, 3, 4]},
-    edges=[(1, 2), (1, 3), (2, 3), (2, 6), (3, 4), (3, 5), (4, 7), (6, 8), (4, 9),
-           (6, 12), (6, 14), (7, 11), (11, 13), (9, 10)],
+    rows=[[1], [2, 3], [4, 5]],
+    cols={0: [1], 1: [0.5, 1.5], 2: [0.5, 1.5]},
+    ncols=3,
+    edges=[(1, 2), (1, 3), (2, 3), (3, 4), (3, 5)],
     table=[
         (1, [], 'Algoritma kavramı ve çalışma süresinin girdi boyutuyla büyümesi: asimptotik gösterimler.'),
         (2, [1], 'İlk büyük problem sınıfı; O(n²) yöntemlerden O(n log n) yöntemlere geçiş analizle ölçülür.'),
         (3, [1, 2], 'Sıralı dizide ikili arama; hash ile ortalama O(1) arama.'),
-        (4, [1, 3], 'Arama çizgeye taşınır: DFS ve BFS, güçlü bağlantılı bileşenler, en kısa yollar.'),
-        (5, [1, 3], 'Metinde örüntü arama: KMP, Boyer-Moore, Rabin-Karp; sıkıştırma ve dizi hizalama.'),
-        (6, [1, 2], 'Birleştirme sıralaması ve hızlı sıralamanın ortak şablonu; yineleme bağıntısı ve Ana Teorem.'),
-        (7, [4, 6], 'Her adımda en iyi görünen seçim; Prim, Kruskal ve Dijkstra açgözlü çizge algoritmalarıdır.'),
-        (8, [5, 6], 'Böl ve fethetin örtüşen alt problemli hâli: bellekleme ve tablolama; dizgilerde LCS ve düzenleme uzaklığı.'),
-        (9, [4], 'Durum uzayı ağacında derinlik öncelikli arama; P, NP ve NP-zor problemlere giriş.'),
-        (10, [9], 'Geri izlemeye sınır eklenir: en iyi çözümü içeremeyecek dallar budanır.'),
-        (11, [7, 9], 'NP-zor problemlerde kanıtlanmış oranlı çözüm: MST tabanlı 2-yaklaşım, LPT, düğüm kapsama.'),
-        (12, [2, 6], 'Rastgele pivotlu hızlı sıralama ve QuickSelect; Las Vegas ve Monte Carlo türleri.'),
-        (13, [7, 11], 'Geleceği bilmeden karar: rekabet oranı yaklaşım oranının çevrim içi karşılığıdır; sayfalama.'),
-        (14, [1, 6], 'Bağımsız alt problemler paralel çözülür: önek toplamı, paralel birleştirme sıralaması, iş ve derinlik.'),
+        (4, [1, 3], 'Arama çizgeye taşınır: DFS ve BFS, güçlü bağlantılı bileşenler, en kısa yollar, kapsayan ağaçlar ve akış.'),
+        (5, [1, 3], 'Metinde örüntü arama: KMP, Boyer-Moore, Rabin-Karp; sıkıştırma, düzenleme uzaklığı ve trie.'),
     ],
-    caption='Oklar, bir konunun hangi konunun üzerine kurulduğunu gösterir. Temel problemlerden tasarım paradigmalarına, oradan zor problemlere ve diğer hesaplama modellerine geçilir.',
-    spine='Haritanın ana omurgası şöyle okunabilir: <strong>analiz → temel problemler → tasarım paradigmaları → zor problemler → diğer modeller</strong>. Sıralama ve arama, sonraki bütün bölümlerin hem aracı hem örneğidir. Böl ve fethet sıralamadan doğar ve dinamik programlamaya, rastgele ve paralel algoritmalara açılır. Çizge algoritmaları açgözlü yönteme ve durum uzayı aramasına örnek verir. Geri izleme ile dal sınır en iyi çözümü üstel zamanda arar; yaklaşım algoritmaları bunun yerine kanıtlanmış bir oranla yetinir. Çevrim içi algoritmalar aynı oran fikrini bilinmeyen geleceğe uygular.',
+    caption='Oklar, bir konunun hangi konunun üzerine kurulduğunu gösterir. Analizden temel problemlere, oradan çizge ve dizgi algoritmalarına geçilir.',
+    spine='Haritanın ana omurgası şöyle okunabilir: <strong>analiz → sıralama ve arama → çizgeler ve dizgiler</strong>. İlk bölümdeki asimptotik analiz sonraki bütün bölümlerin ölçüsüdür. Sıralama ve arama, sonraki bölümlerin hem aracı hem örneğidir: çizgede gezinme aramanın çizgeye taşınmış biçimidir, dizgi eşleştirme ise aramanın metne uygulanmasıdır. Tasarım paradigmaları, zor problemler ve diğer hesaplama modelleri <a href="/teaching/advanced-algorithms/">İleri Algoritmalar</a> dersinde bu temelin üzerine kurulur.',
+)
+
+MAPS['advanced_algorithms'] = dict(
+    title='İleri Algoritmalar', folder='advanced_algorithms', page='advanced-algorithms.md',
+    rows=[[1, 4], [2, 3, 7, 9, 5], [6, 8]],
+    cols={0: [1.5, 4], 2: [0.5, 1.5]},
+    edges=[(1, 2), (1, 3), (1, 7), (1, 9), (4, 5), (2, 6), (6, 8)],
+    table=[
+        (1, [], 'Birleştirme sıralaması ve hızlı sıralamanın ortak şablonu; yineleme bağıntısı ve Ana Teorem (Algoritmalar, Bölüm 1–2).'),
+        (2, [1], 'Her adımda en iyi görünen seçim; Prim, Kruskal ve Dijkstra açgözlü çizge algoritmalarıdır (Algoritmalar, Bölüm 4).'),
+        (3, [1], 'Böl ve fethetin örtüşen alt problemli hâli: bellekleme ve tablolama; dizgilerde LCS ve düzenleme uzaklığı (Algoritmalar, Bölüm 5).'),
+        (4, [], 'Durum uzayı ağacında derinlik öncelikli arama (Algoritmalar, Bölüm 4); P, NP ve NP-zor problemlere giriş.'),
+        (5, [4], 'Geri izlemeye sınır eklenir: en iyi çözümü içeremeyecek dallar budanır.'),
+        (6, [2, 4], 'NP-zor problemlerde kanıtlanmış oranlı çözüm: MST tabanlı 2-yaklaşım, LPT, düğüm kapsama.'),
+        (7, [1], 'Rastgele pivotlu hızlı sıralama ve QuickSelect; Las Vegas ve Monte Carlo türleri.'),
+        (8, [2, 6], 'Geleceği bilmeden karar: rekabet oranı yaklaşım oranının çevrim içi karşılığıdır; sayfalama.'),
+        (9, [1], 'Bağımsız alt problemler paralel çözülür: önek toplamı, paralel birleştirme sıralaması, iş ve derinlik.'),
+    ],
+    caption='Oklar, bir konunun hangi konunun üzerine kurulduğunu gösterir. Tasarım paradigmalarından zor problemlere ve diğer hesaplama modellerine geçilir.',
+    spine='Haritanın ana omurgası şöyle okunabilir: <strong>tasarım paradigmaları → zor problemler → diğer modeller</strong>. Ders, <a href="/teaching/algorithms/">Algoritmalar</a> dersindeki analiz, sıralama, arama, çizge ve dizgi algoritmalarının üzerine kurulur. Böl ve fethet sıralamadan doğar ve dinamik programlamaya, rastgele ve paralel algoritmalara açılır. Açgözlü yöntem çizge algoritmalarından tanıdıktır. Geri izleme ile dal sınır en iyi çözümü üstel zamanda arar; yaklaşım algoritmaları bunun yerine kanıtlanmış bir oranla yetinir. Çevrim içi algoritmalar aynı oran fikrini bilinmeyen geleceğe uygular.',
 )
 
 MAPS['computer'] = dict(
