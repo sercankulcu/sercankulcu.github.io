@@ -11,8 +11,9 @@ import notes_book
 # turetildi. Yazar gozden gecirmeli.
 PREFACE = '''
 <p>Algoritma, bir problemi çözmek ya da bir hesabı yapmak için sonlu ve iyi tanımlanmış
-adımlar dizisidir. Bu kitap temel algoritma tasarım tekniklerini, algoritmaların doğruluğunu,
-zaman ve bellek karmaşıklığını ve farklı çözümler arasındaki ödünleşimleri inceler. Kitap,
+adımlar dizisidir. Bu kitap algoritmaların doğruluğunu, zaman ve bellek karmaşıklığının
+ölçülmesini ve bu araçların sıralama, arama, çizge ve dizgi problemlerine uygulanışını; farklı
+çözümler arasındaki ödünleşimlerle birlikte inceler. Kitap,
 Giresun Üniversitesi Bilgisayar Mühendisliği Bölümü'nde verilen Algoritmalar dersinin
 notlarından oluşur ve bölümleri dersteki sırayla izler. Örnekler Java ile yazılmıştır.</p>
 
