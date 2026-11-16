@@ -117,9 +117,10 @@ MAPS['algorithms'] = dict(
 
 MAPS['advanced_algorithms'] = dict(
     title='İleri Algoritmalar', folder='advanced_algorithms', page='advanced-algorithms.md',
-    rows=[[1, 4], [2, 3, 7, 9, 5], [6, 8]],
-    cols={0: [1.5, 4], 2: [0.5, 1.5]},
-    edges=[(1, 2), (1, 3), (1, 7), (1, 9), (4, 5), (2, 6), (6, 8)],
+    rows=[[3, 1, 2], [7, 9, 6, 4], [8, 5]],
+    cols={0: [0.5, 1.5, 2.5], 1: [0, 1, 2, 3], 2: [1, 3]},
+    ncols=4,
+    edges=[(1, 3), (1, 2), (1, 7), (1, 9), (2, 6), (4, 6), (4, 5), (6, 8)],
     table=[
         (1, [], 'Birleştirme sıralaması ve hızlı sıralamanın ortak şablonu; yineleme bağıntısı ve Ana Teorem (Algoritmalar, Bölüm 1–2).'),
         (2, [1], 'Her adımda en iyi görünen seçim; Prim, Kruskal ve Dijkstra açgözlü çizge algoritmalarıdır (Algoritmalar, Bölüm 4).'),
@@ -131,7 +132,7 @@ MAPS['advanced_algorithms'] = dict(
         (8, [2, 6], 'Geleceği bilmeden karar: rekabet oranı yaklaşım oranının çevrim içi karşılığıdır; sayfalama.'),
         (9, [1], 'Bağımsız alt problemler paralel çözülür: önek toplamı, paralel birleştirme sıralaması, iş ve derinlik.'),
     ],
-    caption='Oklar, bir konunun hangi konunun üzerine kurulduğunu gösterir. Tasarım paradigmalarından zor problemlere ve diğer hesaplama modellerine geçilir.',
+    caption='Oklar, bir konunun hangi konunun üzerine kurulduğunu gösterir. Üst satırda tasarım paradigmaları, sağda zor problemler, solda diğer hesaplama modelleri yer alır.',
     spine='Haritanın ana omurgası şöyle okunabilir: <strong>tasarım paradigmaları → zor problemler → diğer modeller</strong>. Ders, <a href="/teaching/algorithms/">Algoritmalar</a> dersindeki analiz, sıralama, arama, çizge ve dizgi algoritmalarının üzerine kurulur. Böl ve fethet sıralamadan doğar ve dinamik programlamaya, rastgele ve paralel algoritmalara açılır. Açgözlü yöntem çizge algoritmalarından tanıdıktır. Geri izleme ile dal sınır en iyi çözümü üstel zamanda arar; yaklaşım algoritmaları bunun yerine kanıtlanmış bir oranla yetinir. Çevrim içi algoritmalar aynı oran fikrini bilinmeyen geleceğe uygular.',
 )
 
