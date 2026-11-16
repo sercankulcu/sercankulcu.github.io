@@ -44,7 +44,7 @@ GROUPS = [
     ('🔮', 'Fun', '#6a3fa0', 'EntertainmentApplication', False, [
         ('🔮', '/apps/fortune-teller/'), ('🃏', '/apps/tarot/tarot-reader/')]),
     ('🏔️', 'Other projects', '#2d6a4f', 'LifestyleApplication', False, [
-        ('🧘', '/mantra/'), ('🏔️', 'https://dorukdayim.netlify.app')]),
+        ('🧘', '/apps/mantra/'), ('🏔️', 'https://dorukdayim.netlify.app')]),
 ]
 EXTERNAL = {'https://dorukdayim.netlify.app': ('Dorukdayım', 'A separate project site, in Turkish.')}
 MANAGED = ('seo_title', 'og_image', 'web_app')
@@ -65,8 +65,8 @@ def short(desc):
 
 
 def page_file(url):
-    if url == '/mantra/':
-        return os.path.join(REPO, 'mantra', 'index.html')
+    if url == '/apps/mantra/':
+        return os.path.join(REPO, 'apps', 'mantra', 'index.html')
     return os.path.join(REPO, *url.strip('/').split('/')) + '.html'
 
 

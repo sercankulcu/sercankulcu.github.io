@@ -80,7 +80,7 @@ APPS = {
         'Kristal küreye dokunun, günün falını ve sembollerini görün.'),
     '/apps/tarot/tarot-reader/': ('tarot', 'Tarot Falı · Üç Kartlık Geçmiş, Şimdi, Gelecek',
         'Büyük Arkana kartlarıyla geçmiş, şimdi ve gelecek için üç kartlık bir tarot açılımı yapın.'),
-    '/mantra/': ('mantra', 'Mantra · Tekrarla Odaklanma Egzersizi',
+    '/apps/mantra/': ('mantra', 'Mantra · Tekrarla Odaklanma Egzersizi',
         'Düşünceleri gözlemlemek, yavaşlamak ve tekrarla odaklanmak için rehberli bir mantra egzersizi.'),
 }
 

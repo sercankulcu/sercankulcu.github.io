@@ -18,7 +18,7 @@ Dosya denetimleri (saniyeler surer):
            birlestirir ve yorum betigin geri kalanini yutar (yerelde calisir, canlida kirilir);
            ayrica satirlari birlestirilmis her betik node ile ayristirilir (node yoksa atlanir).
            Kod ornegi tasiyan text/x-asm, text/x-java ... betikleri denetlenmez.
-  uygulama ders verilmediginde apps/, game/, mantra/ sayfalari da: betik ve Liquid denetimi,
+  uygulama ders verilmediginde apps/ ve game/ sayfalari da: betik ve Liquid denetimi,
            make_app_pages.py / make_game_pages.py'nin yazdigi on bilgi (title, excerpt,
            permalink, seo_title, og_image, web_app ya da game_genre) ve og_image dosyasi
 
@@ -376,7 +376,7 @@ def front_matter(s):
 
 
 def check_app_page(path):
-    """apps/, game/, mantra/ ve tr/ (Turkce kopyalar) sayfalari: betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
+    """apps/, game/ ve tr/ (Turkce kopyalar) sayfalari: betikler, Liquid ve uretec betiklerinin yazdigi on bilgi."""
     rel = os.path.relpath(path, REPO).replace('\\', '/')
     s = open(path, encoding='utf-8').read()
     fm = front_matter(s)
@@ -400,7 +400,7 @@ def check_app_page(path):
 
 
 def app_pages():
-    for d in ('apps', 'game', 'mantra', 'tr', 'en'):
+    for d in ('apps', 'game', 'tr', 'en'):
         for dirpath, _, names in os.walk(os.path.join(REPO, d)):
             for n in sorted(names):
                 if n.endswith('.html'):
