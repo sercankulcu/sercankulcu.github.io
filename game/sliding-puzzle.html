@@ -19,7 +19,7 @@ game_genre: "Puzzle"
 }
 .sp-app button{font:inherit;cursor:pointer}
 .sp-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.sp-title{margin:0;font-size:clamp(1.5rem,5vw,2rem);font-weight:750;letter-spacing:-.04em}
+.sp-title{margin:0;font-size:clamp(1.35rem,4vw,1.6rem);font-weight:750;letter-spacing:-.04em}
 .sp-topbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .sp-stat{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
 .sp-stat small{display:block;opacity:.8;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
@@ -84,12 +84,27 @@ game_genre: "Puzzle"
 }
 .sp-won.is-visible{display:block}
 :root[data-theme="dark"] .sp-won{color:#7fd6a6}
-.sp-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.8}
+.sp-app .sp-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
+.sp-help:focus-visible,.sp-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.sp-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
+  border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.sp-dialog::backdrop{background:rgba(0,0,0,.45)}
+.sp-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
+.sp-dialog-head h2{margin:0;font-size:1.1rem}
+.sp-dialog-close{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.sp-dialog-body{padding:14px 18px 18px;overflow:auto;line-height:1.55}
+.sp-dialog-body h3{margin:1em 0 .35em;font-size:.95rem}
+.sp-dialog-body ul,.sp-dialog-body ol{margin:.2em 0 .6em;padding-left:1.2em}
+@media (prefers-reduced-motion: no-preference){.sp-dialog[open]{animation:sp-pop .16s ease-out}
+  @keyframes sp-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
 </style>
 
 <div class="sp-app">
   <div class="sp-header">
     <h1 class="sp-title">Kaydırmalı Bulmaca</h1>
+    <button class="sp-help" id="sp-help" type="button" aria-haspopup="dialog" aria-controls="sp-help-dialog" aria-label="Nasıl oynanır">?</button>
   </div>
 
   <div class="sp-topbar">
@@ -111,8 +126,34 @@ game_genre: "Puzzle"
   <div class="sp-controls">
     <button class="sp-btn primary" id="sp-new-btn" type="button">Yeni Oyun</button>
   </div>
-  <div class="sp-hint">Boş hücreye komşu bir karoya dokun ya da ok tuşlarını kullan</div>
 </div>
+
+<dialog class="sp-dialog" id="sp-help-dialog" aria-labelledby="sp-help-title">
+  <div class="sp-dialog-head">
+    <h2 id="sp-help-title">Nasıl oynanır</h2>
+    <button class="sp-dialog-close" type="button" data-close aria-label="Kapat">×</button>
+  </div>
+  <div class="sp-dialog-body">
+    <p>Karışık karoları kaydırarak 1'den başlayan sıraya diz; boş hücre sağ alt köşede kalmalı.</p>
+    <h3>Nasıl oynanır</h3>
+    <ol>
+      <li>3 × 3, 4 × 4 ya da 5 × 5 tahtayı seç; seçince yeni oyun başlar.</li>
+      <li>Boş hücreye komşu bir karoya dokunarak onu boşluğa kaydır.</li>
+      <li>Bütün sayılar sırasıyla yerine oturunca bulmaca çözülür.</li>
+    </ol>
+    <h3>Kontroller</h3>
+    <ul>
+      <li>Dokunma ya da fare: boş hücreye komşu bir karoya dokun.</li>
+      <li>Klavye: ok tuşları boşluğun yanındaki karoyu o yöne kaydırır; Tab ile oynanabilir karolara gidip Enter'a da basabilirsin.</li>
+    </ul>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Yerindeki karolarda küçük bir onay işareti görünür.</li>
+      <li>Süre ilk karıştırmayla başlar ve bu pencere açıkken durur.</li>
+      <li>Her tahta boyutunun rekoru ayrı tutulur ve yalnızca bu tarayıcıda saklanır.</li>
+    </ul>
+  </div>
+</dialog>
 
 <script>
 (() => {
@@ -135,6 +176,7 @@ let seconds = 0;
 let timerInt = null;
 let won = false;
 let startTime = 0;
+let pausedAt = 0;
 let resizeTimer = 0;
 let bests = JSON.parse(store.getItem("sp.bests") || "{}");
 
@@ -164,6 +206,7 @@ function startTimer() {
      best time far shorter than the player actually took, and that time is
      written straight to storage. */
   timerInt = setInterval(() => {
+    if (pausedAt) return;
     seconds = Math.floor((performance.now() - startTime) / 1000);
     timeEl.textContent = fmt(seconds);
   }, 250);
@@ -278,7 +321,7 @@ function newGame() {
 
 /* Arrow keys */
 window.addEventListener("keydown", e => {
-  if (won) return;
+  if (won || helpDialog.open) return;
   const tag = e.target.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
   const brow = Math.floor(blankIdx / N), bcol = blankIdx % N;
@@ -291,6 +334,16 @@ window.addEventListener("keydown", e => {
 });
 
 document.getElementById("sp-new-btn").addEventListener("click", newGame);
+
+const helpDialog = document.getElementById("sp-help-dialog");
+document.getElementById("sp-help").addEventListener("click", () => {
+  if (!won) pausedAt = performance.now();
+  helpDialog.showModal();
+});
+helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+helpDialog.addEventListener("close", () => {
+  if (pausedAt) { startTime += performance.now() - pausedAt; pausedAt = 0; }
+});
 
 /* Tile heights are baked in as pixels at render time, so a rotation or a resized
    window left the board at its old size until the next move. */
