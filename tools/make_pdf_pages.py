@@ -51,7 +51,7 @@ BOOKS = [
 ART = {
     'agt/Algoritmik-Oyun-Kurami.pdf': ('teaching-algorithmic-game-theory.webp', '#7b3fa0'),
     'algorithms/Algoritmalar.pdf': ('teaching-algorithms.webp', '#e08a00'),
-    'advanced_algorithms/Ileri-Algoritmalar.pdf': ('teaching-algorithms.webp', '#a34e1a'),
+    'advanced_algorithms/Ileri-Algoritmalar.pdf': ('teaching-advanced-algorithms.webp', '#a34e1a'),
     'computer/Bilgisayar-ve-Programlamaya-Giris.pdf': ('teaching-computer-and-programming.webp', '#1f6fb2'),
     'data_structures/Veri-Yapilari.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
     'data_structures/Data-Structures.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
