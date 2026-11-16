@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Algoritmalar kitabi: 5 bolum, 12 ders notu (Bolum 1, 4 ve 5 birden cok nottan) + terim sozlugu eki.
+"""Algoritmalar kitabi: 11 bolum, 11 ders notu + terim sozlugu eki.
 
 Bolum 6-14 Ileri Algoritmalar kitabindadir (course_advanced_algorithms.py).
 
@@ -17,9 +17,9 @@ adımlar dizisidir. Bu kitap algoritmaların doğruluğunu, zaman ve bellek karm
 Giresun Üniversitesi Bilgisayar Mühendisliği Bölümü'nde verilen Algoritmalar dersinin
 notlarından oluşur ve bölümleri dersteki sırayla izler. Örnekler Java ile yazılmıştır.</p>
 
-<p>Kitap iki kısımdır. __PARTS__ Tasarım paradigmaları, zor problemler ve diğer hesaplama
+<p>Kitap üç kısımdır. __PARTS__ Tasarım paradigmaları, zor problemler ve diğer hesaplama
 modelleri dersin devamı olan <em>İleri Algoritmalar</em> kitabındadır.</p>
-''' + notes_book.MULTI_NOTE + notes_book.STRUCTURE + '''
+''' + notes_book.STRUCTURE + '''
 <p>Bölümlerin kodu derse eşlik eden <span class="u">github.com/sercankulcu/algorithms-java</span>
 deposunda, her bölüm için ayrı bir klasördedir; klasörün adı bölümün başında yazılıdır.
 Sunumlar, çalışma soruları ve algoritmaları adım adım çalıştıran simülatörler ders
