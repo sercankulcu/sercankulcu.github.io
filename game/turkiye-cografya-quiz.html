@@ -36,7 +36,7 @@ game_genre: "Quiz"
   @keyframes tq-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
 .tq-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .tq-title{margin:0;font-size:clamp(1.35rem,4.5vw,1.6rem);font-weight:750;letter-spacing:-.04em}
-.tq-topbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.tq-topbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .tq-stat{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
 .tq-stat small{display:block;opacity:.78;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .tq-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px}
@@ -84,6 +84,9 @@ game_genre: "Quiz"
 .tq-end-card h2{margin:0 0 8px;font-size:1.7rem;font-weight:750}
 .tq-end-score{font-size:2.6rem;font-weight:800;margin:12px 0}
 .tq-end-card p{margin:0 0 20px;opacity:.8;font-size:.88rem}
+/* Records kept on this device. */
+.tq-end-card p.tq-end-record{margin:-12px 0 20px;opacity:1;color:var(--global-text-color-light);font-size:.88rem}
+.tq-new-best{color:var(--global-link-text-color);font-weight:800}
 .tq-btn{min-height:46px;padding:12px 30px;border:none;border-radius:12px;background:var(--global-text-color);color:var(--global-bg-color);font:inherit;font-size:.9rem;font-weight:750}
 .tq-btn:hover{opacity:.85}
 @media(max-width:620px){
@@ -108,6 +111,7 @@ game_genre: "Quiz"
     <div class="tq-stat"><small>Puan</small><strong id="tq-score">0</strong></div>
     <div class="tq-stat"><small>Doğru</small><strong id="tq-correct">0</strong></div>
     <div class="tq-stat"><small>Soru</small><strong id="tq-qnum">0/0</strong></div>
+    <div class="tq-stat"><small>Rekor</small><strong id="tq-record">0</strong></div>
   </div>
 
   <div class="tq-cats" id="tq-cats" role="group" aria-label="Kategori"></div>
@@ -130,6 +134,7 @@ game_genre: "Quiz"
     <h2 id="tq-end-title">Tebrikler!</h2>
     <div class="tq-end-score" id="tq-end-score">0</div>
     <p id="tq-end-sub">puan</p>
+    <p class="tq-end-record" id="tq-end-record"></p>
     <button class="tq-btn" id="tq-restart-btn" type="button">Tekrar Oyna</button>
   </div>
 </div>
@@ -151,7 +156,8 @@ game_genre: "Quiz"
     <h3>Klavye</h3>
     <p>Klavyede 1–4 tuşlarıyla da cevap verebilirsin.</p>
     <h3>Not</h3>
-    <p>Bu pencere açıkken süre durur. Kategori değiştirmek turu baştan başlatır.</p>
+    <p>Bu pencere açıkken de süre işlemeye devam eder. Kategori değiştirmek turu baştan başlatır.</p>
+    <p><b>Rekor</b>, seçili kategorideki en yüksek puanındır. Rekorlar ve oynanan oyun sayısı yalnızca bu cihazda saklanır.</p>
   </div>
 </dialog>
 
@@ -226,6 +232,52 @@ let qIdx = 0, score = 0, correctCount = 0;
 let timeLeft = 20, timerInt = null, deadline = 0;
 let answered = false;
 
+/* Records live only in this browser. Blocked storage (private mode) just
+   means nothing is remembered; the quiz itself must keep working. */
+const STATS_KEY = "pz:turkiye-cografya-quiz:stats";
+
+function loadStats() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (raw && typeof raw === "object") {
+      return {
+        played: Number(raw.played) || 0,
+        best: raw.best && typeof raw.best === "object" ? raw.best : {}
+      };
+    }
+  } catch (e) {}
+  return { played: 0, best: {} };
+}
+
+function saveStats() {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+}
+
+const stats = loadStats();
+let roundCat = selectedCat;
+const bestFor = cat => Number(stats.best[cat]) || 0;
+
+/* Rounds of one category are scored alike, so each category has its own record. */
+function saveRecord() {
+  const previous = bestFor(roundCat);
+  const isNewBest = score > previous;
+  stats.played += 1;
+  if (isNewBest) stats.best[roundCat] = score;
+  saveStats();
+  document.getElementById("tq-record").textContent = String(Math.max(previous, score));
+  const line = document.getElementById("tq-end-record");
+  line.textContent = "";
+  if (isNewBest) {
+    const badge = document.createElement("span");
+    badge.className = "tq-new-best";
+    badge.textContent = "Yeni rekor!";
+    line.append(badge, previous ? ` Önceki rekor: ${previous} · ` : " ");
+  } else {
+    line.append(`${roundCat} rekoru: ${previous} · `);
+  }
+  line.append(`Oynanan oyun: ${stats.played}`);
+}
+
 function shuffle(arr) {
   for (let i = arr.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]] = [arr[j],arr[i]]; }
   return arr;
@@ -257,6 +309,8 @@ function renderCats() {
 
 function startGame() {
   questions = filtered(); qIdx = 0; score = 0; correctCount = 0; answered = false;
+  roundCat = selectedCat;
+  document.getElementById("tq-record").textContent = String(bestFor(roundCat));
   document.getElementById("tq-score").textContent = "0";
   document.getElementById("tq-correct").textContent = "0";
   document.getElementById("tq-end-card").style.display = "none";
@@ -349,6 +403,7 @@ function endGame() {
   document.getElementById("tq-end-title").textContent = `${emoji} Quiz Bitti!`;
   document.getElementById("tq-end-score").textContent = score;
   document.getElementById("tq-end-sub").textContent = `puan · ${correctCount}/${questions.length} doğru (${pct}%)`;
+  saveRecord();
   document.getElementById("tq-restart-btn").focus();
 }
 

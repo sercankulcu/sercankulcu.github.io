@@ -24,7 +24,7 @@ game_genre: "Word game"
 .bg-title{margin:0;font-size:clamp(1.35rem,4vw,1.6rem);font-weight:750;letter-spacing:-.04em}
 .bg-head-actions{display:flex;align-items:center;gap:8px}
 .bg-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
-.bg-topbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.bg-topbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .bg-stat{padding:8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
 .bg-stat small{display:block;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase; color: var(--global-text-color-light);}
 .bg-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
@@ -100,6 +100,10 @@ game_genre: "Word game"
 .bg-over-card h2{margin:0 0 10px;font-size:1.6rem;font-weight:750}
 .bg-over-card p{margin:0 0 18px;opacity:.8;font-size:.92rem}
 .bg-over-card strong{font-size:1.2rem}
+.bg-over-card .bg-record{margin:-8px 0 18px;opacity:1;font-weight:800;color:var(--global-link-text-color)}
+.bg-over-card .bg-record:empty{display:none}
+.bg-reset{min-height:44px;padding:0;border:0;background:none;color:var(--global-link-text-color);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.bg-reset:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
 .bg-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .bg-dialog::backdrop{background:rgba(0,0,0,.45)}
 .bg-dialog-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--global-border-color);background:var(--global-bg-color)}
@@ -138,6 +142,7 @@ game_genre: "Word game"
     <div class="bg-stat"><small>Puan</small><strong id="bg-score">0</strong></div>
     <div class="bg-stat"><small>Kelime</small><strong id="bg-count">0</strong></div>
     <div class="bg-stat"><small>Süre</small><strong id="bg-time">3:00</strong></div>
+    <div class="bg-stat"><small>Rekor</small><strong id="bg-best">0</strong></div>
   </div>
 
   <div class="bg-layout">
@@ -164,6 +169,7 @@ game_genre: "Word game"
   <div class="bg-over-card">
     <h2 id="bg-over-title">⏰ Süre Doldu!</h2>
     <p>Toplam puan: <strong id="bg-final-score">0</strong><br>Bulunan kelime: <strong id="bg-final-count">0</strong></p>
+    <p class="bg-record" id="bg-record" aria-live="polite"></p>
     <button class="bg-btn primary" id="bg-play-again" type="button" style="width:100%;padding:12px">Tekrar Oyna</button>
   </div>
 </div>
@@ -194,6 +200,9 @@ game_genre: "Word game"
       <li>Klavyede harfleri yaz, Enter ile ekle, Backspace ile sil, Esc ile temizle.</li>
       <li>Süre, bu pencere açıkken ve sekme arka plandayken durur.</li>
     </ul>
+
+    <h3>Rekorlar</h3>
+    <p>Süresi dolan her oyun sayılır; en yüksek puan, en çok kelime ve oynanan oyun sayısı yalnızca bu cihazda saklanır. <button class="bg-reset" id="bg-reset" type="button">Rekorları sıfırla</button></p>
   </div>
 </dialog>
 <script>
@@ -218,6 +227,35 @@ const overlay = document.getElementById("bg-overlay");
 const playAgain = document.getElementById("bg-play-again");
 const newBtn = document.getElementById("bg-new-btn");
 const helpDialog = document.getElementById("bg-help-dialog");
+
+/* Records live on this device only; blocked storage simply means no records. */
+const STATS_KEY = "pz:boggle:stats";
+function loadStats() {
+  try {
+    const v = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (v && typeof v === "object") return { played: +v.played || 0, best: +v.best || 0, bestWords: +v.bestWords || 0 };
+  } catch (e) {}
+  return { played: 0, best: 0, bestWords: 0 };
+}
+let stats = loadStats();
+function saveStats() { try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {} }
+function renderBest() { document.getElementById("bg-best").textContent = stats.best; }
+
+/* Called once per finished game (the timer ran out). */
+function recordGame() {
+  const prevBest = stats.best, prevWords = stats.bestWords;
+  stats.played++;
+  if (totalScore > stats.best) stats.best = totalScore;
+  if (foundWords.size > stats.bestWords) stats.bestWords = foundWords.size;
+  saveStats();
+  renderBest();
+  const parts = [];
+  if (totalScore > prevBest) parts.push("Yeni puan rekoru!");
+  if (foundWords.size > prevWords) parts.push("Yeni kelime rekoru!");
+  document.getElementById("bg-record").textContent = parts.length
+    ? "🏆 " + parts.join(" ")
+    : `Rekor: ${stats.best} puan, ${stats.bestWords} kelime · ${stats.played}. oyun`;
+}
 
 function wordScore(w) { const l = w.length; return l < 3 ? 0 : l === 3 ? 1 : l === 4 ? 2 : l === 5 ? 4 : l === 6 ? 6 : 11; }
 
@@ -383,6 +421,7 @@ function endGame() {
   updateWordInput();
   document.getElementById("bg-final-score").textContent = totalScore;
   document.getElementById("bg-final-count").textContent = foundWords.size;
+  recordGame();
   overlay.classList.add("open");
   app.inert = true;
   playAgain.focus();
@@ -498,6 +537,13 @@ newBtn.addEventListener("click", () => {
   newGame();
 });
 playAgain.addEventListener("click", newGame);
+document.getElementById("bg-reset").addEventListener("click", () => {
+  if (!window.confirm("Bu cihazdaki Boggle rekorları silinsin mi?")) return;
+  stats = { played: 0, best: 0, bestWords: 0 };
+  saveStats();
+  renderBest();
+});
+renderBest();
 
 buildGrid();
 newBtn.disabled = true;

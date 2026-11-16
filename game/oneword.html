@@ -71,7 +71,7 @@ game_genre: "Word game"
 
 .oneword-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 9px;
   margin-bottom: 12px;
 }
@@ -88,6 +88,18 @@ game_genre: "Word game"
 
 .oneword-stat.time {
   color: #c2491c;
+}
+
+.oneword-reset {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--global-link-text-color);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .oneword-progress {
@@ -432,6 +444,7 @@ game_genre: "Word game"
     <div class="oneword-stats">
       <div class="oneword-stat" id="oneword-score">Puan: 0</div>
       <div class="oneword-stat time" id="oneword-timer">Süre: 30</div>
+      <div class="oneword-stat" id="oneword-best" title="Bir turda en yüksek puan">Rekor: 0</div>
     </div>
 
     <div class="oneword-progress"><span id="oneword-timebar"></span></div>
@@ -482,6 +495,9 @@ game_genre: "Word game"
       <li>Fiziksel klavyede harfler, Backspace ve Enter da çalışır.</li>
       <li>Süre, bu pencere açıkken ve sekme arka plandayken durur.</li>
     </ul>
+
+    <h3>Rekor</h3>
+    <p><b>Rekor</b>, süresi dolan bir turda topladığın en yüksek puandır; yalnızca bu cihazda saklanır. Süre dolmadan <b>Yeni Harfler</b> ile geçilen tur sayılmaz. <button class="oneword-reset" id="oneword-reset" type="button">Rekoru sıfırla</button></p>
   </div>
 </dialog>
 
@@ -498,6 +514,35 @@ game_genre: "Word game"
   let timeLeft = 30;
   let paused = false;
   let foundWords = [];
+  let roundScore = 0;
+
+  /* Records live on this device only; blocked storage simply means no records. */
+  const STATS_KEY = "pz:oneword:stats";
+  function loadStats() {
+    try {
+      const v = JSON.parse(localStorage.getItem(STATS_KEY));
+      if (v && typeof v === "object") return { played: +v.played || 0, best: +v.best || 0, bestWords: +v.bestWords || 0 };
+    } catch (e) {}
+    return { played: 0, best: 0, bestWords: 0 };
+  }
+  let stats = loadStats();
+  function saveStats() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+  }
+  function renderBest() {
+    document.getElementById("oneword-best").textContent = "Rekor: " + stats.best;
+  }
+
+  /* Called when a round's 30 seconds run out; returns true for a new best. */
+  function recordRound() {
+    const isBest = roundScore > stats.best;
+    stats.played++;
+    if (isBest) stats.best = roundScore;
+    if (foundWords.length > stats.bestWords) stats.bestWords = foundWords.length;
+    saveStats();
+    renderBest();
+    return isBest;
+  }
 
   const vowels = ["A","A","A","E","E","E","İ","İ","İ","I","I","O","O","U","U","Ö","Ü"];
   const consonants = ["N","N","N","R","R","R","L","L","L","K","K","K","T","T","T","S","S","S","M","M","M","B","B","D","D","Y","Y","P","P","C","C","Ç","Ç","Ş","Ş","F","G","H","V","Z","Ğ","J"];
@@ -644,9 +689,10 @@ game_genre: "Word game"
       if (timeLeft <= 0) {
         /* newRound() wipes the list, so read the count before it runs. */
         const total = foundWords.length;
+        const isBest = recordRound();
         newRound();
         showMessage(total
-          ? `⏱️ Süre doldu — ${total} kelime buldun. Yeni harfler geldi.`
+          ? `⏱️ Süre doldu — ${total} kelime buldun.${isBest ? " 🏆 Yeni rekor!" : ""} Yeni harfler geldi.`
           : "⏱️ Süre doldu, yeni harfler geldi.", "time");
       }
     },1000);
@@ -701,6 +747,7 @@ game_genre: "Word game"
       foundWords.push(upper);
       const gain = upper.length * 10;
       score += gain;
+      roundScore += gain;
       scoreEl.textContent = "Puan: " + score;
       renderFound();
       showMessage("🎉 +" + gain + " puan kazandınız!", "ok");
@@ -728,6 +775,7 @@ game_genre: "Word game"
   function newRound() {
     letters = generateLetters();
     foundWords = [];
+    roundScore = 0;
     input.value = "";
     markUsed();
     updateLetters();
@@ -821,6 +869,14 @@ game_genre: "Word game"
       }
     }
   });
+
+  document.getElementById("oneword-reset").addEventListener("click", () => {
+    if (!window.confirm("Bu cihazdaki Bir Kelime rekoru silinsin mi?")) return;
+    stats = { played: 0, best: 0, bestWords: 0 };
+    saveStats();
+    renderBest();
+  });
+  renderBest();
 
   infoBtn.addEventListener("click", () => {
     helpDialog.showModal();

@@ -36,7 +36,7 @@ game_genre: "Quiz"
   @keyframes eq-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
 .eq-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .eq-title{margin:0;font-size:clamp(1.35rem,4.5vw,1.6rem);font-weight:750;letter-spacing:-.04em}
-.eq-topbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.eq-topbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .eq-stat{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
 .eq-stat small{display:block;opacity:.78;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .eq-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
@@ -79,6 +79,9 @@ game_genre: "Quiz"
 .eq-end-card{padding:clamp(24px,5vw,40px);border:1px solid var(--global-border-color);border-radius:18px;background:var(--global-bg-color);box-shadow:0 12px 35px rgba(0,0,0,.07);text-align:center;display:none}
 .eq-end-card h2{margin:0 0 8px;font-size:1.8rem;font-weight:750}
 .eq-end-card p{margin:0 0 20px;opacity:.8;font-size:.88rem}
+/* Records kept on this device. */
+.eq-end-card p.eq-end-record{margin:-12px 0 20px;opacity:1;color:var(--global-text-color-light);font-size:.88rem}
+.eq-new-best{color:var(--global-link-text-color);font-weight:800}
 .eq-end-score{font-size:2.8rem;font-weight:800;margin:12px 0}
 .eq-btn{min-height:46px;padding:12px 30px;border:none;border-radius:12px;background:var(--global-text-color);color:var(--global-bg-color);font:inherit;font-size:.9rem;font-weight:750}
 .eq-btn:hover{opacity:.85}
@@ -105,6 +108,7 @@ game_genre: "Quiz"
     <div class="eq-stat"><small>Puan</small><strong id="eq-score">0</strong></div>
     <div class="eq-stat"><small>Doğru</small><strong id="eq-correct">0</strong></div>
     <div class="eq-stat"><small>Soru</small><strong id="eq-qnum">0/0</strong></div>
+    <div class="eq-stat"><small>Rekor</small><strong id="eq-record">0</strong></div>
   </div>
 
   <div class="eq-cats" id="eq-cats" role="group" aria-label="Kategori"></div>
@@ -123,6 +127,7 @@ game_genre: "Quiz"
     <h2 id="eq-end-title">Tebrikler! 🎉</h2>
     <div class="eq-end-score" id="eq-end-score">0</div>
     <p id="eq-end-sub">puan</p>
+    <p class="eq-end-record" id="eq-end-record"></p>
     <button class="eq-btn" id="eq-restart-btn" type="button">Tekrar Oyna</button>
   </div>
 </div>
@@ -144,7 +149,8 @@ game_genre: "Quiz"
     <h3>Klavye</h3>
     <p>Klavyede 1–4 tuşlarıyla da cevap verebilirsin.</p>
     <h3>Not</h3>
-    <p>Bu pencere açıkken süre durur. Kategori değiştirmek turu baştan başlatır.</p>
+    <p>Bu pencere açıkken de süre işlemeye devam eder. Kategori değiştirmek turu baştan başlatır.</p>
+    <p><b>Rekor</b>, seçili kategorideki en yüksek puanındır. Rekorlar ve oynanan oyun sayısı yalnızca bu cihazda saklanır.</p>
   </div>
 </dialog>
 
@@ -241,6 +247,52 @@ let timerInt = null;
 let timeLeft = 15;
 let answered = false;
 
+/* Records live only in this browser. Blocked storage (private mode) just
+   means nothing is remembered; the quiz itself must keep working. */
+const STATS_KEY = "pz:emoji-quiz:stats";
+
+function loadStats() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (raw && typeof raw === "object") {
+      return {
+        played: Number(raw.played) || 0,
+        best: raw.best && typeof raw.best === "object" ? raw.best : {}
+      };
+    }
+  } catch (e) {}
+  return { played: 0, best: {} };
+}
+
+function saveStats() {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+}
+
+const stats = loadStats();
+let roundCat = selectedCat;
+const bestFor = cat => Number(stats.best[cat]) || 0;
+
+/* Rounds of one category are scored alike, so each category has its own record. */
+function saveRecord() {
+  const previous = bestFor(roundCat);
+  const isNewBest = score > previous;
+  stats.played += 1;
+  if (isNewBest) stats.best[roundCat] = score;
+  saveStats();
+  document.getElementById("eq-record").textContent = String(Math.max(previous, score));
+  const line = document.getElementById("eq-end-record");
+  line.textContent = "";
+  if (isNewBest) {
+    const badge = document.createElement("span");
+    badge.className = "eq-new-best";
+    badge.textContent = "Yeni rekor!";
+    line.append(badge, previous ? ` Önceki rekor: ${previous} · ` : " ");
+  } else {
+    line.append(`${roundCat} rekoru: ${previous} · `);
+  }
+  line.append(`Oynanan oyun: ${stats.played}`);
+}
+
 function filteredQuestions() {
   const q = selectedCat === "Tümü" ? ALL_QUESTIONS : ALL_QUESTIONS.filter(q => q.cat === selectedCat);
   return shuffle([...q]).slice(0, 15);
@@ -276,6 +328,8 @@ function renderCats() {
 
 function startGame() {
   questions = filteredQuestions();
+  roundCat = selectedCat;
+  document.getElementById("eq-record").textContent = String(bestFor(roundCat));
   qIdx = 0; score = 0; correctCount = 0; answered = false;
   document.getElementById("eq-score").textContent = "0";
   document.getElementById("eq-correct").textContent = "0";
@@ -379,6 +433,7 @@ function endGame() {
   document.getElementById("eq-end-title").textContent = `${emoji} Oyun Bitti!`;
   document.getElementById("eq-end-score").textContent = score;
   document.getElementById("eq-end-sub").textContent = `puan · ${correctCount}/${questions.length} doğru (${pct}%)`;
+  saveRecord();
   document.getElementById("eq-restart-btn").focus();
 }
 

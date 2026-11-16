@@ -49,7 +49,10 @@ web_app: BusinessApplication
 
 .pc-help{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
   background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:1.05rem;cursor:pointer}
-.pc-help:focus-visible,.pc-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+.pc-lang{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--global-border-color);border-radius:50%;
+  background:transparent;color:var(--global-text-color);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer}
+.pc-hero-actions{display:flex;gap:8px;flex:0 0 auto}
+.pc-help:focus-visible,.pc-lang:focus-visible,.pc-dialog-close:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
 .pc-dialog{width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);padding:0;border:1px solid var(--global-border-color);
   border-radius:16px;background:var(--global-bg-color);color:var(--global-text-color);box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .pc-dialog::backdrop{background:rgba(0,0,0,.45)}
@@ -331,9 +334,12 @@ html[data-theme="dark"] .pc-status.error {
 <div class="pdf-compressor-app">
   <section class="pc-panel" aria-labelledby="pc-title">
     <header class="pc-hero">
-      <h1 class="pc-title" id="pc-title">PDF Compressor</h1>
-      <button class="pc-help" id="pc-help" type="button" aria-haspopup="dialog" aria-controls="pc-help-dialog"
-              aria-label="How to use">?</button>
+      <h1 class="pc-title" id="pc-title" data-i18n="title">PDF Compressor</h1>
+      <div class="pc-hero-actions">
+        <button class="pc-lang" data-lang-toggle></button>
+        <button class="pc-help" id="pc-help" type="button" aria-haspopup="dialog" aria-controls="pc-help-dialog"
+                data-i18n-attr="aria-label:howTo" aria-label="How to use">?</button>
+      </div>
     </header>
 
     <div
@@ -357,7 +363,7 @@ html[data-theme="dark"] .pc-status.error {
     <div class="pc-card">
       <div class="pc-row">
         <div class="pc-field">
-          <label for="pc-quality">Quality</label>
+          <label for="pc-quality" data-i18n="quality">Quality</label>
 
           <div class="pc-quality-line">
             <input
@@ -379,12 +385,12 @@ html[data-theme="dark"] .pc-status.error {
         </div>
 
         <div class="pc-field">
-          <label for="pc-scale">Render scale</label>
+          <label for="pc-scale" data-i18n="scale">Render scale</label>
 
           <select id="pc-scale">
-            <option value="1">Small</option>
-            <option value="1.35" selected>Balanced</option>
-            <option value="1.7">High quality</option>
+            <option value="1" data-i18n="small">Small</option>
+            <option value="1.35" selected data-i18n="balanced">Balanced</option>
+            <option value="1.7" data-i18n="high">High quality</option>
           </select>
         </div>
       </div>
@@ -406,6 +412,7 @@ html[data-theme="dark"] .pc-status.error {
           id="pc-compress"
           type="button"
           disabled
+          data-i18n="compress"
         >
           Compress & Download
         </button>
@@ -415,6 +422,7 @@ html[data-theme="dark"] .pc-status.error {
           id="pc-clear"
           type="button"
           disabled
+          data-i18n="clear"
         >
           Clear
         </button>
@@ -426,11 +434,15 @@ html[data-theme="dark"] .pc-status.error {
         role="status"
         aria-live="polite"
       ></div>
+
+      <div id="pc-next" hidden></div>
     </div>
   </section>
 </div>
 
 <script defer src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="/assets/js/tool-handoff.js"></script>
+<script src="/assets/js/tool-i18n.js"></script>
 
 <script type="module">
 import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.min.mjs";
@@ -453,15 +465,74 @@ const clearBtn = byId("pc-clear");
 const status = byId("pc-status");
 const dropTitle = byId("pc-drop-title");
 const dropHint = byId("pc-drop-hint");
-const dropTitleDefault = dropTitle.textContent;
-const dropHintDefault = dropHint.textContent;
+function i18nHarvest(en) {
+  document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (!(k in en)) en[k] = el.textContent.trim(); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { const k = el.getAttribute("data-i18n-html"); if (!(k in en)) en[k] = el.innerHTML; });
+  document.querySelectorAll("[data-i18n-attr]").forEach(el => el.getAttribute("data-i18n-attr").split(";").forEach(p => { const q = p.split(":"); if (q.length !== 2) return; const a = q[0].trim(), k = q[1].trim(); if (a && !(k in en) && el.hasAttribute(a)) en[k] = el.getAttribute(a); }));
+  return en;
+}
+const I18N = {
+  en: i18nHarvest({
+    dropTitle: "Drop a PDF here or click to choose", dropHint: "Processed in your browser — nothing is uploaded",
+    replace: "Click or drop to replace", choose: "Choose a PDF.", ready: "{name} · {size} · ready",
+    smaller: "Original: {a} · Output: {b} · {n}% smaller", larger: "Original: {a} · Output: {b} · {n}% larger",
+    notPdf: "Please choose a PDF file.", readFail: "The PDF could not be read.", noLib: "PDF library could not be loaded.",
+    opening: "Opening PDF…", page: "Processing page {i} of {n}…", saving: "Saving compressed PDF…",
+    done: "Compression complete.",
+    doneLarger: "Done, but the output is larger than the original. Keep the original file or try a lower quality.",
+    fail: "The PDF could not be compressed. It may be encrypted, damaged or unsupported.",
+    loadedFrom: "Loaded {name} from the previous tool."
+  }),
+  tr: {
+    title: "PDF Sıkıştırıcı", howTo: "Nasıl kullanılır", close: "Kapat",
+    dropTitle: "PDF'yi buraya bırakın ya da seçin", dropHint: "Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez",
+    replace: "Değiştirmek için tıklayın ya da yeni dosya bırakın",
+    quality: "Kalite", scale: "Çizim ölçeği", small: "Küçük", balanced: "Dengeli", high: "Yüksek kalite",
+    compress: "Sıkıştır ve indir", clear: "Temizle",
+    choose: "Bir PDF seçin.", ready: "{name} · {size} · hazır",
+    smaller: "Özgün: {a} · Çıktı: {b} · %{n} daha küçük", larger: "Özgün: {a} · Çıktı: {b} · %{n} daha büyük",
+    notPdf: "Lütfen bir PDF dosyası seçin.", readFail: "PDF okunamadı.", noLib: "PDF kitaplığı yüklenemedi.",
+    opening: "PDF açılıyor…", page: "Sayfa işleniyor: {i} / {n}…", saving: "Sıkıştırılmış PDF kaydediliyor…",
+    done: "Sıkıştırma tamamlandı.",
+    doneLarger: "Bitti, ama çıktı özgün dosyadan büyük. Özgün dosyayı saklayın ya da daha düşük bir kalite deneyin.",
+    fail: "PDF sıkıştırılamadı. Şifreli, bozuk ya da desteklenmeyen bir dosya olabilir.",
+    loadedFrom: "{name} önceki araçtan alındı.",
+    help: `
+    <p>Görsel ağırlıklı PDF'leri, her sayfayı JPEG olarak çizip belgeyi yeniden kurarak sıkıştırın. Yükleme boyutu sınırları için kullanışlıdır.</p>
+    <h3>Nasıl kullanılır</h3>
+    <ol>
+      <li>PDF'yi kutuya bırakın ya da kutuya tıklayıp bir dosya seçin.</li>
+      <li>JPEG kalitesini ve çizim ölçeğini ayarlayın. Düşük değerler daha küçük dosya verir.</li>
+      <li><strong>Sıkıştır ve indir</strong>'e basın ve yeni boyutu özgün boyutla karşılaştırın.</li>
+      <li><strong>Şununla devam et</strong> sıkıştırılmış PDF'yi doğrudan başka bir araca aktarır.</li>
+    </ol>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Her şey tarayıcınızda işlenir. PDF hiçbir yere yüklenmez.</li>
+      <li><strong>Önemli:</strong> görsele çevirerek sıkıştırma seçilebilir metni, bağlantıları, formları ve vektör verisini kaldırır. Özgün PDF'yi saklayın.</li>
+    </ul>
+    <p>TR / EN düğmesi arayüz dilini değiştirir; seçim bütün araçlar için hatırlanır.</p>
+  `
+  }
+};
+let i18n = null;
+const T = (k, v) => i18n ? i18n.t(k, v) : I18N.en[k];
+let lastStatus = null;
+let lastInfo = ["choose"];
+let dropFile = null;
 
-function showDropFile(file, extra) {
+function setInfo(key, vars) {
+  lastInfo = [key, vars];
+  info.textContent = T(key, vars);
+}
+
+function showDropFile(file) {
+  dropFile = file || null;
   drop.classList.toggle("has-file", !!file);
 
   if (!file) {
-    dropTitle.textContent = dropTitleDefault;
-    dropHint.textContent = dropHintDefault;
+    dropTitle.textContent = T("dropTitle");
+    dropHint.textContent = T("dropHint");
     return;
   }
 
@@ -469,13 +540,26 @@ function showDropFile(file, extra) {
   const size = kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb / 1024).toFixed(2)} MB`;
 
   dropTitle.textContent = file.name;
-  dropHint.textContent = `${size}${extra ? " · " + extra : ""} · Click or drop to replace`;
+  dropHint.textContent = `${size} · ${T("replace")}`;
 }
 
 let sourceBytes = null;
 let sourceFile = null;
 let outputUrl = null;
 let busy = false;
+let lastResult = null;
+const nextBox = byId("pc-next");
+
+function showNext(result) {
+  lastResult = result || null;
+  if (!lastResult || !window.ToolHandoff) {
+    nextBox.hidden = true;
+    nextBox.innerHTML = "";
+    return;
+  }
+  ToolHandoff.renderNext(nextBox, "pdf", () => [lastResult]);
+  nextBox.hidden = false;
+}
 
 function humanSize(bytes) {
   if (bytes < 1024) {
@@ -489,8 +573,9 @@ function humanSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-function setStatus(message, error = false) {
-  status.textContent = message;
+function setStatus(key, error = false, vars) {
+  lastStatus = key ? [key, vars] : null;
+  status.textContent = key ? T(key, vars) : "";
   status.classList.toggle("error", error);
 }
 
@@ -504,13 +589,14 @@ function clearAll() {
   sourceFile = null;
   fileInput.value = "";
 
-  info.textContent = "Choose a PDF.";
+  setInfo("choose");
   showDropFile(null);
   compressBtn.disabled = true;
   clearBtn.disabled = true;
 
   resetProgress();
   setStatus("");
+  showNext(null);
 
   if (outputUrl) {
     URL.revokeObjectURL(outputUrl);
@@ -526,19 +612,19 @@ async function loadFile(file) {
       !file.name.toLowerCase().endsWith(".pdf")
     )
   ) {
-    setStatus("Please choose a PDF file.", true);
+    setStatus("notPdf", true);
     return;
   }
 
   try {
+    showNext(null);
     sourceFile = file;
     sourceBytes =
       new Uint8Array(
         await file.arrayBuffer()
       );
 
-    info.textContent =
-      `${file.name} · ${humanSize(file.size)} · ready`;
+    setInfo("ready", { name: file.name, size: humanSize(file.size) });
 
     showDropFile(file);
 
@@ -551,7 +637,7 @@ async function loadFile(file) {
   } catch (error) {
     console.error(error);
     clearAll();
-    setStatus("The PDF could not be read.", true);
+    setStatus("readFail", true);
   }
 }
 
@@ -606,10 +692,7 @@ compressBtn.addEventListener("click", async () => {
   }
 
   if (!window.PDFLib) {
-    setStatus(
-      "PDF library could not be loaded.",
-      true
-    );
+    setStatus("noLib", true);
     return;
   }
 
@@ -620,7 +703,7 @@ compressBtn.addEventListener("click", async () => {
   progress.style.display = "block";
   progressBar.style.width = "0%";
 
-  setStatus("Opening PDF…");
+  setStatus("opening");
 
   try {
     const sourcePdf =
@@ -642,9 +725,7 @@ compressBtn.addEventListener("click", async () => {
       pageNumber <= sourcePdf.numPages;
       pageNumber++
     ) {
-      setStatus(
-        `Processing page ${pageNumber} of ${sourcePdf.numPages}…`
-      );
+      setStatus("page", false, { i: pageNumber, n: sourcePdf.numPages });
 
       const page =
         await sourcePdf.getPage(pageNumber);
@@ -721,7 +802,7 @@ compressBtn.addEventListener("click", async () => {
         )}%`;
     }
 
-    setStatus("Saving compressed PDF…");
+    setStatus("saving");
 
     const outputBytes =
       await outputPdf.save();
@@ -730,16 +811,17 @@ compressBtn.addEventListener("click", async () => {
       URL.revokeObjectURL(outputUrl);
     }
 
-    outputUrl =
-      URL.createObjectURL(
-        new Blob(
-          [outputBytes],
-          {
-            type:
-              "application/pdf"
-          }
-        )
+    const outputBlob =
+      new Blob(
+        [outputBytes],
+        {
+          type:
+            "application/pdf"
+        }
       );
+
+    outputUrl =
+      URL.createObjectURL(outputBlob);
 
     const anchor =
       document.createElement("a");
@@ -758,6 +840,8 @@ compressBtn.addEventListener("click", async () => {
     anchor.click();
     anchor.remove();
 
+    showNext({ blob: outputBlob, name: anchor.download });
+
     const originalSize =
       sourceFile.size;
 
@@ -772,16 +856,9 @@ compressBtn.addEventListener("click", async () => {
           )
         : 0;
 
-    info.textContent =
-      reduction >= 0
-        ? `Original: ${humanSize(originalSize)} · Output: ${humanSize(outputSize)} · ${reduction}% smaller`
-        : `Original: ${humanSize(originalSize)} · Output: ${humanSize(outputSize)} · ${Math.abs(reduction)}% larger`;
+    setInfo(reduction >= 0 ? "smaller" : "larger", { a: humanSize(originalSize), b: humanSize(outputSize), n: Math.abs(reduction) });
 
-    setStatus(
-      reduction >= 0
-        ? "Compression complete."
-        : "Done, but the output is larger than the original. Keep the original file or try a lower quality."
-    );
+    setStatus(reduction >= 0 ? "done" : "doneLarger");
 
     window.setTimeout(() => {
       if (outputUrl) {
@@ -792,10 +869,7 @@ compressBtn.addEventListener("click", async () => {
   } catch (error) {
     console.error(error);
 
-    setStatus(
-      "The PDF could not be compressed. It may be encrypted, damaged or unsupported.",
-      true
-    );
+    setStatus("fail", true);
   } finally {
     busy = false;
     compressBtn.disabled =
@@ -808,26 +882,45 @@ compressBtn.addEventListener("click", async () => {
 
 qualityValue.textContent =
   `${qualityInput.value}%`;
+
+if (window.ToolHandoff) {
+  ToolHandoff.take().then(async files => {
+    const file = (files || []).find(f => f.type === "application/pdf" || /\.pdf$/i.test(f.name));
+    if (!file) return;
+    await loadFile(file);
+    if (sourceFile === file) setStatus("loadedFrom", false, { name: file.name });
+  }).catch(() => {});
+}
+
+i18n = ToolI18n.setup(I18N, () => {
+  if (!i18n) return;
+  showDropFile(dropFile);
+  info.textContent = T(lastInfo[0], lastInfo[1]);
+  if (lastStatus) status.textContent = T(lastStatus[0], lastStatus[1]);
+  if (lastResult && window.ToolHandoff && !nextBox.hidden) ToolHandoff.renderNext(nextBox, "pdf", () => [lastResult]);
+});
 </script>
 
 <dialog class="pc-dialog" id="pc-help-dialog" aria-labelledby="pc-help-title">
   <div class="pc-dialog-head">
-    <h2 id="pc-help-title">How to use</h2>
-    <button class="pc-dialog-close" type="button" data-close aria-label="Close">×</button>
+    <h2 id="pc-help-title" data-i18n="howTo">How to use</h2>
+    <button class="pc-dialog-close" type="button" data-close data-i18n-attr="aria-label:close" aria-label="Close">×</button>
   </div>
-  <div class="pc-dialog-body">
+  <div class="pc-dialog-body" data-i18n-html="help">
     <p>Compress image-heavy PDFs by rendering each page as JPEG and rebuilding the document. Useful for upload-size limits.</p>
     <h3>How to use</h3>
     <ol>
       <li>Drop a PDF on the drop zone, or click it to choose a file.</li>
       <li>Set the JPEG quality and the render scale. Lower values give smaller files.</li>
       <li>Press <strong>Compress &amp; Download</strong> and compare the new size with the original.</li>
+      <li><strong>Continue with</strong> passes the compressed PDF straight to another tool.</li>
     </ol>
     <h3>Notes</h3>
     <ul>
       <li>Everything is processed in your browser. The PDF is never uploaded.</li>
       <li><strong>Important:</strong> raster compression removes selectable text, links, forms and vector data. Keep the original PDF.</li>
     </ul>
+    <p>TR / EN switches the interface language; the choice is remembered for all tools.</p>
   </div>
 </dialog>
 

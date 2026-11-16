@@ -244,6 +244,18 @@ game_genre: "Word game"
   font-weight: 800;
 }
 
+.sb-reset {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--global-link-text-color);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .sb-found {
   margin-top: 14px;
   padding: 13px;
@@ -370,6 +382,16 @@ game_genre: "Word game"
     min-height: 44px;
   }
 
+  /* Three chips (score, found, record) stay on one row at 360 px. */
+  .sb-stats {
+    gap: 6px;
+  }
+
+  .sb-stat {
+    padding: 8px 8px;
+    font-size: .88rem;
+  }
+
   .sb-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -411,6 +433,7 @@ game_genre: "Word game"
     <div class="sb-stats">
       <span class="sb-stat">Puan: <b id="sb-score">0</b></span>
       <span class="sb-stat">Bulunan: <b id="sb-count">0</b></span>
+      <span class="sb-stat" title="Bu petekte en yüksek puan">Rekor: <b id="sb-best">0</b></span>
     </div>
 
     <div id="sb-word" class="sb-word" aria-live="polite"></div>
@@ -473,6 +496,9 @@ game_genre: "Word game"
       <li>Peteklere dokunabilir veya fiziksel klavyeyi kullanabilirsiniz.</li>
       <li>Enter kelimeyi ekler, Backspace son harfi siler.</li>
     </ul>
+
+    <h3>Rekor</h3>
+    <p><b>Rekor</b>, o petekte ulaştığın en yüksek puandır; her petek için ayrı tutulur ve yalnızca bu cihazda saklanır. <button class="sb-reset" id="sb-reset" type="button">Rekorları sıfırla</button></p>
   </div>
 </dialog>
 
@@ -504,6 +530,51 @@ game_genre: "Word game"
   let scoreVal = 0;
   let outerOrder = [];
   let clickHistory = [];
+  let puzzleKey = "";
+  let beatAnnounced = false;
+
+  /* Records live on this device only; blocked storage simply means no records.
+     A hive has no end, so it counts as played once a first word is found in it,
+     and its best score is saved as the score grows. */
+  const STATS_KEY = "pz:spellbee:stats";
+  function loadStats() {
+    try {
+      const v = JSON.parse(localStorage.getItem(STATS_KEY));
+      if (v && typeof v === "object") {
+        return {
+          played: +v.played || 0,
+          bestAll: +v.bestAll || 0,
+          best: v.best && typeof v.best === "object" ? v.best : {}
+        };
+      }
+    } catch (e) {}
+    return { played: 0, bestAll: 0, best: {} };
+  }
+  let stats = loadStats();
+  function saveStats() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+  }
+  function hiveBest() {
+    return +stats.best[puzzleKey] || 0;
+  }
+  function renderBest() {
+    document.getElementById("sb-best").textContent = hiveBest();
+  }
+
+  /* Returns true the first time this visit beats an earlier record for the hive. */
+  function recordScore() {
+    const prev = hiveBest();
+    if (found.length === 1) stats.played++;
+    if (scoreVal > prev) stats.best[puzzleKey] = scoreVal;
+    if (scoreVal > stats.bestAll) stats.bestAll = scoreVal;
+    saveStats();
+    renderBest();
+    if (prev > 0 && scoreVal > prev && !beatAnnounced) {
+      beatAnnounced = true;
+      return true;
+    }
+    return false;
+  }
 
   const scoreEl = document.getElementById("sb-score");
   const countEl = document.getElementById("sb-count");
@@ -527,6 +598,9 @@ game_genre: "Word game"
     }
     lastPuzzleIndex = index;
     puzzle = PUZZLES[index];
+    puzzleKey = puzzle.center + "-" + puzzle.outer.join("");
+    beatAnnounced = false;
+    renderBest();
     outerOrder = [...puzzle.outer];
     found = [];
     current = "";
@@ -630,7 +704,8 @@ game_genre: "Word game"
     scoreEl.textContent = scoreVal;
     countEl.textContent = found.length;
     renderFound();
-    showMessage("+" + points + " puan", true);
+    const isBest = recordScore();
+    showMessage("+" + points + " puan" + (isBest ? " · 🏆 Yeni rekor!" : ""), true);
   }
 
   function showMessage(text, good) {
@@ -726,6 +801,13 @@ game_genre: "Word game"
   });
 
   helpBtn.addEventListener("click", () => helpDialog.showModal());
+
+  document.getElementById("sb-reset").addEventListener("click", () => {
+    if (!window.confirm("Bu cihazdaki Spell Bee rekorları silinsin mi?")) return;
+    stats = { played: 0, bestAll: 0, best: {} };
+    saveStats();
+    renderBest();
+  });
 
   helpDialog.addEventListener("click", event => {
     if (event.target === helpDialog || event.target.closest("[data-close]")) {

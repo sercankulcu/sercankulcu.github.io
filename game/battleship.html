@@ -26,6 +26,10 @@ game_genre: "Puzzle"
   background:rgba(127,127,127,.04);text-align:center;font-weight:700;font-size:.88rem;
   margin-bottom:12px;min-height:44px;display:flex;align-items:center;justify-content:center;
 }
+.bs-record{margin:0;text-align:center;font-size:.82rem;font-weight:700;color:var(--global-text-color-light)}
+.bs-record:empty{display:none}
+.bs-reset{min-height:44px;padding:0;border:0;background:none;color:var(--global-link-text-color);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.bs-reset:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
 .bs-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .bs-board-section{display:flex;flex-direction:column;gap:8px;min-width:0}
 .bs-board-title{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;text-align:center; color: var(--global-text-color-light);}
@@ -133,6 +137,7 @@ button.bs-ship-item:hover:not(:disabled){background:color-mix(in srgb,var(--glob
       <div class="bs-board-title" id="bs-ai-title">Düşman Denizi</div>
       <div class="bs-grid-wrap" id="bs-ai-grid" role="group" aria-labelledby="bs-ai-title"></div>
       <div class="bs-ships bs-ships-ai" id="bs-ai-ships" role="list" aria-label="Düşman filosu"></div>
+      <p class="bs-record" id="bs-record"></p>
     </div>
   </div>
 </div>
@@ -162,6 +167,8 @@ button.bs-ship-item:hover:not(:disabled){background:color-mix(in srgb,var(--glob
       <li>Ok tuşları ile haritada gez, Enter ile yerleştir ya da ateş et.</li>
       <li>Home ve End satırın başına ve sonuna gider; R yerleştirmede gemiyi döndürür.</li>
     </ul>
+    <h3>Rekorlar</h3>
+    <p>Biten her savaş sayılır: galibiyet, mağlubiyet ve en az atışla kazanılan oyun düşman denizinin altında görünür, yalnızca bu cihazda saklanır. <button class="bs-reset" id="bs-reset" type="button">Rekorları sıfırla</button></p>
   </div>
 </dialog>
 
@@ -195,6 +202,37 @@ let aiQueue = [];
 let aiAttacked = new Set();
 
 const app = document.querySelector(".bs-app");
+
+/* Records live on this device only; blocked storage simply means no records.
+   Only battles that end (someone loses the whole fleet) are counted. */
+const STATS_KEY = "pz:battleship:stats";
+function loadStats() {
+  try {
+    const v = JSON.parse(localStorage.getItem(STATS_KEY));
+    if (v && typeof v === "object") return { played: +v.played || 0, wins: +v.wins || 0, fewest: +v.fewest || 0 };
+  } catch (e) {}
+  return { played: 0, wins: 0, fewest: 0 };
+}
+let stats = loadStats();
+function saveStats() { try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {} }
+function renderRecord() {
+  const el = document.getElementById("bs-record");
+  if (!stats.played) { el.textContent = ""; return; }
+  el.textContent = `${stats.played} oyun · ${stats.wins} galibiyet · ${stats.played - stats.wins} mağlubiyet` +
+    (stats.fewest ? ` · Rekor: ${stats.fewest} atış` : "");
+}
+/* Returns true when a win needed fewer shots than any earlier win. */
+function recordGame(won, shots) {
+  stats.played++;
+  let isBest = false;
+  if (won) {
+    stats.wins++;
+    if (!stats.fewest || shots < stats.fewest) { stats.fewest = shots; isBest = true; }
+  }
+  saveStats();
+  renderRecord();
+  return isBest;
+}
 function idx(r,c){ return r*10+c; }
 function cellName(i){ return COLS[colOf(i)] + (rowOf(i)+1); }
 function setPhase(p){
@@ -429,7 +467,11 @@ function playerAttack(i) {
   if (checkWin(aiGrid, aiHits)) {
     setPhase("over");
     renderAIGrid();
-    setStatus("🎉 Kazandın! Tüm düşman gemileri battı!");
+    const shots = aiHits.filter(Boolean).length;
+    const isBest = recordGame(true, shots);
+    setStatus(isBest
+      ? `🎉 Kazandın! ${shots} atış — 🏆 Yeni rekor!`
+      : `🎉 Kazandın! ${shots} atışta tüm düşman gemileri battı!`);
     return;
   }
 
@@ -453,6 +495,7 @@ function aiTurn() {
   if (checkWin(playerGrid, playerHits)) {
     setPhase("over"); awaitingAI = false;
     renderAIGrid();
+    recordGame(false, 0);
     setStatus("💥 Kaybettin! Düşman tüm gemilerini batırdı.");
     return;
   }
@@ -553,6 +596,13 @@ document.getElementById("bs-new-btn").addEventListener("click", initGame);
 const helpDialog = document.getElementById("bs-help-dialog");
 document.getElementById("bs-help").addEventListener("click", () => helpDialog.showModal());
 helpDialog.addEventListener("click", e => { if (e.target === helpDialog || e.target.closest("[data-close]")) helpDialog.close(); });
+document.getElementById("bs-reset").addEventListener("click", () => {
+  if (!window.confirm("Bu cihazdaki Amiral Battı rekorları silinsin mi?")) return;
+  stats = { played: 0, wins: 0, fewest: 0 };
+  saveStats();
+  renderRecord();
+});
+renderRecord();
 
 initGame();
 })();

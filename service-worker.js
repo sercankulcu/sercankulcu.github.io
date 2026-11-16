@@ -1,6 +1,9 @@
 const CACHE_PREFIX = "my-pwa-sercan-cache-";
-const CACHE_VERSION = "v30";
+const CACHE_VERSION = "v31";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
+
+const LIB_CACHE = "sercan-libs-v1";
+const LIB_HOSTS = ["cdnjs.cloudflare.com", "cdn.jsdelivr.net", "esm.sh"];
 
 const PRECACHE_URLS = [
   "/images/owl-coffee-beans.webp",
@@ -39,8 +42,8 @@ self.addEventListener("activate", event => {
           cacheNames
             .filter(
               cacheName =>
-                cacheName.startsWith(CACHE_PREFIX) &&
-                cacheName !== CACHE_NAME
+                (cacheName.startsWith(CACHE_PREFIX) && cacheName !== CACHE_NAME) ||
+                (cacheName.startsWith("sercan-libs-") && cacheName !== LIB_CACHE)
             )
             .map(cacheName => caches.delete(cacheName))
         )
@@ -62,8 +65,12 @@ self.addEventListener("fetch", event => {
     return; // Tarayıcının varsayılan güncelleme davranışına bırak.
   }
 
-  // Cache only resources from this website.
+  // Libraries of the apps (PDF, image, QR tools) come from CDNs with a pinned version in the URL,
+  // so they never change: keep them, then the tools also work offline once opened.
   if (url.origin !== self.location.origin) {
+    if (isPinnedLibrary(url)) {
+      event.respondWith(cacheFirst(request, LIB_CACHE));
+    }
     return;
   }
 
@@ -188,4 +195,38 @@ function isCacheableResponse(response) {
     response.status === 200 &&
     response.type === "basic"
   );
+}
+
+/**
+ * A CDN file whose URL names an exact version (pdf-lib@1.17.1, /ajax/libs/jszip/3.10.1/ ...).
+ */
+function isPinnedLibrary(url) {
+  return (
+    LIB_HOSTS.includes(url.hostname) &&
+    /(@|\/)\d+\.\d+\.\d+(\/|\?|$)/.test(url.pathname + url.search)
+  );
+}
+
+/**
+ * Serves a stored copy when there is one, otherwise fetches and stores it. Script tags load CDN
+ * files without CORS, so the response may be opaque (status 0); those are stored too.
+ */
+async function cacheFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cachedResponse = await cache.match(request);
+
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  const networkResponse = await fetch(request);
+
+  if (
+    networkResponse &&
+    (networkResponse.ok || networkResponse.type === "opaque")
+  ) {
+    await cache.put(request, networkResponse.clone());
+  }
+
+  return networkResponse;
 }

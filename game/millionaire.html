@@ -94,9 +94,15 @@ game_genre: "Quiz"
 
 .millionaire-next-prize:empty { display:none; }
 
+/* A prize like 1.000.000 is wider than the counters beside it. */
+.millionaire-stat b.millionaire-record {
+  font-size:.92rem;
+  white-space:nowrap;
+}
+
 .millionaire-status {
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:8px;
   margin:10px 0;
 }
@@ -305,6 +311,7 @@ game_genre: "Quiz"
     <div class="millionaire-stat">SORU<b><span id="millionaire-qno">1</span>/10</b></div>
     <div class="millionaire-stat">DOĞRU<b id="millionaire-correct">0</b></div>
     <div class="millionaire-stat">YANLIŞ<b id="millionaire-wrong">0</b></div>
+    <div class="millionaire-stat">REKOR<b class="millionaire-record" id="millionaire-record">₺0</b></div>
   </div>
 
   <section class="millionaire-question">
@@ -350,6 +357,8 @@ game_genre: "Quiz"
     <p>Her joker bir oyunda yalnızca bir kez kullanılabilir. Yeni oyun başlatıldığında jokerler sıfırlanır ve yeni sorular seçilir.</p>
     <h3>Klavye</h3>
     <p>Klavyede <b>A–D</b> ya da <b>1–4</b> tuşlarıyla da cevap verebilirsiniz.</p>
+    <h3>Rekor</h3>
+    <p><b>Rekor</b>, bugüne kadar kazandığınız en yüksek ödüldür. Rekor ve oynanan oyun sayısı yalnızca bu cihazda saklanır.</p>
   </div>
 </dialog>
 
@@ -389,6 +398,47 @@ game_genre: "Quiz"
   let wrongCount = 0;
   let locked = false;
   let soundEnabled = true;
+
+  /* Records live only in this browser. Blocked storage (private mode) just
+     means nothing is remembered; the game itself must keep working.
+     "level" is the number of prize steps won (0-10). */
+  const STATS_KEY = "pz:millionaire:stats";
+  const recordEl = document.getElementById("millionaire-record");
+
+  function loadStats() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STATS_KEY));
+      if (raw && typeof raw === "object") {
+        return {
+          played: Number(raw.played) || 0,
+          level: Math.min(10, Math.max(0, Number(raw.level) || 0))
+        };
+      }
+    } catch (e) {}
+    return { played: 0, level: 0 };
+  }
+
+  function saveStats() {
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    } catch (e) {}
+  }
+
+  const prizeFor = level => level === 0 ? "₺0" : PRIZES[level - 1];
+  const stats = loadStats();
+  recordEl.textContent = prizeFor(stats.level);
+
+  /* Called once per finished game with the number of prize steps won. */
+  function saveRecord(level) {
+    const isNewBest = level > stats.level;
+    stats.played += 1;
+    if (isNewBest) stats.level = level;
+    saveStats();
+    recordEl.textContent = prizeFor(stats.level);
+    return isNewBest
+      ? "\nYeni rekor! Oynanan oyun: " + stats.played
+      : "\nRekor: " + prizeFor(stats.level) + " · Oynanan oyun: " + stats.played;
+  }
 
   function shuffle(array) {
     const copy = [...array];
@@ -521,7 +571,8 @@ game_genre: "Quiz"
         if (index === 9) {
           prizeEl.textContent = "Kazandığınız ödül: " + PRIZES[9];
           messageEl.textContent =
-            "Tebrikler! 10 soruyu tamamladınız ve " + PRIZES[9] + " kazandınız.";
+            "Tebrikler! 10 soruyu tamamladınız ve " + PRIZES[9] + " kazandınız." +
+            saveRecord(10);
           endGame();
           return;
         }
@@ -542,6 +593,7 @@ game_genre: "Quiz"
 
       messageEl.textContent =
         "Yanlış cevap. Doğru cevap: " + q.o[q.c] +
+        saveRecord(index) +
         "\nYeni oyun başlatabilirsiniz.";
       endGame();
     }

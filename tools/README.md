@@ -74,6 +74,22 @@ içinde (`tr`/`en`); ad ve açıklama oyun sayfasının `title` ve `excerpt`'ind
 yüzden bir oyunun adını değiştirmek için sayfasındaki `title`'ı değiştirip betiği
 çalıştırın.
 
+## Benzer araçlar / diğer oyunlar şeridi
+
+```
+python tools/make_related.py
+```
+
+İki betiğin `GROUPS` listelerinden `_data/related_tools.yml`'i yazar: her uygulama ve oyun
+için aynı gruptan sıradaki dört sayfa ve hub adresi. `_includes/related-tools.html` bunu
+`without-sidebar` düzeninde içeriğin altına basar (Türkçe sayfalarda "Diğer oyunlar",
+İngilizcelerde "More games / More tools"). Grup ya da ad değişince, hub betiklerinden sonra
+bunu da çalıştırın.
+
+Dosya araçları sonucu birbirine `assets/js/tool-handoff.js` ile aktarır: sonuç dosyası
+tarayıcının IndexedDB'sinde en çok 10 dakika bekler, hedef sayfa `?handoff=1` ile açılınca
+alınıp silinir. Hiçbir şey sunucuya gitmez.
+
 ## Kitap
 
 ```bash
