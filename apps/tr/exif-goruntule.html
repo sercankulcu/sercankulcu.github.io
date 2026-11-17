@@ -824,7 +824,7 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
       );
   }
 
-  function readDimensions(file) {
+  function readDimensions(file, record) {
     dimsState = "reading";
     byId("metadata-dims")
       .textContent =
@@ -837,6 +837,15 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
       URL.createObjectURL(file);
 
     image.onload = () => {
+      URL.revokeObjectURL(
+        url
+      );
+
+      /* A newer file was chosen meanwhile: leave its table alone. */
+      if (metadata !== record) {
+        return;
+      }
+
       const width =
         image.naturalWidth;
 
@@ -855,21 +864,21 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
         height;
 
       render();
-
-      URL.revokeObjectURL(
-        url
-      );
     };
 
     image.onerror = () => {
+      URL.revokeObjectURL(
+        url
+      );
+
+      if (metadata !== record) {
+        return;
+      }
+
       dimsState = "notAvail";
       byId("metadata-dims")
         .textContent =
           i18n.t("notAvail");
-
-      URL.revokeObjectURL(
-        url
-      );
     };
 
     image.src =
@@ -899,7 +908,7 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
         file.type ||
         i18n.t("unknown");
 
-    metadata = {
+    const record = {
       FileName:
         file.name,
       FileSize:
@@ -911,11 +920,12 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
           file.lastModified
         )
     };
+    metadata = record;
 
     searchInput.value = "";
 
     render();
-    readDimensions(file);
+    readDimensions(file, record);
 
     try {
       if (
@@ -941,6 +951,11 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
           }
         );
 
+      /* Another file was loaded while this one was being parsed. */
+      if (metadata !== record) {
+        return;
+      }
+
       if (
         exif
       ) {
@@ -952,6 +967,10 @@ input.metadata-search[type="search"] { box-sizing: border-box; }
 
       render();
     } catch (error) {
+      if (metadata !== record) {
+        return;
+      }
+
       metadata.MetadataError =
         error.message;
 

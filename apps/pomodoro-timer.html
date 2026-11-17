@@ -2,11 +2,11 @@
 layout: without-sidebar
 title: "Pomodoro Timer"
 permalink: /apps/pomodoro-timer/
-excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, short breaks, and long breaks with session tracking and browser notifications."
+excerpt: "A Pomodoro timer with work sessions, short and long breaks, and session tracking."
+hreflang: {en: "/apps/pomodoro-timer/", tr: "/apps/tr/pomodoro/"}
 seo_title: "Pomodoro Timer · Free Online"
 og_image: https://sercankulcu.github.io/images/apps/pomodoro-timer.jpg
 web_app: UtilitiesApplication
-hreflang: {en: "/apps/pomodoro-timer/", tr: "/apps/tr/pomodoro/"}
 ---
 
 <style>
@@ -146,7 +146,7 @@ hreflang: {en: "/apps/pomodoro-timer/", tr: "/apps/tr/pomodoro/"}
     <h3>Steps</h3>
     <ol>
       <li>Press <b>Start</b> to begin a work session. The ring colour shows the phase: red for work, green for a short break, blue for a long break.</li>
-      <li>When a phase ends you hear a beep; press <b>Next</b> to start the following phase.</li>
+      <li>When a phase ends you hear a beep and the next phase is loaded, even if the tab is in the background; press <b>Start</b> to begin it.</li>
       <li>Each dot is a finished work session. After four work sessions comes a long break.</li>
       <li><b>Skip</b> jumps to the next phase; <b>Reset</b> starts the cycle over (you can undo it from the message).</li>
     </ol>
@@ -205,7 +205,7 @@ catch { const mem = new Map(); store = {
       pause: "Pause", next: "Next", start: "Start", started: "{p} started, {t}", paused: "Paused, {t}",
       msgWork: "Work session complete! Take a break.", msgShort: "Break over — time to focus!", msgLong: "Long break done — ready to go!",
       sessionReset: "Session reset", undo: "Undo", resetUndone: "Reset undone",
-      notifOn: "Notifications on", notifOff: "Notifications off", saved: "Settings saved", skipped: "Phase skipped"
+      notifOn: "Notifications on", notifOff: "Notifications off", notifBlocked: "Notifications are blocked or unavailable in this browser", saved: "Settings saved", skipped: "Phase skipped"
     }),
     tr: {
       title: "Pomodoro Sayacı", notifyToggle: "Bildirimleri aç / kapat", settings: "Ayarlar", fsToggle: "Tam ekranı aç / kapat", fsTitle: "Tam ekran (F)",
@@ -216,7 +216,7 @@ catch { const mem = new Map(); store = {
     <h3>Adımlar</h3>
     <ol>
       <li>Çalışma oturumunu başlatmak için <b>Başlat</b>'a basın. Halkanın rengi evreyi gösterir: kırmızı çalışma, yeşil kısa mola, mavi uzun mola.</li>
-      <li>Bir evre bitince bip sesi duyulur; sonraki evreyi başlatmak için <b>Sonraki</b>'ye basın.</li>
+      <li>Bir evre bitince bip sesi duyulur ve sekme arkada olsa bile sonraki evre hazırlanır; başlatmak için <b>Başlat</b>'a basın.</li>
       <li>Her nokta biten bir çalışma oturumudur. Dört çalışma oturumundan sonra uzun mola gelir.</li>
       <li><b>Atla</b> sonraki evreye geçer; <b>Sıfırla</b> döngüyü baştan başlatır (iletideki düğmeyle geri alabilirsiniz).</li>
     </ol>
@@ -239,7 +239,7 @@ catch { const mem = new Map(); store = {
       pause: "Duraklat", next: "Sonraki", start: "Başlat", started: "{p} başladı, {t}", paused: "Duraklatıldı, {t}",
       msgWork: "Çalışma oturumu bitti! Mola verin.", msgShort: "Mola bitti, odaklanma zamanı!", msgLong: "Uzun mola bitti, hazırsınız!",
       sessionReset: "Oturum sıfırlandı", undo: "Geri al", resetUndone: "Sıfırlama geri alındı",
-      notifOn: "Bildirimler açık", notifOff: "Bildirimler kapalı", saved: "Ayarlar kaydedildi", skipped: "Evre atlandı"
+      notifOn: "Bildirimler açık", notifOff: "Bildirimler kapalı", notifBlocked: "Bildirimler bu tarayıcıda engelli ya da kullanılamıyor", saved: "Ayarlar kaydedildi", skipped: "Evre atlandı"
     }
   };
   let i18n = null;
@@ -273,7 +273,10 @@ catch { const mem = new Map(); store = {
   let running = false;
   let endAt = 0;
   let raf = 0;
-  let notificationsEnabled = (store.getItem("pomo.notifications") || "off") === "on";
+  let fallback = 0;
+  let audioCtx = null;
+  let notificationsEnabled = (store.getItem("pomo.notifications") || "off") === "on" &&
+    typeof Notification !== "undefined" && Notification.permission === "granted";
 
   function currentPhaseKey() { return PHASE_SEQ[phaseIdx]; }
   function phaseSecs(key) {
@@ -286,6 +289,7 @@ catch { const mem = new Map(); store = {
     remaining = duration;
     running = false;
     cancelAnimationFrame(raf);
+    armFallback();
     const color = COLORS[key];
     progressEl.style.stroke = color;
     toggleBtn.style.background = BTN_COLORS[key];
@@ -326,10 +330,32 @@ catch { const mem = new Map(); store = {
     raf = requestAnimationFrame(tick);
   }
 
+  /* requestAnimationFrame stops in background tabs, so a timeout makes sure the phase still ends. */
+  function armFallback() {
+    clearTimeout(fallback); fallback = 0;
+    if (!running) return;
+    fallback = setTimeout(() => {
+      fallback = 0;
+      if (!running) return;
+      remaining = Math.max(0, (endAt - performance.now()) / 1000);
+      if (remaining <= 0) { cancelAnimationFrame(raf); finish(); } else armFallback();
+    }, Math.max(0, endAt - performance.now()) + 30);
+  }
+
+  function audio() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+
   function start() {
-    if (remaining <= 0) { advancePhase(); return; }
+    if (remaining <= 0) { advancePhase(true); return; }
     running = true;
     endAt = performance.now() + remaining * 1000;
+    try { audio(); } catch (_) {}
+    armFallback();
     render();
     announce(i18n.t("started", { p: LABELS[currentPhaseKey()], t: spoken(remaining) }));
     tick();
@@ -340,25 +366,23 @@ catch { const mem = new Map(); store = {
     remaining = Math.max(0, (endAt - performance.now()) / 1000);
     running = false;
     cancelAnimationFrame(raf);
+    armFallback();
     render();
     announce(i18n.t("paused", { t: spoken(remaining) }));
   }
 
   function toggle() { running ? pause() : start(); }
 
-  function advancePhase() {
-    const key = currentPhaseKey();
-    if (key === "work") {
-      pomoDone = (pomoDone + 1) % 5;
-      if (pomoDone === 0) pomoDone = 0;
-    }
+  /* completed is false when the phase is skipped, so a skipped work phase is not counted. */
+  function advancePhase(completed) {
+    if (completed && currentPhaseKey() === "work") pomoDone = Math.min(4, pomoDone + 1);
     phaseIdx = (phaseIdx + 1) % PHASE_SEQ.length;
     if (phaseIdx === 0) pomoDone = 0;
     loadPhase();
   }
 
   function finish() {
-    running = false; remaining = 0; render();
+    running = false; remaining = 0; cancelAnimationFrame(raf); armFallback(); render();
     beep();
     navigator.vibrate?.([180, 100, 180]);
     const key = currentPhaseKey();
@@ -366,11 +390,13 @@ catch { const mem = new Map(); store = {
     showToast(msgs[key]);
     announce(msgs[key]);
     notify(msgs[key]);
+    advancePhase(true);
   }
 
   function beep() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = audio();
+      if (!ctx) return;
       [[0, 660], [0.22, 770], [0.44, 880]].forEach(([d, f]) => {
         const o = ctx.createOscillator(), g = ctx.createGain();
         o.type = "sine"; o.frequency.value = f;
@@ -428,8 +454,15 @@ catch { const mem = new Map(); store = {
     if (notificationsEnabled && "Notification" in window && Notification.permission === "default") {
       try { await Notification.requestPermission(); } catch (_) {}
     }
+    /* Do not show "on" when the browser refuses or does not support notifications. */
+    let blocked = false;
+    if (notificationsEnabled && !("Notification" in window && Notification.permission === "granted")) {
+      notificationsEnabled = false;
+      store.setItem("pomo.notifications", "off");
+      blocked = true;
+    }
     renderNotifyBtn();
-    showToast(i18n.t(notificationsEnabled ? "notifOn" : "notifOff"));
+    showToast(i18n.t(blocked ? "notifBlocked" : notificationsEnabled ? "notifOn" : "notifOff"));
   }
 
   function openSettings() {
@@ -461,7 +494,7 @@ catch { const mem = new Map(); store = {
   }
 
   toggleBtn.addEventListener("click", toggle);
-  $("pa-skip").addEventListener("click", () => { pause(); advancePhase(); showToast(i18n.t("skipped")); });
+  $("pa-skip").addEventListener("click", () => { pause(); advancePhase(false); showToast(i18n.t("skipped")); });
   $("pa-reset").addEventListener("click", resetAll);
   $("pa-notify").addEventListener("click", toggleNotify);
   $("pa-settings").addEventListener("click", openSettings);
@@ -491,12 +524,13 @@ catch { const mem = new Map(); store = {
     if (e.code === "Space" && tg && tg.tagName === "BUTTON") return;
     if (e.code === "Space") { e.preventDefault(); toggle(); }
     else if (e.key === "r" || e.key === "R") resetAll();
-    else if (e.key === "s" || e.key === "S") { pause(); advancePhase(); showToast(i18n.t("skipped")); }
+    else if (e.key === "s" || e.key === "S") { pause(); advancePhase(false); showToast(i18n.t("skipped")); }
     else if (e.key === "f" || e.key === "F") $("pa-fullscreen").click();
   });
 
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && running) {
+      cancelAnimationFrame(raf);
       remaining = Math.max(0, (endAt - performance.now()) / 1000);
       if (remaining <= 0) finish(); else tick();
     }

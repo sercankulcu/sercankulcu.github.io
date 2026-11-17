@@ -3,7 +3,7 @@
 layout: without-sidebar
 title: "PDF Karşılaştırma"
 permalink: /apps/tr/pdf-karsilastir/
-excerpt: "İki PDF dosyasını sayfa sayfa karşılaştırın; metin ve görünüm farklarını işaretli olarak görün."
+excerpt: "İki PDF'yi karşılaştırın: metin farkları işaretli, sayfalar yan yana."
 lang: tr
 ui_lang: tr
 seo_title: "PDF Karşılaştırma · İki PDF Arasındaki Farkları Bul"
@@ -530,6 +530,8 @@ html[data-theme="dark"] .pd-status.err { color:#ff9f9f; }
     <div class="pd-dialog-body" data-i18n-html="help">
       <p>Compare two PDF files page by page. Added and removed text is highlighted,
         and pages can also be viewed side by side.</p>
+      <p>Pages are matched by their content, so a page inserted into or removed from PDF B is shown
+        as an added or removed page and the pages after it are still compared with their counterparts.</p>
 
       <h3>How to use</h3>
       <ol>
@@ -576,7 +578,8 @@ const I18N = {
     extracting: "Extracting {label}: page {n} / {total}", pageN: "Page {n}", missing: "Missing page", changed: "Changed", same: "Same",
     rowAria: "Page {n}: {status}. Open text diff", done: "Done. {n} changed page(s) detected.", noText: "(No text)",
     notAvail: "Page not available", rendering: "Rendering page {n}...", visualReady: "Visual comparison ready for page {n}.",
-    loadingA: "Loading PDF A...", loadingB: "Loading PDF B...", error: "Error: {msg}"
+    loadingA: "Loading PDF A...", loadingB: "Loading PDF B...", error: "Error: {msg}",
+    pageAdded: "Page added in B", pageRemoved: "Page removed in B"
   }),
   tr: {
     title: "PDF Karşılaştırma", howTo: "Nasıl kullanılır", close: "Kapat",
@@ -596,9 +599,12 @@ const I18N = {
     rowAria: "Sayfa {n}: {status}. Metin farkını aç", done: "Bitti. {n} sayfada değişiklik bulundu.", noText: "(Metin yok)",
     notAvail: "Sayfa yok", rendering: "{n}. sayfa çiziliyor...", visualReady: "{n}. sayfanın görsel karşılaştırması hazır.",
     loadingA: "PDF A yükleniyor...", loadingB: "PDF B yükleniyor...", error: "Hata: {msg}",
+    pageAdded: "B'de eklenen sayfa", pageRemoved: "B'de silinen sayfa",
     help: `
       <p>İki PDF dosyasını sayfa sayfa karşılaştırın. Eklenen ve silinen metin vurgulanır,
         sayfalar yan yana da görüntülenebilir.</p>
+      <p>Sayfalar içeriklerine göre eşleştirilir; PDF B'ye eklenen ya da ondan çıkarılan bir sayfa
+        eklenmiş ya da silinmiş sayfa olarak gösterilir, sonraki sayfalar yine karşılıklarıyla karşılaştırılır.</p>
 
       <h3>Nasıl kullanılır</h3>
       <ol>
@@ -628,6 +634,11 @@ let textB = [];
 let results = [];
 let currentPage = 1;
 let visualPage = 1;
+/* Render tasks of the visual comparison in progress; a newer request cancels them, and its
+   token makes the older request drop its result. Pages are drawn on a spare canvas first and
+   copied to the visible one only when the request is still the current one. */
+let visualToken = 0;
+let renderTasks = [];
 
 function setStatus(key, vars, className = "") {
   lastStatus = [key, vars, className];
@@ -640,11 +651,19 @@ function updateCompareButton() {
   byId("pd-go").disabled = !(fileA && fileB);
 }
 
+function closePdfs() {
+  visualToken++;
+  cancelRenders();
+  if (pdfA) pdfA.loadingTask.destroy().catch(() => {});
+  if (pdfB) pdfB.loadingTask.destroy().catch(() => {});
+  pdfA = null;
+  pdfB = null;
+}
+
 function resetApp() {
   fileA = null;
   fileB = null;
-  pdfA = null;
-  pdfB = null;
+  closePdfs();
   textA = [];
   textB = [];
   results = [];
@@ -871,13 +890,81 @@ function compareOne(a, b) {
   };
 }
 
-function buildResults() {
-  const pageCount = Math.max(textA.length, textB.length);
-  results = [];
-
-  for (let index = 0; index < pageCount; index++) {
-    results.push(compareOne(textA[index], textB[index]));
+/* Dice similarity (0..1) of two normalized page texts over their word pairs; pairs of
+   neighbouring words tell pages apart better than single words, which pages share a lot of. */
+function pageSimilarity(a, b) {
+  if (a === b) return 1;
+  const shingles = text => {
+    const words = text.split(/\s+/).filter(Boolean);
+    if (words.length < 2) return words;
+    const out = [];
+    for (let i = 1; i < words.length; i++) out.push(words[i - 1] + " " + words[i]);
+    return out;
+  };
+  const listA = shingles(a);
+  const listB = shingles(b);
+  if (!listA.length || !listB.length) return 0;
+  const counts = new Map();
+  for (const w of listA) counts.set(w, (counts.get(w) || 0) + 1);
+  let common = 0;
+  for (const w of listB) {
+    const n = counts.get(w);
+    if (n) { common++; counts.set(w, n - 1); }
   }
+  return 2 * common / (listA.length + listB.length);
+}
+
+/* Aligns the pages of A and B by content (jsdiff diffArrays with a similarity comparator), so an
+   inserted or deleted page does not shift every later page. Returns rows { a, b } with 0-based page
+   indexes; a or b is null for a page that exists on one side only. Unmatched pages between two
+   matches are paired in order (a changed page), the rest are added or removed pages. */
+function alignPages(pagesA, pagesB) {
+  const ids = (pages, side) => pages.map((text, index) => ({ side, index, text }));
+  const parts = Diff.diffArrays(ids(pagesA, "a"), ids(pagesB, "b"), {
+    comparator: (x, y) => pageSimilarity(x.text, y.text) >= 0.5
+  });
+  const rows = [];
+  let removed = [];
+  let added = [];
+  let ia = 0;
+  let ib = 0;
+
+  const flush = () => {
+    const paired = Math.min(removed.length, added.length);
+    for (let i = 0; i < paired; i++) rows.push({ a: removed[i], b: added[i] });
+    for (let i = paired; i < removed.length; i++) rows.push({ a: removed[i], b: null });
+    for (let i = paired; i < added.length; i++) rows.push({ a: null, b: added[i] });
+    removed = [];
+    added = [];
+  };
+
+  for (const part of parts) {
+    const n = part.count != null ? part.count : part.value.length;
+    if (part.removed) {
+      for (let i = 0; i < n; i++) removed.push(ia++);
+    } else if (part.added) {
+      for (let i = 0; i < n; i++) added.push(ib++);
+    } else {
+      flush();
+      for (let i = 0; i < n; i++) rows.push({ a: ia++, b: ib++ });
+    }
+  }
+  flush();
+  return rows;
+}
+
+function rowLabel(row) {
+  const a = row.a == null ? null : row.a + 1;
+  const b = row.b == null ? null : row.b + 1;
+  return a === b ? String(a) : `A ${a == null ? "–" : a} ↔ B ${b == null ? "–" : b}`;
+}
+
+function buildResults() {
+  const rows = alignPages(textA.map(normalizeText), textB.map(normalizeText));
+  results = rows.map(row => Object.assign(
+    { a: row.a, b: row.b },
+    compareOne(row.a == null ? "" : textA[row.a], row.b == null ? "" : textB[row.b])
+  ));
 
   byId("pd-pa").textContent = textA.length;
   byId("pd-pb").textContent = textB.length;
@@ -900,8 +987,9 @@ function renderResultLabels() {
   byId("pd-vpages").innerHTML = "";
 
   for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
-    byId("pd-pages").add(new Option(T("pageN", { n: pageNumber }), pageNumber));
-    byId("pd-vpages").add(new Option(T("pageN", { n: pageNumber }), pageNumber));
+    const label = T("pageN", { n: rowLabel(results[pageNumber - 1]) });
+    byId("pd-pages").add(new Option(label, pageNumber));
+    byId("pd-vpages").add(new Option(label, pageNumber));
   }
   byId("pd-pages").value = currentPage;
   byId("pd-vpages").value = visualPage;
@@ -910,16 +998,16 @@ function renderResultLabels() {
   tbody.innerHTML = "";
 
   results.forEach((result,index) => {
-    const missing = index >= textA.length || index >= textB.length;
-    const statusText = T(missing ? "missing" : result.changed ? "changed" : "same");
+    const missing = result.a == null || result.b == null;
+    const statusText = T(result.a == null ? "pageAdded" : result.b == null ? "pageRemoved" : result.changed ? "changed" : "same");
     const badgeClass = missing ? "pd-missing" : result.changed ? "pd-changed" : "pd-same";
 
     const row = document.createElement("tr");
     row.tabIndex = 0;
-    row.setAttribute("aria-label", T("rowAria", { n: index + 1, status: statusText }));
+    row.setAttribute("aria-label", T("rowAria", { n: rowLabel(result), status: statusText }));
 
     row.innerHTML = `
-      <td>${index + 1}</td>
+      <td>${rowLabel(result)}</td>
       <td><span class="pd-badge ${badgeClass}">${statusText}</span></td>
       <td>${result.added}</td>
       <td>${result.removed}</td>
@@ -954,7 +1042,7 @@ function showText(pageNumber) {
 
   byId("pd-da").innerHTML = result.htmlA || escapeHtml(T("noText"));
   byId("pd-db").innerHTML = result.htmlB || escapeHtml(T("noText"));
-  byId("pd-pl").textContent = currentPage;
+  byId("pd-pl").textContent = rowLabel(result);
   byId("pd-pages").value = currentPage;
   byId("pd-prev").disabled = currentPage === 1;
   byId("pd-next").disabled = currentPage === results.length;
@@ -985,10 +1073,15 @@ byId("pd-tv").addEventListener("click", () => {
   renderVisual(visualPage);
 });
 
+function cancelRenders() {
+  renderTasks.forEach(task => task.cancel());
+  renderTasks = [];
+}
+
 async function renderOne(pdf, pageNumber, canvas, scale) {
   const context = canvas.getContext("2d");
 
-  if (!pdf || pageNumber > pdf.numPages) {
+  if (!pdf || pageNumber == null || pageNumber > pdf.numPages) {
     canvas.width = 600;
     canvas.height = 180;
 
@@ -1008,10 +1101,23 @@ async function renderOne(pdf, pageNumber, canvas, scale) {
   canvas.width = viewport.width;
   canvas.height = viewport.height;
 
-  await page.render({
+  const task = page.render({
     canvasContext: context,
     viewport
-  }).promise;
+  });
+  renderTasks.push(task);
+
+  try {
+    await task.promise;
+  } finally {
+    renderTasks = renderTasks.filter(item => item !== task);
+  }
+}
+
+function copyCanvas(from, to) {
+  to.width = from.width;
+  to.height = from.height;
+  to.getContext("2d").drawImage(from, 0, 0);
 }
 
 async function renderVisual(pageNumber) {
@@ -1025,16 +1131,34 @@ async function renderVisual(pageNumber) {
   byId("pd-vprev").disabled = visualPage === 1;
   byId("pd-vnext").disabled = visualPage === results.length;
 
-  setStatus("rendering", { n: visualPage });
+  const row = results[visualPage - 1];
+  const label = rowLabel(row);
+  const token = ++visualToken;
+  cancelRenders();
+
+  setStatus("rendering", { n: label });
 
   const scale = Number(byId("pd-scale").value);
+  const spareA = document.createElement("canvas");
+  const spareB = document.createElement("canvas");
 
-  await Promise.all([
-    renderOne(pdfA, visualPage, byId("pd-ca"), scale),
-    renderOne(pdfB, visualPage, byId("pd-cb"), scale)
-  ]);
+  try {
+    await Promise.all([
+      renderOne(pdfA, row.a == null ? null : row.a + 1, spareA, scale),
+      renderOne(pdfB, row.b == null ? null : row.b + 1, spareB, scale)
+    ]);
+  } catch (error) {
+    if (token !== visualToken || (error && error.name === "RenderingCancelledException")) return;
+    console.error(error);
+    setStatus("error", { msg: error.message || error }, "err");
+    return;
+  }
 
-  setStatus("visualReady", { n: visualPage }, "ok");
+  if (token !== visualToken) return;
+
+  copyCanvas(spareA, byId("pd-ca"));
+  copyCanvas(spareB, byId("pd-cb"));
+  setStatus("visualReady", { n: label }, "ok");
 }
 
 byId("pd-vprev").addEventListener("click", () => renderVisual(visualPage - 1));
@@ -1046,6 +1170,8 @@ byId("pd-go").addEventListener("click", async () => {
   try {
     byId("pd-go").disabled = true;
     showPanel("text");
+
+    closePdfs();
 
     setStatus("loadingA");
     pdfA = await loadPdf(fileA);

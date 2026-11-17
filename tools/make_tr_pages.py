@@ -16,7 +16,7 @@ For every page in tools/tr_pages.py:
    Turkish page gets ui_lang: tr and hreflang. The /games/ hub links the English copies.
 Then run tools/make_related.py (the strip under each page also covers the Turkish pages).
 """
-import io, json, os, sys
+import io, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import make_app_pages as A
@@ -134,6 +134,16 @@ def en_copies():
                 io.open(src, 'w', encoding='utf-8', newline='').write(new)
 
 
+# Kartta yalnız işi anlatan cümle kalsın: sayfanın girişi zaten her şeyin tarayıcıda yapıldığını söylüyor.
+# Arama açıklaması (excerpt) olduğu gibi kalır.
+TRIM_TR = re.compile(r'\s+(Dosya(lar|nız)?\b[^.]*|Görsel yüklenmez|Hepsi cihazınızda yapılır|Sıkıştırma tarayıcınızda[^.]*'
+                     r'|Tarayıcıda çalışır|Yükleme yok|İşlem tarayıcınızda[^.]*|Şifreler yalnız tarayıcınızda[^.]*)\.$')
+
+
+def card_desc(desc):
+    return TRIM_TR.sub('', desc)
+
+
 def card(url, ico, name, desc):
     return ('<a class="app-card" href="%s"><span class="app-head"><span class="app-ico" aria-hidden="true">%s</span>'
             '%s</span><span class="app-desc">%s</span></a>' % (url, ico, A.e(name), A.e(desc)))
@@ -156,7 +166,7 @@ def hubs():
                              % (url, ico, A.e(name)))
             elif url in T.APPS:
                 n += 1
-                cards.append(card(T.tr_url(url), ico, M.TR_TITLES.get(url, A.read_meta(url)[0]), T.APPS[url][2]))
+                cards.append(card(T.tr_url(url), ico, M.TR_TITLES.get(url, A.read_meta(url)[0]), card_desc(T.APPS[url][2])))
         out.append('<h2 class="apps-group">%s %s</h2>\n<div class="apps-grid">\n%s\n</div>' % (gi, A.e(gtr), '\n'.join(cards)))
     tools_hub = """---
 layout: archive

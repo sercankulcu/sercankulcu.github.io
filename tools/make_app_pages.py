@@ -24,20 +24,20 @@ CARD_BASE = SITE + '/' + CARD_DIR + '/'
 # (emoji, grup adi, vurgu rengi, schema.org applicationCategory, dosya isleyen arac mi, uygulamalar)
 GROUPS = [
     ('📄', 'PDF & document tools', '#c0392b', 'BusinessApplication', True, [
-        ('✍️', '/apps/pdf-signer/'), ('📝', '/apps/pdf-form-filler/'), ('📎', '/apps/pdf-merger/'),
+        ('✍️', '/apps/pdf-signer/'), ('📎', '/apps/pdf-merger/'),
         ('✂️', '/apps/pdf-splitter/'), ('🗜️', '/apps/pdf-compressor/'), ('📑', '/apps/pdf-page-organizer/'),
         ('📐', '/apps/pdf-to-a4/'), ('🖼️', '/apps/pdf-to-image/'), ('📄', '/apps/image-to-a4-pdf/'),
         ('🗂️', '/apps/images-to-pdf/'), ('🔎', '/apps/pdf-diff/'), ('🛡️', '/apps/pdf-review-integrity-scanner/'),
         ('📷', '/apps/document-scanner/'), ('✒️', '/apps/signature-maker/')]),
     ('🖼️', 'Image tools', '#2f8a6b', 'MultimediaApplication', True, [
         ('✂️', '/apps/image-background-remover/'), ('🗜️', '/apps/image-compressor-resizer/'),
-        ('🕵️', '/apps/image-redactor/'), ('🔄', '/apps/image-format-converter/'), ('🎨', '/apps/image-color-palette/')]),
+        ('🕵️', '/apps/image-redactor/'), ('🎨', '/apps/image-color-palette/')]),
     ('🛠️', 'Utilities', '#1f6fb2', 'UtilitiesApplication', False, [
         ('📲', '/apps/qr-code-generator/'), ('🔐', '/apps/password-generator/'), ('📏', '/apps/unit-converter/'),
         ('🌐', '/apps/favicon-generator/'), ('⏱️', '/apps/minimal-timer/'), ('🍅', '/apps/pomodoro-timer/')]),
     ('🔍', 'Document & metadata tools', '#7b3fa0', 'BusinessApplication', True, [
         ('📝', '/apps/word-document-diff/'), ('🔎', '/apps/pdf-metadata-viewer/'),
-        ('🗂️', '/apps/office-metadata-viewer/'), ('🏷️', '/apps/image-metadata-viewer/')]),
+        ('🏷️', '/apps/image-metadata-viewer/')]),
     ('🧠', 'Tests', '#e08a00', 'EducationalApplication', False, [
         ('⚡', '/apps/reaction-time-test/'), ('🧠', '/apps/memory-test/'),
         ('🧩', '/apps/cognitive-reasoning-test/'), ('🌟', '/apps/personality-test/')]),

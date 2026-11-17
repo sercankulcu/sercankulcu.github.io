@@ -1,12 +1,12 @@
 ---
 # tools/make_tr_pages.py writes this copy of apps/pdf-review-integrity-scanner.html; edit that page, then run the script.
 layout: without-sidebar
-title: "PDF Hakem Bütünlüğü Tarayıcı"
+title: "Makalede Gizli Talimat Tarayıcı"
 permalink: /apps/tr/pdf-hakem-butunlugu/
-excerpt: "Gönderilen makale PDF'lerinde hakem değerlendirmesini etkilemeye yönelik gizli ya da şüpheli talimatları arayın."
+excerpt: "Makale PDF'lerinde hakemi etkilemeye yönelik gizli ya da şüpheli talimatları arayın."
 lang: tr
 ui_lang: tr
-seo_title: "PDF Hakem Bütünlüğü Tarayıcı · Gizli Talimat Tespiti"
+seo_title: "Makalede Gizli Talimat Tarayıcı · Hakemi Etkileme Girişimini Bul"
 og_image: https://sercankulcu.github.io/images/apps/pdf-review-integrity-scanner.jpg
 web_app: BusinessApplication
 hreflang: {en: "/apps/pdf-review-integrity-scanner/", tr: "/apps/tr/pdf-hakem-butunlugu/"}
@@ -399,7 +399,10 @@ html[data-theme="dark"] .pis-pill.medium { color:#ffbf72; }
 
       <h3>What it looks for</h3>
       <p>Designed to surface review-influencing instructions, prompt-injection patterns, and suspiciously hidden text
-        (for example very small or invisible text).</p>
+        (for example very small, invisible or white text). The rules look for English text.</p>
+      <p>A match in ordinary visible text is reported as LOW at most. MEDIUM and HIGH need hidden text
+        (invisible, white, very small or off-page) or an unmistakable injection such as
+        "ignore all previous instructions" or a command addressed to an AI reviewer.</p>
 
       <h3>Notes</h3>
       <ul>
@@ -453,7 +456,7 @@ const I18N = {
     copied: "Copied", noClip: "Clipboard access is unavailable in this browser."
   }),
   tr: {
-    title: "PDF Hakem Bütünlüğü Tarayıcı", howTo: "Nasıl kullanılır", close: "Kapat",
+    title: "Makalede Gizli Talimat Tarayıcı", howTo: "Nasıl kullanılır", close: "Kapat",
     choosePdf: "PDF seçin", dropTitle: "Gönderilen PDF'yi buraya bırakın",
     dropHint: 'ya da <span class="pis-browse">bilgisayarınızdan seçin</span>', reading: "PDF okunuyor…",
     statPages: "Taranan sayfa", statText: "Metin parçası", statHidden: "Gizli metin işareti", statFindings: "Şüpheli bulgu",
@@ -478,7 +481,8 @@ const I18N = {
     reason_outside: "metin normal sayfa alanının dışında",
     reason_tiny: "çok küçük metin (~{n} pt karşılığı)",
     reason_zero: "neredeyse sıfır boyutlu metin",
-    reason_invisible: "sayfada görünmez metin çizme işlemleri var",
+    reason_invisible: "görünmez kipte çizilen metin (Tr 3)",
+    reason_white: "beyaz ya da beyaza çok yakın renkte metin",
     help: `
       <p>Bir hakemi, otomatik değerlendiriciyi ya da yapay zekâ destekli değerlendirme sürecini etkilemeye yönelik
         şüpheli ya da gizlenmiş yönergeleri bulur.</p>
@@ -493,7 +497,10 @@ const I18N = {
 
       <h3>Neye bakar</h3>
       <p>Değerlendirmeyi etkilemeye yönelik yönergeleri, istem enjeksiyonu kalıplarını ve şüpheli biçimde gizlenmiş metni
-        (örneğin çok küçük ya da görünmez metin) ortaya çıkarmak için tasarlandı. Kurallar İngilizce metni arar.</p>
+        (örneğin çok küçük, görünmez ya da beyaz metin) ortaya çıkarmak için tasarlandı. Kurallar İngilizce metni arar.</p>
+      <p>Sıradan görünür metindeki bir eşleşme en çok DÜŞÜK olarak bildirilir. ORTA ve YÜKSEK için gizli metin
+        (görünmez, beyaz, çok küçük ya da sayfa dışında) ya da "ignore all previous instructions" gibi açık bir
+        enjeksiyon ya da yapay zekâ hakemine yöneltilmiş bir komut gerekir.</p>
 
       <h3>Notlar</h3>
       <ul>
@@ -528,46 +535,60 @@ function reasonLabel(reason) {
   if (!i18n || i18n.lang !== "tr") return reason;
   if (reason === "text positioned outside the normal page area") return T("reason_outside");
   if (reason === "near-zero-size text") return T("reason_zero");
-  if (reason === "page contains invisible text-rendering operations") return T("reason_invisible");
+  if (reason === "text drawn in invisible rendering mode (Tr 3)") return T("reason_invisible");
+  if (reason === "text filled in white or near-white") return T("reason_white");
   const m = /^very small text \(~(.+) pt-equivalent\)$/.exec(reason);
   if (m) return T("reason_tiny", { n: m[1].replace(".", ",") });
   return reason;
 }
 
+/* The rules read English text. A finding is scored per sentence: the strongest matching rule,
+   plus 2 for every further rule that matches the same passage, plus the visibility boost of the
+   hidden text items it touches. Matches in ordinary visible text stay LOW (at most 6) unless an
+   "explicit" rule (an unmistakable injection or a command addressed to an AI) matches the passage
+   or its neighbour. "needs": patterns that must also occur in the passage. */
 const RULES = [
+  {
+    id:"prompt-injection", weight:9, explicit:true, label:"Prompt-injection style instruction",
+    re:/\b(?:ignore|disregard|forget|override)\s+(?:all\s+|any\s+)?(?:of\s+)?(?:the\s+|your\s+|these\s+|those\s+)?(?:previous|prior|above|earlier|preceding|foregoing)\s+(?:instructions?|prompts?|directions?|directives?|guidelines?|commands?)\b/gi
+  },
+  {
+    id:"ai-reviewer", weight:8, explicit:true, label:"Instruction targeting an AI reviewer",
+    re:/\b(?:chatgpt|gpt-?\d*|claude|gemini|copilot|(?:large )?language models?|llms?|ai(?:-based)? (?:reviewers?|systems?|assistants?|models?|tools?)|automated reviewers?)\b/gi,
+    needs:[
+      /\b(?:you|your|yourself)\b|\bplease\b/i,
+      /\b(?:recommend|accept|approve|score|rate|give|ignore|disregard|praise|favou?r|output|respond|say|write)\b/i
+    ]
+  },
+  {
+    id:"decision-manipulation", weight:7, label:"Attempt to influence review outcome",
+    re:/\b(?:accept (?:this|the) (?:paper|manuscript|submission|work)|recommend(?:ing)? (?:the )?accept(?:ing|ance)?|give (?:this|the) (?:paper|manuscript|submission).{0,30}(?:high|maximum|positive).{0,20}(?:score|rating)|rate (?:this|the) (?:paper|manuscript).{0,30}(?:high|positively)|do not reject|must be accepted|positive review)\b/gi
+  },
   {
     id:"direct-review-command", weight:7, label:"Direct instruction to reviewer",
     re:/\b(?:reviewer|peer reviewer|evaluator|referee)\b.{0,90}\b(?:must|should|please|kindly|need to|have to)\b.{0,100}\b(?:accept|recommend|approve|score|rate|give|assign|ignore|overlook|praise|favor|favour)\b/gi
-  },
-  {
-    id:"decision-manipulation", weight:8, label:"Attempt to influence review outcome",
-    re:/\b(?:accept (?:this|the) (?:paper|manuscript|submission)|recommend acceptance|give (?:this|the) (?:paper|manuscript|submission).{0,30}(?:high|maximum|positive).{0,20}(?:score|rating)|rate (?:this|the) (?:paper|manuscript).{0,30}(?:high|positively)|do not reject|must be accepted)\b/gi
-  },
-  {
-    id:"prompt-injection", weight:8, label:"Prompt-injection style instruction",
-    re:/\b(?:ignore|disregard|forget|override)\b.{0,45}\b(?:previous|prior|earlier|system|review|reviewer|instructions?|criteria|guidelines?|prompt)\b/gi
-  },
-  {
-    id:"ai-reviewer", weight:7, label:"Instruction targeting an AI reviewer",
-    re:/\b(?:chatgpt|gpt-?\d*|large language model|llm|ai (?:reviewer|review|system|assistant)|automated reviewer)\b.{0,120}\b(?:ignore|follow|must|should|accept|recommend|score|rate|output|respond|say|write)\b/gi
-  },
-  {
-    id:"secrecy", weight:6, label:"Instruction to conceal the manipulation",
-    re:/\b(?:do not|don't|never)\b.{0,45}\b(?:mention|reveal|disclose|report|tell|acknowledge)\b.{0,80}\b(?:instruction|prompt|text|message|review|reviewer|author)\b/gi
   },
   {
     id:"identity-control", weight:6, label:"Reviewer-role manipulation",
     re:/\b(?:you are|act as|behave as|pretend (?:to be|you are))\b.{0,60}\b(?:reviewer|peer reviewer|editor|referee|expert evaluator)\b/gi
   },
   {
-    id:"positive-language", weight:4, label:"Suspicious positive-review instruction",
+    id:"secrecy", weight:6, label:"Instruction to conceal the manipulation",
+    re:/\b(?:do not|don't|never)\b.{0,45}\b(?:mention|reveal|disclose|report|tell|acknowledge|highlight|point out)\b.{0,80}\b(?:instructions?|prompt|text|message|review|reviewer|author|negatives?|weaknesses|flaws|limitations)\b/gi
+  },
+  {
+    id:"positive-language", weight:5, label:"Suspicious positive-review instruction",
     re:/\b(?:write|produce|provide|return|give)\b.{0,60}\b(?:positive|favorable|favourable|enthusiastic|strong)\b.{0,30}\b(?:review|recommendation|assessment|evaluation)\b/gi
   },
   {
-    id:"review-score", weight:4, label:"Suspicious scoring instruction",
+    id:"review-score", weight:5, label:"Suspicious scoring instruction",
     re:/\b(?:score|rating|recommendation)\b.{0,35}\b(?:must|should|set|give|assign|be)\b.{0,25}\b(?:[89]|10|high|maximum|highest|accept|strong accept)\b/gi
   }
 ];
+
+/* score added by each visibility reason of a hidden text item */
+const HIDDEN_BOOST = { outside: 5, tiny: 4, zero: 3, invisible: 6, white: 6 };
+const VISIBLE_CAP = 6;
 
 const normalize = value =>
   value.replace(/\u0000/g,"").replace(/\s+/g," ").trim();
@@ -608,34 +629,281 @@ function contextAround(text, start, end, radius = 170) {
   return (from > 0 ? "…" : "") + text.slice(from, to) + (to < text.length ? "…" : "");
 }
 
-function scanRules(text, pageNum, hiddenBoost = 0, hiddenReasons = []) {
-  const findings = [];
+/* [start, end) ranges of the sentences in a text */
+function sentenceSpans(text) {
+  const spans = [];
+  const re = /[^.!?]+(?:[.!?]+|$)/g;
+  let match;
+
+  while ((match = re.exec(text)) !== null) {
+    if (match[0].trim()) spans.push([match.index, match.index + match[0].length]);
+    if (match.index === re.lastIndex) re.lastIndex++;
+  }
+
+  return spans;
+}
+
+function matchRules(text) {
+  const hits = [];
 
   for (const rule of RULES) {
     rule.re.lastIndex = 0;
-    let match;
+    const match = rule.re.exec(text);
+    if (!match) continue;
+    if (rule.needs && !rule.needs.every(re => re.test(text))) continue;
+    hits.push({ rule, index: match.index, length: match[0].length });
+  }
 
-    while ((match = rule.re.exec(text)) !== null) {
-      const score = rule.weight + hiddenBoost;
+  return hits;
+}
 
-      findings.push({
-        page: pageNum,
-        type: rule.label,
-        score,
-        severity: severity(score),
-        evidence: contextAround(text, match.index, match.index + match[0].length),
-        match: match[0],
-        reasons: [...hiddenReasons],
-        rule: rule.id
-      });
+/* hiddenAt(ranges) returns { boost, reasons } for the hidden text items overlapping the ranges */
+function scanText(text, pageNum, hiddenAt) {
+  const findings = [];
+  const spans = sentenceSpans(text);
+  const hitsBySpan = spans.map(([start, end]) => matchRules(text.slice(start, end)));
+  const isExplicit = hits => hits.some(hit => hit.rule.explicit);
 
-      if (match.index === rule.re.lastIndex) {
-        rule.re.lastIndex++;
-      }
+  for (let i = 0; i < spans.length; i++) {
+    let [start, end] = spans[i];
+    let hits = hitsBySpan[i];
+    let explicit = isExplicit(hits) || (i > 0 && isExplicit(hitsBySpan[i - 1])) ||
+      (i + 1 < spans.length && isExplicit(hitsBySpan[i + 1]));
+
+    /* an injection usually goes on in the next sentence: read the two together */
+    if (isExplicit(hits) && i + 1 < spans.length) {
+      end = spans[i + 1][1];
+      hits = matchRules(text.slice(start, end));
+      i++;
     }
+
+    if (!hits.length) continue;
+
+    hits.sort((a, b) => b.rule.weight - a.rule.weight);
+    const ranges = hits.map(hit => [start + hit.index, start + hit.index + hit.length]);
+    const hidden = hiddenAt ? hiddenAt(ranges) : { boost: 0, reasons: [] };
+    let score = hits[0].rule.weight + 2 * (hits.length - 1) + hidden.boost;
+
+    if (!explicit && !hidden.boost) score = Math.min(score, VISIBLE_CAP);
+
+    findings.push({
+      page: pageNum,
+      type: hits[0].rule.label,
+      score,
+      severity: severity(score),
+      evidence: contextAround(text, start, end, 120),
+      match: text.slice(start, end).trim(),
+      reasons: hidden.reasons,
+      rule: hits[0].rule.id
+    });
   }
 
   return findings;
+}
+
+/* Fill colour from a fill-colour operator's arguments as [r, g, b] in 0..1. pdf.js normally turns
+   gray, RGB and CMYK fills into setFillRGBColor with a "#rrggbb" string; arrays are read too. */
+function fillToRgb(args) {
+  if (!args || !args.length) return null;
+  const first = args[0];
+
+  if (typeof first === "string") {
+    return /^#[0-9a-f]{6}$/i.test(first)
+      ? [1, 3, 5].map(i => parseInt(first.slice(i, i + 2), 16) / 255)
+      : null;
+  }
+
+  const list = first != null && typeof first === "object" && "length" in first ? Array.from(first) : Array.from(args);
+  const nums = list.map(Number);
+  if (!nums.length || nums.some(n => !isFinite(n))) return null;
+  const scale = nums.some(n => n > 1) ? 255 : 1;
+  const v = nums.map(n => n / scale);
+
+  if (v.length === 1) return [v[0], v[0], v[0]];
+  if (v.length === 3) return v;
+  if (v.length === 4) return [(1 - v[0]) * (1 - v[3]), (1 - v[1]) * (1 - v[3]), (1 - v[2]) * (1 - v[3])];
+  return null;
+}
+
+/* Text runs of a page's operator list with their drawing state. The text rendering mode and the
+   fill colour are kept on a q/Q stack (form XObjects save and restore too). */
+function textRunsFromOps(opList, OPS) {
+  const runs = [];
+  const stack = [];
+  let state = { mode: 0, fill: [0, 0, 0] };
+  const fillOps = new Set([OPS.setFillRGBColor, OPS.setFillGray, OPS.setFillCMYKColor, OPS.setFillColor, OPS.setFillColorN]);
+  const textOps = new Set([OPS.showText, OPS.showSpacedText, OPS.nextLineShowText, OPS.nextLineSetSpacingShowText]);
+
+  for (let index = 0; index < opList.fnArray.length; index++) {
+    const fn = opList.fnArray[index];
+    const args = opList.argsArray[index];
+
+    if (fn === OPS.save || fn === OPS.paintFormXObjectBegin) {
+      stack.push(state);
+    } else if (fn === OPS.restore || fn === OPS.paintFormXObjectEnd) {
+      if (stack.length) state = stack.pop();
+    } else if (fn === OPS.setTextRenderingMode) {
+      state = { mode: Number(args?.[0] ?? 0), fill: state.fill };
+    } else if (fillOps.has(fn)) {
+      const rgb = fillToRgb(args);
+      if (rgb) state = { mode: state.mode, fill: rgb };
+    } else if (textOps.has(fn)) {
+      const glyphs = (args || []).find(arg => Array.isArray(arg)) || [];
+      const text = glyphs.map(g => g && typeof g === "object" && typeof g.unicode === "string" ? g.unicode : "").join("");
+      if (!text.trim()) continue;
+      runs.push({
+        text,
+        invisible: state.mode === 3 || state.mode === 7,
+        white: [0, 2, 4, 6].includes(state.mode) && state.fill.every(c => c >= 0.95)
+      });
+    }
+  }
+
+  return runs;
+}
+
+/* Reads one pdf.js page: its text items with their visibility reasons, and the findings. */
+async function analyzePage(page, pageNumber, OPS) {
+  const textContent = await page.getTextContent({includeMarkedContent:true});
+  const textItems = textContent.items.filter(item =>
+    typeof item.str === "string" && item.str.trim()
+  );
+
+  let runs = [];
+  try {
+    runs = textRunsFromOps(await page.getOperatorList(), OPS);
+  } catch (error) {
+    console.warn("Operator-list inspection skipped on page", pageNumber, error);
+  }
+
+  /* Most of the page in invisible mode is the text layer of a scanned (OCR) page, not hidden text */
+  const squash = text => text.replace(/\s+/g, "");
+  const totalChars = runs.reduce((sum, run) => sum + squash(run.text).length, 0);
+  const invisibleChars = runs.reduce((sum, run) => sum + (run.invisible ? squash(run.text).length : 0), 0);
+  const ocrLayer = totalChars >= 40 && invisibleChars >= totalChars * 0.6;
+  const blob = filter => squash(runs.filter(filter).map(run => run.text).join(""));
+  const invisibleBlob = ocrLayer ? "" : blob(run => run.invisible);
+  const whiteBlob = blob(run => run.white && !run.invisible);
+  const visibleBlob = blob(run => !run.invisible && !run.white);
+
+  const [vx0, vy0, vx1, vy1] = page.view;
+  const items = [];
+  const hiddenSignals = [];
+  let pageText = "";
+
+  function addItem(text, reasons, boost) {
+    if (!text) return;
+    if (pageText) pageText += " ";
+    const start = pageText.length;
+    pageText += text;
+    items.push({ start, end: pageText.length, boost, reasons });
+
+    if (reasons.length) {
+      hiddenSignals.push({
+        page: pageNumber,
+        text,
+        reasons
+      });
+    }
+  }
+
+  for (const item of textItems) {
+    const text = normalize(item.str);
+    if (!text) continue;
+
+    const transform = item.transform || [1,0,0,1,0,0];
+    const fontHeight = Math.max(
+      Math.hypot(transform[2], transform[3]),
+      Math.hypot(transform[0], transform[1])
+    );
+
+    /* text-item positions are in PDF user space, so compare with the page box itself */
+    const x = transform[4] || 0;
+    const y = transform[5] || 0;
+    const outside =
+      x < Math.min(vx0, vx1) - 5 || x > Math.max(vx0, vx1) + 5 ||
+      y < Math.min(vy0, vy1) - 5 || y > Math.max(vy0, vy1) + 5;
+
+    const tiny = fontHeight > 0 && fontHeight < 3.5;
+    const nearlyZero = fontHeight > 0 && fontHeight < 1.1;
+    const key = squash(text);
+    const drawnAs = blobText => key.length >= 4 && blobText.includes(key) && !visibleBlob.includes(key);
+
+    const reasons = [];
+    let boost = 0;
+
+    if (outside) {
+      boost += HIDDEN_BOOST.outside;
+      reasons.push("text positioned outside the normal page area");
+    }
+
+    if (tiny) {
+      boost += HIDDEN_BOOST.tiny;
+      reasons.push(`very small text (~${fontHeight.toFixed(1)} pt-equivalent)`);
+    }
+
+    if (nearlyZero) {
+      boost += HIDDEN_BOOST.zero;
+      reasons.push("near-zero-size text");
+    }
+
+    if (drawnAs(invisibleBlob)) {
+      boost += HIDDEN_BOOST.invisible;
+      reasons.push("text drawn in invisible rendering mode (Tr 3)");
+    } else if (drawnAs(whiteBlob)) {
+      boost += HIDDEN_BOOST.white;
+      reasons.push("text filled in white or near-white");
+    }
+
+    addItem(text, reasons, boost);
+  }
+
+  /* pdf.js leaves glyphs outside the page box out of getTextContent, so off-page text only shows
+     up in the operator list: scan runs that are missing from the extracted text as off-page text.
+     If much of the page is missing the font has no usable Unicode mapping; skip the check then. */
+  const fold = text => squash(text.normalize("NFKC").toLowerCase());
+  const extracted = fold(textItems.map(item => item.str).join(""));
+  const missing = runs.filter(run =>
+    !(ocrLayer && run.invisible) && fold(run.text).length >= 8 && !extracted.includes(fold(run.text))
+  );
+  const missingChars = missing.reduce((sum, run) => sum + fold(run.text).length, 0);
+
+  if (missing.length && missingChars <= totalChars * 0.3) {
+    for (const run of missing) {
+      const reasons = ["text positioned outside the normal page area"];
+      let boost = HIDDEN_BOOST.outside;
+      if (run.invisible) {
+        boost += HIDDEN_BOOST.invisible;
+        reasons.push("text drawn in invisible rendering mode (Tr 3)");
+      } else if (run.white) {
+        boost += HIDDEN_BOOST.white;
+        reasons.push("text filled in white or near-white");
+      }
+      addItem(normalize(run.text), reasons, boost);
+    }
+  }
+
+  const hiddenAt = ranges => {
+    const reasons = new Set();
+    let boost = 0;
+
+    for (const item of items) {
+      if (!item.reasons.length) continue;
+      if (!ranges.some(([from, to]) => item.start < to && from < item.end)) continue;
+      boost = Math.max(boost, item.boost);
+      item.reasons.forEach(reason => reasons.add(reason));
+    }
+
+    return { boost, reasons: [...reasons] };
+  };
+
+  return {
+    text: pageText,
+    fragments: textItems.length,
+    hiddenSignals,
+    ocrLayer,
+    findings: scanText(pageText, pageNumber, hiddenAt)
+  };
 }
 
 function mergeNearby(items) {
@@ -646,8 +914,7 @@ function mergeNearby(items) {
   for (const finding of items) {
     const duplicate = merged.find(item =>
       item.page === finding.page &&
-      (item.evidence.includes(finding.match) || finding.evidence.includes(item.match)) &&
-      Math.abs(item.score - finding.score) <= 5
+      (item.match.includes(finding.match) || finding.match.includes(item.match))
     );
 
     if (duplicate) {
@@ -689,122 +956,17 @@ async function analyzePdf(file) {
     );
 
     const page = await pdf.getPage(pageNumber);
-    const viewport = page.getViewport({scale:1});
-    const textContent = await page.getTextContent({includeMarkedContent:true});
-    const textItems = textContent.items.filter(item =>
-      typeof item.str === "string" && item.str.trim()
-    );
+    const pageResult = await analyzePage(page, pageNumber, pdfjsLib.OPS);
 
-    fragmentCount += textItems.length;
-
-    const pageText = normalize(textItems.map(item => item.str).join(" "));
-    allExtracted += "\n" + pageText;
-
-    findings.push(...scanRules(pageText, pageNumber, 0, []));
-
-    for (const item of textItems) {
-      const text = normalize(item.str);
-      if (!text) continue;
-
-      const transform = item.transform || [1,0,0,1,0,0];
-      const fontHeight = Math.max(
-        Math.hypot(transform[2], transform[3]),
-        Math.hypot(transform[0], transform[1])
-      );
-
-      const x = transform[4] || 0;
-      const y = transform[5] || 0;
-
-      const outside =
-        x < -5 || x > viewport.width + 5 ||
-        y < -5 || y > viewport.height + 5;
-
-      const tiny = fontHeight > 0 && fontHeight < 3.5;
-      const nearlyZero = fontHeight > 0 && fontHeight < 1.1;
-
-      let boost = 0;
-      const reasons = [];
-
-      if (outside) {
-        boost += 5;
-        reasons.push("text positioned outside the normal page area");
-      }
-
-      if (tiny) {
-        boost += 4;
-        reasons.push(`very small text (~${fontHeight.toFixed(1)} pt-equivalent)`);
-      }
-
-      if (nearlyZero) {
-        boost += 3;
-        reasons.push("near-zero-size text");
-      }
-
-      if (reasons.length) {
-        hiddenSignals.push({
-          page: pageNumber,
-          text,
-          reasons
-        });
-
-        findings.push(...scanRules(text, pageNumber, boost, reasons));
-      }
-    }
-
-    try {
-      const opList = await page.getOperatorList();
-      const OPS = pdfjsLib.OPS;
-
-      let renderMode = 0;
-      let invisibleRuns = 0;
-
-      for (let index = 0; index < opList.fnArray.length; index++) {
-        const fn = opList.fnArray[index];
-        const args = opList.argsArray[index];
-
-        if (fn === OPS.setTextRenderingMode) {
-          renderMode = Number(args?.[0] ?? 0);
-        } else if (
-          renderMode === 3 &&
-          (
-            fn === OPS.showText ||
-            fn === OPS.showSpacedText ||
-            fn === OPS.nextLineShowText ||
-            fn === OPS.nextLineSetSpacingShowText
-          )
-        ) {
-          invisibleRuns++;
-        }
-      }
-
-      if (invisibleRuns) {
-        hiddenSignals.push({
-          page: pageNumber,
-          text: "",
-          reasons: [`${invisibleRuns} invisible PDF text-rendering operation(s) detected`]
-        });
-
-        for (const finding of findings) {
-          if (finding.page === pageNumber) {
-            finding.score += 3;
-            finding.severity = severity(finding.score);
-            finding.reasons = [
-              ...new Set([
-                ...finding.reasons,
-                "page contains invisible text-rendering operations"
-              ])
-            ];
-          }
-        }
-      }
-    } catch (error) {
-      console.warn("Operator-list inspection skipped on page", pageNumber, error);
-    }
+    fragmentCount += pageResult.fragments;
+    allExtracted += "\n" + pageResult.text;
+    findings.push(...pageResult.findings);
+    hiddenSignals.push(...pageResult.hiddenSignals);
   }
 
   setProgress(94, "evaluating");
 
-  const documentFindings = scanRules(normalize(allExtracted), 0, 0, []);
+  const documentFindings = scanText(normalize(allExtracted), 0, null);
 
   if (!findings.length && documentFindings.length) {
     for (const finding of documentFindings.slice(0,5)) {

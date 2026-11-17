@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "PDF Splitter"
 permalink: /apps/pdf-splitter/
 excerpt: "Split a PDF into individual pages or extract a custom page range — entirely in your browser, no server, no upload."
+hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
 seo_title: "PDF Splitter · Free Online, No Upload"
 og_image: https://sercankulcu.github.io/images/apps/pdf-splitter.jpg
 web_app: BusinessApplication
-hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
 ---
 
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -296,7 +296,7 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
               aria-describedby="ps-range-hint"
             >
           </div>
-          <div class="ps-range-hint" id="ps-range-hint" data-i18n="rangeHint">Separate ranges with commas. Pages are numbered from 1.</div>
+          <div class="ps-range-hint" id="ps-range-hint" data-i18n="rangeHint">Separate ranges with commas. Pages are numbered from 1; 8- means page 8 to the end.</div>
           <div class="ps-actions">
             <button class="ps-btn primary" id="ps-extract-btn" type="button" data-i18n="extract">Extract pages</button>
           </div>
@@ -373,7 +373,10 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
       building: "Building PDF…", extracted1: "1 page extracted successfully.", extractedN: "{n} pages extracted successfully.",
       extractFail: "Extraction failed: {msg}", noZip: "JSZip not loaded. Try refreshing the page.",
       splitting: "Splitting {n} pages…", splitDone: "{n} PDF files downloaded as ZIP.", splitFail: "Split failed: {msg}",
-      dropPdf: "Please drop a PDF file.", loadedFrom: "Loaded {name} from the previous tool."
+      dropPdf: "Please drop a PDF file.", loadedFrom: "Loaded {name} from the previous tool.",
+      encrypted: "This PDF is encrypted (restricted). Save a copy with Print → Save as PDF first.",
+      badPart: "Could not read “{p}”. Use page numbers and ranges such as 1-3, 5, 8-.",
+      outOfRange: "“{p}” is outside the document. Pages are 1 to {n}."
     }),
     tr: {
       title: "PDF Bölücü", howTo: "Nasıl kullanılır", close: "Kapat",
@@ -381,7 +384,7 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
       dropHint: "Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez",
       change: "Dosyayı değiştir", modeAria: "Bölme biçimi", tabRange: "Aralık çıkar", tabSplit: "Tüm sayfaları böl",
       rangeLabel: "Sayfa aralığı", rangePh: "ör. 1-3, 5, 8-12", rangePhN: "ör. 1-{a}, {b}",
-      rangeHint: "Aralıkları virgülle ayırın. Sayfa numaraları 1'den başlar.",
+      rangeHint: "Aralıkları virgülle ayırın. Sayfa numaraları 1'den başlar; 8- 8. sayfadan sona kadar demektir.",
       extract: "Sayfaları çıkar", splitBtn: "Böl ve ZIP indir",
       splitInfo0: "Her sayfa ayrı bir PDF dosyası olarak kaydedilip bir ZIP arşivinde toplanır.",
       splitInfo: "{n} sayfanın her biri ayrı bir PDF olarak kaydedilip bir ZIP arşivinde toplanır.",
@@ -392,6 +395,9 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
       extractFail: "Çıkarma başarısız: {msg}", noZip: "JSZip yüklenemedi. Sayfayı yenilemeyi deneyin.",
       splitting: "{n} sayfa bölünüyor…", splitDone: "{n} PDF dosyası ZIP olarak indirildi.", splitFail: "Bölme başarısız: {msg}",
       dropPdf: "Lütfen bir PDF dosyası bırakın.", loadedFrom: "{name} önceki araçtan alındı.",
+      encrypted: "Bu PDF şifreli (izinleri kısıtlı). Önce Yazdır → PDF olarak kaydet ile bir kopyasını alın.",
+      badPart: "“{p}” anlaşılamadı. 1-3, 5, 8- gibi sayfa numaraları ve aralıklar yazın.",
+      outOfRange: "“{p}” belgenin dışında. Sayfalar 1 ile {n} arasında.",
       help: `
     <p>Bir sayfa aralığını çıkarın ya da her sayfayı ayrı PDF'lere bölün; hepsi tarayıcınızda.</p>
     <h3>Nasıl kullanılır</h3>
@@ -460,22 +466,21 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
     if (pct !== null) progressBar.style.width = pct + "%";
   }
 
-  function parseRange(str) {
+  /* Returns sorted 0-based page indexes, or throws { key, vars } for the status line.
+     Accepts "3", "1-4", "5-2" (same as 2-5) and "8-" (8 to the last page). */
+  function parseRange(str, total) {
     const pages = new Set();
-    str.split(",").forEach(part => {
-      part = part.trim();
-      const range = part.match(/^(\d+)\s*-\s*(\d+)$/);
-      if (range) {
-        const a = Math.min(+range[1], +range[2]), b = Math.max(+range[1], +range[2]);
-        for (let i = a; i <= Math.min(b, pageCount); i++) {
-          if (i >= 1) pages.add(i - 1);
-        }
-      } else if (/^\d+$/.test(part)) {
-        const n = +part;
-        if (n >= 1 && n <= pageCount) pages.add(n - 1);
-      }
-    });
-    return [...pages].sort((a, b) => a - b);
+    const parts = str.split(",").map(p => p.trim()).filter(Boolean);
+    for (const part of parts) {
+      const m = part.match(/^(\d+)\s*(?:([-–])\s*(\d*))?$/);
+      if (!m) throw { key: "badPart", vars: { p: part } };
+      let a = +m[1];
+      let b = m[2] ? (m[3] === "" ? total : +m[3]) : a;
+      if (a > b) { const t = a; a = b; b = t; }
+      if (a < 1 || b > total) throw { key: "outOfRange", vars: { p: part, n: total } };
+      for (let i = a; i <= b; i++) pages.add(i - 1);
+    }
+    return [...pages].sort((x, y) => x - y);
   }
 
   function baseName() {
@@ -504,9 +509,11 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
       const buf = await file.arrayBuffer();
       const { PDFDocument } = PDFLib;
       const doc = await PDFDocument.load(buf, { ignoreEncryption: false });
+      if (pdfBytes) $("ps-range-input").value = "";
       pdfBytes = buf;
       pageCount = doc.getPageCount();
       fileName = file.name;
+      input.value = "";
 
       fileSize = file.size;
       $("ps-info-name").textContent = file.name;
@@ -517,16 +524,22 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
       drop.classList.add("loaded");
       hideStatus();
     } catch (e) {
-      showStatus("readFail", "error", { msg: e.message || e });
-      pdfBytes = null; pageCount = 0;
-      input.value = "";
+      reset();
+      if (isEncrypted(e)) showStatus("encrypted", "error");
+      else showStatus("readFail", "error", { msg: e.message || e });
     }
+  }
+
+  function isEncrypted(e) {
+    return !!e && (e.name === "EncryptedPDFError" || /encrypted/i.test(String(e.message || e)));
   }
 
   async function extractRange() {
     const rangeStr = $("ps-range-input").value.trim();
     if (!rangeStr) { showStatus("noRange", "error"); return; }
-    const pages = parseRange(rangeStr);
+    let pages;
+    try { pages = parseRange(rangeStr, pageCount); }
+    catch (er) { showStatus(er.key || "badRange", "error", er.vars || { n: pageCount }); return; }
     if (!pages.length) { showStatus("badRange", "error", { n: pageCount }); return; }
 
     $("ps-extract-btn").disabled = true;
@@ -624,7 +637,8 @@ hreflang: {en: "/apps/pdf-splitter/", tr: "/apps/tr/pdf-bol/"}
   }
 
   input.addEventListener("change", () => { if (input.files[0]) loadFile(input.files[0]); });
-  $("ps-change-btn").addEventListener("click", () => { reset(); input.focus(); input.click(); });
+  /* the current file stays until a new one is actually picked (cancelling the picker keeps it) */
+  $("ps-change-btn").addEventListener("click", () => { input.value = ""; input.click(); });
   $("ps-range-input").addEventListener("keydown", e => {
     if (e.key === "Enter") { e.preventDefault(); if (!$("ps-extract-btn").disabled) extractRange(); }
   });

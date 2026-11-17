@@ -3,7 +3,7 @@
 layout: without-sidebar
 title: "Görsel Karartıcı"
 permalink: /apps/tr/gorsel-karart/
-excerpt: "Ekran görüntülerinde ve fotoğraflarda kişisel bilgileri karartın ya da bulanıklaştırın. Yükleme yok."
+excerpt: "Ekran görüntülerinde ve fotoğraflarda kişisel bilgileri karartın ya da pikselleştirin. Yükleme yok."
 lang: tr
 ui_lang: tr
 seo_title: "Görsel Karartma · Ekran Görüntüsünde Bilgi Gizleme"
@@ -430,6 +430,7 @@ html[data-theme="dark"] .ir-status.error {
       countN: "{base} · {n} redactions",
       invalid: "Please choose a valid image file.",
       loadFail: "The image could not be loaded.",
+      exportFail: "The redacted image could not be created.",
       confirmAll: "Remove all {n} redactions?"
     }),
     tr: {
@@ -448,6 +449,7 @@ html[data-theme="dark"] .ir-status.error {
       countN: "{base} · {n} karartma",
       invalid: "Lütfen geçerli bir görsel dosyası seçin.",
       loadFail: "Görsel yüklenemedi.",
+      exportFail: "Karartılmış görsel oluşturulamadı.",
       confirmAll: "{n} karartmanın hepsi kaldırılsın mı?",
       help: `
       <p>Gizlilik aracı: ekran görüntülerindeki ya da fotoğraflardaki hassas bilgileri siyah kutu, beyaz kutu ya da pikselleştirmeyle gizleyin.</p>
@@ -596,7 +598,7 @@ html[data-theme="dark"] .ir-status.error {
     const tempContext = temp.getContext("2d");
 
     tempContext.drawImage(
-      canvas,
+      targetContext.canvas,
       x,
       y,
       width,
@@ -639,6 +641,39 @@ html[data-theme="dark"] .ir-status.error {
 
     drawDraft();
     updateButtons();
+  }
+
+  /* The editing canvas is at most 1400 px; actions are kept in its coordinates.
+     For export, redraw the image at its natural size and replay the actions
+     scaled by 1 / scale (pixelation blocks scale with the rectangle). */
+  function exportCanvas() {
+    const full = document.createElement("canvas");
+    full.width = image.naturalWidth;
+    full.height = image.naturalHeight;
+
+    const fullContext = full.getContext("2d");
+    fullContext.drawImage(image, 0, 0, full.width, full.height);
+
+    const fx = full.width / canvas.width;
+    const fy = full.height / canvas.height;
+
+    actions.forEach(action => {
+      applyRedaction(fullContext, {
+        x1: action.x1 * fx,
+        y1: action.y1 * fy,
+        x2: action.x2 * fx,
+        y2: action.y2 * fy,
+        mode: action.mode
+      });
+    });
+
+    return full;
+  }
+
+  function exportBlob() {
+    return new Promise(resolve => {
+      exportCanvas().toBlob(blob => resolve(blob), "image/png");
+    });
   }
 
   function loadFile(file, note) {
@@ -701,9 +736,8 @@ html[data-theme="dark"] .ir-status.error {
     if (!window.ToolHandoff || !original) {
       return;
     }
-    ToolHandoff.renderNext(byId("ir-next"), "image", () => new Promise(resolve => {
-      canvas.toBlob(blob => resolve(blob ? [{ blob, name: "redacted-image.png" }] : []), "image/png");
-    }));
+    ToolHandoff.renderNext(byId("ir-next"), "image", () => exportBlob()
+      .then(blob => blob ? [{ blob, name: "redacted-image.png" }] : []));
   }
 
   function startDrag(event) {
@@ -871,10 +905,19 @@ html[data-theme="dark"] .ir-status.error {
       return;
     }
 
-    const anchor = document.createElement("a");
-    anchor.href = canvas.toDataURL("image/png");
-    anchor.download = "redacted-image.png";
-    anchor.click();
+    exportBlob().then(blob => {
+      if (!blob) {
+        say(() => i18n.t("exportFail"), true);
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "redacted-image.png";
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
   });
 
   updateButtons();

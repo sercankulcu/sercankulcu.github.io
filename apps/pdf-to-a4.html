@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "PDF to A4 Converter"
 permalink: /apps/pdf-to-a4/
 excerpt: "Convert every PDF page to standard A4 size while preserving original PDF content."
+hreflang: {en: "/apps/pdf-to-a4/", tr: "/apps/tr/pdf-a4/"}
 seo_title: "PDF to A4 Converter · Free Online, No Upload"
 og_image: https://sercankulcu.github.io/images/apps/pdf-to-a4.jpg
 web_app: BusinessApplication
-hreflang: {en: "/apps/pdf-to-a4/", tr: "/apps/tr/pdf-a4/"}
 ---
 
 <style>
@@ -461,7 +461,9 @@ html[data-theme="dark"] .pa4-status.error {
         <li>Content is automatically centered on each A4 page.</li>
         <li>Pages are scaled so that no content is cropped.</li>
         <li>Automatic mode keeps landscape pages landscape.</li>
+        <li>Pages saved with a rotation are placed the way they appear on screen.</li>
         <li>You can add a safety margin around page content.</li>
+        <li>Filled form fields are kept as flat text; comments and highlights may not carry over.</li>
       </ul>
       <p>Useful for mixed page sizes, scanned pages, presentation slides,
         or PDFs that need to print cleanly on standard A4 paper.</p>
@@ -494,7 +496,8 @@ html[data-theme="dark"] .pa4-status.error {
     en: i18nHarvest({
       notPdf: "Please select a PDF file.", noLib: "PDF library could not be loaded.",
       reading: "Reading PDF...", converting: "Converting page {i} of {n}...", saving: "Saving A4 PDF...",
-      marginLarge: "The selected margin is too large.", failMsg: "{msg}", fail: "The PDF could not be converted.",
+      marginLarge: "The selected margin is too large.", failMsg: "The PDF could not be converted. The file may be damaged or unsupported.", fail: "The PDF could not be converted.",
+      encrypted: "This PDF is encrypted (restricted). Save a copy with Print → Save as PDF first.",
       done1: "Done. 1 page converted to A4.", doneN: "Done. {n} pages converted to A4.",
       loadedFrom: "Loaded {name} from the previous tool."
     }),
@@ -506,7 +509,8 @@ html[data-theme="dark"] .pa4-status.error {
       convert: "A4 PDF'e dönüştür", hint: "Önce bir PDF dosyası seçin.", progress: "Dönüştürme ilerlemesi",
       notPdf: "Lütfen bir PDF dosyası seçin.", noLib: "PDF kitaplığı yüklenemedi.",
       reading: "PDF okunuyor...", converting: "Sayfa {i} / {n} dönüştürülüyor...", saving: "A4 PDF kaydediliyor...",
-      marginLarge: "Seçilen kenar boşluğu çok büyük.", failMsg: "PDF dönüştürülemedi. Dosya şifreli ya da bozuk olabilir.",
+      marginLarge: "Seçilen kenar boşluğu çok büyük.", failMsg: "PDF dönüştürülemedi. Dosya bozuk ya da desteklenmeyen bir biçimde olabilir.",
+      encrypted: "Bu PDF şifreli (izinleri kısıtlı). Önce Yazdır → PDF olarak kaydet ile bir kopyasını alın.",
       fail: "PDF dönüştürülemedi.",
       done1: "Bitti. 1 sayfa A4'e dönüştürüldü.", doneN: "Bitti. {n} sayfa A4'e dönüştürüldü.",
       loadedFrom: "{name} önceki araçtan alındı.",
@@ -529,7 +533,9 @@ html[data-theme="dark"] .pa4-status.error {
         <li>İçerik her A4 sayfada kendiliğinden ortalanır.</li>
         <li>Sayfalar hiçbir içerik kırpılmayacak şekilde ölçeklenir.</li>
         <li>Otomatik kipte yatay sayfalar yatay kalır.</li>
+        <li>Döndürülmüş kaydedilen sayfalar ekranda göründükleri gibi yerleştirilir.</li>
         <li>Sayfa içeriğinin çevresine güvenlik boşluğu ekleyebilirsiniz.</li>
+        <li>Doldurulmuş form alanları düz metin olarak korunur; yorum ve vurgulamalar aktarılmayabilir.</li>
       </ul>
       <p>Karışık sayfa boyutları, taranmış sayfalar, sunum slaytları ya da standart A4 kâğıda düzgün
         basılması gereken PDF'ler için kullanışlıdır.</p>
@@ -600,6 +606,44 @@ html[data-theme="dark"] .pa4-status.error {
     lastStatus = null;
     status.textContent = "";
     status.className = "pa4-status";
+  }
+
+  /* Where to draw one source page on its A4 sheet. rawW/rawH: the unrotated page box;
+     rotate: the page's /Rotate (clockwise). The page is drawn with rotate = -rotation
+     about its anchor (x, y), so the anchor moves to whichever corner the rotation
+     swings the unrotated bottom-left to. Returns null when the margin leaves no room. */
+  function layoutPage(rawW, rawH, rotate, mode, margin, upscale, a4) {
+    const rotation = (((Math.round((Number(rotate) || 0) / 90) * 90) % 360) + 360) % 360;
+    const quarter = rotation === 90 || rotation === 270;
+    const shownW = quarter ? rawH : rawW;
+    const shownH = quarter ? rawW : rawH;
+
+    let pageWidth = a4[0];
+    let pageHeight = a4[1];
+    if (mode === "landscape" || (mode === "auto" && shownW > shownH)) {
+      [pageWidth, pageHeight] = [pageHeight, pageWidth];
+    }
+
+    const availableWidth = pageWidth - margin * 2;
+    const availableHeight = pageHeight - margin * 2;
+    if (availableWidth <= 0 || availableHeight <= 0) return null;
+
+    let scale = Math.min(availableWidth / shownW, availableHeight / shownH);
+    if (!upscale && scale > 1) scale = 1;
+
+    const width = rawW * scale;
+    const height = rawH * scale;
+    const boxW = shownW * scale;
+    const boxH = shownH * scale;
+    const left = (pageWidth - boxW) / 2;
+    const bottom = (pageHeight - boxH) / 2;
+
+    let x = left, y = bottom;
+    if (rotation === 90) { y = bottom + width; }
+    else if (rotation === 180) { x = left + width; y = bottom + height; }
+    else if (rotation === 270) { x = left + height; }
+
+    return { pageWidth, pageHeight, x, y, width, height, rotation };
   }
 
   function selectFile(file) {
@@ -685,7 +729,8 @@ html[data-theme="dark"] .pa4-status.error {
     try {
       const {
         PDFDocument,
-        PageSizes
+        PageSizes,
+        degrees
       } = window.PDFLib;
 
       const bytes = await selectedFile.arrayBuffer();
@@ -696,6 +741,9 @@ html[data-theme="dark"] .pa4-status.error {
           ignoreEncryption: false
         }
       );
+
+      /* bake form field values into the page content; embedPage drops the widgets otherwise */
+      try { sourcePdf.getForm().flatten(); } catch (e) {}
 
       const outputPdf = await PDFDocument.create();
 
@@ -721,75 +769,38 @@ html[data-theme="dark"] .pa4-status.error {
         showStatus("converting", "processing", { i: pageIndex + 1, n: totalPages });
 
         const sourcePage = sourcePdf.getPage(pageIndex);
-        const sourceSize = sourcePage.getSize();
-
-        let targetWidth = PageSizes.A4[0];
-        let targetHeight = PageSizes.A4[1];
-
-        if (orientation.value === "landscape") {
-          [targetWidth, targetHeight] =
-            [targetHeight, targetWidth];
-        } else if (
-          orientation.value === "auto" &&
-          sourceSize.width > sourceSize.height
-        ) {
-          [targetWidth, targetHeight] =
-            [targetHeight, targetWidth];
-        }
-
-        const availableWidth =
-          targetWidth - margin * 2;
-
-        const availableHeight =
-          targetHeight - margin * 2;
-
-        if (
-          availableWidth <= 0 ||
-          availableHeight <= 0
-        ) {
-          throw Object.assign(new Error(I18N.en.marginLarge), { i18nKey: "marginLarge" });
-        }
 
         const embeddedPage =
           await outputPdf.embedPage(sourcePage);
 
-        let scale = Math.min(
-          availableWidth / sourceSize.width,
-          availableHeight / sourceSize.height
+        const layout = layoutPage(
+          embeddedPage.width,
+          embeddedPage.height,
+          sourcePage.getRotation().angle,
+          orientation.value,
+          margin,
+          allowUpscale.checked,
+          PageSizes.A4
         );
 
-        if (
-          !allowUpscale.checked &&
-          scale > 1
-        ) {
-          scale = 1;
+        if (!layout) {
+          throw Object.assign(new Error(I18N.en.marginLarge), { i18nKey: "marginLarge" });
         }
-
-        const drawWidth =
-          sourceSize.width * scale;
-
-        const drawHeight =
-          sourceSize.height * scale;
-
-        const x =
-          (targetWidth - drawWidth) / 2;
-
-        const y =
-          (targetHeight - drawHeight) / 2;
 
         const outputPage =
           outputPdf.addPage([
-            targetWidth,
-            targetHeight
+            layout.pageWidth,
+            layout.pageHeight
           ]);
 
         outputPage.drawPage(
           embeddedPage,
           {
-            x,
-            y,
-            width: drawWidth,
-            height: drawHeight
+            x: layout.x,
+            y: layout.y,
+            width: layout.width,
+            height: layout.height,
+            rotate: degrees(-layout.rotation)
           }
         );
 
@@ -846,8 +857,8 @@ html[data-theme="dark"] .pa4-status.error {
       console.error(error);
 
       if (error && error.i18nKey) showStatus(error.i18nKey, "error");
-      else if (error && error.message) showStatus("failMsg", "error", { msg: error.message });
-      else showStatus("fail", "error");
+      else if (error && (error.name === "EncryptedPDFError" || /encrypted/i.test(String(error.message || error)))) showStatus("encrypted", "error");
+      else showStatus("failMsg", "error");
     } finally {
       convertBtn.disabled = !selectedFile;
     }

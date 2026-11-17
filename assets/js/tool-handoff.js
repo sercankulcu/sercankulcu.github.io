@@ -22,34 +22,33 @@
       ['/apps/pdf-merger/', 'Merge'],
       ['/apps/pdf-splitter/', 'Split'],
       ['/apps/pdf-page-organizer/', 'Organize pages'],
-      ['/apps/pdf-signer/', 'Sign'],
-      ['/apps/pdf-form-filler/', 'Fill form'],
+      ['/apps/pdf-signer/', 'Fill & sign'],
       ['/apps/pdf-to-a4/', 'Fit to A4'],
       ['/apps/pdf-to-image/', 'Convert to images'],
       ['/apps/pdf-metadata-viewer/', 'View metadata']
     ],
     image: [
-      ['/apps/image-compressor-resizer/', 'Compress / resize'],
-      ['/apps/image-format-converter/', 'Convert format'],
+      ['/apps/image-compressor-resizer/', 'Compress / convert'],
       ['/apps/image-background-remover/', 'Remove background'],
       ['/apps/image-redactor/', 'Redact'],
       ['/apps/image-color-palette/', 'Extract colors'],
-      ['/apps/image-to-a4-pdf/', 'Image to A4 PDF'],
+      ['/apps/image-to-a4-pdf/', 'Split into A4 PDF'],
       ['/apps/images-to-pdf/', 'Images to PDF'],
       ['/apps/image-metadata-viewer/', 'View metadata'],
       ['/apps/favicon-generator/', 'Make favicon'],
-      ['/apps/signature-maker/', 'Signature from photo']
+      ['/apps/signature-maker/', 'Signature from photo'],
+      ['/apps/pdf-signer/', 'Sign a PDF']
     ]
   };
 
   /* Turkish names; the language is the shared tool choice (assets/js/tool-i18n.js, "pz:lang") */
   var TR = {
     'Compress': 'Sıkıştır', 'Merge': 'Birleştir', 'Split': 'Böl', 'Organize pages': 'Sayfaları düzenle',
-    'Sign': 'İmzala', 'Fill form': 'Formu doldur', 'Fit to A4': "A4'e sığdır", 'Convert to images': 'Görsele dönüştür',
-    'View metadata': 'Üst verileri gör', 'Compress / resize': 'Sıkıştır / boyutlandır', 'Convert format': 'Biçim dönüştür',
+    'Fill & sign': 'Doldur ve imzala', 'Fit to A4': "A4'e sığdır", 'Convert to images': 'Görsele dönüştür',
+    'View metadata': 'Üst verileri gör', 'Compress / convert': 'Sıkıştır / dönüştür',
     'Remove background': 'Arka planı kaldır', 'Redact': 'Karart', 'Extract colors': 'Renkleri çıkar',
-    'Image to A4 PDF': "A4 PDF'e çevir", 'Images to PDF': 'Görsellerden PDF', 'Make favicon': 'Favicon yap',
-    'Signature from photo': 'Fotoğraftan imza', 'Continue with': 'Şununla devam et'
+    'Split into A4 PDF': "A4 sayfalara böl", 'Images to PDF': 'Görsellerden PDF', 'Make favicon': 'Favicon yap',
+    'Signature from photo': 'Fotoğraftan imza', 'Sign a PDF': 'PDF imzala', 'Continue with': 'Şununla devam et'
   };
 
   function lang() {

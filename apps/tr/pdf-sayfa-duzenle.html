@@ -329,7 +329,7 @@ html[data-theme="dark"] .po-status.error {
           spellcheck="false"
           aria-describedby="po-order-hint"
         >
-        <div class="po-hint" id="po-order-hint" data-i18n="orderHint">Comma-separated page numbers. Leave a page out to delete it; repeat it to duplicate it.</div>
+        <div class="po-hint" id="po-order-hint" data-i18n="orderHint">Page numbers or ranges such as 1-5, 8 (commas or spaces). Leave a page out to delete it; repeat it to duplicate it; 5-1 reverses.</div>
       </div>
 
       <div class="po-field">
@@ -426,14 +426,17 @@ const dropHint = byId("po-drop-hint");
     openFail: "The PDF could not be opened. It may be encrypted, damaged or unsupported.",
     badOrder: "Output page order is empty or invalid.", creating: "Creating organized PDF...",
     done1: "Done. 1 page in the output PDF.", doneN: "Done. {n} pages in the output PDF.",
-    fail: "The organized PDF could not be created.", loadedFrom: "Loaded {name} from the previous tool."
+    fail: "The organized PDF could not be created.", loadedFrom: "Loaded {name} from the previous tool.",
+    encrypted: "This PDF is encrypted (restricted). Save a copy with Print → Save as PDF first.",
+    badPart: "{f}: could not read “{p}”. Use page numbers and ranges such as 1-5, 8.",
+    outOfRange: "{f}: “{p}” is out of range. Use 1 to {n}."
   };
   const TR = {
     title: "PDF Sayfa Düzenleyici", howTo: "Nasıl kullanılır", close: "Kapat",
     dropTitle: "PDF'yi buraya bırakın ya da seçin", dropHint: "Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez",
     replace: "Değiştirmek için tıklayın ya da yeni dosya bırakın",
     order: "Çıktı sayfa sırası",
-    orderHint: "Virgülle ayrılmış sayfa numaraları. Silmek istediğiniz sayfayı yazmayın; çoğaltmak için tekrar yazın.",
+    orderHint: "1-5, 8 gibi sayfa numaraları ya da aralıklar (virgül ya da boşlukla). Silmek istediğiniz sayfayı yazmayın; çoğaltmak için tekrar yazın; 5-1 ters sıra verir.",
     rotPages: "Döndürülecek çıktı sayfaları", rotPh: "ör. 2,4",
     rotHint: "Özgün sayfa numaraları değil, çıktı sırasındaki konumlar.",
     rotation: "Döndürme", cw90: "Saat yönünde 90°", cw270: "Saat yönünde 270°",
@@ -444,12 +447,15 @@ const dropHint = byId("po-drop-hint");
     badOrder: "Çıktı sayfa sırası boş ya da geçersiz.", creating: "Düzenlenmiş PDF hazırlanıyor...",
     done1: "Bitti. Çıktı PDF'de 1 sayfa var.", doneN: "Bitti. Çıktı PDF'de {n} sayfa var.",
     fail: "Düzenlenmiş PDF oluşturulamadı.", loadedFrom: "{name} önceki araçtan alındı.",
+    encrypted: "Bu PDF şifreli (izinleri kısıtlı). Önce Yazdır → PDF olarak kaydet ile bir kopyasını alın.",
+    badPart: "{f}: “{p}” anlaşılamadı. 1-5, 8 gibi sayfa numaraları ve aralıklar yazın.",
+    outOfRange: "{f}: “{p}” sınırların dışında. 1 ile {n} arasında olmalı.",
     help: `
     <p>PDF sayfalarını yeniden sıralayın, silin ve döndürün. 3,1,2,5 gibi basit bir çıktı listesi kullanın.</p>
     <h3>Nasıl kullanılır</h3>
     <ol>
       <li>PDF'yi kutuya bırakın ya da kutuya tıklayıp bir dosya seçin.</li>
-      <li>Çıktı sayfa sırasını virgülle ayrılmış sayfa numaraları olarak yazın. Bir sayfayı çoğaltmak için numarasını tekrar yazın.</li>
+      <li>Çıktı sayfa sırasını 1-5, 8 gibi sayfa numaraları ya da aralıklar olarak yazın. Bir sayfayı çoğaltmak için numarasını tekrar yazın; 5-1 gibi azalan bir aralık sayfaları ters çevirir.</li>
       <li>Sayfa silmek için o sayfayı çıktı sırasına yazmayın.</li>
       <li>Sayfa döndürmek için çıktı sırasındaki konumlarını yazıp döndürme açısını seçin.</li>
       <li><strong>Düzenlenmiş PDF'yi indir</strong>'e basın.</li>
@@ -516,15 +522,37 @@ const dropHint = byId("po-drop-hint");
     status.classList.toggle("error", error);
   }
 
-  function parseList(text) {
-    return text
-      .split(",")
-      .map(value => Number.parseInt(value.trim(), 10))
-      .filter(number =>
-        Number.isInteger(number) &&
-        number >= 1 &&
-        number <= pageCount
-      );
+  /* Keeps order and repeats. Items are separated by commas or spaces; "a-b" expands
+     (descending "5-1" too). Throws { key, vars } on an unreadable or out-of-range item. */
+  function parseList(text, max, fieldKey) {
+    const items = String(text)
+      .replace(/\s*[-–]\s*/g, "-")
+      .split(/[\s,;]+/)
+      .filter(Boolean);
+    const out = [];
+    for (const item of items) {
+      const m = item.match(/^(\d+)(?:-(\d+))?$/);
+      if (!m) throw { key: "badPart", vars: { f: fieldKey, p: item } };
+      const a = Number(m[1]);
+      const b = m[2] === undefined ? a : Number(m[2]);
+      if (a < 1 || b < 1 || a > max || b > max) throw { key: "outOfRange", vars: { f: fieldKey, p: item, n: max } };
+      const step = a <= b ? 1 : -1;
+      for (let i = a; i !== b + step; i += step) out.push(i);
+    }
+    return out;
+  }
+  function listError(er) {
+    if (er && er.key) {
+      const fKey = er.vars.f;
+      /* getter: the field label follows a later language switch */
+      const v = { p: er.vars.p, n: er.vars.n, get f() { return T(fKey); } };
+      setStatus(er.key, true, v);
+    } else {
+      setStatus("badOrder", true);
+    }
+  }
+  function isEncrypted(e) {
+    return !!e && (e.name === "EncryptedPDFError" || /encrypted/i.test(String(e.message || e)));
   }
 
   function clearAll() {
@@ -607,7 +635,7 @@ const dropHint = byId("po-drop-hint");
       downloadBtn.disabled = true;
       clearBtn.disabled = true;
 
-      setStatus("openFail", true);
+      setStatus(isEncrypted(error) ? "encrypted" : "openFail", true);
     }
   }
 
@@ -656,10 +684,13 @@ const dropHint = byId("po-drop-hint");
       return;
     }
 
-    const order = parseList(orderInput.value);
-
-    if (!order.length) {
-      setStatus("badOrder", true);
+    let order, rotateList;
+    try {
+      order = parseList(orderInput.value, pageCount, "order");
+      if (!order.length) { setStatus("badOrder", true); return; }
+      rotateList = parseList(rotatePagesInput.value, order.length, "rotPages");
+    } catch (er) {
+      listError(er);
       return;
     }
 
@@ -685,12 +716,7 @@ const dropHint = byId("po-drop-hint");
         outputPdf.addPage(page);
       });
 
-      const rotatePages =
-        new Set(
-          parseList(
-            rotatePagesInput.value
-          )
-        );
+      const rotatePages = new Set(rotateList);
 
       const degrees =
         Number(rotationInput.value);
@@ -738,7 +764,7 @@ const dropHint = byId("po-drop-hint");
         outputUrl;
 
       anchor.download =
-        "organized.pdf";
+        (fileName.replace(/\.pdf$/i, "") || "document") + "-organized.pdf";
 
       document.body
         .appendChild(anchor);
@@ -820,7 +846,7 @@ const dropHint = byId("po-drop-hint");
     <h3>How to use</h3>
     <ol>
       <li>Drop a PDF on the drop zone, or click it to choose a file.</li>
-      <li>Type the output page order as comma-separated page numbers. Repeat a number to duplicate a page.</li>
+      <li>Type the output page order as page numbers or ranges such as 1-5, 8. Repeat a number to duplicate a page; a descending range such as 5-1 reverses the pages.</li>
       <li>To delete pages, simply omit them from the output page order.</li>
       <li>To rotate pages, list their positions in the output order and choose the rotation.</li>
       <li>Press <strong>Download Organized PDF</strong>.</li>

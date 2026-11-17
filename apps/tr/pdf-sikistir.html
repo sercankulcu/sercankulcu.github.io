@@ -392,9 +392,9 @@ html[data-theme="dark"] .pc-status.error {
           <label for="pc-scale" data-i18n="scale">Render scale</label>
 
           <select id="pc-scale">
-            <option value="1" data-i18n="small">Small</option>
-            <option value="1.35" selected data-i18n="balanced">Balanced</option>
-            <option value="1.7" data-i18n="high">High quality</option>
+            <option value="1.5" data-i18n="small">Small (108 dpi)</option>
+            <option value="2" selected data-i18n="balanced">Balanced (144 dpi)</option>
+            <option value="2.5" data-i18n="high">High quality (180 dpi)</option>
           </select>
         </div>
       </div>
@@ -482,8 +482,10 @@ const I18N = {
     smaller: "Original: {a} · Output: {b} · {n}% smaller", larger: "Original: {a} · Output: {b} · {n}% larger",
     notPdf: "Please choose a PDF file.", readFail: "The PDF could not be read.", noLib: "PDF library could not be loaded.",
     opening: "Opening PDF…", page: "Processing page {i} of {n}…", saving: "Saving compressed PDF…",
-    done: "Compression complete.",
-    doneLarger: "Done, but the output is larger than the original. Keep the original file or try a lower quality.",
+    lossless: "Trying lossless optimization…",
+    done: "Compression complete. Pages were turned into images, so text can no longer be selected.",
+    doneLossless: "Compression complete. The lossless optimization was smallest, so text, links and forms are kept.",
+    doneLarger: "The original file is already smaller, so nothing was downloaded. Keep the original or try a lower quality or scale.",
     fail: "The PDF could not be compressed. It may be encrypted, damaged or unsupported.",
     loadedFrom: "Loaded {name} from the previous tool."
   }),
@@ -491,14 +493,16 @@ const I18N = {
     title: "PDF Sıkıştırıcı", howTo: "Nasıl kullanılır", close: "Kapat",
     dropTitle: "PDF'yi buraya bırakın ya da seçin", dropHint: "Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez",
     replace: "Değiştirmek için tıklayın ya da yeni dosya bırakın",
-    quality: "Kalite", scale: "Çizim ölçeği", small: "Küçük", balanced: "Dengeli", high: "Yüksek kalite",
+    quality: "Kalite", scale: "Çizim ölçeği", small: "Küçük (108 dpi)", balanced: "Dengeli (144 dpi)", high: "Yüksek kalite (180 dpi)",
     compress: "Sıkıştır ve indir", clear: "Temizle",
     choose: "Bir PDF seçin.", ready: "{name} · {size} · hazır",
     smaller: "Özgün: {a} · Çıktı: {b} · %{n} daha küçük", larger: "Özgün: {a} · Çıktı: {b} · %{n} daha büyük",
     notPdf: "Lütfen bir PDF dosyası seçin.", readFail: "PDF okunamadı.", noLib: "PDF kitaplığı yüklenemedi.",
     opening: "PDF açılıyor…", page: "Sayfa işleniyor: {i} / {n}…", saving: "Sıkıştırılmış PDF kaydediliyor…",
-    done: "Sıkıştırma tamamlandı.",
-    doneLarger: "Bitti, ama çıktı özgün dosyadan büyük. Özgün dosyayı saklayın ya da daha düşük bir kalite deneyin.",
+    lossless: "Kayıpsız iyileştirme deneniyor…",
+    done: "Sıkıştırma tamamlandı. Sayfalar görsele çevrildi; metin artık seçilemez.",
+    doneLossless: "Sıkıştırma tamamlandı. En küçük sonucu kayıpsız iyileştirme verdi; metin, bağlantılar ve formlar korundu.",
+    doneLarger: "Özgün dosya zaten daha küçük, bu yüzden hiçbir şey indirilmedi. Özgün dosyayı kullanın ya da daha düşük bir kalite ya da ölçek deneyin.",
     fail: "PDF sıkıştırılamadı. Şifreli, bozuk ya da desteklenmeyen bir dosya olabilir.",
     loadedFrom: "{name} önceki araçtan alındı.",
     help: `
@@ -507,7 +511,7 @@ const I18N = {
     <ol>
       <li>PDF'yi kutuya bırakın ya da kutuya tıklayıp bir dosya seçin.</li>
       <li>JPEG kalitesini ve çizim ölçeğini ayarlayın. Düşük değerler daha küçük dosya verir.</li>
-      <li><strong>Sıkıştır ve indir</strong>'e basın ve yeni boyutu özgün boyutla karşılaştırın.</li>
+      <li><strong>Sıkıştır ve indir</strong>'e basın ve yeni boyutu özgün boyutla karşılaştırın. Araç kayıpsız bir iyileştirme de dener ve en küçük sonucu verir; özgün dosya zaten en küçükse hiçbir şey indirilmez.</li>
       <li><strong>Şununla devam et</strong> sıkıştırılmış PDF'yi doğrudan başka bir araca aktarır.</li>
     </ol>
     <h3>Notlar</h3>
@@ -710,6 +714,18 @@ compressBtn.addEventListener("click", async () => {
   setStatus("opening");
 
   try {
+    /* 1) lossless pass: re-save with object streams; text, links and forms survive */
+    let lossless = null;
+    try {
+      setStatus("lossless");
+      const plain = await PDFLib.PDFDocument.load(sourceBytes.slice(), { updateMetadata: false });
+      lossless = await plain.save({ useObjectStreams: true });
+    } catch (e) {
+      console.warn(e);
+      lossless = null;
+    }
+
+    /* 2) raster pass */
     const sourcePdf =
       await pdfjsLib.getDocument({
         data: sourceBytes.slice()
@@ -776,16 +792,14 @@ compressBtn.addEventListener("click", async () => {
           )
         );
 
-      const sourceWidth =
-        Math.abs(page.view[2] - page.view[0]);
-
-      const sourceHeight =
-        Math.abs(page.view[3] - page.view[1]);
+      /* the scale-1 viewport already applies /Rotate, so rotated pages keep their shape */
+      const pageBox =
+        page.getViewport({ scale: 1 });
 
       const outputPage =
         outputPdf.addPage([
-          sourceWidth,
-          sourceHeight
+          pageBox.width,
+          pageBox.height
         ]);
 
       outputPage.drawImage(
@@ -798,6 +812,10 @@ compressBtn.addEventListener("click", async () => {
         }
       );
 
+      canvas.width = 0;
+      canvas.height = 0;
+      page.cleanup();
+
       progressBar.style.width =
         `${Math.round(
           pageNumber /
@@ -808,8 +826,31 @@ compressBtn.addEventListener("click", async () => {
 
     setStatus("saving");
 
-    const outputBytes =
+    const rasterBytes =
       await outputPdf.save();
+
+    sourcePdf.loadingTask.destroy().catch(() => {});
+
+    /* 3) keep whichever is smallest; never hand out a file bigger than the original */
+    const originalSize =
+      sourceFile.size;
+
+    let outputBytes = rasterBytes;
+    let usedLossless = false;
+    if (lossless && lossless.length <= rasterBytes.length) {
+      outputBytes = lossless;
+      usedLossless = true;
+    }
+
+    const outputSize =
+      outputBytes.length;
+
+    if (outputSize >= originalSize) {
+      setInfo("larger", { a: humanSize(originalSize), b: humanSize(outputSize), n: originalSize > 0 ? Math.round((outputSize / originalSize - 1) * 100) : 0 });
+      setStatus("doneLarger");
+      showNext({ blob: sourceFile, name: sourceFile.name });
+      return;
+    }
 
     if (outputUrl) {
       URL.revokeObjectURL(outputUrl);
@@ -846,23 +887,15 @@ compressBtn.addEventListener("click", async () => {
 
     showNext({ blob: outputBlob, name: anchor.download });
 
-    const originalSize =
-      sourceFile.size;
-
-    const outputSize =
-      outputBytes.length;
-
     const reduction =
-      originalSize > 0
-        ? Math.round(
-            (1 - outputSize / originalSize) *
-            100
-          )
-        : 0;
+      Math.round(
+        (1 - outputSize / originalSize) *
+        100
+      );
 
-    setInfo(reduction >= 0 ? "smaller" : "larger", { a: humanSize(originalSize), b: humanSize(outputSize), n: Math.abs(reduction) });
+    setInfo("smaller", { a: humanSize(originalSize), b: humanSize(outputSize), n: reduction });
 
-    setStatus(reduction >= 0 ? "done" : "doneLarger");
+    setStatus(usedLossless ? "doneLossless" : "done");
 
     window.setTimeout(() => {
       if (outputUrl) {
@@ -916,7 +949,7 @@ i18n = ToolI18n.setup(I18N, () => {
     <ol>
       <li>Drop a PDF on the drop zone, or click it to choose a file.</li>
       <li>Set the JPEG quality and the render scale. Lower values give smaller files.</li>
-      <li>Press <strong>Compress &amp; Download</strong> and compare the new size with the original.</li>
+      <li>Press <strong>Compress &amp; Download</strong> and compare the new size with the original. The tool also tries a lossless optimization and keeps whichever result is smallest; if the original is already smallest, nothing is downloaded.</li>
       <li><strong>Continue with</strong> passes the compressed PDF straight to another tool.</li>
     </ol>
     <h3>Notes</h3>

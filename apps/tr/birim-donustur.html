@@ -600,18 +600,18 @@ html[data-theme="dark"] .uc-btn {
       l: ["Liter", 1],
       ml: ["Milliliter", .001],
       m3: ["Cubic meter", 1000],
-      cup: ["US cup", .2365882365],
-      tbsp: ["US tablespoon", .01478676478],
-      tsp: ["US teaspoon", .004928921594],
+      cup: ["US cup", 3.785411784 / 16],
+      tbsp: ["US tablespoon", 3.785411784 / 256],
+      tsp: ["US teaspoon", 3.785411784 / 768],
       gal: ["US gallon", 3.785411784],
-      floz: ["US fluid ounce", .02957352956]
+      floz: ["US fluid ounce", 3.785411784 / 128]
     },
 
     Speed: {
       ms: ["Meter/second", 1],
-      kmh: ["Kilometer/hour", .2777777778],
+      kmh: ["Kilometer/hour", 1000 / 3600],
       mph: ["Mile/hour", .44704],
-      knot: ["Knot", .5144444444]
+      knot: ["Knot", 1852 / 3600]
     },
 
     Time: {
@@ -631,7 +631,12 @@ html[data-theme="dark"] .uc-btn {
       TB: ["Terabyte", 1e12],
       KiB: ["Kibibyte", 1024],
       MiB: ["Mebibyte", 1048576],
-      GiB: ["Gibibyte", 1073741824]
+      GiB: ["Gibibyte", 1073741824],
+      TiB: ["Tebibyte", 1099511627776],
+      bit: ["Bit", 1 / 8],
+      kbit: ["Kilobit", 1000 / 8],
+      Mbit: ["Megabit", 1e6 / 8],
+      Gbit: ["Gigabit", 1e9 / 8]
     },
 
     Temperature: {
@@ -711,7 +716,7 @@ html[data-theme="dark"] .uc-btn {
     l: "Litre", ml: "Mililitre", m3: "Metreküp", cup: "ABD su bardağı", tbsp: "ABD yemek kaşığı", tsp: "ABD çay kaşığı", gal: "ABD galonu", floz: "ABD sıvı onsu",
     ms: "Metre/saniye", kmh: "Kilometre/saat", mph: "Mil/saat", knot: "Knot (deniz mili/saat)",
     s: "Saniye", min: "Dakika", h: "Saat", day: "Gün", week: "Hafta", year: "Yıl",
-    B: "Bayt", KB: "Kilobayt", MB: "Megabayt", GB: "Gigabayt", TB: "Terabayt", KiB: "Kibibayt", MiB: "Mebibayt", GiB: "Gibibayt",
+    B: "Bayt", KB: "Kilobayt", MB: "Megabayt", GB: "Gigabayt", TB: "Terabayt", KiB: "Kibibayt", MiB: "Mebibayt", GiB: "Gibibayt", TiB: "Tebibayt", bit: "Bit", kbit: "Kilobit", Mbit: "Megabit", Gbit: "Gigabit",
     C: "Celsius", F: "Fahrenheit", K: "Kelvin"
   };
   let i18n = null;
@@ -850,6 +855,9 @@ html[data-theme="dark"] .uc-btn {
     ).toString();
   }
 
+  /* Unrounded result of the last conversion; used by the swap button. */
+  let lastOutput = NaN;
+
   function convert() {
     const value =
       parseFloat(
@@ -865,6 +873,8 @@ html[data-theme="dark"] .uc-btn {
     if (
       Number.isNaN(value)
     ) {
+      lastOutput = NaN;
+
       toValue.value =
         "";
 
@@ -872,7 +882,7 @@ html[data-theme="dark"] .uc-btn {
         "";
 
       formula.textContent =
-        fromValue.value.trim() ? i18n.t("invalid") : "";
+        fromValue.validity && fromValue.validity.badInput ? i18n.t("invalid") : "";
 
       byId("uc-copy").disabled = true;
       byId("uc-copy").title = i18n.t("enterFirst");
@@ -898,6 +908,8 @@ html[data-theme="dark"] .uc-btn {
         DATA[category][source][1] /
         DATA[category][target][1];
     }
+
+    lastOutput = output;
 
     const formatted =
       formatNumber(
@@ -1028,11 +1040,11 @@ html[data-theme="dark"] .uc-btn {
         toUnit.value =
           source;
 
-        const current =
-          toValue.value;
-
+        /* Use the raw result (15 significant digits drops only float noise), not the rounded display text. */
         fromValue.value =
-          current || 1;
+          Number.isFinite(lastOutput)
+            ? String(Number(lastOutput.toPrecision(15)))
+            : (toValue.value || 1);
 
         convert();
       }

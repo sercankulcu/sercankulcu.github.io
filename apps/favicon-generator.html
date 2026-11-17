@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "Favicon Generator"
 permalink: /apps/favicon-generator/
 excerpt: "Generate favicon PNG files and a ready-to-use favicon package directly in your browser."
+hreflang: {en: "/apps/favicon-generator/", tr: "/apps/tr/favicon-olustur/"}
 seo_title: "Favicon Generator · Free Online"
 og_image: https://sercankulcu.github.io/images/apps/favicon-generator.jpg
 web_app: UtilitiesApplication
-hreflang: {en: "/apps/favicon-generator/", tr: "/apps/tr/favicon-olustur/"}
 ---
 
 <style>
@@ -708,7 +708,8 @@ html[data-theme="dark"] .favicon-btn.primary {
     </ol>
     <h3>Downloads</h3>
     <ul>
-      <li><b>Download All PNGs</b> gives a ZIP with 16, 32 and 48 px favicons, <code>apple-touch-icon.png</code> (180 px), the 192 and 512 px Android icons, a <code>site.webmanifest</code> and <code>favicon-links.txt</code> with the HTML tags to paste into your page.</li>
+      <li><b>Download All PNGs</b> gives a ZIP with 16, 32 and 48 px favicons, a <code>favicon.ico</code> holding those three sizes, <code>apple-touch-icon.png</code> (180 px), the 192 and 512 px Android icons, a <code>site.webmanifest</code> and <code>favicon-links.txt</code> with the HTML tags to paste into your page.</li>
+      <li>The 180, 192 and 512 px icons are always square with a solid background (white when <b>Transparent background</b> is ticked): iOS and Android round the corners themselves, and iOS paints transparent areas black.</li>
       <li><b>Download favicon-32x32.png</b> saves only the most common size.</li>
     </ul>
     <h3>Privacy</h3>
@@ -783,7 +784,8 @@ html[data-theme="dark"] .favicon-btn.primary {
         "<li>Küçük önizlemelere bakın, sonra indirin.</li>" +
         "<li>Görseli Ctrl+V ile yapıştırabilir ya da başka bir araçtan görselle buraya gelebilirsiniz.</li>" +
         "</ol><h3>İndirmeler</h3><ul>" +
-        "<li><b>Tüm PNG'leri indir</b> bir ZIP verir: 16, 32 ve 48 px favicon'lar, <code>apple-touch-icon.png</code> (180 px), 192 ve 512 px Android simgeleri, bir <code>site.webmanifest</code> ve sayfanıza yapıştıracağınız HTML etiketlerini içeren <code>favicon-links.txt</code>.</li>" +
+        "<li><b>Tüm PNG'leri indir</b> bir ZIP verir: 16, 32 ve 48 px favicon'lar, bu üç boyutu içeren bir <code>favicon.ico</code>, <code>apple-touch-icon.png</code> (180 px), 192 ve 512 px Android simgeleri, bir <code>site.webmanifest</code> ve sayfanıza yapıştıracağınız HTML etiketlerini içeren <code>favicon-links.txt</code>.</li>" +
+        "<li>180, 192 ve 512 px simgeler her zaman kare ve dolu zeminlidir (<b>Saydam arka plan</b> işaretliyse beyaz): iOS ve Android köşeleri kendisi yuvarlar, iOS saydam alanları siyaha boyar.</li>" +
         "<li><b>favicon-32x32.png indir</b> yalnızca en yaygın boyutu kaydeder.</li>" +
         "</ul><h3>Gizlilik</h3>" +
         "<p>Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez.</p>" +
@@ -808,6 +810,91 @@ html[data-theme="dark"] .favicon-btn.primary {
 
   const image =
     new Image();
+
+  /* Home-screen icons: iOS paints transparent pixels black and both iOS and
+     Android apply their own corner mask, so these stay square and opaque. */
+  const OPAQUE_SIZES = [180, 192, 512];
+
+  /* Halved copies of the source image, so small icons are drawn with at most
+     a 2x reduction per step instead of one blurry/aliased jump. */
+  let mips = null;
+
+  function buildMips() {
+    mips = [image];
+
+    let w = image.naturalWidth;
+    let h = image.naturalHeight;
+
+    if (!w || !h) {
+      return;
+    }
+
+    while (w > 32 && h > 32) {
+      w = Math.max(1, Math.round(w / 2));
+      h = Math.max(1, Math.round(h / 2));
+
+      const step = document.createElement("canvas");
+      step.width = w;
+      step.height = h;
+
+      const stepContext = step.getContext("2d");
+      stepContext.imageSmoothingEnabled = true;
+      stepContext.imageSmoothingQuality = "high";
+      stepContext.drawImage(mips[mips.length - 1], 0, 0, w, h);
+
+      mips.push(step);
+    }
+  }
+
+  function sourceFor(width, height) {
+    if (!mips) {
+      buildMips();
+    }
+
+    let best = mips[0];
+
+    for (const level of mips) {
+      const lw = level.naturalWidth || level.width;
+      const lh = level.naturalHeight || level.height;
+
+      if (lw >= width && lh >= height) {
+        best = level;
+      }
+    }
+
+    return best;
+  }
+
+  /* favicon.ico: ICONDIR (6 bytes), one 16-byte ICONDIRENTRY per image,
+     then the PNG files themselves (PNG-in-ICO, supported since Windows Vista). */
+  function buildIco(images) {
+    const headerSize = 6 + 16 * images.length;
+    const total = images.reduce((sum, item) => sum + item.bytes.length, headerSize);
+    const out = new Uint8Array(total);
+    const view = new DataView(out.buffer);
+
+    view.setUint16(0, 0, true);
+    view.setUint16(2, 1, true);
+    view.setUint16(4, images.length, true);
+
+    let offset = headerSize;
+
+    images.forEach((item, i) => {
+      const entry = 6 + 16 * i;
+      view.setUint8(entry, item.size >= 256 ? 0 : item.size);
+      view.setUint8(entry + 1, item.size >= 256 ? 0 : item.size);
+      view.setUint8(entry + 2, 0);
+      view.setUint8(entry + 3, 0);
+      view.setUint16(entry + 4, 1, true);
+      view.setUint16(entry + 6, 32, true);
+      view.setUint32(entry + 8, item.bytes.length, true);
+      view.setUint32(entry + 12, offset, true);
+      out.set(item.bytes, offset);
+      offset += item.bytes.length;
+    });
+
+    return out;
+  }
 
   let hasImage = false;
   let fileName = "favicon";
@@ -883,18 +970,29 @@ html[data-theme="dark"] .favicon-btn.primary {
       size
     );
 
-    const transparent =
+    const opaque =
+      OPAQUE_SIZES.includes(size);
+
+    const transparentChecked =
       byId("favicon-transparent")
         .checked;
 
+    const transparent =
+      transparentChecked && !opaque;
+
     const radius =
-      size *
-      (
-        Number(
-          byId("favicon-radius")
-            .value
-        ) / 100
-      );
+      opaque
+        ? 0
+        : size *
+          (
+            Number(
+              byId("favicon-radius")
+                .value
+            ) / 100
+          );
+
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
 
     context.save();
 
@@ -913,8 +1011,10 @@ html[data-theme="dark"] .favicon-btn.primary {
       !transparent
     ) {
       context.fillStyle =
-        byId("favicon-bg")
-          .value;
+        transparentChecked
+          ? "#ffffff"
+          : byId("favicon-bg")
+            .value;
 
       context.fillRect(
         0,
@@ -998,7 +1098,7 @@ html[data-theme="dark"] .favicon-btn.primary {
         context.clip();
 
         context.drawImage(
-          image,
+          sourceFor(width, height),
           x,
           y,
           width,
@@ -1008,7 +1108,7 @@ html[data-theme="dark"] .favicon-btn.primary {
         context.restore();
       } else {
         context.drawImage(
-          image,
+          sourceFor(width, height),
           x,
           y,
           width,
@@ -1100,6 +1200,7 @@ html[data-theme="dark"] .favicon-btn.primary {
     image.onload =
       () => {
         hasImage = true;
+        mips = null;
 
         render();
 
@@ -1347,6 +1448,8 @@ html[data-theme="dark"] .favicon-btn.primary {
       const zip =
         new JSZip();
 
+      const icoParts = [];
+
       for (
         const size of sizes
       ) {
@@ -1370,16 +1473,33 @@ html[data-theme="dark"] .favicon-btn.primary {
           name,
           blob
         );
+
+        if (size <= 48) {
+          icoParts.push({
+            size,
+            bytes: new Uint8Array(await blob.arrayBuffer())
+          });
+        }
       }
 
+      zip.file(
+        "favicon.ico",
+        buildIco(icoParts)
+      );
+
       const htmlSnippet =
-`<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+`<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">`;
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">`;
+
+      const appName =
+        fileName.replace(/[-_]+/g, " ").trim() || "favicon";
 
       const manifest = {
-        name: "",
-        short_name: "",
+        name: appName,
+        short_name: appName.length > 12 ? appName.slice(0, 12).trim() : appName,
         icons: [
           {
             src:

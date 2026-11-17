@@ -267,7 +267,7 @@ hreflang: {en: "/apps/memory-test/", tr: "/apps/tr/bellek-testi/"}
   display: grid;
 
   grid-template-columns:
-    repeat(4, minmax(52px, 68px));
+    repeat(var(--memory-cols, 4), minmax(52px, 68px));
 
   gap: 8px;
 
@@ -466,7 +466,7 @@ html[data-theme="dark"] .memory-btn.primary {
 
   .memory-visual {
     grid-template-columns:
-      repeat(4, minmax(46px, 60px));
+      repeat(var(--memory-cols, 4), minmax(44px, 60px));
   }
 }
 
@@ -595,13 +595,13 @@ html[data-theme="dark"] .memory-btn.primary {
     <ol>
       <li>Choose a mode: Number, Sequence or Visual.</li>
       <li>Press Start and memorize what appears.</li>
-      <li>Answer correctly to move up a level. A wrong answer ends the run and shows the level you reached.</li>
+      <li>Answer correctly to move up a level. A wrong answer ends the run and shows the level you reached; Try Again starts over from level 1.</li>
     </ol>
     <h3>Modes</h3>
     <ul>
       <li><strong>Number:</strong> a number is shown briefly, then type it and press Submit or Enter. It gets one digit longer each level.</li>
       <li><strong>Sequence:</strong> watch the pads light up, then tap them in the same order.</li>
-      <li><strong>Visual:</strong> some cells are highlighted briefly, then select all of them.</li>
+      <li><strong>Visual:</strong> some cells are highlighted briefly, then select all of them. The grid grows from 4×4 to 5×5 and 6×6 at higher levels.</li>
     </ul>
     <h3>Buttons</h3>
     <ul>
@@ -665,13 +665,13 @@ html[data-theme="dark"] .memory-btn.primary {
     <ol>
       <li>Bir tür seçin: Sayı, Sıra ya da Görsel.</li>
       <li>Başlat'a basın ve görüneni aklınızda tutun.</li>
-      <li>Doğru yanıtla bir seviye atlarsınız. Yanlış yanıt turu bitirir ve ulaştığınız seviyeyi gösterir.</li>
+      <li>Doğru yanıtla bir seviye atlarsınız. Yanlış yanıt turu bitirir ve ulaştığınız seviyeyi gösterir; Yeniden dene 1. seviyeden başlatır.</li>
     </ol>
     <h3>Türler</h3>
     <ul>
       <li><strong>Sayı:</strong> bir sayı kısa süre görünür; sonra onu yazıp Gönder'e ya da Enter'a basın. Her seviyede bir basamak uzar.</li>
       <li><strong>Sıra:</strong> düğmelerin yanışını izleyin, sonra aynı sırayla dokunun.</li>
-      <li><strong>Görsel:</strong> bazı kareler kısa süre vurgulanır; sonra hepsini seçin.</li>
+      <li><strong>Görsel:</strong> bazı kareler kısa süre vurgulanır; sonra hepsini seçin. Üst seviyelerde ızgara 4×4'ten 5×5 ve 6×6'ya büyür.</li>
     </ul>
     <h3>Düğmeler</h3>
     <ul>
@@ -776,6 +776,10 @@ html[data-theme="dark"] .memory-btn.primary {
     hintState = null;
     failInfo = Object.assign({ level }, info);
     renderFail();
+
+    /* Try Again starts over from level 1. */
+    level = 1;
+    updateStatus("missed");
 
     setStart("tryAgain");
     startButton.focus();
@@ -888,15 +892,19 @@ html[data-theme="dark"] .memory-btn.primary {
             return;
           }
 
+          /* Ignore spaces and other non-digit characters. */
+          const digits =
+            answerInput.value.replace(/[^0-9]/g, "");
+
           if (
-            answerInput.value.trim() === ""
+            digits === ""
           ) {
             answerInput.focus();
             return;
           }
 
           if (
-            answerInput.value ===
+            digits ===
             answer
           ) {
             submit.disabled = true;
@@ -1051,12 +1059,16 @@ html[data-theme="dark"] .memory-btn.primary {
   }
 
   function visualMode(currentRun) {
-    const total = 16;
+    /* The grid grows with the level: 4x4 up to level 5, then 5x5, then 6x6. */
+    const side =
+      level <= 5 ? 4 : level <= 9 ? 5 : 6;
+
+    const total = side * side;
 
     const count =
       Math.min(
         3 + level,
-        8
+        Math.floor(total / 2)
       );
 
     answer = [];
@@ -1077,7 +1089,7 @@ html[data-theme="dark"] .memory-btn.primary {
     }
 
     stage.innerHTML = `
-      <div class="memory-visual">
+      <div class="memory-visual" style="--memory-cols:${side}">
         ${
           Array.from(
             { length: total },

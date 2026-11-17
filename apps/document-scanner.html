@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "Document Scanner"
 permalink: /apps/document-scanner/
 excerpt: "Scan document photos, enhance them and export as JPG or A4 PDF directly in your browser."
+hreflang: {en: "/apps/document-scanner/", tr: "/apps/tr/belge-tarayici/"}
 seo_title: "Document Scanner · Free Online, No Upload"
 og_image: https://sercankulcu.github.io/images/apps/document-scanner.jpg
 web_app: BusinessApplication
-hreflang: {en: "/apps/document-scanner/", tr: "/apps/tr/belge-tarayici/"}
 ---
 
 <style>
@@ -493,7 +493,8 @@ html[data-theme="dark"] .ds-status.error {
       libFail: "PDF library could not be loaded.",
       creating: "Creating PDF…",
       pdfDone: "PDF downloaded.",
-      pdfFail: "The PDF could not be created.", pct: "{n}%"
+      pdfFail: "The PDF could not be created.", pct: "{n}%",
+      jpgFail: "The JPG could not be created."
     }),
     tr: {
       title: "Belge Tarayıcı", howTo: "Nasıl kullanılır", close: "Kapat",
@@ -511,6 +512,7 @@ html[data-theme="dark"] .ds-status.error {
       creating: "PDF oluşturuluyor…",
       pdfDone: "PDF indirildi.",
       pdfFail: "PDF oluşturulamadı.", pct: "%{n}",
+      jpgFail: "JPG oluşturulamadı.",
       help: `
       <p>Telefon kamerasına uygun bir araç: belge fotoğrafı çekin ya da seçin, döndürün, karşıtlığı artırın,
         gri tonlamaya ya da siyah beyaza geçin, sonra görsel ya da A4 PDF olarak kaydedin.</p>
@@ -588,13 +590,35 @@ html[data-theme="dark"] .ds-status.error {
     pdfBtn.disabled = !loaded;
   }
 
+  /* The on-screen preview stays at most 1000 px; JPG and PDF are rendered again
+     from the original image at up to 3508 px on the long side (A4 at 300 DPI)
+     with the same rotation and filter. */
+  const PREVIEW_MAX = 1000;
+  const EXPORT_MAX = 3508;
+
   function draw() {
     if (!loaded) {
       return;
     }
 
+    renderTo(canvas, PREVIEW_MAX);
+  }
+
+  function exportJpeg() {
+    const out = document.createElement("canvas");
+    renderTo(out, EXPORT_MAX);
+
+    return new Promise((resolve, reject) => {
+      out.toBlob(
+        blob => blob ? resolve(blob) : reject(new Error("toBlob failed")),
+        "image/jpeg",
+        .9
+      );
+    });
+  }
+
+  function renderTo(canvas, maxDimension) {
     const swapped = rotation % 180 !== 0;
-    const maxDimension = 1000;
 
     const sourceWidth =
       swapped
@@ -744,15 +768,26 @@ html[data-theme="dark"] .ds-status.error {
     draw();
   });
 
-  jpgBtn.addEventListener("click", () => {
+  jpgBtn.addEventListener("click", async () => {
     if (!loaded) {
       return;
     }
 
+    let blob;
+
+    try {
+      blob = await exportJpeg();
+    } catch (error) {
+      setStatus("jpgFail", true);
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
-    anchor.href = canvas.toDataURL("image/jpeg", .9);
+    anchor.href = url;
     anchor.download = "scanned-document.jpg";
     anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 
     setStatus("jpgDone");
   });
@@ -780,7 +815,7 @@ html[data-theme="dark"] .ds-status.error {
       ]);
 
       const jpg = await documentPdf.embedJpg(
-        canvas.toDataURL("image/jpeg", .9)
+        new Uint8Array(await (await exportJpeg()).arrayBuffer())
       );
 
       const margin = 28;

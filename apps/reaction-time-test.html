@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "Reaction Time Test"
 permalink: /apps/reaction-time-test/
 excerpt: "Measure your reaction speed with a simple five-attempt visual reaction test."
+hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
 seo_title: "Reaction Time Test · Free Online"
 og_image: https://sercankulcu.github.io/images/apps/reaction-time-test.jpg
 web_app: EducationalApplication
-hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
 ---
 
 <style>
@@ -416,7 +416,7 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
     <ol>
       <li>Click or tap the test area to start. It turns red.</li>
       <li>Wait for the area to turn green, then click as quickly as you can.</li>
-      <li>Clicking while it is still red counts as too soon and the attempt does not count.</li>
+      <li>Clicking while it is still red, or less than 100 ms after it turns green, counts as too soon and the attempt does not count.</li>
       <li>Five valid attempts are averaged. Last, average and best times appear under the area.</li>
     </ol>
     <h3>Controls</h3>
@@ -488,7 +488,7 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
     <ol>
       <li>Başlamak için test alanına tıklayın ya da dokunun. Alan kırmızı olur.</li>
       <li>Alanın yeşile dönmesini bekleyin, sonra olabildiğince hızlı tıklayın.</li>
-      <li>Alan hâlâ kırmızıyken tıklamak erken sayılır ve o deneme geçersiz olur.</li>
+      <li>Alan hâlâ kırmızıyken ya da yeşile döndükten sonraki 100 ms içinde tıklamak erken sayılır ve o deneme geçersiz olur.</li>
       <li>Beş geçerli denemenin ortalaması alınır. Son, ortalama ve en iyi süreler alanın altında görünür.</li>
     </ol>
     <h3>Denetimler</h3>
@@ -518,6 +518,9 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
   let state = "idle";
   let timer = null;
   let startTime = 0;
+  let goFrame = 0;
+  /* Faster than this is anticipation, not reaction. */
+  const MIN_REACTION = 100;
   let times = [];
 
   function resetStats() {
@@ -568,13 +571,24 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
 
         setMsg("goMain", null);
 
-        startTime =
-          performance.now();
+        /* Start timing only once the green frame has been painted:
+           the second animation frame runs after that paint. */
+        startTime = 0;
+        goFrame = requestAnimationFrame(() => {
+          goFrame = requestAnimationFrame(() => {
+            goFrame = 0;
+            startTime = performance.now();
+          });
+        });
       }, delay);
   }
 
   function showTooSoon() {
     window.clearTimeout(timer);
+    cancelAnimationFrame(goFrame);
+
+    zone.className =
+      "rt-zone rt-wait";
 
     setMsg("tooSoonMain", "tooSoonSub");
 
@@ -583,11 +597,16 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
     state = "idle";
   }
 
-  function recordReaction() {
+  function recordReaction(eventTime) {
     const milliseconds =
       Math.round(
-        performance.now() - startTime
+        eventTime - startTime
       );
+
+    if (!startTime || milliseconds < MIN_REACTION) {
+      showTooSoon();
+      return;
+    }
 
     times.push(milliseconds);
 
@@ -638,7 +657,13 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
     }, 700);
   }
 
-  function handleAction() {
+  function handleAction(event) {
+    /* event.timeStamp shares the performance.now() clock and marks when the input happened. */
+    const eventTime =
+      event && event.timeStamp > 0
+        ? event.timeStamp
+        : performance.now();
+
     if (state === "idle") {
       if (
         times.length >= TOTAL_ATTEMPTS
@@ -656,7 +681,7 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
     }
 
     if (state === "go") {
-      recordReaction();
+      recordReaction(eventTime);
     }
   }
 
@@ -671,19 +696,19 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
       }
 
       skipClick = true;
-      handleAction();
+      handleAction(event);
     }
   );
 
   zone.addEventListener(
     "click",
-    () => {
+    event => {
       if (skipClick) {
         skipClick = false;
         return;
       }
 
-      handleAction();
+      handleAction(event);
     }
   );
 
@@ -695,6 +720,7 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
         (state === "wait" || state === "go")
       ) {
         window.clearTimeout(timer);
+        cancelAnimationFrame(goFrame);
         showIdle();
       }
     }
@@ -708,7 +734,13 @@ hreflang: {en: "/apps/reaction-time-test/", tr: "/apps/tr/tepki-suresi-testi/"}
         event.key === " "
       ) {
         event.preventDefault();
-        handleAction();
+
+        /* A held key repeats; only the first press counts. */
+        if (event.repeat) {
+          return;
+        }
+
+        handleAction(event);
       }
     }
   );

@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "QR Code Generator"
 permalink: /apps/qr-code-generator/
 excerpt: "Create QR codes for URLs, text, Wi-Fi networks and email directly in your browser."
+hreflang: {en: "/apps/qr-code-generator/", tr: "/apps/tr/qr-kod-olustur/"}
 seo_title: "QR Code Generator · Free Online"
 og_image: https://sercankulcu.github.io/images/apps/qr-code-generator.jpg
 web_app: UtilitiesApplication
-hreflang: {en: "/apps/qr-code-generator/", tr: "/apps/tr/qr-kod-olustur/"}
 ---
 
 <style>
@@ -821,7 +821,7 @@ html[data-theme="dark"] .qr-btn.primary {
   aria-live="polite"
 ></div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 
 <script src="/assets/js/tool-i18n.js"></script>
 <script>
@@ -843,7 +843,7 @@ html[data-theme="dark"] .qr-btn.primary {
     en: i18nHarvest({
       initial: "Enter data and generate a QR code.", needData: "Please enter some data first.", libFail: "QR library could not be loaded.",
       ready: "QR code ready.", nothing: "Nothing to copy.", dataCopied: "Data copied.", copied: "Copied", copyFail: "Copy failed.",
-      genFirst: "Generate a QR code first.", stale: "Inputs changed. Press Generate QR to update the code.",
+      genFirst: "Generate a QR code first.", tooLong: "The text is too long for a QR code. Shorten it or choose a lower error-correction level.", genFail: "The QR code could not be generated.", stale: "Inputs changed. Press Generate QR to update the code.",
       show: "Show", hide: "Hide", showPass: "Show password", hidePass: "Hide password"
     }),
     tr: {
@@ -872,7 +872,7 @@ html[data-theme="dark"] .qr-btn.primary {
   `,
       initial: "Veri girip bir QR kod oluşturun.", needData: "Lütfen önce bir veri girin.", libFail: "QR kitaplığı yüklenemedi.",
       ready: "QR kod hazır.", nothing: "Kopyalanacak bir şey yok.", dataCopied: "Veri kopyalandı.", copied: "Kopyalandı", copyFail: "Kopyalanamadı.",
-      genFirst: "Önce bir QR kod oluşturun.", stale: "Girdiler değişti. Kodu güncellemek için QR oluştur'a basın.",
+      genFirst: "Önce bir QR kod oluşturun.", tooLong: "Metin bir QR kod için çok uzun. Kısaltın ya da daha düşük bir hata düzeltme düzeyi seçin.", genFail: "QR kod oluşturulamadı.", stale: "Girdiler değişti. Kodu güncellemek için QR oluştur'a basın.",
       show: "Göster", hide: "Gizle", showPass: "Şifreyi göster", hidePass: "Şifreyi gizle"
     }
   };
@@ -986,18 +986,50 @@ html[data-theme="dark"] .qr-btn.primary {
         i18n.t(key);
   }
 
+  const QR_DARK = "#0a1020";
+  const QR_LIGHT = "#ffffff";
+  let lastQr = null;
+
+  /* Returns the first empty required field of the active form, or null. */
+  function missingField() {
+    if (type === "wifi" && !byId("qr-ssid").value.trim()) return byId("qr-ssid");
+    if (type === "email" && !byId("qr-email-to").value.trim()) return byId("qr-email-to");
+    return null;
+  }
+
+  /* Draws the modules of qr on ctx; quiet is the white border in modules. */
+  function drawQr(ctx, qr, px, quiet) {
+    const n = qr.getModuleCount();
+    const total = n + quiet * 2;
+    ctx.fillStyle = QR_LIGHT;
+    ctx.fillRect(0, 0, px, px);
+    ctx.fillStyle = QR_DARK;
+    for (let r = 0; r < n; r++) {
+      const y0 = Math.round((r + quiet) * px / total);
+      const y1 = Math.round((r + quiet + 1) * px / total);
+      for (let c = 0; c < n; c++) {
+        if (!qr.isDark(r, c)) continue;
+        const x0 = Math.round((c + quiet) * px / total);
+        const x1 = Math.round((c + quiet + 1) * px / total);
+        ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+      }
+    }
+  }
+
   function generate() {
     const value =
       currentData();
 
+    const missing = missingField();
+
     if (
-      !value
+      !value || missing
     ) {
       setStatus(
         "needData"
       );
 
-      const firstField =
+      const firstField = missing ||
         document.querySelector(
           "[data-qr-form]:not([hidden]) input, [data-qr-form]:not([hidden]) textarea"
         );
@@ -1010,7 +1042,7 @@ html[data-theme="dark"] .qr-btn.primary {
     }
 
     if (
-      typeof window.QRCode !==
+      typeof window.qrcode !==
       "function"
     ) {
       setStatus(
@@ -1020,88 +1052,53 @@ html[data-theme="dark"] .qr-btn.primary {
       return;
     }
 
+    /* Encode text as plain UTF-8 bytes (no BOM), so emoji and accents survive. */
+    window.qrcode.stringToBytes = window.qrcode.stringToBytesFuncs["UTF-8"];
+
+    let qr;
+    try {
+      qr = window.qrcode(0, byId("qr-ecc").value);
+      qr.addData(value, "Byte");
+      qr.make();
+    } catch (error) {
+      setStatus(
+        /overflow|length/i.test(String(error)) ? "tooLong" : "genFail"
+      );
+      return;
+    }
+
     const size =
       Number(
         byId("qr-size")
           .value
       );
 
-    const eccMap = {
-      L:
-        QRCode.CorrectLevel.L,
-      M:
-        QRCode.CorrectLevel.M,
-      Q:
-        QRCode.CorrectLevel.Q,
-      H:
-        QRCode.CorrectLevel.H
-    };
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "QR");
+    drawQr(canvas.getContext("2d"), qr, size, 0);
 
     const output =
       byId("qr-output");
 
     output.innerHTML =
       "";
+    output.appendChild(canvas);
 
-    new QRCode(
-      output,
-      {
-        text: value,
-        width: size,
-        height: size,
-        colorDark:
-          "#0a1020",
-        colorLight:
-          "#ffffff",
-        correctLevel:
-          eccMap[
-            byId("qr-ecc")
-              .value
-          ]
-      }
+    lastQr = qr;
+    lastData =
+      value;
+
+    byId("qr-box").classList.remove("is-stale");
+
+    setStatus(
+      "ready"
     );
 
     window.requestAnimationFrame(
       () => {
-        const canvas =
-          output.querySelector(
-            "canvas"
-          );
-
-        const image =
-          output.querySelector(
-            "img"
-          );
-
-        if (
-          canvas
-        ) {
-          canvas.style.maxWidth =
-            "100%";
-
-          canvas.style.height =
-            "auto";
-        }
-
-        if (
-          image
-        ) {
-          image.style.maxWidth =
-            "100%";
-
-          image.style.height =
-            "auto";
-        }
-
-        lastData =
-          value;
-
-        byId("qr-box").classList.remove("is-stale");
-
-        setStatus(
-          "ready"
-        );
-
         const box = byId("qr-box");
         const rect = box.getBoundingClientRect();
 
@@ -1185,60 +1182,29 @@ html[data-theme="dark"] .qr-btn.primary {
     }
   }
 
-  let _downloadRetries = 0;
   function download() {
-    if (
-      !lastData &&
-      !currentData()
-    ) {
-      setStatus(
-        "needData"
-      );
-
-      return;
-    }
-
     if (
       !lastData
     ) {
-      if (_downloadRetries++ > 20) {
-        _downloadRetries = 0;
-        return;
-      }
-
       generate();
+    }
 
-      window.setTimeout(
-        download,
-        80
-      );
-
+    if (
+      !lastData || !lastQr
+    ) {
       return;
     }
 
-    _downloadRetries = 0;
+    /* PNG with a 4-module white quiet zone so scanners can find the code. */
+    const n = lastQr.getModuleCount();
+    const cell = Math.max(1, Math.round(Number(byId("qr-size").value) / n));
+    const px = (n + 8) * cell;
+    const canvas = document.createElement("canvas");
+    canvas.width = px;
+    canvas.height = px;
+    drawQr(canvas.getContext("2d"), lastQr, px, 4);
 
-    const output =
-      byId("qr-output");
-
-    const canvas =
-      output.querySelector(
-        "canvas"
-      );
-
-    const image =
-      output.querySelector(
-        "img"
-      );
-
-    const href =
-      canvas
-        ? canvas.toDataURL(
-            "image/png"
-          )
-        : image
-          ? image.src
-          : "";
+    const href = canvas.toDataURL("image/png");
 
     if (
       !href

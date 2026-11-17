@@ -1,9 +1,9 @@
 ---
 # tools/make_tr_pages.py writes this copy of apps/image-to-a4-pdf.html; edit that page, then run the script.
 layout: without-sidebar
-title: "Görselden A4 PDF"
+title: "Uzun Görseli A4'e Böl"
 permalink: /apps/tr/gorselden-a4-pdf/
-excerpt: "Uzun bir görseli ya da web sayfası ekran görüntüsünü A4 sayfalara bölüp PDF olarak kaydedin."
+excerpt: "Uzun bir görseli ya da ekran görüntüsünü A4 sayfalara bölüp PDF yapın."
 lang: tr
 ui_lang: tr
 seo_title: "Uzun Görseli A4 PDF'ye Çevir · Ekran Görüntüsünden PDF"
@@ -441,7 +441,7 @@ html[data-theme="dark"] .a4-status.error {
 
 <div class="image-a4-app">
   <header class="a4-hero">
-    <h1 class="a4-title" data-i18n="title">Image to A4 PDF</h1>
+    <h1 class="a4-title" data-i18n="title">Long Screenshot to A4 PDF</h1>
     <div class="a4-hero-actions">
       <button class="a4-lang" data-lang-toggle></button>
       <button class="a4-help" id="a4-help" type="button" aria-haspopup="dialog" aria-controls="a4-help-dialog"
@@ -608,11 +608,12 @@ html[data-theme="dark"] .a4-status.error {
       previewReady1: "Preview ready: 1 page.", previewReadyN: "Preview ready: {n} pages.",
       created1: "PDF created: 1 page.", createdN: "PDF created: {n} pages.",
       loadedFrom: "Loaded {name} from the previous tool.",
+      pdfFail: "The PDF could not be created. The image may be too large for this browser; try a lower quality or a smaller image.",
       noImage: "No image", notGenerated: "Preview not generated",
       badge1: "1 A4 page", badgeN: "{n} A4 pages", pageN: "Page {n}", pct: "{n}%"
     }),
     tr: {
-      title: "Görselden A4 PDF", howTo: "Nasıl kullanılır", close: "Kapat",
+      title: "Uzun Görseli A4'e Böl", howTo: "Nasıl kullanılır", close: "Kapat",
       dropAria: "Bir görsel seçin", dropTitle: "Görseli buraya bırakın",
       dropHint: "ya da tıklayıp PNG, JPG, JPEG veya WebP seçin",
       orient: "A4 yönü", portrait: "Dikey — 210 × 297 mm", landscape: "Yatay — 297 × 210 mm",
@@ -629,6 +630,7 @@ html[data-theme="dark"] .a4-status.error {
       previewReady1: "Önizleme hazır: 1 sayfa.", previewReadyN: "Önizleme hazır: {n} sayfa.",
       created1: "PDF oluşturuldu: 1 sayfa.", createdN: "PDF oluşturuldu: {n} sayfa.",
       loadedFrom: "{name} önceki araçtan alındı.",
+      pdfFail: "PDF oluşturulamadı. Görsel bu tarayıcı için çok büyük olabilir; daha düşük bir kalite ya da daha küçük bir görsel deneyin.",
       noImage: "Görsel yok", notGenerated: "Önizleme oluşturulmadı",
       badge1: "1 A4 sayfa", badgeN: "{n} A4 sayfa", pageN: "Sayfa {n}", pct: "%{n}",
       help: `
@@ -774,7 +776,7 @@ html[data-theme="dark"] .a4-status.error {
       fileName =
         file.name
           .replace(/\.[^.]+$/, "")
-          .replace(/[^\w\-]+/g, "_")
+          .replace(/[^\p{L}\p{N}_-]+/gu, "_")
           .replace(/^_+|_+$/g, "") ||
         "image-to-a4";
 
@@ -822,14 +824,19 @@ html[data-theme="dark"] .a4-status.error {
 
     const pxPerMm = sourceWidth / printableWidth;
     const sourceSliceHeight = printableHeight * pxPerMm;
-    const pageCount = Math.max(1, Math.ceil(sourceHeight / sourceSliceHeight));
+    /* a leftover under 1% of a page joins the previous slice instead of making a blank page */
+    const pageCount = Math.max(1, Math.ceil(sourceHeight / sourceSliceHeight - 0.01));
 
     const data = [];
 
     for (let index = 0; index < pageCount; index++) {
       const sourceY = index * sourceSliceHeight;
       const remaining = sourceHeight - sourceY;
-      const sliceHeight = Math.min(sourceSliceHeight, remaining);
+      const sliceHeight = index === pageCount - 1 ? remaining : Math.min(sourceSliceHeight, remaining);
+      /* that last, slightly taller slice is shrunk a little so it still fits the printable area */
+      const fit = Math.min(1, sourceSliceHeight / sliceHeight);
+      const drawWidth = printableWidth * fit;
+      const drawHeight = sliceHeight * printableWidth / sourceWidth * fit;
 
       data.push({
         index,
@@ -839,7 +846,10 @@ html[data-theme="dark"] .a4-status.error {
         pageHeight: page.height,
         margin,
         printableWidth,
-        printableHeight
+        printableHeight,
+        drawX: margin + (printableWidth - drawWidth) / 2,
+        drawWidth,
+        drawHeight
       });
     }
 
@@ -875,14 +885,10 @@ html[data-theme="dark"] .a4-status.error {
       context.fillStyle = "#ffffff";
       context.fillRect(0, 0, canvas.width, canvas.height);
 
-      const x = data.margin * scale;
+      const x = data.drawX * scale;
       const y = data.margin * scale;
-      const width = data.printableWidth * scale;
-
-      const visibleHeightMm =
-        data.sliceHeight * data.printableWidth / sourceWidth;
-
-      const height = visibleHeightMm * scale;
+      const width = data.drawWidth * scale;
+      const height = data.drawHeight * scale;
 
       context.drawImage(
         image,
@@ -917,81 +923,87 @@ html[data-theme="dark"] .a4-status.error {
       return;
     }
 
-    const data = buildPages();
-    const orientation = orientationEl.value;
-    const page = MM[orientation];
-    const quality = Number(qualityEl.value);
+    try {
+      const data = buildPages();
+      const orientation = orientationEl.value;
+      const page = MM[orientation];
+      const quality = Number(qualityEl.value);
 
-    const { jsPDF } = window.jspdf;
+      const { jsPDF } = window.jspdf;
 
-    const pdf = new jsPDF({
-      orientation: orientation === "portrait" ? "p" : "l",
-      unit: "mm",
-      format: "a4",
-      compress: true
-    });
+      const pdf = new jsPDF({
+        orientation: orientation === "portrait" ? "p" : "l",
+        unit: "mm",
+        format: "a4",
+        compress: true
+      });
 
-    data.forEach((item, index) => {
-      if (index > 0) {
-        pdf.addPage(
-          "a4",
-          orientation === "portrait" ? "p" : "l"
+      data.forEach((item, index) => {
+        if (index > 0) {
+          pdf.addPage(
+            "a4",
+            orientation === "portrait" ? "p" : "l"
+          );
+        }
+
+        const sliceCanvas = document.createElement("canvas");
+
+        sliceCanvas.width = sourceWidth;
+        sliceCanvas.height = Math.max(1, Math.ceil(item.sliceHeight));
+
+        const context = sliceCanvas.getContext("2d");
+
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+
+        context.drawImage(
+          image,
+          0,
+          item.sourceY,
+          sourceWidth,
+          item.sliceHeight,
+          0,
+          0,
+          sourceWidth,
+          item.sliceHeight
         );
-      }
 
-      const sliceCanvas = document.createElement("canvas");
+        const imageData = sliceCanvas.toDataURL("image/jpeg", quality);
 
-      sliceCanvas.width = sourceWidth;
-      sliceCanvas.height = Math.max(1, Math.ceil(item.sliceHeight));
+        pdf.addImage(
+          imageData,
+          "JPEG",
+          item.drawX,
+          item.margin,
+          item.drawWidth,
+          item.drawHeight,
+          undefined,
+          "FAST"
+        );
 
-      const context = sliceCanvas.getContext("2d");
+        sliceCanvas.width = 0;
+        sliceCanvas.height = 0;
+      });
 
-      context.fillStyle = "#ffffff";
-      context.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+      /* one output, so the download and "Continue with" carry the same bytes */
+      const pdfBlob = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const anchor = document.createElement("a");
+      anchor.href = pdfUrl;
+      anchor.download = `${fileName}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(pdfUrl), 1500);
+      showNext({ blob: pdfBlob, name: anchor.download });
 
-      context.drawImage(
-        image,
-        0,
-        item.sourceY,
-        sourceWidth,
-        item.sliceHeight,
-        0,
-        0,
-        sourceWidth,
-        item.sliceHeight
-      );
-
-      const imageData = sliceCanvas.toDataURL("image/jpeg", quality);
-
-      const imageHeightMm =
-        item.sliceHeight * item.printableWidth / sourceWidth;
-
-      pdf.addImage(
-        imageData,
-        "JPEG",
-        item.margin,
-        item.margin,
-        item.printableWidth,
-        imageHeightMm,
-        undefined,
-        "FAST"
-      );
-    });
-
-    /* one output, so the download and "Continue with" carry the same bytes */
-    const pdfBlob = pdf.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const anchor = document.createElement("a");
-    anchor.href = pdfUrl;
-    anchor.download = `${fileName}.pdf`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(pdfUrl), 1500);
-    showNext({ blob: pdfBlob, name: anchor.download });
-
-    if (data.length === 1) setStatus("created1", "ok");
-    else setStatus("createdN", "ok", { n: data.length });
+      if (data.length === 1) setStatus("created1", "ok");
+      else setStatus("createdN", "ok", { n: data.length });
+    } catch (error) {
+      console.error(error);
+      showNext(null);
+      setStatus("pdfFail", "error");
+    }
   }
 
   dropZone.addEventListener("click", () => {

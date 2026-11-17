@@ -3,10 +3,10 @@ layout: without-sidebar
 title: "Image Color Palette"
 permalink: /apps/image-color-palette/
 excerpt: "Extract dominant color palettes from any image entirely in your browser — with hex, RGB, and HSL values."
+hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
 seo_title: "Image Color Palette · Free Online, No Upload"
 og_image: https://sercankulcu.github.io/images/apps/image-color-palette.jpg
 web_app: MultimediaApplication
-hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
 ---
 
 <style>
@@ -332,6 +332,8 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
     en: i18nHarvest({
       fewPixels: "Image has too few distinct pixels.",
       extracted: "{n} colors extracted. Press Copy on a swatch to copy its value.",
+      extractedFew: "The image has only {n} distinct colors, so the palette has {n} instead of {k}. Press Copy on a swatch to copy its value.",
+      share: "{n}% of the image",
       loaded: "Loaded {name} from the previous tool",
       copy: "Copy", copyAria: "Copy {hex}", copied: "Copied!", copiedVal: "Copied {val}",
       copyFail: "Could not copy automatically. Value: {val}", cssFail: "Could not copy the CSS variables automatically.",
@@ -347,6 +349,8 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
       previewAlt: "Yüklenen görselin önizlemesi", dominant: "Baskın renkler",
       fewPixels: "Görselde yeterince farklı piksel yok.",
       extracted: "{n} renk çıkarıldı. Değerini kopyalamak için bir rengin Kopyala düğmesine basın.",
+      extractedFew: "Görselde yalnızca {n} farklı renk var, bu yüzden palette {k} yerine {n} renk var. Değerini kopyalamak için bir rengin Kopyala düğmesine basın.",
+      share: "görselin %{n} kadarı",
       loaded: "{name} önceki araçtan alındı",
       copy: "Kopyala", copyAria: "{hex} kopyala", copied: "Kopyalandı!", copiedVal: "{val} kopyalandı",
       copyFail: "Otomatik kopyalanamadı. Değer: {val}", cssFail: "CSS değişkenleri otomatik kopyalanamadı.",
@@ -467,7 +471,7 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
       while (centroids.length < k) centroids.push([...centroids[0]]);
     }
 
-    for (let iter = 0; iter < 15; iter++) {
+    function assign() {
       const sums = centroids.map(() => [0, 0, 0, 0]);
       for (const p of pixels) {
         let minD = Infinity, minI = 0;
@@ -477,6 +481,11 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
         }
         sums[minI][0] += p[0]; sums[minI][1] += p[1]; sums[minI][2] += p[2]; sums[minI][3]++;
       }
+      return sums;
+    }
+
+    for (let iter = 0; iter < 15; iter++) {
+      const sums = assign();
       let moved = false;
       for (let i = 0; i < k; i++) {
         if (sums[i][3] === 0) continue;
@@ -489,12 +498,20 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
       if (!moved) break;
     }
 
-    /* Sort by luminance */
-    return centroids.sort((a, b) => {
-      const la = 0.299 * a[0] + 0.587 * a[1] + 0.114 * a[2];
-      const lb = 0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2];
-      return la - lb;
+    /* Count the pixels of each final cluster, merge identical colors (an image with
+       fewer than k distinct colors leaves duplicate or empty clusters), then sort by share. */
+    const sums = assign();
+    const merged = new Map();
+    centroids.forEach((c, i) => {
+      if (!sums[i][3]) return;
+      const key = c.join(",");
+      const prev = merged.get(key);
+      if (prev) prev.count += sums[i][3];
+      else merged.set(key, { rgb: c, count: sums[i][3] });
     });
+    return [...merged.values()]
+      .sort((a, b) => b.count - a.count)
+      .map(c => ({ rgb: c.rgb, share: c.count / N }));
   }
 
   let loadNote = null;
@@ -517,18 +534,19 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
       if (data[i + 3] < 128) continue;
       pixels.push([data[i], data[i + 1], data[i + 2]]);
     }
-    if (pixels.length < k) { showStatus([["fewPixels"]], "error"); return; }
+    if (!pixels.length) { showStatus([["fewPixels"]], "error"); return; }
 
     currentColors = kMeans(pixels, k);
     renderPalette();
     cssBtn.disabled = false;
-    showStatus((loadNote ? [loadNote] : []).concat([["extracted", { n: currentColors.length }]]), "info");
+    const n = currentColors.length;
+    showStatus((loadNote ? [loadNote] : []).concat([n < k ? ["extractedFew", { n, k }] : ["extracted", { n }]]), "info");
     loadNote = null;
   }
 
   function renderPalette() {
     palette.innerHTML = "";
-    currentColors.forEach(([r, g, b]) => {
+    currentColors.forEach(({ rgb: [r, g, b], share }) => {
       const hex = rgbToHex(r, g, b);
       const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
@@ -550,7 +568,9 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
 
       const rgbEl = document.createElement("div");
       rgbEl.className = "icp-swatch-rgb";
-      rgbEl.textContent = `rgb(${r}, ${g}, ${b}) · ${rgbToHsl(r, g, b)}`;
+      rgbEl.dataset.share = String(Math.max(share * 100 < 1 ? 1 : 0, Math.round(share * 100)));
+      rgbEl.dataset.rest = `rgb(${r}, ${g}, ${b}) · ${rgbToHsl(r, g, b)}`;
+      rgbEl.textContent = `${T("share", { n: rgbEl.dataset.share })} · ${rgbEl.dataset.rest}`;
 
       info.append(hexEl, rgbEl);
 
@@ -578,7 +598,7 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
   }
 
   async function copyCssVars() {
-    const lines = currentColors.map(([r, g, b], i) => `  --color-${i + 1}: ${colorStr([r, g, b])};`);
+    const lines = currentColors.map(({ rgb: [r, g, b] }, i) => `  --color-${i + 1}: ${colorStr([r, g, b])};`);
     const css = ":root {\n" + lines.join("\n") + "\n}";
     if (!(await copyText(css))) { showStatus([["cssFail"]], "error"); return; }
     showStatus([["cssDone"]], "success");
@@ -632,6 +652,9 @@ hreflang: {en: "/apps/image-color-palette/", tr: "/apps/tr/renk-paleti/"}
     palette.querySelectorAll(".icp-swatch-copy").forEach(b => {
       b.textContent = T(b.classList.contains("copied") ? "copied" : "copy");
       b.setAttribute("aria-label", T("copyAria", { hex: b.dataset.hex }));
+    });
+    palette.querySelectorAll(".icp-swatch-rgb").forEach(el => {
+      el.textContent = `${T("share", { n: el.dataset.share })} · ${el.dataset.rest}`;
     });
     if (lastStatus && status.className !== "icp-status") status.textContent = statusText(lastStatus);
   });
