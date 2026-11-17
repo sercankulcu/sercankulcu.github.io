@@ -372,7 +372,7 @@ This PhD thesis investigates the integration of smart and directional antennas w
 
 Turkish-language course textbook on algorithmic game theory: decision theory, games and their representations, Nash equilibrium, mechanism design, auctions, online platforms, social choice and voting, network design and routing, the price of anarchy, multi-agent systems, algorithmic fairness, and learning in games.
 
-**How to cite:** Külcü, S. (2026). *Algoritmik Oyun Kuramı* [Course textbook, 937 pages]. https://sercankulcu.github.io/books/algoritmik-oyun-kurami/
+**How to cite:** Külcü, S. (2026). *Algoritmik Oyun Kuramı* [Course textbook, 939 pages]. https://sercankulcu.github.io/books/algoritmik-oyun-kurami/
 
 [Book](/books/algoritmik-oyun-kurami/) · [PDF](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf) · [Course](/teaching/algorithmic-game-theory/)
 
