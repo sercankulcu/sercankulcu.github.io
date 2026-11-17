@@ -183,7 +183,7 @@
         /* sol: kâr eğrisi */
         const L = frame(svg, { x0: 56, x1: 420, y0: 40, y1: 196, xmin: 0, xmax: 12, ymin: 0, ymax: 36,
           xt: [0, 2, 4, 6, 8, 10, 12], yt: [0, 9, 18, 27, 36], xlabel: "y₁ (benim miktarım)", ylabel: "kâr u₁" });
-        legend(svg, 14, [{ x: 56, color: C_LINK, kind: "line", text: "u₁(y₁) = y₁ · max{0, 12 − y₁ − y₂}" }]);
+        legend(svg, 14, [{ x: 56, color: C_LINK, kind: "line", text: "u₁(y₁) = y₁(12 − y₁ − y₂), eksi kısım çizilmez" }]);
         curve(svg, u, 0, 12, L, undefined, "stroke:" + C_LINK);
         const px = L.X(br), py = L.Y(prof);
         dash(svg, "M" + px.toFixed(1) + " " + py.toFixed(1) + " V196", "stroke:" + C_ACC);
