@@ -420,7 +420,7 @@ Turkish-language course textbook on algorithm-design paradigms and hard problems
 
 Turkish-language introductory textbook covering computer hardware, operating systems, the Internet, office applications, algorithms, and programming with Java.
 
-**How to cite:** Külcü, S. (2026). *Bilgisayar ve Programlamaya Giriş* [Course textbook, 1353 pages]. https://sercankulcu.github.io/books/bilgisayar-ve-programlamaya-giris/
+**How to cite:** Külcü, S. (2026). *Bilgisayar ve Programlamaya Giriş* [Course textbook, 1355 pages]. https://sercankulcu.github.io/books/bilgisayar-ve-programlamaya-giris/
 
 [Book](/books/bilgisayar-ve-programlamaya-giris/) · [PDF](https://sercankulcu.github.io/courses-pdfs/computer/Bilgisayar-ve-Programlamaya-Giris.pdf) · [Course](/teaching/computer-and-introduction-to-programming/)
 
