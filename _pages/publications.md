@@ -436,7 +436,7 @@ Turkish-language introductory textbook covering computer hardware, operating sys
 
 Turkish-language course textbook on data structures in Java: algorithm analysis, arrays, recursion, linked lists, stacks and queues, trees, priority queues, hash tables, sets, and graphs.
 
-**How to cite:** Külcü, S. (2026). *Veri Yapıları* [Course textbook, 926 pages]. https://sercankulcu.github.io/books/veri-yapilari/
+**How to cite:** Külcü, S. (2026). *Veri Yapıları* [Course textbook, 927 pages]. https://sercankulcu.github.io/books/veri-yapilari/
 
 [Book](/books/veri-yapilari/) · [PDF](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf) · [Course](/teaching/data-structures/?lang=tr)
 
