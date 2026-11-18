@@ -3,7 +3,7 @@
 layout: without-sidebar
 title: "Dört Taş"
 permalink: /game/tr/dort-tas/
-excerpt: "Bir arkadaşınıza ya da üç seviyeli bilgisayara karşı Dört Taş (Connect Four) oynayın."
+excerpt: "Bir arkadaşına ya da üç seviyeli bilgisayara karşı Dört Taş oyna."
 lang: tr
 ui_lang: tr
 seo_title: "Dört Taş · Connect Four Oyna"
@@ -209,7 +209,7 @@ catch { const mem = new Map(); store = {
 }; }
 
 const ROWS=6,COLS=7,EMPTY=0,RED=1,YELLOW=2;
-let board=[],currentPlayer=RED,humanPiece=RED,aiPiece=YELLOW,mode="cpu",difficulty="medium",round=1,leftScore=0,rightScore=0,gameOver=false,busy=false;
+let board=[],currentPlayer=RED,humanPiece=RED,aiPiece=YELLOW,mode="cpu",difficulty="medium",round=1,leftScore=0,rightScore=0,gameOver=false,busy=false,roundGen=0;
 let soundEnabled=store.getItem("connect-four-sound")!=="off",audioCtx=null;
 const boardEl=document.getElementById("connectfour-board"),hintsEl=document.getElementById("connectfour-hints"),statusEl=document.getElementById("connectfour-status");
 const modeEl=document.getElementById("connectfour-mode"),difficultyEl=document.getElementById("connectfour-difficulty"),colorEl=document.getElementById("connectfour-color"),starterEl=document.getElementById("connectfour-starter");
@@ -226,9 +226,11 @@ function render(){boardEl.innerHTML="";for(let r=0;r<ROWS;r++)for(let c=0;c<COLS
 function updateHints(){const fi=[...hintsEl.children].indexOf(document.activeElement);hintsEl.innerHTML="";for(let c=0;c<COLS;c++){const h=document.createElement("button");h.type="button";h.className="connectfour-hint";h.textContent="●";h.setAttribute("aria-label",i18n.t("drop",{c:c+1}));h.addEventListener("mouseenter",()=>{if(!gameOver&&!busy&&firstOpenRow(board,c)>=0)h.classList.add(currentPlayer===RED?"preview-red":"preview-yellow")});h.addEventListener("mouseleave",()=>h.classList.remove("preview-red","preview-yellow"));h.addEventListener("click",()=>humanMove(c));hintsEl.appendChild(h)}if(fi>=0&&hintsEl.children[fi])hintsEl.children[fi].focus()}
 function updateStatus(key=null,cls=null){statusEl.className="connectfour-status";if(cls)statusEl.classList.add(cls);if(key){statusState=key;statusEl.textContent=i18n.t(key);return}if(gameOver)return;statusState=null;const icon=currentPlayer===RED?"🔴":"🟡";statusEl.textContent=i18n.t(mode==="cpu"?(currentPlayer===humanPiece?"turnYou":"turnCpu"):(currentPlayer===RED?"turnRed":"turnYellow"),{icon});statusEl.classList.add(colorName(currentPlayer))}
 function animateDisc(row,col,p){const slot=boardEl.children[row*COLS+col];slot.innerHTML="";const d=document.createElement("span");d.className=`connectfour-disc ${colorName(p)} drop`;slot.appendChild(d)}
-async function playMove(col,p){if(gameOver||busy)return false;const row=firstOpenRow(board,col);if(row<0)return false;busy=true;board[row][col]=p;animateDisc(row,col,p);tone(p===RED?340:440,.045,.02);await new Promise(r=>setTimeout(r,420));const win=checkWin(board,p);if(win){finishWin(p,win);busy=false;return true}if(isDraw(board)){gameOver=true;updateStatus("draw","win");busy=false;return true}currentPlayer=other(p);busy=false;render();updateStatus();return true}
+/* A move animates for 420 ms; New Round or a settings change during that wait
+   used to let the old move finish on the new board and flip whose turn it is. */
+async function playMove(col,p){if(gameOver||busy)return false;const row=firstOpenRow(board,col);if(row<0)return false;busy=true;const g=roundGen;board[row][col]=p;animateDisc(row,col,p);tone(p===RED?340:440,.045,.02);await new Promise(r=>setTimeout(r,420));if(g!==roundGen)return false;const win=checkWin(board,p);if(win){finishWin(p,win);busy=false;return true}if(isDraw(board)){gameOver=true;updateStatus("draw","win");busy=false;return true}currentPlayer=other(p);busy=false;render();updateStatus();return true}
 function finishWin(p,cells){gameOver=true;cells.forEach(([r,c])=>{const d=boardEl.children[r*COLS+c].querySelector(".connectfour-disc");if(d)d.classList.add("winning")});if(mode==="cpu"){if(p===humanPiece)leftScore++;else rightScore++;updateStatus(p===humanPiece?"youWin":"cpuWins","win")}else{if(p===RED)leftScore++;else rightScore++;updateStatus(p===RED?"redWins":"yellowWins","win")}updateScores();winTone()}
-function humanMove(col){if(gameOver||busy||mode==="cpu"&&currentPlayer!==humanPiece)return;const p=currentPlayer;playMove(col,p).then(()=>{if(mode==="cpu"&&!gameOver&&currentPlayer===aiPiece)setTimeout(aiMove,260)})}
+function humanMove(col){if(gameOver||busy||mode==="cpu"&&currentPlayer!==humanPiece)return;const p=currentPlayer;playMove(col,p).then(ok=>{if(ok&&mode==="cpu"&&!gameOver&&currentPlayer===aiPiece)setTimeout(aiMove,260)})}
 function findImmediate(b,p){for(const c of legalMoves(b)){const copy=cloneBoard(b);dropOn(copy,c,p);if(checkWin(copy,p))return c}return null}
 function mediumMove(){let c=findImmediate(board,aiPiece);if(c!==null)return c;c=findImmediate(board,humanPiece);if(c!==null)return c;const priority=[3,2,4,1,5,0,6].filter(x=>legalMoves(board).includes(x));return priority[Math.floor(Math.random()*Math.min(priority.length,3))]}
 function evaluateWindow(v,p){const opp=other(p),pc=v.filter(x=>x===p).length,oc=v.filter(x=>x===opp).length,ec=v.filter(x=>x===EMPTY).length;if(pc===4)return 100000;if(pc===3&&ec===1)return 120;if(pc===2&&ec===2)return 14;if(oc===3&&ec===1)return-150;if(oc===2&&ec===2)return-10;return 0}
@@ -238,7 +240,7 @@ function hardMove(){const win=findImmediate(board,aiPiece);if(win!==null)return 
 function aiMove(){if(gameOver||busy||mode!=="cpu"||currentPlayer!==aiPiece)return;const moves=legalMoves(board);if(!moves.length)return;const col=difficulty==="easy"?moves[Math.floor(Math.random()*moves.length)]:difficulty==="medium"?mediumMove():hardMove();playMove(col,aiPiece)}
 function resolveStarter(){const v=starterEl.value;if(mode==="pvp")return v==="random"?(Math.random()<.5?RED:YELLOW):v==="computer"?YELLOW:RED;if(v==="random")return Math.random()<.5?humanPiece:aiPiece;return v==="computer"?aiPiece:humanPiece}
 function syncControls(){const pvp=modeEl.value==="pvp";difficultyEl.disabled=pvp;colorEl.disabled=pvp;document.getElementById("connectfour-pvp-note").hidden=!pvp;starterEl.options[0].text=i18n.t(pvp?"red":"you");starterEl.options[1].text=i18n.t(pvp?"yellow":"computer")}
-function newRound(){syncControls();board=emptyBoard();gameOver=false;busy=false;mode=modeEl.value;difficulty=difficultyEl.value;humanPiece=colorEl.value==="red"?RED:YELLOW;aiPiece=other(humanPiece);currentPlayer=resolveStarter();setSideLabels();render();updateScores();updateStatus();if(mode==="cpu"&&currentPlayer===aiPiece)setTimeout(aiMove,350)}
+function newRound(){roundGen++;syncControls();board=emptyBoard();gameOver=false;busy=false;mode=modeEl.value;difficulty=difficultyEl.value;humanPiece=colorEl.value==="red"?RED:YELLOW;aiPiece=other(humanPiece);currentPlayer=resolveStarter();setSideLabels();render();updateScores();updateStatus();if(mode==="cpu"&&currentPlayer===aiPiece)setTimeout(aiMove,350)}
 function setSideLabels(){leftLabel.textContent=i18n.t(mode==="cpu"?"youL":"redL");rightLabel.textContent=i18n.t(mode==="cpu"?"cpuL":"yellowL")}
 function resetMatch(){clearTimeout(_winToneTimer);disarmReset();round=1;leftScore=0;rightScore=0;newRound()}
 function updateScores(){leftScoreEl.textContent=String(leftScore);rightScoreEl.textContent=String(rightScore);roundEl.textContent=String(round)}

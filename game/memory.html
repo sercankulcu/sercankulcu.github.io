@@ -3,11 +3,11 @@ layout: without-sidebar
 title: "Memory Game"
 permalink: /game/memory/
 excerpt: "Match pairs of cards while tracking moves and time."
+hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
 lang: en
 seo_title: "Memory Game · Free Online Game"
 og_image: https://sercankulcu.github.io/images/games/memory.jpg
 game_genre: "Puzzle"
-hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
 ---
 
 <style>
@@ -340,7 +340,7 @@ hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
       <li>Keyboard: Tab to a card, then Enter or Space.</li>
       <li>TR / EN switches the interface language.</li>
     </ul>
-    <p>The timer pauses while this window is open.</p>
+    <p>The timer pauses while this window is open or the tab is hidden.</p>
   </div>
 </dialog>
 
@@ -399,7 +399,7 @@ hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
       <li>Klavye: Tab ile karta git, sonra Enter ya da Boşluk.</li>
       <li>TR / EN düğmesi arayüz dilini değiştirir.</li>
     </ul>
-    <p>Bu pencere açıkken süre durur.</p>
+    <p>Bu pencere açıkken ya da sekme gizliyken süre durur.</p>
   `
     }
   };
@@ -454,6 +454,7 @@ hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
   let startTime = 0;
   let pausedAt = 0;
   let totalPairs = 0;
+  let closeTimer = 0;
 
   function shuffle(items) {
     const copy = [...items];
@@ -508,6 +509,9 @@ hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
   }
 
   function finishGame() {
+    /* Read the clock now: the 250 ms tick can lag behind the last match. */
+    seconds = Math.floor((performance.now() - startTime) / 1000);
+    time.textContent = seconds;
     stopTimer();
 
     const best = getBest();
@@ -563,11 +567,15 @@ hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
     }
 
     lock = true;
-    window.setTimeout(closeCards, 700);
+    closeTimer = window.setTimeout(closeCards, 700);
   }
 
   function startGame() {
     stopTimer();
+    /* A pending flip-back from the previous game used to close a card the
+       player had just opened in the new one. */
+    window.clearTimeout(closeTimer);
+    pausedAt = 0;
 
     openCards = [];
     moveCount = 0;
@@ -612,7 +620,16 @@ hreflang: {en: "/game/memory/", tr: "/game/tr/hafiza-oyunu/"}
     if (event.target === helpDialog || event.target.closest("[data-close]")) helpDialog.close();
   });
   helpDialog.addEventListener("close", () => {
-    if (pausedAt) {
+    if (pausedAt && !document.hidden) {
+      startTime += performance.now() - pausedAt;
+      pausedAt = 0;
+    }
+  });
+  /* The clock also stops while the tab is hidden. */
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (timer !== null && !pausedAt) pausedAt = performance.now();
+    } else if (pausedAt && !helpDialog.open) {
       startTime += performance.now() - pausedAt;
       pausedAt = 0;
     }

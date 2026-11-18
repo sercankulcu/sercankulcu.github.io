@@ -31,43 +31,43 @@ No download, no sign-up. The word games use Turkish words.
 <a class="app-card" href="/game/basketball/"><span class="app-head"><span class="app-ico" aria-hidden="true">🏀</span>Basketball</span><span class="app-desc">Swipe the ball toward the hoop and score as many baskets as possible in 30 seconds.</span></a>
 <a class="app-card" href="/game/fastreflex/"><span class="app-head"><span class="app-ico" aria-hidden="true">⚡</span>Fast Reflex</span><span class="app-desc">Tap good targets quickly, avoid traps, and beat your best score in 30 seconds.</span></a>
 <a class="app-card" href="/game/squid/"><span class="app-head"><span class="app-ico" aria-hidden="true">🚦</span>Red Light, Green Light</span><span class="app-desc">Reach the finish line by moving only during the green light.</span></a>
-<a class="app-card" href="/game/pong/"><span class="app-head"><span class="app-ico" aria-hidden="true">🏓</span>Pong</span><span class="app-desc">Classic Pong against the computer — three difficulty levels, smooth controls, first to 7 wins.</span></a>
-<a class="app-card" href="/game/en/floppy-bird/"><span class="app-head"><span class="app-ico" aria-hidden="true">🐦</span>Floppy Bird</span><span class="app-desc">Tap or press Space to flap; fly between the pipes without crashing and set a high score.</span></a>
+<a class="app-card" href="/game/pong/"><span class="app-head"><span class="app-ico" aria-hidden="true">🏓</span>Pong</span><span class="app-desc">Classic Pong against the computer: three levels, first to 7 points wins.</span></a>
+<a class="app-card" href="/game/en/floppy-bird/"><span class="app-head"><span class="app-ico" aria-hidden="true">🐦</span>Floppy Bird</span><span class="app-desc">Tap or press Space to flap through the pipes and set a high score.</span></a>
 </div>
 <h2 class="games-group">🧠 Puzzle &amp; logic</h2>
 <div class="games-grid">
 <a class="app-card" href="/game/minesweeper/"><span class="app-head"><span class="app-ico" aria-hidden="true">💣</span>Minesweeper</span><span class="app-desc">Classic Minesweeper with three difficulty levels, touch controls, and best times.</span></a>
 <a class="app-card" href="/game/sudoku/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔢</span>Sudoku</span><span class="app-desc">Classic Sudoku with notes, hints, undo and unique-solution generation.</span></a>
 <a class="app-card" href="/game/connections/"><span class="app-head"><span class="app-ico" aria-hidden="true">🧩</span>Connections</span><span class="app-desc">Group 16 words into four connected categories.</span></a>
-<a class="app-card" href="/game/en/strands/"><span class="app-head"><span class="app-ico" aria-hidden="true">🧶</span>Strands</span><span class="app-desc">Find five hidden Turkish words on a common theme in a letter grid, with a new theme every day.</span></a>
+<a class="app-card" href="/game/en/strands/"><span class="app-head"><span class="app-ico" aria-hidden="true">🧶</span>Strands</span><span class="app-desc">Find five hidden Turkish words on one theme; a new grid every day.</span></a>
 <a class="app-card" href="/game/memory/"><span class="app-head"><span class="app-ico" aria-hidden="true">🃏</span>Memory Game</span><span class="app-desc">Match pairs of cards while tracking moves and time.</span></a>
 <a class="app-card" href="/game/bulls-and-cows/"><span class="app-head"><span class="app-ico" aria-hidden="true">🐂</span>Bulls &amp; Cows</span><span class="app-desc">Crack the hidden four-digit code from the bulls and cows clues after each guess.</span></a>
-<a class="app-card" href="/game/en/sliding-puzzle/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔀</span>Sliding Puzzle</span><span class="app-desc">The classic 15 puzzle: slide the numbered tiles into order on a 3×3, 4×4 or 5×5 board.</span></a>
-<a class="app-card" href="/game/en/battleship/"><span class="app-head"><span class="app-ico" aria-hidden="true">⚓</span>Battleship</span><span class="app-desc">Classic Battleship: place your fleet and sink the enemy ships before they find yours.</span></a>
+<a class="app-card" href="/game/en/sliding-puzzle/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔀</span>Sliding Puzzle</span><span class="app-desc">Classic 15 puzzle: slide numbered tiles into order on a 3×3, 4×4 or 5×5 board.</span></a>
+<a class="app-card" href="/game/en/battleship/"><span class="app-head"><span class="app-ico" aria-hidden="true">⚓</span>Battleship</span><span class="app-desc">Place your fleet and sink the computer&#x27;s hidden ships before it sinks yours.</span></a>
 </div>
 <h2 class="games-group">🔤 Word games</h2>
 <div class="games-grid">
-<a class="app-card" href="/game/en/five-letters/"><span class="app-head"><span class="app-ico" aria-hidden="true">5️⃣</span>Five Letters</span><span class="app-desc">Guess the hidden five-letter Turkish word in six tries: a Wordle-style game with a new puzzle every day.</span></a>
-<a class="app-card" href="/game/en/six-letters/"><span class="app-head"><span class="app-ico" aria-hidden="true">6️⃣</span>Six Letters</span><span class="app-desc">Guess the hidden six-letter Turkish word in six tries, with a daily puzzle and shareable results.</span></a>
+<a class="app-card" href="/game/en/five-letters/"><span class="app-head"><span class="app-ico" aria-hidden="true">5️⃣</span>Five Letters</span><span class="app-desc">Guess the five-letter Turkish word in six tries; a new puzzle every day.</span></a>
+<a class="app-card" href="/game/en/six-letters/"><span class="app-head"><span class="app-ico" aria-hidden="true">6️⃣</span>Six Letters</span><span class="app-desc">Guess the six-letter Turkish word in six tries; a new puzzle every day.</span></a>
 <a class="app-card" href="/game/en/one-word/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔤</span>One Word</span><span class="app-desc">Build as many Turkish words as you can from seven letters before the time runs out.</span></a>
 <a class="app-card" href="/game/en/spell-bee/"><span class="app-head"><span class="app-ico" aria-hidden="true">🐝</span>Spell Bee</span><span class="app-desc">Make Turkish words from seven letters; every word must use the centre letter.</span></a>
-<a class="app-card" href="/game/en/hangman/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎯</span>Hangman</span><span class="app-desc">Find the hidden word before six wrong letters; play in Turkish or five other languages.</span></a>
+<a class="app-card" href="/game/en/hangman/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎯</span>Hangman</span><span class="app-desc">Find the hidden word before six misses; Turkish and five other languages.</span></a>
 <a class="app-card" href="/game/en/boggle/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔡</span>Boggle</span><span class="app-desc">Find as many Turkish words as you can on a 4×4 letter grid before the time runs out.</span></a>
 </div>
 <h2 class="games-group">🎓 Quiz &amp; brain training</h2>
 <div class="games-grid">
-<a class="app-card" href="/game/flagquiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🏳️</span>Flag Quiz</span><span class="app-desc">Identify country flags in a 10-question quiz.</span></a>
+<a class="app-card" href="/game/flagquiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🏳️</span>Flag Quiz</span><span class="app-desc">Identify the flags of 197 countries in 10-question rounds at three levels.</span></a>
 <a class="app-card" href="/game/mathmaster/"><span class="app-head"><span class="app-ico" aria-hidden="true">➗</span>Math Master</span><span class="app-desc">Solve as many arithmetic problems as possible in two minutes.</span></a>
-<a class="app-card" href="/game/en/millionaire/"><span class="app-head"><span class="app-ico" aria-hidden="true">💰</span>Millionaire</span><span class="app-desc">Play Millionaire with 10 questions from easy to hard, three lifelines and a prize ladder.</span></a>
+<a class="app-card" href="/game/en/millionaire/"><span class="app-head"><span class="app-ico" aria-hidden="true">💰</span>Millionaire</span><span class="app-desc">Answer 10 questions from easy to hard with three lifelines.</span></a>
 <a class="app-card" href="/game/capital-city-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🌍</span>Capital City Quiz</span><span class="app-desc">Test your knowledge of countries and capital cities with configurable quiz modes.</span></a>
-<a class="app-card" href="/game/movie-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎬</span>Movie Quiz</span><span class="app-desc">Test your knowledge of 200 popular movies across release years, directors, actors, genres, and titles.</span></a>
-<a class="app-card" href="/game/en/pixar-color-millionaire/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎨</span>Pixar Color Millionaire</span><span class="app-desc">Recognise Pixar films from their colour palettes in a 15-question, Millionaire-style quiz.</span></a>
-<a class="app-card" href="/game/en/emoji-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎭</span>Emoji Quiz</span><span class="app-desc">Guess the film, country or food from emoji clues against the clock; how many can you get?</span></a>
-<a class="app-card" href="/game/en/turkiye-geography-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🗺️</span>Türkiye Geography Quiz</span><span class="app-desc">Test your knowledge of Türkiye&#x27;s provinces, regions, mountains, rivers and historic places.</span></a>
+<a class="app-card" href="/game/movie-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎬</span>Movie Quiz</span><span class="app-desc">Guess release years, directors, actors and genres of 200 popular films.</span></a>
+<a class="app-card" href="/game/en/pixar-color-millionaire/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎨</span>Pixar Color Millionaire</span><span class="app-desc">Name Pixar films from their colour palettes in a 15-question quiz.</span></a>
+<a class="app-card" href="/game/en/emoji-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🎭</span>Emoji Quiz</span><span class="app-desc">Guess the film, country, food or saying from emoji clues against the clock.</span></a>
+<a class="app-card" href="/game/en/turkiye-geography-quiz/"><span class="app-head"><span class="app-ico" aria-hidden="true">🗺️</span>Türkiye Geography Quiz</span><span class="app-desc">A timed quiz on Türkiye&#x27;s provinces, regions, mountains, rivers and lakes.</span></a>
 </div>
 <h2 class="games-group">🎲 Classic &amp; casual</h2>
 <div class="games-grid">
-<a class="app-card" href="/game/yazitura/"><span class="app-head"><span class="app-ico" aria-hidden="true">🪙</span>Coin Flip</span><span class="app-desc">Pick heads or tails, place a virtual bet, and track your results.</span></a>
+<a class="app-card" href="/game/yazitura/"><span class="app-head"><span class="app-ico" aria-hidden="true">🪙</span>Coin Flip</span><span class="app-desc">Guess heads or tails, track runs, and simulate thousands of flips.</span></a>
 <a class="app-card" href="/game/connectfour/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔴</span>Connect Four</span><span class="app-desc">Play Connect Four against another player or three levels of computer AI.</span></a>
 <a class="app-card" href="/game/tictactoe/"><span class="app-head"><span class="app-ico" aria-hidden="true">❌</span>Tic Tac Toe</span><span class="app-desc">Play Tic Tac Toe against the computer with three difficulty levels.</span></a>
 </div>

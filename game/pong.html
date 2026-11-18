@@ -2,12 +2,12 @@
 layout: without-sidebar
 title: "Pong"
 permalink: /game/pong/
-excerpt: "Classic Pong against the computer — three difficulty levels, smooth controls, first to 7 wins."
+excerpt: "Classic Pong against the computer: three levels, first to 7 points wins."
+hreflang: {en: "/game/pong/", tr: "/game/tr/pong/"}
 lang: en
 seo_title: "Pong · Free Online Game"
 og_image: https://sercankulcu.github.io/images/games/pong.jpg
 game_genre: "Arcade"
-hreflang: {en: "/game/pong/", tr: "/game/tr/pong/"}
 ---
 
 <style>
@@ -158,6 +158,7 @@ const BALL_SPEED_STEP = 21;       /* px/s per paddle hit */
 const BALL_SPEED_MAX = 1080;      /* px/s */
 const MAX_DT = 1 / 60;
 let difficulty = 0;
+let gameDiff = 0;   /* difficulty the current game started on; records go there */
 let scores = [0, 0];
 let state = "idle"; /* idle | playing | scored | over */
 let raf = 0;
@@ -171,7 +172,7 @@ let gameRally = 0;  /* longest rally in the current game */
 
 /* Records live on this device only; blocked storage simply means no records.
    A game counts once someone reaches 7; abandoned games are not counted. */
-const STATS_KEY = "pz:pong:stats";
+const STATS_KEY = "pz:pong" + ":stats";  /* iki nokta arasında kelime jemoji emoji koduna dönüşebilir */
 const I18N = {
   en: {
     title: "Pong", newGame: "New game", help: "How to play", close: "Close", player: "Player", computer: "Computer",
@@ -184,9 +185,9 @@ const I18N = {
     record: "{diff}: {w} of {n} won", bestRally: "Best rally {n}", newRally: "🏆 New best rally: {n}!",
     reset: "Reset records", confirmReset: "Delete the Pong records stored on this device?",
     h_intro: "Classic Pong against the computer: keep the ball in play with your paddle and get it past the computer's.",
-    h_steps: "<li>Pick a computer difficulty under the court: Easy, Medium or Hard.</li><li>Press Start Game. You control the left paddle.</li><li>Where the ball meets your paddle sets its angle; every hit makes it a little faster.</li><li>First to 7 points wins.</li>",
+    h_steps: `<li>Pick a computer difficulty under the court: Easy, Medium or Hard.</li><li>Press Start Game. You control the left paddle.</li><li>Where the ball meets your paddle sets its angle; every hit makes it a little faster.</li><li>First to 7 points wins.</li>`,
     h_controls: "Controls",
-    h_ctrl: "<li>Mouse: move it over the court.</li><li>Touch: drag or tap on the court.</li><li>Keyboard: W / S or ↑ / ↓.</li><li>P pauses and resumes; ↺ starts a new game.</li>",
+    h_ctrl: `<li>Mouse: move it over the court.</li><li>Touch: drag or tap on the court.</li><li>Keyboard: W / S or ↑ / ↓.</li><li>P pauses and resumes; ↺ starts a new game.</li>`,
     h_notes: "Notes", h_pause: "The game pauses when you switch tabs or open this help.",
     h_lang: "TR / EN switches the interface language; the choice is remembered for all games and tools.",
     h_records: "Wins per difficulty and your longest rally (paddle hits in one point) are kept for finished games, on this device only."
@@ -202,9 +203,9 @@ const I18N = {
     record: "{diff}: {n} oyunda {w} galibiyet", bestRally: "En uzun ralli {n}", newRally: "🏆 Yeni rekor ralli: {n}!",
     reset: "Rekorları sıfırla", confirmReset: "Bu cihazdaki Pong rekorları silinsin mi?",
     h_intro: "Bilgisayara karşı klasik Pong: topu raketinle oyunda tut ve bilgisayarın raketini geçir.",
-    h_steps: "<li>Sahanın altından bilgisayarın zorluğunu seç: Kolay, Orta ya da Zor.</li><li>Başla düğmesine bas. Soldaki raket senin.</li><li>Topun rakete değdiği yer gidiş açısını belirler; her vuruşta top biraz hızlanır.</li><li>7 sayıya ilk ulaşan kazanır.</li>",
+    h_steps: `<li>Sahanın altından bilgisayarın zorluğunu seç: Kolay, Orta ya da Zor.</li><li>Başla düğmesine bas. Soldaki raket senin.</li><li>Topun rakete değdiği yer gidiş açısını belirler; her vuruşta top biraz hızlanır.</li><li>7 sayıya ilk ulaşan kazanır.</li>`,
     h_controls: "Kontroller",
-    h_ctrl: "<li>Fare: sahanın üzerinde gezdir.</li><li>Dokunmatik: sahada sürükle ya da dokun.</li><li>Klavye: W / S ya da ↑ / ↓.</li><li>P duraklatır ve devam ettirir; ↺ yeni oyun başlatır.</li>",
+    h_ctrl: `<li>Fare: sahanın üzerinde gezdir.</li><li>Dokunmatik: sahada sürükle ya da dokun.</li><li>Klavye: W / S ya da ↑ / ↓.</li><li>P duraklatır ve devam ettirir; ↺ yeni oyun başlatır.</li>`,
     h_notes: "Notlar", h_pause: "Sekme değiştirdiğinde ya da bu yardımı açtığında oyun duraklar.",
     h_lang: "TR / EN arayüz dilini değiştirir; seçim tüm oyunlar ve araçlar için hatırlanır.",
     h_records: "Biten oyunlarda zorluk başına galibiyetlerin ve en uzun rallin (bir sayıdaki raket vuruşları) yalnızca bu cihazda saklanır."
@@ -259,6 +260,7 @@ function startGame() {
   clearTimeout(resumeTimer);
   scores = [0, 0];
   gameRally = 0;
+  gameDiff = difficulty;
   updateScoreUI();
   initPaddles();
   initBall(Math.random() > 0.5 ? 1 : -1);
@@ -362,8 +364,10 @@ function gameOver(winner) {
   state = "over";
   cancelAnimationFrame(raf);
   clearTimeout(resumeTimer);
-  stats.played[difficulty]++;
-  if (winner === 0) stats.wins[difficulty]++;
+  /* Counted on the starting level: switching to Hard at 6–0 used to file an
+     Easy game as a Hard win. */
+  stats.played[gameDiff]++;
+  if (winner === 0) stats.wins[gameDiff]++;
   const newRally = gameRally > stats.bestRally;
   if (newRally) stats.bestRally = gameRally;
   saveStats();

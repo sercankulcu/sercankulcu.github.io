@@ -2,13 +2,13 @@
 layout: without-sidebar
 title: "Amiral Battı"
 permalink: /game/battleship/
-excerpt: "Klasik Amiral Battı: filonu yerleştir, düşman gemilerini onlar seninkileri bulmadan batır."
+excerpt: "Filonu yerleştir, bilgisayarın gizli filosunu o seninkini bulmadan batır."
+ui_lang: tr
+hreflang: {en: "/game/en/battleship/", tr: "/game/battleship/"}
 lang: tr
 seo_title: "Amiral Battı · Ücretsiz Online Oyun"
 og_image: https://sercankulcu.github.io/images/games/battleship.jpg
 game_genre: "Puzzle"
-ui_lang: tr
-hreflang: {en: "/game/en/battleship/", tr: "/game/battleship/"}
 ---
 
 <style>
@@ -248,7 +248,7 @@ Object.assign(I18N.tr, {
   stWinBest: "🎉 Kazandın! {shots} atış — 🏆 Yeni rekor!",
   stWin: "🎉 Kazandın! {shots} atışta tüm düşman gemileri battı!",
   stSunk: "🔥 Battı! {name} — Saldırmaya devam et!", stHit: "💥 İsabet! Tekrar saldır!",
-  stMiss: "• Kaçtı. AI hamle yapıyor...",
+  stMiss: "• Iska. Bilgisayar hamle yapıyor...",
   stLose: "💥 Kaybettin! Düşman tüm gemilerini batırdı.",
   stAiHit: "💥 Düşman gemine vurdu! Tekrar saldırıyor...",
   stYourTurn: "Senin hamlen! Düşman haritasına tıkla.",
@@ -280,15 +280,15 @@ let aiPlaced   = {};
 let hoverIdx   = -1;
 let awaitingAI = false;
 
-/* AI hunt/target */
-let aiQueue = [];
-let aiAttacked = new Set();
+/* Bumped by every new game, so a computer turn still waiting on its timer
+   from the previous game cannot fire into the next one. */
+let gameId = 0;
 
 const app = document.querySelector(".bs-app");
 
 /* Records live on this device only; blocked storage simply means no records.
    Only battles that end (someone loses the whole fleet) are counted. */
-const STATS_KEY = "pz:battleship:stats";
+const STATS_KEY = "pz:battleship" + ":stats";
 function loadStats() {
   try {
     const v = JSON.parse(localStorage.getItem(STATS_KEY));
@@ -507,36 +507,47 @@ function isShipSunk(grid, hits, shipId) {
   return grid.every((cell, i) => cell !== shipId || hits[i] === "hit");
 }
 
+/* Hunt and target. Only hits on ships that are still afloat are followed
+   (a sunk ship is announced, so its neighbours are not worth a shot), and
+   once two hits line up the ends of that line come first. Without targets it
+   hunts on a checkerboard, since the smallest ship covers two squares. */
 function aiAttack() {
-  let target = -1;
-  while (aiQueue.length && target < 0) {
-    const q = aiQueue.shift();
-    if (!aiAttacked.has(q)) target = q;
+  const open = i => !playerHits[i];
+  const live = new Set();
+  for (let i = 0; i < 100; i++) {
+    if (playerHits[i] === "hit" && !isShipSunk(playerGrid, playerHits, playerGrid[i])) live.add(i);
   }
-  if (target < 0) {
-    /* Checkerboard hunt */
-    const candidates = [];
+  const lineEnds = [], neighbours = [];
+  live.forEach(i => {
+    const r = rowOf(i), c = colOf(i);
+    [[0, 1], [1, 0]].forEach(([dr, dc]) => {
+      const pr = r - dr, pc = c - dc;
+      if (pr >= 0 && pc >= 0 && live.has(idx(pr, pc))) return;
+      let er = r, ec = c, len = 1;
+      while (er + dr <= 9 && ec + dc <= 9 && live.has(idx(er + dr, ec + dc))) { er += dr; ec += dc; len++; }
+      if (len < 2) return;
+      if (pr >= 0 && pc >= 0 && open(idx(pr, pc))) lineEnds.push(idx(pr, pc));
+      if (er + dr <= 9 && ec + dc <= 9 && open(idx(er + dr, ec + dc))) lineEnds.push(idx(er + dr, ec + dc));
+    });
+    [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dr, dc]) => {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 9 && open(idx(nr, nc))) neighbours.push(idx(nr, nc));
+    });
+  });
+  let pool = lineEnds.length ? lineEnds : neighbours;
+  if (!pool.length) {
+    const all = [], parity = [];
     for (let i = 0; i < 100; i++) {
-      if (!aiAttacked.has(i) && (rowOf(i) + colOf(i)) % 2 === 0) candidates.push(i);
+      if (!open(i)) continue;
+      all.push(i);
+      if ((rowOf(i) + colOf(i)) % 2 === 0) parity.push(i);
     }
-    if (candidates.length) {
-      target = candidates[Math.floor(Math.random() * candidates.length)];
-    } else {
-      for (let i = 0; i < 100; i++) if (!aiAttacked.has(i)) { target = i; break; }
-    }
+    pool = parity.length ? parity : all;
   }
-  if (target < 0) return false;
-  aiAttacked.add(target);
+  if (!pool.length) return false;
+  const target = pool[Math.floor(Math.random() * pool.length)];
   const hit = playerGrid[target] !== null;
   playerHits[target] = hit ? "hit" : "miss";
-  if (hit) {
-    /* Queue adjacent cells */
-    const r = rowOf(target), c = colOf(target);
-    if (r > 0) aiQueue.push(idx(r-1,c));
-    if (r < 9) aiQueue.push(idx(r+1,c));
-    if (c > 0) aiQueue.push(idx(r,c-1));
-    if (c < 9) aiQueue.push(idx(r,c+1));
-  }
   return hit;
 }
 
@@ -564,7 +575,8 @@ function playerAttack(i) {
 
   setStatus("stMiss");
   awaitingAI = true;
-  setTimeout(aiTurn, 600);
+  const g = gameId;
+  setTimeout(() => { if (g === gameId) aiTurn(); }, 600);
 }
 
 function aiTurn() {
@@ -583,7 +595,8 @@ function aiTurn() {
 
   if (hit) {
     setStatus("stAiHit");
-    setTimeout(aiTurn, 600);
+    const g = gameId;
+    setTimeout(() => { if (g === gameId) aiTurn(); }, 600);
     return;
   }
 
@@ -612,7 +625,7 @@ function initGame() {
   playerHits = new Array(100).fill(null);
   aiHits     = new Array(100).fill(null);
   placedShips = {}; aiPlaced = {};
-  aiQueue = []; aiAttacked = new Set();
+  gameId++;
   awaitingAI = false;
   renderRotate();
 
