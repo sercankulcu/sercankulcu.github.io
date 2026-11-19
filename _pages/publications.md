@@ -516,7 +516,7 @@ Turkish-language course textbook on the 8086 microprocessor: architecture, regis
 
 Turkish-language course textbook on operating systems: processes, threads, scheduling, synchronization, deadlock, memory and virtual memory, file systems, I/O, security, and Linux.
 
-**How to cite:** Külcü, S. (2026). *İşletim Sistemleri* [Course textbook, 1095 pages]. https://sercankulcu.github.io/books/isletim-sistemleri/
+**How to cite:** Külcü, S. (2026). *İşletim Sistemleri* [Course textbook, 1097 pages]. https://sercankulcu.github.io/books/isletim-sistemleri/
 
 [Book](/books/isletim-sistemleri/) · [PDF](https://sercankulcu.github.io/courses-pdfs/os/Isletim-Sistemleri.pdf) · [Course](/teaching/operating-systems/)
 
