@@ -474,7 +474,7 @@ system  Finalizer  daemon=true</code></pre>
 
 <h3 id="s10-2-4"><span class="nt-num">10.2.4</span>JVM başlarken çalışan iş parçacıkları</h3>
 
-<p>Sunum, JVM başladığında var olan dört temel iş parçacığını öne çıkarır:</p>
+<p>Sunum, HotSpot JVM'i başlarken var olan iş parçacıklarından öne çıkan dördünü ele alır:</p>
 
 <dl>
   <dt>Ana iş parçacığı (<span lang="en">main thread</span>)</dt>
@@ -484,7 +484,7 @@ system  Finalizer  daemon=true</code></pre>
   <dt>Sinyal gönderici (<span lang="en">Signal Dispatcher</span>)</dt>
   <dd>İşletim sisteminden gelen sinyalleri karşılar. Örneğin Ctrl+C ile gelen kapatma isteğinde JVM'in düzenli kapanmasını başlatır.</dd>
   <dt>Sonlandırıcı (<span lang="en">Finalizer</span>)</dt>
-  <dd>Nesnelerin <code>finalize()</code> metodunu çağırır. <code>finalize()</code> Java 9'da kullanımdan kaldırıldı (<span lang="en">deprecated</span>), Java 18'den beri de ileride silinecek olarak işaretlidir. Yerine <code>try</code>-<code>finally</code> ya da <code>AutoCloseable</code> ile try-with-resources kullanılır.</dd>
+  <dd>Nesnelerin <code>finalize()</code> metodunu çağırır. <code>finalize()</code> Java 9'da kullanımdan kaldırıldı (<span lang="en">deprecated</span>), Java 18'de de silinmek üzere işaretlendi (JEP 421). JVM <code>--finalization=disabled</code> seçeneğiyle başlatılırsa sonlandırıcı iş parçacığı hiç başlamaz. Yerine <code>try</code>-<code>finally</code> ya da <code>AutoCloseable</code> ile try-with-resources kullanılır.</dd>
 </dl>
 <h2 class="nt-pb" id="s10-3"><span class="nt-num">10.3</span>Yaşam döngüsü</h2>
 
@@ -1364,16 +1364,16 @@ Kuyruk dolu</code></pre>
 
 <h3 id="s10-7-1"><span class="nt-num">10.7.1</span><code>volatile</code> alanlar</h3>
 
-<p>Yarış durumu, iki iş parçacığının aynı anda yazmasından doğar. Daha sinsi bir sorun da vardır: bir iş parçacığının yazdığı değeri öteki hiç görmeyebilir. İşlemciler hız için değerleri çekirdeğe yakın önbelleklerde ya da yazmaçlarda (<span lang="en">register</span>) tutar. Derleyici de bir döngüde değişmediğini düşündüğü bir değişkeni bir kez okuyup yazmaçta tutabilir. Bu durumda başka bir çekirdekteki iş parçacığı ana belleğe yeni değeri yazsa bile ilk iş parçacığı eski değerle çalışmayı sürdürür.</p>
+<p>Yarış durumu, iki iş parçacığının aynı anda yazmasından doğar. Daha sinsi bir sorun da vardır: bir iş parçacığının yazdığı değeri öteki hiç görmeyebilir. Sezgisel bir modelle anlatalım. İşlemciler hız için değerleri çekirdeğe yakın önbelleklerde ya da yazmaçlarda (<span lang="en">register</span>) tutar. Derleyici de bir döngüde değişmediğini düşündüğü bir değişkeni bir kez okuyup yazmaçta tutabilir. Bu durumda başka bir çekirdekteki iş parçacığı ana belleğe yeni değeri yazsa bile ilk iş parçacığı eski değerle çalışmayı sürdürür.</p>
 
 <div class="nt-box nt-box--tanim" id="tanim-volatile">
   <span class="nt-box__title">Tanım 10.9</span>
-  <p><strong><code>volatile</code></strong> anahtar sözcüğüyle tanımlanan bir alan, her okunuşta ana bellekten okunur ve her yazılışta hemen bütün iş parçacıklarına görünür olur. <code>volatile</code> görünürlüğü garanti eder; birden çok adımlı işlemleri atomik yapmaz.</p>
+  <p><strong><code>volatile</code></strong> anahtar sözcüğüyle tanımlanan bir alanda her okuma, o alana yapılan son yazmayı görür: bir <code>volatile</code> yazma, aynı alanın sonraki her okumasından önce-olur (<span lang="en">happens-before</span>). Sezgisel modelde bu, değerin her okunuşta ana bellekten okunması ve her yazılışta hemen bütün iş parçacıklarına görünür olması diye düşünülebilir. <code>volatile</code> görünürlüğü garanti eder; birden çok adımlı işlemleri atomik yapmaz.</p>
 </div>
 
 <figure class="nt-fig" id="sekil-gorunur" style="--w:460px">
-  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 460 182" width="460" role="img" aria-label="main yeni değeri ana belleğe yazar; t iş parçacığı değeri yazmacında eski haliyle tuttuğu için değişikliği görmez"><defs><marker id="n10-j091-m12-s38_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker><marker id="n10-j091-m13-s38_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="j091-badah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="j091-a" x="6" y="6" width="200" height="70" rx="10"/><text class="j091-h" x="106" y="26" text-anchor="middle">Çekirdek 1: main</text><rect class="j091-plain" x="22" y="36" width="168" height="28" rx="6"/><text class="j091-m" x="106" y="55" text-anchor="middle">önbellek: dur = true</text><rect class="j091-b" x="254" y="6" width="200" height="70" rx="10"/><text class="j091-h" x="354" y="26" text-anchor="middle">Çekirdek 2: t</text><rect class="j091-bad" x="270" y="36" width="168" height="28" rx="6"/><text class="j091-m" x="354" y="55" text-anchor="middle">yazmaç: dur = false</text><rect class="j091-c" x="6" y="136" width="448" height="40" rx="10"/><text class="j091-m" x="230" y="161" text-anchor="middle">Ana bellek: dur = true</text><line class="line" x1="106" y1="78" x2="106" y2="134" marker-end="url(#n10-j091-m12-s38_00-1)"/><text class="j091-sm" x="114" y="110">yazar</text><line class="j091-badl" x1="354" y1="134" x2="354" y2="80" marker-end="url(#n10-j091-m13-s38_00-1)"/><text class="j091-badt" x="346" y="104" text-anchor="end">tekrar okumaz</text><text class="j091-sm" x="346" y="120" text-anchor="end">(eski kopya)</text></svg></div>
-  <figcaption><b>Şekil 10.15:</b> <code>main</code> yeni değeri ana belleğe yazar; <code>t</code> iş parçacığı değeri yazmacında eski hâliyle tuttuğu için değişikliği görmez.</figcaption>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 460 182" width="460" role="img" aria-label="main yeni değeri ana belleğe yazar; t iş parçacığı değeri yazmacında eski haliyle tuttuğu için değişikliği görmez"><defs><marker id="n10-j091-m12-s38_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker><marker id="n10-j091-m13-s38_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="j091-badah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="j091-a" x="6" y="6" width="200" height="70" rx="10"/><text class="j091-h" x="106" y="26" text-anchor="middle">Çekirdek 1: main</text><rect class="j091-plain" x="22" y="36" width="168" height="28" rx="6"/><text class="j091-m" x="106" y="55" text-anchor="middle">önbellek: dur = true</text><rect class="j091-b" x="254" y="6" width="200" height="70" rx="10"/><text class="j091-h" x="354" y="26" text-anchor="middle">Çekirdek 2: t</text><rect class="j091-bad" x="270" y="36" width="168" height="28" rx="6"/><text class="j091-m" x="354" y="55" text-anchor="middle">yazmaç: dur = false</text><rect class="j091-c" x="6" y="136" width="448" height="40" rx="10"/><text class="j091-m" x="230" y="161" text-anchor="middle">Ana bellek (sezgisel model): dur = true</text><line class="line" x1="106" y1="78" x2="106" y2="134" marker-end="url(#n10-j091-m12-s38_00-1)"/><text class="j091-sm" x="114" y="110">yazar</text><line class="j091-badl" x1="354" y1="134" x2="354" y2="80" marker-end="url(#n10-j091-m13-s38_00-1)"/><text class="j091-badt" x="346" y="104" text-anchor="end">tekrar okumaz</text><text class="j091-sm" x="346" y="120" text-anchor="end">(eski kopya)</text></svg></div>
+  <figcaption><b>Şekil 10.15:</b> Sezgisel model: <code>main</code> yeni değeri ana belleğe yazar; <code>t</code> iş parçacığı değeri yazmacında eski hâliyle tuttuğu için değişikliği görmez.</figcaption>
 </figure>
 
 <p>Java dilinin kuralına göre <code>long</code> ve <code>double</code> dışındaki bütün değişkenlerin tek bir okunması ya da yazılması zaten atomiktir. 64 bitlik <code>long</code> ve <code>double</code> değerleri ise bazı JVM'lerde iki 32 bitlik yarım olarak yazılabilir. <code>volatile long</code> ve <code>volatile double</code> alanlarda bu yarım yazma olmaz; okuma ve yazma atomik hâle gelir.</p>
@@ -1457,12 +1457,12 @@ Runnable r = () -&gt; {
   <thead><tr><th><code>final</code></th><th><code>volatile</code></th></tr></thead>
   <tbody>
     <tr><td>Bir kez atanır (yapıcıda); sonra değişmez</td><td>Değeri değişebilir</td></tr>
-    <tr><td>Yapıcı bitince herkes aynı değeri görür</td><td>Her okuma güncel değeri döndürür</td></tr>
+    <tr><td>Yapıcı bitince (<code>this</code> yapıcıdan sızdırılmadıysa) herkes aynı değeri görür</td><td>Her okuma güncel değeri döndürür</td></tr>
   </tbody>
 </table>
 </div>
 
-<p><code>final</code> alan hiç değişmediği için görünürlük sorunu yoktur; Java, yapıcı bittikten sonra bütün iş parçacıklarının <code>final</code> alanın doğru değerini göreceğini garanti eder. <code>volatile</code> ise yalnız değişen alanlar için anlamlıdır. İkisini birlikte yazmak çelişkili olduğu için derleyici reddeder.</p>
+<p><code>final</code> alan hiç değişmediği için görünürlük sorunu yoktur; Java, yapıcı bittikten sonra bütün iş parçacıklarının <code>final</code> alanın doğru değerini göreceğini garanti eder; yeter ki <code>this</code> yapıcı bitmeden başka bir iş parçacığına sızdırılmamış olsun. <code>volatile</code> ise yalnız değişen alanlar için anlamlıdır. İkisini birlikte yazmak çelişkili olduğu için derleyici reddeder.</p>
 
 <h3 id="s10-7-4"><span class="nt-num">10.7.4</span>Java Bellek Modeli ve önce-olur ilişkisi</h3>
 
@@ -1911,7 +1911,8 @@ Kilitlenmiş: 0</code></pre>
 
 <pre class="nt-code"><code>Lock adil = <span class="kw">new</span> ReentrantLock(<span class="kw">true</span>);  <span class="cm">// adil</span>
 <span class="kw">if</span> (kilit.tryLock(50, TimeUnit.MILLISECONDS)) {
-    <span class="cm">// ... iş, sonra kilit.unlock()</span>
+    <span class="kw">try</span> { <span class="cm">/* iş */</span> }
+    <span class="kw">finally</span> { kilit.unlock(); }
 } <span class="kw">else</span> {
     Thread.sleep(rnd.nextInt(20)); <span class="cm">// rastgele</span>
 }</code></pre>
@@ -1978,6 +1979,9 @@ Kilitlenmiş: 0</code></pre>
     <span class="kw">private</span> <span class="kw">int</span> son = 0;
     <span class="kw">private</span> <span class="kw">int</span> buyukluk = 0;
     <span class="kw">public</span> BlockingQueue(<span class="kw">int</span> boyut) {
+        <span class="kw">if</span> (boyut &lt;= 0)
+            <span class="kw">throw</span> <span class="kw">new</span> IllegalArgumentException(
+                    "boyut &gt; 0 olmalı");
         veri = <span class="kw">new</span> Object[boyut];
     }
     <span class="kw">public</span> synchronized <span class="kw">int</span> getSize() {
@@ -2000,6 +2004,7 @@ Kilitlenmiş: 0</code></pre>
             wait();
         }
         Object oge = veri[bas];
+        veri[bas] = <span class="kw">null</span>;
         bas = (bas + 1) % veri.length;
         buyukluk--;
         notifyAll();
@@ -2007,7 +2012,7 @@ Kilitlenmiş: 0</code></pre>
     }
 }</code></pre>
 
-<p>Dizi dairesel (<span lang="en">circular</span>) kullanılır. <code>bas</code> çıkarılacak öğenin, <code>son</code> eklenecek öğenin konumudur. Her ekleme ve çıkarmada konum bir artar; <code>% veri.length</code> sona gelince başa sarar. <code>buyukluk</code> kuyruktaki öğe sayısıdır.</p>
+<p>Dizi dairesel (<span lang="en">circular</span>) kullanılır. <code>bas</code> çıkarılacak öğenin, <code>son</code> eklenecek öğenin konumudur. Her ekleme ve çıkarmada konum bir artar; <code>% veri.length</code> sona gelince başa sarar. <code>buyukluk</code> kuyruktaki öğe sayısıdır. <code>remove</code> okuduğu gözü <code>null</code> yapar; böylece kuyruk artık kendisine ait olmayan nesneyi tutmaz ve çöp toplayıcı onu temizleyebilir. Yapıcı, 0 ya da negatif boyutu <code>IllegalArgumentException</code> ile reddeder; boyutu 0 olan bir kuyrukta <code>add</code> sonsuza dek beklerdi.</p>
 
 <p><code>add</code>, kuyruk doluyken (<code>buyukluk == veri.length</code>) bekler; <code>remove</code>, kuyruk boşken bekler. Her ekleme ya da çıkarmadan sonra <code>notifyAll()</code> bekleyenleri uyandırır. Burada <code>notifyAll()</code> bilinçli bir seçimdir. Aynı bekleme kümesinde hem üreticiler hem tüketiciler bekleyebilir. <code>notify()</code> yanlış türden birini uyandırırsa o iş parçacığı koşulu bozuk bulup yeniden bekler ve doğru iş parçacığı hiç uyanmayabilir.</p>
 
@@ -2031,6 +2036,7 @@ Kilitlenmiş: 0</code></pre>
         wait();
     }
     Object oge = veri[bas];
+    veri[bas] = <span class="kw">null</span>;
     bas = (bas + 1) % veri.length;
     buyukluk--;
     notifyAll();
@@ -2044,11 +2050,11 @@ Kilitlenmiş: 0</code></pre>
 <tr><td>1</td><td>6: <code>veri[son] = oge;</code><br>7: <code>son = (son + 1) % veri.length;</code><br>8: <code>buyukluk++;</code></td><td>bas=0, son=1, buyukluk=1</td></tr>
 <tr><td>2</td><td>6: <code>veri[son] = oge;</code><br>7: <code>son = (son + 1) % veri.length;</code><br>8: <code>buyukluk++;</code></td><td>bas=0, son=0, buyukluk=2</td></tr>
 <tr><td>3</td><td>4: <code>wait();</code></td><td>bas=0, son=0, buyukluk=2</td></tr>
-<tr><td>4</td><td>16: <code>Object oge = veri[bas];</code><br>17: <code>bas = (bas + 1) % veri.length;</code><br>18: <code>buyukluk--;</code></td><td>bas=1, son=0, buyukluk=1</td></tr>
-<tr><td>5</td><td>19: <code>notifyAll();</code></td><td>bas=1, son=0, buyukluk=1</td></tr>
+<tr><td>4</td><td>16: <code>Object oge = veri[bas];</code><br>17: <code>veri[bas] = null;</code><br>18: <code>bas = (bas + 1) % veri.length;</code><br>19: <code>buyukluk--;</code></td><td>bas=1, son=0, buyukluk=1</td></tr>
+<tr><td>5</td><td>20: <code>notifyAll();</code></td><td>bas=1, son=0, buyukluk=1</td></tr>
 <tr><td>6</td><td>3: <code>while (buyukluk == veri.length) {</code><br>6: <code>veri[son] = oge;</code><br>7: <code>son = (son + 1) % veri.length;</code><br>8: <code>buyukluk++;</code></td><td>bas=1, son=1, buyukluk=2</td></tr>
-<tr><td>7</td><td>16: <code>Object oge = veri[bas];</code><br>17: <code>bas = (bas + 1) % veri.length;</code><br>18: <code>buyukluk--;</code></td><td>bas=0, son=1, buyukluk=1</td></tr>
-<tr><td>8</td><td>16: <code>Object oge = veri[bas];</code><br>17: <code>bas = (bas + 1) % veri.length;</code><br>18: <code>buyukluk--;</code></td><td>bas=1, son=1, buyukluk=0</td></tr>
+<tr><td>7</td><td>16: <code>Object oge = veri[bas];</code><br>17: <code>veri[bas] = null;</code><br>18: <code>bas = (bas + 1) % veri.length;</code><br>19: <code>buyukluk--;</code></td><td>bas=0, son=1, buyukluk=1</td></tr>
+<tr><td>8</td><td>16: <code>Object oge = veri[bas];</code><br>17: <code>veri[bas] = null;</code><br>18: <code>bas = (bas + 1) % veri.length;</code><br>19: <code>buyukluk--;</code></td><td>bas=1, son=1, buyukluk=0</td></tr>
 <tr><td>9</td><td>14: <code>wait();</code></td><td>bas=1, son=1, buyukluk=0</td></tr>
 </tbody>
 </table>
@@ -2061,7 +2067,7 @@ Kilitlenmiş: 0</code></pre>
   <figcaption><b>Şekil 10.22:</b> 3. adım. Kuyruk dolu; üretici <code>wait()</code> ile bekleme kümesinde ve kilit boşta.</figcaption>
 </figure>
 
-<p>Kilit boşaldığı için 4. adımda tüketici içeri girebilir. <code>remove()</code> 1'i alır ve <code>bas</code> 1 olur. 5. adımda <code>notifyAll()</code> üreticiyi uyandırır. Ama kilit hâlâ tüketicidedir; üretici kilidi bekler. <code>remove</code> 1'i döndürüp kilidi bırakınca 6. adımda üretici kilidi alır. <code>while</code> koşulunu yeniden denetler: kuyruk artık dolu değildir. 3, <code>veri[0]</code>'a yazılır. 7. ve 8. adımlarda tüketici 2'yi ve 3'ü alır; kuyruk boşalır. 9. adımda bir sonraki <code>remove()</code> boş kuyrukla karşılaşır ve tüketici bekler. Üretici 4'ü ekleyip <code>notifyAll()</code> yapınca uyanacaktır.</p>
+<p>Kilit boşaldığı için 4. adımda tüketici içeri girebilir. <code>remove()</code> 1'i alır, gözü <code>null</code> yapar ve <code>bas</code> 1 olur. 5. adımda <code>notifyAll()</code> üreticiyi uyandırır. Ama kilit hâlâ tüketicidedir; üretici kilidi bekler. <code>remove</code> 1'i döndürüp kilidi bırakınca 6. adımda üretici kilidi alır. <code>while</code> koşulunu yeniden denetler: kuyruk artık dolu değildir. 3, <code>veri[0]</code>'a yazılır. 7. ve 8. adımlarda tüketici 2'yi ve 3'ü alır; kuyruk boşalır. 9. adımda bir sonraki <code>remove()</code> boş kuyrukla karşılaşır ve tüketici bekler. Üretici 4'ü ekleyip <code>notifyAll()</code> yapınca uyanacaktır.</p>
 
 <p>Bu, olası sıralardan biridir; gerçek sıra çizelgeleyiciye bağlıdır. Ama hiçbir sırada kuyruk taşmaz ya da boşken okunmaz. Bu güvenceyi <code>while</code> ile <code>wait</code> birlikte verir.</p>
 
@@ -2130,6 +2136,9 @@ kalan: 0</code></pre>
     <span class="kw">private</span> <span class="kw">int</span> son = 0;
     <span class="kw">private</span> <span class="kw">int</span> buyukluk = 0;
     <span class="kw">public</span> BlockingQueue(<span class="kw">int</span> boyut) {
+        <span class="kw">if</span> (boyut &lt;= 0)
+            <span class="kw">throw</span> <span class="kw">new</span> IllegalArgumentException(
+                    "boyut &gt; 0 olmalı");
         veri = <span class="kw">new</span> Object[boyut];
     }
     <span class="cm">// add() ve remove() metotları</span>
@@ -2157,6 +2166,7 @@ kalan: 0</code></pre>
         <span class="kw">while</span> (buyukluk == 0)
             bosDegil.await();
         Object oge = veri[bas];
+        veri[bas] = <span class="kw">null</span>;
         bas = (bas + 1) % veri.length;
         buyukluk--;
         doluDegil.signal();

@@ -404,7 +404,7 @@ Turkish-language course textbook on the analysis of algorithms and fundamental p
 
 Turkish-language course textbook on algorithm-design paradigms and hard problems, the continuation of Algoritmalar: divide and conquer, greedy algorithms, dynamic programming, backtracking, branch and bound, and approximation, randomized, online and parallel algorithms.
 
-**How to cite:** Külcü, S. (2026). *İleri Algoritmalar* [Course textbook, 508 pages]. https://sercankulcu.github.io/books/ileri-algoritmalar/
+**How to cite:** Külcü, S. (2026). *İleri Algoritmalar* [Course textbook, 509 pages]. https://sercankulcu.github.io/books/ileri-algoritmalar/
 
 [Book](/books/ileri-algoritmalar/) · [PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Ileri-Algoritmalar.pdf) · [Course](/teaching/advanced-algorithms/)
 
@@ -484,7 +484,7 @@ Turkish-language textbook implementing classic data structures and algorithms in
 
 Turkish-language course textbook on object-oriented programming in Java: classes, inheritance, polymorphism, collections, exceptions, testing, I/O, graphics, threads, and databases.
 
-**How to cite:** Külcü, S. (2026). *Java ile Nesne Yönelimli Programlama* [Course textbook, 1621 pages]. https://sercankulcu.github.io/books/java-ile-nesne-yonelimli-programlama/
+**How to cite:** Külcü, S. (2026). *Java ile Nesne Yönelimli Programlama* [Course textbook, 1622 pages]. https://sercankulcu.github.io/books/java-ile-nesne-yonelimli-programlama/
 
 [Book](/books/java-ile-nesne-yonelimli-programlama/) · [PDF](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf) · [Course](/teaching/object-oriented-programming-with-java/)
 

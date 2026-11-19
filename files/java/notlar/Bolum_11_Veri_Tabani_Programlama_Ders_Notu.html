@@ -265,7 +265,7 @@ course:
     <tr><td>Güncelleme</td><td>Çoğu zaman bütün dosya yeniden yazılır</td><td>Yalnız ilgili satır değişir</td></tr>
     <tr><td>Eş zamanlı erişim</td><td>İki program aynı anda yazarsa veri bozulabilir</td><td>Kilitleme ve işlemlerle güvenli</td></tr>
     <tr><td>Tutarlılık</td><td>Biçim denetimi tamamen programcıya kalır</td><td>Veri tipleri ve kısıtlar (<code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code>)</td></tr>
-    <tr><td>Güvenlik</td><td>Dosya izni: ya hepsi ya hiçbiri</td><td>Kullanıcı, tablo ve alan düzeyinde yetki</td></tr>
+    <tr><td>Güvenlik</td><td>Dosya izni: ya hepsi ya hiçbiri</td><td>Kullanıcı, tablo ve alan düzeyinde yetki (sunuculu VTYS'lerde; SQLite'ta dosya iznine bağlı)</td></tr>
     <tr><td>Hata sonrası</td><td>Yarım kalan yazma dosyayı bozabilir</td><td>Yarım kalan işlem geri alınır</td></tr>
   </tbody>
 </table>
@@ -288,7 +288,7 @@ course:
 
 <p><strong>Verilere hızlı erişim.</strong> Veri tabanı, sık aranan sütunlar için indeks adı verilen ek yapılar tutar. İndeks sayesinde milyonlarca satır arasından aranan kayıt, bütün satırlara bakılmadan kısa sürede bulunur.</p>
 
-<p><strong>Alan düzeyinde güvenlik.</strong> Dosyada yetki genellikle bütün dosya içindir: dosyayı okuyabilen her şeyi okur. VTYS ise yetkiyi tablo, hatta sütun (alan) düzeyinde verebilir. Örneğin bir şirket veri tabanında maaş sütununu yalnız muhasebe birimi görebilir; öteki birimler aynı tablonun ad ve telefon sütunlarını okur.</p>
+<p><strong>Alan düzeyinde güvenlik.</strong> Dosyada yetki genellikle bütün dosya içindir: dosyayı okuyabilen her şeyi okur. VTYS ise yetkiyi tablo, hatta sütun (alan) düzeyinde verebilir. Örneğin bir şirket veri tabanında maaş sütununu yalnız muhasebe birimi görebilir; öteki birimler aynı tablonun ad ve telefon sütunlarını okur. Bu yetkiler sunuculu VTYS'lerde verilir (ör. PostgreSQL/MySQL'de <code>GRANT</code>); SQLite'ta kullanıcı ve yetki yoktur, erişim dosya iznine bağlıdır.</p>
 
 <p><strong>Platform bağımsız, standart arayüzler.</strong> SQL bir standarttır; temel komutları bütün ilişkisel veri tabanlarında aynıdır. Java tarafında da JDBC adlı tek bir arayüz kümesi vardır. Aynı Java kodu, sürücü değiştirilerek farklı veri tabanlarına erişir.</p>
 
@@ -1979,8 +1979,10 @@ Ece: 5800</code></pre>
       + sonuc[0] + " satır etkiledi");
 } <span class="kw">catch</span> (SQLException e) {
   conn.rollback();
-}
-conn.setAutoCommit(<span class="kw">true</span>);</code></pre>
+  <span class="kw">throw</span> e;
+} <span class="kw">finally</span> {
+  conn.setAutoCommit(<span class="kw">true</span>);
+}</code></pre>
 <pre class="nt-code nt-out"><code>1000 komut, ilki 1 satır etkiledi
 1000 satır, toplam 500500</code></pre>
 
@@ -2007,7 +2009,7 @@ conn.setAutoCommit(<span class="kw">true</span>);</code></pre>
 <pre class="nt-code nt-out"><code>SQLiteException: [SQLITE_CONSTRAINT_CHECK] A CHECK constraint failed (CHECK constraint failed: deger &lt;&gt; 500)
 tabloda 0 satır</code></pre>
 
-<p>500. komut reddedildi, <code>catch</code> bloğu <code>rollback()</code> çağırdı ve tablo boş kaldı: ya hepsi ya hiçbiri. Standart, toplu işlemdeki hatanın <code>SQLException</code>'ın bir alt sınıfı olan <code>BatchUpdateException</code> ile bildirilmesini öngörür. SQLite sürücüsü burada kendi <code>SQLiteException</code>'ını fırlattı. İkisi de <code>SQLException</code> olduğu için <code>catch (SQLException e)</code> iki durumu da yakalar.</p>
+<p>500. komut reddedildi, <code>catch</code> bloğu <code>rollback()</code> çağırdı ve tablo boş kaldı: ya hepsi ya hiçbiri. Geri alınan istisna <code>throw e;</code> ile yeniden fırlatılır; hata sessizce yutulmaz ve çağıran işlemin başarısız olduğunu öğrenir. <code>finally</code> bloğu ise başarıda da hatada da otomatik onayı yeniden açar. Standart, toplu işlemdeki hatanın <code>SQLException</code>'ın bir alt sınıfı olan <code>BatchUpdateException</code> ile bildirilmesini öngörür. SQLite sürücüsü burada kendi <code>SQLiteException</code>'ını fırlattı. İkisi de <code>SQLException</code> olduğu için <code>catch (SQLException e)</code> iki durumu da yakalar.</p>
 
 <p>Çok büyük yüklemelerde kuyruk parça parça gönderilir. Örneğin her 500 <code>addBatch</code>'te bir <code>executeBatch</code> çağrılır. Böylece bir milyon komut bellekte birikmez ve bellek şişmez; işlem yine tek bir <code>commit</code> ile bitebilir.</p>
 
@@ -2135,7 +2137,7 @@ sınıf: org.sqlite.SQLiteException, kod: 1, SQLState: null</code></pre>
 <h2 class="nt-pb" id="s11-12"><span class="nt-num">11.12</span>Özet</h2>
 
 <ul>
-  <li>Veri tabanı, kalıcı, düzenli ve sorgulanabilir veri topluluğudur; onu VTYS yönetir. Dosyaya göre hızlı arama, güvenli eş zamanlı erişim, kısıtlarla tutarlılık, alan düzeyinde yetki ve hatadan sonra kurtarma sağlar.</li>
+  <li>Veri tabanı, kalıcı, düzenli ve sorgulanabilir veri topluluğudur; onu VTYS yönetir. Dosyaya göre hızlı arama, güvenli eş zamanlı erişim, kısıtlarla tutarlılık, alan düzeyinde yetki (sunuculu VTYS'lerde, ör. PostgreSQL/MySQL <code>GRANT</code>; SQLite'ta erişim dosya iznine bağlıdır) ve hatadan sonra kurtarma sağlar.</li>
   <li>İlişkisel model veriyi tablolarda tutar: sütun bir özellik, satır bir kayıttır; birincil anahtar her satırı tekil olarak tanımlar. Tablo bir sınıfa, sütun bir alana, satır bir nesneye benzer.</li>
   <li>SQLite gömülü, sunucusuz ve tek dosyalı bir ilişkisel veri tabanıdır. Java'dan kullanmak için sürücü jar'ı sınıf yolunda olmalıdır; adres <code>jdbc:sqlite:sample.db</code> biçimindedir.</li>
   <li>Temel SQL komutları CRUD işlemlerini karşılar: <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, <code>DELETE</code>. <code>WHERE</code> satırları süzer, <code>ORDER BY</code> sıralar, <code>LIMIT</code> sınırlar. <code>WHERE</code>'siz <code>UPDATE</code> ve <code>DELETE</code> bütün satırları etkiler.</li>
