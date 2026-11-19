@@ -403,8 +403,7 @@ def acilis():
             <div class="ds-deck__pc ds-deck__pc--con"><h3>Bu derste yok</h3><ul>
               <li>Ders notu ve kitap</li><li>Kod örnekleri ve ödev</li><li>Formüllerin türetilmesi</li>
               <li>Bir dersin bütün konuları</li></ul></div>
-          </div>
-          <div class="ds-deck__callout">Her sunum aynı iskeleti izler; böylece iki dersi yan yana koyup karşılaştırmak kolaylaşır.</div>''' % len(D.DERSLER)))
+          </div>''' % len(D.DERSLER)))
     # ic ice kumeler
     venn = '''<svg class="ds-svg" viewBox="0 0 720 330" role="img" aria-label="Yapay zekâ makine öğrenmesini, makine öğrenmesi yapay sinir ağlarını, yapay sinir ağları derin öğrenmeyi kapsar" style="max-width:700px">
 <ellipse cx="360" cy="168" rx="350" ry="158" style="fill:color-mix(in srgb, var(--ds-link) 6%, var(--ds-bg));stroke:var(--ds-link);stroke-width:2"/>
@@ -437,9 +436,7 @@ def acilis():
     cards = ''.join('<div class="ds-deck__card">%s<p style="margin-top:6px"><b>%s</b></p><p>%s</p></div>' % (rel_badge(t), ornek[t][0], ornek[t][1])
                     for t in ('alt', 'temel', 'yontem', 'uygulama'))
     S.append(slide('İlişki Türleri', 'Yapı', head('Yapı', 'Dersler Arası Dört İlişki Türü') +
-                   '\n          <div class="ds-deck__grid ds-deck__grid--2 ai-cards">%s</div>'
-                   '\n          <div class="ds-deck__callout">Rehberde %d ilişki tanımlıdır. Bir ilişki iki sunumda da yer alır: A, B\'yi temel alıyorsa B\'nin sunumu da bunu söyler.</div>'
-                   % (cards, len(D.ILISKILER))))
+                   '\n          <div class="ds-deck__grid ds-deck__grid--2 ai-cards">%s</div>' % cards))
     # olcutler
     acik = {'yaklasim': 'Problemi hangi düşünce biçimiyle ele alır: arama, istatistik, mantık, dönüşüm…',
             'girdi': 'Ders hangi tür veriyle ya da tanımla işe başlar?',
@@ -450,8 +447,7 @@ def acilis():
     cards = '<div class="ds-deck__card"><strong>Temel soru</strong><p>Dersin tek cümlelik varlık nedeni.</p></div>' + ''.join(
         '<div class="ds-deck__card"><strong>%s</strong><p>%s</p></div>' % (et, acik[al]) for al, et in P.ALANLAR)
     S.append(slide('Karşılaştırma Ölçütleri', 'Yapı', head('Yapı', 'Dersleri Karşılaştırma Ölçütleri') +
-                   '\n          <div class="ds-deck__grid ds-deck__grid--3 ai-cards">%s</div>'
-                   '\n          <div class="ds-deck__callout">Her sunumdaki "Ayrıştığı Noktalar" tabloları ve son bölümdeki büyük karşılaştırma tablosu bu yedi ölçütle kurulur.</div>' % cards))
+                   '\n          <div class="ds-deck__grid ds-deck__grid--3 ai-cards">%s</div>' % cards))
     # etkilesimli harita
     groups = []
     for k_no, k_ad in D.KISIMLAR:
@@ -492,14 +488,6 @@ def acilis():
     S.append(slide('Kavşak Dersler', 'Harita', head('Harita', 'Kavşak Dersler: En Çok Bağı Olanlar') +
                    '\n          <table class="ds-deck__table ai-tbl"><tr><th>Ders</th><th class="num">Bağ</th><th>Bazı komşuları</th></tr>%s</table>'
                    '\n          <div class="ds-deck__callout">Makine öğrenmesi ile matematik temeli (doğrusal cebir, olasılık, optimizasyon) haritanın kavşaklarıdır: başka derslerin çoğu bunlardan birine dayanır.</div>' % rows))
-    # iskelet
-    iskelet = ['Ders hangi soruyu sorar?', 'Kısa tarihçe', 'Temel kavramlar', 'Tipik iş akışı', 'Ön koşullar',
-               'Dersin komşuları (şema)', 'Örtüştüğü dersler', 'Ayrıştığı noktalar', 'Uygulama alanları',
-               'Araçlar ve örnek veriler', 'Sık karıştırılanlar', 'Bu dersten sonra', 'Kaynaklar']
-    S.append(slide('Her Sunumun İskeleti', 'Kullanım', head('Kullanım', 'Her Sunumun İskeleti') +
-                   '\n          <div class="ds-deck__two"><ol>%s</ol><ol start="8">%s</ol></div>'
-                   '\n          <div class="ds-deck__callout">Komşuluk şeması ve örtüşme tablosu her sunumda aynı ilişki tablosundan üretilir; şemadaki bir derse tıklamak o dersin sunumunu açar.</div>'
-                   % (''.join('<li>%s</li>' % x for x in iskelet[:7]), ''.join('<li>%s</li>' % x for x in iskelet[7:]))))
     S.append(slide('Nasıl Okunmalı?', 'Kullanım', head('Kullanım', 'Rehber Nasıl Okunmalı?') + '''
           <div class="ds-deck__grid ds-deck__grid--2 ai-cards">
             <div class="ds-deck__card"><strong>Baştan sona</strong><p>Çekirdek dersler (Bölüm 2–5) bütün haritanın ortak dilidir; önce onları okuyun.</p></div>
@@ -746,10 +734,9 @@ def ders_sayfasi(icerik):
          'location: "Giresun, Turkey"', 'course_language: tr', '---', '',
          'This course is a map of the courses around artificial intelligence and data. Each of its %d presentations introduces one course: '
          'the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it '
-         'differs from its nearest neighbours, its applications and tools. All presentations follow the same outline, and the overlap and '
-         'comparison slides are generated from one shared table of %d relations, so that any two courses can be put side by side. '
+         'differs from its nearest neighbours, its applications and tools. '
          'There are no lecture notes, code examples or textbook: the aim is to help students see the field as a whole before choosing their electives.'
-         % (len(D.DERSLER), len(D.ILISKILER)), '', '---', '',
+         % len(D.DERSLER), '', '---', '',
          '## Ders Haritası', '',
          '### Bölüm 1: Alanın Haritası', '',
          'Bu bölümde rehberin amacı, yapay zekâ, makine öğrenmesi, yapay sinir ağları ve derin öğrenmenin iç içe ilişkisi, dersleri bölen altı kısım, '
