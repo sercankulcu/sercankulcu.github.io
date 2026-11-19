@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+ICERIK = dict(
+    excerpt=('Yapay Zekâ ve Veri Dersleri Rehberi Bölüm 32: Olasılık ve İstatistik dersinin tanıtımı; olasılık, dağılımlar, '
+             'Bayes kuralı, kestirim, hipotez testi, yapay zekâda neden gerektiği, kısa tarihçe ve komşu dersler.'),
+    gundem=['Olasılık ve Bayes', 'Dağılımlar', 'Kestirim', 'Hipotez testi', 'YZ\'de nerede', 'Komşu dersler'],
+    tanim=('Olasılık belirsizliği ölçmenin dilidir; istatistik bu dili kullanarak <b>sınırlı veriden</b> genel sonuç '
+           'çıkarır. Yapay zekâ ve veri derslerindeki her model bir belirsizlikle çalışır: tahminin ne kadar güvenilir '
+           'olduğunu ancak bu ders söyleyebilir.'),
+    tarihce=[
+        ('1654', 'Pascal ve Fermat, yarıda kalan bir şans oyununun paylaşımı üzerine mektuplaşır.'),
+        ('1763', 'Bayes\'in makalesi ölümünden sonra yayımlanır: kanıtla güncellenen olasılık.'),
+        ('1908', 'Gosset, "Student" takma adıyla küçük örneklemler için t dağılımını yayımlar.'),
+        ('1925', 'Fisher\'ın Statistical Methods for Research Workers kitabı anlamlılık testini yaygınlaştırır.'),
+        ('1933', 'Kolmogorov olasılığı aksiyomlarla kurar; olasılık kuramı ölçü kuramına dayanır.'),
+        ('1979', 'Efron bootstrap yöntemini önerir: belirsizliği yeniden örneklemeyle ölçmek.'),
+    ],
+    kavramlar=[
+        ('Koşullu olasılık', 'Bir bilgi verildiğinde olasılığın değişmesi.'),
+        ('Bayes kuralı', 'Önsel inancı kanıtla sonsal inanca çevirmek.'),
+        ('Rastgele değişken', 'Beklenen değer, varyans ve dağılım.'),
+        ('Normal dağılım', 'Merkezi limit kuramı: ortalamalar normale yaklaşır.'),
+        ('En çok olabilirlik', 'Veriyi en olası kılan parametreyi seçmek.'),
+        ('Güven aralığı', 'Kestirimin belirsizliğini bir aralıkla vermek.'),
+        ('Hipotez testi', 'Gözlenen fark rastlantı mı, gerçek mi?'),
+        ('Regresyon', 'Bir değişkeni ötekilerle açıklamak ve sınamak.'),
+    ],
+    akis=[('Soru sor', 'neyi merak\nediyoruz?'), ('Örnekle', 'rastgele\nörneklem'), ('Modelle', 'dağılım\nvarsayımı'),
+          ('Kestir', 'parametre,\naralık'), ('Karar ver', 'test, risk')],
+    akis_ornek=('<b>Örnek:</b> Bir YZ ekibi yeni öneri modelinin tıklamayı artırıp artırmadığını sorar. Kullanıcıların '
+                'yarısı rastgele yeni modeli görür (A/B testi), tıklama oranları kestirilir, farkın güven aralığı '
+                'hesaplanır ve fark rastlantıyla açıklanamıyorsa model yayına alınır.'),
+    onkosul_ek=[
+        ('Analiz (Kalkülüs)', 'integral ve türev: sürekli dağılımlar ve en çok olabilirlik', None),
+        ('Ayrık Matematik', 'kümeler ve sayma (permütasyon, kombinasyon)', None),
+    ],
+    ayrisma=[
+        ('MO', 'MÖ tahmin başarımını öne çıkarır; istatistik modelin anlamını, varsayımlarını ve belirsizliğini sorar.'),
+        ('VB', 'Veri bilimi bütün süreci (veri, çözümleme, iletişim) kapsar; bu ders o sürecin çıkarım kuramını verir.'),
+        ('OGM', 'Olasılıksal grafik modeller çok değişkenli dağılımları çizgeyle yapılandırır; bu ders tek ve az değişkenle başlar.'),
+        ('BK', 'Bilgi kuramı belirsizliği entropiyle ölçer; bu ders olasılıkla kestirim ve karar üzerine kuruludur.'),
+    ],
+    uygulamalar=[
+        ('A/B testi', 'Yeni modelin gerçekten daha iyi olup olmadığı.'),
+        ('Naive Bayes', 'Metin ve istenmeyen e-posta sınıflandırma.'),
+        ('Belirsizlik', 'Tahminin güven aralığı ve kalibrasyonu.'),
+        ('Model karşılaştırma', 'İki modelin farkı anlamlı mı?'),
+        ('Üretken modeller', 'Verinin dağılımını öğrenip örneklemek.'),
+        ('Tıbbi testler', 'Duyarlılık, özgüllük ve taban oranı.'),
+    ],
+    araclar=['R', 'SciPy (scipy.stats)', 'statsmodels', 'pandas', 'PyMC', 'Stan'],
+    veri_baslik='Klasik örnek problemler',
+    veriler=['Monty Hall', 'Doğum günü paradoksu', 'Tıbbi test ve taban oranı', 'Galton\'un boy verisi', 'A/B testi',
+             'Kumarbaz yanılgısı'],
+    yanilgilar=[
+        ('p = 0,03 ise hipotezin doğru olma olasılığı %97\'dir.', 'p değeri, sıfır hipotezi doğruysa bu kadar uç verinin görülme olasılığıdır; hipotezin olasılığı değildir.'),
+        ('İlinti varsa neden-sonuç vardır.', 'Ortak bir neden ya da rastlantı da ilinti üretir; nedensellik için deney gerekir.'),
+        ('Test %99 doğruysa pozitif sonuç %99 hastalıktır.', 'Hastalık nadirse pozitiflerin çoğu yanlış alarm olabilir; Bayes kuralı taban oranını katar.'),
+        ('Çok veri varsa istatistiğe gerek kalmaz.', 'Büyük veride önemsiz farklar bile "anlamlı" çıkar; etki büyüklüğü ve yanlılık hâlâ sorulur.'),
+    ],
+    meslekler=['İstatistikçi', 'Veri bilimci', 'Makine öğrenmesi araştırmacısı', 'Biyoistatistikçi', 'Aktüer'],
+    sonra=('Bu dersten sonra makine öğrenmesine, olasılıksal grafik modellere, örüntü tanımaya ve bilgi kuramına geçmek '
+           'kolaylaşır. Bayesçi istatistik ve nedensel çıkarım, belirsizliği ve neden-sonuç ilişkisini daha derin '
+           'ele alan iki doğal devam yoludur.'),
+    kaynaklar=[
+        'Wasserman, <em>All of Statistics</em>, Springer, 2004.',
+        'DeGroot ve Schervish, <em>Probability and Statistics</em>, 4. baskı, Pearson, 2012.',
+        'Blitzstein ve Hwang, <em>Introduction to Probability</em>, 2. baskı, CRC Press, 2019.',
+        'Gelman, Carlin, Stern, Dunson, Vehtari ve Rubin, <em>Bayesian Data Analysis</em>, 3. baskı, CRC Press, 2013.',
+    ],
+)
