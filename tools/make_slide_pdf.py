@@ -107,8 +107,13 @@ def local_file(root, path, shell=None):
         data = h.read()
     ext = f.rsplit('.', 1)[-1].lower()
     if shell and ext == 'html':
+        # duzen tek bir sayfadan (SHELL_URL) alinir; onun <title>'i yerine bu sayfanin basligi konur,
+        # yoksa tarayici sekmesi ve PDF bilgisi butun sunumlarda ayni basligi gosterir
+        head = re.sub(rb'<title>.*?</title>',
+                      lambda m: b'<title>' + page_title(data).encode('utf-8').replace(b'&', b'&amp;').replace(b'<', b'&lt;') + b'</title>',
+                      shell[0], count=1, flags=re.S)
         data = re.sub(rb'\A---\r?\n.*?\r?\n---\r?\n', b'', data, count=1, flags=re.S)
-        data = shell[0] + data + shell[1]
+        data = head + data + shell[1]
     return data, TYPES.get(ext, 'application/octet-stream')
 
 
@@ -206,13 +211,27 @@ def render(page, url, public_url=None):
 AUTHOR = 'Sercan Külcü'
 
 
-def set_pdf_info(path):
-    """PDF bilgisini duzeltir: baslik sayfa basligindan site adi (" - Point Zero") atilarak,
-    yazar AUTHOR. Arama motorlari (Google, Google Scholar) bu alanlari okur."""
+def page_title(data):
+    """Sunum dosyasinin on bilgisinden baslik: seo_title, yoksa title (Jekyll'in <title>'i)."""
+    if isinstance(data, bytes):
+        data = data.decode('utf-8', 'replace')
+    fm = re.match(r'\A---\r?\n(.*?)\r?\n---', data, re.S)
+    fm = fm.group(1) if fm else ''
+    for key in ('seo_title', 'title'):
+        m = re.search(r'^%s:\s*"?(.*?)"?\s*$' % key, fm, re.M)
+        if m:
+            return m.group(1)
+    return ''
+
+
+def set_pdf_info(path, title=None):
+    """PDF bilgisini duzeltir: baslik verilen baslik (sunumun on bilgisi) ya da sayfa basligindan
+    site adi (" - Point Zero") atilarak, yazar AUTHOR. Arama motorlari (Google, Google Scholar)
+    ve tarayici sekmesi bu alanlari okur."""
     import pymupdf
     d = pymupdf.open(path)
     m = dict(d.metadata)
-    title = re.sub(r'\s+-\s+Point Zero\s*$', '', m.get('title') or '')
+    title = title or re.sub(r'\s+-\s+Point Zero\s*$', '', m.get('title') or '')
     if m.get('title') == title and m.get('author') == AUTHOR:
         d.close()
         return False
@@ -232,6 +251,8 @@ def main():
     ap.add_argument('--stale', action='store_true', help='yalnizca PDF\'i olmayan ya da sunumundan eski olanlar')
     ap.add_argument('--out', help='cikti klasoru (varsayilan ../courses-pdfs/<ders>/pdf)')
     ap.add_argument('--no-theme', action='store_true', help='canli site duzenini kullanma (cevrimdisi)')
+    ap.add_argument('--fix-titles', action='store_true',
+                    help='PDF uretmeden var olan PDF\'lerin basligini sunumun on bilgisinden duzelt')
     a = ap.parse_args()
 
     # sunumlar files/<ders>/slides altinda; Veri Yapilari'nda Turkce sunumlar sunumlar/,
@@ -253,6 +274,15 @@ def main():
             if not found:
                 sys.exit('Sunum yok: ' + n)
             where[n] = found[0]
+    if a.fix_titles:
+        k = 0
+        for n in names:
+            pdf = os.path.join(pdfdir, n + '.pdf')
+            if os.path.exists(pdf):
+                with open(os.path.join(course_dir, where[n], n + '.html'), encoding='utf-8') as h:
+                    k += set_pdf_info(pdf, page_title(h.read()))
+        print('%s: %d PDF basligi duzeltildi.' % (a.course, k))
+        return
     if a.stale:
         names = [n for n in names if is_stale(os.path.join(course_dir, where[n]), pdfdir, n)]
     if not names:
@@ -282,7 +312,8 @@ def main():
             out = os.path.join(pdfdir, n + '.pdf')
             page.pdf(path=out, width='800px', height='600px', print_background=True,
                      margin={'top': '0', 'right': '0', 'bottom': '0', 'left': '0'}, prefer_css_page_size=True)
-            set_pdf_info(out)
+            with open(os.path.join(course_dir, where[n], n + '.html'), encoding='utf-8') as h:
+                set_pdf_info(out, page_title(h.read()))
             ok = len(snaps) == expected
             bad += not ok
             print('%-45s %4d sayfa%s  %5d KB' % (n, len(snaps), '' if ok else ' (beklenen %d!)' % expected,
