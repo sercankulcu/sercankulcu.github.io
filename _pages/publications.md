@@ -388,7 +388,7 @@ Turkish-language course textbook on algorithmic game theory: decision theory, ga
 
 Turkish-language course textbook on the analysis of algorithms and fundamental problems: complexity, sorting, searching, and graph and string algorithms. Its continuation is İleri Algoritmalar.
 
-**How to cite:** Külcü, S. (2026). *Algoritmalar* [Course textbook, 663 pages]. https://sercankulcu.github.io/books/algoritmalar/
+**How to cite:** Külcü, S. (2026). *Algoritmalar* [Course textbook, 664 pages]. https://sercankulcu.github.io/books/algoritmalar/
 
 [Book](/books/algoritmalar/) · [PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf) · [Course](/teaching/algorithms/)
 
