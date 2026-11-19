@@ -742,7 +742,7 @@ def kapanis(icerik):
 def ders_sayfasi(icerik):
     rom = ['I', 'II', 'III', 'IV', 'V', 'VI']
     L = ['---', 'title: "Guide to AI and Data Courses"', 'collection: teaching', 'type: "Undergraduate"',
-         'permalink: %s' % DERS_URL, 'venue: "Giresun University, Computer Engineering"', 'date: 2026-11-19 12:00:00',
+         'permalink: %s' % DERS_URL, 'venue: "Giresun University, Computer Engineering"', 'date: 2023-09-01',
          'location: "Giresun, Turkey"', 'course_language: tr', '---', '',
          'This course is a map of the courses around artificial intelligence and data. Each of its %d presentations introduces one course: '
          'the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it '

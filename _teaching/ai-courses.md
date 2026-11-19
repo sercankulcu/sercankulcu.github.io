@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate"
 permalink: /teaching/ai-courses/
 venue: "Giresun University, Computer Engineering"
-date: 2026-11-19 12:00:00
+date: 2023-09-01
 location: "Giresun, Turkey"
 course_language: tr
 ---
