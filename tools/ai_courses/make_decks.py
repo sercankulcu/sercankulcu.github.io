@@ -73,6 +73,19 @@ STYLE = """<style>
   .ds-deck .ai-prof .ds-deck__card strong { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ds-muted); }
   .ds-deck .ai-mx td, .ds-deck .ai-mx th { text-align: center; }
   .ds-deck .ai-mx th:first-child { width: 190px; }
+  .ds-deck .ai-demo-p { margin: -4px 0 8px; font-size: 15.5px; line-height: 1.4; }
+  .ds-deck .ai-demo { display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; }
+  .ds-deck .ai-demo svg { display: block; flex-shrink: 0; }
+  .ds-deck .ai-demo .ai-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ds-deck .ai-demo .ai-ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ds-deck .ai-demo button { padding: 4px 11px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-text); font: inherit; font-size: 13.5px; cursor: pointer; }
+  .ds-deck .ai-demo button:hover { border-color: var(--ds-link); }
+  .ds-deck .ai-demo button.is-on { border-color: var(--ds-accent); background: color-mix(in srgb, var(--ds-accent) 16%, var(--ds-bg)); font-weight: 700; }
+  .ds-deck .ai-demo label { font-size: 13.5px; color: var(--ds-muted); }
+  .ds-deck .ai-demo input[type=range] { width: 100%; accent-color: var(--ds-link); }
+  .ds-deck .ai-demo .ai-out { padding: 8px 11px; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-bg); font-size: 14px; line-height: 1.4; }
+  .ds-deck .ai-demo .ai-out b { color: var(--ds-accent); }
+  .ds-deck .ai-demo-n { margin-top: 8px; padding: 7px 12px; border-radius: 10px; background: var(--ds-surface-strong); font-size: 14px; line-height: 1.4; }
   .ds-deck .ai-myth td:first-child { width: 42%; }
   .ds-deck .ai-node rect { fill: var(--ds-bg); stroke: var(--ds-border); stroke-width: 1.5; }
   .ds-deck .ai-node:hover rect { stroke: var(--ds-link); }
@@ -242,7 +255,14 @@ def icerik_yukle(kod):
     spec = importlib.util.spec_from_file_location('icerik_' + kod, p)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
-    return m.ICERIK
+    C = dict(m.ICERIK)
+    pd = os.path.join(HERE, 'icerik', 'demo', kod + '.py')
+    if os.path.exists(pd):
+        spec = importlib.util.spec_from_file_location('demo_' + kod, pd)
+        md = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(md)
+        C['demo'] = md.DEMO
+    return C
 
 
 def iliski_listesi(kod):
@@ -308,6 +328,13 @@ def ders_sunumu(kod, C):
     S.append(slide('Tipik İş Akışı', 'Ders', head('Ders', 'Tipik İş Akışı') +
                    '\n          <div class="ds-deck__figure">%s</div>\n          <div class="ds-deck__callout">%s</div>'
                    % (svg_akis(C['akis']), C['akis_ornek'])))
+    # 5b etkilesimli problem sayfasi
+    demo = C.get('demo')
+    if demo:
+        S.append(slide('Dene: ' + demo['baslik'], 'Dene', head('Dene', demo['baslik']) +
+                       '\n          <p class="ai-demo-p">%s</p>\n          <div class="ai-demo" id="ai-demo">%s</div>%s'
+                       % (demo['problem'], re.sub(r'<svg(?![^>]*class=)', '<svg class="ds-svg"', demo['html'].strip()),
+                          ('\n          <div class="ai-demo-n">%s</div>' % demo['not']) if demo.get('not') else '')))
     # 6 on kosullar
     rows = []
     for r in iliski_listesi(kod):
@@ -380,7 +407,13 @@ def ders_sunumu(kod, C):
     S.append(slide('Son', '', '          <h1>Son</h1>\n          <div class="ds-deck__subtitle">Bölüm %d: %s</div>\n'
                    '          <small><a href="%s">← Önceki bölüm</a> · <a href="Bolum_01_Alanin_Haritasi.html">Alanın haritası</a> · <a href="%s">Sonraki bölüm →</a></small>'
                    % (no, adi, onceki, sonraki), ' ds-deck__slide--title'))
-    return page(no, adi, C['excerpt'], S)
+    script = ''
+    css = ''
+    if demo:
+        script = ('(function () {\n  var root = document.getElementById("ai-demo");\n  if (!root) return;\n'
+                  '  var SVGNS = "http:" + "/" + "/www.w3.org/2000/svg";\n%s\n})();' % demo['js'].strip('\n'))
+        css = demo.get('css', '')
+    return page(no, adi, C['excerpt'], S, extra_css=css, script=script)
 
 
 # ---------------------------------------------------------------- acilis sunumu
@@ -732,6 +765,8 @@ def ders_sayfasi(icerik):
     L = ['---', 'title: "Guide to AI and Data Courses"', 'collection: teaching', 'type: "Undergraduate"',
          'permalink: %s' % DERS_URL, 'venue: "Giresun University, Computer Engineering"', 'date: 2023-09-01',
          'location: "Giresun, Turkey"', 'course_language: tr', '---', '',
+         ('![ai and data courses](/images/teaching/teaching-ai-courses.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} \n'
+          if os.path.exists(os.path.join(REPO, 'images', 'teaching', 'teaching-ai-courses.webp')) else '') +
          'This course is a map of the courses around artificial intelligence and data. Each of its %d presentations introduces one course: '
          'the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it '
          'differs from its nearest neighbours, its applications and tools. '
