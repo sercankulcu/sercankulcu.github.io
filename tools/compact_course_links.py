@@ -80,10 +80,8 @@ def render_group(items, lang, games):
                 decks[last]['links'].setdefault(kind, []).append((tag, url))
             else:
                 out.append(('extra', '- [%s](%s)' % (tag, url)))
-        elif kind == 'sim' and raw[:1] in ' 	' and last:
-            # girintili simulator: ait oldugu sunumun satirina
-            decks[last]['links'].setdefault('subsim', []).append(('🕹️ ' + name, url))
         elif kind == 'sim':
+            # girintili (bir alt bolume bagli) simulatorler de bolumun tek simulator satirina toplanir
             sims.append((name, url))
     rows = []
     multi = len(order) > 1
