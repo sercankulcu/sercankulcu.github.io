@@ -15,7 +15,7 @@ import glob, io, os, re, sys
 
 sys.stdout.reconfigure(encoding='utf-8')
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ITEM = re.compile(r'^[-*] \[(?P<lab>.*?)\]\((?P<url>[^)\s]+)\)\s*$')
+ITEM = re.compile(r'^(?P<ind>\s*)[-*] \[(?P<lab>.*?)\]\((?P<url>[^)\s]+)\)\s*$')
 
 KINDS = [  # (tur, desen, dil)
     ('slides', re.compile(r'^🖼️\s*Sunum\s*[-–]\s*(?P<n>.+?) \(HTML\)$'), 'tr'),
@@ -36,7 +36,7 @@ LABEL = {
     'en': {'slides': '🖼️ Slides', 'pdf': '📄 PDF', 'notes': '📖 Notes', 'quiz': '📝 Questions',
            'code': '💻 Code', 'lab': '🧪 Lab', 'sim': 'Simulators', 'games': 'Games and simulators'},
 }
-ORDER = ['slides', 'pdf', 'notes', 'quiz', 'code', 'lab']
+ORDER = ['slides', 'pdf', 'notes', 'quiz', 'code', 'lab', 'subsim']
 STEM_SUFFIX = re.compile(r'(_Ders_Notu|_Calisma_Sorulari|_Lecture_Notes|_Study_Questions)$')
 
 
@@ -80,6 +80,9 @@ def render_group(items, lang, games):
                 decks[last]['links'].setdefault(kind, []).append((tag, url))
             else:
                 out.append(('extra', '- [%s](%s)' % (tag, url)))
+        elif kind == 'sim' and raw[:1] in ' 	' and last:
+            # girintili simulator: ait oldugu sunumun satirina
+            decks[last]['links'].setdefault('subsim', []).append(('🕹️ ' + name, url))
         elif kind == 'sim':
             sims.append((name, url))
     rows = []
