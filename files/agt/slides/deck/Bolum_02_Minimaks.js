@@ -18,12 +18,16 @@
   var tarayici = typeof document !== "undefined";
   if (tarayici && ["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
   var INF = Infinity;
+  /* dil: İngilizce sunum (lang="en") metinleri İngilizce gösterir */
+  var deckEl = tarayici ? document.getElementById("ds-deck") : null;
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  function tx(tr, en) { return EN ? en : tr; }
 
   /* ================= yardımcılar: sayı biçimi ve Türkçe ekler ================= */
   function sayi(n) {
     if (n === INF) return "+∞";
     if (n === -INF) return "−∞";
-    var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, EN ? "," : ".");
     return (n < 0 ? "−" : "") + s;
   }
   function isaretli(n) { return n > 0 && isFinite(n) ? "+" + sayi(n) : sayi(n); }
@@ -60,14 +64,14 @@
     else e = (unlu ? "n" : "") + i4 + "n";
     return (typeof x === "number" ? sayi(x) : String(x)) + "'" + e;
   }
-  function bas(t) { return t.charAt(0).toLocaleUpperCase("tr-TR") + t.slice(1); }
+  function bas(t) { return (EN ? t.charAt(0).toUpperCase() : t.charAt(0).toLocaleUpperCase("tr-TR")) + t.slice(1); }
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function karistir(a, rnd) {
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
   function simdi() { return (typeof performance !== "undefined" ? performance : Date).now(); }
-  function ms(t) { return t < 10 ? String(Math.round(t * 10) / 10).replace(".", ",") : String(Math.round(t)); }
+  function ms(t) { return t < 10 ? String(Math.round(t * 10) / 10).replace(".", EN ? "." : ",") : String(Math.round(t)); }
 
   /* ================= soyut oyun ağacı ================= */
   /* spec: iç içe diziler, sayı = yaprak. Kök MAX; katmanlar MAX/MIN diye değişir. İç düğümlere
@@ -116,51 +120,64 @@
   function izMinimaks(agac, o) {
     o = o || {};
     var ev = [], F = o.fmt || sayi;
-    function yAd(c) { return o.yaprakAd ? o.yaprakAd(c) : "Yaprak " + sayi(c.deger) + " okunur"; }
+    function yAd(c) { return o.yaprakAd ? o.yaprakAd(c) : tx("Yaprak " + sayi(c.deger) + " okunur", "Leaf " + sayi(c.deger) + " is read"); }
     function rec(n) {
-      ev.push({ t: "gir", n: n, m: n.ata ? n.ad + " düğümüne inilir (" + rol(n) + "): değer " + (n.max ? "−∞" : "+∞") + " ile başlar." :
-        n.ad + " (" + rol(n) + ") aranmaya başlar: değer −∞ ile başlar, çocuklar soldan sağa ziyaret edilir." });
+      ev.push({ t: "gir", n: n, m: n.ata ? tx(n.ad + " düğümüne inilir (" + rol(n) + "): değer " + (n.max ? "−∞" : "+∞") + " ile başlar.",
+        "Descend to " + n.ad + " (" + rol(n) + "): its value starts at " + (n.max ? "−∞" : "+∞") + ".") :
+        tx(n.ad + " (" + rol(n) + ") aranmaya başlar: değer −∞ ile başlar, çocuklar soldan sağa ziyaret edilir.",
+          "Search starts at " + n.ad + " (" + rol(n) + "): its value starts at −∞; children are visited left to right.") });
       var v = n.max ? -INF : INF;
       n.cocuk.forEach(function (c, k) {
         var w = c.yaprak ? c.deger : rec(c), once = v;
         v = n.max ? Math.max(v, w) : Math.min(v, w);
         var son = k === n.cocuk.length - 1;
-        var m = (c.yaprak ? yAd(c) : ek(c.ad, "in") + " değeri " + F(w)) + " → " + n.ad + " (" + rol(n) + "): " +
+        var m = (c.yaprak ? yAd(c) : tx(ek(c.ad, "in") + " değeri " + F(w), c.ad + " has value " + F(w))) + " → " + n.ad + " (" + rol(n) + "): " +
           (n.max ? "max" : "min") + "(" + F(once) + ", " + F(w) + ") = " + F(v) + ".";
-        if (son) m += n.ata ? " " + n.ad + " tamamlandı, değeri " + F(v) + " olarak " + ek(n.ata.ad, "e") + " döner." : "";
+        if (son) m += n.ata ? " " + tx(n.ad + " tamamlandı, değeri " + F(v) + " olarak " + ek(n.ata.ad, "e") + " döner.",
+          n.ad + " is done and returns " + F(v) + " to " + n.ata.ad + ".") : "";
         ev.push({ t: "guncelle", n: n, c: c, v: v, son: son, m: m });
       });
       return v;
     }
     var v = rec(agac.kok), en = null;
     agac.kok.cocuk.forEach(function (c) { if (en === null && tamMinimaks(c) === v) en = c; });
-    ev.push({ t: "bitti", v: v, en: en, m: "Kökün değeri " + F(v) + ": " + rol(agac.kok) + ", " + (en.ad ? ek(en.ad, "e") + " giden" : "kalın kenardaki") +
-      " hamleyi seçer. " + sayi(agac.yaprakSay) + " yaprağın hepsi değerlendirildi." });
+    ev.push({ t: "bitti", v: v, en: en, m: tx("Kökün değeri " + F(v) + ": " + rol(agac.kok) + ", " + (en.ad ? ek(en.ad, "e") + " giden" : "kalın kenardaki") +
+      " hamleyi seçer. " + sayi(agac.yaprakSay) + " yaprağın hepsi değerlendirildi.",
+      "The root's value is " + F(v) + ": " + rol(agac.kok) + " picks the move " + (en.ad ? "to " + en.ad : "on the bold edge") +
+      ". All " + sayi(agac.yaprakSay) + " leaves were evaluated.") });
     return ev;
   }
   function izAlfaBeta(agac) {
     var ev = [];
     function aralik(a, b) { return "[" + sayi(a) + ", " + sayi(b) + "]"; }
     function rec(n, a, b) {
-      ev.push({ t: "gir", n: n, a: a, b: b, m: n.ata ? n.ad + " düğümüne inilir (" + rol(n) + "): [α, β] = " + aralik(a, b) + " aralığı yukarıdan gelir." :
-        n.ad + " (" + rol(n) + ") aranmaya başlar: α = −∞, β = +∞." });
+      ev.push({ t: "gir", n: n, a: a, b: b, m: n.ata ? tx(n.ad + " düğümüne inilir (" + rol(n) + "): [α, β] = " + aralik(a, b) + " aralığı yukarıdan gelir.",
+        "Descend to " + n.ad + " (" + rol(n) + "): the window [α, β] = " + aralik(a, b) + " comes from above.") :
+        tx(n.ad + " (" + rol(n) + ") aranmaya başlar: α = −∞, β = +∞.", "Search starts at " + n.ad + " (" + rol(n) + "): α = −∞, β = +∞.") });
       var v = n.max ? -INF : INF, en = null;
       for (var k = 0; k < n.cocuk.length; k++) {
         var c = n.cocuk[k], w = c.yaprak ? c.deger : rec(c, a, b).v, once = v, a0 = a, b0 = b;
         if (n.max) { if (w > v) { v = w; en = c; } a = Math.max(a, v); } else { if (w < v) { v = w; en = c; } b = Math.min(b, v); }
         var son = k === n.cocuk.length - 1;
-        var m = (c.yaprak ? "Yaprak " + sayi(w) + " okunur" : ek(c.ad, "in") + " değeri " + sayi(w)) + " → " + n.ad + " (" + rol(n) + "): değer = " +
+        var m = (c.yaprak ? tx("Yaprak " + sayi(w) + " okunur", "Leaf " + sayi(w) + " is read") : tx(ek(c.ad, "in") + " değeri " + sayi(w), c.ad + " has value " + sayi(w))) +
+          " → " + n.ad + " (" + rol(n) + "): " + tx("değer", "value") + " = " +
           (n.max ? "max" : "min") + "(" + sayi(once) + ", " + sayi(w) + ") = " + sayi(v) + ", " + (n.max ? "α = max(" + sayi(a0) + ", " + sayi(v) + ") = " + sayi(a) : "β = min(" + sayi(b0) + ", " + sayi(v) + ") = " + sayi(b)) + ".";
-        if (son) m += n.ata ? " " + n.ad + " tamamlandı, " + sayi(v) + " olarak " + ek(n.ata.ad, "e") + " döner." : "";
+        if (son) m += n.ata ? " " + tx(n.ad + " tamamlandı, " + sayi(v) + " olarak " + ek(n.ata.ad, "e") + " döner.",
+          n.ad + " is done and returns " + sayi(v) + " to " + n.ata.ad + ".") : "";
         ev.push({ t: "guncelle", n: n, c: c, v: v, a: a, b: b, son: son, m: m });
         if (a >= b) {
           if (!son) {
             var kalan = n.cocuk.slice(k + 1);
-            var neden = n.max ? n.ad + " en az " + sayi(v) + " verir; yukarıdaki MIN " + ek(b, "i") + " zaten garanti ediyor, " + ek(n.ad, "i") + " seçmez."
-              : n.ad + " en fazla " + sayi(v) + " verir; yukarıdaki MAX " + ek(a, "i") + " zaten garanti ediyor, " + ek(n.ad, "i") + " seçmez.";
-            ev.push({ t: "buda", n: n, v: v, kalan: kalan, m: n.ad + " düğümünde " + (n.max ? "α = " + sayi(a) + " ≥ β = " + sayi(b) : "β = " + sayi(b) + " ≤ α = " + sayi(a)) +
+            var neden = n.max ? tx(n.ad + " en az " + sayi(v) + " verir; yukarıdaki MIN " + ek(b, "i") + " zaten garanti ediyor, " + ek(n.ad, "i") + " seçmez.",
+                n.ad + " is worth at least " + sayi(v) + "; the MIN above can already guarantee " + sayi(b) + ", so it never picks " + n.ad + ".")
+              : tx(n.ad + " en fazla " + sayi(v) + " verir; yukarıdaki MAX " + ek(a, "i") + " zaten garanti ediyor, " + ek(n.ad, "i") + " seçmez.",
+                n.ad + " is worth at most " + sayi(v) + "; the MAX above can already guarantee " + sayi(a) + ", so it never picks " + n.ad + ".");
+            var kosul = n.max ? "α = " + sayi(a) + " ≥ β = " + sayi(b) : "β = " + sayi(b) + " ≤ α = " + sayi(a);
+            ev.push({ t: "buda", n: n, v: v, kalan: kalan, m: tx(n.ad + " düğümünde " + kosul +
               ": kalan " + (kalan.length === 1 ? "çocuk" : sayi(kalan.length) + " çocuk") + " budandı. " + neden +
-              (n.ata ? " " + n.ad + ", " + sayi(v) + " olarak " + ek(n.ata.ad, "e") + " döner." : "") });
+              (n.ata ? " " + n.ad + ", " + sayi(v) + " olarak " + ek(n.ata.ad, "e") + " döner." : ""),
+              "At " + n.ad + ", " + kosul + ": the remaining " + (kalan.length === 1 ? "child is" : sayi(kalan.length) + " children are") + " pruned. " + neden +
+              (n.ata ? " " + n.ad + " returns " + sayi(v) + " to " + n.ata.ad + "." : "")) });
           }
           break;
         }
@@ -169,8 +186,10 @@
     }
     var r = rec(agac.kok, -INF, INF), say = { yaprak: 0 };
     tamAlfaBeta(agac.kok, -INF, INF, say);
-    ev.push({ t: "bitti", v: r.v, en: r.en, m: "Kökün değeri " + sayi(r.v) + ": " + rol(agac.kok) + ", " + ek(r.en.ad, "e") + " giden hamleyi seçer. " +
-      sayi(agac.yaprakSay) + " yaprağın " + ek(say.yaprak, "si") + " değerlendirildi, " + ek(agac.yaprakSay - say.yaprak, "si") + " budandı." });
+    ev.push({ t: "bitti", v: r.v, en: r.en, m: tx("Kökün değeri " + sayi(r.v) + ": " + rol(agac.kok) + ", " + ek(r.en.ad, "e") + " giden hamleyi seçer. " +
+      sayi(agac.yaprakSay) + " yaprağın " + ek(say.yaprak, "si") + " değerlendirildi, " + ek(agac.yaprakSay - say.yaprak, "si") + " budandı.",
+      "The root's value is " + sayi(r.v) + ": " + rol(agac.kok) + " picks the move to " + r.en.ad + ". Of the " + sayi(agac.yaprakSay) + " leaves, " +
+      sayi(say.yaprak) + " were evaluated and " + sayi(agac.yaprakSay - say.yaprak) + " pruned.") });
     return ev;
   }
   /* k. adıma kadar olayları uygula */
@@ -222,7 +241,7 @@
     var etiket = o.katman || ["MAX", "MIN", "MAX", "MIN", "MAX", "MIN"];
     if (o.katmanYaz !== false) {
       for (var d = 0; d <= L.derin; d++) {
-        var lb = d === L.derin && !o.karisik ? "yaprak" : (agac.kok.max === (d % 2 === 0) ? "MAX" : "MIN");
+        var lb = d === L.derin && !o.karisik ? tx("yaprak", "leaf") : (agac.kok.max === (d % 2 === 0) ? "MAX" : "MIN");
         if (o.katman) lb = etiket[d] || lb;
         out.push('<text class="lbl" x="2" y="' + (o.ust + d * o.dy + 4) + '" text-anchor="start">' + lb + "</text>");
       }
@@ -238,7 +257,7 @@
       var y1 = n.ata.y + (o.dugumH ? o.dugumH / 2 : h / 2), y2 = n.y - (n.yaprak && !o.dugumH ? 12 : (o.dugumH ? o.dugumH / 2 : h / 2));
       out.push('<line class="' + c.join(" ") + '" x1="' + n.ata.x + '" y1="' + y1 + '" x2="' + n.x + '" y2="' + y2 + '"/>');
       if (s && s.kesKenar[n.id]) {
-        out.push('<text class="b02m-cutl" x="' + ((n.ata.x + n.x) / 2 + (n.x >= n.ata.x ? 6 : -6)) + '" y="' + ((y1 + y2) / 2) + '" text-anchor="' + (n.x >= n.ata.x ? "start" : "end") + '">budandı</text>');
+        out.push('<text class="b02m-cutl" x="' + ((n.ata.x + n.x) / 2 + (n.x >= n.ata.x ? 6 : -6)) + '" y="' + ((y1 + y2) / 2) + '" text-anchor="' + (n.x >= n.ata.x ? "start" : "end") + '">' + tx("budandı", "pruned") + '</text>');
       }
     });
     agac.dugum.forEach(function (n) {
@@ -267,12 +286,14 @@
       }
       out.push("</g>");
     });
-    return '<svg class="ds-svg" viewBox="0 0 ' + o.W + " " + L.H + '" width="' + o.W + '" height="' + L.H + '" role="img" aria-label="' + esc(o.aria || "Oyun ağacı") + '">' + out.join("") + "</svg>";
+    return '<svg class="ds-svg" viewBox="0 0 ' + o.W + " " + L.H + '" width="' + o.W + '" height="' + L.H + '" role="img" aria-label="' + esc(o.aria || tx("Oyun ağacı", "Game tree")) + '">' + out.join("") + "</svg>";
   }
 
   /* ================= XOX ================= */
   var CIZGI = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-  var KARE = ["sol üst", "üst orta", "sağ üst", "sol orta", "merkez", "sağ orta", "sol alt", "alt orta", "sağ alt"];
+  var KARE = EN ? ["top-left", "top-middle", "top-right", "middle-left", "center", "middle-right", "bottom-left", "bottom-middle", "bottom-right"]
+    : ["sol üst", "üst orta", "sağ üst", "sol orta", "merkez", "sağ orta", "sol alt", "alt orta", "sağ alt"];
+  function kareAd(i) { return tx(KARE[i] + " kare", "the " + KARE[i] + " square"); }
   var SIRA_MKK = [4, 0, 2, 6, 8, 1, 3, 5, 7], SIRA_DUZ = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   function xKazanan(b) {
     for (var i = 0; i < 8; i++) { var l = CIZGI[i]; if (b[l[0]] && b[l[0]] === b[l[1]] && b[l[0]] === b[l[2]]) return b[l[0]]; }
@@ -355,28 +376,33 @@
     return { deg: deg, en: en, mm: say.n, ab: sab.n, abv: abv, abEn: kok.en, tmm: t1 - t0, tab: t2 - t1, gerekce: en === null ? "" : bas(xGerekce(b, p, en, deg, ceza)) };
   }
   function xGerekce(b, p, i, deg, ceza) {
-    var r = rakip(p), v = deg[i] * (p === "X" ? 1 : -1), ad = KARE[i] + " kare";
+    var r = rakip(p), v = deg[i] * (p === "X" ? 1 : -1), ad = kareAd(i);
     var kayip = 0, toplam = 0;
     for (var k in deg) { toplam++; if (deg[k] * (p === "X" ? 1 : -1) < 0) kayip++; }
-    var ek2 = kayip && v >= 0 ? (kayip === toplam - 1 ? " Diğer karelerin hepsi kaybettirir." : " Diğer karelerden " + sayi(kayip) + " tanesi kaybettirir.") : "";
+    var ek2 = kayip && v >= 0 ? (kayip === toplam - 1 ? tx(" Diğer karelerin hepsi kaybettirir.", " Every other square loses.")
+      : tx(" Diğer karelerden " + sayi(kayip) + " tanesi kaybettirir.", " " + sayi(kayip) + " of the other squares lose.")) : "";
     b[i] = p;
     var kazandi = xKazanan(b) === p, tehdit = xTehdit(b, p).length;
     b[i] = "";
     var rt = xTehdit(b, r);
     var hamle = ceza ? 10 - Math.abs(deg[i]) : 0;
-    if (kazandi) return ad + " üçlüyü tamamlar: hemen kazanır.";
-    if (rt.indexOf(i) >= 0 && rt.length > 1) return "Rakibin iki ayrı kazanma tehdidi var; biri kapatılsa da kayıp önlenemez. " + bas(ad) + " kaybı en çok geciktiren seçenektir.";
-    if (rt.indexOf(i) >= 0) return ad + " rakibin kazanacağı kareyi kapatır: engellemezse " + r + " bir sonraki hamlede kazanır." + (v > 0 ? " Engellerken kazanmayı da zorlar." : "") + ek2;
-    if (tehdit >= 2) return ad + " çatal kurar: iki ayrı kazanma tehdidi oluşur, rakip ikisini birden kapatamaz." + ek2;
-    if (v > 0) return ad + " kazanmayı zorlar: rakip ne yaparsa yapsın" + (ceza ? " en geç " + sayi(hamle) + " hamle içinde" : "") + " kazanılır." + ek2;
-    if (v === 0) return ad + " beraberliği garanti eder; iki taraf da hatasız oynarsa oyun berabere biter." + ek2;
-    return "Her kare kaybettiriyor; " + ad + " kaybı en çok geciktirir" + (ceza ? " (" + sayi(hamle) + " hamle)" : "") + " ve rakibe hata yapma fırsatı bırakır.";
+    if (kazandi) return ad + tx(" üçlüyü tamamlar: hemen kazanır.", " completes three in a row: an immediate win.");
+    if (rt.indexOf(i) >= 0 && rt.length > 1) return tx("Rakibin iki ayrı kazanma tehdidi var; biri kapatılsa da kayıp önlenemez. " + bas(ad) + " kaybı en çok geciktiren seçenektir.",
+      "The opponent has two separate winning threats; blocking one cannot prevent the loss. " + bas(ad) + " delays the loss the longest.");
+    if (rt.indexOf(i) >= 0) return ad + tx(" rakibin kazanacağı kareyi kapatır: engellemezse " + r + " bir sonraki hamlede kazanır.", " blocks the opponent's winning square: otherwise " + r + " wins on the next move.") +
+      (v > 0 ? tx(" Engellerken kazanmayı da zorlar.", " While blocking, it also forces a win.") : "") + ek2;
+    if (tehdit >= 2) return ad + tx(" çatal kurar: iki ayrı kazanma tehdidi oluşur, rakip ikisini birden kapatamaz.", " sets up a fork: two separate winning threats that the opponent cannot both block.") + ek2;
+    if (v > 0) return ad + tx(" kazanmayı zorlar: rakip ne yaparsa yapsın" + (ceza ? " en geç " + sayi(hamle) + " hamle içinde" : "") + " kazanılır.",
+      " forces a win: whatever the opponent does, the game is won" + (ceza ? " within " + sayi(hamle) + " moves" : "") + ".") + ek2;
+    if (v === 0) return ad + tx(" beraberliği garanti eder; iki taraf da hatasız oynarsa oyun berabere biter.", " guarantees a draw; with perfect play by both sides the game is drawn.") + ek2;
+    return tx("Her kare kaybettiriyor; " + ad + " kaybı en çok geciktirir" + (ceza ? " (" + sayi(hamle) + " hamle)" : "") + " ve rakibe hata yapma fırsatı bırakır.",
+      "Every square loses; " + ad + " delays the loss the longest" + (ceza ? " (" + sayi(hamle) + " moves)" : "") + " and gives the opponent a chance to err.");
   }
   /* XOX konumundan oyun ağacı (agacKur'a uygun düğüm nesneleri) */
   function xAgacSpec(b, p, d, hamle) {
     var w = xKazanan(b), n = { tahta: b.slice(), hamle: hamle, p: p, cocuk: [] };
-    if (w) { n.deger = xUc(w, d, true); n.son = w + " kazanır"; return n; }
-    if (xDolu(b)) { n.deger = 0; n.son = "berabere"; return n; }
+    if (w) { n.deger = xUc(w, d, true); n.son = w + tx(" kazanır", " wins"); return n; }
+    if (xDolu(b)) { n.deger = 0; n.son = tx("berabere", "draw"); return n; }
     for (var i = 0; i < 9; i++) {
       if (b[i]) continue;
       b[i] = p; n.cocuk.push(xAgacSpec(b, rakip(p), d + 1, i)); b[i] = "";
@@ -614,12 +640,12 @@
       var s = k < 0 ? { deg: {}, bitti: {}, gez: {}, ab: {}, kes: {}, kesKenar: {}, yigin: [], cur: null, yaprak: 0, en: null } : durum(agac, ev, k);
       gor.innerHTML = agacSvg(agac, s, o);
       st.textContent = k < 0 ? o.ilk : s.m;
-      if (bilgi) bilgi.innerHTML = "Adım <b>" + (k + 1) + " / " + ev.length + "</b> · Değerlendirilen yaprak: <b>" + s.yaprak + " / " + agac.yaprakSay + "</b>" +
-        (s.yigin.length ? " · Yığın: " + s.yigin.map(function (n) { return n.ad; }).join(" ▸ ") : "");
+      if (bilgi) bilgi.innerHTML = tx("Adım", "Step") + " <b>" + (k + 1) + " / " + ev.length + "</b> · " + tx("Değerlendirilen yaprak", "Leaves evaluated") + ": <b>" + s.yaprak + " / " + agac.yaprakSay + "</b>" +
+        (s.yigin.length ? " · " + tx("Yığın", "Stack") + ": " + s.yigin.map(function (n) { return n.ad; }).join(" ▸ ") : "");
       dugme(kutu, "geri").disabled = k < 0;
       dugme(kutu, "adim").disabled = k >= ev.length - 1;
     }
-    function dur() { if (zam) { clearInterval(zam); zam = null; } oynat.textContent = "Oynat"; oynat.setAttribute("aria-label", "Adımları otomatik oynat"); }
+    function dur() { if (zam) { clearInterval(zam); zam = null; } oynat.textContent = tx("Oynat", "Play"); oynat.setAttribute("aria-label", tx("Adımları otomatik oynat", "Play the steps automatically")); }
     kutu.addEventListener("click", function (e) {
       var b = e.target.closest("[data-op]");
       if (!b) return;
@@ -630,7 +656,7 @@
       else if (op === "oynat") {
         if (zam) { dur(); return; }
         if (k >= ev.length - 1) k = -1;
-        oynat.textContent = "Durdur"; oynat.setAttribute("aria-label", "Otomatik oynatmayı durdur");
+        oynat.textContent = tx("Durdur", "Pause"); oynat.setAttribute("aria-label", tx("Otomatik oynatmayı durdur", "Stop automatic playback"));
         zam = setInterval(function () { if (k >= ev.length - 1) { dur(); return; } k++; ciz(); }, o.hiz || 900);
       }
     });
@@ -644,9 +670,12 @@
     var agac = agacKur(AGACLAR[kutu.getAttribute("data-tree")] || AGACLAR.T1), ab = kutu.getAttribute("data-mode") === "alfabeta";
     var ev = ab ? izAlfaBeta(agac) : izMinimaks(agac);
     var o = {}; for (var k in AGAC_O) o[k] = AGAC_O[k];
-    o.aria = (ab ? "Alfa-beta" : "Minimaks") + " adımlayıcısı: MAX kökü, MIN ve MAX katmanları, yapraklar";
-    o.ilk = ab ? "Başlangıç: kök A'da α = −∞, β = +∞. Adım düğmesiyle derinlik öncelikli arama başlar; budanan dallar kesik çizgiyle gösterilir."
-      : "Başlangıç: değerler yapraklarda. Adım düğmesiyle derinlik öncelikli arama başlar; değerler yapraktan köke yükselir.";
+    o.aria = tx((ab ? "Alfa-beta" : "Minimaks") + " adımlayıcısı: MAX kökü, MIN ve MAX katmanları, yapraklar",
+      (ab ? "Alpha-beta" : "Minimax") + " stepper: MAX root, MIN and MAX levels, leaves");
+    o.ilk = ab ? tx("Başlangıç: kök A'da α = −∞, β = +∞. Adım düğmesiyle derinlik öncelikli arama başlar; budanan dallar kesik çizgiyle gösterilir.",
+        "Start: at root A, α = −∞, β = +∞. The Step button starts a depth-first search; pruned branches are dashed.")
+      : tx("Başlangıç: değerler yapraklarda. Adım düğmesiyle derinlik öncelikli arama başlar; değerler yapraktan köke yükselir.",
+        "Start: the values sit at the leaves. The Step button starts a depth-first search; values rise from the leaves to the root.");
     adimlayici(kutu, agac, ev, o);
   });
 
@@ -655,7 +684,7 @@
     var b = dugme(kutu, "goster"), cv = kutu.querySelector(".b02m-cevap");
     b.addEventListener("click", function () {
       var acik = cv.classList.toggle("is-acik");
-      b.textContent = acik ? "Cevabı gizle" : "Cevabı göster";
+      b.textContent = acik ? tx("Cevabı gizle", "Hide answer") : tx("Cevabı göster", "Show answer");
       b.setAttribute("aria-expanded", acik ? "true" : "false");
     });
   });
@@ -666,11 +695,11 @@
     var o = {}; for (var k in AGAC_O) o[k] = AGAC_O[k];
     if (kutu.getAttribute("data-mode") === "alfabeta-son") {
       var ev = izAlfaBeta(agac);
-      o.aria = "Alfa-beta aramasının sonu: değerler, [α, β] aralıkları ve budanan dallar";
+      o.aria = tx("Alfa-beta aramasının sonu: değerler, [α, β] aralıkları ve budanan dallar", "End of the alpha-beta search: values, [α, β] windows and pruned branches");
       kutu.innerHTML = agacSvg(agac, durum(agac, ev, ev.length - 1), o);
       return;
     }
-    o.aria = "Oyun ağacı: yapraklarda değerler, iç düğümler boş";
+    o.aria = tx("Oyun ağacı: yapraklarda değerler, iç düğümler boş", "Game tree: values at the leaves, inner nodes empty");
     kutu.innerHTML = agacSvg(agac, { deg: {}, bitti: {}, gez: {}, ab: {}, kes: {}, kesKenar: {}, yigin: [], cur: null, en: null }, o).replace(/ is-new/g, "");
   });
 
@@ -690,14 +719,14 @@
       h.className = "b02m-cell" + (i === en ? " is-best" : "") + (kazCizgi && kazCizgi.indexOf(i) >= 0 ? " is-win" : "");
       if (b[i]) {
         h.innerHTML = '<span class="' + (b[i] === "X" ? "b02m-X" : "b02m-O") + '">' + b[i] + "</span>";
-        h.setAttribute("aria-label", KARE[i] + " kare: " + b[i]);
+        h.setAttribute("aria-label", tx(KARE[i] + " kare: " + b[i], KARE[i] + " square: " + b[i]));
       } else if (deg && deg[i] !== undefined) {
         var v = deg[i] * bakis;
         h.innerHTML = '<span class="b02m-cv' + (v > 0 ? " b02m-pos" : v < 0 ? " b02m-neg" : "") + '">' + isaretli(v) + "</span>";
-        h.setAttribute("aria-label", KARE[i] + " kare: boş, değer " + isaretli(v));
+        h.setAttribute("aria-label", tx(KARE[i] + " kare: boş, değer " + isaretli(v), KARE[i] + " square: empty, value " + isaretli(v)));
       } else {
         h.innerHTML = "";
-        h.setAttribute("aria-label", KARE[i] + " kare: boş");
+        h.setAttribute("aria-label", tx(KARE[i] + " kare: boş", KARE[i] + " square: empty"));
       }
     });
   }
@@ -711,12 +740,12 @@
     var st = kutu.querySelector(".b02m-status"), yzB = dugme(kutu, "yz"), b, insan, yz, sira, an, bitti;
     var hucre = xTahtaKur(kutu, function (i) {
       if (bitti || sira !== insan || b[i]) return;
-      b[i] = insan; sira = yz; ilerle(KARE[i] + " kareye " + insan + " kondu. ");
+      b[i] = insan; sira = yz; ilerle(tx(KARE[i] + " kareye " + insan + " kondu. ", insan + " is placed on the " + KARE[i] + " square. "));
     });
     function bitis() {
       var w = xKazanan(b);
-      if (w) { bitti = true; st.innerHTML = "<b>" + (w === yz ? "YZ kazandı." : "İnsan oyuncu kazandı.") + "</b> " + (w === yz ? "Rakibin hatası minimaks değerlerinde hemen görünür: hatadan sonra YZ'nin seçtiği karenin değeri artıya döndü." : "Tam ağacı arayan YZ'ye karşı bu sonuç beklenmez."); xTahtaCiz(hucre, b, null, null, 1, kazCizgisi(b)); return true; }
-      if (xDolu(b)) { bitti = true; st.innerHTML = "<b>Berabere.</b> İki taraf da hatasız oynadığında XOX'un sonucu budur."; xTahtaCiz(hucre, b, null, null, 1); return true; }
+      if (w) { bitti = true; st.innerHTML = "<b>" + (w === yz ? tx("YZ kazandı.", "The AI wins.") : tx("İnsan oyuncu kazandı.", "The human player wins.")) + "</b> " + (w === yz ? tx("Rakibin hatası minimaks değerlerinde hemen görünür: hatadan sonra YZ'nin seçtiği karenin değeri artıya döndü.", "The opponent's mistake shows up at once in the minimax values: after it, the value of the AI's chosen square turned positive.") : tx("Tam ağacı arayan YZ'ye karşı bu sonuç beklenmez.", "This is not expected against an AI that searches the full tree.")); xTahtaCiz(hucre, b, null, null, 1, kazCizgisi(b)); return true; }
+      if (xDolu(b)) { bitti = true; st.innerHTML = tx("<b>Berabere.</b> İki taraf da hatasız oynadığında XOX'un sonucu budur.", "<b>Draw.</b> This is the result of tic-tac-toe when both sides play perfectly."); xTahtaCiz(hucre, b, null, null, 1); return true; }
       return false;
     }
     function ilerle(on) {
@@ -726,24 +755,25 @@
         an = xAnaliz(b, yz, true);
         var bakis = yz === "X" ? 1 : -1;
         xTahtaCiz(hucre, b, an.deg, an.en, bakis);
-        st.innerHTML = (on || "") + "YZ (" + yz + ") her boş kareyi tam ağaçla değerlendirdi; sayılar YZ'nin gözünden değer (+ kazanır, 0 berabere, − kaybeder). " +
-          "Seçim: <b>" + KARE[an.en] + " kare (" + isaretli(an.deg[an.en] * bakis) + ")</b>. " + an.gerekce + " <span class=\"b02m-muted\">(" + sayi(an.mm) + " düğüm)</span>";
+        st.innerHTML = (on || "") + tx("YZ (" + yz + ") her boş kareyi tam ağaçla değerlendirdi; sayılar YZ'nin gözünden değer (+ kazanır, 0 berabere, − kaybeder). " +
+          "Seçim: <b>" + KARE[an.en] + " kare (", "The AI (" + yz + ") evaluated every empty square with the full tree; numbers are values from the AI's view (+ win, 0 draw, − loss). " +
+          "Choice: <b>the " + KARE[an.en] + " square (") + isaretli(an.deg[an.en] * bakis) + ")</b>. " + an.gerekce + " <span class=\"b02m-muted\">(" + sayi(an.mm) + tx(" düğüm)", " nodes)") + "</span>";
         yzB.disabled = false;
       } else {
         xTahtaCiz(hucre, b, null, null, 1);
-        st.innerHTML = (on || "") + "Sıra insan oyuncuda (" + insan + "): boş bir kareye tıklanır.";
+        st.innerHTML = (on || "") + tx("Sıra insan oyuncuda (" + insan + "): boş bir kareye tıklanır.", "The human player (" + insan + ") to move: click an empty square.");
       }
     }
     yzB.addEventListener("click", function () {
       if (bitti || sira !== yz || !an) return;
       b[an.en] = yz; sira = insan;
-      ilerle("YZ " + KARE[an.en] + " kareye oynadı. ");
+      ilerle(tx("YZ " + KARE[an.en] + " kareye oynadı. ", "The AI played the " + KARE[an.en] + " square. "));
     });
     function yeni(yzBaslar, ornek) {
       b = ["", "", "", "", "", "", "", "", ""]; bitti = false;
       insan = yzBaslar ? "O" : "X"; yz = rakip(insan); sira = "X";
-      if (ornek) { b[0] = "X"; sira = "O"; ilerle("Örnek: sol üst köşeye X kondu. "); }
-      else ilerle(yzBaslar ? "Yeni oyun: YZ (X) başlar. " : "Yeni oyun: insan oyuncu X ile başlar. ");
+      if (ornek) { b[0] = "X"; sira = "O"; ilerle(tx("Örnek: sol üst köşeye X kondu. ", "Example: X is in the top-left corner. ")); }
+      else ilerle(yzBaslar ? tx("Yeni oyun: YZ (X) başlar. ", "New game: the AI (X) starts. ") : tx("Yeni oyun: insan oyuncu X ile başlar. ", "New game: the human player starts as X. "));
     }
     dugme(kutu, "yeni-ben").addEventListener("click", function () { yeni(false); });
     dugme(kutu, "yeni-yz").addEventListener("click", function () { yeni(true); });
@@ -765,21 +795,22 @@
       hesapla();
     });
     function hesapla() {
-      siraB.textContent = "Sıra: " + p + (p === "X" ? " (MAX)" : " (MIN)");
-      cezaB.textContent = "Derinlik cezası: " + (ceza ? "açık" : "kapalı");
+      siraB.textContent = tx("Sıra: ", "To move: ") + p + (p === "X" ? " (MAX)" : " (MIN)");
+      cezaB.textContent = tx("Derinlik cezası: ", "Depth penalty: ") + (ceza ? tx("açık", "on") : tx("kapalı", "off"));
       var w = xKazanan(b), nx = 0, no = 0;
       b.forEach(function (c) { if (c === "X") nx++; else if (c === "O") no++; });
-      var uyari = nx - no > 1 || no - nx > 1 ? " Taş sayıları sırayla oynanan bir oyunda oluşamaz." : "";
+      var uyari = nx - no > 1 || no - nx > 1 ? tx(" Taş sayıları sırayla oynanan bir oyunda oluşamaz.", " These piece counts cannot arise when players alternate.") : "";
       if (w || xDolu(b)) {
         xTahtaCiz(hucre, b, null, null, 1, w ? kazCizgisi(b) : null);
-        st.innerHTML = (w ? "<b>" + w + " kazanmış:</b> oyun bitti, değerlendirilecek hamle yok." : "<b>Tahta dolu:</b> berabere.") + uyari;
+        st.innerHTML = (w ? "<b>" + w + tx(" kazanmış:</b> oyun bitti, değerlendirilecek hamle yok.", " has won:</b> the game is over; no moves to evaluate.") : tx("<b>Tahta dolu:</b> berabere.", "<b>Board full:</b> a draw.")) + uyari;
         bilgi.innerHTML = "&nbsp;";
         return;
       }
       an = xAnaliz(b, p, ceza);
       xTahtaCiz(hucre, b, an.deg, an.en, 1);
-      st.innerHTML = "Sıra " + ek(p, "de") + " (" + (p === "X" ? "MAX, en büyüğü seçer" : "MIN, en küçüğü seçer") + "): <b>" + KARE[an.en] + " kare, " + isaretli(an.deg[an.en]) + "</b>. " + an.gerekce + uyari;
-      bilgi.innerHTML = "Minimaks: <b>" + sayi(an.mm) + "</b> düğüm (" + ms(an.tmm) + " ms) · Alfa-beta: <b>" + sayi(an.ab) + "</b> düğüm (" + ms(an.tab) + " ms) · kök değeri ikisinde de <b>" + isaretli(an.abv) + "</b>";
+      st.innerHTML = tx("Sıra " + ek(p, "de") + " (" + (p === "X" ? "MAX, en büyüğü seçer" : "MIN, en küçüğü seçer") + "): <b>" + KARE[an.en] + " kare, ",
+        p + " to move (" + (p === "X" ? "MAX, picks the largest" : "MIN, picks the smallest") + "): <b>the " + KARE[an.en] + " square, ") + isaretli(an.deg[an.en]) + "</b>. " + an.gerekce + uyari;
+      bilgi.innerHTML = tx("Minimaks", "Minimax") + ": <b>" + sayi(an.mm) + "</b> " + tx("düğüm", "nodes") + " (" + ms(an.tmm) + " ms) · " + tx("Alfa-beta", "Alpha-beta") + ": <b>" + sayi(an.ab) + "</b> " + tx("düğüm", "nodes") + " (" + ms(an.tab) + " ms) · " + tx("kök değeri ikisinde de", "root value in both") + " <b>" + isaretli(an.abv) + "</b>";
     }
     function yukle(ad) { var h = HAZIR[ad]; b = h.b.split("").map(function (c) { return c === " " ? "" : c; }); p = h.p; hesapla(); }
     kutu.addEventListener("click", function (e) {
@@ -800,7 +831,7 @@
     var agac = agacKur(xAgacSpec(konum, "X", 0, -1));
     var o = { W: 720, solPay: 92, sagPay: 50, ust: 26, dy: 74, alt: 26, karisik: true, dugumH: 36, renkli: true, degerDx: 26,
       degerYazi: isaretli, katman: ["MAX (X)", "MIN (O)", "MAX (X)", "MIN (O)"],
-      aria: "Orta oyun XOX konumunun tam oyun ağacı" };
+      aria: tx("Orta oyun XOX konumunun tam oyun ağacı", "Full game tree of a mid-game tic-tac-toe position") };
     o.dugumCiz = function (n) {
       var out = [miniTahta(n, n.x, n.y, 12)];
       if (!n.yaprak) {
@@ -812,10 +843,12 @@
       return out.join("");
     };
     var ev = izMinimaks(agac, { fmt: isaretli, yaprakAd: function (c) {
-      return "Oyun sonu (" + c.son + ", derinlik " + sayi(c.derinlik) + ") okunur: değer " + isaretli(c.deger);
+      return tx("Oyun sonu (" + c.son + ", derinlik " + sayi(c.derinlik) + ") okunur: değer " + isaretli(c.deger),
+        "Game end (" + c.son + ", depth " + sayi(c.derinlik) + ") is read: value " + isaretli(c.deger));
     } });
     ev.forEach(function (e) { e.m = e.m.replace(/\((MAX)\)/g, "(MAX, X)").replace(/\((MIN)\)/g, "(MIN, O)"); });
-    o.ilk = "Başlangıç: X'in sırası, üç boş kare. Her düğüm bir konum; turuncu kare o konuma götüren hamle. Değerler oyun sonlarından köke yükselir.";
+    o.ilk = tx("Başlangıç: X'in sırası, üç boş kare. Her düğüm bir konum; turuncu kare o konuma götüren hamle. Değerler oyun sonlarından köke yükselir.",
+      "Start: X to move, three empty squares. Each node is a position; the orange square is the move leading to it. Values rise from the game ends to the root.");
     adimlayici(kutu, agac, ev, o);
   });
 
@@ -832,7 +865,7 @@
       if (goster) agac.kok.cocuk.forEach(function (c) { if (tamMinimaks(c) === kokV && kokV > 0) { s.enler[c.id] = true; kazanan.push(c); } });
       var yap = agac.yaprakSay, adim = 46;
       var o = { W: Math.max(360, Math.min(720, 120 + (yap - 1) * adim)), solPay: 82, sagPay: 34, ust: 18, dy: 52, alt: 32, karisik: true, renkli: true, degerDx: 17,
-        degerYazi: isaretli, aria: "Nim(" + h.join(", ") + ") oyun ağacı", katman: ["MAX (A)", "MIN (B)", "MAX (A)", "MIN (B)", "MAX (A)"] };
+        degerYazi: isaretli, aria: "Nim(" + h.join(", ") + ") " + tx("oyun ağacı", "game tree"), katman: ["MAX (A)", "MIN (B)", "MAX (A)", "MIN (B)", "MAX (A)"] };
       o.dugumCiz = function (n, s2) {
         var lab = n.yigin.join(",");
         if (n.yaprak) return '<rect class="b02m-n" x="' + (n.x - 16) + '" y="' + (n.y - 11) + '" width="32" height="22" rx="4"/>' +
@@ -847,21 +880,22 @@
       gor.innerHTML = svg;
       var x = h.reduce(function (a, c) { return a ^ c; }, 0);
       var xorYazi = h.length > 1 ? h.join(" ⊕ ") + " = " + x : String(x);
-      if (!goster) { st.innerHTML = "Değerler gizli: kökün değeri ve kazandıran hamle önce elle bulunur. Nim toplamı " + xorYazi + "."; return; }
+      if (!goster) { st.innerHTML = tx("Değerler gizli: kökün değeri ve kazandıran hamle önce elle bulunur. Nim toplamı ", "Values hidden: find the root's value and the winning move by hand first. Nim-sum ") + xorYazi + "."; return; }
       if (kokV > 0) {
         var hm = kazanan.map(function (c) { return "(" + c.yigin.join(", ") + ")"; }).join(", ");
         var xorH = kazanan.filter(function (c) { return c.yigin.reduce(function (a, v) { return a ^ v; }, 0) === 0; }).length === kazanan.length;
-        st.innerHTML = "Kök (" + h.join(", ") + "): değer <b>+1</b>, sıradaki A kazanır → <b>N konumu</b>. Kazandıran hamle: <b>" + hm + "</b>. Nim toplamı " + xorYazi +
-          " ≠ 0; XOR'u 0 yapan hamle " + (xorH ? "aynısı ✓" : "farklı ✗") + ".";
+        st.innerHTML = tx("Kök (", "Root (") + h.join(", ") + tx("): değer <b>+1</b>, sıradaki A kazanır → <b>N konumu</b>. Kazandıran hamle: <b>", "): value <b>+1</b>, A to move wins → an <b>N position</b>. Winning move: <b>") + hm +
+          tx("</b>. Nim toplamı ", "</b>. Nim-sum ") + xorYazi + tx(" ≠ 0; XOR'u 0 yapan hamle ", " ≠ 0; the move making the XOR 0 is ") + (xorH ? tx("aynısı ✓", "the same ✓") : tx("farklı ✗", "different ✗")) + ".";
       } else {
-        st.innerHTML = "Kök (" + h.join(", ") + "): değer <b>−1</b>, sıradaki A her hamlede kaybeder → <b>P konumu</b>. Nim toplamı " + xorYazi + ": XOR 0 iken kazandıran hamle yoktur.";
+        st.innerHTML = tx("Kök (", "Root (") + h.join(", ") + tx("): değer <b>−1</b>, sıradaki A her hamlede kaybeder → <b>P konumu</b>. Nim toplamı ", "): value <b>−1</b>, A to move loses with every move → a <b>P position</b>. Nim-sum ") + xorYazi +
+          tx(": XOR 0 iken kazandıran hamle yoktur.", ": with XOR 0 there is no winning move.");
       }
     }
     kutu.addEventListener("click", function (e) {
       var d = e.target.closest("[data-op]");
       if (!d) return;
       var op = d.getAttribute("data-op");
-      if (op === "degerler") { goster = !goster; degB.textContent = goster ? "Değerleri gizle" : "Değerleri göster"; }
+      if (op === "degerler") { goster = !goster; degB.textContent = goster ? tx("Değerleri gizle", "Hide values") : tx("Değerleri göster", "Show values"); }
       else { h = op.split("-").map(Number); kutu.querySelectorAll("[data-pos]").forEach(function (x) { x.setAttribute("aria-pressed", x === d ? "true" : "false"); }); }
       ciz();
     });
@@ -886,10 +920,11 @@
   }
   demolar("b02m-sirala").forEach(function (kutu) {
     var gor = kutu.querySelector(".b02m-view"), st = kutu.querySelector(".b02m-status"), spec = SIRALA_ILK, ozgun = SIRALA_ILK, rnd = rastgele(2026);
-    var AD = { ozgun: "Özgün sıra", karistir: "Karıştırılmış sıra", iyi: "En iyi sıra", kotu: "En kötü sıra", yeni: "Yeni değerler" };
+    var AD = EN ? { ozgun: "Original order", karistir: "Shuffled order", iyi: "Best order", kotu: "Worst order", yeni: "New values" }
+      : { ozgun: "Özgün sıra", karistir: "Karıştırılmış sıra", iyi: "En iyi sıra", kotu: "En kötü sıra", yeni: "Yeni değerler" };
     function ciz(kip) {
       var agac = agacKur(spec), ev = izAlfaBeta(agac), s = durum(agac, ev, ev.length - 1);
-      var o = { W: 720, solPay: 64, sagPay: 18, ust: 18, dy: 56, alt: 18, adYaz: false, degerYaz: false, abYaz: false, w: 26, h: 22, aria: "Hamle sıralaması: alfa-beta ile değerlendirilen ve budanan yapraklar" };
+      var o = { W: 720, solPay: 64, sagPay: 18, ust: 18, dy: 56, alt: 18, adYaz: false, degerYaz: false, abYaz: false, w: 26, h: 22, aria: tx("Hamle sıralaması: alfa-beta ile değerlendirilen ve budanan yapraklar", "Move ordering: leaves evaluated and pruned by alpha-beta") };
       o.dugumCiz = function (n) {
         if (n.yaprak) return '<rect class="b02m-n" x="' + (n.x - 11) + '" y="' + (n.y - 11) + '" width="22" height="22" rx="3"/><text class="b02m-lv" x="' + n.x + '" y="' + (n.y + 4) + '" text-anchor="middle" style="font-size:11px">' + n.deger + "</text>";
         return '<polygon class="b02m-n" points="' + ucgen(n.x, n.y, 26, 22, n.max) + '"/>' + (n.ata ? "" : '<text class="b02m-v" x="' + (n.x + 20) + '" y="' + (n.y + 5) + '">' + tamMinimaks(n) + "</text>");
@@ -897,8 +932,8 @@
       var svg = agacSvg(agac, s, o).replace(/<text class="b02m-cutl"[^<]*<\/text>/g, "");
       gor.innerHTML = svg;
       var kok = tamMinimaks(agac.kok);
-      st.innerHTML = "<b>" + AD[kip] + ":</b> değerlendirilen yaprak <b>" + s.yaprak + " / " + agac.yaprakSay + "</b>, kökün değeri <b>" + kok + "</b>" +
-        (kip === "ozgun" || kip === "yeni" ? "" : " (özgün sırada da " + kok + ")") + ". Kuram: en iyi sırada 3² + 3¹ − 1 = 11, sırasız minimaksta 27 yaprak.";
+      st.innerHTML = "<b>" + AD[kip] + ":</b> " + tx("değerlendirilen yaprak", "leaves evaluated") + " <b>" + s.yaprak + " / " + agac.yaprakSay + "</b>, " + tx("kökün değeri", "root value") + " <b>" + kok + "</b>" +
+        (kip === "ozgun" || kip === "yeni" ? "" : tx(" (özgün sırada da " + kok + ")", " (" + kok + " in the original order too)")) + tx(". Kuram: en iyi sırada 3² + 3¹ − 1 = 11, sırasız minimaksta 27 yaprak.", ". Theory: 3² + 3¹ − 1 = 11 with the best order, 27 leaves for plain minimax.");
     }
     kutu.addEventListener("click", function (e) {
       var d = e.target.closest("[data-op]");
@@ -942,7 +977,7 @@
       out.push('<circle class="' + (v === 1 ? "b02m-d41" : v === 2 ? "b02m-d42" : "b02m-d40") + (kazP && kazP.indexOf(i) >= 0 ? " is-win" : "") + '" cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>');
       if (i === son) out.push('<circle class="b02m-d4son" cx="' + cx + '" cy="' + cy + '" r="7"/>');
     }
-    return '<svg class="ds-svg" viewBox="0 0 ' + (D4W * a + 6) + " " + (D4H * a + 6) + '" role="img" aria-label="Dörtlü Bağla tahtası, 7 sütun 6 satır">' + out.join("") + "</svg>";
+    return '<svg class="ds-svg" viewBox="0 0 ' + (D4W * a + 6) + " " + (D4H * a + 6) + '" role="img" aria-label="' + tx("Dörtlü Bağla tahtası, 7 sütun 6 satır", "Connect Four board, 7 columns and 6 rows") + '">' + out.join("") + "</svg>";
   }
   function d4KazananPencere(g) {
     for (var k = 0; k < D4PEN.length; k++) if (g.c1[k] === 4 || g.c2[k] === 4) return D4PEN[k];
@@ -951,7 +986,7 @@
   demolar("b02m-d4").forEach(function (kutu) {
     var gor = kutu.querySelector(".b02m-view"), st = kutu.querySelector(".b02m-status"), bilgi = kutu.querySelector(".b02m-info");
     var sutunlar = kutu.querySelector(".b02m-cols"), yzB = dugme(kutu, "yz"), derB = kutu.querySelector(".b02m-der"), siraB = dugme(kutu, "sira");
-    var g, insan, yz, sira, bitti, son = -1, der = 5, ortadan = true, an = null, nesil = 0, mesgul = false, renk = { 1: "Kırmızı", 2: "Mavi" };
+    var g, insan, yz, sira, bitti, son = -1, der = 5, ortadan = true, an = null, nesil = 0, mesgul = false, renk = EN ? { 1: "Red", 2: "Blue" } : { 1: "Kırmızı", 2: "Mavi" };
     var sb = [];
     for (var c = 0; c < D4W; c++) {
       var b = document.createElement("button");
@@ -960,25 +995,25 @@
       sutunlar.appendChild(b); sb.push(b);
     }
     function etiket(v) {
-      if (v >= D4KAZ - 100) return "kazanç";
-      if (v <= -(D4KAZ - 100)) return "kayıp";
+      if (v >= D4KAZ - 100) return tx("kazanç", "win");
+      if (v <= -(D4KAZ - 100)) return tx("kayıp", "loss");
       return isaretli(v);
     }
     function sutunCiz() {
       sb.forEach(function (b, c) {
         var v = an && an.deg[c] !== undefined ? an.deg[c] * (yz === 1 ? 1 : -1) : null;
         b.className = "b02m-col" + (an && an.en === c ? " is-best" : "") + (v !== null && v >= D4KAZ - 100 ? " b02m-pos" : v !== null && v <= -(D4KAZ - 100) ? " b02m-neg" : "");
-        b.innerHTML = '<span class="b02m-cn">' + (c + 1) + "</span><span>" + (v === null ? (an ? "dolu" : "↓") : etiket(v)) + "</span>";
+        b.innerHTML = '<span class="b02m-cn">' + (c + 1) + "</span><span>" + (v === null ? (an ? tx("dolu", "full") : "↓") : etiket(v)) + "</span>";
         b.disabled = bitti || g.h[c] >= D4H || sira !== insan;
-        b.setAttribute("aria-label", "Sütun " + (c + 1) + (v === null ? "" : ", YZ için puan " + etiket(v)));
+        b.setAttribute("aria-label", tx("Sütun ", "Column ") + (c + 1) + (v === null ? "" : tx(", YZ için puan ", ", score for the AI ") + etiket(v)));
       });
-      derB.textContent = "Derinlik " + der;
-      siraB.textContent = "Sıra: " + (ortadan ? "ortadan dışa" : "soldan sağa");
+      derB.textContent = tx("Derinlik ", "Depth ") + der;
+      siraB.textContent = tx("Sıra: ", "Order: ") + (ortadan ? tx("ortadan dışa", "center out") : tx("soldan sağa", "left to right"));
     }
     function ciz(kaz) { gor.innerHTML = d4Ciz(g, son, kaz ? d4KazananPencere(g) : null); sutunCiz(); }
     function bitis(kz, p) {
-      if (kz) { bitti = true; an = null; ciz(true); st.innerHTML = "<b>" + renk[p] + " dörtlü yaptı: " + (p === yz ? "YZ kazandı." : "insan oyuncu kazandı.") + "</b>" + (p === insan ? " Derinlik sınırı olan YZ ufkunun ötesini göremez." : ""); return true; }
-      if (g.hamle === D4W * D4H) { bitti = true; an = null; ciz(); st.innerHTML = "<b>Tahta doldu: berabere.</b>"; return true; }
+      if (kz) { bitti = true; an = null; ciz(true); st.innerHTML = "<b>" + renk[p] + tx(" dörtlü yaptı: ", " connects four: ") + (p === yz ? tx("YZ kazandı.", "the AI wins.") : tx("insan oyuncu kazandı.", "the human player wins.")) + "</b>" + (p === insan ? tx(" Derinlik sınırı olan YZ ufkunun ötesini göremez.", " A depth-limited AI cannot see beyond its horizon.") : ""); return true; }
+      if (g.hamle === D4W * D4H) { bitti = true; an = null; ciz(); st.innerHTML = tx("<b>Tahta doldu: berabere.</b>", "<b>Board full: a draw.</b>"); return true; }
       return false;
     }
     function insanOyna(c) {
@@ -987,13 +1022,13 @@
       var kz = g.oyna(c, insan);
       sira = yz; an = null;
       if (bitis(kz, insan)) return;
-      dusun("Sütun " + (c + 1) + ": " + renk[insan] + " taş düştü. ");
+      dusun(tx("Sütun " + (c + 1) + ": " + renk[insan] + " taş düştü. ", "Column " + (c + 1) + ": a " + renk[insan] + " disc drops. "));
     }
     /* YZ: önce her sütunun minimaks değeri (parça parça), sonra tek bir alfa-beta araması */
     function dusun(on) {
       var no = ++nesil, sira2 = ortadan ? SIRA_ORTA : SIRA_SOL, deg = {}, say = { n: 1 }, tmm = 0, k = 0;
       mesgul = true; yzB.disabled = true; an = null; ciz();
-      st.innerHTML = (on || "") + "YZ düşünüyor (derinlik " + der + ")…";
+      st.innerHTML = (on || "") + tx("YZ düşünüyor (derinlik ", "The AI is thinking (depth ") + der + ")…";
       bilgi.innerHTML = "&nbsp;";
       function parca() {
         if (no !== nesil) return;
@@ -1011,9 +1046,9 @@
         mesgul = false;
         an = { deg: deg, en: en, mm: say.n, ab: sab.n, tmm: tmm, tab: tab, abv: abv, abEn: kok.en };
         ciz();
-        st.innerHTML = (on || "") + "YZ'nin seçimi: <b>sütun " + (en + 1) + "</b> (" + etiket(deg[en] * (yz === 1 ? 1 : -1)) + "). " + gerekce(en);
-        bilgi.innerHTML = "Minimaks: <b>" + sayi(an.mm) + "</b> düğüm, " + ms(tmm) + " ms · Alfa-beta: <b>" + sayi(an.ab) + "</b> düğüm, " + ms(tab) + " ms · " +
-          (abv === deg[en] && kok.en === en ? "aynı değer, aynı sütun ✓" : "FARK: " + abv + " / " + deg[en]);
+        st.innerHTML = (on || "") + tx("YZ'nin seçimi: <b>sütun ", "The AI's choice: <b>column ") + (en + 1) + "</b> (" + etiket(deg[en] * (yz === 1 ? 1 : -1)) + "). " + gerekce(en);
+        bilgi.innerHTML = tx("Minimaks", "Minimax") + ": <b>" + sayi(an.mm) + "</b> " + tx("düğüm", "nodes") + ", " + ms(tmm) + " ms · " + tx("Alfa-beta", "Alpha-beta") + ": <b>" + sayi(an.ab) + "</b> " + tx("düğüm", "nodes") + ", " + ms(tab) + " ms · " +
+          (abv === deg[en] && kok.en === en ? tx("aynı değer, aynı sütun ✓", "same value, same column ✓") : tx("FARK: ", "MISMATCH: ") + abv + " / " + deg[en]);
         yzB.disabled = false;
       }
       setTimeout(parca, 30);
@@ -1021,14 +1056,16 @@
     function gerekce(c) {
       var v = an.deg[c] * (yz === 1 ? 1 : -1), kaybettiren = 0;
       for (var k in an.deg) if (an.deg[k] * (yz === 1 ? 1 : -1) <= -(D4KAZ - 100)) kaybettiren++;
-      var ek2 = kaybettiren && v > -(D4KAZ - 100) ? " " + sayi(kaybettiren) + " sütun derinlik sınırı içinde kayba götürüyor." : "";
+      var ek2 = kaybettiren && v > -(D4KAZ - 100) ? " " + sayi(kaybettiren) + tx(" sütun derinlik sınırı içinde kayba götürüyor.", (kaybettiren === 1 ? " column leads" : " columns lead") + " to a loss within the depth limit.") : "";
       var kz = g.oyna(c, yz); g.geri(c, yz);
-      if (kz) return "Bu sütun dörtlüyü tamamlar: hemen kazanır.";
+      if (kz) return tx("Bu sütun dörtlüyü tamamlar: hemen kazanır.", "This column completes four in a row: an immediate win.");
       var rk = g.oyna(c, insan); g.geri(c, insan);
-      if (v >= D4KAZ - 100) return "Derinlik " + der + " içinde zorlanmış kazanç görüyor: en geç " + sayi(D4KAZ - v) + " hamlede." + (rk ? " Aynı sütun rakibin dörtlüsünü de engeller." : "");
-      if (rk) return "Rakip bu sütuna oynasaydı dörtlü yapacaktı: engeller." + ek2;
-      if (v <= -(D4KAZ - 100)) return "Her sütun derinlik sınırı içinde kaybettiriyor; kaybı en çok geciktiren sütun seçildi.";
-      return "Bu sütunda derinlik sınırı içinde zorunlu bir kazanç ya da kayıp yok; ufuktaki konumların değerlendirme puanı (açık ikili ve üçlüler, orta sütun) en iyi olan sütun seçildi." + ek2;
+      if (v >= D4KAZ - 100) return tx("Derinlik " + der + " içinde zorlanmış kazanç görüyor: en geç " + sayi(D4KAZ - v) + " hamlede.", "It sees a forced win within depth " + der + ": in at most " + sayi(D4KAZ - v) + " moves.") +
+        (rk ? tx(" Aynı sütun rakibin dörtlüsünü de engeller.", " The same column also blocks the opponent's four.") : "");
+      if (rk) return tx("Rakip bu sütuna oynasaydı dörtlü yapacaktı: engeller.", "The opponent would connect four in this column: it blocks.") + ek2;
+      if (v <= -(D4KAZ - 100)) return tx("Her sütun derinlik sınırı içinde kaybettiriyor; kaybı en çok geciktiren sütun seçildi.", "Every column loses within the depth limit; the one that delays the loss the longest was chosen.");
+      return tx("Bu sütunda derinlik sınırı içinde zorunlu bir kazanç ya da kayıp yok; ufuktaki konumların değerlendirme puanı (açık ikili ve üçlüler, orta sütun) en iyi olan sütun seçildi.",
+        "No forced win or loss within the depth limit; the column whose horizon positions score best on the evaluation function (open twos and threes, center column) was chosen.") + ek2;
     }
     yzB.addEventListener("click", function () {
       if (bitti || sira !== yz || !an || mesgul) return;
@@ -1036,11 +1073,11 @@
       son = g.h[c] * D4W + c;
       var kz = g.oyna(c, yz);
       sira = insan;
-      var not = "YZ sütun " + ek(c + 1, "e") + " oynadı. ";
+      var not = tx("YZ sütun " + ek(c + 1, "e") + " oynadı. ", "The AI played column " + (c + 1) + ". ");
       an = null;
       if (bitis(kz, yz)) return;
       ciz();
-      st.innerHTML = not + "Sıra insan oyuncuda (" + renk[insan] + "): bir sütun düğmesine tıklanır.";
+      st.innerHTML = not + tx("Sıra insan oyuncuda (" + renk[insan] + "): bir sütun düğmesine tıklanır.", "The human player (" + renk[insan] + ") to move: click a column button.");
       bilgi.innerHTML = "&nbsp;";
       yzB.disabled = true;
     });
@@ -1050,9 +1087,9 @@
       if (ornek) {
         [3, 3, 2].forEach(function (c, k) { son = g.h[c] * D4W + c; g.oyna(c, k % 2 ? 2 : 1); });
         sira = 2;
-        dusun("Örnek konum: Kırmızı 4. ve 3. sütunlara, Mavi 4. sütuna oynadı. ");
-      } else if (yzBaslar) dusun("Yeni oyun: YZ (Kırmızı) başlar. ");
-      else { ciz(); yzB.disabled = true; st.innerHTML = "Yeni oyun: insan oyuncu Kırmızı ile başlar; bir sütun düğmesine tıklanır."; bilgi.innerHTML = "&nbsp;"; }
+        dusun(tx("Örnek konum: Kırmızı 4. ve 3. sütunlara, Mavi 4. sütuna oynadı. ", "Example position: Red played columns 4 and 3, Blue played column 4. "));
+      } else if (yzBaslar) dusun(tx("Yeni oyun: YZ (Kırmızı) başlar. ", "New game: the AI (Red) starts. "));
+      else { ciz(); yzB.disabled = true; st.innerHTML = tx("Yeni oyun: insan oyuncu Kırmızı ile başlar; bir sütun düğmesine tıklanır.", "New game: the human player starts as Red; click a column button."); bilgi.innerHTML = "&nbsp;"; }
     }
     function yeniden() { if (!bitti && sira === yz) dusun(""); else sutunCiz(); }
     kutu.addEventListener("click", function (e) {
@@ -1079,7 +1116,7 @@
       var v3 = d4AB(g, d, 0, 1, false, -INF, INF, SIRA_ORTA, s3, null);
       var h = r.querySelectorAll("td");
       h[1].textContent = sayi(s1.n); h[2].textContent = sayi(s2.n); h[3].textContent = sayi(s3.n);
-      h[4].textContent = v1 === v2 && v2 === v3 ? isaretli(v1) : "FARK";
+      h[4].textContent = v1 === v2 && v2 === v3 ? isaretli(v1) : tx("FARK", "MISMATCH");
       setTimeout(parca, 0);
     }
     setTimeout(parca, 200);

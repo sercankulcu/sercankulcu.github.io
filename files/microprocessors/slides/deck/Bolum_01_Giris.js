@@ -1,5 +1,8 @@
 /* Bölüm 1 Giriş: saat hızı, periyot ve çalışma süresi hesaplayıcı */
 document.querySelectorAll('.ds-deck [data-demo="m01g-clock"]').forEach(function (demo) {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   var inF = demo.querySelector('[data-in="f"]');
   var inC = demo.querySelector('[data-in="cpi"]');
   var inN = demo.querySelector('[data-in="n"]');
@@ -7,7 +10,7 @@ document.querySelectorAll('.ds-deck [data-demo="m01g-clock"]').forEach(function 
   function out(name) { return demo.querySelector('[data-out="' + name + '"]'); }
 
   function fmt(x, digits) {
-    return x.toLocaleString("tr-TR", { maximumFractionDigits: digits, minimumFractionDigits: 0 });
+    return x.toLocaleString(tx("tr-TR", "en-US"), { maximumFractionDigits: digits, minimumFractionDigits: 0 });
   }
   function time(sec) {
     if (sec >= 1) return fmt(sec, 3) + " s";
@@ -21,7 +24,7 @@ document.querySelectorAll('.ds-deck [data-demo="m01g-clock"]').forEach(function 
     var fMHz = parseFloat(inF.value), cpi = parseFloat(inC.value), nM = parseFloat(inN.value);
     if (!(fMHz > 0) || !(cpi > 0) || !(nM >= 0)) {
       ["t", "bus", "mips", "time"].forEach(function (k) { out(k).textContent = "—"; });
-      status.innerHTML = "f ve CPI sıfırdan büyük olmalı.";
+      status.innerHTML = tx("f ve CPI sıfırdan büyük olmalı.", "f and CPI must be greater than zero.");
       return;
     }
     var f = fMHz * 1e6, T = 1 / f;
@@ -31,7 +34,7 @@ document.querySelectorAll('.ds-deck [data-demo="m01g-clock"]').forEach(function 
     out("bus").textContent = time(4 * T);
     out("mips").textContent = fmt(mips, 2);
     out("time").textContent = time(sec);
-    status.innerHTML = "T = 1 / " + fmt(fMHz, 3) + " MHz = <b>" + time(T) + "</b> · süre = N × CPI / f = " +
+    status.innerHTML = "T = 1 / " + fmt(fMHz, 3) + " MHz = <b>" + time(T) + "</b> · " + tx("süre", "time") + " = N × CPI / f = " +
       fmt(nM, 3) + "·10⁶ × " + fmt(cpi, 2) + " / " + fmt(fMHz, 3) + "·10⁶ Hz = <b>" + time(sec) + "</b>";
   }
 

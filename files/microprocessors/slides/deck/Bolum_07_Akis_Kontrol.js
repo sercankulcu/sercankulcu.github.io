@@ -1,5 +1,7 @@
 /* Bölüm 7 Akış Kontrolü demoları: atlama kodu hesaplayıcı ve CMP bayrak hesaplayıcı */
 (function () {
+  const EN = String(document.getElementById("ds-deck").getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   function hex(v, n) { return (v >>> 0).toString(16).toUpperCase().padStart(n, "0"); }
   function parseHex(s) {
     s = String(s).trim().replace(/h$/i, "");
@@ -33,27 +35,27 @@
       var a = parseHex(at.value), t = parseHex(to.value);
       if (a === null || t === null) {
         res.innerHTML = "";
-        status.innerHTML = "Adresler 1–4 haneli onaltılık olmalı (ör. <b>010C</b>).";
+        status.innerHTML = tx("Adresler 1–4 haneli onaltılık olmalı (ör. <b>010C</b>).", "Addresses must be 1–4 hex digits (e.g. <b>010C</b>).");
         return;
       }
       var next = (a + len) & 0xFFFF;
       var d = t - next;
       if (d > 32767) d -= 65536;
       if (d < -32768) d += 65536;
-      var html = "sonraki IP = " + hex(a, 4) + "h + " + len + " = <b>" + hex(next, 4) + "h</b><br>uzaklık = " +
+      var html = tx("sonraki IP = ", "next IP = ") + hex(a, 4) + "h + " + len + " = <b>" + hex(next, 4) + "h</b><br>" + tx("uzaklık = ", "displacement = ") +
         hex(t, 4) + "h − " + hex(next, 4) + "h = <b>" + (d >= 0 ? "+" : "−") + Math.abs(d) + "</b>";
       if (len === 2) {
         if (d < -128 || d > 127) {
           res.innerHTML = html;
-          status.innerHTML = "<b>Menzil dışı!</b> rel8 yalnızca −128…+127 olabilir. Çözüm: ters koşul + JMP NEAR.";
+          status.innerHTML = tx("<b>Menzil dışı!</b> rel8 yalnızca −128…+127 olabilir. Çözüm: ters koşul + JMP NEAR.", "<b>Out of range!</b> rel8 can only be −128…+127. Fix: inverted condition + JMP NEAR.");
           return;
         }
-        res.innerHTML = html + "<br>rel8 = " + hex(d & 0xFF, 2) + "h → makine kodu <b>" + code + " " + hex(d & 0xFF, 2) + "</b>";
+        res.innerHTML = html + "<br>rel8 = " + hex(d & 0xFF, 2) + "h → " + tx("makine kodu", "machine code") + " <b>" + code + " " + hex(d & 0xFF, 2) + "</b>";
       } else {
         var r = d & 0xFFFF;
-        res.innerHTML = html + "<br>rel16 = " + hex(r, 4) + "h → makine kodu <b>" + code + " " + hex(r & 0xFF, 2) + " " + hex(r >> 8, 2) + "</b> (little-endian)";
+        res.innerHTML = html + "<br>rel16 = " + hex(r, 4) + "h → " + tx("makine kodu", "machine code") + " <b>" + code + " " + hex(r & 0xFF, 2) + " " + hex(r >> 8, 2) + "</b> (little-endian)";
       }
-      status.innerHTML = name + " " + hex(a, 4) + "h adresinde, hedef " + hex(t, 4) + "h.";
+      status.innerHTML = tx(name + " " + hex(a, 4) + "h adresinde, hedef " + hex(t, 4) + "h.", name + " at " + hex(a, 4) + "h, target " + hex(t, 4) + "h.");
     }
     [op, at, to].forEach(function (el) { el.addEventListener("input", run); el.addEventListener("change", run); });
     run();
@@ -89,7 +91,7 @@
       var a = parseByte(ia.value), b = parseByte(ib.value);
       if (a === null || b === null) {
         res.innerHTML = ""; flags.innerHTML = ""; jumps.innerHTML = "";
-        status.innerHTML = "Değerler −128…255 aralığında olmalı (ör. <b>-5</b>, <b>200</b>, <b>7Fh</b>).";
+        status.innerHTML = tx("Değerler −128…255 aralığında olmalı (ör. <b>-5</b>, <b>200</b>, <b>7Fh</b>).", "Values must be in −128…255 (e.g. <b>-5</b>, <b>200</b>, <b>7Fh</b>).");
         return;
       }
       var r = (a - b) & 0xFF;
@@ -114,7 +116,7 @@
       }).join("");
       var u = a > b ? "&gt;" : a < b ? "&lt;" : "=";
       var s = sgn(a) > sgn(b) ? "&gt;" : sgn(a) < sgn(b) ? "&lt;" : "=";
-      status.innerHTML = "işaretsiz: " + a + " " + u + " " + b + " · işaretli: " + sd(sgn(a)) + " " + s + " " + sd(sgn(b));
+      status.innerHTML = tx("işaretsiz: ", "unsigned: ") + a + " " + u + " " + b + tx(" · işaretli: ", " · signed: ") + sd(sgn(a)) + " " + s + " " + sd(sgn(b));
     }
     [ia, ib].forEach(function (el) { el.addEventListener("input", run); });
     run();

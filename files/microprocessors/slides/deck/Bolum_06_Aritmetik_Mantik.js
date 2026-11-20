@@ -1,5 +1,7 @@
 /* Bölüm 6: Aritmetik ve Mantıksal İşlemler sunumu demoları */
 (function () {
+  const EN = String(document.getElementById("ds-deck").getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   function hex(n, w) { return (n >>> 0).toString(16).toUpperCase().padStart(w, "0"); }
   function bin(n, bits) { return (n >>> 0).toString(2).padStart(bits, "0").replace(/(.{4})(?=.)/g, "$1 "); }
   function parity(v) { var c = 0; v &= 0xFF; while (v) { c += v & 1; v >>= 1; } return c % 2 === 0 ? 1 : 0; }
@@ -29,7 +31,7 @@
       var a = parse(q("a").value), b = one ? 0 : parse(q("b").value);
       var lim = n === 8 ? 255 : 65535, lo = n === 8 ? -128 : -32768;
       if (isNaN(a) || isNaN(b) || a < lo || a > lim || b < lo || b > lim) {
-        out.innerHTML = ""; status.innerHTML = n + " bitlik aralık dışında; değerler " + lo + " … " + lim + " arasında olmalı.";
+        out.innerHTML = ""; status.innerHTML = tx(n + " bitlik aralık dışında; değerler " + lo + " … " + lim + " arasında olmalı.", "Out of the " + n + "-bit range; values must be between " + lo + " … " + lim + ".");
         return;
       }
       a &= M; b &= M;
@@ -55,17 +57,17 @@
       r &= M;
       if (op !== "NOT") { f.ZF = r === 0 ? 1 : 0; f.SF = (r & S) ? 1 : 0; f.PF = parity(r); }
       var w = n / 4;
-      var rows = '<div class="m06-bits">hedef  ' + bin(a, n) + "  = " + hex(a, w) + "h</div>";
-      if (!one) rows += '<div class="m06-bits">kaynak ' + bin(b, n) + "  = " + hex(b, w) + "h</div>";
-      rows += '<div class="m06-bits"><b>sonuç  ' + bin(r, n) + "  = " + hex(r, w) + "h</b>  (işaretsiz " + r + ", işaretli " + sd(signed(r, n)) + ")</div>";
+      var rows = '<div class="m06-bits">' + tx("hedef  ", "dest   ") + bin(a, n) + "  = " + hex(a, w) + "h</div>";
+      if (!one) rows += '<div class="m06-bits">' + tx("kaynak ", "src    ") + bin(b, n) + "  = " + hex(b, w) + "h</div>";
+      rows += '<div class="m06-bits"><b>' + tx("sonuç  ", "result ") + bin(r, n) + "  = " + hex(r, w) + "h</b>  (" + tx("işaretsiz ", "unsigned ") + r + tx(", işaretli ", ", signed ") + sd(signed(r, n)) + ")</div>";
       var chips = Object.keys(f).map(function (k) {
         return '<span class="' + (f[k] === 1 ? "is-on" : "") + '">' + k + " = " + f[k] + "</span>";
       }).join("");
       out.innerHTML = rows + '<div class="m06-chips">' + chips + "</div>";
-      status.innerHTML = store ? "Sonuç hedefe yazılır." : "<b>" + op + "</b> sonucu saklamaz; yalnızca bayraklar değişir.";
-      if (f.AF === "?") status.innerHTML += " AF tanımsızdır; CF ve OF daima 0.";
-      if (op === "INC" || op === "DEC") status.innerHTML += " INC/DEC CF'yi değiştirmez.";
-      if (op === "NOT") status.innerHTML += " NOT hiçbir bayrağı etkilemez.";
+      status.innerHTML = store ? tx("Sonuç hedefe yazılır.", "The result is written to dest.") : "<b>" + op + "</b>" + tx(" sonucu saklamaz; yalnızca bayraklar değişir.", " stores no result; only the flags change.");
+      if (f.AF === "?") status.innerHTML += tx(" AF tanımsızdır; CF ve OF daima 0.", " AF is undefined; CF and OF are always 0.");
+      if (op === "INC" || op === "DEC") status.innerHTML += tx(" INC/DEC CF'yi değiştirmez.", " INC/DEC leave CF unchanged.");
+      if (op === "NOT") status.innerHTML += tx(" NOT hiçbir bayrağı etkilemez.", " NOT affects no flags.");
     }
     demo.querySelectorAll("input, select").forEach(function (el) { el.addEventListener("input", calc); el.addEventListener("change", calc); });
     calc();
@@ -84,7 +86,7 @@
       var a = parse(q("a").value), b = parse(q("b").value);
       var aMax = Math.pow(2, an), bMax = Math.pow(2, n);
       if (isNaN(a) || isNaN(b) || a < -aMax / 2 || a >= aMax || b < -bMax / 2 || b >= bMax) {
-        out.innerHTML = ""; status.innerHTML = "Değerler seçilen boyuta sığmalı (" + q("alab").textContent + ": " + an + " bit, işlenen: " + n + " bit).";
+        out.innerHTML = ""; status.innerHTML = tx("Değerler seçilen boyuta sığmalı (" + q("alab").textContent + ": " + an + " bit, işlenen: " + n + " bit).", "Values must fit the chosen size (" + q("alab").textContent + ": " + an + " bits, operand: " + n + " bits).");
         return;
       }
       var au = ((a % aMax) + aMax) % aMax, bu = ((b % bMax) + bMax) % bMax;
@@ -97,16 +99,16 @@
         html = '<div class="m06-bits">' + sd(av) + " × " + sd(bv) + " = <b>" + sd(p) + "</b></div>";
         html += '<div class="m06-chips">' + (n === 8 ? reg("AX", pu, 4) + "<span>AH = " + hex(hi, 2) + "h</span><span>AL = " + hex(lo, 2) + "h</span>" :
           reg("DX", hi, 4) + reg("AX", lo, 4)) + '<span class="' + (fits ? "" : "is-on") + '">CF = OF = ' + (fits ? 0 : 1) + "</span></div>";
-        msg = fits ? "Sonuç alt yarıya sığdı; üst yarı yalnızca " + (sg ? "işaret uzantısı" : "sıfır") + "." : "Sonuç üst yarıya taştı → CF = OF = 1.";
+        msg = fits ? tx("Sonuç alt yarıya sığdı; üst yarı yalnızca " + (sg ? "işaret uzantısı" : "sıfır") + ".", "The result fits in the lower half; the upper half is just " + (sg ? "sign extension" : "zero") + ".") : tx("Sonuç üst yarıya taştı → CF = OF = 1.", "The result spills into the upper half → CF = OF = 1.");
       } else {
-        if (bv === 0) { out.innerHTML = '<div class="m06-bits"><b>Bölme hatası → INT 0</b></div>'; status.innerHTML = "Sıfıra bölme."; return; }
+        if (bv === 0) { out.innerHTML = '<div class="m06-bits"><b>' + tx("Bölme hatası", "Divide error") + ' → INT 0</b></div>'; status.innerHTML = tx("Sıfıra bölme.", "Division by zero."); return; }
         var qt = Math.trunc(av / bv), rm = av - qt * bv;
         var ok = sg ? (qt >= -bMax / 2 && qt < bMax / 2) : qt < bMax;
-        html = '<div class="m06-bits">' + sd(av) + " / " + sd(bv) + " → bölüm <b>" + sd(qt) + "</b>, kalan <b>" + sd(rm) + "</b></div>";
-        if (!ok) { out.innerHTML = html + '<div class="m06-bits"><b>Bölme hatası → INT 0</b></div>'; status.innerHTML = "Bölüm " + (n === 8 ? "AL'ye" : "AX'e") + " sığmıyor."; return; }
+        html = '<div class="m06-bits">' + sd(av) + " / " + sd(bv) + tx(" → bölüm <b>", " → quotient <b>") + sd(qt) + tx("</b>, kalan <b>", "</b>, remainder <b>") + sd(rm) + "</b></div>";
+        if (!ok) { out.innerHTML = html + '<div class="m06-bits"><b>' + tx("Bölme hatası", "Divide error") + ' → INT 0</b></div>'; status.innerHTML = tx("Bölüm " + (n === 8 ? "AL'ye" : "AX'e") + " sığmıyor.", "The quotient does not fit in " + (n === 8 ? "AL" : "AX") + "."); return; }
         var qu = ((qt % bMax) + bMax) % bMax, ru = ((rm % bMax) + bMax) % bMax, w = n / 4;
-        html += '<div class="m06-chips">' + reg(n === 8 ? "AL" : "AX", qu, w) + reg(n === 8 ? "AH" : "DX", ru, w) + "<span>bayraklar tanımsız</span></div>";
-        msg = sg ? "IDIV sıfıra doğru keser; kalan bölünenle aynı işaretli." : "Bölüm " + (n === 8 ? "AL" : "AX") + ", kalan " + (n === 8 ? "AH" : "DX") + ".";
+        html += '<div class="m06-chips">' + reg(n === 8 ? "AL" : "AX", qu, w) + reg(n === 8 ? "AH" : "DX", ru, w) + "<span>" + tx("bayraklar tanımsız", "flags undefined") + "</span></div>";
+        msg = sg ? tx("IDIV sıfıra doğru keser; kalan bölünenle aynı işaretli.", "IDIV truncates toward zero; the remainder has the sign of the dividend.") : tx("Bölüm " + (n === 8 ? "AL" : "AX") + ", kalan " + (n === 8 ? "AH" : "DX") + ".", "Quotient in " + (n === 8 ? "AL" : "AX") + ", remainder in " + (n === 8 ? "AH" : "DX") + ".");
       }
       out.innerHTML = html;
       status.innerHTML = msg;
@@ -118,6 +120,8 @@
 
 /* kaydırma / döndürme gezgini (Komut Kümesi sunumundan taşındı) */
 (function () {
+  const EN = String(document.getElementById("ds-deck").getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   function hex2(v) { return ("0" + (v & 0xFF).toString(16).toUpperCase()).slice(-2) + "h"; }
   function bin8(v) { return ("0000000" + (v & 0xFF).toString(2)).slice(-8); }
   function signed8(v) { v &= 0xFF; return v > 127 ? v - 256 : v; }
@@ -143,32 +147,32 @@
     var v = parseHex(inV.value) || 0, cf = 0;
 
     function render(prev, hot) {
-      out.innerHTML = (prev !== null ? bitsRow("önce", prev, hex2(prev)) : "") +
+      out.innerHTML = (prev !== null ? bitsRow(tx("önce", "before"), prev, hex2(prev)) : "") +
         bitsRow("AL", v, hex2(v) + " = " + v + " / " + sd(signed8(v)), hot) +
         "<div class=\"m10-chips\"><span class=\"" + (cf ? "on" : "") + "\">CF = " + cf + "</span></div>";
     }
     inV.addEventListener("input", function () {
       var x = parseHex(inV.value);
-      if (x === null) { status.innerHTML = "Geçerli değer: 00–FF arası onaltılık sayı."; return; }
-      v = x; render(null); status.innerHTML = "AL = <b>" + hex2(v) + "</b>. Bir komut düğmesi seçilince sonuç burada görünür.";
+      if (x === null) { status.innerHTML = tx("Geçerli değer: 00–FF arası onaltılık sayı.", "Valid value: a hex number 00–FF."); return; }
+      v = x; render(null); status.innerHTML = "AL = <b>" + hex2(v) + "</b>. " + tx("Bir komut düğmesi seçilince sonuç burada görünür.", "Pick an instruction button to see the result here.");
     });
     demo.addEventListener("click", function (e) {
       var b = e.target.closest("button[data-op]");
       if (!b) return;
       var o = b.dataset.op, prev = v, msb = (v >> 7) & 1, lsb = v & 1, hot = [0, 0, 0, 0, 0, 0, 0, 0], msg;
-      if (o === "cf") { cf ^= 1; render(null); status.innerHTML = "CF = <b>" + cf + "</b> (RCL/RCR bu biti içeri alır)."; return; }
-      if (o === "shl") { cf = msb; v = (v << 1) & 255; hot[7] = 1; msg = "Sola kaydırıldı, sağdan 0 girdi; çıkan b7 = " + msb + " → CF. Değer ×2 (mod 256)."; }
-      if (o === "shr") { cf = lsb; v = v >> 1; hot[0] = 1; msg = "Sağa kaydırıldı, soldan 0 girdi; çıkan b0 = " + lsb + " → CF. İşaretsiz ÷2."; }
-      if (o === "sar") { cf = lsb; v = (v >> 1) | (v & 0x80); hot[0] = 1; msg = "Aritmetik sağa kaydırma: işaret biti (" + msb + ") korundu. İşaretli ÷2: " + sd(signed8(prev)) + " → " + sd(signed8(v)) + "."; }
-      if (o === "rol") { cf = msb; v = ((v << 1) | msb) & 255; hot[7] = 1; msg = "b7 = " + msb + " hem b0'a hem CF'ye gitti."; }
-      if (o === "ror") { cf = lsb; v = (v >> 1) | (lsb << 7); hot[0] = 1; msg = "b0 = " + lsb + " hem b7'ye hem CF'ye gitti."; }
-      if (o === "rcl") { var c1 = cf; cf = msb; v = ((v << 1) | c1) & 255; hot[7] = 1; msg = "Eski CF (" + c1 + ") b0'a girdi, b7 (" + msb + ") CF'ye çıktı."; }
-      if (o === "rcr") { var c2 = cf; cf = lsb; v = (v >> 1) | (c2 << 7); hot[0] = 1; msg = "Eski CF (" + c2 + ") b7'ye girdi, b0 (" + lsb + ") CF'ye çıktı."; }
+      if (o === "cf") { cf ^= 1; render(null); status.innerHTML = "CF = <b>" + cf + "</b> " + tx("(RCL/RCR bu biti içeri alır).", "(RCL/RCR shift this bit in)."); return; }
+      if (o === "shl") { cf = msb; v = (v << 1) & 255; hot[7] = 1; msg = tx("Sola kaydırıldı, sağdan 0 girdi; çıkan b7 = " + msb + " → CF. Değer ×2 (mod 256).", "Shifted left, 0 entered on the right; b7 = " + msb + " went out → CF. Value ×2 (mod 256)."); }
+      if (o === "shr") { cf = lsb; v = v >> 1; hot[0] = 1; msg = tx("Sağa kaydırıldı, soldan 0 girdi; çıkan b0 = " + lsb + " → CF. İşaretsiz ÷2.", "Shifted right, 0 entered on the left; b0 = " + lsb + " went out → CF. Unsigned ÷2."); }
+      if (o === "sar") { cf = lsb; v = (v >> 1) | (v & 0x80); hot[0] = 1; msg = tx("Aritmetik sağa kaydırma: işaret biti (" + msb + ") korundu. İşaretli ÷2: ", "Arithmetic shift right: the sign bit (" + msb + ") is kept. Signed ÷2: ") + sd(signed8(prev)) + " → " + sd(signed8(v)) + "."; }
+      if (o === "rol") { cf = msb; v = ((v << 1) | msb) & 255; hot[7] = 1; msg = "b7 = " + msb + tx(" hem b0'a hem CF'ye gitti.", " went to both b0 and CF."); }
+      if (o === "ror") { cf = lsb; v = (v >> 1) | (lsb << 7); hot[0] = 1; msg = "b0 = " + lsb + tx(" hem b7'ye hem CF'ye gitti.", " went to both b7 and CF."); }
+      if (o === "rcl") { var c1 = cf; cf = msb; v = ((v << 1) | c1) & 255; hot[7] = 1; msg = tx("Eski CF (" + c1 + ") b0'a girdi, b7 (" + msb + ") CF'ye çıktı.", "Old CF (" + c1 + ") entered b0, b7 (" + msb + ") went out to CF."); }
+      if (o === "rcr") { var c2 = cf; cf = lsb; v = (v >> 1) | (c2 << 7); hot[0] = 1; msg = tx("Eski CF (" + c2 + ") b7'ye girdi, b0 (" + lsb + ") CF'ye çıktı.", "Old CF (" + c2 + ") entered b7, b0 (" + lsb + ") went out to CF."); }
       inV.value = hex2(v).slice(0, 2);
       render(prev, hot);
       status.innerHTML = "<b>" + o.toUpperCase() + " AL, 1</b>: " + msg;
     });
     render(null);
-    status.innerHTML = "AL = <b>" + hex2(v) + "</b>. Bir komut düğmesi seçilince sonuç burada görünür.";
+    status.innerHTML = "AL = <b>" + hex2(v) + "</b>. " + tx("Bir komut düğmesi seçilince sonuç burada görünür.", "Pick an instruction button to see the result here.");
   });
 })();

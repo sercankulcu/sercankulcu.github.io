@@ -1,5 +1,8 @@
 /* Bölüm 4.2: Sarmalama - setter koruması deneme alanı */
 (function () {
+  var EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
+  var AD = { saat: tx("saat", "hour"), dakika: tx("dakika", "minute"), saniye: tx("saniye", "second") };
   document.querySelectorAll('.ds-deck [data-demo="j042-saat"]').forEach(function (demo) {
     var LIMIT = { saat: 24, dakika: 60, saniye: 60 };
     var BAS = { saat: 9, dakika: 5, saniye: 30 };
@@ -39,28 +42,28 @@
     }
     function setter() {
       var a = alan.value, v = oku();
-      code.innerHTML = 's.set' + buyuk(a) + '(' + v + ');';
+      code.innerHTML = 's.set' + buyuk(AD[a]) + '(' + v + ');';
       if (gecerli(a, v)) {
         deger[a] = v;
         ciz(a);
-        status.innerHTML = "Koşul <b>doğru</b> (0 ≤ " + trSayi(v) + " &lt; " + LIMIT[a] + "): setter değeri atadı.";
+        status.innerHTML = tx("Koşul <b>doğru</b> (0 ≤ ", "Condition <b>true</b> (0 ≤ ") + trSayi(v) + " &lt; " + LIMIT[a] + tx("): setter değeri atadı.", "): the setter assigned the value.");
       } else {
         ciz(null);
-        status.innerHTML = "Koşul <b>yanlış</b>: setter " + trSayi(v) + " değerini <b>reddetti</b>, nesne geçerli kaldı.";
+        status.innerHTML = tx("Koşul <b>yanlış</b>: setter " + trSayi(v) + " değerini <b>reddetti</b>, nesne geçerli kaldı.", "Condition <b>false</b>: the setter <b>rejected</b> " + trSayi(v) + "; the object stays valid.");
       }
     }
     function dogrudan() {
       var a = alan.value, v = oku();
-      code.innerHTML = 's.' + a + ' = ' + v + ';   <span class="cm">/* alan public olsaydı */</span>';
+      code.innerHTML = 's.' + AD[a] + ' = ' + v + ';   <span class="cm">/* ' + tx("alan public olsaydı", "if field were public") + ' */</span>';
       deger[a] = v;
       var bozuk = ciz(a);
-      status.innerHTML = bozuk ? "Hiçbir kontrol yok: nesne artık <b>geçersiz</b> bir durumda!" : "Değer bu kez geçerli, ama bunu kontrol eden <b>kimse yoktu</b>.";
+      status.innerHTML = bozuk ? tx("Hiçbir kontrol yok: nesne artık <b>geçersiz</b> bir durumda!", "No check at all: the object is now in an <b>invalid</b> state!") : tx("Değer bu kez geçerli, ama bunu kontrol eden <b>kimse yoktu</b>.", "The value happens to be valid, but <b>nobody</b> checked it.");
     }
     function sifirla() {
       Object.keys(BAS).forEach(function (a) { deger[a] = BAS[a]; });
-      code.innerHTML = "s.setSaat(9); s.setDakika(5); s.setSaniye(30);";
+      code.innerHTML = tx("s.setSaat(9); s.setDakika(5); s.setSaniye(30);", "s.setHour(9); s.setMinute(5); s.setSecond(30);");
       ciz(null);
-      status.innerHTML = "Bir alan ve değer seçip iki yolu karşılaştırın.";
+      status.innerHTML = tx("Bir alan ve değer seçip iki yolu karşılaştırın.", "Pick a field and a value, then compare the two paths.");
     }
     demo.querySelector('[data-op="set"]').addEventListener("click", setter);
     demo.querySelector('[data-op="direct"]').addEventListener("click", dogrudan);

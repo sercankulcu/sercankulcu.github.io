@@ -1,5 +1,7 @@
 /* Bölüm 8 Makrolar: makro genişletici (metin değiştirme + boyut karşılaştırması) */
 document.querySelectorAll('.ds-deck [data-demo="m08-macro"]').forEach(function (demo) {
+  const EN = String(document.getElementById("ds-deck").getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   var sel = demo.querySelector('[data-k="macro"]');
   var a = [demo.querySelector('[data-k="a1"]'), demo.querySelector('[data-k="a2"]'), demo.querySelector('[data-k="a3"]')];
   var nIn = demo.querySelector('[data-k="n"]');
@@ -40,11 +42,11 @@ document.querySelectorAll('.ds-deck [data-demo="m08-macro"]').forEach(function (
     a.forEach(function (inp, i) { inp.disabled = i >= m.params.length; if (inp.disabled) inp.value = ""; });
     var args = m.params.map(function (p, i) { return a[i].value.trim(); });
     var n = Math.max(1, Math.min(200, parseInt(nIn.value, 10) || 1));
-    if (args.some(function (x) { return !x; })) { status.innerHTML = "Tüm parametreleri doldurun."; return; }
-    callOut.innerHTML = esc(m.name + " " + args.join(", ")) + (n > 1 ? "\n<span class=\"cm\">; … toplam " + n + " kez</span>" : "");
+    if (args.some(function (x) { return !x; })) { status.innerHTML = tx("Tüm parametreleri doldurun.", "Fill in all the parameters."); return; }
+    callOut.innerHTML = esc(m.name + " " + args.join(", ")) + (n > 1 ? "\n<span class=\"cm\">; … " + tx("toplam " + n + " kez", n + " times in all") + "</span>" : "");
     var shown = Math.min(n, 2), out = [];
     for (var k = 0; k < shown; k++) {
-      if (n > 1) out.push('<span class="cm">; ' + (k + 1) + '. kopya</span>');
+      if (n > 1) out.push('<span class="cm">; ' + tx((k + 1) + '. kopya', 'copy ' + (k + 1)) + '</span>');
       m.body.forEach(function (line) {
         var s = esc(line);
         m.params.forEach(function (p, i) {
@@ -55,13 +57,14 @@ document.querySelectorAll('.ds-deck [data-demo="m08-macro"]').forEach(function (
         out.push(s);
       });
     }
-    if (n > 2) out.push('<span class="cm">; … ' + (n - 2) + " kopya daha</span>");
+    if (n > 2) out.push('<span class="cm">; … ' + tx((n - 2) + " kopya daha", (n - 2) + " more copies") + "</span>");
     expOut.innerHTML = out.join("\n");
     var one = sizeOf(m, args), proc = one + 1;
-    var msg = "Bir kopya ≈ <b>" + one + " bayt</b>. " + n + " kullanım: makro ≈ <b>" + (one * n) + "</b> bayt, prosedür ≈ " + proc + " + " + n + " × 3 = <b>" + (proc + 3 * n) + "</b> bayt.";
-    if (sel.value === "power" && n > 1) msg += " LOCAL olmasaydı <i>powerloop</i> etiketi tekrar ederdi; burada benzersiz adlar (??0000, ??0001) gösteriliyor.";
+    var msg = tx("Bir kopya ≈ <b>" + one + " bayt</b>. " + n + " kullanım: makro ≈ <b>" + (one * n) + "</b> bayt, prosedür ≈ " + proc + " + " + n + " × 3 = <b>" + (proc + 3 * n) + "</b> bayt.",
+      "One copy ≈ <b>" + one + " bytes</b>. " + n + " uses: macro ≈ <b>" + (one * n) + "</b> bytes, procedure ≈ " + proc + " + " + n + " × 3 = <b>" + (proc + 3 * n) + "</b> bytes.");
+    if (sel.value === "power" && n > 1) msg += tx(" LOCAL olmasaydı <i>powerloop</i> etiketi tekrar ederdi; burada benzersiz adlar (??0000, ??0001) gösteriliyor.", " Without LOCAL the <i>powerloop</i> label would repeat; unique names (??0000, ??0001) are shown here.");
     if (sel.value === "my" && args.some(function (x, i) { return i > 0 && /^(AX|BX)$/i.test(x) && ["AX", "BX"].indexOf(x.toUpperCase()) < i; }))
-      msg += " Önceki satırda değişen bir yazmaç parametre olarak verildi; eski değeri okunmaz.";
+      msg += tx(" Önceki satırda değişen bir yazmaç parametre olarak verildi; eski değeri okunmaz.", " A register changed on an earlier line was passed as a parameter; its old value is not read.");
     status.innerHTML = msg;
   }
 

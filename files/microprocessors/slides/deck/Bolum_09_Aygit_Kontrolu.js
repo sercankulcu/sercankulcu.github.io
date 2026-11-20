@@ -1,5 +1,7 @@
 /* Bölüm 9 Aygıt Kontrolü: trafik lambası bit düzenleyici, termostat simülatörü ve 8255 kontrol sözcüğü oluşturucu */
 (function () {
+  const EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   var NS = "http://www.w3.org/2000/svg";
   function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function hex4(v) { return ("0000" + (v & 0xFFFF).toString(16).toUpperCase()).slice(-4) + "h"; }
@@ -10,8 +12,8 @@
 
   /* ---------- traffic lights (port 4) ---------- */
   var POS = [[232, 150], [232, 14], [38, 14], [38, 150]];
-  var POLE = ["sağ alt", "sağ üst", "sol üst", "sol alt"];
-  var COLORS = ["kırmızı", "sarı", "yeşil"], CLS = ["lamp-r", "lamp-y", "lamp-g"];
+  var POLE = EN ? ["bottom right", "top right", "top left", "bottom left"] : ["sağ alt", "sağ üst", "sol üst", "sol alt"];
+  var COLORS = EN ? ["red", "amber", "green"] : ["kırmızı", "sarı", "yeşil"], CLS = ["lamp-r", "lamp-y", "lamp-g"];
   var PRESET = { all_red: 0x0249, situation: 0x030C, s1: 0x069A, s2: 0x0861, s4: 0x04D3, clear: 0 };
 
   function trafficSvg(w) {
@@ -27,7 +29,7 @@
         p.push('<text class="lbl mono" x="' + lx + '" y="' + (cy + 4) + '" text-anchor="' + (x < 150 ? "end" : "start") + '">' + bit.toString(16).toUpperCase() + "</text>");
       }
     });
-    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 300 236" role="img" aria-label="Kavşak, port 4 = ' + hex4(w) + '" style="max-width:300px;width:100%">' + p.join("") + "</svg>";
+    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 300 236" role="img" aria-label="' + tx("Kavşak", "Junction") + ', port 4 = ' + hex4(w) + '" style="max-width:300px;width:100%">' + p.join("") + "</svg>";
   }
 
   document.querySelectorAll('.ds-deck [data-demo="m09-traffic"]').forEach(function (demo) {
@@ -49,19 +51,19 @@
       svgBox.innerHTML = trafficSvg(w);
       for (var i = 0; i < 16; i++) {
         buttons[i].classList.toggle("is-on", ((w >> i) & 1) === 1);
-        buttons[i].setAttribute("aria-label", "bit " + i + ((w >> i) & 1 ? " açık" : " kapalı"));
+        buttons[i].setAttribute("aria-label", "bit " + i + ((w >> i) & 1 ? tx(" açık", " on") : tx(" kapalı", " off")));
       }
       code.textContent = "mov ax, " + bin16(w) + "b   ; " + hex4(w) + "\nout 4, ax";
       var parts = [], warn = [];
       for (var g = 0; g < 4; g++) {
         var on = [];
         for (var k = 0; k < 3; k++) if ((w >> (3 * g + k)) & 1) on.push(COLORS[k]);
-        parts.push(POLE[g] + ": <b>" + (on.length ? on.join(" + ") : "sönük") + "</b>");
-        if (((w >> (3 * g)) & 1) && ((w >> (3 * g + 2)) & 1)) warn.push(POLE[g] + " direğinde kırmızı ve yeşil birlikte");
+        parts.push(POLE[g] + ": <b>" + (on.length ? on.join(" + ") : tx("sönük", "off")) + "</b>");
+        if (((w >> (3 * g)) & 1) && ((w >> (3 * g + 2)) & 1)) warn.push(POLE[g] + tx(" direğinde kırmızı ve yeşil birlikte", " pole: red and green together"));
       }
       var g0 = (w >> 2) & 1 || (w >> 8) & 1, g1 = (w >> 5) & 1 || (w >> 11) & 1;
-      if (g0 && g1) warn.push("iki kesişen yön aynı anda yeşil: kaza riski!");
-      status.innerHTML = parts.join(" · ") + (warn.length ? '<br><b style="color:var(--ds-bad)">Uyarı:</b> ' + warn.join("; ") + "." : "");
+      if (g0 && g1) warn.push(tx("iki kesişen yön aynı anda yeşil: kaza riski!", "two crossing directions green at once: crash risk!"));
+      status.innerHTML = parts.join(" · ") + (warn.length ? '<br><b style="color:var(--ds-bad)">' + tx("Uyarı:", "Warning:") + '</b> ' + warn.join("; ") + "." : "");
     }
     demo.addEventListener("click", function (e) {
       var p = e.target.closest("[data-set]");
@@ -89,9 +91,9 @@
       p.push('<path class="line" d="M30 ' + y.toFixed(0) + ' H76" style="stroke:var(--ds-good);stroke-dasharray:4 3"/>');
     });
     p.push('<text class="txt" x="130" y="60">port 125: <tspan class="mono">' + sd(t) + " °C</tspan></text>");
-    p.push('<rect x="130" y="100" width="120" height="40" rx="8" class="' + (heater ? "lamp-y" : "lamp-off") + '"/><text class="txt" x="190" y="126" text-anchor="middle">ısıtıcı ' + (heater ? "AÇIK" : "KAPALI") + "</text>");
+    p.push('<rect x="130" y="100" width="120" height="40" rx="8" class="' + (heater ? "lamp-y" : "lamp-off") + '"/><text class="txt" x="190" y="126" text-anchor="middle">' + tx("ısıtıcı ", "heater ") + (heater ? tx("AÇIK", "ON") : tx("KAPALI", "OFF")) + "</text>");
     p.push('<text class="lbl" x="130" y="160">port 127 = ' + heater + "</text>");
-    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 270 220" role="img" aria-label="Termometre ' + sd(t) + ' derece" style="max-width:280px;width:100%">' + p.join("") + "</svg>";
+    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 270 220" role="img" aria-label="' + tx("Termometre ", "Thermometer ") + sd(t) + tx(' derece', ' degrees') + '" style="max-width:280px;width:100%">' + p.join("") + "</svg>";
   }
 
   document.querySelectorAll('.ds-deck [data-demo="m09-thermo"]').forEach(function (demo) {
@@ -105,11 +107,11 @@
     /* one pass of the program loop; returns executed line indices */
     function step(t) {
       var ex = [0, 1];
-      if (t < 60) { ex.push(2, 6, 7, 8, 11); heater = 1; return [ex, "JL alındı: " + sd(t) + " &lt; 60 → ısıtıcı <b>açık</b>."]; }
+      if (t < 60) { ex.push(2, 6, 7, 8, 11); heater = 1; return [ex, tx("JL alındı: ", "JL taken: ") + sd(t) + tx(" &lt; 60 → ısıtıcı <b>açık</b>.", " &lt; 60 → heater <b>on</b>.")]; }
       ex.push(2, 3, 4);
-      if (t <= 80) { ex.push(11); return [ex, "60 ≤ " + t + " ≤ 80 → JLE alındı, ısıtıcıya dokunulmadı (" + (heater ? "açık" : "kapalı") + " kalır)."]; }
+      if (t <= 80) { ex.push(11); return [ex, "60 ≤ " + t + tx(" ≤ 80 → JLE alındı, ısıtıcıya dokunulmadı (", " ≤ 80 → JLE taken, heater left alone (stays ") + (heater ? tx("açık", "on") : tx("kapalı", "off")) + tx(" kalır).", ").")]; }
       ex.push(5, 9, 10, 11); heater = 0;
-      return [ex, "JG alındı: " + t + " &gt; 80 → ısıtıcı <b>kapalı</b>."];
+      return [ex, tx("JG alındı: ", "JG taken: ") + t + tx(" &gt; 80 → ısıtıcı <b>kapalı</b>.", " &gt; 80 → heater <b>off</b>.")];
     }
     function show(t) {
       var r = step(t);
@@ -117,14 +119,14 @@
       svgBox.innerHTML = thermoSvg(t, heater);
       tOut.textContent = sd(t);
       var b = t < 0 ? (t + 256) : t;
-      status.innerHTML = r[1] + "<br>AL = " + ("0" + b.toString(16).toUpperCase()).slice(-2) + "h" + (t < 0 ? " (işaretli: " + sd(t) + "; işaretsiz JB/JA kullanılsaydı " + b + " sanılırdı)" : "");
+      status.innerHTML = r[1] + "<br>AL = " + ("0" + b.toString(16).toUpperCase()).slice(-2) + "h" + (t < 0 ? tx(" (işaretli: ", " (signed: ") + sd(t) + tx("; işaretsiz JB/JA kullanılsaydı ", "; with unsigned JB/JA it would read as ") + b + tx(" sanılırdı)", ")") : "");
     }
-    function stop() { if (timer) { clearInterval(timer); timer = null; runBtn.textContent = "▶ zamanı akıt"; } }
+    function stop() { if (timer) { clearInterval(timer); timer = null; runBtn.textContent = tx("▶ zamanı akıt", "▶ run time"); } }
     slider.addEventListener("input", function () { stop(); show(parseInt(slider.value, 10)); });
     runBtn.addEventListener("click", function () {
       if (timer) { stop(); return; }
       ticks = 0;
-      runBtn.textContent = "❚❚ durdur";
+      runBtn.textContent = tx("❚❚ durdur", "❚❚ stop");
       timer = setInterval(function () {
         var t = parseInt(slider.value, 10) + (heater ? 2 : -2);
         t = Math.max(-40, Math.min(120, t));
@@ -139,11 +141,11 @@
   /* ---------- 8255 kontrol sözcüğü oluşturucu ---------- */
   var PPI = [
     { bit: 4, name: "Port A", pins: "PA7–PA0", addr: "310h", y: 46 },
-    { bit: 3, name: "Port C üst", pins: "PC7–PC4", addr: "312h", y: 100 },
+    { bit: 3, name: tx("Port C üst", "Port C upper"), pins: "PC7–PC4", addr: "312h", y: 100 },
     { bit: 1, name: "Port B", pins: "PB7–PB0", addr: "311h", y: 154 },
-    { bit: 0, name: "Port C alt", pins: "PC3–PC0", addr: "312h", y: 208 }
+    { bit: 0, name: tx("Port C alt", "Port C lower"), pins: "PC3–PC0", addr: "312h", y: 208 }
   ];
-  var CWNAME = ["PC alt", "PB", "B mod", "PC üst", "PA", "A mod", "A mod", "mod"];
+  var CWNAME = EN ? ["PC lo", "PB", "B mode", "PC hi", "PA", "A mode", "A mode", "mode"] : ["PC alt", "PB", "B mod", "PC üst", "PA", "A mod", "A mod", "mod"];
   function hex2(v) { return ("0" + (v & 0xFF).toString(16).toUpperCase()).slice(-2); }
   function bin8(v) { return ("0000000" + (v & 0xFF).toString(2)).slice(-8); }
 
@@ -157,9 +159,9 @@
       var d = input ? "M270 " + g.y + " H134" : "M132 " + g.y + " H268";
       p.push('<path class="line" d="' + d + '" marker-end="url(#m09p-ah)"' + (bsr ? ' style="opacity:.35"' : "") + "/>");
       p.push('<text class="lbl mono" x="200" y="' + (g.y - 7) + '" text-anchor="middle">' + g.pins + "</text>");
-      p.push('<text class="txt" x="200" y="' + (g.y + 20) + '" text-anchor="middle" style="font-size:13px">' + (bsr ? "—" : input ? "giriş" : "çıkış") + "</text>");
+      p.push('<text class="txt" x="200" y="' + (g.y + 20) + '" text-anchor="middle" style="font-size:13px">' + (bsr ? "—" : input ? tx("giriş", "input") : tx("çıkış", "output")) + "</text>");
     });
-    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 280 250" role="img" aria-label="8255 port yönleri, kontrol sözcüğü ' + hex2(cw) + 'h" style="max-width:290px;width:100%">' + p.join("") + "</svg>";
+    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 280 250" role="img" aria-label="' + tx("8255 port yönleri, kontrol sözcüğü ", "8255 port directions, control word ") + hex2(cw) + 'h" style="max-width:290px;width:100%">' + p.join("") + "</svg>";
   }
 
   document.querySelectorAll('.ds-deck [data-demo="m09-ppi"]').forEach(function (demo) {
@@ -188,19 +190,19 @@
       cwBox.innerHTML = html;
       var bsr = !(cw & 0x80);
       PPI.forEach(function (g, k) {
-        btns[k].textContent = bsr ? "—" : (cw >> g.bit) & 1 ? "giriş (1)" : "çıkış (0)";
+        btns[k].textContent = bsr ? "—" : (cw >> g.bit) & 1 ? tx("giriş (1)", "input (1)") : tx("çıkış (0)", "output (0)");
         btns[k].classList.toggle("is-on", !bsr && ((cw >> g.bit) & 1) === 1);
       });
-      var lines = ["mov dx, 313h   ; kontrol yazmacı", "mov al, " + hex2(cw) + "h    ; " + bin8(cw) + "b", "out dx, al"];
+      var lines = ["mov dx, 313h   ; " + tx("kontrol yazmacı", "control register"), "mov al, " + hex2(cw) + "h    ; " + bin8(cw) + "b", "out dx, al"];
       if (bsr) {
         var n = (cw >> 1) & 7, v = cw & 1;
-        status.innerHTML = "D7 = 0: <b>bit kur/sil</b> (BSR) sözcüğü. Port yönleri değişmez; yalnız <b>PC" + n + " ← " + v + "</b> olur." +
-          ((cw & 0x70) ? " (D6–D4 kullanılmaz.)" : "");
+        status.innerHTML = tx("D7 = 0: <b>bit kur/sil</b> (BSR) sözcüğü. Port yönleri değişmez; yalnız <b>PC", "D7 = 0: a <b>bit set/reset</b> (BSR) word. Port directions stay; only <b>PC") + n + " ← " + v + tx("</b> olur.", "</b> changes.") +
+          ((cw & 0x70) ? tx(" (D6–D4 kullanılmaz.)", " (D6–D4 are unused.)") : "");
         lines[1] = "mov al, " + hex2(cw) + "h    ; PC" + n + " = " + v;
       } else {
-        var parts = PPI.map(function (g) { return g.name + " <b>" + ((cw >> g.bit) & 1 ? "giriş" : "çıkış") + "</b>"; });
+        var parts = PPI.map(function (g) { return g.name + " <b>" + ((cw >> g.bit) & 1 ? tx("giriş", "input") : tx("çıkış", "output")) + "</b>"; });
         var ma = (cw >> 5) & 3, mb = (cw >> 2) & 1, warn = "";
-        if (ma || mb) warn = "<br>A grubu mod " + (ma > 1 ? 2 : ma) + ", B grubu mod " + mb + ": el sıkışmalı modlar; burada yalnız mod 0 yönleri gösterilir.";
+        if (ma || mb) warn = tx("<br>A grubu mod ", "<br>Group A mode ") + (ma > 1 ? 2 : ma) + tx(", B grubu mod ", ", group B mode ") + mb + tx(": el sıkışmalı modlar; burada yalnız mod 0 yönleri gösterilir.", ": handshake modes; only mode 0 directions are shown here.");
         status.innerHTML = parts.join(" · ") + warn;
         PPI.forEach(function (g) {
           if (g.bit === 0 && ((cw >> 3) & 1) === ((cw >> 0) & 1)) return;

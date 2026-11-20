@@ -1,5 +1,7 @@
 /* Bölüm 1.3: Algoritmalar - arama ve sıralama deneme alanları */
 (function () {
+  var EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   function rnd(n) { return Math.floor(Math.random() * n); }
   function draw(box, vals, kinds, marks) {
     box.innerHTML = "";
@@ -27,12 +29,12 @@
         dizi.sort(function (a, b) { return a - b; });
       }
       draw(box, dizi, {}, {});
-      status.innerHTML = "Sıralı bir dizi hazır. Bir sayı yazıp yöntem seçin.";
+      status.innerHTML = tx("Sıralı bir dizi hazır. Bir sayı yazıp yöntem seçin.", "A sorted array is ready. Enter a number and pick a method.");
     }
     function dur() { if (timer) { clearInterval(timer); timer = null; } }
     function hedef() {
       var h = parseInt(keyIn.value, 10);
-      if (!(h >= 0 && h <= 99)) { status.innerHTML = "0 ile 99 arasında bir tam sayı girin."; return null; }
+      if (!(h >= 0 && h <= 99)) { status.innerHTML = tx("0 ile 99 arasında bir tam sayı girin.", "Enter an integer from 0 to 99."); return null; }
       return h;
     }
     function dogrusal(h) {
@@ -42,18 +44,18 @@
         for (var j = 0; j < i; j++) k[j] = "bad";
         if (i >= N) {
           dur(); draw(box, dizi, k, {});
-          status.innerHTML = "Doğrusal arama: <b>" + h + " bulunamadı</b> (" + say + " karşılaştırma, sonuç −1).";
+          status.innerHTML = tx("Doğrusal arama: <b>" + h + " bulunamadı</b> (" + say + " karşılaştırma, sonuç −1).", "Linear search: <b>" + h + " not found</b> (" + say + " comparisons, result −1).");
           return;
         }
         say++;
         m[i] = "i";
         if (dizi[i] === h) {
           k[i] = "ok"; dur(); draw(box, dizi, k, m);
-          status.innerHTML = "Doğrusal arama: dizi[" + i + "] = " + h + " <b>bulundu</b> (" + say + " karşılaştırma).";
+          status.innerHTML = tx("Doğrusal arama: dizi[" + i + "] = " + h + " <b>bulundu</b> (" + say + " karşılaştırma).", "Linear search: arr[" + i + "] = " + h + " <b>found</b> (" + say + " comparisons).");
           return;
         }
         k[i] = "hot"; draw(box, dizi, k, m);
-        status.innerHTML = "Doğrusal: dizi[" + i + "] = " + dizi[i] + " ≠ " + h + " · " + say + " karşılaştırma";
+        status.innerHTML = tx("Doğrusal: dizi[", "Linear: arr[") + i + "] = " + dizi[i] + " ≠ " + h + " · " + say + tx(" karşılaştırma", " comparisons");
         i++;
       }, 450);
     }
@@ -63,29 +65,29 @@
         var k = {}, m = {};
         for (var j = 0; j < N; j++) if (j < alt || j > ust) k[j] = "off";
         if (orta >= 0 && !son) { k[orta] = faz === 2 ? "ok" : "hot"; }
-        if (alt <= ust) { m[alt] = "alt"; m[ust] = (m[ust] ? m[ust] + "," : "") + "üst"; }
-        if (orta >= 0 && !son) m[orta] = (m[orta] ? m[orta] + "," : "") + "orta";
+        if (alt <= ust) { m[alt] = tx("alt", "low"); m[ust] = (m[ust] ? m[ust] + "," : "") + tx("üst", "high"); }
+        if (orta >= 0 && !son) m[orta] = (m[orta] ? m[orta] + "," : "") + tx("orta", "mid");
         draw(box, dizi, k, m);
       }
       goster(false);
       timer = setInterval(function () {
         if (alt > ust) {
           dur(); goster(true);
-          status.innerHTML = "İkili arama: alan tükendi, <b>" + h + " bulunamadı</b> (" + say + " karşılaştırma, sonuç −1).";
+          status.innerHTML = tx("İkili arama: alan tükendi, <b>" + h + " bulunamadı</b> (" + say + " karşılaştırma, sonuç −1).", "Binary search: range empty, <b>" + h + " not found</b> (" + say + " comparisons, result −1).");
           return;
         }
         orta = Math.floor((alt + ust) / 2); say++;
         if (dizi[orta] === h) {
           faz = 2; dur(); goster(false);
-          status.innerHTML = "İkili arama: dizi[" + orta + "] = " + h + " <b>bulundu</b> (" + say + " karşılaştırma).";
+          status.innerHTML = tx("İkili arama: dizi[" + orta + "] = " + h + " <b>bulundu</b> (" + say + " karşılaştırma).", "Binary search: arr[" + orta + "] = " + h + " <b>found</b> (" + say + " comparisons).");
           return;
         }
         faz = 1; goster(false);
         if (h < dizi[orta]) {
-          status.innerHTML = "İkili: orta = " + orta + ", " + h + " &lt; " + dizi[orta] + " → sol yarı · " + say + " karşılaştırma";
+          status.innerHTML = tx("İkili: orta = ", "Binary: mid = ") + orta + ", " + h + " &lt; " + dizi[orta] + tx(" → sol yarı · ", " → left half · ") + say + tx(" karşılaştırma", " comparisons");
           ust = orta - 1;
         } else {
-          status.innerHTML = "İkili: orta = " + orta + ", " + h + " &gt; " + dizi[orta] + " → sağ yarı · " + say + " karşılaştırma";
+          status.innerHTML = tx("İkili: orta = ", "Binary: mid = ") + orta + ", " + h + " &gt; " + dizi[orta] + tx(" → sağ yarı · ", " → right half · ") + say + tx(" karşılaştırma", " comparisons");
           alt = orta + 1;
         }
       }, 900);
@@ -114,7 +116,7 @@
       dizi = bas.slice();
       st = { i: 0, j: modeSel.value === "sec" ? 1 : 0, enk: 0, tur: 0, degisti: false, kars: 0, takas: 0, bitti: false };
       goster({}, {});
-      status.innerHTML = (modeSel.value === "sec" ? "Seçimli sıralama" : "Kabarcık sıralaması") + " hazır. \"bir adım\" ile ilerleyin.";
+      status.innerHTML = EN ? (modeSel.value === "sec" ? "Selection sort" : "Bubble sort") + " ready. Advance with \"one step\"." : (modeSel.value === "sec" ? "Seçimli sıralama" : "Kabarcık sıralaması") + " hazır. \"bir adım\" ile ilerleyin.";
     }
     function yerinde() {
       var k = {};
@@ -124,42 +126,42 @@
       return k;
     }
     function goster(k, m) { draw(box, dizi, k, m); }
-    function sayac() { return " · " + st.kars + " karşılaştırma, " + st.takas + " takas"; }
+    function sayac() { return " · " + st.kars + tx(" karşılaştırma, ", " comparisons, ") + st.takas + tx(" takas", " swaps"); }
     function adimSec() {
-      if (st.i >= N - 1) { st.bitti = true; goster(yerinde(), {}); status.innerHTML = "Dizi sıralandı" + sayac() + "."; return false; }
+      if (st.i >= N - 1) { st.bitti = true; goster(yerinde(), {}); status.innerHTML = tx("Dizi sıralandı", "Array sorted") + sayac() + "."; return false; }
       var k = yerinde(), m = {}, msg;
       if (st.j < N) {
         st.kars++;
         var yeni = dizi[st.j] < dizi[st.enk];
-        msg = "dizi[" + st.j + "] = " + dizi[st.j] + (yeni ? " &lt; " : " ≥ ") + dizi[st.enk] + (yeni ? " → yeni en küçük" : "");
+        msg = tx("dizi[", "arr[") + st.j + "] = " + dizi[st.j] + (yeni ? " &lt; " : " ≥ ") + dizi[st.enk] + (yeni ? tx(" → yeni en küçük", " → new minimum") : "");
         if (yeni) st.enk = st.j;
-        k[st.j] = "hot"; k[st.enk] = "hot"; m[st.i] = "i"; m[st.enk] = (m[st.enk] ? m[st.enk] + "," : "") + "enK"; m[st.j] = (m[st.j] ? m[st.j] + "," : "") + "j";
+        k[st.j] = "hot"; k[st.enk] = "hot"; m[st.i] = "i"; m[st.enk] = (m[st.enk] ? m[st.enk] + "," : "") + tx("enK", "min"); m[st.j] = (m[st.j] ? m[st.j] + "," : "") + "j";
         st.j++;
       } else {
         var g = dizi[st.i]; dizi[st.i] = dizi[st.enk]; dizi[st.enk] = g;
         if (st.enk !== st.i) st.takas++;
-        msg = (st.i + 1) + ". adım bitti: en küçük " + dizi[st.i] + ", dizi[" + st.i + "] konumuna yerleşti";
+        msg = EN ? "Step " + (st.i + 1) + " done: minimum " + dizi[st.i] + " placed at arr[" + st.i + "]" : (st.i + 1) + ". adım bitti: en küçük " + dizi[st.i] + ", dizi[" + st.i + "] konumuna yerleşti";
         st.i++; st.enk = st.i; st.j = st.i + 1;
         k = yerinde();
-        if (st.i >= N - 1) { st.bitti = true; k = yerinde(); msg += "; dizi sıralı"; }
+        if (st.i >= N - 1) { st.bitti = true; k = yerinde(); msg += tx("; dizi sıralı", "; array sorted"); }
       }
       goster(k, m);
       status.innerHTML = msg + sayac();
       return !st.bitti;
     }
     function adimKab() {
-      if (st.bitti) { goster(yerinde(), {}); status.innerHTML = "Dizi sıralandı" + sayac() + "."; return false; }
+      if (st.bitti) { goster(yerinde(), {}); status.innerHTML = tx("Dizi sıralandı", "Array sorted") + sayac() + "."; return false; }
       var son = N - 1 - st.tur, k, m = {}, msg;
       if (st.j < son) {
         var j = st.j, takas = dizi[j] > dizi[j + 1];
         st.kars++;
         if (takas) { var g = dizi[j]; dizi[j] = dizi[j + 1]; dizi[j + 1] = g; st.takas++; st.degisti = true; }
         k = yerinde(); k[j] = "hot"; k[j + 1] = "hot"; m[j] = "j"; m[j + 1] = "j+1";
-        msg = (st.tur + 1) + ". tur: " + (takas ? "yer değiştirdi" : "değişiklik yok");
+        msg = EN ? "Pass " + (st.tur + 1) + ": " + (takas ? "swapped" : "no change") : (st.tur + 1) + ". tur: " + (takas ? "yer değiştirdi" : "değişiklik yok");
         st.j++;
       } else {
-        msg = (st.tur + 1) + ". tur bitti";
-        if (!st.degisti) { st.bitti = true; msg += ": hiç takas yok, dizi sıralı"; }
+        msg = EN ? "Pass " + (st.tur + 1) + " done" : (st.tur + 1) + ". tur bitti";
+        if (!st.degisti) { st.bitti = true; msg += tx(": hiç takas yok, dizi sıralı", ": no swaps, array sorted"); }
         st.tur++; st.j = 0; st.degisti = false;
         if (st.tur >= N - 1) st.bitti = true;
         k = yerinde();

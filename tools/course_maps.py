@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Ders haritalari; course_map.py bu tanimlardan files/<ders>/ders_haritasi.html uretir.
+"""Ders haritalari; course_map.py bu tanimlardan files/<ders>/Ders_Haritasi.html uretir.
 
 rows   : satir satir bolum numaralari (ustten alta). Bir satirda en cok 5 dugum.
 cols   : istege bagli, {satir: [sutun, ...]} ile dugumleri belirli sutunlara koyar.

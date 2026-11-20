@@ -2,7 +2,7 @@
 """Turkce "ders notu" kalibindaki dersler icin ortak kitap tanimi (AGT, Veri Yapilari).
 
 Bu derslerin notlari ayni kalipta: files/<ders>/notlar/Bolum_NN_*_Ders_Notu.html,
-ortak notlar.css, terim sozlugu files/<ders>/sozluk.html, ders sayfasinda
+ortak notlar.css, terim sozlugu files/<ders>/Sozluk.html, ders sayfasinda
 "## Kısım I: ..." / "### Bölüm N: ..." duzeni. Ders modulu yalnizca farklari verir:
 
     import notes_book
@@ -252,7 +252,7 @@ def parts_sentence(parts, lang='tr'):
 class _Course:
     def __init__(self, folder, course_page, title, subtitle, output, meta, preface,
                  colophon, extra_css=(), scripts=(), code_note=None, intro=(), lang='tr',
-                 glossary='sozluk.html'):
+                 glossary='Sozluk.html'):
         self.lang = lang
         self.T = TEXT[lang]
         self.gloss_file = glossary          # terim sozlugu: files/<ders>/<glossary>

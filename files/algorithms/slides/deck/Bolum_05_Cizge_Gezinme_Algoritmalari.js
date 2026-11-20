@@ -1,5 +1,7 @@
 /* Bölüm 5: BFS / DFS deneme alanı (adım adım gezinme) */
 (function () {
+  const EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   document.querySelectorAll('.ds-deck [data-demo="a041-gez"]').forEach(function (demo) {
     var view = demo.querySelector(".a041-lab__view");
     var status = demo.querySelector(".a041-lab__status");
@@ -21,13 +23,13 @@
       var s = +sel.value;
       st = { kind: kind, seen: {}, done: {}, order: [], box: [s], cur: -1, tree: {}, msg: "" };
       if (kind === "bfs") st.seen[s] = true;
-      st.msg = (kind === "bfs" ? "BFS: " : "DFS: ") + NAMES[s] + (kind === "bfs" ? " işaretlendi ve kuyruğa kondu." : " yığına itildi.");
+      st.msg = (kind === "bfs" ? "BFS: " : "DFS: ") + NAMES[s] + (kind === "bfs" ? tx(" işaretlendi ve kuyruğa kondu.", " marked and enqueued.") : tx(" yığına itildi.", " pushed onto the stack."));
       render();
     }
 
     function step() {
       if (!st) { start("bfs"); return false; }
-      if (!st.box.length) { st.cur = -1; st.msg = "Bitti. Sıra: " + st.order.map(function (i) { return NAMES[i]; }).join(" "); render(); return false; }
+      if (!st.box.length) { st.cur = -1; st.msg = tx("Bitti. Sıra: ", "Done. Order: ") + st.order.map(function (i) { return NAMES[i]; }).join(" "); render(); return false; }
       var v, nw = [];
       if (st.kind === "bfs") {
         v = st.box.shift();
@@ -35,10 +37,10 @@
           if (!st.seen[w]) { st.seen[w] = true; st.box.push(w); st.tree[v + "-" + w] = true; nw.push(NAMES[w]); }
         });
         st.order.push(v); st.done[v] = true; st.cur = v;
-        st.msg = "Kuyruktan " + NAMES[v] + " alındı" + (nw.length ? "; " + nw.join(", ") + " kuyruğa eklendi." : "; yeni komşu yok.");
+        st.msg = tx("Kuyruktan " + NAMES[v] + " alındı", "Dequeued " + NAMES[v]) + (nw.length ? "; " + nw.join(", ") + tx(" kuyruğa eklendi.", " enqueued.") : tx("; yeni komşu yok.", "; no new neighbors."));
       } else {
         v = st.box.pop();
-        if (st.done[v]) { st.cur = v; st.msg = NAMES[v] + " çekildi ama zaten ziyaret edilmiş: atlandı."; render(); return true; }
+        if (st.done[v]) { st.cur = v; st.msg = NAMES[v] + tx(" çekildi ama zaten ziyaret edilmiş: atlandı.", " popped but already visited: skipped."); render(); return true; }
         st.done[v] = true; st.order.push(v); st.cur = v;
         if (st.from && st.from[v] !== undefined) st.tree[st.from[v] + "-" + v] = true;
         st.from = st.from || {};
@@ -46,7 +48,7 @@
         rev.forEach(function (w) {
           if (!st.done[w]) { st.box.push(w); st.seen[w] = true; st.from[w] = v; nw.push(NAMES[w]); }
         });
-        st.msg = NAMES[v] + " ziyaret edildi" + (nw.length ? "; " + nw.reverse().join(", ") + " yığına itildi (ters sırada)." : "; itilecek komşu yok.");
+        st.msg = NAMES[v] + tx(" ziyaret edildi", " visited") + (nw.length ? "; " + nw.reverse().join(", ") + tx(" yığına itildi (ters sırada).", " pushed (in reverse order).") : tx("; itilecek komşu yok.", "; no neighbors to push."));
       }
       render();
       return true;
@@ -69,11 +71,11 @@
         out.push('<circle class="' + cls + '" cx="' + POS[i][0] + '" cy="' + POS[i][1] + '" r="17"/>');
         out.push('<text class="txt" x="' + POS[i][0] + '" y="' + POS[i][1] + '" text-anchor="middle" dominant-baseline="central">' + n + "</text>");
       });
-      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 425 240" role="img" aria-label="Sekiz düğümlü yönsüz çizge">' + out.join("") + "</svg>";
-      if (!st) { status.innerHTML = "Bir başlangıç düğümü seçip <b>BFS</b> ya da <b>DFS</b>'e basın, sonra <b>adım</b> ile ilerleyin."; return; }
-      var boxName = st.kind === "bfs" ? "Kuyruk (ön → arka)" : "Yığın (alt → üst)";
+      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 425 240" role="img" aria-label="' + tx("Sekiz düğümlü yönsüz çizge", "Undirected graph with eight vertices") + '">' + out.join("") + "</svg>";
+      if (!st) { status.innerHTML = tx("Bir başlangıç düğümü seçip <b>BFS</b> ya da <b>DFS</b>'e basın, sonra <b>adım</b> ile ilerleyin.", "Pick a start vertex, press <b>BFS</b> or <b>DFS</b>, then advance with <b>step</b>."); return; }
+      var boxName = st.kind === "bfs" ? tx("Kuyruk (ön → arka)", "Queue (front → back)") : tx("Yığın (alt → üst)", "Stack (bottom → top)");
       status.innerHTML = st.msg + "<br><b>" + boxName + ":</b> [" + st.box.map(function (i) { return NAMES[i]; }).join(", ") +
-        "] · <b>Sıra:</b> " + (st.order.map(function (i) { return NAMES[i]; }).join(" ") || "—");
+        "] · <b>" + tx("Sıra", "Order") + ":</b> " + (st.order.map(function (i) { return NAMES[i]; }).join(" ") || "—");
     }
 
     demo.addEventListener("click", function (ev) {

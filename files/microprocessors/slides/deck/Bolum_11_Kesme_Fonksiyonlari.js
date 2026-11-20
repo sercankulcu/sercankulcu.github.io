@@ -1,7 +1,12 @@
 /* Kesme Fonksiyonları demoları (öznitelik gezgini, klavye gezgini, piksel adresi gezgini) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  const EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   function hex(v, n) { var s = v.toString(16).toUpperCase(); while (s.length < n) s = "0" + s; return s + "h"; }
-  var NAMES = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
+  var NAMES_EN = ["black", "blue", "green", "cyan", "red", "magenta", "brown", "light gray",
+    "dark gray", "light blue", "light green", "light cyan", "light red", "light magenta", "yellow", "white"];
+  var NAMES = EN ? NAMES_EN : ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
     "koyu gri", "açık mavi", "açık yeşil", "açık camgöbeği", "açık kırmızı", "açık eflatun", "sarı", "beyaz"];
   var RGB = ["#000000", "#0000AA", "#00AA00", "#00AAAA", "#AA0000", "#AA00AA", "#AA5500", "#AAAAAA",
     "#555555", "#5555FF", "#55FF55", "#55FFFF", "#FF5555", "#FF55FF", "#FFFF55", "#FFFFFF"];
@@ -38,7 +43,7 @@
       big.innerHTML = "BL = <b>" + hex(a, 2) + "</b>";
       status.innerHTML = "<code>mov ah, 09h</code> · <code>mov al, " + (code < 128 && code > 32 ? "'" + esc + "'" : hex(code & 255, 2)) +
         "</code> · <code>mov bh, 0</code> · <code>mov bl, " + hex(a, 2) + "</code> · <code>mov cx, 3</code> · <code>int 10h</code>" +
-        (code > 127 ? " — bu karakter 7 bit ASCII dışında" : "");
+        (code > 127 ? tx(" — bu karakter 7 bit ASCII dışında", " — this character is outside 7-bit ASCII") : "");
     }
     [fg, bg, blink, ch].forEach(function (el) { el.addEventListener("input", update); el.addEventListener("change", update); });
     update();
@@ -67,23 +72,23 @@
     var oAl = demo.querySelector('[data-out="al"]');
     var oAx = demo.querySelector('[data-out="ax"]');
     var status = demo.querySelector(".ds-deck__status");
-    status.innerHTML = "Alan seçilip bir tuşa basılınca AH, AL ve AX gösterilir.";
+    status.innerHTML = tx("Alan seçilip bir tuşa basılınca AH, AL ve AX gösterilir.", "Click the field and press a key to see AH, AL and AX.");
     inp.addEventListener("keydown", function (e) {
       e.preventDefault();
       e.stopPropagation();
       if (MODS[e.code]) {
-        status.innerHTML = "<b>" + e.code + "</b> tek başına tampona tuş koymaz; durumu INT 16h/<b>02h</b> ile okunur.";
+        status.innerHTML = "<b>" + e.code + tx("</b> tek başına tampona tuş koymaz; durumu INT 16h/<b>02h</b> ile okunur.", "</b> alone puts no key in the buffer; its state is read with INT 16h/<b>02h</b>.");
         return;
       }
       var sc = SC[e.code];
-      if (sc === undefined) { status.innerHTML = "<b>" + e.code + "</b>: bu tuş tabloda yok."; return; }
+      if (sc === undefined) { status.innerHTML = "<b>" + e.code + tx("</b>: bu tuş tabloda yok.", "</b>: this key is not in the table."); return; }
       var al = 0, note = "";
       if (CTRLCODE[e.code] !== undefined) al = CTRLCODE[e.code];
       else if (e.key.length === 1) al = e.key.charCodeAt(0);
       if (e.ctrlKey && /^Key[A-Z]$/.test(e.code)) { al = e.code.charCodeAt(3) - 64; note = " · Ctrl+harf → AL = harf − 40h"; }
-      if (e.altKey) { al = 0; note = " · Alt+tuş → AL = 00h (genişletilmiş)"; }
-      if (al > 127) { note = " · ASCII dışı karakter (kod sayfasına bağlı); BIOS'ta farklı bir değer dönebilir"; al = al & 255; }
-      if (al === 0 && !note) note = " · ASCII karşılığı yok → AL = 00h, tuş AH'den tanınır";
+      if (e.altKey) { al = 0; note = tx(" · Alt+tuş → AL = 00h (genişletilmiş)", " · Alt+key → AL = 00h (extended)"); }
+      if (al > 127) { note = tx(" · ASCII dışı karakter (kod sayfasına bağlı); BIOS'ta farklı bir değer dönebilir", " · non-ASCII character (code-page dependent); the BIOS may return a different value"); al = al & 255; }
+      if (al === 0 && !note) note = tx(" · ASCII karşılığı yok → AL = 00h, tuş AH'den tanınır", " · no ASCII code → AL = 00h; the key is identified by AH");
       oAh.textContent = hex(sc, 2);
       oAl.textContent = hex(al, 2);
       oAx.textContent = hex((sc << 8) | al, 4);
@@ -114,7 +119,7 @@
     function show(x, y, extra) {
       var off = y * 320 + x;
       out.innerHTML = "(" + x + ", " + y + ") → " + y + " · 320 + " + x + " = <b>" + hex(off, 4) + "</b> · A000:" + hex(off, 4).slice(0, 4) +
-        " = fiziksel <b>" + hex(0xA0000 + off, 5) + "</b>";
+        tx(" = fiziksel <b>", " = physical <b>") + hex(0xA0000 + off, 5) + "</b>";
       status.innerHTML = extra || "";
     }
     function line(start, step, color, label) {
@@ -123,7 +128,7 @@
       function one() {
         plot(di, color);
         var x = di % 320, y = Math.floor(di / 320);
-        show(x, y, label + " · adım " + (n + 1) + "/200 · DI = <b>" + hex(di, 4) + "</b>");
+        show(x, y, label + tx(" · adım ", " · step ") + (n + 1) + "/200 · DI = <b>" + hex(di, 4) + "</b>");
         n++;
         di += step;
       }
@@ -140,21 +145,24 @@
       if (timer) { clearInterval(timer); timer = null; }
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(x, y, 1, 1);
-      show(x, y, "Renk 0Fh (beyaz). <code>mov es:[" + hex(y * 320 + x, 4) + "], al</code> ya da INT 10h/0Ch ile CX = " + x + ", DX = " + y + ".");
+      show(x, y, tx("Renk 0Fh (beyaz). <code>mov es:[", "Color 0Fh (white). <code>mov es:[") + hex(y * 320 + x, 4) + tx("], al</code> ya da INT 10h/0Ch ile CX = ", "], al</code>, or INT 10h/0Ch with CX = ") + x + ", DX = " + y + ".");
     });
     demo.addEventListener("click", function (e) {
       var b = e.target.closest("[data-act]");
       if (!b) return;
-      if (b.dataset.act === "diag") line(0, 0x141, "#FFFF55", "Sol üstten: <code>add di, 141h</code>");
-      else if (b.dataset.act === "anti") line(0x13F, 0x13F, "#55FFFF", "Sağ üstten: <code>add di, 13Fh</code>");
-      else { clear(); out.innerHTML = ""; status.innerHTML = "Ekran temizlendi (renk 0)."; }
+      if (b.dataset.act === "diag") line(0, 0x141, "#FFFF55", tx("Sol üstten: <code>add di, 141h</code>", "From top left: <code>add di, 141h</code>"));
+      else if (b.dataset.act === "anti") line(0x13F, 0x13F, "#55FFFF", tx("Sağ üstten: <code>add di, 13Fh</code>", "From top right: <code>add di, 13Fh</code>"));
+      else { clear(); out.innerHTML = ""; status.innerHTML = tx("Ekran temizlendi (renk 0).", "Screen cleared (color 0)."); }
     });
     clear();
-    show(100, 50, "Bir piksel seçilince ya da köşegen çizdirilince adres hesaplanır.");
+    show(100, 50, tx("Bir piksel seçilince ya da köşegen çizdirilince adres hesaplanır.", "Pick a pixel or draw a diagonal to compute the address."));
   });
 })();
 
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  const EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   function hex(n, w) { return n.toString(16).toUpperCase().padStart(w, "0"); }
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
@@ -176,8 +184,8 @@
       lines.push('<span class="kw">RET</span>');
       pre.innerHTML = lines.join("\n");
       scr.textContent = s.replace(/[^\x20-\x7e]/g, "") + "_";
-      status.innerHTML = bad ? "ASCII dışı " + bad + " karakter atlandı (ör. Türkçe harfler kod sayfasına bağlıdır)." :
-        "<b>" + (s.length * 2 + 2) + "</b> komut, " + s.length + " kesme çağrısı";
+      status.innerHTML = bad ? (EN ? bad + " non-ASCII character(s) skipped (e.g. Turkish letters depend on the code page)." : "ASCII dışı " + bad + " karakter atlandı (ör. Türkçe harfler kod sayfasına bağlıdır).") :
+        "<b>" + (s.length * 2 + 2) + "</b>" + (EN ? " instructions, " + s.length + " interrupt calls" : " komut, " + s.length + " kesme çağrısı");
     }
     input.addEventListener("input", render);
     render();

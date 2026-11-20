@@ -1,5 +1,8 @@
-/* Bölüm 8: Giriş Çıkış İşlemleri - karakter kodlama ve ByteBuffer deneme alanları */
+/* Bölüm 8: Giriş Çıkış İşlemleri - karakter kodlama ve ByteBuffer deneme alanları (TR/EN) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   function hex(n) { var s = n.toString(16).toUpperCase(); return s.length < 2 ? "0" + s : s; }
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
@@ -45,13 +48,13 @@
           cell(u8, false) + cell(u16, false) + "</tr>";
       });
       body.innerHTML = rows;
-      footCells[2].textContent = tA + " bayt";
-      footCells[3].textContent = tL + " bayt";
-      footCells[4].textContent = t8 + " bayt";
-      footCells[5].textContent = t16 + " bayt";
-      if (!chars.length) status.innerHTML = "Bir metin yazın.";
-      else if (kayip) status.innerHTML = "<b>" + kayip + "</b> karakter ASCII dışında: ASCII ile kaydedilirse <b>kaybolur</b>. UTF-8 hepsini korur.";
-      else status.innerHTML = "Tümü ASCII: ASCII, ISO-8859-9 ve UTF-8 <b>aynı baytları</b> üretir.";
+      footCells[2].textContent = tA + tx(" bayt", " bytes");
+      footCells[3].textContent = tL + tx(" bayt", " bytes");
+      footCells[4].textContent = t8 + tx(" bayt", " bytes");
+      footCells[5].textContent = t16 + tx(" bayt", " bytes");
+      if (!chars.length) status.innerHTML = tx("Bir metin yazın.", "Type some text.");
+      else if (kayip) status.innerHTML = "<b>" + kayip + "</b>" + tx(" karakter ASCII dışında: ASCII ile kaydedilirse <b>kaybolur</b>. UTF-8 hepsini korur.", " non-ASCII character(s): <b>lost</b> if saved as ASCII. UTF-8 keeps them all.");
+      else status.innerHTML = tx("Tümü ASCII: ASCII, ISO-8859-9 ve UTF-8 <b>aynı baytları</b> üretir.", "All ASCII: ASCII, ISO-8859-9 and UTF-8 produce <b>the same bytes</b>.");
     }
     input.addEventListener("input", ciz);
     ciz();
@@ -93,35 +96,35 @@
       if (op === "put") {
         var ch = (chIn.value || "?").charAt(0);
         code.textContent = "b.put((byte) '" + ch + "');";
-        if (pos >= lim) { msg = "<b>BufferOverflowException</b>: position = limit, yazacak yer yok."; }
-        else { data[pos] = ch; pos++; msg = "'" + esc(ch) + "' yazıldı, position bir arttı."; }
+        if (pos >= lim) { msg = "<b>BufferOverflowException</b>: position = limit, " + tx("yazacak yer yok.", "no room to write."); }
+        else { data[pos] = ch; pos++; msg = "'" + esc(ch) + "'" + tx(" yazıldı, position bir arttı.", " written; position advanced by one."); }
       } else if (op === "get") {
         code.textContent = "char c = (char) b.get();";
-        if (pos >= lim) { msg = "<b>BufferUnderflowException</b>: okunacak veri kalmadı (position = limit)."; }
-        else { lastRead = pos; msg = "Okunan: <b>" + esc(data[pos] === null ? "0" : data[pos]) + "</b>, position bir arttı."; pos++; }
+        if (pos >= lim) { msg = "<b>BufferUnderflowException</b>: " + tx("okunacak veri kalmadı (position = limit).", "nothing left to read (position = limit)."); }
+        else { lastRead = pos; msg = tx("Okunan: <b>", "Read: <b>") + esc(data[pos] === null ? "0" : data[pos]) + tx("</b>, position bir arttı.", "</b>; position advanced by one."); pos++; }
       } else if (op === "flip") {
         code.textContent = "b.flip();";
         lim = pos; pos = 0; mark = -1;
-        msg = "Okuma moduna geçildi: limit = eski position, position = 0.";
+        msg = tx("Okuma moduna geçildi: limit = eski position, position = 0.", "Switched to read mode: limit = old position, position = 0.");
       } else if (op === "rewind") {
         code.textContent = "b.rewind();";
         pos = 0; mark = -1;
-        msg = "position = 0, limit değişmedi: aynı veri baştan yeniden okunabilir.";
+        msg = tx("position = 0, limit değişmedi: aynı veri baştan yeniden okunabilir.", "position = 0, limit unchanged: the same data can be read again.");
       } else if (op === "clear") {
         code.textContent = "b.clear();";
         pos = 0; lim = CAP; mark = -1;
-        msg = "Yazma moduna geçildi: position = 0, limit = capacity. Baytlar <b>silinmedi</b>, üzerine yazılacak.";
+        msg = tx("Yazma moduna geçildi: position = 0, limit = capacity. Baytlar <b>silinmedi</b>, üzerine yazılacak.", "Switched to write mode: position = 0, limit = capacity. The bytes are <b>not erased</b>; they will be overwritten.");
       } else if (op === "compact") {
         code.textContent = "b.compact();";
         var kalan = lim - pos;
         for (var k = 0; k < kalan; k++) data[k] = data[pos + k];
         pos = kalan; lim = CAP; mark = -1;
-        msg = "Okunmamış " + kalan + " bayt başa taşındı; position = " + kalan + ", limit = capacity. Yazmaya devam edilebilir.";
+        msg = tx("Okunmamış " + kalan + " bayt başa taşındı; position = " + kalan + ", limit = capacity. Yazmaya devam edilebilir.", kalan + " unread byte(s) moved to the front; position = " + kalan + ", limit = capacity. Ready to write more.");
       } else if (op === "reset") {
         data = []; for (var r = 0; r < CAP; r++) data.push(null);
         pos = 0; lim = CAP; mark = -1;
         code.textContent = "ByteBuffer b = ByteBuffer.allocate(8);";
-        msg = "Boş tampon: yazma modunda, position = 0, limit = capacity = 8.";
+        msg = tx("Boş tampon: yazma modunda, position = 0, limit = capacity = 8.", "Empty buffer in write mode: position = 0, limit = capacity = 8.");
       }
       status.innerHTML = msg;
       ciz();

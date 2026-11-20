@@ -3,6 +3,10 @@
 (function () {
   var stages = Array.prototype.slice.call(document.querySelectorAll(".algo-stage--stage"));
   var W = 800, H = 600;
+  /* iki dilli: lang="en" olan sunum ya da sayfada arayüz metni İngilizce */
+  var deckEl = document.getElementById("ds-deck");
+  var EN = String((deckEl && deckEl.getAttribute("lang")) || document.documentElement.getAttribute("lang") || "tr").toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   /* kaydırma çubuğunun yeri sabit: çubuk açılıp kapanınca genişlik ve ölçek salınmasın */
   if (stages.length) document.documentElement.style.scrollbarGutter = "stable";
 
@@ -38,7 +42,7 @@
       var help = head.querySelector(".algo-stage__help");
       head.insertBefore(full, help || null);
       var label = function () {
-        var t = isFull() ? "Tam ekrandan çık" : "Tam ekran";
+        var t = isFull() ? tx("Tam ekrandan çık", "Exit full screen") : tx("Tam ekran", "Full screen");
         full.setAttribute("aria-label", t);
         full.title = t;
         full.setAttribute("aria-pressed", String(isFull()));
@@ -58,7 +62,7 @@
     var dlg = document.getElementById(btn.getAttribute("aria-controls"));
     if (!dlg) return;
     btn.setAttribute("aria-haspopup", "dialog");
-    if (!btn.getAttribute("aria-label")) btn.setAttribute("aria-label", "Açıklama ve kurallar");
+    if (!btn.getAttribute("aria-label")) btn.setAttribute("aria-label", tx("Açıklama ve kurallar", "Description and rules"));
     /* dialog sahnenin dışında, belgenin kökünde dursun: ölçeklenmesin */
     document.body.appendChild(dlg);
     btn.addEventListener("click", function () {

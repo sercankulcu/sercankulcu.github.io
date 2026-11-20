@@ -1,5 +1,8 @@
 /* Bölüm 10: düzenli ifade sınayıcı */
 (function () {
+  const deckEl = document.getElementById("ds-deck");
+  const EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   document.querySelectorAll('.ds-deck [data-demo="a052-regex"]').forEach(function (demo) {
     var pat = demo.querySelector(".a052-lab__pat");
     var text = demo.querySelector(".a052-lab__text");
@@ -19,12 +22,12 @@
         re = new RegExp(pat.value, "g" + (ci.checked ? "i" : ""));
       } catch (err) {
         view.innerHTML = esc(src);
-        status.textContent = "Geçersiz düzenli ifade: " + err.message;
+        status.textContent = tx("Geçersiz düzenli ifade: ", "Invalid regular expression: ") + err.message;
         return;
       }
       if (pat.value === "") {
         view.innerHTML = esc(src);
-        status.textContent = "Bir örüntü yazın.";
+        status.textContent = tx("Bir örüntü yazın.", "Enter a pattern.");
         return;
       }
       var out = "", last = 0, n = 0, groups = [], m;
@@ -35,13 +38,13 @@
         n++;
         if (m.length > 1 && groups.length < 4) {
           groups.push('"' + m[0] + '" → ' + m.slice(1).map(function (g, i) {
-            return "grup " + (i + 1) + ' = "' + (g === undefined ? "" : g) + '"';
+            return tx("grup ", "group ") + (i + 1) + ' = "' + (g === undefined ? "" : g) + '"';
           }).join(", "));
         }
       }
       out += esc(src.slice(last));
       view.innerHTML = out + (groups.length ? '<div class="a052-lab__groups">' + esc(groups.join(" · ")) + "</div>" : "");
-      status.textContent = n ? n + " eşleşme bulundu." : "Eşleşme yok.";
+      status.textContent = n ? n + tx(" eşleşme bulundu.", n === 1 ? " match found." : " matches found.") : tx("Eşleşme yok.", "No matches.");
     }
 
     pat.addEventListener("input", run);

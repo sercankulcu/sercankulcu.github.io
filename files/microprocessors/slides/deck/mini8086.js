@@ -18,6 +18,14 @@
    Tarayıcıda window.Mini8086, Node'da module.exports olarak kullanılır. */
 (function (root) {
   "use strict";
+  /* dil: sunum kökünün (#ds-deck) lang özniteliği "en" ile başlıyorsa İngilizce; Node'da ve Türkçe sunumda Türkçe.
+     Değerlendirme her çağrıda yapılır (betik sunum öğesinden önce yüklenebilir). */
+  function isEN() {
+    if (typeof document === "undefined") return false;
+    var d = document.getElementById("ds-deck") || document.documentElement;
+    return String((d && d.getAttribute("lang")) || "").toLowerCase().indexOf("en") === 0;
+  }
+  function tx(tr, en) { return isEN() ? en : tr; }
   if (typeof document !== "undefined" && typeof module === "undefined" &&
       ["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
 
@@ -58,13 +66,13 @@
 
   function AsmError(msg, line, text) {
     this.msg = msg; this.line = line == null ? null : line; this.text = text || null;
-    this.message = (this.line ? "satır " + this.line + ": " : "") + msg;
+    this.message = (this.line ? tx("satır ", "line ") + this.line + ": " : "") + msg;
   }
   AsmError.prototype.toString = function () { return this.message; };
   function EmuError(msg) { this.message = msg; }
   EmuError.prototype.toString = function () { return this.message; };
   /* klavye kuyruğu boşken okuma: adım geri alınır, girdi gelince yeniden denenir */
-  function InputWait(what) { this.message = "girdi bekleniyor"; this.what = what || ""; }
+  function InputWait(what) { this.message = tx("girdi bekleniyor", "waiting for input"); this.what = what || ""; }
 
   /* ================= yardımcılar ================= */
   function stripComment(line) {
@@ -135,7 +143,7 @@
       var m = TOKEN_RE.exec(text);
       if (!m || TOKEN_RE.lastIndex === pos) {
         if (text.slice(pos).trim() === "") break;
-        throw new AsmError("ifade çözümlenemedi: " + text, line);
+        throw new AsmError(tx("ifade çözümlenemedi: ", "cannot parse expression: ") + text, line);
       }
       pos = TOKEN_RE.lastIndex;
       if (m[1] != null) this.toks.push(["str", m[1]]);
@@ -149,7 +157,7 @@
   Expr.prototype.take = function () { var t = this.peek(); this.i++; return t; };
   Expr.prototype.value = function () {
     var v = this.eOr();
-    if (this.i !== this.toks.length) throw new AsmError("ifadede fazla öğe: " + this.toks.map(function (t) { return t[1]; }).join(" "), this.line);
+    if (this.i !== this.toks.length) throw new AsmError(tx("ifadede fazla öğe: ", "extra tokens in expression: ") + this.toks.map(function (t) { return t[1]; }).join(" "), this.line);
     return v;
   };
   Expr.prototype.kw = function () {
@@ -215,7 +223,7 @@
         else {
           if (b.val === 0) {
             if (a.unknown || b.unknown) { a = this.comb(a, b, 0); continue; }
-            throw new AsmError("ifadede sıfıra bölme", this.line);
+            throw new AsmError(tx("ifadede sıfıra bölme", "division by zero in expression"), this.line);
           }
           a = this.comb(a, b, Math.trunc(a.val / b.val));
         }
@@ -258,15 +266,15 @@
   };
   Expr.prototype.primary = function () {
     var t = this.take(), k = t[0], s = t[1], v;
-    if (k === null) throw new AsmError("eksik ifade", this.line);
+    if (k === null) throw new AsmError(tx("eksik ifade", "missing expression"), this.line);
     if (k === "num") {
       v = parseNumber(s);
-      if (isNaN(v)) throw new AsmError("geçersiz sayı: " + s, this.line);
+      if (isNaN(v)) throw new AsmError(tx("geçersiz sayı: ", "invalid number: ") + s, this.line);
       return new Val(v);
     }
     if (k === "str") {
       var q = s.charAt(0), body = s.slice(1, -1).split(q + q).join(q);
-      if (body.length > 2) throw new AsmError("ifadede 2 karakterden uzun dizgi: " + s, this.line);
+      if (body.length > 2) throw new AsmError(tx("ifadede 2 karakterden uzun dizgi: ", "string longer than 2 characters in expression: ") + s, this.line);
       v = 0;
       for (var i = 0; i < body.length; i++) v = (v << 8) | (body.charCodeAt(i) & 0xFF);
       return new Val(v);
@@ -274,7 +282,7 @@
     if (k === "op" && (s === "(" || s === "[")) {
       v = this.eOr();
       var c = this.take();
-      if (c[0] !== "op" || c[1] !== (s === "(" ? ")" : "]")) throw new AsmError(s === "(" ? "kapanmayan parantez" : "kapanmayan köşeli parantez", this.line);
+      if (c[0] !== "op" || c[1] !== (s === "(" ? ")" : "]")) throw new AsmError(s === "(" ? tx("kapanmayan parantez", "unclosed parenthesis") : tx("kapanmayan köşeli parantez", "unclosed bracket"), this.line);
       return v;
     }
     if (k === "id") {
@@ -284,16 +292,16 @@
       if (u === "BYTE") return new Val(1);
       if (u === "WORD") return new Val(2);
       if (u === "DWORD") return new Val(4);
-      if (has(REG16, u) || has(REG8, u) || has(SREG, u)) throw new AsmError("ifadede yazmaç kullanılamaz: " + s, this.line);
-      if (this.pre && !/^[0-9A-F]+H$/.test(u)) throw new AsmError("bilinmeyen sembol " + s, this.line);
+      if (has(REG16, u) || has(REG8, u) || has(SREG, u)) throw new AsmError(tx("ifadede yazmaç kullanılamaz: ", "register not allowed in expression: ") + s, this.line);
+      if (this.pre && !/^[0-9A-F]+H$/.test(u)) throw new AsmError(tx("bilinmeyen sembol ", "unknown symbol ") + s, this.line);
       var r = this.lookup(u);
       if (r == null) {
-        if (/^[A-F][0-9A-F]*H$/.test(u)) throw new AsmError("onaltılık sayı rakamla başlamalı: '" + s + "' yerine '0" + s + "' yazılmalı", this.line);
+        if (/^[A-F][0-9A-F]*H$/.test(u)) throw new AsmError(tx("onaltılık sayı rakamla başlamalı: '" + s + "' yerine '0" + s + "' yazılmalı", "hexadecimal number must start with a digit: write '0" + s + "' instead of '" + s + "'"), this.line);
         return new Val(0, { unknown: true });
       }
       return r;
     }
-    throw new AsmError("beklenmeyen öğe: " + s, this.line);
+    throw new AsmError(tx("beklenmeyen öğe: ", "unexpected token: ") + s, this.line);
   };
 
   /* ================= semboller, işlenenler, deyimler ================= */
@@ -722,7 +730,7 @@
       else if (ENDM_RE.test(t)) { depth--; if (depth === 0) return [body, j]; }
       body.push(lines[j]);
     }
-    throw new AsmError("ENDM bulunamadı", lines[i].no, lines[i].text.trim());
+    throw new AsmError(tx("ENDM bulunamadı", "ENDM not found"), lines[i].no, lines[i].text.trim());
   };
   PPP.subst = function (text, map) {
     if (!Object.keys(map).length) return text;
@@ -753,7 +761,7 @@
     catch (e) { if (e instanceof AsmError) return 0; throw e; }
   };
   PPP.process = function (lines, depth) {
-    if (depth > 50) throw new AsmError("makro açılımı çok derin (özyineleme?)");
+    if (depth > 50) throw new AsmError(tx("makro açılımı çok derin (özyineleme?)", "macro expansion too deep (recursion?)"));
     var out = [], cond = [], i = 0, m, self = this;
     var reIf = /^(IF|IFE|IFB|IFNB|IFDEF|IFNDEF|IFIDN|IFDIF)\b([\s\S]*)$/i;
     var reMac = new RegExp("^(" + IDENT + ")\\s+MACRO\\b([\\s\\S]*)$", "iu");
@@ -784,13 +792,13 @@
         i++; continue;
       }
       if (/^ELSE\b/.test(u)) {
-        if (!cond.length) throw new AsmError("ELSE için IF yok", ln.no, ln.text.trim());
+        if (!cond.length) throw new AsmError(tx("ELSE için IF yok", "ELSE without IF"), ln.no, ln.text.trim());
         var taken = cond.pop()[1];
         cond.push([active() && !taken, true]);
         i++; continue;
       }
       if (/^ENDIF\b/.test(u)) {
-        if (!cond.length) throw new AsmError("ENDIF için IF yok", ln.no, ln.text.trim());
+        if (!cond.length) throw new AsmError(tx("ENDIF için IF yok", "ENDIF without IF"), ln.no, ln.text.trim());
         cond.pop(); i++; continue;
       }
       if (!act) {
@@ -807,7 +815,7 @@
             var inc = EMU8086_INC.split("\n").map(function (x) { return new PLine(ln.no, x, "emu8086.inc", ln.anchor); });
             out = out.concat(this.process(inc, depth + 1));
           }
-        } else throw new AsmError("include desteklenmiyor: " + m[1] + " (yalnız emu8086.inc)", ln.no, ln.text.trim());
+        } else throw new AsmError(tx("include desteklenmiyor: ", "include not supported: ") + m[1] + tx(" (yalnız emu8086.inc)", " (only emu8086.inc)"), ln.no, ln.text.trim());
         i++; continue;
       }
       m = reMac.exec(t);
@@ -826,7 +834,7 @@
           for (var r = 0; r < n; r++) body.forEach(function (b) { exp.push(new PLine(ln.no, b.text, b.macro || "REPT", anc)); });
         } else {
           var cm = arg2.indexOf(",");
-          if (cm < 0) throw new AsmError(kw2 + " için parametre ve liste gerekir", ln.no, ln.text.trim());
+          if (cm < 0) throw new AsmError(kw2 + tx(" için parametre ve liste gerekir", " requires a parameter and a list"), ln.no, ln.text.trim());
           var p = arg2.slice(0, cm).trim().toUpperCase(), rest = arg2.slice(cm + 1).trim(), items;
           if (kw2 === "IRP") {
             if (rest.charAt(0) === "<" && rest.charAt(rest.length - 1) === ">") rest = rest.slice(1, -1);
@@ -875,7 +883,7 @@
       out.push(ln);
       i++;
     }
-    if (cond.length) throw new AsmError("kapanmamış IF bloğu");
+    if (cond.length) throw new AsmError(tx("kapanmamış IF bloğu", "unclosed IF block"));
     return out;
   };
 
@@ -915,8 +923,8 @@
         st.op = "SEGPFX"; st.args = first.slice(0, 2);
       } else {
         var known = { IMUL: 0, PUSHA: "80186", POPA: "80186", ENTER: "80186", LEAVE: "80186", BOUND: "80186", ESC: 0 };
-        throw new AsmError(has(known, first) ? first + " komutu bu laboratuvarda desteklenmiyor" :
-          "bilinmeyen ya da desteklenmeyen komut: " + toks[0], ln.no, ln.text.trim());
+        throw new AsmError(has(known, first) ? first + tx(" komutu bu laboratuvarda desteklenmiyor", " instruction is not supported in this lab") :
+          tx("bilinmeyen ya da desteklenmeyen komut: ", "unknown or unsupported instruction: ") + toks[0], ln.no, ln.text.trim());
       }
       var dropped = false;
       while (has(PREFIXES, st.op)) {
@@ -1064,16 +1072,16 @@
     flat.forEach(function (x) {
       var u = x[1].toUpperCase();
       if (["BX", "BP", "SI", "DI"].indexOf(u) >= 0) {
-        if (x[0] === "-") throw new AsmError("yazmaç çıkarılamaz: " + t, st.line);
+        if (x[0] === "-") throw new AsmError(tx("yazmaç çıkarılamaz: ", "cannot subtract a register: ") + t, st.line);
         regs.push(u);
       } else if (has(REG16, u) || has(REG8, u) || has(SREG, u)) {
-        throw new AsmError("8086 adreslemede yalnız BX, BP, SI, DI kullanılabilir: " + t, st.line);
+        throw new AsmError(tx("8086 adreslemede yalnız BX, BP, SI, DI kullanılabilir: ", "8086 addressing allows only BX, BP, SI and DI: ") + t, st.line);
       } else expr.push(x[0] + "(" + x[1] + ")");
     });
     var base = null, index = null;
     regs.forEach(function (r) {
-      if (r === "BX" || r === "BP") { if (base) throw new AsmError("iki taban yazmacı birlikte kullanılamaz: " + t, st.line); base = r; }
-      else { if (index) throw new AsmError("iki indis yazmacı birlikte kullanılamaz: " + t, st.line); index = r; }
+      if (r === "BX" || r === "BP") { if (base) throw new AsmError(tx("iki taban yazmacı birlikte kullanılamaz: ", "cannot use two base registers together: ") + t, st.line); base = r; }
+      else { if (index) throw new AsmError(tx("iki indis yazmacı birlikte kullanılamaz: ", "cannot use two index registers together: ") + t, st.line); index = r; }
     });
     var v = expr.length ? this.ev(expr.join(""), st) : new Val(0);
     if (size == null && v.vr) size = v.vr.size;
@@ -1083,7 +1091,7 @@
   Assembler.prototype.dataItems = function (st, unit) {
     var out = [], countFirst = null, self = this;
     splitTop(st.args).forEach(function (it) {
-      if (it === "") throw new AsmError("boş veri öğesi", st.line, st.text);
+      if (it === "") throw new AsmError(tx("boş veri öğesi", "empty data item"), st.line, st.text);
       var n = self.dataItem(it, st, unit, out);
       if (countFirst == null) countFirst = n;
     });
@@ -1107,15 +1115,15 @@
         out.push(v0 & 0xFF, (v0 >> 8) & 0xFF);
         return 1;
       }
-      throw new AsmError("DW/DD içinde uzun dizgi", st.line, st.text);
+      throw new AsmError(tx("DW/DD içinde uzun dizgi", "long string inside DW/DD"), st.line, st.text);
     }
     if (it === "?") { for (i = 0; i < unit; i++) out.push(0); return 1; }
     var v = this.ev(it, st), x = v.val;
     if (unit === 1) {
-      if (!v.unknown && !(x >= -128 && x <= 255)) throw new AsmError("bayt değeri sığmıyor: " + it + " = " + x, st.line, st.text);
+      if (!v.unknown && !(x >= -128 && x <= 255)) throw new AsmError(tx("bayt değeri sığmıyor: ", "value does not fit in a byte: ") + it + " = " + x, st.line, st.text);
       out.push(x & 0xFF);
     } else if (unit === 2) {
-      if (!v.unknown && !(x >= -32768 && x <= 65535)) throw new AsmError("sözcük değeri sığmıyor: " + it, st.line, st.text);
+      if (!v.unknown && !(x >= -32768 && x <= 65535)) throw new AsmError(tx("sözcük değeri sığmıyor: ", "value does not fit in a word: ") + it, st.line, st.text);
       out.push(x & 0xFF, (x >> 8) & 0xFF);
     } else {
       if ((v.label || v.vr) && v.reloc) { var sg = v.segv || 0; out.push(x & 0xFF, (x >> 8) & 0xFF, sg & 0xFF, (sg >> 8) & 0xFF); }
@@ -1138,7 +1146,7 @@
     var un = Object.keys(this.unresolved).sort(), self = this;
     if (un.length) {
       var lines = un.map(function (k) { return self.unresLine[k]; }).filter(Boolean);
-      throw new AsmError("tanımsız sembol(ler): " + un.map(function (k) { return self.rawName[k] || k.toLowerCase(); }).join(", "), lines.length ? Math.min.apply(null, lines) : null);
+      throw new AsmError(tx("tanımsız sembol(ler): ", "undefined symbol(s): ") + un.map(function (k) { return self.rawName[k] || k.toLowerCase(); }).join(", "), lines.length ? Math.min.apply(null, lines) : null);
     }
     return this.build();
   };
@@ -1169,7 +1177,7 @@
       else if (st.kind === "equ") this.doEqu(st);
       else if (st.kind === "data") {
         var unit = { DB: 1, DW: 2, DD: 4 }[op];
-        if (!st.args) throw new AsmError("veri tanımında değer yok", st.line, st.text);
+        if (!st.args) throw new AsmError(tx("veri tanımında değer yok", "no value in data definition"), st.line, st.text);
         var di = this.dataItems(st, unit);
         st.bytes = di[0]; size = di[0].length;
         if (st.name) this.define(st.name, new Sym(st.name, "var", st.seg, cur.loc, { size: unit, length: di[1] }), st);
@@ -1240,9 +1248,9 @@
   };
   function sortObj(o) { var r = {}; Object.keys(o).sort().forEach(function (k) { r[k] = o[k]; }); return r; }
   Assembler.prototype.define = function (name, sym, st) {
-    if (has(this.syms, name)) throw new AsmError("sembol iki kez tanımlandı: " + name, st.line, st.text);
-    if (has(REG16, name) || has(REG8, name) || has(SREG, name)) throw new AsmError("yazmaç adı etiket olamaz: " + name, st.line, st.text);
-    if (has(MNEMONICS, name) || has(PREFIXES, name)) this.warn(st, "'" + name + "' komut adıyla aynı etiket (emu8086 kabul eder, MASM hata verir)");
+    if (has(this.syms, name)) throw new AsmError(tx("sembol iki kez tanımlandı: ", "symbol defined twice: ") + name, st.line, st.text);
+    if (has(REG16, name) || has(REG8, name) || has(SREG, name)) throw new AsmError(tx("yazmaç adı etiket olamaz: ", "a register name cannot be a label: ") + name, st.line, st.text);
+    if (has(MNEMONICS, name) || has(PREFIXES, name)) this.warn(st, "'" + name + tx("' komut adıyla aynı etiket (emu8086 kabul eder, MASM hata verir)", "' is a label with the same name as an instruction (emu8086 accepts it, MASM reports an error)"));
     this.syms[name] = sym;
   };
   Assembler.prototype.doEqu = function (st) {
@@ -1262,7 +1270,7 @@
   };
   Assembler.prototype.modrm = function (regf, o, st) {
     if (o.kind === "r8" || o.kind === "r16") return [0xC0 | (regf << 3) | (o.kind === "r8" ? REG8[o.reg] : REG16[o.reg])];
-    if (o.kind !== "mem") throw new AsmError("bellek ya da yazmaç işleneni bekleniyordu: " + o.text, st.line);
+    if (o.kind !== "mem") throw new AsmError(tx("bellek ya da yazmaç işleneni bekleniyordu: ", "memory or register operand expected: ") + o.text, st.line);
     var d = o.disp & 0xFFFF;
     if (o.base == null && o.index == null) return [(regf << 3) | 6, d & 0xFF, d >> 8];
     var rm = { "BX,SI": 0, "BX,DI": 1, "BP,SI": 2, "BP,DI": 3, ",SI": 4, ",DI": 5, "BP,": 6, "BX,": 7 }[(o.base || "") + "," + (o.index || "")];
@@ -1287,21 +1295,21 @@
     var isR = function (o) { return o.kind === "r8" || o.kind === "r16"; };
     if (sa && sb && sa !== sb) {
       if ((a.kind === "mem" && a.ptr == null && isR(b)) || (b.kind === "mem" && b.ptr == null && isR(a)))
-        throw new AsmError("işlenen boyutları uyuşmuyor (" + a.text + " " + sa + " bayt, " + b.text + " " + sb + " bayt)", st.line, st.text);
-      if (isR(a) && isR(b)) throw new AsmError("işlenen boyutları uyuşmuyor: " + a.text + ", " + b.text, st.line, st.text);
+        throw new AsmError(tx("işlenen boyutları uyuşmuyor (", "operand sizes do not match (") + a.text + " " + sa + tx(" bayt, ", " bytes, ") + b.text + " " + sb + tx(" bayt)", " bytes)"), st.line, st.text);
+      if (isR(a) && isR(b)) throw new AsmError(tx("işlenen boyutları uyuşmuyor: ", "operand sizes do not match: ") + a.text + ", " + b.text, st.line, st.text);
       var sz0 = a.ptr ? a.size : b.size;
-      if (sz0 !== 1 && sz0 !== 2) throw new AsmError("geçersiz işlenen boyutu", st.line, st.text);
+      if (sz0 !== 1 && sz0 !== 2) throw new AsmError(tx("geçersiz işlenen boyutu", "invalid operand size"), st.line, st.text);
       return sz0;
     }
     var sz = sa || sb;
-    if (sz == null) throw new AsmError("işlenen boyutu belirsiz: BYTE PTR ya da WORD PTR gerekir", st.line, st.text);
-    if (sz !== 1 && sz !== 2) throw new AsmError("8086 komutu için geçersiz boyut (" + sz + " bayt)", st.line, st.text);
+    if (sz == null) throw new AsmError(tx("işlenen boyutu belirsiz: BYTE PTR ya da WORD PTR gerekir", "operand size is ambiguous: BYTE PTR or WORD PTR required"), st.line, st.text);
+    if (sz !== 1 && sz !== 2) throw new AsmError(tx("8086 komutu için geçersiz boyut (", "invalid size for an 8086 instruction (") + sz + tx(" bayt)", " bytes)"), st.line, st.text);
     return sz;
   };
   Assembler.prototype.immBytes = function (v, w, st, o) {
     if (!o.unknown && !o.reloc) {
-      if (w === 1 && !(v >= -128 && v <= 255)) throw new AsmError("anlık değer bayta sığmıyor: " + o.text, st.line, st.text);
-      if (w === 2 && !(v >= -32768 && v <= 65535)) throw new AsmError("anlık değer sözcüğe sığmıyor: " + o.text, st.line, st.text);
+      if (w === 1 && !(v >= -128 && v <= 255)) throw new AsmError(tx("anlık değer bayta sığmıyor: ", "immediate value does not fit in a byte: ") + o.text, st.line, st.text);
+      if (w === 2 && !(v >= -32768 && v <= 65535)) throw new AsmError(tx("anlık değer sözcüğe sığmıyor: ", "immediate value does not fit in a word: ") + o.text, st.line, st.text);
     }
     v &= 0xFFFF;
     return w === 1 ? [v & 0xFF] : [v & 0xFF, v >> 8];
@@ -1310,10 +1318,10 @@
   Assembler.prototype.rcode = function (o) {
     if (o.kind === "r8") return REG8[o.reg];
     if (o.kind === "r16") return REG16[o.reg];
-    throw new AsmError("yazmaç bekleniyordu: " + o.text);
+    throw new AsmError(tx("yazmaç bekleniyordu: ", "register expected: ") + o.text);
   };
   Assembler.prototype.warn = function (st, msg) {
-    var w = "satır " + st.line + ": " + msg;
+    var w = tx("satır ", "line ") + st.line + ": " + msg;
     if (this.final && this.warnings.indexOf(w) < 0) this.warnings.push(w);
   };
   Assembler.prototype.encode = function (st, final) {
@@ -1322,14 +1330,14 @@
     var ops = args.map(function (a) { return self.operand(a, st); });
     st.ops = ops;
     var n = ops.length, a, b, w, isR = function (o) { return o.kind === "r8" || o.kind === "r16"; };
-    function need(k) { if (n !== k) throw new AsmError(mn + " " + k + " işlenen ister", st.line, st.text); }
+    function need(k) { if (n !== k) throw new AsmError(mn + tx(" " + k + " işlenen ister", " requires " + k + " operand" + (k === 1 ? "" : "s")), st.line, st.text); }
     if (mn === "IN" || mn === "OUT") { /* aşağıda */ }
     if (has(SIMPLE, mn)) { need(0); return cat(this.segpfx(st, null), [SIMPLE[mn]]); }
     if (has(STRING_OPS, mn)) {
-      if (n === 0) throw new AsmError(mn + " işlenen ister (ya da " + mn + "B/" + mn + "W kullanılmalı)", st.line);
+      if (n === 0) throw new AsmError(mn + tx(" işlenen ister (ya da " + mn + "B/" + mn + "W kullanılmalı)", " requires operands (or use " + mn + "B/" + mn + "W)"), st.line);
       var sz = null;
       ops.forEach(function (o) { if (o.kind === "mem" && o.size) sz = o.size; });
-      if (sz == null) throw new AsmError("dizgi komutunda boyut belirsiz", st.line, st.text);
+      if (sz == null) throw new AsmError(tx("dizgi komutunda boyut belirsiz", "operand size is ambiguous in a string instruction"), st.line, st.text);
       st.op = mn + (sz === 1 ? "B" : "W");
       var src = (mn === "MOVS" || mn === "CMPS" || mn === "LODS") ? ops[ops.length - 1] : null;
       if (mn === "CMPS") src = ops[0];
@@ -1353,8 +1361,8 @@
     if (has(ALU, mn)) {
       need(2); a = ops[0]; b = ops[1];
       var code = ALU[mn];
-      if (a.kind === "imm") throw new AsmError("hedef anlık değer olamaz", st.line, st.text);
-      if (a.kind === "sreg" || b.kind === "sreg") throw new AsmError("kesim yazmacı aritmetik/mantık komutunda kullanılamaz", st.line, st.text);
+      if (a.kind === "imm") throw new AsmError(tx("hedef anlık değer olamaz", "destination cannot be an immediate value"), st.line, st.text);
+      if (a.kind === "sreg" || b.kind === "sreg") throw new AsmError(tx("kesim yazmacı aritmetik/mantık komutunda kullanılamaz", "a segment register cannot be used in an arithmetic/logic instruction"), st.line, st.text);
       if (b.kind === "imm") {
         w = this.opsize(st, a);
         if (isR(a) && (a.reg === "AL" || a.reg === "AX")) return cat(this.segpfx(st, a), [code * 8 + 4 + (w - 1)], this.immBytes(b.val, w, st, b));
@@ -1364,7 +1372,7 @@
         if (!final && b.unknown) st.wide.i16 = 1;
         return cat(this.segpfx(st, a), [0x81], this.modrm(code, a, st), this.immBytes(b.val, 2, st, b));
       }
-      if (a.kind === "mem" && b.kind === "mem") throw new AsmError("iki bellek işleneni birlikte kullanılamaz", st.line, st.text);
+      if (a.kind === "mem" && b.kind === "mem") throw new AsmError(tx("iki bellek işleneni birlikte kullanılamaz", "cannot use two memory operands together"), st.line, st.text);
       w = this.opsize(st, a, b);
       if (isR(a)) return cat(this.segpfx(st, b), [code * 8 + 2 + (w - 1)], this.modrm(this.rcode(a), b, st));
       return cat(this.segpfx(st, a), [code * 8 + (w - 1)], this.modrm(this.rcode(b), a, st));
@@ -1376,14 +1384,14 @@
         if (isR(a) && (a.reg === "AL" || a.reg === "AX")) return cat([0xA8 + w - 1], this.immBytes(b.val, w, st, b));
         return cat(this.segpfx(st, a), [0xF6 + w - 1], this.modrm(0, a, st), this.immBytes(b.val, w, st, b));
       }
-      if (a.kind === "mem" && b.kind === "mem") throw new AsmError("iki bellek işleneni birlikte kullanılamaz", st.line, st.text);
+      if (a.kind === "mem" && b.kind === "mem") throw new AsmError(tx("iki bellek işleneni birlikte kullanılamaz", "cannot use two memory operands together"), st.line, st.text);
       w = this.opsize(st, a, b);
       if (a.kind === "mem") { var tt = a; a = b; b = tt; }
       return cat(this.segpfx(st, b), [0x84 + w - 1], this.modrm(this.rcode(a), b, st));
     }
     if (has(GRP3, mn)) {
       need(1); a = ops[0];
-      if (a.kind === "imm") throw new AsmError(mn + " anlık değer alamaz (8086)", st.line, st.text);
+      if (a.kind === "imm") throw new AsmError(mn + tx(" anlık değer alamaz (8086)", " cannot take an immediate value (8086)"), st.line, st.text);
       w = this.opsize(st, a);
       return cat(this.segpfx(st, a), [0xF6 + w - 1], this.modrm(GRP3[mn], a, st));
     }
@@ -1398,24 +1406,24 @@
       w = this.opsize(st, a);
       var sc = SHIFTS[mn];
       if (b.kind === "r8" && b.reg === "CL") return cat(this.segpfx(st, a), [0xD2 + w - 1], this.modrm(sc, a, st));
-      if (b.kind !== "imm") throw new AsmError("kaydırma sayısı 1 ya da CL olmalı", st.line, st.text);
+      if (b.kind !== "imm") throw new AsmError(tx("kaydırma sayısı 1 ya da CL olmalı", "shift count must be 1 or CL"), st.line, st.text);
       if (b.val === 1) return cat(this.segpfx(st, a), [0xD0 + w - 1], this.modrm(sc, a, st));
-      this.warn(st, "kaydırma sayısı " + b.val + " anlık değer: 8086'da yok (80186+ C0/C1); emu8086 kabul eder");
+      this.warn(st, tx("kaydırma sayısı ", "shift count ") + b.val + tx(" anlık değer: 8086'da yok (80186+ C0/C1); emu8086 kabul eder", " as an immediate value: not on the 8086 (80186+ C0/C1); emu8086 accepts it"));
       return cat(this.segpfx(st, a), [0xC0 + w - 1], this.modrm(sc, a, st), [b.val & 0xFF]);
     }
     if (mn === "MOV") {
       need(2); a = ops[0]; b = ops[1];
-      if (a.kind === "imm" || a.kind === "farimm") throw new AsmError("MOV hedefi anlık değer olamaz", st.line, st.text);
-      if (a.kind === "mem" && b.kind === "mem") throw new AsmError("MOV bellekten belleğe yapılamaz", st.line, st.text);
+      if (a.kind === "imm" || a.kind === "farimm") throw new AsmError(tx("MOV hedefi anlık değer olamaz", "MOV destination cannot be an immediate value"), st.line, st.text);
+      if (a.kind === "mem" && b.kind === "mem") throw new AsmError(tx("MOV bellekten belleğe yapılamaz", "MOV cannot copy memory to memory"), st.line, st.text);
       if (a.kind === "sreg") {
-        if (b.kind === "imm") throw new AsmError("kesim yazmacına anlık değer yüklenemez (önce AX'e yüklenmeli)", st.line, st.text);
-        if (b.kind === "sreg") throw new AsmError("kesim yazmacından kesim yazmacına MOV yok", st.line, st.text);
-        if (a.reg === "CS") throw new AsmError("MOV CS, ... kullanılamaz", st.line, st.text);
-        if (b.kind === "r8" || (b.kind === "mem" && b.size === 1 && b.ptr)) throw new AsmError("kesim yazmacı 16 bittir", st.line, st.text);
+        if (b.kind === "imm") throw new AsmError(tx("kesim yazmacına anlık değer yüklenemez (önce AX'e yüklenmeli)", "cannot load an immediate value into a segment register (load it into AX first)"), st.line, st.text);
+        if (b.kind === "sreg") throw new AsmError(tx("kesim yazmacından kesim yazmacına MOV yok", "there is no MOV from a segment register to a segment register"), st.line, st.text);
+        if (a.reg === "CS") throw new AsmError(tx("MOV CS, ... kullanılamaz", "MOV CS, ... is not allowed"), st.line, st.text);
+        if (b.kind === "r8" || (b.kind === "mem" && b.size === 1 && b.ptr)) throw new AsmError(tx("kesim yazmacı 16 bittir", "segment registers are 16-bit"), st.line, st.text);
         return cat(this.segpfx(st, b), [0x8E], this.modrm(SREG[a.reg], b, st));
       }
       if (b.kind === "sreg") {
-        if (a.kind === "r8") throw new AsmError("kesim yazmacı 16 bittir", st.line, st.text);
+        if (a.kind === "r8") throw new AsmError(tx("kesim yazmacı 16 bittir", "segment registers are 16-bit"), st.line, st.text);
         return cat(this.segpfx(st, a), [0x8C], this.modrm(SREG[b.reg], a, st));
       }
       if (b.kind === "imm") {
@@ -1434,8 +1442,8 @@
     }
     if (mn === "XCHG") {
       need(2); a = ops[0]; b = ops[1];
-      if (a.kind === "mem" && b.kind === "mem") throw new AsmError("XCHG iki bellek işleneni alamaz", st.line, st.text);
-      if (a.kind === "imm" || a.kind === "sreg" || b.kind === "imm" || b.kind === "sreg") throw new AsmError("XCHG yalnız yazmaç/bellek işlenenleri alır", st.line, st.text);
+      if (a.kind === "mem" && b.kind === "mem") throw new AsmError(tx("XCHG iki bellek işleneni alamaz", "XCHG cannot take two memory operands"), st.line, st.text);
+      if (a.kind === "imm" || a.kind === "sreg" || b.kind === "imm" || b.kind === "sreg") throw new AsmError(tx("XCHG yalnız yazmaç/bellek işlenenleri alır", "XCHG accepts only register/memory operands"), st.line, st.text);
       w = this.opsize(st, a, b);
       if (w === 2 && a.kind === "r16" && b.kind === "r16" && (a.reg === "AX" || b.reg === "AX")) return [0x90 + REG16[(a.reg === "AX" ? b : a).reg]];
       if (a.kind === "mem") { var t2 = a; a = b; b = t2; }
@@ -1443,8 +1451,8 @@
     }
     if (mn === "LEA" || mn === "LDS" || mn === "LES") {
       need(2); a = ops[0]; b = ops[1];
-      if (a.kind !== "r16") throw new AsmError(mn + " hedefi 16 bitlik yazmaç olmalı", st.line, st.text);
-      if (b.kind !== "mem") throw new AsmError(mn + " kaynağı bellek işleneni olmalı", st.line, st.text);
+      if (a.kind !== "r16") throw new AsmError(mn + tx(" hedefi 16 bitlik yazmaç olmalı", " destination must be a 16-bit register"), st.line, st.text);
+      if (b.kind !== "mem") throw new AsmError(mn + tx(" kaynağı bellek işleneni olmalı", " source must be a memory operand"), st.line, st.text);
       if (mn === "LEA" && !this.leaMasm && b.direct && b.base == null && b.index == null && !b.seg && !st.prefixes.length)
         return cat([0xB8 + REG16[a.reg]], this.immBytes(b.disp, 2, st, b));
       return cat(this.segpfx(st, b), [{ LEA: 0x8D, LDS: 0xC5, LES: 0xC4 }[mn]], this.modrm(REG16[a.reg], b, st));
@@ -1454,40 +1462,40 @@
       if (a.kind === "r16") return [0x50 + REG16[a.reg]];
       if (a.kind === "sreg") return [0x06 + 8 * SREG[a.reg]];
       if (a.kind === "mem") {
-        if (a.size !== 2 && a.size != null) throw new AsmError("PUSH yalnız 16 bit işlenen alır", st.line, st.text);
+        if (a.size !== 2 && a.size != null) throw new AsmError(tx("PUSH yalnız 16 bit işlenen alır", "PUSH accepts only 16-bit operands"), st.line, st.text);
         a.size = 2;
         return cat(this.segpfx(st, a), [0xFF], this.modrm(6, a, st));
       }
       if (a.kind === "imm") {
-        this.warn(st, "PUSH ile anlık değer 8086'da yok (80186+); emu8086 kabul eder");
+        this.warn(st, tx("PUSH ile anlık değer 8086'da yok (80186+); emu8086 kabul eder", "PUSH with an immediate value is not on the 8086 (80186+); emu8086 accepts it"));
         var pv = s16(a.val);
         if (pv >= -128 && pv <= 127 && !a.reloc && !has(st.wide, "i16")) return [0x6A, pv & 0xFF];
         return cat([0x68], this.immBytes(a.val, 2, st, a));
       }
-      throw new AsmError("PUSH 8 bitlik yazmaç alamaz", st.line, st.text);
+      throw new AsmError(tx("PUSH 8 bitlik yazmaç alamaz", "PUSH cannot take an 8-bit register"), st.line, st.text);
     }
     if (mn === "POP") {
       need(1); a = ops[0];
       if (a.kind === "r16") return [0x58 + REG16[a.reg]];
-      if (a.kind === "sreg") { if (a.reg === "CS") throw new AsmError("POP CS kullanılamaz", st.line, st.text); return [0x07 + 8 * SREG[a.reg]]; }
+      if (a.kind === "sreg") { if (a.reg === "CS") throw new AsmError(tx("POP CS kullanılamaz", "POP CS is not allowed"), st.line, st.text); return [0x07 + 8 * SREG[a.reg]]; }
       if (a.kind === "mem") {
-        if (a.size !== 2 && a.size != null) throw new AsmError("POP yalnız 16 bit işlenen alır", st.line, st.text);
+        if (a.size !== 2 && a.size != null) throw new AsmError(tx("POP yalnız 16 bit işlenen alır", "POP accepts only 16-bit operands"), st.line, st.text);
         a.size = 2;
         return cat(this.segpfx(st, a), [0x8F], this.modrm(0, a, st));
       }
-      throw new AsmError("POP işleneni geçersiz", st.line, st.text);
+      throw new AsmError(tx("POP işleneni geçersiz", "invalid POP operand"), st.line, st.text);
     }
     if (mn === "IN" || mn === "OUT") {
       need(2);
       var acc = mn === "IN" ? ops[0] : ops[1], port = mn === "IN" ? ops[1] : ops[0];
-      if (!isR(acc) || (acc.reg !== "AL" && acc.reg !== "AX")) throw new AsmError(mn + " yalnız AL ya da AX ile çalışır", st.line, st.text);
+      if (!isR(acc) || (acc.reg !== "AL" && acc.reg !== "AX")) throw new AsmError(mn + tx(" yalnız AL ya da AX ile çalışır", " works only with AL or AX"), st.line, st.text);
       w = acc.size;
       if (port.kind === "r16" && port.reg === "DX") return [(mn === "IN" ? 0xEC : 0xEE) + w - 1];
       if (port.kind === "imm") {
-        if (!port.unknown && !(port.val >= 0 && port.val <= 255)) throw new AsmError("255'ten büyük port numarası DX ile verilmeli", st.line, st.text);
+        if (!port.unknown && !(port.val >= 0 && port.val <= 255)) throw new AsmError(tx("255'ten büyük port numarası DX ile verilmeli", "port numbers above 255 must be given in DX"), st.line, st.text);
         return [(mn === "IN" ? 0xE4 : 0xE6) + w - 1, port.val & 0xFF];
       }
-      throw new AsmError("port işleneni sabit (0-255) ya da DX olmalı", st.line, st.text);
+      throw new AsmError(tx("port işleneni sabit (0-255) ya da DX olmalı", "the port operand must be a constant (0-255) or DX"), st.line, st.text);
     }
     if (mn === "INT") { need(1); var iv = ops[0].val & 0xFF; return iv === 3 ? [0xCC] : [0xCD, iv]; }
     if (mn === "RET" || mn === "RETN" || mn === "RETF") {
@@ -1497,7 +1505,7 @@
       return [rf ? 0xCB : 0xC3];
     }
     if (has(JCC, mn) || has(LOOPS, mn) || mn === "JMP" || mn === "CALL") { need(1); return this.encodeBranch(st, mn, ops[0], final); }
-    throw new AsmError("desteklenmeyen komut: " + mn, st.line, st.text);
+    throw new AsmError(tx("desteklenmeyen komut: ", "unsupported instruction: ") + mn, st.line, st.text);
   };
   Assembler.prototype.encodeBranch = function (st, mn, o, final) {
     var here = st.addr, rel;
@@ -1511,18 +1519,18 @@
     }
     st.indirect = false;
     if (o.kind === "farimm") {
-      if (mn !== "JMP" && mn !== "CALL") throw new AsmError("koşullu atlama uzak olamaz", st.line, st.text);
+      if (mn !== "JMP" && mn !== "CALL") throw new AsmError(tx("koşullu atlama uzak olamaz", "a conditional jump cannot be far"), st.line, st.text);
       st.far = true; st.target = o.val; st.targetSeg = o.segv;
       return [mn === "JMP" ? 0xEA : 0x9A, o.val & 0xFF, o.val >> 8, o.segv & 0xFF, o.segv >> 8];
     }
-    if (o.kind !== "imm") throw new AsmError("atlama hedefi geçersiz: " + o.text, st.line, st.text);
+    if (o.kind !== "imm") throw new AsmError(tx("atlama hedefi geçersiz: ", "invalid jump target: ") + o.text, st.line, st.text);
     var tgt = o.val & 0xFFFF, lab = o.label;
     st.target = tgt;
     var fr = o.ptr === "FAR" || (lab != null && lab.far && mn === "CALL" && o.ptr !== "NEAR");
     if (lab && lab.far && mn === "JMP" && o.ptr !== "NEAR") fr = true;
     if (lab && this.final && lab.seg !== st.seg && lab.seg != null && o.ptr !== "NEAR") fr = (mn === "JMP" || mn === "CALL") ? true : fr;
     if (fr) {
-      if (mn !== "JMP" && mn !== "CALL") throw new AsmError("koşullu atlama uzak olamaz", st.line, st.text);
+      if (mn !== "JMP" && mn !== "CALL") throw new AsmError(tx("koşullu atlama uzak olamaz", "a conditional jump cannot be far"), st.line, st.text);
       st.far = true;
       var segv = o.segv || 0;
       st.targetSeg = segv;
@@ -1532,7 +1540,7 @@
     if (mn === "CALL") { rel = (tgt - (here + 3)) & 0xFFFF; return [0xE8, rel & 0xFF, rel >> 8]; }
     if (has(LOOPS, mn)) {
       rel = tgt - (here + 2);
-      if (!o.unknown && !(rel >= -128 && rel <= 127) && final) throw new AsmError(mn + " hedefi çok uzak (" + rel + " bayt; en çok -128..127)", st.line, st.text);
+      if (!o.unknown && !(rel >= -128 && rel <= 127) && final) throw new AsmError(mn + tx(" hedefi çok uzak (", " target out of range (") + rel + tx(" bayt; en çok -128..127)", " bytes; limit -128..127)"), st.line, st.text);
       return [LOOPS[mn], rel & 0xFF];
     }
     if (mn === "JMP") {
@@ -1540,7 +1548,7 @@
       if (!st.long) {
         rel = tgt - (here + 2);
         if (o.unknown || (rel >= -128 && rel <= 127)) return [0xEB, rel & 0xFF];
-        if (o.short && final) throw new AsmError("JMP SHORT hedefi çok uzak", st.line, st.text);
+        if (o.short && final) throw new AsmError(tx("JMP SHORT hedefi çok uzak", "JMP SHORT target out of range"), st.line, st.text);
         if (!o.short) { st.long = true; this._grew = true; }
       }
       rel = (tgt - (here + 3)) & 0xFFFF;
@@ -1553,13 +1561,13 @@
       st.long = true; this._grew = true;
     }
     rel = (tgt - (here + 5)) & 0xFFFF;
-    if (final) this.warn(st, mn + " hedefi -128..127 dışında: emu8086 gibi ters koşul + JMP (5 bayt) üretildi");
+    if (final) this.warn(st, mn + tx(" hedefi -128..127 dışında: emu8086 gibi ters koşul + JMP (5 bayt) üretildi", " target outside -128..127: an inverted condition + JMP (5 bytes) was generated, as emu8086 does"));
     return [0x70 + (cc ^ 1), 3, 0xE9, rel & 0xFF, rel >> 8];
   };
   Assembler.prototype.build = function () {
     var self = this, prog = { stmts: this.stmts, syms: this.syms, segs: this.segs, com: this.com, warnings: this.warnings, code: {}, image: [],
       lines: (this.lines || []).map(function (l, i) { return { eid: i, no: l.no, text: l.text, macro: l.macro, anchor: l.anchor }; }) };
-    if (this.implicitOrg && !this.hasOrg && this.com) prog.warnings.unshift("ORG 100h yok: .COM varsayıldı, kod 0100h'den başlatıldı");
+    if (this.implicitOrg && !this.hasOrg && this.com) prog.warnings.unshift(tx("ORG 100h yok: .COM varsayıldı, kod 0100h'den başlatıldı", "no ORG 100h: .COM assumed, code starts at 0100h"));
     this.stmts.forEach(function (st) {
       if (st.seg == null || !st.bytes.length) return;
       var para = self.segs[st.seg].para, phys = ((para << 4) + st.addr) & 0xFFFFF;
@@ -1574,7 +1582,7 @@
       else {
         var cs = this.segs._TEXT || null;
         if (!cs) this.segOrder.some(function (nm) { var g = self.segs[nm]; if (g.kind === "code" && !g.stack) { cs = g; return true; } return false; });
-        if (!cs) throw new AsmError("kod kesimi bulunamadı");
+        if (!cs) throw new AsmError(tx("kod kesimi bulunamadı", "code segment not found"));
         var first = null;
         this.stmts.forEach(function (st) { if (st.seg === cs.name && st.kind === "instr" && (first == null || st.addr < first)) first = st.addr; });
         ent = [cs.para, first || 0];
@@ -1656,7 +1664,7 @@
           else if (sk) addr = this.phys(this.s[SREG[sk[1].toUpperCase()]], parseInt(sk[2], 16));
           else {
             var parts = ak.split("+"), sym = prog.syms[parts[0].trim().toUpperCase()];
-            if (!sym || (sym.kind !== "var" && sym.kind !== "label")) throw new EmuError("init mem: tanımsız değişken " + parts[0]);
+            if (!sym || (sym.kind !== "var" && sym.kind !== "label")) throw new EmuError(tx("init mem: tanımsız değişken ", "init mem: undefined variable ") + parts[0]);
             addr = (prog.segs[sym.seg].para << 4) + sym.off;
             if (parts[1]) { var of = parts[1].trim(); addr += /h$/i.test(of) ? parseInt(of.slice(0, -1), 16) : parseInt(of, 10); }
             size = sym.size || 1;
@@ -1667,7 +1675,7 @@
           else if (size === 2) this.w16(addr, val);
           else this.mem[addr & 0xFFFFF] = val & 0xFF;
         }
-      } else throw new EmuError("init anahtarı tanınmadı: " + key);
+      } else throw new EmuError(tx("init anahtarı tanınmadı: ", "unrecognized init key: ") + key);
     }
     this.initSp = this.r[4];
   }
@@ -1712,7 +1720,7 @@
     if (name === "IP") return this.ip;
     if (name === "FLAGS") return this.flagsWord();
     if (has(FLAGBITS, name)) return this.f[name];
-    throw new EmuError("bilinmeyen ad " + name);
+    throw new EmuError(tx("bilinmeyen ad ", "unknown name ") + name);
   };
   MP.set = function (name, v) {
     if (has(REG16, name)) this.r[REG16[name]] = v & 0xFFFF;
@@ -1722,7 +1730,7 @@
       if (c < 4) this.r[c] = (this.r[c] & 0xFF00) | v; else this.r[c - 4] = (this.r[c - 4] & 0x00FF) | (v << 8);
     } else if (has(SREG, name)) this.s[SREG[name]] = v & 0xFFFF;
     else if (name === "IP") this.ip = v & 0xFFFF;
-    else throw new EmuError("bilinmeyen ad " + name);
+    else throw new EmuError(tx("bilinmeyen ad ", "unknown name ") + name);
   };
   MP.flagsWord = function () { var w = 0xF002; for (var k in FLAGBITS) if (this.f[k]) w |= 1 << FLAGBITS[k]; return w; };
   MP.setFlagsWord = function (w) { for (var k in FLAGBITS) this.f[k] = (w >> FLAGBITS[k]) & 1; };
@@ -1741,13 +1749,13 @@
     if (k === "r8" || k === "r16" || k === "sreg") return this.get(o.reg);
     if (k === "imm") return o.val & (w === 1 ? 0xFF : 0xFFFF);
     if (k === "mem") { var e = this.ea(o); return w === 1 ? this.rd8(e[0], e[1]) : this.rd16(e[0], e[1]); }
-    throw new EmuError("okunamayan işlenen " + o.text);
+    throw new EmuError(tx("okunamayan işlenen ", "unreadable operand ") + o.text);
   };
   MP.wr = function (o, w, v) {
     var k = o.kind;
     if (k === "r8" || k === "r16" || k === "sreg") this.set(o.reg, v);
     else if (k === "mem") { var e = this.ea(o); if (w === 1) this.wr8(e[0], e[1], v); else this.wr16(e[0], e[1], v); }
-    else throw new EmuError("yazılamayan işlenen " + o.text);
+    else throw new EmuError(tx("yazılamayan işlenen ", "unwritable operand ") + o.text);
   };
   function osize(st) {
     var i;
@@ -1809,7 +1817,7 @@
   };
   MP.divideError = function () {
     var off = this.rd16(0, 0), seg = this.rd16(0, 2);
-    if (seg === BIOS_SEG && off === BIOS_OFF) throw new EmuError("bölme hatası (INT 0): bölen 0 ya da bölüm hedefe sığmıyor");
+    if (seg === BIOS_SEG && off === BIOS_OFF) throw new EmuError(tx("bölme hatası (INT 0): bölen 0 ya da bölüm hedefe sığmıyor", "divide error (INT 0): the divisor is 0 or the quotient does not fit in the destination"));
     this.interrupt(0, this.ipNext);
     this.jumped = true;
   };
@@ -1865,7 +1873,7 @@
     if (n === 0x20) { this.halted = "INT 20h"; return; }
     if (n === 0x21) {
       if (ah === 0x00) this.halted = "INT 21h/00h";
-      else if (ah === 0x4C) this.halted = "INT 21h/4Ch (çıkış kodu " + al + ")";
+      else if (ah === 0x4C) this.halted = "INT 21h/4Ch (" + tx("çıkış kodu ", "exit code ") + al + ")";
       else if (ah === 0x01) { ch = this.key("INT 21h, AH = 01h"); this.set("AL", ch.charCodeAt(0)); this.emit(ch); }
       else if (ah === 0x07 || ah === 0x08) this.set("AL", this.key("INT 21h, AH = " + hx(ah, 1)).charCodeAt(0));
       else if (ah === 0x02) { var dl = this.get("DL"); this.emit(String.fromCharCode(dl)); this.set("AL", dl); }
@@ -1883,7 +1891,7 @@
           if (c === 0x24) break;
           this.emit(String.fromCharCode(c));
           off = (off + 1) & 0xFFFF;
-          if (++cnt > 65535) throw new EmuError("INT 21h/09h: '$' sonlandırıcı bulunamadı");
+          if (++cnt > 65535) throw new EmuError(tx("INT 21h/09h: '$' sonlandırıcı bulunamadı", "INT 21h/09h: '$' terminator not found"));
         }
         this.set("AL", 0x24);
       } else if (ah === 0x0A) {
@@ -1914,11 +1922,11 @@
       else if (ah === 0x30) this.set("AX", 0x0005);
       else if (ah === 0x19) this.set("AL", 2);
       else if (ah === 0x40) {
-        if (this.get("BX") !== 1 && this.get("BX") !== 2) throw new EmuError("INT 21h/40h: yalnız ekran (BX=1/2) destekli");
+        if (this.get("BX") !== 1 && this.get("BX") !== 2) throw new EmuError(tx("INT 21h/40h: yalnız ekran (BX=1/2) destekli", "INT 21h/40h: only the screen (BX=1/2) is supported"));
         seg = this.s[3]; off = this.get("DX");
         for (i = 0; i < this.get("CX"); i++) this.emit(String.fromCharCode(this.rd8(seg, off + i)));
         this.set("AX", this.get("CX")); this.f.CF = 0;
-      } else throw new EmuError("desteklenmeyen DOS servisi: INT 21h, AH=" + hx(ah, 1));
+      } else throw new EmuError(tx("desteklenmeyen DOS servisi: ", "unsupported DOS service: ") + "INT 21h, AH=" + hx(ah, 1));
       return;
     }
     if (n === 0x10) {
@@ -1974,7 +1982,7 @@
         var a8 = (VIDEO_SEG << 4) + 2 * (this.cursor[0] * 80 + this.cursor[1]);
         this.set("AL", this.mem[a8]); this.set("AH", this.mem[a8 + 1]);
       } else if (ah === 0x0F) { this.set("AL", this.videoMode); this.set("AH", this.mem[0x44A]); this.set("BH", 0); }
-      else throw new EmuError("desteklenmeyen BIOS servisi: INT 10h, AH=" + hx(ah, 1));
+      else throw new EmuError(tx("desteklenmeyen BIOS servisi: ", "unsupported BIOS service: ") + "INT 10h, AH=" + hx(ah, 1));
       return;
     }
     if (n === 0x16) {
@@ -1985,7 +1993,7 @@
         if (this.keyReady()) { ch = this.input[0]; this.set("AL", ch.charCodeAt(0) & 0xFF); this.set("AH", SCAN[ch] || 0); this.f.ZF = 0; }
         else this.f.ZF = 1;
       } else if (ah === 0x02) this.set("AL", 0);
-      else throw new EmuError("desteklenmeyen BIOS servisi: INT 16h, AH=" + hx(ah, 1));
+      else throw new EmuError(tx("desteklenmeyen BIOS servisi: ", "unsupported BIOS service: ") + "INT 16h, AH=" + hx(ah, 1));
       return;
     }
     if (n === 0x1A) {
@@ -1997,7 +2005,7 @@
       else if (ah === 0x04) {
         this.set("CH", bcd(Math.floor(dt[0] / 100))); this.set("CL", bcd(dt[0] % 100));
         this.set("DH", bcd(dt[1])); this.set("DL", bcd(dt[2])); this.f.CF = 0;
-      } else throw new EmuError("desteklenmeyen BIOS servisi: INT 1Ah, AH=" + hx(ah, 1));
+      } else throw new EmuError(tx("desteklenmeyen BIOS servisi: ", "unsupported BIOS service: ") + "INT 1Ah, AH=" + hx(ah, 1));
       return;
     }
     if (n === 0x15 && ah === 0x86) {
@@ -2006,8 +2014,8 @@
       this.advance(wus); this.f.CF = 0; this.svc = { wait: wus };
       return;
     }
-    if (n === 0x03) { this.halted = "INT 3 (kesme noktası)"; return; }
-    throw new EmuError("desteklenmeyen kesme: INT " + hx(n, 1) + " (AH=" + hx(ah, 1) + "); vektör tablosunda bu kesme için bir yordam yok");
+    if (n === 0x03) { this.halted = tx("INT 3 (kesme noktası)", "INT 3 (breakpoint)"); return; }
+    throw new EmuError(tx("desteklenmeyen kesme: INT ", "unsupported interrupt: INT ") + hx(n, 1) + " (AH=" + hx(ah, 1) + tx("); vektör tablosunda bu kesme için bir yordam yok", "); the vector table has no routine for this interrupt"));
   };
   MP.scroll = function (up, n, r1, c1, r2, c2, attr) {
     var rows = [], base = VIDEO_SEG << 4, r, c, i, k;
@@ -2050,8 +2058,8 @@
       }
       var end = 0;
       this.prog.image.forEach(function (im) { end = Math.max(end, im[0] + im[1].length); });
-      if (phys >= end && this.mem[phys] === 0) { this.halted = "kod sonu (RET/HLT/INT 20h yok; program parçası bitti)"; return null; }
-      throw new EmuError("CS:IP = " + hx(cs).slice(0, 4) + ":" + hx(this.ip).slice(0, 4) + " bir komutun başını göstermiyor (veri ya da kodun ortası)");
+      if (phys >= end && this.mem[phys] === 0) { this.halted = tx("kod sonu (RET/HLT/INT 20h yok; program parçası bitti)", "end of code (no RET/HLT/INT 20h; the program fragment ended)"); return null; }
+      throw new EmuError("CS:IP = " + hx(cs).slice(0, 4) + ":" + hx(this.ip).slice(0, 4) + tx(" bir komutun başını göstermiyor (veri ya da kodun ortası)", " does not point to the start of an instruction (data or the middle of an instruction)"));
     }
     return st;
   };
@@ -2066,7 +2074,7 @@
       if (has(ALU, op)) h = execAlu;
       else if (has(JCC, op)) h = execJcc;
       else if (has(SHIFTS, op)) h = execShift;
-      else throw new EmuError("yürütülemeyen komut: " + op);
+      else throw new EmuError(tx("yürütülemeyen komut: ", "cannot execute instruction: ") + op);
     }
     h.call(this, st);
     if (!this.jumped) this.ip = this.ipNext;
@@ -2392,47 +2400,52 @@
   function opName(o) { return o.kind === "r8" || o.kind === "r16" || o.kind === "sreg" ? o.reg : o.text; }
   function segName(o) { return o.seg || (o.base === "BP" ? "SS" : "DS"); }
   function chText(c) {
-    if (c === 13) return "satır başı (0Dh)";
-    if (c === 10) return "yeni satır (0Ah)";
-    if (c === 8) return "geri silme (08h)";
-    if (c >= 32 && c < 127) return "'" + String.fromCharCode(c) + "' karakteri";
-    return hx(c, 1) + " kodlu karakter";
+    if (c === 13) return tx("satır başı (0Dh)", "carriage return (0Dh)");
+    if (c === 10) return tx("yeni satır (0Ah)", "line feed (0Ah)");
+    if (c === 8) return tx("geri silme (08h)", "backspace (08h)");
+    if (c >= 32 && c < 127) return tx("'" + String.fromCharCode(c) + "' karakteri", "the character '" + String.fromCharCode(c) + "'");
+    return tx(hx(c, 1) + " kodlu karakter", "the character with code " + hx(c, 1));
   }
-  function birim(w) { return w === 1 ? "bayt" : "sözcük"; }
+  function birim(w) { return w === 1 ? tx("bayt", "byte") : tx("sözcük", "word"); }
+  /* İngilizcede yalnız adres (cümle "to …" ile kurulur), Türkçede "… adresine" */
   function targetText(m, off) {
     var lab = m.prog.labelAt && m.prog.labelAt[off];
-    return (lab ? lab + " (" + hx(off) + ")" : hx(off)) + " adresine";
+    return (lab ? lab + " (" + hx(off) + ")" : hx(off)) + tx(" adresine", "");
   }
   /* bayrak gerekçeleri: kind = add | sub | logic | inc */
   function flagNote(rec, kind) {
     var f = rec.flags, p = [], zero = [];
     if (kind === "add" || kind === "sub") {
-      if (f.CF) p.push(kind === "sub" ? "ödünç alındığı için CF = 1" : "elde oluştuğu için CF = 1"); else zero.push("CF");
+      if (f.CF) p.push(kind === "sub" ? tx("ödünç alındığı için CF = 1", "CF = 1 because of a borrow") : tx("elde oluştuğu için CF = 1", "CF = 1 because of a carry")); else zero.push("CF");
     }
-    if (kind !== "logic") { if (f.OF) p.push("işaretli taşma olduğu için OF = 1"); else zero.push("OF"); }
-    if (f.ZF) p.push("sonuç sıfır olduğu için ZF = 1"); else zero.push("ZF");
-    if (f.SF) p.push("sonucun en anlamlı biti 1 olduğu için SF = 1"); else zero.push("SF");
+    if (kind !== "logic") { if (f.OF) p.push(tx("işaretli taşma olduğu için OF = 1", "OF = 1 because of signed overflow")); else zero.push("OF"); }
+    if (f.ZF) p.push(tx("sonuç sıfır olduğu için ZF = 1", "ZF = 1 because the result is zero")); else zero.push("ZF");
+    if (f.SF) p.push(tx("sonucun en anlamlı biti 1 olduğu için SF = 1", "SF = 1 because the most significant bit of the result is 1")); else zero.push("SF");
     var t = p.join(", ");
     if (!p.length) t = zero.join(" = ") + " = 0";
     else if (zero.length && kind !== "add" && kind !== "sub") t += "; " + zero.join(" = ") + " = 0";
-    if (kind === "logic") return "mantık komutu olduğu için CF = OF = 0; " + t;
-    if (kind === "inc") return t + "; CF değişmez";
+    if (kind === "logic") return tx("mantık komutu olduğu için CF = OF = 0; ", "CF = OF = 0 because this is a logic instruction; ") + t;
+    if (kind === "inc") return t + tx("; CF değişmez", "; CF unchanged");
     return t;
   }
   /* ---- kesme ve hizmet açıklamaları ---- */
   var DAYS = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+  var DAYS_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   function so(seg, off) { return hx(seg).slice(0, 4) + ":" + hx(off); }
   function irqText(m, rec, isDiv) {
     var q = rec.irq, R = rec.regs;
+    if (isEN()) return (isDiv ? "" : "the vector table entry for INT " + hx(q.n, 1) + " (0000:" + hx(q.n * 4) + ") gives CS:IP = " + so(R.CS, R.IP).replace(/h$/, "") + "h; ") +
+      "FLAGS (" + hx(q.flags) + "), CS (" + hx(q.cs) + ") and " + (isDiv ? "the address of the instruction after the divide" : "the return address") + " (IP = " + hx(q.ip) + ") are pushed onto the stack (SP = " + hx(R.SP) + "), IF = TF = 0, and " +
+      (isDiv ? "control passes through the vector table entry at 0000:0000h to the interrupt service routine (" + so(R.CS, R.IP) + ")." : "control passes to the interrupt service routine.");
     return (isDiv ? "" : "vektör tablosunda INT " + hx(q.n, 1) + " girişi (0000:" + hx(q.n * 4) + ") CS:IP = " + so(R.CS, R.IP).replace(/h$/, "") + "h gösterir; ") +
       "FLAGS (" + hx(q.flags) + "), CS (" + hx(q.cs) + ") ve " + (isDiv ? "bölme komutundan sonraki komutun adresi" : "dönüş adresi") + " (IP = " + hx(q.ip) + ") yığına itilir (SP = " + hx(R.SP) + "), IF = TF = 0 olur ve " +
       (isDiv ? "vektör tablosundaki 0000:0000h girişinden kesme hizmet yordamına (" + so(R.CS, R.IP) + ") gidilir." : "kesme hizmet yordamına gidilir.");
   }
   function attrText(v) { return hx(v, 1); }
   function keyText(c) {
-    if (c === 13) return "Enter tuşu (0Dh)";
-    if (c === 8) return "geri silme tuşu (08h)";
-    if (c === 27) return "Esc tuşu (1Bh)";
+    if (c === 13) return tx("Enter tuşu (0Dh)", "the Enter key (0Dh)");
+    if (c === 8) return tx("geri silme tuşu (08h)", "the Backspace key (08h)");
+    if (c === 27) return tx("Esc tuşu (1Bh)", "the Esc key (1Bh)");
     return chText(c);
   }
   function serviceText(m, rec, nn) {
@@ -2440,41 +2453,83 @@
     var rAL = R.AX & 0xFF, rAH = R.AX >> 8;
     function dh(v) { return v >> 8; }
     function lo(v) { return v & 0xFF; }
-    if (nn === 0x20) return "program sonlanır ve DOS'a dönülür.";
-    if (nn === 3) return "kesme noktası: program durur.";
+    if (nn === 0x20) return tx("program sonlanır ve DOS'a dönülür.", "the program terminates and returns to DOS.");
+    if (nn === 3) return tx("kesme noktası: program durur.", "breakpoint: the program stops.");
     if (nn === 0x21) {
-      var dos = "DOS hizmeti AH = " + hx(ah, 1) + ": ";
-      if (ah === 0x02) return dos + "DL'deki " + chText(lo(B.DX)) + " ekrana yazılır.";
-      if (ah === 0x09) return dos + "DS:" + hx(B.DX) + " adresinden başlayan dizgi '$' işaretine kadar ekrana yazılır.";
-      if (ah === 0x4C) return dos + "program sonlanır, çıkış kodu AL = " + hx(al, 1) + ".";
-      if (ah === 0x00) return dos + "program sonlanır.";
-      if (ah === 0x01) return dos + "klavyeden " + keyText(rAL) + " okunur, ekrana yansıtılır ve AL'ye yazılır (AL = " + hx(rAL, 1) + ").";
-      if (ah === 0x07 || ah === 0x08) return dos + "klavyeden " + keyText(rAL) + " okunur; ekrana yansıtılmaz, AL = " + hx(rAL, 1) + ".";
+      var dos = tx("DOS hizmeti AH = ", "DOS service AH = ") + hx(ah, 1) + ": ";
+      if (ah === 0x02) return dos + tx("DL'deki " + chText(lo(B.DX)) + " ekrana yazılır.", chText(lo(B.DX)) + " in DL is written to the screen.");
+      if (ah === 0x09) return dos + tx("DS:" + hx(B.DX) + " adresinden başlayan dizgi '$' işaretine kadar ekrana yazılır.", "the string starting at DS:" + hx(B.DX) + " is written to the screen up to the '$' sign.");
+      if (ah === 0x4C) return dos + tx("program sonlanır, çıkış kodu AL = ", "the program terminates with exit code AL = ") + hx(al, 1) + ".";
+      if (ah === 0x00) return dos + tx("program sonlanır.", "the program terminates.");
+      if (ah === 0x01) return dos + tx("klavyeden " + keyText(rAL) + " okunur, ekrana yansıtılır ve AL'ye yazılır (AL = " + hx(rAL, 1) + ").", keyText(rAL) + " is read from the keyboard, echoed to the screen and stored in AL (AL = " + hx(rAL, 1) + ").");
+      if (ah === 0x07 || ah === 0x08) return dos + tx("klavyeden " + keyText(rAL) + " okunur; ekrana yansıtılmaz, AL = " + hx(rAL, 1) + ".", keyText(rAL) + " is read from the keyboard without echo, AL = " + hx(rAL, 1) + ".");
       if (ah === 0x06) {
-        if (lo(B.DX) !== 0xFF) return dos + "DL'deki " + chText(lo(B.DX)) + " ekrana yazılır.";
-        return dos + "DL = FFh olduğu için klavyeye bakılır: " + (fl.ZF ? "tuş yok, AL = 00h ve ZF = 1." : "tuş var, " + keyText(rAL) + " alınır (AL = " + hx(rAL, 1) + ", ZF = 0).");
+        if (lo(B.DX) !== 0xFF) return dos + tx("DL'deki " + chText(lo(B.DX)) + " ekrana yazılır.", chText(lo(B.DX)) + " in DL is written to the screen.");
+        return dos + tx("DL = FFh olduğu için klavyeye bakılır: " + (fl.ZF ? "tuş yok, AL = 00h ve ZF = 1." : "tuş var, " + keyText(rAL) + " alınır (AL = " + hx(rAL, 1) + ", ZF = 0)."),
+          "DL = FFh, so the keyboard is checked: " + (fl.ZF ? "no key, AL = 00h and ZF = 1." : "a key is available, " + keyText(rAL) + " is taken (AL = " + hx(rAL, 1) + ", ZF = 0)."));
       }
       if (ah === 0x0A) {
         var sv = rec.svc || { buf: "", mx: 0, at: B.DX };
+        if (isEN()) return dos + "the " + sv.buf.length + " character" + (sv.buf.length === 1 ? "" : "s") + " typed up to Enter" + (sv.buf ? " ('" + sv.buf + "')" : "") + " are read into the buffer at DS:" + hx(sv.at) + ": the first byte is the maximum " + sv.mx +
+          " (Enter included), DS:" + hx((sv.at + 1) & 0xFFFF) + " = " + hx(sv.buf.length, 1) + " is the number of characters read, and the text starts at DS:" + hx((sv.at + 2) & 0xFFFF) + " and ends with 0Dh.";
         return dos + "Enter'a kadar yazılan " + sv.buf.length + " karakter" + (sv.buf ? " ('" + sv.buf + "')" : "") + " DS:" + hx(sv.at) + " tamponuna okunur: ilk bayt en çok " + sv.mx +
           " (Enter dahil), DS:" + hx((sv.at + 1) & 0xFFFF) + " = " + hx(sv.buf.length, 1) + " okunan karakter sayısı, metin DS:" + hx((sv.at + 2) & 0xFFFF) + " adresinden başlar ve sonuna 0Dh yazılır.";
       }
-      if (ah === 0x0B) return dos + "tuş durumu sorulur: " + (rAL ? "bekleyen tuş var, AL = FFh." : "bekleyen tuş yok, AL = 00h.");
-      if (ah === 0x0C) return dos + "klavye tamponu boşaltılır, ardından AL'deki hizmet (" + hx(al, 1) + ") yürütülür.";
-      if (ah === 0x05) return dos + "DL'deki " + chText(lo(B.DX)) + " yazıcıya gönderilir.";
-      if (ah === 0x2A) return dos + "sistem tarihi alınır: CX = " + R.CX + " (" + hx(R.CX) + "), DH = " + dh(R.DX) + " (ay), DL = " + lo(R.DX) + " (gün), AL = " + rAL +
-        " (haftanın günü: " + (DAYS[rAL] || "?") + "). Laboratuvarda tarih sabittir.";
-      if (ah === 0x2C) return dos + "sistem saati alınır: CH = " + dh(R.CX) + " (saat), CL = " + lo(R.CX) + " (dakika), DH = " + dh(R.DX) + " (saniye), DL = " + lo(R.DX) + " (salise)." + clockNote(m);
-      if (ah === 0x25) return dos + "INT " + hx(al, 1) + " vektörü DS:DX = " + so(B.DS, B.DX) + " yapılır (vektör tablosunda 0000:" + hx(al * 4) + ").";
-      if (ah === 0x35) return dos + "INT " + hx(al, 1) + " vektörü okunur: ES:BX = " + so(R.ES, R.BX) + ".";
-      if (ah === 0x30) return dos + "DOS sürümü AL = " + rAL + ", AH = " + rAH + " olarak alınır.";
-      if (ah === 0x19) return dos + "geçerli sürücü AL = " + rAL + " (C:) olarak alınır.";
-      if (ah === 0x40) return dos + "DS:" + hx(B.DX) + " adresindeki " + B.CX + " bayt ekrana yazılır; AX = yazılan bayt sayısı.";
-      return dos + "yürütülür.";
+      if (ah === 0x0B) return dos + tx("tuş durumu sorulur: " + (rAL ? "bekleyen tuş var, AL = FFh." : "bekleyen tuş yok, AL = 00h."), "the keyboard status is checked: " + (rAL ? "a key is waiting, AL = FFh." : "no key is waiting, AL = 00h."));
+      if (ah === 0x0C) return dos + tx("klavye tamponu boşaltılır, ardından AL'deki hizmet (" + hx(al, 1) + ") yürütülür.", "the keyboard buffer is flushed, then the service in AL (" + hx(al, 1) + ") runs.");
+      if (ah === 0x05) return dos + tx("DL'deki " + chText(lo(B.DX)) + " yazıcıya gönderilir.", chText(lo(B.DX)) + " in DL is sent to the printer.");
+      if (ah === 0x2A) return dos + tx("sistem tarihi alınır: CX = " + R.CX + " (" + hx(R.CX) + "), DH = " + dh(R.DX) + " (ay), DL = " + lo(R.DX) + " (gün), AL = " + rAL +
+        " (haftanın günü: " + (DAYS[rAL] || "?") + "). Laboratuvarda tarih sabittir.",
+        "the system date is read: CX = " + R.CX + " (" + hx(R.CX) + ", year), DH = " + dh(R.DX) + " (month), DL = " + lo(R.DX) + " (day), AL = " + rAL +
+        " (day of the week: " + (DAYS_EN[rAL] || "?") + "). The date is fixed in the lab.");
+      if (ah === 0x2C) return dos + tx("sistem saati alınır: CH = " + dh(R.CX) + " (saat), CL = " + lo(R.CX) + " (dakika), DH = " + dh(R.DX) + " (saniye), DL = " + lo(R.DX) + " (salise).",
+        "the system time is read: CH = " + dh(R.CX) + " (hours), CL = " + lo(R.CX) + " (minutes), DH = " + dh(R.DX) + " (seconds), DL = " + lo(R.DX) + " (hundredths).") + clockNote(m);
+      if (ah === 0x25) return dos + tx("INT " + hx(al, 1) + " vektörü DS:DX = " + so(B.DS, B.DX) + " yapılır (vektör tablosunda 0000:" + hx(al * 4) + ").",
+        "the INT " + hx(al, 1) + " vector is set to DS:DX = " + so(B.DS, B.DX) + " (vector table entry 0000:" + hx(al * 4) + ").");
+      if (ah === 0x35) return dos + tx("INT " + hx(al, 1) + " vektörü okunur: ES:BX = " + so(R.ES, R.BX) + ".", "the INT " + hx(al, 1) + " vector is read: ES:BX = " + so(R.ES, R.BX) + ".");
+      if (ah === 0x30) return dos + tx("DOS sürümü AL = " + rAL + ", AH = " + rAH + " olarak alınır.", "the DOS version is returned as AL = " + rAL + ", AH = " + rAH + ".");
+      if (ah === 0x19) return dos + tx("geçerli sürücü AL = " + rAL + " (C:) olarak alınır.", "the current drive is returned as AL = " + rAL + " (C:).");
+      if (ah === 0x40) return dos + tx("DS:" + hx(B.DX) + " adresindeki " + B.CX + " bayt ekrana yazılır; AX = yazılan bayt sayısı.", B.CX + " bytes at DS:" + hx(B.DX) + " are written to the screen; AX = number of bytes written.");
+      return dos + tx("yürütülür.", "runs.");
     }
     if (nn === 0x10) {
-      var bio = "BIOS video hizmeti AH = " + hx(ah, 1) + ": ";
+      var bio = tx("BIOS video hizmeti AH = ", "BIOS video service AH = ") + hx(ah, 1) + ": ";
       var cur = rec.cursorBefore || [0, 0];
+      if (isEN()) {
+        if (ah === 0x0E) return "BIOS service AH = 0Eh: " + chText(al) + " in AL is written to the screen" + (al === 13 || al === 10 || al === 8 ? " (the cursor moves)" : ", the cursor advances by one") + ".";
+        if (ah === 0x00) {
+          if ((al & 0x7F) === 0x13) return bio + "video mode AL = " + hx(al, 1) + " is selected: 320×200 pixels, 256 colors; video memory A000:0000h–F9FFh, one byte per pixel (offset = y · 320 + x)" +
+            (al & 0x80 ? "; bit 7 of AL is 1, so video memory is not cleared." : "; video memory is cleared (all pixels 0 = black).");
+          if ((al & 0x7F) === 3) return bio + "video mode AL = " + hx(al, 1) + " (80×25 text, B800h) is selected; the screen is cleared and the cursor moves to (0, 0).";
+          return bio + "video mode AL = " + hx(al, 1) + " is selected; the lab shows this mode as an 80×25 text screen: the screen is cleared and the cursor moves to (0, 0).";
+        }
+        if (ah === 0x01) return bio + "the cursor shape is changed (CH = " + hx(dh(B.CX), 1) + ", CL = " + hx(lo(B.CX), 1) + (dh(B.CX) & 0x20 ? "; bit 5 = 1, so the cursor is hidden" : "") + ").";
+        if (ah === 0x02) return bio + "the cursor moves to row DH = " + dh(B.DX) + ", column DL = " + lo(B.DX) + ".";
+        if (ah === 0x03) return bio + "the cursor position is read: DH = " + dh(R.DX) + " (row), DL = " + lo(R.DX) + " (column); CX = " + hx(R.CX) + " is the cursor shape.";
+        if (ah === 0x06 || ah === 0x07) {
+          var winE = "the window from (" + dh(B.CX) + ", " + lo(B.CX) + ") to (" + dh(B.DX) + ", " + lo(B.DX) + ")";
+          if (al === 0) return bio + winE + " is cleared with attribute BH = " + attrText(dh(B.BX)) + ".";
+          return bio + winE + " is scrolled " + (ah === 0x06 ? "up" : "down") + " by " + al + " line" + (al === 1 ? "" : "s") + "; the vacated lines are filled with attribute BH = " + attrText(dh(B.BX)) + ".";
+        }
+        if (ah === 0x08) return bio + "the character and attribute at the cursor are read: AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + ".";
+        if (ah === 0x09 || ah === 0x0A) return bio + chText(al) + " in AL is written CX = " + B.CX + " times at the cursor position (" + cur[0] + ", " + cur[1] + ")" +
+          (ah === 0x09 ? " with attribute BL = " + attrText(lo(B.BX)) : "") + "; the cursor does not advance.";
+        var g13e = m.videoMode === 0x13, insideE = B.CX < 320 && B.DX < 200, pofE = B.DX * 320 + B.CX;
+        if (ah === 0x0C) {
+          if (!g13e) return bio + "color AL = " + hx(al, 1) + " is written to pixel (" + B.CX + ", " + B.DX + "); it does not show because the screen is in text mode.";
+          if (!insideE) return bio + "(" + B.CX + ", " + B.DX + ") is outside the 320×200 screen, so no pixel changes.";
+          return bio + "color AL = " + hx(al, 1) + " (" + colorName(al) + ") is written to pixel (" + B.CX + ", " + B.DX + "): A000:" + hx(pofE) + " = " + B.DX + " · 320 + " + B.CX + ".";
+        }
+        if (ah === 0x0D) {
+          if (g13e && insideE) return bio + "the color of pixel (" + B.CX + ", " + B.DX + ") is read from byte A000:" + hx(pofE) + ": AL = " + hx(rAL, 1) + " (" + colorName(rAL) + ").";
+          return bio + "the color of pixel (" + B.CX + ", " + B.DX + ") is read: AL = " + hx(rAL, 1) + ".";
+        }
+        if (ah === 0x0F) return bio + "the video mode is read: AL = " + hx(rAL, 1) + (rAL === 0x13 ? " (320×200, 256 colors)" : rAL === 3 ? " (80×25 text)" : "") + ", AH = " + rAH + " columns, BH = 0 (page).";
+        if (ah === 0x13) return bio + "the " + B.CX + "-character string at ES:BP = " + so(B.ES, B.BP) + " is written at (" + dh(B.DX) + ", " + lo(B.DX) + ") " +
+          (al & 2 ? "with its own character/attribute pairs" : "with attribute BL = " + attrText(lo(B.BX))) + "; AL = " + hx(al, 1) +
+          (al & 1 ? ", so the cursor moves to the end of the string." : ", so the cursor stays in place.");
+        return bio + "runs (no visible change on the screen).";
+      }
       if (ah === 0x0E) return "BIOS hizmeti AH = 0Eh: AL'deki " + chText(al) + " ekrana yazılır" + (al === 13 || al === 10 || al === 8 ? " (imleç hareket eder)" : ", imleç bir ilerler") + ".";
       if (ah === 0x00) {
         if ((al & 0x7F) === 0x13) return bio + "video modu AL = " + hx(al, 1) + " seçilir: 320×200 piksel, 256 renk; görüntü belleği A000:0000h–F9FFh, her piksel bir bayt (bağıl konum = y · 320 + x)" +
@@ -2510,31 +2565,42 @@
       return bio + "yürütülür (ekranda görünür bir değişiklik yok).";
     }
     if (nn === 0x16) {
-      var kb = "BIOS klavye hizmeti AH = " + hx(ah, 1) + ": ";
-      if (ah === 0x00 || ah === 0x10) return kb + "tampondan " + keyText(rAL) + " alınır: AL = " + hx(rAL, 1) + " (ASCII kodu), AH = " + hx(rAH, 1) + " (tarama kodu); tuş ekrana yazılmaz.";
-      if (ah === 0x01 || ah === 0x11) return kb + (fl.ZF ? "bekleyen tuş yok, ZF = 1." : "bekleyen tuş var (ZF = 0): " + keyText(rAL) + ", AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + "; tuş tamponda kalır.");
-      if (ah === 0x02) return kb + "kaydırma tuşlarının durumu alınır: AL = 00h.";
+      var kb = tx("BIOS klavye hizmeti AH = ", "BIOS keyboard service AH = ") + hx(ah, 1) + ": ";
+      if (ah === 0x00 || ah === 0x10) return kb + tx("tampondan " + keyText(rAL) + " alınır: AL = " + hx(rAL, 1) + " (ASCII kodu), AH = " + hx(rAH, 1) + " (tarama kodu); tuş ekrana yazılmaz.",
+        keyText(rAL) + " is taken from the buffer: AL = " + hx(rAL, 1) + " (ASCII code), AH = " + hx(rAH, 1) + " (scan code); the key is not echoed.");
+      if (ah === 0x01 || ah === 0x11) return kb + tx(fl.ZF ? "bekleyen tuş yok, ZF = 1." : "bekleyen tuş var (ZF = 0): " + keyText(rAL) + ", AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + "; tuş tamponda kalır.",
+        fl.ZF ? "no key is waiting, ZF = 1." : "a key is waiting (ZF = 0): " + keyText(rAL) + ", AL = " + hx(rAL, 1) + ", AH = " + hx(rAH, 1) + "; the key stays in the buffer.");
+      if (ah === 0x02) return kb + tx("kaydırma tuşlarının durumu alınır: AL = 00h.", "the shift key status is read: AL = 00h.");
     }
     if (nn === 0x1A) {
-      var rt = "BIOS saat hizmeti AH = " + hx(ah, 1) + ": ";
-      if (ah === 0x00) return rt + "gece yarısından beri geçen saat tıkı sayısı (saniyede yaklaşık 18,2) alınır: CX:DX = " + hx(R.CX).slice(0, 4) + " " + hx(R.DX) + " = " +
-        trNum(R.CX * 65536 + R.DX) + " tık." + clockNote(m);
-      if (ah === 0x02) return rt + "gerçek zamanlı saat paketli BCD olarak alınır: CH = " + hx(dh(R.CX), 1) + " (saat), CL = " + hx(lo(R.CX), 1) + " (dakika), DH = " + hx(dh(R.DX), 1) + " (saniye); CF = 0." + clockNote(m);
-      if (ah === 0x04) return rt + "tarih paketli BCD olarak alınır: CX = " + hx(R.CX) + " (yıl), DH = " + hx(dh(R.DX), 1) + " (ay), DL = " + hx(lo(R.DX), 1) + " (gün); CF = 0.";
+      var rt = tx("BIOS saat hizmeti AH = ", "BIOS clock service AH = ") + hx(ah, 1) + ": ";
+      if (ah === 0x00) return rt + tx("gece yarısından beri geçen saat tıkı sayısı (saniyede yaklaşık 18,2) alınır: CX:DX = ", "the number of clock ticks since midnight (about 18.2 per second) is read: CX:DX = ") + hx(R.CX).slice(0, 4) + " " + hx(R.DX) + " = " +
+        trNum(R.CX * 65536 + R.DX) + tx(" tık.", " ticks.") + clockNote(m);
+      if (ah === 0x02) return rt + tx("gerçek zamanlı saat paketli BCD olarak alınır: CH = " + hx(dh(R.CX), 1) + " (saat), CL = " + hx(lo(R.CX), 1) + " (dakika), DH = " + hx(dh(R.DX), 1) + " (saniye); CF = 0.",
+        "the real-time clock is read as packed BCD: CH = " + hx(dh(R.CX), 1) + " (hours), CL = " + hx(lo(R.CX), 1) + " (minutes), DH = " + hx(dh(R.DX), 1) + " (seconds); CF = 0.") + clockNote(m);
+      if (ah === 0x04) return rt + tx("tarih paketli BCD olarak alınır: CX = " + hx(R.CX) + " (yıl), DH = " + hx(dh(R.DX), 1) + " (ay), DL = " + hx(lo(R.DX), 1) + " (gün); CF = 0.",
+        "the date is read as packed BCD: CX = " + hx(R.CX) + " (year), DH = " + hx(dh(R.DX), 1) + " (month), DL = " + hx(lo(R.DX), 1) + " (day); CF = 0.");
     }
-    if (nn === 0x15 && ah === 0x86) return "BIOS bekleme hizmeti: CX:DX = " + hx(B.CX).slice(0, 4) + " " + hx(B.DX) + " = " + trNum(B.CX * 65536 + B.DX) +
-      " mikrosaniye (" + secText(B.CX * 65536 + B.DX) + ") beklenir; saat ve tık sayacı bu kadar ilerler, CF = 0.";
-    return "INT " + hx(nn, 1) + " hizmeti yürütülür.";
+    if (nn === 0x15 && ah === 0x86) return tx("BIOS bekleme hizmeti: CX:DX = " + hx(B.CX).slice(0, 4) + " " + hx(B.DX) + " = " + trNum(B.CX * 65536 + B.DX) +
+      " mikrosaniye (" + secText(B.CX * 65536 + B.DX) + ") beklenir; saat ve tık sayacı bu kadar ilerler, CF = 0.",
+      "BIOS wait service: waits CX:DX = " + hx(B.CX).slice(0, 4) + " " + hx(B.DX) + " = " + trNum(B.CX * 65536 + B.DX) +
+      " microseconds (" + secText(B.CX * 65536 + B.DX) + "); the clock and the tick counter advance by that much, CF = 0.");
+    return "INT " + hx(nn, 1) + tx(" hizmeti yürütülür.", " service runs.");
   }
   /* 256 renkli VGA paletinin ilk 16 rengi metin renkleriyle aynıdır; 16–31 gri tonlar */
   var VGA16 = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
     "koyu gri", "açık mavi", "açık yeşil", "açık camgöbeği", "açık kırmızı", "açık eflatun", "sarı", "beyaz"];
-  function colorName(c) { return c < 16 ? VGA16[c] : c < 32 ? "gri ton " + (c - 16) : c >= 248 ? "siyah" : "palet rengi " + c; }
-  /* Türkçe sayı yazımı: binlik ayırıcı nokta, ondalık virgül (5.000.000; 0,5) */
+  var VGA16_EN = ["black", "blue", "green", "cyan", "red", "magenta", "brown", "light gray",
+    "dark gray", "light blue", "light green", "light cyan", "light red", "light magenta", "yellow", "white"];
+  function colorName(c) {
+    if (isEN()) return c < 16 ? VGA16_EN[c] : c < 32 ? "gray shade " + (c - 16) : c >= 248 ? "black" : "palette color " + c;
+    return c < 16 ? VGA16[c] : c < 32 ? "gri ton " + (c - 16) : c >= 248 ? "siyah" : "palet rengi " + c;
+  }
+  /* Türkçe sayı yazımı: binlik ayırıcı nokta, ondalık virgül (5.000.000; 0,5); İngilizcede virgül ve nokta (5,000,000; 0.5) */
   function trNum(x, frac) {
-    var k = Math.pow(10, frac || 0), p = String(Math.round(x * k) / k).split(".");
-    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    return p.join(",");
+    var k = Math.pow(10, frac || 0), p = String(Math.round(x * k) / k).split("."), en = isEN();
+    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, en ? "," : ".");
+    return p.join(en ? "." : ",");
   }
   function secText(us) {
     var s = us / 1000000;
@@ -2543,12 +2609,12 @@
     return trNum(s, 3) + " s";
   }
   function clockNote(m) {
-    return m.us ? " Program başından beri " + secText(m.us) + " geçti." : "";
+    return m.us ? tx(" Program başından beri " + secText(m.us) + " geçti.", " " + secText(m.us) + " elapsed since the program started.") : "";
   }
   function describe(m, rec) {
     var st = rec.st, mn = st.op, ops = st.ops, pre = rec.pre, w = rec.w, R = rec.regs, B = rec.before.regs;
     var head = st.psp ? "INT 20h (PSP:0000h)" : (st.show || st.text).replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ");
-    if (st.macro && st.macro !== "emu8086.inc") head = st.macro + " açılımı · " + head;
+    if (st.macro && st.macro !== "emu8086.inc") head = st.macro + tx(" açılımı · ", " expansion · ") + head;
     var s = head + ": ", a = ops[0], b = ops[1], an = a ? opName(a) : "", bn = b ? opName(b) : "";
     function post(o, wid) {
       if (o.kind === "r8" || o.kind === "r16" || o.kind === "sreg") return R[o.reg] != null ? R[o.reg] : m.get(o.reg);
@@ -2556,37 +2622,76 @@
       return o.val;
     }
     function where(i) { return segName(ops[i]) + ":" + hx(pre[i].ea[1]) + " adresi"; }
+    function addr(i) { return segName(ops[i]) + ":" + hx(pre[i].ea[1]); }
     function src(i, wid) {
       var o = ops[i], v = hx(pre[i].v, wid || w);
       if (o.kind === "imm") return v;
-      if (o.kind === "mem") return where(i) + "ndeki " + birim(wid || w) + " (" + v + ")";
-      return o.reg + " değeri (" + v + ")";
+      if (o.kind === "mem") return tx(where(i) + "ndeki " + birim(wid || w) + " (" + v + ")", "the " + birim(wid || w) + " at " + addr(i) + " (" + v + ")");
+      return tx(o.reg + " değeri (" + v + ")", o.reg + " (" + v + ")");
     }
     var fl = rec.flags, bf = rec.before.flags, x, y, r, t;
-    if (rec.st.op === "_BIOS") return "Varsayılan kesme vektörü: BIOS hizmeti yapılır ve IRET ile dönülür.";
+    if (rec.st.op === "_BIOS") return tx("Varsayılan kesme vektörü: BIOS hizmeti yapılır ve IRET ile dönülür.", "Default interrupt vector: the BIOS service runs and returns with IRET.");
     if (mn === "MOV") {
-      if (a.kind === "mem") return s + src(1) + " " + where(0) + "ne yazılır; bayraklar değişmez.";
-      if (b.kind === "imm") return s + an + " yazmacına " + hx(pre[1].v, w) + " yüklenir; bayraklar değişmez.";
-      return s + src(1) + " " + an + " yazmacına kopyalanır; bayraklar değişmez.";
+      if (a.kind === "mem") return s + tx(src(1) + " " + where(0) + "ne yazılır; bayraklar değişmez.", src(1) + " is written to " + addr(0) + "; flags unchanged.");
+      if (b.kind === "imm") return s + tx(an + " yazmacına " + hx(pre[1].v, w) + " yüklenir; bayraklar değişmez.", hx(pre[1].v, w) + " is loaded into " + an + "; flags unchanged.");
+      return s + tx(src(1) + " " + an + " yazmacına kopyalanır; bayraklar değişmez.", src(1) + " is copied to " + an + "; flags unchanged.");
     }
-    if (mn === "XCHG") return s + an + " ile " + bn + " değerleri yer değiştirir: şimdi " + an + " = " + hx(post(a), w) + ", " + bn + " = " + hx(post(b), w) + ".";
+    if (mn === "XCHG") return s + tx(an + " ile " + bn + " değerleri yer değiştirir: şimdi ", an + " and " + bn + " swap values: now ") + an + " = " + hx(post(a), w) + ", " + bn + " = " + hx(post(b), w) + ".";
     if (mn === "LEA") {
-      if (b.direct) return s + b.text + " değişkeninin bağıl konumu (" + hx(R[a.reg]) + ") " + an + " yazmacına yüklenir; belleğe erişilmez.";
-      return s + b.text + " ifadesinin etkin adresi (" + hx(R[a.reg]) + ") " + an + " yazmacına yüklenir; belleğe erişilmez.";
+      if (b.direct) return s + tx(b.text + " değişkeninin bağıl konumu (" + hx(R[a.reg]) + ") " + an + " yazmacına yüklenir; belleğe erişilmez.", "the offset of variable " + b.text + " (" + hx(R[a.reg]) + ") is loaded into " + an + "; memory is not accessed.");
+      return s + tx(b.text + " ifadesinin etkin adresi (" + hx(R[a.reg]) + ") " + an + " yazmacına yüklenir; belleğe erişilmez.", "the effective address of " + b.text + " (" + hx(R[a.reg]) + ") is loaded into " + an + "; memory is not accessed.");
     }
-    if (mn === "LDS" || mn === "LES") return s + where(1) + "ndeki uzak işaretçi okunur: " + an + " = " + hx(R[a.reg]) + ", " + (mn === "LDS" ? "DS" : "ES") + " = " + hx(R[mn === "LDS" ? "DS" : "ES"]) + ".";
+    if (mn === "LDS" || mn === "LES") return s + tx(where(1) + "ndeki uzak işaretçi okunur: ", "the far pointer at " + addr(1) + " is read: ") + an + " = " + hx(R[a.reg]) + ", " + (mn === "LDS" ? "DS" : "ES") + " = " + hx(R[mn === "LDS" ? "DS" : "ES"]) + ".";
     if (has(ALU, mn)) {
       x = pre[0].v; y = pre[1].v; r = rec.info ? rec.info.r : post(a);
       var carry = (mn === "ADC" || mn === "SBB") ? " " + (mn === "ADC" ? "+" : "−") + " CF(" + bf.CF + ")" : "";
-      if (mn === "CMP") return s + an + " − " + (b.kind === "imm" ? hx(y, w) : bn) + " = " + hx(x, w) + " − " + hx(y, w) + " = " + hx(r, w) + " hesaplanır, sonuç saklanmaz; " + flagNote(rec, "sub") + ".";
+      if (mn === "CMP") return s + an + " − " + (b.kind === "imm" ? hx(y, w) : bn) + " = " + hx(x, w) + " − " + hx(y, w) + " = " + hx(r, w) + tx(" hesaplanır, sonuç saklanmaz; ", " is computed, the result is discarded; ") + flagNote(rec, "sub") + ".";
       if (mn === "ADD" || mn === "ADC") return s + an + " = " + hx(x, w) + " + " + hx(y, w) + carry + " = " + hx(r, w) + "; " + flagNote(rec, "add") + ".";
       if (mn === "SUB" || mn === "SBB") return s + an + " = " + hx(x, w) + " − " + hx(y, w) + carry + " = " + hx(r, w) + "; " + flagNote(rec, "sub") + ".";
-      if (mn === "XOR" && a.kind !== "mem" && b.kind === a.kind && a.reg === b.reg) return s + "bir değer kendisiyle XOR'lanınca 0 olur, " + an + " = " + hx(0, w) + "; " + flagNote(rec, "logic") + ".";
+      if (mn === "XOR" && a.kind !== "mem" && b.kind === a.kind && a.reg === b.reg) return s + tx("bir değer kendisiyle XOR'lanınca 0 olur, ", "a value XORed with itself gives 0, ") + an + " = " + hx(0, w) + "; " + flagNote(rec, "logic") + ".";
       return s + an + " = " + hx(x, w) + " " + mn + " " + hx(y, w) + " = " + hx(r, w) + "; " + flagNote(rec, "logic") + ".";
     }
-    if (mn === "TEST") return s + hx(pre[0].v, w) + " AND " + hx(pre[1].v, w) + " = " + hx(rec.info.r, w) + " hesaplanır, sonuç saklanmaz; " + flagNote(rec, "logic") + ".";
+    if (mn === "TEST") return s + hx(pre[0].v, w) + " AND " + hx(pre[1].v, w) + " = " + hx(rec.info.r, w) + tx(" hesaplanır, sonuç saklanmaz; ", " is computed, the result is discarded; ") + flagNote(rec, "logic") + ".";
     if (mn === "INC" || mn === "DEC") return s + an + " = " + hx(pre[0].v, w) + (mn === "INC" ? " + 1 = " : " − 1 = ") + hx(post(a), w) + "; " + flagNote(rec, "inc") + ".";
-    if (mn === "NEG") return s + an + " = 0 − " + hx(pre[0].v, w) + " = " + hx(post(a), w) + " (ikiye tümleyen); " + (fl.CF ? "işlenen sıfır olmadığı için CF = 1" : "işlenen sıfır olduğu için CF = 0") + (fl.OF ? ", işaretli taşma olduğu için OF = 1" : "") + ".";
+    if (mn === "NEG" && !isEN()) return s + an + " = 0 − " + hx(pre[0].v, w) + " = " + hx(post(a), w) + " (ikiye tümleyen); " + (fl.CF ? "işlenen sıfır olmadığı için CF = 1" : "işlenen sıfır olduğu için CF = 0") + (fl.OF ? ", işaretli taşma olduğu için OF = 1" : "") + ".";
+    if (isEN()) {
+      if (mn === "NEG") return s + an + " = 0 − " + hx(pre[0].v, w) + " = " + hx(post(a), w) + " (two's complement); " + (fl.CF ? "CF = 1 because the operand is not zero" : "CF = 0 because the operand is zero") + (fl.OF ? ", OF = 1 because of signed overflow" : "") + ".";
+      if (mn === "NOT") return s + "all bits of " + an + " are inverted: " + hx(pre[0].v, w) + " → " + hx(post(a), w) + "; flags unchanged.";
+      if (mn === "MUL" || mn === "IMUL") {
+        var sgE = mn === "IMUL" ? "signed " : "";
+        if (w === 1) return s + "AX = AL × " + an + " = " + hx(B.AX & 0xFF, 1) + " × " + hx(pre[0].v, 1) + " = " + hx(R.AX) + " (" + sgE + "product); " +
+          (fl.CF ? "CF = OF = 1 because the result does not fit in AL." : "CF = OF = 0 because the result fits in AL.");
+        return s + "DX:AX = AX × " + an + " = " + hx(B.AX) + " × " + hx(pre[0].v) + " = " + hx(R.DX).slice(0, 4) + " " + hx(R.AX) + " (" + sgE + "product); " +
+          (fl.CF ? "CF = OF = 1 because the result does not fit in AX." : "CF = OF = 0 because the result fits in AX.");
+      }
+      if (mn === "DIV" || mn === "IDIV") {
+        if (rec.irq) return s + "a divide error occurs (INT 0) because " + (pre[0].v === 0 ? "the divisor is 0" : "the quotient does not fit in " + (w === 1 ? "AL" : "AX")) + ": " + irqText(m, rec, true);
+        if (w === 1) return s + "AX (" + hx(B.AX) + ") ÷ " + an + " (" + hx(pre[0].v, 1) + ") → quotient AL = " + hx(R.AX & 0xFF, 1) + ", remainder AH = " + hx(R.AX >> 8, 1) + "; flags are undefined.";
+        return s + "DX:AX (" + hx(B.DX).slice(0, 4) + " " + hx(B.AX) + ") ÷ " + an + " (" + hx(pre[0].v) + ") → quotient AX = " + hx(R.AX) + ", remainder DX = " + hx(R.DX) + "; flags are undefined.";
+      }
+      if (has(SHIFTS, mn)) {
+        var cntE = rec.info ? rec.info.cnt : 0, nbE = b.kind === "r8" ? "CL (" + cntE + ")" : String(cntE);
+        if (cntE === 0) return s + "nothing changes because the count is 0.";
+        var verbE = { SHL: ["shifted left", ""], SAL: ["shifted left", ""], SHR: ["shifted right", ", 0 enters from the left"], SAR: ["shifted right", ", the sign bit is preserved"],
+          ROL: ["rotated left", ""], ROR: ["rotated right", ""], RCL: ["rotated left through CF", ""], RCR: ["rotated right through CF", ""] }[mn];
+        return s + an + " (" + hx(pre[0].v, w) + ") is " + verbE[0] + " by " + nbE + " bit" + (cntE === 1 ? "" : "s") + verbE[1] + ": " + hx(post(a), w) + "; the last bit shifted out is CF = " + fl.CF + ".";
+      }
+      if (has(JCC, mn)) {
+        var ccE = JCC[mn], jumpedE = R.IP === st.target && R.IP !== ((rec.before.ip + st.size) & 0xFFFF);
+        var nowE = (COND_FLAGS[ccE >> 1] || []).map(function (k) { return k + " = " + bf[k]; }).join(", ");
+        return s + "now " + nowE + ", so the condition (" + COND[ccE].replace(" ya da ", " or ").replace(" ve ", " and ") + ") " +
+          (jumpedE ? "holds; jump to " + targetText(m, st.target) + "." : "does not hold; no jump, execution continues with the next instruction.");
+      }
+      if (mn === "JMP") return s + "unconditional jump to " + targetText(m, R.IP) + ".";
+      if (mn === "LOOP" || mn === "LOOPE" || mn === "LOOPZ" || mn === "LOOPNE" || mn === "LOOPNZ") {
+        var backE = R.IP === st.target && st.target !== ((rec.before.ip + st.size) & 0xFFFF);
+        var extraE = mn === "LOOP" ? "" : " and ZF = " + bf.ZF;
+        return s + "CX is decremented (CX = " + hx(R.CX) + "). " + (backE ? "CX is not zero" + extraE + ", so the loop jumps back to " + targetText(m, st.target) + "." :
+          (R.CX === 0 ? "The loop exits because CX is zero." : "The loop exits because ZF = " + bf.ZF + "."));
+      }
+      if (mn === "JCXZ") return s + (B.CX === 0 ? "CX = 0, so jump to " + targetText(m, st.target) + "." : "no jump because CX is not zero.");
+      if (mn === "CALL") return s + "the return address " + hx((rec.before.ip + st.size) & 0xFFFF) + " is pushed onto the stack (SP = " + hx(R.SP) + ") and control goes to " + targetText(m, R.IP) + ".";
+    }
     if (mn === "NOT") return s + an + " değerinin bütün bitleri ters çevrilir: " + hx(pre[0].v, w) + " → " + hx(post(a), w) + "; bayraklar değişmez.";
     if (mn === "MUL" || mn === "IMUL") {
       var sg = mn === "IMUL" ? "işaretli " : "";
@@ -2623,6 +2728,87 @@
     if (mn === "JCXZ") return s + (B.CX === 0 ? "CX = 0 olduğu için " + targetText(m, st.target) + " atlanır." : "CX sıfır olmadığı için atlanmaz.");
     if (mn === "CALL") return s + "dönüş adresi " + hx((rec.before.ip + st.size) & 0xFFFF) + " yığına itilir (SP = " + hx(R.SP) + ") ve " + targetText(m, R.IP) + " gidilir.";
     var depth = (m.initSp - B.SP) & 0xFFFF;   /* yığındaki bayt sayısı; 8000h üstü: SP başlangıcın üstünde (alt taşma) */
+    if (isEN()) {
+      if (mn === "RET" || mn === "RETN" || mn === "RETF") {
+        if (R.IP === 0 && R.CS === PSP_SEG && m.prog.com) return s + "0000h is popped from the stack; IP = 0000h, so control goes to the INT 20h instruction in the PSP.";
+        if (st.far) return s + "IP = " + hx(R.IP) + " and then CS = " + hx(R.CS) + " are popped from the stack (SP = " + hx(R.SP) + ")" + (ops.length ? ", and SP is increased by " + ops[0].val + " bytes" : "") + "; far return.";
+        return s + "the return address " + hx(R.IP) + " is popped from the stack (SP = " + hx(R.SP) + ")" + (ops.length ? ", SP is increased by " + ops[0].val + " bytes" : "") + " and execution returns there." +
+          (depth >= 0x8000 ? " SP was outside the stack area: the word read is not a return address (underflow)." : "");
+      }
+      if (mn === "PUSH") return s + "SP is decreased by 2 (" + hx(R.SP) + ") and " + (a.kind === "imm" ? hx(pre[0].v) : a.kind === "mem" ? "the word at " + addr(0) + " (" + hx(pre[0].v) + ")" : an + " (" + hx(pre[0].v) + ")") + " is written to SS:" + hx(R.SP) + ".";
+      if (mn === "POP") return s + "the word at SS:" + hx(B.SP) + " (" + hx(m.rd16(rec.regs.SS, B.SP)) + ") is popped into " + (a.kind === "mem" ? addr(0) : an) + " and SP is increased by 2 (" + hx(R.SP) + ")." +
+        (depth === 0 && m.prog.com ? " No value pushed by the program was left on the stack: DOS's return address (0000h) was popped and SP wrapped around (underflow)." :
+          depth >= 0x8000 ? " SP was outside the stack area: the word read is not a value that was pushed (underflow)." : "");
+      if (mn === "PUSHF") return s + "the FLAGS word (" + hx(m.rd16(R.SS, R.SP)) + ") is pushed onto the stack; SP = " + hx(R.SP) + ".";
+      if (mn === "POPF") return s + "the word on the stack (" + hx(m.rd16(R.SS, B.SP)) + ") is popped into FLAGS; all flags are restored, SP = " + hx(R.SP) + ".";
+      if (mn === "LAHF") return s + "the low byte of FLAGS, holding SF, ZF, AF, PF and CF, is copied to AH: AH = " + hx(R.AX >> 8, 1) + ".";
+      if (mn === "SAHF") return s + "AH (" + hx(B.AX >> 8, 1) + ") is written to the low byte of FLAGS; SF, ZF, AF, PF and CF take their values from it.";
+      if (mn === "CLC") return s + "CF is cleared to 0.";
+      if (mn === "STC") return s + "CF is set to 1.";
+      if (mn === "CMC") return s + "CF is complemented: CF = " + fl.CF + ".";
+      if (mn === "CLD") return s + "DF is cleared to 0; string instructions increment SI and DI.";
+      if (mn === "STD") return s + "DF is set to 1; string instructions decrement SI and DI.";
+      if (mn === "CLI") return s + "IF is cleared to 0; hardware interrupts are disabled.";
+      if (mn === "STI") return s + "IF is set to 1; hardware interrupts are enabled.";
+      if (mn === "CBW") return s + "AL (" + hx(B.AX & 0xFF, 1) + ") is sign-extended into AX: AX = " + hx(R.AX) + ".";
+      if (mn === "CWD") return s + "AX (" + hx(B.AX) + ") is sign-extended into DX:AX: DX = " + hx(R.DX) + ".";
+      if (mn === "NOP") return s + "nothing happens; only IP advances.";
+      if (mn === "HLT") return s + "the processor halts.";
+      if (mn === "XLATB") return s + "the byte at DS:[BX + AL] = DS:" + hx((B.BX + (B.AX & 0xFF)) & 0xFFFF) + " is loaded into AL: AL = " + hx(R.AX & 0xFF, 1) + ".";
+      if (has(EXEC, mn) && EXEC[mn] === strop) {
+        var baseE = mn.slice(0, -1), wdE = /B$/.test(mn) ? 1 : 2, infE = rec.info || { n: 1 }, accE = wdE === 1 ? "AL" : "AX";
+        var uE = birim(wdE), ddP = (bf.DF ? "decrease" : "increase") + " by " + wdE, ddS = (bf.DF ? "decreases" : "increases") + " by " + wdE;
+        if (infE.rep && m.repStep) {
+          if (!infE.n) return s + "the instruction does not run at all because CX = 0.";
+          var movedE = wdE === 1 ? m.rd8(R.ES, B.DI) : m.rd16(R.ES, B.DI);
+          var oneE = { MOVS: "the " + uE + " at DS:" + hx(B.SI) + " (" + hx(movedE, wdE) + ") is copied to ES:" + hx(B.DI),
+            STOS: accE + " is written to ES:" + hx(B.DI),
+            LODS: "the " + uE + " at DS:" + hx(B.SI) + " is read into " + accE,
+            CMPS: "the " + uE + "s at DS:" + hx(B.SI) + " and ES:" + hx(B.DI) + " are compared (ZF = " + fl.ZF + ")",
+            SCAS: accE + " is compared with the " + uE + " at ES:" + hx(B.DI) + " (ZF = " + fl.ZF + ")" }[baseE];
+          var finE;
+          if (infE.again) finE = "the condition still holds, so the same instruction will run one more iteration";
+          else if (R.CX === 0 && !((baseE === "CMPS" || baseE === "SCAS") && ((infE.rep === "E") !== !!fl.ZF))) finE = "the repetition ends because CX reached zero";
+          else finE = infE.rep === "E" ? "the repetition ends because a different " + uE + " was found (ZF = 0)" : "the repetition ends because the " + uE + " searched for was found (ZF = 1)";
+          return s + "one iteration: " + oneE + "; CX is decremented (CX = " + hx(R.CX) + "); " + finE + ".";
+        }
+        if (infE.rep) {
+          var nE = infE.n, stopE = "", unE = uE + (nE === 1 ? "" : "s"), beE = nE === 1 ? " is" : " are";
+          if (baseE === "CMPS" || baseE === "SCAS") stopE = R.CX === 0 && !((infE.rep === "E") !== !!fl.ZF) ? "stops because CX reached zero" :
+            (infE.rep === "E" ? "stops because a different " + uE + " was found (ZF = 0)" : "stops because the " + uE + " searched for was found (ZF = 1)");
+          else stopE = "stops when CX reaches zero";
+          var whatE = { MOVS: nE + " " + unE + beE + " copied from DS:" + hx(B.SI) + " to ES:" + hx(B.DI),
+            STOS: nE + " " + unE + " starting at ES:" + hx(B.DI) + beE + " filled with " + accE + " (" + hx(wdE === 1 ? B.AX & 0xFF : B.AX, wdE) + ")",
+            LODS: nE + " " + unE + beE + " read into " + accE + " one after another",
+            CMPS: nE + " " + uE + " pair" + (nE === 1 ? "" : "s") + beE + " compared", SCAS: nE + " " + unE + beE + " compared with " + accE }[baseE];
+          var regsNowE = "CX = " + hx(R.CX) + (baseE === "SCAS" || baseE === "STOS" ? "" : ", SI = " + hx(R.SI)) + (baseE === "LODS" ? "" : ", DI = " + hx(R.DI));
+          return s + whatE + "; the repetition " + stopE + ". Now " + regsNowE + ".";
+        }
+        if (baseE === "MOVS") return s + "the " + uE + " at DS:" + hx(B.SI) + " is copied to ES:" + hx(B.DI) + "; SI and DI " + ddP + ".";
+        if (baseE === "STOS") return s + accE + " is written to ES:" + hx(B.DI) + "; DI " + ddS + ".";
+        if (baseE === "LODS") return s + "the " + uE + " at DS:" + hx(B.SI) + " is read into " + accE + " (" + hx(wdE === 1 ? R.AX & 0xFF : R.AX, wdE) + "); SI " + ddS + ".";
+        if (baseE === "CMPS") return s + "the " + uE + "s at DS:" + hx(B.SI) + " and ES:" + hx(B.DI) + " are compared (subtracted); " + (fl.ZF ? "ZF = 1 because they are equal" : "ZF = 0 because they differ") + "; SI and DI " + ddP + ".";
+        if (baseE === "SCAS") return s + accE + " is compared with the " + uE + " at ES:" + hx(B.DI) + "; " + (fl.ZF ? "ZF = 1 because they are equal" : "ZF = 0 because they differ") + "; DI " + ddS + ".";
+      }
+      if ((mn === "INTO") && !bf.OF) return s + "no interrupt occurs because OF = 0.";
+      if (mn === "AAM") return s + "AL (" + hx(B.AX & 0xFF, 1) + ") is divided by " + (st.aamBase == null ? 10 : st.aamBase) + ": AH = quotient (" + hx(R.AX >> 8, 1) + "), AL = remainder (" + hx(R.AX & 0xFF, 1) + "); the result is unpacked BCD digits.";
+      if (mn === "AAD") return s + "AL = AH × " + (st.aamBase == null ? 10 : st.aamBase) + " + AL = " + hx(B.AX >> 8, 1) + " × " + (st.aamBase == null ? 10 : st.aamBase) + " + " + hx(B.AX & 0xFF, 1) + " = " + hx(R.AX & 0xFF, 1) + ", AH = 00h; the unpacked BCD number is converted to binary.";
+      if (mn === "DAA" || mn === "DAS") return s + "AL is adjusted to packed BCD: " + hx(B.AX & 0xFF, 1) + " → " + hx(R.AX & 0xFF, 1) + "; " +
+        (fl.AF ? (mn === "DAA" ? "6 was added to" : "6 was subtracted from") + " the low nibble (AF = 1)" : "the low nibble is valid (AF = 0)") + ", " + (fl.CF ? "the high nibble was adjusted too (CF = 1)." : "the high nibble is valid (CF = 0).");
+      if (mn === "AAA" || mn === "AAS") return s + (fl.AF ? "an adjustment is made because the low nibble of AL is greater than 9 or AF = 1: AL = " + hx(R.AX & 0xFF, 1) + ", AH = " + hx(R.AX >> 8, 1) + ", CF = AF = 1." :
+        "no adjustment is needed: the high nibble of AL is cleared (AL = " + hx(R.AX & 0xFF, 1) + "), CF = AF = 0.");
+      if (mn === "IRET") return s + "IP = " + hx(R.IP) + ", CS = " + hx(R.CS) + " and FLAGS = " + hx(m.rd16(R.SS, (B.SP + 4) & 0xFFFF)) +
+        " are popped from the stack (SP = " + hx(R.SP) + "); execution returns to the interrupted program" + (fl.IF !== bf.IF ? " and IF becomes " + fl.IF + " again" : "") + ".";
+      if (mn === "OUT") {
+        var pwE = rec.info ? rec.info.port : (a.kind === "r16" ? B.DX : a.val & 0xFF);
+        return s + b.reg + " (" + hx(rec.info ? rec.info.v : m.get(b.reg), b.size) + ") is written to port " + hx(pwE, pwE > 255 ? 2 : 1) +
+          (b.size === 2 ? " (word: low byte to " + hx(pwE, pwE > 255 ? 2 : 1) + ", high byte to the next port)" : "") + ".";
+      }
+      if (mn === "IN") {
+        var prE = rec.info ? rec.info.port : (b.kind === "r16" ? B.DX : b.val & 0xFF);
+        return s + "the " + birim(a.size) + " read from port " + hx(prE, prE > 255 ? 2 : 1) + " (" + hx(rec.info ? rec.info.v : R[an], a.size) + ") is loaded into " + an + ".";
+      }
+    }
     if (mn === "RET" || mn === "RETN" || mn === "RETF") {
       if (R.IP === 0 && R.CS === PSP_SEG && m.prog.com) return s + "yığından 0000h alınır; IP = 0000h olur ve PSP'deki INT 20h komutuna gidilir.";
       if (st.far) return s + "yığından önce IP = " + hx(R.IP) + ", sonra CS = " + hx(R.CS) + " alınır (SP = " + hx(R.SP) + ")" + (ops.length ? ", ayrıca SP " + ops[0].val + " bayt artırılır" : "") + "; uzak dönüş yapılır.";
@@ -2711,7 +2897,7 @@
     var ch = [];
     ["AX", "BX", "CX", "DX", "SI", "DI", "BP", "SP"].forEach(function (k) { if (R[k] !== B[k]) ch.push(k + " = " + hx(R[k])); });
     FLAGORDER.forEach(function (k) { if (fl[k] !== bf[k]) ch.push(k + " = " + fl[k]); });
-    return s + (ch.length ? "değişenler: " + ch.join(", ") + "." : "yazmaçlar değişmez.");
+    return s + (ch.length ? tx("değişenler: ", "changed: ") + ch.join(", ") + "." : tx("yazmaçlar değişmez.", "registers unchanged."));
   }
 
   /* ================= emu8086 sanal aygıt modelleri (laboratuvar çizimleri için) ================= */
@@ -2766,7 +2952,7 @@
     var res = { steps: [], output: "", stop: null, error: null, warnings: [], final: null };
     var prog;
     try { prog = assemble(source, opts); }
-    catch (e) { if (e instanceof AsmError) { res.stop = "error"; res.error = "Assembly hatası: " + e.message; return res; } throw e; }
+    catch (e) { if (e instanceof AsmError) { res.stop = "error"; res.error = tx("Assembly hatası: ", "Assembly error: ") + e.message; return res; } throw e; }
     res.warnings = prog.warnings.slice();
     var m = new Machine(prog, opts), maxSteps = opts.maxSteps || 10000, n = 0;
     res.machine = m; res.program = prog;
@@ -2778,8 +2964,8 @@
         rec = m.stepRecord();
         if (rec == null) continue;
       } catch (e) {
-        if (e instanceof EmuError) { res.stop = "error"; res.error = "Çalışma hatası: " + e.message; break; }
-        if (e instanceof InputWait) { res.stop = "input_wait"; res.error = "girdi bekleniyor (" + e.what + ")"; break; }
+        if (e instanceof EmuError) { res.stop = "error"; res.error = tx("Çalışma hatası: ", "Runtime error: ") + e.message; break; }
+        if (e instanceof InputWait) { res.stop = "input_wait"; res.error = tx("girdi bekleniyor (", "waiting for input (") + e.what + ")"; break; }
         throw e;
       }
       n++;

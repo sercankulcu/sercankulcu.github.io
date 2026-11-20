@@ -26,7 +26,7 @@ notes_book.setup(
     folder='advanced_algorithms',
     course_page='advanced-algorithms.md',
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
-    intro=[('ders_haritasi.html', 'harita')],
+    intro=[('Ders_Haritasi.html', 'harita')],
     title='İleri Algoritmalar',
     subtitle='',
     output='advanced_algorithms/Ileri-Algoritmalar.pdf',   # courses-pdfs/ altinda

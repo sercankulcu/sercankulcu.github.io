@@ -33,8 +33,8 @@ This course is the continuation of [Algorithms](/teaching/algorithms/). It studi
 * [Ön Koşul: Algoritmalar Dersi (Bölüm 1–11)](/teaching/algorithms/)
 * [İleri Algoritmalarda Önemli İsimler (HTML)](/files/advanced_algorithms/Advanced_Algorithms_Important_People.html)
 * [İleri Algoritmalar İçin Ön Bilgiler (HTML)](/files/advanced_algorithms/Advanced_Algorithms_Prerequisites.html)
-* [Dersin Haritası (HTML)](/files/advanced_algorithms/ders_haritasi.html)
-* [Terim Sözlüğü (HTML)](/files/advanced_algorithms/sozluk.html)
+* [Dersin Haritası (HTML)](/files/advanced_algorithms/Ders_Haritasi.html)
+* [Terim Sözlüğü (HTML)](/files/advanced_algorithms/Sozluk.html)
 
 ---
 
@@ -50,8 +50,8 @@ Böl ve fethet yaklaşımı, bir problemi aynı türden daha küçük alt proble
 - [📝Çalışma Soruları - Böl ve Fethet Yaklaşımı (HTML)](/files/advanced_algorithms/sunumlar/Bolum_01_Bol_ve_Fethet_Yaklasimi_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/advanced-algorithms-java/tree/main/Bolum01/src)
 
-- [🕹️Özyineleme ve Ana Teorem (HTML)](/files/algorithms/slides/Bolum_02_Recurrence_Master_Theorem.html)
-- [🕹️Sıralama Algoritmaları (HTML)](/files/algorithms/slides/Bolum_03_Sorting.html)
+- [🕹️Özyineleme ve Ana Teorem (HTML)](/files/algorithms/sunumlar/Bolum_02_Recurrence_Master_Theorem.html)
+- [🕹️Sıralama Algoritmaları (HTML)](/files/algorithms/sunumlar/Bolum_03_Sorting.html)
 
 ---
 
@@ -65,8 +65,8 @@ Açgözlü algoritmalar çözümü adım adım kurar, her adımda o an en iyi g�
 - [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](/files/advanced_algorithms/sunumlar/Bolum_02_Acgozlu_Algoritmalar_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/advanced-algorithms-java/tree/main/Bolum02/src)
 
-- [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](/files/algorithms/slides/Bolum_07_MST.html)
-- [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](/files/algorithms/slides/Bolum_09_String_Compression.html)
+- [🕹️Minimum Kapsayan Ağaç Simülatörü (HTML)](/files/algorithms/sunumlar/Bolum_07_MST.html)
+- [🕹️Dizgi Sıkıştırma Algoritmaları (HTML)](/files/algorithms/sunumlar/Bolum_09_String_Compression.html)
 
 ---
 

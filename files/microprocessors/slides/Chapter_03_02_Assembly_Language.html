@@ -1,0 +1,634 @@
+---
+layout: without-sidebar
+title: "Chapter 3.2: Assembly Language"
+permalink: /files/microprocessors/slides/Chapter_03_02_Assembly_Language.html
+excerpt: "Microprocessors, Chapter 3.2 slides: assembler and emu8086, source line format, instructions vs. directives, labels, implicit operands, instruction timing, IP and flags, a first .COM program, common errors."
+lang: en
+seo_title: "Chapter 3.2: Assembly Language · Microprocessors Slides"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/sunumlar/Bolum_03_02_Assembly.html
+  en: /files/microprocessors/slides/Chapter_03_02_Assembly_Language.html
+resource: "Presentation"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+.ds-deck .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-deck__step > svg.ds-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.ds-deck .ds-deck__card strong { display: inline; margin: 0; font-size: inherit; }
+.ds-deck .ds-deck__card > strong:first-child { display: block; margin-bottom: 3px; font-size: 17px; }
+.ds-deck pre .dir { color: var(--ds-accent); font-weight: 700; }
+.ds-deck .ds-trace.m-side { grid-template-columns: minmax(0, var(--m-cw, 300px)) minmax(0, 1fr); column-gap: 14px; row-gap: 6px; }
+.ds-deck .m-side > .ds-deck__steps { grid-column: 2; grid-row: 1; }
+.ds-deck .m-side > pre.ds-trace__code { grid-column: 1; grid-row: 1 / span 2; }
+.ds-deck .m-side > .ds-trace__col { grid-column: 2; grid-row: 2; }
+.ds-deck .m-side .ds-deck__step svg { display: block; margin: 0 auto; }
+.ds-deck .m-side .ds-deck__stepnote { margin-top: 4px; min-height: 44px; font-size: 15px; line-height: 1.35; }
+.ds-deck .m-side .ds-trace__var { font-size: 12.5px; padding: 1px 7px; }
+.ds-deck.is-fluid .m-side > * { grid-column: auto !important; grid-row: auto !important; }
+.ds-deck pre.m-asm { font-size: 14px; line-height: 1.42; }
+.ds-deck .m-tight li { margin: 3px 0; }
+.ds-deck .m-ok { color: var(--ds-good) !important; }
+.ds-deck .m-bad { color: var(--ds-bad) !important; }
+
+.ds-deck .ds-svg .ptr { fill: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.5; }
+.ds-deck .mt-tr { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); column-gap: 14px; }
+.ds-deck .mt-tr pre.ds-trace__code { font-size: 13px; line-height: 1.5; }
+.ds-deck .mt-tr .ds-deck__step > svg.ds-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.ds-deck .mt-tr .ds-deck__stepnote { margin-top: 4px; min-height: 44px; font-size: 15px; }
+.ds-deck .mt-tr .ds-trace__var { font-size: 13px; }
+.ds-deck .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-deck .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-deck .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-deck .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-deck .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-deck .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-deck .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-deck .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-deck .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+.ds-deck .ds-svg .mt-wire { stroke: var(--ds-link); stroke-width: 2.4; fill: none; }
+.ds-deck .ds-svg .mt-wire0 { stroke: var(--ds-muted); stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+.ds-deck .ds-svg .mt-sig { stroke: var(--ds-text); stroke-width: 2; fill: none; }
+.ds-deck .mt-tr pre .dir { color: var(--ds-accent); font-weight: 700; }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="en">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="slide deck" aria-label="Chapter 3.2: Assembly Language slides">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Chapter 3.2: Assembly Language" data-section="">
+  <h1>Chapter 3.2: Assembly Language</h1>
+  <div class="ds-deck__subtitle">Microprocessors</div>
+  <div class="ds-deck__agenda" aria-label="Chapter contents"><span>Assembly language</span><span>Source line format</span><span>Instructions and directives</span><span>Operand types</span><span>Implicit operands</span><span>Instruction timing</span><span>IP and flags</span><span>A first program</span></div>
+  <small>Sercan KÜLCÜ · Giresun University · Computer Engineering</small>
+</section>
+
+<section class="ds-deck__slide" data-title="Learning Outcomes" data-section="Introduction">
+  <p class="ds-deck__kicker">Introduction</p>
+  <h2>Learning Outcomes</h2>
+<div class="ds-deck__grid ds-deck__grid--2 ds-deck__grid--roomy">
+  <div class="ds-deck__card"><strong>Where assembly fits</strong><p>Relate assembly language to machine language and to high-level languages.</p></div>
+  <div class="ds-deck__card"><strong>Line format</strong><p>Read a source line as label, mnemonic, operands and comment; tell an instruction from a directive.</p></div>
+  <div class="ds-deck__card"><strong>Operands</strong><p>Recognize register, immediate and memory operands, and the implicit operands of instructions.</p></div>
+  <div class="ds-deck__card"><strong>Instruction timing</strong><p>Compare register and memory forms of an instruction in clock cycles.</p></div>
+  <div class="ds-deck__card"><strong>IP and flags</strong><p>Follow how IP advances and which instructions change the flags.</p></div>
+  <div class="ds-deck__card"><strong>A first program</strong><p>Write a simple .COM program in emu8086 and single-step through it.</p></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Assembly Language" data-section="Assembly Language">
+  <p class="ds-deck__kicker">Assembly Language</p>
+  <h2>Assembly Language</h2>
+<div class="ds-deck__two ds-deck__two--wide-left ds-deck__two--center">
+<ul class="m-tight">
+  <li>A <strong>low-level</strong> language: each instruction corresponds to exactly one machine instruction.</li>
+  <li>Instead of raw numbers it uses readable <strong>mnemonics</strong>: <code>MOV</code>, <code>ADD</code>, <code>JMP</code>…</li>
+  <li>Writing it <strong>requires</strong> knowing the machine: registers, memory, the system bus.</li>
+  <li>It is the best way to <strong>understand</strong> how a computer is organized and how a program really runs.</li>
+  <li>Every processor family has its own assembly language; this course uses the <strong>Intel 8086</strong> and <strong>emu8086</strong>.</li>
+</ul>
+<div class="ds-deck__card"><strong>One line, three views</strong>
+<p class="ds-deck__small">Assembly: <code>MOV AX, 5</code></p>
+<p class="ds-deck__small">Machine code in hex: <code>B8 05 00</code></p>
+<p class="ds-deck__small">What the CPU sees:<br><code style="font-size:13px">10111000 00000101 00000000</code></p>
+<p class="ds-deck__small ds-deck__muted" style="margin-top:6px">The 16-bit value 0005h is stored low byte first (05 00).</p>
+</div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="The Assembler and emu8086" data-section="Assembly Language">
+  <p class="ds-deck__kicker">Assembly Language</p>
+  <h2>The Assembler and emu8086</h2>
+<div class="ds-deck__figure" style="margin:0 0 10px"><svg class="ds-svg" viewBox="0 0 720 126" role="img" aria-label="The assembler turns the source file into machine code; the loader puts it in memory" style="max-width:720px"><defs><marker id="m03p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="150" height="60" rx="8"/><text class="txt" x="85" y="56" text-anchor="middle">source.asm</text><text class="lbl" x="85" y="76" text-anchor="middle">text</text><path class="line" d="M162 60 L196 60" marker-end="url(#m03p1)"/><rect class="ptr" x="190" y="30" width="150" height="60" rx="8"/><text class="txt" x="265" y="56" text-anchor="middle">Assembler</text><text class="lbl" x="265" y="76" text-anchor="middle">one-to-one</text><path class="line" d="M342 60 L376 60" marker-end="url(#m03p1)"/><rect class="box" x="370" y="30" width="150" height="60" rx="8"/><text class="txt" x="445" y="56" text-anchor="middle">object / .COM</text><text class="lbl" x="445" y="76" text-anchor="middle">machine code</text><path class="line" d="M522 60 L556 60" marker-end="url(#m03p1)"/><rect class="ptr" x="550" y="30" width="150" height="60" rx="8"/><text class="txt" x="625" y="56" text-anchor="middle">Loader</text><text class="lbl" x="625" y="76" text-anchor="middle">loads into RAM</text><text class="lbl" x="445" y="118" text-anchor="middle">For .EXE files a linker sits in between: .obj → .exe</text><text class="lbl" x="625" y="118" text-anchor="middle"></text></svg></div>
+<div class="ds-deck__grid ds-deck__grid--3">
+<div class="ds-deck__card"><strong>Assembler</strong>Translates mnemonics and labels into machine code and variable names into addresses. Examples: MASM, TASM, NASM.</div>
+<div class="ds-deck__card"><strong>emu8086</strong>Editor + assembler + 8086 emulator. Shows registers, memory and flags <em>step by step</em>.</div>
+<div class="ds-deck__card"><strong>.COM / .EXE</strong>.COM is the simple single-segment format, at most 64 KB (ORG 100h). .EXE may use several segments.</div>
+</div>
+<p class="ds-deck__foot">Examples in this course use emu8086 syntax; most also assemble with MASM/TASM.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Why Assembly?" data-section="Assembly Language">
+  <p class="ds-deck__kicker">Assembly Language</p>
+  <h2>Why Assembly?</h2>
+<p>A program written in assembly language:</p>
+<div class="ds-deck__two">
+<div class="ds-deck__pc ds-deck__pc--pro"><h3>Pros</h3><ul>
+<li>Is <strong>smaller</strong> (no unnecessary code).</li>
+<li>Is <strong>faster</strong>, since it does only what it has to.</li>
+<li>Can do what high-level languages cannot: port I/O, interrupt handling, direct access to flags.</li>
+<li>Is indispensable for boot loaders, device drivers and embedded systems.</li>
+</ul></div>
+<div class="ds-deck__pc ds-deck__pc--con"><h3>Cons</h3><ul>
+<li><strong>Not portable</strong>: 8086 code does not run on ARM.</li>
+<li>Tedious to write, read and debug.</li>
+<li>Unproductive for large projects; modern compilers usually generate code that is fast enough.</li>
+</ul></div>
+</div>
+<div class="ds-deck__callout">In practice a <strong>mixed</strong> approach is common: the program is written in a high-level language and only small, time-critical parts in assembly.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Source Line Format" data-section="Assembly Language">
+  <p class="ds-deck__kicker">Assembly Language</p>
+  <h2>Source Line Format</h2>
+<div class="ds-deck__callout" style="margin-top:0;text-align:center;font-size:19px"><code>[label:]&nbsp;&nbsp;mnemonic&nbsp;&nbsp;[dest], [source]&nbsp;&nbsp;[; comment]</code></div>
+<figure class="ds-deck__figure" style="margin:6px 0 0"><svg class="ds-svg" viewBox="0 0 560 70" role="img" aria-label="Fields of a source line: label, mnemonic, destination, source, comment" style="max-width:560px"><rect class="mt-dim" x="60" y="6" width="70" height="30" rx="4"/><text class="mt-m" x="95" y="26" text-anchor="middle">start:</text><text class="lbl" x="95" y="56" text-anchor="middle">label</text><rect class="mt-hot" x="144" y="6" width="56" height="30" rx="4"/><text class="mt-m" x="172" y="26" text-anchor="middle">MOV</text><text class="lbl" x="172" y="56" text-anchor="middle">mnemonic</text><rect class="mt-acc" x="214" y="6" width="44" height="30" rx="4"/><text class="mt-m" x="236" y="26" text-anchor="middle">AX</text><text class="lbl" x="236" y="56" text-anchor="middle">dest</text><text class="mt-v" x="268" y="28" text-anchor="middle">,</text><rect class="mt-good" x="280" y="6" width="34" height="30" rx="4"/><text class="mt-m" x="297" y="26" text-anchor="middle">5</text><text class="lbl" x="297" y="56" text-anchor="middle">source</text><rect class="mt-dim" x="328" y="6" width="96" height="30" rx="4"/><text class="mt-m" x="376" y="26" text-anchor="middle">; AX ← 5</text><text class="lbl" x="376" y="56" text-anchor="middle">comment</text><text class="mt-a" x="470" y="26" text-anchor="start">→ AX ← 5</text></svg></figure>
+<table class="ds-deck__table" style="margin-top:8px">
+<thead><tr><th>Line</th><th>Label</th><th>Mnemonic</th><th>Operands</th><th>Comment</th></tr></thead>
+<tbody>
+<tr><td><code>start: MOV AX, 5 ; AX ← 5</code></td><td><code>start</code></td><td><code>MOV</code></td><td><code>AX</code>, <code>5</code></td><td><code>; AX ← 5</code></td></tr>
+<tr><td><code>INC AX</code></td><td>—</td><td><code>INC</code></td><td><code>AX</code></td><td>—</td></tr>
+<tr><td><code>RET</code></td><td>—</td><td><code>RET</code></td><td>none</td><td>—</td></tr>
+</tbody></table>
+<ul class="ds-deck__small" style="margin-top:10px">
+<li>With two operands the order is <strong>destination, source</strong>: <code>MOV AX, BX</code> → AX ← BX.</li>
+<li>The assembler is case-insensitive: <code>mov ax, bx</code> and <code>MOV AX, BX</code> are the same.</li>
+<li>Everything from <code>;</code> to the end of the line is a comment and produces no machine code.</li>
+</ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Instruction or Directive?" data-section="Assembly Language">
+  <p class="ds-deck__kicker">Assembly Language</p>
+  <h2>Instruction or Directive?</h2>
+<table class="ds-deck__table" style="font-size:14px"><thead><tr><th>Line</th><th>Kind</th><th>What it puts in memory</th></tr></thead><tbody>
+<tr><td><code>MOV AX, 5</code></td><td>instruction</td><td>machine code: B8 05 00</td></tr>
+<tr><td><code>ORG 100h</code></td><td>directive</td><td>nothing; sets the location counter to 0100h</td></tr>
+<tr><td><code>num DB 0</code></td><td>directive (data definition)</td><td>1 byte of data: 00</td></tr>
+<tr><td><code>k EQU 5</code></td><td>directive</td><td>nothing; the name k stands for 5</td></tr>
+<tr><td><code>END</code></td><td>directive</td><td>nothing; the source ends here</td></tr>
+<tr><td><code>PUTC 'A'</code></td><td>macro call</td><td>code for the instructions in the macro body</td></tr>
+</tbody></table>
+<div class="ds-deck__grid ds-deck__grid--3 ds-deck__small" style="margin-top:10px">
+<div class="ds-deck__card"><strong>Instruction</strong>An operation the processor carries out at run time. Each one becomes a machine instruction.</div>
+<div class="ds-deck__card"><strong>Directive</strong>Information for the assembler: where code goes, how much space to reserve, what names stand for.</div>
+<div class="ds-deck__card"><strong>Macro</strong>A named text pattern replaced by several lines at assembly time.</div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Labels and Names" data-section="Assembly Language">
+  <p class="ds-deck__kicker">Assembly Language</p>
+  <h2>Labels and Names</h2>
+<div class="ds-deck__two ds-deck__two--wide-right">
+<pre class="m-asm">start:  <span class="kw">MOV</span> CX, 3   <span class="cm">; code label</span>
+again:  <span class="kw">INC</span> AX
+        <span class="kw">LOOP</span> again  <span class="cm">; an address</span>
+        <span class="kw">RET</span>
+num     <span class="dir">DB</span> 7        <span class="cm">; data name</span></pre>
+<ul class="ds-deck__small">
+<li>A code label ends with a colon and stands for the address of an instruction (its offset within CS); it generates no code itself.</li>
+<li>A variable name has no colon; the assembler records its name, type (DB, DW…) and address.</li>
+<li>A name starts with a letter or underscore, never a digit; letters, digits and underscores may follow.</li>
+<li>Instruction, register and directive names (MOV, AX, DB, END…) are reserved.</li>
+<li>Case does not matter: <code>again</code> and <code>AGAIN</code> are the same label; defining both gives a “duplicate definition” error.</li>
+</ul>
+</div>
+<table class="ds-deck__table" style="font-size:14px;margin-top:8px"><thead><tr><th>Name</th><th><code>_count</code></th><th><code>sum2</code></th><th><code>2sum</code></th><th><code>cx</code></th><th><code>last-val</code></th></tr></thead><tbody>
+<tr><td>Valid?</td><td class="m-ok">yes</td><td class="m-ok">yes</td><td class="m-bad">starts with a digit</td><td class="m-bad">register name</td><td class="m-bad">− is an operator</td></tr>
+</tbody></table>
+</section>
+
+<section class="ds-deck__slide" data-title="Operand Types and Implicit Operands" data-section="Working with Registers">
+  <p class="ds-deck__kicker">Working with Registers</p>
+  <h2>Operand Types and Implicit Operands</h2>
+<div class="ds-deck__grid ds-deck__grid--3 ds-deck__small">
+<div class="ds-deck__card"><strong>Register</strong><code>MOV AX, BX</code>: the value comes from inside the processor; the fastest kind.</div>
+<div class="ds-deck__card"><strong>Immediate</strong><code>MOV AX, 5</code>: the value is part of the instruction bytes; it can only be a source.</div>
+<div class="ds-deck__card"><strong>Memory</strong><code>MOV AX, [BX]</code>: the value is read from memory in a bus cycle.</div>
+</div>
+<table class="ds-deck__table" style="font-size:14px;margin-top:10px"><thead><tr><th>Instruction</th><th>Explicit operand</th><th>Implicit operand(s)</th></tr></thead><tbody>
+<tr><td><code>MUL BL</code></td><td>BL</td><td>AL (multiplicand), AX (product)</td></tr>
+<tr><td><code>DIV BL</code></td><td>BL</td><td>AX (dividend), AL (quotient), AH (remainder)</td></tr>
+<tr><td><code>LOOP again</code></td><td>again</td><td>CX (counter)</td></tr>
+<tr><td><code>CBW</code></td><td>—</td><td>AL → AX</td></tr>
+<tr><td><code>PUSH AX</code></td><td>AX</td><td>SS:SP (top of stack)</td></tr>
+<tr><td><code>XLAT</code></td><td>—</td><td>AL (index and result), BX (table address)</td></tr>
+</tbody></table>
+<p class="ds-deck__foot">An implicit operand is not written, yet it changes: <code>MUL BL</code> also overwrites AH. A program that needs to keep a register’s value must know the implicit operands of the instructions it uses.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Implicit Operands: Code Trace" data-section="Working with Registers">
+  <p class="ds-deck__kicker">Working with Registers · Step through the code</p>
+  <h2>Code Trace: Implicit Operands of MUL, SHR and LOOP</h2>
+  <div class="ds-trace mt-tr">
+<pre class="ds-trace__code"><span class="dir">ORG</span> 100h
+<span class="kw">MOV</span> AL, 12
+<span class="kw">MOV</span> BL, 10
+<span class="kw">MUL</span> BL         <span class="cm">; AX = AL × BL</span>
+<span class="kw">MOV</span> CL, 2
+<span class="kw">SHR</span> AX, CL     <span class="cm">; count in CL</span>
+<span class="kw">MOV</span> CX, 3      <span class="cm">; LOOP counter</span>
+again:
+<span class="kw">ADD</span> AX, 1
+<span class="kw">LOOP</span> again     <span class="cm">; CX - 1</span>
+<span class="kw">RET</span></pre>
+    <div class="ds-trace__col">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="2,3" data-vars="AX=000Ch; BX=000Ah; CX=0000h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">000Ch</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="mt-hot" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 12 (dec)</text></svg><p class="ds-deck__stepnote">AL = 12, BL = 10. AH starts at 0.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=0078h; BX=000Ah; CX=0000h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0078h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">?</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 120 (dec)</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">implicit: AL, AX</text></svg><p class="ds-deck__stepnote"><code>MUL BL</code> names only BL; the multiplicand is implicitly AL and the product implicitly AX: AX = 120 = <b>0078h</b>. The product fits in 8 bits, so CF = 0.</p></div>
+<div class="ds-deck__step" data-line="5,6" data-vars="AX=001Eh; BX=000Ah; CX=0002h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">001Eh</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0002h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 30 (dec)</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">count in CL</text></svg><p class="ds-deck__stepnote"><code>SHR AX, CL</code>: a shift count above 1 must be in CL. 120 ÷ 4 = 30 → AX = <b>001Eh</b>.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=001Eh; BX=000Ah; CX=0003h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="box" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">001Eh</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0003h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 30 (dec)</text></svg><p class="ds-deck__stepnote">CX = 3: the implicit counter of LOOP. CL is part of CX, so the old count 2 is gone.</p></div>
+<div class="ds-deck__step" data-line="9,10" data-vars="AX=001Fh; BX=000Ah; CX=0002h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">001Fh</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0002h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 31 (dec)</text></svg><p class="ds-deck__stepnote">Pass 1: AX + 1 = 31; <code>LOOP</code> decrements CX: CX = 2, not zero → <code>again</code>.</p></div>
+<div class="ds-deck__step" data-line="9,10" data-vars="AX=0020h; BX=000Ah; CX=0001h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0020h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0001h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 32 (dec)</text></svg><p class="ds-deck__stepnote">Pass 2: AX + 1 = 32; <code>LOOP</code> decrements CX: CX = 1, not zero → <code>again</code>.</p></div>
+<div class="ds-deck__step" data-line="9,10" data-vars="AX=0021h; BX=000Ah; CX=0000h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0021h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 33 (dec)</text></svg><p class="ds-deck__stepnote">Pass 3: AX + 1 = 33; <code>LOOP</code> decrements CX: CX = 0, the loop ends.</p></div>
+<div class="ds-deck__step" data-line="11" data-vars="AX=0021h; BX=000Ah; CX=0000h"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="AX, BX, CX and flags after the step" style="max-width:400px"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="box" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0021h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 33 (dec)</text></svg><p class="ds-deck__stepnote">RET. The program never decrements CX explicitly, yet LOOP changed it three times: AX = <b>0021h</b> = 33.</p></div>
+</div>
+      <div class="ds-trace__vars"></div>
+    </div>
+  </div>
+  <p class="ds-deck__foot">AX, CL and CX were “hidden” operands in this program; the special roles of the registers come from these implicit uses.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Register or Memory?" data-section="Working with Registers">
+  <p class="ds-deck__kicker">Working with Registers</p>
+  <h2>Register or Memory?</h2>
+<div class="ds-deck__grid ds-deck__grid--2">
+<div class="ds-deck__card"><strong>Register</strong>
+<ul class="ds-deck__small"><li>Inside the CPU; no bus cycle needed.</li><li>Very few of them (the 8086 has 14 16-bit registers).</li><li>Ideal for intermediate results and counters.</li></ul></div>
+<div class="ds-deck__card"><strong>Memory</strong>
+<ul class="ds-deck__small"><li>Outside the CPU; each access takes at least one bus cycle (4 clock periods on the 8086).</li><li>Large: up to 1 MB.</li><li>Holds the program code, variables, arrays and the stack.</li></ul></div>
+</div>
+<figure class="ds-deck__figure" style="margin:6px 0"><svg class="ds-svg" viewBox="0 0 560 92" role="img" aria-label="Registers are inside the CPU; memory is across the system bus" style="max-width:560px"><defs><marker id="mt2-12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-dim" x="6" y="6" width="200" height="80" rx="8"/><text class="lbl" x="20" y="24" text-anchor="start">CPU</text><rect class="mt-hot" x="20" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="40" y="54" text-anchor="middle">AX</text><rect class="mt-hot" x="65" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="85" y="54" text-anchor="middle">BX</text><rect class="mt-hot" x="110" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="130" y="54" text-anchor="middle">CX</text><rect class="mt-hot" x="155" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="175" y="54" text-anchor="middle">DX</text><text class="mt-g" x="106" y="80" text-anchor="middle" style="font-size:12px">0 bus cycles</text><path class="mt-wire" d="M210 46 H370" marker-end="url(#mt2-12)" marker-start="url(#mt2-12)"/><text class="lbl" x="290" y="38" text-anchor="middle">system bus</text><text class="mt-a" x="290" y="68" text-anchor="middle" style="font-size:12px">each access ≥ 4 clock periods</text><rect class="box" x="376" y="6" width="178" height="80" rx="8"/><text class="mt-s" x="465" y="28" text-anchor="middle">Memory (1 MB)</text><text class="lbl" x="465" y="50" text-anchor="middle">code · variables</text><text class="lbl" x="465" y="68" text-anchor="middle">arrays · stack</text></svg></figure>
+<div class="ds-deck__callout">Good assembly code keeps frequently used values in <strong>registers</strong> and goes to memory only when it must. Keeping a loop counter in <code>CX</code> instead of memory, for example, speeds up the loop.</div>
+<p class="ds-deck__foot">14 registers: 8 general-purpose + 4 segment + IP + FLAGS.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Instruction Timing: Register vs. Memory" data-section="Working with Registers">
+  <p class="ds-deck__kicker">Working with Registers</p>
+  <h2>Instruction Timing: Register vs. Memory</h2>
+<div class="ds-deck__two">
+<table class="ds-deck__table" style="font-size:14px"><thead><tr><th>Instruction (8086)</th><th>Clocks</th></tr></thead><tbody>
+<tr><td><code>MOV AX, BX</code></td><td>2</td></tr>
+<tr><td><code>MOV AX, 5</code></td><td>4</td></tr>
+<tr><td><code>MOV AX, num</code></td><td>10</td></tr>
+<tr><td><code>MOV CX, [BX]</code></td><td>8 + 5 = 13</td></tr>
+<tr><td><code>ADD AX, BX</code></td><td>3</td></tr>
+<tr><td><code>ADD AX, num</code></td><td>9 + 6 = 15</td></tr>
+<tr><td><code>INC CX</code></td><td>2</td></tr>
+<tr><td><code>INC count</code> (word)</td><td>15 + 6 = 21</td></tr>
+</tbody></table>
+<div><ul class="ds-deck__small">
+<li>A memory operand adds the <strong>effective address calculation</strong> (EA) time: direct address 6, <code>[BX]</code> 5, <code>[BX+SI]</code> 7 clocks.</li>
+<li>Instructions that write memory take longer: <code>INC count</code> reads, then writes (two bus cycles).</li>
+<li>Loading AX from a direct address uses the short accumulator form: 10 clocks.</li>
+<li>In a loop that runs 1000 times, incrementing a counter in CX costs 1000 × 2 = 2000 clocks; in memory, 1000 × 21 = 21,000. At 5 MHz that is 4.2 ms instead of 0.4 ms.</li>
+</ul></div>
+</div>
+<div class="ds-deck__callout ds-deck__small">These are best-case times from the Intel 8086 data sheet; word access at an odd address and a flushed prefetch queue make them longer. The ratio holds: a memory-operand instruction is several times slower than its register form.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="How Does IP Advance?" data-section="IP and Flags">
+  <p class="ds-deck__kicker">IP and Flags · Step through the code</p>
+  <h2>Code Trace: How Does IP Advance?</h2>
+<div class="ds-trace m-side" style="--m-cw:280px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="IP=0100h; AX=0000h; BX=0000h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP" style="max-width:400px"><defs><marker id="m03i12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><path class="line" d="M10 118 L10 70" marker-end="url(#m03i12)"/><text class="txt mono" x="10" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0100h</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><p class="ds-deck__stepnote">The program is loaded at CS:0100h; <b>IP = 0100h</b> points to the first instruction.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="IP=0103h; AX=0005h; BX=0000h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP" style="max-width:400px"><defs><marker id="m03i13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><path class="line" d="M124 118 L124 70" marker-end="url(#m03i13)"/><text class="txt mono" x="124" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0103h</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><p class="ds-deck__stepnote">MOV AX, 5 (B8 05 00) is fetched: <b>IP = 0103h</b>; once executed, AX = 0005h.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="IP=0106h; AX=0005h; BX=0002h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP" style="max-width:400px"><defs><marker id="m03i14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><path class="line" d="M238 118 L238 70" marker-end="url(#m03i14)"/><text class="txt mono" x="238" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0106h</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><p class="ds-deck__stepnote">Three more bytes: <b>IP = 0106h</b>, BX = 0002h.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="IP=0107h; AX=0006h; BX=0002h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP" style="max-width:400px"><defs><marker id="m03i15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><path class="line" d="M276 118 L276 70" marker-end="url(#m03i15)"/><text class="txt mono" x="276" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0107h</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><p class="ds-deck__stepnote">INC AX is a single byte (40h): <b>IP = 0107h</b>, AX = 0006h.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="IP=0109h; AX=0008h; BX=0002h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP" style="max-width:400px"><defs><marker id="m03i16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text><path class="line" d="M352 118 L352 70" marker-end="url(#m03i16)"/><text class="txt mono" x="352" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0109h</text></svg><p class="ds-deck__stepnote">ADD AX, BX is 2 bytes: <b>IP = 0109h</b>, AX = 0008h.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="IP=0000h; AX=0008h; BX=0002h; SP=0000h"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP" style="max-width:400px"><defs><marker id="m03i17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text><text class="txt mono" x="200" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0000h (back to PSP)</text></svg><p class="ds-deck__stepnote">RET pops 0000h off the stack: <b>IP = 0000h</b>, SP = 0000h. The INT 20h at PSP:0000 ends the program.</p></div>
+</div>
+<pre class="ds-trace__code"><span class="dir">ORG</span> 100h
+<span class="kw">MOV</span> AX, 5     <span class="cm">; 3 bytes</span>
+<span class="kw">MOV</span> BX, 2     <span class="cm">; 3 bytes</span>
+<span class="kw">INC</span> AX        <span class="cm">; 1 byte</span>
+<span class="kw">ADD</span> AX, BX    <span class="cm">; 2 bytes</span>
+<span class="kw">RET</span>           <span class="cm">; 1 byte</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Instructions That Leave Flags Alone: Code Trace" data-section="IP and Flags">
+  <p class="ds-deck__kicker">IP and Flags · Step through the code</p>
+  <h2>Code Trace: Which Instructions Touch the Flags?</h2>
+  <div class="ds-trace mt-tr">
+<pre class="ds-trace__code"><span class="dir">ORG</span> 100h
+<span class="kw">STC</span>              <span class="cm">; CF = 1</span>
+<span class="kw">MOV</span> AL, 0FFh     <span class="cm">; flags kept</span>
+<span class="kw">INC</span> AL           <span class="cm">; CF untouched</span>
+<span class="kw">MOV</span> CX, 0        <span class="cm">; ZF kept</span>
+<span class="kw">DEC</span> AL
+<span class="kw">ADD</span> AL, 1        <span class="cm">; new CF</span>
+<span class="kw">CLC</span>
+<span class="kw">NOT</span> AL           <span class="cm">; flags kept</span>
+<span class="kw">RET</span></pre>
+    <div class="ds-trace__col">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="2" data-vars="AL=00h; CF=1; ZF=0; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="box" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="mt-hot" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF only</text></svg><p class="ds-deck__stepnote"><code>STC</code>: CF = 1. One of the instructions that set a flag directly.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AL=FFh; CF=1; ZF=0; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">no flags</text></svg><p class="ds-deck__stepnote"><code>MOV AL, 0FFh</code>: AL changed, none of the flags did. MOV does not affect flags.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AL=00h; CF=1; ZF=1; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF kept</text></svg><p class="ds-deck__stepnote"><code>INC AL</code>: FFh + 1 = 00h → ZF = 1, AF = 1, PF = 1. CF is still 1: INC and DEC never touch the carry flag.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="AL=00h; CF=1; ZF=1; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="box" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">no flags</text></svg><p class="ds-deck__stepnote"><code>MOV CX, 0</code>: the result is zero, but ZF is not recomputed; it keeps the value from the previous instruction.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AL=FFh; CF=1; ZF=0; SF=1"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF kept</text></svg><p class="ds-deck__stepnote"><code>DEC AL</code>: 00h − 1 = FFh → SF = 1, ZF = 0. CF is still 1: DEC does not record the borrow in CF.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AL=00h; CF=1; ZF=1; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">all updated</text></svg><p class="ds-deck__stepnote"><code>ADD AL, 1</code>: FFh + 1 = 100h → AL = 00h. ADD rewrites every status flag: this time CF = 1 is ADD’s own carry.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="AL=00h; CF=0; ZF=1; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="box" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="mt-hot" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF only</text></svg><p class="ds-deck__stepnote"><code>CLC</code>: CF = 0.</p></div>
+<div class="ds-deck__step" data-line="9" data-vars="AL=FFh; CF=0; ZF=1; SF=0"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and flags after the step" style="max-width:400px"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">no flags</text></svg><p class="ds-deck__stepnote"><code>NOT AL</code>: AL = FFh, yet ZF is still 1. NOT changes no flags; to test the result, follow it with <code>TEST AL, AL</code> or <code>CMP</code>.</p></div>
+</div>
+      <div class="ds-trace__vars"></div>
+    </div>
+  </div>
+  <p class="ds-deck__foot">MOV, NOT, XCHG, LEA, PUSH and POP leave the flags alone; INC and DEC change all but CF. Before a conditional jump, check which instruction last set the flag.</p>
+</section>
+
+<section class="ds-deck__slide" data-title=".COM Program Template" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>.COM Program Template</h2>
+<div class="ds-deck__two ds-deck__two--wide-left">
+<pre class="m-asm" style="font-size:14px"><span class="dir">ORG</span> 100h          <span class="cm">; .COM: code starts at 0100h</span>
+
+<span class="kw">MOV</span> AX, 5         <span class="cm">; AX = 5</span>
+<span class="kw">MOV</span> BX, 3         <span class="cm">; BX = 3</span>
+<span class="kw">ADD</span> AX, BX        <span class="cm">; AX = AX + BX = 8</span>
+<span class="kw">MOV</span> CL, AL        <span class="cm">; CL = 08h</span>
+
+<span class="kw">RET</span>               <span class="cm">; back to DOS</span>
+
+num <span class="dir">DB</span> 0          <span class="cm">; variables go after RET</span></pre>
+<ul class="ds-deck__small">
+<li><code>ORG 100h</code>: a .COM program is loaded at offset 0100h of its segment; the first 256 bytes (the PSP) belong to DOS.</li>
+<li>Instructions execute top to bottom, <strong>in order</strong>.</li>
+<li><code>RET</code> returns to the operating system.</li>
+<li>Variables go at the <strong>end</strong> (after RET) so the CPU never executes them as instructions.</li>
+<li>A .COM program starts with <code>CS = DS = ES = SS</code>, <code>IP = 0100h</code>, <code>SP = FFFEh</code>.</li>
+</ul>
+</div>
+<div class="ds-deck__callout ds-deck__small">In emu8086, <strong>new → COM template</strong> opens the template; <strong>emulate</strong> loads the program into the emulator, and <strong>single step</strong> shows how the registers change after each instruction.</div>
+</section>
+
+<section class="ds-deck__slide" data-title=".COM Program: Code Trace" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program · Step through the code</p>
+  <h2>Code Trace: A .COM Program in Memory</h2>
+  <div class="ds-trace mt-tr">
+<pre class="ds-trace__code"><span class="dir">ORG</span> 100h       <span class="cm">; code at 0100h</span>
+<span class="kw">MOV</span> AX, 5
+<span class="kw">MOV</span> BX, 3
+<span class="kw">ADD</span> AX, BX     <span class="cm">; AX = 8</span>
+<span class="kw">MOV</span> CL, AL     <span class="cm">; CL = 08h</span>
+<span class="kw">RET</span>            <span class="cm">; back to DOS</span>
+num <span class="dir">DB</span> 0       <span class="cm">; data</span></pre>
+    <div class="ds-trace__col">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="AX=0000h; BX=0000h; CL=00h; IP=0100h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 1: segment 0700h, IP and SP" style="max-width:400px"><defs><marker id="mt2-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="mt-hot" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0100h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 41.5 H200" marker-end="url(#mt2-6)"/><text class="mt-l" x="136" y="45.5" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#mt2-6)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">00h</text></svg><p class="ds-deck__stepnote">The program is loaded at 0700:0100. CS = DS = ES = SS = 0700h, <b>IP = 0100h</b>, <b>SP = FFFEh</b>; the top of the stack holds 0000h.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="AX=0005h; BX=0000h; CL=00h; IP=0103h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 2: segment 0700h, IP and SP" style="max-width:400px"><defs><marker id="mt2-7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="mt-hot" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0103h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 59 H200" marker-end="url(#mt2-7)"/><text class="mt-l" x="136" y="63" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#mt2-7)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="mt-hot" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0005h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">00h</text></svg><p class="ds-deck__stepnote"><code>MOV AX, 5</code> (3 bytes): AX = 0005h, IP = <b>0103h</b>.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AX=0005h; BX=0003h; CL=00h; IP=0106h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 3: segment 0700h, IP and SP" style="max-width:400px"><defs><marker id="mt2-8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="mt-hot" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0106h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 76.5 H200" marker-end="url(#mt2-8)"/><text class="mt-l" x="136" y="80.5" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#mt2-8)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0005h</text><rect class="mt-hot" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0003h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">00h</text></svg><p class="ds-deck__stepnote"><code>MOV BX, 3</code> (3 bytes): BX = 0003h, IP = <b>0106h</b>.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=0008h; BX=0003h; CL=00h; IP=0108h; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 4: segment 0700h, IP and SP" style="max-width:400px"><defs><marker id="mt2-9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="mt-hot" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0108h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 94 H200" marker-end="url(#mt2-9)"/><text class="mt-l" x="136" y="98" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#mt2-9)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="mt-hot" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0008h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0003h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">00h</text></svg><p class="ds-deck__stepnote"><code>ADD AX, BX</code> (2 bytes): AX = <b>0008h</b>, IP = 0108h.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="AX=0008h; BX=0003h; CL=08h; IP=010Ah; SP=FFFEh"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 5: segment 0700h, IP and SP" style="max-width:400px"><defs><marker id="mt2-10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="mt-hot" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 010Ah</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 111.5 H200" marker-end="url(#mt2-10)"/><text class="mt-l" x="136" y="115.5" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#mt2-10)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0008h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0003h</text><rect class="mt-hot" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">08h</text></svg><p class="ds-deck__stepnote"><code>MOV CL, AL</code> (2 bytes): CL = <b>08h</b>, IP = 010Ah.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=0008h; BX=0003h; CL=08h; IP=0000h; SP=0000h"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 6: segment 0700h, IP and SP" style="max-width:400px"><defs><marker id="mt2-11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="mt-hot" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0000h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = 0000h</text><path class="line" d="M140 24 H200" marker-end="url(#mt2-11)"/><text class="mt-l" x="136" y="28" text-anchor="end" style="font-size:11.5px">CS:IP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0008h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0003h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">08h</text></svg><p class="ds-deck__stepnote"><code>RET</code> pops 0000h: IP = 0000h, SP = 0000h. The <code>INT 20h</code> at PSP:0000 ends the program; <code>num</code> at 010Bh is never executed.</p></div>
+</div>
+      <div class="ds-trace__vars"></div>
+    </div>
+  </div>
+  <p class="ds-deck__foot">The instructions are 3, 3, 2, 2 and 1 bytes long; IP advances by each length. The data sits after RET, so it is never executed.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="The Program in Memory: Machine Code" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>The Program in Memory, Byte by Byte</h2>
+<table class="ds-deck__table" style="font-size:14px"><thead><tr><th>Offset</th><th>Bytes</th><th>Source line</th><th>Note</th></tr></thead><tbody>
+<tr><td>0100h</td><td><code>B8 05 00</code></td><td><code>MOV AX, 5</code></td><td>B8 + register number (AX = 0); immediate little-endian</td></tr>
+<tr><td>0103h</td><td><code>BB 03 00</code></td><td><code>MOV BX, 3</code></td><td>B8 + 3 (BX)</td></tr>
+<tr><td>0106h</td><td><code>03 C3</code></td><td><code>ADD AX, BX</code></td><td>C3 = 11 000 011: register–register, AX, BX</td></tr>
+<tr><td>0108h</td><td><code>8A C8</code></td><td><code>MOV CL, AL</code></td><td>C8 = 11 001 000: CL, AL</td></tr>
+<tr><td>010Ah</td><td><code>C3</code></td><td><code>RET</code></td><td>one-byte instruction</td></tr>
+<tr><td>010Bh</td><td><code>00</code></td><td><code>num DB 0</code></td><td>data, not an instruction</td></tr>
+</tbody></table>
+<ul class="ds-deck__small" style="margin-top:8px">
+<li>The .COM file is exactly these 12 bytes: there is no header; DOS copies them into memory starting at 0100h.</li>
+<li><code>ORG 100h</code> produces no bytes; it only sets where the first byte goes.</li>
+<li>One instruction can have several encodings: <code>01 D8</code> is also valid for <code>ADD AX, BX</code>. MASM picks 03 C3; both do the same thing.</li>
+<li>Nothing in memory marks code apart from data: had IP reached 010Bh, the 00 there would have been decoded as an instruction.</li>
+</ul>
+</section>
+
+<section class="ds-deck__slide" data-title="The emu8086 Emulator Window" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>The emu8086 Emulator Window</h2>
+<div class="ds-deck__figure" style="margin:0 0 8px"><svg class="ds-svg" viewBox="0 0 560 236" role="img" aria-label="Simplified emu8086 emulator window: buttons on top, registers on the left, memory in the middle, disassembly on the right" style="max-width:560px"><rect class="mt-dim" x="4" y="4" width="552" height="228" rx="6"/><rect class="box" x="14" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="62" y="30" text-anchor="middle" style="font-size:12.5px;">Load</text><rect class="box" x="118" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="166" y="30" text-anchor="middle" style="font-size:12.5px;">reload</text><rect class="box" x="222" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="270" y="30" text-anchor="middle" style="font-size:12.5px;">step back</text><rect class="mt-hot" x="326" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="374" y="30" text-anchor="middle" style="font-size:12.5px;">single step</text><rect class="box" x="430" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="478" y="30" text-anchor="middle" style="font-size:12.5px;">run</text><rect class="box" x="14" y="48" width="150" height="140" rx="4"/><text class="mt-s" x="89" y="64" text-anchor="middle" style="font-size:12px;">registers (H / L)</text><text class="mt-m" x="26" y="86" text-anchor="start" style="font-size:12.5px;">AX</text><text class="mt-m" x="150" y="86" text-anchor="end" style="font-size:12.5px;">00 05</text><text class="mt-m" x="26" y="106" text-anchor="start" style="font-size:12.5px;">BX</text><text class="mt-m" x="150" y="106" text-anchor="end" style="font-size:12.5px;">00 00</text><text class="mt-m" x="26" y="126" text-anchor="start" style="font-size:12.5px;">CX</text><text class="mt-m" x="150" y="126" text-anchor="end" style="font-size:12.5px;">00 00</text><text class="mt-m" x="26" y="146" text-anchor="start" style="font-size:12.5px;">IP</text><text class="mt-m" x="150" y="146" text-anchor="end" style="font-size:12.5px;">0103</text><text class="mt-m" x="26" y="166" text-anchor="start" style="font-size:12.5px;">SP</text><text class="mt-m" x="150" y="166" text-anchor="end" style="font-size:12.5px;">FFFE</text><rect class="box" x="174" y="48" width="180" height="140" rx="4"/><text class="mt-s" x="264" y="64" text-anchor="middle" style="font-size:12px;">memory</text><text class="mt-m" x="184" y="86" text-anchor="start" style="font-size:12px;">07100</text><text class="mt-m" x="260" y="86" text-anchor="start" style="font-size:12px;">B8</text><text class="mt-m" x="184" y="106" text-anchor="start" style="font-size:12px;">07101</text><text class="mt-m" x="260" y="106" text-anchor="start" style="font-size:12px;">05</text><text class="mt-m" x="184" y="126" text-anchor="start" style="font-size:12px;">07102</text><text class="mt-m" x="260" y="126" text-anchor="start" style="font-size:12px;">00</text><text class="mt-m" x="184" y="146" text-anchor="start" style="font-size:12px;">07103</text><text class="mt-m" x="260" y="146" text-anchor="start" style="font-size:12px;">BB</text><text class="mt-m" x="184" y="166" text-anchor="start" style="font-size:12px;">07104</text><text class="mt-m" x="260" y="166" text-anchor="start" style="font-size:12px;">03</text><rect class="box" x="364" y="48" width="182" height="140" rx="4"/><text class="mt-s" x="455" y="64" text-anchor="middle" style="font-size:12px;">disassembly</text><text class="mt-m" x="374" y="86" text-anchor="start" style="font-size:12px;">MOV AX, 00005h</text><rect class="mt-hot" x="368" y="92" width="174" height="19" rx="2"/><text class="mt-m" x="374" y="106" text-anchor="start" style="font-size:12px;">MOV BX, 00003h</text><text class="mt-m" x="374" y="126" text-anchor="start" style="font-size:12px;">ADD AX, BX</text><text class="mt-m" x="374" y="146" text-anchor="start" style="font-size:12px;">MOV CL, AL</text><text class="mt-m" x="374" y="166" text-anchor="start" style="font-size:12px;">RET</text><rect class="box" x="14" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="62" y="216" text-anchor="middle" style="font-size:12.5px;">screen</text><rect class="box" x="118" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="166" y="216" text-anchor="middle" style="font-size:12.5px;">vars</text><rect class="box" x="222" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="270" y="216" text-anchor="middle" style="font-size:12.5px;">stack</text><rect class="box" x="326" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="374" y="216" text-anchor="middle" style="font-size:12.5px;">flags</text></svg></div>
+<ul class="ds-deck__small" style="columns:2;column-gap:28px">
+<li><strong>single step</strong> executes one instruction; changed registers and memory show up at once.</li>
+<li><strong>step back</strong> undoes the last step, which makes it easy to go back to the cause of a bug.</li>
+<li>The highlighted line in the disassembly is the <strong>next</strong> instruction (CS:IP), not the one just executed.</li>
+<li>The disassembly shows constants in hex with 5 digits (00005h).</li>
+<li>Extra windows: screen output, variables, stack and flags.</li>
+</ul>
+<p class="ds-deck__foot">The memory column shows physical addresses: 0700:0100 = 07100h. The drawing shows only the main parts of the window.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Syntax Rules" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>Syntax Rules</h2>
+<div class="ds-deck__grid ds-deck__grid--2 ds-deck__small">
+<div class="ds-deck__card"><strong>Number bases</strong>
+<code>25</code> or <code>25d</code> decimal · <code>19h</code> hex · <code>00011001b</code> binary · <code>31o</code> octal. All the same value: 25.</div>
+<div class="ds-deck__card"><strong>Hex starting with a letter</strong>
+Prefix a <code>0</code>: <code>0FFh</code>, <code>0B800h</code>. Written as <code>FFh</code>, the assembler takes it for a <em>name</em> (label or variable).</div>
+<div class="ds-deck__card"><strong>Characters</strong>
+<code>'A'</code> → ASCII code 41h. <code>MOV CL, 'A'</code> and <code>MOV CL, 41h</code> produce the same machine code.</div>
+<div class="ds-deck__card"><strong>Signed numbers</strong>
+<code>-1</code> is stored as FFh in 8 bits and FFFFh in 16 bits (two’s complement).</div>
+<div class="ds-deck__card"><strong>Case</strong>
+The assembler ignores case: <code>mov</code>, <code>MOV</code>, <code>Mov</code> are the same; so are <code>var1</code> and <code>VAR1</code>.</div>
+<div class="ds-deck__card"><strong>Comments</strong>
+Anything after <code>;</code> is a comment. Good habit: say “why”, not “what”.</div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Common Mistakes" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>Common Mistakes</h2>
+<table class="ds-deck__table" style="font-size:15px">
+<thead><tr><th>Wrong</th><th>Why?</th><th>Correct</th></tr></thead>
+<tbody>
+<tr><td><code>MOV AL, BX</code></td><td>Sizes differ (8 ↔ 16 bits)</td><td><code>MOV AL, BL</code> or <code>MOV AX, BX</code></td></tr>
+<tr><td><code>MOV DS, 1234h</code></td><td>No immediate into a segment register</td><td><code>MOV AX, 1234h</code> · <code>MOV DS, AX</code></td></tr>
+<tr><td><code>MOV AL, [AX]</code></td><td>Only BX, SI, DI, BP can address memory</td><td><code>MOV BX, AX</code> · <code>MOV AL, [BX]</code></td></tr>
+<tr><td><code>MOV AL, FFh</code></td><td>FFh is taken for a name</td><td><code>MOV AL, 0FFh</code></td></tr>
+<tr><td><code>MOV IP, 200h</code></td><td>IP cannot be written with MOV</td><td>use <code>JMP</code></td></tr>
+<tr><td><code>MOV AL, 300</code></td><td>300 &gt; 255, does not fit in 8 bits</td><td><code>MOV AX, 300</code></td></tr>
+</tbody></table>
+<p class="ds-deck__foot">These rules come from the operand restrictions of MOV.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="More Syntax Errors" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>More Syntax Errors</h2>
+<table class="ds-deck__table" style="font-size:14px"><thead><tr><th>Wrong</th><th>Why?</th><th>Correct</th></tr></thead><tbody>
+<tr><td><code>MOV CS, AX</code></td><td>only JMP, CALL, RET, INT change CS</td><td>a far jump</td></tr>
+<tr><td><code>MOV ES, DS</code></td><td>no segment-to-segment MOV</td><td><code>MOV AX, DS</code> · <code>MOV ES, AX</code></td></tr>
+<tr><td><code>MOV [BX], [SI]</code></td><td>two memory operands</td><td><code>MOV AL, [SI]</code> · <code>MOV [BX], AL</code></td></tr>
+<tr><td><code>INC [BX]</code></td><td>size unknown</td><td><code>INC BYTE PTR [BX]</code></td></tr>
+<tr><td><code>MOV AL, [BX+BP]</code></td><td>two base registers together</td><td><code>[BX+SI]</code> or <code>[BP+DI]</code></td></tr>
+<tr><td><code>ADD 5, AX</code></td><td>destination cannot be immediate</td><td><code>ADD AX, 5</code></td></tr>
+<tr><td><code>PUSH 5</code></td><td>not before the 80186</td><td><code>MOV AX, 5</code> · <code>PUSH AX</code></td></tr>
+<tr><td><code>SHL AX, 2</code></td><td>8086 count is 1 or CL only</td><td><code>MOV CL, 2</code> · <code>SHL AX, CL</code></td></tr>
+</tbody></table>
+<p class="ds-deck__foot">PUSH immediate and SHL AX, 2 are valid from the 80186 on. MASM rejects them when assembling for the 8086; emu8086 accepts them, but the code will not run on a real 8086.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Assembly Error or Logic Error?" data-section="A First Program">
+  <p class="ds-deck__kicker">A First Program</p>
+  <h2>Assembly Error or Logic Error?</h2>
+<div class="ds-deck__grid ds-deck__grid--2 ds-deck__small">
+<div class="ds-deck__card"><strong>Assembly (syntax) error</strong>The assembler finds it and reports the line number; no program is produced.
+<ul><li><code>MOV AL, BX</code>: size mismatch</li><li><code>JMP strt</code>: undefined label</li><li><code>MOV AL, 300</code>: constant too large</li></ul></div>
+<div class="ds-deck__card"><strong>Logic error</strong>The program assembles and runs, but the result is wrong; the assembler cannot know.
+<ul><li>Forgetting RET: data executed as code</li><li>Using <code>JA</code> for signed numbers</li><li>ADD instead of ADC: the carry is lost</li><li>Not loading DS in an .EXE</li></ul></div>
+</div>
+<div class="ds-deck__callout ds-deck__small">Logic errors are found by single-stepping: after each instruction, compare the expected register and flag values with the emulator’s. The first instruction where they differ is where the bug is.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Lab: First Programs" data-section="Lab">
+<p class="ds-deck__kicker">Lab · 8086 instructions step by step</p>
+<h2>Lab: First Programs</h2>
+<div class="ds-deck__demo m-lab" data-demo="m-lab">
+<script type="text/x-asm" data-name=".COM program">
+ORG 100h       ; code at 0100h
+MOV AX, 5
+MOV BX, 3
+ADD AX, BX     ; AX = 8
+MOV CL, AL     ; CL = 08h
+RET            ; back to DOS
+num DB 0       ; data
+</script>
+<script type="text/x-asm" data-name="Implicit operands">
+ORG 100h
+MOV AL, 12
+MOV BL, 10
+MUL BL         ; AX = AL × BL
+MOV CL, 2
+SHR AX, CL     ; count in CL
+MOV CX, 3      ; LOOP counter
+again:
+ADD AX, 1
+LOOP again     ; CX - 1
+RET
+</script>
+<script type="text/x-asm" data-name="How IP advances">
+ORG 100h
+MOV AX, 5     ; 3 bytes
+MOV BX, 2     ; 3 bytes
+INC AX        ; 1 byte
+ADD AX, BX    ; 2 bytes
+RET           ; 1 byte
+</script>
+<script type="text/x-asm" data-name="Flag-preserving instructions">
+ORG 100h
+STC              ; CF = 1
+MOV AL, 0FFh     ; flags kept
+INC AL           ; CF untouched
+MOV CX, 0        ; ZF kept
+DEC AL
+ADD AL, 1        ; new CF
+CLC
+NOT AL           ; flags kept
+RET
+</script>
+<script type="text/x-asm" data-name="Labels and names">
+ORG 100h
+start:  MOV CX, 3   ; code label
+again:  INC AX
+        LOOP again  ; an address
+        RET
+num     DB 7        ; data name
+</script>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Summary" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>Summary</h2>
+<div class="ds-deck__grid ds-deck__grid--2 ds-deck__small">
+<div class="ds-deck__card"><strong>Assembly</strong>A low-level language that maps one-to-one onto machine code: small, fast code and direct hardware access, but not portable.</div>
+<div class="ds-deck__card"><strong>Line format</strong><code>[label:] mnemonic dest, source ; comment</code>. Directives (ORG, DB, EQU) produce no machine code.</div>
+<div class="ds-deck__card"><strong>Operands</strong>Registers are fastest; immediates can only be sources; memory operands need a bus cycle. MUL, LOOP and CBW use implicit operands.</div>
+<div class="ds-deck__card"><strong>First program</strong>A .COM program starts at 0100h with <code>ORG 100h</code>; data goes after RET.</div>
+<div class="ds-deck__card"><strong>IP</strong>CS:IP points to the next instruction; IP advances by the instruction’s length.</div>
+<div class="ds-deck__card"><strong>Flags</strong>MOV, NOT and XCHG leave the flags alone; INC and DEC do not touch CF; ADD rewrites them all.</div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Exercises" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>Exercises</h2>
+<ol class="ds-deck__small">
+<li>With AX = 0ABCDh, what are AX, AL and BX after <code>MOV AH, 0</code>?</li>
+<li>With AX = 1234h and BL = 03h, what is AX after <code>MUL BL</code>? What happens to the 12h in AH?</li>
+<li>On an 8 MHz 8086, a loop runs 2000 times. How many clocks and milliseconds are saved by using <code>INC CX</code> (2 clocks) instead of <code>INC count</code> (21 clocks)?</li>
+<li>With AL = 80h, give AL, CF, ZF, SF and OF after <code>ADD AL, 80h</code>.</li>
+<li>A program starts at 0100h. What is IP after four instructions of 3, 2, 1 and 4 bytes?</li>
+<li>Why are <code>MOV CX, AL</code> and <code>MOV ES, 0B800h</code> wrong? Fix them.</li>
+</ol>
+<details class="ds-deck__answers"><summary>Answers</summary><ol>
+<li>AX = 00CDh, AL = CDh; BX is unchanged.</li>
+<li>MUL BL multiplies AL (34h = 52) by BL: 52 × 3 = 156 = <b>009Ch</b>. The product goes into all of AX; the 12h in AH is lost.</li>
+<li>2000 × (21 − 2) = <b>38,000</b> clocks; one clock is 1/8 MHz = 0.125 µs → <b>4.75 ms</b>.</li>
+<li>80h + 80h = 100h → AL = 00h, CF = 1, ZF = 1, SF = 0, OF = 1 (−128 + −128 does not fit).</li>
+<li>0100h + 10 = <b>010Ah</b>.</li>
+<li>Size mismatch → <code>MOV CL, AL</code> (or <code>MOV CH, 0</code> + <code>MOV CL, AL</code>); no immediate into a segment register → <code>MOV AX, 0B800h</code> · <code>MOV ES, AX</code>.</li>
+</ol></details>
+</section>
+
+<section class="ds-deck__slide" data-title="References" data-section="Summary">
+  <p class="ds-deck__kicker">Summary</p>
+  <h2>References</h2>
+<ul>
+<li>emu8086 documentation, <em>8086 assembler tutorial for beginners</em> (part 1: numbering systems, part 2: memory access).</li>
+<li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> data sheet.</li>
+<li>Barry B. Brey, <em>The Intel Microprocessors</em>, 8th ed., Pearson.</li>
+<li>Muhammad Ali Mazidi, Janice G. Mazidi, <em>The 80x86 IBM PC and Compatible Computers</em>, Pearson.</li>
+</ul>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="The End" data-section="">
+  <h1>The End</h1>
+  <div class="ds-deck__subtitle">Chapter 3.2: Assembly Language</div>
+  <small>Previous: <a href="Chapter_03_01_Programming_Languages.html">Chapter 3.1: Programming Languages</a> · Next: <a href="Chapter_04_01_Memory_Access.html">Chapter 4.1: Memory Access</a></small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Previous slide">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Next slide">→</button>
+        <span class="ds-deck__section" id="ds-deck-section">Sercan KÜLCÜ. All rights reserved.</span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Go to slide"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/deck.js"></script>
+<script src="deck/mini8086.js"></script>
+<script src="deck/m-lab.js"></script>

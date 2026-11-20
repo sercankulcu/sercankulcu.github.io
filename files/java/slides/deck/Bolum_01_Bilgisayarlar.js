@@ -1,5 +1,7 @@
 /* Bölüm 1.1: Bilgisayarlar - bit ve karakter kodu deneme alanları */
 (function () {
+  var EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   /* ---------- 8 bit deneme alanı ---------- */
   document.querySelectorAll('.ds-deck [data-demo="j011-bits"]').forEach(function (demo) {
     var row = demo.querySelector(".j011-bitrow");
@@ -27,17 +29,17 @@
         var one = bits.charAt(i) === "1";
         b.lastChild.textContent = one ? "1" : "0";
         b.classList.toggle("is-one", one);
-        b.setAttribute("aria-label", "bit " + (7 - i) + " (ağırlık " + WEIGHTS[i] + "): " + (one ? "1" : "0"));
+        b.setAttribute("aria-label", "bit " + (7 - i) + tx(" (ağırlık ", " (weight ") + WEIGHTS[i] + "): " + (one ? "1" : "0"));
       });
       var signed = value >= 128 ? value - 256 : value;
       var ch = value >= 32 && value <= 126 ? "'" + String.fromCharCode(value) + "'" : "—";
       var parts = [
-        ["İkili", bits.slice(0, 4) + " " + bits.slice(4)],
-        ["İşaretsiz (0–255)", String(value)],
-        ["İşaretli byte (−128–127)", String(signed).replace("-", "−")],
-        ["Onaltılı", "0x" + pad(value.toString(16).toUpperCase(), 2)],
-        ["Sekizli", "0" + value.toString(8)],
-        ["ASCII karakter", ch]
+        [tx("İkili", "Binary"), bits.slice(0, 4) + " " + bits.slice(4)],
+        [tx("İşaretsiz (0–255)", "Unsigned (0–255)"), String(value)],
+        [tx("İşaretli byte (−128–127)", "Signed byte (−128–127)"), String(signed).replace("-", "−")],
+        [tx("Onaltılı", "Hex"), "0x" + pad(value.toString(16).toUpperCase(), 2)],
+        [tx("Sekizli", "Octal"), "0" + value.toString(8)],
+        [tx("ASCII karakter", "ASCII character"), ch]
       ];
       read.innerHTML = parts.map(function (p) { return "<div><span>" + p[0] + "</span><b>" + p[1] + "</b></div>"; }).join("");
     }
@@ -104,9 +106,9 @@
           u.map(function (x) { return hex(x, 2); }).join(" ") + "</code>";
         cells.appendChild(d);
       });
-      if (!cps.length) cells.innerHTML = '<p class="ds-deck__small">Bir metin yazın.</p>';
-      sum.innerHTML = "Kod noktası: <b>" + cps.length + "</b> · Java <code>length()</code> (UTF-16 char): <b>" + text.length +
-        "</b> · UTF-8 bayt: <b>" + bytes + "</b>" + (cps.length > MAX ? " · (ilk " + MAX + " gösteriliyor)" : "");
+      if (!cps.length) cells.innerHTML = '<p class="ds-deck__small">' + tx("Bir metin yazın.", "Type some text.") + '</p>';
+      sum.innerHTML = tx("Kod noktası", "Code points") + ": <b>" + cps.length + "</b> · Java <code>length()</code> (UTF-16 char): <b>" + text.length +
+        "</b> · " + tx("UTF-8 bayt", "UTF-8 bytes") + ": <b>" + bytes + "</b>" + (cps.length > MAX ? tx(" · (ilk " + MAX + " gösteriliyor)", " · (first " + MAX + " shown)") : "");
     }
 
     demo.querySelectorAll("[data-op]").forEach(function (b) {

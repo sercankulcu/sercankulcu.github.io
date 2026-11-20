@@ -28,7 +28,7 @@ SITE = 'https://sercankulcu.github.io'
 # sayfa duzeni (tema, .page__content sarmalayicisi, MathJax) bu yayimlanmis sunumdan alinir
 # duzeni alinan ornek sunum: adi degismeyen bir sunum secin (yeniden adlandirilan sunum
 # yayina cikana kadar 404 verir)
-SHELL_URL = SITE + '/files/os/slides/Bolum_01_Giris.html'
+SHELL_URL = SITE + '/files/advanced_algorithms/sunumlar/Bolum_09_Paralel_Algoritmalar.html'
 
 PRINT_CSS = """
 @page { size: 800px 600px; margin: 0; }

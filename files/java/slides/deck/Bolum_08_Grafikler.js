@@ -1,5 +1,8 @@
 /* Bölüm 9: Grafikler ve Kullanıcı Arayüzleri - Swing pencerelerinin tarayıcıdaki etkileşimli benzerleri */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   var SVGNS = "http://www.w3.org/2000/svg";
 
   function konum(svg, ev) {
@@ -51,7 +54,7 @@
       try { svg.setPointerCapture(ev.pointerId); } catch (e) { /* yok say */ }
       nokta(p, 5);
       yaz("mousePressed", ev, p);
-      status.innerHTML = "Son olay: <b>mousePressed</b> (" + p.x + ", " + p.y + ")";
+      status.innerHTML = tx("Son olay: ", "Last event: ") + "<b>mousePressed</b> (" + p.x + ", " + p.y + ")";
     });
     svg.addEventListener("pointermove", function (ev) {
       if (!basili) return;
@@ -68,7 +71,7 @@
       var p = konum(svg, ev);
       yaz("mouseReleased", ev, p);
       if (Math.abs(p.x - inX) < 4 && Math.abs(p.y - inY) < 4) yaz("mouseClicked", ev, p);
-      status.innerHTML = "Son olay: <b>mouseReleased</b> (" + p.x + ", " + p.y + ")";
+      status.innerHTML = tx("Son olay: ", "Last event: ") + "<b>mouseReleased</b> (" + p.x + ", " + p.y + ")";
     });
   });
 
@@ -129,8 +132,8 @@
     var status = demo.querySelector(".ds-deck__status");
     demo.querySelector('[data-op="tik"]').addEventListener("click", function () {
       sayac++;
-      etiket.textContent = sayac + " kez tıklandı";
-      status.innerHTML = "<code>actionPerformed</code> çağrıldı, <code>sayac</code> = <b>" + sayac + "</b>";
+      etiket.textContent = sayac + tx(" kez tıklandı", " click(s)");
+      status.innerHTML = tx("<code>actionPerformed</code> çağrıldı, <code>sayac</code> = <b>", "<code>actionPerformed</code> called, <code>count</code> = <b>") + sayac + "</b>";
     });
   });
 
@@ -142,8 +145,8 @@
     ad.addEventListener("keydown", function (ev) {
       ev.stopPropagation();
       if (ev.key !== "Enter") return;
-      selam.textContent = "Merhaba, " + ad.value + "!";
-      status.innerHTML = "Enter: <code>actionPerformed</code> → <code>selam.setText(…)</code>";
+      selam.textContent = tx("Merhaba, ", "Hello, ") + ad.value + "!";
+      status.innerHTML = "Enter: <code>actionPerformed</code> → <code>" + tx("selam", "greeting") + ".setText(…)</code>";
     });
   });
 
@@ -153,12 +156,12 @@
     var status = demo.querySelector(".ds-deck__status");
     alan.addEventListener("keydown", function (ev) { ev.stopPropagation(); });
     demo.querySelector('[data-op="buyuk"]').addEventListener("click", function () {
-      alan.value = alan.value.toLocaleUpperCase("tr-TR");
-      status.innerHTML = "<code>alan.setText(alan.getText().toUpperCase())</code>";
+      alan.value = alan.value.toLocaleUpperCase(tx("tr-TR", "en-US"));
+      status.innerHTML = tx("<code>alan.setText(alan.getText().toUpperCase())</code>", "<code>field.setText(field.getText().toUpperCase())</code>");
     });
     demo.querySelector('[data-op="kucuk"]').addEventListener("click", function () {
-      alan.value = alan.value.toLocaleLowerCase("tr-TR");
-      status.innerHTML = "<code>alan.setText(alan.getText().toLowerCase())</code>";
+      alan.value = alan.value.toLocaleLowerCase(tx("tr-TR", "en-US"));
+      status.innerHTML = tx("<code>alan.setText(alan.getText().toLowerCase())</code>", "<code>field.setText(field.getText().toLowerCase())</code>");
     });
   });
 
@@ -171,13 +174,13 @@
     function raporuGuncelle() {
       var s = miktarAlani.value;
       if (!/^[-+]?[0-9]+$/.test(s) || Number(s) > 2147483647 || Number(s) < -2147483648) {
-        rapor.textContent = "Tam sayı değil veya aralık dışında";
+        rapor.textContent = tx("Tam sayı değil veya aralık dışında", "Not an integer or out of range");
         return;
       }
       var miktar = parseInt(s, 10);
-      var metin = miktar + " kuruş yapmak için kullanılacaklar:\n";
+      var metin = miktar + tx(" kuruş yapmak için kullanılacaklar:\n", " cents in coins:\n");
       [50, 25, 10, 5, 1].forEach(function (x) {
-        metin += Math.trunc(miktar / x) + " " + x + " kuruş\n";
+        metin += Math.trunc(miktar / x) + tx(" " + x + " kuruş\n", " x " + x + "c\n");
         miktar = miktar % x;
       });
       rapor.textContent = metin;

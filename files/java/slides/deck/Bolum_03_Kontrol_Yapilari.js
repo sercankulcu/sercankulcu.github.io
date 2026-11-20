@@ -1,5 +1,8 @@
-/* Bölüm 3: for döngüsü deneme alanı */
+/* Bölüm 3: for döngüsü deneme alanı (iki dilli: TR / EN) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   document.querySelectorAll('.ds-deck [data-demo="j031-for"]').forEach(function (demo) {
     var LIMIT = 200;
     var bas = demo.querySelector('[data-k="bas"]');
@@ -42,7 +45,7 @@
     }
     function run() {
       var a = num(bas, 1), b = num(son, 10), o = op.value, u = upd.value;
-      code.innerHTML = '<span class="kw">for</span> (<span class="kw">int</span> i = ' + a + "; i " + esc(o) + " " + b + "; " + updText(u) + ") { toplam += i; }";
+      code.innerHTML = '<span class="kw">for</span> (<span class="kw">int</span> i = ' + a + "; i " + esc(o) + " " + b + "; " + updText(u) + ") { " + tx("toplam", "sum") + " += i; }";
       vals.innerHTML = "";
       var i = a, n = 0, toplam = 0;
       while (test(i, o, b) && n < LIMIT) {
@@ -60,7 +63,8 @@
         st.className = "is-stop";
         st.textContent = "…";
         vals.appendChild(st);
-        status.innerHTML = "<b>" + LIMIT + " turdan sonra durduruldu</b>: koşul hiç yanlış olmuyor, bu bir <b>sonsuz döngü</b>dür.";
+        status.innerHTML = tx("<b>" + LIMIT + " turdan sonra durduruldu</b>: koşul hiç yanlış olmuyor, bu bir <b>sonsuz döngü</b>dür.",
+          "<b>Stopped after " + LIMIT + " passes</b>: the condition never becomes false; this is an <b>infinite loop</b>.");
         return;
       }
       if (n > 60) {
@@ -69,9 +73,11 @@
         vals.appendChild(more);
       }
       if (n === 0) {
-        status.innerHTML = "İlk kontrolde " + trSayi(a) + " " + esc(o) + " " + trSayi(b) + " <b>yanlış</b>: gövde <b>hiç</b> çalışmadı.";
+        status.innerHTML = tx("İlk kontrolde " + trSayi(a) + " " + esc(o) + " " + trSayi(b) + " <b>yanlış</b>: gövde <b>hiç</b> çalışmadı.",
+          "On the first check " + trSayi(a) + " " + esc(o) + " " + trSayi(b) + " is <b>false</b>: the body <b>never</b> ran.");
       } else {
-        status.innerHTML = "Gövde <b>" + n + "</b> kez çalıştı · toplam = <b>" + trSayi(toplam) + "</b> · çıkışta i = <b>" + trSayi(i) + "</b> (" + trSayi(i) + " " + esc(o) + " " + trSayi(b) + " yanlış).";
+        status.innerHTML = tx("Gövde <b>" + n + "</b> kez çalıştı · toplam = <b>" + trSayi(toplam) + "</b> · çıkışta i = <b>" + trSayi(i) + "</b> (" + trSayi(i) + " " + esc(o) + " " + trSayi(b) + " yanlış).",
+          "The body ran <b>" + n + "</b> times · sum = <b>" + trSayi(toplam) + "</b> · on exit i = <b>" + trSayi(i) + "</b> (" + trSayi(i) + " " + esc(o) + " " + trSayi(b) + " is false).");
       }
     }
     demo.querySelector('[data-op="run"]').addEventListener("click", run);

@@ -133,7 +133,7 @@ künye, önsöz), CSS dosyaları, PDF künyesi ve çıktı yolu. Yeni ders için
 başında anlatılır.
 
 Türkçe "ders notu" kalıbındaki dersler (C dışındaki bütün dersler: `files/<ders>/notlar/`,
-ortak `notlar.css`, `sozluk.html`) için ortak tanım `book/notes_book.py` içindedir;
+ortak `notlar.css`, `Sozluk.html`) için ortak tanım `book/notes_book.py` içindedir;
 `course_<ders>.py` dosyaları yalnızca derse özgü ayarları (başlık, önsöz, künye,
 ek betikler) verir. Kısımlar ve bölüm sırası ders sayfasındaki `## Kısım …` /
 `### Bölüm N: …` başlıklarından okunur, kitap o sırayla kalır. Terim sözlüğü Ek A
@@ -146,7 +146,7 @@ ders sayfasında bağı olmayan not kitaba girmez ve derleme uyarı verir. Çok 
 ders sayfasındaki ad ve açıklamayla bir açılış sayfası alır; notlar onun altında yeni
 sayfada başlayan alt bölümler olur ve içindekilerde alt bölüm olarak listelenir.
 
-Ekler: Ek A terim sözlüğü (`sozluk.html`; ders modülünde `glossary=` ile başka dosya, ör. Veri Yapıları `Sozluk.html` / `Dictionary.html`), Ek B "Ön Bilgiler" (`*Prerequisites*.html`, `On_Bilgiler.html`),
+Ekler: Ek A terim sözlüğü (`Sozluk.html`; ders modülünde `glossary=` ile başka dosya, ör. Veri Yapıları `Sozluk.html` / `Dictionary.html`), Ek B "Ön Bilgiler" (`*Prerequisites*.html`, `On_Bilgiler.html`),
 Ek C "Önemli İsimler" (`*Important_People*.html` / `Pioneers*.html` / `Onemli_Isimler.html`). B ve C web'de
 etkileşimli sayfalardır; kitapta arama, süzgeç, sıralama ve düğmeler atılır, gizli
 "Ayrıntılar" açılır, sayfanın kendi `<style>` bloğu kalır. C kitabında aynı iki sayfa
@@ -154,7 +154,7 @@ Appendix A/B olur (`course_c.py`, `_appendix`).
 
 İsteğe bağlı giriş sayfaları (`notes_book.setup(..., intro=[('dosya.html', 'kimlik')])`)
 Kısım I'den önce basılır ve içindekilerin en üstünde yer alır; Türkçe derslerin hepsinde
-dersin haritası (`files/<ders>/ders_haritasi.html`) böyledir.
+dersin haritası (`files/<ders>/Ders_Haritasi.html`) böyledir.
 
 | Aşama | Dosya | İş |
 |---|---|---|
@@ -208,7 +208,7 @@ python tools/course_map.py               # bütün dersler
 python tools/course_map.py os java       # yalnızca verilenler
 ```
 
-`files/<ders>/ders_haritasi.html` sayfalarını `tools/course_maps.py` içindeki tanımlardan
+`files/<ders>/Ders_Haritasi.html` sayfalarını `tools/course_maps.py` içindeki tanımlardan
 üretir: satır satır bölüm numaraları, oklar ve bağ tablosu. Bölüm adları ders sayfasındaki
 `### Bölüm N: Ad` başlıklarından okunur; bölüm adı değişirse haritayı yeniden üretin. Oklar
 yalnızca aynı satırdaki komşu iki kutu ya da ardışık iki satır arasında çizilir, böylece

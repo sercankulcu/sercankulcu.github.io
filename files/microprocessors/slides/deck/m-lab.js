@@ -25,6 +25,12 @@
   if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
   var M = window.Mini8086;
   if (!M) return;
+  var EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang") || "").toLowerCase().indexOf("en") === 0;
+  function tx(tr, en) { return EN ? en : tr; }
+  /* sayıda ondalık ayırıcı: Türkçede virgül, İngilizcede nokta */
+  function dec(v) { return EN ? String(v) : String(v).replace(".", ","); }
+  /* VIEWS içindeki scr değerleri ("Çıktı", "Ekran") iç anahtar olarak da kullanılır; ekranda bu işlevle gösterilir */
+  function scrLabel(s) { return s === "Ekran" ? tx("Ekran", "Screen") : tx("Çıktı", "Output"); }
   var hx = M.hx, MAX_RUN = 5000, PLAY_MS = 650, SPEEDS = [0.5, 1, 2, 5, 20, 100];
   var GP = ["AX", "BX", "CX", "DX"], PAIRS = [["SI", "DI", "BP"], ["SP", "CS", "IP"], ["DS", "ES", "SS"]];
   var FL = ["OF", "DF", "IF", "TF", "SF", "ZF", "AF", "PF", "CF"];
@@ -42,6 +48,8 @@
     "--ds-muted", "--ds-link", "--ds-good", "--ds-accent", "--ds-bad", "--ds-accent", "--ds-look", "--ds-text"];
   var CNAME = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
     "koyu gri", "açık mavi", "açık yeşil", "açık camgöbeği", "açık kırmızı", "açık eflatun", "sarı", "beyaz"];
+  var CNAME_EN = ["black", "blue", "green", "cyan", "red", "magenta", "brown", "light gray",
+    "dark gray", "light blue", "light green", "light cyan", "light red", "light magenta", "yellow", "white"];
   /* mod 13h: VGA'nın varsayılan 256 renkli paleti (6 bitlik DAC değerleri; ekran görüntüsü olduğu için tema dışı sabit renkler).
      0–15 metin renkleri, 16–31 gri tonlar, 32–247 üç parlaklık × üç doygunlukta 24 tonluk halkalar, 248–255 siyah. */
   var PAL = (function () {
@@ -90,11 +98,15 @@
     if (fg === bg) fg = "--ds-bg";
     return (bg ? "background:var(" + bg + ");" : "") + "color:var(" + fg + ")";
   }
-  function attrName(a) { return "öznitelik " + hx(a, 1) + ": " + CNAME[(a >> 4) & 7] + " zemin, " + CNAME[a & 15] + " yazı"; }
+  function attrName(a) {
+    if (EN) return "attribute " + hx(a, 1) + ": " + CNAME_EN[a & 15] + " on " + CNAME_EN[(a >> 4) & 7];
+    return "öznitelik " + hx(a, 1) + ": " + CNAME[(a >> 4) & 7] + " zemin, " + CNAME[a & 15] + " yazı";
+  }
 
   /* ---------- aygıt çizimleri (sunumdaki SVG üslubu, var(--ds-*) renkleri) ---------- */
   var TPOS = [[232, 150], [232, 14], [38, 14], [38, 150]], TCLS = ["m-lab-lamp-r", "m-lab-lamp-y", "m-lab-lamp-g"];
-  var TPOLE = ["sağ alt", "sağ üst", "sol üst", "sol alt"], TCOL = ["kırmızı", "sarı", "yeşil"];
+  var TPOLE = EN ? ["bottom right", "top right", "top left", "bottom left"] : ["sağ alt", "sağ üst", "sol üst", "sol alt"];
+  var TCOL = EN ? ["red", "yellow", "green"] : ["kırmızı", "sarı", "yeşil"];
   function svgWrap(vb, label, inner, h) {
     return '<svg class="ds-svg m-lab__svg" xmlns="' + NS + '" viewBox="' + vb + '" role="img" aria-label="' + esc(label) + '" style="height:' + h + 'px">' + inner + "</svg>";
   }
@@ -110,16 +122,16 @@
       }
     });
     p.push('<text class="lbl mono" x="150" y="226" text-anchor="middle">port 4 = ' + hx(w) + "</text>");
-    return svgWrap("0 0 300 232", "Kavşak, port 4 = " + hx(w), p.join(""), h);
+    return svgWrap("0 0 300 232", tx("Kavşak, port 4 = ", "Intersection, port 4 = ") + hx(w), p.join(""), h);
   }
   function trafficText(w) {
     var parts = [];
     for (var g = 0; g < 4; g++) {
       var on = [];
       for (var k = 0; k < 3; k++) if ((w >> (3 * g + k)) & 1) on.push(TCOL[k]);
-      parts.push(TPOLE[g] + " " + (on.length ? on.join(" + ") : "sönük"));
+      parts.push(TPOLE[g] + " " + (on.length ? on.join(" + ") : tx("sönük", "off")));
     }
-    return "Trafik ışıkları: " + parts.join(", ") + ".";
+    return tx("Trafik ışıkları: ", "Traffic lights: ") + parts.join(", ") + ".";
   }
   /* bir hane: x, y sol üst; s ölçek; bits bölüt deseni */
   function digitSvg(x, y, s, bits, lit) {
@@ -138,7 +150,7 @@
     while (txt.length < 6) txt = " " + txt;
     for (var i = 0; i < 6; i++) p.push(digitSvg(16 + i * 46, 14, 1.6, SEG7[txt.charAt(i)] || 0));
     p.push('<text class="lbl mono" x="150" y="120" text-anchor="middle">port 199 = ' + hx(v) + " (" + sd(sv) + ")</text>");
-    return svgWrap("0 0 300 126", "LED gösterge: " + sd(sv), p.join(""), h);
+    return svgWrap("0 0 300 126", tx("LED gösterge: ", "LED display: ") + sd(sv), p.join(""), h);
   }
   function gaugeSvg(st, h) {
     var p = ['<rect class="m-lab-panel" x="0" y="0" width="300" height="96" rx="10"/>'];
@@ -147,8 +159,8 @@
       p.push(digitSvg(30 + i * 66, 14, 1.6, st.shown[i], lit ? true : false));
       p.push('<circle cx="' + (44 + i * 66) + '" cy="88" r="3" class="' + (lit ? "m-lab-lamp-g" : "m-lab-lamp-off") + '"/>');
     }
-    p.push('<text class="lbl mono" x="150" y="120" text-anchor="middle">310h (bölüt) = ' + h2(st.a) + "h · 312h (hane) = " + h2(st.sel) + "h</text>");
-    return svgWrap("0 0 300 126", "4 haneli 7 bölütlü gösterge", p.join(""), h);
+    p.push('<text class="lbl mono" x="150" y="120" text-anchor="middle">310h (' + tx("bölüt", "segments") + ") = " + h2(st.a) + "h · 312h (" + tx("hane", "digit") + ") = " + h2(st.sel) + "h</text>");
+    return svgWrap("0 0 300 126", tx("4 haneli 7 bölütlü gösterge", "4-digit 7-segment display"), p.join(""), h);
   }
   function thermoSvg(t, heater, h) {
     var hh = Math.max(0, Math.min(170, (t + 40) * 1.0625)), p = [
@@ -164,9 +176,9 @@
       p.push('<path class="line" d="M30 ' + y.toFixed(0) + ' H76" style="stroke:var(--ds-good);stroke-dasharray:4 3"/>');
     });
     p.push('<text class="txt" x="130" y="60">port 125: <tspan class="mono">' + sd(t) + " °C</tspan></text>");
-    p.push('<rect x="130" y="96" width="140" height="44" rx="8" class="' + (heater ? "m-lab-lamp-y" : "m-lab-lamp-off") + '"/><text class="txt" x="200" y="124" text-anchor="middle">ısıtıcı ' + (heater ? "AÇIK" : "KAPALI") + "</text>");
+    p.push('<rect x="130" y="96" width="140" height="44" rx="8" class="' + (heater ? "m-lab-lamp-y" : "m-lab-lamp-off") + '"/><text class="txt" x="200" y="124" text-anchor="middle">' + tx("ısıtıcı ", "heater ") + (heater ? tx("AÇIK", "ON") : tx("KAPALI", "OFF")) + "</text>");
     p.push('<text class="lbl mono" x="130" y="166">port 127 = ' + heater + "</text>");
-    return svgWrap("0 0 280 220", "Termometre " + sd(t) + " derece, ısıtıcı " + (heater ? "açık" : "kapalı"), p.join(""), h);
+    return svgWrap("0 0 280 220", tx("Termometre " + sd(t) + " derece, ısıtıcı " + (heater ? "açık" : "kapalı"), "Thermometer " + sd(t) + " degrees, heater " + (heater ? "on" : "off")), p.join(""), h);
   }
   function deg(half) {
     var d = ((half * 11.25) % 360 + 360) % 360;
@@ -190,12 +202,12 @@
       p.push('<rect x="' + x + '" y="14" width="26" height="26" rx="4" class="' + (on ? "m-lab-lamp-r" : "m-lab-lamp-off") + '"/>');
       p.push('<text class="lbl mono" x="' + (x + 13) + '" y="54" text-anchor="middle">' + m + "</text>");
     }
-    p.push('<text class="lbl" x="233" y="70" text-anchor="middle">mıknatıslar (bit 2–0)</text>');
-    p.push('<text class="txt" x="168" y="100">mil <tspan class="mono">' + deg(st.half) + "</tspan></text>");
-    p.push('<text class="lbl" x="168" y="120">' + (st.half ? (st.half > 0 ? "+" : "−") + Math.abs(st.half) + " yarım adım (" + (st.half > 0 ? "CW" : "CCW") + ")" : "başlangıç konumu") + "</text>");
-    p.push('<rect x="168" y="134" width="12" height="12" rx="6" class="' + (ready ? "m-lab-lamp-g" : "m-lab-lamp-off") + '"/><text class="lbl" x="186" y="145">bit 7: ' + (ready ? "hazır" : "meşgul") + "</text>");
+    p.push('<text class="lbl" x="233" y="70" text-anchor="middle">' + tx("mıknatıslar (bit 2–0)", "magnets (bits 2–0)") + "</text>");
+    p.push('<text class="txt" x="168" y="100">' + tx("mil", "shaft") + ' <tspan class="mono">' + deg(st.half) + "</tspan></text>");
+    p.push('<text class="lbl" x="168" y="120">' + (st.half ? (st.half > 0 ? "+" : "−") + Math.abs(st.half) + tx(" yarım adım (", " half step" + (Math.abs(st.half) === 1 ? "" : "s") + " (") + (st.half > 0 ? "CW" : "CCW") + ")" : tx("başlangıç konumu", "start position")) + "</text>");
+    p.push('<rect x="168" y="134" width="12" height="12" rx="6" class="' + (ready ? "m-lab-lamp-g" : "m-lab-lamp-off") + '"/><text class="lbl" x="186" y="145">bit 7: ' + (ready ? tx("hazır", "ready") : tx("meşgul", "busy")) + "</text>");
     p.push('<text class="lbl mono" x="168" y="170">port 7 = ' + (st.mag == null ? "–" : "00000" + bin3(st.mag)) + "</text>");
-    return svgWrap("0 0 316 180", "Step motor: mil " + deg(st.half) + ", mıknatıslar " + (st.mag == null ? "kapalı" : bin3(st.mag)), p.join(""), h);
+    return svgWrap("0 0 316 180", tx("Step motor: mil ", "Stepper motor: shaft ") + deg(st.half) + tx(", mıknatıslar ", ", magnets ") + (st.mag == null ? tx("kapalı", "off") : bin3(st.mag)), p.join(""), h);
   }
   /* yazıcı kâğıdı: pp = Mini8086.printerPaper(metin); son satırlar, kafa konumu */
   function paperSvg(pp0, h) {
@@ -212,9 +224,10 @@
       if (t) p.push('<text class="m-lab-print mono' + (gone ? " is-gone" : "") + '" x="14" y="' + (20 + i * lh) + '" style="white-space:pre">' + esc(t) + "</text>");
     }
     if (pp.row >= r0 && pp.row < r0 + rows) p.push('<rect class="m-lab-head" x="' + (14 + pp.col * cw - 0.5).toFixed(1) + '" y="' + (8 + (pp.row - r0) * lh) + '" width="' + cw.toFixed(1) + '" height="15" rx="1.5"/>');
-    var svg = svgWrap("0 0 " + W.toFixed(0) + " " + H, "Yazıcı kâğıdı: " + pp.lines.filter(Boolean).length + " dolu satır", p.join(""), h);
-    return svg + '<p class="m-lab__papnote">' + (gone ? "sayfa " + pp.ejected + " çıktı (FF); yeni sayfa boş" : "kafa: satır " + (pp.row + 1) + ", sütun " + (pp.col + 1) +
-      (pp.ejected ? " · çıkan sayfa: " + pp.ejected : "")) + "</p>";
+    var svg = svgWrap("0 0 " + W.toFixed(0) + " " + H, tx("Yazıcı kâğıdı: ", "Printer paper: ") + pp.lines.filter(Boolean).length + tx(" dolu satır", " printed lines"), p.join(""), h);
+    return svg + '<p class="m-lab__papnote">' + (gone ? tx("sayfa " + pp.ejected + " çıktı (FF); yeni sayfa boş", "page " + pp.ejected + " ejected (FF); new page blank") :
+      tx("kafa: satır ", "head: line ") + (pp.row + 1) + tx(", sütun ", ", column ") + (pp.col + 1) +
+      (pp.ejected ? tx(" · çıkan sayfa: ", " · pages ejected: ") + pp.ejected : "")) + "</p>";
   }
 
   document.querySelectorAll('.ds-deck [data-demo="m-lab"]').forEach(function (demo) {
@@ -222,7 +235,7 @@
       var init = null, ports = null;
       try { if (s.dataset.init) init = JSON.parse(s.dataset.init); } catch (e) { init = null; }
       try { if (s.dataset.ports) ports = JSON.parse(s.dataset.ports); } catch (e) { ports = null; }
-      return { name: s.dataset.name || "Örnek", init: init, ports: ports, input: s.dataset.input != null ? s.dataset.input.replace(/\\r/g, "\r").replace(/\\b/g, "\b").replace(/\\e/g, "\x1b") : null,
+      return { name: s.dataset.name || tx("Örnek", "Example"), init: init, ports: ports, input: s.dataset.input != null ? s.dataset.input.replace(/\\r/g, "\r").replace(/\\b/g, "\b").replace(/\\e/g, "\x1b") : null,
         poll: parseInt(s.dataset.poll || "0", 10) || 0, dev: s.dataset.dev ? s.dataset.dev.split(/\s+/) : [],
         view: VIEWS[s.dataset.view] ? s.dataset.view : "normal", exp: s.dataset.acilim === "1",
         clock: triple(s.dataset.clock, CLOCK), date: triple(s.dataset.date, DATE),
@@ -234,41 +247,41 @@
     /* ---------- arayüz ---------- */
     var bar = el("div", "m-lab__bar");
     var pick = el("select");
-    pick.setAttribute("aria-label", "Hazır örnek");
+    pick.setAttribute("aria-label", tx("Hazır örnek", "Preset example"));
     examples.forEach(function (ex, i) { var o = el("option", null, esc(ex.name)); o.value = i; pick.appendChild(o); });
     var btns = el("div", "m-lab__btns");
-    var bEdit = btn("edit", "Düzenle"), bRun = btn("run", "Çalıştır", "Programı sonuna kadar çalıştır");
-    var bBack = btn("back", "◀ Geri", "Bir adım geri"), bStep = btn("step", "Adım ▶", "Bir komut yürüt");
-    var bPlay = btn("play", "Oynat", "Adımları otomatik oynat"), bReset = btn("reset", "Sıfırla", "Programı başa al");
+    var bEdit = btn("edit", tx("Düzenle", "Edit")), bRun = btn("run", tx("Çalıştır", "Run"), tx("Programı sonuna kadar çalıştır", "Run the program to the end"));
+    var bBack = btn("back", tx("◀ Geri", "◀ Back"), tx("Bir adım geri", "One step back")), bStep = btn("step", tx("Adım ▶", "Step ▶"), tx("Bir komut yürüt", "Execute one instruction"));
+    var bPlay = btn("play", tx("Oynat", "Play"), tx("Adımları otomatik oynat", "Play the steps automatically")), bReset = btn("reset", tx("Sıfırla", "Reset"), tx("Programı başa al", "Restart the program"));
     var speedSel = el("select", "m-lab__speed");
-    speedSel.setAttribute("aria-label", "Oynat hızı: adım sıklığı ve saatin akışı bu katsayıyla ölçeklenir");
-    speedSel.title = "Oynat hızı";
-    SPEEDS.forEach(function (v) { var o = el("option", null, "×" + String(v).replace(".", ",")); o.value = v; if (v === 1) o.selected = true; speedSel.appendChild(o); });
+    speedSel.setAttribute("aria-label", tx("Oynat hızı: adım sıklığı ve saatin akışı bu katsayıyla ölçeklenir", "Play speed: the step rate and the clock are scaled by this factor"));
+    speedSel.title = tx("Oynat hızı", "Play speed");
+    SPEEDS.forEach(function (v) { var o = el("option", null, "×" + dec(v)); o.value = v; if (v === 1) o.selected = true; speedSel.appendChild(o); });
     [bEdit, bRun, bBack, bStep, bPlay, speedSel, bReset].forEach(function (b) { btns.appendChild(b); });
     bar.appendChild(pick); bar.appendChild(btns);
 
     var main = el("div", "m-lab__main");
     var pCode = el("div", "m-lab__panel");
     var codeHead = el("div", "m-lab__head");
-    var codeTitle = el("p", "m-lab__title", "Kod");
-    var bExp = el("button", "m-lab__toggle", "Açılım");
+    var codeTitle = el("p", "m-lab__title", tx("Kod", "Code"));
+    var bExp = el("button", "m-lab__toggle", tx("Açılım", "Expansion"));
     bExp.type = "button"; bExp.setAttribute("aria-pressed", "false");
-    bExp.title = "Makro açılımını göster ya da gizle";
+    bExp.title = tx("Makro açılımını göster ya da gizle", "Show or hide the macro expansion");
     codeHead.appendChild(codeTitle); codeHead.appendChild(bExp);
     var code = el("div", "m-lab__code");
-    code.setAttribute("aria-label", "Program kodu");
+    code.setAttribute("aria-label", tx("Program kodu", "Program code"));
     var src = el("textarea", "m-lab__src");
-    src.spellcheck = false; src.hidden = true; src.setAttribute("aria-label", "Program kaynağı (düzenlenebilir)");
+    src.spellcheck = false; src.hidden = true; src.setAttribute("aria-label", tx("Program kaynağı (düzenlenebilir)", "Program source (editable)"));
     var kbd = el("div", "m-lab__kbd");
     var kbdIn = el("input");
-    kbdIn.type = "text"; kbdIn.setAttribute("aria-label", "Klavye girdisi: yazılan tuşlar programa gider (Enter, geri silme ve Esc de)");
-    kbdIn.placeholder = "tuş yaz"; kbdIn.autocomplete = "off"; kbdIn.spellcheck = false;
+    kbdIn.type = "text"; kbdIn.setAttribute("aria-label", tx("Klavye girdisi: yazılan tuşlar programa gider (Enter, geri silme ve Esc de)", "Keyboard input: typed keys go to the program (Enter, Backspace and Esc too)"));
+    kbdIn.placeholder = tx("tuş yaz", "type keys"); kbdIn.autocomplete = "off"; kbdIn.spellcheck = false;
     var kbdQ = el("span", "m-lab__queue");
-    kbd.appendChild(el("b", null, "Girdi")); kbd.appendChild(kbdIn); kbd.appendChild(kbdQ);
+    kbd.appendChild(el("b", null, tx("Girdi", "Input"))); kbd.appendChild(kbdIn); kbd.appendChild(kbdQ);
     pCode.appendChild(codeHead); pCode.appendChild(code); pCode.appendChild(src); pCode.appendChild(kbd);
 
     var pCpu = el("div", "m-lab__panel m-lab__mono");
-    pCpu.appendChild(el("p", "m-lab__title", "Yazmaçlar"));
+    pCpu.appendChild(el("p", "m-lab__title", tx("Yazmaçlar", "Registers")));
     var regBox = el("div", "m-lab__regs"), pairBox = el("div", "m-lab__regs is-pair"), cells = {};
     GP.forEach(function (r) {
       regBox.appendChild(el("b", null, r));
@@ -293,15 +306,15 @@
     });
     var ipNote = el("p", "m-lab__ipnote");
     pCpu.appendChild(regBox); pCpu.appendChild(pairBox);
-    pCpu.appendChild(el("p", "m-lab__title", "Bayraklar")).style.marginTop = "6px";
+    pCpu.appendChild(el("p", "m-lab__title", tx("Bayraklar", "Flags"))).style.marginTop = "6px";
     pCpu.appendChild(flagBox); pCpu.appendChild(ipNote);
 
     var pSide = el("div", "m-lab__panel m-lab__mono");
     var memTitle = pSide.appendChild(el("p", "m-lab__title"));
     var memBox = pSide.appendChild(el("div", "m-lab__mem"));
-    var stackTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", "Yığın <b>SS:SP</b>"));
+    var stackTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", tx("Yığın", "Stack") + " <b>SS:SP</b>"));
     var stackBox = pSide.appendChild(el("div", "m-lab__stack"));
-    var scrTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", "Çıktı"));
+    var scrTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", tx("Çıktı", "Output")));
     var mini = pSide.appendChild(el("canvas", "m-lab__mini"));
     mini.setAttribute("aria-hidden", "true");
     var outBox = pSide.appendChild(el("div", "m-lab__out"));
@@ -310,7 +323,7 @@
     gfx.width = 640; gfx.height = 400; gfx.hidden = true;
     gfx.setAttribute("role", "img");
     var gfxBuf = null;
-    var devTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", "Aygıtlar"));
+    var devTitle = pSide.appendChild(el("p", "m-lab__title m-lab__sub", tx("Aygıtlar", "Devices")));
     var devBox = pSide.appendChild(el("div", "m-lab__dev"));
     var devSvg = devBox.appendChild(el("div", "m-lab__devsvg"));
     var devCtl = devBox.appendChild(el("div", "m-lab__devctl"));
@@ -383,7 +396,7 @@
         var name = el("span", null, esc(a.v.ad || ("port " + a.port)));
         var rng = el("input");
         rng.type = "range"; rng.min = a.v.min != null ? a.v.min : -40; rng.max = a.v.max != null ? a.v.max : 120; rng.value = adj[a.port];
-        rng.setAttribute("aria-label", (a.v.ad || "port " + a.port) + " değeri");
+        rng.setAttribute("aria-label", (a.v.ad || "port " + a.port) + tx(" değeri", " value"));
         var val = el("b", "m-lab__mono", sd(adj[a.port]));
         rng.addEventListener("input", function () {
           adj[a.port] = parseInt(rng.value, 10);
@@ -407,7 +420,7 @@
       scrTitle.hidden = outBox.hidden = !view.scr;
       mini.hidden = !view.mini;
       devTitle.hidden = devBox.hidden = !view.dev;
-      if (view.scr) scrTitle.textContent = view.scr;
+      if (view.scr) scrTitle.textContent = scrLabel(view.scr);
       demo.classList.toggle("is-ekran", !!view.mini);
       demo.classList.toggle("is-aygit", !!view.dev);
     }
@@ -457,7 +470,7 @@
       var ib = initBase();
       memSeg = null;
       memBase = Math.max(0, ((ib != null ? ib : firstVar()) & ~7));
-      if (prog.com && ex.view === "kesme") stackTag[mach.initSp & 0xFFFF] = "DOS dönüşü";
+      if (prog.com && ex.view === "kesme") stackTag[mach.initSp & 0xFFFF] = tx("DOS dönüşü", "DOS return");
       render();
     }
     /* bir adım; false: ilerlenemedi */
@@ -507,9 +520,9 @@
         var nm = "INT " + h2(r.irq.n) + "h";
         stackTag[sp] = nm + ": IP"; stackTag[(sp + 2) & 0xFFFF] = nm + ": CS"; stackTag[(sp + 4) & 0xFFFF] = nm + ": FLAGS";
       } else if (op === "CALL") {
-        if (st.far) { stackTag[sp] = "dönüş IP"; stackTag[(sp + 2) & 0xFFFF] = "dönüş CS"; }
-        else stackTag[sp] = "dönüş adresi";
-      } else if (op === "PUSH") stackTag[sp] = st.ops[0].kind === "imm" ? "sabit" : (st.ops[0].reg || st.ops[0].text);
+        if (st.far) { stackTag[sp] = tx("dönüş IP", "return IP"); stackTag[(sp + 2) & 0xFFFF] = tx("dönüş CS", "return CS"); }
+        else stackTag[sp] = tx("dönüş adresi", "return address");
+      } else if (op === "PUSH") stackTag[sp] = st.ops[0].kind === "imm" ? tx("sabit", "immediate") : (st.ops[0].reg || st.ops[0].text);
       else if (op === "PUSHF") stackTag[sp] = "FLAGS";
     }
     /* aygıt durumları port yazımlarından */
@@ -535,7 +548,7 @@
     function stop() {
       if (!playing) return;
       clearTimeout(timer); timer = null; playing = false;
-      bPlay.textContent = "Oynat"; bPlay.setAttribute("aria-label", "Adımları otomatik oynat");
+      bPlay.textContent = tx("Oynat", "Play"); bPlay.setAttribute("aria-label", tx("Adımları otomatik oynat", "Play the steps automatically"));
     }
     /* Oynat: adımlar PLAY_MS / hız arayla; INT 15h/86h beklemesi gerçek zamanda (bekleme / hız) sürer */
     function schedule(ms) {
@@ -556,7 +569,7 @@
       if (playing) { stop(); resume = null; render(); return; }
       if (done || (err && !err.soft)) reset(true);
       resume = "play"; playing = true; tRef = performance.now();
-      bPlay.textContent = "Durdur"; bPlay.setAttribute("aria-label", "Otomatik oynatmayı durdur");
+      bPlay.textContent = tx("Durdur", "Stop"); bPlay.setAttribute("aria-label", tx("Otomatik oynatmayı durdur", "Stop autoplay"));
       schedule(PLAY_MS / speed);
     }
     function runAll() {
@@ -569,22 +582,24 @@
       while (k++ < MAX_RUN && stepOnce()) {
         if (mach.pollEmpty && !mach.input.length) { waiting = { poll: true }; break; }
       }
-      if (!done && !err && !waiting) err = { msg: MAX_RUN + " adımda bitmedi; sonsuz döngü olabilir. Adım, Geri ya da Sıfırla ile incelenebilir" +
-        (/\bint\s+1ah|\b0*6ch\b/i.test(text) ? ". Saat Çalıştır kipinde yalnız INT 15h beklemeleriyle ilerler; saati bekleyen döngü Oynat kipinde gerçek zamanla biter" : ""), soft: true };
+      if (!done && !err && !waiting) err = { msg: tx(MAX_RUN + " adımda bitmedi; sonsuz döngü olabilir. Adım, Geri ya da Sıfırla ile incelenebilir",
+          "Not finished after " + MAX_RUN + " steps; this may be an infinite loop. Inspect it with Step, Back or Reset") +
+        (/\bint\s+1ah|\b0*6ch\b/i.test(text) ? tx(". Saat Çalıştır kipinde yalnız INT 15h beklemeleriyle ilerler; saati bekleyen döngü Oynat kipinde gerçek zamanla biter",
+          ". In Run mode the clock advances only through INT 15h waits; a loop that waits for the clock finishes in Play mode in real time") : ""), soft: true };
       render();
     }
     function setEditing(on) {
       if (on) {
         editing = true; stop();
         src.value = text; src.hidden = false; code.hidden = true;
-        codeTitle.textContent = "Kod (düzenleniyor)";
-        bEdit.textContent = "Bitti";
+        codeTitle.textContent = tx("Kod (düzenleniyor)", "Code (editing)");
+        bEdit.textContent = tx("Bitti", "Done");
         render();
         src.focus();
       } else {
         editing = false;
         src.hidden = true; code.hidden = false;
-        bEdit.textContent = "Düzenle";
+        bEdit.textContent = tx("Düzenle", "Edit");
         if (src.value !== text) load(src.value.replace(/\s+$/, "") + "\n", true); else render();
       }
     }
@@ -633,7 +648,7 @@
         (exp[i + 1] || []).forEach(function (l) {
           var t = l.text.replace(/^\s+/, "");
           var e = el("div", "m-lab__ln is-exp", "<i>+</i><span>" + esc(t) + "</span>");
-          e.title = l.macro + " açılımı";
+          e.title = l.macro + tx(" açılımı", " expansion");
           code.appendChild(e); rows.push({ el: e, no: i + 1, eid: l.eid });
         });
       });
@@ -652,13 +667,13 @@
     function segName(seg) {
       if (seg == null) return "DS = " + h4(mach.s[3]) + "h";
       var nm = ["DS", "ES", "SS", "CS"].filter(function (k) { return mach.get(k) === seg; })[0];
-      return nm ? nm + " = " + h4(seg) + "h" : "kesim " + h4(seg) + "h";
+      return nm ? nm + " = " + h4(seg) + "h" : tx("kesim ", "segment ") + h4(seg) + "h";
     }
     function memNote(seg) {
       if (seg === 0 && memBase < 0x400) return " · IVT";
-      if (seg === 0xB800) return " · ekran";
-      if (seg === 0xA000) return " · grafik";
-      if (seg === 0x40 || (seg === 0 && memBase >= 0x400 && memBase < 0x500)) return " · BIOS verileri";
+      if (seg === 0xB800) return tx(" · ekran", " · screen");
+      if (seg === 0xA000) return tx(" · grafik", " · graphics");
+      if (seg === 0x40 || (seg === 0 && memBase >= 0x400 && memBase < 0x500)) return tx(" · BIOS verileri", " · BIOS data");
       return "";
     }
     /* mod 13h: A000h belleği 320×200 tuvale (2 kat), son adımda yazılan piksel halkayla işaretlenir */
@@ -683,7 +698,8 @@
         g.lineWidth = now ? 4 : 2; g.strokeStyle = cs.getPropertyValue("--ds-look").trim() || "orange";
         g.beginPath(); g.arc(2 * x + 1, 2 * y + 1, 17, 0, 2 * Math.PI); g.stroke();
       }
-      gfx.setAttribute("aria-label", "Mod 13h ekranı, 320×200: " + cnt + " piksel siyahtan farklı" + (last != null ? "; son yazılan piksel (" + (last % 320) + ", " + Math.floor(last / 320) + ")" : ""));
+      gfx.setAttribute("aria-label", tx("Mod 13h ekranı, 320×200: ", "Mode 13h screen, 320×200: ") + cnt + tx(" piksel siyahtan farklı", " non-black pixels") +
+        (last != null ? tx("; son yazılan piksel (", "; last pixel written (") + (last % 320) + ", " + Math.floor(last / 320) + ")" : ""));
     }
     gfx.addEventListener("mousemove", function (e) {
       if (!mach) return;
@@ -725,7 +741,7 @@
       }
       outBox.innerHTML = html;
       outBox.dataset.empty = any ? "0" : "1";
-      outBox.title = "Satır " + r0 + "–" + Math.min(24, r0 + nrows - 1) + ", sütun " + c0 + "–" + Math.min(79, c0 + cols - 1) + "; imleç (" + mach.cursor[0] + ", " + mach.cursor[1] + ")";
+      outBox.title = tx("Satır ", "Rows ") + r0 + "–" + Math.min(24, r0 + nrows - 1) + tx(", sütun ", ", columns ") + c0 + "–" + Math.min(79, c0 + cols - 1) + tx("; imleç (", "; cursor (") + mach.cursor[0] + ", " + mach.cursor[1] + ")";
       if (view.mini) drawMini(r0, c0, nrows, cols);
     }
     function drawMini(r0, c0, nrows, cols) {
@@ -770,29 +786,33 @@
         list.push("<span>" + hp(w[1]) + " ← " + (w[3] === 2 ? hx(w[2]) : hx(w[2], 1)) + "</span>");
       }
       if (rec && rec.st && rec.st.op === "IN" && rec.info) list.unshift('<span class="is-in">' + hp(rec.info.port) + " → " + hx(rec.info.v, rec.st.ops[0].size) + "</span>");
-      devPorts.innerHTML = list.length ? list.join("") : ex.dev.join() === "yazici" ? "" : '<span class="is-none">henüz port erişimi yok</span>';
+      devPorts.innerHTML = list.length ? list.join("") : ex.dev.join() === "yazici" ? "" : '<span class="is-none">' + tx("henüz port erişimi yok", "no port access yet") + "</span>";
       /* aygıt düzeninde ekran çıktısı (INT 21h/09h gibi) tek satırda */
       var o = mach.out.split(/[\r\n]/).filter(function (x) { return x.trim(); }).pop() || "";
       devOut.hidden = !o;
-      devOut.innerHTML = o ? "<b>Ekran</b> " + esc(o.length > 46 ? "…" + o.slice(-45) : o) : "";
+      devOut.innerHTML = o ? "<b>" + tx("Ekran", "Screen") + "</b> " + esc(o.length > 46 ? "…" + o.slice(-45) : o) : "";
     }
     function timeNote() {
       if (!rec || !rec.svc || rec.svc.wait == null) return "";
       var w = rec.svc.wait;
-      if (rec.kip === "play") return " Oynat kipinde bu bekleme gerçek zamanda " + M.secText(Math.round(w / rec.speed)) + " sürer" +
-        (rec.speed !== 1 ? " (hız ×" + String(rec.speed).replace(".", ",") + ")" : "") + ".";
+      if (rec.kip === "play") return tx(" Oynat kipinde bu bekleme gerçek zamanda ", " In Play mode this wait takes ") + M.secText(Math.round(w / rec.speed)) + tx(" sürer", " in real time") +
+        (rec.speed !== 1 ? tx(" (hız ×", " (speed ×") + dec(rec.speed) + ")" : "") + ".";
+      if (EN) return " In " + (rec.kip === "run" ? "Run" : "Step") + " mode the wait completes in a single step: " + M.trNum(w) + " µs are counted as elapsed.";
       return " " + (rec.kip === "run" ? "Çalıştır" : "Adım") + " kipinde bekleme tek adımda tamamlanır: " + M.trNum(w) + " µs geçmiş sayılır.";
     }
     function printerNote() {
       if (ex.dev.indexOf("yazici") < 0 || !rec || !rec.st || rec.st.op !== "INT" || rec.irq || (rec.before.regs.AX >> 8) !== 5) return "";
       if (!rec.st.ops[0] || rec.st.ops[0].val !== 0x21) return "";
       var c = rec.before.regs.DX & 0xFF, txt = mach.printer, pb = M.printerPaper(txt.slice(0, -1)), pa = M.printerPaper(txt);
-      if (c === 13) return " Yazıcı kafası satırın başına döner (CR); kâğıt ilerlemez.";
-      if (c === 10) return " Kâğıt bir satır ilerler (LF); kafa aynı sütunda kalır.";
-      if (c === 9) return " Kafa sonraki sekme durağına, " + (pa.col + 1) + ". sütuna atlar (HT).";
-      if (c === 12) return pb.lines.join("").trim() ? " Sayfa yazıcıdan çıkar (FF); yeni sayfa başlar." : " Kâğıt boş olduğu için yalnız yeni sayfanın başına geçilir (FF).";
-      if (c < 32) return " Bu denetim karakteri kâğıtta iz bırakmaz.";
+      if (c === 13) return tx(" Yazıcı kafası satırın başına döner (CR); kâğıt ilerlemez.", " The print head returns to the start of the line (CR); the paper does not advance.");
+      if (c === 10) return tx(" Kâğıt bir satır ilerler (LF); kafa aynı sütunda kalır.", " The paper advances one line (LF); the head stays in the same column.");
+      if (c === 9) return tx(" Kafa sonraki sekme durağına, " + (pa.col + 1) + ". sütuna atlar (HT).", " The head jumps to the next tab stop, column " + (pa.col + 1) + " (HT).");
+      if (c === 12) return pb.lines.join("").trim() ? tx(" Sayfa yazıcıdan çıkar (FF); yeni sayfa başlar.", " The page is ejected from the printer (FF); a new page begins.") :
+        tx(" Kâğıt boş olduğu için yalnız yeni sayfanın başına geçilir (FF).", " The paper is blank, so the head only moves to the top of a new page (FF).");
+      if (c < 32) return tx(" Bu denetim karakteri kâğıtta iz bırakmaz.", " This control character leaves no mark on the paper.");
       var old = (pb.lines[pb.row] || "").charAt(pb.col);
+      if (EN) return " It is printed on the paper at line " + (pb.row + 1) + ", column " + (pb.col + 1) +
+        (old && old !== " " ? "; '" + old + "' was already there, so the new character is printed over it" : "") + ".";
       return " Kâğıtta " + (pb.row + 1) + ". satır, " + (pb.col + 1) + ". sütuna basılır" +
         (old && old !== " " ? "; orada önceden '" + old + "' vardı, yeni karakter onun üzerine basılır" : "") + ".";
     }
@@ -801,23 +821,29 @@
       if (!rec || !rec.st || !rec.info) return tn;
       var p = rec.info.port;
       if (p === 7 && ex.dev.indexOf("step") >= 0) {
-        if (rec.st.op === "IN") return (rec.info.v & 0x80 ? " Bit 7 = 1: motor yeni bayta hazır." : " Bit 7 = 0: motor meşgul; durum yeniden okunur.");
+        if (rec.st.op === "IN") return (rec.info.v & 0x80 ? tx(" Bit 7 = 1: motor yeni bayta hazır.", " Bit 7 = 1: the motor is ready for a new byte.") : tx(" Bit 7 = 0: motor meşgul; durum yeniden okunur.", " Bit 7 = 0: the motor is busy; the status is read again."));
         var sa = M.stepper(mach.portWrites), sb = M.stepper(mach.portWrites.slice(0, -1));
-        if (sa.kind === "ilk") return " Step motor: " + bin3(sa.mag) + " mıknatısları açılır; mil " + deg(sa.half) + " konumunda kilitlenir.";
-        if (sa.kind === "aynı") return " Mıknatıs düzeni (" + bin3(sa.mag) + ") değişmediği için mil kıpırdamaz.";
-        if (sa.kind === "tablo dışı") return " " + bin3(sb.mag) + " → " + bin3(sa.mag) + " geçişi emu8086 örneğinin tablolarında yok; laboratuvarda mil yerinde kalır (" + deg(sa.half) + ").";
+        /* stepper kind değerleri Mini8086'nın iç anahtarlarıdır (Türkçe); İngilizcede burada çevrilir */
+        if (sa.kind === "ilk") return tx(" Step motor: " + bin3(sa.mag) + " mıknatısları açılır; mil " + deg(sa.half) + " konumunda kilitlenir.", " Stepper motor: magnets " + bin3(sa.mag) + " are energized; the shaft locks at " + deg(sa.half) + ".");
+        if (sa.kind === "aynı") return tx(" Mıknatıs düzeni (" + bin3(sa.mag) + ") değişmediği için mil kıpırdamaz.", " The magnet pattern (" + bin3(sa.mag) + ") is unchanged, so the shaft does not move.");
+        if (sa.kind === "tablo dışı") return tx(" " + bin3(sb.mag) + " → " + bin3(sa.mag) + " geçişi emu8086 örneğinin tablolarında yok; laboratuvarda mil yerinde kalır (" + deg(sa.half) + ").",
+          " The transition " + bin3(sb.mag) + " → " + bin3(sa.mag) + " is not in the emu8086 example's tables; in the lab the shaft stays put (" + deg(sa.half) + ").");
+        var KIND_EN = { "saat yönünde yarım adım": "half step clockwise", "saat yönünün tersine yarım adım": "half step counterclockwise",
+          "saat yönünde tam adım": "full step clockwise", "saat yönünün tersine tam adım": "full step counterclockwise" };
+        if (EN) return " Magnets " + bin3(sb.mag) + " → " + bin3(sa.mag) + ": " + (KIND_EN[sa.kind] || sa.kind) + " (" + (sa.delta > 0 ? "+" : "−") + dec(Math.abs(sa.delta) * 11.25) + "°); shaft at " + deg(sa.half) + ".";
         return " Mıknatıslar " + bin3(sb.mag) + " → " + bin3(sa.mag) + ": " + sa.kind + " (" + (sa.delta > 0 ? "+" : "−") + String(Math.abs(sa.delta) * 11.25).replace(".", ",") + "°); mil " + deg(sa.half) + ".";
       }
       if (rec.st.op === "OUT") {
         if (p === 4 && ex.dev.indexOf("trafik") >= 0) return " " + trafficText(rec.info.v);
-        if (p === 199 && ex.dev.indexOf("led") >= 0) { var v = rec.info.v; return " LED göstergede " + sd(v & 0x8000 ? v - 0x10000 : v) + " görünür (işaretli onluk)."; }
-        if (p === 127 && ex.dev.indexOf("termometre") >= 0) return " Isıtıcı " + (rec.info.v ? "açılır." : "kapanır.");
-        if (p === 0x310 && ex.dev.indexOf("gosterge") >= 0) return " Port A bölüt desenini (" + h2(rec.info.v) + "h) taşır; hane seçimi açık olan hanede görünür.";
-        if (p === 0x312 && ex.dev.indexOf("gosterge") >= 0) return rec.info.v & 15 ? " Port C'de bit " + Math.log2(rec.info.v & 15) + " = 1: yalnız o hane yanar." : " Port C = 0: bütün haneler sönük.";
+        if (p === 199 && ex.dev.indexOf("led") >= 0) { var v = rec.info.v; return tx(" LED göstergede ", " The LED display shows ") + sd(v & 0x8000 ? v - 0x10000 : v) + tx(" görünür (işaretli onluk).", " (signed decimal)."); }
+        if (p === 127 && ex.dev.indexOf("termometre") >= 0) return tx(" Isıtıcı " + (rec.info.v ? "açılır." : "kapanır."), " The heater turns " + (rec.info.v ? "on." : "off."));
+        if (p === 0x310 && ex.dev.indexOf("gosterge") >= 0) return tx(" Port A bölüt desenini (" + h2(rec.info.v) + "h) taşır; hane seçimi açık olan hanede görünür.", " Port A carries the segment pattern (" + h2(rec.info.v) + "h); it shows on the selected digit.");
+        if (p === 0x312 && ex.dev.indexOf("gosterge") >= 0) return rec.info.v & 15 ? tx(" Port C'de bit " + Math.log2(rec.info.v & 15) + " = 1: yalnız o hane yanar.", " Bit " + Math.log2(rec.info.v & 15) + " of port C = 1: only that digit lights up.") :
+          tx(" Port C = 0: bütün haneler sönük.", " Port C = 0: all digits are off.");
       }
       if (rec.st.op === "IN" && p === 125 && ex.dev.indexOf("termometre") >= 0) {
         var t = rec.info.v & 0x80 ? rec.info.v - 256 : rec.info.v;
-        return " Termometre " + sd(t) + " °C gösteriyor" + (t < 0 ? " (işaretli bayt " + h2(rec.info.v) + "h)" : "") + ".";
+        return tx(" Termometre ", " The thermometer reads ") + sd(t) + tx(" °C gösteriyor", " °C") + (t < 0 ? tx(" (işaretli bayt ", " (signed byte ") + h2(rec.info.v) + "h)" : "") + ".";
       }
       return tn;
     }
@@ -835,15 +861,15 @@
         var top = focus.offsetTop - code.offsetTop, lh = focus.offsetHeight;
         if (top < code.scrollTop + lh || top + 3 * lh > code.scrollTop + code.clientHeight) code.scrollTop = Math.max(0, Math.round((top - code.clientHeight / 3) / lh) * lh);
       }
-      if (!editing) codeTitle.innerHTML = "Kod" + (prog ? " · <b>" + prog.image.reduce(function (a, im) { return a + im[1].length; }, 0) + " bayt</b>" : "");
+      if (!editing) codeTitle.innerHTML = tx("Kod", "Code") + (prog ? " · <b>" + prog.image.reduce(function (a, im) { return a + im[1].length; }, 0) + tx(" bayt</b>", " bytes</b>") : "");
       kbd.hidden = !needsInput();
       kbd.classList.toggle("is-wait", !!waiting);
       if (!kbd.hidden) {
         var all = mach ? (ex.input || "") + typed : "", used = mach ? mach.keysRead : 0, q = "";
         var from = Math.max(0, all.length - 14);
         for (var i = from; i < all.length; i++) q += '<span class="' + (i < used ? "is-used" : "") + '">' + esc(keyGlyph(all.charAt(i))) + "</span>";
-        kbdQ.innerHTML = q || '<span class="is-none">kuyruk boş</span>';
-        kbdQ.title = "Okunan tuşlar soluk, sıradakiler koyu gösterilir.";
+        kbdQ.innerHTML = q || '<span class="is-none">' + tx("kuyruk boş", "queue empty") + "</span>";
+        kbdQ.title = tx("Okunan tuşlar soluk, sıradakiler koyu gösterilir.", "Keys already read are dimmed; pending keys are shown in bold.");
       }
       /* yazmaçlar */
       function put(name, v, w, old) {
@@ -865,20 +891,20 @@
         c.querySelector("em").textContent = v == null ? "·" : und ? "?" : String(v);
         c.classList.toggle("is-undef", !!und);
         c.classList.toggle("is-changed", !!(before && (before.flags[f] !== v || !!before.undef[f] !== !!und)));
-        c.title = f + (und ? " (8086'da tanımsız)" : "");
+        c.title = f + (und ? tx(" (8086'da tanımsız)", " (undefined on the 8086)") : "");
       });
-      ipNote.textContent = mach ? "CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + " · adım " + n + (mach.us ? " · t = " + M.secText(mach.us) : "") : "";
+      ipNote.textContent = mach ? "CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + tx(" · adım ", " · step ") + n + (mach.us ? " · t = " + M.secText(mach.us) : "") : "";
       if (mach) {
         /* bellek */
         var seg = memSeg == null ? mach.s[3] : memSeg, written = {};
         if (rec) rec.mem.forEach(function (w) { written[w[0]] = 1; });
-        memTitle.innerHTML = "Bellek <b>" + segName(memSeg) + "</b>" + memNote(seg);
+        memTitle.innerHTML = tx("Bellek", "Memory") + " <b>" + segName(memSeg) + "</b>" + memNote(seg);
         var mrows = "";
         for (var r = 0; r < view.mem; r++) {
           var off = (memBase + 8 * r) & 0xFFFF, bytes = "";
           for (var b = 0; b < 8; b++) {
             var o2 = (off + b) & 0xFFFF, ph = mach.phys(seg, o2), v = mach.mem[ph], nm = varAt[ph];
-            if (!nm && ph < 0x400) nm = "INT " + h2(ph >> 2) + "h vektörü: " + ((ph & 3) < 2 ? "IP" : "CS") + ((ph & 1) ? " yüksek bayt" : " düşük bayt");
+            if (!nm && ph < 0x400) nm = "INT " + h2(ph >> 2) + tx("h vektörü: ", "h vector: ") + ((ph & 3) < 2 ? "IP" : "CS") + ((ph & 1) ? tx(" yüksek bayt", " high byte") : tx(" düşük bayt", " low byte"));
             var cls = (written[ph] ? "is-changed" : "") + (varAt[ph] ? " is-var" : "");
             bytes += '<span class="' + cls + '"' + (nm ? ' title="' + esc(nm) + '"' : "") + ">" + h2(v) + "</span>";
           }
@@ -900,12 +926,12 @@
         var g13 = !!view.scr && mach.videoMode === 0x13;
         outBox.hidden = !view.scr || g13; mini.hidden = !view.mini || g13; gfx.hidden = !g13;
         stackTitle.hidden = stackBox.hidden = !view.stack || g13;
-        if (view.scr) scrTitle.innerHTML = g13 ? "Ekran <b>mod 13h · 320×200</b>" : view.scr;
+        if (view.scr) scrTitle.innerHTML = g13 ? tx("Ekran <b>mod 13h · 320×200</b>", "Screen <b>mode 13h · 320×200</b>") : scrLabel(view.scr);
         if (g13) drawGfx();
         else if (view.scr) renderScreen();
         if (view.dev) renderDevices();
       } else {
-        memTitle.innerHTML = "Bellek"; memBox.innerHTML = ""; stackBox.innerHTML = ""; outBox.innerHTML = ""; devSvg.innerHTML = ""; devPorts.innerHTML = "";
+        memTitle.innerHTML = tx("Bellek", "Memory"); memBox.innerHTML = ""; stackBox.innerHTML = ""; outBox.innerHTML = ""; devSvg.innerHTML = ""; devPorts.innerHTML = "";
       }
       /* düğmeler */
       var stuck = !mach || !!done || !!(err && !err.soft) || editing;
@@ -919,32 +945,34 @@
       status.innerHTML = statusText();
     }
     function statusText() {
-      if (editing) return "Kod düzenlenebilir. Bitti düğmesi programı yeniden çevirir; Çalıştır düğmesi programı sonuna kadar yürütür.";
-      if (err && err.asm) return "<b>Assembly hatası" + (err.line ? " (satır " + err.line + ")" : "") + ":</b> " + esc(err.msg) + ".";
+      if (editing) return tx("Kod düzenlenebilir. Bitti düğmesi programı yeniden çevirir; Çalıştır düğmesi programı sonuna kadar yürütür.", "The code is editable. Done reassembles the program; Run executes it to the end.");
+      if (err && err.asm) return "<b>" + tx("Assembly hatası", "Assembly error") + (err.line ? tx(" (satır ", " (line ") + err.line + ")" : "") + ":</b> " + esc(err.msg) + ".";
       var s = rec ? esc(rec.text) + esc(devNote()) : "";
       if (waiting) {
-        var w = waiting.poll ? "<b>Program tuş yokluyor:</b> Girdi kutusuna bir tuş yazılınca devam eder." :
-          "<b>Girdi bekleniyor:</b> " + esc(waiting.what) + (/0Ah/.test(waiting.what || "") ? " Enter ile biten bir satır okur" : " bir tuş okur") +
-          "; Girdi kutusuna yazılınca program kaldığı yerden sürer.";
+        var w = waiting.poll ? tx("<b>Program tuş yokluyor:</b> Girdi kutusuna bir tuş yazılınca devam eder.", "<b>The program is polling for a key:</b> it continues when a key is typed in the Input box.") :
+          tx("<b>Girdi bekleniyor:</b> ", "<b>Waiting for input:</b> ") + esc(waiting.what) + (/0Ah/.test(waiting.what || "") ? tx(" Enter ile biten bir satır okur", " reads a line ending with Enter") : tx(" bir tuş okur", " reads a key")) +
+          tx("; Girdi kutusuna yazılınca program kaldığı yerden sürer.", "; type in the Input box and the program continues where it stopped.");
         return (s ? s + " " : "") + w;
       }
-      if (err) return (s ? s + " " : "") + "<b>" + (err.soft ? "Durduruldu:" : "Çalışma hatası:") + "</b> " + esc(err.msg) + ".";
+      if (err) return (s ? s + " " : "") + "<b>" + (err.soft ? tx("Durduruldu:", "Stopped:") : tx("Çalışma hatası:", "Runtime error:")) + "</b> " + esc(err.msg) + ".";
       if (done) {
-        if (/^kod sonu/.test(done)) return (s ? s + " " : "") + "<b>IP = " + h4(mach.ip) + "h adresinde komut yok; program burada durur.</b>";
-        return s + " <b>Program bitti (" + n + " adım).</b>";
+        if (/^(kod sonu|end of code)/.test(done)) return (s ? s + " " : "") + "<b>" + tx("IP = " + h4(mach.ip) + "h adresinde komut yok; program burada durur.", "No instruction at IP = " + h4(mach.ip) + "h; the program stops here.") + "</b>";
+        return s + " <b>" + tx("Program bitti (" + n + " adım).", "Program finished (" + n + " steps).") + "</b>";
       }
       if (rec) return s;
       var size = prog.image.reduce(function (a, im) { return a + im[1].length; }, 0);
       var note = initNote(), extra = [];
-      if (ex.input) extra.push("Girdi kuyruğunda hazır tuşlar var: <b>" + esc(ex.input.split("").map(keyGlyph).join(" ")) + "</b>; başka tuşlar Girdi kutusuna yazılabilir.");
-      else if (needsInput()) extra.push("Program klavyeden okuyunca Girdi kutusuna yazılan tuşları alır.");
-      if (adjustables().length) extra.push("Termometre değeri kaydırıcıyla değiştirilebilir.");
-      if (/\bint\s+15h|\bint\s+1ah|\b0*6ch\b/i.test(text)) extra.push("Saat sanaldır: Adım ve Çalıştır kiplerinde yalnız INT 15h beklemeleriyle ilerler, Oynat kipinde gerçek zamanla akar (hız ayarıyla ölçekli).");
-      if (hasExp && !showExp) extra.push("Açılım düğmesi makroların ürettiği satırları gösterir.");
-      return "Program yüklendi: " + size + " bayt, CS:IP = " + h4(mach.s[1]) + ":" + h4(mach.ip) + "h. " +
-        (note ? "Başlangıç belleği slayttaki varsayımla doldurulur: <b>" + note + "</b>. " : prog.com && !extra.length ? "emu8086'daki gibi CX başlangıçta program boyutunu (" + hx(size) + ") gösterir. " : "") +
+      if (ex.input) extra.push(tx("Girdi kuyruğunda hazır tuşlar var: <b>", "Keys are ready in the input queue: <b>") + esc(ex.input.split("").map(keyGlyph).join(" ")) + tx("</b>; başka tuşlar Girdi kutusuna yazılabilir.", "</b>; more keys can be typed in the Input box."));
+      else if (needsInput()) extra.push(tx("Program klavyeden okuyunca Girdi kutusuna yazılan tuşları alır.", "When the program reads the keyboard, it takes the keys typed in the Input box."));
+      if (adjustables().length) extra.push(tx("Termometre değeri kaydırıcıyla değiştirilebilir.", "The thermometer value can be changed with the slider."));
+      if (/\bint\s+15h|\bint\s+1ah|\b0*6ch\b/i.test(text)) extra.push(tx("Saat sanaldır: Adım ve Çalıştır kiplerinde yalnız INT 15h beklemeleriyle ilerler, Oynat kipinde gerçek zamanla akar (hız ayarıyla ölçekli).",
+        "The clock is virtual: in Step and Run modes it advances only through INT 15h waits; in Play mode it runs in real time (scaled by the speed setting)."));
+      if (hasExp && !showExp) extra.push(tx("Açılım düğmesi makroların ürettiği satırları gösterir.", "The Expansion button shows the lines generated by macros."));
+      return tx("Program yüklendi: ", "Program loaded: ") + size + tx(" bayt, CS:IP = ", " bytes, CS:IP = ") + h4(mach.s[1]) + ":" + h4(mach.ip) + "h. " +
+        (note ? tx("Başlangıç belleği slayttaki varsayımla doldurulur: <b>", "Initial memory is filled as assumed on the slide: <b>") + note + "</b>. " :
+          prog.com && !extra.length ? tx("emu8086'daki gibi CX başlangıçta program boyutunu (" + hx(size) + ") gösterir. ", "As in emu8086, CX initially holds the program size (" + hx(size) + "). ") : "") +
         (extra.length ? extra.join(" ") + " " : "") +
-        "Adım düğmesiyle komutlar tek tek yürütülür; vurgulu satır sıradaki komuttur.";
+        tx("Adım düğmesiyle komutlar tek tek yürütülür; vurgulu satır sıradaki komuttur.", "The Step button executes instructions one at a time; the highlighted line is the next instruction.");
     }
 
     /* ---------- olaylar ---------- */
@@ -953,7 +981,7 @@
       if (!b || b.disabled) return;
       var act = b.dataset.act;
       if (act === "edit") { setEditing(!editing); return; }
-      if (act === "run") { if (editing) { editing = false; src.hidden = true; code.hidden = false; bEdit.textContent = "Düzenle"; if (src.value !== text) load(src.value.replace(/\s+$/, "") + "\n", true); } runAll(); return; }
+      if (act === "run") { if (editing) { editing = false; src.hidden = true; code.hidden = false; bEdit.textContent = tx("Düzenle", "Edit"); if (src.value !== text) load(src.value.replace(/\s+$/, "") + "\n", true); } runAll(); return; }
       if (act === "step") { stop(); resume = "step"; mode = "step"; stepOnce(); render(); return; }
       if (act === "back") { stop(); resume = null; goTo(n - 1); return; }
       if (act === "play") { play(); return; }

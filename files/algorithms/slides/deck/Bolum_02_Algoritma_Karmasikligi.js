@@ -1,5 +1,10 @@
 /* Bölüm 2: f1-f6 adım sayacı (Algoritma Karmaşıklığı) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
+  var SEP = tx(".", ",");
+  var DEC = tx(",", ".");
   document.querySelectorAll('.ds-deck [data-demo="a012-say"]').forEach(function (demo) {
     var range = demo.querySelector(".a012-lab__n");
     var out = demo.querySelector(".a012-lab__val");
@@ -24,7 +29,7 @@
     ];
     var prev = null;
 
-    function fmt(b) { return b.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+    function fmt(b) { return b.toString().replace(/\B(?=(\d{3})+(?!\d))/g, SEP); }
     function lg(b) { var s = b.toString(); return (s.length - 1) + Math.log10(Number(s.slice(0, 15)) / Math.pow(10, Math.min(15, s.length) - 1)); }
 
     function draw() {
@@ -43,9 +48,9 @@
       if (prev && prev.n * 2 === n) {
         var r1 = Number(vals[0]) / Number(prev.v[0]);
         var r2 = Number(vals[1]) / Math.max(1, Number(prev.v[1]));
-        status.innerHTML = "n iki katına çıktı: f1 × <b>" + r1.toFixed(1).replace(".", ",") + "</b>, f2 × <b>" + r2.toFixed(1).replace(".", ",") + "</b>, f3 × <b>" + fmt(vals[2] / (prev.v[2] || 1n)) + "</b>.";
+        status.innerHTML = tx("n iki katına çıktı", "n doubled") + ": f1 × <b>" + r1.toFixed(1).replace(".", DEC) + "</b>, f2 × <b>" + r2.toFixed(1).replace(".", DEC) + "</b>, f3 × <b>" + fmt(vals[2] / (prev.v[2] || 1n)) + "</b>.";
       } else {
-        status.innerHTML = "n = <b>" + n + "</b>: f3 tek başına <b>" + fmt(vals[2]) + "</b> çağrı yapar.";
+        status.innerHTML = "n = <b>" + n + "</b>: " + tx("f3 tek başına <b>" + fmt(vals[2]) + "</b> çağrı yapar.", "f3 alone makes <b>" + fmt(vals[2]) + "</b> calls.");
       }
       prev = { n: n, v: vals };
     }
@@ -65,6 +70,10 @@
 
 /* Bölüm 2: büyüme hesaplayıcı (işlem sayısı ve tahmini süre) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
+  var LOC = tx("tr-TR", "en-US");
   document.querySelectorAll('.ds-deck [data-demo="a012-growth"]').forEach(function (demo) {
     var input = demo.querySelector(".a012-gl__n");
     var tbody = demo.querySelector(".a012-gl__table tbody");
@@ -93,21 +102,21 @@
       if (lg === -Infinity) return "0";
       if (lg < 7) {
         var v = Math.pow(10, lg);
-        if (Math.abs(v - Math.round(v)) < 1e-6) return Math.round(v).toLocaleString("tr-TR");
-        return v.toLocaleString("tr-TR", { maximumFractionDigits: 1 });
+        if (Math.abs(v - Math.round(v)) < 1e-6) return Math.round(v).toLocaleString(LOC);
+        return v.toLocaleString(LOC, { maximumFractionDigits: 1 });
       }
       var e = Math.floor(lg), m = Math.pow(10, lg - e);
-      return m.toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " · 10" + sup(e);
+      return m.toLocaleString(LOC, { maximumFractionDigits: 1 }) + " · 10" + sup(e);
     }
     function fmtTime(lg) {
       if (lg === -Infinity) return "0";
       var sec = lg - 9;
-      if (sec > 12) return "≈ 10" + sup(Math.floor(sec - Math.log10(31536000))) + " yıl";
+      if (sec > 12) return "≈ 10" + sup(Math.floor(sec - Math.log10(31536000))) + tx(" yıl", " years");
       var s = Math.pow(10, sec);
-      var units = [[31536000, "yıl"], [86400, "gün"], [3600, "sa"], [60, "dk"], [1, "s"], [1e-3, "ms"], [1e-6, "µs"], [1e-9, "ns"]];
+      var units = [[31536000, tx("yıl", "yr")], [86400, tx("gün", "days")], [3600, tx("sa", "h")], [60, tx("dk", "min")], [1, "s"], [1e-3, "ms"], [1e-6, "µs"], [1e-9, "ns"]];
       for (var i = 0; i < units.length; i++) {
         if (s >= units[i][0] || i === units.length - 1) {
-          return (s / units[i][0]).toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " " + units[i][1];
+          return (s / units[i][0]).toLocaleString(LOC, { maximumFractionDigits: 1 }) + " " + units[i][1];
         }
       }
       return "";
@@ -115,7 +124,7 @@
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
     function render() {
       var n = Math.floor(Number(input.value));
-      if (!isFinite(n) || n < 1) { status.innerHTML = "n en az 1 olmalıdır."; return; }
+      if (!isFinite(n) || n < 1) { status.innerHTML = tx("n en az 1 olmalıdır.", "n must be at least 1."); return; }
       if (n > 1e9) { n = 1e9; input.value = n; }
       var rows = [];
       FUNCS.forEach(function (f) {
@@ -126,7 +135,7 @@
           "</td><td><span class=\"a012-gl__bar" + (over ? " is-over" : "") + "\" style=\"width:" + w + "px\"></span></td></tr>");
       });
       tbody.innerHTML = rows.join("");
-      status.innerHTML = "n = <b>" + esc(n.toLocaleString("tr-TR")) + "</b> · çubuk: işlem sayısının basamak sayısı (log ölçek) · kırmızı: 1 saatten uzun";
+      status.innerHTML = "n = <b>" + esc(n.toLocaleString(LOC)) + "</b> · " + tx("çubuk: işlem sayısının basamak sayısı (log ölçek) · kırmızı: 1 saatten uzun", "bar: digits in the operation count (log scale) · red: over 1 hour");
     }
     input.addEventListener("input", render);
     demo.querySelectorAll("[data-n]").forEach(function (b) {

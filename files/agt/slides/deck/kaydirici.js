@@ -9,6 +9,10 @@
 (function () {
   if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
   const NS = "http://www.w3.org/2000/svg";
+  /* dil: #ds-deck'in lang özniteliği, yoksa <html lang> (İngilizce sunumlar için) */
+  const EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang") || "").toLowerCase().indexOf("en") === 0;
+  const tx = function (tr, en) { return EN ? en : tr; };
+  function pct(t) { return EN ? t + "%" : "%" + t; }
 
   /* ---------- yardımcılar ---------- */
   function fmt(x, d) {
@@ -17,7 +21,8 @@
     let t = (Math.round(x * k) / k).toFixed(d);
     if (t.indexOf(".") >= 0) t = t.replace(/0+$/, "").replace(/\.$/, "");
     if (t === "-0") t = "0";
-    return t.replace("-", "−").replace(".", ",");
+    t = t.replace("-", "−");
+    return EN ? t : t.replace(".", ",");
   }
   function gcd(a, b) {
     a = Math.abs(a); b = Math.abs(b);
@@ -175,34 +180,34 @@
   /* ---------- 1. Cournot en iyi tepkisi: P = 12 − y₁ − y₂, maliyet 0 ---------- */
   W.cournot = function (box) {
     build(box, {
-      label: "Cournot: rakibin miktarı y₂'ye göre kâr eğrisi u₁(y₁) ve en iyi tepki doğrusu",
-      sliders: [{ key: "r", name: "y₂", min: 0, max: 14, step: 0.5, value: 4, aria: "Rakibin üretim miktarı y₂" }],
+      label: tx("Cournot: rakibin miktarı y₂'ye göre kâr eğrisi u₁(y₁) ve en iyi tepki doğrusu", "Cournot: profit curve u₁(y₁) given the rival's quantity y₂, and the best-response line"),
+      sliders: [{ key: "r", name: "y₂", min: 0, max: 14, step: 0.5, value: 4, aria: tx("Rakibin üretim miktarı y₂", "Rival's output quantity y₂") }],
       draw: function (v, svg) {
         const r = v.r, br = Math.max(0, (12 - r) / 2), price = Math.max(0, 12 - br - r), prof = br * price;
         const u = function (y) { return y * Math.max(0, 12 - y - r); };
         /* sol: kâr eğrisi */
         const L = frame(svg, { x0: 56, x1: 420, y0: 40, y1: 196, xmin: 0, xmax: 12, ymin: 0, ymax: 36,
-          xt: [0, 2, 4, 6, 8, 10, 12], yt: [0, 9, 18, 27, 36], xlabel: "y₁ (benim miktarım)", ylabel: "kâr u₁" });
-        legend(svg, 14, [{ x: 56, color: C_LINK, kind: "line", text: "u₁(y₁) = y₁(12 − y₁ − y₂), eksi kısım çizilmez" }]);
+          xt: [0, 2, 4, 6, 8, 10, 12], yt: [0, 9, 18, 27, 36], xlabel: tx("y₁ (benim miktarım)", "y₁ (my quantity)"), ylabel: tx("kâr u₁", "profit u₁") });
+        legend(svg, 14, [{ x: 56, color: C_LINK, kind: "line", text: tx("u₁(y₁) = y₁(12 − y₁ − y₂), eksi kısım çizilmez", "u₁(y₁) = y₁(12 − y₁ − y₂), negative part not drawn") }]);
         curve(svg, u, 0, 12, L, undefined, "stroke:" + C_LINK);
         const px = L.X(br), py = L.Y(prof);
         dash(svg, "M" + px.toFixed(1) + " " + py.toFixed(1) + " V196", "stroke:" + C_ACC);
         dot(svg, px, py, 6, "fill:" + C_ACC + ";stroke:var(--ds-bg);stroke-width:2");
         const right = br <= 8;
         el(svg, "text", { class: "lbl halo", x: (px + (right ? 12 : -12)).toFixed(1), y: (py - 8).toFixed(1), "text-anchor": right ? "start" : "end", style: "font-weight:700;fill:" + C_ACC },
-          prof > 0 ? "en iyi: y₁ = " + fmt(br) + ", kâr " + fmt(prof) : "üretmemek en iyisi (y₁ = 0)");
+          prof > 0 ? tx("en iyi: y₁ = ", "best: y₁ = ") + fmt(br) + tx(", kâr ", ", profit ") + fmt(prof) : tx("üretmemek en iyisi (y₁ = 0)", "best not to produce (y₁ = 0)"));
         /* sağ: en iyi tepki doğrusu */
         const R = frame(svg, { x0: 500, x1: 704, y0: 40, y1: 196, xmin: 0, xmax: 14, ymin: 0, ymax: 6,
-          xt: [0, 4, 8, 12], yt: [0, 2, 4, 6], xlabel: "y₂ (rakibin miktarı)" });
-        el(svg, "text", { class: "lbl", x: 500, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, "en iyi tepki BR₁(y₂)");
+          xt: [0, 4, 8, 12], yt: [0, 2, 4, 6], xlabel: tx("y₂ (rakibin miktarı)", "y₂ (rival's quantity)") });
+        el(svg, "text", { class: "lbl", x: 500, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, tx("en iyi tepki BR₁(y₂)", "best response BR₁(y₂)"));
         el(svg, "path", { class: "curve", d: "M" + R.X(0) + " " + R.Y(6) + " L" + R.X(12).toFixed(1) + " " + R.Y(0) + " L" + R.X(14) + " " + R.Y(0), style: "stroke:" + C_LINK });
         dot(svg, R.X(4), R.Y(4), 8, "fill:none;stroke:" + C_GOOD + ";stroke-width:2.5");
-        el(svg, "text", { class: "lbl halo", x: (R.X(4) + 11).toFixed(1), y: (R.Y(4) - 9).toFixed(1), style: "font-weight:700;fill:" + C_GOOD }, "denge (4, 4)");
+        el(svg, "text", { class: "lbl halo", x: (R.X(4) + 11).toFixed(1), y: (R.Y(4) - 9).toFixed(1), style: "font-weight:700;fill:" + C_GOOD }, tx("denge (4, 4)", "equilibrium (4, 4)"));
         const qx = R.X(r), qy = R.Y(br);
         dash(svg, "M" + qx.toFixed(1) + " " + qy.toFixed(1) + " V196 M" + qx.toFixed(1) + " " + qy.toFixed(1) + " H500", "stroke:" + C_ACC);
         dot(svg, qx, qy, 5, "fill:" + C_ACC);
         return chip("BR₁(" + fmt(r) + ") = max{0, (12 − " + fmt(r) + ")/2} = <b>" + fmt(br) + "</b>") +
-          chip("fiyat = <b>" + fmt(price) + "</b>") + chip("en iyi kâr = <b>" + fmt(prof) + "</b>");
+          chip(tx("fiyat = <b>", "price = <b>") + fmt(price) + "</b>") + chip(tx("en iyi kâr = <b>", "best profit = <b>") + fmt(prof) + "</b>");
       }
     });
   };
@@ -210,30 +215,30 @@
   /* ---------- 2. Denetim oyunu: işçinin tek kazancı c (Kaytar–Denetle) ---------- */
   W.denetim = function (box) {
     build(box, {
-      label: "Denetim oyunu: yakalanan kaytarıcının kazancı c değişince karışık denge olasılıkları",
-      sliders: [{ key: "c", name: "c", min: -6, max: 1, step: 0.5, value: 0, aria: "Yakalanan kaytarıcının kazancı c" }],
+      label: tx("Denetim oyunu: yakalanan kaytarıcının kazancı c değişince karışık denge olasılıkları", "Inspection game: mixed-equilibrium probabilities as the payoff c of a caught shirker changes"),
+      sliders: [{ key: "c", name: "c", min: -6, max: 1, step: 0.5, value: 0, aria: tx("Yakalanan kaytarıcının kazancı c", "Payoff c of a caught shirker") }],
       draw: function (v, svg) {
         const c = v.c, q = 2 / (4 - c), p = 0.75;
         /* matris */
-        el(svg, "text", { class: "lbl", x: 146, y: 14, "text-anchor": "middle", style: "font-weight:700;fill:" + C_LINK }, "Müdür");
-        el(svg, "text", { class: "lbl", x: 18, y: 90, "text-anchor": "middle", transform: "rotate(-90 18 90)", style: "font-weight:700;fill:" + C_LINK }, "İşçi");
-        el(svg, "text", { class: "lbl", x: 106, y: 40, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, "Denetle");
-        el(svg, "text", { class: "lbl", x: 186, y: 40, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, "Denetleme");
-        el(svg, "text", { class: "lbl", x: 60, y: 74, "text-anchor": "end", style: "font-weight:700;fill:var(--ds-text)" }, "Çalış");
-        el(svg, "text", { class: "lbl", x: 60, y: 114, "text-anchor": "end", style: "font-weight:700;fill:var(--ds-text)" }, "Kaytar");
+        el(svg, "text", { class: "lbl", x: 146, y: 14, "text-anchor": "middle", style: "font-weight:700;fill:" + C_LINK }, tx("Müdür", "Manager"));
+        el(svg, "text", { class: "lbl", x: 18, y: 90, "text-anchor": "middle", transform: "rotate(-90 18 90)", style: "font-weight:700;fill:" + C_LINK }, tx("İşçi", "Worker"));
+        el(svg, "text", { class: "lbl", x: 106, y: 40, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, tx("Denetle", "Inspect"));
+        el(svg, "text", { class: "lbl", x: 186, y: 40, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, tx("Denetleme", "Don't inspect"));
+        el(svg, "text", { class: "lbl", x: 60, y: 74, "text-anchor": "end", style: "font-weight:700;fill:var(--ds-text)" }, tx("Çalış", "Work"));
+        el(svg, "text", { class: "lbl", x: 60, y: 114, "text-anchor": "end", style: "font-weight:700;fill:var(--ds-text)" }, tx("Kaytar", "Shirk"));
         const cells = [[66, 50, "(2, 1)"], [146, 50, "(2, 2)"], [66, 90, "(" + fmt(c) + ", −1)"], [146, 90, "(4, −4)"]];
         cells.forEach(function (k, i) {
           const hot = i === 2;
           el(svg, "rect", { x: k[0], y: k[1], width: 80, height: 40, style: "fill:" + (hot ? "var(--ds-hot)" : "var(--ds-bg)") + ";stroke:" + (hot ? C_ACC : "var(--ds-border)") + ";stroke-width:" + (hot ? 2.5 : 1.5) });
           el(svg, "text", { class: "txt", x: k[0] + 40, y: k[1] + 25, "text-anchor": "middle" }, k[2]);
         });
-        el(svg, "text", { class: "lbl", x: 126, y: 154, "text-anchor": "middle" }, "hücre: (işçi, müdür)");
-        el(svg, "text", { class: "lbl", x: 126, y: 174, "text-anchor": "middle" }, "c: yakalanan kaytarıcının");
-        el(svg, "text", { class: "lbl", x: 126, y: 190, "text-anchor": "middle" }, "kazancı");
+        el(svg, "text", { class: "lbl", x: 126, y: 154, "text-anchor": "middle" }, tx("hücre: (işçi, müdür)", "cell: (worker, manager)"));
+        el(svg, "text", { class: "lbl", x: 126, y: 174, "text-anchor": "middle" }, tx("c: yakalanan kaytarıcının", "c: payoff of a caught"));
+        el(svg, "text", { class: "lbl", x: 126, y: 190, "text-anchor": "middle" }, tx("kazancı", "shirker"));
         /* işçinin beklenen kazanç doğruları */
         const F = frame(svg, { x0: 290, x1: 500, y0: 40, y1: 196, xmin: 0, xmax: 1, ymin: -6, ymax: 4,
-          xt: [0, 0.5, 1], yt: [-6, -4, -2, 0, 2, 4], xlabel: "q (Denetle olasılığı)" });
-        legend(svg, 14, [{ x: 290, color: C_GOOD, kind: "line", text: "E[Çalış]" }, { x: 390, color: C_BAD, kind: "line", text: "E[Kaytar]" }]);
+          xt: [0, 0.5, 1], yt: [-6, -4, -2, 0, 2, 4], xlabel: tx("q (Denetle olasılığı)", "q (probability of Inspect)") });
+        legend(svg, 14, [{ x: 290, color: C_GOOD, kind: "line", text: tx("E[Çalış]", "E[Work]") }, { x: 390, color: C_BAD, kind: "line", text: tx("E[Kaytar]", "E[Shirk]") }]);
         el(svg, "path", { class: "curve", d: "M" + F.X(0) + " " + F.Y(2).toFixed(1) + " H" + F.X(1), style: "stroke:" + C_GOOD });
         el(svg, "path", { class: "curve", d: "M" + F.X(0) + " " + F.Y(4).toFixed(1) + " L" + F.X(1) + " " + F.Y(c).toFixed(1), style: "stroke:" + C_BAD });
         const ix = F.X(q), iy = F.Y(2);
@@ -242,14 +247,14 @@
         el(svg, "text", { class: "lbl halo", x: ix.toFixed(1), y: (iy - 11).toFixed(1), "text-anchor": "middle", style: "font-weight:700;fill:" + C_ACC }, "q*");
         /* olasılık çubukları */
         const B = frame(svg, { x0: 572, x1: 712, y0: 40, y1: 196, xmin: 0, xmax: 1, ymin: 0, ymax: 1, xt: [], yt: [0, 0.5, 1] });
-        el(svg, "text", { class: "lbl", x: 552, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, "denge olasılıkları");
-        [[p, 584, C_GOOD, "p*", "işçi"], [q, 654, C_LINK, "q*", "müdür"]].forEach(function (b) {
+        el(svg, "text", { class: "lbl", x: 552, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, tx("denge olasılıkları", "equilibrium probabilities"));
+        [[p, 584, C_GOOD, "p*", tx("işçi", "worker")], [q, 654, C_LINK, "q*", tx("müdür", "manager")]].forEach(function (b) {
           el(svg, "rect", { x: b[1], y: B.Y(b[0]).toFixed(1), width: 46, height: (196 - B.Y(b[0])).toFixed(1), rx: 3, style: "fill:" + b[2] });
           el(svg, "text", { class: "lbl", x: b[1] + 23, y: (B.Y(b[0]) - 6).toFixed(1), "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, b[3] + " = " + fmt(b[0], 3));
           el(svg, "text", { class: "lbl", x: b[1] + 23, y: 214, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, b[4]);
         });
         return chip("q* = 2/(4 − c) = <b>" + fracDec(4, 8 - 2 * c) + "</b>") +
-          chip("p* = <b>3/4</b>, c'den bağımsız") + chip("işçinin denge kazancı = <b>2</b>");
+          chip(tx("p* = <b>3/4</b>, c'den bağımsız", "p* = <b>3/4</b>, independent of c")) + chip(tx("işçinin denge kazancı = <b>2</b>", "worker's equilibrium payoff = <b>2</b>"));
       }
     });
   };
@@ -259,19 +264,19 @@
     const R = 3, P = 1;
     build(box, {
       height: 212,
-      label: "Kinci tetik stratejisi: uymanın ve sapmanın değeri δ'ya göre, eşik δ*",
+      label: tx("Kinci tetik stratejisi: uymanın ve sapmanın değeri δ'ya göre, eşik δ*", "Grim trigger strategy: value of complying and of deviating as a function of δ, threshold δ*"),
       sliders: [
-        { key: "d", name: "δ", min: 0, max: 0.99, step: 0.01, value: 0.6, aria: "İskonto faktörü δ" },
-        { key: "t", name: "cazibe", min: 3.5, max: 10, step: 0.5, value: 5, aria: "Cazibe kazancı" }
+        { key: "d", name: "δ", min: 0, max: 0.99, step: 0.01, value: 0.6, aria: tx("İskonto faktörü δ", "Discount factor δ") },
+        { key: "t", name: tx("cazibe", "temptation"), min: 3.5, max: 10, step: 0.5, value: 5, aria: tx("Cazibe kazancı", "Temptation payoff") }
       ],
       draw: function (v, svg) {
         const d = v.d, T = v.t, ds = (T - R) / (T - P);
         const uy = function (x) { return R / (1 - x); }, sp = function (x) { return T + x * P / (1 - x); };
         const ok = d >= ds - 1e-9;
         const F = frame(svg, { x0: 56, x1: 704, y0: 34, y1: 172, xmin: 0, xmax: 1, ymin: 0, ymax: 20,
-          xt: [0, 0.2, 0.4, 0.6, 0.8, 1], yt: [0, 5, 10, 15, 20], xlabel: "δ (oyunun bir tur daha sürme olasılığı)", ylabel: "toplam puan" });
+          xt: [0, 0.2, 0.4, 0.6, 0.8, 1], yt: [0, 5, 10, 15, 20], xlabel: tx("δ (oyunun bir tur daha sürme olasılığı)", "δ (probability the game lasts another round)"), ylabel: tx("toplam puan", "total payoff") });
         el(svg, "rect", { x: F.X(ds).toFixed(1), y: 34, width: (F.X(1) - F.X(ds)).toFixed(1), height: 138, style: "fill:color-mix(in srgb, var(--ds-good) 10%, transparent)" });
-        legend(svg, 14, [{ x: 56, color: C_GOOD, kind: "line", text: "uymak: 3/(1 − δ)" }, { x: 236, color: C_BAD, kind: "line", text: "sapmak: cazibe + δ/(1 − δ)" }]);
+        legend(svg, 14, [{ x: 56, color: C_GOOD, kind: "line", text: tx("uymak: 3/(1 − δ)", "comply: 3/(1 − δ)") }, { x: 236, color: C_BAD, kind: "line", text: tx("sapmak: cazibe + δ/(1 − δ)", "deviate: temptation + δ/(1 − δ)") }]);
         curve(svg, uy, 0, 0.99, F, 20, "stroke:" + C_GOOD);
         curve(svg, sp, 0, 0.99, F, 20, "stroke:" + C_BAD);
         /* eşik */
@@ -284,11 +289,11 @@
         el(svg, "path", { d: "M" + cx.toFixed(1) + " 34 V172", style: "fill:none;stroke:" + C_ACC + ";stroke-width:2;stroke-dasharray:6 4" });
         if (uy(d) <= 20) dot(svg, cx, F.Y(uy(d)), 4.5, "fill:" + C_GOOD);
         if (sp(d) <= 20) dot(svg, cx, F.Y(sp(d)), 4.5, "fill:" + C_BAD);
-        el(svg, "text", { class: "lbl halo", x: 698, y: 164, "text-anchor": "end", style: "font-weight:700;fill:" + C_GOOD }, "δ ≥ δ*: işbirliği sürer");
-        return chip("uymak = <b>" + fmt(uy(d), 2) + "</b>") +
-          chip("sapmak = " + fmt(T) + " + δ/(1 − δ) = <b>" + fmt(sp(d), 2) + "</b>") +
-          chip("eşik δ* = <b>" + fracDec(2 * T - 6, 2 * T - 2) + "</b>") +
-          '<span class="ds-kd__badge ' + (ok ? "ds-kd__badge--ok" : "ds-kd__badge--no") + '">' + (ok ? "İşbirliği sürdürülebilir" : "İşbirliği sürdürülemez") + "</span>";
+        el(svg, "text", { class: "lbl halo", x: 698, y: 164, "text-anchor": "end", style: "font-weight:700;fill:" + C_GOOD }, tx("δ ≥ δ*: işbirliği sürer", "δ ≥ δ*: cooperation is sustained"));
+        return chip(tx("uymak = <b>", "comply = <b>") + fmt(uy(d), 2) + "</b>") +
+          chip(tx("sapmak = ", "deviate = ") + fmt(T) + " + δ/(1 − δ) = <b>" + fmt(sp(d), 2) + "</b>") +
+          chip(tx("eşik δ* = <b>", "threshold δ* = <b>") + fracDec(2 * T - 6, 2 * T - 2) + "</b>") +
+          '<span class="ds-kd__badge ' + (ok ? "ds-kd__badge--ok" : "ds-kd__badge--no") + '">' + (ok ? tx("İşbirliği sürdürülebilir", "Cooperation is sustainable") : tx("İşbirliği sürdürülemez", "Cooperation is not sustainable")) + "</span>";
       }
     });
   };
@@ -296,17 +301,17 @@
   /* ---------- 4. Birinci fiyat: teklif kırpma ve teklifçi sayısı ---------- */
   W.kirpma = function (box) {
     build(box, {
-      label: "Birinci fiyatta denge teklifi b = (n − 1)v/n, dürüst teklif b = v ve beklenen gelir",
-      sliders: [{ key: "n", name: "n", min: 2, max: 10, step: 1, value: 2, aria: "Teklifçi sayısı n" }],
+      label: tx("Birinci fiyatta denge teklifi b = (n − 1)v/n, dürüst teklif b = v ve beklenen gelir", "First-price auction: equilibrium bid b = (n − 1)v/n, truthful bid b = v, and expected revenue"),
+      sliders: [{ key: "n", name: "n", min: 2, max: 10, step: 1, value: 2, aria: tx("Teklifçi sayısı n", "Number of bidders n") }],
       draw: function (v, svg) {
         const n = v.n, k = (n - 1) / n, b8 = 0.8 * k, rev = (n - 1) / (n + 1);
         const F = frame(svg, { x0: 56, x1: 400, y0: 40, y1: 196, xmin: 0, xmax: 1, ymin: 0, ymax: 1,
-          xt: [0, 0.2, 0.4, 0.6, 0.8, 1], yt: [0, 0.2, 0.4, 0.6, 0.8, 1], xlabel: "v (değer)", ylabel: "teklif b" });
+          xt: [0, 0.2, 0.4, 0.6, 0.8, 1], yt: [0, 0.2, 0.4, 0.6, 0.8, 1], xlabel: tx("v (değer)", "v (value)"), ylabel: tx("teklif b", "bid b") });
         el(svg, "path", { d: "M" + F.X(0) + " " + F.Y(0) + " L" + F.X(1) + " " + F.Y(1) + " L" + F.X(1) + " " + F.Y(k).toFixed(1) + " Z", style: "fill:var(--ds-hot);opacity:.85" });
         legend(svg, 14, [
-          { x: 56, color: C_MUT, kind: "dash", text: "dürüst: b = v" },
-          { x: 174, color: C_LINK, kind: "line", text: "denge: b = (n − 1)v/n" },
-          { x: 342, color: "var(--ds-hot)", kind: "box", text: "kırpma" }
+          { x: 56, color: C_MUT, kind: "dash", text: tx("dürüst: b = v", "truthful: b = v") },
+          { x: 174, color: C_LINK, kind: "line", text: tx("denge: b = (n − 1)v/n", "equilibrium: b = (n − 1)v/n") },
+          { x: 342, color: "var(--ds-hot)", kind: "box", text: tx("kırpma", "shading") }
         ]);
         el(svg, "path", { class: "curve", d: "M" + F.X(0) + " " + F.Y(0) + " L" + F.X(1) + " " + F.Y(1), style: "stroke:" + C_MUT + ";stroke-width:2;stroke-dasharray:6 5" });
         el(svg, "path", { class: "curve", d: "M" + F.X(0) + " " + F.Y(0) + " L" + F.X(1) + " " + F.Y(k).toFixed(1), style: "stroke:" + C_LINK });
@@ -317,14 +322,14 @@
         dot(svg, x8, F.Y(b8), 5.5, "fill:" + C_ACC + ";stroke:var(--ds-bg);stroke-width:2");
         /* beklenen gelir çubukları */
         const B = frame(svg, { x0: 500, x1: 704, y0: 40, y1: 196, xmin: 0, xmax: 1, ymin: 0, ymax: 1, xt: [], yt: [0, 0.5, 1] });
-        rich(svg, { class: "lbl", x: 470, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, ["beklenen gelir = (n − 1)/(n + 1)"]);
-        [[520, C_LINK, "birinci fiyat"], [620, C_GOOD, "ikinci fiyat"]].forEach(function (b) {
+        rich(svg, { class: "lbl", x: 470, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, [tx("beklenen gelir = (n − 1)/(n + 1)", "expected revenue = (n − 1)/(n + 1)")]);
+        [[520, C_LINK, tx("birinci fiyat", "first price")], [620, C_GOOD, tx("ikinci fiyat", "second price")]].forEach(function (b) {
           el(svg, "rect", { x: b[0], y: B.Y(rev).toFixed(1), width: 70, height: (196 - B.Y(rev)).toFixed(1), rx: 3, style: "fill:" + b[1] });
           el(svg, "text", { class: "lbl", x: b[0] + 35, y: (B.Y(rev) - 6).toFixed(1), "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, fmt(rev, 3));
           el(svg, "text", { class: "lbl", x: b[0] + 35, y: 214, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, b[2]);
         });
-        return chip("v = 0,8: teklif b = <b>" + fmt(b8, 3) + "</b>") + chip("kırpma v/n = <b>" + fmt(0.8 / n, 3) + "</b>") +
-          chip("beklenen gelir = <b>" + fracDec(n - 1, n + 1) + "</b> (iki kuralda aynı)");
+        return chip(tx("v = 0,8: teklif b = <b>", "v = 0.8: bid b = <b>") + fmt(b8, 3) + "</b>") + chip(tx("kırpma v/n = <b>", "shading v/n = <b>") + fmt(0.8 / n, 3) + "</b>") +
+          chip(tx("beklenen gelir = <b>", "expected revenue = <b>") + fracDec(n - 1, n + 1) + tx("</b> (iki kuralda aynı)", "</b> (same under both rules)"));
       }
     });
   };
@@ -336,13 +341,13 @@
   }
   W.pigou = function (box) {
     build(box, {
-      label: "Pigou ağında gecikme üssü p'ye göre Anarşinin Bedeli ve optimum trafik payları",
-      sliders: [{ key: "p", name: "p", min: 1, max: 10, step: 1, value: 1, aria: "Üst yol gecikme üssü p" }],
+      label: tx("Pigou ağında gecikme üssü p'ye göre Anarşinin Bedeli ve optimum trafik payları", "Price of Anarchy and optimal traffic split in Pigou's network as a function of the delay exponent p"),
+      sliders: [{ key: "p", name: "p", min: 1, max: 10, step: 1, value: 1, aria: tx("Üst yol gecikme üssü p", "Delay exponent p of the upper route") }],
       draw: function (v, svg) {
         const p = v.p, r = pigou(p);
         const F = frame(svg, { x0: 56, x1: 440, y0: 40, y1: 196, xmin: 1, xmax: 10, ymin: 1, ymax: 4,
-          xt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], yt: [1, 2, 3, 4], xlabel: "p (üst yol gecikmesinin üssü)", ylabel: "PoA" });
-        legend(svg, 14, [{ x: 56, color: C_LINK, kind: "line", text: "PoA = C(denge) / C(OPT) = 1 / C(OPT)" }]);
+          xt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], yt: [1, 2, 3, 4], xlabel: tx("p (üst yol gecikmesinin üssü)", "p (exponent of the upper-route delay)"), ylabel: "PoA" });
+        legend(svg, 14, [{ x: 56, color: C_LINK, kind: "line", text: tx("PoA = C(denge) / C(OPT) = 1 / C(OPT)", "PoA = C(equilibrium) / C(OPT) = 1 / C(OPT)") }]);
         dash(svg, "M56 " + F.Y(4 / 3).toFixed(1) + " H440", "stroke:" + C_MUT);
         el(svg, "text", { class: "lbl", x: 446, y: (F.Y(4 / 3) + 4).toFixed(1), style: "font-weight:700" }, "4/3");
         curve(svg, function (t) { return pigou(t).poa; }, 1, 10, F, undefined, "stroke:" + C_LINK);
@@ -351,23 +356,23 @@
         dash(svg, "M" + px.toFixed(1) + " " + py.toFixed(1) + " V196 M" + px.toFixed(1) + " " + py.toFixed(1) + " H56", "stroke:" + C_ACC);
         dot(svg, px, py, 6, "fill:" + C_ACC + ";stroke:var(--ds-bg);stroke-width:2");
         /* trafik payları */
-        el(svg, "text", { class: "lbl", x: 520, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, "trafik payları");
+        el(svg, "text", { class: "lbl", x: 520, y: 14, style: "font-weight:700;fill:var(--ds-text)" }, tx("trafik payları", "traffic split"));
         const X0 = 520, WD = 184;
         function bar(y, share, title) {
           el(svg, "text", { class: "lbl", x: X0, y: y - 8, style: "font-weight:700;fill:var(--ds-text)" }, title);
           const w = WD * share;
           el(svg, "rect", { x: X0, y: y, width: w.toFixed(1), height: 26, style: "fill:" + C_LINK });
           if (share < 1) el(svg, "rect", { x: (X0 + w).toFixed(1), y: y, width: (WD - w).toFixed(1), height: 26, style: "fill:var(--ds-node);stroke:" + C_LINK + ";stroke-width:1" });
-          if (w > 40) el(svg, "text", { class: "lbl", x: (X0 + w / 2).toFixed(1), y: y + 18, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-bg)" }, "%" + fmt(100 * share, 0));
-          if (WD - w > 40) el(svg, "text", { class: "lbl", x: (X0 + w + (WD - w) / 2).toFixed(1), y: y + 18, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, "%" + fmt(100 * (1 - share), 0));
+          if (w > 40) el(svg, "text", { class: "lbl", x: (X0 + w / 2).toFixed(1), y: y + 18, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-bg)" }, pct(fmt(100 * share, 0)));
+          if (WD - w > 40) el(svg, "text", { class: "lbl", x: (X0 + w + (WD - w) / 2).toFixed(1), y: y + 18, "text-anchor": "middle", style: "font-weight:700;fill:var(--ds-text)" }, pct(fmt(100 * (1 - share), 0)));
         }
-        bar(58, 1, "denge (maliyet 1)");
-        bar(122, r.x, "optimum (maliyet " + fmt(r.opt, 3) + ")");
-        legend(svg, 180, [{ x: X0, color: C_LINK, kind: "box", text: ["üst yol: x", ["p"]] }]);
-        legend(svg, 200, [{ x: X0, color: "var(--ds-node)", stroke: C_LINK, kind: "box", text: "alt yol: 1" }]);
+        bar(58, 1, tx("denge (maliyet 1)", "equilibrium (cost 1)"));
+        bar(122, r.x, tx("optimum (maliyet ", "optimum (cost ") + fmt(r.opt, 3) + ")");
+        legend(svg, 180, [{ x: X0, color: C_LINK, kind: "box", text: [tx("üst yol: x", "upper route: x"), ["p"]] }]);
+        legend(svg, 200, [{ x: X0, color: "var(--ds-node)", stroke: C_LINK, kind: "box", text: tx("alt yol: 1", "lower route: 1") }]);
         return chip("x* = (p + 1)<sup>−1/p</sup> = <b>" + fmt(r.x, 3) + "</b>") +
           chip("C(OPT) = 1 − p(p + 1)<sup>−(p+1)/p</sup> = <b>" + fmt(r.opt, 3) + "</b>") +
-          chip("C(denge) = <b>1</b>") + chip("PoA = <b>" + fmt(r.poa, 3) + "</b>");
+          chip(tx("C(denge) = <b>1</b>", "C(equilibrium) = <b>1</b>")) + chip("PoA = <b>" + fmt(r.poa, 3) + "</b>");
       }
     });
   };

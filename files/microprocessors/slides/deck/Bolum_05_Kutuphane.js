@@ -1,5 +1,7 @@
 /* Bölüm 5: emu8086.inc Kütüphanesi sunumu demoları */
 (function () {
+  const EN = String((document.getElementById("ds-deck") || document.documentElement).getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   function sd(n) { return n < 0 ? "−" + -n : String(n); }
   function hex(n, w) { return n.toString(16).toUpperCase().padStart(w, "0"); }
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -22,7 +24,7 @@
       cells[cur].classList.add("is-cur");
       var col = i % 80, row = Math.floor(i / 80), off = (row * 80 + col) * 2;
       status.innerHTML = "<b>GOTOXY " + col + ", " + row + "</b> → MOV DL," + col + " · MOV DH," + row +
-        " · AH=02h · INT 10h<br>video belleği: B800:" + hex(off, 4) + "h (karakter), B800:" + hex(off + 1, 4) + "h (renk)";
+        " · AH=02h · INT 10h<br>" + tx("video belleği", "video memory") + ": B800:" + hex(off, 4) + "h (" + tx("karakter", "character") + "), B800:" + hex(off + 1, 4) + "h (" + tx("renk", "attribute") + ")";
     }
     grid.addEventListener("click", function (ev) {
       var t = ev.target.closest("span");
@@ -31,7 +33,7 @@
       var ch = input.value || " ";
       cells[i].textContent = ch;
       show(i);
-      status.innerHTML += "<br>PUTC '" + esc(ch) + "' → imleç " + ((i + 1) % 80) + ", " + Math.min(24, Math.floor((i + 1) / 80)) + " konumuna ilerler";
+      status.innerHTML += "<br>PUTC '" + esc(ch) + "' → " + tx("imleç ", "cursor advances to ") + ((i + 1) % 80) + ", " + Math.min(24, Math.floor((i + 1) / 80)) + tx(" konumuna ilerler", "");
     });
     demo.querySelector('[data-op="clear"]').addEventListener("click", function () {
       cells.forEach(function (c) { c.textContent = ""; });
@@ -56,7 +58,7 @@
       var n = parse(input.value);
       if (isNaN(n) || n < -32768 || n > 65535) {
         out.innerHTML = "";
-        status.innerHTML = "Değer −32.768 ile 65.535 arasında olmalı (ör. -25, 1234, FFE7h).";
+        status.innerHTML = tx("Değer −32.768 ile 65.535 arasında olmalı (ör. -25, 1234, FFE7h).", "Enter a value from −32,768 to 65,535 (e.g. -25, 1234, FFE7h).");
         return;
       }
       var ax = n & 0xFFFF, signed = ax >= 0x8000 ? ax - 0x10000 : ax;
@@ -64,8 +66,8 @@
       out.innerHTML = "<div><b>AX</b><code>" + hex(ax, 4) + "h</code><br><span class='ds-deck__muted' style='font-size:12.5px'>" + bin + "</span></div>" +
         "<div><b>PRINT_NUM</b><code>" + signed + "</code></div>" +
         "<div><b>PRINT_NUM_UNS</b><code>" + ax + "</code></div>";
-      status.innerHTML = ax >= 0x8000 ? "Bit 15 = 1: işaretli yorumda negatif (" + ax + " − 65536 = " + sd(signed) + ")." :
-        "Bit 15 = 0: iki yorum aynı sonucu verir.";
+      status.innerHTML = ax >= 0x8000 ? tx("Bit 15 = 1: işaretli yorumda negatif (", "Bit 15 = 1: negative when read as signed (") + ax + " − 65536 = " + sd(signed) + ")." :
+        tx("Bit 15 = 0: iki yorum aynı sonucu verir.", "Bit 15 = 0: both readings give the same value.");
     }
     input.addEventListener("input", calc);
     demo.querySelectorAll("[data-v]").forEach(function (b) {

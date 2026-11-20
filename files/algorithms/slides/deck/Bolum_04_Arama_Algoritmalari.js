@@ -1,5 +1,8 @@
 /* Bölüm 4: arama yarışı (doğrusal, ikili, atlayarak, ara değer, üstel) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   document.querySelectorAll('.ds-deck [data-demo="a03-race"]').forEach(function (demo) {
     var view = demo.querySelector(".a03-lab__view");
     var status = demo.querySelector(".a03-lab__status");
@@ -8,7 +11,8 @@
     var UNI = [3, 8, 15, 21, 27, 34, 40, 46, 52, 59, 65, 71, 78, 84, 90, 97];
     var SKEW = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 500];
     var dizi = UNI.slice();
-    var NAMES = { lin: "Doğrusal", bin: "İkili", jmp: "Atlayarak", int: "Ara değer", exp: "Üstel" };
+    var NAMES = EN ? { lin: "Linear", bin: "Binary", jmp: "Jump", int: "Interpolation", exp: "Exponential" }
+                 : { lin: "Doğrusal", bin: "İkili", jmp: "Atlayarak", int: "Ara değer", exp: "Üstel" };
 
     /* her fonksiyon {r: sonuç indisi, p: yoklanan indisler} döndürür */
     function lin(a, x) {
@@ -76,11 +80,11 @@
         out.push('<text class="txt" x="' + (x + cw / 2) + '" y="44" text-anchor="middle">' + dizi[i] + "</text>");
         out.push('<text class="lbl" x="' + (x + cw / 2) + '" y="72" text-anchor="middle">' + i + "</text>");
       }
-      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + (8 + n * cw) + ' 78" role="img" aria-label="Dizi ve yoklama sırası">' + out.join("") + "</svg>";
+      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + (8 + n * cw) + ' 78" role="img" aria-label="' + tx("Dizi ve yoklama sırası", "Array and probe order") + '">' + out.join("") + "</svg>";
     }
     function table(x) {
-      var h = '<table class="ds-deck__table"><thead><tr><th>aranan ' + String(x).replace("-", "−") + '</th>';
-      var b = "<tr><td>yoklama</td>";
+      var h = '<table class="ds-deck__table"><thead><tr><th>' + tx("aranan ", "target ") + String(x).replace("-", "−") + '</th>';
+      var b = "<tr><td>" + tx("yoklama", "probes") + "</td>";
       Object.keys(F).forEach(function (k) {
         h += '<th class="c">' + NAMES[k] + "</th>";
         b += '<td class="c">' + F[k](dizi, x).p.length + "</td>";
@@ -89,12 +93,12 @@
     }
     function run(op) {
       var x = parseInt(input.value, 10);
-      if (isNaN(x)) { status.textContent = "Bir tam sayı girin."; return; }
+      if (isNaN(x)) { status.textContent = tx("Bir tam sayı girin.", "Enter an integer."); return; }
       var res = F[op](dizi, x);
       render(res);
       table(x);
-      status.innerHTML = "<b>" + NAMES[op] + "</b> arama: " + res.p.length + " yoklama (" + res.p.join(", ") + ") → " +
-        (res.r >= 0 ? "indis <b>" + res.r + "</b>" : "<b>bulunamadı</b> (−1)");
+      status.innerHTML = "<b>" + NAMES[op] + "</b> " + tx("arama", "search") + ": " + res.p.length + tx(" yoklama (", " probes (") + res.p.join(", ") + ") → " +
+        (res.r >= 0 ? tx("indis <b>", "index <b>") + res.r + "</b>" : tx("<b>bulunamadı</b> (−1)", "<b>not found</b> (−1)"));
     }
     demo.addEventListener("click", function (e) {
       var b = e.target.closest("[data-op]");
@@ -104,13 +108,13 @@
         dizi = (op === "uni" ? UNI : SKEW).slice();
         input.value = op === "uni" ? 65 : 15;
         render(null); log.innerHTML = "";
-        status.textContent = op === "uni" ? "Düzgün dağılımlı dizi yüklendi." : "Çarpık dizi yüklendi (son eleman 500). Ara değer arama için zor bir örnek: 15.";
+        status.textContent = op === "uni" ? tx("Düzgün dağılımlı dizi yüklendi.", "Uniformly distributed array loaded.") : tx("Çarpık dizi yüklendi (son eleman 500). Ara değer arama için zor bir örnek: 15.", "Skewed array loaded (last element 500). A hard case for interpolation search: 15.");
         return;
       }
       run(op);
     });
     input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); run("bin"); } });
     render(null);
-    status.textContent = "Bir değer girip algoritma seçin (Enter = ikili).";
+    status.textContent = tx("Bir değer girip algoritma seçin (Enter = ikili).", "Enter a value and pick an algorithm (Enter = binary).");
   });
 })();

@@ -10,12 +10,15 @@ Depo: `C:\Users\Sercan\Documents\GitHub\sercankulcu.github.io` (Jekyll / GitHub 
 - Üslup örneği: `files/data_structures/sunumlar/Bolum_03_Diziler.html` (Türkçe) ve onaylanmış İngilizcesi `files/data_structures/slides/Chapter_03_Arrays.html`. Önce bu ikisinden birkaç slaytı yan yana oku.
 
 ## Kod: tamamen İngilizce
-- Sınıf, metot, değişken adları, yorumlar, yazdırılan metinler İngilizce (ör. `birlestir` → `merge`, `dizi` → `arr`/`a`, `sonuc` → `result`). Adları kısa ve deyimsel seç; aynı ad bütün sunumda (ve aynı dersin öteki İngilizce sunumlarında) tutarlı olsun — derste paylaşılan bir ad tablosu varsa (`tools/bilingual/<ders>_names.tsv`) ona uy, yeni adları oraya ekle.
+- Sınıf, metot, değişken adları, yorumlar, yazdırılan metinler İngilizce (ör. `birlestir` → `merge`, `dizi` → `arr`/`a`, `sonuc` → `result`). Adları kısa ve deyimsel seç (Java'da Java kuralları, C'de C kuralları, 8086'da Intel/emu8086 sözdizimi); aynı ad bütün sunumda tutarlı olsun. Kod yorumlarını KISA tut: İngilizce yorum Türkçesinden uzunsa `<pre>` yatay taşar (pilotta en sık hata buydu).
 - Kod izleme slaytlarında (`<pre class="ds-trace__code">` + adımlarda `data-line`, `data-vars`, `data-stack`, `data-out`) değişken adları, yığın çerçeveleri ve çıktı metni kodla birebir aynı olmalı. Satır sayısı değişmemeli (değişirse data-line'ları kaydır). Kod mantığı ve sayısal sonuçlar aynı kalır.
 - SVG içindeki yazılar (etiketler, eksenler, düğüm adları, aria-label, title) İngilizce olur; koordinatlara dokunma, metin uzarsa kısalt.
 
 ## Dosya ve front matter
-- Türkçe sunum `files/<ders>/sunumlar/Bolum_NN_<Ad>.html`. İngilizcesi `files/<ders>/slides/Chapter_NN_<English_Title>.html` (ASCII, kelimeler `_` ile, ör. `Chapter_01_Divide_and_Conquer.html`). Bölüm numarası aynı kalır.
+- Türkçe sunum `files/<ders>/sunumlar/Bolum_NN_<Ad>.html`. İngilizcesi `files/<ders>/slides/<en_file>.html`; dosya adı ve başlık (`en_title`) `tools/bilingual/chapters.tsv` tablosundan alınır, değiştirme. Önceki/sonraki bölüm bağlantıları da bu tablodaki adlarla.
+- Yalnız görevindeki sunumlara ve onların Türkçe ikizlerinin front matter'ına dokun; başka dosya düzenleme (ders sayfası, 404, ortak betikler ana oturumda).
+- Ders adları ve ders sayfası adresleri (front matter `course:` için):
+  advanced_algorithms "Advanced Algorithms" /teaching/advanced-algorithms/ · algorithms "Algorithms" /teaching/algorithms/ · agt "Algorithmic Game Theory" /teaching/algorithmic-game-theory/ · os "Operating Systems" /teaching/operating-systems/ · microprocessors "Microprocessors" /teaching/microprocessors/ · dsa_c "Data Structures and Algorithms with C" /teaching/data-structures-and-algorithms-with-c/ · computer "Computer Fundamentals and Introduction to Programming" /teaching/computer-and-introduction-to-programming/ · java "Object Oriented Programming with Java" /teaching/object-oriented-programming-with-java/
 - Kopyala ve dönüştür: Türkçe dosyayı İngilizce adla `slides/` içine kopyala, sonra metni İngilizceleştir. Yapı, sınıflar, slayt sırası, `data-*` öznitelikleri, betik etiketleri korunur. Büyük dosyalarda (MB'larca SVG) metni Python betiğiyle yer değiştirerek düzenle; dosyayı elle baştan yazma.
 - `../slides/deck/…` yolları İngilizce dosyada `deck/…` olur (aynı klasör); `../slides/img/…` → `img/…`.
 - `<div class="ds-deck" … lang="tr">` → `lang="en"` (deck.js arayüz metinlerini buna göre İngilizce gösterir).
@@ -38,19 +41,26 @@ Depo: `C:\Users\Sercan\Documents\GitHub\sercankulcu.github.io` (Jekyll / GitHub 
   Türkçe ikizin front matter'ına da aynı `hreflang` bloğunu ekle (lang'den sonra) ve `course.url`'ün sonuna `?lang=tr` ekle.
 - `ds-guard` bloğunu (sayfa başındaki telif/koruma betiği) Türkçe dosyadan AYNEN koru; içindeki hiçbir adı değiştirme (bir ajan `window.top`'u `window.total` yapıp sayfayı canlıda kilitlemişti). Yalnız görünen telif cümlesi "Tüm hakları saklıdır" → İngilizce sunumda "All rights reserved" olabilir, betik kodu değişmez.
 
+## PDF
+- İngilizce sunumların PDF'i ŞİMDİLİK üretilmiyor (kullanıcı kararı): PDF üretme, İngilizce sunumda kendi PDF'ine bağlantı verme. `og_image` olduğu gibi kalır.
+
 ## Bağlantılar (kullanıcı kararı: çevrilmeyen Türkçe kaynaklar İngilizce tarafta GÖSTERİLMEZ)
 - İngilizce sunumdan Türkçe nota, çalışma sorularına, Türkçe simülatörlere, sözlüğe, Türkçe ders haritasına ve başka derslerin Türkçe sayfalarına bağlantı VERME. Bu bağlantılar bir slaytın tek içeriğiyse (ör. "Etkileşimli Simülatörler", "Çalışma Soruları") o slaytı çıkar ya da yalnız İngilizce kaynaklarla (dış kaynaklar, aynı dersin öteki Chapter_ sunumları) bırak. Kaynakça/okuma listesi (kitaplar, makaleler) kalır.
 - Önceki/sonraki bölüm bağlantıları İngilizce Chapter_ dosyalarına gider (adlarını ders brifindeki tablodan al).
 
 ## Derse özel betikler
 - `files/<ders>/slides/deck/` altında bir sunuma özel betik varsa (ör. `Bolum_02_Acgozlu_Algoritmalar.js`) ve içinde kullanıcıya görünen Türkçe metin varsa, betiği iki dilli yap: `deck.js`'teki gibi `const EN = String(document.getElementById("ds-deck").getAttribute("lang")).toLowerCase().indexOf("en") === 0; const tx = (tr, en) => EN ? en : tr;` ve görünen her metni `tx("…", "…")` ile ver. Türkçe sunumun davranışı birebir aynı kalmalı. Betiğin adı değişmez, iki sunum da aynı dosyayı kullanır.
+- Birden çok sunumun paylaştığı betiklere (`deck.js`, `stage.js`, `oyun.js`, `calisma.js`, `kaydirici.js`, `m-lab.js`, `mini8086.js`, `dsc-lab.js`) DOKUNMA: deck.js ve stage.js zaten iki dilli; ötekileri ayrı bir ajan iki dilli yapıyor. Yalnız görevindeki sunumlara özel `Bolum_*.js` betiklerini düzenle. Paylaşılan betiğe HTML'den Türkçe metin geçiliyorsa (data-* öznitelikleri, betiğe verilen etiketler) onu İngilizce sunumun HTML'inde İngilizce yaz.
 - Inline `<script>` içinde `//` satır yorumu YAZMA (`/* */` kullan); `{{` ya da `{%` YAZMA; `:kelime:` biçiminde iki nokta arasında kelime YAZMA (jemoji). Bunlar canlıda sayfayı bozar.
+
+## Geçici dosyalar
+- Aynı anda çok ajan çalışıyor: betiklerini ve tablolarını scratchpad'in DOĞRUDAN içine değil, kendine ait benzersiz bir alt klasöre yaz (ör. `scratchpad/<ders>_<bölümler>/`). Başkasının dosyasına dokunma.
 
 ## Doğrulama (her sunum için)
 1. Türkçe karakter taraması: `[çğıİöşüÇĞÖŞÜ]` İngilizce dosyada yalnız kişi/yer adlarında ve ds-guard telif yorumunda kalabilir; kalan her eşleşmeyi gözden geçir.
 2. Slayt sayısı ve `data-line` aralıkları Türkçe ile aynı (betikle say).
 3. Inline betikleri çıkarıp `node --check`.
-4. Bitince depo kökünde `python tools/check_site.py <ders> --browser` (−I olmadan; birkaç dakika sürer) 0 hata / 0 uyarı vermeli; taşan slaytta metni kısalt, yazı boyutunu küçültme.
+4. `check_site --browser` ÇALIŞTIRMA (aynı anda çok ajan çalışıyor; denetimi ana oturum yapar). Bunun yerine taşma riskini azalt: İngilizce metin Türkçesinden uzun olmasın; SVG etiketleri ve kod yorumları kısa.
 5. Commit etme; `git stash/checkout/reset` kullanma.
 
 Son mesajında: oluşturduğun dosyalar, iki dilli yaptığın betikler, çıkardığın/ değiştirdiğin bağlantı slaytları, ad tablosuna eklediğin adlar ve doğrulama sonucu.

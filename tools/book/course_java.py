@@ -28,7 +28,7 @@ notes_book.setup(
     folder='java',
     course_page='oop-with-java.md',
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
-    intro=[('ders_haritasi.html', 'harita')],
+    intro=[('Ders_Haritasi.html', 'harita')],
     title='Java ile Nesne Yönelimli Programlama',
     subtitle='',
     output='java/Java-ile-Nesne-Yonelimli-Programlama.pdf',   # courses-pdfs/ altinda

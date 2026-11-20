@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Ders haritasi ureteci: files/<ders>/ders_haritasi.html.
+"""Ders haritasi ureteci: files/<ders>/Ders_Haritasi.html.
 
     python tools/course_map.py            # tanimli butun dersler
     python tools/course_map.py os java    # yalnizca verilenler
@@ -22,7 +22,7 @@ GAP_Y = 34
 LINE = 17          # satir araligi
 FONT = 14.5
 
-GUARD = io.open(os.path.join(SITE, 'files', 'agt', 'ders_haritasi.html'), encoding='utf-8').read()
+GUARD = io.open(os.path.join(SITE, 'files', 'agt', 'Ders_Haritasi.html'), encoding='utf-8').read()
 GUARD = GUARD[GUARD.index('<!-- ds-guard:begin -->'):GUARD.index('<!-- ds-guard:end -->') + len('<!-- ds-guard:end -->')]
 
 LEAD = ('Bu sayfa dersin bütün bölümlerini tek bir haritada birleştirir. Her bölüm bir düğümdür; '
@@ -161,14 +161,14 @@ excerpt: "%(title)s dersinin bütün bölümlerini tek bir haritada birleştiren
 
 <p>%(spine)s</p>
 
-<p class="nt-foot">Ders sayfası: <a href="%(permalink)s">%(title)s</a> · <a href="sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
+<p class="nt-foot">Ders sayfası: <a href="%(permalink)s">%(title)s</a> · <a href="Sozluk.html">Terim sözlüğü</a> · © Sercan Külcü. Tüm hakları saklıdır.</p>
 </article>
 ''' % dict(title=title, folder=folder, guard=GUARD, lead=LEAD, w=W, svg=body, caption=m['caption'],
            rows='\n'.join(rows), spine=m['spine'], permalink=permalink,
-           fname=m.get('file', 'ders_haritasi.html'))
+           fname=m.get('file', 'Ders_Haritasi.html'))
     covered = {r[0] for r in m['table']}
     assert covered == set(names), ('tabloda eksik', set(names) - covered)
-    p = os.path.join(SITE, 'files', folder, m.get('file', 'ders_haritasi.html'))
+    p = os.path.join(SITE, 'files', folder, m.get('file', 'Ders_Haritasi.html'))
     io.open(p, 'w', encoding='utf-8', newline='\n').write(out)
     print('%-16s %2d bolum, %d satir, yukseklik %d' % (key, len(names), len(m['rows']), H))
 

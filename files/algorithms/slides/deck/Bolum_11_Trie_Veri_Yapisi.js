@@ -1,5 +1,8 @@
 /* Bölüm 11: Trie Veri Yapısı deneme alanı (ekle, ara, önek / tamamla, sil) */
 (function () {
+  const deckEl = document.getElementById("ds-deck");
+  const EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
   document.querySelectorAll('.ds-deck [data-demo="a053-trie"]').forEach(function (demo) {
     var view = demo.querySelector(".a053-lab__view");
     var status = demo.querySelector(".a053-lab__status");
@@ -9,7 +12,7 @@
 
     function mk() { return { kids: {}, end: false }; }
     function reset() { root = mk(); }
-    function where(k) { return k ? "\"" + esc(k) + "\" düğümünde" : "kökte"; }
+    function where(k) { return k ? tx("\"" + esc(k) + "\" düğümünde", "at node \"" + esc(k) + "\"") : tx("kökte", "at the root"); }
     function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
     function words(n, pre, acc) {
@@ -61,7 +64,7 @@
         var x = n.x + off, y = 16 + n.depth * dy;
         if (!n.depth) {
           out.push('<rect class="' + (hl[""] === "cur" ? "a053-cur" : hl[""] ? "a053-path" : "box") + '" x="' + (x - 30) + '" y="' + (y - 13) + '" width="60" height="26" rx="13"/>');
-          out.push('<text class="txt a053-rt" x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">kök</text>');
+          out.push('<text class="txt a053-rt" x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">' + tx("kök", "root") + '</text>');
           return;
         }
         if (n.ghost) {
@@ -75,13 +78,13 @@
         out.push('<text class="txt" x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">' + n.ch + "</text>");
       });
       var n = words(root, "", []).length;
-      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Trie: ' + n + ' kelime">' + out.join("") + "</svg>";
+      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Trie: ' + n + tx(" kelime", n === 1 ? " word" : " words") + '">' + out.join("") + "</svg>";
     }
 
     function read() {
       var w = (input.value || "").trim().toLowerCase();
       if (!/^[a-z]+$/.test(w) || w.length > MAXL) {
-        status.innerHTML = "Yalnızca a–z harflerinden oluşan, en fazla " + MAXL + " harflik bir kelime girin.";
+        status.innerHTML = tx("Yalnızca a–z harflerinden oluşan, en fazla " + MAXL + " harflik bir kelime girin.", "Enter a word of lowercase a–z letters, at most " + MAXL + " letters long.");
         return null;
       }
       return w;
@@ -102,7 +105,7 @@
       var n = root, made = 0;
       var ex = walk(w);
       if (words(root, "", []).length >= MAXW && !(ex.d === w.length && ex.n.end)) {
-        if (!quiet) status.innerHTML = "En fazla " + MAXW + " kelime: önce bir kelime silin ya da sıfırlayın.";
+        if (!quiet) status.innerHTML = tx("En fazla " + MAXW + " kelime: önce bir kelime silin ya da sıfırlayın.", "At most " + MAXW + " words: delete a word or reset first.");
         return;
       }
       for (var i = 0; i < w.length; i++) {
@@ -114,30 +117,31 @@
       n.end = true;
       if (!quiet) {
         render(pathHl(w, w.length));
-        status.innerHTML = "ekle(\"" + esc(w) + "\"): " + (was ? "kelime zaten vardı, değişiklik yok." :
-          made + " yeni düğüm, " + (w.length - made) + " düğüm paylaşıldı. Toplam " + count(root) + " düğüm (kök dahil).");
+        status.innerHTML = tx("ekle", "insert") + "(\"" + esc(w) + "\"): " + (was ? tx("kelime zaten vardı, değişiklik yok.", "the word was already there; no change.") :
+          tx(made + " yeni düğüm, " + (w.length - made) + " düğüm paylaşıldı. Toplam " + count(root) + " düğüm (kök dahil).",
+             made + " new node(s), " + (w.length - made) + " shared. " + count(root) + " nodes in total (including the root)."));
       }
     }
     function find(w) {
       var r = walk(w);
       if (r.d < w.length) {
         render(pathHl(w, r.d), w.slice(0, r.d + 1));
-        status.innerHTML = "ara(\"" + esc(w) + "\") → <b>false</b>: " + where(w.slice(0, r.d)) + " '" + w.charAt(r.d) + "' dalı yok (" + (r.d + 1) + ". karakter).";
+        status.innerHTML = tx("ara", "search") + "(\"" + esc(w) + "\") → <b>false</b>: " + (EN ? "no '" + w.charAt(r.d) + "' branch " + where(w.slice(0, r.d)) + " (character " + (r.d + 1) + ")." : where(w.slice(0, r.d)) + " '" + w.charAt(r.d) + "' dalı yok (" + (r.d + 1) + ". karakter).");
         return;
       }
       render(pathHl(w, w.length));
-      status.innerHTML = "ara(\"" + esc(w) + "\") → <b>" + r.n.end + "</b>" + (r.n.end ? ": yol tamam, kelimeSonu = true." : ": yol var ama kelimeSonu = false (yalnızca önek).");
+      status.innerHTML = tx("ara", "search") + "(\"" + esc(w) + "\") → <b>" + r.n.end + "</b>" + (r.n.end ? tx(": yol tamam, kelimeSonu = true.", ": full path, isEnd = true.") : tx(": yol var ama kelimeSonu = false (yalnızca önek).", ": the path exists but isEnd = false (only a prefix)."));
     }
     function pre(w) {
       var r = walk(w);
       if (r.d < w.length) {
         render(pathHl(w, r.d), w.slice(0, r.d + 1));
-        status.innerHTML = "onekVarMi(\"" + esc(w) + "\") → <b>false</b>: tamamlanacak kelime yok.";
+        status.innerHTML = tx("onekVarMi", "startsWith") + "(\"" + esc(w) + "\") → <b>false</b>: " + tx("tamamlanacak kelime yok.", "no words to complete.");
         return;
       }
       var hl = pathHl(w, w.length), list = words(r.n, w, []);
       render(hl);
-      status.innerHTML = "onekVarMi(\"" + esc(w) + "\") → <b>true</b> · tamamla → [" + list.map(esc).join(", ") + "]";
+      status.innerHTML = tx("onekVarMi", "startsWith") + "(\"" + esc(w) + "\") → <b>true</b> · " + tx("tamamla", "complete") + " → [" + list.map(esc).join(", ") + "]";
     }
     function del(w) {
       var removed = 0, found = false;
@@ -156,20 +160,20 @@
       rec(root, 0);
       var r = walk(w);
       render(pathHl(w, r.d));
-      status.innerHTML = "sil(\"" + esc(w) + "\"): " + (!found ? "kelime trie'de yok, değişiklik yok." :
-        removed ? removed + " düğüm silindi; " + where(w.slice(0, r.d)) + " durdu." : "yalnızca kelimeSonu işareti kaldırıldı (düğümün çocuğu var).");
+      status.innerHTML = tx("sil", "delete") + "(\"" + esc(w) + "\"): " + (!found ? tx("kelime trie'de yok, değişiklik yok.", "the word is not in the trie; no change.") :
+        removed ? tx(removed + " düğüm silindi; " + where(w.slice(0, r.d)) + " durdu.", removed + " node(s) removed; stopped " + where(w.slice(0, r.d)) + ".") : tx("yalnızca kelimeSonu işareti kaldırıldı (düğümün çocuğu var).", "only the isEnd mark was cleared (the node has children)."));
     }
     function sample() {
       reset();
       ["and", "ant", "dad", "do"].forEach(function (w) { ins(w, true); });
       render({});
-      status.innerHTML = "Örnek trie: and, ant, dad, do (" + count(root) + " düğüm, kök dahil). Bir kelime yazıp bir işlem seçin.";
+      status.innerHTML = tx("Örnek trie: and, ant, dad, do (" + count(root) + " düğüm, kök dahil). Bir kelime yazıp bir işlem seçin.", "Sample trie: and, ant, dad, do (" + count(root) + " nodes, including the root). Type a word and pick an operation.");
     }
 
     demo.addEventListener("click", function (e) {
       var op = e.target && e.target.getAttribute && e.target.getAttribute("data-op");
       if (!op) return;
-      if (op === "reset") { reset(); render({}); status.innerHTML = "Trie boşaltıldı: yalnızca kök."; return; }
+      if (op === "reset") { reset(); render({}); status.innerHTML = tx("Trie boşaltıldı: yalnızca kök.", "Trie cleared: just the root."); return; }
       if (op === "demo") { sample(); return; }
       var w = read();
       if (w === null) return;
