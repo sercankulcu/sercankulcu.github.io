@@ -1,5 +1,8 @@
 /* Bölüm 3: Dinamik Programlama — dizgi DP tablosu demosu (LCS, ortak alt dizgi, düzenleme uzaklığı) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   var roots = document.querySelectorAll('.ds-deck [data-demo="a06-lcs"]');
   Array.prototype.forEach.call(roots, function (root) {
     var view = root.querySelector(".a06-lab__view");
@@ -38,11 +41,11 @@
           else if (T[i - 1][j] >= T[i][j - 1]) i--;
           else j--;
         }
-        msg = "LCS uzunluğu <b>" + T[n][k] + "</b>: \"" + esc(res) + "\" (son hücre).";
+        msg = tx("LCS uzunluğu <b>", "LCS length <b>") + T[n][k] + "</b>: \"" + esc(res) + tx("\" (son hücre).", "\" (last cell).");
       } else if (m === "sub") {
         for (var t = 0; t < best; t++) on[(bi - t) + "," + (bj - t)] = true;
         res = x.substring(bj - best, bj);
-        msg = best ? "En uzun ortak alt dizgi <b>" + best + "</b>: \"" + esc(res) + "\" (tablonun en büyük değeri)." : "Ortak karakter yok: cevap 0.";
+        msg = best ? tx("En uzun ortak alt dizgi <b>", "Longest common substring <b>") + best + "</b>: \"" + esc(res) + tx("\" (tablonun en büyük değeri).", "\" (the largest value in the table).") : tx("Ortak karakter yok: cevap 0.", "No common characters: the answer is 0.");
       } else {
         i = n; j = k;
         on[i + "," + j] = true;
@@ -52,14 +55,14 @@
           else j--;
           on[i + "," + j] = true;
         }
-        msg = "Düzenleme uzaklığı (Y → X) <b>" + T[n][k] + "</b>: çapraz adım = eşleşme/değiştirme, aşağı = silme, sağa = ekleme.";
+        msg = tx("Düzenleme uzaklığı (Y → X) <b>", "Edit distance (Y → X) <b>") + T[n][k] + tx("</b>: çapraz adım = eşleşme/değiştirme, aşağı = silme, sağa = ekleme.", "</b>: diagonal step = match/substitute, down = delete, right = insert.");
       }
       return { T: T, on: on, msg: msg, best: m === "sub" ? best : -1 };
     }
 
     function draw() {
       var x = inX.value.trim().slice(0, 9), y = inY.value.trim().slice(0, 7);
-      if (!x || !y) { view.innerHTML = ""; status.innerHTML = "İki dizgi de en az bir karakter olmalı."; return; }
+      if (!x || !y) { view.innerHTML = ""; status.innerHTML = tx("İki dizgi de en az bir karakter olmalı.", "Both strings need at least one character."); return; }
       var r = compute(x, y, mode), i, j;
       var h = '<table class="a06-lab__tbl"><tr><th></th><th></th>';
       for (j = 0; j < x.length; j++) h += "<th>" + esc(x.charAt(j)) + "</th>";

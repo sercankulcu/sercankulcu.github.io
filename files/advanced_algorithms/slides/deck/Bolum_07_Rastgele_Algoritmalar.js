@@ -1,5 +1,8 @@
 /* Bölüm 7: Monte Carlo ile π tahmini deneme alanı */
 (function () {
+  const EN = String(document.getElementById("ds-deck").getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  const tx = (tr, en) => EN ? en : tr;
+  const LOC = EN ? "en-US" : "tr-TR";
   document.querySelectorAll('.ds-deck [data-demo="a08-pi"]').forEach(function (demo) {
     var view = demo.querySelector(".a08-lab__view");
     var status = demo.querySelector(".a08-lab__status");
@@ -15,27 +18,27 @@
     }
     function build() {
       view.innerHTML = "";
-      svg = el("svg", { "class": "ds-svg", viewBox: "0 0 " + (SZ + 2 * O) + " " + (SZ + 2 * O), role: "img", "aria-label": "Birim kare ve çeyrek daire içinde rastgele noktalar" });
+      svg = el("svg", { "class": "ds-svg", viewBox: "0 0 " + (SZ + 2 * O) + " " + (SZ + 2 * O), role: "img", "aria-label": tx("Birim kare ve çeyrek daire içinde rastgele noktalar", "Random points in the unit square and the quarter circle") });
       svg.appendChild(el("rect", { "class": "box-empty", x: O, y: O, width: SZ, height: SZ }));
       svg.appendChild(el("path", { "class": "a08-arcq", d: "M" + O + " " + O + " A" + SZ + " " + SZ + " 0 0 1 " + (O + SZ) + " " + (O + SZ) }));
       dots = el("g", {});
       svg.appendChild(dots);
       view.appendChild(svg);
     }
-    function fmt(x, d) { return x.toFixed(d).replace(".", ","); }
+    function fmt(x, d) { return EN ? x.toFixed(d) : x.toFixed(d).replace(".", ","); }
     function set(k, v) { demo.querySelector('[data-k="' + k + '"]').textContent = v; }
     function show() {
-      set("n", n.toLocaleString("tr-TR"));
-      set("in", inside.toLocaleString("tr-TR"));
+      set("n", n.toLocaleString(LOC));
+      set("in", inside.toLocaleString(LOC));
       if (n) {
         var est = 4 * inside / n;
         set("pi", fmt(est, 4));
         set("err", fmt(Math.abs(est - Math.PI), 4));
         set("sd", fmt(1.642 / Math.sqrt(n), 4));
-        status.innerHTML = "π ≈ 4 · " + inside.toLocaleString("tr-TR") + " / " + n.toLocaleString("tr-TR") + " = <b>" + fmt(est, 4) + "</b>" + (drawn >= MAXDRAW ? " (çizim 3.000 noktada durdu)" : "");
+        status.innerHTML = "π ≈ 4 · " + inside.toLocaleString(LOC) + " / " + n.toLocaleString(LOC) + " = <b>" + fmt(est, 4) + "</b>" + (drawn >= MAXDRAW ? tx(" (çizim 3.000 noktada durdu)", " (drawing stopped at 3,000 points)") : "");
       } else {
         set("pi", "—"); set("err", "—"); set("sd", "—");
-        status.textContent = "Nokta eklemek için bir düğmeye basın.";
+        status.textContent = tx("Nokta eklemek için bir düğmeye basın.", "Press a button to add points.");
       }
     }
     function add(k) {

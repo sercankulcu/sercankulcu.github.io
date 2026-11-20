@@ -1,5 +1,8 @@
-/* Bölüm 4: n-vezir geri izleme deneme alanı */
+/* Bölüm 4: n-vezir geri izleme deneme alanı (iki dilli: lang="en" sunumda İngilizce) */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = String(deckEl && deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   document.querySelectorAll('.ds-deck [data-demo="a13-vezir"]').forEach(function (demo) {
     var view = demo.querySelector(".a13-lab__view");
     var status = demo.querySelector(".a13-lab__status");
@@ -20,7 +23,8 @@
       col = [];
       for (var i = 0; i < n; i++) col.push(-1);
       r = 0; c = 0; places = 0; backs = 0; sols = 0; last = null; after = false; done = false;
-      render("Boş tahta (n = " + n + "). Vezirler satır satır yerleştirilir; her satırda sütunlar soldan sağa denenir.");
+      render(tx("Boş tahta (n = " + n + "). Vezirler satır satır yerleştirilir; her satırda sütunlar soldan sağa denenir.",
+        "Empty board (n = " + n + "). Queens are placed row by row; in each row columns are tried left to right."));
     }
 
     function safe(row, cc) {
@@ -37,12 +41,13 @@
       c = old + 1;
       backs++;
       last = null;
-      return "Geri dön: satır " + r + " sütun " + old + " kaldırıldı; satır " + r + " için sütun " + ekDen(c) + " devam.";
+      return tx("Geri dön: satır " + r + " sütun " + old + " kaldırıldı; satır " + r + " için sütun " + ekDen(c) + " devam.",
+        "Backtrack: removed row " + r + " column " + old + "; row " + r + " continues from column " + c + ".");
     }
 
     /* one search step; returns {msg, kind} */
     function step() {
-      if (done) return { msg: "Arama bitti: toplam " + sols + " çözüm.", kind: "end" };
+      if (done) return { msg: tx("Arama bitti: toplam " + sols + " çözüm.", "Search finished: " + sols + " solutions in total."), kind: "end" };
       if (after) {
         after = false;
         return { msg: backtrack(), kind: "back" };
@@ -50,15 +55,15 @@
       if (r === n) {
         sols++;
         after = true;
-        return { msg: "Çözüm " + sols + " bulundu: [" + col.join(", ") + "].", kind: "sol" };
+        return { msg: tx("Çözüm " + sols + " bulundu: [", "Solution " + sols + " found: [") + col.join(", ") + "].", kind: "sol" };
       }
       if (c >= n) {
         if (r === 0) {
           done = true;
           last = null;
-          return { msg: "Satır 0'da denenecek sütun kalmadı: arama bitti, toplam " + sols + " çözüm.", kind: "end" };
+          return { msg: tx("Satır 0'da denenecek sütun kalmadı: arama bitti, toplam " + sols + " çözüm.", "No columns left to try in row 0: search finished, " + sols + " solutions in total."), kind: "end" };
         }
-        return { msg: "Satır " + ekDe(r) + " güvenli sütun kalmadı → " + backtrack(), kind: "back" };
+        return { msg: tx("Satır " + ekDe(r) + " güvenli sütun kalmadı → ", "No safe column left in row " + r + " → ") + backtrack(), kind: "back" };
       }
       var ok = safe(r, c);
       last = { r: r, c: c, ok: ok };
@@ -66,11 +71,11 @@
       if (ok) {
         col[r] = c;
         places++;
-        m = "(" + r + ", " + c + ") güvenli → vezir yerleştirildi, satır " + ekE(r + 1) + " inilir.";
+        m = "(" + r + ", " + c + ")" + tx(" güvenli → vezir yerleştirildi, satır " + ekE(r + 1) + " inilir.", " is safe → queen placed, moving down to row " + (r + 1) + ".");
         r++;
         c = 0;
       } else {
-        m = "(" + r + ", " + c + ") tehdit altında → sonraki sütun.";
+        m = "(" + r + ", " + c + ")" + tx(" tehdit altında → sonraki sütun.", " is attacked → next column.");
         c++;
       }
       return { msg: m, kind: "try" };
@@ -99,8 +104,8 @@
         if (col[i] < 0) continue;
         out.push('<text class="' + (solved ? "a13-qok" : "a13-q") + '" x="' + (2 + col[i] * s + s / 2) + '" y="' + (2 + i * s + s / 2 + 10) + '" text-anchor="middle" style="font-size:29px">' + QUEEN + "</text>");
       }
-      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + W + " " + W + '" role="img" aria-label="' + n + ' vezir tahtası">' + out.join("") + "</svg>";
-      status.textContent = msg + "  ·  yerleştirme: " + places + ", geri dönüş: " + backs + ", çözüm: " + sols;
+      view.innerHTML = '<svg class="ds-svg" viewBox="0 0 ' + W + " " + W + '" role="img" aria-label="' + n + tx(' vezir tahtası">', '-queens board">') + out.join("") + "</svg>";
+      status.textContent = msg + tx("  ·  yerleştirme: ", "  ·  placements: ") + places + tx(", geri dönüş: ", ", backtracks: ") + backs + tx(", çözüm: ", ", solutions: ") + sols;
     }
 
     function doStep() {
@@ -111,7 +116,7 @@
 
     function stop() {
       if (timer) { clearInterval(timer); timer = null; }
-      if (playBtn) playBtn.textContent = "oynat";
+      if (playBtn) playBtn.textContent = tx("oynat", "play");
     }
 
     demo.addEventListener("click", function (ev) {
@@ -122,7 +127,7 @@
       else if (op === "reset") reset();
       else if (op === "play") {
         if (timer) { stop(); return; }
-        playBtn.textContent = "durdur";
+        playBtn.textContent = tx("durdur", "stop");
         timer = setInterval(function () {
           var e = doStep();
           if (e.kind === "sol" || e.kind === "end") stop();

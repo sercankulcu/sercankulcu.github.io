@@ -1,5 +1,8 @@
 /* Bölüm 2: Açgözlü para üstü ile dinamik programlama (en iyi) karşılaştırması */
 (function () {
+  var deckEl = document.getElementById("ds-deck");
+  var EN = !!deckEl && String(deckEl.getAttribute("lang")).toLowerCase().indexOf("en") === 0;
+  var tx = function (tr, en) { return EN ? en : tr; };
   document.querySelectorAll('.ds-deck [data-demo="a12-coin"]').forEach(function (demo) {
     var view = demo.querySelector(".a12-lab__view");
     var status = demo.querySelector(".a12-lab__status");
@@ -53,16 +56,16 @@
     function run() {
       var coins = parse();
       var t = parseInt(amtIn.value, 10);
-      if (!coins) { status.innerHTML = "Paralar: virgülle ayrılmış 1–999 arası tam sayılar (en fazla 8 tür)."; return; }
-      if (!(t >= 1 && t <= 999)) { status.innerHTML = "Tutar 1 ile 999 arasında olmalı."; return; }
+      if (!coins) { status.innerHTML = tx("Paralar: virgülle ayrılmış 1–999 arası tam sayılar (en fazla 8 tür).", "Coins: comma-separated integers from 1 to 999 (at most 8 kinds)."); return; }
+      if (!(t >= 1 && t <= 999)) { status.innerHTML = tx("Tutar 1 ile 999 arasında olmalı.", "The amount must be between 1 and 999."); return; }
       var g = greedy(coins, t), b = best(coins, t);
-      var gtxt = g.rest ? "<b>" + g.rest + "</b> ödenemedi (açgözlü takıldı)" : "<b>" + g.list.length + "</b> para";
-      var btxt = b ? "<b>" + b.length + "</b> para" : "tutar bu paralarla ödenemez";
+      var gtxt = g.rest ? "<b>" + g.rest + "</b>" + tx(" ödenemedi (açgözlü takıldı)", " left unpaid (greedy got stuck)") : "<b>" + g.list.length + "</b>" + tx(" para", " coins");
+      var btxt = b ? "<b>" + b.length + "</b>" + tx(" para", " coins") : tx("tutar bu paralarla ödenemez", "the amount cannot be paid with these coins");
       var ok = b && !g.rest && g.list.length === b.length;
-      view.innerHTML = box("Açgözlü", g.list, gtxt, ok ? "a12-win" : "a12-lose") + box("En iyi (DP)", b || [], btxt, "a12-win");
-      if (!b) status.innerHTML = "Bu para kümesiyle " + t + " tutarı hiç ödenemez (1 yok).";
-      else if (ok) status.innerHTML = "Açgözlü sonuç <b>en iyi</b>: " + t + " = " + g.list.join(" + ") + ".";
-      else status.innerHTML = "Açgözlü <b>en iyi değil</b>: " + (g.rest ? "takıldı" : g.list.length + " para") + ", en iyi " + b.length + " para (" + b.join(" + ") + ").";
+      view.innerHTML = box(tx("Açgözlü", "Greedy"), g.list, gtxt, ok ? "a12-win" : "a12-lose") + box(tx("En iyi (DP)", "Optimal (DP)"), b || [], btxt, "a12-win");
+      if (!b) status.innerHTML = tx("Bu para kümesiyle " + t + " tutarı hiç ödenemez (1 yok).", "The amount " + t + " cannot be paid with this coin set (no 1).");
+      else if (ok) status.innerHTML = tx("Açgözlü sonuç <b>en iyi</b>: ", "The greedy result is <b>optimal</b>: ") + t + " = " + g.list.join(" + ") + ".";
+      else status.innerHTML = tx("Açgözlü <b>en iyi değil</b>: ", "Greedy is <b>not optimal</b>: ") + (g.rest ? tx("takıldı", "stuck") : g.list.length + tx(" para", " coins")) + tx(", en iyi ", ", optimal ") + b.length + tx(" para (", " coins (") + b.join(" + ") + ").";
     }
 
     demo.addEventListener("click", function (e) {
