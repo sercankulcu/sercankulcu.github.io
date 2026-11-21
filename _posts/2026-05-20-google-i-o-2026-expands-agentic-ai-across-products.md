@@ -1,6 +1,6 @@
 ---
 title: Google I-O 2026 Expands Agentic AI Across Products
-date: 2026-05-15
+date: 2026-05-20
 permalink: /posts/2026/05/google-i-o-2026-expands-agentic-ai-across-products/
 tags:
   - artificial-intelligence
