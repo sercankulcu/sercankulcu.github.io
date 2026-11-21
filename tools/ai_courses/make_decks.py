@@ -765,7 +765,7 @@ def ders_sayfasi(icerik):
     L = ['---', 'title: "Guide to AI and Data Courses"', 'collection: teaching', 'type: "Undergraduate"',
          'permalink: %s' % DERS_URL, 'venue: "Giresun University, Computer Engineering"', 'date: 2023-09-01',
          'location: "Giresun, Turkey"', 'course_language: tr', '---', '',
-         ('![ai and data courses](/images/teaching/teaching-ai-courses.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} \n'
+         ('![ai and data courses](/images/teaching/teaching-ai-courses.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} \n'
           if os.path.exists(os.path.join(REPO, 'images', 'teaching', 'teaching-ai-courses.webp')) else '') +
          'This course is a map of the courses around artificial intelligence and data. Each of its %d presentations introduces one course: '
          'the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it '

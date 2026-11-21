@@ -9,6 +9,7 @@ location: "Giresun, Turkey"
 course_language: tr
 ---
 
+![ai and data courses](/images/teaching/teaching-ai-courses.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 This course is a map of the courses around artificial intelligence and data. Each of its 38 presentations introduces one course: the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it differs from its nearest neighbours, its applications and tools. There are no lecture notes, code examples or textbook: the aim is to help students see the field as a whole before choosing their electives.
 
 ---

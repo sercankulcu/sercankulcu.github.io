@@ -43,6 +43,15 @@ GROUPS = [
         ('🪙', 'yazitura', 'en'), ('🔴', 'connectfour', 'en'), ('❌', 'tictactoe', 'en')]),
 ]
 
+# Ders sayfalarindaki oyunlar: hub'da kartla listelenir, sayfalari ders klasorunde kalir
+# (on bilgilerine ve paylasim kartlarina bu betik dokunmaz).
+# grup turu -> [(emoji, adres, ad, aciklama, Turkce ad, Turkce aciklama)]
+COURSE_GAMES = {
+    'Casual': [('🎲', '/files/agt/sunumlar/Bolum_01_Backgammon.html', 'Backgammon',
+                'Play backgammon against an AI with an aggressive, balanced or defensive style, or watch two AIs play. Turkish interface.',
+                'Tavla', 'Saldırgan, dengeli ya da savunmacı oynayan yapay zekâya karşı tavla oynayın ya da iki yapay zekâyı izleyin.')],
+}
+
 # arama basligi: genel kalip yerine daha aranir bir ifade
 SEO = {
     'fiveletters': 'Beş Harf · Türkçe Wordle, Kelime Tahmin Oyunu',
@@ -101,6 +110,11 @@ def build():
                                         'game_genre: ' + json.dumps(genre)],
                                   path=page_file(name), managed=MANAGED)
             cards.append((name, A.card_html(title, excerpt, ico, accent, False, kicker=t['kicker'], l2=t['l2'], lang=lang)))
+        for ico, url, title, desc, _tt, _td in COURSE_GAMES.get(genre, []):
+            n += 1
+            items.append({'@type': 'ListItem', 'position': n, 'url': SITE + url, 'name': title})
+            out.append('<a class="app-card" href="%s"><span class="app-head"><span class="app-ico" aria-hidden="true">'
+                       '%s</span>%s</span><span class="app-desc">%s</span></a>' % (url, ico, e(title), e(desc)))
         out.append('</div>')
 
     ld = {'@context': 'https://schema.org', '@type': 'ItemList', 'name': 'Free browser games',

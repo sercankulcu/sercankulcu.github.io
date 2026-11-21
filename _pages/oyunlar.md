@@ -21,7 +21,7 @@ a.app-card:hover, a.app-card:focus-visible { border-color: var(--global-link-col
 .app-ico { font-size: 1.3em; line-height: 1; }
 .app-desc { font-size: .85em; line-height: 1.45; color: var(--global-text-color-light); }</style>
 
-<p class="apps-intro">Tarayıcıda oynanan 31 ücretsiz oyun: kelime oyunları, bulmacalar, bilgi yarışmaları ve arcade.
+<p class="apps-intro">Tarayıcıda oynanan 32 ücretsiz oyun: kelime oyunları, bulmacalar, bilgi yarışmaları ve arcade.
 İndirme ve üyelik gerekmez. <a href="/games/" hreflang="en" lang="en">English</a></p>
 
 <h2 class="apps-group">🎮 Arcade ve aksiyon</h2>
@@ -69,4 +69,5 @@ a.app-card:hover, a.app-card:focus-visible { border-color: var(--global-link-col
 <a class="app-card" href="/game/tr/yazi-tura/"><span class="app-head"><span class="app-ico" aria-hidden="true">🪙</span>Yazı Tura</span><span class="app-desc">Yazı mı tura mı tahmin edin, serileri izleyin, binlerce atışı simüle edin.</span></a>
 <a class="app-card" href="/game/tr/dort-tas/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔴</span>Dört Taş</span><span class="app-desc">Bir arkadaşına ya da üç seviyeli bilgisayara karşı Dört Taş oyna.</span></a>
 <a class="app-card" href="/game/tr/xox/"><span class="app-head"><span class="app-ico" aria-hidden="true">❌</span>XOX</span><span class="app-desc">Üç zorluk seviyeli bilgisayara karşı XOX oynayın.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_01_Backgammon.html"><span class="app-head"><span class="app-ico" aria-hidden="true">🎲</span>Tavla</span><span class="app-desc">Saldırgan, dengeli ya da savunmacı oynayan yapay zekâya karşı tavla oynayın ya da iki yapay zekâyı izleyin.</span></a>
 </div>

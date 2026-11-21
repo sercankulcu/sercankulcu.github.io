@@ -450,6 +450,9 @@ dosyalarınız kendi cihazınızda işlenir, hiçbir sunucuya yüklenmez. Üyeli
                 cards.append(card(T.tr_url(url), ico, M.TR_TITLES.get(url, title), T.GAMES[url][2]))
             else:
                 cards.append(card(url, ico, title, excerpt))
+        for ico, url, _t, _d, title_tr, desc_tr in G.COURSE_GAMES.get(category, []):
+            n += 1
+            cards.append(card(url, ico, title_tr, desc_tr))
         out.append('<h2 class="apps-group">%s %s</h2>\n<div class="apps-grid">\n%s\n</div>' % (gi, A.e(gtr), '\n'.join(cards)))
     games_hub = """---
 layout: archive
