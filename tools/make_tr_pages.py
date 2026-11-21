@@ -11,8 +11,11 @@ For every page in tools/tr_pages.py:
    The copies are generated: edit the English page, then run this script.
    The copy's language is also written into its HTML (for crawlers without JavaScript):
    data-i18n / data-i18n-html / data-i18n-attr elements get the strings of the page's table
-   (tools/i18n_tables.js reads it with Node), text nodes that are exactly a table string get its
-   translation, and an H1 the table does not cover gets the copy's title. Strings the page would
+   (tools/i18n_tables.js reads it with Node; data-i18n-vars="n=0; best=0" fills the string's {n}
+   and {best} placeholders, as tool-i18n.js does at runtime), text nodes that are exactly a table
+   string (or an item of a list of strings) get its translation, and an H1 the table does not
+   cover gets the copy's title. Pages with their own language system name their en/tr table with
+   data-i18n-table="name"; their data-i18n* marks only serve this script (their own code switches). Strings the page would
    otherwise read back from its HTML go into window.PZ_I18N_ORIG (tool-i18n.js restores them),
    so the TR/EN switch still works both ways. --report prints what was done per copy.
 2. hreflang {en, tr} in the front matter of both pages (head/custom.html prints the alternates).
@@ -155,6 +158,17 @@ def closing(html, start, name):
         pos = m.end()
 
 
+def fill_vars(s, spec):
+    """s with the {name} placeholders of a data-i18n-vars spec ("n=0; best=0") filled in."""
+    if not spec or not isinstance(s, str):
+        return s
+    for part in spec.split(';'):
+        if '=' in part:
+            k, v = part.split('=', 1)
+            s = s.replace('{%s}' % k.strip(), v.strip())
+    return s
+
+
 def localize(body, tables, lang, src_lang, title):
     """body with the strings of tables[lang] written in; returns (body, original strings, notes)."""
     to = tables.get(lang) or {}
@@ -170,6 +184,7 @@ def localize(body, tables, lang, src_lang, title):
             continue
         name = m.group(2).lower()
         new_attrs = m.group(3)
+        to_k = lambda k, v=attrs.get('data-i18n-vars'): fill_vars(to[k], v)
         for spec in (attrs.get('data-i18n-attr') or '').split(';'):
             p = spec.split(':')
             if len(p) != 2 or not p[0].strip():
@@ -178,12 +193,12 @@ def localize(body, tables, lang, src_lang, title):
             if k not in to:
                 missing.append(k)
                 continue
-            if '{' in to[k]:
+            if not isinstance(to[k], str) or '{' in to_k(k):
                 skipped.append(k)
                 continue
             if k not in have and a.lower() in attrs and attrs[a.lower()] is not None:
                 orig.setdefault(k, attrs[a.lower()])
-            new_attrs = set_attr(new_attrs, a, to[k])
+            new_attrs = set_attr(new_attrs, a, to_k(k))
         inner = None
         for kind in ('data-i18n', 'data-i18n-html'):
             k = attrs.get(kind)
@@ -198,13 +213,13 @@ def localize(body, tables, lang, src_lang, title):
             if k not in to:
                 missing.append(k)
                 break
-            if kind == 'data-i18n' and '{' in to[k]:
+            if not isinstance(to[k], str) or (kind == 'data-i18n' and '{' in to_k(k)):
                 skipped.append(k)
                 break
             old = body[m.end():close[0]]
             if k not in have:
                 orig.setdefault(k, html_unescape(re.sub(r'<[^>]*>', '', old)) if kind == 'data-i18n' else old)
-            inner = (close[0], esc_text(to[k]) if kind == 'data-i18n' else liquid_safe(to[k]))
+            inner = (close[0], esc_text(to_k(k)) if kind == 'data-i18n' else liquid_safe(to_k(k)))
             break
         if new_attrs != m.group(3):
             edits.append((m.start(), m.end(), body[m.start():m.end()].replace(m.group(3), new_attrs, 1), 'tag'))
@@ -220,8 +235,14 @@ def localize(body, tables, lang, src_lang, title):
     # is exactly one of the source-language strings of the table gets its translation
     pairs = {}
     for k, v in have.items():
-        if isinstance(v, str) and k in to and isinstance(to[k], str) and '{' not in v + to[k] and '<' not in v + to[k]:
-            pairs.setdefault(v.strip(), set()).add(to[k])
+        w = to.get(k)
+        if isinstance(v, list) and isinstance(w, list) and len(v) == len(w):
+            items = zip(v, w)                      # e.g. the help rules of hangman
+        else:
+            items = [(v, w)]
+        for v, w in items:
+            if isinstance(v, str) and isinstance(w, str) and '{' not in v + w and '<' not in v + w:
+                pairs.setdefault(v.strip(), set()).add(w)
     pairs = dict((v, t.pop()) for v, t in pairs.items() if len(t) == 1 and v)
     raw = [(m.start(), m.end()) for m in RAW.finditer(body)]
     parts, last, matched = [], 0, 0

@@ -8,6 +8,8 @@
     data-i18n="key"                       textContent from the table
     data-i18n-html="key"                  innerHTML (static strings from the page's own table only)
     data-i18n-attr="aria-label:key; placeholder:key2; title:key3"
+    data-i18n-vars="n=0; best=0"          fills {n} / {best} in the element's strings (the start
+                                          state; the page's callback writes the live values)
     <button data-lang-toggle></button>    becomes the TR/EN switch (44x44, like the "?" button)
 
   Script:
@@ -73,15 +75,25 @@
       return s;
     };
 
+    function varsOf(el) {
+      var spec = el.getAttribute('data-i18n-vars'), out = null;
+      if (!spec) return null;
+      spec.split(';').forEach(function (part) {
+        var i = part.indexOf('=');
+        if (i > 0) { out = out || {}; out[part.slice(0, i).trim()] = part.slice(i + 1).trim(); }
+      });
+      return out;
+    }
+
     function apply() {
       var lang = api.lang;
       document.documentElement.lang = lang;
-      [].forEach.call(document.querySelectorAll('[data-i18n]'), function (el) { el.textContent = api.t(el.getAttribute('data-i18n')); });
-      [].forEach.call(document.querySelectorAll('[data-i18n-html]'), function (el) { el.innerHTML = api.t(el.getAttribute('data-i18n-html')); });
+      [].forEach.call(document.querySelectorAll('[data-i18n]'), function (el) { el.textContent = api.t(el.getAttribute('data-i18n'), varsOf(el)); });
+      [].forEach.call(document.querySelectorAll('[data-i18n-html]'), function (el) { el.innerHTML = api.t(el.getAttribute('data-i18n-html'), varsOf(el)); });
       [].forEach.call(document.querySelectorAll('[data-i18n-attr]'), function (el) {
         el.getAttribute('data-i18n-attr').split(';').forEach(function (pair) {
           var p = pair.split(':');
-          if (p.length === 2 && p[0].trim()) el.setAttribute(p[0].trim(), api.t(p[1].trim()));
+          if (p.length === 2 && p[0].trim()) el.setAttribute(p[0].trim(), api.t(p[1].trim(), varsOf(el)));
         });
       });
       [].forEach.call(document.querySelectorAll('[data-lang-toggle]'), function (b) {

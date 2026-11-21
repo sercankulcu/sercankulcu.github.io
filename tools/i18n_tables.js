@@ -7,8 +7,9 @@
 
   Used by tools/make_tr_pages.py to write the Turkish (or English) strings into the HTML of the
   generated copies. The page's inline scripts run in a sandbox with a do-nothing DOM; the table is
-  the first argument of ToolI18n.setup(...) (or, for word-document-diff, its own "translations"
-  object). Nothing is parsed with regexes except the static "import ... from" lines of module
+  the first argument of ToolI18n.setup(...) (or, for word-document-diff and pdf-merger, their own
+  "translations" object; a page with its own language system names its table variable with
+  data-i18n-table="name" on any element, e.g. fortune-teller's "ui", the tests' "UI"). Nothing is parsed with regexes except the static "import ... from" lines of module
   scripts, which become empty stubs. Harvest helpers that copy DOM text into the table see no
   elements, so the result holds only the strings written in the script itself.
 */
@@ -111,6 +112,7 @@ async function tablesOf(file) {
   base.window = base.self = base.globalThis = g;
   const ctx = vm.createContext({ __g: g });
   const errors = [];
+  const named = (html.match(/\bdata-i18n-table\s*=\s*["']([A-Za-z_$][\w$]*)["']/) || [])[1];
   for (const s of inlineScripts(html)) {
     if (found) break;
     let code = s.module ? stubImports(s.code) : s.code;
@@ -118,7 +120,7 @@ async function tablesOf(file) {
        before it reaches ToolI18n.setup (word-document-diff and pdf-merger keep their own
        "translations" object). */
     const arg = (code.match(/ToolI18n\.setup\(\s*([A-Za-z_$][\w$]*)\s*[,)]/) || [])[1];
-    for (const name of [arg, 'translations']) {
+    for (const name of [arg, named, 'translations']) {
       if (!name) continue;
       const decl = new RegExp('\\b(const|let|var)\\s+' + name.replace(/\$/g, '\\$') + '\\s*=');
       code = code.replace(decl, (m) => m + ' __holder.declared = ');
