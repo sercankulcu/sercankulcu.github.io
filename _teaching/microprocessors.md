@@ -14,7 +14,7 @@ textbook:
   url: /books/mikroislemciler/
 ---
 
-![microprocessor](/images/teaching/teaching-microprocessors.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![microprocessor](/images/teaching/teaching-microprocessors.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 Microprocessors execute instructions, process data, and coordinate the operations of modern computing systems. The 8086 architecture provides a useful foundation for studying processor organization, registers, memory access, instruction execution, and low-level programming. The 8086 is an early member of the x86 family. Although modern x86-64 processors are substantially more complex, the 8086 remains useful for introducing registers, segmentation, instruction execution, addressing modes, interrupts, and assembly programming.
 
 

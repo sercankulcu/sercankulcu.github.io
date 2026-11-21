@@ -14,7 +14,7 @@ textbook:
   url: /books/algoritmalar/
 ---
 
-![algorithms](/images/teaching/teaching-algorithms.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![algorithms](/images/teaching/teaching-algorithms.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 An algorithm is a finite and well-defined sequence of steps for solving a problem or performing a computation. Algorithms form the foundation of software systems and are used in tasks ranging from sorting and searching to graph processing, optimization, text analysis, and scientific computing. This course lays the foundations: how to measure an algorithm's running time and memory use with asymptotic notation, recurrences and the Master Theorem, and how these tools apply to fundamental problems. It covers sorting and searching, graph algorithms (traversal, shortest paths, minimum spanning trees and network flow) and string algorithms (pattern matching, compression and tries), comparing alternative solutions by correctness, complexity and practical trade-offs. Algorithm-design paradigms, hard problems and other models of computation continue in [Advanced Algorithms](/teaching/advanced-algorithms/).
 
 

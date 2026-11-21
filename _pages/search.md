@@ -2,6 +2,8 @@
 
 layout: without-sidebar
 title: "Search"
+sitemap: false
+noindex: true
 permalink: /search/
 author_profile: false
 ---

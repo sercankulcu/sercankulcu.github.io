@@ -2,6 +2,8 @@
 layout: archive
 permalink: /
 title: "About Me"
+description: "Sercan Külcü, computer engineer at Giresun University: bilingual course slides and notes, research publications, and free browser-based tools and games."
+seo_title: "Sercan Külcü · Computer Engineering: Teaching, Research and Tools"
 author_profile: true
 ---
 

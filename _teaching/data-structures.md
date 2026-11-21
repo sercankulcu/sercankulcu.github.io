@@ -14,7 +14,7 @@ textbook:
   url: /books/veri-yapilari/
 ---
 
-![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines algorithm analysis, arrays, recursion, linked lists, lists, stacks, queues, trees, search trees, priority queues and heaps, hash tables, sets and disjoint sets, and graphs, with an emphasis on their implementations, complexity, and practical applications.
 
 <div data-lt="tr" lang="tr" markdown="1">

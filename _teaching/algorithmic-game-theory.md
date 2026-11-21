@@ -14,7 +14,7 @@ textbook:
   url: /books/algoritmik-oyun-kurami/
 ---
 
-![algorithmic game theory](/images/teaching/teaching-algorithmic-game-theory.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![algorithmic game theory](/images/teaching/teaching-algorithmic-game-theory.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 Algorithmic game theory studies strategic interaction through the lens of computation. It combines game-theoretic models with algorithms and complexity analysis to examine equilibria, auctions, market mechanisms, routing, online platforms, fairness, and the behavior of self-interested agents.
 
 

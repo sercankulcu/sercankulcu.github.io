@@ -14,7 +14,7 @@ textbook:
   url: /books/java-ile-nesne-yonelimli-programlama/
 ---
 
-![object oriented programming](/images/teaching/teaching-object-oriented-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![object oriented programming](/images/teaching/teaching-object-oriented-programming.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 Java is one of the most popular programming languages, extensively used in various fields such as web development, mobile app development, and game development. It encompasses key concepts like classes, objects, inheritance, polymorphism, encapsulation, and abstraction, which form the foundation of its Object-Oriented Programming (OOP) paradigm. These principles enable developers to create modular, reusable, and efficient code, fostering better software design and maintainability. Java's platform independence, achieved through the Java Virtual Machine (JVM), allows applications to run on any device equipped with a JVM, making it a versatile choice for cross-platform development. Additionally, Java's extensive standard library provides a wide range of tools and functionalities, simplifying many common programming tasks and enhancing productivity.
 
 

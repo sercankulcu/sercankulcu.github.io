@@ -9,6 +9,12 @@ For every page in tools/tr_pages.py:
    front matter (title, excerpt, seo_title, lang: tr, ui_lang: tr). ui_lang makes the interface open
    in Turkish (head/custom.html sets window.PZ_PAGE_LANG; assets/js/tool-i18n.js reads it).
    The copies are generated: edit the English page, then run this script.
+   The copy's language is also written into its HTML (for crawlers without JavaScript):
+   data-i18n / data-i18n-html / data-i18n-attr elements get the strings of the page's table
+   (tools/i18n_tables.js reads it with Node), text nodes that are exactly a table string get its
+   translation, and an H1 the table does not cover gets the copy's title. Strings the page would
+   otherwise read back from its HTML go into window.PZ_I18N_ORIG (tool-i18n.js restores them),
+   so the TR/EN switch still works both ways. --report prints what was done per copy.
 2. hreflang {en, tr} in the front matter of both pages (head/custom.html prints the alternates).
 3. _pages/araclar.md and _pages/oyunlar.md: Turkish hubs. Turkish-only games link to their own page.
 4. _data/tr_urls.yml: English URL -> Turkish URL, used on Turkish pages for "Continue with" links.
@@ -60,7 +66,229 @@ def hreflang(en, tr):
     return 'hreflang: {en: "%s", tr: "%s"}' % (en, tr)
 
 
+# ---------------------------------------------------------------------------------------------
+# Writing the copy's language into its HTML. The pages switch language at runtime
+# (assets/js/tool-i18n.js, data-i18n / data-i18n-html / data-i18n-attr); without this the copy's
+# body would hold the source language until JavaScript runs, and search engines would index an
+# English H1 under a Turkish title. The data-* attributes stay, so the switch still works both ways.
+
+I18N_TABLES = {}          # source page (repo-relative) -> {lang: {key: string}} or {'error': ...}
+REPORT = []               # one line per copy, printed with --report
+STATS = {}
+
+
+def load_tables(srcs):
+    """Each page's table, from tools/i18n_tables.js (Node runs the page's inline scripts in a sandbox)."""
+    import subprocess
+    rels = [os.path.relpath(s, REPO).replace(os.sep, '/') for s in srcs]
+    try:
+        r = subprocess.run(['node', os.path.join(REPO, 'tools', 'i18n_tables.js')] + rels, cwd=REPO,
+                           capture_output=True, text=True, encoding='utf-8')
+    except OSError:
+        sys.exit('make_tr_pages.py needs Node (node) to read the pages\' language tables.')
+    if r.returncode:
+        sys.exit('tools/i18n_tables.js failed:\n' + r.stderr)
+    for rel, v in json.loads(r.stdout).items():
+        I18N_TABLES[rel] = v.get('tables') or {'error': v.get('error')}
+
+
+VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'}
+TAG = re.compile(r'<(/?)([a-zA-Z][\w-]*)((?:\s+[^\s=>/"\']+(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>"\']+))?)*)\s*(/?)>')
+ATTR = re.compile(r'([^\s=>/"\']+)(?:\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>"\']+))?')
+RAW = re.compile(r'<(script|style|textarea)\b[^>]*>.*?</\1\s*>', re.S | re.I)
+EMOJI = re.compile(r':[a-z0-9_+-]+:')
+
+
+def esc_text(s):
+    s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    return s.replace('{', '&#123;').replace('}', '&#125;')
+
+
+def esc_attr(s):
+    return esc_text(s).replace('"', '&quot;')
+
+
+def liquid_safe(s):
+    """HTML from a table: braces would be read by Liquid, ':name:' by jemoji."""
+    return re.sub(r'\{(?=[{%])', '&#123;', s)
+
+
+def attrs_of(attr_text):
+    out = []
+    for m in ATTR.finditer(attr_text):
+        v = m.group(2)
+        if v and v[0] in '"\'':
+            v = v[1:-1]
+        out.append((m.group(1), v))
+    return out
+
+
+def set_attr(attr_text, name, value):
+    """attr_text with name="value" (replaced in place, or appended)."""
+    new = '%s="%s"' % (name, esc_attr(value))
+    for m in ATTR.finditer(attr_text):
+        if m.group(1).lower() == name.lower():
+            return attr_text[:m.start()] + new + attr_text[m.end():]
+    return attr_text + ' ' + new
+
+
+def closing(html, start, name):
+    """Index of the '</name>' that closes the element whose start tag ends at start, and its end."""
+    depth = 1
+    raw = [(m.start(), m.end()) for m in RAW.finditer(html, start)]
+    pos = start
+    while True:
+        m = TAG.search(html, pos)
+        if not m:
+            return None
+        inside = next((r for r in raw if r[0] <= m.start() < r[1]), None)
+        if inside:
+            pos = inside[1]
+            continue
+        if m.group(2).lower() == name:
+            if m.group(1):
+                depth -= 1
+                if depth == 0:
+                    return m.start(), m.end()
+            elif not m.group(4):
+                depth += 1
+        pos = m.end()
+
+
+def localize(body, tables, lang, src_lang, title):
+    """body with the strings of tables[lang] written in; returns (body, original strings, notes)."""
+    to = tables.get(lang) or {}
+    have = tables.get(src_lang) or {}
+    orig, skipped, missing = {}, [], []
+    raw = [(m.start(), m.end()) for m in RAW.finditer(body)]
+    edits = []                                     # (start, end, replacement, kind), applied back to front
+    for m in TAG.finditer(body):
+        if m.group(1) or any(a <= m.start() < b for a, b in raw):
+            continue
+        attrs = dict((k.lower(), v) for k, v in attrs_of(m.group(3)))
+        if not any(k.startswith('data-i18n') for k in attrs):
+            continue
+        name = m.group(2).lower()
+        new_attrs = m.group(3)
+        for spec in (attrs.get('data-i18n-attr') or '').split(';'):
+            p = spec.split(':')
+            if len(p) != 2 or not p[0].strip():
+                continue
+            a, k = p[0].strip(), p[1].strip()
+            if k not in to:
+                missing.append(k)
+                continue
+            if '{' in to[k]:
+                skipped.append(k)
+                continue
+            if k not in have and a.lower() in attrs and attrs[a.lower()] is not None:
+                orig.setdefault(k, attrs[a.lower()])
+            new_attrs = set_attr(new_attrs, a, to[k])
+        inner = None
+        for kind in ('data-i18n', 'data-i18n-html'):
+            k = attrs.get(kind)
+            if k is None:
+                continue
+            if name in VOID:
+                break
+            close = closing(body, m.end(), name)
+            if not close:
+                missing.append(k + ' (unclosed <%s>)' % name)
+                break
+            if k not in to:
+                missing.append(k)
+                break
+            if kind == 'data-i18n' and '{' in to[k]:
+                skipped.append(k)
+                break
+            old = body[m.end():close[0]]
+            if k not in have:
+                orig.setdefault(k, html_unescape(re.sub(r'<[^>]*>', '', old)) if kind == 'data-i18n' else old)
+            inner = (close[0], esc_text(to[k]) if kind == 'data-i18n' else liquid_safe(to[k]))
+            break
+        if new_attrs != m.group(3):
+            edits.append((m.start(), m.end(), body[m.start():m.end()].replace(m.group(3), new_attrs, 1), 'tag'))
+        if inner:
+            edits.append((m.end(), inner[0], inner[1], 'inner'))
+    # nested data-i18n elements inside a replaced one disappear with it: keep the outermost edit
+    inners = [(x[0], x[1]) for x in edits if x[3] == 'inner']
+    kept = [x for x in edits if not any(a <= x[0] and x[1] <= b and (a, b) != (x[0], x[1]) for a, b in inners)]
+    for s, e, rep, _ in sorted(kept, key=lambda e: e[0], reverse=True):
+        body = body[:s] + rep + body[e:]
+
+    # text the script writes at start (status lines, "Choose an image to begin."): a text node that
+    # is exactly one of the source-language strings of the table gets its translation
+    pairs = {}
+    for k, v in have.items():
+        if isinstance(v, str) and k in to and isinstance(to[k], str) and '{' not in v + to[k] and '<' not in v + to[k]:
+            pairs.setdefault(v.strip(), set()).add(to[k])
+    pairs = dict((v, t.pop()) for v, t in pairs.items() if len(t) == 1 and v)
+    raw = [(m.start(), m.end()) for m in RAW.finditer(body)]
+    parts, last, matched = [], 0, 0
+    for m in re.finditer(r'>([^<>]+)<', body):
+        a, b = m.start(1), m.end(1)
+        if any(x <= a < y for x, y in raw):
+            continue
+        text = html_unescape(m.group(1)).strip()
+        if text in pairs and not re.search(r'[{}]', m.group(1)):
+            lead = m.group(1)[:len(m.group(1)) - len(m.group(1).lstrip())]
+            trail = m.group(1)[len(m.group(1).rstrip()):]
+            parts += [body[last:a], lead + esc_text(pairs[text]) + trail]
+            last, matched = b, matched + 1
+    body = ''.join(parts) + body[last:]
+    STATS['text'] = matched
+
+    # the visible H1: written by the table above, else the copy's title
+    h1 = None
+    for m in TAG.finditer(body):
+        if not m.group(1) and m.group(2).lower() == 'h1' and not any(a <= m.start() < b for a, b in raw):
+            h1 = m
+            break
+    if h1:
+        close = closing(body, h1.end(), 'h1')
+        text = re.sub(r'<[^>]*>', '', body[h1.end():close[0]]).strip() if close else ''
+        localized = 'data-i18n' in h1.group(3) and any(
+            k == dict((a.lower(), v) for a, v in attrs_of(h1.group(3))).get('data-i18n') for k in to)
+        if close and not localized and '<' not in body[h1.end():close[0]].strip():
+            if text != title:
+                body = body[:h1.end()] + esc_text(title) + body[close[0]:]
+    return body, orig, sorted(set(skipped)), sorted(set(missing))
+
+
+def html_unescape(s):
+    import html as H
+    return H.unescape(s)
+
+
+def orig_script(lang, strings):
+    """window.PZ_I18N_ORIG: the strings this copy replaced that the page's own table does not hold
+    (tool pages take them from the HTML at start). tool-i18n.js puts them back into the table."""
+    def enc(s):
+        s = json.dumps(s, ensure_ascii=False)
+        for a, b in ((':', '\\u003a'), ('/', '\\/'), ('{', '\\u007b'), ('}', '\\u007d'), ('<', '\\u003c')):
+            s = s.replace(a, b)
+        return s
+    if not strings:
+        return ''
+    return ('<script>window.PZ_I18N_ORIG = {"lang": %s, "strings": {%s}};</script>\n'
+            % (enc(lang), ', '.join('%s: %s' % (enc(k), enc(v)) for k, v in sorted(strings.items()))))
+
+
+def localized_body(src, body, lang, src_lang, title, label):
+    rel = os.path.relpath(src, REPO).replace(os.sep, '/')
+    tables = I18N_TABLES.get(rel) or {}
+    if 'error' in tables or lang not in tables:
+        new, orig, skipped, missing = localize(body, {}, lang, src_lang, title)
+        REPORT.append('%s: no table (%s); H1 only' % (label, tables.get('error') or 'none'))
+        return new
+    new, orig, skipped, missing = localize(body, tables, lang, src_lang, title)
+    REPORT.append('%s: %d original strings kept for the switch; %d start-up texts matched; placeholders skipped: %s; keys without %s: %s'
+                  % (label, len(orig), STATS.get('text', 0), ', '.join(skipped) or '-', lang, ', '.join(missing) or '-'))
+    return orig_script(src_lang, orig) + new
+
+
 def copies():
+    load_tables([A.page_file(u) for u, _ in T.all_pages()] + [A.page_file(u) for u in E.GAMES])
     for en_url, hub in T.all_pages():
         table = T.APPS if en_url in T.APPS else T.GAMES
         slug, seo, excerpt = table[en_url]
@@ -84,8 +312,9 @@ def copies():
                 lines.append('%s: %s' % (key, v))
         lines.append(hreflang(en_url, tr_url))
         lines.append('---')
-        text = nl.join(lines) + nl + body
-        assert '{{' not in body and '{%' not in body, en_url
+        tr_body = localized_body(src, body, 'tr', 'en', title, tr_url)
+        text = nl.join(lines) + nl + tr_body
+        assert '{{' not in tr_body and '{%' not in tr_body, en_url
         folder = T.TOOLS_HUB.strip('/') if hub == T.TOOLS_HUB else T.GAMES_HUB.strip('/')
         write('%s/%s.html' % (folder, slug), text)
 
@@ -121,8 +350,9 @@ def en_copies():
                 lines.append('%s: %s' % (key, v))
         lines.append(hreflang(en, tr_page))
         lines.append('---')
-        assert '{{' not in body and '{%' not in body, tr_page
-        write(E.PREFIX.strip('/') + '/%s.html' % slug, nl.join(lines) + nl + body)
+        en_body = localized_body(src, body, 'en', 'tr', title, en)
+        assert '{{' not in en_body and '{%' not in en_body, tr_page
+        write(E.PREFIX.strip('/') + '/%s.html' % slug, nl.join(lines) + nl + en_body)
 
         # the Turkish page: opens in Turkish and points at its English address
         want = ['ui_lang: tr', hreflang(en, tr_page)]
@@ -242,6 +472,8 @@ if __name__ == '__main__':
             sys.exit(1)
         print('Turkish copies up to date')
     else:
+        if '--report' in sys.argv:
+            print('\n'.join(REPORT))
         print('%d files written' % len(changed))
         for c in changed:
             print('  ' + c)

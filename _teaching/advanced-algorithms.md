@@ -14,7 +14,7 @@ textbook:
   url: /books/ileri-algoritmalar/
 ---
 
-![advanced algorithms](/images/teaching/teaching-advanced-algorithms.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![advanced algorithms](/images/teaching/teaching-advanced-algorithms.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 This course is the continuation of [Algorithms](/teaching/algorithms/). It studies the main algorithm-design paradigms (divide and conquer, greedy algorithms and dynamic programming), methods for hard problems (backtracking, branch and bound and approximation algorithms), and other models of computation: randomized, online and parallel algorithms. For each technique the course examines correctness, running time and the kinds of problems it suits, and compares the techniques on shared examples such as the knapsack and travelling salesman problems.
 
 

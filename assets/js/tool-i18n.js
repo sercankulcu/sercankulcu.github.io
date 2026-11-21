@@ -58,6 +58,13 @@
   function setup(table, onChange) {
     var api = { lang: current(), t: null, set: null };
 
+    /* A generated copy (tools/make_tr_pages.py) has the other language written into its HTML, so a
+       table filled from the HTML at start got those strings: the copy keeps the originals here. */
+    var orig = window.PZ_I18N_ORIG;
+    if (orig && orig.strings && table[orig.lang]) {
+      for (var ok in orig.strings) { if (Object.prototype.hasOwnProperty.call(orig.strings, ok)) table[orig.lang][ok] = orig.strings[ok]; }
+    }
+
     api.t = function (key, vars) {
       var s = (table[api.lang] && table[api.lang][key]);
       if (s == null) s = (table.en && table.en[key]);

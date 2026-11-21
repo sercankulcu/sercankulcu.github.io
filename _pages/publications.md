@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Publications"
+description: "Books, journal articles, conference papers and theses by Sercan Külcü, with abstracts, PDFs and citation details."
+seo_title: "Publications · Books, Articles and Papers by Sercan Külcü"
 permalink: /publications/
 author_profile: true
 ---
