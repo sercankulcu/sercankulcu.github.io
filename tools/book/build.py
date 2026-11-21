@@ -64,6 +64,33 @@ if book['appendices']:
 front = book['front'].replace('__TOC__', '\n'.join(toc)) \
                      .replace('__DATE__', C.date_text(datetime.date.today()))
 
+
+def cover_image():
+    """Dersin gorseli (tools/images/teaching_originals) beyaz zeminde JPEG olarak; yoksa None.
+    Hangi gorselin hangi kitaba ait oldugu make_pdf_pages.ART tablosundan gelir. JPEG, Chrome'un
+    PDF'e oldugu gibi gommesi icin: saydam PNG/WebP sikistirilmamis buyuk bir akisa donusuyor."""
+    sys.path.insert(0, os.path.dirname(common.HERE))
+    import make_pdf_pages
+    art = make_pdf_pages.ART.get(C.OUTPUT)
+    if not art:
+        return None
+    src = os.path.join(os.path.dirname(common.HERE), 'images', 'teaching_originals', art[0])
+    if not os.path.exists(src):
+        return None
+    from PIL import Image
+    im = Image.open(src).convert('RGBA')
+    bg = Image.new('RGBA', im.size, (255, 255, 255, 255))
+    bg.alpha_composite(im)
+    dst = os.path.join(OUT, 'cover.jpg')
+    bg.convert('RGB').save(dst, quality=88, optimize=True)
+    return 'file:///' + dst.replace('\\', '/')
+
+
+cover = cover_image()
+if cover:
+    front = front.replace('<section class="bk-title">',
+                          '<section class="bk-title bk-has-cover">\n  <img class="bk-cover" src="%s" alt="">' % cover, 1)
+
 body = [u['html'] for u in book.get('intro', [])]
 for p in book['parts']:
     nums = p['chapters']

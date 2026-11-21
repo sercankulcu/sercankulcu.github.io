@@ -24,7 +24,7 @@ Java is one of the most popular programming languages, extensively used in vario
 
 ## Ders Kitabı
 
-[📕 Java ile Nesne Yönelimli Programlama (PDF, 29 MB)](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf)
+[📕 Java ile Nesne Yönelimli Programlama (PDF, 30 MB)](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf)
 
 ---
 
