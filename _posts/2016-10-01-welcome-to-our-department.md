@@ -1,5 +1,5 @@
 ---
-title: 'Welcome to Our Department'
+title: 'Welcome to Our Department, 2016'
 excerpt: "A welcome note to new computer engineering students: be patient with the foundations, build small things, and learn to work with people."
 date: 2016-10-01
 permalink: /posts/2016/10/welcome-to-our-department/

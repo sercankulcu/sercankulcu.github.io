@@ -11,7 +11,7 @@ tags:
 
 Consider the sentence: "This statement is false." It is only four words, but it creates a problem that has troubled philosophers and logicians for more than two thousand years.
 
-<img width="200" alt="liar paradox" src="/images/posts/the-liar-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="199" alt="liar paradox" src="/images/posts/the-liar-paradox.webp" style="float: left; margin-right: 10px;" />
 
 Suppose the sentence is true. If it is true, then what it says must be correct. But it says that it is false. So if it is true, it is false. Suppose instead that it is false. Then the statement "this statement is false" is not accurate — which means the statement is true. We move in a circle.
 

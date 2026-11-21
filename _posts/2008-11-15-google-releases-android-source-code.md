@@ -9,7 +9,7 @@ tags:
   - technology-history
 ---
 
-Google released the Android source code in 2008, shortly after the first commercial Android phone reached the market. The release mattered because Android was not presented only as a product; it was also framed as a platform that manufacturers, developers, and the wider industry could build around.
+Google released the Android source code on October 21, 2008, on the eve of the first commercial Android phone, the T-Mobile G1, reaching the market. The release mattered because Android was not presented only as a product; it was also framed as a platform that manufacturers, developers, and the wider industry could build around.
 
 Open source did not mean that every part of the Android ecosystem would be simple or fully open in practice. Still, publishing the source code gave Android a different character from many earlier mobile platforms. It allowed hardware makers to adapt the system and gave developers a clearer view of how the platform worked.
 
@@ -30,3 +30,5 @@ That tradeoff became one of Android's defining characteristics: broad reach and 
 Releasing the Android source code helped accelerate the smartphone era. It supported an ecosystem where many companies could produce devices at many price points, which eventually made app-based mobile computing global.
 
 The moment is historically important because it showed that open-source strategy could shape consumer electronics at massive scale. Android's source release was not just a developer gesture; it was part of the architecture of a worldwide mobile platform.
+
+**Sources:** [Google and the Open Handset Alliance Announce Android Open Source Availability](https://openhandsetalliance.com/press_102108.html), [Android Is Now Open Source - Android Developers Blog](https://android-developers.googleblog.com/2008/10/android-is-now-open-source.html)

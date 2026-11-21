@@ -1,7 +1,7 @@
 ---
 title: Ubuntu 7.04 Feisty Fawn Is Released
 excerpt: "Why Ubuntu 7.04 Feisty Fawn mattered in 2007: easier installs, better hardware support, and a Linux desktop that students could learn from."
-date: 2007-04-15
+date: 2007-04-19
 permalink: /posts/2007/04/ubuntu-7-04-feisty-fawn-is-released/
 tags:
   - software
@@ -30,3 +30,5 @@ Feisty arrived when forums, blogs, and community documentation were central to l
 Desktop Linux did not replace Windows for the general public in 2007, but Ubuntu helped change the tone of the conversation. Linux was no longer only something hidden in server rooms or used by specialists. It could be installed on a laptop, used for schoolwork, programming, browsing, and experimentation.
 
 Ubuntu 7.04 belongs to that story: not a perfect desktop, but an important step in making open-source computing feel reachable.
+
+**Sources:** [Congratulations Ubuntu (Canonical, 19 April 2007)](https://ubuntu.com/blog/congratulations-ubuntu), [Ubuntu Feisty Fawn 7.04 has been released (official announcement text)](https://www.debuntu.org/ubuntu-feisty-fawn-7-04-has-been-released/)

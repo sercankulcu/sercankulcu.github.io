@@ -10,7 +10,7 @@ tags:
 
 Edsger Wybe Dijkstra was one of the people who helped turn programming from a practical craft into a serious intellectual discipline. He was born in Rotterdam in 1930. His parents were both highly educated, and Dijkstra initially studied theoretical physics at Leiden University.
 
-<img width="200" alt="Edsger Dijkstra" src="/images/posts/edsger-wybe-dijkstra-1.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="100" alt="Edsger Dijkstra" src="/images/posts/edsger-wybe-dijkstra-1.webp" style="float: left; margin-right: 10px;" />
 
 While still a student, he began working as a programmer at the Mathematical Centre in Amsterdam in 1952. At the time, programming was so new that it was not yet a normal profession. Dijkstra later joked that when he wanted to record "programmer" as his profession, the authorities did not consider it a proper occupation. His work quickly became important.
 
@@ -18,7 +18,7 @@ While still a student, he began working as a programmer at the Mathematical Cent
 
 In 1956, while thinking about how to find the shortest route between cities for a demonstration, he developed what we now call Dijkstra's shortest-path algorithm. The algorithm solves the single-source shortest path problem on a weighted graph with non-negative edge weights. Starting from a source vertex, it maintains a priority queue of unvisited vertices sorted by their current best-known distance. At each step it extracts the nearest unvisited vertex, finalises its distance, and relaxes the distances to its neighbours. The process repeats until all vertices are settled. With a binary heap the complexity is O((V + E) log V); with a Fibonacci heap it improves to O(E + V log V). Dijkstra said he designed the algorithm in twenty minutes while sitting in a café in Amsterdam, without paper, and published it in a three-page paper in 1959. It remains one of the most widely taught and used algorithms in computer science, embedded in GPS routing, network packet routing (OSPF protocol), and shortest-path libraries across every programming language. You can watch it run step by step in the [Dijkstra's Algorithm Simulator](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html).
 
-<img alt="Dijkstra shortest-path example: a weighted graph with the final distance of each vertex" src="/images/posts/edsger-wybe-dijkstra-2.webp" style="clear: both; display: block; max-width: 100%; height: auto; margin: 1.25rem auto;" />
+<img loading="lazy" width="300" height="117" alt="Dijkstra shortest-path example: a weighted graph with the final distance of each vertex" src="/images/posts/edsger-wybe-dijkstra-2.webp" style="clear: both; display: block; max-width: 100%; height: auto; margin: 1.25rem auto;" />
 
 ## Semaphores and concurrent programming
 

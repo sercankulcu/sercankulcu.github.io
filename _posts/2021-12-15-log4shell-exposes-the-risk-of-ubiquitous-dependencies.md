@@ -30,3 +30,5 @@ This is why the incident pushed software bills of materials, dependency scanning
 Log4Shell became a lasting example of supply-chain risk in software. It reminded engineers that small components can carry enormous operational importance. It also showed the value of secure defaults, minimizing surprising features, isolating network access, and monitoring outbound connections.
 
 The larger lesson is humility. Software systems are not only the code a team writes directly; they are the full stack of libraries, tools, services, and assumptions underneath. Log4Shell made that invisible stack visible in the most uncomfortable way.
+
+**Sources:** [Apache Log4j Security Vulnerabilities](https://logging.apache.org/security.html), [Apache Log4j Vulnerability Guidance (CISA)](https://www.cisa.gov/news-events/news/apache-log4j-vulnerability-guidance)

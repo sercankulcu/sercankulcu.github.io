@@ -11,7 +11,7 @@ tags:
 
 The Unexpected Hanging Paradox appears to prove that a judge's announcement cannot be fulfilled — and then the announcement is immediately fulfilled. The contradiction is not in the judge's statement. It is in the prisoner's reasoning about knowledge.
 
-<img width="200" alt="unexpected hanging" src="/images/posts/the-unexpected-hanging-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="143" alt="unexpected hanging" src="/images/posts/the-unexpected-hanging-paradox.webp" style="float: left; margin-right: 10px;" />
 
 A judge tells a prisoner: you will be executed on one weekday next week, but you will not know which day in advance. The execution will be a surprise.
 

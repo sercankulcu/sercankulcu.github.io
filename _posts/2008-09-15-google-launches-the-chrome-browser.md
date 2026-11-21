@@ -30,3 +30,5 @@ That simplicity also supported Google's larger business. A faster, more capable 
 Chrome's launch accelerated browser competition. Firefox, Safari, Internet Explorer, and later Edge all had to respond to a world where performance, standards support, security updates, and developer tools mattered more visibly.
 
 The release is historically important because it captured a turning point: the browser had become an operating environment. Chrome did not merely help people visit websites; it helped define what modern web software could expect from the machine underneath.
+
+**Sources:** [A fresh take on the browser (Google Official Blog)](https://googleblog.blogspot.com/2008/09/fresh-take-on-browser.html)

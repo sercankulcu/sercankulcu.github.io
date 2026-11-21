@@ -13,7 +13,7 @@ Zeno of Elea, a Greek philosopher from the fifth century BCE, created several pa
 
 The most famous, the Dichotomy Paradox, argues that motion is impossible. Before you can walk across a room, you must first walk halfway. Before you can cover that half, you must cover the first quarter. Before the quarter, the eighth. There are infinitely many steps before you can move at all — and, similarly, infinitely many steps before you complete any journey. Since an infinite number of tasks cannot be completed, motion cannot occur.
 
-<img width="200" alt="zeno paradox" src="/images/posts/the-zeno-s-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="133" alt="zeno paradox" src="/images/posts/the-zeno-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 The second version, Achilles and the Tortoise, makes the same argument through a race. Give the tortoise a hundred-meter head start. When Achilles reaches the place where the tortoise started, the tortoise has moved forward. When Achilles reaches that new position, the tortoise has moved again. The gap shrinks but never closes — at least not under this description.
 

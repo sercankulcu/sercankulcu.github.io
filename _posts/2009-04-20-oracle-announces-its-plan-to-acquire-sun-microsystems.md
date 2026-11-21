@@ -1,7 +1,7 @@
 ---
 title: Oracle Announces Its Plan to Acquire Sun Microsystems
 excerpt: "Oracle's 2009 plan to buy Sun Microsystems: why Sun, Java, Solaris and MySQL mattered, what Oracle wanted, and how the deal reshaped several ecosystems."
-date: 2009-04-15
+date: 2009-04-20
 permalink: /posts/2009/04/oracle-announces-its-plan-to-acquire-sun-microsystems/
 tags:
   - technology
@@ -30,3 +30,5 @@ The Java angle was especially important. Java was everywhere in enterprise softw
 The announcement marked the end of Sun as an independent force and the beginning of a new phase for many technologies associated with it. Some communities adjusted, some forked projects, and some moved toward alternatives.
 
 Looking back, the deal is a reminder that technology history is also institutional history. Languages, databases, operating systems, and developer communities do not float separately from the companies that fund and govern them. Oracle's plan to acquire Sun changed not only a balance sheet, but the future path of several important ecosystems.
+
+**Sources:** [Oracle to Buy Sun (joint press release, April 20, 2009)](https://www.sec.gov/Archives/edgar/data/0000709519/000119312509082650/dex991.htm)

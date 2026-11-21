@@ -11,7 +11,7 @@ tags:
 
 The Banach-Tarski Paradox is a theorem in mathematics stating that a solid ball in three-dimensional space can be decomposed into a finite number of disjoint subsets, which can then be reassembled — using only rigid motions: rotations and translations — into two solid balls each identical in size to the original. One ball becomes two. No stretching, no scaling, no adding material.
 
-<img width="200" alt="banach tarski paradox" src="/images/posts/the-banach-tarski-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="199" alt="banach tarski paradox" src="/images/posts/the-banach-tarski-paradox.webp" style="float: left; margin-right: 10px;" />
 
 This cannot be done with a physical orange. The important word is *mathematical*. The pieces in the Banach-Tarski construction are not objects that could be cut with a knife or described with a recipe. They are what mathematicians call non-measurable sets.
 

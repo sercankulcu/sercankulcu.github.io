@@ -1,7 +1,7 @@
 ---
 title: Ubuntu Introduces the Unity Desktop by Default
 excerpt: "Why Ubuntu made the Unity desktop its default in 2011, how the community reacted, and what the episode taught about redesigning mature workflows."
-date: 2011-04-15
+date: 2011-04-28
 permalink: /posts/2011/04/ubuntu-introduces-the-unity-desktop-by-default/
 tags:
   - software
@@ -30,3 +30,5 @@ The debate was not only about taste. It raised deeper questions about who gets t
 Ubuntu eventually moved away from Unity as its default desktop, but the episode remains historically useful. It showed that Linux distributions could attempt polished, opinionated design at a large scale. It also showed how hard it is to redesign mature workflows without losing trust.
 
 Unity's legacy is therefore mixed but valuable: ambition, friction, lessons about community, and a reminder that interface design is never merely cosmetic.
+
+**Sources:** [Canonical Releases Ubuntu 11.04 Natty Narwhal (Linux.com)](https://www.linux.com/news/canonical-releases-ubuntu-1104-natty-narwhal/)

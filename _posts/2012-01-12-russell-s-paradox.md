@@ -11,7 +11,7 @@ tags:
 
 Russell's Paradox is one of those problems that looks harmless until one sentence turns mathematics against itself. Bertrand Russell discovered it around 1901 while reading Gottlob Frege's *Grundgesetze der Arithmetik* — an attempt to derive all of arithmetic from pure logic. Russell noticed that Frege's axiom allowing unrestricted set formation contained a contradiction, and he wrote a letter to Frege in June 1902 explaining it.
 
-<img width="200" alt="russell paradox" src="/images/posts/russell-s-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="149" alt="russell paradox" src="/images/posts/russell-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 The problem begins with a simple question: can a set contain itself?
 

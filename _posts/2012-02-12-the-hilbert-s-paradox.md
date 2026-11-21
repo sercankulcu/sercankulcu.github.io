@@ -13,7 +13,7 @@ Hilbert's Hotel is one of my favourite ways to think about infinity. David Hilbe
 
 Imagine a hotel with infinitely many rooms, numbered 1, 2, 3, and so on forever. Every room is occupied. A new guest arrives. In an ordinary hotel with a finite number of rooms, this is simply impossible — all full means all full.
 
-<img width="200" alt="hilbert hotel" src="/images/posts/the-hilbert-s-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="200" alt="hilbert hotel" src="/images/posts/the-hilbert-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 In the infinite hotel, the manager has a solution. Ask every current guest to move from room n to room n+1. The guest in room 1 moves to room 2, the guest in room 2 moves to room 3, and so on, forever. Room 1 is now empty. The hotel accommodated a new guest without displacing anyone.
 

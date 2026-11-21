@@ -30,3 +30,5 @@ It also made new kinds of products more practical. Photo sharing, media processi
 S3 helped normalize cloud infrastructure as a set of building blocks. Compute, queues, databases, monitoring, and deployment tools would all follow the same broad pattern: expose infrastructure through APIs and let teams assemble systems without owning every layer.
 
 Its influence is visible far beyond Amazon. Object storage became a default assumption in modern software architecture. Even when teams use other providers or self-hosted compatible systems, the S3-style model remains one of the clearest examples of how a small API can reshape the way software is built.
+
+**Sources:** [Amazon Web Services Launches "Amazon S3" (Amazon press release, 14 March 2006)](https://press.aboutamazon.com/2006/3/amazon-web-services-launches), [Announcing Amazon S3 - Simple Storage Service (AWS What's New)](https://aws.amazon.com/about-aws/whats-new/2006/03/announcing-amazon-s3---simple-storage-service)

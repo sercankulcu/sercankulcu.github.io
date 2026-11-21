@@ -10,7 +10,7 @@ tags:
 
 Mathematics began very close to the physical world. People counted objects, measured land, followed the movement of stars, and solved practical problems.
 
-<img width="150" alt="imaginary numbers" src="/images/posts/the-invention-of-imaginary-numbers.webp" style="float: left; margin-right: 60px;" />
+<img width="150" height="150" alt="imaginary numbers" src="/images/posts/the-invention-of-imaginary-numbers.webp" style="float: left; margin-right: 60px;" />
 
 For a long time, numbers were expected to represent something we could imagine directly. Then algebra started asking questions that did not fit so comfortably inside physical reality.
 

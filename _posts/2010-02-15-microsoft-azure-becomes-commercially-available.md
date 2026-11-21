@@ -30,3 +30,5 @@ That enterprise angle mattered. Not every organization could move to the cloud a
 Azure's commercial launch helped turn cloud computing from a startup infrastructure trend into a mainstream enterprise direction. It also pushed Microsoft to rethink its own culture and engineering priorities.
 
 Today, Azure is part of a much larger cloud ecosystem, but its 2010 launch remains important because it showed how deeply the software industry was changing. The future of platforms would be measured not only by what could be installed, but by what could be provisioned, scaled, monitored, and improved continuously.
+
+**Sources:** [Windows Azure General Availability](https://blogs.microsoft.com/blog/2010/02/01/windows-azure-general-availability/)

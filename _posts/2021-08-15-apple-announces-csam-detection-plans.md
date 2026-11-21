@@ -30,3 +30,5 @@ Apple later changed course on parts of the plan, but the debate remained valuabl
 The episode is a reminder that privacy and safety are not abstract slogans. They become engineering decisions, policy commitments, and user experiences. A system can be built with good intentions and still raise legitimate concerns about future use.
 
 Apple's 2021 CSAM announcement matters because it exposed one of the central tensions of modern computing: the same devices that protect our private lives are also expected to help prevent serious harm.
+
+**Sources:** [Apple's Plan to Think Different About Encryption Opens a Backdoor to Your Private Life (EFF, 5 August 2021)](https://www.eff.org/deeplinks/2021/08/apples-plan-think-different-about-encryption-opens-a-backdoor-to-your-private-life)

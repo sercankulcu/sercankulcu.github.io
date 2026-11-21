@@ -30,3 +30,5 @@ For developers, Android opened another path into mobile software. It promised to
 Looking back, the 2007 announcement was one of the most consequential moments in consumer computing. Android became a global platform, shaped mobile hardware competition, and brought app-based computing to billions of users.
 
 It also showed how quickly computing platforms can shift. The desktop had dominated software thinking for decades, but Android helped confirm that the next major platform would fit in a pocket, travel everywhere, and stay connected by default.
+
+**Sources:** [Industry Leaders Announce Open Platform for Mobile Devices (Open Handset Alliance)](https://www.openhandsetalliance.com/press_110507.html), [Google's New Mobile Alliance (Fortune)](https://fortune.com/2007/11/05/googles-new-mobile-alliance/)

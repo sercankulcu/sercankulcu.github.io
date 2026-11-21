@@ -30,3 +30,5 @@ Large organizations also saw potential, though their path was slower. Security, 
 Cloud computing changed the expectations placed on software. Users came to expect services that were always available, globally reachable, and continuously updated. Developers came to expect managed infrastructure, logs, metrics, and deployment automation as normal tools.
 
 The phrase may have sounded vague in 2008, but the consequences became concrete. Cloud computing reshaped startups, enterprise IT, software architecture, and eventually the economics of artificial intelligence and large-scale data processing.
+
+**Sources:** [Announcing Amazon Elastic Compute Cloud (Amazon EC2) - beta](https://aws.amazon.com/about-aws/whats-new/2006/08/24/announcing-amazon-elastic-compute-cloud-amazon-ec2---beta)

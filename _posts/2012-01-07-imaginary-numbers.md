@@ -13,7 +13,7 @@ The name "imaginary number" sounds almost like a joke — how can a number be im
 
 The need for them appears when we try to solve equations with no answer among the real numbers. The simplest example:
 
-<img width="200" alt="imaginary numbers" src="/images/posts/imaginary-numbers.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="112" alt="imaginary numbers" src="/images/posts/imaginary-numbers.webp" style="float: left; margin-right: 10px;" />
 
 x² + 1 = 0
 

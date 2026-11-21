@@ -1,5 +1,5 @@
 ---
-title: 'Welcome to Our Department'
+title: 'Welcome to Our Department, 2020'
 excerpt: "A welcome to computer engineering students in the pandemic year 2020: why foundations matter, how to stay active in remote learning, and why patience helps."
 date: 2020-10-01
 permalink: /posts/2020/10/welcome-to-our-department/

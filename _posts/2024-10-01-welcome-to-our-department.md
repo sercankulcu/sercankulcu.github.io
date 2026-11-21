@@ -1,5 +1,5 @@
 ---
-title: 'Welcome to Our Department'
+title: 'Welcome to Our Department, 2024'
 excerpt: "A welcome to new Computer Engineering students in 2024: why fundamentals and good habits matter more than any tool, AI assistants included."
 date: 2024-10-01
 permalink: /posts/2024/10/welcome-to-our-department/

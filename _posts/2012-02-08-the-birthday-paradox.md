@@ -13,7 +13,7 @@ The Birthday Paradox is not a real contradiction. It is a collision between prob
 
 The question: in a room of 23 people, what is the probability that at least two of them share the same birthday?
 
-<img width="200" alt="birthday paradox" src="/images/posts/the-birthday-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="159" alt="birthday paradox" src="/images/posts/the-birthday-paradox.webp" style="float: left; margin-right: 10px;" />
 
 Most people guess something small — 5%, 10%, maybe 15%. The actual answer, assuming 365 possible birthdays and uniform distribution, is just above 50%.
 

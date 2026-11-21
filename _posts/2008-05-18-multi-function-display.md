@@ -11,7 +11,7 @@ tags:
 
 A Multi-Function Display, usually called an MFD, is one of the cockpit systems that interests me because it brings many different kinds of information onto a single screen. Instead of giving every function its own instrument, the display can change according to what the pilot needs at that moment.
 
-<img width="200" alt="mfd" src="/images/posts/multi-function-display.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="200" alt="mfd" src="/images/posts/multi-function-display.webp" style="float: left; margin-right: 10px;" />
 
 ## Where the idea came from
 

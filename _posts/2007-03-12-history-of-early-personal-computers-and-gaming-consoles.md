@@ -10,7 +10,7 @@ tags:
 
 When I look at today's computers, it is easy to forget how young personal computing really is. Many of the machines that helped shape home computing and video games appeared only a few decades ago. They had tiny amounts of memory and very limited processors compared with modern systems, but they created a new relationship between people and computers.
 
-<img width="200" alt="atari" src="/images/posts/history-of-early-personal-computers-and-gaming-consoles.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="133" alt="atari" src="/images/posts/history-of-early-personal-computers-and-gaming-consoles.webp" style="float: left; margin-right: 10px;" />
 
 ## The Apple II and the beginning of personal computing
 

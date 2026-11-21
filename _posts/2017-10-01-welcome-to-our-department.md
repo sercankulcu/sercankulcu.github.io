@@ -1,5 +1,5 @@
 ---
-title: 'Welcome to Our Department'
+title: 'Welcome to Our Department, 2017'
 excerpt: "A short welcome for new Computer Engineering students in 2017: build strong foundations before chasing trends, explore widely and learn honestly."
 date: 2017-10-01
 permalink: /posts/2017/10/welcome-to-our-department/

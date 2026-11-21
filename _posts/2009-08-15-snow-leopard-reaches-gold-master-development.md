@@ -30,3 +30,5 @@ The timing mattered because hardware was becoming increasingly parallel. Clock s
 Snow Leopard is often remembered fondly because it made restraint feel productive. It showed that an operating system release could be valuable by making the existing experience better rather than constantly chasing visible novelty.
 
 In computing history, that is an important lesson. Mature platforms do not improve only by adding features. They also improve by reducing friction, strengthening foundations, and giving developers better tools for the hardware world that is coming next.
+
+**Sources:** [Apple to Ship Mac OS X Snow Leopard on August 28 (Apple Newsroom)](https://www.apple.com/newsroom/2009/08/24Apple-to-Ship-Mac-OS-X-Snow-Leopard-on-August-28/)

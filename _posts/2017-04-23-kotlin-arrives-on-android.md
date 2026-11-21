@@ -20,7 +20,7 @@ data class User(val name: String, val email: String, val age: Int)
 
 That single line generates equals, hashCode, toString, and copy automatically.
 
-Null safety is the other change that matters daily. In Java, the possibility that any reference might be null is implicit and unchecked. NullPointerExceptions are one of the most common runtime crashes in Android applications — JetBrains' own analysis of crash reports from major applications found null dereferences were the leading category.
+Null safety is the other change that matters daily. In Java, the possibility that any reference might be null is implicit and unchecked. NullPointerExceptions are one of the most common runtime crashes in Android applications.
 
 In Kotlin, nullability is part of the type system. A variable declared as `String` cannot hold null. A variable that might be null must be declared as `String?`, and the compiler forces the developer to handle that case before using the value. Null errors that previously appeared in production crash logs become compile errors.
 
@@ -51,3 +51,5 @@ The language design has ideas behind it that reward engagement. Kotlin is opinio
 Kotlin's approach to Android is interesting beyond the specific features. It demonstrates that a language can improve a developer experience by replacing the surface language while leaving the underlying platform — the JVM, the Android SDK, the existing toolchain — intact. This is different from platforms that require their own runtime, their own build tools, and their own library ecosystem.
 
 Whether Android developers adopt Kotlin widely will depend partly on whether Google makes it an official first-class language for the platform. That question has not been answered yet. But the momentum is real, and the interoperability design means there is no forcing event — individual developers and teams can adopt it at their own pace.
+
+**Sources:** [Android Announces Support for Kotlin](https://android-developers.googleblog.com/2017/05/android-announces-support-for-kotlin.html)

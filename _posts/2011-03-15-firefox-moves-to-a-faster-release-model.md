@@ -30,3 +30,5 @@ These concerns were real, and Mozilla later refined its approach with extended s
 The faster release model showed how browser competition had changed. Version numbers became less important than continuous improvement. Users gradually stopped thinking of browser upgrades as major manual events and started expecting the browser to keep itself current.
 
 That expectation is now normal across much of software. Firefox's 2011 transition was one step in the broader move from occasional releases to living platforms that evolve in place.
+
+**Sources:** [Firefox 6 will be released in six seven weeks (Nicholas Nethercote, Mozilla blog)](https://blog.mozilla.org/nnethercote/?p=941), [Mozilla meeting notes, March 2011](https://blog.mozilla.org/meeting-notes/archives/515)

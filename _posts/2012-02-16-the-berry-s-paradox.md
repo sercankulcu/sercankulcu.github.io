@@ -13,7 +13,7 @@ Berry's Paradox lives in the uncomfortable space between language and mathematic
 
 The paradox was communicated to Bertrand Russell in a letter around 1905 by G. G. Berry, a librarian at the Bodleian Library at Oxford. Russell published it in his 1908 paper "Mathematical Logic as Based on the Theory of Types," where he used it as evidence that naive self-reference in language leads to contradiction.
 
-<img width="200" alt="berry paradox" src="/images/posts/the-berry-s-paradox.webp" style="float: left; margin-right: 10px;" />
+<img width="200" height="143" alt="berry paradox" src="/images/posts/the-berry-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 The standard form: consider "the smallest positive integer that cannot be described in fewer than twenty words." Count the words: *the-smallest-positive-integer-that-cannot-be-described-in-fewer-than-twenty-words* is fourteen words. So the sentence is itself a description of a number — in fewer than twenty words — that claims to be indescribable in fewer than twenty words.
 

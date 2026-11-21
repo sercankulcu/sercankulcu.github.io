@@ -1,7 +1,7 @@
 ---
 title: Windows Vista Beta 2 Reaches the Public
 excerpt: "Windows Vista Beta 2 gave PC users a first serious look at Aero, User Account Control and the compatibility challenge of replacing Windows XP."
-date: 2006-05-15
+date: 2006-06-08
 permalink: /posts/2006/05/windows-vista-beta-2-reaches-the-public/
 tags:
   - software
@@ -30,3 +30,5 @@ That is why public feedback mattered. A desktop operating system succeeds or fai
 Vista's reputation would later become complicated, but the beta marked an important moment in PC history. It showed that visual polish, security, and modernization could not be judged separately from performance and hardware readiness.
 
 Many ideas associated with Vista matured more successfully in Windows 7. In that sense, Vista Beta 2 was not only a preview of one operating system; it was an early look at the design problems Microsoft had to solve for the next decade of Windows.
+
+**Sources:** [Windows Vista Beta 2 Public Release (Microsoft Windows Vista team blog)](https://learn.microsoft.com/en-us/archive/blogs/windowsvista/windows-vista-beta-2-public-release)
