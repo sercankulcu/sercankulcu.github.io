@@ -1,5 +1,6 @@
 ---
 title: Google Announces the PaLM 2 Model
+excerpt: "Google's PaLM 2 announcement at I/O 2023: the four model sizes, MMLU and Med-PaLM 2 results, Codey and Sec-PaLM, and how it powered Bard before Gemini."
 date: 2023-05-15
 permalink: /posts/2023/05/google-announces-the-palm-2-model/
 tags:

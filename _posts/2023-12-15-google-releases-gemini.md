@@ -1,5 +1,6 @@
 ---
 title: Google Releases Gemini
+excerpt: "Google's Gemini launch in December 2023: the Nano, Pro and Ultra sizes, native multimodal training, benchmark claims and the DeepMind and Brain merger."
 date: 2023-12-15
 permalink: /posts/2023/12/google-releases-gemini/
 tags:

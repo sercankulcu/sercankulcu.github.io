@@ -1,5 +1,6 @@
 ---
 title: LK-99 Claims Trigger Intense Computational Analysis
+excerpt: "The July 2023 LK-99 room-temperature superconductor claim: rapid DFT calculations, failed replications, and lessons about open science and viral claims."
 date: 2023-08-15
 permalink: /posts/2023/08/lk-99-claims-trigger-intense-computational-analysis/
 tags:

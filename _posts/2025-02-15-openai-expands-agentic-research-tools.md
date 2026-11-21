@@ -1,5 +1,6 @@
 ---
 title: OpenAI Expands Agentic Research Tools
+excerpt: "OpenAI's Deep Research and Operator in early 2025: how a long-running research agent works, its inspectable reasoning, the Plus rollout and its limits."
 date: 2025-02-15
 permalink: /posts/2025/02/openai-expands-agentic-research-tools/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Elon Musk Reaches an Agreement to Buy Twitter
+excerpt: "Musk's $44 billion Twitter deal in 2022: how it was financed, the bot-account dispute and lawsuit, how it closed, and what mDAU actually measures."
 date: 2022-04-25
 permalink: /posts/2022/04/elon-musk-reaches-an-agreement-to-buy-twitter/
 tags:

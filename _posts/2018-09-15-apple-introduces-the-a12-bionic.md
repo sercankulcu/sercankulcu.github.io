@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the A12 Bionic
+excerpt: "Apple's A12 Bionic: TSMC 7nm, Vortex and Tempest cores, an eight-core Neural Engine, Core ML and Smart HDR, and the shift to heterogeneous smartphone chips."
 date: 2018-09-15
 permalink: /posts/2018/09/apple-introduces-the-a12-bionic/
 tags:

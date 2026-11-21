@@ -1,5 +1,6 @@
 ---
 title: 'Java Superstars'
+excerpt: "After Java 21, a look at Java Champions such as Heinz Kabutz, Venkat Subramaniam and Jose Paumard, and the larger community that sustains the platform."
 date: 2023-11-28
 permalink: /posts/2023/11/java-superstars/
 tags:
@@ -43,3 +44,5 @@ Java is in its twenty-eighth year as a commercially relevant language. That is u
 Project Loom's virtual threads, now stable in Java 21, did not arrive because Oracle decided threads should be lighter. They arrived because a consistent community feedback signal over many years indicated that the thread-per-request model was limiting for certain workloads, and that the async alternatives required too much restructuring of existing code. The language followed the community's experience.
 
 The famous names are useful as entry points. The community behind them is what actually keeps a platform alive.
+
+The [Object-Oriented Programming with Java course](/teaching/object-oriented-programming-with-java/?lang=en) is one place on this site to learn the language itself.

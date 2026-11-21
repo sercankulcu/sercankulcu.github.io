@@ -1,5 +1,6 @@
 ---
 title: 'The Hilberts Paradox'
+excerpt: "Hilbert's Hotel and countable infinity: how a full hotel takes new guests, what Cantor's diagonal argument shows, and its link to computability."
 date: 2012-02-12
 permalink: /posts/2012/02/the-hilbert-s-paradox/
 tags:

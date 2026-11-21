@@ -1,5 +1,6 @@
 ---
 title: 'How To Be A Good Software Developer'
+excerpt: "What makes a good software developer beyond languages: fundamentals, building real projects, readable code, communication and reliability habits (2016)."
 date: 2016-08-14
 permalink: /posts/2016/08/how-to-be-a-good-software-developer/
 tags:

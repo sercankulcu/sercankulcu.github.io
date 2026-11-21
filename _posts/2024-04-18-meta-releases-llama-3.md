@@ -1,5 +1,6 @@
 ---
 title: Meta Releases Llama 3
+excerpt: "Meta's Llama 3 in April 2024: 8B and 70B models, a 128,000-token vocabulary and 15 trillion training tokens, running locally, and the later 405B release."
 date: 2024-04-18
 permalink: /posts/2024/04/meta-releases-llama-3/
 tags:

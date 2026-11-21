@@ -1,5 +1,6 @@
 ---
 title: 'The iPad And The Question Of What A Computer Is'
+excerpt: "What the 2010 iPad removes from the traditional computer, why it suits consuming better than creating, and what an App Store-only device means for control."
 date: 2010-04-18
 permalink: /posts/2010/04/the-ipad-and-the-question-of-what-a-computer-is/
 tags:

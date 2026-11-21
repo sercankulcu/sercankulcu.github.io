@@ -1,5 +1,6 @@
 ---
 title: Google Wave Is Revealed
+excerpt: "Google Wave's 2009 debut: real-time shared waves built on Operational Transformation, why it was shut down in 2010, and how its ideas live on in Google Docs."
 date: 2009-05-15
 permalink: /posts/2009/05/google-wave-is-revealed/
 tags:

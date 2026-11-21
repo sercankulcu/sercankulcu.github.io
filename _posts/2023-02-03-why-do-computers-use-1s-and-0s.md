@@ -1,5 +1,6 @@
 ---
 title: 'Why Do Computers Use 1s And 0s?'
+excerpt: "Why computers use binary: reliable two-state transistors, positional binary numbers, how text, images and sound become bits, and what logic gates do."
 date: 2023-02-03
 permalink: /posts/2023/02/why-do-computers-use-1s-and-0s/
 tags:
@@ -58,3 +59,5 @@ By combining these gates, engineers build adders — circuits that add two binar
 A photograph, a piece of music, a word processing document, a video game, a running web browser — all of these exist in the computer as sequences of numbers stored in binary. The hardware never knows the difference between an image and a program. It processes binary data according to instructions that are themselves binary data.
 
 Complexity grows from combinations of simple things, repeated at enormous speed. That is the principle behind digital computing. The screen full of colors and movement is ultimately the result of billions of very small decisions between two states.
+
+The [Microprocessors course](/teaching/microprocessors/?lang=en) shows how these binary decisions are built into a working processor.

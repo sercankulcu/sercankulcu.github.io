@@ -1,5 +1,6 @@
 ---
 title: SPEC CPU2006 Redefines Processor Benchmarking
+excerpt: "SPEC CPU2006 replaced CPU2000 with 29 real workloads, normalized scores and base/peak runs; see how it became the standard for comparing processors."
 date: 2006-08-15
 permalink: /posts/2006/08/spec-cpu2006-redefines-processor-benchmarking/
 tags:

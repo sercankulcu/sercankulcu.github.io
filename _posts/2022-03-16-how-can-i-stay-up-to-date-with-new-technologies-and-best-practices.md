@@ -1,5 +1,6 @@
 ---
 title: 'How Can I Stay Up-to-date With New Technologies And Best Practices?'
+excerpt: "How to stay current in software in 2022: documentation, newsletters, engineering blogs, GitHub, books and building, plus choosing what not to learn."
 date: 2022-03-16
 permalink: /posts/2022/03/how-can-i-stay-up-to-date-with-new-technologies-and-best-practices/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Google Announces Kotlin Support for Android
+excerpt: "Google's 2017 endorsement of Kotlin for Android: null safety, data classes, coroutines, the Kotlin-first shift in 2019 and Jetpack Compose's Kotlin requirement."
 date: 2017-05-17
 permalink: /posts/2017/05/google-announces-kotlin-support-for-android/
 tags:

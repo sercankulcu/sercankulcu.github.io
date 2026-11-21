@@ -1,5 +1,6 @@
 ---
 title: 'Apple Silicon And The Return Of Processor Diversity'
+excerpt: "What the Apple M1 is, how it benchmarks, how Rosetta 2 and universal binaries handle compatibility, and what it means for processor diversity (January 2021)."
 date: 2021-01-31
 permalink: /posts/2021/01/apple-silicon-and-the-return-of-processor-diversity/
 tags:

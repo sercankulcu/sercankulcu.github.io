@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2008'
+excerpt: "A November 10 reflection in 2008 on Atatürk's idea of independence as education, production and institutions, in the shadow of a global financial crisis."
 date: 2008-11-10
 permalink: /posts/2008/11/remembering-ataturk-on-november-10-2008/
 tags:

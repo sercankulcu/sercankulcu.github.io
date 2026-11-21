@@ -1,5 +1,6 @@
 ---
 title: Microsoft Launches the Bing Search Engine
+excerpt: "Microsoft launched Bing in June 2009 as a 'decision engine': how it ranked results, the Yahoo Search Alliance, and its market share against Google."
 date: 2009-06-15
 permalink: /posts/2009/06/microsoft-launches-the-bing-search-engine/
 tags:

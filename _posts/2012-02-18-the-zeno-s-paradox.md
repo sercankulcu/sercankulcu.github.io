@@ -1,5 +1,6 @@
 ---
 title: 'The Zenos Paradox'
+excerpt: "Zeno's Dichotomy and Achilles paradoxes, how a convergent geometric series resolves them, and why the philosophical question of motion remains open."
 date: 2012-02-18
 permalink: /posts/2012/02/the-zeno-s-paradox/
 tags:

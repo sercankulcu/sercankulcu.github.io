@@ -1,5 +1,6 @@
 ---
 title: Microsoft Announces the Surface Tablet
+excerpt: "Microsoft's 2012 Surface announcement: RT versus Pro, why building its own hardware set it against PC makers, the pricing and write-off, and the 2-in-1 legacy."
 date: 2012-06-18
 permalink: /posts/2012/06/microsoft-announces-the-surface-tablet/
 tags:

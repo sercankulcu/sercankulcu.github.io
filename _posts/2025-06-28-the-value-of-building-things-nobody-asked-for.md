@@ -1,5 +1,6 @@
 ---
 title: 'The Value of Building Things Nobody Asked For'
+excerpt: "Why personal projects nobody requested teach what professional work cannot: freedom from specifications, calibration from finishing, and permission not to scale"
 date: 2025-06-28
 permalink: /posts/2025/06/the-value-of-building-things-nobody-asked-for/
 tags:
@@ -34,3 +35,5 @@ A recurring temptation with personal projects that work is to scale them: add ac
 A one-page tool can be complete. A tiny game can be complete. A script that runs once a week can be complete.
 
 If a small idea keeps returning to you, it probably deserves an evening. The outcome might be a useful tool, a discovered skill, or a clear understanding of why the idea wasn't quite right. Any of these is a reasonable result.
+
+The [games](/games/) and [apps](/apps/) on this site are small projects in that spirit.

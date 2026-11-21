@@ -1,5 +1,6 @@
 ---
 title: OpenAI Releases GPT-2 in Stages
+excerpt: "OpenAI's staged GPT-2 release in 2019, how next-token prediction produced surprising abilities, and the open versus closed model debate that followed."
 date: 2019-08-15
 permalink: /posts/2019/08/openai-releases-gpt-2-in-stages/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Microsoft Releases Visual Studio Code
+excerpt: "Visual Studio Code's 2015 debut, Erich Gamma's role, and how the Language Server Protocol and extension marketplace reshaped the code editor ecosystem."
 date: 2015-06-15
 permalink: /posts/2015/06/microsoft-releases-visual-studio-code/
 tags:

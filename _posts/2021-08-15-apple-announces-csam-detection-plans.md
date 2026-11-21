@@ -1,5 +1,6 @@
 ---
 title: Apple Announces CSAM Detection Plans
+excerpt: "Apple's 2021 plan to detect known CSAM on devices, why privacy researchers objected, and what the debate shows about safety, trust and client-side scanning."
 date: 2021-08-15
 permalink: /posts/2021/08/apple-announces-csam-detection-plans/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Grady Booch, A Pioneer Of Computing Technology'
+excerpt: "Grady Booch's work beyond UML: the Booch method, the Three Amigos, why modeling still helps design, and his case for software that people can understand."
 date: 2021-09-12
 permalink: /posts/2021/09/grady-booch-a-pioneer-of-computing-technology/
 tags:
@@ -56,3 +57,5 @@ Beyond UML, Booch's sustained contribution is an argument about software archite
 A system that works but that nobody on the team can confidently describe is in a precarious position. The next change is more likely to introduce bugs. The next person to join the team will be slower to contribute. Architectural decisions that were reasonable three years ago may now be constraints that nobody knows how to change because nobody fully understands them.
 
 Making software understandable — which is not the same as making it simple — is a deliberate design goal that Booch argued for throughout his career. In 2021, as systems grow larger and teams turn over faster, that argument has not aged at all.
+
+The [Object-Oriented Programming with Java course](/teaching/object-oriented-programming-with-java/?lang=en) works through the same object-oriented ideas in practice.

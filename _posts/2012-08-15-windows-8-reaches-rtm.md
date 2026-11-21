@@ -1,5 +1,6 @@
 ---
 title: Windows 8 Reaches RTM
+excerpt: "Windows 8 reached RTM in August 2012: the Metro Start screen, WinRT apps beside the Win32 desktop, and why the dual design confused mouse users."
 date: 2012-08-15
 permalink: /posts/2012/08/windows-8-reaches-rtm/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: The Kinect Sensor Reaches Consumers
+excerpt: "How Kinect worked, from its structured-light depth camera to skeletal tracking by machine learning, and how researchers used it beyond games."
 date: 2010-11-15
 permalink: /posts/2010/11/the-kinect-sensor-reaches-consumers/
 tags:

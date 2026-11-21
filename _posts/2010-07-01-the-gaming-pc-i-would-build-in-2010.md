@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2010"
+excerpt: "A July 2010 gaming PC built around the Core i7-930 and GeForce GTX 480, with the reasoning behind each part, the roughly $2,000 price and the heat problem."
 date: 2010-07-01
 permalink: /posts/2010/07/the-gaming-pc-i-would-build-in-2010/
 tags:

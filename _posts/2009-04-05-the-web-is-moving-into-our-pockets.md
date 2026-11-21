@@ -1,5 +1,6 @@
 ---
 title: 'The Web Is Moving Into Our Pockets'
+excerpt: "In April 2009 the iPhone and Android make the real web usable on phones. What that means for web design, mobile-native features and always-on connectivity."
 date: 2009-04-05
 permalink: /posts/2009/04/the-web-is-moving-into-our-pockets/
 tags:

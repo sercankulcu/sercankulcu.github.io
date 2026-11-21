@@ -1,5 +1,6 @@
 ---
 title: 'Book Suggestions For Software Engineers'
+excerpt: "Software engineering books I recommend most, from The Pragmatic Programmer and Clean Code to design, computer fundamentals and projects, and how to use them."
 date: 2019-08-12
 permalink: /posts/2019/08/book-suggestions-for-software-engineers/
 tags:

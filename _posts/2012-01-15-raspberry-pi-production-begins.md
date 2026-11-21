@@ -1,5 +1,6 @@
 ---
 title: Raspberry Pi Production Begins
+excerpt: "How the $35 Raspberry Pi Model B went into production in January 2012: the BCM2835 chip, cost-driven board design, limited first batch and distributor strategy."
 date: 2012-01-15
 permalink: /posts/2012/01/raspberry-pi-production-begins/
 tags:

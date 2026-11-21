@@ -1,5 +1,6 @@
 ---
 title: AMD Launches the Threadripper Platform
+excerpt: "AMD's Threadripper in 2017: 16 cores, a multi-chip design on Infinity Fabric, 64 PCIe lanes, and how it pushed Intel to ship higher core counts."
 date: 2017-08-15
 permalink: /posts/2017/08/amd-launches-the-threadripper-platform/
 tags:

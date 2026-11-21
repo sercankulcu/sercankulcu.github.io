@@ -1,5 +1,6 @@
 ---
 title: Windows Vista Launches for Business Customers
+excerpt: "Windows Vista reached business customers in November 2006: WDDM, a rewritten TCP/IP stack, BitLocker, and why compatibility problems slowed enterprise rollouts."
 date: 2006-11-30
 permalink: /posts/2006/11/windows-vista-launches-for-business-customers/
 tags:

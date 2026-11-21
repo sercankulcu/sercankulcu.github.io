@@ -1,5 +1,6 @@
 ---
 title: Google Agrees to Acquire Motorola Mobility
+excerpt: "Google's $12.5 billion Motorola Mobility deal in 2011: the Android patent wars behind it, the Nortel auction, and what the patents cost after the Lenovo sale."
 date: 2011-08-15
 permalink: /posts/2011/08/google-agrees-to-acquire-motorola-mobility/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Launches the Kepler GPU Architecture
+excerpt: "NVIDIA's 2012 Kepler GPUs, led by the GTX 680: SMX cores, GPU Boost and Dynamic Parallelism, and Kepler's early role in the deep-learning boom."
 date: 2012-03-22
 permalink: /posts/2012/03/nvidia-launches-the-kepler-gpu-architecture/
 tags:

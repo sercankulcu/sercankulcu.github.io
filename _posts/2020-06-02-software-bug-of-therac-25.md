@@ -1,5 +1,6 @@
 ---
 title: 'Software Bug Of Therac-25'
+excerpt: "The Therac-25 radiation overdoses: the race condition, ambiguous error messages and organizational failures, and the lessons for safety-critical software."
 date: 2020-06-02
 permalink: /posts/2020/06/software-bug-of-therac-25/
 tags:
@@ -44,6 +45,6 @@ Hospitals that reported problems were told that no similar incidents had been re
 
 The Therac-25 is cited in engineering ethics courses, safety-critical systems courses, and software engineering courses because it makes concrete several principles that are otherwise abstract.
 
-Software cannot replace hardware safety mechanisms for life-critical systems without independent verification at least as rigorous as the hardware it replaced. Error messages in safety-critical systems must communicate severity, not just the existence of a problem. Testing must specifically include boundary conditions, race conditions, and sequences of operator input that reflect how operators actually use the system under real conditions.
+Software cannot replace hardware safety mechanisms for life-critical systems without independent verification at least as rigorous as the hardware it replaced. Error messages in safety-critical systems must communicate severity, not just the existence of a problem. Testing must specifically include boundary conditions, race conditions, and sequences of operator input that reflect how operators actually use the system under real conditions. The [Operating Systems course](/teaching/operating-systems/?lang=en) explains race conditions and synchronization in more detail.
 
 Most fundamentally: when software controls a device that can physically harm a person, confidence in normal operation is not sufficient. The question must also be "what happens in abnormal operation?" — and the answer must come from careful analysis, not from the absence of complaints during testing.

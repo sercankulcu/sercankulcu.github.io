@@ -1,5 +1,6 @@
 ---
 title: 'The Liar Paradox'
+excerpt: "'This statement is false' explained: the liar paradox from Epimenides to Russell, Gödel's incompleteness theorems and Tarski's answer."
 date: 2012-01-19
 permalink: /posts/2012/01/the-liar-paradox/
 tags:

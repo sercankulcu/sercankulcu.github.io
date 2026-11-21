@@ -1,5 +1,6 @@
 ---
 title: Microsoft Introduces Mesh for Mixed Reality
+excerpt: "Microsoft Mesh, announced in March 2021: shared holographic collaboration on HoloLens 2, enterprise focus, Azure Spatial Anchors and later Teams integration."
 date: 2021-03-15
 permalink: /posts/2021/03/microsoft-introduces-mesh-for-mixed-reality/
 tags:

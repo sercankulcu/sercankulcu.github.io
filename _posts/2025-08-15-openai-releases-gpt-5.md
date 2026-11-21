@@ -1,5 +1,6 @@
 ---
 title: OpenAI Releases GPT-5
+excerpt: "OpenAI's GPT-5 combined fast chat and extended reasoning in one system; the post covers the reported benchmarks and the routing trade-off."
 date: 2025-08-15
 permalink: /posts/2025/08/openai-releases-gpt-5/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Apple Reveals iOS 7 and the New Mac Pro
+excerpt: "At WWDC 2013 Apple unveiled flat iOS 7 and the cylindrical 'trash can' Mac Pro: what changed, how developers adapted, and why the Mac Pro design was reversed."
 date: 2013-06-15
 permalink: /posts/2013/06/apple-reveals-ios-7-and-the-new-mac-pro/
 tags:

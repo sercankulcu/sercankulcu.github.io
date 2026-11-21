@@ -1,5 +1,6 @@
 ---
 title: 'How AI Tools Empower Developers To Write Better Code'
+excerpt: "What GitHub Copilot does well (boilerplate, API exploration, tests), where it fails (security, business logic), and what it means for learning to code."
 date: 2022-10-11
 permalink: /posts/2022/10/how-ai-tools-empower-developers-to-write-better-code/
 tags:

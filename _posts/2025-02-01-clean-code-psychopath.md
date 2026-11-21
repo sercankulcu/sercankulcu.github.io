@@ -1,5 +1,6 @@
 ---
 title: 'Clean Code Psychopath'
+excerpt: "Why clean code principles can turn harmful when applied without context, when duplication beats abstraction, and how to treat rules as tools."
 date: 2025-02-01
 permalink: /posts/2025/02/clean-code-psychopath/
 tags:

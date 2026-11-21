@@ -1,5 +1,6 @@
 ---
 title: Microsoft Introduces Copilot Plus PCs
+excerpt: "Microsoft's Copilot+ PCs of 2024: the 40 TOPS NPU requirement, the Recall privacy controversy, and Arm Windows finally running x86 apps via Prism."
 date: 2024-05-20
 permalink: /posts/2024/05/microsoft-introduces-copilot-plus-pcs/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2019'
+excerpt: "A short remembrance of Mustafa Kemal Ataturk on November 10, 2019, the centenary year of his arrival in Samsun, and what taking responsibility early means."
 date: 2019-11-10
 permalink: /posts/2019/11/remembering-ataturk-on-november-10-2019/
 tags:

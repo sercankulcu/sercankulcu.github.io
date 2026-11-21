@@ -1,5 +1,6 @@
 ---
 title: Samsung Unveils the Galaxy Z Flip
+excerpt: "The Galaxy Z Flip's ultra-thin glass display, hideaway hinge and Flex Mode software, and how it made the clamshell foldable a real product category."
 date: 2020-02-15
 permalink: /posts/2020/02/samsung-unveils-the-galaxy-z-flip/
 tags:

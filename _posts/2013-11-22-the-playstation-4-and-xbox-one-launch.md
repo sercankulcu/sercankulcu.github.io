@@ -1,5 +1,6 @@
 ---
 title: The PlayStation 4 and Xbox One Launch
+excerpt: "Comparing the 2013 PS4 and Xbox One launches: shared AMD x86-64 hardware, GDDR5 vs. DDR3 plus ESRAM, the Xbox DRM reversal, and how the generation played out."
 date: 2013-11-22
 permalink: /posts/2013/11/the-playstation-4-and-xbox-one-launch/
 tags:

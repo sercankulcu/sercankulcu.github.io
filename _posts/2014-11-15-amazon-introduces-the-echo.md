@@ -1,5 +1,6 @@
 ---
 title: Amazon Introduces the Echo
+excerpt: "Amazon's Echo in 2014: its microphone array, cloud-based Alexa speech processing, the Skills Kit, and the privacy questions of an always-listening speaker."
 date: 2014-11-15
 permalink: /posts/2014/11/amazon-introduces-the-echo/
 tags:

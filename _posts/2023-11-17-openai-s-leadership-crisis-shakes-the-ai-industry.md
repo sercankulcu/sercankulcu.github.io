@@ -1,5 +1,6 @@
 ---
 title: OpenAI's Leadership Crisis Shakes the AI Industry
+excerpt: "The November 2023 firing and return of Sam Altman at OpenAI: the board, Microsoft's role, the employee letter, and what it showed about governance risk."
 date: 2023-11-17
 permalink: /posts/2023/11/openai-s-leadership-crisis-shakes-the-ai-industry/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Docker Reaches Its First Major Wave of Adoption
+excerpt: "How Docker turned Linux namespaces and cgroups into images, a Dockerfile and Docker Hub, and won backing from Red Hat, Google and AWS by late 2013."
 date: 2013-12-15
 permalink: /posts/2013/12/docker-reaches-its-first-major-wave-of-adoption/
 tags:

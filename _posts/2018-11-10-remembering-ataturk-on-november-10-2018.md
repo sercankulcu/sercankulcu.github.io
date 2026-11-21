@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2018'
+excerpt: "A reflection for November 10, 2018 on Atatürk's legacy as a durable republic, and why strong institutions matter more than admiration alone."
 date: 2018-11-10
 permalink: /posts/2018/11/remembering-ataturk-on-november-10-2018/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2022'
+excerpt: "A reflection for November 10, 2022, a year before the Republic's centennial, on remembering Atatürk as a mirror for education, reason and knowledge."
 date: 2022-11-10
 permalink: /posts/2022/11/remembering-ataturk-on-november-10-2022/
 tags:

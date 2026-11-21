@@ -1,5 +1,6 @@
 ---
 title: Google Compute Engine Expands Cloud Competition
+excerpt: "Google Compute Engine's December 2012 expansion: VM types, pricing against Amazon EC2, its network and disk design, and where it stood in the IaaS market."
 date: 2012-12-15
 permalink: /posts/2012/12/google-compute-engine-expands-cloud-competition/
 tags:

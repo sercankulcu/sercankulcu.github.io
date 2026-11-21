@@ -1,5 +1,6 @@
 ---
 title: Microsoft Introduces the Surface Pro 3
+excerpt: "Microsoft's 2014 Surface Pro 3: the 3:2 display, Pen and kickstand aimed at replacing a laptop, and how it created the detachable 2-in-1 category."
 date: 2014-05-20
 permalink: /posts/2014/05/microsoft-introduces-the-surface-pro-3/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Intel Launches the Core 2 Duo
+excerpt: "Intel's July 2006 Core 2 Duo launch ended NetBurst: a 14-stage pipeline, shared L2 cache and half the power beat Pentium D and Athlon 64 FX."
 date: 2006-07-27
 permalink: /posts/2006/07/intel-launches-the-core-2-duo/
 tags:

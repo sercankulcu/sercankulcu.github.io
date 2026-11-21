@@ -1,5 +1,6 @@
 ---
 title: Google Introduces the Pixel 9 Generation Early
+excerpt: "Google's August 2024 Pixel 9 launch, its four models and Tensor G4 camera features, and why moving the date earlier was a strategy against the iPhone 16."
 date: 2024-08-15
 permalink: /posts/2024/08/google-introduces-the-pixel-9-generation-early/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2014"
+excerpt: "A July 2014 gaming PC build around the i7-4790K and GTX 780 Ti, with reasons for each choice, a rough $1,900-2,150 price and the 3 GB VRAM weak point."
 date: 2014-07-01
 permalink: /posts/2014/07/the-gaming-pc-i-would-build-in-2014/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'What Is Quantum Computing?'
+excerpt: "What qubits, superposition and entanglement are, what Shor's and Grover's algorithms offer, and how far quantum hardware had come by December 2020."
 date: 2020-12-08
 permalink: /posts/2020/12/what-is-quantum-computing/
 tags:

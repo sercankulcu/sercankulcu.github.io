@@ -1,5 +1,6 @@
 ---
 title: Let's Encrypt Enters Public Beta
+excerpt: "Let's Encrypt's December 2015 public beta: free 90-day certificates, the ACME protocol, Certbot, and how HTTPS became the default on the web."
 date: 2015-12-15
 permalink: /posts/2015/12/let-s-encrypt-enters-public-beta/
 tags:

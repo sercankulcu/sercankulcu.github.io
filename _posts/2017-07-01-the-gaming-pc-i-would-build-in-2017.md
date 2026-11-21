@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2017"
+excerpt: "A July 2017 gaming PC build around the i7-7700K and GTX 1080 Ti for 1440p at 144 Hz, with Ryzen as the alternative and four cores as the long-term weak point."
 date: 2017-07-01
 permalink: /posts/2017/07/the-gaming-pc-i-would-build-in-2017/
 tags:

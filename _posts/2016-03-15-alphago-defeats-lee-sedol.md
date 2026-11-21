@@ -1,5 +1,6 @@
 ---
 title: AlphaGo Defeats Lee Sedol
+excerpt: "How AlphaGo beat Lee Sedol 4-1 in March 2016 with policy and value networks plus Monte Carlo Tree Search, including Move 37, Lee's game-four win and AlphaZero."
 date: 2016-03-15
 permalink: /posts/2016/03/alphago-defeats-lee-sedol/
 tags:

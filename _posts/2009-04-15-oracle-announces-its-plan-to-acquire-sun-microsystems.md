@@ -1,5 +1,6 @@
 ---
 title: Oracle Announces Its Plan to Acquire Sun Microsystems
+excerpt: "Oracle's 2009 plan to buy Sun Microsystems: why Sun, Java, Solaris and MySQL mattered, what Oracle wanted, and how the deal reshaped several ecosystems."
 date: 2009-04-15
 permalink: /posts/2009/04/oracle-announces-its-plan-to-acquire-sun-microsystems/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Google Open-Sources TensorFlow
+excerpt: "Google open-sourced TensorFlow in November 2015: its dataflow graph design, automatic differentiation, and the later rivalry with PyTorch."
 date: 2015-11-15
 permalink: /posts/2015/11/google-open-sources-tensorflow/
 tags:

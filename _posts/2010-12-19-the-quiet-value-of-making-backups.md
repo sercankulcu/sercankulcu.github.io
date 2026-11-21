@@ -1,5 +1,6 @@
 ---
 title: 'The Quiet Value Of Making Backups'
+excerpt: "Why one copy is not a backup, how the 3-2-1 rule works, why automation and test restores matter, and what backups teach about quiet preparation."
 date: 2010-12-19
 permalink: /posts/2010/12/the-quiet-value-of-making-backups/
 tags:

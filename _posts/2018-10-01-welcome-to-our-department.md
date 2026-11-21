@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A welcome to new computer engineering students in 2018: take the basics seriously, build small finished projects, and give your curiosity structure."
 date: 2018-10-01
 permalink: /posts/2018/10/welcome-to-our-department/
 tags:

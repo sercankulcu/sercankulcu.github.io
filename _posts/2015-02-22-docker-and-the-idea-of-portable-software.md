@@ -1,5 +1,6 @@
 ---
 title: 'Docker And The Idea Of Portable Software'
+excerpt: "How Docker answers 'it works on my machine': containers, Dockerfile images, layers and Docker Hub, plus what it does not solve, such as persistent data."
 date: 2015-02-22
 permalink: /posts/2015/02/docker-and-the-idea-of-portable-software/
 tags:

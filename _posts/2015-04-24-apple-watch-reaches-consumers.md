@@ -1,5 +1,6 @@
 ---
 title: Apple Watch Reaches Consumers
+excerpt: "The first Apple Watch in April 2015: its models, hardware and dependence on the iPhone, and how health features and native apps shaped later versions."
 date: 2015-04-24
 permalink: /posts/2015/04/apple-watch-reaches-consumers/
 tags:

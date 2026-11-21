@@ -1,5 +1,6 @@
 ---
 title: Ubuntu Announces Its Phone Interface
+excerpt: "Canonical's 2013 Ubuntu for Phones: an edge-gesture interface, one OS across phone and desktop, and the Ubuntu Edge crowdfunding campaign that fell short."
 date: 2013-02-15
 permalink: /posts/2013/02/ubuntu-announces-its-phone-interface/
 tags:

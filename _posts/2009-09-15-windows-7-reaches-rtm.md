@@ -1,5 +1,6 @@
 ---
 title: Windows 7 Reaches RTM
+excerpt: "Windows 7 reached RTM in July 2009: the OEM and enterprise preparation period, retail pricing, and why Vista's driver groundwork helped it sell quickly."
 date: 2009-09-15
 permalink: /posts/2009/09/windows-7-reaches-rtm/
 tags:

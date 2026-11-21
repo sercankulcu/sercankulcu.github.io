@@ -1,5 +1,6 @@
 ---
 title: 'Edsger Wybe Dijkstra'
+excerpt: "Dijkstra's life and legacy: the shortest-path algorithm, semaphores, the go-to letter, the EWD notes and his belief that computing needs mathematical rigour."
 date: 2015-09-09
 permalink: /posts/2015/09/edsger-wybe-dijkstra/
 tags:
@@ -15,13 +16,13 @@ While still a student, he began working as a programmer at the Mathematical Cent
 
 ## Dijkstra's algorithm
 
-In 1956, while thinking about how to find the shortest route between cities for a demonstration, he developed what we now call Dijkstra's shortest-path algorithm. The algorithm solves the single-source shortest path problem on a weighted graph with non-negative edge weights. Starting from a source vertex, it maintains a priority queue of unvisited vertices sorted by their current best-known distance. At each step it extracts the nearest unvisited vertex, finalises its distance, and relaxes the distances to its neighbours. The process repeats until all vertices are settled. With a binary heap the complexity is O((V + E) log V); with a Fibonacci heap it improves to O(E + V log V). Dijkstra said he designed the algorithm in twenty minutes while sitting in a café in Amsterdam, without paper, and published it in a three-page paper in 1959. It remains one of the most widely taught and used algorithms in computer science, embedded in GPS routing, network packet routing (OSPF protocol), and shortest-path libraries across every programming language.
+In 1956, while thinking about how to find the shortest route between cities for a demonstration, he developed what we now call Dijkstra's shortest-path algorithm. The algorithm solves the single-source shortest path problem on a weighted graph with non-negative edge weights. Starting from a source vertex, it maintains a priority queue of unvisited vertices sorted by their current best-known distance. At each step it extracts the nearest unvisited vertex, finalises its distance, and relaxes the distances to its neighbours. The process repeats until all vertices are settled. With a binary heap the complexity is O((V + E) log V); with a Fibonacci heap it improves to O(E + V log V). Dijkstra said he designed the algorithm in twenty minutes while sitting in a café in Amsterdam, without paper, and published it in a three-page paper in 1959. It remains one of the most widely taught and used algorithms in computer science, embedded in GPS routing, network packet routing (OSPF protocol), and shortest-path libraries across every programming language. You can watch it run step by step in the [Dijkstra's Algorithm Simulator](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html).
 
 <img alt="Dijkstra shortest-path example: a weighted graph with the final distance of each vertex" src="/images/posts/edsger-wybe-dijkstra-2.webp" style="clear: both; display: block; max-width: 100%; height: auto; margin: 1.25rem auto;" />
 
 ## Semaphores and concurrent programming
 
-In the early 1960s, Dijkstra made major contributions to the emerging problem of concurrent programming. He coined the term *semaphore* for a synchronisation primitive: a shared counter that processes can increment (signal) and decrement (wait, blocking if the counter reaches zero). Semaphores provided a general tool for mutual exclusion and coordination that was cleaner than the busy-waiting loops that had been common. He formulated the *dining philosophers problem* as a pedagogical illustration of deadlock, and contributed to the understanding of how concurrent processes could be designed to avoid it. Dijkstra became a professor at Eindhoven University of Technology in 1962.
+In the early 1960s, Dijkstra made major contributions to the emerging problem of concurrent programming. He coined the term *semaphore* for a synchronisation primitive: a shared counter that processes can increment (signal) and decrement (wait, blocking if the counter reaches zero). Semaphores provided a general tool for mutual exclusion and coordination that was cleaner than the busy-waiting loops that had been common. He formulated the *dining philosophers problem* as a pedagogical illustration of deadlock, and contributed to the understanding of how concurrent processes could be designed to avoid it. Dijkstra became a professor at Eindhoven University of Technology in 1962. The [Operating Systems course](/teaching/operating-systems/?lang=en) covers semaphores and deadlock in more detail.
 
 ## Structured programming and the go-to debate
 

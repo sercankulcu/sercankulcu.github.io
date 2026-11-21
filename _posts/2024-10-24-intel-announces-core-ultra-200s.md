@@ -1,5 +1,6 @@
 ---
 title: Intel Announces Core Ultra 200S
+excerpt: "Intel's Core Ultra 200S (Arrow Lake) dropped HyperThreading, used a tiled design with TSMC and added an NPU; see how reviews judged it against Raptor Lake."
 date: 2024-10-24
 permalink: /posts/2024/10/intel-announces-core-ultra-200s/
 tags:

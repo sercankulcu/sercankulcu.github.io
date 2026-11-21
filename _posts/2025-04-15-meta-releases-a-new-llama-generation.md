@@ -1,5 +1,6 @@
 ---
 title: Meta Releases a New Llama Generation
+excerpt: "Llama 4 Scout and Maverick move Meta to mixture-of-experts: active versus total parameters, a 10 million token context, and harder deployment."
 date: 2025-04-15
 permalink: /posts/2025/04/meta-releases-a-new-llama-generation/
 tags:

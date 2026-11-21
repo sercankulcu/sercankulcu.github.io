@@ -1,5 +1,6 @@
 ---
 title: 'Quotes From Famous Computer Scientists'
+excerpt: "Quotes from Turing, Dijkstra, Knuth and Hopper, with what each means for starting under uncertainty, simplicity, measuring first and questioning habits."
 date: 2021-02-13
 permalink: /posts/2021/02/quotes-from-famous-computer-scientists/
 tags:

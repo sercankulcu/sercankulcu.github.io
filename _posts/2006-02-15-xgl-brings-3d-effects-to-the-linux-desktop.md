@@ -1,5 +1,6 @@
 ---
 title: XGL Brings 3D Effects to the Linux Desktop
+excerpt: "How Xgl and Compiz brought GPU-composited 3D desktop effects to Linux in 2006, why AIGLX won out, and how that led to Compiz Fusion and Wayland."
 date: 2006-02-15
 permalink: /posts/2006/02/xgl-brings-3d-effects-to-the-linux-desktop/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Learning Linux From A Live CD'
+excerpt: "How a live CD such as Knoppix or Ubuntu 6.06 lets you try Linux without installing it, what an afternoon of exploring teaches, and where it falls short."
 date: 2007-01-28
 permalink: /posts/2007/01/learning-linux-from-a-live-cd/
 tags:
@@ -35,3 +36,5 @@ Wireless networking is the most common source of frustration. Many wireless card
 When you are not in a hurry, this kind of problem becomes educational. A small hardware compatibility issue leads to reading about kernel modules, firmware, and device drivers — subjects that a working out-of-box experience would never require engaging with.
 
 A live CD makes the first step low-stakes. Curiosity does not require a permanent decision. Sometimes the safest way to learn something unfamiliar is to make the first step reversible, and the live CD is precisely that: a complete operating environment that leaves no trace when you are done with it.
+
+The [Operating Systems course](/teaching/operating-systems/?lang=en) on this site goes deeper into how operating systems work.

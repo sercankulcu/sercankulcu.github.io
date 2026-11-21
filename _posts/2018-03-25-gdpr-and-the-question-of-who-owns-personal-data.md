@@ -1,5 +1,6 @@
 ---
 title: 'GDPR And The Question Of Who Owns Personal Data'
+excerpt: "What GDPR requires before its May 2018 enforcement, how rights like erasure change software design, and the fines, set against the Cambridge Analytica story."
 date: 2018-03-25
 permalink: /posts/2018/03/gdpr-and-the-question-of-who-owns-personal-data/
 tags:

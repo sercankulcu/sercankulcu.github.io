@@ -1,5 +1,6 @@
 ---
 title: Amazon Opens Its First Checkout-Free Store Concept
+excerpt: "Amazon Go's 2016 checkout-free store: how cameras, shelf weight sensors and computer vision track shoppers, and why the rollout was limited."
 date: 2016-12-15
 permalink: /posts/2016/12/amazon-opens-its-first-checkout-free-store-concept/
 tags:

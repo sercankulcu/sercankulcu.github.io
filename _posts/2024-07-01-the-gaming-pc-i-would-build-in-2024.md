@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2024"
+excerpt: "A July 2024 gaming PC with a Ryzen 7 7800X3D and GeForce RTX 4090, why upgrading for its own sake is pointless, and the roughly $3,000 cost."
 date: 2024-07-01
 permalink: /posts/2024/07/the-gaming-pc-i-would-build-in-2024/
 tags:

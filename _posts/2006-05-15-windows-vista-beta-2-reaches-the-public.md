@@ -1,5 +1,6 @@
 ---
 title: Windows Vista Beta 2 Reaches the Public
+excerpt: "Windows Vista Beta 2 gave PC users a first serious look at Aero, User Account Control and the compatibility challenge of replacing Windows XP."
 date: 2006-05-15
 permalink: /posts/2006/05/windows-vista-beta-2-reaches-the-public/
 tags:

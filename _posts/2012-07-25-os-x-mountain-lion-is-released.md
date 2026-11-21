@@ -1,5 +1,6 @@
 ---
 title: OS X Mountain Lion Is Released
+excerpt: "What OS X Mountain Lion brought to the Mac in 2012 for $19.99, from iOS features like Messages and Notification Center to the Gatekeeper security model."
 date: 2012-07-25
 permalink: /posts/2012/07/os-x-mountain-lion-is-released/
 tags:

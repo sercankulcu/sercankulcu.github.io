@@ -1,5 +1,6 @@
 ---
 title: James Webb Telescope Images Showcase Massive Scientific Computing
+excerpt: "How JWST's first images of July 2022 were made: the calibration pipeline at STScI, the drizzle algorithm, public data in MAST, and operating a telescope at L2."
 date: 2022-07-15
 permalink: /posts/2022/07/james-webb-telescope-images-showcase-massive-scientific-computing/
 tags:

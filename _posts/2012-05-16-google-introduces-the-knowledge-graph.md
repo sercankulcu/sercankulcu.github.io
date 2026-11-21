@@ -1,5 +1,6 @@
 ---
 title: Google Introduces the Knowledge Graph
+excerpt: "Google's 2012 Knowledge Graph moved search from strings to things: about 500 million entities, Freebase roots, knowledge panels, and the road to AI Overviews."
 date: 2012-05-16
 permalink: /posts/2012/05/google-introduces-the-knowledge-graph/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2013'
+excerpt: "A short reflection for November 10, 2013, the Republic's ninetieth year: remembering Ataturk with respect and treating his legacy as a standard, not a slogan."
 date: 2013-11-10
 permalink: /posts/2013/11/remembering-ataturk-on-november-10-2013/
 tags:

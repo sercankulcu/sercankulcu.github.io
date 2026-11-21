@@ -1,5 +1,6 @@
 ---
 title: Google Releases Blink as a New Browser Engine
+excerpt: "Google forked WebKit's WebCore into Blink in 2013; the post covers how it diverged from Safari and why browser-engine consolidation worries standards advocates."
 date: 2013-04-15
 permalink: /posts/2013/04/google-releases-blink-as-a-new-browser-engine/
 tags:

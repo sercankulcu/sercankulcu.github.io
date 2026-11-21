@@ -1,5 +1,6 @@
 ---
 title: Intel Introduces the Sandy Bridge Architecture
+excerpt: "A look at Intel's Sandy Bridge architecture: tighter integration, integrated graphics, better Turbo Boost, and why these CPUs aged so well."
 date: 2011-01-15
 permalink: /posts/2011/01/intel-introduces-the-sandy-bridge-architecture/
 tags:

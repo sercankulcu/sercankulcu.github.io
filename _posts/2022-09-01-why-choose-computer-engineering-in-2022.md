@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2022?'
+excerpt: "Why study Computer Engineering in 2022: chip shortage and CHIPS Act, GitHub Copilot, security and machine learning, and why curiosity beats job-market hype."
 date: 2022-09-01
 permalink: /posts/2022/09/why-choose-computer-engineering-in-2022/
 tags:
@@ -29,4 +30,4 @@ Cybersecurity is one area that has become impossible to ignore. Ransomware attac
 
 Machine learning shows why fundamentals still matter. Training and running large models requires algorithms, data engineering, software infrastructure, distributed systems, and specialised processors. Understanding only the application is not enough to understand the engineering problem.
 
-A better reason to choose the department than job market popularity is curiosity: wanting to know how a processor executes instructions, how information travels across a network, how an operating system manages resources, or how software can solve a real problem. In 2022, computers are becoming both more important and more complex. That combination is an invitation to study them carefully.
+A better reason to choose the department than job market popularity is curiosity: wanting to know how a processor executes instructions, how information travels across a network, how an operating system manages resources, or how software can solve a real problem. In 2022, computers are becoming both more important and more complex. That combination is an invitation to study them carefully. The [Microprocessors](/teaching/microprocessors/?lang=en) and [Operating Systems](/teaching/operating-systems/?lang=en) courses on this site are good places to start.

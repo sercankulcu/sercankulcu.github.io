@@ -1,5 +1,6 @@
 ---
 title: 'Cloud Computing Still Feels Like A Strange Name'
+excerpt: "Cloud computing in December 2008: what EC2, S3, App Engine and Azure offer developers, why the economics appeal, and the trade-offs behind the name."
 date: 2008-12-07
 permalink: /posts/2008/12/cloud-computing-still-feels-like-a-strange-name/
 tags:

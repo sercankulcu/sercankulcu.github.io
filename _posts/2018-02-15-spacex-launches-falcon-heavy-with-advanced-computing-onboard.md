@@ -1,5 +1,6 @@
 ---
 title: SpaceX Launches Falcon Heavy With Advanced Computing Onboard
+excerpt: "The first Falcon Heavy launch in 2018 and the redundant flight computers, engine controllers and landing software behind its three-booster recovery attempt."
 date: 2018-02-15
 permalink: /posts/2018/02/spacex-launches-falcon-heavy-with-advanced-computing-onboard/
 tags:

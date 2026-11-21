@@ -1,5 +1,6 @@
 ---
 title: OpenAI Releases the o3 Reasoning Model Preview
+excerpt: "OpenAI's December 2024 o3 preview: its 87.7% ARC-AGI score, the inference-compute cost trade-off, other benchmarks, and debates about contamination."
 date: 2024-12-20
 permalink: /posts/2024/12/openai-releases-the-o3-reasoning-model-preview/
 tags:

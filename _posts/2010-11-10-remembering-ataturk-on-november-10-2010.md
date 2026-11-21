@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2010'
+excerpt: "A November 10, 2010 reflection on Ataturk's trust in youth and why the better tribute is study, questioning and doing one's work well after the silence."
 date: 2010-11-10
 permalink: /posts/2010/11/remembering-ataturk-on-november-10-2010/
 tags:

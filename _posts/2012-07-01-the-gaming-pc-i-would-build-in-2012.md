@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2012"
+excerpt: "A July 2012 gaming PC build around the Core i5-3570K and GTX 680, with the reasoning behind each choice, the rough cost and the weak point."
 date: 2012-07-01
 permalink: /posts/2012/07/the-gaming-pc-i-would-build-in-2012/
 tags:

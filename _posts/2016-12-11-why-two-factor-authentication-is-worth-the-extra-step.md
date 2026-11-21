@@ -1,5 +1,6 @@
 ---
 title: 'Why Two Factor Authentication Is Worth The Extra Step'
+excerpt: "Why two-factor authentication matters after huge password breaches: how TOTP codes work, SMS and SIM swapping, hardware tokens, and saving backup codes."
 date: 2016-12-11
 permalink: /posts/2016/12/why-two-factor-authentication-is-worth-the-extra-step/
 tags:
@@ -10,7 +11,7 @@ tags:
 
 Passwords are structurally weak as the sole mechanism for account security, and the events of the past few years have made this concrete rather than theoretical. In 2012, LinkedIn suffered a breach that exposed 6.5 million password hashes; in 2016, it became clear that the actual number was 117 million. Yahoo's 2013 breach, disclosed in 2016, exposed credentials for 500 million accounts. Adobe, Dropbox, and dozens of other services have had major breaches. The stolen credentials from these breaches are traded and combined into large credential lists that attackers use in automated "credential stuffing" attacks — testing username and password combinations across many services simultaneously.
 
-If you use the same password on multiple services, a breach at any one of them threatens the others. Most people reuse passwords, because remembering distinct strong passwords for dozens of accounts is genuinely difficult.
+If you use the same password on multiple services, a breach at any one of them threatens the others. Most people reuse passwords, because remembering distinct strong passwords for dozens of accounts is genuinely difficult. A [password generator](/apps/password-generator/) can create a different strong password for each account.
 
 Two-factor authentication (2FA) changes the threat model. Even if an attacker has your username and password, they also need the second factor — and that factor is typically device-bound.
 

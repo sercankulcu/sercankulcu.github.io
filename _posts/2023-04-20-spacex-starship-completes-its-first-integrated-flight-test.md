@@ -1,5 +1,6 @@
 ---
 title: SpaceX Starship Completes Its First Integrated Flight Test
+excerpt: "Starship's first integrated flight test in April 2023: the engine failures, the damaged launch pad, and SpaceX's test-to-failure approach to learning."
 date: 2023-04-20
 permalink: /posts/2023/04/spacex-starship-completes-its-first-integrated-flight-test/
 tags:

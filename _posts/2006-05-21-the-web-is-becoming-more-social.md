@@ -1,5 +1,6 @@
 ---
 title: 'The Web Is Becoming More Social'
+excerpt: "In 2006 Flickr, del.icio.us, MySpace, YouTube and Wikipedia ask users to take part. What 'Web 2.0' means, what it asks of users, and why it is exciting."
 date: 2006-05-21
 permalink: /posts/2006/05/the-web-is-becoming-more-social/
 tags:

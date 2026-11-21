@@ -1,5 +1,6 @@
 ---
 title: Google Announces the First Pixel Phones
+excerpt: "The Pixel and Pixel XL of 2016: Google's own hardware and software, the HDR+ camera approach behind its DxOMark score, and Google Assistant's debut."
 date: 2016-10-15
 permalink: /posts/2016/10/google-announces-the-first-pixel-phones/
 tags:

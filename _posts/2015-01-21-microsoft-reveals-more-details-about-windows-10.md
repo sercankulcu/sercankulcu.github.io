@@ -1,5 +1,6 @@
 ---
 title: Microsoft Reveals More Details About Windows 10
+excerpt: "What Microsoft showed at its January 2015 Windows 10 event: the hybrid Start menu, Cortana, Spartan (Edge), Continuum, DirectX 12 and HoloLens."
 date: 2015-01-21
 permalink: /posts/2015/01/microsoft-reveals-more-details-about-windows-10/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'What Makes a Good Programming Assignment?'
+excerpt: "What makes a programming assignment teach: a clear learning goal, narrow scope, a small story, clear specifications, and designs that hold up in the age of AI."
 date: 2025-09-27
 permalink: /posts/2025/09/what-makes-a-good-programming-assignment/
 tags:

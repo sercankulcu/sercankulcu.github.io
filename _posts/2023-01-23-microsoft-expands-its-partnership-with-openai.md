@@ -1,5 +1,6 @@
 ---
 title: Microsoft Expands Its Partnership With OpenAI
+excerpt: "Microsoft's January 2023 investment in OpenAI of about $10 billion, the Azure OpenAI Service and Copilot products, and the strategy behind the partnership."
 date: 2023-01-23
 permalink: /posts/2023/01/microsoft-expands-its-partnership-with-openai/
 tags:

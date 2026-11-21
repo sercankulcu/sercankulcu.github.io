@@ -1,5 +1,6 @@
 ---
 title: 'AI Coding Assistants Are Becoming Part Of The Editor'
+excerpt: "How AI assistants like Copilot became part of the editor by 2024: where they help, where they fail, and why reviewing code now matters more than writing it."
 date: 2024-03-24
 permalink: /posts/2024/03/ai-coding-assistants-are-becoming-part-of-the-editor/
 tags:

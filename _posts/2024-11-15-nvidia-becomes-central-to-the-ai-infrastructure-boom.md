@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Becomes Central to the AI Infrastructure Boom
+excerpt: "Why NVIDIA became central to AI in 2024: H100 and Blackwell hardware, the CUDA software ecosystem, and the power and cooling engineering behind the moat."
 date: 2024-11-15
 permalink: /posts/2024/11/nvidia-becomes-central-to-the-ai-infrastructure-boom/
 tags:

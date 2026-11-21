@@ -1,5 +1,6 @@
 ---
 title: The iPhone 5 Brings LTE to Apple Phones
+excerpt: "The iPhone 5 in detail: LTE and battery life, the A6 with custom cores, the Lightning connector, and the Apple Maps problems that forced a public apology."
 date: 2012-09-15
 permalink: /posts/2012/09/the-iphone-5-brings-lte-to-apple-phones/
 tags:

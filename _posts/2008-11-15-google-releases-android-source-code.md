@@ -1,5 +1,6 @@
 ---
 title: Google Releases Android Source Code
+excerpt: "Why Google's 2008 Android source release mattered: a platform for manufacturers and developers, the fragmentation tradeoff, and the smartphone era it enabled."
 date: 2008-11-15
 permalink: /posts/2008/11/google-releases-android-source-code/
 tags:

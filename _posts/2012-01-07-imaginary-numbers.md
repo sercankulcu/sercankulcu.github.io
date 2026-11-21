@@ -1,5 +1,6 @@
 ---
 title: 'Imaginary Numbers'
+excerpt: "How imaginary numbers went from Cardano's 'fictitious' roots to Euler's formula, and why engineers and physicists now rely on them every day."
 date: 2012-01-07
 permalink: /posts/2012/01/imaginary-numbers/
 tags:

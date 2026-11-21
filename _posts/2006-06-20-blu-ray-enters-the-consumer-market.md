@@ -1,5 +1,6 @@
 ---
 title: Blu-ray Enters the Consumer Market
+excerpt: "Blu-ray reached shoppers in June 2006 with Samsung's $999 BD-P1000. How the blue laser raised capacity to 25 GB and why it beat HD DVD by 2008."
 date: 2006-06-20
 permalink: /posts/2006/06/blu-ray-enters-the-consumer-market/
 tags:

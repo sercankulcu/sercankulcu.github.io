@@ -1,5 +1,6 @@
 ---
 title: Windows 8 Is Shown to Developers
+excerpt: "At BUILD 2011 Microsoft showed Windows 8 with the tile-based Metro interface, the WinRT app platform and a Windows Store, and gave attendees a tablet."
 date: 2011-09-15
 permalink: /posts/2011/09/windows-8-is-shown-to-developers/
 tags:

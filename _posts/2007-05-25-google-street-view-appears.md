@@ -1,5 +1,6 @@
 ---
 title: Google Street View Appears
+excerpt: "Google Street View's 2007 launch in five US cities: the camera and sensor pipeline, the privacy backlash and blurring, and the computer vision it later fed."
 date: 2007-05-25
 permalink: /posts/2007/05/google-street-view-appears/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Tactical Environment Software'
+excerpt: "How tactical software fuses maps, weather and surveillance into one picture, and why interoperability and interface design matter as much as the data."
 date: 2007-08-02
 permalink: /posts/2007/08/tactical-environment-software/
 tags:

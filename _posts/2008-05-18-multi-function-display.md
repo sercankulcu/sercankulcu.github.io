@@ -1,5 +1,6 @@
 ---
 title: 'Multi-Function Display'
+excerpt: "How multi-function displays replaced cockpit gauges, from the F-16 to glass cockpits, what they show, and the human-factors problems of reconfigurable screens."
 date: 2008-05-18
 permalink: /posts/2008/05/multi-function-display/
 tags:

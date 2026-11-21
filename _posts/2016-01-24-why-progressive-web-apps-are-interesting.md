@@ -1,5 +1,6 @@
 ---
 title: 'Why Progressive Web Apps Are Interesting'
+excerpt: "How service workers, the web app manifest and HTTPS make Progressive Web Apps possible in 2016, with early Flipkart results and honest limits."
 date: 2016-01-24
 permalink: /posts/2016/01/why-progressive-web-apps-are-interesting/
 tags:

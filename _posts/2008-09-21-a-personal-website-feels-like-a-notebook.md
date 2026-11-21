@@ -1,5 +1,6 @@
 ---
 title: 'A Personal Website Feels Like A Notebook'
+excerpt: "Why keep a personal website when Blogger, WordPress.com and Facebook exist? Control, continuity, and a notebook-like archive of how you used to think."
 date: 2008-09-21
 permalink: /posts/2008/09/a-personal-website-feels-like-a-notebook/
 tags:

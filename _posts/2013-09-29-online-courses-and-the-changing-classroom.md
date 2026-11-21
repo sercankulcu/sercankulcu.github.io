@@ -1,5 +1,6 @@
 ---
 title: 'Online Courses And The Changing Classroom'
+excerpt: "What MOOCs like Coursera, edX and Udacity offer, why most students do not finish, and how online lectures could reshape the physical classroom."
 date: 2013-09-29
 permalink: /posts/2013/09/online-courses-and-the-changing-classroom/
 tags:

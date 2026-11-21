@@ -1,5 +1,6 @@
 ---
 title: "Never Use a Floating-Point Loop Counter"
+excerpt: "Why a float or double loop counter breaks, how binary representation distorts decimal steps, and the habit it teaches: count with integers, debug with evidence."
 date: 2010-05-16
 permalink: /posts/2010/05/never-use-a-floating-point-loop-counter/
 tags:

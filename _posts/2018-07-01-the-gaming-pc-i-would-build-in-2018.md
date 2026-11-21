@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2018"
+excerpt: "A July 2018 gaming PC build around the Core i7-8700K and GTX 1080 Ti, weighing it against Ryzen 2700X, with cost, weak point and verdict."
 date: 2018-07-01
 permalink: /posts/2018/07/the-gaming-pc-i-would-build-in-2018/
 tags:

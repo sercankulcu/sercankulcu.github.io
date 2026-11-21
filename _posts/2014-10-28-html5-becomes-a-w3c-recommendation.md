@@ -1,5 +1,6 @@
 ---
 title: HTML5 Becomes a W3C Recommendation
+excerpt: "HTML5 became a W3C Recommendation in 2014, eight years after drafting began: what it standardized and how it ended Flash's dominance."
 date: 2014-10-28
 permalink: /posts/2014/10/html5-becomes-a-w3c-recommendation/
 tags:

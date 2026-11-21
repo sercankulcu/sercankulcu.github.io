@@ -1,5 +1,6 @@
 ---
 title: Google Chromecast Is Released
+excerpt: "How the $35 Chromecast of July 2013 worked, from mDNS discovery to the Cast protocol, and how it shaped streaming sticks and smart TVs."
 date: 2013-07-24
 permalink: /posts/2013/07/google-chromecast-is-released/
 tags:

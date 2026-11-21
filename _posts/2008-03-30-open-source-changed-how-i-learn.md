@@ -1,5 +1,6 @@
 ---
 title: 'Open Source Changed How I Learn'
+excerpt: "Why reading real open-source code teaches more than textbook examples, with a practical way to follow one path through a large codebase like Linux or Apache."
 date: 2008-03-30
 permalink: /posts/2008/03/open-source-changed-how-i-learn/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'About Semantic Web Technologies'
+excerpt: "RDF, SPARQL and OWL explained with examples, where Semantic Web ideas succeeded in DBpedia and Schema.org, and why the original vision fell short."
 date: 2017-01-07
 permalink: /posts/2017/01/about-semantic-web-technologies/
 tags:

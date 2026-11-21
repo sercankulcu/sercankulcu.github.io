@@ -1,5 +1,6 @@
 ---
 title: 'Meltdown Spectre And The Cost Of Going Fast'
+excerpt: "How speculative execution and cache timing enable Meltdown and Spectre, how KPTI and retpoline mitigate them, and the lesson about hardware optimization."
 date: 2018-01-21
 permalink: /posts/2018/01/meltdown-spectre-and-the-cost-of-going-fast/
 tags:
@@ -57,3 +58,5 @@ For thirty years, software developers have generally been able to treat the proc
 Speculative execution violates this assumption in a precise way. The timing of memory operations is observable, and that timing depends on microarchitectural state that crosses security boundaries. An architectural guarantee (access control) was respected while a microarchitectural side effect (cache population) was not.
 
 The mitigations — KPTI for Meltdown, retpoline and microcode patches for Spectre — are software and firmware corrections applied to hardware that was designed, manufactured, and shipped before the problem was identified. This is an unusual situation: a performance optimization built into hardware over decades turned out to contain security assumptions that do not hold. The correction will never be complete in existing hardware; only new processor designs can address the root cause architecturally.
+
+The [Operating Systems course](/teaching/operating-systems/?lang=en) covers virtual memory and the kernel/user boundary that Meltdown attacks.

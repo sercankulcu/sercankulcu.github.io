@@ -1,5 +1,6 @@
 ---
 title: Microsoft Introduces the Surface Book
+excerpt: "The 2015 Surface Book was Microsoft's first laptop: its Dynamic Fulcrum Hinge, a detachable tablet display, a GPU in the keyboard base, and the later models."
 date: 2015-10-15
 permalink: /posts/2015/10/microsoft-introduces-the-surface-book/
 tags:

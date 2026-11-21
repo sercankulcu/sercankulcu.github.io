@@ -1,5 +1,6 @@
 ---
 title: 'Smart Antennas'
+excerpt: "How beamforming, switched-beam and adaptive arrays, and massive MIMO steer signals electronically in 5G, Wi-Fi 6, radar and satellite links."
 date: 2020-10-03
 permalink: /posts/2020/10/smart-antennas/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Google Reveals Imagen
+excerpt: "Google's 2022 Imagen paper: a frozen T5 text encoder with cascaded diffusion models, its DrawBench results, and how Stable Diffusion and DALL-E 2 followed."
 date: 2022-05-23
 permalink: /posts/2022/05/google-reveals-imagen/
 tags:

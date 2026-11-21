@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the iPhone 4
+excerpt: "The iPhone 4 of 2010: Retina Display, the A4 chip, FaceTime, and the Antennagate antenna problem that ended with free bumper cases."
 date: 2010-06-15
 permalink: /posts/2010/06/apple-introduces-the-iphone-4/
 tags:

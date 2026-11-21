@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2016?'
+excerpt: "The case for studying Computer Engineering in 2016: job demand, what the curriculum teaches, why it is hard, and why reasoning beats learning one tool."
 date: 2016-09-01
 permalink: /posts/2016/09/why-choose-computer-engineering-in-2016/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Ubuntu 7.04 Feisty Fawn Is Released
+excerpt: "Why Ubuntu 7.04 Feisty Fawn mattered in 2007: easier installs, better hardware support, and a Linux desktop that students could learn from."
 date: 2007-04-15
 permalink: /posts/2007/04/ubuntu-7-04-feisty-fawn-is-released/
 tags:
@@ -22,7 +23,7 @@ That first hour matters. If the network adapter fails, the display looks wrong, 
 
 Ubuntu releases also served as milestones for students and self-taught programmers. Installing Linux was a practical way to understand filesystems, permissions, shells, packages, services, and open-source development. A distribution like Ubuntu made those ideas accessible without requiring users to assemble everything from scratch.
 
-Feisty arrived when forums, blogs, and community documentation were central to learning. Solving a driver issue or customizing the desktop often led users into deeper technical knowledge almost by accident.
+Feisty arrived when forums, blogs, and community documentation were central to learning. Solving a driver issue or customizing the desktop often led users into deeper technical knowledge almost by accident. The [Operating Systems course](/teaching/operating-systems/?lang=en) on this site covers many of the same ideas in a structured way.
 
 ## The Bigger Picture
 

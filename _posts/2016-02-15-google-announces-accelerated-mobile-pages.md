@@ -1,5 +1,6 @@
 ---
 title: Google Announces Accelerated Mobile Pages
+excerpt: "Google's AMP: the mobile speed problem it targeted, how the AMP Cache worked, the publisher controversy, and why AMP faded after Core Web Vitals."
 date: 2016-02-15
 permalink: /posts/2016/02/google-announces-accelerated-mobile-pages/
 tags:

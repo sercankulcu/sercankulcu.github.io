@@ -1,5 +1,6 @@
 ---
 title: 'The Rise Of Smart Speakers'
+excerpt: "Lessons from eighteen months with an Echo: what voice does well, how the cloud architecture and wake word work, and the discoverability problem."
 date: 2017-11-19
 permalink: /posts/2017/11/the-rise-of-smart-speakers/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Netbooks And The Return Of The Small Computer'
+excerpt: "The ASUS Eee PC and Intel's Atom show how a small, cheap, simple computer can be enough for writing and browsing, and what its 7-inch tradeoffs cost."
 date: 2008-01-20
 permalink: /posts/2008/01/netbooks-and-the-return-of-the-small-computer/
 tags:

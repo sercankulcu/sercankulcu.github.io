@@ -1,5 +1,6 @@
 ---
 title: Google Photos Launches
+excerpt: "Google Photos' 2015 launch with free unlimited storage, its computer-vision search, the end of the free tier in 2021, and the deep learning behind it."
 date: 2015-05-28
 permalink: /posts/2015/05/google-photos-launches/
 tags:

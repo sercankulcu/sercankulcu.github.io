@@ -1,5 +1,6 @@
 ---
 title: Microsoft Releases Chromium-Based Edge Preview Builds
+excerpt: "Microsoft's move from EdgeHTML to Chromium for Edge: why it happened, what it contributed back, IE Mode, and which browser engines stayed independent."
 date: 2019-04-15
 permalink: /posts/2019/04/microsoft-releases-chromium-based-edge-preview-builds/
 tags:

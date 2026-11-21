@@ -1,5 +1,6 @@
 ---
 title: Raspberry Pi 4 Is Released
+excerpt: "Raspberry Pi 4 in 2019: the Cortex-A72 CPU, RAM options and prices, the separate USB 3.0 and Gigabit Ethernet design, and the VideoCore VI GPU."
 date: 2019-06-24
 permalink: /posts/2019/06/raspberry-pi-4-is-released/
 tags:

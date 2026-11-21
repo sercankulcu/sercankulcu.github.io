@@ -1,5 +1,6 @@
 ---
 title: Google Acquires DeepMind
+excerpt: "Google's 2014 purchase of DeepMind: its founders, the DQN Atari agent, and how the deal led to AlphaGo, AlphaFold and a Nobel Prize for Demis Hassabis."
 date: 2014-01-26
 permalink: /posts/2014/01/google-acquires-deepmind/
 tags:

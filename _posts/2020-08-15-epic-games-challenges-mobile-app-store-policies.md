@@ -1,5 +1,6 @@
 ---
 title: Epic Games Challenges Mobile App Store Policies
+excerpt: "Epic's 2020 Fortnite payment move against Apple and Google, the lawsuits and ruling, and how it reshaped app store rules in the EU and elsewhere."
 date: 2020-08-15
 permalink: /posts/2020/08/epic-games-challenges-mobile-app-store-policies/
 tags:

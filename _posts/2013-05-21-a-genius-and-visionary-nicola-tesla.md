@@ -1,5 +1,6 @@
 ---
 title: 'A Genius And Visionary Nicola Tesla'
+excerpt: "Nikola Tesla beyond the myth: the AC induction motor, the War of Currents, the Tesla coil and the failed Wardenclyffe Tower, told as an engineer's story."
 date: 2013-05-21
 permalink: /posts/2013/05/a-genius-and-visionary-nicola-tesla/
 tags:

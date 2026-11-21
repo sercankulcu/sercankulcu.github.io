@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2011"
+excerpt: "A July 2011 gaming PC with a Sandy Bridge Core i5-2500K and GeForce GTX 580: why that pair, what it would cost, and where the money is wasted."
 date: 2011-07-01
 permalink: /posts/2011/07/the-gaming-pc-i-would-build-in-2011/
 tags:

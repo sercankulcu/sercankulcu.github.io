@@ -1,5 +1,6 @@
 ---
 title: AMD Moves Desktop Processors to 65 Nanometers
+excerpt: "How AMD's 2006 move to 65 nm desktop processors fit the Core 2 Duo rivalry, and why process shrinks quietly drive efficiency and performance."
 date: 2006-12-15
 permalink: /posts/2006/12/amd-moves-desktop-processors-to-65-nanometers/
 tags:

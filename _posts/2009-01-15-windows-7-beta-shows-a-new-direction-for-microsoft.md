@@ -1,5 +1,6 @@
 ---
 title: Windows 7 Beta Shows a New Direction for Microsoft
+excerpt: "The Windows 7 beta of January 2009 and how it fixed Vista's problems: calmer UAC, the new taskbar, Aero Snap, faster boot and lower memory needs."
 date: 2009-01-15
 permalink: /posts/2009/01/windows-7-beta-shows-a-new-direction-for-microsoft/
 tags:

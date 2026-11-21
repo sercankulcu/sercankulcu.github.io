@@ -1,5 +1,6 @@
 ---
 title: 'Learning From Stack Overflow'
+excerpt: "Why Stack Overflow's question-and-answer format helps programmers, and how to use copied answers for real learning instead of only a quick fix."
 date: 2009-02-15
 permalink: /posts/2009/02/learning-from-stack-overflow/
 tags:

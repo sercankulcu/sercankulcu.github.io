@@ -1,5 +1,6 @@
 ---
 title: Google Introduces Android Studio
+excerpt: "Google's 2013 Android Studio replaced Eclipse with IntelliJ and Gradle, bringing build variants, lint and a layout editor, later Instant Run and Kotlin."
 date: 2013-05-15
 permalink: /posts/2013/05/google-introduces-android-studio/
 tags:

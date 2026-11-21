@@ -1,5 +1,6 @@
 ---
 title: Google Announces Kubernetes
+excerpt: "Kubernetes in 2014: its Borg roots, Pods, Deployments and Services, the declarative control loop, and the CNCF donation that made it standard."
 date: 2014-07-15
 permalink: /posts/2014/07/google-announces-kubernetes/
 tags:

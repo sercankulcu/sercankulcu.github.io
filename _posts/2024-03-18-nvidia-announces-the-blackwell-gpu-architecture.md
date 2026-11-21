@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Announces the Blackwell GPU Architecture
+excerpt: "NVIDIA's Blackwell at GTC 2024: the B200's dual-die design, FP4 Transformer Engine, NVLink 5, and the rack-scale GB200 NVL72 with liquid cooling."
 date: 2024-03-18
 permalink: /posts/2024/03/nvidia-announces-the-blackwell-gpu-architecture/
 tags:

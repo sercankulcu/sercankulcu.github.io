@@ -1,5 +1,6 @@
 ---
 title: Meltdown and Spectre Expose CPU Speculation Risks
+excerpt: "How Meltdown and Spectre turned CPU speculation and caches into security holes, and why fixing them took changes across hardware, OS, browsers and cloud."
 date: 2018-01-15
 permalink: /posts/2018/01/meltdown-and-spectre-expose-cpu-speculation-risks/
 tags:

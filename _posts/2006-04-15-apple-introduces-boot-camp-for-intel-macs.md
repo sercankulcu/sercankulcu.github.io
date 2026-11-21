@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces Boot Camp for Intel Macs
+excerpt: "Apple's April 2006 Boot Camp beta let Intel Macs dual-boot Windows XP; how EFI-to-BIOS emulation worked and why it ended with Apple silicon in 2020."
 date: 2006-04-15
 permalink: /posts/2006/04/apple-introduces-boot-camp-for-intel-macs/
 tags:

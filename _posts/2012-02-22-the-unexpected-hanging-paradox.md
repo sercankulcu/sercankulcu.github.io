@@ -1,5 +1,6 @@
 ---
 title: 'The Unexpected Hanging Paradox'
+excerpt: "The judge promises a surprise execution; the prisoner proves it impossible and is surprised anyway. Why the backward reasoning fails, and what 'surprise' means."
 date: 2012-02-22
 permalink: /posts/2012/02/the-unexpected-hanging-paradox/
 tags:

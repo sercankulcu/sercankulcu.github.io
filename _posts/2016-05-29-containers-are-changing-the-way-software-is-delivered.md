@@ -1,5 +1,6 @@
 ---
 title: 'Containers Are Changing The Way Software Is Delivered'
+excerpt: "What containers are and how they differ from virtual machines, with a minimal Dockerfile and the complexity containers move into orchestration and storage."
 date: 2016-05-29
 permalink: /posts/2016/05/containers-are-changing-the-way-software-is-delivered/
 tags:

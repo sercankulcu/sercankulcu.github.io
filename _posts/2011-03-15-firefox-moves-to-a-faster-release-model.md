@@ -1,5 +1,6 @@
 ---
 title: Firefox Moves to a Faster Release Model
+excerpt: "Why Mozilla moved Firefox to rapid releases in 2011, what it meant for security, standards, add-ons and enterprises, and how extended support helped."
 date: 2011-03-15
 permalink: /posts/2011/03/firefox-moves-to-a-faster-release-model/
 tags:

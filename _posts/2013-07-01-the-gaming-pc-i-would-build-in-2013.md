@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2013"
+excerpt: "A July 2013 gaming PC for 1440p: Core i7-4770K, GTX 780 and quiet, durable parts, with the reasoning behind each choice, the cost and the weak point."
 date: 2013-07-01
 permalink: /posts/2013/07/the-gaming-pc-i-would-build-in-2013/
 tags:

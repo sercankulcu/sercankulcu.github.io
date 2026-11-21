@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the 64-Bit A7 Processor
+excerpt: "Apple's 64-bit A7 in the iPhone 5s: the ARMv8 Cyclone design, the 'speed-bumping' dispute with Qualcomm, and why controlling the stack let Apple move first."
 date: 2013-09-15
 permalink: /posts/2013/09/apple-introduces-the-64-bit-a7-processor/
 tags:

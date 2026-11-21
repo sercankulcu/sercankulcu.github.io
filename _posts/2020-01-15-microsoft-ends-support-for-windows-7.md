@@ -1,5 +1,6 @@
 ---
 title: Microsoft Ends Support for Windows 7
+excerpt: "Windows 7 reached end of extended support in January 2020: the paid ESU program, browser support deadlines, and what the end of life meant for migration."
 date: 2020-01-15
 permalink: /posts/2020/01/microsoft-ends-support-for-windows-7/
 tags:

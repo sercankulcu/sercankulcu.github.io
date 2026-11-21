@@ -1,5 +1,6 @@
 ---
 title: 'GitHub And The Social Side Of Code'
+excerpt: "How GitHub in 2011 turned code into a social object through forks, pull requests and profiles, and why that success sits in tension with Git's decentralization."
 date: 2011-07-17
 permalink: /posts/2011/07/github-and-the-social-side-of-code/
 tags:

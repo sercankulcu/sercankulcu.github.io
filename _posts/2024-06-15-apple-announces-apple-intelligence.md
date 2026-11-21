@@ -1,5 +1,6 @@
 ---
 title: Apple Announces Apple Intelligence
+excerpt: "Apple Intelligence at WWDC 2024: its features, the three-tier design of on-device model, Private Cloud Compute and ChatGPT, and its hardware and EU limits."
 date: 2024-06-15
 permalink: /posts/2024/06/apple-announces-apple-intelligence/
 tags:

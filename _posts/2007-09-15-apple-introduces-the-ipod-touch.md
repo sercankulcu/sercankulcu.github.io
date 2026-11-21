@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the iPod Touch
+excerpt: "The 2007 iPod touch gave Apple the iPhone's touchscreen and Safari without a carrier contract, widening its platform and foreshadowing the iPad."
 date: 2007-09-15
 permalink: /posts/2007/09/apple-introduces-the-ipod-touch/
 tags:

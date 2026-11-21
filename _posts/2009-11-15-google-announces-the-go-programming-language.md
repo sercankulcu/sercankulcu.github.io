@@ -1,5 +1,6 @@
 ---
 title: Google Announces the Go Programming Language
+excerpt: "Go, designed by Griesemer, Pike and Thompson, answered slow C++ builds with fast compilation, implicit interfaces and goroutines; Docker followed."
 date: 2009-11-15
 permalink: /posts/2009/11/google-announces-the-go-programming-language/
 tags:

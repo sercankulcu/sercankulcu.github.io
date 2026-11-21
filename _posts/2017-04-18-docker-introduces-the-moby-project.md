@@ -1,5 +1,6 @@
 ---
 title: Docker Introduces the Moby Project
+excerpt: "Docker's 2017 Moby announcement: modular container components, the CE and EE rebrand, the contributor backlash and Kubernetes' growing dominance."
 date: 2017-04-18
 permalink: /posts/2017/04/docker-introduces-the-moby-project/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Facebook Acquires WhatsApp
+excerpt: "Facebook's 2014 purchase of WhatsApp for about $19 billion, the lean Erlang backend behind 450 million users, and Jan Koum's 2018 exit over privacy."
 date: 2014-02-19
 permalink: /posts/2014/02/facebook-acquires-whatsapp/
 tags:

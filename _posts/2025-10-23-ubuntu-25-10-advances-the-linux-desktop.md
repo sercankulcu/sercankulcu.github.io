@@ -1,5 +1,6 @@
 ---
 title: Ubuntu 25.10 Advances the Linux Desktop
+excerpt: "What Ubuntu 25.10 'Questing Quokka' shipped: GNOME 48, Linux 6.12, PipeWire, Snap, new GPU drivers, and how it prepares the 26.04 LTS."
 date: 2025-10-23
 permalink: /posts/2025/10/ubuntu-25-10-advances-the-linux-desktop/
 tags:

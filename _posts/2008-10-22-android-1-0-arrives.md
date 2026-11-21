@@ -1,5 +1,6 @@
 ---
 title: Android 1.0 Arrives
+excerpt: "Android 1.0 and the T-Mobile G1 in 2008: hardware, Linux process isolation, Dalvik, permissions and intents, and how Android later overtook the iPhone."
 date: 2008-10-22
 permalink: /posts/2008/10/android-1-0-arrives/
 tags:

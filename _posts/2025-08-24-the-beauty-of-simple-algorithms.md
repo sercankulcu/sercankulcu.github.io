@@ -1,5 +1,6 @@
 ---
 title: 'The Beauty of Simple Algorithms'
+excerpt: "Why simple algorithms like binary search, Euclid's GCD, Fisher-Yates and quicksort feel obvious afterward, and how to look for the property that cuts work."
 date: 2025-08-24
 permalink: /posts/2025/08/the-beauty-of-simple-algorithms/
 tags:
@@ -38,4 +39,4 @@ The frustrating thing about simple algorithms is that this insight is invisible 
 
 This suggests the real skill is not learning more algorithms but developing the habit of asking what property of this specific problem might let me reduce work. Sometimes the answer is "none, and the brute-force approach is fine." But sometimes the right question reveals a structure that was there all along.
 
-Students often assume a hard problem needs complicated code. This is understandable — difficulty should map to complexity. But the best solutions are sometimes short because the thinking happened before the code. A good algorithm changes the shape of the problem, not just the speed of solving it.
+Students often assume a hard problem needs complicated code. This is understandable — difficulty should map to complexity. But the best solutions are sometimes short because the thinking happened before the code. A good algorithm changes the shape of the problem, not just the speed of solving it. The [Algorithms course](/teaching/algorithms/?lang=en) works through ideas like these step by step.

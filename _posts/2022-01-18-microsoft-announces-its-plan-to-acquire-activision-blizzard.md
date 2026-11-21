@@ -1,5 +1,6 @@
 ---
 title: Microsoft Announces Its Plan to Acquire Activision Blizzard
+excerpt: "Microsoft's $68.7 billion Activision Blizzard deal: the Game Pass strategy behind it, the CMA block and cloud-rights fix, and the October 2023 close."
 date: 2022-01-18
 permalink: /posts/2022/01/microsoft-announces-its-plan-to-acquire-activision-blizzard/
 tags:

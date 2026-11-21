@@ -1,5 +1,6 @@
 ---
 title: Apple Confirms It Slows Some Older iPhones to Protect Batteries
+excerpt: "Why Apple throttled older iPhones with worn batteries: the Geekbench evidence, the lithium-ion voltage-sag rationale, and the fines and lawsuits that followed."
 date: 2017-12-20
 permalink: /posts/2017/12/apple-confirms-it-slows-some-older-iphones-to-protect-batteries/
 tags:

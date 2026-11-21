@@ -1,5 +1,6 @@
 ---
 title: USB Type-C Reaches New Consumer Devices
+excerpt: "How USB-C reached consumers in 2015 with the 12-inch MacBook and Chromebook Pixel, why one connector hides many protocols, and the EU's charger mandate."
 date: 2015-03-15
 permalink: /posts/2015/03/usb-type-c-reaches-new-consumer-devices/
 tags:

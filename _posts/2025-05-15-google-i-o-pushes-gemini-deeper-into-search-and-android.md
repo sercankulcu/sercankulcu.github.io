@@ -1,5 +1,6 @@
 ---
 title: Google I-O Pushes Gemini Deeper Into Search and Android
+excerpt: "Google I/O 2025 in review: Gemini 2.5, AI Mode in Search, Veo 3 and Imagen 4, Jules, Android 16 with Gemini Nano, and the shift to product integration."
 date: 2025-05-15
 permalink: /posts/2025/05/google-i-o-pushes-gemini-deeper-into-search-and-android/
 tags:

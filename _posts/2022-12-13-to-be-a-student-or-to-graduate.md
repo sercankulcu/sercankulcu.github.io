@@ -1,5 +1,6 @@
 ---
 title: 'To Be A Student Or To Graduate?'
+excerpt: "How being a student differs from working as a graduate: unshaped problems, no answer key, and the skills that close the gap, such as clarifying and scoping."
 date: 2022-12-13
 permalink: /posts/2022/12/to-be-a-student-or-to-graduate/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Leonardo Da Vinci: The Man Beyond The Mona Lisa'
+excerpt: "Leonardo da Vinci beyond the Mona Lisa: his notebooks and anatomical drawings, unbuilt inventions, and why his curiosity across fields still feels current."
 date: 2023-02-07
 permalink: /posts/2023/02/leonardo-da-vinci-the-man-beyond-the-mona-lisa/
 tags:

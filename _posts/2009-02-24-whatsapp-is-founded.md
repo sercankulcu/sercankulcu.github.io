@@ -1,5 +1,6 @@
 ---
 title: WhatsApp Is Founded
+excerpt: "How Jan Koum and Brian Acton founded WhatsApp in 2009, built it on phone numbers and Erlang, and reached 450 million users before Facebook's $19 billion deal."
 date: 2009-02-24
 permalink: /posts/2009/02/whatsapp-is-founded/
 tags:

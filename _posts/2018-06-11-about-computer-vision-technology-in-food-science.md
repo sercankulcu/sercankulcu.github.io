@@ -1,5 +1,6 @@
 ---
 title: 'About Computer Vision Technology In Food Science'
+excerpt: "How computer vision inspects food: the pipeline from lighting to classification, uses in sorting and grain, and why biological variability is the hard part."
 date: 2018-06-11
 permalink: /posts/2018/06/about-computer-vision-technology-in-food-science/
 tags:

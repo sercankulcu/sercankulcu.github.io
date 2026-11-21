@@ -1,5 +1,6 @@
 ---
 title: Google Launches the Chrome Browser
+excerpt: "Chrome's 2008 launch treated the browser as an application runtime: V8 speed, per-tab process isolation, a sparse interface and the pressure on rivals."
 date: 2008-09-15
 permalink: /posts/2008/09/google-launches-the-chrome-browser/
 tags:

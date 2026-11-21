@@ -1,5 +1,6 @@
 ---
 title: 'JavaScript Is Growing Up'
+excerpt: "How JavaScript grew from page tricks into a serious language through Ajax, jQuery, ECMAScript 5 and Node.js, and why its flaws and its reach both matter."
 date: 2010-07-25
 permalink: /posts/2010/07/javascript-is-growing-up/
 tags:

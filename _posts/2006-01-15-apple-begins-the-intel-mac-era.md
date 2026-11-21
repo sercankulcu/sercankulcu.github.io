@@ -1,5 +1,6 @@
 ---
 title: Apple Begins the Intel Mac Era
+excerpt: "Apple's January 2006 switch to Intel Core Duo: the first Intel iMac and MacBook Pro, Rosetta, Universal Binary, Boot Camp, and the later Apple Silicon move."
 date: 2006-01-15
 permalink: /posts/2006/01/apple-begins-the-intel-mac-era/
 tags:

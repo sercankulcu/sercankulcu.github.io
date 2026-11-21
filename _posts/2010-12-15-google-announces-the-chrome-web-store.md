@@ -1,5 +1,6 @@
 ---
 title: Google Announces the Chrome Web Store
+excerpt: "How the Chrome Web Store, Chrome OS and the Cr-48 launched in 2010, the hosted versus packaged app split, and Google's bet on web apps replacing native ones."
 date: 2010-12-15
 permalink: /posts/2010/12/google-announces-the-chrome-web-store/
 tags:

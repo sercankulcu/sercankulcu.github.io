@@ -1,5 +1,6 @@
 ---
 title: 'Chatbots Before The Hype'
+excerpt: "Chatbots in 2016: from ELIZA and AIML to Messenger bots and NLP services, why interface design is the hard part, and what narrow bots can do well."
 date: 2016-09-18
 permalink: /posts/2016/09/chatbots-before-the-hype/
 tags:

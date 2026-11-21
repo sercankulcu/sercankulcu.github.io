@@ -1,5 +1,6 @@
 ---
 title: 'Blogging For Your Career And Life'
+excerpt: "Why a public blog shows how you think: writing as a thinking tool, a compounding archive, platform choices and what to write about (2020)."
 date: 2020-04-07
 permalink: /posts/2020/04/blogging-for-your-career-and-life/
 tags:

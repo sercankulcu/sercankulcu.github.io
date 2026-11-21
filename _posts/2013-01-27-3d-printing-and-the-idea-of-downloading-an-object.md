@@ -1,5 +1,6 @@
 ---
 title: '3D Printing And The Idea Of Downloading An Object'
+excerpt: "How FDM printing, RepRap and MakerBot made downloading a physical object plausible in 2013, and where materials, skill and copyright still limit it."
 date: 2013-01-27
 permalink: /posts/2013/01/3d-printing-and-the-idea-of-downloading-an-object/
 tags:

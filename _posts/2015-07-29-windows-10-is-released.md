@@ -1,5 +1,6 @@
 ---
 title: Windows 10 Is Released
+excerpt: "Windows 10 launched in July 2015 as a free upgrade that restored the Start menu, added DirectX 12 and Edge, and treated the OS as an updated service."
 date: 2015-07-29
 permalink: /posts/2015/07/windows-10-is-released/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'The Last Days Of The Floppy Disk'
+excerpt: "The floppy disk's path from IBM's 8-inch original to the 1.44 MB 3.5-inch standard, why USB flash drives replaced it, and what the medium's physicality gave us."
 date: 2006-12-03
 permalink: /posts/2006/12/the-last-days-of-the-floppy-disk/
 tags:

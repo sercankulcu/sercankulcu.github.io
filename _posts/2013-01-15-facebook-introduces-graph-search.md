@@ -1,5 +1,6 @@
 ---
 title: Facebook Introduces Graph Search
+excerpt: "Facebook Graph Search in 2013: natural-language queries over the social graph, the permission-filtering challenge, privacy risks and why it was wound down."
 date: 2013-01-15
 permalink: /posts/2013/01/facebook-introduces-graph-search/
 tags:

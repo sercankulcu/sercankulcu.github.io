@@ -1,5 +1,6 @@
 ---
 title: Intel Launches the Skylake-X Platform
+excerpt: "Intel's 2017 Skylake-X and X299 platform: Core i9 pricing, the move from ring bus to mesh interconnect, and how AMD's Threadripper pushed Intel's core counts."
 date: 2017-07-15
 permalink: /posts/2017/07/intel-launches-the-skylake-x-platform/
 tags:

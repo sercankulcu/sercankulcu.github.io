@@ -1,5 +1,6 @@
 ---
 title: 'AJAX And The Web Without Reloading'
+excerpt: "How XMLHttpRequest, Jesse James Garrett's Ajax article and Gmail and Google Maps changed the browser from a document reader into a place where software lives."
 date: 2006-01-22
 permalink: /posts/2006/01/ajax-and-the-web-without-reloading/
 tags:

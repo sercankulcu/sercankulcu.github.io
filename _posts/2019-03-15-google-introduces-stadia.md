@@ -1,5 +1,6 @@
 ---
 title: Google Introduces Stadia
+excerpt: "Google's Stadia cloud gaming service, announced in 2019, ran into latency limits and missing features and shut down in January 2023; the post explains why."
 date: 2019-03-15
 permalink: /posts/2019/03/google-introduces-stadia/
 tags:

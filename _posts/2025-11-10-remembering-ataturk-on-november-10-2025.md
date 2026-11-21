@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2025'
+excerpt: "Remembering Mustafa Kemal Ataturk on November 10, 2025, and why his emphasis on science and education matters in an age of AI and global technology competition."
 date: 2025-11-10
 permalink: /posts/2025/11/remembering-ataturk-on-november-10-2025/
 tags:

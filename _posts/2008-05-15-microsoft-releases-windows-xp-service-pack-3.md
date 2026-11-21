@@ -1,5 +1,6 @@
 ---
 title: Microsoft Releases Windows XP Service Pack 3
+excerpt: "Windows XP SP3 in 2008: what it bundled, why Vista's weak reception made it necessary, and how XP's long life led to the WannaCry problem of 2017."
 date: 2008-05-15
 permalink: /posts/2008/05/microsoft-releases-windows-xp-service-pack-3/
 tags:

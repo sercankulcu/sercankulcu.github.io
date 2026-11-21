@@ -1,5 +1,6 @@
 ---
 title: Microsoft Opens More of Its Server Protocol Documentation
+excerpt: "Microsoft's February 2008 pledge to publish protocol documentation after EU fines, and how it helped Samba reach an Active Directory domain controller."
 date: 2008-02-21
 permalink: /posts/2008/02/microsoft-opens-more-of-its-server-protocol-documentation/
 tags:

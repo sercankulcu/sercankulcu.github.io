@@ -1,5 +1,6 @@
 ---
 title: OpenAI Releases the o1 Reasoning Model
+excerpt: "OpenAI's o1 trained models to think before answering. Its benchmark gains over GPT-4o and why test-time compute became a second axis of AI scaling."
 date: 2024-09-15
 permalink: /posts/2024/09/openai-releases-the-o1-reasoning-model/
 tags:

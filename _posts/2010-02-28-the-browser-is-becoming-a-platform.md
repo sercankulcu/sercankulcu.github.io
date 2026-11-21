@@ -1,5 +1,6 @@
 ---
 title: 'The Browser Is Becoming A Platform'
+excerpt: "How Chrome's fast JavaScript, HTML5 features and Google Docs turned the browser into an application platform in 2010, and what it still could not do well."
 date: 2010-02-28
 permalink: /posts/2010/02/the-browser-is-becoming-a-platform/
 tags:

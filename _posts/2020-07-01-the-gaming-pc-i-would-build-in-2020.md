@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2020"
+excerpt: "The gaming PC I would build on July 1, 2020, with reasons for the CPU and GPU, the price, the weak point and a verdict given the pending RTX 30 launch."
 date: 2020-07-01
 permalink: /posts/2020/07/the-gaming-pc-i-would-build-in-2020/
 tags:

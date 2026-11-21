@@ -1,5 +1,6 @@
 ---
 title: 'Serverless Computing And The Idea Of Less Maintenance'
+excerpt: "Serverless computing in 2017: what AWS Lambda removes, an image-resize example, and the costs that follow: cold starts, debugging, pricing and lock-in."
 date: 2017-03-26
 permalink: /posts/2017/03/serverless-computing-and-less-maintenance/
 tags:

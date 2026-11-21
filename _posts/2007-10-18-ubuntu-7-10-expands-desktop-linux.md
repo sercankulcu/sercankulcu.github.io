@@ -1,5 +1,6 @@
 ---
 title: Ubuntu 7.10 Expands Desktop Linux
+excerpt: "Ubuntu 7.10 Gutsy Gibbon made Compiz desktop effects standard and added AppArmor and a Windows migration tool, arriving as Vista pushed users to look at Linux."
 date: 2007-10-18
 permalink: /posts/2007/10/ubuntu-7-10-expands-desktop-linux/
 tags:

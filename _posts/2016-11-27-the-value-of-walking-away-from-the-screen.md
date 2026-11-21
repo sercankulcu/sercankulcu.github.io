@@ -1,5 +1,6 @@
 ---
 title: 'The Value Of Walking Away From The Screen'
+excerpt: "Why stepping away from a stubborn bug helps: focused versus diffuse thinking, how long sessions fix a wrong frame, and which problems benefit from a break."
 date: 2016-11-27
 permalink: /posts/2016/11/the-value-of-walking-away-from-the-screen/
 tags:

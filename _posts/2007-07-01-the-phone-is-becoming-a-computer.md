@@ -1,5 +1,6 @@
 ---
 title: 'The Phone Is Becoming a Computer'
+excerpt: "Two days after the iPhone went on sale in 2007, why a phone with a full Safari browser may be a real computer rather than a polished version of older devices."
 date: 2007-07-01
 permalink: /posts/2007/07/the-phone-is-becoming-a-computer/
 tags:

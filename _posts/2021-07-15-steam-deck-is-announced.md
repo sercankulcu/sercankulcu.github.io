@@ -1,5 +1,6 @@
 ---
 title: Steam Deck Is Announced
+excerpt: "Valve's Steam Deck: three models and prices, the custom AMD APU, and SteamOS 3 with Proton, which brought most Windows games to Linux without developer work."
 date: 2021-07-15
 permalink: /posts/2021/07/steam-deck-is-announced/
 tags:

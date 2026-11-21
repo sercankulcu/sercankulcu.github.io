@@ -1,5 +1,6 @@
 ---
 title: MacBook Air Redefines the Thin Laptop
+excerpt: "The 2008 MacBook Air's specs, price and trade-offs, and how its thin design became the template for Intel's Ultrabooks and later PC laptops."
 date: 2008-01-15
 permalink: /posts/2008/01/macbook-air-redefines-the-thin-laptop/
 tags:

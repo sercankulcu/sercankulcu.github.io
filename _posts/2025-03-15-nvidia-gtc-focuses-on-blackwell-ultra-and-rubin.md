@@ -1,5 +1,6 @@
 ---
 title: NVIDIA GTC Focuses on Blackwell Ultra and Rubin
+excerpt: "NVIDIA GTC 2025: Blackwell Ultra with 288 GB HBM3e, the Rubin and Vera roadmap, liquid cooling, annual release cadence and soaring data-center revenue."
 date: 2025-03-15
 permalink: /posts/2025/03/nvidia-gtc-focuses-on-blackwell-ultra-and-rubin/
 tags:

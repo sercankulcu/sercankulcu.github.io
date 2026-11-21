@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2011'
+excerpt: "A November 10, 2011 reflection on Atatürk's legacy as continuity: laws, schools, public trust and citizens who understand the institutions they inherited."
 date: 2011-11-10
 permalink: /posts/2011/11/remembering-ataturk-on-november-10-2011/
 tags:

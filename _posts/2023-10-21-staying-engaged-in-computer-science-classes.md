@@ -1,5 +1,6 @@
 ---
 title: 'Staying Engaged In Computer Science Classes'
+excerpt: "How to stay engaged in computer science classes: ask the next question, build the concrete version, take notes in your own words, and teach in study groups."
 date: 2023-10-21
 permalink: /posts/2023/10/staying-engaged-in-computer-science-classes/
 tags:
@@ -53,3 +54,5 @@ Teaching a concept to another person is one of the fastest ways to discover gaps
 Not every topic will feel immediately interesting. Some subjects require working through a period of confusion and difficulty before interest develops. The natural-language processing lecture is incomprehensible until the third one. The dynamic programming problem seems impossible until you have solved three examples and the pattern appears.
 
 Interest and engagement are often the result of effort rather than the precondition for it. A topic that seems dry or abstract frequently becomes interesting once you are good enough at it to see something more than the surface. Waiting to feel engaged before engaging is usually the wrong order.
+
+To practice these ideas, try the [Binary Search Tree simulator](/files/data_structures/slides/Chapter_10_Binary_Search_Tree_Simulator.html), the [Queue simulator](/files/data_structures/slides/Chapter_08_Queue_Simulator.html) and the [Dijkstra's Algorithm simulator](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html) from the [Data Structures course](/teaching/data-structures/?lang=en).

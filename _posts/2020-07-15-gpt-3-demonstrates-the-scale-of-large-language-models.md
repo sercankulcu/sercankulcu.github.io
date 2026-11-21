@@ -1,5 +1,6 @@
 ---
 title: GPT-3 Demonstrates the Scale of Large Language Models
+excerpt: "How GPT-3's 175 billion parameters and few-shot in-context learning changed language models, and which products and rivals followed."
 date: 2020-07-15
 permalink: /posts/2020/07/gpt-3-demonstrates-the-scale-of-large-language-models/
 tags:

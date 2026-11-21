@@ -1,5 +1,6 @@
 ---
 title: 'The Invention Of Imaginary Numbers: Separating Math From Reality'
+excerpt: "How cubic equations forced mathematicians to accept square roots of negative numbers, from Cardano and Bombelli to Euler, Gauss and modern engineering."
 date: 2012-01-09
 permalink: /posts/2012/01/the-invention-of-imaginary-numbers/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: AMD Launches Ryzen
+excerpt: "AMD's March 2017 Ryzen launch: the Zen architecture replacing Bulldozer, the Ryzen 7 lineup and prices, and the competitive pressure it put on Intel."
 date: 2017-03-15
 permalink: /posts/2017/03/amd-launches-ryzen/
 tags:

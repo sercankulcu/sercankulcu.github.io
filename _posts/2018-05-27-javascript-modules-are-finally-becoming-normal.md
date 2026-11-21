@@ -1,5 +1,6 @@
 ---
 title: 'JavaScript Modules Are Finally Becoming Normal'
+excerpt: "Why JavaScript lacked modules, how CommonJS, AMD and ES modules differ, and what Webpack and other bundlers still do in 2018."
 date: 2018-05-27
 permalink: /posts/2018/05/javascript-modules-are-finally-becoming-normal/
 tags:

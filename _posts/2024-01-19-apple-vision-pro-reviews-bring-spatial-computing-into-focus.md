@@ -1,5 +1,6 @@
 ---
 title: Apple Vision Pro Reviews Bring Spatial Computing Into Focus
+excerpt: "What early 2024 reviews praised in Apple Vision Pro's displays and passthrough, and why price, weight and missing apps limited its audience."
 date: 2024-01-19
 permalink: /posts/2024/01/apple-vision-pro-reviews-bring-spatial-computing-into-focus/
 tags:

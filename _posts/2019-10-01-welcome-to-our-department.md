@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A welcome to computer engineering students in 2019: the field is far broader than programming, so give yourself time, experiment and learn how to learn."
 date: 2019-10-01
 permalink: /posts/2019/10/welcome-to-our-department/
 tags:

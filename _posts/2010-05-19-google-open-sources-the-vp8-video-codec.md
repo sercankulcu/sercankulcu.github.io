@@ -1,5 +1,6 @@
 ---
 title: Google Open-Sources the VP8 Video Codec
+excerpt: "Google opened VP8 and launched WebM in May 2010 to break the HTML5 H.264 vs. Theora deadlock; covers MPEG-LA's patent challenge and the path to VP9 and AV1."
 date: 2010-05-19
 permalink: /posts/2010/05/google-open-sources-the-vp8-video-codec/
 tags:

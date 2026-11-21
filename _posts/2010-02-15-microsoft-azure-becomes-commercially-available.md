@@ -1,5 +1,6 @@
 ---
 title: Microsoft Azure Becomes Commercially Available
+excerpt: "Azure's 2010 commercial launch showed that cloud computing was reaching enterprise software; how it fit .NET developers and why the shift mattered."
 date: 2010-02-15
 permalink: /posts/2010/02/microsoft-azure-becomes-commercially-available/
 tags:

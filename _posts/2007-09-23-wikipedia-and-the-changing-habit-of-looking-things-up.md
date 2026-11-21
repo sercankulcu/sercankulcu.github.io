@@ -1,5 +1,6 @@
 ---
 title: 'Wikipedia And The Changing Habit Of Looking Things Up'
+excerpt: "How Wikipedia replaced the home encyclopedia as a first stop, what the 2005 Nature study found about its errors, and when to verify instead."
 date: 2007-09-23
 permalink: /posts/2007/09/wikipedia-and-the-changing-habit-of-looking-things-up/
 tags:

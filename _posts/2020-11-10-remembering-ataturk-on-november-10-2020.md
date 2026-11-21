@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2020'
+excerpt: "A reflection for November 10, 2020 on Atatürk's respect for science and education, and why trust in knowledge mattered during the pandemic."
 date: 2020-11-10
 permalink: /posts/2020/11/remembering-ataturk-on-november-10-2020/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: GDPR Changes How Software Handles Personal Data
+excerpt: "How GDPR, enforceable from May 2018, forced engineers to build data deletion and export tools and brought cookie consent banners to the web."
 date: 2018-05-25
 permalink: /posts/2018/05/gdpr-changes-how-software-handles-personal-data/
 tags:

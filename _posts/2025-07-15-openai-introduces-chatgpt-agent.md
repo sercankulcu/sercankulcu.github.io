@@ -1,5 +1,6 @@
 ---
 title: OpenAI Introduces ChatGPT Agent
+excerpt: "ChatGPT Agent combined browsing, code execution and files into one stateful workflow; how OpenAI handled reliability and prompt-injection risk."
 date: 2025-07-15
 permalink: /posts/2025/07/openai-introduces-chatgpt-agent/
 tags:

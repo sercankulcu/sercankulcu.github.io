@@ -1,5 +1,6 @@
 ---
 title: HTML5 Becomes the Center of Modern Web Development
+excerpt: "How HTML5 became the web's center by late 2011: the Flash and codec debates, canvas, Web Workers, WebSockets, Web Storage and semantic markup."
 date: 2011-12-15
 permalink: /posts/2011/12/html5-becomes-the-center-of-modern-web-development/
 tags:

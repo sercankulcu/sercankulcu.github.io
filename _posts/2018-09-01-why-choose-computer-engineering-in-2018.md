@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2018?'
+excerpt: "Why Computer Engineering is a strong choice in 2018: data privacy after Cambridge Analytica and GDPR, cloud and machine learning, and a lasting foundation."
 date: 2018-09-01
 permalink: /posts/2018/09/why-choose-computer-engineering-in-2018/
 tags:

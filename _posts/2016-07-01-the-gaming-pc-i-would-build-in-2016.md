@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2016"
+excerpt: "A July 2016 gaming PC around the GTX 1080 and Core i7-6700K: full parts list, estimated cost, reasons for each pick and the weak point of the build."
 date: 2016-07-01
 permalink: /posts/2016/07/the-gaming-pc-i-would-build-in-2016/
 tags:

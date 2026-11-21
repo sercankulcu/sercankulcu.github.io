@@ -1,5 +1,6 @@
 ---
 title: Amazon Expands the Idea of Cloud Computing
+excerpt: "How Amazon S3, EC2 and SimpleDB turned rented infrastructure into pay-by-the-hour services, and how that changed what a startup needed to launch."
 date: 2007-12-15
 permalink: /posts/2007/12/amazon-expands-the-idea-of-cloud-computing/
 tags:

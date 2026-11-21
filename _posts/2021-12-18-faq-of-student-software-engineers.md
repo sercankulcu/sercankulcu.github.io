@@ -1,5 +1,6 @@
 ---
 title: 'FAQ Of Student Software Engineers'
+excerpt: "Straight answers to common student questions: first language, math, grades, projects, internships, specializing, and learning how to learn."
 date: 2021-12-18
 permalink: /posts/2021/12/faq-of-student-software-engineers/
 tags:
@@ -24,7 +25,7 @@ It depends on what you want to build. Every developer needs logical thinking and
 
 Beyond that, the requirement varies significantly. Application developers building web services or mobile apps rarely need calculus or linear algebra in their daily work. Developers working in machine learning, computer graphics, signal processing, scientific computing, or cryptography use advanced mathematics regularly. The field is wide enough that you can find a place in it with or without deep mathematical background.
 
-Study data structures and algorithms carefully regardless of your other interests. They appear in job interviews, but more importantly they shape how you reason about efficiency and correctness.
+Study data structures and algorithms carefully regardless of your other interests. They appear in job interviews, but more importantly they shape how you reason about efficiency and correctness. The [Data Structures course](/teaching/data-structures/?lang=en) and the [Algorithms course](/teaching/algorithms/?lang=en) on this site are a place to start.
 
 ## Do grades matter?
 

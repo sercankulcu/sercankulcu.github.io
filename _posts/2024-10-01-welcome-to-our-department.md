@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A welcome to new Computer Engineering students in 2024: why fundamentals and good habits matter more than any tool, AI assistants included."
 date: 2024-10-01
 permalink: /posts/2024/10/welcome-to-our-department/
 tags:
@@ -12,7 +13,7 @@ If you are beginning Computer Engineering in 2024, welcome to a field where tool
 
 AI assistants, cloud platforms, cybersecurity risks, robotics, and data-driven products are now part of the normal technology landscape. You will see tools that can generate code, explain errors, and speed up routine work. Use them, but do not let them replace your own thinking.
 
-Your real advantage will come from understanding principles. Programming, algorithms, data structures, mathematics, operating systems, networks, databases, digital design, and computer architecture may look like separate courses at first. Over time, they become the map you use to understand complex systems.
+Your real advantage will come from understanding principles. Programming, algorithms, data structures, mathematics, operating systems, networks, databases, digital design, and computer architecture may look like separate courses at first. Over time, they become the map you use to understand complex systems. The [Algorithms](/teaching/algorithms/?lang=en), [Data Structures](/teaching/data-structures/?lang=en) and [Operating Systems](/teaching/operating-systems/?lang=en) courses on this site cover some of these foundations.
 
 In your first year, focus on habits as much as grades. Write code often. Take notes. Learn version control. Ask questions. Test your programs. Read documentation. Work with classmates without copying their thinking.
 

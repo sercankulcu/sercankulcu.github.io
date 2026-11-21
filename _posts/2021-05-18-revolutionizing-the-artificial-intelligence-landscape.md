@@ -1,5 +1,6 @@
 ---
 title: 'Revolutionizing The Artificial Intelligence Landscape'
+excerpt: "Three real AI advances of 2021, AlphaFold 2, GPT-3 and transformers, separated from hype, and what a cautious reading of them looks like in practice."
 date: 2021-05-18
 permalink: /posts/2021/05/revolutionizing-the-artificial-intelligence-landscape/
 tags:

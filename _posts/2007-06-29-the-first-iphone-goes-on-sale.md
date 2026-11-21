@@ -1,5 +1,6 @@
 ---
 title: The First iPhone Goes on Sale
+excerpt: "The original 2007 iPhone: its specs, price and AT&T EDGE limits, what it lacked at launch (no App Store), and why multi-touch and a full web browser mattered."
 date: 2007-06-29
 permalink: /posts/2007/06/the-first-iphone-goes-on-sale/
 tags:

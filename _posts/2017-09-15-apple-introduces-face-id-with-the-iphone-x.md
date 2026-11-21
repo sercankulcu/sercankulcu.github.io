@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces Face ID with the iPhone X
+excerpt: "How the iPhone X's TrueDepth camera, A11 Bionic chip and Secure Enclave made Face ID work, and how losing the Home button changed iPhone gestures."
 date: 2017-09-15
 permalink: /posts/2017/09/apple-introduces-face-id-with-the-iphone-x/
 tags:

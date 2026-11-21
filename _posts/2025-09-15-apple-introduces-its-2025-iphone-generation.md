@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces Its 2025 iPhone Generation
+excerpt: "The iPhone 17 family of September 2025: A18 and A19 Pro chips, the 5.5 mm iPhone 17 Air, camera upgrades and the Neural Engine growth behind Apple Intelligence."
 date: 2025-09-15
 permalink: /posts/2025/09/apple-introduces-its-2025-iphone-generation/
 tags:

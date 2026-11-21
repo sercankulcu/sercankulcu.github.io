@@ -1,5 +1,6 @@
 ---
 title: Firefox 2 Arrives
+excerpt: "Firefox 2 launched on October 24, 2006 with session restore and spell checking, a week after IE7, and revived browser competition after years of IE6 stagnation."
 date: 2006-10-24
 permalink: /posts/2006/10/firefox-2-arrives/
 tags:

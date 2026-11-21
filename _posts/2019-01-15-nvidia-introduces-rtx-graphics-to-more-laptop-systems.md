@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Introduces RTX Graphics to More Laptop Systems
+excerpt: "NVIDIA's RTX 20-series laptop GPUs at CES 2019: Max-Q power limits, ray tracing on mobile hardware, and why DLSS upscaling was needed."
 date: 2019-01-15
 permalink: /posts/2019/01/nvidia-introduces-rtx-graphics-to-more-laptop-systems/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: GitHub Announces Actions for General Availability
+excerpt: "GitHub Actions reaching general availability in 2019: YAML workflows, hosted runners, the Marketplace, and how built-in CI/CD displaced Travis CI."
 date: 2019-11-15
 permalink: /posts/2019/11/github-announces-actions-for-general-availability/
 tags:

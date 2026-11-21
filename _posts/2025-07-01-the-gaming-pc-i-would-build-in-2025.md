@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2025"
+excerpt: "A July 2025 gaming PC built around the Ryzen 7 9800X3D and RTX 5090: the parts, the reasoning, a $3,800-4,500 estimate, and the weak points."
 date: 2025-07-01
 permalink: /posts/2025/07/the-gaming-pc-i-would-build-in-2025/
 tags:
@@ -54,4 +55,4 @@ Power and cost are again uncomfortable, and real retail pricing can be far above
 
 The 2025 philosophy is simple: buy the gaming-specialized X3D CPU and put the serious money into the 5090. I would not dilute the budget with a workstation processor.
 
-The date matters. I am judging only hardware that was available by July 1, not products announced or released later in the year. That makes each build a snapshot of what I could realistically have assembled at that moment.
+The date matters. I am judging only hardware that was available by July 1, not products announced or released later in the year. That makes each build a snapshot of what I could realistically have assembled at that moment. For a ten-year comparison, see [the 2015 build](/posts/2015/07/the-gaming-pc-i-would-build-in-2015/).

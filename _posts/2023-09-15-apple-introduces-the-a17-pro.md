@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the A17 Pro
+excerpt: "Apple's A17 Pro in the iPhone 15 Pro: a 3nm chip with hardware ray tracing and USB 3, and what it meant for console-class games on a phone."
 date: 2023-09-15
 permalink: /posts/2023/09/apple-introduces-the-a17-pro/
 tags:

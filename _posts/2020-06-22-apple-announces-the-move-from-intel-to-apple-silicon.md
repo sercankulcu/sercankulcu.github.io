@@ -1,5 +1,6 @@
 ---
 title: Apple Announces the Move From Intel to Apple Silicon
+excerpt: "Apple's 2020 move from Intel to its own ARM chips: Rosetta 2, Universal 2 binaries, the M1 design, and what one chip family meant for the Mac."
 date: 2020-06-22
 permalink: /posts/2020/06/apple-announces-the-move-from-intel-to-apple-silicon/
 tags:

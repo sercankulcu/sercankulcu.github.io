@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Launches the GeForce RTX 3060
+excerpt: "The $329 RTX 3060 shipped with 12 GB of memory and DLSS, but launched into a mining-driven GPU shortage. NVIDIA's mining limiter and the CMP cards are covered."
 date: 2021-02-25
 permalink: /posts/2021/02/nvidia-launches-the-geforce-rtx-3060/
 tags:

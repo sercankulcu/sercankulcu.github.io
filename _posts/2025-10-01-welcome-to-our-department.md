@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A welcome to new Computer Engineering students in 2025: use AI tools as helpers, keep learning the fundamentals, and build small projects."
 date: 2025-10-01
 permalink: /posts/2025/10/welcome-to-our-department/
 tags:

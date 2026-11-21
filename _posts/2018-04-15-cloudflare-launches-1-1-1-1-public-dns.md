@@ -1,5 +1,6 @@
 ---
 title: Cloudflare Launches 1.1.1.1 Public DNS
+excerpt: "Cloudflare's 1.1.1.1 resolver, launched with APNIC in 2018, promised short log retention and offered DNS over HTTPS and TLS; the post explains why it matters."
 date: 2018-04-15
 permalink: /posts/2018/04/cloudflare-launches-1-1-1-1-public-dns/
 tags:

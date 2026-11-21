@@ -1,5 +1,6 @@
 ---
 title: GitHub Is Acquired by Microsoft
+excerpt: "Microsoft bought GitHub for $7.5 billion in 2018: the deal, what GitHub meant to developers, the open-source skepticism, and Microsoft's change of attitude."
 date: 2018-06-15
 permalink: /posts/2018/06/github-is-acquired-by-microsoft/
 tags:

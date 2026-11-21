@@ -1,5 +1,6 @@
 ---
 title: Cloud Computing Becomes a Serious Industry Strategy
+excerpt: "How cloud computing became a serious industry strategy by 2008: programmable infrastructure, new economics for businesses, and the lasting shift in software."
 date: 2008-12-15
 permalink: /posts/2008/12/cloud-computing-becomes-a-serious-industry-strategy/
 tags:

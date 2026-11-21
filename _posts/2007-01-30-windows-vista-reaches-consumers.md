@@ -1,5 +1,6 @@
 ---
 title: Windows Vista Reaches Consumers
+excerpt: "Windows Vista's January 2007 retail launch: editions and prices, WDDM, UAC and BitLocker, why enterprises skipped it, and how Windows 7 reused its foundations."
 date: 2007-01-30
 permalink: /posts/2007/01/windows-vista-reaches-consumers/
 tags:

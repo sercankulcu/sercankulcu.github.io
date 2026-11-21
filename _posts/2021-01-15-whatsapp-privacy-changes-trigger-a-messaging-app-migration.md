@@ -1,5 +1,6 @@
 ---
 title: WhatsApp Privacy Changes Trigger a Messaging-App Migration
+excerpt: "WhatsApp's January 2021 privacy-policy notice caused confusion and a rush to Signal and Telegram; the post sorts out what data was actually shared."
 date: 2021-01-15
 permalink: /posts/2021/01/whatsapp-privacy-changes-trigger-a-messaging-app-migration/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'How To Study To Be A Good Software Developer'
+excerpt: "A practical study path for software developers: learn one language, then data structures, then build projects, plus debugging habits and books worth reading."
 date: 2017-08-14
 permalink: /posts/2017/08/how-to-study-to-be-a-good-software-developer/
 tags:
@@ -16,7 +17,7 @@ The best response is not to learn everything at once. The best response is to bu
 
 Start with one programming language and learn it well enough to solve problems without constantly fighting syntax. Python and Java are both reasonable starting points in 2017: Python for its readability and accessible ecosystem, Java for its explicit types and wide use in production systems. The specific choice matters less than going deep enough to feel fluent.
 
-Then study data structures and algorithms — arrays, linked lists, trees, hash tables, sorting, searching. Not to memorize every detail, but to understand when each structure makes sense and roughly how fast each operation is. This knowledge shapes how you design solutions.
+Then study data structures and algorithms — arrays, linked lists, trees, hash tables, sorting, searching. Not to memorize every detail, but to understand when each structure makes sense and roughly how fast each operation is. This knowledge shapes how you design solutions. The [Data Structures course](/teaching/data-structures/?lang=en) and the [Algorithms course](/teaching/algorithms/?lang=en) on this site cover these topics.
 
 Then build something. A project that matters to you is better than a tutorial project, because you will have to make decisions the tutorial does not cover. Building something real creates gaps in your knowledge that are specific and concrete — which are much easier to study than a general sense that you do not know enough.
 

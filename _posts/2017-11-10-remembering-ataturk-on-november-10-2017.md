@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2017'
+excerpt: "A short reflection for November 10, 2017 on remembering Ataturk through reading, education and responsibility, so that memory does not become mere decoration."
 date: 2017-11-10
 permalink: /posts/2017/11/remembering-ataturk-on-november-10-2017/
 tags:

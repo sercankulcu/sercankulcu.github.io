@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2021"
+excerpt: "A July 2021 gaming PC build around a Ryzen 9 5900X and RTX 3080 Ti, with the reasoning behind each part, the likely cost and the GPU shortage."
 date: 2021-07-01
 permalink: /posts/2021/07/the-gaming-pc-i-would-build-in-2021/
 tags:

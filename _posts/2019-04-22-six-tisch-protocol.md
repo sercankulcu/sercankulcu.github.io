@@ -1,5 +1,6 @@
 ---
 title: '6TiSCH Protocol'
+excerpt: "6TiSCH explained: how time-slotted channel hopping, 6LoWPAN, IPv6 and RPL let battery-powered sensors join IP networks, and the trade-offs involved."
 date: 2019-04-22
 permalink: /posts/2019/04/six-tisch-protocol/
 tags:

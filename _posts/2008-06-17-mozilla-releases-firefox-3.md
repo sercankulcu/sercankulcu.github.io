@@ -1,5 +1,6 @@
 ---
 title: Mozilla Releases Firefox 3
+excerpt: "Firefox 3 in June 2008: the Gecko 1.9 engine, the Awesome Bar, memory-leak fixes and the Download Day record, plus the Chrome and V8 race that followed."
 date: 2008-06-17
 permalink: /posts/2008/06/mozilla-releases-firefox-3/
 tags:

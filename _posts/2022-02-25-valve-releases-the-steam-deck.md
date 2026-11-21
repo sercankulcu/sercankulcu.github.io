@@ -1,5 +1,6 @@
 ---
 title: Valve Releases the Steam Deck
+excerpt: "The Steam Deck shipped in February 2022: its AMD APU, SteamOS and Proton compatibility layer, shader pre-caching, and how it mainstreamed handheld PC gaming."
 date: 2022-02-25
 permalink: /posts/2022/02/valve-releases-the-steam-deck/
 tags:

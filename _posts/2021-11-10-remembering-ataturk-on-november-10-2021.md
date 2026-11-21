@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2021'
+excerpt: "A November 10, 2021 reflection on Ataturk's emphasis on education and how schools can repair a society's future after long pandemic disruption."
 date: 2021-11-10
 permalink: /posts/2021/11/remembering-ataturk-on-november-10-2021/
 tags:

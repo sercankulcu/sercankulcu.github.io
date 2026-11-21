@@ -1,5 +1,6 @@
 ---
 title: Stable Diffusion Opens a New Era of Generative Images
+excerpt: "Stable Diffusion's 2022 open release: how its latent diffusion pipeline works, the community tools built on it, and the copyright lawsuits that followed."
 date: 2022-08-22
 permalink: /posts/2022/08/stable-diffusion-opens-a-new-era-of-generative-images/
 tags:

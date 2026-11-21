@@ -1,5 +1,6 @@
 ---
 title: Apple Announces iCloud
+excerpt: "Apple's 2011 iCloud announcement: how it replaced MobileMe, moved the hub from the Mac to the cloud, and handled device sync, backup and iTunes Match."
 date: 2011-06-15
 permalink: /posts/2011/06/apple-announces-icloud/
 tags:

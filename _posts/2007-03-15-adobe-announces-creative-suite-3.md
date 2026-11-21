@@ -1,5 +1,6 @@
 ---
 title: Adobe Announces Creative Suite 3
+excerpt: "Why Adobe's Creative Suite 3 mattered in 2007: Photoshop, Illustrator, Flash and Premiere Pro as one connected pipeline for print, web and video work."
 date: 2007-03-15
 permalink: /posts/2007/03/adobe-announces-creative-suite-3/
 tags:

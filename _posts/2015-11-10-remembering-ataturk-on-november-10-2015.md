@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2015'
+excerpt: "A November 10, 2015 reflection on Ataturk's reforms: lasting progress needs institutions, education and patience, reaction versus construction."
 date: 2015-11-10
 permalink: /posts/2015/11/remembering-ataturk-on-november-10-2015/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'How AI Shape The Future Of Coding'
+excerpt: "Where AI coding assistants help and where they fail in early 2025, how developer skills shift toward evaluation, and what programming education should change."
 date: 2025-02-07
 permalink: /posts/2025/02/how-ai-shape-the-future-of-coding/
 tags:

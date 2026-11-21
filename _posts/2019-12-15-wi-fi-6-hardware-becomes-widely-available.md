@@ -1,5 +1,6 @@
 ---
 title: Wi-Fi 6 Hardware Becomes Widely Available
+excerpt: "Wi-Fi 6 (802.11ax) in 2019: OFDMA, BSS Coloring, Target Wake Time and uplink MU-MIMO, early devices and routers, and the 6 GHz Wi-Fi 6E extension."
 date: 2019-12-15
 permalink: /posts/2019/12/wi-fi-6-hardware-becomes-widely-available/
 tags:

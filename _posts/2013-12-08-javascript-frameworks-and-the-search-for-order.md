@@ -1,5 +1,6 @@
 ---
 title: 'JavaScript Frameworks And The Search For Order'
+excerpt: "Backbone, AngularJS, Ember and React compared in 2013, the problems they all try to solve, and why understanding those problems outlasts any framework."
 date: 2013-12-08
 permalink: /posts/2013/12/javascript-frameworks-and-the-search-for-order/
 tags:

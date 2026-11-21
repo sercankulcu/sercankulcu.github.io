@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A welcome note to new Computer Engineering students in 2021 on persistence, early habits like version control, and why difficulty is not failure."
 date: 2021-10-01
 permalink: /posts/2021/10/welcome-to-our-department/
 tags:

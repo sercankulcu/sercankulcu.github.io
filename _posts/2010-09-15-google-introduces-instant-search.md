@@ -1,5 +1,6 @@
 ---
 title: Google Introduces Instant Search
+excerpt: "Google Instant Search updated results as you typed. See the AJAX and Caffeine index behind it, why it multiplied queries, and why Google removed it in 2017."
 date: 2010-09-15
 permalink: /posts/2010/09/google-introduces-instant-search/
 tags:

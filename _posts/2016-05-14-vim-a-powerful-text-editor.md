@@ -1,5 +1,6 @@
 ---
 title: 'Vim A Powerful Text Editor'
+excerpt: "Vim for newcomers: modes, the verb-and-motion grammar, repeating edits with the dot command and macros, plugins, and how to learn it with vimtutor."
 date: 2016-05-14
 permalink: /posts/2016/05/vim-a-powerful-text-editor/
 tags:

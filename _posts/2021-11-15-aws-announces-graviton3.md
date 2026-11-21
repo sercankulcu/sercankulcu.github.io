@@ -1,5 +1,6 @@
 ---
 title: AWS Announces Graviton3
+excerpt: "AWS's Graviton3 Arm server processor, announced at re:Invent 2021, and why Google and Microsoft also design their own cloud chips."
 date: 2021-11-15
 permalink: /posts/2021/11/aws-announces-graviton3/
 tags:

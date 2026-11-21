@@ -1,5 +1,6 @@
 ---
 title: 'Daily Life Of A Software Engineer'
+excerpt: "A realistic look at a software engineer's day: messages, standups, small changes, code review, debugging, and how junior and senior days differ."
 date: 2019-08-14
 permalink: /posts/2019/08/daily-life-of-a-software-engineer/
 tags:

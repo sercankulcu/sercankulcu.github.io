@@ -1,5 +1,6 @@
 ---
 title: Mozilla Releases Firefox Quantum
+excerpt: "Firefox 57 Quantum in November 2017: the Rust-based Stylo engine, lower memory use, the end of legacy extensions, and why Chrome kept its lead."
 date: 2017-11-15
 permalink: /posts/2017/11/mozilla-releases-firefox-quantum/
 tags:

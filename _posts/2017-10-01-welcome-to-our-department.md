@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A short welcome for new Computer Engineering students in 2017: build strong foundations before chasing trends, explore widely and learn honestly."
 date: 2017-10-01
 permalink: /posts/2017/10/welcome-to-our-department/
 tags:
@@ -19,3 +20,5 @@ Do not worry if you do not know your specialization yet. The first years are for
 The most valuable habit you can develop is honest learning: knowing what you understand, noticing what you do not, and closing that gap step by step.
 
 Welcome to the department. The field changes quickly, but careful thinking remains useful.
+
+The [Data Structures](/teaching/data-structures/?lang=en) and [Operating Systems](/teaching/operating-systems/?lang=en) courses on this site are good places to start building those foundations.

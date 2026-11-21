@@ -1,5 +1,6 @@
 ---
 title: 'The Barber Paradox'
+excerpt: "The Barber Paradox retells Russell's Paradox as a village story, showing how a self-referential rule contradicts itself and why careful definitions matter."
 date: 2012-01-15
 permalink: /posts/2012/01/the-barber-paradox/
 tags:

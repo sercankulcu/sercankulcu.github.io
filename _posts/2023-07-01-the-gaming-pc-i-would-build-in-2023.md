@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2023"
+excerpt: "A July 2023 gaming PC build around the Ryzen 7 7800X3D and RTX 4090, with part choices, a cost of about $2,700-3,100 and the weak points to watch."
 date: 2023-07-01
 permalink: /posts/2023/07/the-gaming-pc-i-would-build-in-2023/
 tags:

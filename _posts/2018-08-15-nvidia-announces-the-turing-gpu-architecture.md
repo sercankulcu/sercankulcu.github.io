@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Announces the Turing GPU Architecture
+excerpt: "How NVIDIA's Turing architecture brought RT Cores and Tensor Cores to GeForce RTX cards, what ray tracing and DLSS did, and why the pricing drew criticism."
 date: 2018-08-15
 permalink: /posts/2018/08/nvidia-announces-the-turing-gpu-architecture/
 tags:

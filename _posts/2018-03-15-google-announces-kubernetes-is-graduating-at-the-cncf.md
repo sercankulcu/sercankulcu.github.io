@@ -1,5 +1,6 @@
 ---
 title: Google Announces Kubernetes Is Graduating at the CNCF
+excerpt: "Kubernetes became the first CNCF graduated project in March 2018: what graduation required, the cloud providers' managed offerings, and the ecosystem."
 date: 2018-03-15
 permalink: /posts/2018/03/google-announces-kubernetes-is-graduating-at-the-cncf/
 tags:

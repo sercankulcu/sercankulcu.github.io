@@ -1,5 +1,6 @@
 ---
 title: Google Releases Gemini 3
+excerpt: "How Gemini 3 launched in November 2025 with Deep Think and agentic tool use, and what putting it inside Google Search means for publishers."
 date: 2025-11-18
 permalink: /posts/2025/11/google-releases-gemini-3/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Some Of Popular Java Developers'
+excerpt: "Five people who shaped Java: Gosling, Bloch, Goetz, Lea and Johnson, and how their language design, API, concurrency and Spring work still affects Java in 2021."
 date: 2021-07-23
 permalink: /posts/2021/07/some-of-popular-java-developers/
 tags:
@@ -45,3 +46,5 @@ Spring became one of the most widely used frameworks in enterprise Java developm
 None of these contributions came from mastering syntax. Gosling made decisions about what to leave out of the language. Bloch applied engineering rigor to the question of how an API should feel to its users. Goetz traced the gap between what programmers believe about concurrency and what the memory model actually guarantees. Lea built the data structures that made reliable concurrency practical. Johnson argued that complexity in frameworks is a design choice, not an inevitability.
 
 A programming language is never only syntax. It grows through libraries, tools, books, frameworks, and people who care enough to improve the ecosystem over a long time. The Java of 2021 reflects decisions made by these people — and by many others — at specific moments in its history.
+
+For a structured introduction to the language itself, see the [Object-Oriented Programming with Java course](/teaching/object-oriented-programming-with-java/?lang=en).

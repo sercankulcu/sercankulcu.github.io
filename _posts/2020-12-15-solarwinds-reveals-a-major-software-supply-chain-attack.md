@@ -1,5 +1,6 @@
 ---
 title: SolarWinds Reveals a Major Software Supply Chain Attack
+excerpt: "How attackers hid the SUNBURST backdoor in signed SolarWinds Orion updates in 2020, and how the breach made supply-chain security a first-class concern."
 date: 2020-12-15
 permalink: /posts/2020/12/solarwinds-reveals-a-major-software-supply-chain-attack/
 tags:

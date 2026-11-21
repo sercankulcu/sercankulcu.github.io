@@ -1,5 +1,6 @@
 ---
 title: The First ARM-Based Windows RT Devices Arrive
+excerpt: "Windows RT and Surface RT in 2012: ARM tablets with great battery life that could not run existing Windows programs, and why Microsoft wrote them off."
 date: 2012-11-15
 permalink: /posts/2012/11/the-first-arm-based-windows-rt-devices-arrive/
 tags:

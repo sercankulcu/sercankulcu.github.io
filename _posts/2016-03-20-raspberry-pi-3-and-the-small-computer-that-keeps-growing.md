@@ -1,5 +1,6 @@
 ---
 title: 'Raspberry Pi 3 And The Small Computer That Keeps Growing'
+excerpt: "What the Raspberry Pi 3 adds with built-in Wi-Fi and Bluetooth, how fast it really is, and why the GPIO pins still make it valuable for education."
 date: 2016-03-20
 permalink: /posts/2016/03/raspberry-pi-3-and-the-small-computer-that-keeps-growing/
 tags:

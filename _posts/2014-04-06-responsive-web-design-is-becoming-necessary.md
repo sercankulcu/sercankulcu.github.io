@@ -1,5 +1,6 @@
 ---
 title: 'Responsive Web Design Is Becoming Necessary'
+excerpt: "Responsive web design in 2014: Marcotte's fluid grids, flexible images and media queries, the viewport tag, and why one site beats a separate mobile site."
 date: 2014-04-06
 permalink: /posts/2014/04/responsive-web-design-is-becoming-necessary/
 tags:

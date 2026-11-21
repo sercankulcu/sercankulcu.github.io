@@ -1,5 +1,6 @@
 ---
 title: Windows 11 Is Released
+excerpt: "Windows 11 in October 2021: the centered Start menu and Snap Layouts, DirectStorage, the TPM 2.0 requirement controversy, and the phased rollout."
 date: 2021-10-15
 permalink: /posts/2021/10/windows-11-is-released/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: IBM Watson Defeats Jeopardy Champions
+excerpt: "How IBM's Watson beat Ken Jennings and Brad Rutter on Jeopardy in 2011: the DeepQA pipeline, its Toronto error, and why Watson Health was later scaled back."
 date: 2011-02-15
 permalink: /posts/2011/02/ibm-watson-defeats-jeopardy-champions/
 tags:

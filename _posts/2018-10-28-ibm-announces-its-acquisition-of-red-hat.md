@@ -1,5 +1,6 @@
 ---
 title: IBM Announces Its Acquisition of Red Hat
+excerpt: "IBM's $34 billion Red Hat deal in 2018: what Red Hat sold, why hybrid cloud, RHEL and OpenShift mattered, and how Red Hat kept its independence."
 date: 2018-10-28
 permalink: /posts/2018/10/ibm-announces-its-acquisition-of-red-hat/
 tags:

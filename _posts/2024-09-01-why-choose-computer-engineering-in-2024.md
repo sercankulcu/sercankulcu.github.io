@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2024?'
+excerpt: "Why computer engineering still matters in 2024's AI boom: the foundations it teaches, growing hardware relevance, and the careers it opens."
 date: 2024-09-01
 permalink: /posts/2024/09/why-choose-computer-engineering-in-2024/
 tags:
@@ -19,7 +20,7 @@ The Stack Overflow Developer Survey 2024 found that 76% of developers are using 
 
 ## What Computer Engineering provides
 
-The strongest reason to choose the field is not that one technology is currently popular. It is that the discipline teaches the foundations that many technologies share. Programming, algorithms, data structures, operating systems, databases, networks, digital systems, and computer architecture remain useful even as individual tools change.
+The strongest reason to choose the field is not that one technology is currently popular. It is that the discipline teaches the foundations that many technologies share. Programming, algorithms, data structures, operating systems, databases, networks, digital systems, and computer architecture remain useful even as individual tools change. Courses on this site cover several of them, such as [Algorithms](/teaching/algorithms/?lang=en), [Data Structures](/teaching/data-structures/?lang=en) and [Operating Systems](/teaching/operating-systems/?lang=en).
 
 This matters especially in the AI era. Generative models can assist with coding, documentation, and analysis, but they do not remove the need to understand what a system is doing. Engineers still need to define requirements, evaluate outputs, protect data, design architectures, optimise performance, and detect failures. A model that confidently generates incorrect code needs a reviewer who can catch the error — and that reviewer needs to understand the system.
 

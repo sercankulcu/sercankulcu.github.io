@@ -1,5 +1,6 @@
 ---
 title: Google Announces LaMDA
+excerpt: "Google's LaMDA, a 137-billion-parameter dialogue model: how it was evaluated, the sentience controversy, and its path to Bard."
 date: 2021-05-18
 permalink: /posts/2021/05/google-announces-lamda/
 tags:

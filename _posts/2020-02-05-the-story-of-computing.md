@@ -1,5 +1,6 @@
 ---
 title: 'The Story Of Computing'
+excerpt: "From Babbage, Lovelace, Boole and Turing to ENIAC, the PC and the web: how computing grew from many contributions, and its darker side."
 date: 2020-02-05
 permalink: /posts/2020/02/the-story-of-computing/
 tags:

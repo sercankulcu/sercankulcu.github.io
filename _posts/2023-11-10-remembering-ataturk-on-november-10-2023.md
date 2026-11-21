@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2023'
+excerpt: "A November 10, 2023 reflection at the Republic's centennial: moving from symbol to study, and what education and institutions the second century will need."
 date: 2023-11-10
 permalink: /posts/2023/11/remembering-ataturk-on-november-10-2023/
 tags:

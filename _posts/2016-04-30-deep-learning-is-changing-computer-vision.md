@@ -1,5 +1,6 @@
 ---
 title: 'Deep Learning Is Changing Computer Vision'
+excerpt: "How AlexNet and ImageNet changed computer vision: how convolutional networks work, why GPUs mattered in 2012, and the limits shown by adversarial examples."
 date: 2016-04-30
 permalink: /posts/2016/04/deep-learning-is-changing-computer-vision/
 tags:

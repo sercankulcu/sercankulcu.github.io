@@ -1,5 +1,6 @@
 ---
 title: Raspberry Pi Hardware Design Nears Production
+excerpt: "The final Raspberry Pi design in late 2011: the BCM2835 chip, the $35 price target, manufacturing choices, and the launch that overwhelmed the website."
 date: 2011-11-15
 permalink: /posts/2011/11/raspberry-pi-hardware-design-nears-production/
 tags:

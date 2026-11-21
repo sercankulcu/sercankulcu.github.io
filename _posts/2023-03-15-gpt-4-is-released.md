@@ -1,5 +1,6 @@
 ---
 title: GPT-4 Is Released
+excerpt: "GPT-4's March 2023 release: access and pricing, the technical report that withheld details, delayed image input, and how it spurred LangChain and RAG apps."
 date: 2023-03-15
 permalink: /posts/2023/03/gpt-4-is-released/
 tags:

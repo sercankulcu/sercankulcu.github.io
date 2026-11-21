@@ -1,5 +1,6 @@
 ---
 title: Google Announces Android
+excerpt: "Why Google's 2007 Android announcement mattered: an open Linux-based mobile platform built with the Open Handset Alliance, new competition and lasting impact."
 date: 2007-11-15
 permalink: /posts/2007/11/google-announces-android/
 tags:

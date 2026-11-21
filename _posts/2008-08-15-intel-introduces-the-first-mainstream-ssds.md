@@ -1,5 +1,6 @@
 ---
 title: Intel Introduces the First Mainstream SSDs
+excerpt: "Intel's X25-M SSD in 2008: 35,000 random read IOPS against about 100 for hard drives, how NAND flash writes work, and how SSD prices fell."
 date: 2008-08-15
 permalink: /posts/2008/08/intel-introduces-the-first-mainstream-ssds/
 tags:

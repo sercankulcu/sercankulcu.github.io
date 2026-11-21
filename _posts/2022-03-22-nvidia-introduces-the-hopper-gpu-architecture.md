@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Introduces the Hopper GPU Architecture
+excerpt: "NVIDIA's Hopper H100: FP8 and the Transformer Engine, NVLink, MIG, Grace Hopper, and why H100 became the standard chip for training large AI models."
 date: 2022-03-22
 permalink: /posts/2022/03/nvidia-introduces-the-hopper-gpu-architecture/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Apple Opens the App Store
+excerpt: "How the 2008 App Store launch reversed Apple's web-apps-only plan and set the 70/30 revenue split and sandboxed app model that shaped the mobile market."
 date: 2008-07-15
 permalink: /posts/2008/07/apple-opens-the-app-store/
 tags:

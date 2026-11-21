@@ -1,5 +1,6 @@
 ---
 title: 'Why We Need Operating Systems?'
+excerpt: "What an operating system does and why: CPU scheduling, virtual memory, file system abstractions, and the user/kernel boundary that protects programs."
 date: 2023-02-02
 permalink: /posts/2023/02/why-we-need-operating-systems/
 tags:
@@ -43,4 +44,4 @@ This separation is why a buggy application can crash without taking down the ent
 
 ## Why it matters to understand this
 
-I teach operating systems because they make visible what is otherwise invisible. Every file save, every network connection, every context switch between applications is managed by a system most developers interact with only through high-level abstractions. Understanding what happens underneath those abstractions helps explain why systems behave the way they do under load, why certain failures occur in predictable patterns, and why the design decisions made in the 1960s and 1970s still shape the systems we use today.
+I teach operating systems because they make visible what is otherwise invisible (the [Operating Systems course](/teaching/operating-systems/?lang=en) covers these topics in more detail). Every file save, every network connection, every context switch between applications is managed by a system most developers interact with only through high-level abstractions. Understanding what happens underneath those abstractions helps explain why systems behave the way they do under load, why certain failures occur in predictable patterns, and why the design decisions made in the 1960s and 1970s still shape the systems we use today.

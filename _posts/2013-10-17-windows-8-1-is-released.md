@@ -1,5 +1,6 @@
 ---
 title: Windows 8.1 Is Released
+excerpt: "Windows 8.1 arrived in October 2013 as a free Store update that brought back the Start button and boot-to-desktop after Windows 8's poor reception."
 date: 2013-10-17
 permalink: /posts/2013/10/windows-8-1-is-released/
 tags:

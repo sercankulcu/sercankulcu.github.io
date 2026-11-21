@@ -1,5 +1,6 @@
 ---
 title: 'The Birthday Paradox'
+excerpt: "Why 23 people give better than even odds of a shared birthday: counting pairs instead of people, the calculation, and how it drives hash collisions."
 date: 2012-02-08
 permalink: /posts/2012/02/the-birthday-paradox/
 tags:
@@ -61,3 +62,5 @@ The birthday paradox appears directly in computing. A hash function maps input v
 This is why cryptographic hash functions aim for 256-bit output spaces or larger: a birthday attack on a 256-bit hash still requires approximately 2^128 operations, which is computationally infeasible.
 
 The paradox is also relevant to probability estimation in general: a situation can feel unlikely because we are asking the wrong version of the question. Changing the question — from "does this match a specific thing" to "does any pair among these match" — changes the calculation completely.
+
+Hash collisions are easy to watch happen in the [Hash Table Simulator](/files/data_structures/slides/Chapter_12_Hash_Table_Simulator.html).

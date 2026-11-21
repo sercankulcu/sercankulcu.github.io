@@ -1,5 +1,6 @@
 ---
 title: Google Home and Modern Voice Assistants Expand
+excerpt: "Google Home's 2016 launch against Amazon Echo: hardware, Knowledge Graph versus Alexa Skills, and how the smart speaker market grew into the early 2020s."
 date: 2016-11-15
 permalink: /posts/2016/11/google-home-and-modern-voice-assistants-expand/
 tags:

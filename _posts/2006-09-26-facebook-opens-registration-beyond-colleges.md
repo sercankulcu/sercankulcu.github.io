@@ -1,5 +1,6 @@
 ---
 title: Facebook Opens Registration Beyond Colleges
+excerpt: "Facebook opened sign-up to everyone 13 and older in 2006, after News Feed: the backlash, the growth numbers and the Memcached and Cassandra stack behind it."
 date: 2006-09-26
 permalink: /posts/2006/09/facebook-opens-registration-beyond-colleges/
 tags:

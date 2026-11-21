@@ -1,5 +1,6 @@
 ---
 title: 'RSS And The Quiet Pleasure Of Following The Web'
+excerpt: "RSS feeds and a feed reader gather new posts in one place and give you control of your reading list; the post also weighs excerpt-only feeds and unread counts."
 date: 2006-07-16
 permalink: /posts/2006/07/rss-and-the-quiet-pleasure-of-following-the-web/
 tags:

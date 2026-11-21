@@ -1,5 +1,6 @@
 ---
 title: VMware Fusion Brings Virtualization to Intel Macs
+excerpt: "VMware Fusion let Intel Macs run Windows or Linux beside Mac OS X without rebooting; the post explains why virtualization became an everyday developer tool."
 date: 2007-08-15
 permalink: /posts/2007/08/vmware-fusion-brings-virtualization-to-intel-macs/
 tags:

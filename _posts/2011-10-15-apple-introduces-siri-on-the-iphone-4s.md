@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces Siri on the iPhone 4S
+excerpt: "How Siri reached the iPhone 4S in 2011: the Siri Inc. acquisition, the speech and language-understanding architecture, its cultural impact and its competitors."
 date: 2011-10-15
 permalink: /posts/2011/10/apple-introduces-siri-on-the-iphone-4s/
 tags:

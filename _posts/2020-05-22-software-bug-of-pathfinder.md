@@ -1,5 +1,6 @@
 ---
 title: 'Software Bug Of Pathfinder'
+excerpt: "How a priority inversion kept resetting Mars Pathfinder in 1997, why a disabled VxWorks setting caused it, and the patch engineers uploaded from Earth."
 date: 2020-05-22
 permalink: /posts/2020/05/software-bug-of-pathfinder/
 tags:
@@ -45,6 +46,6 @@ The Pathfinder bug is cited in software engineering courses for several reasons.
 
 It shows that correctness in concurrent systems is not just about whether code works in the normal case — it is about whether the scheduling and synchronization rules produce the right behavior under all possible interleavings. A system can behave correctly for months and fail only when a specific timing sequence occurs for the first time.
 
-It shows that configuration is part of the software. The bug was not in an algorithm; it was in a single disabled setting. The VxWorks feature existed. The choice not to enable it, made for defensible performance reasons, was the source of the problem.
+It shows that configuration is part of the software. The bug was not in an algorithm; it was in a single disabled setting. The VxWorks feature existed. The choice not to enable it, made for defensible performance reasons, was the source of the problem. The [Operating Systems course](/teaching/operating-systems/?lang=en) covers scheduling, mutexes and priority inversion in more detail.
 
 And it shows that a fix can be small relative to the work required to find it. The final change was enabling one flag. The process of identifying which flag, understanding why, and verifying the fix across 190 million kilometers of space was weeks of careful engineering.

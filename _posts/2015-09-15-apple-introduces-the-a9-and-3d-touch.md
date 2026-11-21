@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the A9 and 3D Touch
+excerpt: "The iPhone 6s brought the A9 chip and 3D Touch with Peek and Pop. Why pressure sensing was hard to discover and was replaced by Haptic Touch."
 date: 2015-09-15
 permalink: /posts/2015/09/apple-introduces-the-a9-and-3d-touch/
 tags:

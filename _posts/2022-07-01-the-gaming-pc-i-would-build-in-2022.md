@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2022"
+excerpt: "A no-budget July 2022 gaming PC: Core i9-12900K, RTX 3090 Ti, DDR5, a full parts list, the rough price, and why the cheaper RTX 3080 Ti makes more sense."
 date: 2022-07-01
 permalink: /posts/2022/07/the-gaming-pc-i-would-build-in-2022/
 tags:

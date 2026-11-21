@@ -1,5 +1,6 @@
 ---
 title: 'The Importance Of Active And Collaborative Education'
+excerpt: "Why passive lectures fall short: evidence from Hake and Freeman, Mazur's Peer Instruction, collaborative work, group-work pitfalls and a balance with lectures."
 date: 2022-11-17
 permalink: /posts/2022/11/the-importance-of-active-and-collaborative-education/
 tags:

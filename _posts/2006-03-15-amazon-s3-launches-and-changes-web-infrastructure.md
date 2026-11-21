@@ -1,5 +1,6 @@
 ---
 title: Amazon S3 Launches and Changes Web Infrastructure
+excerpt: "How Amazon S3 in 2006 turned storage into a pay-as-you-go web API, and why that changed startup economics, stateless servers and cloud architecture."
 date: 2006-03-15
 permalink: /posts/2006/03/amazon-s3-launches-and-changes-web-infrastructure/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Windows 11 Is Announced
+excerpt: "What Windows 11 changed in 2021, from the centered taskbar and Snap Layouts to stricter TPM 2.0 requirements and delayed Android app support."
 date: 2021-06-24
 permalink: /posts/2021/06/windows-11-is-announced/
 tags:

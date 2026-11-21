@@ -1,5 +1,6 @@
 ---
 title: 'Why I Keep Notes While Programming'
+excerpt: "Why programmers should keep notes: what to write down (decisions, quirks, dead ends, setup steps), where to keep it, and the habit that saves hours later."
 date: 2010-11-13
 permalink: /posts/2010/11/why-i-keep-notes-while-programming/
 tags:

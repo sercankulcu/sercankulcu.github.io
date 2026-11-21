@@ -1,5 +1,6 @@
 ---
 title: 'The Banach-tarski Paradox'
+excerpt: "The Banach-Tarski paradox explained: how one ball becomes two, why the pieces are non-measurable, and what the Axiom of Choice has to do with it."
 date: 2012-01-26
 permalink: /posts/2012/01/the-banach-tarski-paradox/
 tags:

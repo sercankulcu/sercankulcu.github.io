@@ -1,5 +1,6 @@
 ---
 title: Windows 7 Is Released
+excerpt: "Windows 7 launched in October 2009 after Vista's troubles: the Superbar, Aero Snap, a quieter UAC, and the fast enterprise adoption that followed."
 date: 2009-10-22
 permalink: /posts/2009/10/windows-7-is-released/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: OpenAI Releases ChatGPT
+excerpt: "ChatGPT's 2022 launch: how RLHF turned GPT-3.5 into a chat assistant, the competitive scramble it triggered, and what it changed for software developers."
 date: 2022-11-30
 permalink: /posts/2022/11/openai-releases-chatgpt/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Node.js Gains Attention as Server-Side JavaScript
+excerpt: "Node.js in 2010: the single-threaded event loop on libuv, the C10K problem, callback hell, and how npm made Node the base of JavaScript tooling."
 date: 2010-07-15
 permalink: /posts/2010/07/node-js-gains-attention-as-server-side-javascript/
 tags:

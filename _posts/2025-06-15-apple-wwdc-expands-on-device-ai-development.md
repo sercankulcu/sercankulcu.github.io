@@ -1,5 +1,6 @@
 ---
 title: Apple WWDC Expands On-Device AI Development
+excerpt: "Apple's WWDC 2025 Foundation Models expansion: on-device model streaming, multimodal input, adapters, Private Cloud Compute, and what it means for developers."
 date: 2025-06-15
 permalink: /posts/2025/06/apple-wwdc-expands-on-device-ai-development/
 tags:

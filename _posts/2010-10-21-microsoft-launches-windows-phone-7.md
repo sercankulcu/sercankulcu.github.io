@@ -1,5 +1,6 @@
 ---
 title: Microsoft Launches Windows Phone 7
+excerpt: "Windows Phone 7 broke from Windows Mobile with Metro design, Live Tiles and fixed hardware specs. How the Nokia deal and the WP8 upgrade gap sealed its fate."
 date: 2010-10-21
 permalink: /posts/2010/10/microsoft-launches-windows-phone-7/
 tags:

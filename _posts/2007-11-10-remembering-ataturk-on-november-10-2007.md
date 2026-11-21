@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2007'
+excerpt: "A short reflection for November 10, 2007: why a republic is protected through civic responsibility, education and respect for institutions, not ceremony alone."
 date: 2007-11-10
 permalink: /posts/2007/11/remembering-ataturk-on-november-10-2007/
 tags:

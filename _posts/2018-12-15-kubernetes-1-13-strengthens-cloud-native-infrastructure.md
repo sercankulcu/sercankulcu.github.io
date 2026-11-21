@@ -1,5 +1,6 @@
 ---
 title: Kubernetes 1.13 Strengthens Cloud-Native Infrastructure
+excerpt: "Kubernetes 1.13 made kubeadm and the Container Storage Interface generally available, as Kubernetes became the dominant container orchestrator in 2018."
 date: 2018-12-15
 permalink: /posts/2018/12/kubernetes-1-13-strengthens-cloud-native-infrastructure/
 tags:

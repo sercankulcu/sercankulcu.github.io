@@ -1,5 +1,6 @@
 ---
 title: Google Introduces the Nexus One
+excerpt: "The Nexus One sold unlocked straight from Google in 2010 at $529. Why the direct-sale model failed, and how the Nexus line led to Pixel in 2016."
 date: 2010-01-15
 permalink: /posts/2010/01/google-introduces-the-nexus-one/
 tags:

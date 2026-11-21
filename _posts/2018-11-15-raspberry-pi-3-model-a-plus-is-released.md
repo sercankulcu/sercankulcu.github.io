@@ -1,5 +1,6 @@
 ---
 title: Raspberry Pi 3 Model A+ Is Released
+excerpt: "The $25 Raspberry Pi 3 Model A+ (2018): Pi 3B+ processor and dual-band Wi-Fi in a smaller board, what it omitted, and why that suits embedded projects."
 date: 2018-11-15
 permalink: /posts/2018/11/raspberry-pi-3-model-a-plus-is-released/
 tags:

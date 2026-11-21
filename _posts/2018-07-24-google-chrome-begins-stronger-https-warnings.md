@@ -1,5 +1,6 @@
 ---
 title: Google Chrome Begins Stronger HTTPS Warnings
+excerpt: "Chrome 68 labels every HTTP page 'Not secure'. How Let's Encrypt, HTTP/2 and HSTS made that step possible and how HTTPS use grew."
 date: 2018-07-24
 permalink: /posts/2018/07/google-chrome-begins-stronger-https-warnings/
 tags:

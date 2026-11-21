@@ -1,5 +1,6 @@
 ---
 title: 'Heartbleed And The Fragile Trust Behind The Lock Icon'
+excerpt: "How the 2014 Heartbleed bug in OpenSSL leaked server memory, why patching was not enough, and what it says about trust in open-source infrastructure."
 date: 2014-04-13
 permalink: /posts/2014/04/heartbleed-and-the-fragile-trust-behind-the-lock-icon/
 tags:

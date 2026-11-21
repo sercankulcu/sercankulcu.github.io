@@ -1,5 +1,6 @@
 ---
 title: Samsung Launches the Galaxy S4
+excerpt: "The Galaxy S4 in 2013: its 441 PPI display, regional chipsets, gimmicky TouchWiz features, strong sales, and Android update delays."
 date: 2013-03-15
 permalink: /posts/2013/03/samsung-launches-the-galaxy-s4/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2025?'
+excerpt: "With AI writing code, why study Computer Engineering in 2025? What changed in AI, what the degree teaches, and how the profession is shifting."
 date: 2025-09-01
 permalink: /posts/2025/09/why-choose-computer-engineering-in-2025/
 tags:
@@ -23,7 +24,7 @@ AI can accelerate development, but real products still need architecture, testin
 
 ## What the degree provides
 
-Computer Engineering provides the foundations needed to answer those questions. Students study algorithms, data structures, operating systems, computer networks, databases, computer architecture, digital systems, and software development. These subjects help explain what happens beneath the interface of modern AI tools.
+Computer Engineering provides the foundations needed to answer those questions. Students study algorithms, data structures, operating systems, computer networks, databases, computer architecture, digital systems, and software development. These subjects help explain what happens beneath the interface of modern AI tools. The [Operating Systems course](/teaching/operating-systems/?lang=en) and the [Data Structures course](/teaching/data-structures/?lang=en) on this site cover two of them.
 
 The field is also expanding beyond conventional application development. AI systems need specialised processors and large data-centre infrastructures. Robotics combines software with sensors and control systems. Cybersecurity grows in importance as more processes become automated. Edge devices bring intelligence to phones, vehicles, factories, and small embedded systems.
 

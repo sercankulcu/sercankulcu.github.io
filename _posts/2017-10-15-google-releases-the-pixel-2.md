@@ -1,5 +1,6 @@
 ---
 title: Google Releases the Pixel 2
+excerpt: "The Pixel 2 and Pixel 2 XL: a single-lens camera with dual-pixel Portrait Mode, HDR+ burst merging, and the Pixel Visual Core, Google's first custom image chip."
 date: 2017-10-15
 permalink: /posts/2017/10/google-releases-the-pixel-2/
 tags:

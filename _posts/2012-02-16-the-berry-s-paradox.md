@@ -1,5 +1,6 @@
 ---
 title: 'The Berrys Paradox'
+excerpt: "Berry's Paradox, the 'smallest number not describable in fewer than twenty words', and how it connects to Godel's theorems and Kolmogorov complexity."
 date: 2012-02-16
 permalink: /posts/2012/02/the-berry-s-paradox/
 tags:

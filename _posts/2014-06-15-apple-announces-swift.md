@@ -1,5 +1,6 @@
 ---
 title: Apple Announces Swift
+excerpt: "Apple announced Swift at WWDC 2014 to replace Objective-C. Its safety features, Objective-C interoperability and how it evolved from Swift 1 to Swift 4."
 date: 2014-06-15
 permalink: /posts/2014/06/apple-announces-swift/
 tags:

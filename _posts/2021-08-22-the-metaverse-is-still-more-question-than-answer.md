@@ -1,5 +1,6 @@
 ---
 title: 'The Metaverse Is Still More Question Than Answer'
+excerpt: "The metaverse in 2021: what Fortnite, Roblox and VRChat already show, what Facebook and Microsoft promise, and the technical barriers that remain."
 date: 2021-08-22
 permalink: /posts/2021/08/the-metaverse-is-still-more-question-than-answer/
 tags:

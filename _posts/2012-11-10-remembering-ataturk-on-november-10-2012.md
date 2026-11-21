@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2012'
+excerpt: "A reflection on Atatürk on November 10, 2012: remembering him means studying his preparation, planning and patience, not only the famous moments."
 date: 2012-11-10
 permalink: /posts/2012/11/remembering-ataturk-on-november-10-2012/
 tags:

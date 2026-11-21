@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2015"
+excerpt: "A July 2015 gaming PC with a Core i7-4790K and GTX 980 Ti: the parts, the reasoning, a $1,900-2,200 price estimate, and the platform's weak point."
 date: 2015-07-01
 permalink: /posts/2015/07/the-gaming-pc-i-would-build-in-2015/
 tags:
@@ -54,4 +55,4 @@ The Z97/LGA1150 platform is near the end of its life. DDR4 and Skylake are arriv
 
 If I had to spend my own money on July 1, 2015, most of the excitement would be in the 980 Ti. The Witcher 3 has just arrived and The Witcher 3 is beautiful at 1440p ultra settings. The rest of the machine exists to keep this card fed, cool, and quiet.
 
-The date matters. I am judging only hardware that was available by July 1, not products announced or released later in the year. That makes each build a snapshot of what I could realistically have assembled at that moment.
+The date matters. I am judging only hardware that was available by July 1, not products announced or released later in the year. That makes each build a snapshot of what I could realistically have assembled at that moment. For a ten-year comparison, see [the 2025 build](/posts/2025/07/the-gaming-pc-i-would-build-in-2025/).

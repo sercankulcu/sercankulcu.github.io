@@ -1,5 +1,6 @@
 ---
 title: Windows 8 Is Released
+excerpt: "Windows 8 and its Start Screen, WinRT apps, fast startup and Secure Boot, why adoption lagged Windows 7, and how 8.1 and Windows 10 walked the design back."
 date: 2012-10-26
 permalink: /posts/2012/10/windows-8-is-released/
 tags:

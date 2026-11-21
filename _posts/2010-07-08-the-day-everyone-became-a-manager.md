@@ -1,5 +1,6 @@
 ---
 title: "The Day Everyone Became a Manager"
+excerpt: "A personal story from July 2010: a general manager is fired, two managers resign, and four employees are told they are all managers, with no change in work."
 date: 2010-07-08
 permalink: /posts/2010/07/the-day-everyone-became-a-manager/
 tags:

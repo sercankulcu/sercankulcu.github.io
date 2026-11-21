@@ -1,5 +1,6 @@
 ---
 title: Microsoft Releases Windows Terminal 1.0
+excerpt: "Windows Terminal 1.0 replaced the old conhost console with GPU text rendering, tabs, panes and WSL profiles, reflecting Windows' turn toward Linux tools."
 date: 2020-05-15
 permalink: /posts/2020/05/microsoft-releases-windows-terminal-1-0/
 tags:

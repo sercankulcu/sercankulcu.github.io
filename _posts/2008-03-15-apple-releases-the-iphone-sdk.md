@@ -1,5 +1,6 @@
 ---
 title: Apple Releases the iPhone SDK
+excerpt: "How the March 2008 iPhone SDK and App Store replaced the web-apps-only plan, and why mandatory code signing and review made iOS a curated platform."
 date: 2008-03-15
 permalink: /posts/2008/03/apple-releases-the-iphone-sdk/
 tags:

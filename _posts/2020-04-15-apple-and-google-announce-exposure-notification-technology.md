@@ -1,5 +1,6 @@
 ---
 title: Apple and Google Announce Exposure Notification Technology
+excerpt: "How the Apple-Google Exposure Notification API traced COVID-19 contacts with rotating Bluetooth IDs and on-device matching, and how countries adopted it."
 date: 2020-04-15
 permalink: /posts/2020/04/apple-and-google-announce-exposure-notification-technology/
 tags:

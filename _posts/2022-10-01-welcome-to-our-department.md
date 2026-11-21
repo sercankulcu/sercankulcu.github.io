@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A welcome note to new Computer Engineering students in 2022: why fundamentals matter more than trends, and why to try many areas before choosing one."
 date: 2022-10-01
 permalink: /posts/2022/10/welcome-to-our-department/
 tags:

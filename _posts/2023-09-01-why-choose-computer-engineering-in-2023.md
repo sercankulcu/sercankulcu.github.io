@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2023?'
+excerpt: "Why generative AI is a reason to study Computer Engineering in 2023: fundamentals still matter and work shifts toward design and verification."
 date: 2023-09-01
 permalink: /posts/2023/09/why-choose-computer-engineering-in-2023/
 tags:
@@ -31,4 +32,4 @@ The field also remains much broader than AI. Cybersecurity, robotics, cloud comp
 
 Students considering the department should expect difficulty. Mathematics matters. Debugging requires patience. New technologies appear constantly, and graduation is not the end of learning. But that continuous change is one of the best parts of the profession. A strong Computer Engineering education gives you a framework for understanding technologies that may not even exist when you begin university.
 
-In 2023, nobody can predict exactly how computing careers will look ten years from now. That uncertainty is not a reason to avoid the field. It is a reason to learn the fundamentals well enough to adapt.
+In 2023, nobody can predict exactly how computing careers will look ten years from now. That uncertainty is not a reason to avoid the field. It is a reason to learn the fundamentals well enough to adapt. The [Algorithms](/teaching/algorithms/?lang=en) and [Operating Systems](/teaching/operating-systems/?lang=en) courses on this site cover two of those fundamentals.

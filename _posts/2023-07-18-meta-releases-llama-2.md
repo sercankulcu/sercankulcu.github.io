@@ -1,5 +1,6 @@
 ---
 title: Meta Releases Llama 2
+excerpt: "Meta's July 2023 Llama 2 release: model sizes, training data, licence terms, and how downloadable weights let developers fine-tune and run models locally."
 date: 2023-07-18
 permalink: /posts/2023/07/meta-releases-llama-2/
 tags:

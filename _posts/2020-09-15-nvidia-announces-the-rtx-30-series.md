@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Announces the RTX 30 Series
+excerpt: "NVIDIA's RTX 30 series and Ampere: doubled FP32 per SM, second-gen RT cores, DLSS 2.0, and why cards were scarce through 2020 and 2021."
 date: 2020-09-15
 permalink: /posts/2020/09/nvidia-announces-the-rtx-30-series/
 tags:

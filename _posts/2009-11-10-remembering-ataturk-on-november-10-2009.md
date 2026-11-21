@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2009'
+excerpt: "A November 10, 2009 reflection on Ataturk's trust in science, education and rational thought in an age of fast information."
 date: 2009-11-10
 permalink: /posts/2009/11/remembering-ataturk-on-november-10-2009/
 tags:

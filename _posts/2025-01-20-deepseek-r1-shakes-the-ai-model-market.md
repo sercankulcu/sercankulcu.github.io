@@ -1,5 +1,6 @@
 ---
 title: DeepSeek R1 Shakes the AI Model Market
+excerpt: "DeepSeek R1's January 2025 release: its mixture-of-experts design, GRPO reinforcement learning, the R1-Zero experiment and effects on the AI market."
 date: 2025-01-20
 permalink: /posts/2025/01/deepseek-r1-shakes-the-ai-model-market/
 tags:

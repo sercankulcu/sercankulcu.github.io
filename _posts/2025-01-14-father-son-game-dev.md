@@ -1,5 +1,6 @@
 ---
 title: 'Father Son Game Dev'
+excerpt: "Lessons from making games with my son: start tiny, pick tools like Scratch, Pygame or Godot, share the work, and let mistakes become play."
 date: 2025-01-14
 permalink: /posts/2025/01/father-son-game-dev/
 tags:
@@ -15,6 +16,8 @@ Many children spend hours playing games. Some of them eventually ask a more inte
 The first project should be very small. Not "small for a game" — actually small. A ball that bounces off the screen edges. A character that moves left and right. A score that counts how many times you clicked something. A number guessing game with ten lines of code.
 
 The reason is not that children cannot handle complexity. It is that finishing something matters enormously at the beginning. A project that takes one afternoon to reach "it works" teaches something that a three-month project cannot: the feeling of closing the loop between idea and result. That feeling is what makes someone want to do it again.
+
+Small games like [Pong](/game/pong/) or [Tic-Tac-Toe](/game/tictactoe/) are good examples of this size, and the post [Games as a Way to Understand Algorithms](/posts/2026/06/games-as-a-way-to-understand-algorithms/) looks at what such games teach.
 
 ## Tools that work for this
 

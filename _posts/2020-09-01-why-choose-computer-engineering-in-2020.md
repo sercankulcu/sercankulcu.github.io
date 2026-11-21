@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2020?'
+excerpt: "What 2020 showed about computing, from Zoom's growth to failing legacy systems, and why Computer Engineering's broad foundations prepare students for change."
 date: 2020-09-01
 permalink: /posts/2020/09/why-choose-computer-engineering-in-2020/
 tags:

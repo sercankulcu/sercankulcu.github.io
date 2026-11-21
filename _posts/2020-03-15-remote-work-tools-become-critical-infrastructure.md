@@ -1,5 +1,6 @@
 ---
 title: Remote Work Tools Become Critical Infrastructure
+excerpt: "How COVID-19 moved millions online in March 2020, straining Zoom and enterprise VPNs and speeding up multi-factor authentication and zero-trust security."
 date: 2020-03-15
 permalink: /posts/2020/03/remote-work-tools-become-critical-infrastructure/
 tags:

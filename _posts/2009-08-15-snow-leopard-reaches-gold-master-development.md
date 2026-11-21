@@ -1,5 +1,6 @@
 ---
 title: Snow Leopard Reaches Gold Master Development
+excerpt: "Mac OS X Snow Leopard in 2009 favored refinement over new features: performance, 64-bit support, Grand Central Dispatch and OpenCL for multi-core hardware."
 date: 2009-08-15
 permalink: /posts/2009/08/snow-leopard-reaches-gold-master-development/
 tags:

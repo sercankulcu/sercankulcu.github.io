@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2016'
+excerpt: "A November 10, 2016 reflection on remembering Atatürk in a tense year, and on reason, law, education and civic responsibility."
 date: 2016-11-10
 permalink: /posts/2016/11/remembering-ataturk-on-november-10-2016/
 tags:

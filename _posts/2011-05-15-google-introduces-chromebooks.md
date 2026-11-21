@@ -1,5 +1,6 @@
 ---
 title: Google Introduces Chromebooks
+excerpt: "Google's first Chromebooks in 2011: how Chrome OS worked, why early sales were weak, and how schools turned it into the top-selling education laptop."
 date: 2011-05-15
 permalink: /posts/2011/05/google-introduces-chromebooks/
 tags:

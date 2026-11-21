@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the Vision Pro
+excerpt: "Apple Vision Pro in 2023: its displays, R1 and M2 chips, eye-and-hand interface, visionOS, the $3,499 price and why early sales fell short of projections."
 date: 2023-06-15
 permalink: /posts/2023/06/apple-introduces-the-vision-pro/
 tags:

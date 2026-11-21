@@ -1,5 +1,6 @@
 ---
 title: Google Becomes Part of Alphabet
+excerpt: "In 2015 Google restructured under Alphabet, with Pichai running Google and 'Other Bets' like Waymo and Verily kept separate; the post explains what changed."
 date: 2015-08-15
 permalink: /posts/2015/08/google-becomes-part-of-alphabet/
 tags:

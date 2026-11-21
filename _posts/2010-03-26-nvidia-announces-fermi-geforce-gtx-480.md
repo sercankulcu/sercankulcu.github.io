@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Announces Fermi GeForce GTX 480
+excerpt: "The GeForce GTX 480 and the Fermi architecture: caches, heat and power draw, and why Fermi mattered for GPU computing and the AlexNet training run."
 date: 2010-03-26
 permalink: /posts/2010/03/nvidia-announces-fermi-geforce-gtx-480/
 tags:

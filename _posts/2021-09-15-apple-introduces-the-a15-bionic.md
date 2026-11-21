@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the A15 Bionic
+excerpt: "Apple's A15 Bionic (2021): 5nm design, CPU and Neural Engine figures, 4-core vs 5-core GPU segmentation, and how Cinematic Mode used heterogeneous compute."
 date: 2021-09-15
 permalink: /posts/2021/09/apple-introduces-the-a15-bionic/
 tags:

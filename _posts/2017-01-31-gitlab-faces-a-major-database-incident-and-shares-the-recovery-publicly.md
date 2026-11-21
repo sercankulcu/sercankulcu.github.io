@@ -1,5 +1,6 @@
 ---
 title: GitLab Faces a Major Database Incident and Shares the Recovery Publicly
+excerpt: "GitLab's January 2017 accidental deletion of production data, five failed backups, the public livestreamed recovery, and the lessons about restorable backups."
 date: 2017-01-31
 permalink: /posts/2017/01/gitlab-faces-a-major-database-incident-and-shares-the-recovery-publicly/
 tags:

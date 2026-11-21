@@ -1,5 +1,6 @@
 ---
 title: Google Claims Quantum Supremacy With Sycamore
+excerpt: "Google's 2019 quantum supremacy claim with the 53-qubit Sycamore, IBM's objection about classical simulation, and what the experiment did and did not show."
 date: 2019-10-23
 permalink: /posts/2019/10/google-claims-quantum-supremacy-with-sycamore/
 tags:

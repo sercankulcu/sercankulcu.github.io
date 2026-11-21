@@ -1,5 +1,6 @@
 ---
 title: IBM Announces a Major Investment in Cloud Computing
+excerpt: "IBM's $1.2 billion cloud investment: SoftLayer's bare-metal servers, Bluemix and a hybrid cloud strategy aimed at enterprises with legacy systems."
 date: 2014-08-15
 permalink: /posts/2014/08/ibm-announces-a-major-investment-in-cloud-computing/
 tags:

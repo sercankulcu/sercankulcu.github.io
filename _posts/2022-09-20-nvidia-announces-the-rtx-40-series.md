@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Announces the RTX 40 Series
+excerpt: "NVIDIA's RTX 40 series in 2022: Ada Lovelace, DLSS 3 Frame Generation, the withdrawn 12GB RTX 4080, 12VHPWR connector melting, and AMD's RX 7900 XTX answer."
 date: 2022-09-20
 permalink: /posts/2022/09/nvidia-announces-the-rtx-40-series/
 tags:

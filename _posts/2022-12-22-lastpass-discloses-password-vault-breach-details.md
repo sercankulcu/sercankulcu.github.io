@@ -1,5 +1,6 @@
 ---
 title: LastPass Discloses Password Vault Breach Details
+excerpt: "LastPass's December 2022 disclosure: how the August incident led to stolen vault backups, which data was encrypted, and why master password strength mattered."
 date: 2022-12-22
 permalink: /posts/2022/12/lastpass-discloses-password-vault-breach-details/
 tags:

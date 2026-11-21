@@ -1,5 +1,6 @@
 ---
 title: Google Drive Launches
+excerpt: "Google Drive launched in 2012 with 5 GB free. How it compared with Dropbox, SkyDrive and iCloud, how sync worked, and why storage became ecosystem lock-in."
 date: 2012-04-24
 permalink: /posts/2012/04/google-drive-launches/
 tags:

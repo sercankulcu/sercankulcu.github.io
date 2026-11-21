@@ -1,5 +1,6 @@
 ---
 title: Apple Releases the First iPad
+excerpt: "The first iPad's price, A4 chip, display and app ecosystem, plus its launch sales and the rival tablets that followed in 2010 and 2011."
 date: 2010-04-15
 permalink: /posts/2010/04/apple-releases-the-first-ipad/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Log4Shell Exposes the Risk of Ubiquitous Dependencies
+excerpt: "Log4Shell in December 2021: how a logging bug enabled remote code execution, why finding Log4j was so hard, and the supply-chain lessons for engineers."
 date: 2021-12-15
 permalink: /posts/2021/12/log4shell-exposes-the-risk-of-ubiquitous-dependencies/
 tags:

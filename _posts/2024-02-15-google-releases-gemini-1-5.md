@@ -1,5 +1,6 @@
 ---
 title: Google Releases Gemini 1.5
+excerpt: "Gemini 1.5 Pro's one-million-token context window, its Mixture of Experts design, pricing, and what long context meant for RAG and developers."
 date: 2024-02-15
 permalink: /posts/2024/02/google-releases-gemini-1-5/
 tags:

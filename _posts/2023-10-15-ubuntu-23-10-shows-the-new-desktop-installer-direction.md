@@ -1,5 +1,6 @@
 ---
 title: Ubuntu 23.10 Shows the New Desktop Installer Direction
+excerpt: "Ubuntu 23.10 shipped the new Flutter-based installer and kernel 6.5, and a malicious translation delayed the release, a lesson in supply chain risk."
 date: 2023-10-15
 permalink: /posts/2023/10/ubuntu-23-10-shows-the-new-desktop-installer-direction/
 tags:

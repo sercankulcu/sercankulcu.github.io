@@ -1,5 +1,6 @@
 ---
 title: Raspberry Pi Goes on Sale
+excerpt: "The $35 Raspberry Pi went on sale on 29 February 2012 and crashed its distributors' sites; the post covers hardware, mission and what makers built."
 date: 2012-02-29
 permalink: /posts/2012/02/raspberry-pi-goes-on-sale/
 tags:

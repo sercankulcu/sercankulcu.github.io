@@ -1,5 +1,6 @@
 ---
 title: 'HTTPS Is Becoming Everyones Problem'
+excerpt: "Why even simple sites should use HTTPS in 2015: what encryption protects, how Let's Encrypt automates certificates, and what the padlock does not guarantee."
 date: 2015-12-13
 permalink: /posts/2015/12/https-is-becoming-everyones-problem/
 tags:

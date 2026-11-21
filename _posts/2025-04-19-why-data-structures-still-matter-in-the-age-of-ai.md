@@ -1,5 +1,6 @@
 ---
 title: 'Why Data Structures Still Matter in the Age of AI'
+excerpt: "Why students still need data structures when AI writes code: judging performance, stacks, queues, trees and graphs, and using AI as a second voice."
 date: 2025-04-19
 permalink: /posts/2025/04/why-data-structures-still-matter-in-the-age-of-ai/
 tags:
@@ -36,3 +37,5 @@ I do not think students should avoid AI tools. That would not be realistic, and 
 Programming tools are becoming faster, but learning still needs some slow moments. Sometimes five boxes drawn on paper explain an array better than a long piece of code. Sometimes a tree drawn by hand makes a rotation much easier to remember than reading it in a textbook.
 
 The age of AI changes some parts of programming education, but it does not remove the need for understanding. Syntax becomes easier to obtain. Judgment becomes more important. That is why I still believe in teaching fundamentals — not because the tools haven't changed, but because the habit of thinking clearly about structure lasts much longer than any particular tool.
+
+The [Data Structures course](/teaching/data-structures/?lang=en) on this site has interactive simulators for [hash tables](/files/data_structures/slides/Chapter_12_Hash_Table_Simulator.html) and [binary search trees](/files/data_structures/slides/Chapter_10_Binary_Search_Tree_Simulator.html) if you want to watch these structures at work.

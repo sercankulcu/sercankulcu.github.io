@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the First Apple Watch
+excerpt: "The first Apple Watch: its sensors, Digital Crown and iPhone-dependent apps, and how watchOS 2, GPS, LTE and ECG made it a standalone device."
 date: 2014-09-15
 permalink: /posts/2014/09/apple-introduces-the-first-apple-watch/
 tags:

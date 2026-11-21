@@ -1,5 +1,6 @@
 ---
 title: Meta Releases LLaMA
+excerpt: "Meta's LLaMA release in 2023: model sizes, training data, the leak, llama.cpp and Alpaca, and how quantization made large language models run on laptops."
 date: 2023-02-24
 permalink: /posts/2023/02/meta-releases-llama/
 tags:

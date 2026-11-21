@@ -1,5 +1,6 @@
 ---
 title: Google Public DNS Launches
+excerpt: "Google Public DNS (8.8.8.8) in 2009: how DNS resolution and anycast work, the privacy trade-offs, and the later rise of DoT, DoH, 1.1.1.1 and Quad9."
 date: 2009-12-15
 permalink: /posts/2009/12/google-public-dns-launches/
 tags:

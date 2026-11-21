@@ -1,5 +1,6 @@
 ---
 title: Microsoft Releases Ubuntu on Windows Preview
+excerpt: "The Windows Subsystem for Linux, from the 2016 'Bash on Ubuntu on Windows' preview to WSL 2 with a real Linux kernel, Docker support and GPU compute."
 date: 2016-04-15
 permalink: /posts/2016/04/microsoft-releases-ubuntu-on-windows-preview/
 tags:

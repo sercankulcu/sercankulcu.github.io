@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the A13 Bionic
+excerpt: "Apple's A13 Bionic in the 2019 iPhone 11 line: 7nm N7P, faster CPU cores, power management, a six-core Neural Engine and Deep Fusion computational photography."
 date: 2019-09-15
 permalink: /posts/2019/09/apple-introduces-the-a13-bionic/
 tags:

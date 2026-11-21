@@ -1,5 +1,6 @@
 ---
 title: 'Wearable Computing Is Looking For A Purpose'
+excerpt: "Fitness trackers, Google Glass and smartwatches in early 2014, and why wearables need uses native to the body rather than shrunken phone apps."
 date: 2014-02-16
 permalink: /posts/2014/02/wearable-computing-is-looking-for-a-purpose/
 tags:

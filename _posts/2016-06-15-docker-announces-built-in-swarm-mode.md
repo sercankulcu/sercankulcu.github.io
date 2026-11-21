@@ -1,5 +1,6 @@
 ---
 title: Docker Announces Built-In Swarm Mode
+excerpt: "Docker Engine 1.12 built Swarm orchestration in, using Raft and mutual TLS, then lost the 2016 container race to Kubernetes."
 date: 2016-06-15
 permalink: /posts/2016/06/docker-announces-built-in-swarm-mode/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Google Announces the End of Google Plus for Consumers
+excerpt: "Why Google shut down consumer Google+ in 2019: the API bugs that exposed profile data, the late disclosure, weak engagement and the GDPR questions it raised."
 date: 2019-02-15
 permalink: /posts/2019/02/google-announces-the-end-of-google-plus-for-consumers/
 tags:

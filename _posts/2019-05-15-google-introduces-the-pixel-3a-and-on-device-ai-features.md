@@ -1,5 +1,6 @@
 ---
 title: Google Introduces the Pixel 3a and On-Device AI Features
+excerpt: "The $399 Pixel 3a kept the Pixel 3 camera through software, and Google I/O 2019 brought on-device Live Caption and Live Relay as AI moved from cloud to phone."
 date: 2019-05-15
 permalink: /posts/2019/05/google-introduces-the-pixel-3a-and-on-device-ai-features/
 tags:

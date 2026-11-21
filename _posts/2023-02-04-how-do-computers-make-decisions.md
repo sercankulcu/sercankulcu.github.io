@@ -1,5 +1,6 @@
 ---
 title: 'How Do Computers Make Decisions?'
+excerpt: "How logic gates, machine instructions and neural networks turn binary signals into decisions, and why meaning stays outside the machine."
 date: 2023-02-04
 permalink: /posts/2023/02/how-do-computers-make-decisions/
 tags:
@@ -20,7 +21,7 @@ At the hardware level, decisions are implemented using logic gates. Each gate is
 
 These three operations are sufficient to implement any logical function. A combination of AND and NOT gates (NAND), or OR and NOT gates (NOR), is functionally complete — every other logical operation can be built from either combination alone.
 
-A comparator circuit — which answers "is A greater than B?" — is built from these gates. An adder that sums two binary numbers is built from these gates. The arithmetic logic unit in a processor, which performs addition, subtraction, and comparison, is a large collection of these gates arranged to produce the right outputs for the right inputs.
+A comparator circuit — which answers "is A greater than B?" — is built from these gates. An adder that sums two binary numbers is built from these gates. The arithmetic logic unit in a processor, which performs addition, subtraction, and comparison, is a large collection of these gates arranged to produce the right outputs for the right inputs. The [Microprocessors course](/teaching/microprocessors/?lang=en) covers processor hardware in more depth.
 
 ## The jump from gates to code
 

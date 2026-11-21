@@ -1,5 +1,6 @@
 ---
 title: Ubuntu Introduces the Unity Desktop by Default
+excerpt: "Why Ubuntu made the Unity desktop its default in 2011, how the community reacted, and what the episode taught about redesigning mature workflows."
 date: 2011-04-15
 permalink: /posts/2011/04/ubuntu-introduces-the-unity-desktop-by-default/
 tags:

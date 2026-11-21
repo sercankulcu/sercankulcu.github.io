@@ -1,5 +1,6 @@
 ---
 title: 'Generative Image Models Are Getting Hard To Ignore'
+excerpt: "How text-to-image systems such as DALL-E 2 improved by 2022, where they still fail, and the questions they raise about artists and copyright."
 date: 2022-05-15
 permalink: /posts/2022/05/generative-image-models-are-getting-hard-to-ignore/
 tags:

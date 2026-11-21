@@ -1,5 +1,6 @@
 ---
 title: Cloudflare Discloses the Cloudbleed Bug
+excerpt: "How a Ragel parser pointer bug made Cloudflare leak memory from other sites in 2016-2017, what was exposed, and why it fueled interest in memory-safe languages."
 date: 2017-02-23
 permalink: /posts/2017/02/cloudflare-discloses-the-cloudbleed-bug/
 tags:

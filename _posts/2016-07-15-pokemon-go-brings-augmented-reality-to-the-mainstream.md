@@ -1,5 +1,6 @@
 ---
 title: Pokemon Go Brings Augmented Reality to the Mainstream
+excerpt: "Pokémon Go's 2016 launch put GPS-based augmented reality in millions of hands and overloaded Niantic's servers; the post covers the scale and strain."
 date: 2016-07-15
 permalink: /posts/2016/07/pokemon-go-brings-augmented-reality-to-the-mainstream/
 tags:

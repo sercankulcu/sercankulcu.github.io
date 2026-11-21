@@ -1,5 +1,6 @@
 ---
 title: Google Chrome OS Is Publicly Announced
+excerpt: "Google's July 2009 Chrome OS announcement: a browser-only Linux OS for netbooks, its security design, and how Chromebooks later took over US schools."
 date: 2009-07-15
 permalink: /posts/2009/07/google-chrome-os-is-publicly-announced/
 tags:

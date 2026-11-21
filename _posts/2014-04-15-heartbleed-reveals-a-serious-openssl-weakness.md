@@ -1,5 +1,6 @@
 ---
 title: Heartbleed Reveals a Serious OpenSSL Weakness
+excerpt: "Heartbleed, the 2014 OpenSSL Heartbeat bug, leaked 64 KB of server memory per request; the post explains the damage and the patch, revoke and reset response."
 date: 2014-04-15
 permalink: /posts/2014/04/heartbleed-reveals-a-serious-openssl-weakness/
 tags:

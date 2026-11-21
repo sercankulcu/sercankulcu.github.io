@@ -1,5 +1,6 @@
 ---
 title: Apple Removes the Headphone Jack from the iPhone
+excerpt: "Apple dropped the headphone jack with the iPhone 7 in 2016: the 'courage' claim, the engineering reasons, AirPods, and how Android makers followed."
 date: 2016-09-15
 permalink: /posts/2016/09/apple-removes-the-headphone-jack-from-the-iphone/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'History of Early Personal Computers and Gaming Consoles'
+excerpt: "A tour of the Apple II, Atari 2600, BBC Micro, Commodore 64 and NES, and what their open, hackable culture taught a generation of programmers."
 date: 2007-03-12
 permalink: /posts/2007/03/history-of-early-personal-computers-and-gaming-consoles/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Machine Learning Is Becoming A Normal Software Tool'
+excerpt: "When machine learning beats hand-written rules, and the traps developers must check: weak baselines, data leakage, distribution shift and overfitting."
 date: 2018-10-21
 permalink: /posts/2018/10/machine-learning-is-becoming-a-normal-software-tool/
 tags:

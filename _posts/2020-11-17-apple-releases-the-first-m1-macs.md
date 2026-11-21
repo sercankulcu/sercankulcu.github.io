@@ -1,5 +1,6 @@
 ---
 title: Apple Releases the First M1 Macs
+excerpt: "Apple's first M1 Macs in November 2020: the chip's CPU, GPU and unified memory design, unchanged prices, and how Rosetta 2 kept Intel apps running."
 date: 2020-11-17
 permalink: /posts/2020/11/apple-releases-the-first-m1-macs/
 tags:

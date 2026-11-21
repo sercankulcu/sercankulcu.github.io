@@ -1,5 +1,6 @@
 ---
 title: 'Remote Work Is Changing How Software Teams Communicate'
+excerpt: "How remote work in 2020 changed software team communication: written documentation, asynchronous messages, visibility, trust, and blurred home-work boundaries."
 date: 2020-11-15
 permalink: /posts/2020/11/remote-work-is-changing-how-software-teams-communicate/
 tags:

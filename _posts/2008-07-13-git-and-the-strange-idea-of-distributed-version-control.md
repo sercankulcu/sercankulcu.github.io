@@ -1,5 +1,6 @@
 ---
 title: 'Git And The Strange Idea Of Distributed Version Control'
+excerpt: "Why Git's distributed model, snapshot graph and staging area differ from Subversion, and what GitHub's pull requests added when it launched in 2008."
 date: 2008-07-13
 permalink: /posts/2008/07/git-and-the-strange-idea-of-distributed-version-control/
 tags:

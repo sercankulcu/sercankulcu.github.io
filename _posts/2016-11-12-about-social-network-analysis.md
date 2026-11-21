@@ -1,5 +1,6 @@
 ---
 title: 'About Social Network Analysis'
+excerpt: "Social network analysis explained: graphs, centrality measures, scale-free networks and applications, plus the ethical risks of analysing connections."
 date: 2016-11-12
 permalink: /posts/2016/11/about-social-network-analysis/
 tags:
@@ -43,3 +44,5 @@ Python's `networkx` library and the visualization tool Gephi are common tools fo
 A social network can reveal sensitive information even when individual data appears harmless. The pattern of connections may reveal political affiliation, sexual orientation, health conditions, or financial relationships that no individual would volunteer. The ability to analyze social structure at scale creates a responsibility to consider what the analysis is used for.
 
 People do not exist in isolation, and data analysis that treats them as isolated individuals misses the structure that often explains the most interesting things.
+
+The [Dijkstra's Algorithm simulator](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html) shows step by step how shortest paths are found in a graph.

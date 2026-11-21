@@ -1,5 +1,6 @@
 ---
 title: 'Russells Paradox'
+excerpt: "Russell's Paradox explained: the set of all sets that do not contain themselves, how type theory and ZFC answered it, and its link to Godel and type systems."
 date: 2012-01-12
 permalink: /posts/2012/01/russell-s-paradox/
 tags:

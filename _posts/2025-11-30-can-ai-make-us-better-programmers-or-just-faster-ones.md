@@ -1,5 +1,6 @@
 ---
 title: 'Can AI Make Us Better Programmers or Just Faster Ones?'
+excerpt: "Faster is not the same as better: why AI speeds up mechanical programming, the calibration problem, and what still makes a programmer better."
 date: 2025-11-30
 permalink: /posts/2025/11/can-ai-make-us-better-programmers-or-just-faster-ones/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the Core ML Framework
+excerpt: "Apple's Core ML (2017) brought on-device inference to iOS: model conversion, the Neural Engine, Vision, Create ML and on-device personalization in Core ML 3."
 date: 2017-06-15
 permalink: /posts/2017/06/apple-introduces-the-core-ml-framework/
 tags:

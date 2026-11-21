@@ -1,5 +1,6 @@
 ---
 title: Google App Engine Opens to Developers
+excerpt: "Google App Engine's April 2008 preview: its Python sandbox, Datastore and automatic scaling, how it differed from EC2, and its place in the rise of PaaS."
 date: 2008-04-15
 permalink: /posts/2008/04/google-app-engine-opens-to-developers/
 tags:

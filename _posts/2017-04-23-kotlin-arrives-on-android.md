@@ -1,5 +1,6 @@
 ---
 title: 'Kotlin Arrives On Android'
+excerpt: "Why Kotlin appealed to Android developers in 2017: data classes, null safety, extension functions and full Java interoperability that allows gradual adoption."
 date: 2017-04-23
 permalink: /posts/2017/04/kotlin-arrives-on-android/
 tags:

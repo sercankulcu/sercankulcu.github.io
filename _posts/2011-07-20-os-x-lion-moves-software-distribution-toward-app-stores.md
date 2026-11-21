@@ -1,5 +1,6 @@
 ---
 title: OS X Lion Moves Software Distribution Toward App Stores
+excerpt: "OS X Lion was the first Mac system sold only as a download; its iOS-style features and stronger App Store sandboxing moved the desktop toward app stores."
 date: 2011-07-20
 permalink: /posts/2011/07/os-x-lion-moves-software-distribution-toward-app-stores/
 tags:

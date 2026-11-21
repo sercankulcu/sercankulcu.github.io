@@ -1,5 +1,6 @@
 ---
 title: Elon Musk Completes the Twitter Acquisition
+excerpt: "Musk's October 2022 purchase of Twitter, and why a platform that works as public infrastructure raises hard questions about governance, APIs and portability."
 date: 2022-10-15
 permalink: /posts/2022/10/elon-musk-completes-the-twitter-acquisition/
 tags:

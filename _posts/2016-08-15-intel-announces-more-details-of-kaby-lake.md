@@ -1,5 +1,6 @@
 ---
 title: Intel Announces More Details of Kaby Lake
+excerpt: "Intel's Kaby Lake ended tick-tock for Process-Architecture-Optimization, added 4K video decode and exposed how Intel's 10nm delay stalled the roadmap."
 date: 2016-08-15
 permalink: /posts/2016/08/intel-announces-more-details-of-kaby-lake/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2017?'
+excerpt: "Why Computer Engineering looked like a strong choice in 2017, from AlphaGo, TensorFlow and cloud platforms to what the degree teaches and why breadth matters."
 date: 2017-09-01
 permalink: /posts/2017/09/why-choose-computer-engineering-in-2017/
 tags:

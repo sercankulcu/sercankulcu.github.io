@@ -1,5 +1,6 @@
 ---
 title: "Before Likes Became Likes"
+excerpt: "A 2010 Ekşi Sözlük entry about wanting a vote, not just a message, and what it shows about metrics, validation and why a number is not meaning."
 date: 2010-07-12
 permalink: /posts/2010/07/before-likes-became-likes/
 tags:
@@ -12,6 +13,8 @@ tags:
 
 Long before every platform put a heart, thumb, star, flame, clap, or reaction button under everything we wrote, people were already doing the same emotional mathematics: who liked this, who agreed, who noticed, who said something, and who said something but did not press the button.
 
+## The Ekşi Sözlük entry
+
 In July 2010, I wrote an entry about a very specific irritation on Ekşi Sözlük. Some people would send me a message saying that they liked an entry or agreed with it, which was nice — except they would not give the entry a "şükela." And apparently, this bothered me.
 
 I wrote that "many" of my badis did this, then immediately corrected myself: by many, I meant three — three, written out for emphasis. These three people had actually become acquaintances through messages like "I agree with you." We talked, we got to know one another, and yet, as far as I could tell, they never gave me a şükela. This was unacceptable — not morally unacceptable, internet-statistics unacceptable. The distinction matters.
@@ -19,6 +22,8 @@ I wrote that "many" of my badis did this, then immediately corrected myself: by 
 I was not angry that they disagreed — they explicitly agreed. That was the problem. If you agree, why is the number not moving?
 
 This may be one of the purest early examples of online validation logic. The private message says, "I liked what you wrote." The visible counter says nothing happened. And somehow the counter wins. That is embarrassing — and also extremely human.
+
+## The five-minute protocol
 
 The old entry gets better. I admitted that I was the kind of person who checked the recently voted entries constantly. When the green message light appeared, signaling a new private message, a normal person might read it first — I did not. I would check whether the recent-votes area had changed, and if it had not, I would wait around five minutes before reading the message, then another fifteen minutes before replying. A complete behavioral protocol: a new message arrives, do not open it, check the metric, see no change, and apply the emotional delay — read after five minutes, reply after fifteen. Why? Because apparently the sender had committed the grave offense of complimenting the content without updating the public statistic.
 
@@ -28,11 +33,15 @@ We often talk as if social media platforms invented the need for validation. The
 
 Now the content itself is no longer the only thing being evaluated — the number is evaluating the writer, or at least that is how it can feel.
 
+## Private appreciation, public metrics
+
 The strange part is that the private message contained richer information than the vote. Someone had taken the time to write, "I agree with you" — personalized, specific, human. That should have been more meaningful. The vote, by contrast, was a click, yet the click mattered because it was visible to the system.
 
 This is one of the central tensions of online life: private appreciation is emotionally rich, while public metrics are socially legible. A message tells you what one person thinks; a number tells you how you appear to everyone. Those are different rewards, and the second can become addictive — not because it is deeper, but because it is measurable. Measurement has authority.
 
 If somebody says, "That was good," you can wonder whether they are being polite. If the number rises, the system appears to confirm it — the machine has spoken.
+
+## Numbers as storytellers
 
 Of course, the machine has not spoken. People clicked, or did not, at different times and for different reasons: maybe they saw it, maybe they did not; maybe they liked it but never vote; maybe they forgot; maybe they agreed privately and felt no need to signal publicly; maybe the entry appeared at a bad time, or the people most likely to appreciate it simply were not online. The number contains all these hidden variables, and we ignore them. A metric feels clean. Human behavior is not.
 
@@ -46,6 +55,8 @@ The entry contains another joke: to avoid making the whole thing too obvious, I 
 
 The younger voice is wonderful because it knows the scale of the grievance and commits to it anyway.
 
+## The loop that never changed
+
 We often imagine the early internet as a more innocent place, and in some ways it was: smaller communities, less algorithmic optimization, fewer corporate attention systems, less pervasive identity management. But people were still people. Status, recognition, cliques, visibility, and reputation all existed. People refreshed pages, watched reactions, and counted. The specific interfaces change; the loop does not: write, publish, wait, check, interpret, repeat.
 
 Today the loop can be much faster. Notifications arrive immediately, phones vibrate, analytics dashboards update, platforms rank content, and recommendation systems extend or kill visibility. The writer can watch performance almost in real time, which creates the illusion that creative work has a live scoreboard. It does not help. Some kinds of work become distorted when feedback arrives too quickly. You stop asking whether you meant it, whether it was useful, whether it was interesting, whether you expressed the idea properly — and start asking only how it performed.
@@ -56,15 +67,21 @@ My three badis accidentally demonstrated this. They gave me qualitative feedback
 
 That is the part of the story I find most interesting now. The private messages had consequences larger than the votes: a vote might raise a number, but a message could create a person in your life. Yet the immediate brain values the visible reward, which reveals something about delayed and invisible value.
 
+## Metrics shape behavior
+
 The most important effects of writing are often difficult to count. Someone remembers a sentence years later; someone changes their mind; someone sends a message; someone uses an explanation in a class; someone feels less alone; someone starts a project — and someone never tells you any of this. Analytics show none of it. Meanwhile, a trivial post may generate enormous engagement. If you let the metric define meaning, you will eventually optimize toward what can be measured — a general systems problem. People respond to measurement, and measuring the wrong thing changes behavior around the wrong objective.
 
 In software teams, measure lines of code and people write more code; measure tickets closed and people optimize for easy tickets; measure hours and presence replaces effectiveness; measure clicks and media learns to produce clickable things; measure likes and writers learn what earns likes. Metrics are not passive — they shape the system they observe.
 
 My 2010 behavior was the microscopic personal version: the metric existed, therefore I checked it; because I checked it, it influenced how I felt; and because it influenced how I felt, it influenced how I behaved toward people. A tiny number changed a social interaction. That is remarkable.
 
+## Unintended meanings
+
 The platform did not need a sophisticated engagement model — a green light and a voting list were enough. This is why interface design matters: every visible metric invites comparison, every notification creates a priority signal, and every counter becomes a possible emotional variable. Designers may think they are only showing information; users experience it as meaning something about them. The meaning may not be intended, but it still becomes real. Social systems are full of these unintended semantics.
 
 Read receipts are a good example: originally just "the message was seen," but emotionally, "why did they see it and not reply?" Online status originally just meant "this person is connected," but emotionally, "they are online but not talking to me." A follower count is technically the number of accounts subscribed, but emotionally it can mean social worth, credibility, popularity, or success, depending on the person. The technical field is small; the human interpretation is enormous. My old "recently voted" checking belongs in the same family — the system gave me a signal, and I built a story around it.
+
+## Delay as language
 
 The amusing detail is the timing strategy: five minutes before reading, fifteen before replying. This is social signaling by artificial latency. People still do this: do not answer immediately, or you will look too eager. Wait — but how long? Enough to communicate that you have a life, not so long that you look uninterested.
 
@@ -74,9 +91,13 @@ My delay had a specific hidden message: I noticed you did not vote, you do not k
 
 This is another lesson the old entry gives me unintentionally: if something actually matters, communicate. Do not construct elaborate signals and hope the other person decodes them correctly. Of course, actually telling someone, "I appreciate your message, but I am strangely emotionally invested in whether you also voted for my entry," would have been ridiculous. That reveals the more important option: perhaps the grievance did not require communication at all, but simply letting go. Not every irritation deserves resolution. Sometimes maturity is noticing the feeling and declining to build infrastructure around it.
 
+## A distributed system of pettiness
+
 The younger me built infrastructure instead: a refresh workflow, a delay policy, a retaliatory vote, then a message — a complete distributed system of pettiness. At least it had documentation. I am glad it does, because this tiny entry preserves a particular internet era better than a broad essay about technology could. Terms like "badi," the green message light, şükela votes, and recent-vote checking were not abstract features — they formed habits. Interface features become cultural behavior.
 
 Years later, some of those habits sound quaint, but the emotional structure remains current. Today someone may post something and check likes, refresh a video view count, check whether a story was seen, look at who reacted, and notice one specific person did not — or receive a private compliment and still wonder why it was not publicly liked. Same story, different icons.
+
+## The case for distance
 
 This is why I would not mock the younger version of myself too harshly. The behavior was petty, but the susceptibility was normal — platforms exploit exactly these tendencies because they are powerful. Variable rewards are especially effective: sometimes the number jumps, sometimes nothing happens, and you check again, maybe now, maybe one more time. The uncertainty keeps attention attached. I was doing this manually; today's systems automate the invitation. This makes deliberate distance useful — not because metrics are evil, but because unconscious checking converts them from information into mood control.
 
@@ -86,13 +107,19 @@ Another thing I notice now is that the entry distinguishes two forms of approval
 
 Maybe the best systems are the ones where interaction can still become relationship rather than only metric. The three people in my entry matter because they became people, not numbers — I knew them through messages. The votes I wanted are forgotten individually, but the fact that conversation happened survived. That is a clue about what has durable value.
 
+## Countability is not importance
+
 Counters are intense in the present and weak in memory; relationships are often the reverse. A number can excite you for ten minutes; a person can alter years. We frequently optimize attention toward the shorter reward. This is not only an internet problem: salary versus learning, title versus good colleagues, recognition versus meaningful work, convenience versus friendship. Immediate measurable rewards compete with slower invisible ones everywhere.
 
 The correct choice is not always the invisible one — money matters, recognition matters, metrics can matter. But they should not automatically dominate just because they are countable. Countability is not importance. That may be the mature sentence hidden inside the old joke. A message created friendship; a vote changed a number. I was watching the number. The archive remembers the friendship.
 
+## An honest archive
+
 There is another reason I enjoy this entry: it refuses to make me look dignified. Personal archives are better when they preserve embarrassing pettiness alongside major feelings — if every old version of yourself appears wise, generous, and self-aware, the archive has probably been edited too aggressively. People are inconsistent. We care about stupid things, and we know they are stupid and care anyway. That is part of the historical truth.
 
 I could rewrite the memory now and pretend I was interested only in meaningful discussion. I was not — I wanted the şükela too. Fine. That is more useful, because growth is visible only if the earlier position remains visible. You cannot mature from a past that has been cosmetically corrected. The younger me checked the votes before reading the message. The older me finds that funny and understands why. Both versions belong to the same person.
+
+## Read the message first
 
 I suspect some version of the habit still exists in almost everyone who publishes anything publicly. You can become more disciplined, but you do not become biologically indifferent to recognition — humans are social, and feedback matters. The goal is not to become someone who needs nothing from others — that fantasy usually produces its own ego. The healthier goal is proportion: enjoy approval, but do not let the counter become the meaning. Read the message — maybe read the message first. That would have been a good start.
 

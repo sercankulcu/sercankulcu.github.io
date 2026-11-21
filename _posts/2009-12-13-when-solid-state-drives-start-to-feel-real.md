@@ -1,5 +1,6 @@
 ---
 title: 'When Solid State Drives Start To Feel Real'
+excerpt: "Why SSDs felt transformative in December 2009: microsecond reads, X25-M pricing against hard drives, TRIM and wear-leveling, and the case for a system drive."
 date: 2009-12-13
 permalink: /posts/2009/12/when-solid-state-drives-start-to-feel-real/
 tags:

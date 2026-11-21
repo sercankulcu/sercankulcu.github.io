@@ -1,5 +1,6 @@
 ---
 title: 'Popular Questions About Software'
+excerpt: "Plain answers on software: hardware versus software, what an operating system does, why bugs and updates exist, compiled versus interpreted."
 date: 2018-08-14
 permalink: /posts/2018/08/popular-questions-about-software/
 tags:

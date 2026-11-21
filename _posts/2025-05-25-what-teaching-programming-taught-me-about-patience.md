@@ -1,5 +1,6 @@
 ---
 title: 'What Teaching Programming Taught Me About Patience'
+excerpt: "What teaching programming taught me about patience: explaining recursion in several ways, separating bugs from confidence, and learning to wait."
 date: 2025-05-25
 permalink: /posts/2025/05/what-teaching-programming-taught-me-about-patience/
 tags:

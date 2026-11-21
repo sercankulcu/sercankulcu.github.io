@@ -1,5 +1,6 @@
 ---
 title: Apple Introduces the M1 iMac and New iPad Pro
+excerpt: "Apple's April 2021 M1 iMac and iPad Pro: chip and display specs, and why shared silicon across form factors did not mean shared capability."
 date: 2021-04-15
 permalink: /posts/2021/04/apple-introduces-the-m1-imac-and-new-ipad-pro/
 tags:

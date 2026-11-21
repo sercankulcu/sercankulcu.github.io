@@ -1,5 +1,6 @@
 ---
 title: 'Raspberry Pi And The Joy Of Small Computers'
+excerpt: "One year after launch, the $35 Raspberry Pi: why Cambridge researchers built it, why Python and GPIO pins suit learning, and what people made with it."
 date: 2013-03-17
 permalink: /posts/2013/03/raspberry-pi-and-the-joy-of-small-computers/
 tags:

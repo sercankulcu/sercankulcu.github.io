@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2019?'
+excerpt: "Reasons to study Computer Engineering in 2019: 5G, Kubernetes and PyTorch, a degree spanning AI to security, and why enjoying problem solving matters most."
 date: 2019-09-01
 permalink: /posts/2019/09/why-choose-computer-engineering-in-2019/
 tags:

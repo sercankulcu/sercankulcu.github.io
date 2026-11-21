@@ -1,5 +1,6 @@
 ---
 title: Facebook Announces More Details of Libra's Technical Design
+excerpt: "Libra's technical design: BFT consensus, the Move language, the reserve basket and Association, and why regulators ended the project while Move lived on."
 date: 2019-07-15
 permalink: /posts/2019/07/facebook-announces-more-details-of-libra-s-technical-design/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2019"
+excerpt: "A July 2019 gaming PC build around the Core i9-9900K and RTX 2080 Ti, written just before Ryzen 3000 launched, with price, trade-offs and verdict."
 date: 2019-07-01
 permalink: /posts/2019/07/the-gaming-pc-i-would-build-in-2019/
 tags:

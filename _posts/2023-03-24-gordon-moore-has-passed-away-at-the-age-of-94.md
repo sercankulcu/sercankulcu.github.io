@@ -1,5 +1,6 @@
 ---
 title: 'Gordon Moore Has Passed Away At The Age Of 94'
+excerpt: "Remembering Gordon Moore: the 1965 forecast behind Moore's Law, how it became a self-fulfilling roadmap, and where it meets physics today."
 date: 2023-03-24
 permalink: /posts/2023/03/gordon-moore-has-passed-away-at-the-age-of-94/
 tags:

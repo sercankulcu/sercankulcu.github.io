@@ -1,5 +1,6 @@
 ---
 title: 'The Comfort Of Long Forum Conversations'
+excerpt: "Why slow, messy forum threads still matter next to Stack Overflow: they capture uncertainty, keep searchable archives and build trust between people."
 date: 2009-08-09
 permalink: /posts/2009/08/the-comfort-of-long-forum-conversations/
 tags:

@@ -1,5 +1,6 @@
 ---
 title: 'Why Choose Computer Engineering in 2021?'
+excerpt: "Why study Computer Engineering in 2021: the chip shortage, AI hardware demand, remote work, what the degree teaches, and the career paths it opens."
 date: 2021-09-01
 permalink: /posts/2021/09/why-choose-computer-engineering-in-2021/
 tags:
@@ -27,4 +28,4 @@ AI workloads are driving renewed interest in GPU programming, specialized neural
 
 Software engineering remains the most common path, but graduates can also move toward cybersecurity, cloud infrastructure, embedded systems, data engineering, machine learning, networking, or hardware design. The Stack Overflow Developer Survey 2021 placed US developer median salaries around $120,000, and international remote work has expanded the accessible job market for students in many countries.
 
-The most valuable part of the degree is not access to one fashionable technology — technology changes too quickly for that. The real value is learning how to analyse a problem, design a solution, test it, measure it, and improve it. In 2021, computing is not just one sector among many. It is becoming a foundation for nearly every sector, which makes learning its fundamentals a durable investment.
+The most valuable part of the degree is not access to one fashionable technology — technology changes too quickly for that. The real value is learning how to analyse a problem, design a solution, test it, measure it, and improve it. In 2021, computing is not just one sector among many. It is becoming a foundation for nearly every sector, which makes learning its fundamentals a durable investment. Courses such as [Algorithms](/teaching/algorithms/?lang=en) and [Operating Systems](/teaching/operating-systems/?lang=en) on this site show what that foundation looks like.

@@ -1,5 +1,6 @@
 ---
 title: Oracle Completes Major Changes Around Java and Sun
+excerpt: "Oracle's 2010 Sun acquisition put Java and MySQL under its control, leading to the Google lawsuit, forks like LibreOffice and Jenkins, and a new Java cadence."
 date: 2010-08-15
 permalink: /posts/2010/08/oracle-completes-major-changes-around-java-and-sun/
 tags:

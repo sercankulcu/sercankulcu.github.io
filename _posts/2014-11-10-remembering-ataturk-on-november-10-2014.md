@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2014'
+excerpt: "A reflection on November 10, 2014, a century after the start of World War I, on Atatürk's legacy of peace, education and building institutions."
 date: 2014-11-10
 permalink: /posts/2014/11/remembering-ataturk-on-november-10-2014/
 tags:

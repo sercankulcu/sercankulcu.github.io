@@ -1,5 +1,6 @@
 ---
 title: Microsoft Finalizes Windows 8.1
+excerpt: "Windows 8.1 reached RTM in August 2013: the Start button's return, boot to desktop and other changes, and what the quick fix said about Microsoft's update pace."
 date: 2013-08-27
 permalink: /posts/2013/08/microsoft-finalizes-windows-8-1/
 tags:

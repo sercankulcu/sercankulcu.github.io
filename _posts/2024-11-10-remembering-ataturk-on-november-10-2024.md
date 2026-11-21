@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2024'
+excerpt: "Remembering Ataturk on November 10, 2024: what remembrance means as the Republic enters its second century, and why science, reason and education still matter."
 date: 2024-11-10
 permalink: /posts/2024/11/remembering-ataturk-on-november-10-2024/
 tags:

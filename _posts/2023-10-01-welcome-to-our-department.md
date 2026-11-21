@@ -1,5 +1,6 @@
 ---
 title: 'Welcome to Our Department'
+excerpt: "A 2023 welcome to Computer Engineering students: use AI tools, but keep building fundamentals, projects and judgment instead of outsourcing understanding."
 date: 2023-10-01
 permalink: /posts/2023/10/welcome-to-our-department/
 tags:

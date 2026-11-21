@@ -1,5 +1,6 @@
 ---
 title: Google Introduces the Tensor Processing Unit
+excerpt: "Google's 2016 Tensor Processing Unit: a 256x256 systolic array for neural-network inference, its performance claims, and how TPU v2 and v3 pushed rivals."
 date: 2016-05-18
 permalink: /posts/2016/05/google-introduces-the-tensor-processing-unit/
 tags:

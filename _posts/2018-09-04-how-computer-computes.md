@@ -1,5 +1,6 @@
 ---
 title: 'How Computer Computes?'
+excerpt: "How a CPU runs code: the fetch-decode-execute cycle, registers, the cache hierarchy, speculative execution behind Spectre, and why all data is binary."
 date: 2018-09-04
 permalink: /posts/2018/09/how-computer-computes/
 tags:
@@ -62,4 +63,4 @@ Programming languages exist precisely to hide this level from developers. But th
 
 A screen can show a photograph, a game, or a complex document. Underneath, the machine is still performing very small operations — loads, additions, comparisons, stores — at enormous speed. The complexity we see in software is not a property of the hardware. It grows from simple steps repeated many times, structured carefully by compilers and operating systems and runtime environments that most programs never need to think about.
 
-That is one of the things I find genuinely interesting about computing. The gap between what a programmer writes and what the machine executes is enormous. But each layer of that gap exists for a clear reason, and following one line of code all the way down is a useful exercise at least once.
+That is one of the things I find genuinely interesting about computing. The gap between what a programmer writes and what the machine executes is enormous. But each layer of that gap exists for a clear reason, and following one line of code all the way down is a useful exercise at least once. The [Microprocessors course](/teaching/microprocessors/?lang=en) goes deeper into registers, instruction execution and memory.

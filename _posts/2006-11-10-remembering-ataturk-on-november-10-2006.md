@@ -1,5 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2006'
+excerpt: "A November 10, 2006 reflection on Atatürk's legacy of education, reason and independent thinking in an increasingly digital, connected Turkey."
 date: 2006-11-10
 permalink: /posts/2006/11/remembering-ataturk-on-november-10-2006/
 tags:

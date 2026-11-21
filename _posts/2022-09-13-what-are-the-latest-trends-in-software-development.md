@@ -1,5 +1,6 @@
 ---
 title: 'What Are The Latest Trends In Software Development?'
+excerpt: "A September 2022 view of software trends sorted into normal, still developing and overstated, from TypeScript and Rust to Web3, the metaverse and AI coding."
 date: 2022-09-13
 permalink: /posts/2022/09/what-are-the-latest-trends-in-software-development/
 tags:

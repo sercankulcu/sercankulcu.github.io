@@ -1,5 +1,6 @@
 ---
 title: Raspberry Pi 2 Is Released
+excerpt: "Raspberry Pi 2 brought a quad-core Cortex-A7 and 1 GB RAM at $35; the ARMv7 shift opened the Pi to standard Linux distributions and Windows 10 IoT Core."
 date: 2015-02-15
 permalink: /posts/2015/02/raspberry-pi-2-is-released/
 tags:

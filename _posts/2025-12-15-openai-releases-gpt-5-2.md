@@ -1,5 +1,6 @@
 ---
 title: OpenAI Releases GPT-5.2
+excerpt: "GPT-5.2 targets reliable agentic work: tool use, long context and coding. Also how release cadence and evals shape teams building on a changing model API."
 date: 2025-12-15
 permalink: /posts/2025/12/openai-releases-gpt-5-2/
 tags:
