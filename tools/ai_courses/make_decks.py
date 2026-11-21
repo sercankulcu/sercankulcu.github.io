@@ -1111,7 +1111,11 @@ def sayfa_blogu(icerik):
     sun = T('🖼️ Sunum', '🖼️ Slides')
 
     def lnk(f):
-        return '- [%s](/files/ai_courses/%s/%s)' % (sun, kl, f)
+        s = '- [%s](/files/ai_courses/%s/%s)' % (sun, kl, f)
+        pdf = f[:-5] + '.pdf'
+        if os.path.exists(os.path.join(os.path.dirname(REPO), 'courses-pdfs', 'ai_courses', 'pdf', pdf)):
+            s += ' · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/%s)' % pdf
+        return s
     L = ['---', '', '## %s' % T('Ders Haritası', 'Course Map'), '',
          '### %s: %s' % (bolum(1), T(D.ACILIS[1], EN_ACILIS[0])), '',
          T('Bu bölümde rehberin amacı, yapay zekâ, makine öğrenmesi, yapay sinir ağları ve derin öğrenmenin iç içe ilişkisi, dersleri bölen altı kısım, '
