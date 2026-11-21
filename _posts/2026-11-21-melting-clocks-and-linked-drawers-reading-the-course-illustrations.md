@@ -2,7 +2,7 @@
 title: 'Melting Clocks and Linked Drawers: Reading the Course Illustrations'
 date: 2026-11-21
 permalink: /posts/2026/11/melting-clocks-and-linked-drawers-reading-the-course-illustrations/
-excerpt: "An art-history reading of the eleven new course illustrations: soft surrealist furniture, a four-colour code and a melting clock that turns every computer science course into a small allegory."
+excerpt: "An art-history reading of the eleven course illustrations: surrealist melting clocks, a four-colour code and what each picture says about its course."
 tags:
   - education
   - art

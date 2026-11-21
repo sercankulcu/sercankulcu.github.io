@@ -1,6 +1,7 @@
 ---
 title: 'How Japanese Carpenters Built Without Nails'
 date: 2026-09-07
+excerpt: "How Japanese carpenters joined timber without nails: kigumi joints, the suspended shinbashira of the Horyuji pagoda, and lessons for modern engineering."
 permalink: /posts/2026/09/how-japanese-carpenters-built-without-nails/
 tags:
   - engineering
