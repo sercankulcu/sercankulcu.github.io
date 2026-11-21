@@ -129,6 +129,8 @@ layout: without-sidebar
 title: "%(title)s: Dersin Haritası"
 permalink: /files/%(folder)s/%(fname)s
 excerpt: "%(title)s dersinin bütün bölümlerini tek bir haritada birleştiren sayfa: her bölümün hangi bölümün üzerine kurulduğu ve aralarındaki bağ."
+lang: tr
+resource: "Reference"
 ---
 
 %(guard)s

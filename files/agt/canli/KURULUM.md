@@ -3,6 +3,8 @@ layout: without-sidebar
 title: "Canlı Sınıf Oyunları: Kurulum ve Kullanım"
 permalink: /files/agt/canli/KURULUM
 excerpt: "Canlı sınıf oyunları için Firebase kurulumu ve sınıfta kullanım kılavuzu."
+lang: tr
+seo_title: "Canlı Sınıf Oyunları: Kurulum ve Kullanım · Algoritmik Oyun Kuramı"
 ---
 
 # Canlı Sınıf Oyunları: Kurulum ve Kullanım
