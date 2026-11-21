@@ -193,7 +193,7 @@ Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik da
 
 This chapter reviews the mathematics the course actually uses, always through small game examples. It covers set and function notation, the summation sign, max and argmax, probability and expected value, and the idea of a mixed strategy. Students then practice reading a payoff matrix, finding best responses, solving indifference equations and applying backward induction on a game tree.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_00_Preliminaries.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_00_Preliminaries.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_00_Preliminaries.pdf)
 
 ---
 
@@ -201,7 +201,7 @@ This chapter reviews the mathematics the course actually uses, always through sm
 
 Before turning to strategic interaction, we study a single decision maker. Topics include expected utility and the von Neumann–Morgenstern axioms, the transformations under which a utility scale is unique, and the Allais and Ellsberg paradoxes. The chapter continues with risk attitudes and certainty equivalents, decision criteria under uncertainty, Bayesian decision making, backward induction in decision trees and the value of information.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_01_Decision_Theory.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_01_Decision_Theory.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_01_Decision_Theory.pdf)
 
 ---
 
@@ -209,8 +209,8 @@ Before turning to strategic interaction, we study a single decision maker. Topic
 
 This chapter defines what a game is and how to write one down: players, strategies, payoffs and information, in normal and extensive form, along with a classification of games. It covers the Prisoner's Dilemma and Pareto optimality, the classic 2×2 games, the guess-2/3-of-the-average game and level-k reasoning, and combinatorial games solved by minimax. Alpha-beta pruning, depth-limited search and evaluation functions show how minimax is made fast, and sequential games lead to backward induction, subgame-perfect equilibrium and trigger strategies. A supplementary deck treats minimax and alpha-beta pruning in more depth.
 
-- **Games and Representations** — [🖼️ Slides](/files/agt/slides/Chapter_02_Games_and_Representations.html)
-- **Minimax and Alpha-Beta Pruning** — [🖼️ Slides](/files/agt/slides/Chapter_02_Minimax_and_Alpha_Beta_Pruning.html)
+- **Games and Representations** — [🖼️ Slides](/files/agt/slides/Chapter_02_Games_and_Representations.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_02_Games_and_Representations.pdf)
+- **Minimax and Alpha-Beta Pruning** — [🖼️ Slides](/files/agt/slides/Chapter_02_Minimax_and_Alpha_Beta_Pruning.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_02_Minimax_and_Alpha_Beta_Pruning.pdf)
 
 ---
 
@@ -218,7 +218,7 @@ This chapter defines what a game is and how to write one down: players, strategi
 
 A Nash equilibrium is a strategy profile from which no player can gain by deviating alone. The chapter develops best responses, Cournot and Bertrand competition, iterated elimination of dominated strategies, and mixed-strategy equilibria with the indifference principle. It then covers Nash's existence theorem, equilibrium selection, correlated equilibrium, minimax in zero-sum games, security games and the PPAD complexity of computing an equilibrium.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_03_Nash_Equilibrium.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_03_Nash_Equilibrium.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_03_Nash_Equilibrium.pdf)
 
 ---
 
@@ -228,7 +228,7 @@ A Nash equilibrium is a strategy profile from which no player can gain by deviat
 
 Mechanism design turns the question around: once the goal is fixed, which rules lead self-interested participants to act toward it? We study social choice functions, the revelation principle, incentive compatibility and individual rationality, Myerson's lemma and the VCG mechanism. Applications include Gale–Shapley stable matching, the median mechanism and Top Trading Cycles (TTC), and the chapter closes with Bayesian games.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_04_Mechanism_Design.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_04_Mechanism_Design.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_04_Mechanism_Design.pdf)
 
 ---
 
@@ -236,7 +236,7 @@ Mechanism design turns the question around: once the goal is fixed, which rules 
 
 Auctions are the most widely used mechanisms for allocating goods and setting prices. We compare the four basic formats (English, Dutch, first-price and second-price sealed-bid), derive equilibrium bidding strategies, and examine revenue equivalence and the role of information. The chapter ends with double-auction markets, in which both buyers and sellers submit bids.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_05_Auctions.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_05_Auctions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_05_Auctions.pdf)
 
 ---
 
@@ -244,7 +244,7 @@ Auctions are the most widely used mechanisms for allocating goods and setting pr
 
 Digital platforms bring self-interested users together and set the rules of the game they play. The chapter covers two-sided markets, network effects and critical mass, and two-sided pricing. It then analyzes sponsored-search auctions (GSP and VCG), budget-constrained online allocation, reputation systems and competition between platforms.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_06_Online_Platforms.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_06_Online_Platforms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_06_Online_Platforms.pdf)
 
 ---
 
@@ -252,7 +252,7 @@ Digital platforms bring self-interested users together and set the rules of the 
 
 Social choice studies how individual preferences are turned into a collective decision. Working from a single preference profile, we count the majority, plurality, Borda, approval, instant-runoff and Condorcet rules and see how their winners differ. The chapter then examines Condorcet cycles and strategic voting, and closes with the theorems of Arrow, Gibbard–Satterthwaite and May.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_07_Social_Choice_and_Voting.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_07_Social_Choice_and_Voting.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_07_Social_Choice_and_Voting.pdf)
 
 ---
 
@@ -262,7 +262,7 @@ Social choice studies how individual preferences are turned into a collective de
 
 When every driver or packet picks its own route, the outcome can differ from what a central planner would choose. We start with the basics of routing and selfish routing, then compare Wardrop equilibrium with the system optimum. Braess's paradox, congestion games with Rosenthal's potential, and network formation games complete the chapter.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_08_Network_Design_and_Routing.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_08_Network_Design_and_Routing.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_08_Network_Design_and_Routing.pdf)
 
 ---
 
@@ -270,7 +270,7 @@ When every driver or packet picks its own route, the outcome can differ from wha
 
 The price of anarchy measures how much efficiency selfish behavior costs by comparing the worst equilibrium with the optimum; the price of stability makes the same comparison for the best equilibrium. We compute both ratios on a two-road network and on Pigou's network, prove the 4/3 bound for linear latencies and introduce smoothness arguments. The chapter also covers the Braess network, load balancing, the logarithmic bound on the price of stability, congestion pricing and other interventions.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_09_Price_of_Anarchy.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_09_Price_of_Anarchy.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_09_Price_of_Anarchy.pdf)
 
 ---
 
@@ -280,7 +280,7 @@ The price of anarchy measures how much efficiency selfish behavior costs by comp
 
 Multi-agent systems consist of autonomous agents that cooperate or compete in a shared environment. The chapter describes the properties of agents, cooperation and competition, and task allocation with the contract net protocol. It then introduces coalitional games, the Shapley value and the core, and closes with free riding in public goods.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_10_Multi_Agent_Systems.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_10_Multi_Agent_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_10_Multi_Agent_Systems.pdf)
 
 ---
 
@@ -288,7 +288,7 @@ Multi-agent systems consist of autonomous agents that cooperate or compete in a 
 
 Algorithmic decisions and allocations affect individuals and groups in different ways. We define fairness criteria computed from the confusion matrix (demographic parity, equalized odds, predictive parity and calibration) and show why they cannot all hold at once. The chapter then treats fair division through cut-and-choose, proportionality and envy-freeness, and ends with ethical principles and algorithmic auditing.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_11_Algorithmic_Fairness_and_Ethics.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_11_Algorithmic_Fairness_and_Ethics.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_11_Algorithmic_Fairness_and_Ethics.pdf)
 
 ---
 
@@ -296,7 +296,7 @@ Algorithmic decisions and allocations affect individuals and groups in different
 
 Real people depart from the rational model, and groups face dilemmas that no single individual meets on their own. Topics include bounded rationality, prospect theory, loss aversion and framing, and the tragedy of the commons with best-response dynamics. We then look at institutional remedies such as taxes, quotas and sanctions, public goods experiments and measures of social welfare.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_12_Behavioral_and_Collective_Decisions.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_12_Behavioral_and_Collective_Decisions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_12_Behavioral_and_Collective_Decisions.pdf)
 
 ---
 
@@ -306,7 +306,7 @@ Real people depart from the rational model, and groups face dilemmas that no sin
 
 How do agents that learn from experience reach an equilibrium, and why do they sometimes fail to? The chapter studies best-response dynamics, fictitious play, regret and multiplicative weights. It continues with multi-armed bandit problems (epsilon-greedy and UCB), replicator dynamics and the repeated Prisoner's Dilemma.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_13_Learning_and_Adaptation.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_13_Learning_and_Adaptation.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_13_Learning_and_Adaptation.pdf)
 
 ---
 
@@ -314,6 +314,6 @@ How do agents that learn from experience reach an equilibrium, and why do they s
 
 The final chapter surveys open problems at the frontier of the field: AI agents and algorithmic collusion, mechanisms learned from data and their sample complexity, and differential privacy. It also covers transaction-fee mechanisms on blockchains and MEV. The course closes with an overall map that ties its topics together.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_14_Future_Directions.html)
+- [🖼️ Slides](/files/agt/slides/Chapter_14_Future_Directions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_14_Future_Directions.pdf)
 
 </div>

@@ -173,8 +173,8 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 
 The microprocessor is the heart of a computer system: it fetches instructions from memory, decodes them and executes them. The chapter begins with the difference between microprocessors and microcontrollers, the fetch–decode–execute cycle, the internal structure of a processor and clock speed, then compares CISC, RISC and EPIC designs, special-purpose processors and the evolution of the Intel x86 family from the 4004 to today. The number-systems part covers decimal, binary and hexadecimal bases, base conversion, signed numbers in ones' and two's complement, and binary arithmetic. It ends with encodings such as IEEE 754 floating point, BCD, Gray code and byte order.
 
-- **1.1 Introduction** — [🖼️ Slides](/files/microprocessors/slides/Chapter_01_01_Introduction.html)
-- **1.2 Number Systems** — [🖼️ Slides](/files/microprocessors/slides/Chapter_01_02_Number_Systems.html)
+- **1.1 Introduction** — [🖼️ Slides](/files/microprocessors/slides/Chapter_01_01_Introduction.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_01_01_Introduction.pdf)
+- **1.2 Number Systems** — [🖼️ Slides](/files/microprocessors/slides/Chapter_01_02_Number_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_01_02_Number_Systems.pdf)
 
 ---
 
@@ -182,8 +182,8 @@ The microprocessor is the heart of a computer system: it fetches instructions fr
 
 The Intel 8086, introduced in 1978, is the 16-bit microprocessor that launched the x86 family. This chapter describes the system buses, the bus interface unit (BIU) and execution unit (EU), the prefetch queue, and how a 20-bit physical address is formed in segmented memory. It then studies the fourteen registers of the 8086 by group: the general-purpose registers AX, BX, CX and DX, the pointer and index registers SP, BP, SI and DI, the segment registers and IP. The flags register, with its status and control flags, and the instructions that change those flags complete the chapter.
 
-- **2.1 8086 Architecture** — [🖼️ Slides](/files/microprocessors/slides/Chapter_02_01_8086_Architecture.html)
-- **2.2 8086 Registers** — [🖼️ Slides](/files/microprocessors/slides/Chapter_02_02_8086_Registers.html)
+- **2.1 8086 Architecture** — [🖼️ Slides](/files/microprocessors/slides/Chapter_02_01_8086_Architecture.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_02_01_8086_Architecture.pdf)
+- **2.2 8086 Registers** — [🖼️ Slides](/files/microprocessors/slides/Chapter_02_02_8086_Registers.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_02_02_8086_Registers.pdf)
 
 ---
 
@@ -191,8 +191,8 @@ The Intel 8086, introduced in 1978, is the 16-bit microprocessor that launched t
 
 Software can be written at different levels of abstraction, from machine language up to high-level languages. The chapter looks at machine language and instruction formats, the roles of the assembler and the linker, assembly languages on different platforms, and compiled versus interpreted languages. The assembly part covers the structure of a source line (label, mnemonic, operands and comment), the difference between instructions and directives, operand types and implicit operands. Instruction timing, how IP advances, the flags and a first program written in emu8086 close the chapter.
 
-- **3.1 Programming Languages** — [🖼️ Slides](/files/microprocessors/slides/Chapter_03_01_Programming_Languages.html)
-- **3.2 Assembly Language** — [🖼️ Slides](/files/microprocessors/slides/Chapter_03_02_Assembly_Language.html)
+- **3.1 Programming Languages** — [🖼️ Slides](/files/microprocessors/slides/Chapter_03_01_Programming_Languages.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_03_01_Programming_Languages.pdf)
+- **3.2 Assembly Language** — [🖼️ Slides](/files/microprocessors/slides/Chapter_03_02_Assembly_Language.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_03_02_Assembly_Language.pdf)
 
 ---
 
@@ -202,8 +202,8 @@ Software can be written at different levels of abstraction, from machine languag
 
 The 8086 reaches memory by combining a segment value with an offset. This chapter presents the addressing modes built from the BX, SI, DI and BP registers, effective and physical address calculation, specifying data size with byte ptr and word ptr, and the valid operand combinations of MOV and XCHG. The variables part covers DB, DW and DD definitions, memory layout, ORG 100h and .COM programs, arrays with DUP, taking addresses with LEA and OFFSET, and EQU constants. Sample programs that move, add and compare variables complete the chapter.
 
-- **4.1 Memory Access** — [🖼️ Slides](/files/microprocessors/slides/Chapter_04_01_Memory_Access.html)
-- **4.2 Variables** — [🖼️ Slides](/files/microprocessors/slides/Chapter_04_02_Variables.html)
+- **4.1 Memory Access** — [🖼️ Slides](/files/microprocessors/slides/Chapter_04_01_Memory_Access.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_04_01_Memory_Access.pdf)
+- **4.2 Variables** — [🖼️ Slides](/files/microprocessors/slides/Chapter_04_02_Variables.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_04_02_Variables.pdf)
 
 ---
 
@@ -211,8 +211,8 @@ The 8086 reaches memory by combining a segment value with an offset. This chapte
 
 An interrupt is an event that makes the processor set aside its current work and run a special service routine. The chapter explains the types of interrupts, the interrupt vector table, how INT and IRET save and restore FLAGS, CS and IP on the stack, processor exceptions, and masking hardware interrupts with the 8259A. The BIOS and DOS services part covers screen output with INT 10h, keyboard input with INT 16h, character and string handling with INT 21h, and reading the date and time, including INT 1Ah. Terminating a program correctly and an application that combines these services close the chapter.
 
-- **5.1 Interrupts** — [🖼️ Slides](/files/microprocessors/slides/Chapter_05_01_Interrupts.html)
-- **5.2 Interrupt Functions** — [🖼️ Slides](/files/microprocessors/slides/Chapter_05_02_Interrupt_Functions.html)
+- **5.1 Interrupts** — [🖼️ Slides](/files/microprocessors/slides/Chapter_05_01_Interrupts.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_05_01_Interrupts.pdf)
+- **5.2 Interrupt Functions** — [🖼️ Slides](/files/microprocessors/slides/Chapter_05_02_Interrupt_Functions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_05_02_Interrupt_Functions.pdf)
 
 ---
 
@@ -222,7 +222,7 @@ An interrupt is an event that makes the processor set aside its current work and
 
 Arithmetic and logic instructions let the processor compute on data and set the flags according to the result. The chapter starts with the results that set CF, ZF, SF, OF, PF and AF, then studies the instructions in groups: the two-operand ADD, SUB, CMP, AND, OR, XOR and TEST; multiplication and division with MUL, IMUL, DIV and IDIV; and single-operand instructions such as INC, DEC, NOT and NEG. The effect of shift and rotate instructions on the bits and on CF is shown step by step, and examples on BCD arithmetic, summing an array and temperature conversion complete the chapter.
 
-- [🖼️ Slides](/files/microprocessors/slides/Chapter_06_Arithmetic_Logic_and_Shift_Instructions.html)
+- [🖼️ Slides](/files/microprocessors/slides/Chapter_06_Arithmetic_Logic_and_Shift_Instructions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_06_Arithmetic_Logic_and_Shift_Instructions.pdf)
 
 ---
 
@@ -230,7 +230,7 @@ Arithmetic and logic instructions let the processor compute on data and set the 
 
 Program flow is steered by changing the sequential progress of IP with jump and loop instructions. This chapter covers unconditional jumps with JMP, how the relative offset is computed, and conditional jumps that test a single flag. After a CMP, students learn when to choose the JA/JB family for unsigned numbers and the JG/JL family for signed numbers. The LOOP family, JCXZ and nested loops are traced in sample programs.
 
-- [🖼️ Slides](/files/microprocessors/slides/Chapter_07_Flow_Control.html)
+- [🖼️ Slides](/files/microprocessors/slides/Chapter_07_Flow_Control.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_07_Flow_Control.pdf)
 
 ---
 
@@ -238,8 +238,8 @@ Program flow is steered by changing the sequential progress of IP with jump and 
 
 The 8086 stack is addressed by the SS:SP pair and is a LIFO structure that grows downward in memory. The chapter covers PUSH and POP, how SP changes, saving and swapping registers, preserving the flags with PUSHF and POPF, and stack safety. The procedures part explains defining procedures with PROC and ENDP, how CALL and RET push and pop the return address, passing parameters in registers, in memory and on the stack, and setting up a stack frame with BP. Recursive examples and common mistakes close the chapter.
 
-- **8.1 The Stack** — [🖼️ Slides](/files/microprocessors/slides/Chapter_08_01_The_Stack.html)
-- **8.2 Procedures** — [🖼️ Slides](/files/microprocessors/slides/Chapter_08_02_Procedures.html)
+- **8.1 The Stack** — [🖼️ Slides](/files/microprocessors/slides/Chapter_08_01_The_Stack.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_08_01_The_Stack.pdf)
+- **8.2 Procedures** — [🖼️ Slides](/files/microprocessors/slides/Chapter_08_02_Procedures.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_08_02_Procedures.pdf)
 
 ---
 
@@ -247,8 +247,8 @@ The 8086 stack is addressed by the SS:SP pair and is a LIFO structure that grows
 
 A macro gives a name to a repeated piece of code; unlike a procedure, the assembler expands it as text at every place it is used. This chapter covers defining parameterized macros with MACRO and ENDM, expansion, parameter pitfalls, avoiding label clashes with LOCAL, and comparing macros with procedures in size and speed, running the PUTC and POWER macros step by step. The emu8086.inc part presents the INCLUDE directive, macros such as PUTC, GOTOXY, PRINT and PRINTN, and the procedures for reading and printing numbers. Sample programs built from the library's macros and procedures complete the chapter.
 
-- **9.1 Macros** — [🖼️ Slides](/files/microprocessors/slides/Chapter_09_01_Macros.html)
-- **9.2 The emu8086.inc Library** — [🖼️ Slides](/files/microprocessors/slides/Chapter_09_02_The_emu8086_inc_Library.html)
+- **9.1 Macros** — [🖼️ Slides](/files/microprocessors/slides/Chapter_09_01_Macros.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_09_01_Macros.pdf)
+- **9.2 The emu8086.inc Library** — [🖼️ Slides](/files/microprocessors/slides/Chapter_09_02_The_emu8086_inc_Library.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_09_02_The_emu8086_inc_Library.pdf)
 
 ---
 
@@ -258,8 +258,8 @@ A macro gives a name to a repeated piece of code; unlike a procedure, the assemb
 
 The 8086 carries its address, data, control, status and interrupt signals on the 40 pins of a DIP package. This chapter explains the multiplexing of address and data lines, ALE and address latches, memory banks with BHE', read and write bus cycles made of the T1–T4 states, minimum and maximum mode, and the 8284A and 8288 chips. The device-control part covers the IN and OUT instructions, polling, waiting with INT 15h and software delays. The chapter ends by programming emu8086 devices such as traffic lights, a stepper motor, an LED display, a thermometer, a printer and a robot.
 
-- **10.1 8086 Pins** — [🖼️ Slides](/files/microprocessors/slides/Chapter_10_01_8086_Pins.html)
-- **10.2 Device Control** — [🖼️ Slides](/files/microprocessors/slides/Chapter_10_02_Device_Control.html)
+- **10.1 8086 Pins** — [🖼️ Slides](/files/microprocessors/slides/Chapter_10_01_8086_Pins.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_10_01_8086_Pins.pdf)
+- **10.2 Device Control** — [🖼️ Slides](/files/microprocessors/slides/Chapter_10_02_Device_Control.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_10_02_Device_Control.pdf)
 
 ---
 
@@ -267,6 +267,6 @@ The 8086 carries its address, data, control, status and interrupt signals on the
 
 The 8086 instruction set falls into functional classes: data transfer, arithmetic and logic, control transfer, string processing and processor control. This chapter shows how an instruction's machine code is built from the opcode, the D and W bits and the ModR/M byte, using the forms of MOV and the encoding of JMP as examples. The string instructions MOVS, CMPS, SCAS, LODS and STOS are studied with the REP prefixes while tracing changes in DF, SI, DI and CX. XLAT, LEA, LDS and LES, the processor control instructions and a table of flag effects complete the chapter.
 
-- [🖼️ Slides](/files/microprocessors/slides/Chapter_11_Instruction_Encoding_and_String_Instructions.html)
+- [🖼️ Slides](/files/microprocessors/slides/Chapter_11_Instruction_Encoding_and_String_Instructions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_11_Instruction_Encoding_and_String_Instructions.pdf)
 
 </div>

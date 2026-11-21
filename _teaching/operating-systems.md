@@ -184,7 +184,7 @@ Linux, dersin kavramlarını gerçek bir sistemde bir arada gösterir. Bu bölü
 
 An operating system is the software that sits between the hardware and applications and connects the two. This chapter presents its two roles, as an extended machine and as a resource manager, together with kernel and user mode and the switch between them, spooling and resource sharing. It traces the history of operating systems generation by generation, summarizes the hardware an operating system relies on, gives an overview of I/O methods and surveys the different kinds of operating systems.
 
-- [🖼️ Slides](/files/os/slides/Chapter_01_Introduction.html)
+- [🖼️ Slides](/files/os/slides/Chapter_01_Introduction.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_01_Introduction.pdf)
 
 ---
 
@@ -192,7 +192,7 @@ An operating system is the software that sits between the hardware and applicati
 
 An operating system offers its services to applications through system calls. The chapter introduces core abstractions such as processes, address spaces, files and pipes, protection through dual-mode operation and the timer, how system calls work, the POSIX and Win32 interfaces and the standard C library. It compares monolithic, layered, microkernel, modular, hybrid and exokernel designs, gives a short introduction to virtual machines and follows the boot process step by step.
 
-- [🖼️ Slides](/files/os/slides/Chapter_02_Operating_System_Structures.html)
+- [🖼️ Slides](/files/os/slides/Chapter_02_Operating_System_Structures.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_02_Operating_System_Structures.pdf)
 
 ---
 
@@ -202,7 +202,7 @@ An operating system offers its services to applications through system calls. Th
 
 A process is a program in execution. This chapter examines the memory layout of a process, process creation with fork, exec and wait, how a shell works, process termination, and zombie and orphan processes. It continues with process states and the process control block, ready and wait queues, and context switching and its cost, and covers interprocess communication through shared memory, message passing, pipes and sockets.
 
-- [🖼️ Slides](/files/os/slides/Chapter_03_Processes.html)
+- [🖼️ Slides](/files/os/slides/Chapter_03_Processes.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_03_Processes.pdf)
 
 ---
 
@@ -210,7 +210,7 @@ A process is a program in execution. This chapter examines the memory layout of 
 
 A thread is an independent flow of execution within a process. The chapter looks at multithreaded server designs, concurrency versus parallelism and Amdahl's law, user-level and kernel-level threads and the models that map one onto the other. It covers POSIX Pthreads, Java threads and virtual threads, implicit approaches such as thread pools, fork-join and OpenMP, and the problems that threads introduce.
 
-- [🖼️ Slides](/files/os/slides/Chapter_04_Threads.html)
+- [🖼️ Slides](/files/os/slides/Chapter_04_Threads.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_04_Threads.pdf)
 
 ---
 
@@ -218,7 +218,7 @@ A thread is an independent flow of execution within a process. The chapter looks
 
 The scheduler decides which ready process gets the processor next. This chapter presents scheduling criteria and the FCFS, SJF, SRTF, priority and round-robin algorithms with Gantt charts and waiting-time calculations, followed by multilevel feedback queues, lottery and stride scheduling. Multiprocessor scheduling brings in affinity and load balancing, real-time scheduling covers rate-monotonic and EDF scheduling with the Liu–Layland test, and the chapter ends with Linux CFS/EEVDF and the Windows scheduler.
 
-- [🖼️ Slides](/files/os/slides/Chapter_05_CPU_Scheduling.html)
+- [🖼️ Slides](/files/os/slides/Chapter_05_CPU_Scheduling.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_05_CPU_Scheduling.pdf)
 
 ---
 
@@ -226,7 +226,7 @@ The scheduler decides which ready process gets the processor next. This chapter 
 
 Concurrent access to shared data leads to race conditions. The chapter states the critical-section problem and the three requirements of a solution, presents Peterson's algorithm and why it breaks on modern processors, and introduces atomic hardware instructions, spinlocks and mutexes, and semaphores. It works through the bounded-buffer, readers-writers and dining-philosophers problems, monitors and condition variables, and the POSIX and Java synchronization tools, closing with priority inversion and the Mars Pathfinder incident.
 
-- [🖼️ Slides](/files/os/slides/Chapter_06_Synchronization.html)
+- [🖼️ Slides](/files/os/slides/Chapter_06_Synchronization.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_06_Synchronization.pdf)
 
 ---
 
@@ -234,7 +234,7 @@ Concurrent access to shared data leads to race conditions. The chapter states th
 
 In a deadlock, a group of processes waits forever because each holds a resource another one needs. This chapter covers the four conditions for deadlock, the resource-allocation graph, and detection and recovery algorithms. It then treats avoidance with safe states and the banker's algorithm, prevention by attacking each of the four conditions, and livelock and starvation, with deadlock examples in Java and detection tools such as jstack and lockdep.
 
-- [🖼️ Slides](/files/os/slides/Chapter_07_Deadlocks.html)
+- [🖼️ Slides](/files/os/slides/Chapter_07_Deadlocks.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_07_Deadlocks.pdf)
 
 ---
 
@@ -244,7 +244,7 @@ In a deadlock, a group of processes waits forever because each holds a resource 
 
 The memory manager lets processes share memory safely. The chapter covers memory hardware and caches, protection with base and limit registers, logical and physical addresses, static and dynamic binding, swapping, contiguous allocation and fragmentation, and free-space management. It then develops paging, the TLB and effective access time, multilevel, hashed and inverted page tables, and segmentation, and looks at the actual layouts used on x86, ARM and RISC-V.
 
-- [🖼️ Slides](/files/os/slides/Chapter_08_Memory_Management.html)
+- [🖼️ Slides](/files/os/slides/Chapter_08_Memory_Management.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_08_Memory_Management.pdf)
 
 ---
 
@@ -252,7 +252,7 @@ The memory manager lets processes share memory safely. The chapter covers memory
 
 Virtual memory lets processes work with address spaces larger than physical memory. This chapter examines demand paging and page-fault handling, copy-on-write and memory-mapped files, and page-replacement algorithms such as FIFO, OPT, LRU, clock and aging, together with Belady's anomaly. It continues with the working set and WSClock, frame allocation and thrashing, kernel memory with the buddy and slab allocators, and how Linux and Windows implement these ideas.
 
-- [🖼️ Slides](/files/os/slides/Chapter_09_Virtual_Memory.html)
+- [🖼️ Slides](/files/os/slides/Chapter_09_Virtual_Memory.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_09_Virtual_Memory.pdf)
 
 ---
 
@@ -260,7 +260,7 @@ Virtual memory lets processes work with address spaces larger than physical memo
 
 A file system stores data on disk persistently and in an organized way. The chapter covers files and directories, path resolution, hard and symbolic links, rwx permissions, and the MBR and GPT disk layouts. It compares contiguous, linked, FAT and inode-based allocation, examines ext4 and NTFS, free-space management and the buffer cache, and treats consistency through journaling, copy-on-write and fsck before closing with VFS and NFS.
 
-- [🖼️ Slides](/files/os/slides/Chapter_10_File_Systems.html)
+- [🖼️ Slides](/files/os/slides/Chapter_10_File_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_10_File_Systems.pdf)
 
 ---
 
@@ -268,7 +268,7 @@ A file system stores data on disk persistently and in an organized way. The chap
 
 The I/O system manages devices of very different speeds through a common interface. This chapter covers device controllers and their registers, programmed I/O, interrupts and DMA, the layers of I/O software and device drivers, and buffering. It goes on to blocking and asynchronous I/O with epoll and io_uring, clocks, magnetic disk geometry and disk-arm scheduling algorithms, and ends with SSDs, NVMe, TRIM, RAID and stable storage.
 
-- [🖼️ Slides](/files/os/slides/Chapter_11_Input_Output.html)
+- [🖼️ Slides](/files/os/slides/Chapter_11_Input_Output.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_11_Input_Output.pdf)
 
 ---
 
@@ -278,7 +278,7 @@ The I/O system manages devices of very different speeds through a common interfa
 
 Multiple processors raise new problems for the operating system. The chapter covers UMA and NUMA architectures, cache coherence and the MESI protocol, false sharing, multiprocessor operating-system models, scaling spinlocks, and space sharing and gang scheduling. It then turns to multicomputers and RPC, virtualization with hypervisors, hardware-assisted virtualization and containers, and middleware for distributed systems.
 
-- [🖼️ Slides](/files/os/slides/Chapter_12_Multiprocessor_Systems.html)
+- [🖼️ Slides](/files/os/slides/Chapter_12_Multiprocessor_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_12_Multiprocessor_Systems.pdf)
 
 ---
 
@@ -286,7 +286,7 @@ Multiple processors raise new problems for the operating system. The chapter cov
 
 Security means protecting confidentiality, integrity and availability against threats. This chapter introduces the basics of cryptography and TLS, protection domains, access control lists and capabilities, and the Bell–LaPadula and Biba models. It covers password storage, multi-factor authentication and passkeys, buffer overflows and their defenses, malware, sandboxing and SELinux, and closes with secure boot, the TPM and side-channel attacks such as Spectre.
 
-- [🖼️ Slides](/files/os/slides/Chapter_13_Security.html)
+- [🖼️ Slides](/files/os/slides/Chapter_13_Security.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_13_Security.pdf)
 
 ---
 
@@ -294,7 +294,7 @@ Security means protecting confidentiality, integrity and availability against th
 
 Designing an operating system means balancing goals that pull against each other. The chapter discusses principles of interface design, the trade-offs between system structures, separating mechanism from policy, naming and binding time, and techniques such as indirection and reuse. It also covers performance through caching and locality, managing large software projects, testing kernel code and debugging tools, and current trends in operating systems.
 
-- [🖼️ Slides](/files/os/slides/Chapter_14_Operating_System_Design.html)
+- [🖼️ Slides](/files/os/slides/Chapter_14_Operating_System_Design.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_14_Operating_System_Design.pdf)
 
 ---
 
@@ -302,6 +302,6 @@ Designing an operating system means balancing goals that pull against each other
 
 Linux brings the concepts of the course together in a real system. This chapter follows the path from UNIX to Linux, the shell and pipelines, the kernel structure and modules, task_struct, signals and clone, and the EEVDF scheduler and booting with systemd. It continues with the virtual address space and the SLUB allocator, device files and the block layer, VFS, ext4 and /proc, permission checks, namespaces and cgroups for containers, and the way Android is built on top of Linux.
 
-- [🖼️ Slides](/files/os/slides/Chapter_15_Linux.html)
+- [🖼️ Slides](/files/os/slides/Chapter_15_Linux.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/os/pdf/Chapter_15_Linux.pdf)
 
 </div>

@@ -217,7 +217,7 @@ Hızlı sıralama bölümleme değişmezi üzerinden anlatılır; en kötü, en 
 
 We begin with the software life cycle, from requirements to verification, the notion of an algorithm, and how abstract data types are expressed in C through header files. Selection sort, written in C with a SWAP macro, serves as the first worked example. Program performance is then measured in terms of space and time complexity: step counting, best, average and worst cases, and the O, Ω and Θ notations. The magic square problem and timing experiments with sorting and linear search connect the theoretical analysis to practice.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_01_Introduction_and_Algorithm_Analysis.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_01_Introduction_and_Algorithm_Analysis.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_01_Introduction_and_Algorithm_Analysis.pdf)
 
 ---
 
@@ -225,7 +225,7 @@ We begin with the software life cycle, from requirements to verification, the no
 
 The starting point is the array ADT and the close relationship between arrays and pointers in C. We build dynamic arrays with malloc, look at the amortized cost of growable arrays, and compute row-major and column-major addresses in two- and higher-dimensional arrays. Lower-triangular and band matrices are packed into one-dimensional arrays to save space. The chapter closes with struct, union and alignment, strings as character arrays, and matrix multiplication.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_02_Arrays_and_Structures.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_02_Arrays_and_Structures.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_02_Arrays_and_Structures.pdf)
 
 ---
 
@@ -233,7 +233,7 @@ The starting point is the array ADT and the close relationship between arrays an
 
 Recursive algorithms are traced through their stack frames, and we discuss how recursion relates to iteration and what tail recursion is. Iterative and recursive binary search are developed step by step together with their logarithmic complexity. The Towers of Hanoi and permutation generation serve as classic exercises in recursive thinking. Backtracking is then applied to satisfiability (SAT), the n-queens problem, subset generation and the knight's tour with Warnsdorff's rule.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_03_Recursion_Binary_Search_and_Backtracking.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_03_Recursion_Binary_Search_and_Backtracking.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_03_Recursion_Binary_Search_and_Backtracking.pdf)
 
 ---
 
@@ -243,7 +243,7 @@ Recursive algorithms are traced through their stack frames, and we discuss how r
 
 Starting from the situations where arrays fall short, we build linked lists out of nodes using malloc and free. Traversal, insertion at the front, at the end, in the middle and in sorted order, deletion and search on singly linked lists are traced step by step. Classic routines include reversing a list, concatenating two lists, finding the middle node and Floyd's cycle-detection algorithm. Circular and doubly linked lists, header nodes and an available-space list that recycles freed nodes complete the chapter.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_04_Linked_Lists.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_04_Linked_Lists.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_04_Linked_Lists.pdf)
 
 ---
 
@@ -251,7 +251,7 @@ Starting from the situations where arrays fall short, we build linked lists out 
 
 The polynomial ADT is introduced with coefficient-array and term-array representations, and polynomial addition is implemented and analyzed with the padd routine. We then represent polynomials as linked lists and use this form for polynomial multiplication. Sparse matrices are stored as triples; transpose, the faster fast_transpose and sparse matrix multiplication are presented along with their costs. The CSR format and linked sparse matrices are introduced as alternatives.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_05_Polynomials_and_Sparse_Matrices.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_05_Polynomials_and_Sparse_Matrices.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_05_Polynomials_and_Sparse_Matrices.pdf)
 
 ---
 
@@ -259,7 +259,7 @@ The polynomial ADT is introduced with coefficient-array and term-array represent
 
 The stack, which follows the last-in, first-out (LIFO) principle, is introduced as an abstract data type together with its typical uses. We implement push and pop on an array, handle overflow and underflow, and move from a global array to a cleaner struct-based implementation in C. A linked-list stack is then compared with the array-based version. The chapter also looks at how function calls map onto the call stack, how to keep several stacks in a single array, and which output orders a stack can produce.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_06_Stacks.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_06_Stacks.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_06_Stacks.pdf)
 
 ---
 
@@ -267,7 +267,7 @@ The stack, which follows the last-in, first-out (LIFO) principle, is introduced 
 
 The queue, which follows the first-in, first-out (FIFO) principle, is presented as an abstract data type with its typical uses. The drift problem of a linear array queue is solved with a circular queue based on modular arithmetic, and we compare ways of telling a full queue from an empty one. A linked queue is implemented and contrasted with the array-based version. Deques, multiple queues, a job-scheduling simulation and a queue built from two stacks round out the chapter.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_07_Queues.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_07_Queues.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_07_Queues.pdf)
 
 ---
 
@@ -275,7 +275,7 @@ The queue, which follows the first-in, first-out (FIFO) principle, is presented 
 
 Two larger applications show stacks and queues at work on real problems. The maze problem is solved by backtracking with a move table and a stack, and its complexity is evaluated. Infix, postfix and prefix notation are introduced in light of operator precedence and associativity; we evaluate postfix expressions and convert infix to postfix step by step using in-stack (isp) and incoming (icp) priorities. Prefix evaluation, bracket matching and further applications are also covered.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_08_Stack_and_Queue_Applications.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_08_Stack_and_Queue_Applications.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_08_Stack_and_Queue_Applications.pdf)
 
 ---
 
@@ -283,7 +283,7 @@ Two larger applications show stacks and queues at work on real problems. The maz
 
 We state the contract of the list ADT and compare its array and linked implementations. Generalized lists, whose elements may be atoms or sublists, are introduced through multivariate polynomials and their memory layout. Copying, equality, traversal, depth and reversal routines are written recursively and traced step by step. The chapter also covers representing trees with lists, shared lists, reference counting and the idea of garbage collection.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_09_List_ADT_and_Generalized_Lists.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_09_List_ADT_and_Generalized_Lists.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_09_List_ADT_and_Generalized_Lists.pdf)
 
 ---
 
@@ -293,7 +293,7 @@ We state the contract of the list ADT and compare its array and linked implement
 
 After tree terminology and the definitions of depth, we turn to binary trees, complete and perfect trees, and the relationships among node counts. Array and linked representations of binary trees are compared, and a general tree is converted into a binary tree. Preorder, inorder and postorder traversals are written as recursive routines and illustrated with expression trees, followed by iterative versions that use a stack. Level-order traversal with a queue, copying trees, testing equality and swapping children are also covered.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_10_Trees.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_10_Trees.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_10_Trees.pdf)
 
 ---
 
@@ -301,7 +301,7 @@ After tree terminology and the definitions of depth, we turn to binary trees, co
 
 We define the binary search tree and show with examples how the insertion order shapes the tree. Insertion, iterative and recursive search, and depth computation are written in C, and we discuss the pitfalls of recursive search and the use of an extra parameter. Deletion is worked through case by case, along with alternative deletion strategies. The cost of imbalance is addressed with AVL trees and single and double rotations; red-black trees and B-trees are introduced briefly.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_11_Search_Trees.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_11_Search_Trees.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_11_Search_Trees.pdf)
 
 ---
 
@@ -309,7 +309,7 @@ We define the binary search tree and show with examples how the insertion order 
 
 A binary tree with n nodes has n+1 null pointers, and Perlis and Thornton's idea is to put them to use as threads. The rules for building threads, the thread flags and the header node are explained through examples. We trace how to find the inorder successor and traverse the tree without a stack, and introduce Morris traversal. Inserting a node as a right or left child of a threaded tree is covered case by case.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_12_Threaded_Binary_Trees.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_12_Threaded_Binary_Trees.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_12_Threaded_Binary_Trees.pdf)
 
 ---
 
@@ -317,7 +317,7 @@ A binary tree with n nodes has n+1 null pointers, and Perlis and Thornton's idea
 
 We introduce the priority queue, why it is needed and its abstract data type. Max-heaps and min-heaps, which store a complete binary tree in an array, are explained along with how they differ from binary search trees. Insertion by sifting up and deletion by sifting down are written in C and traced step by step, and the heap is compared with other structures on numerical examples. The chapter also shows why bottom-up heap construction takes O(n) time and covers d-ary heaps and applications.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_13_Priority_Queues_and_Heaps.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_13_Priority_Queues_and_Heaps.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_13_Priority_Queues_and_Heaps.pdf)
 
 ---
 
@@ -327,7 +327,7 @@ We introduce the priority queue, why it is needed and its abstract data type. Ma
 
 Starting from direct addressing, we introduce the idea of hashing and the dictionary ADT. Hash functions based on division, multiplication, folding and mid-square, as well as hash functions for strings, are examined. Collisions are resolved with open addressing (linear probing, quadratic probing and double hashing) and with chaining, all implemented in C. Deletion with tombstones in open addressing, the load factor and resizing are discussed, and the two approaches are compared.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_14_Hash_Tables.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_14_Hash_Tables.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_14_Hash_Tables.pdf)
 
 ---
 
@@ -335,7 +335,7 @@ Starting from direct addressing, we introduce the idea of hashing and the dictio
 
 Beginning with the Seven Bridges of Königsberg, we define graphs and the notions of adjacency, paths, connectivity and degree. Five representations are compared: the adjacency matrix, adjacency lists, sequential arrays, the orthogonal representation and adjacency multilists, along with how to represent weighted graphs. Depth-first search (DFS) and breadth-first search (BFS) are written in C and traced step by step. Finding connected components, detecting cycles and recognizing bipartite graphs complete the chapter.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_15_Graphs.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_15_Graphs.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_15_Graphs.pdf)
 
 ---
 
@@ -343,7 +343,7 @@ Beginning with the Seven Bridges of Königsberg, we define graphs and the notion
 
 Disjoint sets and the union and find operations are introduced through an implementation based on a parent array. We show that the simple routines can reach O(n²) cost on a bad sequence of operations. The weighting rule keeps trees shallow and the collapsing rule shortens paths during find; both improvements are traced step by step. The Tarjan–van Leeuwen analysis, the Ackermann function and its inverse, and applications such as counting components and Kruskal's algorithm are also discussed.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_16_Sets_and_Union_Find.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_16_Sets_and_Union_Find.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_16_Sets_and_Union_Find.pdf)
 
 ---
 
@@ -351,7 +351,7 @@ Disjoint sets and the union and find operations are introduced through an implem
 
 Spanning trees are introduced through tree and non-tree edges and their properties, with a note on isomorphism and planarity. The minimum-cost spanning tree problem is approached with the greedy method. Kruskal's algorithm, using sorted edges and union-find, and Prim's algorithm, which grows the tree from a single vertex, are implemented and traced step by step, including a heap-based version of Prim. Sollin's (Borůvka's) algorithm, the difference between a minimum spanning tree and a shortest-path tree, and a comparison of Kruskal and Prim complete the chapter.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_17_Minimum_Spanning_Trees.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_17_Minimum_Spanning_Trees.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_17_Minimum_Spanning_Trees.pdf)
 
 ---
 
@@ -359,7 +359,7 @@ Spanning trees are introduced through tree and non-tree edges and their properti
 
 The single-source shortest-path problem starts with a brute-force analysis and is solved with Dijkstra's greedy algorithm, using a predecessor array to recover the path itself. Bellman-Ford handles negative edges and Floyd-Warshall solves the all-pairs problem, both worked through step by step. In AoV networks a topological order is found with a routine that keeps a predecessor count in each list header. In AoE networks we compute earliest and latest times, slack and the critical path.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_18_Shortest_Paths_and_Activity_Networks.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_18_Shortest_Paths_and_Activity_Networks.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_18_Shortest_Paths_and_Activity_Networks.pdf)
 
 ---
 
@@ -369,7 +369,7 @@ The single-source shortest-path problem starts with a brute-force analysis and i
 
 The sorting problem is introduced together with stability and in-place sorting, using a shared set of C macros. Selection, insertion and bubble sort are traced and analyzed, and the average case of insertion sort is derived by counting inversions. Linear-time counting sort, Shell sort and bucket sort follow. A decision-tree argument proves the lower bound for comparison-based sorting, and we discuss when each algorithm is the right choice.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_19_Basic_Sorting_Algorithms.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_19_Basic_Sorting_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_19_Basic_Sorting_Algorithms.pdf)
 
 ---
 
@@ -377,6 +377,6 @@ The sorting problem is introduced together with stability and in-place sorting, 
 
 Quicksort is explained through its partitioning invariant, with worst-case, best-case and average-case analyses. We look at a non-recursive version, an improved quicksort with median-of-three and a cutoff for small subarrays, the C library's qsort and hybrid sorts. Merge sort on arrays and linked lists, heapsort and radix sort for multi-key data are traced step by step and analyzed. The chapter ends with a comparison of when each algorithm should be preferred.
 
-- [🖼️ Slides](/files/dsa_c/slides/Chapter_20_Advanced_Sorting_Algorithms.html)
+- [🖼️ Slides](/files/dsa_c/slides/Chapter_20_Advanced_Sorting_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_20_Advanced_Sorting_Algorithms.pdf)
 
 </div>

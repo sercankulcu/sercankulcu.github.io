@@ -165,10 +165,10 @@ Veri tabanları, verinin kalıcı, tutarlı ve sorgulanabilir biçimde saklanmas
 
 Programming rests on how a computer represents and processes information. The chapter opens with the representation of numbers, characters and strings in memory, the stored-program idea and the von Neumann architecture. It then touches on the history of computer science, Turing machines and the limits of computation, and approaches problem solving through the notion of an algorithm with simple searching and sorting examples. The last part introduces flowchart symbols and works through sequential, conditional and repeated flow on sample problems.
 
-- **1.1 Computers** — [🖼️ Slides](/files/java/slides/Chapter_01_01_Computers.html)
-- **1.2 Computation and Computational Thinking** — [🖼️ Slides](/files/java/slides/Chapter_01_02_Computation_and_Computational_Thinking.html)
-- **1.3 Algorithms** — [🖼️ Slides](/files/java/slides/Chapter_01_03_Algorithms.html)
-- **1.4 Flowcharts** — [🖼️ Slides](/files/java/slides/Chapter_01_04_Flowcharts.html)
+- **1.1 Computers** — [🖼️ Slides](/files/java/slides/Chapter_01_01_Computers.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_01_01_Computers.pdf)
+- **1.2 Computation and Computational Thinking** — [🖼️ Slides](/files/java/slides/Chapter_01_02_Computation_and_Computational_Thinking.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_01_02_Computation_and_Computational_Thinking.pdf)
+- **1.3 Algorithms** — [🖼️ Slides](/files/java/slides/Chapter_01_03_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_01_03_Algorithms.pdf)
+- **1.4 Flowcharts** — [🖼️ Slides](/files/java/slides/Chapter_01_04_Flowcharts.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_01_04_Flowcharts.pdf)
 
 ---
 
@@ -176,8 +176,8 @@ Programming rests on how a computer represents and processes information. The ch
 
 A programming language is made of statements that follow precise rules of syntax and meaning. The chapter first gives a general picture of how programming languages evolved, the difference between syntax and semantics, and the roles of expressions, variables and types. On the Java side it covers compiling and running source code, primitive data types, identifiers and keywords, assignment, constants, type conversions and operators in detail. A short introduction to control flow closes the chapter.
 
-- **2.1 Programming** — [🖼️ Slides](/files/java/slides/Chapter_02_01_Programming.html)
-- **2.2 Syntax Rules** — [🖼️ Slides](/files/java/slides/Chapter_02_02_Syntax_Rules.html)
+- **2.1 Programming** — [🖼️ Slides](/files/java/slides/Chapter_02_01_Programming.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_02_01_Programming.pdf)
+- **2.2 Syntax Rules** — [🖼️ Slides](/files/java/slides/Chapter_02_02_Syntax_Rules.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_02_02_Syntax_Rules.pdf)
 
 ---
 
@@ -185,11 +185,11 @@ A programming language is made of statements that follow precise rules of syntax
 
 Decisions and loops steer the flow of a program. This chapter covers if and switch, nested loops, break and continue, and then methods: how to define and call them, scope rules and their role in abstraction. Arrays are examined through their memory layout, common mistakes, basic array algorithms and multidimensional arrays, reinforced with a Tic Tac Toe program. Strings are studied for immutability, comparison and formatted output, and recursion starts from factorial and series examples before moving on to efficiency, tail recursion and memoization.
 
-- **3.1 Control Structures** — [🖼️ Slides](/files/java/slides/Chapter_03_01_Control_Structures.html)
-- **3.2 Methods** — [🖼️ Slides](/files/java/slides/Chapter_03_02_Methods.html)
-- **3.3 Arrays** — [🖼️ Slides](/files/java/slides/Chapter_03_03_Arrays.html)
-- **3.4 Strings** — [🖼️ Slides](/files/java/slides/Chapter_03_04_Strings.html)
-- **3.5 Recursion** — [🖼️ Slides](/files/java/slides/Chapter_03_05_Recursion.html)
+- **3.1 Control Structures** — [🖼️ Slides](/files/java/slides/Chapter_03_01_Control_Structures.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_03_01_Control_Structures.pdf)
+- **3.2 Methods** — [🖼️ Slides](/files/java/slides/Chapter_03_02_Methods.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_03_02_Methods.pdf)
+- **3.3 Arrays** — [🖼️ Slides](/files/java/slides/Chapter_03_03_Arrays.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_03_03_Arrays.pdf)
+- **3.4 Strings** — [🖼️ Slides](/files/java/slides/Chapter_03_04_Strings.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_03_04_Strings.pdf)
+- **3.5 Recursion** — [🖼️ Slides](/files/java/slides/Chapter_03_05_Recursion.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_03_05_Recursion.pdf)
 
 ---
 
@@ -199,11 +199,11 @@ Decisions and loops steer the flow of a program. This chapter covers if and swit
 
 Object-oriented programming brings data and the behavior that operates on it together in classes. The chapter starts with classes and objects, constructors, static members, the this reference, records, enum types and inner classes, and continues with encapsulation, access modifiers, immutable classes and packages. Inheritance is treated through super, overriding and the Object class, and polymorphism through reference types, casting, dynamic binding and overloading. The final part covers abstract classes, interfaces, lambda expressions, sealed types, generics, annotations and widely used design patterns.
 
-- **4.1 Objects and Classes** — [🖼️ Slides](/files/java/slides/Chapter_04_01_Objects_and_Classes.html)
-- **4.2 Encapsulation** — [🖼️ Slides](/files/java/slides/Chapter_04_02_Encapsulation.html)
-- **4.3 Inheritance** — [🖼️ Slides](/files/java/slides/Chapter_04_03_Inheritance.html)
-- **4.4 Polymorphism** — [🖼️ Slides](/files/java/slides/Chapter_04_04_Polymorphism.html)
-- **4.5 Abstract Classes and Interfaces** — [🖼️ Slides](/files/java/slides/Chapter_04_05_Abstract_Classes_and_Interfaces.html)
+- **4.1 Objects and Classes** — [🖼️ Slides](/files/java/slides/Chapter_04_01_Objects_and_Classes.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_04_01_Objects_and_Classes.pdf)
+- **4.2 Encapsulation** — [🖼️ Slides](/files/java/slides/Chapter_04_02_Encapsulation.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_04_02_Encapsulation.pdf)
+- **4.3 Inheritance** — [🖼️ Slides](/files/java/slides/Chapter_04_03_Inheritance.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_04_03_Inheritance.pdf)
+- **4.4 Polymorphism** — [🖼️ Slides](/files/java/slides/Chapter_04_04_Polymorphism.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_04_04_Polymorphism.pdf)
+- **4.5 Abstract Classes and Interfaces** — [🖼️ Slides](/files/java/slides/Chapter_04_05_Abstract_Classes_and_Interfaces.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_04_05_Abstract_Classes_and_Interfaces.pdf)
 
 ---
 
@@ -211,7 +211,7 @@ Object-oriented programming brings data and the behavior that operates on it tog
 
 The Java Collections Framework provides common interfaces and ready-made classes for storing and processing groups of objects. We study lists and queues such as ArrayList, LinkedList, Stack, PriorityQueue and ArrayDeque, the HashSet and TreeSet sets, and the HashMap and TreeMap maps, together with how each works internally. Iteration with iterators, ordering with Comparable and Comparator, and the algorithms of the Collections class are illustrated with examples. The Stream API is introduced with intermediate and terminal operations and lazy evaluation, and the chapter ends with choosing the right collection and with unmodifiable collections.
 
-- [🖼️ Slides](/files/java/slides/Chapter_05_Collections.html)
+- [🖼️ Slides](/files/java/slides/Chapter_05_Collections.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_05_Collections.pdf)
 
 ---
 
@@ -221,7 +221,7 @@ The Java Collections Framework provides common interfaces and ready-made classes
 
 Exceptions let a program handle unusual situations that arise at run time separately from its normal flow. The chapter covers try, catch and finally blocks, the exception hierarchy, checked and unchecked exceptions, and the Error classes. Throwing exceptions, the most common run-time exceptions and defining custom exception classes are shown through examples. A stack trace is used to show how an exception propagates up the call stack.
 
-- [🖼️ Slides](/files/java/slides/Chapter_06_Exceptions.html)
+- [🖼️ Slides](/files/java/slides/Chapter_06_Exceptions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_06_Exceptions.pdf)
 
 ---
 
@@ -229,7 +229,7 @@ Exceptions let a program handle unusual situations that arise at run time separa
 
 Testing checks that a program behaves as expected, and debugging finds the source of a defect once it appears. The chapter covers kinds and levels of testing, unit testing with JUnit 5, assertion methods, parameterized tests, boundary values and the qualities of a good test. Regression testing, automated testing and test-driven development are introduced, and we show how to use breakpoints and stepping commands in a debugger. Profilers, code coverage, static analysis and memory analysis tools round out the chapter.
 
-- [🖼️ Slides](/files/java/slides/Chapter_07_Testing_and_Debugging.html)
+- [🖼️ Slides](/files/java/slides/Chapter_07_Testing_and_Debugging.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_07_Testing_and_Debugging.pdf)
 
 ---
 
@@ -239,7 +239,7 @@ Testing checks that a program behaves as expected, and debugging finds the sourc
 
 Reading and writing data in Java is built on the concept of streams. The chapter covers byte and character streams, file encodings, working with the file system, reading and writing text files, and the gains that buffering brings. File copying, random-access files and object serialization are shown through examples. The newer file and channel interfaces of the NIO library close the chapter.
 
-- [🖼️ Slides](/files/java/slides/Chapter_08_Input_and_Output.html)
+- [🖼️ Slides](/files/java/slides/Chapter_08_Input_and_Output.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_08_Input_and_Output.pdf)
 
 ---
 
@@ -247,7 +247,7 @@ Reading and writing data in Java is built on the concept of streams. The chapter
 
 A graphical user interface lets the user interact with a program through windows, buttons and drawings. The chapter introduces the AWT and Swing libraries, the JFrame and JPanel classes, drawing with paintComponent, colors and fonts, and the FlowLayout and BorderLayout layout managers. Mouse events, listener interfaces and the event dispatch thread are demonstrated with a simple drawing program. JButton, JLabel and text components are then put to work in a text converter and a change calculator.
 
-- [🖼️ Slides](/files/java/slides/Chapter_09_Graphics_and_User_Interfaces.html)
+- [🖼️ Slides](/files/java/slides/Chapter_09_Graphics_and_User_Interfaces.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_09_Graphics_and_User_Interfaces.pdf)
 
 ---
 
@@ -255,7 +255,7 @@ A graphical user interface lets the user interact with a program through windows
 
 Threads let a program carry out several tasks concurrently. The chapter explains the difference between processes and threads, the Thread class and the Runnable interface, the thread life cycle, and sleep, join and safe ways to stop a thread. Race conditions, mutual exclusion with synchronized, visibility with volatile, explicit locks, deadlock and the producer–consumer problem with wait and notify are worked through step by step. Synchronizers such as CountDownLatch, Semaphore and the atomic classes, as well as thread pools and ExecutorService, are also covered.
 
-- [🖼️ Slides](/files/java/slides/Chapter_10_Threads.html)
+- [🖼️ Slides](/files/java/slides/Chapter_10_Threads.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_10_Threads.pdf)
 
 ---
 
@@ -263,6 +263,6 @@ Threads let a program carry out several tasks concurrently. The chapter explains
 
 Databases store data so that it stays persistent, consistent and easy to query. The chapter covers the relational model, SQLite, basic SQL commands, normalization, foreign keys, grouping and indexes. Connecting with JDBC, creating tables, and inserting, reading, updating and deleting records are shown on a sample contacts program, along with SQL injection and how PreparedStatement prevents it. The DAO pattern, moving to MySQL, transactions and the ACID properties, and batch operations complete the chapter.
 
-- [🖼️ Slides](/files/java/slides/Chapter_11_Database_Programming.html)
+- [🖼️ Slides](/files/java/slides/Chapter_11_Database_Programming.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/java/pdf/Chapter_11_Database_Programming.pdf)
 
 </div>
