@@ -1,5 +1,6 @@
 ---
 title: Apple Unveils Siri AI at WWDC26
+excerpt: "Apple's redesigned Siri at WWDC26: multi-turn context, on-device and private cloud models, and what changes for iOS 27 users and developers."
 date: 2026-06-15
 permalink: /posts/2026/06/apple-unveils-siri-ai-at-wwdc26/
 tags:

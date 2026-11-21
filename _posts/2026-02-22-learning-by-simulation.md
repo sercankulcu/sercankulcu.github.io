@@ -1,5 +1,6 @@
 ---
 title: 'Learning by Simulation'
+excerpt: "Why interactive simulations help students learn algorithms and systems: watching AVL rotations, scheduling and data structures step by step."
 date: 2026-02-22
 permalink: /posts/2026/02/learning-by-simulation/
 tags:
@@ -20,6 +21,8 @@ Algorithms are processes. They happen step by step across time, and the importan
 The tools that do this well tend to be simple ones. VisuAlgo (visualgo.net) provides step-by-step animations for sorting, graph algorithms, and data structure operations. Red Blob Games (redblobgames.com), Amit Patel's site, gives interactive explanations of pathfinding and hex grids where sliders and clicks change the example in real time. These work not because of impressive production values but because the interaction is tightly connected to the concept being explained.
 
 The student who clicks "add node 7" and watches it descend through a BST — turning left at 12, right at 3, landing at 5 — has traced one insertion themselves. The student who reads "smaller values go left, larger values go right" has read one sentence. Both pieces of information are present in both experiences, but the physical act of following the process seems to leave a different kind of trace.
+
+The simulators that accompany my Data Structures course are built on the same idea. You can insert keys into a [binary search tree](/files/data_structures/slides/Chapter_10_Binary_Search_Tree_Simulator.html) and watch where each one lands, trigger the rotations of an [AVL tree](/files/data_structures/slides/Chapter_10_AVL_Tree_Simulator.html), follow [Dijkstra's algorithm](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html) as it settles one vertex at a time, or run a [round-robin scheduler](/files/data_structures/slides/Chapter_08_Round_Robin_Scheduler_Simulator.html) and see processes take turns. The full list is on the [course page](/teaching/data-structures/?lang=en).
 
 ## What students can ask
 

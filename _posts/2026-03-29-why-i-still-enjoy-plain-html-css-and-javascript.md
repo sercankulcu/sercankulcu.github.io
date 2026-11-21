@@ -1,5 +1,6 @@
 ---
 title: 'Why I Still Enjoy Plain HTML, CSS, and JavaScript'
+excerpt: "Why plain HTML, CSS and JavaScript still feel good in 2026: a short feedback loop, fewer dependencies and pages that keep working for years."
 date: 2026-03-29
 permalink: /posts/2026/03/why-i-still-enjoy-plain-html-css-and-javascript/
 tags:

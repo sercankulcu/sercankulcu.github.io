@@ -1,5 +1,6 @@
 ---
 title: 'The Return Of Small Software'
+excerpt: "The case for small, single-purpose software: tools that open instantly, need no account, keep your files local and do one job well."
 date: 2026-02-08
 permalink: /posts/2026/02/the-return-of-small-software/
 tags:

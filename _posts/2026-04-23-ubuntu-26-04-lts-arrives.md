@@ -1,5 +1,6 @@
 ---
 title: Ubuntu 26.04 LTS Arrives
+excerpt: "Ubuntu 26.04 LTS Resolute Raccoon: the new kernel, desktop and toolchain, five years of support, and what upgraders from 22.04 and 24.04 should know."
 date: 2026-04-23
 permalink: /posts/2026/04/ubuntu-26-04-lts-arrives/
 tags:

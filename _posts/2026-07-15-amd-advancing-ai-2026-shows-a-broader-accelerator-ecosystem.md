@@ -1,5 +1,6 @@
 ---
 title: AMD Advancing AI 2026 Shows a Broader Accelerator Ecosystem
+excerpt: "AMD's Advancing AI 2026: the Instinct MI450, rack-scale systems, ROCm 7 and the cloud partners backing a second source for AI accelerators."
 date: 2026-07-15
 permalink: /posts/2026/07/amd-advancing-ai-2026-shows-a-broader-accelerator-ecosystem/
 tags:

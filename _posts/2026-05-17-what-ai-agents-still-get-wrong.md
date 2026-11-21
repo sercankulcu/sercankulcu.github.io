@@ -1,5 +1,6 @@
 ---
 title: 'What AI Agents Still Get Wrong'
+excerpt: "Where AI agents still fail in daily use: losing context, overconfident tool calls, silent errors and tasks with side effects that need a human check."
 date: 2026-05-17
 permalink: /posts/2026/05/what-ai-agents-still-get-wrong/
 tags:

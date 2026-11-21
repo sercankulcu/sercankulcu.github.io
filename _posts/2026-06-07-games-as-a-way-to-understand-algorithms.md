@@ -1,5 +1,6 @@
 ---
 title: 'Games as a Way to Understand Algorithms'
+excerpt: "Pathfinding, game trees, randomness and scoring: the algorithms hidden inside games, and why playing them makes computer science easier to learn."
 date: 2026-06-07
 permalink: /posts/2026/06/games-as-a-way-to-understand-algorithms/
 tags:
@@ -17,6 +18,8 @@ This is one reason I find games useful as teaching tools. The algorithm is not a
 
 Breadth-first search (BFS) visits nodes level by level, guaranteeing the shortest path in terms of number of steps. Placed inside a grid maze — walls, open cells, a start position, and a goal — it becomes immediately concrete. The frontier expands outward from the start in all reachable directions simultaneously, like water spreading across the floor. When it reaches the goal, the shortest path is the one it took to get there.
 
+The same search on a weighted graph is Dijkstra's algorithm; the [Dijkstra simulator](/files/data_structures/slides/Chapter_14_Dijkstras_Algorithm_Simulator.html) from my Data Structures course shows it settling one vertex at a time.
+
 A* (A-star) extends BFS with a heuristic — a function that estimates how close each cell is to the goal, typically the straight-line distance. By prioritizing cells that are closer to the goal as well as closer to the start, A* reaches the goal much faster than BFS in large spaces, at the cost of not always finding the absolute shortest path if the heuristic is imperfect.
 
 Video games use A* extensively for enemy navigation — pathfinding around obstacles, finding a route from an enemy's position to the player's position in a changing map. The same algorithm that finds a path in Pacman's pursuit of the player can be traced directly to a textbook description of A* with a Manhattan distance heuristic.
@@ -24,6 +27,8 @@ Video games use A* extensively for enemy navigation — pathfinding around obsta
 ## Decision-making and minimax
 
 Two-player zero-sum games — chess, checkers, tic-tac-toe — have a natural algorithmic structure: one player tries to maximize their advantage, the other tries to minimize it. The minimax algorithm searches the game tree, evaluating positions at the leaves and propagating values up: at nodes where the maximizing player acts, take the maximum of children; at nodes where the minimizing player acts, take the minimum.
+
+You can play against a computer opponent that searches ahead in this way in [Tic-Tac-Toe](/game/tictactoe/) and [Connect Four](/game/connectfour/) on this site.
 
 Alpha-beta pruning eliminates branches of the tree that cannot affect the result — if we already know the maximizing player can guarantee a score of 5, we can stop examining a subtree where the minimizing player can force the value below 5. Alpha-beta allows the same minimax decision with roughly half the tree nodes examined.
 
@@ -48,3 +53,5 @@ Implementing a game is algorithmically dense in ways that are invisible from the
 Each of these is a small algorithm problem. Together they are a complete programming project. The student who implements all of them has practiced data representation, loop design, recursion, and basic game tree search — connected by a context that makes the relationship between input and output immediately visible.
 
 Games make failure normal. A wrong move has an immediate and reversible consequence. That is a healthier feeling for learning than answers that are graded as correct or incorrect once, after the thinking is done.
+
+More games are collected on the [games page](/games/), and the ideas behind them are taught in my [Algorithms](/teaching/algorithms/?lang=en) and [Algorithmic Game Theory](/teaching/algorithmic-game-theory/?lang=en) courses.

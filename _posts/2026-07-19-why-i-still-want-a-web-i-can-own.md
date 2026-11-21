@@ -1,5 +1,6 @@
 ---
 title: 'Why I Still Want A Web I Can Own'
+excerpt: "Platforms make publishing easy but change their rules over time. The case for owning your own site, domain and archive on the open web."
 date: 2026-07-19
 permalink: /posts/2026/07/why-i-still-want-a-web-i-can-own/
 tags:

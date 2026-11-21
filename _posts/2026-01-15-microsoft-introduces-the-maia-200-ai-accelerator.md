@@ -1,5 +1,6 @@
 ---
 title: Microsoft Introduces the Maia 200 AI Accelerator
+excerpt: "Microsoft's Maia 200 AI accelerator: 3nm process, 216 GB of HBM3e, memory bandwidth against NVIDIA's H100 and H200, and its role in Azure."
 date: 2026-01-15
 permalink: /posts/2026/01/microsoft-introduces-the-maia-200-ai-accelerator/
 tags:

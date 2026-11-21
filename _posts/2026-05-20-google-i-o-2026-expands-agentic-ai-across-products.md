@@ -1,5 +1,6 @@
 ---
 title: Google I-O 2026 Expands Agentic AI Across Products
+excerpt: "Google I/O 2026 in brief: Gemini 3.5 Flash, Gemini Omni and agentic AI features across Search, Android and Workspace."
 date: 2026-05-20
 permalink: /posts/2026/05/google-i-o-2026-expands-agentic-ai-across-products/
 tags:

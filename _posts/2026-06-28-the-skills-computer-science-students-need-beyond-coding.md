@@ -1,5 +1,6 @@
 ---
 title: 'The Skills Computer Science Students Need Beyond Coding'
+excerpt: "Beyond writing code: reading others' code, debugging, writing, estimating and working in a team, the skills that make CS students effective."
 date: 2026-06-28
 permalink: /posts/2026/06/the-skills-computer-science-students-need-beyond-coding/
 tags:

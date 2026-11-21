@@ -1,5 +1,6 @@
 ---
 title: Google Introduces the Pixel 11 Generation
+excerpt: "Google's Pixel 11 lineup and the Tensor G6 chip: what changed for on-device AI, cameras and the four models announced in August 2026."
 date: 2026-08-15
 permalink: /posts/2026/08/google-introduces-the-pixel-11-generation/
 tags:

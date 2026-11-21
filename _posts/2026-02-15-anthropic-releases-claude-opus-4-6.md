@@ -1,5 +1,6 @@
 ---
 title: Anthropic Releases Claude Opus 4.6
+excerpt: "Claude Opus 4.6: pricing, context window, agentic coding and tool use, and where it fits among Anthropic's models in February 2026."
 date: 2026-02-15
 permalink: /posts/2026/02/anthropic-releases-claude-opus-4-6/
 tags:

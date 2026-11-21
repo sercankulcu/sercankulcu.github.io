@@ -1,5 +1,6 @@
 ---
 title: "The Gaming PC I Would Build in 2026"
+excerpt: "The gaming PC I would build on July 1, 2026: each part chosen for performance, reliability and headroom, and the reasoning behind every choice."
 date: 2026-07-01
 permalink: /posts/2026/07/the-gaming-pc-i-would-build-in-2026/
 tags:

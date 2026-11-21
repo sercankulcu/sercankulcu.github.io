@@ -1,5 +1,6 @@
 ---
 title: 'A Personal Website Is Never Really Finished'
+excerpt: "Why a personal website has no final version, and how to treat endless small changes as part of the project instead of a failure to finish."
 date: 2026-07-26
 permalink: /posts/2026/07/a-personal-website-is-never-really-finished/
 tags:

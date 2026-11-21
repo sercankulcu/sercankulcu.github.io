@@ -1,5 +1,6 @@
 ---
 title: NVIDIA Unveils Vera Rubin at GTC
+excerpt: "NVIDIA's Vera Rubin platform at GTC 2026: the Rubin GPU, the custom Arm-based Vera CPU, NVLink-C2C and AI computing sold as a whole system."
 date: 2026-03-15
 permalink: /posts/2026/03/nvidia-unveils-vera-rubin-at-gtc/
 tags:
