@@ -244,6 +244,9 @@ STYLE = """<style>
   .ds-deck .ai-demo .ai-out b { color: var(--ds-accent); }
   .ds-deck .ai-demo-n { margin-top: 8px; padding: 7px 12px; border-radius: 10px; background: var(--ds-surface-strong); font-size: 14px; line-height: 1.4; }
   .ds-deck .ai-myth td:first-child { width: 42%; }
+  .ds-deck .ai-isl { columns: 2; column-gap: 28px; margin: 4px 0 0; padding-left: 22px; font-size: 15px; line-height: 1.35; }
+  .ds-deck .ai-isl li { margin: 0 0 5px; break-inside: avoid; }
+  .ds-deck .ai-haz td:first-child { width: 56%; }
   .ds-deck .ai-node rect { fill: var(--ds-bg); stroke: var(--ds-border); stroke-width: 1.5; }
   .ds-deck .ai-node:hover rect { stroke: var(--ds-link); }
   .ds-deck .ai-center rect { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 2; }
@@ -510,6 +513,17 @@ def ders_sunumu(kod, C):
     S.append(slide(t5, dsec, head(dsec, t5) +
                    '\n          <div class="ds-deck__figure">%s</div>\n          <div class="ds-deck__callout">%s</div>'
                    % (svg_akis(C['akis']), C['akis_ornek'])))
+    # 5a donem akisi ve beceriler
+    if C.get('islenenler'):
+        t = T('Derste Neler İşlenir?', 'What Does the Course Cover?')
+        S.append(slide(t, dsec, head(dsec, t) +
+                       '\n          <ol class="ai-isl">%s</ol>'
+                       '\n          <h3 style="margin-top:10px">%s</h3>\n          <div class="ai-chips">%s</div>'
+                       '\n          <p class="ds-deck__small ds-deck__muted" style="margin-top:8px">%s</p>'
+                       % (''.join('<li>%s</li>' % x for x in C['islenenler']), T('Kazandırdığı beceriler', 'Skills you will gain'),
+                          ''.join('<span>%s</span>' % x for x in C['beceriler']),
+                          T('Tipik bir dönemin akışıdır; sıra ve kapsam üniversiteden üniversiteye değişir.',
+                            'A typical semester; the order and coverage vary between universities.'))))
     # 5b etkilesimli problem sayfasi
     demo = C.get('demo')
     if demo:
@@ -534,6 +548,20 @@ def ders_sunumu(kod, C):
                    % (T('Bu dersten önce bilinmesi yararlı olan dersler ve neden gerektikleri.',
                         'Courses worth knowing before this one, and why they are needed.'),
                       T('Ders', 'Course'), T('Neden gerekir', 'Why it is needed'), ''.join(rows))))
+    # 6b hazirlik
+    if C.get('hazirlik'):
+        t = T('Bu Ders Sana Göre mi?', 'Are You Ready for This Course?')
+        rows = ''.join('<tr><td>%s</td><td>%s</td></tr>' % (q, re.sub(r'@([A-Z]+)', lambda m: link(m.group(1)), h))
+                       for q, h in C['hazirlik'])
+        S.append(slide(t, ksec, head(ksec, t) +
+                       '\n          <p class="ds-deck__small ds-deck__muted">%s</p>'
+                       '\n          <table class="ds-deck__table ai-tbl ai-haz"><tr><th>%s</th><th>%s</th></tr>%s</table>'
+                       '\n          <div class="ds-deck__callout">%s</div>'
+                       % (T('Kendine sor; "hayır" dediklerin için sağdaki sütun nereden başlayacağını gösterir.',
+                            'Ask yourself; for every "no", the right-hand column shows where to start.'),
+                          T('Kendine sor', 'Ask yourself'), T('Hayırsa önce', 'If not, start with'), rows,
+                          T('Çoğuna "evet" diyebiliyorsan derse hazırsın; bir ya da iki "hayır" dönem içinde kapanabilir.',
+                            'If you can say "yes" to most of these, you are ready; one or two gaps can be closed during the semester.'))))
     # 7 komsuluk semasi
     t7 = T('Dersin Komşuları', 'Neighbouring Courses')
     S.append(slide(t7, ksec, head(ksec, t7) +
@@ -570,6 +598,14 @@ def ders_sunumu(kod, C):
     t10 = T('Uygulama Alanları', 'Applications')
     S.append(slide(t10, usec, head(usec, t10) +
                    '\n          <div class="ds-deck__grid ds-deck__grid--3 ai-cards">%s</div>' % cards))
+    # 10b riskler
+    if C.get('riskler'):
+        t = T('Riskler ve Etik', 'Risks and Ethics')
+        cards = ''.join('<div class="ds-deck__card"><strong>%s</strong><p>%s</p></div>' % (b_, t_) for b_, t_ in C['riskler'])
+        S.append(slide(t, usec, head(usec, t) +
+                       '\n          <div class="ds-deck__grid ds-deck__grid--2 ai-cards">%s</div>'
+                       '\n          <p class="ds-deck__small ds-deck__muted" style="margin-top:8px">%s</p>'
+                       % (cards, '' if kod == 'AYE' else T('Ayrıntılı tartışma: %s.', 'In depth: %s.') % link('AYE'))))
     # 11 araclar
     t11 = T('Araçlar ve Örnek Veriler', 'Tools and Datasets')
     S.append(slide(t11, usec, head(usec, t11) +
