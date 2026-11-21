@@ -1,0 +1,73 @@
+# -*- coding: utf-8 -*-
+ICERIK = dict(
+    excerpt=('Guide to AI and Data Courses, Chapter 37 slides: GPU Programming and Parallel Computing — thread model, '
+             'memory hierarchy, parallel patterns, speedup, history, neighbours, overlaps.'),
+    gundem=['CPU and GPU', 'Thread model', 'Memory hierarchy', 'Parallel patterns', 'Measuring performance', 'Neighbouring courses'],
+    tanim=('GPU programming studies <b>data-parallel</b> computation, which applies the same operation to thousands of '
+           'data elements at once. Using a model such as CUDA, the course teaches how to organize threads, use the memory '
+           'hierarchy efficiently and measure speedup; this is also the hardware that makes deep learning practical.'),
+    tarihce=[
+        ('1966', 'Flynn classifies computers as SISD, SIMD, MISD and MIMD.'),
+        ('1967', 'Amdahl shows that the remaining sequential part limits parallel speedup (Amdahl\'s law).'),
+        ('1999', 'NVIDIA GeForce 256 is marketed under the name "GPU".'),
+        ('2007', 'NVIDIA releases CUDA: the GPU becomes general-purpose programmable in a C-like language.'),
+        ('2012', 'AlexNet is trained on two GPUs and wins ImageNet; the GPU becomes the engine of deep learning.'),
+        ('2017', 'The Volta architecture introduces tensor cores: hardware units dedicated to matrix multiplication.'),
+    ],
+    kavramlar=[
+        ('SIMT and warps', '32 threads execute the same instruction together.'),
+        ('Thread organization', 'The grid, block and thread hierarchy.'),
+        ('Memory hierarchy', 'Registers, shared memory, global memory.'),
+        ('Coalesced access', 'Neighbouring threads should access neighbouring addresses.'),
+        ('Synchronization', 'Barriers, atomic operations and race conditions.'),
+        ('Amdahl\'s law', 'The sequential part caps the achievable speedup.'),
+        ('Occupancy', 'Enough threads to keep the cores busy.'),
+        ('Parallel patterns', 'Map, reduction, prefix sum, stencil.'),
+    ],
+    akis=[('Find\nparallelism', 'data-parallel\nloops'), ('Copy\ndata', 'CPU → GPU\nmemory'),
+          ('Launch\nkernel', 'grid, block,\nthread'), ('Copy\nback', 'GPU → CPU'),
+          ('Measure,\noptimize', 'profiling,\nmemory access')],
+    akis_ornek=('<b>Example:</b> To add two vectors of two million elements, one thread is assigned to each element: the '
+                'arrays are copied to GPU memory, the kernel is launched with 256-thread blocks and the result is copied back. '
+                'Measurement often shows that the time goes into copying data, not into computing.'),
+    onkosul_ek=[
+        ('Programming with C', 'pointers, arrays and memory allocation: the basis of CUDA C', '/teaching/programming-with-c/?lang=en'),
+        ('Operating Systems', 'threads, synchronization and race conditions', '/teaching/operating-systems/?lang=en'),
+        ('Microprocessors', 'registers, caches and the memory hierarchy', '/teaching/microprocessors/?lang=en'),
+    ],
+    ayrisma=[
+        ('DO', 'Deep learning uses the GPU through ready-made libraries; this course writes the kernels and memory access beneath them.'),
+        ('BV', 'Big data systems spread work across many machines; this course makes efficient use of thousands of cores on one device.'),
+        ('BGR', 'Computer graphics programs the GPU with shaders to draw images; this course uses it for general-purpose computation.'),
+        ('GYZ', 'Embedded AI teaches making do with little power; this course teaches getting peak performance from the largest accelerator.'),
+    ],
+    uygulamalar=[
+        ('Deep learning', 'Matrix multiplication and convolution on tensor cores.'),
+        ('Scientific simulation', 'Fluids, climate and molecular dynamics.'),
+        ('Image and video', 'Real-time filters, encoding and decoding.'),
+        ('Finance', 'Monte Carlo risk and pricing.'),
+        ('Bioinformatics', 'Sequence alignment and protein structure computation.'),
+        ('Data analytics', 'Table and database operations on the GPU.'),
+    ],
+    araclar=['CUDA', 'OpenCL', 'OpenMP', 'MPI', 'Numba', 'CuPy', 'NVIDIA Nsight'],
+    veri_baslik='Classic example problems',
+    veriler=['Vector addition', 'Matrix multiplication', 'Parallel reduction', 'Prefix sum (scan)', 'Histogram', 'N-body simulation'],
+    araclar_not='The metric is <b>speedup</b>: a sequential CPU version and a parallel GPU version of the same problem are compared on the same input.',
+    yanilgilar=[
+        ('A GPU speeds up any program.', 'Only parts with many independent, similar operations speed up; branching and sequential parts do not.'),
+        ('Doubling the cores halves the run time.', 'Amdahl\'s law: the sequential part sets an upper bound on the achievable speedup.'),
+        ('Computation is the most expensive part.', 'In most GPU programs the bottleneck is memory bandwidth and data transfer between CPU and GPU.'),
+        ('Parallel programming is only for deep learning.', 'Simulation, graphics and scientific computing used GPUs long before deep learning.'),
+    ],
+    meslekler=['GPU software engineer', 'High-performance computing (HPC) specialist', 'ML infrastructure engineer',
+               'Game and graphics engine developer', 'Scientific computing researcher'],
+    sonra=('GPU programming opens up the engine beneath deep learning and graphics. From here you can move to systems '
+           'topics such as distributed training, compilers and accelerator design, or to neighbouring courses in the guide '
+           'such as big data systems and embedded AI.'),
+    kaynaklar=[
+        'Kirk, Hwu and El Hajj, <em>Programming Massively Parallel Processors</em>, 4th ed., Morgan Kaufmann, 2022.',
+        'Sanders and Kandrot, <em>CUDA by Example</em>, Addison-Wesley, 2010.',
+        'Hennessy and Patterson, <em>Computer Architecture: A Quantitative Approach</em>, 6th ed., Morgan Kaufmann, 2017.',
+        'Amdahl, "Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities", <em>AFIPS Conference Proceedings</em> 30, 1967.',
+    ],
+)
