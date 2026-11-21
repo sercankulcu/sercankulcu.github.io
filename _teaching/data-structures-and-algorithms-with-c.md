@@ -14,7 +14,7 @@ textbook:
   url: /books/c-ile-veri-yapilari-ve-algoritmalar/
 ---
 
-![data structures and algorithms with c](/images/teaching/teaching-data-structures.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
+![data structures and algorithms with c](/images/teaching/teaching-dsa-c.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
 This course studies data structures and algorithms through their memory representation and their implementation in C. Each topic is developed from the abstract data type to a working C99/C11 implementation with pointers, dynamic memory, and structures, together with its complexity analysis. The course covers arrays and structures, linked lists, stacks, queues, lists, trees, priority queues and heaps, hash tables, search trees, graphs, sets and union-find, as well as recursion, backtracking, spanning trees, shortest paths, and sorting algorithms.
 
 

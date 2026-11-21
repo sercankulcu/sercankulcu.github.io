@@ -49,17 +49,17 @@ BOOKS = [
 
 # kitap PDF'i -> (ders sayfasindaki gorsel, kartin vurgu rengi)
 ART = {
-    'agt/Algoritmik-Oyun-Kurami.pdf': ('teaching-algorithmic-game-theory.webp', '#7b3fa0'),
-    'algorithms/Algoritmalar.pdf': ('teaching-algorithms.webp', '#e08a00'),
-    'advanced_algorithms/Ileri-Algoritmalar.pdf': ('teaching-advanced-algorithms.webp', '#a34e1a'),
-    'computer/Bilgisayar-ve-Programlamaya-Giris.pdf': ('teaching-computer-and-programming.webp', '#1f6fb2'),
-    'data_structures/Veri-Yapilari.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
-    'data_structures/Data-Structures.pdf': ('teaching-data-structures.webp', '#2f8a6b'),
-    'dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf': ('teaching-data-structures.webp', '#c0563b'),
-    'java/Java-ile-Nesne-Yonelimli-Programlama.pdf': ('teaching-object-oriented-programming.webp', '#c0392b'),
-    'microprocessors/Mikroislemciler.pdf': ('teaching-microprocessors.webp', '#2d6a4f'),
-    'os/Isletim-Sistemleri.pdf': ('teaching-operating-systems.webp', '#34508f'),
-    'c/Programming-with-C.pdf': ('teaching-procedural-programming-c.webp', '#355c9a'),
+    'agt/Algoritmik-Oyun-Kurami.pdf': ('teaching-algorithmic-game-theory.webp', '#7048c8'),
+    'algorithms/Algoritmalar.pdf': ('teaching-algorithms.webp', '#3b5bdb'),
+    'advanced_algorithms/Ileri-Algoritmalar.pdf': ('teaching-advanced-algorithms.webp', '#7048c8'),
+    'computer/Bilgisayar-ve-Programlamaya-Giris.pdf': ('teaching-computer-and-programming.webp', '#3b5bdb'),
+    'data_structures/Veri-Yapilari.pdf': ('teaching-data-structures.webp', '#2f9e6e'),
+    'data_structures/Data-Structures.pdf': ('teaching-data-structures.webp', '#2f9e6e'),
+    'dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf': ('teaching-dsa-c.webp', '#2f9e6e'),
+    'java/Java-ile-Nesne-Yonelimli-Programlama.pdf': ('teaching-object-oriented-programming.webp', '#d9483b'),
+    'microprocessors/Mikroislemciler.pdf': ('teaching-microprocessors.webp', '#2f9e6e'),
+    'os/Isletim-Sistemleri.pdf': ('teaching-operating-systems.webp', '#3b5bdb'),
+    'c/Programming-with-C.pdf': ('teaching-procedural-programming-c.webp', '#d9483b'),
 }
 
 HAZEL_AUTHORS = [('Özgür', 'Tomak'), ('Mehmet Cem', 'Dikbaş'), ME]
