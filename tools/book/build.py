@@ -59,7 +59,8 @@ for p in book['parts']:
 if book['appendices']:
     toc.append('<li class="bk-toc-part"><span>%s</span></li>' % L['appendices'])
     for a in book['appendices']:
-        toc.append(toc_row('bk-toc-ch', a['label'], a['title'], a['id']))
+        # icindekilerde yalniz harf ("Appendix A" sutuna sigmiyordu; baslik zaten "Ekler")
+        toc.append(toc_row('bk-toc-ch', a['label'].split()[-1], a['title'], a['id']))
 
 front = book['front'].replace('__TOC__', '\n'.join(toc)) \
                      .replace('__DATE__', C.date_text(datetime.date.today()))
