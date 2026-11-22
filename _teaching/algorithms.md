@@ -152,13 +152,19 @@ Tasarım paradigmaları (böl ve fethet, açgözlü algoritmalar, dinamik progra
 
 ---
 
+## Getting Started
+
+* [Dictionary of Terms (HTML)](/files/algorithms/Dictionary.html)
+
+---
+
 ## Part I: Foundations
 
 ### Chapter 1: Introduction
 
 An algorithm is a method that solves a problem in a finite number of well-defined steps. This chapter introduces the idea of an algorithm and the properties every algorithm must have through everyday examples, then looks at how an algorithm becomes code and at the main kinds of algorithms. Using input size, line-by-line operation counts and a growth table, we follow examples that run in constant, linear, square-root, cubic, factorial and exponential time to see how running time grows with the input, and we explain why Euclid's algorithm is so fast.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_01_Introduction.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_01_Introduction.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_01_Introduction_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_01_Introduction.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_01_Introduction.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_01_Introduction_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_01_Introduction_Study_Questions.html)
 
 ---
 
@@ -166,7 +172,7 @@ An algorithm is a method that solves a problem in a finite number of well-define
 
 This chapter gives the tools for measuring cost: counting steps, best, worst and average cases, space complexity, and Big O, Omega and Theta notation. We analyze loops with summation formulas, set up recurrences by unrolling and with recursion trees, and solve them with the Master Theorem on a series of sample functions. A brief look at amortized analysis closes the chapter.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_02_Algorithm_Complexity.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_02_Algorithm_Complexity.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_02_Algorithm_Complexity_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_02_Algorithm_Complexity.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_02_Algorithm_Complexity.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_02_Algorithm_Complexity_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_02_Algorithm_Complexity_Study_Questions.html)
 
 ---
 
@@ -174,7 +180,7 @@ This chapter gives the tools for measuring cost: counting steps, best, worst and
 
 Sorting puts data into a given order and is the first step of many other algorithms. We trace the elementary methods (bubble, insertion, selection and Shell sort) and then merge sort, quicksort and heapsort step by step, analyzing each with Java code. The chapter proves the Ω(n log n) lower bound for comparison sorting, introduces linear-time methods such as counting, radix and bucket sort along with Timsort, the algorithm real libraries use, and compares all of them by stability, extra memory and complexity.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_03_Sorting_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_03_Sorting_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_03_Sorting_Algorithms_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_03_Sorting_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_03_Sorting_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_03_Sorting_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_03_Sorting_Algorithms_Study_Questions.html)
 
 ---
 
@@ -182,7 +188,7 @@ Sorting puts data into a given order and is the first step of many other algorit
 
 Searching is the problem of locating a wanted item in a collection of data. We cover linear search and its sentinel version, binary search on a sorted array and its reading as an implicit binary search tree, and finding the first position among duplicates. Hash functions, hash-table lookup with linear probing and with chaining, and the effect of the load factor on cost come next, followed by interpolation, jump and exponential search. The algorithms are compared by the number of probes they make on the same array, with a discussion of which one suits which situation.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_04_Searching_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_04_Searching_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_04_Searching_Algorithms_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_04_Searching_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_04_Searching_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_04_Searching_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_04_Searching_Algorithms_Study_Questions.html)
 
 ---
 
@@ -192,7 +198,7 @@ Searching is the problem of locating a wanted item in a collection of data. We c
 
 Graphs model anything that can be described as nodes and connections, from road networks to social networks. The chapter starts with storing a graph as an adjacency list or an adjacency matrix and with depth-first (DFS) and breadth-first (BFS) traversal. It then covers strongly connected components with Tarjan's and Kosaraju's algorithms, topological sorting with Kahn's algorithm and with DFS, and testing whether a graph is bipartite.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_05_Graph_Traversal.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_05_Graph_Traversal.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_05_Graph_Traversal_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_05_Graph_Traversal.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_05_Graph_Traversal.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_05_Graph_Traversal_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_05_Graph_Traversal_Study_Questions.html)
 
 ---
 
@@ -200,7 +206,7 @@ Graphs model anything that can be described as nodes and connections, from road 
 
 We introduce the kinds of shortest-path problems and the relaxation step that all shortest-path algorithms are built on. Dijkstra's algorithm is implemented with a priority queue, Bellman–Ford handles negative edges and detects negative cycles, and Floyd–Warshall computes shortest paths between all pairs. A* search guided by heuristic functions and BFS on unweighted graphs are also covered, and the algorithms are compared on sample graphs.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_06_Shortest_Paths.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_06_Shortest_Paths.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_06_Shortest_Paths_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_06_Shortest_Paths.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_06_Shortest_Paths.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_06_Shortest_Paths_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_06_Shortest_Paths_Study_Questions.html)
 
 ---
 
@@ -208,7 +214,7 @@ We introduce the kinds of shortest-path problems and the relaxation step that al
 
 A minimum spanning tree connects all the vertices of a graph at the lowest possible total weight. The chapter presents the cut and cycle properties and the algorithms built on them: Kruskal, Prim, Borůvka and reverse-delete. For Kruskal we develop the disjoint-set (union-find) structure with path compression and union by rank; for Prim we give both the array and the priority-queue versions and point out how it differs from Dijkstra's algorithm.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_07_Minimum_Spanning_Trees.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_07_Minimum_Spanning_Trees.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_07_Minimum_Spanning_Trees_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_07_Minimum_Spanning_Trees.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_07_Minimum_Spanning_Trees.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_07_Minimum_Spanning_Trees_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_07_Minimum_Spanning_Trees_Study_Questions.html)
 
 ---
 
@@ -216,7 +222,7 @@ A minimum spanning tree connects all the vertices of a graph at the lowest possi
 
 Network flow asks for the largest flow that can be sent from a source to a sink through a network with capacities. We define capacity and conservation constraints, the residual network, augmenting paths and bottlenecks, and prove the max-flow min-cut theorem. The Ford–Fulkerson method, Edmonds–Karp, Dinic's algorithm and push–relabel are then studied together with their complexity and applications.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_08_Network_Flow.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_08_Network_Flow.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_08_Network_Flow_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_08_Network_Flow.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_08_Network_Flow.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_08_Network_Flow_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_08_Network_Flow_Study_Questions.html)
 
 ---
 
@@ -226,7 +232,7 @@ Network flow asks for the largest flow that can be sent from a source to a sink 
 
 String algorithms underlie text search, data compression and the analysis of biological sequences. The first half of the chapter studies and compares the brute-force, Knuth–Morris–Pratt, Boyer–Moore and Rabin–Karp pattern-matching algorithms. The second half turns to lossless compression with run-length encoding (RLE), LZW and LZ78.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_09_String_Matching_and_Compression.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_09_String_Matching_and_Compression.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_09_String_Matching_and_Compression_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_09_String_Matching_and_Compression.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_09_String_Matching_and_Compression.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_09_String_Matching_and_Compression_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_09_String_Matching_and_Compression_Study_Questions.html)
 
 ---
 
@@ -234,7 +240,7 @@ String algorithms underlie text search, data compression and the analysis of bio
 
 The chapter opens with string sorting: lexicographic order and LSD and MSD radix sort. It goes on to regular expressions, finite-state machines and pattern-matching automata, and computes the Levenshtein edit distance with dynamic programming. Suffix arrays and the Burrows–Wheeler transform complete the chapter.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_10_Advanced_String_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_10_Advanced_String_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_10_Advanced_String_Algorithms_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_10_Advanced_String_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_10_Advanced_String_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_10_Advanced_String_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_10_Advanced_String_Algorithms_Study_Questions.html)
 
 ---
 
@@ -242,7 +248,7 @@ The chapter opens with string sorting: lexicographic order and LSD and MSD radix
 
 A trie, or prefix tree, stores strings so that common prefixes are shared. We implement insertion, search, deletion and autocomplete, and apply tries to wildcard search and spell checking. Ternary search tries, compressed tries, suffix tries and the Aho–Corasick algorithm, which finds many patterns in a single pass over the text, round out the chapter.
 
-- [🖼️ Slides](/files/algorithms/slides/Chapter_11_Tries.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_11_Tries.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_11_Tries_Lecture_Notes.html)
+- [🖼️ Slides](/files/algorithms/slides/Chapter_11_Tries.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_11_Tries.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_11_Tries_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_11_Tries_Study_Questions.html)
 
 ---
 
