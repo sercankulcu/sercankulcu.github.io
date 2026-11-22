@@ -1,5 +1,6 @@
 ---
 title: "Kaybedenler Kulübü Yolda: Delikanlı Değilim"
+title_en: "Kaybedenler Kulübü on the Way: I'm Not a Tough Guy"
 description: "Seven years after Kaybedenler Kulübü, Nejat İşler returned to Kaan Çaydamlı. But neither the actor nor the character was the same."
 date: 2018-03-18
 publication: "Habertürk"

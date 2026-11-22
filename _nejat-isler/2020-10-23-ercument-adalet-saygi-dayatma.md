@@ -1,5 +1,6 @@
 ---
 title: "Ercüment Çözer: Adalet, Saygı ve Dayatma"
+title_en: "Ercüment Çözer: Justice, Respect and Imposition"
 description: "Three days before Saygı: Bir Ercüment Çözer Dizisi aired, Nejat İşler gave one of his clearest explanations of how he understood Ercüment Çözer."
 date: 2020-10-23
 publication: "T24"

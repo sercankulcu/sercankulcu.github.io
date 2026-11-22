@@ -1,5 +1,6 @@
 ---
 title: "Amacım Bırakıp Gitmek"
+title_en: "My Aim Is to Quit and Walk Away"
 description: "In January 2010, Nejat İşler sounded tired. Not tired of acting itself. That distinction is important."
 date: 2010-01-25
 publication: "Milliyet"

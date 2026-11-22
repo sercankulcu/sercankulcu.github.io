@@ -1,5 +1,6 @@
 ---
 title: "Gerçek Can Acıtıyorsa Acıtacak"
+title_en: "If the Truth Hurts, Let It Hurt"
 description: "Two days after the Gazete Oksijen interview, Nejat İşler appeared in another substantial conversation about Tamirhane."
 date: 2022-11-13
 publication: "Cumhuriyet Pazar"

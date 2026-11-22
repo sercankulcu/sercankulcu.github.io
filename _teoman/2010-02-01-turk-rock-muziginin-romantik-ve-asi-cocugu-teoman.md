@@ -1,5 +1,6 @@
 ---
 title: "Türk Rock Müziğinin Romantik ve Asi Çocuğu Teoman"
+title_en: "Teoman, the Romantic and Rebellious Child of Turkish Rock"
 description: "This interview captures Teoman at an important transitional moment. İnsanlık Halleri had been released recently."
 date: 2010-02-01
 publication: "Aujourd’hui la Turquie"

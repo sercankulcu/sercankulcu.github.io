@@ -1,5 +1,6 @@
 ---
 title: "Empati — Teoman"
+title_en: "Empathy — Teoman"
 description: "This is one of the most biographically revealing conversations in the Teoman archive. Many of its subjects are familiar."
 date: 2026-01-22
 publication: "NTV / Empati"

@@ -1,5 +1,6 @@
 ---
 title: "Yakın Gelecekte Sanatçılar ve İş Dünyası Ekonomik Yıkımla Karşılaşacak"
+title_en: "Artists and Business Will Face Economic Ruin Soon"
 description: "This is one of the most unusual Teoman interviews in the archive. There is almost no romantic mythology here. No discussion of heartbreak."
 date: 2025-08-06
 publication: "Forbes Türkiye"

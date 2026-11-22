@@ -1,5 +1,6 @@
 ---
 title: "Akıllı Kadın Her Zaman Daha İyidir"
+title_en: "A Smart Woman Is Always Better"
 description: "This interview captures Teoman at a moment when success has already changed his position in Turkish popular culture."
 date: 2001-01-24
 publication: "Sabah Gazetesi"

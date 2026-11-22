@@ -1,5 +1,6 @@
 ---
 title: "Kötü Komşu Ev Sahibi Yapar"
+title_en: "A Bad Neighbor Makes You a Homeowner"
 description: "The Evcilik team talk at Antalya catches Nejat İşler's move toward producing, before the January 2025 interviews gave that move a clearer philosophy."
 date: 2024-10-10
 publication: "Antalya Altın Portakal Film Festivali"

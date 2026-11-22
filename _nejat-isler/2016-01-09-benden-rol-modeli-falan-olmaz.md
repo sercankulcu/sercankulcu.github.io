@@ -1,5 +1,6 @@
 ---
 title: "Benden Rol Modeli Falan Olmaz"
+title_en: "I'm No Role Model"
 description: "In January 2016, Gümüşlükspor had just become champions of its amateur league group. Nejat İşler was not watching from the stands."
 date: 2016-01-09
 publication: "Hürriyet"

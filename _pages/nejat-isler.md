@@ -36,6 +36,7 @@ Interviews, conversations, profiles, and archival material about Nejat İşler.
 
   <div class="collection-entry">
     <a href="{{ post.url | relative_url }}" class="collection-title">{{ post.title }}</a>
+    {% if post.title_en %}<div class="collection-meta" lang="en"><em>“{{ post.title_en }}”</em></div>{% endif %}
     <div class="collection-meta">
       {{ post.date | date: "%b %-d, %Y" }} · {{ reading_time }} min read
     </div>

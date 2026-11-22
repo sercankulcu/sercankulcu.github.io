@@ -1,5 +1,6 @@
 ---
 title: "Teoman & Mirgün Cabas Söyleşisi"
+title_en: "Teoman & Mirgün Cabas in Conversation"
 description: "A long conversation with Mirgün Cabas shows a Teoman who has moved beyond his youthful ambitions: he has known fame at its highest, left music and returned."
 date: 2021-02-14
 publication: "GAİN"

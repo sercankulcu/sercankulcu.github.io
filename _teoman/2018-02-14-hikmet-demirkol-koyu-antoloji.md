@@ -1,5 +1,6 @@
 ---
 title: "Teoman'dan Arşivlik Albüm: Koyu Antoloji"
+title_en: "An Album for the Archives from Teoman: Koyu Antoloji"
 description: "This interview belongs to the same period as the Işıl Cinmen conversation, but its emphasis is different. The Posta interview was highly personal."
 date: 2018-02-14
 publication: "Hürriyet"

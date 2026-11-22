@@ -1,5 +1,6 @@
 ---
 title: "İşportacıydı Artık Yıldız"
+title_en: "From Street Vendor to Star"
 description: "In early 2003, Nejat İşler was at an unusual point in his career. He was no longer an unknown theatre-trained actor trying to find work."
 date: 2003-01-19
 publication: "Milliyet"

@@ -1,5 +1,6 @@
 ---
 title: "Aliye ve Aile Üzerine Kadıköy Söyleşisi"
+title_en: "A Kadıköy Conversation on Aliye and Family"
 description: "This 2005 event is not a conventional Nejat İşler interview. It is valuable for a different reason."
 date: 2005-04-07
 publication: "Kadıköy Belediyesi / Gazete Kadıköy archive"

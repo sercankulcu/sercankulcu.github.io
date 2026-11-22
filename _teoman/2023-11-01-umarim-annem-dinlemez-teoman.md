@@ -1,5 +1,6 @@
 ---
 title: "Umarım Annem Dinlemez — Teoman"
+title_en: "Teoman on the Umarım Annem Dinlemez Podcast"
 description: "This conversation shows a different side of Teoman. There is less discussion of albums, artistic legacy or Turkish politics."
 date: 2023-11-01
 publication: "Umarım Annem Dinlemez"

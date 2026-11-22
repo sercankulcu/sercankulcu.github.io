@@ -1,5 +1,6 @@
 ---
 title: "Diziler Bitti, Sinemaya Devam"
+title_en: "The TV Series Are Over, On to Cinema"
 description: "In July 2015, Nejat İşler made one of the clearest professional decisions of his career. He was not retiring from acting."
 date: 2015-07-01
 publication: "Anadolu Ajansı"

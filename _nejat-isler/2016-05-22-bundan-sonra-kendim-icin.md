@@ -1,5 +1,6 @@
 ---
 title: "Bundan Sonra Artık Kendim İçin Hiçbir Şey Yapmayacağım"
+title_en: "From Now On I Won't Do Anything for Myself"
 description: "By May 2016, Nejat İşler had moved beyond simply recovering from illness. He had begun giving the experience a meaning."
 date: 2016-05-22
 publication: "Hürriyet"

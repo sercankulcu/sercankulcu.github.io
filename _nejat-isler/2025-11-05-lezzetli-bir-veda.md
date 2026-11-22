@@ -1,5 +1,6 @@
 ---
 title: "Lezzetli Bir Veda"
+title_en: "A Delicious Farewell"
 description: "By late 2025, Nejat İşler had begun looking backward in a more deliberate way. Not to produce a heroic autobiography."
 date: 2025-11-05
 publication: "Mirgün Cabas"

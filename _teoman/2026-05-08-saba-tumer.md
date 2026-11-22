@@ -1,6 +1,7 @@
 ---
 
 title: "Saba Tümer ile Teoman"
+title_en: "Teoman with Saba Tümer"
 description: "This interview captures Teoman at a particularly clear late-career turning point. For years, he had spoken about reducing production."
 date: 2026-05-08
 publication: "CNBC-e / Saba Tümer"

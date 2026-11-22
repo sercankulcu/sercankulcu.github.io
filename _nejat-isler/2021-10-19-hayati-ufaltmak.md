@@ -1,5 +1,6 @@
 ---
 title: "Hayatı Ufaltmak"
+title_en: "Making Life Smaller"
 description: "By 2021, Nejat İşler had found a working model that came surprisingly close to the life he had been describing for more than a decade."
 date: 2021-10-19
 publication: "Milliyet Sanat"

@@ -1,5 +1,6 @@
 ---
 title: "Orada Rahat mısın Teoman?"
+title_en: "Are You Comfortable Up There, Teoman?"
 description: "This conversation finds Teoman increasingly comfortable with a new identity: not simply Teoman the songwriter,"
 date: 2024-05-31
 publication: "Mirgün Cabas YouTube"

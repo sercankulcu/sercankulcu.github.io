@@ -1,5 +1,6 @@
 ---
 title: "Şöhret, Herkesin Senden Bir Şey İstemesiymiş"
+title_en: "Fame Turned Out to Be Everyone Wanting Something from You"
 description: "One of the most persistent ideas in Nejat İşler's public image is that he dislikes interviews. He does not like journalists."
 date: 2011-01-01
 publication: "Ters Ninja"

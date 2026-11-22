@@ -1,5 +1,6 @@
 ---
 title: "Aklım Kendimde"
+title_en: "I Still Have My Wits About Me"
 description: "This interview is one of the most personal portraits of Teoman from the late 1990s."
 date: 1999-07-04
 publication: "Cumhuriyet Gazetesi"

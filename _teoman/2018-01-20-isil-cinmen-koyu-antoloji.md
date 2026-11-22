@@ -1,5 +1,6 @@
 ---
 title: "Işıl Cinmen ile Koyu Antoloji Röportajı"
+title_en: "Koyu Antoloji Interview with Işıl Cinmen"
 description: "One of Teoman's darkest, most self-analytical interviews: at fifty, with older songs, press archives and a memoir around him, he faces versions of himself."
 date: 2018-01-20
 publication: "Posta"

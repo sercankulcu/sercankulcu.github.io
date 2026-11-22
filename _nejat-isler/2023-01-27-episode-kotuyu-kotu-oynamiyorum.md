@@ -1,5 +1,6 @@
 ---
 title: "Episode: Kötüyü Kötü Oynamıyorum"
+title_en: "Episode: I Don't Play the Villain as a Villain"
 description: "This Episode interview is one of the best documents for understanding Nejat İşler as an actor."
 date: 2023-01-27
 publication: "Episode"

@@ -1,5 +1,6 @@
 ---
 title: "Az Önce Konuştum — Teoman"
+title_en: "Teoman on Az Önce Konuştum (TV100)"
 description: "This conversation comes only a few weeks after Teoman's long interview with Mirgün Cabas. The same broad period is visible:"
 date: 2024-06-25
 publication: "TV100"

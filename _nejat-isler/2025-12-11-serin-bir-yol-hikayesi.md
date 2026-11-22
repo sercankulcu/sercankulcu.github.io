@@ -1,5 +1,6 @@
 ---
 title: "Serin Bir Yol Hikâyesi"
+title_en: "A Cool Road Story"
 description: "The December 2025 MediaCat interview with Nejat İşler begins with the book Miras and opens into larger questions, such as what we inherit."
 date: 2025-12-11
 publication: "MediaCat"

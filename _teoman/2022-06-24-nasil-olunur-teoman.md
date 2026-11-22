@@ -1,5 +1,6 @@
 ---
 title: "Nasıl Olunur? #159 — Teoman"
+title_en: "Teoman on Nasıl Olunur? (#159)"
 description: "This is one of the most substantial long-form conversations with Teoman in the archive."
 date: 2022-06-24
 publication: "Nasıl Olunur?"

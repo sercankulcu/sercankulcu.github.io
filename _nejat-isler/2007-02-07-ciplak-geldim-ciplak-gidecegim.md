@@ -1,5 +1,6 @@
 ---
 title: "Çıplak Geldim, Çıplak Gideceğim"
+title_en: "I Came Naked, I'll Leave Naked"
 description: "A 2007 interview shows Nejat İşler's view of work and money formed earlier than assumed: he wanted money to buy time, not a higher standard of living."
 date: 2007-02-07
 publication: "Ulusoy Dergisi / Tiyatro Dünyası archive"

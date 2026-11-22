@@ -1,5 +1,6 @@
 ---
 title: "Yer Çekimine En Fazla Direnen Şey Yaşam"
+title_en: "Life Is What Resists Gravity the Most"
 description: "In June 2019, Nejat İşler had just published his second book, Ben Hep Senin Yanındaydım."
 date: 2019-06-23
 publication: "Milliyet Pazar"

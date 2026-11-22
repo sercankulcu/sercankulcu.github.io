@@ -1,5 +1,6 @@
 ---
 title: "Rüyalar ve Sayıklamalar"
+title_en: "Dreams and Ravings"
 description: "A 2019 Socrates interview shows acting was never Nejat İşler's only creative identity: writing came much earlier, before television fame."
 date: 2019-08-01
 publication: "Socrates"

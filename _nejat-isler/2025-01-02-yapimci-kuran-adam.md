@@ -1,5 +1,6 @@
 ---
 title: "Yapımcı: Kuran Adam"
+title_en: "Producer: The Man Who Builds"
 description: "At the beginning of 2025, Nejat İşler explained why producing had become important to him. The answer is useful because he rejects the simplest definition."
 date: 2025-01-02
 publication: "Habertürk"

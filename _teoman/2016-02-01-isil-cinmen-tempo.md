@@ -1,5 +1,6 @@
 ---
 title: "Işıl Cinmen ile Tempo Röportajı"
+title_en: "Tempo Interview with Işıl Cinmen"
 description: "This interview shows a noticeably more pessimistic Teoman. Earlier conversations had already revealed his complicated relationship with Turkey."
 date: 2016-02-01
 publication: "Tempo"

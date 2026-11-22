@@ -1,5 +1,6 @@
 ---
 title: "Teoman ile Söyleşi"
+title_en: "A Conversation with Teoman"
 description: "A 2006 interview with Coşkun Çokyiğit on what Teoman is trying to do as an artist: originality, commercial art, language, Istanbul and his audience."
 date: 2006-01-01
 interviewer: "Coşkun Çokyiğit"

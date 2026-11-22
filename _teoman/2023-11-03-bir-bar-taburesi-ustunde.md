@@ -1,5 +1,6 @@
 ---
 title: "Bir Bar Taburesi Üstünde"
+title_en: "On a Bar Stool"
 description: "A conversation series named for the Paramparça lyric 'Bir bar taburesi üstünde': an image from a song that has become part of Teoman's public mythology."
 date: 2023-11-03
 publication: "KAFA TV"

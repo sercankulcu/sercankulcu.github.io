@@ -1,5 +1,6 @@
 ---
 title: "Başkan Olunca Bu İşler Ne Kadar Zormuş Dedim"
+title_en: "Once I Became President, I Saw How Hard It Is"
 description: "By the end of 2015, Nejat İşler had entered a role very different from the ones that had made him famous. He was now the president of Gümüşlükspor."
 date: 2015-12-28
 publication: "Yeni Yüzyıl P"

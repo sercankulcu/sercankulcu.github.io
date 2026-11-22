@@ -1,5 +1,6 @@
 ---
 title: "İçimizden Biri: Teoman"
+title_en: "One of Us: Teoman"
 description: "This interview captures a particularly reflective Teoman. The discussion moves far beyond music."
 date: 1999-06-14
 type: "interview"

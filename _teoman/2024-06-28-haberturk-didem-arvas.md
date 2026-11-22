@@ -1,5 +1,6 @@
 ---
 title: "Özel Röportaj — Teoman"
+title_en: "Exclusive Interview — Teoman"
 description: "A Habertürk interview with Didem Arvas that brings together Teoman's first novel, the character Timur and his changing public image."
 date: 2024-06-28
 publication: "Habertürk"

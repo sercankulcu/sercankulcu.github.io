@@ -1,5 +1,6 @@
 ---
 title: "Seyirci Kötüyü Seviyor, Ben Bunun Canlı Kanıtıyım"
+title_en: "The Audience Loves the Villain, and I'm Living Proof"
 description: "This interview arrives at a revealing moment in Nejat İşler's life. Tamirhane is reaching cinemas. He has just completed a long period associated with Gümüşlük."
 date: 2022-11-11
 publication: "Gazete Oksijen"

@@ -1,5 +1,6 @@
 ---
 title: "Zamanı Satın Almak"
+title_en: "Buying Time"
 description: "By 2017, Nejat İşler had developed a much clearer philosophy for the life he was trying to build. Earlier interviews had shown pieces of it."
 date: 2017-03-07
 publication: "Habertürk"

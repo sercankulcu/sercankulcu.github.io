@@ -1,5 +1,6 @@
 ---
 title: "Popüler Olmak Bir Harika"
+title_en: "Being Popular Is Wonderful"
 description: "By late 2000 Teoman's songs were mainstream, and here he says plainly that being popular is wonderful, without treating it as a compromise."
 date: 2000-12-19
 type: "interview"

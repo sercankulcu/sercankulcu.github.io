@@ -1,5 +1,6 @@
 ---
 title: "Sette Olanları AİHM’ye Götürsek Kazanırız"
+title_en: "If We Took What Happens on Set to the ECHR, We'd Win"
 description: "One day after Nejat İşler's major Milliyet interview about leaving Kapalıçarşı, another conversation made his position even clearer."
 date: 2010-01-26
 publication: "Cinemania / Habertürk"

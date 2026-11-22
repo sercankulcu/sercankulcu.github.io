@@ -1,5 +1,6 @@
 ---
 title: "Ölene Dek Sınıfımın Yanında Yer Alacağım"
+title_en: "I'll Stand by My Class Until I Die"
 description: "By the end of January 2010, Nejat İşler's conflict with the television industry had become much larger than a personal dispute about leaving Kapalıçarşı."
 date: 2010-01-31
 publication: "Cumhuriyet"

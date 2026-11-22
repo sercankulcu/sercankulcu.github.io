@@ -1,5 +1,6 @@
 ---
 title: "Uzun Burunlu Sıska Teoman"
+title_en: "Long-Nosed, Skinny Teoman"
 description: "By the summer of 1999, Teoman was no longer the unknown musician introduced to newspaper readers only a few years earlier."
 date: 1999-06-09
 publication: "Hürriyet Kelebek"

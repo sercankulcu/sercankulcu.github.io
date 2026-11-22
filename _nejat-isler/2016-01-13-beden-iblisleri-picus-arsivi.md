@@ -1,5 +1,6 @@
 ---
 title: "Beden İblisleri"
+title_en: "Demons of the Body"
 description: "Among the surviving Nejat İşler interviews, Beden İblisleri is unusual. It is not organized around a film. There is no conventional promotional structure."
 date: 2016-01-13
 publication: "Picus / Egoist Okur archive"

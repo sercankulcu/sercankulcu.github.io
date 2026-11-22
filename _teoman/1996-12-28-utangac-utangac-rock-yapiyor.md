@@ -1,5 +1,6 @@
 ---
 title: "Utangaç Utangaç Rock Yapıyor"
+title_en: "Making Rock, Shyly"
 description: "One of the earliest surviving Teoman interviews, published just before his first album, when he was still largely unknown to the general public."
 date: 1996-12-28
 publication: "Milliyet"

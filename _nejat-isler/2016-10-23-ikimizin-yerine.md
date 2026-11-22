@@ -1,5 +1,6 @@
 ---
 title: "İkimizin Yerine: Beden Değişti, Oyunculuk Devam Etti"
+title_en: "In Place of the Two of Us: The Body Changed, the Acting Went On"
 description: "By October 2016, Nejat İşler was no longer speaking only as someone who had survived a major health crisis. He was back inside a film."
 date: 2016-10-23
 publication: "Hürriyet"

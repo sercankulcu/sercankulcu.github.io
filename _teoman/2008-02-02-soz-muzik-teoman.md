@@ -1,5 +1,6 @@
 ---
 title: "Söz Müzik Teoman"
+title_en: "Lyrics and Music: Teoman"
 description: "This interview documents an unusual moment in Teoman's career. Instead of releasing another conventional Teoman album, he gives his songs to other musicians."
 date: 2008-02-02
 publication: "PowerTürk"

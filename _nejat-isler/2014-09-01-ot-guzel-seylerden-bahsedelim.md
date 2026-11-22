@@ -1,5 +1,6 @@
 ---
 title: "OT: Güzel Şeylerden Bahsedelim"
+title_en: "OT: Let's Talk About Nice Things"
 description: "In September 2014, Nejat İşler returned to a long-form interview after one of the most serious periods of his life."
 date: 2014-09-01
 publication: "OT"

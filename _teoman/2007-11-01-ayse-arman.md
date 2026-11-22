@@ -1,5 +1,6 @@
 ---
 title: "Ayşe Arman ile Röportaj"
+title_en: "Interview with Ayşe Arman"
 description: "This is one of the most biographically revealing interviews in the Teoman archive."
 date: 2007-11-01
 publication: "Hürriyet"

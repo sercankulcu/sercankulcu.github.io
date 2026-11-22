@@ -1,5 +1,6 @@
 ---
 title: "Zaten Geçerken Uğramıştı"
+title_en: "He Was Only Passing Through"
 description: "This is not a conventional question-and-answer interview. It is something almost more valuable for an archive."
 date: 2013-09-07
 publication: "Milliyet"

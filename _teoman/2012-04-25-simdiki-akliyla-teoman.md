@@ -1,5 +1,6 @@
 ---
 title: "Şimdiki Aklıyla Teoman"
+title_en: "Teoman, With the Wisdom of Hindsight"
 description: "This interview takes place after one of the most dramatic decisions in Teoman's career."
 date: 2012-04-25
 publication: "GQ Türkiye"

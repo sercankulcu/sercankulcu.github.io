@@ -1,5 +1,6 @@
 ---
 title: "Teoman, Fatih Altaylı'nın Sorularını Yanıtladı"
+title_en: "Teoman Answers Fatih Altaylı's Questions"
 description: "This interview is one of the most important political and philosophical conversations of Teoman's later period."
 date: 2023-08-25
 publication: "Fatih Altaylı YouTube"

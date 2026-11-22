@@ -1,5 +1,6 @@
 ---
 title: "Esquire: Kaybedenler, Hırs and Public Image"
+title_en: "Esquire: Losers, Ambition and Public Image"
 description: "In March 2011, Nejat İşler entered one of the most culturally important periods of his career. Kaybedenler Kulübü had just reached cinemas."
 date: 2011-03-29
 publication: "Esquire Türkiye"

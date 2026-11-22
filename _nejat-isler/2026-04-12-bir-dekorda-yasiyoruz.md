@@ -1,5 +1,6 @@
 ---
 title: "Bir Dekorda Yaşıyoruz"
+title_en: "We Live on a Set"
 description: "In April 2026, Nejat İşler returned to a question that had followed him for almost twenty years: The vocabulary has changed."
 date: 2026-04-12
 publication: "BirGün TV"

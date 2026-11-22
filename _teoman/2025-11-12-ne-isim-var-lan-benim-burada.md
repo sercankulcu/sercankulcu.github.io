@@ -1,5 +1,6 @@
 ---
 title: "Ne İşim Var Lan Benim Burada?"
+title_en: "What the Hell Am I Doing Here?"
 description: "By late 2025, Teoman has found a new use for a problem that has followed him through almost his entire public life."
 date: 2025-11-12
 publication: "Mirgün Cabas"

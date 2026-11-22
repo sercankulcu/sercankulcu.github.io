@@ -1,5 +1,6 @@
 ---
 title: "Sorumlu Bir Herifim"
+title_en: "I'm a Responsible Guy"
 description: "By early 2017, two very different versions of Nejat İşler existed in public. One was familiar from celebrity culture:"
 date: 2017-01-17
 publication: "L'Officiel Hommes Türkiye / Habertürk reproduction"

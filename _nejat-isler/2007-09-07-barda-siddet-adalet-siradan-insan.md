@@ -1,5 +1,6 @@
 ---
 title: "Barda: Şiddet, Adalet ve Sıradan İnsan"
+title_en: "Barda: Violence, Justice and the Ordinary Man"
 description: "The 2007 Barda period contains more than one useful Nejat İşler interview. The Harper's Bazaar conversation gives us the broad social question:"
 date: 2007-09-07
 publication: "Archived interview reproduction"

@@ -1,5 +1,6 @@
 ---
 title: "On Yedi Yaş Yaşamda Çok Önemli"
+title_en: "Seventeen Is a Very Important Age in Life"
 description: "This interview is one of the clearest explanations Teoman gave during the Onyedi period about how he writes songs and how he constructs an album."
 date: 2000-08-10
 publication: "Cumhuriyet Gazetesi"

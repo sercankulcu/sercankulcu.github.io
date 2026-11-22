@@ -1,5 +1,6 @@
 ---
 title: "Bu Film Kayıp Yılların Fotoğrafı"
+title_en: "This Film Is a Snapshot of the Lost Years"
 description: "Two days after Kaybedenler Kulübü reached cinemas, Nejat İşler and Yiğit Özşener talked with Sibel Ateş Yengin about the film and the decade it represented."
 date: 2011-03-27
 publication: "Akşam"
