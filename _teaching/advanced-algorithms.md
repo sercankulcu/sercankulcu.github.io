@@ -128,6 +128,7 @@ Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalış
 ## Getting Started
 
 * [Prerequisite: Algorithms (Chapters 1–11)](/teaching/algorithms/?lang=en)
+* [Dictionary of Terms (HTML)](/files/advanced_algorithms/Dictionary.html)
 
 ---
 
@@ -137,7 +138,7 @@ Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalış
 
 Divide and conquer splits a problem into smaller instances of the same problem, solves them recursively and combines the answers. We set up the general template and its recurrence, solve recurrences with the Master Theorem, and revisit merge sort, quicksort and fast exponentiation in this light, noting why the approach breaks down when subproblems overlap. The chapter then works through Quickhull for convex hulls, the closest pair of points, Karatsuba's integer multiplication and Strassen's matrix multiplication.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_01_Divide_and_Conquer.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_01_Divide_and_Conquer.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_01_Divide_and_Conquer.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_01_Divide_and_Conquer.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_01_Divide_and_Conquer_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_01_Divide_and_Conquer_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter01/src)
 
 ---
 
@@ -145,7 +146,7 @@ Divide and conquer splits a problem into smaller instances of the same problem, 
 
 A greedy algorithm builds its answer one step at a time, always taking the choice that looks best right now and never revisiting it. We state the greedy-choice property and optimal substructure, and use coin change to see when greed is optimal and when it fails. Activity selection, scheduling with deadlines, the fractional knapsack, minimum spanning trees through the cut property, and Huffman coding follow, together with a proof that Huffman's code is an optimal prefix code.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_02_Greedy_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_02_Greedy_Algorithms.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_02_Greedy_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_02_Greedy_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_02_Greedy_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_02_Greedy_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter02/src)
 
 ---
 
@@ -153,7 +154,7 @@ A greedy algorithm builds its answer one step at a time, always taking the choic
 
 Dynamic programming solves each overlapping subproblem once and stores the result, turning exponential recursions into polynomial-time algorithms. Using Fibonacci, we cover optimal substructure and overlapping subproblems, the steps of designing a DP solution, memoization versus tabulation, and how DP differs from divide and conquer and from greedy methods. We then fill in the tables step by step for 0/1 and unbounded knapsack, subset sum, longest increasing subsequence (including the O(n log n) binary-search version), longest common substring and longest common subsequence.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_03_Dynamic_Programming.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_03_Dynamic_Programming.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_03_Dynamic_Programming.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_03_Dynamic_Programming.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_03_Dynamic_Programming_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_03_Dynamic_Programming_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter03/src)
 
 ---
 
@@ -163,7 +164,7 @@ Dynamic programming solves each overlapping subproblem once and stores the resul
 
 Backtracking extends a partial solution step by step and, as soon as a branch cannot lead to a valid solution, abandons it and returns to the last decision point. After a short introduction to P, NP and NP-hard problems, we present the state-space tree and the choose–explore–undo template with mazes and permutations. We solve n-queens, Sudoku, graph coloring, Hamiltonian paths and word search in Java, look at the min-conflicts heuristic as a local-repair alternative, and discuss the worst-case cost of backtracking and the heuristics that make pruning stronger.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_04_Backtracking.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_04_Backtracking.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_04_Backtracking.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_04_Backtracking.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_04_Backtracking_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_04_Backtracking_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter04/src)
 
 ---
 
@@ -171,7 +172,7 @@ Backtracking extends a partial solution step by step and, as soon as a branch ca
 
 Branch and bound explores the state-space tree while computing a bound at every node, and prunes any branch that provably cannot contain the best solution. We discuss how to choose bounds and when to prune, compare FIFO, LIFO and least-cost (LC) search, and contrast the method with backtracking. The 0/1 knapsack is solved with the fractional relaxation and the travelling salesman problem with three progressively tighter lower bounds; the assignment problem, integer linear programming and maximum clique serve as further examples. We close by relating branch and bound to A* and comparing the design paradigms side by side.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_05_Branch_and_Bound.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_05_Branch_and_Bound.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_05_Branch_and_Bound_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter05/src)
 
 ---
 
@@ -179,7 +180,7 @@ Branch and bound explores the state-space tree while computing a bound at every 
 
 When finding the optimum of an NP-hard problem is too expensive, an approximation algorithm runs in polynomial time and returns a solution within a proven factor of the best one. We define the approximation ratio and separate approximation algorithms from heuristics and from approximation schemes. Topics include the nearest-neighbor heuristic, the MST-based 2-approximation for metric TSP and 2-opt local search; list scheduling and the longest-processing-time (LPT) rule; a 2-approximation for vertex cover and a reduction from 3-SAT; the ratio-sorted greedy method for knapsack; and power iteration for the dominant eigenvector.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_06_Approximation_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_06_Approximation_Algorithms.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_06_Approximation_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_06_Approximation_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_06_Approximation_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_06_Approximation_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter06/src)
 
 ---
 
@@ -189,7 +190,7 @@ When finding the optimum of an NP-hard problem is too expensive, an approximatio
 
 Randomized algorithms make random choices while they run, which can buy a simpler design, a better expected running time or robustness against bad inputs. We distinguish Las Vegas from Monte Carlo algorithms and show how repeated runs drive the error probability down. The chapter covers the Fisher–Yates shuffle and the bias of the naive shuffle, BogoSort, randomized quicksort with its expected number of comparisons, and QuickSelect, followed by Monte Carlo estimation of π, the Miller–Rabin primality test, Karger's minimum-cut algorithm and pseudorandom number generation.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_07_Randomized_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_07_Randomized_Algorithms.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_07_Randomized_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_07_Randomized_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_07_Randomized_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_07_Randomized_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter07/src)
 
 ---
 
@@ -197,7 +198,7 @@ Randomized algorithms make random choices while they run, which can buy a simple
 
 An online algorithm receives its input piece by piece and must make irrevocable decisions without knowing the future. We measure such algorithms by competitive analysis against an adversary, comparing them with the best offline algorithm that sees the whole input in advance. Topics include ski rental and its lower bound, paging with FIFO, LRU and OPT, Belady's anomaly and the randomized marking algorithm, and the move-to-front rule for list update; in the data-stream model we look at moving averages, the running median, reservoir sampling and pattern search with a rolling hash, and finish with incremental learning.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_08_Online_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_08_Online_Algorithms.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_08_Online_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_08_Online_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_08_Online_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_08_Online_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter08/src)
 
 ---
 
@@ -205,6 +206,6 @@ An online algorithm receives its input piece by piece and must make irrevocable 
 
 Parallel algorithms split a computation across several processing units to cut the running time and to make large data sets tractable. We introduce Flynn's taxonomy, memory architectures and the PRAM model, together with speedup, efficiency, cost, Amdahl's law and the work–span measures. Worked examples include parallel sum and prefix sums (Hillis–Steele and Blelloch), pipelines and pipelined trees, parallel merge sort, MapReduce and data-parallel matrix multiplication; race conditions, concurrent graph traversal and Java's parallelism tools round out the chapter.
 
-- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_09_Parallel_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_09_Parallel_Algorithms.pdf)
+- [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_09_Parallel_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_09_Parallel_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_09_Parallel_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_09_Parallel_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter09/src)
 
 </div>
