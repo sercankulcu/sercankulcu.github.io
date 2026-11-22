@@ -15,4 +15,4 @@ Windows 8.1 added a visible Start button on the desktop taskbar, direct-to-deskt
 
 The August RTM also confirmed Microsoft's shift to a faster Windows update pace. Windows Vista to Windows 7 was roughly three years; Windows 7 to Windows 8 was another three years. Responding to Windows 8 criticism within twelve months more closely resembled a web-service update cycle, where user feedback could drive visible product changes before the next major version. Windows 8.1 Update — a further set of fixes targeted at keyboard-and-mouse users — followed in April 2014, and Windows 10 was announced in September 2014.
 
-
+**Sources:** [Windows 8.1 and Windows RT 8.1 head to manufacturing partners (Microsoft)](https://blogs.microsoft.com/blog/2013/08/27/windows-8-1-and-windows-rt-8-1-head-to-manufacturing-partners/)

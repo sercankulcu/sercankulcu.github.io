@@ -30,3 +30,5 @@ It was also an important moment in the competition between Intel and AMD. Intel 
 Sandy Bridge represents a period when CPU improvements still felt broad and dependable to mainstream users. It combined architectural refinement, manufacturing strength, and platform maturity.
 
 Its legacy is not only benchmark charts. It is the memory of machines that felt fast, efficient, and durable at a time when personal computing was expanding across desktops, laptops, and increasingly mobile workflows.
+
+**Sources:** [Intel Introduces New Processor Family (Digital Engineering 24/7)](https://www.digitalengineering247.com/article/intel-introduces-new-processor-family), [Intel 2nd-Gen Core Processors Get Official With WiDi 2.0 (SlashGear)](https://www.slashgear.com/intel-2nd-gen-core-processors-get-official-with-widi-2-0-15122461)

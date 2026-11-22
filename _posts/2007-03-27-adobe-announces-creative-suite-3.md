@@ -30,3 +30,5 @@ CS3 also reflected Adobe's growing influence after acquiring Macromedia. Bringin
 Some parts of the CS3 world now feel distant. Flash is gone from the modern web, and subscription software later replaced the boxed-suite era. But the basic idea behind CS3 remains familiar: creative work is rarely a single-file activity.
 
 The announcement matters historically because it captured a transitional moment. Designers were becoming multi-platform publishers, and the software industry was reorganizing around integrated workflows rather than isolated applications.
+
+**Sources:** [Adobe Creative Suite branches out (DPReview)](https://www.dpreview.com/articles/6857365213/adobecs3), [Adobe Debuts Creative Suite 3 (Post Magazine)](https://postmagazine.com/Press-Center/Daily-News/2007/ADOBE-DEBUTS-CREATIVE-SUITE-3.aspx)

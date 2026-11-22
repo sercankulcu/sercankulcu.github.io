@@ -1,6 +1,7 @@
 ---
 layout: archive
 title: "Thoughts"
+og_image: https://sercankulcu.github.io/images/og/thoughts.jpg
 seo_title: "Thoughts on Learning, Writing and Life · Sercan Külcü"
 description: "Personal essays by Sercan Külcü on learning, writing, everyday life, technology, and the ideas that change how we see the world."
 permalink: /thoughts/

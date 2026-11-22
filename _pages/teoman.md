@@ -2,6 +2,7 @@
 
 layout: archive
 title: "Teoman"
+og_image: https://sercankulcu.github.io/images/og/teoman.jpg
 seo_title: "Teoman Archive: Interviews and Profiles"
 description: "Interviews, conversations, profiles and archival press material about the Turkish musician Teoman, retold in English."
 permalink: /teoman/

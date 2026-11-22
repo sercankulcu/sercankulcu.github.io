@@ -1,6 +1,7 @@
 ---
 layout: archive
 title: "Nejat İşler"
+og_image: https://sercankulcu.github.io/images/og/nejat-isler.jpg
 seo_title: "Nejat İşler Archive: Interviews and Profiles"
 description: "Interviews, conversations, profiles and archival press material about the actor Nejat İşler, retold in English."
 permalink: /nejat-isler/

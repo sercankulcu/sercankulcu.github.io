@@ -30,3 +30,5 @@ The episode showed how fragile dependence on a single platform can be. When a co
 The acquisition became a case study in platform power. It raised durable questions: Who controls digital public squares? How portable should social identity be? What happens when APIs disappear or pricing changes? How should societies balance speech, safety, and business incentives?
 
 Whatever one thinks of the deal, October 2022 marked a turning point. Twitter was no longer just evolving as a product; it had become a live experiment in ownership, governance, and the future of online public conversation.
+
+**Sources:** [Elon Musk completes purchase of Twitter, fires CEO (Popular Science)](https://www.popsci.com/technology/elon-musk-buys-twitter/), [Elon Musk completes $44 billion Twitter takeover (MacRumors)](https://macrumors.com/2022/10/28/elon-musk-completes-44-billion-twitter-takeover)

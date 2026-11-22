@@ -1,6 +1,7 @@
 ---
 layout: archive
 title: "Fun"
+og_image: https://sercankulcu.github.io/images/og/fun.jpg
 seo_title: "Fun: Films, Games and Music · Sercan Külcü"
 description: "Writing about films, games, music, entertainment and other things I enjoy."
 permalink: /fun/

@@ -1,6 +1,7 @@
 ---
 layout: archive
 title: "Memory"
+og_image: https://sercankulcu.github.io/images/og/memory.jpg
 seo_title: "Memory: Personal Stories · Sercan Külcü"
 description: "Personal stories, memories and small moments from different periods of my life."
 permalink: /memory/
