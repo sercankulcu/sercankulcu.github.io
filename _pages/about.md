@@ -10,12 +10,6 @@ author_profile: true
 
 <!--  <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp"> -->
 
-<style>
-button {
-  margin: 0.25rem 0.12rem;
-}
-</style>
-
 <script>
 let deferredPrompt;
 
@@ -62,7 +56,7 @@ My interests span software engineering, embedded systems, machine learning, comp
 
 This website brings together my academic work, software projects, teaching materials, technical notes, personal writing, and other things I find worth exploring.
 
-<p id="install" style="display: none;">For easier mobile access, <button id="installPWA">🚀 Install App</button> directly on your device.</p>
+<p id="install" style="display: none;">For easier mobile access, <button id="installPWA" style="margin: 0.25rem 0.12rem;">🚀 Install App</button> directly on your device.</p>
 
 **Explore the site**
 
