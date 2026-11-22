@@ -49,8 +49,6 @@ It is noticing when the machine inside your head is still running after the road
 
 I like the memory most where it refuses to explain itself completely. A minor detail can be more faithful than a grand summary.
 
-A minor detail can be more faithful than a grand summary. I think the truth of the memory lives exactly in that uneven size.
-
 Mekanik düşünmenin cazibesi hâlâ anlaşılır geliyor bana. Parçaları ayır, sıraya koy, neden-sonuç ilişkisini bul, sonra sistem çalışsın. Gençken bu yöntem neredeyse ahlaki bir güven veriyordu.
 
 Sonra insan, bazı sistemlerin parçalara ayrılınca anlaşılmadığını görüyor. Özellikle içinde insan varsa. Yine de o mekanik arzu kötü değildi; yalnızca dünyayı olduğundan daha itaatkâr sanıyordu.

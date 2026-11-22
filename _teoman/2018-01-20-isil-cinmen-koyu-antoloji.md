@@ -27,6 +27,8 @@ tags:
 **Posta — 20 January 2018**  
 **Interview by Işıl Cinmen**
 
+Original (Turkish): [Posta, 20 January 2018](https://www.posta.com.tr/teoman-ruhen-yaslandim-gecmiste-yasiyorum-1373504)
+
 This is one of the darkest and most self-analytical Teoman interviews in the archive.
 
 At fifty, Teoman has spent more than two decades as a professional musician. Instead of concentrating on making a completely new record, he has returned to twenty-six older songs and reconstructed them for *Koyu Antoloji*.

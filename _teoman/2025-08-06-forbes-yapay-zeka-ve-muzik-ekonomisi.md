@@ -17,6 +17,8 @@ tags:
 **Forbes Türkiye — 6 August 2025**  
 **Interview / profile by Nilgün Balcı Çavdar**
 
+Original (Turkish): [Forbes Türkiye, 6 August 2025](https://www.forbes.com.tr/dergi/teoman-yakin-gelecekte-sanatcilar-ve-is-dunyasi-ekonomik-yikimla-karsilasacak)
+
 This is one of the most unusual Teoman interviews in the archive.
 
 There is almost no romantic mythology here.

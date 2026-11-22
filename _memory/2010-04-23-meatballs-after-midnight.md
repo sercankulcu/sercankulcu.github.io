@@ -54,7 +54,3 @@ And I remember thinking the meatballs were very good.
 For a food critic, this is weak evidence.
 
 For a memory, it is enough.
-
-## Around Meatballs After Midnight
-
-I like the memory most where it refuses to explain itself completely. Taste is only part of it. Timing and company do most of the remembering. The memory does not ask to be important; it only asks not to be erased.
