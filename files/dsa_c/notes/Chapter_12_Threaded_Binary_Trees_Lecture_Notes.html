@@ -1,0 +1,1149 @@
+---
+layout: without-sidebar
+title: "Chapter 12: Threaded Binary Trees — Lecture Notes"
+permalink: /files/dsa_c/notes/Chapter_12_Threaded_Binary_Trees_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 12 of Data Structures and Algorithms with C: counting null pointers, threads and the header node, finding the inorder successor, stack-free inorder and preorder traversal, the Morris traversal, and insertion with insert_right and insert_left; with worked examples and code traces."
+lang: en
+seo_title: "Chapter 12: Threaded Binary Trees · DSA with C Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/c-ile-veri-yapilari-ve-algoritmalar.jpg
+hreflang:
+  tr: /files/dsa_c/notlar/Bolum_12_Kilavuzlu_Ikili_Agaclar_Ders_Notu.html
+  en: /files/dsa_c/notes/Chapter_12_Threaded_Binary_Trees_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Data Structures and Algorithms with C"
+  url: "/teaching/data-structures-and-algorithms-with-c/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+  /* Chapter 12: classes of the tree figures taken from the slides (same rules as in the slides) */
+  .ds-notes .ds-svg .t-n{fill:var(--ds-bg);stroke:var(--ds-link);stroke-width:1.6}
+  .ds-notes .ds-svg .t-cur{fill:var(--ds-hot);stroke:var(--ds-accent);stroke-width:3}
+  .ds-notes .ds-svg .t-hot{fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1.6}
+  .ds-notes .ds-svg .t-stk{fill:color-mix(in srgb,var(--ds-hot) 38%,var(--ds-bg));stroke:var(--ds-link);stroke-width:1.6;stroke-dasharray:4 2}
+  .ds-notes .ds-svg .t-done{fill:var(--ds-node);stroke:var(--ds-link);stroke-width:2.2}
+  .ds-notes .ds-svg .t-bad{fill:color-mix(in srgb,var(--ds-bad) 22%,var(--ds-bg));stroke:var(--ds-bad);stroke-width:2.6}
+  .ds-notes .ds-svg .t-new{fill:color-mix(in srgb,var(--ds-good) 24%,var(--ds-bg));stroke:var(--ds-good);stroke-width:2.6}
+  .ds-notes .ds-svg .t-ok{fill:color-mix(in srgb,var(--ds-good) 14%,var(--ds-bg));stroke:var(--ds-good);stroke-width:1.8}
+  .ds-notes .ds-svg .t-null{fill:var(--ds-muted);font:11.5px ui-monospace,Consolas,monospace;text-anchor:middle}
+  .ds-notes .ds-svg .t-nullon{fill:var(--ds-accent);font-weight:700}
+  .ds-notes .ds-svg .t-ptr{fill:var(--ds-accent);font:700 13px ui-monospace,Consolas,monospace}
+  .ds-notes .ds-svg .t-sub{fill:var(--ds-muted);font:12px ui-monospace,Consolas,monospace}
+  .ds-notes .ds-svg .t-thr{fill:none;stroke:var(--ds-bad);stroke-width:1.8;stroke-dasharray:5 4}
+  .ds-notes .ds-svg .t-thrh{fill:none;stroke:var(--ds-accent);stroke-width:3;stroke-dasharray:6 3}
+  .ds-notes .ds-svg .t-sm{fill:var(--ds-text);font:600 13px system-ui,sans-serif}
+  .ds-notes .ds-svg .t-bold{fill:var(--ds-accent);font:700 15px system-ui,sans-serif}
+  .ds-notes .ds-svg .t-okt{fill:var(--ds-good);font:700 14px system-ui,sans-serif}
+  .ds-notes .ds-svg .t-badt{fill:var(--ds-bad);font:700 14px system-ui,sans-serif}
+  .ds-notes .ds-svg .mono{font-family:ui-monospace,Consolas,monospace}
+  .ds-notes .ds-svg .t-reg{fill:none;stroke:var(--ds-border);stroke-dasharray:4 4}
+  .ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 300px; }
+  .ds-notes .nt-fig__row--4 > svg.ds-svg { flex: 1 1 300px; max-width: 340px; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Data Structures and Algorithms with C · Lecture Notes</p>
+  <h1>Chapter 12: Threaded Binary Trees</h1>
+  <p class="nt-lead">In a linked binary tree, more than half of the pointer fields are empty. A threaded binary tree puts these empty fields to use. An empty left pointer points to the node that comes immediately before the node in inorder; an empty right pointer points to the node that comes immediately after. The tree can then be traversed from start to finish with a single pointer, with no stack and no recursion. These notes first prove how many empty pointers there are, then show how the threads are built, how they are told apart from real links, and what role the header node plays. Next come finding the successor, stack-free inorder and preorder traversal, the Morris traversal, which needs no flag fields, and the procedures <code>insert_right</code> and <code>insert_left</code>, which insert nodes without breaking the threads. For each procedure we give the C code, a line-by-line explanation, a code trace, and a complexity analysis.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_12_Threaded_Binary_Trees.html">Slides</a></li>
+    <li><a href="../slides/Chapter_12_Threaded_Binary_Trees_Study_Questions.html">Study questions</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_12_Threaded_Binary_Trees.pdf">Slides PDF</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Counting null pointers</dt>
+    <dd>Prove that a binary tree with n nodes has n + 1 null pointers.</dd>
+    <dt>Building threads</dt>
+    <dd>Apply by hand, to a given tree, the rule that ties an empty left pointer to the inorder predecessor and an empty right pointer to the inorder successor.</dd>
+    <dt>Defining the structure completely</dt>
+    <dd>Build the C structure of a threaded tree, with the <code>left_thread</code> and <code>right_thread</code> flags and a header node.</dd>
+    <dt>Traversing without a stack</dt>
+    <dd>Traverse in inorder and preorder with <code>insucc</code> using O(1) extra memory; trace the Morris traversal step by step.</dd>
+    <dt>Inserting nodes</dt>
+    <dd>Merge the two cases of <code>insert_right</code> into a single procedure and derive <code>insert_left</code> from it.</dd>
+    <dt>Writing good code</dt>
+    <dd>Decide on a clearly defined procedure, a comment that states the intent, and the right place for the NULL check.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s12-1">12.1 Empty pointers and the idea of a thread</a>
+      <ol>
+        <li><a href="#s12-1-1">12.1.1 n + 1 null pointers in n nodes</a></li>
+        <li><a href="#s12-1-2">12.1.2 The idea of Perlis and Thornton</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-2">12.2 Building the threads</a>
+      <ol>
+        <li><a href="#s12-2-1">12.2.1 Inorder predecessor and successor</a></li>
+        <li><a href="#s12-2-2">12.2.2 Building the threads one by one</a></li>
+        <li><a href="#s12-2-3">12.2.3 Thread flags</a></li>
+        <li><a href="#s12-2-4">12.2.4 The header node</a></li>
+        <li><a href="#s12-2-5">12.2.5 Why inorder</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-3">12.3 Inorder traversal</a>
+      <ol>
+        <li><a href="#s12-3-1">12.3.1 Finding the successor</a></li>
+        <li><a href="#s12-3-2">12.3.2 Code trace: head, A, and I</a></li>
+        <li><a href="#s12-3-3">12.3.3 Traversal without a stack</a></li>
+        <li><a href="#s12-3-4">12.3.4 The cost of the traversal</a></li>
+        <li><a href="#s12-3-5">12.3.5 Preorder traversal</a></li>
+        <li><a href="#s12-3-6">12.3.6 The Morris traversal</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-4">12.4 Inserting a node</a>
+      <ol>
+        <li><a href="#s12-4-1">12.4.1 Why insertion is intricate</a></li>
+        <li><a href="#s12-4-2">12.4.2 Case 1: inserting under a parent with no right subtree</a></li>
+        <li><a href="#s12-4-3">12.4.3 Case 2: the parent has a right subtree</a></li>
+        <li><a href="#s12-4-4">12.4.4 One procedure: <code>insert_right</code></a></li>
+        <li><a href="#s12-4-5">12.4.5 Inserting on the left</a></li>
+        <li><a href="#s12-4-6">12.4.6 Freeing the tree</a></li>
+        <li><a href="#s12-4-7">12.4.7 Code quality</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-5">12.5 Gains, costs, and a complexity summary</a></li>
+    <li><a href="#s12-6">12.6 Common mistakes</a></li>
+    <li><a href="#s12-7">12.7 Exercises and solutions</a>
+      <ol>
+        <li><a href="#s12-7-1">12.7.1 Drawing the threads of a tree</a></li>
+        <li><a href="#s12-7-2">12.7.2 Finding the predecessor</a></li>
+        <li><a href="#s12-7-3">12.7.3 Traversing backwards</a></li>
+        <li><a href="#s12-7-4">12.7.4 The first node of an empty tree</a></li>
+        <li><a href="#s12-7-5">12.7.5 Why postorder is hard</a></li>
+        <li><a href="#s12-7-6">12.7.6 Inserting into a threaded binary search tree</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12-8">12.8 Summary</a></li>
+    <li><a href="#s12-9">12.9 Key terms</a></li>
+    <li><a href="#s12-10">12.10 Test Yourself</a></li>
+    <li><a href="#s12-11">12.11 Further reading</a></li>
+    <li><a href="#s12-12">12.12 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s12-1"><span class="nt-num">12.1</span>Empty pointers and the idea of a thread</h2>
+
+<p>In the linked representation, each node of a binary tree has three fields: a pointer to the left subtree, the data, and a pointer to the right subtree. In C the node is defined as a self-referential struct:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> node *tree_ptr;
+<span class="kw">struct</span> node {
+    tree_ptr left;   <span class="cm">/* left subtree */</span>
+    <span class="kw">char</span>      data;
+    tree_ptr right;   <span class="cm">/* right subtree */</span>
+};</code></pre>
+
+<p>A pointer in a direction with no child is set to <code>NULL</code>. <code>NULL</code> is the <strong>null pointer</strong>, which points to no object. Both pointers of a leaf are null. A node with one child has one null pointer. The question for this chapter is simple: how many pointers in a tree are left null, and can these fields be put to any use?</p>
+
+<h3 id="s12-1-1"><span class="nt-num">12.1.1</span>n + 1 null pointers in n nodes</h3>
+
+<p>Whatever the shape of the tree, the number of null pointers depends only on the number of nodes. A counting argument shows this.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-null">
+  <span class="nt-box__title">Theorem 12.1 (Number of null pointers)</span>
+  <p>Every binary tree with <span class="m">n ≥ 1</span> nodes stored in the linked representation has exactly <span class="m">n + 1</span> pointer fields equal to <code>NULL</code>.</p>
+</div>
+
+<div class="nt-proof">
+  <p>Each node has two pointer fields, so the tree has <span class="m">2n</span> fields in total. Every node other than the root receives exactly one pointer, from its parent. A node cannot receive pointers from two different fields, because every node has a single parent. No pointer from inside the tree reaches the root; the root is held by a variable outside the tree. Hence the number of non-null fields is <span class="m">n − 1</span>, and the number of remaining fields is <span class="m">2n − (n − 1) = n + 1</span>. <span class="nt-qed">∎</span></p>
+</div>
+
+<p>The proof never looks at whether the tree is balanced or skewed. <a href="#sekil-null">Figure 12.1</a> illustrates this with three examples. The two trees on the left have 4 nodes and very different shapes; both have 5 null pointers. The 10-node tree on the right has 11 null pointers.</p>
+
+<figure class="nt-fig" id="sekil-null" style="--w:690px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 690 186" role="img" aria-label="NULL pointer counts"><path class="line" d="M126.667 20 L73.3333 56"/><path class="line" d="M126.667 20 L180 56"/><path class="line" d="M73.3333 56 L20 92"/><path class="line" d="M79.9333 64.8 L87.6333 76.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M13.4 100.8 L5.7 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M26.6 100.8 L34.3 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M173.4 64.8 L165.7 76.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M186.6 64.8 L194.3 76.9" style="stroke-dasharray:3 3;opacity:.55"/><g><circle class="t-n" cx="126.667" cy="20" r="11"/><text class="txt" x="126.667" y="25" text-anchor="middle" style="font-size:12px">A</text></g><g><circle class="t-n" cx="73.3333" cy="56" r="11"/><text class="txt" x="73.3333" y="61" text-anchor="middle" style="font-size:12px">B</text></g><g><circle class="t-n" cx="20" cy="92" r="11"/><text class="txt" x="20" y="97" text-anchor="middle" style="font-size:12px">D</text></g><g><circle class="t-n" cx="180" cy="56" r="11"/><text class="txt" x="180" y="61" text-anchor="middle" style="font-size:12px">C</text></g><text class="t-sm mono" x="100" y="178" text-anchor="middle">n = 4  NULL = 5</text><path class="line" d="M330 20 L293.333 56"/><path class="line" d="M336.6 28.8 L344.3 40.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M293.333 56 L256.667 92"/><path class="line" d="M299.933 64.8 L307.633 76.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M256.667 92 L220 128"/><path class="line" d="M263.267 100.8 L270.967 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M213.4 136.8 L205.7 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M226.6 136.8 L234.3 148.9" style="stroke-dasharray:3 3;opacity:.55"/><g><circle class="t-n" cx="330" cy="20" r="11"/><text class="txt" x="330" y="25" text-anchor="middle" style="font-size:12px">A</text></g><g><circle class="t-n" cx="293.333" cy="56" r="11"/><text class="txt" x="293.333" y="61" text-anchor="middle" style="font-size:12px">B</text></g><g><circle class="t-n" cx="256.667" cy="92" r="11"/><text class="txt" x="256.667" y="97" text-anchor="middle" style="font-size:12px">C</text></g><g><circle class="t-n" cx="220" cy="128" r="11"/><text class="txt" x="220" y="133" text-anchor="middle" style="font-size:12px">D</text></g><text class="t-sm mono" x="275" y="178" text-anchor="middle">n = 4  NULL = 5</text><path class="line" d="M508.889 20 L444.444 56"/><path class="line" d="M508.889 20 L605.556 56"/><path class="line" d="M444.444 56 L412.222 92"/><path class="line" d="M444.444 56 L476.667 92"/><path class="line" d="M412.222 92 L380 128"/><path class="line" d="M418.822 100.8 L426.522 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M373.4 136.8 L365.7 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M386.6 136.8 L394.3 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M470.067 100.8 L462.367 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M483.267 100.8 L490.967 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M605.556 56 L541.111 92"/><path class="line" d="M605.556 56 L670 92"/><path class="line" d="M541.111 92 L573.333 128"/><path class="line" d="M534.511 100.8 L526.811 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M566.733 136.8 L559.033 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M579.933 136.8 L587.633 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M670 92 L637.778 128"/><path class="line" d="M676.6 100.8 L684.3 112.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M631.178 136.8 L623.478 148.9" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M644.378 136.8 L652.078 148.9" style="stroke-dasharray:3 3;opacity:.55"/><g><circle class="t-n" cx="508.889" cy="20" r="11"/><text class="txt" x="508.889" y="25" text-anchor="middle" style="font-size:12px">A</text></g><g><circle class="t-n" cx="444.444" cy="56" r="11"/><text class="txt" x="444.444" y="61" text-anchor="middle" style="font-size:12px">B</text></g><g><circle class="t-n" cx="412.222" cy="92" r="11"/><text class="txt" x="412.222" y="97" text-anchor="middle" style="font-size:12px">D</text></g><g><circle class="t-n" cx="380" cy="128" r="11"/><text class="txt" x="380" y="133" text-anchor="middle" style="font-size:12px">H</text></g><g><circle class="t-n" cx="476.667" cy="92" r="11"/><text class="txt" x="476.667" y="97" text-anchor="middle" style="font-size:12px">E</text></g><g><circle class="t-n" cx="605.556" cy="56" r="11"/><text class="txt" x="605.556" y="61" text-anchor="middle" style="font-size:12px">C</text></g><g><circle class="t-n" cx="541.111" cy="92" r="11"/><text class="txt" x="541.111" y="97" text-anchor="middle" style="font-size:12px">F</text></g><g><circle class="t-n" cx="573.333" cy="128" r="11"/><text class="txt" x="573.333" y="133" text-anchor="middle" style="font-size:12px">J</text></g><g><circle class="t-n" cx="670" cy="92" r="11"/><text class="txt" x="670" y="97" text-anchor="middle" style="font-size:12px">G</text></g><g><circle class="t-n" cx="637.778" cy="128" r="11"/><text class="txt" x="637.778" y="133" text-anchor="middle" style="font-size:12px">K</text></g><text class="t-sm mono" x="525" y="178" text-anchor="middle">n = 10  NULL = 11</text></svg></div>
+  <figcaption><b>Figure 12.1:</b> Three binary trees and their null pointers. The short dashed lines are <code>NULL</code> fields. The two 4-node trees have 5 null pointers and the 10-node tree has 11.</figcaption>
+</figure>
+
+<p>The ratio is striking. Of the <span class="m">2n</span> fields, <span class="m">n + 1</span>, more than half, carry no information. On a 64-bit machine a pointer takes 8 bytes; in a tree of a million nodes, about 8 MB of memory goes to null pointers. These fields cannot simply be discarded, because it is not known in advance which node will have a child in which direction. But a meaningful value can be stored in them.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-null">
+  <span class="nt-box__title">Example 12.1</span>
+  <p>The running example of these notes is a tree with nine nodes. A is the root; B and C are its children. D and E are the children of B; F and G are the children of C; H and I are the children of D. The tree has <span class="m">2 · 9 = 18</span> pointer fields. Eight pointers arrive at the eight non-root nodes. The number of null fields is <span class="m">18 − 8 = 10</span>: two for each of the leaves H, I, E, F, and G. This agrees with <span class="m">n + 1 = 10</span>.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Counting the pointer to the root as a "non-null pointer" and getting <span class="m">n</span> non-null fields. The variable that points to the root (for example <code>tree_ptr root</code>) is not a field of any node in the tree. The non-null fields inside the nodes number only <span class="m">n − 1</span>.</p>
+</div>
+
+<h3 id="s12-1-2"><span class="nt-num">12.1.2</span>The idea of Perlis and Thornton</h3>
+
+<p>In 1960 A. J. Perlis and C. Thornton proposed that null pointers could be used to point to other nodes of the tree. They called these pointers <strong>threads</strong>. A thread is not a real child of the node; it is a signpost that says which node to move to during a traversal.</p>
+
+<p>The value of the idea shows in the extra memory a traversal needs. There are two familiar ways to traverse a binary tree in inorder. A recursive procedure opens one call for each node. The number of calls left open along one path is as large as the height <span class="m">h</span> of the tree, so the call stack uses <span class="m">O(h)</span> memory. The non-recursive (iterative) procedure does the same job with an explicit stack: while going left it pushes the nodes it passes, and later returns to them. That stack also takes <span class="m">O(h)</span> space.</p>
+
+<p>In a balanced tree <span class="m">h</span> is about <span class="m">log<sub>2</sub> n</span>, and this cost is small. But in a <strong>skewed tree</strong> all nodes line up in one direction and <span class="m">h = n</span>. In a left-skewed tree of a million nodes, a recursive traversal keeps a million calls open at the same time. On most systems the default call stack cannot hold that depth, and the program crashes.</p>
+
+<p>In a threaded tree the situation is different. From each node, the next node in inorder, the <strong>successor</strong>, is reached either directly through a thread or by following a few real links. Because the way back is written inside the tree, nothing has to be remembered. The traversal is done with a single pointer variable, and the extra memory is <span class="m">O(1)</span>. There is a price: for each pointer field we must keep one bit of information saying whether it is a real child or a thread.</p>
+
+<div class="nt-tablewrap" id="tab-ekbellek">
+<table class="nt-table">
+  <caption>Table 12.1: Three ways to traverse in inorder. <span class="m">h</span> is the height of the tree; in a skewed tree <span class="m">h = n</span>.</caption>
+  <thead><tr><th scope="col">Method</th><th scope="col">Time</th><th scope="col">Extra memory</th><th scope="col">What is remembered</th></tr></thead>
+  <tbody>
+    <tr><td>Recursive</td><td>O(n)</td><td>O(h)</td><td>Open calls (the call stack)</td></tr>
+    <tr><td>Non-recursive, with a stack</td><td>O(n)</td><td>O(h)</td><td>The nodes passed while going left</td></tr>
+    <tr><td>Threaded</td><td>O(n)</td><td>O(1)</td><td>Nothing; the way back is written in the tree</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s12-2"><span class="nt-num">12.2</span>Building the threads</h2>
+
+<p>Which node an empty pointer should point to is not arbitrary. The rule is set by the inorder traversal sequence. So the notions of "previous" and "next" node in that sequence must first be made precise.</p>
+
+<h3 id="s12-2-1"><span class="nt-num">12.2.1</span>Inorder predecessor and successor</h3>
+
+<p>At each node, an inorder traversal visits the left subtree first, then the node itself, and the right subtree last. In the running example the sequence is <code>H D I B E A F C G</code>. In this sequence every node has a known neighbor on its left and one on its right.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-oncel-ardil">
+  <span class="nt-box__title">Definition 12.1</span>
+  <p>The <strong>inorder predecessor</strong> of a node <span class="m">p</span> is the node visited immediately before <span class="m">p</span> in an inorder traversal. The <strong>inorder successor</strong> of <span class="m">p</span> is the node visited immediately after <span class="m">p</span>. The first node in the sequence has no predecessor, and the last node has no successor.</p>
+</div>
+
+<p>In the example sequence, the predecessor of E is B and its successor is A. H has no predecessor because it is the first node; G has no successor because it is the last. The rule for threads is written with these two notions.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kilavuz">
+  <span class="nt-box__title">Definition 12.2</span>
+  <p>A <strong>threaded binary tree</strong> is a binary tree whose null pointers have been filled according to the following two rules:</p>
+  <ol>
+    <li>If <code>p-&gt;left_child == NULL</code>, then <code>p-&gt;left_child</code> points to the inorder predecessor of <span class="m">p</span>.</li>
+    <li>If <code>p-&gt;right_child == NULL</code>, then <code>p-&gt;right_child</code> points to the inorder successor of <span class="m">p</span>.</li>
+  </ol>
+  <p>The pointers filled in this way are called <strong>threads</strong>.</p>
+</div>
+
+<p><a href="#sekil-kilavuzlu">Figure 12.2</a> shows the rules applied to the running example. The solid blue lines are real child links. The dashed red arrows are threads. The threads weave the inorder sequence of the tree into the tree itself: the red arrow leaving each leaf to the right goes to the next node in the sequence.</p>
+
+<figure class="nt-fig" id="sekil-kilavuzlu" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 340 230" role="img" aria-label="threaded tree A..I"><defs><marker id="n12-d16-ah1-s4_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah2-s4_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M267.7 29.8 L214.5 54.8" marker-end="url(#n12-d16-ah1-s4_0-1)"/><path class="line" d="M291.5 20 C321.5 2 321.5 42 287.3 29.8" style="" marker-end="url(#n12-d16-ah1-s4_0-1)"/><path class="line" d="M207.5 66 L132.5 112"/><path class="line" d="M207.5 66 L282.5 112"/><path class="line" d="M132.5 112 L57.5 158"/><path class="line" d="M132.5 112 L170 158"/><path class="line" d="M57.5 158 L20 204"/><path class="line" d="M57.5 158 L95 204"/><path class="line" d="M282.5 112 L245 158"/><path class="line" d="M282.5 112 L320 158"/><path class="t-thr" d="M10.2 213.8 Q101.75 223.8 273.3 34" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M29.8 213.8 Q41.55 249.8 53.3 172" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M85.2 213.8 Q73.45 249.8 61.7 172" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M104.8 213.8 Q116.55 249.8 128.3 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M160.2 167.8 Q148.45 203.8 136.7 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M179.8 167.8 Q191.55 203.8 203.3 80" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M235.2 167.8 Q223.45 203.8 211.7 80" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M254.8 167.8 Q266.55 203.8 278.3 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M310.2 167.8 Q298.45 203.8 286.7 126" marker-end="url(#n12-d16-ah2-s4_0-1)"/><path class="t-thr" d="M329.8 167.8 Q345.75 177.8 281.7 34" marker-end="url(#n12-d16-ah2-s4_0-1)"/><rect class="box" x="259.5" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="277.5" y="25" text-anchor="middle">head</text><circle class="t-n" cx="207.5" cy="66" r="14"/><text class="txt" x="207.5" y="71" text-anchor="middle">A</text><circle class="t-n" cx="132.5" cy="112" r="14"/><text class="txt" x="132.5" y="117" text-anchor="middle">B</text><circle class="t-n" cx="57.5" cy="158" r="14"/><text class="txt" x="57.5" y="163" text-anchor="middle">D</text><circle class="t-n" cx="20" cy="204" r="14"/><text class="txt" x="20" y="209" text-anchor="middle">H</text><circle class="t-n" cx="95" cy="204" r="14"/><text class="txt" x="95" y="209" text-anchor="middle">I</text><circle class="t-n" cx="170" cy="158" r="14"/><text class="txt" x="170" y="163" text-anchor="middle">E</text><circle class="t-n" cx="282.5" cy="112" r="14"/><text class="txt" x="282.5" y="117" text-anchor="middle">C</text><circle class="t-n" cx="245" cy="158" r="14"/><text class="txt" x="245" y="163" text-anchor="middle">F</text><circle class="t-n" cx="320" cy="158" r="14"/><text class="txt" x="320" y="163" text-anchor="middle">G</text><text class="t-sm mono" x="170" y="222" text-anchor="middle">inorder: H D I B E A F C G</text></svg></div>
+  <figcaption><b>Figure 12.2:</b> The running example with threads. The dashed red arrows are threads: a left thread goes to the predecessor and a right thread goes to the successor. The left thread of H and the right thread of G have no node to point to.</figcaption>
+</figure>
+
+<p>The threads have one property in common: all of them point upward to a node in the tree. The reason is this. The predecessor of a node with no left subtree is the nearest ancestor whose right subtree contains the node. Likewise, the successor of a node with no right subtree is the nearest ancestor whose left subtree contains the node. For example, I lies in the left subtree of B and has no right subtree; the successor of I is B. Going down is done with real links, and returning upward with threads. The information a stack has to remember is exactly these return paths.</p>
+
+<h3 id="s12-2-2"><span class="nt-num">12.2.2</span>Building the threads one by one</h3>
+
+<p>To build the threads by hand, first write down the inorder sequence. Then, for each empty pointer, read off the node immediately to the left or to the right of the node in that sequence. The running example has ten empty fields (<a href="#ornek-null">Example 12.1</a>). <a href="#tab-kurma">Table 12.2</a> gives the target of each one.</p>
+
+<div class="nt-tablewrap" id="tab-kurma">
+<table class="nt-table">
+  <caption>Table 12.2: Building the ten threads from the inorder sequence <code>H D I B E A F C G</code>. For the "head" rows there is no node to point to; these two threads will be tied to the header node.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Empty field</th><th scope="col">Rule</th><th scope="col">Node pointed to</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>left of H</td><td>predecessor</td><td>none (head)</td></tr>
+    <tr><td>2</td><td>right of H</td><td>successor</td><td>D</td></tr>
+    <tr><td>3</td><td>left of I</td><td>predecessor</td><td>D</td></tr>
+    <tr><td>4</td><td>right of I</td><td>successor</td><td>B</td></tr>
+    <tr><td>5</td><td>left of E</td><td>predecessor</td><td>B</td></tr>
+    <tr><td>6</td><td>right of E</td><td>successor</td><td>A</td></tr>
+    <tr><td>7</td><td>left of F</td><td>predecessor</td><td>A</td></tr>
+    <tr><td>8</td><td>right of F</td><td>successor</td><td>C</td></tr>
+    <tr><td>9</td><td>left of G</td><td>predecessor</td><td>C</td></tr>
+    <tr><td>10</td><td>right of G</td><td>successor</td><td>none (head)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Each row of the table corresponds to an adjacency in the sequence. The inorder sequence has eight pairs of neighbors (H–D, D–I, …, C–G). Each pair of neighbors is tied by exactly one thread, even for pairs such as D and H that are also joined by a real link (the right thread of H points to D). The remaining two threads sit at the two ends of the sequence. <a href="#sekil-kurma">Figure 12.3</a> shows the beginning and the end of the construction. At the top is the ordinary tree with its ten null pointers; at the bottom all ten threads are in place. The inorder sequence is also written under the lower figure, so one can check that each red arrow points to a neighbor in this sequence.</p>
+
+<figure class="nt-fig" id="sekil-kurma" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 224" role="img" aria-label="building threads, step 0"><path class="line" d="M386.25 60 L243.75 100"/><path class="line" d="M386.25 60 L528.75 100"/><path class="line" d="M243.75 100 L101.25 140"/><path class="line" d="M243.75 100 L315 140"/><path class="line" d="M101.25 140 L30 180"/><path class="line" d="M101.25 140 L172.5 180"/><path class="line" d="M528.75 100 L457.5 140"/><path class="line" d="M528.75 100 L600 140"/><circle class="t-n" cx="386.25" cy="60" r="14"/><text class="txt" x="386.25" y="65" text-anchor="middle">A</text><circle class="t-n" cx="243.75" cy="100" r="14"/><text class="txt" x="243.75" y="105" text-anchor="middle">B</text><circle class="t-n" cx="101.25" cy="140" r="14"/><text class="txt" x="101.25" y="145" text-anchor="middle">D</text><circle class="t-n" cx="30" cy="180" r="14"/><text class="txt" x="30" y="185" text-anchor="middle">H</text><circle class="t-n" cx="172.5" cy="180" r="14"/><text class="txt" x="172.5" y="185" text-anchor="middle">I</text><circle class="t-n" cx="315" cy="140" r="14"/><text class="txt" x="315" y="145" text-anchor="middle">E</text><circle class="t-n" cx="528.75" cy="100" r="14"/><text class="txt" x="528.75" y="105" text-anchor="middle">C</text><circle class="t-n" cx="457.5" cy="140" r="14"/><text class="txt" x="457.5" y="145" text-anchor="middle">F</text><circle class="t-n" cx="600" cy="140" r="14"/><text class="txt" x="600" y="145" text-anchor="middle">G</text><path class="line" d="M21.6 191 L12 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M38.4 191 L48 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M164.1 191 L154.5 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M180.9 191 L190.5 206" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M306.6 151 L297 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M323.4 151 L333 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M449.1 151 L439.5 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M465.9 151 L475.5 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M591.6 151 L582 166" style="stroke-dasharray:3 3;opacity:.55"/><path class="line" d="M608.4 151 L618 166" style="stroke-dasharray:3 3;opacity:.55"/><text class="txt mono" x="40" y="214" text-anchor="middle">H</text><text class="txt mono" x="100" y="214" text-anchor="middle">D</text><text class="txt mono" x="160" y="214" text-anchor="middle">I</text><text class="txt mono" x="220" y="214" text-anchor="middle">B</text><text class="txt mono" x="280" y="214" text-anchor="middle">E</text><text class="txt mono" x="340" y="214" text-anchor="middle">A</text><text class="txt mono" x="400" y="214" text-anchor="middle">F</text><text class="txt mono" x="460" y="214" text-anchor="middle">C</text><text class="txt mono" x="520" y="214" text-anchor="middle">G</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 224" role="img" aria-label="building threads, step 10"><defs><marker id="n12-d16-ah18-s5_10-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M386.25 60 L243.75 100"/><path class="line" d="M386.25 60 L528.75 100"/><path class="line" d="M243.75 100 L101.25 140"/><path class="line" d="M243.75 100 L315 140"/><path class="line" d="M101.25 140 L30 180"/><path class="line" d="M101.25 140 L172.5 180"/><path class="line" d="M528.75 100 L457.5 140"/><path class="line" d="M528.75 100 L600 140"/><path class="t-thr" d="M39.8 189.8 Q68.425 225.8 97.05 154" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M162.7 189.8 Q134.075 225.8 105.45 154" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M182.3 189.8 Q210.925 225.8 239.55 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M305.2 149.8 Q276.575 185.8 247.95 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M324.8 149.8 Q353.425 185.8 382.05 74" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M447.7 149.8 Q419.075 185.8 390.45 74" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M467.3 149.8 Q495.925 185.8 524.55 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><path class="t-thr" d="M590.2 149.8 Q561.575 185.8 532.95 114" marker-end="url(#n12-d16-ah18-s5_10-1)"/><circle class="t-n" cx="386.25" cy="60" r="14"/><text class="txt" x="386.25" y="65" text-anchor="middle">A</text><circle class="t-n" cx="243.75" cy="100" r="14"/><text class="txt" x="243.75" y="105" text-anchor="middle">B</text><circle class="t-n" cx="101.25" cy="140" r="14"/><text class="txt" x="101.25" y="145" text-anchor="middle">D</text><circle class="t-n" cx="30" cy="180" r="14"/><text class="txt" x="30" y="185" text-anchor="middle">H</text><circle class="t-n" cx="172.5" cy="180" r="14"/><text class="txt" x="172.5" y="185" text-anchor="middle">I</text><circle class="t-n" cx="315" cy="140" r="14"/><text class="txt" x="315" y="145" text-anchor="middle">E</text><circle class="t-n" cx="528.75" cy="100" r="14"/><text class="txt" x="528.75" y="105" text-anchor="middle">C</text><circle class="t-n" cx="457.5" cy="140" r="14"/><text class="txt" x="457.5" y="145" text-anchor="middle">F</text><circle class="t-cur" cx="600" cy="140" r="14"/><text class="txt" x="600" y="145" text-anchor="middle">G</text><text class="txt mono" x="40" y="214" text-anchor="middle">H</text><text class="txt mono" x="100" y="214" text-anchor="middle">D</text><text class="txt mono" x="160" y="214" text-anchor="middle">I</text><text class="txt mono" x="220" y="214" text-anchor="middle">B</text><text class="txt mono" x="280" y="214" text-anchor="middle">E</text><text class="txt mono" x="340" y="214" text-anchor="middle">A</text><text class="txt mono" x="400" y="214" text-anchor="middle">F</text><text class="txt mono" x="460" y="214" text-anchor="middle">C</text><text class="t-bold mono" x="520" y="214" text-anchor="middle">G</text></svg></div>
+  <figcaption><b>Figure 12.3:</b> The first and last states of building threads. Top: the ordinary tree with 9 nodes and its 10 null pointers (short dashed lines). Bottom: all null pointers tied to a predecessor or successor; the left thread of H and the right thread of G are still dangling.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--ornek" id="ornek-kurma">
+  <span class="nt-box__title">Example 12.2</span>
+  <p>Build the threads of the tree A(B(D, E), C(–, F)): A has children B and C, B has children D and E, and C has only a right child F. The inorder sequence is <code>D B E A C F</code>. The number of nodes is 6, and the number of empty fields is <span class="m">6 + 1 = 7</span>.</p>
+  <ul>
+    <li>Left of D: no predecessor, so the head. Right of D: successor B.</li>
+    <li>Left of E: predecessor B. Right of E: successor A.</li>
+    <li>Left of C: predecessor A. C has a right subtree (F), so its right pointer is a real link.</li>
+    <li>Left of F: predecessor C. Right of F: no successor, so the head.</li>
+  </ul>
+  <p>There are 7 threads in all, 2 of which go to the header node. The left thread of C deserves attention: because the left of C is empty, the predecessor of C is A. A is the parent of C; this time the thread points to the parent.</p>
+</div>
+
+<h3 id="s12-2-3"><span class="nt-num">12.2.3</span>Thread flags</h3>
+
+<p>On paper, threads are drawn in red and real links in black. To the compiler there is no difference between the two pointers: both are the address of a node. When a traversal procedure follows <code>p-&gt;left_child</code>, it cannot tell from the address alone whether it will descend to a real left child or return to a predecessor above. So next to each pointer we store information about its kind. Two extra fields are added to each node:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> threaded_tree *thread_ptr;
+<span class="kw">struct</span> threaded_tree {
+    <span class="kw">short</span> <span class="kw">int</span>    left_thread; <span class="cm">/* TRUE: left_child is a thread */</span>
+    thread_ptr left_child;
+    <span class="kw">char</span>         data;
+    thread_ptr right_child;
+    <span class="kw">short</span> <span class="kw">int</span>    right_thread; <span class="cm">/* TRUE: right_child is a thread */</span>
+};</code></pre>
+
+<p>The structure adds two fields to the ordinary binary tree node. If <code>left_thread</code> is true (<code>TRUE</code>), then <code>left_child</code> is a thread, that is, it points to the predecessor; if it is false (<code>FALSE</code>), it points to a real left child. <code>right_thread</code> carries the same information for the right pointer. The constants <code>TRUE</code> and <code>FALSE</code> are defined with an enumeration type:</p>
+
+<pre class="nt-code"><code><span class="kw">enum</span> { FALSE, TRUE };      <span class="cm">/* FALSE = 0, TRUE = 1 */</span></code></pre>
+
+<p>In an enumeration type the first name gets 0 and the second gets 1. So <code>FALSE</code> is 0 and <code>TRUE</code> is 1, and conditions such as <code>if (p-&gt;left_thread)</code> work directly. The <code>typedef</code> in the first line gives the type <code>struct threaded_tree *</code> the short name <code>thread_ptr</code>. This line comes before the definition of the structure; since the fields of the structure hold pointers to its own type, the name must be known first. The structure definition ends with a semicolon after the closing brace (line 8). If this semicolon is forgotten, the compiler usually reports the error on the next line, and the location of the mistake becomes confusing.</p>
+
+<p>Don't the flags increase memory? They do, but the gain in time is much greater. The lecture states this decision openly: time complexity matters more than space complexity, and the two flags can in fact be stored in two bits. It is instructive to measure how much space is spent. The size of a structure is not just the sum of its fields. The compiler places each field on its own alignment boundary and inserts padding bytes between them. <a href="#tab-boyut">Table 12.3</a> gives the values measured on x86-64 with <code>sizeof</code> and <code>offsetof</code>.</p>
+
+<div class="nt-tablewrap" id="tab-boyut">
+<table class="nt-table">
+  <caption>Table 12.3: Memory layout of <code>struct threaded_tree</code> (x86-64, pointer 8 bytes, <code>short</code> 2 bytes). The measured <code>sizeof</code> is 40 bytes.</caption>
+  <thead><tr><th scope="col">Field</th><th scope="col">Offset (bytes)</th><th scope="col">Size</th><th scope="col">Padding after it</th></tr></thead>
+  <tbody>
+    <tr><td><code>left_thread</code></td><td>0</td><td>2</td><td>6</td></tr>
+    <tr><td><code>left_child</code></td><td>8</td><td>8</td><td>0</td></tr>
+    <tr><td><code>data</code></td><td>16</td><td>1</td><td>7</td></tr>
+    <tr><td><code>right_child</code></td><td>24</td><td>8</td><td>0</td></tr>
+    <tr><td><code>right_thread</code></td><td>32</td><td>2</td><td>6</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Of the 40 bytes, 19 are padding. Pointers must be placed at addresses that are multiples of 8; the small fields in between each occupy a whole 8-byte slot by themselves. If the fields are ordered from large to small (first the two pointers, then the two <code>short</code>s, and <code>char</code> last), the same structure shrinks to 24 bytes. An ordinary node without flags is also 24 bytes. So if the field order is chosen well, the flags add no memory at all on this machine; they fit into the padding bytes that would otherwise be left empty behind the two pointers. Defining the flags as bit fields (<code>unsigned left_thread : 1</code>) does not change the result. The field order in the slides follows the node's drawing on paper: left flag, left pointer, data, right pointer, right flag. This order makes reading easier, but it is the most wasteful layout in memory.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Treating <code>left_child</code> or <code>right_child</code> as a real child without looking at the flag. In a threaded tree no pointer is <code>NULL</code>. A loop such as <code>while (p-&gt;left_child != NULL) p = p-&gt;left_child;</code>, written for an ordinary tree, never stops in a threaded tree. The left thread of the leftmost node goes to the head, and the left of the head goes back to the root; the loop runs forever. In a threaded tree every descent is checked with the flag.</p>
+</div>
+
+<h3 id="s12-2-4"><span class="nt-num">12.2.4</span>The header node</h3>
+
+<p>In <a href="#tab-kurma">Table 12.2</a> two threads were left dangling. The left pointer of H should point to a predecessor, but H is the first node in the sequence. The right pointer of G should point to a successor, but G is the last node. Writing <code>NULL</code> into these two fields would break the "no pointer is null" arrangement and add special cases to the traversal procedures. The solution is the header node, familiar from linked lists.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-baslik">
+  <span class="nt-box__title">Definition 12.3</span>
+  <p>The <strong>header node</strong> of a threaded tree is an extra node that carries no data and stands outside the tree. The root of the real tree is reached through <code>L-&gt;left_child</code>. The right pointer of the header always points to itself, and its <code>right_thread</code> field is <code>FALSE</code>. The two threads that have no node to point to, that is, the left thread of the first node and the right thread of the last node, point to the header.</p>
+</div>
+
+<p>In an empty tree there is only the header. In that case the left pointer of the header also points to itself, and <code>left_thread</code> is <code>TRUE</code>: what it points to is not a real root but a thread. When the first node is inserted, the left pointer is redirected to that node and <code>left_thread</code> is set to <code>FALSE</code>.</p>
+
+<div class="nt-tablewrap" id="tab-bos">
+<table class="nt-table">
+  <caption>Table 12.4: The fields of the header, the only node of an empty threaded tree.</caption>
+  <thead><tr><th scope="col"><code>left_thread</code></th><th scope="col"><code>left_child</code></th><th scope="col"><code>data</code></th><th scope="col"><code>right_child</code></th><th scope="col"><code>right_thread</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>TRUE</code></td><td>→ head</td><td>–</td><td>→ head</td><td><code>FALSE</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>This arrangement is built by a C procedure. Two small helpers that do not appear in the slides are written. <code>new_node</code> allocates memory for a new node. <code>empty_threaded_tree</code> fills in the header as in <a href="#tab-bos">Table 12.4</a>:</p>
+
+<pre class="nt-code"><code>thread_ptr new_node(<span class="kw">char</span> data) {
+  thread_ptr d = malloc(<span class="kw">sizeof</span> *d);
+  <span class="kw">if</span> (d == <span class="kw">NULL</span>) {               <span class="cm">// out of memory</span>
+    fprintf(stderr, "out of memory\n");
+    exit(EXIT_FAILURE);
+  }
+  d-&gt;data = data;
+  d-&gt;left_child = d-&gt;right_child = <span class="kw">NULL</span>;   <span class="cm">// insertion fills these in</span>
+  d-&gt;left_thread = d-&gt;right_thread = TRUE;
+  <span class="kw">return</span> d;
+}
+thread_ptr empty_threaded_tree(<span class="kw">void</span>) {
+  thread_ptr L = new_node('-');  <span class="cm">// head: data unused</span>
+  L-&gt;left_child = L;  L-&gt;left_thread = TRUE;   <span class="cm">// tree is empty</span>
+  L-&gt;right_child = L;  L-&gt;right_thread = FALSE;  <span class="cm">// right is always itself</span>
+  <span class="kw">return</span> L;
+}</code></pre>
+
+<p><code>malloc</code> returns <code>NULL</code> if it cannot find the requested memory. Writing to <code>d-&gt;data</code> without checking the returned value means writing through a null pointer, which is undefined behavior. For this reason the procedure prints a message and ends the program when it gets <code>NULL</code>. The expression <code>sizeof *d</code> gives the size of the type that <code>d</code> points to. Because the type name is not repeated, the expression stays correct even if the structure changes. The pointers of the new node are set to <code>NULL</code>; when the node is inserted into a tree, <code>insert_right</code> or <code>insert_left</code> overwrites these values. For the same reason the initial values of the flags do not matter. In <code>empty_threaded_tree</code>, <code>'-'</code> is written into the data of the header; this value is never read.</p>
+
+<p>The upper half of <a href="#sekil-baslik">Figure 12.4</a> shows the empty tree and the lower half shows the running example with its header. The letters T and F in the figure are the thread flags on the two sides of each node. The left of the header goes to the root (A), and its left flag is F. The left thread of H and the right thread of G are now tied to the header. The right pointer of the header curls back onto itself.</p>
+
+<figure class="nt-fig" id="sekil-baslik" style="--w:660px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 660 220" role="img" aria-label="empty threaded tree"><defs><marker id="n12-d16-ah19-s8_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah20-s8_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="300" y="50" width="60" height="32" rx="5"/><text class="t-sub" x="330" y="71" text-anchor="middle">head</text><text class="t-badt" x="282" y="71" text-anchor="middle" style="font-size:12px">T</text><text class="lbl" x="378" y="71" text-anchor="middle" style="font-size:12px">F</text><path class="t-thr" d="M300 66 C250 66 260 120 322 84" marker-end="url(#n12-d16-ah20-s8_0-1)"/><path class="line" d="M360 66 C410 66 400 120 340 84" marker-end="url(#n12-d16-ah19-s8_0-1)"/><text class="t-badt" x="200" y="140" text-anchor="middle">left_child → itself (thread, TRUE)</text><text class="t-sm" x="470" y="140" text-anchor="middle">right_child → itself (FALSE)</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 660 221" role="img" aria-label="threaded tree with a header"><defs><marker id="n12-d16-ah21-s8_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah22-s8_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M425.2 29.8 L372 52.8" marker-end="url(#n12-d16-ah21-s8_1-1)"/><path class="line" d="M449 20 C479 2 479 42 444.8 29.8" style="" marker-end="url(#n12-d16-ah21-s8_1-1)"/><path class="line" d="M365 64 L235 108"/><path class="line" d="M365 64 L495 108"/><path class="line" d="M235 108 L105 152"/><path class="line" d="M235 108 L300 152"/><path class="line" d="M105 152 L40 196"/><path class="line" d="M105 152 L170 196"/><path class="line" d="M495 108 L430 152"/><path class="line" d="M495 108 L560 152"/><path class="t-thr" d="M30.2 205.8 Q190.5 215.8 430.8 34" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M49.8 205.8 Q75.3 241.8 100.8 166" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M160.2 205.8 Q134.7 241.8 109.2 166" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M179.8 205.8 Q205.3 241.8 230.8 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M290.2 161.8 Q264.7 197.8 239.2 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M309.8 161.8 Q335.3 197.8 360.8 78" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M420.2 161.8 Q394.7 197.8 369.2 78" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M439.8 161.8 Q465.3 197.8 490.8 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M550.2 161.8 Q524.7 197.8 499.2 122" marker-end="url(#n12-d16-ah22-s8_1-1)"/><path class="t-thr" d="M569.8 161.8 Q544.5 171.8 439.2 34" marker-end="url(#n12-d16-ah22-s8_1-1)"/><rect class="box" x="417" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="435" y="25" text-anchor="middle">head</text><text class="lbl" x="409" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="461" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="365" cy="64" r="14"/><text class="txt" x="365" y="69" text-anchor="middle">A</text><text class="lbl" x="343" y="68" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="387" y="68" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="235" cy="108" r="14"/><text class="txt" x="235" y="113" text-anchor="middle">B</text><text class="lbl" x="213" y="112" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="257" y="112" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="105" cy="152" r="14"/><text class="txt" x="105" y="157" text-anchor="middle">D</text><text class="lbl" x="83" y="156" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="127" y="156" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="196" r="14"/><text class="txt" x="40" y="201" text-anchor="middle">H</text><text class="t-badt" x="18" y="200" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="62" y="200" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="170" cy="196" r="14"/><text class="txt" x="170" y="201" text-anchor="middle">I</text><text class="t-badt" x="148" y="200" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="192" y="200" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="300" cy="152" r="14"/><text class="txt" x="300" y="157" text-anchor="middle">E</text><text class="t-badt" x="278" y="156" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="322" y="156" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="495" cy="108" r="14"/><text class="txt" x="495" y="113" text-anchor="middle">C</text><text class="lbl" x="473" y="112" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="517" y="112" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="430" cy="152" r="14"/><text class="txt" x="430" y="157" text-anchor="middle">F</text><text class="t-badt" x="408" y="156" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="452" y="156" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="560" cy="152" r="14"/><text class="txt" x="560" y="157" text-anchor="middle">G</text><text class="t-badt" x="538" y="156" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="582" y="156" text-anchor="middle" style="font-size:11px">T</text></svg></div>
+  <figcaption><b>Figure 12.4:</b> The header node. Top: the empty tree, where both pointers of the header point to itself. Bottom: the full tree, where the left of the header goes to the root and the two dangling threads are tied to the header. T and F are the thread flag of the node on that side.</figcaption>
+</figure>
+
+<p>With the header, the tree closes into a ring. In inorder, after the last node comes the header, and after the header the first node again. The traversal procedures use this ring: they start from the header and stop when they return to it. So special cases such as "is the tree empty", "which node is first", and "the last node has no successor" need no separate <code>if</code>.</p>
+
+<h3 id="s12-2-5"><span class="nt-num">12.2.5</span>Why inorder</h3>
+
+<p>The threads are built according to the inorder sequence. The three traversal orders of the same tree are side by side in <a href="#tab-sira">Table 12.5</a>.</p>
+
+<div class="nt-tablewrap" id="tab-sira">
+<table class="nt-table">
+  <caption>Table 12.5: The three traversal orders of the running example.</caption>
+  <thead><tr><th scope="col">Traversal</th><th scope="col">Rule</th><th scope="col">Order</th></tr></thead>
+  <tbody>
+    <tr><td>inorder</td><td>left, root, right</td><td><code>H D I B E A F C G</code></td></tr>
+    <tr><td>preorder</td><td>root, left, right</td><td><code>A B D H I E C F G</code></td></tr>
+    <tr><td>postorder</td><td>left, right, root</td><td><code>H I D E B F G C A</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The privilege of inorder comes from the consistency of the threads. In this order, the predecessor of a node with no left subtree is always an ancestor; so is the successor of a node with no right subtree. So an empty left field is exactly suited to point to the predecessor, and an empty right field exactly suited to point to the successor. Non-empty fields go downward, and the predecessor or successor is found at the far right or far left of that subtree. Together, the two rules make it possible to find the successor and the predecessor of every node by a short path. In preorder this symmetry is missing. For example, the preorder successor of D is H, and a real left link already goes from D to H; no information is left for a thread to add. For this reason the lecture stresses that the tree is built for inorder traversal. Preorder and postorder traversal can also be done with the same threads, but in a more roundabout way.</p>
+
+<h2 class="nt-pb" id="s12-3"><span class="nt-num">12.3</span>Inorder traversal</h2>
+
+<p>All traversal procedures of a threaded tree rest on a single question: which node is the inorder successor of a given node? If this question can be answered quickly, a traversal consists simply of starting at the header and moving from successor to successor.</p>
+
+<h3 id="s12-3-1"><span class="nt-num">12.3.1</span>Finding the successor</h3>
+
+<p>For the successor of a node <span class="m">p</span> there are two cases.</p>
+
+<ul>
+  <li>If <code>p-&gt;right_thread == TRUE</code>, then <code>p-&gt;right_child</code> is a thread. By the definition of a thread, this pointer already points to the successor of <span class="m">p</span>. No search is needed.</li>
+  <li>If <code>p-&gt;right_thread == FALSE</code>, then <span class="m">p</span> has a real right subtree. After writing <span class="m">p</span>, an inorder traversal enters this subtree and writes its leftmost node first. The successor is the leftmost node of the right subtree. To reach it, start from the right child and follow left links until <code>left_thread</code> is <code>TRUE</code>.</li>
+</ul>
+
+<p>These two rules fit in a few lines in the procedure from the slides:</p>
+
+<pre class="nt-code"><code>thread_ptr insucc(thread_ptr L) {
+  <span class="cm">// successor of the (non-NULL) node L</span>
+  thread_ptr p = L-&gt;right_child;
+  <span class="kw">if</span> (!L-&gt;right_thread)        <span class="cm">// is there a right subtree</span>
+    <span class="kw">while</span> (!p-&gt;left_thread)   <span class="cm">// descend to its leftmost node</span>
+      p = p-&gt;left_child;
+  <span class="kw">return</span> p;
+}</code></pre>
+
+<p>The procedure works line by line as follows.</p>
+
+<ul>
+  <li><b>Lines 1–2.</b> The procedure takes a node pointer and returns the address of the successor. The comment states the precondition: <code>L</code> must not be <code>NULL</code>. In a threaded tree no pointer is <code>NULL</code>, so no such check is needed inside the procedure; satisfying the precondition is the caller's job.</li>
+  <li><b>Line 3.</b> <code>p</code> receives the right pointer of <code>L</code>. This value is both the result directly in the thread case and the starting point of the search in the right-subtree case. The first step common to the two cases is merged into a single assignment.</li>
+  <li><b>Line 4.</b> If <code>!L-&gt;right_thread</code> is true, the right pointer is a real link, that is, there is a right subtree. The comment writes the meaning of the question, not the flag: "is there a right subtree".</li>
+  <li><b>Lines 5–6.</b> In the right subtree we descend to the left. The loop condition looks at <code>p-&gt;left_thread</code>, not at <code>p-&gt;left_child</code>. The left pointer of the leftmost node is also a filled field (a thread), but its flag is <code>TRUE</code>.</li>
+  <li><b>Line 7.</b> In both cases <code>p</code> points to the successor, and it is returned.</li>
+</ul>
+
+<p>The correctness of the rules follows from the definition of inorder traversal.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-ardil">
+  <span class="nt-box__title">Theorem 12.2 (Successor rule)</span>
+  <p>In a threaded binary tree, if <span class="m">p</span> has a right subtree, its successor is the leftmost node of that subtree. If it has no right subtree, its successor is the node that the thread <code>p-&gt;right_child</code> points to. <code>insucc</code> returns this node in both cases.</p>
+</div>
+
+<div class="nt-proof">
+  <p>Immediately after writing <span class="m">p</span>, an inorder traversal begins to traverse the right subtree of <span class="m">p</span>. The traversal of a subtree always opens with its leftmost node: from the root we go down to the left, and the first node with no left child is written. So if there is a right subtree, the first node written after <span class="m">p</span> is the leftmost node of that subtree. The loop of the procedure follows left links until the first node with no left child, that is, one whose <code>left_thread</code> is <code>TRUE</code>; this node is the leftmost node. If there is no right subtree, <code>p-&gt;right_child</code> is a thread and, by the second rule of <a href="#tanim-kilavuz">Definition 12.2</a>, points to the successor. <span class="nt-qed">∎</span></p>
+</div>
+
+<h3 id="s12-3-2"><span class="nt-num">12.3.2</span>Code trace: head, A, and I</h3>
+
+<p>Let the procedure be called with three different nodes. <a href="#tab-ardil">Table 12.6</a> gives, for each call, the values <code>p</code> takes and the flags that decide, in order. The line numbers refer to the code above.</p>
+
+<div class="nt-tablewrap" id="tab-ardil">
+<table class="nt-table">
+  <caption>Table 12.6: Trace of <code>insucc</code>. The tree is the running example with its header (<a href="#sekil-baslik">Figure 12.4</a>, bottom).</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Line</th><th scope="col">Event</th><th scope="col"><code>p</code></th></tr></thead>
+  <tbody>
+    <tr><td rowspan="7"><code>L</code> = head</td><td>3</td><td><code>p = head-&gt;right_child</code>; the right of the head is itself</td><td>head</td></tr>
+    <tr><td>4</td><td><code>right_thread</code> is <code>FALSE</code>: the head is taken to have a real right subtree</td><td>head</td></tr>
+    <tr><td>5–6</td><td>head-&gt;<code>left_thread</code> is <code>FALSE</code>, go left</td><td>A</td></tr>
+    <tr><td>5–6</td><td>A-&gt;<code>left_thread</code> is <code>FALSE</code>, go left</td><td>B</td></tr>
+    <tr><td>5–6</td><td>B-&gt;<code>left_thread</code> is <code>FALSE</code>, go left</td><td>D</td></tr>
+    <tr><td>5–6</td><td>D-&gt;<code>left_thread</code> is <code>FALSE</code>, go left</td><td>H</td></tr>
+    <tr><td>7</td><td>H-&gt;<code>left_thread</code> is <code>TRUE</code>: the loop ends, H is returned</td><td>H</td></tr>
+    <tr><td rowspan="4"><code>L</code> = A</td><td>3</td><td><code>p = A-&gt;right_child</code></td><td>C</td></tr>
+    <tr><td>4</td><td><code>right_thread</code> is <code>FALSE</code>: A has a right subtree</td><td>C</td></tr>
+    <tr><td>5–6</td><td>C-&gt;<code>left_thread</code> is <code>FALSE</code>, go left</td><td>F</td></tr>
+    <tr><td>7</td><td>F-&gt;<code>left_thread</code> is <code>TRUE</code>: F is returned</td><td>F</td></tr>
+    <tr><td rowspan="3"><code>L</code> = I</td><td>3</td><td><code>p = I-&gt;right_child</code> (a thread)</td><td>B</td></tr>
+    <tr><td>4</td><td><code>right_thread</code> is <code>TRUE</code>: the loop is not entered</td><td>B</td></tr>
+    <tr><td>7</td><td>B is returned</td><td>B</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first call gives a special result: the successor of the head is the first node in inorder (H). The right pointer of the head pointing to itself and its <code>right_thread</code> being <code>FALSE</code> are chosen for exactly this. The procedure thinks of the "right subtree" of the head as the head itself, starts descending to the left from there, and reaches the leftmost node of the real tree on the left of the head. So no separate "find the leftmost node" procedure is needed to start a traversal. <a href="#sekil-ardil">Figure 12.5</a> shows the first and last moments of this call.</p>
+
+<figure class="nt-fig" id="sekil-ardil" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 -22 560 210" role="img" aria-label="finding the successor"><defs><marker id="n12-d16-ah23-s11_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah24-s11_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah25-s11_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M383.95 27.8 L330.75 42.8" marker-end="url(#n12-d16-ah23-s11_0-1)"/><path class="line" d="M407.75 18 C437.75 0 437.75 40 403.55 27.8" style="stroke:var(--ds-accent);stroke-width:3" marker-end="url(#n12-d16-ah23-s11_0-1)"/><path class="line" d="M323.75 54 L206.25 90"/><path class="line" d="M323.75 54 L441.25 90"/><path class="line" d="M206.25 90 L88.75 126"/><path class="line" d="M206.25 90 L265 126"/><path class="line" d="M88.75 126 L30 162"/><path class="line" d="M88.75 126 L147.5 162"/><path class="line" d="M441.25 90 L382.5 126"/><path class="line" d="M441.25 90 L500 126"/><path class="t-thr" d="M20.2 171.8 Q164.875 181.8 389.55 32" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M39.8 171.8 Q62.175 207.8 84.55 140" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M137.7 171.8 Q115.325 207.8 92.95 140" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M157.3 171.8 Q179.675 207.8 202.05 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M255.2 135.8 Q232.825 171.8 210.45 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M274.8 135.8 Q297.175 171.8 319.55 68" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M372.7 135.8 Q350.325 171.8 327.95 68" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M392.3 135.8 Q414.675 171.8 437.05 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M490.2 135.8 Q467.825 171.8 445.45 104" marker-end="url(#n12-d16-ah25-s11_0-1)"/><path class="t-thr" d="M509.8 135.8 Q493.875 145.8 397.95 32" marker-end="url(#n12-d16-ah25-s11_0-1)"/><rect class="box" x="375.75" y="5" width="36" height="26" rx="5"/><text class="t-sub" x="393.75" y="23" text-anchor="middle">head</text><text class="lbl" x="367.75" y="22" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="419.75" y="22" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="323.75" cy="54" r="14"/><text class="txt" x="323.75" y="59" text-anchor="middle">A</text><text class="lbl" x="301.75" y="58" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="345.75" y="58" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="206.25" cy="90" r="14"/><text class="txt" x="206.25" y="95" text-anchor="middle">B</text><text class="lbl" x="184.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="228.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="88.75" cy="126" r="14"/><text class="txt" x="88.75" y="131" text-anchor="middle">D</text><text class="lbl" x="66.75" y="130" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="110.75" y="130" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="30" cy="162" r="14"/><text class="txt" x="30" y="167" text-anchor="middle">H</text><text class="t-badt" x="8" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="52" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="147.5" cy="162" r="14"/><text class="txt" x="147.5" y="167" text-anchor="middle">I</text><text class="t-badt" x="125.5" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="169.5" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="265" cy="126" r="14"/><text class="txt" x="265" y="131" text-anchor="middle">E</text><text class="t-badt" x="243" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="287" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="441.25" cy="90" r="14"/><text class="txt" x="441.25" y="95" text-anchor="middle">C</text><text class="lbl" x="419.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="463.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="382.5" cy="126" r="14"/><text class="txt" x="382.5" y="131" text-anchor="middle">F</text><text class="t-badt" x="360.5" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="404.5" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="500" cy="126" r="14"/><text class="txt" x="500" y="131" text-anchor="middle">G</text><text class="t-badt" x="478" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="522" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="361.75" y="-6" text-anchor="end">L,p</text><path class="line" d="M363.75 -8 L383.67 7.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah24-s11_0-1)"/></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="-13 -22 573 210" role="img" aria-label="finding the successor"><defs><marker id="n12-d16-ah41-s11_6-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah42-s11_6-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah43-s11_6-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M383.95 27.8 L330.75 42.8" marker-end="url(#n12-d16-ah41-s11_6-1)"/><path class="line" d="M407.75 18 C437.75 0 437.75 40 403.55 27.8" style="" marker-end="url(#n12-d16-ah41-s11_6-1)"/><path class="line" d="M323.75 54 L206.25 90"/><path class="line" d="M323.75 54 L441.25 90"/><path class="line" d="M206.25 90 L88.75 126"/><path class="line" d="M206.25 90 L265 126"/><path class="line" d="M88.75 126 L30 162"/><path class="line" d="M88.75 126 L147.5 162"/><path class="line" d="M441.25 90 L382.5 126"/><path class="line" d="M441.25 90 L500 126"/><path class="t-thr" d="M20.2 171.8 Q164.875 181.8 389.55 32" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M39.8 171.8 Q62.175 207.8 84.55 140" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M137.7 171.8 Q115.325 207.8 92.95 140" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M157.3 171.8 Q179.675 207.8 202.05 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M255.2 135.8 Q232.825 171.8 210.45 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M274.8 135.8 Q297.175 171.8 319.55 68" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M372.7 135.8 Q350.325 171.8 327.95 68" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M392.3 135.8 Q414.675 171.8 437.05 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M490.2 135.8 Q467.825 171.8 445.45 104" marker-end="url(#n12-d16-ah43-s11_6-1)"/><path class="t-thr" d="M509.8 135.8 Q493.875 145.8 397.95 32" marker-end="url(#n12-d16-ah43-s11_6-1)"/><rect class="box" x="375.75" y="5" width="36" height="26" rx="5"/><text class="t-sub" x="393.75" y="23" text-anchor="middle">head</text><text class="lbl" x="367.75" y="22" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="419.75" y="22" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="323.75" cy="54" r="14"/><text class="txt" x="323.75" y="59" text-anchor="middle">A</text><text class="lbl" x="301.75" y="58" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="345.75" y="58" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="206.25" cy="90" r="14"/><text class="txt" x="206.25" y="95" text-anchor="middle">B</text><text class="lbl" x="184.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="228.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="88.75" cy="126" r="14"/><text class="txt" x="88.75" y="131" text-anchor="middle">D</text><text class="lbl" x="66.75" y="130" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="110.75" y="130" text-anchor="middle" style="font-size:11px">F</text><circle class="t-cur" cx="30" cy="162" r="14"/><text class="txt" x="30" y="167" text-anchor="middle">H</text><text class="t-badt" x="8" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="52" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="147.5" cy="162" r="14"/><text class="txt" x="147.5" y="167" text-anchor="middle">I</text><text class="t-badt" x="125.5" y="166" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="169.5" y="166" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="265" cy="126" r="14"/><text class="txt" x="265" y="131" text-anchor="middle">E</text><text class="t-badt" x="243" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="287" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="441.25" cy="90" r="14"/><text class="txt" x="441.25" y="95" text-anchor="middle">C</text><text class="lbl" x="419.25" y="94" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="463.25" y="94" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="382.5" cy="126" r="14"/><text class="txt" x="382.5" y="131" text-anchor="middle">F</text><text class="t-badt" x="360.5" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="404.5" y="130" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="500" cy="126" r="14"/><text class="txt" x="500" y="131" text-anchor="middle">G</text><text class="t-badt" x="478" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="522" y="130" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="361.75" y="-6" text-anchor="end">L</text><path class="line" d="M363.75 -8 L383.67 7.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah42-s11_6-1)"/><text class="t-ptr" x="-2" y="138" text-anchor="end">p</text><path class="line" d="M0 136 L19.92 151.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah42-s11_6-1)"/></svg></div>
+  <figcaption><b>Figure 12.5:</b> <code>insucc(head)</code>. Top, the start: <code>L</code> and <code>p</code> point to the head. Bottom: <code>p</code> has descended to H by following left links; since the left flag of H is T, the search stops.</figcaption>
+</figure>
+
+<p>In the call for A, the right subtree starts at C, and a single step to the left finds F. In the call for I there is no search at all; the right pointer is a thread and points directly to B. The successor of a leaf is always found in a single step like this.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing the loop as <code>while (!L-&gt;left_thread)</code> instead of <code>while (!p-&gt;left_thread)</code>. Since the condition looks at the same node on every iteration, the loop is either never entered or never left. The loop variable is <code>p</code>, and the condition must test its flag.</p>
+</div>
+
+<h3 id="s12-3-3"><span class="nt-num">12.3.3</span>Traversal without a stack</h3>
+
+<p>Once the successor procedure is ready, inorder traversal is a short loop. We start at the header; on each iteration we move to the next node and write it. When we return to the header, the whole tree has been traversed.</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> tinorder(thread_ptr L) {
+  thread_ptr p = L;        <span class="cm">// L: the header node</span>
+  <span class="kw">for</span> (;;) {
+    p = insucc(p);
+    <span class="kw">if</span> (p == L) <span class="kw">break</span>;       <span class="cm">// back at the head?</span>
+    printf("%c ", p-&gt;data);
+  }
+}</code></pre>
+
+<ul>
+  <li><b>Line 2.</b> <code>p</code> points to the header. The entire state of the traversal is in this single variable.</li>
+  <li><b>Line 3.</b> <code>for (;;)</code> is an unconditional loop; the exit is made by the <code>break</code> in the body. The condition cannot be put at the top of the loop, because the exit test has to be made after the successor is found.</li>
+  <li><b>Line 4.</b> <code>p</code> advances to its own successor.</li>
+  <li><b>Line 5.</b> If the successor is the header, the ring is complete. Since the right thread of the last node points to the header, this always happens.</li>
+  <li><b>Line 6.</b> The node is written.</li>
+</ul>
+
+<p>In an empty tree the first call returns the header itself. <code>p = head-&gt;right_child</code> is the header. Because <code>right_thread</code> is <code>FALSE</code>, the loop is entered, but the <code>left_thread</code> of the header is <code>TRUE</code>, so it exits immediately. <code>p == L</code> is true, and the traversal ends without writing anything. Needing no separate check for the empty tree is the gain from the header node.</p>
+
+<p>In the running example the loop runs ten times. <a href="#tab-gezinme">Table 12.7</a> gives, for each iteration, the rule by which the successor was found and how many pointers were followed. The "Followed" column counts the read in line 3 and each descent to the left in the loop as one step each.</p>
+
+<div class="nt-tablewrap" id="tab-gezinme">
+<table class="nt-table">
+  <caption>Table 12.7: Trace of <code>tinorder</code>. The output is <code>H D I B E A F C G</code>; 15 pointers are followed in total.</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col"><code>p</code> (before)</th><th scope="col">How it was found</th><th scope="col"><code>p</code> (after)</th><th scope="col">Followed</th><th scope="col">Output</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>head</td><td>leftmost of the right subtree (A, B, D, H)</td><td>H</td><td>5</td><td><code>H</code></td></tr>
+    <tr><td>2</td><td>H</td><td>directly through a thread</td><td>D</td><td>1</td><td><code>D</code></td></tr>
+    <tr><td>3</td><td>D</td><td>leftmost of the right subtree (I)</td><td>I</td><td>1</td><td><code>I</code></td></tr>
+    <tr><td>4</td><td>I</td><td>directly through a thread</td><td>B</td><td>1</td><td><code>B</code></td></tr>
+    <tr><td>5</td><td>B</td><td>leftmost of the right subtree (E)</td><td>E</td><td>1</td><td><code>E</code></td></tr>
+    <tr><td>6</td><td>E</td><td>directly through a thread</td><td>A</td><td>1</td><td><code>A</code></td></tr>
+    <tr><td>7</td><td>A</td><td>leftmost of the right subtree (C, F)</td><td>F</td><td>2</td><td><code>F</code></td></tr>
+    <tr><td>8</td><td>F</td><td>directly through a thread</td><td>C</td><td>1</td><td><code>C</code></td></tr>
+    <tr><td>9</td><td>C</td><td>leftmost of the right subtree (G)</td><td>G</td><td>1</td><td><code>G</code></td></tr>
+    <tr><td>10</td><td>G</td><td>directly through a thread</td><td>head</td><td>1</td><td>(<code>break</code>)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The two rules in the table follow one another in turn. After a leaf we go up through a thread; after an internal node we enter the right subtree and descend to the far left. No node is written twice in any iteration, and a stack is needed nowhere.</p>
+
+<h3 id="s12-3-4"><span class="nt-num">12.3.4</span>The cost of the traversal</h3>
+
+<p>A single call of <code>insucc</code> can take a long time. The first call, made with the header, descends from the root to the leftmost node; this path is as long as the height of the tree. The worst cost of a single call is therefore <span class="m">O(h)</span>. In a left-skewed tree of 1000 nodes this first call follows 1001 pointers. But the total cost of the whole traversal is far smaller than the product of the number of calls and the worst cost.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-gezinme">
+  <span class="nt-box__title">Theorem 12.3 (Cost of a threaded traversal)</span>
+  <p>Traversing a threaded tree of <span class="m">n</span> nodes with <code>tinorder</code> follows at most <span class="m">2n + 1</span> pointers. The time is <span class="m">Θ(n)</span> and the extra memory is <span class="m">O(1)</span>.</p>
+</div>
+
+<div class="nt-proof">
+  <p>The loop calls <code>insucc</code> <span class="m">n + 1</span> times: once for each of the <span class="m">n</span> nodes and once for the return to the header. Each call reads exactly one pointer in line 3, which adds up to <span class="m">n + 1</span> steps. The descents to the left in the loop go only over real left links. A left link is followed only when entering, from the left, the subtree that contains the node owning the link, and the traversal enters each subtree once. So each real left link is followed at most once. The number of real left links, counting the link from the header to the root, is at most <span class="m">n</span>. The total is <span class="m">(n + 1) + n = 2n + 1</span>. Each step takes constant time, so the time is <span class="m">O(n)</span>. Since every node is written, the time is also <span class="m">Ω(n)</span>. The procedure uses only the variable <code>p</code>; the extra memory is <span class="m">O(1)</span>. <span class="nt-qed">∎</span></p>
+</div>
+
+<p>In the running example, the nodes with a left child are A, B, C, and D. Together with the link from the header to the root, five descents to the left are made. The total <span class="m">10 + 5 = 15</span> steps equals the sum of the last column of <a href="#tab-gezinme">Table 12.7</a>. The extreme cases were also checked by counting. In a left-skewed tree of 1000 nodes every node has a left child and the bound is reached exactly: 2001 steps. In a right-skewed tree of 1000 nodes only one descent to the left is made, from the header to the root: <span class="m">1001 + 1 = 1002</span> steps.</p>
+
+<p>Dividing the total of <span class="m">2n + 1</span> steps among <span class="m">n + 1</span> calls leaves fewer than two steps per call. Although there are expensive calls when looked at one by one, they are few in a traversal; an expensive descent makes the following calls cheap. This kind of accounting is called <strong>amortized analysis</strong>. The amortized cost of finding a successor within a traversal is <span class="m">O(1)</span>.</p>
+
+<p>Threads bring one more gain. Once the address of any node is at hand, its successor can be reached without starting the traversal from the beginning. In an ordinary tree, finding the successor of a node requires either a parent pointer or a fresh descent from the root. A threaded tree answers this question starting from the node itself.</p>
+
+<p>The value of such an improvement should not be underestimated. The lecture gives an example: a problem is known to be solved in <span class="m">O(n<sup>2</sup>)</span> time, and someone works out an algorithm that brings it down to <span class="m">O(n<sup>1.89</sup>)</span>. This small difference in the exponent is a big achievement, and that algorithm goes into the literature. Threaded traversal improves not time but memory: it brings <span class="m">O(h)</span> down to <span class="m">O(1)</span>. In skewed trees that means going from <span class="m">O(n)</span> to <span class="m">O(1)</span>.</p>
+
+<h3 id="s12-3-5"><span class="nt-num">12.3.5</span>Preorder traversal</h3>
+
+<p>The threads are built for inorder, but the same threads can also be used for preorder traversal. For this we write a procedure that finds the preorder successor.</p>
+
+<pre class="nt-code"><code>thread_ptr presucc(thread_ptr p) {
+  <span class="kw">if</span> (!p-&gt;left_thread)        <span class="cm">// the left child, if any</span>
+    <span class="kw">return</span> p-&gt;left_child;
+  <span class="kw">while</span> (p-&gt;right_thread)      <span class="cm">// climb the right threads</span>
+    p = p-&gt;right_child;
+  <span class="kw">return</span> p-&gt;right_child;        <span class="cm">// first real right child</span>
+}</code></pre>
+
+<p>In a preorder traversal, after a node is written, its left subtree is entered if there is one; the first node of the left subtree is its root. Lines 2–3 handle this case: if the left flag is <code>FALSE</code>, the successor is the left child. If there is no left child, the successor is the root of the first not-yet-traversed right subtree found above, starting from <span class="m">p</span>. Lines 4–5 look for this node. As long as the right pointer of <span class="m">p</span> is a thread, the thread is followed. The right thread goes to the inorder successor, that is, to the nearest ancestor that carries <span class="m">p</span> in its left subtree. The left subtree of that ancestor is finished, and next comes the right subtree of the ancestor. If that ancestor also has no right subtree (its flag is again <code>TRUE</code>), one more thread is followed. We stop at the first node with a real right link, and line 6 returns its right child.</p>
+
+<p>The traversal loop using this procedure has the same form as the inorder traversal:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> tpreorder(thread_ptr L) {
+  thread_ptr p = L;        <span class="cm">// L: the header node</span>
+  <span class="kw">for</span> (;;) {
+    p = presucc(p);
+    <span class="kw">if</span> (p == L) <span class="kw">break</span>;       <span class="cm">// back at the head?</span>
+    printf("%c ", p-&gt;data);
+  }
+}</code></pre>
+
+<p>Starting from the header, the left flag of the header is <code>FALSE</code>, so the successor is the root (A). After the last node, the threads climb up to the header; the right flag of the header is <code>FALSE</code> and its right pointer is itself. The procedure returns the header and the traversal ends. <a href="#tab-kokonde">Table 12.8</a> gives all the steps.</p>
+
+<div class="nt-tablewrap" id="tab-kokonde">
+<table class="nt-table">
+  <caption>Table 12.8: Traversal with <code>presucc</code>. The output is <code>A B D H I E C F G</code>.</caption>
+  <thead><tr><th scope="col"><code>p</code></th><th scope="col">Left flag</th><th scope="col">Right threads followed</th><th scope="col">Successor</th></tr></thead>
+  <tbody>
+    <tr><td>head</td><td>F</td><td>–</td><td>A (left child)</td></tr>
+    <tr><td>A</td><td>F</td><td>–</td><td>B (left child)</td></tr>
+    <tr><td>B</td><td>F</td><td>–</td><td>D (left child)</td></tr>
+    <tr><td>D</td><td>F</td><td>–</td><td>H (left child)</td></tr>
+    <tr><td>H</td><td>T</td><td>H → D</td><td>I (right child of D)</td></tr>
+    <tr><td>I</td><td>T</td><td>I → B</td><td>E (right child of B)</td></tr>
+    <tr><td>E</td><td>T</td><td>E → A</td><td>C (right child of A)</td></tr>
+    <tr><td>C</td><td>F</td><td>–</td><td>F (left child)</td></tr>
+    <tr><td>F</td><td>T</td><td>F → C</td><td>G (right child of C)</td></tr>
+    <tr><td>G</td><td>T</td><td>G → head</td><td>head (the right of the head is itself): done</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Finding the preorder successor of a leaf may require following several threads. For example, after I we climb to B through one thread and find the right child of B, E. In a deeper tree, starting from a leaf, several ancestors in a row may have no right subtree; in that case the chain of threads gets longer. Even so, each right thread is followed at most once in the whole traversal, so the total time stays <span class="m">O(n)</span> and the extra memory <span class="m">O(1)</span>.</p>
+
+<p>Postorder traversal cannot be written as easily. In postorder, a node is usually followed by its parent. If the node is the right child of its parent, its successor is the parent; if it is the left child, its successor is the first postorder node in the parent's right subtree. In both cases the parent must be known. Threads point not to the parent but to the inorder predecessor and successor, and these two do not always coincide with the parent. The right thread of H points to its parent D, but the right thread of I points not to its parent D but to B. Postorder traversal with threads is possible but roundabout. Adding a parent pointer to each node makes the job easier.</p>
+
+<h3 id="s12-3-6"><span class="nt-num">12.3.6</span>The Morris traversal</h3>
+
+<p>A threaded tree pays two costs: flag fields in every node, and the extra complexity of the insertion procedures. In 1979 J. M. Morris proposed a method that needs no flag fields. The <strong>Morris traversal</strong> builds the threads temporarily during the traversal in an ordinary binary tree and removes them when it is done. At the end of the traversal the tree returns to its original state. The procedure works with the ordinary <code>struct node</code> node given at the beginning of the chapter:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> morris_inorder(tree_ptr L) {
+  <span class="kw">while</span> (L) {
+    <span class="kw">if</span> (!L-&gt;left) {             <span class="cm">/* no left: print, go right */</span>
+      printf("%c", L-&gt;data);  L = L-&gt;right;
+    } <span class="kw">else</span> {
+      tree_ptr p = L-&gt;left;    <span class="cm">/* inorder predecessor */</span>
+      <span class="kw">while</span> (p-&gt;right &amp;&amp; p-&gt;right != L)
+        p = p-&gt;right;
+      <span class="kw">if</span> (!p-&gt;right) {           <span class="cm">/* set a temporary thread */</span>
+        p-&gt;right = L;  L = L-&gt;left;
+      } <span class="kw">else</span> {                      <span class="cm">/* remove the thread */</span>
+        p-&gt;right = <span class="kw">NULL</span>;
+        printf("%c", L-&gt;data);  L = L-&gt;right;
+      }
+    }
+  }
+}</code></pre>
+
+<p>The idea of the procedure is this. When we arrive at a node <span class="m">L</span> that has a left subtree, we prepare the way back before going left. The inorder predecessor of <span class="m">L</span> is the rightmost node of its left subtree. The right pointer of this node is null, because the rightmost node cannot have a right child. We write the address of <span class="m">L</span> into this empty field: a temporary thread. After the left subtree has been traversed and the predecessor is reached, following this thread leads back to <span class="m">L</span>. When we reach <span class="m">L</span> a second time, the predecessor is searched for again; this time the right pointer of the predecessor is seen to point to <span class="m">L</span>. This is the sign that the left subtree is finished. The thread is removed, <span class="m">L</span> is written, and we move right.</p>
+
+<ul>
+  <li><b>Line 2.</b> The loop runs until <code>L</code> becomes <code>NULL</code>. The right pointer of the last node really is <code>NULL</code>; the loop ends there.</li>
+  <li><b>Lines 3–4.</b> If there is no left subtree, the node is written and we move right. The right pointer may be a real child or a temporary thread set earlier. The procedure does not distinguish the two; in both cases it goes to the right node.</li>
+  <li><b>Lines 6–8.</b> The predecessor is searched for: start from the left child and go right as long as possible. The second half of the condition (<code>p-&gt;right != L</code>) is important. If the thread has been set earlier, the right pointer of the rightmost node points to <code>L</code>; without this test the search would follow the thread to <code>L</code> and from there turn left again.</li>
+  <li><b>Lines 9–10.</b> If the right of the predecessor is null, this is the first visit: the thread is set and we descend to the left.</li>
+  <li><b>Lines 11–13.</b> If the right of the predecessor points to <code>L</code>, this is the second visit: the thread is removed, <code>L</code> is written, and we move right.</li>
+</ul>
+
+<p>Let us trace the procedure on the tree A(B(D, E), C): the five-node tree in which A has children B and C, and B has children D and E. <a href="#tab-morris">Table 12.9</a> shows each iteration and <a href="#sekil-morris">Figure 12.6</a> shows four moments.</p>
+
+<div class="nt-tablewrap" id="tab-morris">
+<table class="nt-table">
+  <caption>Table 12.9: Trace of <code>morris_inorder</code>, tree A(B(D, E), C). The output is <code>DBEAC</code>.</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col"><code>L</code></th><th scope="col">Predecessor <code>p</code></th><th scope="col">Event</th><th scope="col">Temporary threads</th><th scope="col">Output</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>A</td><td>E (right from B)</td><td>the right of E is empty: set the thread, go left</td><td>E→A</td><td></td></tr>
+    <tr><td>2</td><td>B</td><td>D</td><td>the right of D is empty: set the thread, go left</td><td>E→A, D→B</td><td></td></tr>
+    <tr><td>3</td><td>D</td><td>–</td><td>no left child: write, go right (through the thread to B)</td><td>E→A, D→B</td><td><code>D</code></td></tr>
+    <tr><td>4</td><td>B</td><td>D</td><td>the right of D is B: remove the thread, write, go right</td><td>E→A</td><td><code>DB</code></td></tr>
+    <tr><td>5</td><td>E</td><td>–</td><td>no left child: write, go right (through the thread to A)</td><td>E→A</td><td><code>DBE</code></td></tr>
+    <tr><td>6</td><td>A</td><td>E (right from B)</td><td>the right of E is A: remove the thread, write, go right</td><td>–</td><td><code>DBEA</code></td></tr>
+    <tr><td>7</td><td>C</td><td>–</td><td>no left child: write, go right (<code>NULL</code>)</td><td>–</td><td><code>DBEAC</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-morris" style="--w:700px">
+  <div class="nt-fig__row nt-fig__row--4"><svg class="ds-svg" viewBox="0 -19 470 189" role="img" aria-label="Morris traversal"><defs><marker id="n12-d16-ah135-s16_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah136-s16_1-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-cur" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-n" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-n" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-n" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-n" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-ptr" x="229.5" y="-3" text-anchor="end">L</text><path class="line" d="M231.5 -5 L251.7 13.2" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah135-s16_1-1)"/><path class="t-thrh" d="M205 126 Q268.75 146 270.5 38" marker-end="url(#n12-d16-ah136-s16_1-1)"/><text class="t-bold" x="460" y="60" text-anchor="end">output: </text></svg><svg class="ds-svg" viewBox="0 0 470 170" role="img" aria-label="Morris traversal"><defs><marker id="n12-d16-ah137-s16_2-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah138-s16_2-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-n" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-cur" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-n" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-n" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-n" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-ptr" x="94.5" y="43" text-anchor="end">L</text><path class="line" d="M96.5 41 L116.7 59.2" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah137-s16_2-1)"/><path class="t-thr" d="M205 126 Q268.75 146 270.5 38" marker-end="url(#n12-d16-ah138-s16_2-1)"/><path class="t-thrh" d="M70 126 Q133.75 146 135.5 84" marker-end="url(#n12-d16-ah138-s16_2-1)"/><text class="t-bold" x="460" y="60" text-anchor="end">output: </text></svg><svg class="ds-svg" viewBox="0 0 470 170" role="img" aria-label="Morris traversal"><defs><marker id="n12-d16-ah141-s16_4-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah142-s16_4-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-n" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-cur" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-done" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-n" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-n" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-ptr" x="94.5" y="43" text-anchor="end">L</text><path class="line" d="M96.5 41 L116.7 59.2" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah141-s16_4-1)"/><path class="t-thr" d="M205 126 Q268.75 146 270.5 38" marker-end="url(#n12-d16-ah142-s16_4-1)"/><text class="t-bold" x="460" y="60" text-anchor="end">output: DB</text></svg><svg class="ds-svg" viewBox="0 0 470 170" role="img" aria-label="Morris traversal"><path class="line" d="M262.5 24 L127.5 70"/><path class="line" d="M262.5 24 L330 70"/><path class="line" d="M127.5 70 L60 116"/><path class="line" d="M127.5 70 L195 116"/><g><circle class="t-done" cx="262.5" cy="24" r="15"/><text class="txt" x="262.5" y="29" text-anchor="middle">A</text></g><g><circle class="t-done" cx="127.5" cy="70" r="15"/><text class="txt" x="127.5" y="75" text-anchor="middle">B</text></g><g><circle class="t-done" cx="60" cy="116" r="15"/><text class="txt" x="60" y="121" text-anchor="middle">D</text></g><g><circle class="t-done" cx="195" cy="116" r="15"/><text class="txt" x="195" y="121" text-anchor="middle">E</text></g><g><circle class="t-done" cx="330" cy="70" r="15"/><text class="txt" x="330" y="75" text-anchor="middle">C</text></g><text class="t-bold" x="460" y="60" text-anchor="end">output: DBEAC</text></svg></div>
+  <figcaption><b>Figure 12.6:</b> Four moments of the Morris traversal. In the first, the thread E → A has been set and we have gone left. In the second, the thread D → B has been set as well. In the third, we have returned from D to B, the thread D → B has been removed, and B has been written. In the fourth, the traversal is finished; the tree is in its original state.</figcaption>
+</figure>
+
+<p>The table shows that every temporary thread is seen exactly twice: when it is set and when it is removed. Every node with a left child gives rise to one thread; in this tree there are two (for A and B). When the traversal ends, the right pointers of D and E are <code>NULL</code> again. The result was checked by comparing it with the output of a recursive inorder traversal of the same tree:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> inorder(tree_ptr p) {
+  <span class="kw">if</span> (p) {
+    inorder(p-&gt;left);
+    printf("%c", p-&gt;data);
+    inorder(p-&gt;right);
+  }
+}</code></pre>
+
+<p>The time of the Morris traversal is also <span class="m">O(n)</span>. For each node with a left child the predecessor is searched for twice. Each search walks a path that starts at the left child and goes right. These paths for different nodes share no edge; an edge lies on the predecessor path of at most one node. The total length of the paths is therefore at most <span class="m">n − 1</span>, and walking them twice bounds the total by <span class="m">2(n − 1)</span>. To this is added the constant work done at each node. Measurement confirms this: the five-node example makes 13 pointer moves in all, and the complete seven-node tree makes 18.</p>
+
+<p>The method has a limit. While the traversal is in progress, the tree is temporarily modified: some <code>NULL</code> fields point to other nodes. If another thread reads the tree during this time, it meets cycles and gets a wrong result. If the traversal is cut short by an error or an early exit, the tree is left corrupted. The Morris traversal is therefore suitable for procedures that have the tree to themselves and carry the traversal through to the end.</p>
+
+<h2 class="nt-pb" id="s12-4"><span class="nt-num">12.4</span>Inserting a node</h2>
+
+<p>Traversal in a threaded tree is easy; the price is paid at insertion. Inserting a node into a binary search tree is a single pointer assignment: the new node is written into an empty child field. In a threaded tree there are no empty fields. When a new node is inserted, both its own threads must point to the right places and the threads around it must be adjusted to the new order. Insertion is therefore not an easy procedure on its own; it is a little intricate.</p>
+
+<h3 id="s12-4-1"><span class="nt-num">12.4.1</span>Why insertion is intricate</h3>
+
+<p>A new node is inserted either to the right or to the left of a parent. The pointer assignments for left and right insertion are mirror images of each other, but they are not literally identical; so two separate procedures are written: <code>insert_right</code> and <code>insert_left</code>. Let us deal with <code>insert_right</code> first. There are two cases in inserting on the right:</p>
+
+<ol>
+  <li>The parent has no right subtree. The new node is placed to the right of the parent as a leaf.</li>
+  <li>The parent has a right subtree. The new node goes in between the parent and this subtree; the old subtree becomes the right subtree of the new node.</li>
+</ol>
+
+<p>The second case never arises in inserting into an ordinary binary search tree; there the new node is always a leaf. In a threaded tree both cases are useful: the second is a way to put a node into the middle of the tree.</p>
+
+<h3 id="s12-4-2"><span class="nt-num">12.4.2</span>Case 1: inserting under a parent with no right subtree</h3>
+
+<p>Let the tree be A(–, B(C, –)): A is on the left of the head; A has no left child and has right child B; B has left child C and no right child. The inorder sequence is <code>A C B</code>. The new node D will be inserted to the right of B. The right pointer of B is a thread, and since B is the last node in the sequence, it points to the head. The insertion is done with six assignments:</p>
+
+<pre class="nt-code"><code>child-&gt;right_child  = parent-&gt;right_child;
+child-&gt;right_thread = TRUE;  <span class="cm">// parent had no right child</span>
+child-&gt;left_child  = parent;
+child-&gt;left_thread = TRUE;
+parent-&gt;right_child   = child;
+parent-&gt;right_thread = FALSE;  <span class="cm">// was TRUE</span></code></pre>
+
+<p>The reason for each assignment can be read off the inorder sequence. After the insertion the sequence will be <code>A C B D</code>. D comes immediately after B; the predecessor of D is B, and its successor is the old successor of B. <a href="#tab-durum1">Table 12.10</a> follows the assignments in order, and <a href="#sekil-durum1">Figure 12.7</a> shows the first and last states.</p>
+
+<div class="nt-tablewrap" id="tab-durum1">
+<table class="nt-table">
+  <caption>Table 12.10: Trace of Case 1: <code>parent</code> = B, <code>child</code> = D.</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Assignment</th><th scope="col">Result</th><th scope="col">Reason</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>child-&gt;right_child = parent-&gt;right_child</code></td><td>D → head</td><td>The successor of the parent is now the successor of the child. It does not matter whether this successor is the head.</td></tr>
+    <tr><td>2</td><td><code>child-&gt;right_thread = TRUE</code></td><td>red arrow</td><td>The parent had no right subtree; the child, being a leaf, has none either.</td></tr>
+    <tr><td>3</td><td><code>child-&gt;left_child = parent</code></td><td>D → B</td><td>The predecessor of the child is the parent.</td></tr>
+    <tr><td>4</td><td><code>child-&gt;left_thread = TRUE</code></td><td>red arrow</td><td>This is a thread as well.</td></tr>
+    <tr><td>5</td><td><code>parent-&gt;right_child = child</code></td><td>B → D</td><td>A real link from the parent to the child.</td></tr>
+    <tr><td>6</td><td><code>parent-&gt;right_thread = FALSE</code></td><td>black link</td><td>The right of the parent is no longer a thread but a real child.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-durum1" style="--w:540px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 539 210" role="img" aria-label="insert right"><defs><marker id="n12-d16-ah150-s18_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah151-s18_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah152-s18_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah150-s18_0-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah150-s18_0-1)"/><path class="line" d="M40 60 L306.667 100"/><path class="line" d="M306.667 100 L173.333 140"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah152-s18_0-1)"/><path class="t-thr" d="M316.467 109.8 Q255.333 119.8 114.2 34" marker-end="url(#n12-d16-ah152-s18_0-1)"/><path class="t-thr" d="M163.533 149.8 Q103.867 185.8 44.2 74" marker-end="url(#n12-d16-ah152-s18_0-1)"/><path class="t-thr" d="M183.133 149.8 Q242.8 185.8 302.467 114" marker-end="url(#n12-d16-ah152-s18_0-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">head</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="100" r="14"/><text class="txt" x="306.667" y="105" text-anchor="middle">B</text><text class="lbl" x="284.667" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="t-badt" x="328.667" y="104" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="173.333" cy="140" r="14"/><text class="txt" x="173.333" y="145" text-anchor="middle">C</text><text class="t-badt" x="151.333" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="195.333" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="274.667" y="76" text-anchor="end">parent</text><path class="line" d="M276.667 74 L296.587 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah151-s18_0-1)"/><text class="t-ptr" x="448" y="136" text-anchor="end">child</text><path class="line" d="M450 134 L469.92 149.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah151-s18_0-1)"/><path class="t-thrh" d="M480 146 Q315 -4 120 8" marker-end="url(#n12-d16-ah151-s18_0-1)"/><circle class="t-new" cx="480" cy="160" r="14"/><text class="txt" x="480" y="165" text-anchor="middle">D</text><text class="t-ptr" x="498" y="182" text-anchor="start">child</text><text class="lbl" x="458" y="164" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="502" y="164" text-anchor="middle" style="font-size:11px">F</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 510 210" role="img" aria-label="insert right"><defs><marker id="n12-d16-ah165-s18_5-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah166-s18_5-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah167-s18_5-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah165-s18_5-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah165-s18_5-1)"/><path class="line" d="M40 60 L306.667 100"/><path class="line" d="M306.667 100 L173.333 140"/><path class="line" d="M306.667 100 L480 160" style="stroke:var(--ds-accent);stroke-width:3"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M163.533 149.8 Q103.867 185.8 44.2 74" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M183.133 149.8 Q242.8 185.8 302.467 114" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M470.2 169.8 Q390.533 205.8 310.867 114" marker-end="url(#n12-d16-ah167-s18_5-1)"/><path class="t-thr" d="M489.8 169.8 Q342 179.8 114.2 34" marker-end="url(#n12-d16-ah167-s18_5-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">head</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="100" r="14"/><text class="txt" x="306.667" y="105" text-anchor="middle">B</text><text class="lbl" x="284.667" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="328.667" y="104" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="173.333" cy="140" r="14"/><text class="txt" x="173.333" y="145" text-anchor="middle">C</text><text class="t-badt" x="151.333" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="195.333" y="144" text-anchor="middle" style="font-size:11px">T</text><circle class="t-new" cx="480" cy="160" r="14"/><text class="txt" x="480" y="165" text-anchor="middle">D</text><text class="t-badt" x="458" y="164" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="502" y="164" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="274.667" y="76" text-anchor="end">parent</text><path class="line" d="M276.667 74 L296.587 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah166-s18_5-1)"/><text class="t-ptr" x="448" y="136" text-anchor="end">child</text><path class="line" d="M450 134 L469.92 149.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah166-s18_5-1)"/></svg></div>
+  <figcaption><b>Figure 12.7:</b> Case 1. Top, after the first assignment: D is not yet attached to the tree; its right pointer points to the head, which is the successor of B. Bottom, after the six assignments: D is the real right child of B; the left thread of D points to B and its right thread points to the head.</figcaption>
+</figure>
+
+<p>The order of the assignments is not arbitrary. Line 1 reads the right pointer of the parent, and line 5 overwrites it. If the places of these two lines are exchanged, <code>child-&gt;right_child</code> receives the child's own address instead of the old successor of the parent, and the successor information is lost. The general rule is this: if the old value of a field is needed, use that value first and only then change the field. All the assignments take constant time; the cost of Case 1 is <span class="m">O(1)</span>.</p>
+
+<h3 id="s12-4-3"><span class="nt-num">12.4.3</span>Case 2: the parent has a right subtree</h3>
+
+<p>Now let the tree be A(–, B(C, D(E, F))). The right child of B is D, and the children of D are E and F. The inorder sequence is <code>A C B E D F</code>. The new node X will be made the right child of B. What we want is that the subtree of D must not be lost and must become the right subtree of X. The red pointers must again point to the right places. After the insertion the sequence will be <code>A C B X E D F</code>.</p>
+
+<p>Two requirements are read from this sequence. The predecessor of X is B; this is as in Case 1. But the node that comes after X is E, the leftmost node of the subtree of D. The left thread of E used to point to B, because the old predecessor of E was B. After the insertion the predecessor of E becomes X. So the child must be made the predecessor of the old successor of the parent.</p>
+
+<p>What happens if the six assignments of Case 1 are applied as they are to this tree? The result of trying it is this: the traversal writes <code>A C B X D F</code>; E is lost. The cause is line 2. <code>child-&gt;right_thread = TRUE</code> treats the right pointer of X (which points to D) as a thread. After X, the traversal jumps directly to D by the thread rule and never descends into the left subtree of D. The left thread of E also still points to B. The tree is corrupted, and no compiler warning announces it.</p>
+
+<p>The fix has two parts:</p>
+
+<ul>
+  <li>Line 2 is written as <code>child-&gt;right_thread = parent-&gt;right_thread</code>. In Case 1 the flag of the parent is <code>TRUE</code>, and the thread status passes to the child; in Case 2 it is <code>FALSE</code>, and the real-link status is preserved. The subtree of the parent has now become the subtree of the child.</li>
+  <li>In Case 2, the left thread of the old successor of the parent, that is, of the successor of the child in the new arrangement, is redirected to the child.</li>
+</ul>
+
+<p>With these two changes a single procedure that handles both cases can be written.</p>
+
+<h3 id="s12-4-4"><span class="nt-num">12.4.4</span>One procedure: <code>insert_right</code></h3>
+
+<pre class="nt-code"><code><span class="kw">void</span> insert_right(thread_ptr parent,
+               thread_ptr child) {
+  <span class="cm">// make child the right child of parent (threaded)</span>
+  thread_ptr p;
+  child-&gt;right_child   = parent-&gt;right_child;
+  child-&gt;right_thread = parent-&gt;right_thread;
+  child-&gt;left_child   = parent;
+  child-&gt;left_thread = TRUE;
+  parent-&gt;right_child    = child;
+  parent-&gt;right_thread  = FALSE;
+  <span class="kw">if</span> (!child-&gt;right_thread) { <span class="cm">// did parent have a subtree?</span>
+    p = insucc(child);
+    p-&gt;left_child = child;     <span class="cm">// successor's predecessor is child</span>
+  }
+}</code></pre>
+
+<p>The procedure reads line by line as follows. The line numbers refer to the code above.</p>
+
+<ul>
+  <li><b>Lines 1–2, a clear definition.</b> The name of the procedure says what it does; the incoming parameters (<code>parent</code>, <code>child</code>) are clear; there is no return value (<code>void</code>). A clearly defined procedure can be used without reading its body.</li>
+  <li><b>Lines 5–6.</b> The right pointer and right flag of the child are taken from the parent. In Case 1 the thread status (<code>TRUE</code>) is kept, and in Case 2 the real-link status (<code>FALSE</code>). The common work is written in a common form.</li>
+  <li><b>Lines 7–8.</b> The predecessor of the child is the parent: the left pointer goes to the parent and the left flag becomes <code>TRUE</code>.</li>
+  <li><b>Line 9.</b> A real link from the parent to the child.</li>
+  <li><b>Line 10.</b> The right flag of the parent is set to <code>FALSE</code>. In Case 2 the flag is already <code>FALSE</code>, so this assignment is unnecessary but harmless; in Case 1 it is needed. Writing it in both cases, instead of separating them with an <code>if</code>, simplifies the code.</li>
+  <li><b>Lines 11–13.</b> If the right flag of the child is <code>FALSE</code>, the child has a real right subtree; this is Case 2. The successor of the child is found and its left thread is redirected to the child. In Case 1 only one test is made and the procedure exits.</li>
+</ul>
+
+<p>The condition in line 11 tests a flag, but the question it asks is this: did the parent have a right subtree? After lines 5–6, the old right information of the parent has been moved to the child, so this question is answered by looking at the flag of the child. The comment writes this question, not the flag.</p>
+
+<p><a href="#tab-sagaekle">Table 12.11</a> traces the call <code>insert_right(B, X)</code> line by line on the Case 2 tree.</p>
+
+<div class="nt-tablewrap" id="tab-sagaekle">
+<table class="nt-table">
+  <caption>Table 12.11: Trace of <code>insert_right(B, X)</code>, tree A(–, B(C, D(E, F))). The resulting sequence is <code>A C B X E D F</code>.</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Event</th><th scope="col">Changed field</th></tr></thead>
+  <tbody>
+    <tr><td>5</td><td>The old right subtree of B goes to the right of X</td><td>X-&gt;<code>right_child</code> = D</td></tr>
+    <tr><td>6</td><td>The flag of B was <code>FALSE</code>; the real-link status is kept</td><td>X-&gt;<code>right_thread</code> = <code>FALSE</code></td></tr>
+    <tr><td>7</td><td>The predecessor of X is B</td><td>X-&gt;<code>left_child</code> = B</td></tr>
+    <tr><td>8</td><td>red arrow</td><td>X-&gt;<code>left_thread</code> = <code>TRUE</code></td></tr>
+    <tr><td>9</td><td>A real link from B to X</td><td>B-&gt;<code>right_child</code> = X</td></tr>
+    <tr><td>10</td><td>it was already <code>FALSE</code>; harmless</td><td>B-&gt;<code>right_thread</code> = <code>FALSE</code></td></tr>
+    <tr><td>11</td><td><code>!X-&gt;right_thread</code> is true: X has a right subtree</td><td>–</td></tr>
+    <tr><td>12</td><td>The successor of X: descend left from D and stop at E</td><td><code>p</code> = E</td></tr>
+    <tr><td>13</td><td>The left thread of E points to X instead of B</td><td>E-&gt;<code>left_child</code> = X</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-sagaekle" style="--w:480px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 480 246" role="img" aria-label="insert right"><defs><marker id="n12-d16-ah171-s20_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah172-s20_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah173-s20_0-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah171-s20_0-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah171-s20_0-1)"/><path class="line" d="M40 60 L173.333 100"/><path class="line" d="M173.333 100 L106.667 140"/><path class="line" d="M173.333 100 L373.333 180"/><path class="line" d="M373.333 180 L306.667 220"/><path class="line" d="M373.333 180 L440 220"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M96.8667 149.8 Q70.5333 185.8 44.2 74" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M116.467 149.8 Q142.8 185.8 169.133 114" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M296.867 229.8 Q237.2 265.8 177.533 114" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M316.467 229.8 Q342.8 265.8 369.133 194" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M430.2 229.8 Q403.867 265.8 377.533 194" marker-end="url(#n12-d16-ah173-s20_0-1)"/><path class="t-thr" d="M449.8 229.8 Q322 239.8 114.2 34" marker-end="url(#n12-d16-ah173-s20_0-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">head</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="173.333" cy="100" r="14"/><text class="txt" x="173.333" y="105" text-anchor="middle">B</text><text class="lbl" x="151.333" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="195.333" y="104" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="106.667" cy="140" r="14"/><text class="txt" x="106.667" y="145" text-anchor="middle">C</text><text class="t-badt" x="84.6667" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="128.667" y="144" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="373.333" cy="180" r="14"/><text class="txt" x="373.333" y="185" text-anchor="middle">D</text><text class="lbl" x="351.333" y="184" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="395.333" y="184" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="220" r="14"/><text class="txt" x="306.667" y="225" text-anchor="middle">E</text><text class="t-badt" x="284.667" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="328.667" y="224" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="440" cy="220" r="14"/><text class="txt" x="440" y="225" text-anchor="middle">F</text><text class="t-badt" x="418" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="462" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="141.333" y="76" text-anchor="end">parent</text><path class="line" d="M143.333 74 L163.253 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah172-s20_0-1)"/><text class="t-ptr" x="208" y="116" text-anchor="end">child</text><path class="line" d="M210 114 L229.92 129.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah172-s20_0-1)"/><path class="t-thrh" d="M240 126 Q326.667 116 383.333 168" marker-end="url(#n12-d16-ah172-s20_0-1)"/><circle class="t-new" cx="240" cy="140" r="14"/><text class="txt" x="240" y="145" text-anchor="middle">X</text><text class="t-ptr" x="258" y="162" text-anchor="start">child</text><text class="lbl" x="218" y="144" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="262" y="144" text-anchor="middle" style="font-size:11px">F</text></svg></div>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 480 246" role="img" aria-label="insert right"><defs><marker id="n12-d16-ah195-s20_8-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n12-d16-ah196-s20_8-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n12-d16-ah197-s20_8-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><path class="line" d="M100.2 29.8 L47 48.8" marker-end="url(#n12-d16-ah195-s20_8-1)"/><path class="line" d="M124 20 C154 2 154 42 119.8 29.8" style="" marker-end="url(#n12-d16-ah195-s20_8-1)"/><path class="line" d="M40 60 L173.333 100"/><path class="line" d="M173.333 100 L106.667 140"/><path class="line" d="M173.333 100 L240 140"/><path class="line" d="M240 140 L373.333 180"/><path class="line" d="M373.333 180 L306.667 220"/><path class="line" d="M373.333 180 L440 220"/><path class="t-thr" d="M30.2 69.8 Q28 79.8 105.8 34" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M96.8667 149.8 Q70.5333 185.8 44.2 74" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M116.467 149.8 Q142.8 185.8 169.133 114" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M230.2 149.8 Q203.867 185.8 177.533 114" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thrh" d="M296.867 229.8 Q270.533 265.8 244.2 154" marker-end="url(#n12-d16-ah196-s20_8-1)"/><path class="t-thr" d="M316.467 229.8 Q342.8 265.8 369.133 194" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M430.2 229.8 Q403.867 265.8 377.533 194" marker-end="url(#n12-d16-ah197-s20_8-1)"/><path class="t-thr" d="M449.8 229.8 Q322 239.8 114.2 34" marker-end="url(#n12-d16-ah197-s20_8-1)"/><rect class="box" x="92" y="7" width="36" height="26" rx="5"/><text class="t-sub" x="110" y="25" text-anchor="middle">head</text><text class="lbl" x="84" y="24" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="136" y="24" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="40" cy="60" r="14"/><text class="txt" x="40" y="65" text-anchor="middle">A</text><text class="t-badt" x="18" y="64" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="62" y="64" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="173.333" cy="100" r="14"/><text class="txt" x="173.333" y="105" text-anchor="middle">B</text><text class="lbl" x="151.333" y="104" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="195.333" y="104" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="106.667" cy="140" r="14"/><text class="txt" x="106.667" y="145" text-anchor="middle">C</text><text class="t-badt" x="84.6667" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="128.667" y="144" text-anchor="middle" style="font-size:11px">T</text><circle class="t-new" cx="240" cy="140" r="14"/><text class="txt" x="240" y="145" text-anchor="middle">X</text><text class="t-badt" x="218" y="144" text-anchor="middle" style="font-size:11px">T</text><text class="lbl" x="262" y="144" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="373.333" cy="180" r="14"/><text class="txt" x="373.333" y="185" text-anchor="middle">D</text><text class="lbl" x="351.333" y="184" text-anchor="middle" style="font-size:11px">F</text><text class="lbl" x="395.333" y="184" text-anchor="middle" style="font-size:11px">F</text><circle class="t-n" cx="306.667" cy="220" r="14"/><text class="txt" x="306.667" y="225" text-anchor="middle">E</text><text class="t-badt" x="284.667" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="328.667" y="224" text-anchor="middle" style="font-size:11px">T</text><circle class="t-n" cx="440" cy="220" r="14"/><text class="txt" x="440" y="225" text-anchor="middle">F</text><text class="t-badt" x="418" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-badt" x="462" y="224" text-anchor="middle" style="font-size:11px">T</text><text class="t-ptr" x="141.333" y="76" text-anchor="end">parent</text><path class="line" d="M143.333 74 L163.253 89.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah196-s20_8-1)"/><text class="t-ptr" x="208" y="116" text-anchor="end">child</text><path class="line" d="M210 114 L229.92 129.92" style="stroke:var(--ds-accent);" marker-end="url(#n12-d16-ah196-s20_8-1)"/></svg></div>
+  <figcaption><b>Figure 12.8:</b> <code>insert_right(B, X)</code>, Case 2. Top, after the first assignment: the right of X points to D, X is not yet attached to the tree, and the left thread of E points to B. Bottom, after the procedure finishes: X is between B and D; the left thread of E points to X.</figcaption>
+</figure>
+
+<p>After line 10 the tree is almost correct; X is in place, and even the traversal writes <code>A C B X E D F</code>, because the traversal does not use left threads. But the left thread of E still points to B. A procedure that traverses backwards in inorder or looks for a predecessor exposes this bug at once. The lecture warns at this point: one should not decide right away that the code works correctly; there is still an <code>if</code> block to be executed.</p>
+
+<p>The same procedure was also tried on the Case 1 tree. <code>insert_right(B, D)</code> on the tree A(–, B(C, –)) gives the same result as the six-assignment code: the sequence <code>A C B D</code>, the left thread of D pointing to B, and its right thread pointing to the head. Because the flag of the parent is <code>TRUE</code>, the condition in line 11 is false and the <code>if</code> block does not run.</p>
+
+<p><b>Cost.</b> Lines 5–10 take constant time. The successor search in line 12 descends to the left in the right subtree of the child; this path is at most as long as the height of the tree. The time of <code>insert_right</code> is <span class="m">O(h)</span> in the worst case and <span class="m">O(1)</span> in Case 1. The extra memory is <span class="m">O(1)</span>.</p>
+
+<h3 id="s12-4-5"><span class="nt-num">12.4.5</span>Inserting on the left</h3>
+
+<p><code>insert_left</code> makes the node pointed to by child the left child of the parent. The procedure is the mirror image of <code>insert_right</code>: left and right, and predecessor and successor, are exchanged. The old predecessor of the parent becomes the predecessor of the child. If the parent has a left subtree, the right thread of the rightmost node of that subtree, that is, of the new predecessor of the child, is redirected to the child. For this we need a procedure that finds the inorder predecessor. The predecessor rule is the mirror image of the successor rule: the rightmost node of the left subtree if there is one, otherwise the node that the left thread points to.</p>
+
+<pre class="nt-code"><code>thread_ptr inpred(thread_ptr L) {
+  thread_ptr p = L-&gt;left_child;
+  <span class="kw">if</span> (!L-&gt;left_thread)
+    <span class="kw">while</span> (!p-&gt;right_thread) p = p-&gt;right_child;
+  <span class="kw">return</span> p;
+}
+<span class="kw">void</span> insert_left(thread_ptr parent, thread_ptr child) {
+  child-&gt;left_child   = parent-&gt;left_child;
+  child-&gt;left_thread = parent-&gt;left_thread;
+  child-&gt;right_child   = parent;
+  child-&gt;right_thread = TRUE;      <span class="cm">// successor is parent</span>
+  parent-&gt;left_child    = child;
+  parent-&gt;left_thread  = FALSE;
+  <span class="kw">if</span> (!child-&gt;left_thread) {      <span class="cm">// parent had a left subtree</span>
+    thread_ptr p = inpred(child);
+    p-&gt;right_child = child;         <span class="cm">// predecessor's successor is child</span>
+  }
+}</code></pre>
+
+<div class="nt-tablewrap" id="tab-ayna">
+<table class="nt-table">
+  <caption>Table 12.12: The mirror relation between <code>insert_right</code> and <code>insert_left</code>.</caption>
+  <thead><tr><th scope="col"><code>insert_right</code></th><th scope="col"><code>insert_left</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>child-&gt;right_child = parent-&gt;right_child</code></td><td><code>child-&gt;left_child = parent-&gt;left_child</code></td></tr>
+    <tr><td><code>child-&gt;right_thread = parent-&gt;right_thread</code></td><td><code>child-&gt;left_thread = parent-&gt;left_thread</code></td></tr>
+    <tr><td><code>child-&gt;left_child = parent</code> (the parent is its predecessor)</td><td><code>child-&gt;right_child = parent</code> (the parent is its successor)</td></tr>
+    <tr><td><code>parent-&gt;right_thread = FALSE</code></td><td><code>parent-&gt;left_thread = FALSE</code></td></tr>
+    <tr><td>left thread of the successor to the child</td><td>right thread of the predecessor to the child</td></tr>
+    <tr><td><code>insucc</code>: right, then left and left</td><td><code>inpred</code>: left, then right and right</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-solaekle">
+  <span class="nt-box__title">Example 12.3</span>
+  <p>Let the tree be A(B(D, E), C); the inorder sequence is <code>D B E A C</code>. Let <code>insert_left(A, X)</code> be called. A has a left subtree (B); this is the second case. The lines (8–16) of the second procedure in the code do the following in order:</p>
+  <ol>
+    <li>The left of X takes the old left of A: X-&gt;<code>left_child</code> = B; the flag is carried over as <code>FALSE</code>.</li>
+    <li>The right of X points to A and is <code>TRUE</code>: the successor of X is A.</li>
+    <li>A-&gt;<code>left_child</code> = X, A-&gt;<code>left_thread</code> = <code>FALSE</code>.</li>
+    <li>The left flag of X is <code>FALSE</code>; the predecessor of X is searched for. <code>p</code> = X-&gt;<code>left_child</code> = B. The right flag of B is <code>FALSE</code>, go right: <code>p</code> = E. The right flag of E is <code>TRUE</code>, stop.</li>
+    <li>E-&gt;<code>right_child</code> = X: the right thread of E points to X instead of A.</li>
+  </ol>
+  <p>The resulting sequence is <code>D B E X A C</code>. X has been inserted between the B subtree and A.</p>
+</div>
+
+<p>The procedure <code>inpred</code> can be used for another job as well: starting from the header and moving from predecessor to predecessor until we return to the header traverses the tree backwards in inorder. This is taken up in the exercises. The predecessor of the header is the last node in inorder: the left flag of the header is <code>FALSE</code>, its left pointer is the root, and going right and right from the root reaches the rightmost node.</p>
+
+<h3 id="s12-4-6"><span class="nt-num">12.4.6</span>Freeing the tree</h3>
+
+<p>In a C program, every block obtained with <code>malloc</code> must be returned with <code>free</code> when it is no longer needed. Blocks that are not returned stay in memory until the program ends. This is called a <strong>memory leak</strong>. In a long-running program a leak slowly exhausts memory. A threaded tree is freed by a traversal too:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> threaded_tree_free(thread_ptr L) {
+  thread_ptr p = insucc(L), next;
+  <span class="kw">while</span> (p != L) {
+    next = insucc(p);  <span class="cm">// find the successor first</span>
+    free(p);                           <span class="cm">// then free the node</span>
+    p = next;
+  }
+  free(L);                             <span class="cm">// the head last</span>
+}</code></pre>
+
+<p>The order matters. Reading the fields of a node after it has been returned with <code>free</code> means reading freed memory, which is undefined behavior. So the successor is found first and written into <code>next</code>, and only then is the node freed. The successor procedure reads only the fields of <code>p</code> and of the nodes in its right subtree. These nodes have not been freed yet, because they come after <code>p</code> in inorder. The header is freed last; the stopping condition of the traversal looks at its address.</p>
+
+<p>All the code in these notes was tested with a wrapper that counts calls to <code>malloc</code> and <code>free</code>. The code from the slides and the additional procedures of these notes were run in a single driver: 32 <code>malloc</code> and 32 <code>free</code> calls were counted; in the detailed test both numbers were 2116. There is no leak.</p>
+
+<h3 id="s12-4-7"><span class="nt-num">12.4.7</span>Code quality</h3>
+
+<p>The procedures of a threaded tree are short but error-prone. They illustrate a few principles of good code concretely.</p>
+
+<p><b>Where to put the NULL check.</b> <code>insert_right</code> does not check whether <code>parent</code> or <code>child</code> is <code>NULL</code>. This is not an oversight but a design decision. The reasoning given in the lecture is this: <code>insert_right</code> is written not to be used on its own but inside another procedure; the <code>NULL</code> check should be made in the procedure that uses it. For example, a procedure that inserts into a threaded binary search tree first finds whether the new value is to be inserted to the right or to the left. In place of the single assignment of an ordinary tree, it calls <code>insert_right</code> or <code>insert_left</code>. At that point <code>parent</code> is already a real node. But if the procedure is to be part of a library and anyone can call it directly, the check should go into the procedure. If no check is made, this should be written in the comment: "<code>parent</code> and <code>child</code> must not be <code>NULL</code>". A defensive wrapper for a general-purpose procedure can be written like this:</p>
+
+<pre class="nt-code"><code>#include &lt;assert.h&gt;
+<span class="kw">void</span> insert_right_checked(thread_ptr parent, thread_ptr child) {
+  <span class="cm">// parent and child must not be NULL; child must not be in a tree yet</span>
+  assert(parent != <span class="kw">NULL</span> &amp;&amp; child != <span class="kw">NULL</span>);
+  insert_right(parent, child);
+}</code></pre>
+
+<p><code>assert</code> stops the program, with the file name and line number, if its condition is false. It catches programmer errors early and is very valuable during testing. It is removed in a build compiled with <code>NDEBUG</code> defined; so it is used not for errors that user input could cause but for situations of the "this must never happen" kind. For user errors, returning an error code is more appropriate.</p>
+
+<p><b>Comments.</b> A comment should say what the code intends to do and should not repeat the code itself.</p>
+
+<pre class="nt-code"><code><span class="cm">/* BAD: repeats the code */</span>
+<span class="kw">if</span> (!child-&gt;right_thread)  <span class="cm">// right thread FALSE?</span>
+<span class="cm">/* GOOD: states the intent */</span>
+<span class="kw">if</span> (!child-&gt;right_thread)  <span class="cm">// did parent have a subtree?</span></code></pre>
+
+<p>A comment like "is the right thread <code>FALSE</code>" tells the reader nothing new; the same information is written in the code. "Does the parent have a subtree" states the intent. With intent and code side by side, the reader can compare the two and say: "what it wants to do is right, but the code is wrong." Debugging becomes easier this way. The lecture stresses this point: a later reader should not say "I already know that"; comments should say something different from what the code says.</p>
+
+<p><b>One procedure.</b> It was possible to write a separate procedure for each case: <code>insert_right_no_subtree</code>, <code>insert_right_with_subtree</code>, <code>insert_left_no_subtree</code>, <code>insert_left_with_subtree</code>. That would fragment the code; the user would have to decide each time which procedure to call. Reducing four procedures to two without adding complexity is good. But the opposite extreme must be avoided as well. Squeezing all the cases into one procedure with nested <code>if</code>s produces unreadable code. In that situation separate procedures are better. The success of <code>insert_right</code> comes from defining the common work of the two cases in a common form: copying the thread flag from the parent covers both cases in a single assignment. The method can be summarized like this: first analyze the three or five different cases; then determine the name, return value, and parameters of the procedure; write the common work in a common form. The result is simple, readable, and easily maintained code. The lecture regards these principles as the foundation of software engineering and reminds us that learning them takes years.</p>
+
+<p><b>Vigilance.</b> When writing threaded tree code one must ask on every line: "I am doing this, but am I doing it correctly?" The code for Case 1 is flawless for Case 1 and silently corrupts the tree in Case 2. After the first six assignments of <code>insert_right</code> the tree looks correct, but one thread is still wrong. Such errors are caught only by trying every case separately and by traversing both forward and backward.</p>
+
+<h2 class="nt-pb" id="s12-5"><span class="nt-num">12.5</span>Gains, costs, and a complexity summary</h2>
+
+<p>What a threaded tree gives and takes away can be collected in two lists. Gains: the traversal is done without a stack and with <span class="m">O(1)</span> extra memory; the move from any node to its successor or predecessor takes at most <span class="m">O(h)</span> and amortized <span class="m">O(1)</span> within a traversal; the empty fields are not wasted. Costs: two flags are kept in every node; insertion and deletion become more intricate; every procedure that touches the tree has to respect the threads. <a href="#tab-ozet">Table 12.13</a> gives the costs of the procedures of this chapter together.</p>
+
+<div class="nt-tablewrap" id="tab-ozet">
+<table class="nt-table">
+  <caption>Table 12.13: Complexity summary. <span class="m">n</span> is the number of nodes and <span class="m">h</span> is the height of the tree.</caption>
+  <thead><tr><th scope="col">Operation</th><th scope="col">Time</th><th scope="col">Extra memory</th><th scope="col">Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>insucc</code></td><td>O(h) worst case</td><td>O(1)</td><td>O(1) if there is a right thread</td></tr>
+    <tr><td><code>inpred</code></td><td>O(h) worst case</td><td>O(1)</td><td>O(1) if there is a left thread</td></tr>
+    <tr><td><code>tinorder</code></td><td>Θ(n)</td><td>O(1)</td><td>at most 2n + 1 pointers; no stack or recursion</td></tr>
+    <tr><td>threaded preorder traversal</td><td>Θ(n)</td><td>O(1)</td><td>with the same threads</td></tr>
+    <tr><td><code>insert_right</code> / <code>insert_left</code></td><td>O(h)</td><td>O(1)</td><td>successor or predecessor search; O(1) in Case 1</td></tr>
+    <tr><td><code>threaded_tree_free</code></td><td>Θ(n)</td><td>O(1)</td><td>freeing by traversal</td></tr>
+    <tr><td>Morris traversal (flagless)</td><td>Θ(n)</td><td>O(1)</td><td>temporary threads; the tree changes during the traversal</td></tr>
+    <tr><td>recursive inorder (for comparison)</td><td>Θ(n)</td><td>O(h)</td><td>call stack</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s12-6"><span class="nt-num">12.6</span>Common mistakes</h2>
+
+<ol>
+  <li><b>Treating a pointer as a real child without looking at the flag.</b> In a threaded tree no pointer is <code>NULL</code>. A loop that descends until <code>NULL</code> never stops; it goes around the ring through the threads and the head. Every descent is checked with <code>left_thread</code> or <code>right_thread</code>.</li>
+  <li><b>Forgetting the header node.</b> In a tree without a header, the left thread of the first node and the right thread of the last node are left dangling. If <code>NULL</code> is written into them, the traversal procedures need special cases; if nothing is written, garbage values are followed.</li>
+  <li><b>Not updating the left thread of the successor in the second case of right insertion.</b> Forward traversal still gives the right result and the bug stays hidden; a procedure that looks for a predecessor or traverses backwards goes to the wrong node.</li>
+  <li><b>Writing <code>child-&gt;right_thread</code> as a constant <code>TRUE</code>.</b> In the second case the right subtree of the parent is treated as a thread, and the left part of that subtree drops out of the traversal. In the example, E is lost.</li>
+  <li><b>Forgetting the <code>left_thread</code> of the header in an empty tree.</b> In an empty tree the left of the header is itself and its flag is <code>TRUE</code>. A search that takes <code>L-&gt;left_child</code> for the root without looking at this flag reads the data of the header as if it were a real value.</li>
+  <li><b>Mixing up upper and lower case.</b> C is case-sensitive: <code>parent-&gt;Right_child</code> or <code>parent-&gt;Right_thread</code> does not compile, because the field of the structure is <code>right_child</code>. Note also that the threaded structure uses <code>left_child</code> while the ordinary structure uses <code>left</code>.</li>
+  <li><b>Breaking the order of the assignments.</b> If the line <code>parent-&gt;right_child = child</code> is written before <code>child-&gt;right_child = parent-&gt;right_child</code>, the old successor of the parent is lost and the child points to itself.</li>
+  <li><b>Calling <code>free</code> first when freeing the tree.</b> If the successor is looked up after the node has been freed, freed memory is read. First the successor is found, then the node is freed.</li>
+</ol>
+
+<h2 class="nt-pb" id="s12-7"><span class="nt-num">12.7</span>Exercises and solutions</h2>
+
+<h3 id="s12-7-1"><span class="nt-num">12.7.1</span>Drawing the threads of a tree</h3>
+
+<p><b>Question.</b> Draw the threads of the tree A(B(D, E), C(–, F)); how many threads are there?</p>
+
+<p><b>Solution.</b> The inorder sequence is <code>D B E A C F</code>. The tree has 6 nodes; by <a href="#teorem-null">Theorem 12.1</a> there are <span class="m">6 + 1 = 7</span> empty fields, that is, 7 threads. The threads were given one by one in <a href="#ornek-kurma">Example 12.2</a>: D → head, D → B, E → B, E → A, C → A, F → C, F → head. Two of them go to the head. The solution was also checked with a program that builds the tree and counts the flags.</p>
+
+<h3 id="s12-7-2"><span class="nt-num">12.7.2</span>Finding the predecessor</h3>
+
+<p><b>Question.</b> Write the procedure <code>inpred</code> that finds the inorder predecessor.</p>
+
+<p><b>Solution.</b> The procedure is the mirror image of finding the successor and was given in the section on <a href="#s12-4-5">inserting on the left</a>. If the left flag is <code>TRUE</code>, the left pointer points directly to the predecessor. Otherwise we start from the left child and go right until the right flag is <code>TRUE</code>. In the running example the predecessor of A is found like this: <code>p</code> = B; the right flag of B is <code>FALSE</code>, <code>p</code> = E; the right flag of E is <code>TRUE</code>; the result is E.</p>
+
+<h3 id="s12-7-3"><span class="nt-num">12.7.3</span>Traversing backwards</h3>
+
+<p><b>Question.</b> Write the procedure that traverses a threaded tree backwards in inorder (<code>G C F A …</code>).</p>
+
+<p><b>Solution.</b> Start from the header and move from predecessor to predecessor until we return to the header:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> reverse_tinorder(thread_ptr L) {
+  thread_ptr p = L;
+  <span class="kw">for</span> (;;) {
+    p = inpred(p);
+    <span class="kw">if</span> (p == L) <span class="kw">break</span>;
+    printf("%c ", p-&gt;data);
+  }
+}</code></pre>
+
+<p>The predecessor of the header is the last node (G); the predecessor of the first node (H) is the header. In the running example the output is <code>G C F A E B I D H</code>. The time is <span class="m">Θ(n)</span> and the extra memory is <span class="m">O(1)</span>; the justification is the mirror image of <a href="#teorem-gezinme">Theorem 12.3</a>.</p>
+
+<h3 id="s12-7-4"><span class="nt-num">12.7.4</span>The first node of an empty tree</h3>
+
+<p><b>Question.</b> Is it correct to insert the first node into an empty tree (only the header) with <code>insert_left(head, x)</code>?</p>
+
+<p><b>Solution.</b> It is correct. The left pointer of the header points to itself and its left flag is <code>TRUE</code>. <code>insert_left</code> carries these two over to the child: the left of the child points to the head and is a thread. The right of the child also points to the parent, that is, the head, and is <code>TRUE</code>. The left of the header is redirected to the child and its left flag becomes <code>FALSE</code>. Because the left flag of the child is <code>TRUE</code>, the <code>if</code> block does not run. In the end both threads of the single node point to the head; this is exactly the arrangement in <a href="#tanim-baslik">Definition 12.3</a>.</p>
+
+<h3 id="s12-7-5"><span class="nt-num">12.7.5</span>Why postorder is hard</h3>
+
+<p><b>Question.</b> Why is postorder traversal hard with threads? What extra information makes the job easier?</p>
+
+<p><b>Solution.</b> The postorder successor of a node depends on its parent. If the node is the right child of its parent, or the parent has no right subtree, the successor is the parent; otherwise the successor is the first node in postorder in the right subtree of the parent. In both cases we must know who the parent is and which of its children the node is. Threads point to the inorder predecessor and successor; these do not always coincide with the parent. Adding a parent pointer to each node supplies this information directly, and the postorder successor is found in a constant number of steps and one descent.</p>
+
+<h3 id="s12-7-6"><span class="nt-num">12.7.6</span>Inserting into a threaded binary search tree</h3>
+
+<p><b>Question.</b> Write the insertion procedure for a threaded binary search tree using <code>insert_right</code> and <code>insert_left</code>.</p>
+
+<p><b>Solution.</b> The search is as in an ordinary binary search tree; the only difference is that we stop when the flag of the direction to descend is <code>TRUE</code>. At that point <code>insert_left</code> is called if the sought value is smaller than the node, and <code>insert_right</code> if it is larger. The new node is always a leaf; so both procedures run in Case 1 and finish in constant time.</p>
+
+<pre class="nt-code"><code><span class="kw">int</span> threaded_bst_insert(thread_ptr L, <span class="kw">char</span> x) {
+  <span class="cm">// insert x and return 1; return 0 if present</span>
+  thread_ptr p;
+  <span class="kw">if</span> (L-&gt;left_thread) {                  <span class="cm">// tree is empty</span>
+    insert_left(L, new_node(x));
+    <span class="kw">return</span> 1;
+  }
+  p = L-&gt;left_child;                      <span class="cm">// start at the root</span>
+  <span class="kw">for</span> (;;) {
+    <span class="kw">if</span> (x == p-&gt;data) <span class="kw">return</span> 0;
+    <span class="kw">if</span> (x &lt; p-&gt;data) {
+      <span class="kw">if</span> (p-&gt;left_thread) <span class="kw">break</span>;         <span class="cm">// no left child</span>
+      p = p-&gt;left_child;
+    } <span class="kw">else</span> {
+      <span class="kw">if</span> (p-&gt;right_thread) <span class="kw">break</span>;         <span class="cm">// no right child</span>
+      p = p-&gt;right_child;
+    }
+  }
+  <span class="kw">if</span> (x &lt; p-&gt;data) insert_left(p, new_node(x));
+  <span class="kw">else</span>             insert_right(p, new_node(x));
+  <span class="kw">return</span> 1;
+}</code></pre>
+
+<p>If the tree is empty (the left flag of the header is <code>TRUE</code>), the first node is inserted on the left of the header; the previous exercise showed that this is correct. The procedure was called in the order <code>M F T B H P X K</code>; then <code>H</code> was to be inserted once more and 0 was returned. The inorder traversal wrote <code>B F H K M P T X</code> and the reverse traversal wrote <code>X T P M K H F B</code>. The search takes <span class="m">O(h)</span> and the insertion <span class="m">O(1)</span>; the total is <span class="m">O(h)</span>.</p>
+
+<h2 class="nt-pb" id="s12-8"><span class="nt-num">12.8</span>Summary</h2>
+
+<ul>
+  <li>In a binary tree with <span class="m">n</span> nodes, <span class="m">n − 1</span> of the <span class="m">2n</span> pointers are filled; the remaining <span class="m">n + 1</span> fields are empty.</li>
+  <li>In a threaded binary tree an empty left pointer is tied to the inorder predecessor and an empty right pointer to the inorder successor. These pointers are called threads.</li>
+  <li>The flags <code>left_thread</code> and <code>right_thread</code> distinguish real links from threads. If the field order is chosen well, the flags fit into padding bytes on a 64-bit machine.</li>
+  <li>The header node collects the two dangling threads; the root is at <code>L-&gt;left_child</code>, and the right of the header is itself. In an empty tree the left flag of the header is <code>TRUE</code>.</li>
+  <li>Successor: if the right flag is <code>TRUE</code>, the right pointer directly; otherwise the leftmost node of the right subtree. The predecessor is the mirror image.</li>
+  <li>Threaded inorder traversal follows at most <span class="m">2n + 1</span> pointers: <span class="m">Θ(n)</span> time and <span class="m">O(1)</span> extra memory. Preorder traversal can be done with the same threads; postorder needs parent information.</li>
+  <li>The Morris traversal traverses without flags, by building and removing threads temporarily, in <span class="m">O(n)</span> time and <span class="m">O(1)</span> memory; because the tree is modified during the traversal, it is not suitable for concurrent reads.</li>
+  <li><code>insert_right</code> merges the two cases into one procedure by copying the thread flag from the parent; in the second case the child is made the predecessor of the old successor of the parent. <code>insert_left</code> is its mirror image.</li>
+  <li>Good code: a clearly defined procedure, comments that state the intent, the NULL check in the right place, and a single procedure in which common work is written in a common form.</li>
+</ul>
+
+<h2 id="s12-9"><span class="nt-num">12.9</span>Key terms</h2>
+
+
+<ul class="nt-concepts">
+  <li>null pointer</li>
+  <li>thread</li>
+  <li>threaded binary tree</li>
+  <li>predecessor</li>
+  <li>successor</li>
+  <li>header node</li>
+  <li>inorder</li>
+  <li>preorder</li>
+  <li>postorder</li>
+  <li>traversal</li>
+  <li>Morris traversal</li>
+  <li>call stack</li>
+  <li>skewed tree</li>
+  <li>height</li>
+  <li>amortized analysis</li>
+  <li>self-referential struct</li>
+  <li>binary search tree</li>
+</ul>
+
+<h2 id="s12-10"><span class="nt-num">12.10</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>A binary tree with 15 nodes is being turned into a threaded tree. How many threads are built, and how many go to the header?</p>
+    <details><summary>Answer</summary>
+      <p>The number of empty fields is <span class="m">15 + 1 = 16</span>, so 16 threads are built. Whatever the shape of the tree, only two go to the header: the left thread of the first node and the right thread of the last node.</p>
+    </details>
+  </li>
+  <li>
+    <p>In the running example, which node does <code>insucc(B)</code> return? How many times does the loop run?</p>
+    <details><summary>Answer</summary>
+      <p>It returns E. The right flag of B is <code>FALSE</code> and <code>p</code> becomes E. Because the left flag of E is <code>TRUE</code>, the loop is never entered: 0 iterations.</p>
+    </details>
+  </li>
+  <li>
+    <p>In the running example, which node does <code>presucc(I)</code> return?</p>
+    <details><summary>Answer</summary>
+      <p>E. Because the left flag of I is <code>TRUE</code>, the right threads are followed: I → B. The right flag of B is <code>FALSE</code>; the loop ends and the right child of B, E, is returned.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>insert_right(E, Y)</code> is applied to the running example. Which case is it? Where do the threads of Y point, and what is the new inorder sequence?</p>
+    <details><summary>Answer</summary>
+      <p>E is a leaf; it has no right subtree, so this is the first case. The left thread of Y points to E and its right thread to A, the old successor of E. The sequence becomes <code>H D I B E Y A F C G</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>insert_right(A, Y)</code> is applied to the running example. Whose thread changes?</p>
+    <details><summary>Answer</summary>
+      <p>This is the second case; the right subtree of A (C) becomes the right subtree of Y. The successor of Y is F, the leftmost node of C. The left thread of F points to Y instead of A. The sequence becomes <code>H D I B E A Y F C G</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>In a left-skewed threaded tree of 1000 nodes, how many pointers does <code>insucc(head)</code> follow? How many does the whole traversal follow?</p>
+    <details><summary>Answer</summary>
+      <p>The first call descends from the header to the root and then, through 999 left links, to the bottom node: together with the read in line 3, 1001 pointers. The whole traversal follows <span class="m">2n + 1 = 2001</span> pointers; this is the case that reaches the bound of <a href="#teorem-gezinme">Theorem 12.3</a> exactly.</p>
+    </details>
+  </li>
+  <li>
+    <p>How many temporary threads does the Morris traversal build on the tree A(B(D, E), C)? What does this number equal in general?</p>
+    <details><summary>Answer</summary>
+      <p>Two: E → A and D → B. One thread is built for each node with a left child, and the same thread is removed later.</p>
+    </details>
+  </li>
+  <li>
+    <p>In <code>insert_right</code>, if line 10 (<code>parent-&gt;right_thread = FALSE</code>) is deleted, in which case does the tree break?</p>
+    <details><summary>Answer</summary>
+      <p>In the first case, but insidiously. The flag of the parent stays <code>TRUE</code>. Inorder traversal still gives the right result, because the right pointer taken for a "thread" already points to the child, that is, to the successor of the parent. The other procedures skip the child. When C is inserted on the right of the tree A(B, –), the inorder traversal writes <code>B A C</code>; the preorder traversal writes <code>A B</code> and the backward traversal writes <code>A B</code>. C is lost. In the second case no harm is done, because the flag is already <code>FALSE</code>.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s12-11"><span class="nt-num">12.11</span>Further reading</h2>
+
+<ul>
+  <li>E. Horowitz, S. Sahni, and S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em>, 2nd ed., Section 5.5. The structure of these notes, the <code>insert_right</code> procedure, and the layout of the header node follow the treatment there.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming</em>, Volume 1, Section 2.3.1. Threaded trees, finding the successor, and the algorithms for insertion into a threaded tree are presented with proofs and exercises.</li>
+  <li>J. M. Morris, "Traversing binary trees simply and cheaply", <em>Information Processing Letters</em> 9(5), 1979. This is the short original paper on flagless traversal with temporary threads.</li>
+</ul>
+
+<h2 id="s12-12"><span class="nt-num">12.12</span>References</h2>
+
+<ol class="nt-refs">
+  <li>E. Horowitz, S. Sahni, S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em>, 2nd ed., Silicon Press, 2008. Section 5.5, Threaded Binary Trees.</li>
+  <li>A. J. Perlis, C. Thornton, "Symbol manipulation by threaded lists", <em>Communications of the ACM</em> 3(4), 1960.</li>
+  <li>J. M. Morris, "Traversing binary trees simply and cheaply", <em>Information Processing Letters</em> 9(5), 1979.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming</em>, Volume 1: Fundamental Algorithms, 3rd ed., Addison-Wesley, 1997. Section 2.3.1.</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_12_Threaded_Binary_Trees.html">Chapter 12 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

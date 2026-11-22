@@ -1,0 +1,1341 @@
+---
+layout: without-sidebar
+title: "Chapter 6: Stacks — Lecture Notes"
+permalink: /files/dsa_c/notes/Chapter_06_Stacks_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 6 of Data Structures and Algorithms with C: the stack and LIFO, the stack abstract data type, array stacks (the top index, overflow and underflow, ++*top versus (*top)--), designing with a struct and an opaque type, linked stacks (malloc, free, leaks), growable arrays and amortized analysis, the call stack and stack overflow, multiple stacks, and which output orders a stack can produce; with memory diagrams, C code, and code traces."
+lang: en
+seo_title: "Chapter 6: Stacks · DSA with C Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/c-ile-veri-yapilari-ve-algoritmalar.jpg
+hreflang:
+  tr: /files/dsa_c/notlar/Bolum_06_Yiginlar_Ders_Notu.html
+  en: /files/dsa_c/notes/Chapter_06_Stacks_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Data Structures and Algorithms with C"
+  url: "/teaching/data-structures-and-algorithms-with-c/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Data Structures and Algorithms with C · Lecture Notes</p>
+  <h1>Chapter 6: Stacks</h1>
+  <p class="nt-lead">A stack is the simplest linear structure: items are inserted and deleted at one end only, and the item added last is the first to leave. At first glance this restriction looks like a weakness. Yet whenever a problem obeys the rule "the task opened last is closed first," the stack is exactly the right tool: function calls, bracket matching, the undo command, and backtracking all follow that rule. These notes first define the stack as an abstract data type. They then implement the same interface in three ways: with a fixed array and a <code>top</code> index, with an array that grows on demand, and with a linked list. For each implementation, diagrams show what happens in memory and trace tables follow every line of code. The last sections cover the computer's own stack, the call stack, then keeping several stacks in a single memory array, and finally which output orders a stack can produce.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_06_Stacks.html">Slides</a></li>
+    <li><a href="../slides/Chapter_06_Stacks_Study_Questions.html">Study questions</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/dsa_c/pdf/Chapter_06_Stacks.pdf">Slides PDF</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Define LIFO</dt>
+    <dd>Define a stack as a list <span class="m">S = {a<sub>0</sub>, …, a<sub>n−1</sub>}</span>, identify its bottom and top items, and find the state of a stack after a sequence of operations.</dd>
+    <dt>Implement it with an array</dt>
+    <dd>Write push and pop routines around a <code>top</code> index; check for overflow and underflow; explain the difference between <code>++*top</code> and <code>*top--</code>.</dd>
+    <dt>Build a linked stack</dt>
+    <dd>Allocate nodes with <code>malloc</code> and link them, release popped nodes with <code>free</code>, and empty the stack without leaking memory.</dd>
+    <dt>Understand the call stack</dt>
+    <dd>Explain how function calls behave like a stack, how each call pushes a frame, and why the call stack overflows.</dd>
+    <dt>Make a design decision</dt>
+    <dd>Choose among a fixed array, a growable array, and a linked list by time, memory, and risk of bugs; justify the amortized cost.</dd>
+    <dt>Manage multiple stacks</dt>
+    <dd>Share one memory array among <span class="m">n</span> stacks with the arrays <code>top[i]</code> and <code>boundary[i]</code>, and recognize the limits of this scheme.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s6-1">6.1 The stack: last in, first out</a>
+      <ol>
+        <li><a href="#s6-1-1">6.1.1 Definition</a></li>
+        <li><a href="#s6-1-2">6.1.2 How a stack grows and shrinks</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-2">6.2 The stack abstract data type</a>
+      <ol>
+        <li><a href="#s6-2-1">6.2.1 Operations and preconditions</a></li>
+        <li><a href="#s6-2-2">6.2.2 Where stacks are used</a></li>
+        <li><a href="#s6-2-3">6.2.3 Checking balanced brackets</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-3">6.3 Array-based stack</a>
+      <ol>
+        <li><a href="#s6-3-1">6.3.1 The <code>top</code> index, overflow, and underflow</a></li>
+        <li><a href="#s6-3-2">6.3.2 C definitions</a></li>
+        <li><a href="#s6-3-3">6.3.3 <code>push</code> and <code>pop</code></a></li>
+        <li><a href="#s6-3-4">6.3.4 The precedence trap: <code>*</code> with <code>++</code> and <code>--</code></a></li>
+        <li><a href="#s6-3-5">6.3.5 Code trace</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-4">6.4 Designing the stack as an object</a>
+      <ol>
+        <li><a href="#s6-4-1">6.4.1 A <code>struct</code> instead of a global array</a></li>
+        <li><a href="#s6-4-2">6.4.2 Code trace: <code>push</code> and <code>pop</code> returning <code>bool</code></a></li>
+        <li><a href="#s6-4-3">6.4.3 Interface and implementation</a></li>
+        <li><a href="#s6-4-4">6.4.4 Reversing a string with a stack</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-5">6.5 Linked stack</a>
+      <ol>
+        <li><a href="#s6-5-1">6.5.1 Why the top is the head of the list</a></li>
+        <li><a href="#s6-5-2">6.5.2 Linked <code>push</code></a></li>
+        <li><a href="#s6-5-3">6.5.3 Linked <code>pop</code></a></li>
+        <li><a href="#s6-5-4">6.5.4 Memory ownership and emptying the stack</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-6">6.6 Array-based or linked?</a>
+      <ol>
+        <li><a href="#s6-6-1">6.6.1 The growable array</a></li>
+        <li><a href="#s6-6-2">6.6.2 Amortized cost</a></li>
+        <li><a href="#s6-6-3">6.6.3 Comparison and measurements</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-7">6.7 The call stack</a>
+      <ol>
+        <li><a href="#s6-7-1">6.7.1 The frame</a></li>
+        <li><a href="#s6-7-2">6.7.2 How the call stack overflows</a></li>
+        <li><a href="#s6-7-3">6.7.3 Turning recursion into a loop</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-8">6.8 Multiple stacks</a>
+      <ol>
+        <li><a href="#s6-8-1">6.8.1 Two stacks in one array</a></li>
+        <li><a href="#s6-8-2">6.8.2 <span class="m">n</span> stacks in one memory</a></li>
+        <li><a href="#s6-8-3">6.8.3 Code trace</a></li>
+        <li><a href="#s6-8-4">6.8.4 Making room and evaluation</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-9">6.9 Which output orders are possible?</a></li>
+    <li><a href="#s6-10">6.10 Complexity summary</a></li>
+    <li><a href="#s6-11">6.11 Common mistakes</a></li>
+    <li><a href="#s6-12">6.12 Exercises and solutions</a>
+      <ol>
+        <li><a href="#s6-12-1">6.12.1 A <code>push</code> that returns an error</a></li>
+        <li><a href="#s6-12-2">6.12.2 Two stacks in one array</a></li>
+        <li><a href="#s6-12-3">6.12.3 A linked stack that knows its size</a></li>
+        <li><a href="#s6-12-4">6.12.4 Reversing a string with a stack</a></li>
+        <li><a href="#s6-12-5">6.12.5 The bottom item</a></li>
+        <li><a href="#s6-12-6">6.12.6 Number of frames in a <code>fact(5)</code> call</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6-13">6.13 Summary</a></li>
+    <li><a href="#s6-14">6.14 Key terms</a></li>
+    <li><a href="#s6-15">6.15 Test Yourself</a></li>
+    <li><a href="#s6-16">6.16 Further reading</a></li>
+    <li><a href="#s6-17">6.17 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s6-1"><span class="nt-num">6.1</span>The stack: last in, first out</h2>
+
+<p>Arrays and linked lists allow access to items anywhere. In an array we can write to any index; in a list we can insert a node after any node. A stack deliberately restricts this freedom. Items enter at one end only and leave from the same end. This section defines the stack and shows how it grows and shrinks over a sequence of operations.</p>
+
+<h3 id="s6-1-1"><span class="nt-num">6.1.1</span>Definition</h3>
+
+<p>Everyday life offers many stack-like arrangements. From a pile of plates in the kitchen we take the top plate first. A new document on a desk goes on top of the pile and is read first. <a href="#sekil-sokak">Figure 6.1</a> gives a more instructive example: a dead-end street one car wide, closed by a wall at one end. Cars have entered the street in the order A, B, C, D. The first car that can leave is D, the one nearest the entrance. For A to leave, D must leave first, then C, then B. Because one end is closed, cars must leave in the reverse of the order in which they entered.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sokak" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 140" role="img" aria-label="Dead-end street one car wide: cars enter and leave at the same end"><defs><marker id="n6-d04-ah1-s02_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box-empty" x="20" y="30" width="520" height="70" style="stroke-dasharray:6 4"/><rect class="box" x="540" y="20" width="12" height="90"/><text class="lbl" x="560" y="70" text-anchor="start">wall</text><text class="lbl" x="20" y="20" text-anchor="start">entrance / exit (one end)</text><path class="line" d="M140 125 L40 125" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah1-s02_00-1)"/><text class="lbl" x="150" y="129" text-anchor="start">the car that leaves first is the nearest</text><rect class="box" x="440" y="45" width="88" height="40" rx="10"/><text class="txt" x="484" y="71" text-anchor="middle">A</text><rect class="box" x="340" y="45" width="88" height="40" rx="10"/><text class="txt" x="384" y="71" text-anchor="middle">B</text><rect class="box" x="240" y="45" width="88" height="40" rx="10"/><text class="txt" x="284" y="71" text-anchor="middle">C</text><rect class="box" x="140" y="45" width="88" height="40" rx="10" style="fill:var(--ds-hot)"/><text class="txt" x="184" y="71" text-anchor="middle">D</text></svg></div>
+  <figcaption><b>Figure 6.1:</b> A one-car-wide dead-end street. Cars enter and leave at the same end. D, the last to enter, is nearest the entrance and must leave first; A, the first to enter, leaves last.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--tanim" id="tanim-yigin">
+  <span class="nt-box__title">Definition 6.1</span>
+  <p>A <strong>stack</strong> is an ordered list in which insertion and deletion take place at one end only. In a stack <span class="m">S = {a<sub>0</sub>, a<sub>1</sub>, …, a<sub>n−1</sub>}</span>, the <strong>bottom</strong> item is <span class="m">a<sub>0</sub></span> and the <strong>top</strong> item is <span class="m">a<sub>n−1</sub></span>. Item <span class="m">a<sub>i</sub></span> sits on top of <span class="m">a<sub>i−1</sub></span> (<span class="m">0 &lt; i &lt; n</span>). A new item is always placed above <span class="m">a<sub>n−1</sub></span>, and the item removed is always the current top. The first item out is therefore the last one in. This principle is called <strong>last in, first out</strong> (<strong>LIFO</strong>).</p>
+</div>
+
+<p>The key word in the definition is "only." The items inside a stack are ordered, but from outside that order can be touched at a single point. Adding an item is called <strong>push</strong> and removing the top item is called <strong>pop</strong>. These are the standard names, and the notes use them throughout. Some textbooks, including Horowitz and Sahni, call the same operations <em>add</em> and <em>delete</em>.</p>
+
+<p>Be careful not to confuse the word "stack" with two other things that share its name or spelling. The <em>call stack</em> (Section 6.7) is the stack the system uses to run function calls. The <em>heap</em> is the region of memory from which <code>malloc</code> allocates blocks, and it is also the name of the priority-queue data structure studied in a later chapter. None of these is related to the others except by name. In this chapter, "stack" means the abstract LIFO structure unless the call stack is mentioned explicitly.</p>
+
+<h3 id="s6-1-2"><span class="nt-num">6.1.2</span>How a stack grows and shrinks</h3>
+
+<p>Push A, B, C, D, and E, in that order, onto an empty stack. Keep the stack in an array and store the index of the top item in a variable named <code>top</code>. In an empty stack <code>top</code> is −1. Each push increments <code>top</code> by one and writes the new item at that index. <a href="#sekil-buyume">Figure 6.2</a> shows three moments in this process, followed by the first deletion.</p>
+
+<figure class="nt-fig" id="sekil-buyume" style="--w:300px">
+  <div class="nt-fig__box"><div class="nt-fig__row"><svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Stack: A pushed"><defs><marker id="n6-d04-ah2-s03_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box-empty" x="70" y="98" width="70" height="26"/><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box-empty" x="70" y="72" width="70" height="26"/><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box-empty" x="70" y="46" width="70" height="26"/><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box-empty" x="70" y="20" width="70" height="26"/><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 137 L146 137" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah2-s03_00-1)"/><text class="txt mono" x="190" y="142" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 0</text><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">A pushed</text></svg> <svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Stack: C pushed"><defs><marker id="n6-d04-ah4-s03_02-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box" x="70" y="98" width="70" height="26"/><text class="txt mono" x="105" y="116" text-anchor="middle">B</text><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box" x="70" y="72" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="105" y="90" text-anchor="middle">C</text><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box-empty" x="70" y="46" width="70" height="26"/><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box-empty" x="70" y="20" width="70" height="26"/><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 85 L146 85" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah4-s03_02-1)"/><text class="txt mono" x="190" y="90" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 2</text><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">C pushed</text></svg> <svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Stack: E pushed"><defs><marker id="n6-d04-ah6-s03_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box" x="70" y="98" width="70" height="26"/><text class="txt mono" x="105" y="116" text-anchor="middle">B</text><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box" x="70" y="72" width="70" height="26"/><text class="txt mono" x="105" y="90" text-anchor="middle">C</text><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box" x="70" y="46" width="70" height="26"/><text class="txt mono" x="105" y="64" text-anchor="middle">D</text><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box" x="70" y="20" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="105" y="38" text-anchor="middle">E</text><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 33 L146 33" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah6-s03_04-1)"/><text class="txt mono" x="190" y="38" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 4</text><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">E pushed</text></svg> <svg class="ds-svg" viewBox="0 0 360 180" role="img" aria-label="Stack: E popped"><defs><marker id="n6-d04-ah7-s03_05-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n6-d04-ah8-s03_05-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="70" y="124" width="70" height="26"/><text class="txt mono" x="105" y="142" text-anchor="middle">A</text><text class="lbl" x="64" y="141" text-anchor="end">[0]</text><rect class="box" x="70" y="98" width="70" height="26"/><text class="txt mono" x="105" y="116" text-anchor="middle">B</text><text class="lbl" x="64" y="115" text-anchor="end">[1]</text><rect class="box" x="70" y="72" width="70" height="26"/><text class="txt mono" x="105" y="90" text-anchor="middle">C</text><text class="lbl" x="64" y="89" text-anchor="end">[2]</text><rect class="box" x="70" y="46" width="70" height="26"/><text class="txt mono" x="105" y="64" text-anchor="middle">D</text><text class="lbl" x="64" y="63" text-anchor="end">[3]</text><rect class="box-empty" x="70" y="20" width="70" height="26"/><text class="lbl" x="64" y="37" text-anchor="end">[4]</text><path class="line" d="M186 59 L146 59" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah7-s03_05-1)"/><text class="txt mono" x="190" y="64" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 3</text><rect class="box-empty" x="250" y="10" width="60" height="28" style="stroke:var(--ds-bad);stroke-dasharray:4 3"/><text class="txt" x="280" y="29" text-anchor="middle" style="fill:var(--ds-bad)">E</text><path class="line" d="M250 28 L150 60" style="stroke:var(--ds-bad);stroke-dasharray:5 4;" marker-end="url(#n6-d04-ah8-s03_05-1)"/><text class="txt" x="105" y="172" text-anchor="middle" style="font-size:14px">E popped</text></svg></div></div>
+  <figcaption><b>Figure 6.2:</b> Three moments while A, B, C, D, E are pushed onto an empty stack, and the first deletion. After A is pushed, <code>top</code> = 0; after C, <code>top</code> = 2; after E, <code>top</code> = 4. Deletion happens only at the top: the first item out is E, the most recently added, and <code>top</code> drops back to 3; the top item is now D.</figcaption>
+</figure>
+
+<p>After every push the top item changes: after A is pushed the top is A, after B is pushed it is B, and so on. When E has been pushed, the stack holds five items and <code>top</code> is 4. The number of items is always <code>top + 1</code>. The first deletion that follows returns E, because E is on top. Had all items been popped one by one, the output order would have been E, D, C, B, A, which is exactly the reverse of the input order.</p>
+
+<p>An item in the middle of the stack, say B, cannot be reached directly. To get B, the items above it, C, D, and E, must be popped first. This restriction is not a defect but a contract. A program that uses a stack is dealing with a problem in which the rule "the task opened last is closed first" holds. Because the structure permits nothing but that rule, the program stays simple and mistakes become harder to make. Wherever a stack is used, this rule is at work.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-islem-dizisi">
+  <span class="nt-box__title">Example 6.1</span>
+  <p>The following operations are applied to an empty stack: push(3), push(8), pop, push(5), push(1), pop, pop, push(9). After each step, the stack (bottom to top) and the item popped are:</p>
+  <ol>
+    <li>push(3): [3]</li>
+    <li>push(8): [3, 8]</li>
+    <li>pop: 8 comes out; [3]</li>
+    <li>push(5): [3, 5]</li>
+    <li>push(1): [3, 5, 1]</li>
+    <li>pop: 1 comes out; [3, 5]</li>
+    <li>pop: 5 comes out; [3]</li>
+    <li>push(9): [3, 9]</li>
+  </ol>
+  <p>The items popped are 8, 1, 5, in that order. At the end the stack holds two items; the bottom item is 3, the top item is 9, and in an array implementation <code>top</code> = 1. The item 3 is never popped, because it stays at the very bottom throughout the sequence.</p>
+</div>
+
+<h2 class="nt-pb" id="s6-2"><span class="nt-num">6.2</span>The stack abstract data type</h2>
+
+<p>Asking first what a data structure does and only then how it does it makes a program easier to change. An <strong>abstract data type</strong> (<strong>ADT</strong>) defines a set of values and the operations on those values, independently of how they are implemented. The stack ADT says which operations a stack offers and under what conditions they fail. It does not say whether the stack is built from an array or a list.</p>
+
+<h3 id="s6-2-1"><span class="nt-num">6.2.1</span>Operations and preconditions</h3>
+
+<p><a href="#tab-adt">Table 6.1</a> lists the six operations of the stack ADT. The words <code>push</code>, <code>pop</code>, and <code>peek</code> beside the operations are the common names for the same operations.</p>
+
+<div class="nt-tablewrap" id="tab-adt">
+<table class="nt-table">
+  <caption>Table 6.1: The stack abstract data type.</caption>
+  <thead><tr><th scope="col">Operation</th><th scope="col">Meaning</th><th scope="col">Precondition / error</th></tr></thead>
+  <tbody>
+    <tr><td><code>stack_create(max)</code></td><td>Creates an empty stack that holds at most <code>max</code> items</td><td>—</td></tr>
+    <tr><td><code>stack_full(S)</code></td><td>Returns true if the stack holds <code>max</code> items</td><td>—</td></tr>
+    <tr><td><code>push(S, x)</code></td><td>Puts <code>x</code> on top</td><td>Overflow if the stack is full</td></tr>
+    <tr><td><code>stack_empty(S)</code></td><td>Returns true if the stack holds no items</td><td>—</td></tr>
+    <tr><td><code>pop(S)</code></td><td>Removes and returns the top item</td><td>Underflow if the stack is empty</td></tr>
+    <tr><td><code>stack_top(S)</code> · peek</td><td>Reads the top item without removing it</td><td>Error if the stack is empty</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The two error conditions in the table have names. Trying to add an item to a full stack is called <strong>overflow</strong>; trying to take an item from an empty stack is called <strong>underflow</strong>. Overflow rests on the assumption that a stack has a capacity. The abstract stack on paper is unbounded, but every real memory is finite. That is why the ADT gives <code>stack_create</code> a <code>max</code> value and defines the query <code>stack_full</code>.</p>
+
+<p>Underflow, by contrast, has nothing to do with capacity. An empty stack has no top item, so asking for one is meaningless. The precondition of <code>pop</code> and <code>stack_top</code> is "the stack is not empty." Who checks this precondition is a design decision. The caller can ask <code>stack_empty</code> before every <code>pop</code>. The operation itself can also check and return an error code. The second way is safer, because forgetting the check becomes impossible.</p>
+
+<p>The real value of an ADT is that it separates the code that uses a structure from the code that implements it. The same six operations can be implemented with a fixed array, with an array that grows as needed, or with a linked list. A program that calls only the ADT operations does not change when the implementation changes. These notes build all three implementations in turn and compare the costs of the same operations.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Confusing <code>pop</code> with <code>peek</code>. <code>pop</code> removes the top item and the stack shrinks by one. <code>peek</code> (<code>stack_top</code>) only reads the value of the top item and the stack is unchanged. If a loop that merely inspects the top value calls <code>pop</code> instead of <code>peek</code>, an item disappears at every look.</p>
+</div>
+
+<h3 id="s6-2-2"><span class="nt-num">6.2.2</span>Where stacks are used</h3>
+
+<p>The stack is one of the most widely used structures in computer science. What its applications share is that tasks are opened and closed in a nested fashion: the inner task finishes before the outer one. In each of the following examples, the top of the stack holds "the innermost task that is open right now."</p>
+
+<dl>
+  <dt>Call stack</dt>
+  <dd>Each function call pushes a frame, containing the return address and the local variables, onto the stack. When the function returns, the frame is popped. The function called last finishes first.</dd>
+  <dt>Expression evaluation</dt>
+  <dd>Compilers first convert an infix expression such as <code>a + b * c</code> to postfix notation. The postfix form of this expression is <code>a b c * +</code>. The compiler then evaluates that notation with a stack. In a postfix expression, each number is pushed, and each operator takes the top two values and pushes the result.</dd>
+  <dt>Backtracking</dt>
+  <dd>A program searching for a path through a maze puts each fork on a stack. On reaching a dead end, it returns to the fork on top of the stack, the most recently passed one, and tries another path from there.</dd>
+  <dt>Bracket matching</dt>
+  <dd>Every closing bracket in an expression must match the most recently opened bracket that is still unclosed. The phrase "most recently opened" points straight to a stack.</dd>
+  <dt>Undo</dt>
+  <dd>A text editor puts every action it performs on a stack. The undo command (Ctrl+Z) reverses the action on top of the stack, the most recent one. A second press reverses the action before it.</dd>
+  <dt>Depth-first search</dt>
+  <dd>Depth-first search (DFS) in a graph keeps the nodes to be visited on a stack. This way the search goes as deep as possible along the most recently discovered path.</dd>
+</dl>
+
+<p>The interactive stack tool in the slides demonstrates this rule with a single button. When it pushes four times and then pops four times, the output order is the reverse of the input order. The fifth pop acts on an empty stack and the tool reports it as underflow.</p>
+
+<h3 id="s6-2-3"><span class="nt-num">6.2.3</span>Checking balanced brackets</h3>
+
+<p>One application shows in a few lines of code why the stack is the natural choice. Suppose we ask whether the brackets <code>(</code>, <code>[</code>, and <code>{</code> in a string are balanced. In a balanced string every closing bracket has a matching opener, the types agree, and no bracket is left open at the end. <code>{a[i] = (b + c) * d;}</code> is balanced. <code>([)]</code> is not: the counts are fine, but when <code>)</code> arrives, the most recently opened bracket is <code>[</code>.</p>
+
+<p>The function below uses a <code>Stack</code> type that keeps an array and its top index in one structure. <code>push</code> and <code>pop</code> return success as a <code>bool</code>; <code>pop</code> writes the removed value to the location pointed to by its second argument.</p>
+
+<pre class="nt-code"><code>/* balance check for (, [ and {: each closer must match the latest opener */
+<span class="kw">bool</span> balanced(<span class="kw">const</span> <span class="kw">char</span> *s) {
+    Stack st;  <span class="kw">int</span> opener;
+    stack_init(&amp;st);
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; s[i] != '\0'; i++) {
+        <span class="kw">char</span> c = s[i];
+        <span class="kw">if</span> (c == '(' || c == '[' || c == '{') {
+            <span class="kw">if</span> (!push(&amp;st, c)) <span class="kw">return</span> <span class="kw">false</span>;       /* nested too deep */
+        } <span class="kw">else</span> <span class="kw">if</span> (c == ')' || c == ']' || c == '}') {
+            <span class="kw">if</span> (!pop(&amp;st, &amp;opener)) <span class="kw">return</span> <span class="kw">false</span>;  /* closer with no opener */
+            <span class="kw">if</span> ((c == ')' &amp;&amp; opener != '(') || (c == ']' &amp;&amp; opener != '[') ||
+                (c == '}' &amp;&amp; opener != '{'))
+                <span class="kw">return</span> <span class="kw">false</span>;                     /* types do not match */
+        }
+    }
+    <span class="kw">return</span> stack_empty(&amp;st);                      /* anything left open? */
+}</code></pre>
+
+<p>The function scans the string once from left to right. On seeing an opening bracket, it pushes it. On seeing a closing bracket, it pops the opener from the top of the stack. If the stack is empty at that moment, the closing bracket has no opener and the result is false. If the type of the popped opener does not agree with that of the closer, the result is again false. Characters that are not brackets are skipped. If items remain on the stack when the scan ends, some brackets were never closed, so the function finally returns whether the stack is empty.</p>
+
+<p>The function was tried on these inputs: it returned 1 (true) for <code>{a[i] = (b + c) * d;}</code> and <code>x = f(a[2], {1, 2});</code>, and 0 (false) for <code>([)]</code>, <code>(()</code>, <code>())</code>, and <code>]</code>. The empty string is balanced and returns 1. Each character causes at most one push and one pop. Since push and pop take constant time, a string of <span class="m">n</span> characters takes <span class="m">Θ(n)</span> time. In the worst case every character is an opening bracket and the stack holds <span class="m">n</span> items, so the extra memory is <span class="m">O(n)</span>.</p>
+<h2 class="nt-pb" id="s6-3"><span class="nt-num">6.3</span>Array-based stack</h2>
+
+<p>The shortest way to implement a stack is a one-dimensional array. Cell 0 of the array is the bottom of the stack. Items are laid out upward through cells 1, 2, 3, and so on. The index of the top item is kept in a separate integer variable, <code>top</code>. This section first explains what <code>top</code> means and its two boundary cases, then goes through the C code of Horowitz and Sahni line by line.</p>
+
+<h3 id="s6-3-1"><span class="nt-num">6.3.1</span>The <code>top</code> index, overflow, and underflow</h3>
+
+<p>In an array stack, all the information lies in two things: the contents of the array and the value of <code>top</code>. The variable <code>top</code> is the index of the item on top of the stack. If the stack holds <span class="m">k</span> items, they occupy cells <code>stack[0]</code> through <code>stack[k−1]</code> and <code>top</code> = <span class="m">k − 1</span>. When the stack is empty there are no items; in that case we choose <code>top</code> = −1. The value −1 is not a valid index, but at the first push, incrementing <code>top</code> by one gives exactly 0. This choice simplifies the code.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sinir" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 192" role="img" aria-label="Empty stack: top is minus one; full stack: top is MAX minus one"><defs><marker id="n6-d04-ah9-s07_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker><marker id="n6-d04-ah10-s07_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box-empty" x="60" y="142" width="70" height="28"/><text class="lbl" x="54" y="160" text-anchor="end">[0]</text><rect class="box-empty" x="60" y="114" width="70" height="28"/><text class="lbl" x="54" y="132" text-anchor="end">[1]</text><rect class="box-empty" x="60" y="86" width="70" height="28"/><text class="lbl" x="54" y="104" text-anchor="end">[2]</text><rect class="box-empty" x="60" y="58" width="70" height="28"/><text class="lbl" x="54" y="76" text-anchor="end">[3]</text><rect class="box-empty" x="60" y="30" width="70" height="28"/><text class="lbl" x="54" y="48" text-anchor="end">[4]</text><path class="line" d="M176 184 L136 184" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah9-s07_00-1)"/><text class="txt mono" x="180" y="189" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = -1</text><text class="lbl" x="95" y="188" text-anchor="middle">empty stack</text><text class="txt" x="240" y="110" text-anchor="start" style="font-size:14px">top &lt; 0 → empty</text><text class="lbl" x="240" y="128" text-anchor="start">pop → underflow</text><rect class="box" x="430" y="142" width="70" height="28"/><text class="txt mono" x="465" y="161" text-anchor="middle">A</text><text class="lbl" x="424" y="160" text-anchor="end">[0]</text><rect class="box" x="430" y="114" width="70" height="28"/><text class="txt mono" x="465" y="133" text-anchor="middle">B</text><text class="lbl" x="424" y="132" text-anchor="end">[1]</text><rect class="box" x="430" y="86" width="70" height="28"/><text class="txt mono" x="465" y="105" text-anchor="middle">C</text><text class="lbl" x="424" y="104" text-anchor="end">[2]</text><rect class="box" x="430" y="58" width="70" height="28"/><text class="txt mono" x="465" y="77" text-anchor="middle">D</text><text class="lbl" x="424" y="76" text-anchor="end">[3]</text><rect class="box" x="430" y="30" width="70" height="28" style="fill:var(--ds-hot)"/><text class="txt mono" x="465" y="49" text-anchor="middle">E</text><text class="lbl" x="424" y="48" text-anchor="end">[4]</text><path class="line" d="M546 44 L506 44" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah10-s07_00-1)"/><text class="txt mono" x="550" y="49" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">top = 4</text><text class="lbl" x="465" y="188" text-anchor="middle">full stack</text></svg></div>
+  <figcaption><b>Figure 6.3:</b> The two boundary states of an array stack with five cells. On the left, the empty stack: <code>top</code> = −1, below even cell 0; <code>pop</code> causes underflow in this state. On the right, the full stack: five items A through E, and <code>top</code> = 4 = <code>MAX_STACK_SIZE − 1</code>; one more push would cause overflow.</figcaption>
+</figure>
+
+<p><a href="#sekil-sinir">Figure 6.3</a> shows the two boundary states side by side. Whether the stack is empty is determined by the test <code>top &lt; 0</code>. If the array has <code>MAX_STACK_SIZE</code> cells, the last valid index is <code>MAX_STACK_SIZE − 1</code>. When <code>top</code> reaches this value the stack is full, and the test <code>top ≥ MAX_STACK_SIZE − 1</code> is true. The number of items is always <code>top + 1</code>. Confusing <code>top</code> with the item count is the best-known source of off-by-one errors. For example, a program that writes the full test as <code>top ≥ MAX_STACK_SIZE</code> writes one cell past the end of the array.</p>
+
+<p>C does not check array bounds at run time. The expression <code>stack[MAX_STACK_SIZE]</code> compiles and runs, but it touches the memory cell right after the array. If another variable lives there, its value is corrupted. The program may not crash immediately, and the error shows up much later in an unrelated place. For this reason the overflow and underflow checks are not an optional decoration of stack code. A push without a check overwrites neighboring memory.</p>
+
+<h3 id="s6-3-2"><span class="nt-num">6.3.2</span>C definitions</h3>
+
+<p>The first implementation in the textbook by Horowitz and Sahni defines the stack as a global array:</p>
+
+<pre class="nt-code"><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define MAX_STACK_SIZE 101
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="kw">int</span> key;
+    /* other fields */
+} element;
+
+element stack[MAX_STACK_SIZE];
+
+<span class="kw">void</span> stack_full(<span class="kw">void</span>) {
+    printf("Stack is full!!!\n"); exit(-1);
+}
+<span class="kw">void</span> stack_empty(<span class="kw">void</span>) {
+    printf("Stack is empty!!!\n"); exit(-2);
+}</code></pre>
+
+<p>The line <code>#define MAX_STACK_SIZE 101</code> fixes the capacity of the stack. Before compilation, the preprocessor replaces every occurrence of <code>MAX_STACK_SIZE</code> in the code with 101. To change the capacity, it is enough to edit this one line.</p>
+
+<p>The type <code>element</code> defines the record stored in the stack. For now it has a single field, <code>key</code>. The comment is a reminder that in a real application other fields would be added to this record. A maze program, for instance, would put the row, the column, and the direction on the stack together. Defining the item as a <code>struct</code> rather than an <code>int</code> makes the stack code independent of what an item contains. When fields are added to the record, the stack routines do not change, because they merely copy <code>element</code> values.</p>
+
+<p>The line <code>element stack[MAX_STACK_SIZE];</code> is the stack itself. Because this array is defined outside every function, it is a <strong>global variable</strong>. Every function in the program can access it directly. Global arrays are initialized to zero and live for the whole run of the program. The variable <code>top</code>, however, is not global: it is defined as a local variable in the calling function (usually <code>main</code>) and passed to the stack routines by address.</p>
+
+<p>The last two functions are error routines. <code>stack_full</code> prints a message and ends the program with <code>exit(-1)</code>, and <code>stack_empty</code> does so with <code>exit(-2)</code>. <code>exit</code> is declared in <code>&lt;stdlib.h&gt;</code> and ends the whole program no matter which function it is called from. The number passed is the exit code of the program and is handed to the operating system. On Unix-like systems the shell sees −1 as 255; on Windows this code is reported as 4294967295. The names of these two functions are the same as those of the queries <code>stack_full</code> and <code>stack_empty</code> in the ADT, but their jobs differ: they do not query, they report an error. The name clash is one of the flaws of this first implementation; in a better design these names go to the real queries.</p>
+
+<p>Textbooks give these definitions in a single file, with a global array and a global <code>top</code>. In the exams and assignments of this course, however, global variables are forbidden. The reason is simple. Any function of the program can change a global variable. When a bug appears, finding who corrupted the variable means reading the whole program. Moreover, a single global array is useless when the same program needs two stacks. In this chapter the global array is used only to get to know the textbook code; in assignments, whatever the structure is, a stack, a queue, or something else, it is defined locally and passed by parameter.</p>
+
+<h3 id="s6-3-3"><span class="nt-num">6.3.3</span><code>push</code> and <code>pop</code></h3>
+
+<p>The insertion and deletion routines are three lines each:</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> push(<span class="kw">int</span> *top, element item) {
+    <span class="kw">if</span> (*top &gt;= MAX_STACK_SIZE - 1)  /* any room? */
+        stack_full();         /* warn and exit */
+    stack[++*top] = item;     /* bump the index first */
+}                             /* then store the item */
+
+element pop(<span class="kw">int</span> *top) {
+    <span class="kw">if</span> (*top &lt; 0)
+        stack_empty();        /* warn and exit if empty */
+    <span class="kw">return</span> stack[(*top)--];   /* return, then decrement */
+}</code></pre>
+
+<p><code>push</code> takes two parameters. <code>int *top</code> is the address of the caller's <code>top</code> variable. <code>element item</code> is a copy of the item to be added. The first line tests whether there is room. <code>*top</code> is the integer that the pointer <code>top</code> points to, that is, the caller's top index. If this value has reached <code>MAX_STACK_SIZE − 1</code>, the stack is full and <code>stack_full()</code> ends the program. If there is room, the last line runs: <code>stack[++*top] = item;</code>. This line does two things. First <code>*top</code> is incremented, then the item is written at the new index. In an empty stack <code>*top</code> goes from −1 to 0 and the item is written to <code>stack[0]</code>.</p>
+
+<p><code>pop</code> takes only the address of <code>top</code>. If the stack is empty, that is, <code>*top &lt; 0</code>, <code>stack_empty()</code> ends the program. Otherwise the line <code>return stack[(*top)--];</code> runs. This line also does two things, but in the opposite order. First the item at the old index is read, then <code>*top</code> is decremented. The item read is the return value of the function. For example, when <code>*top</code> is 2, <code>stack[2]</code> is returned and <code>*top</code> becomes 1.</p>
+
+<p>The popped item is not erased from the array. The old value stays in cell <code>stack[2]</code>. But it is no longer part of the stack, because <code>top</code> determines the contents of the stack: the valid items are the cells from 0 up to <code>top</code>. The next push overwrites this cell. That deletion means pulling the boundary down rather than clearing a cell is what makes the array stack fast.</p>
+
+<p>Why is <code>top</code> passed by address? In C, all arguments are passed by <strong>call by value</strong>. A call such as <code>push(top, item)</code> would hand the function a copy of the value of <code>top</code>. The function would increment this copy, but the caller's <code>top</code> would not change. The next push would write to the same cell. A function that wants to change the caller's variable is given the address of that variable: <code>push(&amp;top, item)</code>. Through <code>*top</code> the function reaches the caller's actual variable.</p>
+
+<p>A writing rule matters here. A parameter that appears as <code>*top</code> in the function's parameter list must be used as <code>*top</code> everywhere inside the function. If only <code>top</code> is written inside, the pointer itself, an address, is being used. A test such as <code>if (top &gt;= MAX_STACK_SIZE - 1)</code> compares an address with an integer. At best the compiler gives a warning; the program makes a meaningless comparison. This mistake is graded severely in exams, because not knowing the difference between a pointer and the value it points to means building every structure in this course wrongly.</p>
+
+<p>Both routines cost <span class="m">O(1)</span>. Each performs one comparison, one index change, and one array access. The number of these operations does not depend on the number of items in the stack. The extra memory is also constant: only the parameters are used.</p>
+
+<h3 id="s6-3-4"><span class="nt-num">6.3.4</span>The precedence trap: <code>*</code> with <code>++</code> and <code>--</code></h3>
+
+<p>The expressions <code>stack[++*top]</code> and <code>stack[(*top)--]</code> are short but demand attention. The first has no parentheses; the second does. The reason for this difference is operator precedence in C. <a href="#tab-oncelik">Table 6.2</a> compares four spellings.</p>
+
+<div class="nt-tablewrap" id="tab-oncelik">
+<table class="nt-table">
+  <caption>Table 6.2: What four spellings mean when <code>top</code> is an <code>int *</code>.</caption>
+  <thead><tr><th scope="col">Expression</th><th scope="col">How C parses it</th><th scope="col">Result</th></tr></thead>
+  <tbody>
+    <tr><td><code>++*top</code></td><td><code>++(*top)</code>: increment the int it points to, use the new value</td><td>Correct (push)</td></tr>
+    <tr><td><code>(*top)--</code></td><td>use the value of the int it points to, then decrement it</td><td>Correct (pop)</td></tr>
+    <tr><td><code>*top--</code></td><td><code>*(top--)</code>: decrement the pointer, read the value at the old address</td><td>Wrong: <code>*top</code> is unchanged</td></tr>
+    <tr><td><code>*top++</code></td><td><code>*(top++)</code>: advance the pointer, read the value at the old address</td><td>Wrong</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rule is this. The postfix operators <code>++</code> and <code>--</code> have higher precedence than the unary <code>*</code>. So in the expression <code>*top--</code>, the <code>--</code> binds to <code>top</code> first: what gets decremented is the pointer itself. The prefix <code>++</code> and the unary <code>*</code>, on the other hand, are at the same precedence level and associate from right to left. In the expression <code>++*top</code>, the <code>*</code> on the right is applied first, and <code>++</code> binds to its result, the integer being pointed to. That is why push needs no parentheses and pop does.</p>
+
+<p>What happens if we write <code>*top--</code> instead of <code>(*top)--</code>? The expression reads as <code>*(top--)</code>. <code>top--</code> yields the old value of the pointer and moves the pointer back by one <code>int</code>. The <code>*</code> reads at this old address. The value read is the caller's top index, so the array is read from the right cell. But what gets decremented is the local <code>top</code> pointer. When the function ends, this local copy vanishes. The caller's <code>top</code> has not changed at all. A bug of this kind is very insidious for exactly this reason: the first <code>pop</code> returns the right value.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-oncelik">
+  <span class="nt-box__title">Example 6.2</span>
+  <p>The stack contains only A (<code>top</code> = 0). The last line of <code>pop</code> has mistakenly been written as <code>return stack[*top--];</code>. Two calls are made in a row.</p>
+  <ol>
+    <li>First call: <code>*(top--)</code> reads the caller's 0. <code>stack[0]</code> = A is returned. What is decremented is the local pointer; the caller's <code>top</code> stays 0.</li>
+    <li>Second call: <code>*top &lt; 0</code> is false, so underflow is not caught. Again <code>stack[0]</code> = A is returned, and <code>top</code> is again 0.</li>
+  </ol>
+  <p>This behavior was verified by compiling and running the code: both lines printed "pop: A top=0," and the compiler gave no warning even with <code>-Wall -Wextra</code>. A program that empties the stack with a loop of the form <code>while (!empty) pop</code> goes into an infinite loop. The <code>*top++</code> mistake is worse in push: <code>stack[*top++] = item</code> writes to <code>stack[-1]</code> in an empty stack, that is, outside the array.</p>
+</div>
+
+<p>The most robust way to avoid this trap is to put the increment or decrement through the pointer on a separate line: first <code>(*top)++;</code>, then <code>stack[*top] = item;</code>. The code gets one line longer, but everyone who reads it understands at once what happens. The short form in the textbook is correct too, as long as one knows why the parentheses are there.</p>
+
+<h3 id="s6-3-5"><span class="nt-num">6.3.5</span>Code trace</h3>
+
+<p>The behavior of the routines is easier to see with a small capacity. In the trace <code>MAX_STACK_SIZE</code> = 4, so the full test is <code>*top ≥ 3</code>. In <code>main</code>, with <code>top</code> = −1, A, B, and C are pushed in turn, one item is popped, and then D, E, and F are pushed. <a href="#tab-dizi-iz">Table 6.3</a> gives the state after each call.</p>
+
+<div class="nt-tablewrap" id="tab-dizi-iz">
+<table class="nt-table">
+  <caption>Table 6.3: Trace of the array stack with <code>MAX_STACK_SIZE</code> = 4.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Test</th><th scope="col">Action</th><th scope="col"><code>top</code></th><th scope="col"><code>stack[0..top]</code></th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>—</td><td>—</td><td>−1</td><td>(empty)</td></tr>
+    <tr><td><code>push(&amp;top, A)</code></td><td>−1 ≥ 3? No</td><td><code>++*top</code>, <code>stack[0] = A</code></td><td>0</td><td>A</td></tr>
+    <tr><td><code>push(&amp;top, B)</code></td><td>0 ≥ 3? No</td><td><code>stack[1] = B</code></td><td>1</td><td>A B</td></tr>
+    <tr><td><code>push(&amp;top, C)</code></td><td>1 ≥ 3? No</td><td><code>stack[2] = C</code></td><td>2</td><td>A B C</td></tr>
+    <tr><td><code>pop(&amp;top)</code></td><td>2 &lt; 0? No</td><td>returns <code>stack[2]</code> = C, <code>top</code> decrements</td><td>1</td><td>A B</td></tr>
+    <tr><td><code>push(&amp;top, D)</code></td><td>1 ≥ 3? No</td><td><code>stack[2] = D</code> (over C)</td><td>2</td><td>A B D</td></tr>
+    <tr><td><code>push(&amp;top, E)</code></td><td>2 ≥ 3? No</td><td><code>stack[3] = E</code></td><td>3</td><td>A B D E</td></tr>
+    <tr><td><code>push(&amp;top, F)</code></td><td>3 ≥ 3? <strong>Yes</strong></td><td><code>stack_full()</code>: "Stack is full!!!", <code>exit(-1)</code></td><td>3</td><td>A B D E</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-dizi-iz" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 140" role="img" aria-label="Array stack, MAX_STACK_SIZE = 4, top = 2"><defs><marker id="n6-d04-ah17-s11_06-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="250" y="86" width="70" height="26"/><text class="txt mono" x="285" y="104" text-anchor="middle">A</text><text class="lbl" x="244" y="103" text-anchor="end">[0]</text><rect class="box" x="250" y="60" width="70" height="26"/><text class="txt mono" x="285" y="78" text-anchor="middle">B</text><text class="lbl" x="244" y="77" text-anchor="end">[1]</text><rect class="box" x="250" y="34" width="70" height="26" style="fill:var(--ds-hot)"/><text class="txt mono" x="285" y="52" text-anchor="middle">C</text><text class="lbl" x="244" y="51" text-anchor="end">[2]</text><rect class="box-empty" x="250" y="8" width="70" height="26"/><text class="lbl" x="244" y="25" text-anchor="end">[3]</text><path class="line" d="M366 47 L326 47" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah17-s11_06-1)"/><text class="txt mono" x="370" y="52" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 2</text></svg> <svg class="ds-svg" viewBox="0 0 560 140" role="img" aria-label="Array stack, MAX_STACK_SIZE = 4, top = 1"><defs><marker id="n6-d04-ah19-s11_08-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><rect class="box" x="250" y="86" width="70" height="26"/><text class="txt mono" x="285" y="104" text-anchor="middle">A</text><text class="lbl" x="244" y="103" text-anchor="end">[0]</text><rect class="box" x="250" y="60" width="70" height="26"/><text class="txt mono" x="285" y="78" text-anchor="middle">B</text><text class="lbl" x="244" y="77" text-anchor="end">[1]</text><rect class="box-empty" x="250" y="34" width="70" height="26"/><text class="lbl mono" x="285" y="52" text-anchor="middle" style="opacity:.55">C</text><text class="lbl" x="244" y="51" text-anchor="end">[2]</text><rect class="box-empty" x="250" y="8" width="70" height="26"/><text class="lbl" x="244" y="25" text-anchor="end">[3]</text><path class="line" d="M366 73 L326 73" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah19-s11_08-1)"/><text class="txt mono" x="370" y="78" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 1</text></svg> <svg class="ds-svg" viewBox="0 0 560 140" role="img" aria-label="Array stack, MAX_STACK_SIZE = 4, top = 3"><defs><marker id="n6-d04-ah25-s11_14-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="250" y="86" width="70" height="26"/><text class="txt mono" x="285" y="104" text-anchor="middle">A</text><text class="lbl" x="244" y="103" text-anchor="end">[0]</text><rect class="box" x="250" y="60" width="70" height="26"/><text class="txt mono" x="285" y="78" text-anchor="middle">B</text><text class="lbl" x="244" y="77" text-anchor="end">[1]</text><rect class="box" x="250" y="34" width="70" height="26"/><text class="txt mono" x="285" y="52" text-anchor="middle">D</text><text class="lbl" x="244" y="51" text-anchor="end">[2]</text><rect class="box" x="250" y="8" width="70" height="26"/><text class="txt mono" x="285" y="26" text-anchor="middle">E</text><text class="lbl" x="244" y="25" text-anchor="end">[3]</text><path class="line" d="M366 21 L326 21" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah25-s11_14-1)"/><text class="txt mono" x="370" y="26" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">top = 3</text></svg></div>
+  <figcaption><b>Figure 6.4:</b> Three moments of the trace. At the top, C has been pushed: <code>top</code> = 2. In the middle, C has been popped: <code>top</code> has dropped to 1; the value of C stays in the cell but is no longer part of the stack. At the bottom, D and E have been pushed: <code>top</code> = 3 and the array is full; when F is to be pushed, <code>stack_full()</code> is called.</figcaption>
+</figure>
+
+<p>The fifth row of the table shows how the array performs deletion. <code>pop</code> returns C and lowers <code>top</code> to 1. C still sits in cell 2. In the sixth row, when D is pushed, D is written to the same cell and no trace of C remains. In the last row there is no room. <code>stack_full</code> prints its message and ends the whole program with <code>exit(-1)</code>. This behavior was verified by compiling and running the code: the program printed "push F ... Stack is full!!!" and Windows reported the exit code as 4294967295, that is, −1.</p>
+
+<p>Ending the whole program at the moment of overflow is a crude reaction. A stack is a small library component; it cannot know what the rest of the program will do. Perhaps the caller was going to build a larger stack when this one filled up. Perhaps it would show the user a message and cancel the operation. <code>exit</code> takes these decisions away. Cleanup work such as closing open files properly or releasing allocated memory is also left undone when the program ends. A better design reports the error to the caller and leaves the decision to it.</p>
+
+<h2 class="nt-pb" id="s6-4"><span class="nt-num">6.4</span>Designing the stack as an object</h2>
+
+<p>The first implementation in the textbook has three weaknesses. The stack is a global array, so the program can have only one stack. The variable <code>top</code> lives apart from the array; the caller has to define it separately and pass it separately in every call. On an error, the program ends with <code>exit</code>. This section builds a design that solves all three problems together: the array and the top index live in one structure, the routines take the stack as a parameter, and errors are reported by a return value.</p>
+
+<h3 id="s6-4-1"><span class="nt-num">6.4.1</span>A <code>struct</code> instead of a global array</h3>
+
+<pre class="nt-code"><code>#include &lt;stdbool.h&gt;
+#define CAP 100
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="kw">int</span> data[CAP];
+    <span class="kw">int</span> top;               /* -1 when empty */
+} Stack;
+
+<span class="kw">void</span> stack_init(Stack *s) { s-&gt;top = -1; }
+<span class="kw">bool</span> stack_empty(<span class="kw">const</span> Stack *s) { <span class="kw">return</span> s-&gt;top &lt; 0; }
+<span class="kw">bool</span> stack_full(<span class="kw">const</span> Stack *s)  { <span class="kw">return</span> s-&gt;top == CAP - 1; }
+<span class="kw">int</span>  stack_size(<span class="kw">const</span> Stack *s)  { <span class="kw">return</span> s-&gt;top + 1; }
+<span class="kw">bool</span> stack_top(<span class="kw">const</span> Stack *s, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (stack_empty(s)) <span class="kw">return</span> <span class="kw">false</span>;
+    *x = s-&gt;data[s-&gt;top];  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>The <code>Stack</code> structure carries two fields: the array <code>data</code> of <code>CAP</code> items and <code>top</code>, which holds the top index. A stack is now a single variable. The definition <code>Stack a, b;</code> gives two independent stacks, each with its own array and its own top index. While one fills up, the other is unaffected. There are no global variables.</p>
+
+<p>Each routine receives the stack through the parameter <code>Stack *s</code>, that is, by address. There are two reasons for this. First, <code>push</code> and <code>pop</code> modify the stack; if a copy passed by value were modified, the caller's stack would not change. Second, <code>Stack</code> is a large structure: with <code>CAP</code> = 100 it takes about 404 bytes. Passed by value, these 404 bytes would be copied at every call. An address is 8 bytes. The fields of the structure are accessed through the address with the arrow operator (<code>-&gt;</code>): <code>s-&gt;top</code> is shorthand for <code>(*s).top</code>.</p>
+
+<p>The queries that do not modify the stack take <code>const Stack *s</code>. The <code>const</code> qualifier is a promise that the function will not modify the structure it points to. If an assignment such as <code>s-&gt;top = 0;</code> is written inside the function, the compiler reports an error. This promise informs the reader and also catches accidental modifications at compile time.</p>
+
+<p>Each routine is a single line. <code>stack_init</code> creates an empty stack by setting <code>top</code> to −1. The fields of a local <code>Stack</code> variable hold indeterminate values at first; so every stack must be initialized once before use. <code>stack_empty</code> and <code>stack_full</code> are now real queries and return <code>bool</code>. <code>stack_size</code> gives the item count, <code>top + 1</code>. <code>stack_top</code> is the peek operation of the ADT. If the stack is empty it returns <code>false</code> and leaves <code>*x</code> untouched. Otherwise it writes the top item to <code>*x</code> and returns <code>true</code>. The value is delivered through an output parameter because the return value is reserved for success information. The type <code>bool</code> and the names <code>true</code> and <code>false</code> come from the header <code>&lt;stdbool.h&gt;</code>.</p>
+
+<p>Push and pop are written in the same style:</p>
+
+<pre class="nt-code"><code><span class="kw">bool</span> push(Stack *s, <span class="kw">int</span> x) {
+  <span class="kw">if</span> (s-&gt;top == CAP - 1) <span class="kw">return</span> <span class="kw">false</span>; /* overflow */
+  s-&gt;data[++s-&gt;top] = x;
+  <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> pop(Stack *s, <span class="kw">int</span> *x) {
+  <span class="kw">if</span> (s-&gt;top &lt; 0) <span class="kw">return</span> <span class="kw">false</span>;   /* underflow */
+  *x = s-&gt;data[s-&gt;top--];
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p><code>push</code> first tests for overflow. If <code>top == CAP - 1</code> there is no room and the function returns <code>false</code>. The program goes on; the caller, having learned of the overflow, decides for itself what to do. If there is room, the line <code>s-&gt;data[++s-&gt;top] = x;</code> first increments <code>top</code>, then writes the value at the new index. There is no precedence trap here: the <code>-&gt;</code> operator is applied before <code>++</code>, so <code>++s-&gt;top</code> means <code>++(s-&gt;top)</code>.</p>
+
+<p><code>pop</code> first tests for underflow. If the stack is empty it returns <code>false</code> and leaves <code>*x</code> untouched. Otherwise the line <code>*x = s-&gt;data[s-&gt;top--];</code> copies the top item to <code>*x</code> and then decrements <code>top</code> by one. The expression <code>s-&gt;top--</code> likewise reads as <code>(s-&gt;top)--</code>; what is decremented is a field of the structure.</p>
+
+<p>Because this version reports errors through the return value, it is very convenient to use. For instance, a loop that empties the stack and prints each item popped is a single line: <code>while (pop(&amp;st, &amp;x)) printf("%d ", x);</code>. The loop stops when <code>pop</code> returns <code>false</code> for the first time, that is, when the stack has become empty. All operations are again <span class="m">O(1)</span>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Ignoring the result of a routine that returns <code>bool</code>. A program that writes <code>push(&amp;st, x);</code> and never looks at the return value silently loses the item when the stack fills up. A program that writes <code>pop(&amp;st, &amp;x);</code> without checking the result keeps using the old or indeterminate value of <code>x</code> when the stack is empty. An interface that reports errors is useful only if the report is read.</p>
+</div>
+
+<h3 id="s6-4-2"><span class="nt-num">6.4.2</span>Code trace: <code>push</code> and <code>pop</code> returning <code>bool</code></h3>
+
+<p>In the trace <code>CAP</code> = 3, so the full test is <code>top == 2</code>. An empty stack is created with <code>stack_init(&amp;st)</code>. Then 5, 8, 2, and 9 are pushed in turn, and <code>pop</code> is called four times. <a href="#tab-struct-iz">Table 6.4</a> gives each call and its return value.</p>
+
+<div class="nt-tablewrap" id="tab-struct-iz">
+<table class="nt-table">
+  <caption>Table 6.4: Trace of <code>push</code>/<code>pop</code> with <code>CAP</code> = 3.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Test</th><th scope="col">Action</th><th scope="col">Returns</th><th scope="col"><code>top</code></th><th scope="col"><code>data[0..top]</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>stack_init(&amp;st)</code></td><td>—</td><td><code>top = -1</code></td><td>—</td><td>−1</td><td>(empty)</td></tr>
+    <tr><td><code>push(&amp;st, 5)</code></td><td>−1 == 2? No</td><td><code>data[0] = 5</code></td><td>true</td><td>0</td><td>5</td></tr>
+    <tr><td><code>push(&amp;st, 8)</code></td><td>0 == 2? No</td><td><code>data[1] = 8</code></td><td>true</td><td>1</td><td>5 8</td></tr>
+    <tr><td><code>push(&amp;st, 2)</code></td><td>1 == 2? No</td><td><code>data[2] = 2</code></td><td>true</td><td>2</td><td>5 8 2</td></tr>
+    <tr><td><code>push(&amp;st, 9)</code></td><td>2 == 2? <strong>Yes</strong></td><td>overflow, nothing is written</td><td>false</td><td>2</td><td>5 8 2</td></tr>
+    <tr><td><code>pop(&amp;st, &amp;x)</code></td><td>2 &lt; 0? No</td><td><code>x = data[2]</code></td><td>true, <code>x</code> = 2</td><td>1</td><td>5 8</td></tr>
+    <tr><td><code>pop(&amp;st, &amp;x)</code></td><td>1 &lt; 0? No</td><td><code>x = data[1]</code></td><td>true, <code>x</code> = 8</td><td>0</td><td>5</td></tr>
+    <tr><td><code>pop(&amp;st, &amp;x)</code></td><td>0 &lt; 0? No</td><td><code>x = data[0]</code></td><td>true, <code>x</code> = 5</td><td>−1</td><td>(empty)</td></tr>
+    <tr><td><code>pop(&amp;st, &amp;x)</code></td><td>−1 &lt; 0? <strong>Yes</strong></td><td>underflow, <code>x</code> untouched</td><td>false</td><td>−1</td><td>(empty)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-struct-iz" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 118" role="img" aria-label="struct stack, CAP = 3, top = 2"><defs><marker id="n6-d04-ah33-s13_07-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box" x="250" y="62" width="70" height="28"/><text class="txt mono" x="285" y="81" text-anchor="middle">5</text><text class="lbl" x="244" y="80" text-anchor="end">[0]</text><rect class="box" x="250" y="34" width="70" height="28"/><text class="txt mono" x="285" y="53" text-anchor="middle">8</text><text class="lbl" x="244" y="52" text-anchor="end">[1]</text><rect class="box" x="250" y="6" width="70" height="28"/><text class="txt mono" x="285" y="25" text-anchor="middle">2</text><text class="lbl" x="244" y="24" text-anchor="end">[2]</text><path class="line" d="M366 20 L326 20" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah33-s13_07-1)"/><text class="txt mono" x="370" y="25" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">top = 2</text><text class="txt" x="30" y="30" text-anchor="start" style="font-size:14px">CAP = 3</text><text class="lbl" x="30" y="50" text-anchor="start">size = top + 1 = 3</text></svg> <svg class="ds-svg" viewBox="0 0 560 118" role="img" aria-label="struct stack, CAP = 3, top = -1"><defs><marker id="n6-d04-ah37-s13_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><rect class="box-empty" x="250" y="62" width="70" height="28"/><text class="lbl" x="244" y="80" text-anchor="end">[0]</text><rect class="box-empty" x="250" y="34" width="70" height="28"/><text class="lbl" x="244" y="52" text-anchor="end">[1]</text><rect class="box-empty" x="250" y="6" width="70" height="28"/><text class="lbl" x="244" y="24" text-anchor="end">[2]</text><path class="line" d="M366 104 L326 104" style="stroke:var(--ds-bad);" marker-end="url(#n6-d04-ah37-s13_11-1)"/><text class="txt mono" x="370" y="109" text-anchor="start" style="font-size:14px;fill:var(--ds-bad)">top = -1</text><text class="txt" x="30" y="30" text-anchor="start" style="font-size:14px">CAP = 3</text><text class="lbl" x="30" y="50" text-anchor="start">size = top + 1 = 0</text></svg></div>
+  <figcaption><b>Figure 6.5:</b> Two moments of the trace. At the top, after three pushes the stack is full: <code>top</code> = 2 = <code>CAP − 1</code>, the size is 3; the fourth push returns <code>false</code>. At the bottom, after four pops the stack is empty: <code>top</code> = −1 and the last pop has returned <code>false</code>.</figcaption>
+</figure>
+
+<p>The trace was verified with a test program. The program, which printed the return value of each push, produced the output "push 5:1 8:1 2:1 9:0"; 9 could not be added. The pops returned 2, 8, 5 in that order, and the fourth pop was <code>false</code>. The intermediate queries also worked as expected: after three pushes, <code>stack_size</code> gave 3, <code>stack_full</code> was true, and <code>stack_top</code> gave 2.</p>
+
+<p>The difference between the two implementations shows at the overflow line. The global-array version would end the program at this point. The <code>bool</code> version returns <code>false</code> and the program continues where it left off. In the example, the caller learns that 9 could not be added. It may print a warning to the user or place 9 somewhere else. This way a single routine does not decide the fate of the whole program.</p>
+
+<h3 id="s6-4-3"><span class="nt-num">6.4.3</span>Interface and implementation</h3>
+
+<p>The <code>struct</code> version still has a problem. The fields of the <code>Stack</code> structure are open to all the code that uses it. A programmer can write <code>st.top = 5;</code> and corrupt the stack, or reach into <code>st.data[0]</code> directly and break the stack discipline. A bigger problem is this: when the implementation of the stack changes, say from an array to a linked list, all the code that touches the fields directly breaks.</p>
+
+<p>In C, this problem is solved by splitting the code into a <strong>header file</strong> and a source file. The header file carries the <strong>interface</strong>, that is, the types and function declarations exposed to the outside. The source file carries the <strong>implementation</strong>, that is, the bodies of these functions and the inside of the structure.</p>
+
+<pre class="nt-code"><code>/* stack.h: all the client sees */
+#ifndef STACK_H
+#define STACK_H
+#include &lt;stdbool.h&gt;
+<span class="kw">typedef</span> <span class="kw">struct</span> Stack Stack;  /* opaque */
+Stack *stack_create(<span class="kw">int</span> capacity);
+<span class="kw">void</span> stack_destroy(Stack *s);
+<span class="kw">bool</span> push(Stack *s, <span class="kw">int</span> x);
+<span class="kw">bool</span> pop(Stack *s, <span class="kw">int</span> *x);
+<span class="kw">bool</span> stack_empty(<span class="kw">const</span> Stack *s);
+#endif</code></pre>
+
+<p>The first and last lines of the header file are an <strong>include guard</strong>. In a large program, the same header can be included in a source file twice through indirect paths. The test <code>#ifndef STACK_H</code> processes the contents of the file if the name <code>STACK_H</code> is not yet defined, and defines this name right after. On the second inclusion the name is already defined, so the contents are skipped. This prevents the error of defining the same type twice.</p>
+
+<p>The really important line is <code>typedef struct Stack Stack;</code>. This line says that a structure named <code>struct Stack</code> exists but does not say what its fields are. A type whose name alone is declared in this way is called an <strong>incomplete type</strong>. A type whose fields are hidden from the client is also called an <strong>opaque type</strong>. Client code cannot define a variable of an incomplete type, because the compiler does not know how many bytes it takes. Nor can it access its fields. The only thing it can do is hold a pointer to this type and pass the pointer to the functions in the header. That is why a stack is created with <code>stack_create</code> and destroyed with <code>stack_destroy</code>.</p>
+
+<pre class="nt-code"><code>/* stack.c: implementation */
+<span class="kw">struct</span> Stack { <span class="kw">int</span> *data; <span class="kw">int</span> top, cap; };
+
+Stack *stack_create(<span class="kw">int</span> cap) {
+  Stack *s = malloc(<span class="kw">sizeof</span> *s);
+  <span class="kw">if</span> (s == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">NULL</span>;
+  s-&gt;data = malloc(cap * <span class="kw">sizeof</span> *s-&gt;data);
+  <span class="kw">if</span> (s-&gt;data == <span class="kw">NULL</span>) {
+    free(s);  <span class="kw">return</span> <span class="kw">NULL</span>;
+  }
+  s-&gt;top = -1;  s-&gt;cap = cap;
+  <span class="kw">return</span> s;
+}
+<span class="kw">void</span> stack_destroy(Stack *s) {
+  <span class="kw">if</span> (s) { free(s-&gt;data); free(s); }
+}</code></pre>
+
+<p>The source file holds the full definition of the structure. In this version the array is not of fixed size inside the structure. <code>data</code> is a pointer, and the array itself is allocated from heap memory during <code>stack_create</code>, with the requested capacity. This way the capacity of each stack can be chosen separately.</p>
+
+<p><code>stack_create</code> performs two allocations. First <code>malloc(sizeof *s)</code> is called for the structure itself. <code>sizeof *s</code> is the size of the type that <code>s</code> points to, that is, <code>struct Stack</code>. This spelling stays correct even if the type name changes. If the allocation fails, <code>NULL</code> is returned. Then <code>malloc(cap * sizeof *s-&gt;data)</code> is called for the array of <code>cap</code> items. If this second allocation fails, there is an important detail: the structure block allocated first is returned with <code>free(s)</code>, and only then is <code>NULL</code> returned. If this line were forgotten, the structure's block would remain as a piece of memory that no variable can point to; that is, a <strong>memory leak</strong> would occur. If both allocations succeed, <code>top</code> is set to −1, <code>cap</code> to the requested capacity, and the address of the structure is returned.</p>
+
+<p><code>stack_destroy</code> follows the reverse of the allocation order. First the array and then the structure is released. The order matters: if the structure were released first, the field <code>s-&gt;data</code> would be read from memory that is no longer valid. The test <code>if (s)</code> allows the function to be called safely with <code>NULL</code> as well. By the C standard, <code>free(NULL)</code> does nothing anyway; but to read <code>s-&gt;data</code>, <code>s</code> must be valid.</p>
+
+<p>For brevity, the implementation file in the slides omits the opening <code>#include</code> lines and three routines. A complete <code>stack.c</code> starts with the lines <code>#include &lt;stdlib.h&gt;</code> (for <code>malloc</code> and <code>free</code>) and <code>#include "stack.h"</code> (so that the compiler checks that declarations and definitions agree). The missing routines are the same as <code>push</code>, <code>pop</code>, and <code>stack_empty</code> of the <code>struct</code> version; the only difference is that the full test uses the structure's <code>cap</code> field instead of the constant <code>CAP</code>: <code>if (s-&gt;top == s-&gt;cap - 1) return false;</code>. With these completed, a test program that creates two separate stacks (capacities 2 and 5) was compiled and run. The third push to the stack of capacity 2 returned <code>false</code>; after both stacks were destroyed, a counting <code>malloc</code>/<code>free</code> wrapper counted four allocations and four releases. There is no leak.</p>
+
+<p>The value of this split shows when the implementation changes. Suppose <code>stack.c</code> is converted from an array to a linked list. The inside of <code>struct Stack</code> changes completely; the fields <code>data</code> and <code>cap</code> disappear and a node pointer takes their place. But <code>stack.h</code> stays the same. Therefore all the files that use the stack keep working without any change, merely being relinked. This is how the ADT's separation of "what" from "how" takes concrete form in C.</p>
+
+<h3 id="s6-4-4"><span class="nt-num">6.4.4</span>Reversing a string with a stack</h3>
+
+<p>The simplest application of a stack is reversing a sequence. Items are pushed in order and then popped in order. Because a stack gives back the last item first, the output order is the reverse of the input. The function below reverses a string in place this way; it uses the <code>push</code> and <code>pop</code> routines of the <code>struct</code> version.</p>
+
+<pre class="nt-code"><code><span class="kw">void</span> reverse(<span class="kw">char</span> *s) {
+  Stack st;  <span class="kw">int</span> c, i;
+  stack_init(&amp;st);
+  <span class="kw">for</span> (i = 0; s[i] != '\0'; i++)
+    push(&amp;st, s[i]);    /* assume CAP suffices */
+  <span class="kw">for</span> (i = 0; pop(&amp;st, &amp;c); i++)
+    s[i] = (<span class="kw">char</span>)c;
+}</code></pre>
+
+<p>The function has a local variable <code>Stack st</code>. The stack lives in the function's frame and vanishes by itself when the function returns; neither <code>malloc</code> nor <code>free</code> is needed. The first loop pushes every character up to the <code>'\0'</code> at the end of the string. The return value of <code>push</code> is not checked here; the assumption in the comment is that the string is shorter than <code>CAP</code> = 100 characters. The second loop, as long as <code>pop</code> succeeds, writes the popped character to position <code>i</code> of the string and increments <code>i</code>. When the stack is empty, <code>pop</code> returns <code>false</code> and the loop ends.</p>
+
+<p>The variable <code>c</code> is an <code>int</code> because <code>pop</code> expects an <code>int *</code> as its second argument. In the call <code>push(&amp;st, s[i])</code> the <code>char</code> value is widened to <code>int</code> automatically. When writing back into the string, the cast <code>(char)c</code> narrows the value to <code>char</code> again. No information is lost, since the characters came from the <code>char</code> range in the first place.</p>
+
+<p>Let the input be <code>"STACK"</code>. <a href="#tab-ters-iz">Table 6.5</a> gives every step of the two loops.</p>
+
+<div class="nt-tablewrap" id="tab-ters-iz">
+<table class="nt-table">
+  <caption>Table 6.5: Trace of <code>reverse</code>, input <code>"STACK"</code>.</caption>
+  <thead><tr><th scope="col">Loop</th><th scope="col"><code>i</code></th><th scope="col">Action</th><th scope="col">Stack (bottom to top)</th><th scope="col"><code>s</code></th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>—</td><td><code>stack_init</code></td><td>(empty)</td><td>STACK</td></tr>
+    <tr><td>1</td><td>0</td><td>push('S')</td><td>S</td><td>STACK</td></tr>
+    <tr><td>1</td><td>1</td><td>push('T')</td><td>S T</td><td>STACK</td></tr>
+    <tr><td>1</td><td>2</td><td>push('A')</td><td>S T A</td><td>STACK</td></tr>
+    <tr><td>1</td><td>3</td><td>push('C')</td><td>S T A C</td><td>STACK</td></tr>
+    <tr><td>1</td><td>4</td><td>push('K')</td><td>S T A C K</td><td>STACK</td></tr>
+    <tr><td>2</td><td>0</td><td>pop → 'K', <code>s[0] = 'K'</code></td><td>S T A C</td><td>KTACK</td></tr>
+    <tr><td>2</td><td>1</td><td>pop → 'C', <code>s[1] = 'C'</code></td><td>S T A</td><td>KCACK</td></tr>
+    <tr><td>2</td><td>2</td><td>pop → 'A', <code>s[2] = 'A'</code></td><td>S T</td><td>KCACK</td></tr>
+    <tr><td>2</td><td>3</td><td>pop → 'T', <code>s[3] = 'T'</code></td><td>S</td><td>KCATK</td></tr>
+    <tr><td>2</td><td>4</td><td>pop → 'S', <code>s[4] = 'S'</code></td><td>(empty)</td><td>KCATS</td></tr>
+    <tr><td>2</td><td>5</td><td>pop → <code>false</code>, the loop ends</td><td>(empty)</td><td>KCATS</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-ters" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 146" role="img" aria-label="String and stack"><defs><marker id="n6-d04-ah43-s15_05-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><g><text class="lbl" x="43" y="24" text-anchor="middle">0</text><rect class="box" x="20" y="30" width="46" height="36"/><text class="txt mono" x="43" y="53" text-anchor="middle">S</text></g><g><text class="lbl" x="89" y="24" text-anchor="middle">1</text><rect class="box" x="66" y="30" width="46" height="36"/><text class="txt mono" x="89" y="53" text-anchor="middle">T</text></g><g><text class="lbl" x="135" y="24" text-anchor="middle">2</text><rect class="box" x="112" y="30" width="46" height="36"/><text class="txt mono" x="135" y="53" text-anchor="middle">A</text></g><g><text class="lbl" x="181" y="24" text-anchor="middle">3</text><rect class="box" x="158" y="30" width="46" height="36"/><text class="txt mono" x="181" y="53" text-anchor="middle">C</text></g><g><text class="lbl" x="227" y="24" text-anchor="middle">4</text><rect class="box" x="204" y="30" width="46" height="36" style="fill:var(--ds-hot)"/><text class="txt mono" x="227" y="53" text-anchor="middle">K</text></g><text class="txt mono" x="227" y="82" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">▲ i</text><text class="lbl" x="20" y="16" text-anchor="start">s</text><rect class="box" x="420" y="104" width="56" height="22"/><text class="txt mono" x="448" y="120" text-anchor="middle">S</text><rect class="box" x="420" y="82" width="56" height="22"/><text class="txt mono" x="448" y="98" text-anchor="middle">T</text><rect class="box" x="420" y="60" width="56" height="22"/><text class="txt mono" x="448" y="76" text-anchor="middle">A</text><rect class="box" x="420" y="38" width="56" height="22"/><text class="txt mono" x="448" y="54" text-anchor="middle">C</text><rect class="box" x="420" y="16" width="56" height="22" style="fill:var(--ds-hot)"/><text class="txt mono" x="448" y="32" text-anchor="middle">K</text><path class="line" d="M522 27 L482 27" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah43-s15_05-1)"/><text class="txt mono" x="526" y="32" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = 4</text></svg> <svg class="ds-svg" viewBox="0 0 600 146" role="img" aria-label="String and stack"><defs><marker id="n6-d04-ah49-s15_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><g><text class="lbl" x="43" y="24" text-anchor="middle">0</text><rect class="box" x="20" y="30" width="46" height="36"/><text class="txt mono" x="43" y="53" text-anchor="middle">K</text></g><g><text class="lbl" x="89" y="24" text-anchor="middle">1</text><rect class="box" x="66" y="30" width="46" height="36"/><text class="txt mono" x="89" y="53" text-anchor="middle">C</text></g><g><text class="lbl" x="135" y="24" text-anchor="middle">2</text><rect class="box" x="112" y="30" width="46" height="36"/><text class="txt mono" x="135" y="53" text-anchor="middle">A</text></g><g><text class="lbl" x="181" y="24" text-anchor="middle">3</text><rect class="box" x="158" y="30" width="46" height="36"/><text class="txt mono" x="181" y="53" text-anchor="middle">T</text></g><g><text class="lbl" x="227" y="24" text-anchor="middle">4</text><rect class="box" x="204" y="30" width="46" height="36"/><text class="txt mono" x="227" y="53" text-anchor="middle">S</text></g><text class="lbl" x="20" y="16" text-anchor="start">s</text><rect class="box-empty" x="420" y="104" width="56" height="22"/><rect class="box-empty" x="420" y="82" width="56" height="22"/><rect class="box-empty" x="420" y="60" width="56" height="22"/><rect class="box-empty" x="420" y="38" width="56" height="22"/><rect class="box-empty" x="420" y="16" width="56" height="22"/><path class="line" d="M522 137 L482 137" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah49-s15_11-1)"/><text class="txt mono" x="526" y="142" text-anchor="start" style="font-size:14px;fill:var(--ds-accent)">top = -1</text></svg></div>
+  <figcaption><b>Figure 6.6:</b> Two moments of the reversal. At the top, the first loop has finished: five characters are on the stack with K on top (<code>top</code> = 4). At the bottom, the second loop has finished: the stack is empty (<code>top</code> = −1) and the string has become KCATS.</figcaption>
+</figure>
+
+<p>The intermediate strings in the table may be surprising at first sight. For two steps <code>s</code> reads "KCACK." The reason is that the middle letter of the word "STACK," the A, is written back to the very cell where it already is, so that step changes nothing. Only the other steps actually change the string. The program was run to verify this: it gave KCATS for <code>"STACK"</code> and ba for <code>"ab"</code>; the empty string stayed empty.</p>
+
+<p>The cost is clear. For a string of <span class="m">n</span> characters, the first loop makes <span class="m">n</span> pushes and the second makes <span class="m">n</span> pops and one failed pop. Since each operation is <span class="m">O(1)</span>, the total time is <span class="m">Θ(n)</span>. Because the stack holds all <span class="m">n</span> characters at once, the extra memory is also <span class="m">Θ(n)</span>. The same job can be done with two indices, swapping characters from the two ends, using <span class="m">O(1)</span> extra memory. The value of the stack version is that it shows plainly the stack's ability to reverse order. The same method works for any stream whose order is to be reversed but whose length is not known in advance.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Forgetting the capacity assumption. <code>reverse</code> assumes that the string is shorter than <code>CAP</code> characters. For a string of 150 characters, the first 100 characters enter the stack, push returns <code>false</code> for the remaining 50, and those characters are silently lost. The second loop writes back only 100 characters. The result is a meaningless string made of the reverse of the first 100 characters followed by the remaining 50 characters in their original form. A safe version either checks the result of push and returns an error, or chooses the capacity according to the length of the string.</p>
+</div>
+<h2 class="nt-pb" id="s6-5"><span class="nt-num">6.5</span>Linked stack</h2>
+
+<p>The capacity of an array stack is chosen in advance. If the capacity is too small, the stack overflows; if it is too large, unused cells take up space for nothing. A linked list removes this dilemma. A separate node is allocated for each item, and the stack holds exactly as many nodes as it has items. This section builds the stack on a singly linked list.</p>
+
+<h3 id="s6-5-1"><span class="nt-num">6.5.1</span>Why the top is the head of the list</h3>
+
+<p>In a linked list each item is a <strong>node</strong>. A node carries two fields: <code>data</code>, which holds the value of the item, and <code>link</code>, which holds the address of the next node. Because the node type contains a pointer to its own type, it is a self-referential structure:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> node {
+    <span class="kw">int</span> data;
+    <span class="kw">struct</span> node *link;
+} node;</code></pre>
+
+<p>Which end of the stack should correspond to which end of the list? In a singly linked list the two ends are not equal. Inserting at the head and deleting from the head are <span class="m">O(1)</span>: only the head pointer and one link change. Insertion at the tail is also <span class="m">O(1)</span> if the last node is tracked separately. But to delete from the tail, the link of the second-to-last node has to be set to <code>NULL</code>. In a singly linked list one cannot go back from a node to the one before it; the second-to-last node can be found only by walking from the head, in <span class="m">O(n)</span> time.</p>
+
+<p>In a stack, insertion and deletion happen at the same end, so that end must be the head of the list. The pointer <code>top</code>, which designates the top of the stack, therefore points to the first node of the list. The item added last is at the head of the list and the item added first is at its tail. An empty stack is one whose <code>top</code> is <code>NULL</code>. In short there are two options: either keep two pointers and track the last node as well, and deletion stays slow anyway, or keep the head with a single pointer and everything is fast. The right choice is the second.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bagli" style="--w:540px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 540 108" role="img" aria-label="linked stack"><defs><marker id="n6-d04-ah50-s16_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker></defs><text class="txt mono" x="64" y="58" text-anchor="end">top</text><rect class="box" x="70" y="40" width="34" height="26"/><circle class="ah" cx="87" cy="53" r="3.5"/><g><rect class="box" x="150" y="36" width="78" height="34" rx="3"/><line class="line" x1="198.36" y1="36" x2="198.36" y2="70" style="stroke-width:1.5"/><text class="txt mono" x="174.18" y="58" text-anchor="middle">C</text></g><path class="line" d="M87 53 L148 53" marker-end="url(#n6-d04-ah50-s16_00-1)"/><g><rect class="box" x="270" y="36" width="78" height="34" rx="3"/><line class="line" x1="318.36" y1="36" x2="318.36" y2="70" style="stroke-width:1.5"/><text class="txt mono" x="294.18" y="58" text-anchor="middle">B</text></g><path class="line" d="M213.18 53 L268 53" marker-end="url(#n6-d04-ah50-s16_00-1)"/><g><rect class="box" x="390" y="36" width="78" height="34" rx="3"/><line class="line" x1="438.36" y1="36" x2="438.36" y2="70" style="stroke-width:1.5"/><text class="txt mono" x="414.18" y="58" text-anchor="middle">A</text><text class="lbl" x="453.18" y="57" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M333.18 53 L388 53" marker-end="url(#n6-d04-ah50-s16_00-1)"/><text class="lbl" x="170" y="100" text-anchor="start">top (added last)</text><text class="lbl" x="468" y="100" text-anchor="end">bottom (added first)</text></svg></div>
+  <figcaption><b>Figure 6.7:</b> A linked stack to which A, B, C have been pushed in that order. <code>top</code> points to the head of the list, that is, to C, the item added last; C points to B, and B points to A. The link of A is <code>NULL</code>: A is the bottom of the stack.</figcaption>
+</figure>
+
+<p><a href="#sekil-bagli">Figure 6.7</a> shows a linked stack to which A, B, C have been pushed in that order. Pay attention to the direction of the arrows. They run from top to bottom: each node points to the node that was added before it. A pop moves <code>top</code> one arrow forward and removes C from the list. Nothing is shifted, and there is no capacity limit. The stack overflows only when <code>malloc</code> cannot find room for a new node.</p>
+
+<h3 id="s6-5-2"><span class="nt-num">6.5.2</span>Linked <code>push</code></h3>
+
+<pre class="nt-code"><code><span class="kw">bool</span> push(node **top, <span class="kw">int</span> x) {
+  node *new_node = malloc(<span class="kw">sizeof</span> *new_node);
+  <span class="kw">if</span> (new_node == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>; /* no memory */
+  new_node-&gt;data = x;
+  new_node-&gt;link = *top;  /* point to old top */
+  *top = new_node;        /* new top */
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>The function takes the parameter <code>node **top</code>. This is a <strong>pointer to a pointer</strong>: the address of the caller's <code>top</code> variable. Push is going to make the caller's <code>top</code> point to the new node. If a copy passed by value were changed, the caller's <code>top</code> would keep pointing to the old node and the new node would be lost. That is why the call is made as <code>push(&amp;top, 10)</code>. Inside the function, <code>*top</code> is the caller's <code>top</code> variable itself.</p>
+
+<p>The body has four steps:</p>
+<ol class="nt-steps">
+  <li><code>node *new_node = malloc(sizeof *new_node);</code> allocates room for one node from heap memory. If the allocation fails, <code>malloc</code> returns <code>NULL</code> and the function exits with <code>false</code>. In that case the stack has not changed at all.</li>
+  <li><code>new_node-&gt;data = x;</code> writes the value into the new node. The memory that <code>malloc</code> returns is not cleared; the fields hold indeterminate values until this assignment.</li>
+  <li><code>new_node-&gt;link = *top;</code> makes the link of the new node point to the old top. If the stack is empty, the old top is <code>NULL</code> and the link of the new node becomes <code>NULL</code> too.</li>
+  <li><code>*top = new_node;</code> makes the caller's <code>top</code> point to the new node. The new node is now the top of the stack.</li>
+</ol>
+
+<p>The order of the third and fourth steps is critical. First link, then change the top. Had the order been reversed, the line <code>*top = new_node;</code> would have lost the address of the old top. The following <code>new_node-&gt;link = *top;</code> would then have linked the new node to itself. All the nodes of the old list would have remained as leaked memory that no variable can point to.</p>
+
+<p>Push 10, 20, 30 in turn onto an empty stack. <a href="#tab-bpush-iz">Table 6.6</a> gives the state after each line. In the table, <code>node(10)</code> means the address of the node whose value is 10.</p>
+
+<div class="nt-tablewrap" id="tab-bpush-iz">
+<table class="nt-table">
+  <caption>Table 6.6: Trace of the linked <code>push</code> while 10, 20, 30 are pushed onto an empty stack.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Line</th><th scope="col"><code>new_node</code></th><th scope="col"><code>new_node-&gt;link</code></th><th scope="col"><code>*top</code></th><th scope="col">Stack</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td><code>node *top = NULL;</code></td><td>—</td><td>—</td><td>NULL</td><td>(empty)</td></tr>
+    <tr><td rowspan="4"><code>push(&amp;top, 10)</code></td><td><code>malloc</code></td><td>node(?)</td><td>?</td><td>NULL</td><td>(empty)</td></tr>
+    <tr><td><code>new_node-&gt;data = x</code></td><td>node(10)</td><td>?</td><td>NULL</td><td>(empty)</td></tr>
+    <tr><td><code>new_node-&gt;link = *top</code></td><td>node(10)</td><td>NULL</td><td>NULL</td><td>(empty)</td></tr>
+    <tr><td><code>*top = new_node</code></td><td>node(10)</td><td>NULL</td><td>node(10)</td><td>10</td></tr>
+    <tr><td rowspan="2"><code>push(&amp;top, 20)</code></td><td><code>new_node-&gt;link = *top</code></td><td>node(20)</td><td>node(10)</td><td>node(10)</td><td>10</td></tr>
+    <tr><td><code>*top = new_node</code></td><td>node(20)</td><td>node(10)</td><td>node(20)</td><td>20 → 10</td></tr>
+    <tr><td rowspan="2"><code>push(&amp;top, 30)</code></td><td><code>new_node-&gt;link = *top</code></td><td>node(30)</td><td>node(20)</td><td>node(20)</td><td>20 → 10</td></tr>
+    <tr><td><code>*top = new_node</code></td><td>node(30)</td><td>node(20)</td><td>node(30)</td><td>30 → 20 → 10</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bpush" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Linked stack: empty"><text class="txt mono" x="54" y="94" text-anchor="end">*top</text><rect class="box" x="60" y="76" width="34" height="26"/><text class="lbl" x="77" y="93" text-anchor="middle" style="font-size:10px">NULL</text><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">?</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← new</text></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Linked stack: empty"><defs><marker id="n6-d04-ah51-s17_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="94" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="76" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="89" r="3.5" style="fill:var(--ds-accent)"/><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">10</text><text class="lbl" x="203.18" y="31" text-anchor="middle" style="font-size:10.5px">NULL</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← new</text><path class="line" d="M77 76 Q73 27 138 27" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah51-s17_04-1)"/></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Linked stack: 20 → 10"><defs><marker id="n6-d04-ah59-s17_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah60-s17_11-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="94" text-anchor="end">*top</text><rect class="box" x="60" y="76" width="34" height="26"/><circle class="ah" cx="77" cy="89" r="3.5"/><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">30</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← new</text><path class="line" d="M203.18 35 L212 70" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah60-s17_11-1)"/><g><rect class="box" x="200" y="72" width="78" height="34" rx="3"/><line class="line" x1="248.36" y1="72" x2="248.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="224.18" y="94" text-anchor="middle">20</text></g><path class="line" d="M77 89 L198 89" marker-end="url(#n6-d04-ah59-s17_11-1)"/><g><rect class="box" x="320" y="72" width="78" height="34" rx="3"/><line class="line" x1="368.36" y1="72" x2="368.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="344.18" y="94" text-anchor="middle">10</text><text class="lbl" x="383.18" y="93" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M263.18 89 L318 89" marker-end="url(#n6-d04-ah59-s17_11-1)"/></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Linked stack: 20 → 10"><defs><marker id="n6-d04-ah61-s17_12-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah62-s17_12-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="94" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="76" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="89" r="3.5" style="fill:var(--ds-accent)"/><g><rect class="box" x="140" y="10" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="188.36" y1="10" x2="188.36" y2="44" style="stroke-width:1.5"/><text class="txt mono" x="164.18" y="32" text-anchor="middle">30</text></g><text class="txt mono" x="226" y="32" text-anchor="start" style="fill:var(--ds-accent)">← new</text><path class="line" d="M203.18 35 L212 70" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah62-s17_12-1)"/><path class="line" d="M77 76 Q73 27 138 27" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah62-s17_12-1)"/><g><rect class="box" x="200" y="72" width="78" height="34" rx="3"/><line class="line" x1="248.36" y1="72" x2="248.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="224.18" y="94" text-anchor="middle">20</text></g><g><rect class="box" x="320" y="72" width="78" height="34" rx="3"/><line class="line" x1="368.36" y1="72" x2="368.36" y2="106" style="stroke-width:1.5"/><text class="txt mono" x="344.18" y="94" text-anchor="middle">10</text><text class="lbl" x="383.18" y="93" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M263.18 89 L318 89" marker-end="url(#n6-d04-ah61-s17_12-1)"/></svg></div>
+  <figcaption><b>Figure 6.8:</b> Four moments of the linked push. In the first, <code>malloc</code> has allocated the first node; its fields are indeterminate (?) and <code>*top</code> is still <code>NULL</code>. In the second, 10 is the only item of the stack. In the third, the new node holding 30 has been prepared and linked to the old top, 20, but <code>*top</code> still points to 20. In the fourth, after <code>*top = new_node</code>, the stack is 30 → 20 → 10.</figcaption>
+</figure>
+
+<p>The intermediate state in the third drawing is instructive. The new node is ready and points to 20, but the stack is still 20 → 10. The structure of the stack changes with a single assignment, the line <code>*top = new_node</code>. This arrangement is also safe in the failure case: had <code>malloc</code> failed, the function would have returned at the first check and the stack would not have been touched at all. Each push does a constant amount of work: one allocation and three assignments. The length of the stack does not affect this amount; push is <span class="m">O(1)</span>. The running time of <code>malloc</code> itself is also taken to be constant in practice, but it is much more expensive than writing to an array cell.</p>
+
+<h3 id="s6-5-3"><span class="nt-num">6.5.3</span>Linked <code>pop</code></h3>
+
+<pre class="nt-code"><code><span class="kw">bool</span> pop(node **top, <span class="kw">int</span> *x) {
+  node *old = *top;        /* no malloc! */
+  <span class="kw">if</span> (old == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;  /* empty */
+  *x = old-&gt;data;
+  *top = old-&gt;link;        /* advance top */
+  free(old);               /* release memory */
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>Pop also takes <code>node **top</code>, because it is going to advance the caller's <code>top</code> to the next node. The value removed is delivered through the output parameter <code>int *x</code>; the return value reports success. The body consists of these steps:</p>
+<ol class="nt-steps">
+  <li><code>node *old = *top;</code> saves the address of the top node in a local pointer. This line allocates no new memory; it only copies an address.</li>
+  <li><code>if (old == NULL) return false;</code> reports underflow if the stack is empty.</li>
+  <li><code>*x = old-&gt;data;</code> copies the value to the caller. This line must run before the node is released.</li>
+  <li><code>*top = old-&gt;link;</code> advances the caller's <code>top</code> to the next node. This too must be done before the release, because the link field lives inside the node that is about to be released.</li>
+  <li><code>free(old);</code> returns the node's memory to the system.</li>
+</ol>
+
+<p>Apply four pops to the stack 30 → 20 → 10 and print each successful result. <a href="#tab-bpop-iz">Table 6.7</a> summarizes the calls.</p>
+
+<div class="nt-tablewrap" id="tab-bpop-iz">
+<table class="nt-table">
+  <caption>Table 6.7: Four pops from the stack 30 → 20 → 10.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col"><code>old</code></th><th scope="col"><code>*x</code></th><th scope="col"><code>*top</code> (after)</th><th scope="col"><code>free</code></th><th scope="col">Returns</th><th scope="col">Stack</th></tr></thead>
+  <tbody>
+    <tr><td>1st pop</td><td>node(30)</td><td>30</td><td>node(20)</td><td>node(30)</td><td>true</td><td>20 → 10</td></tr>
+    <tr><td>2nd pop</td><td>node(20)</td><td>20</td><td>node(10)</td><td>node(20)</td><td>true</td><td>10</td></tr>
+    <tr><td>3rd pop</td><td>node(10)</td><td>10</td><td>NULL</td><td>node(10)</td><td>true</td><td>(empty)</td></tr>
+    <tr><td>4th pop</td><td>NULL</td><td>(untouched)</td><td>NULL</td><td>—</td><td>false</td><td>(empty)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bpop" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Pop from a linked stack"><defs><marker id="n6-d04-ah65-s18_01-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah66-s18_01-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="52" text-anchor="end">*top</text><rect class="box" x="60" y="34" width="34" height="26"/><circle class="ah" cx="77" cy="47" r="3.5"/><g><rect class="box" x="180" y="30" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="228.36" y1="30" x2="228.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="204.18" y="52" text-anchor="middle">30</text></g><g><rect class="box" x="300" y="30" width="78" height="34" rx="3"/><line class="line" x1="348.36" y1="30" x2="348.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="324.18" y="52" text-anchor="middle">20</text></g><path class="line" d="M243.18 47 L298 47" marker-end="url(#n6-d04-ah65-s18_01-1)"/><g><rect class="box" x="420" y="30" width="78" height="34" rx="3"/><line class="line" x1="468.36" y1="30" x2="468.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="444.18" y="52" text-anchor="middle">10</text><text class="lbl" x="483.18" y="51" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M363.18 47 L418 47" marker-end="url(#n6-d04-ah65-s18_01-1)"/><path class="line" d="M77 47 L178 47" marker-end="url(#n6-d04-ah65-s18_01-1)"/><path class="line" d="M210 100 L210 68" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah66-s18_01-1)"/><text class="txt mono" x="210" y="116" text-anchor="middle" style="fill:var(--ds-accent)">old</text></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Pop from a linked stack"><defs><marker id="n6-d04-ah69-s18_03-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah70-s18_03-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="52" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="34" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="47" r="3.5" style="fill:var(--ds-accent)"/><g><rect class="box" x="180" y="30" width="78" height="34" rx="3" style="fill:var(--ds-hot)"/><line class="line" x1="228.36" y1="30" x2="228.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="204.18" y="52" text-anchor="middle">30</text></g><g><rect class="box" x="300" y="30" width="78" height="34" rx="3"/><line class="line" x1="348.36" y1="30" x2="348.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="324.18" y="52" text-anchor="middle">20</text></g><path class="line" d="M243.18 47 L298 47" marker-end="url(#n6-d04-ah69-s18_03-1)"/><g><rect class="box" x="420" y="30" width="78" height="34" rx="3"/><line class="line" x1="468.36" y1="30" x2="468.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="444.18" y="52" text-anchor="middle">10</text><text class="lbl" x="483.18" y="51" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M363.18 47 L418 47" marker-end="url(#n6-d04-ah69-s18_03-1)"/><path class="line" d="M77 60 Q250 118 318 66" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah70-s18_03-1)"/><path class="line" d="M210 100 L210 68" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah70-s18_03-1)"/><text class="txt mono" x="210" y="116" text-anchor="middle" style="fill:var(--ds-accent)">old</text></svg> <svg class="ds-svg" viewBox="0 0 600 124" role="img" aria-label="Pop from a linked stack"><defs><marker id="n6-d04-ah71-s18_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="n6-d04-ah72-s18_04-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><text class="txt mono" x="54" y="52" text-anchor="end" style="fill:var(--ds-accent)">*top</text><rect class="box" x="60" y="34" width="34" height="26" style="fill:var(--ds-hot)"/><circle class="ah" cx="77" cy="47" r="3.5" style="fill:var(--ds-accent)"/><g opacity="0.35"><rect class="box-empty" x="180" y="30" width="78" height="34" rx="3"/><line class="line" x1="228.36" y1="30" x2="228.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="204.18" y="52" text-anchor="middle">30</text></g><text class="lbl" x="219" y="20" text-anchor="middle" style="fill:var(--ds-bad);font-size:12px">freed</text><g><rect class="box" x="300" y="30" width="78" height="34" rx="3"/><line class="line" x1="348.36" y1="30" x2="348.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="324.18" y="52" text-anchor="middle">20</text></g><g><rect class="box" x="420" y="30" width="78" height="34" rx="3"/><line class="line" x1="468.36" y1="30" x2="468.36" y2="64" style="stroke-width:1.5"/><text class="txt mono" x="444.18" y="52" text-anchor="middle">10</text><text class="lbl" x="483.18" y="51" text-anchor="middle" style="font-size:10.5px">NULL</text></g><path class="line" d="M363.18 47 L418 47" marker-end="url(#n6-d04-ah71-s18_04-1)"/><path class="line" d="M77 60 Q250 118 318 66" style="stroke:var(--ds-accent);" marker-end="url(#n6-d04-ah72-s18_04-1)"/></svg></div>
+  <figcaption><b>Figure 6.9:</b> Three moments of the first pop. First, <code>old</code> points to the top node (30); no new memory has been allocated. Then, with <code>*top = old-&gt;link</code>, the top advances to 20; the node holding 30 is no longer in the list, but <code>old</code> still points to it. At the end, the node has been released with <code>free(old)</code>; <code>main</code> prints 30.</figcaption>
+</figure>
+
+<p>The test program pushed 10, 20, 30, called pop four times, and printed "30 20 10 false." The output order is the reverse of the input order. Pop also does a constant amount of work: one comparison, two assignments, and one <code>free</code>. Its cost is <span class="m">O(1)</span>.</p>
+
+<p>The order of the steps in pop matters even more than in push. After the call <code>free(old)</code>, the memory that <code>old</code> points to no longer belongs to the program. If <code>old-&gt;data</code> or <code>old-&gt;link</code> is read after that moment, the behavior is undefined. The program often reads the right value, because released memory is not handed to another use immediately. That makes the bug more dangerous: it does not show up in tests, but the value is corrupted when another <code>malloc</code> intervenes. A pointer that points to memory released in this way is called a <strong>dangling pointer</strong>. The robust rule is this: first save the value and the link, and call <code>free</code> last.</p>
+
+<h3 id="s6-5-4"><span class="nt-num">6.5.4</span>Memory ownership and emptying the stack</h3>
+
+<p>In a linked stack, <code>malloc</code> allocates every node and one <code>free</code> must give each node back. In C, this responsibility lies entirely with the programmer. Nodes that remain on the stack when the program ends must be released too. A cleanup routine is written for this job:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> node {
+    <span class="kw">int</span> data;
+    <span class="kw">struct</span> node *link;
+} node;
+
+<span class="kw">void</span> stack_clear(node **top) {
+    <span class="kw">while</span> (*top != <span class="kw">NULL</span>) {
+        node *old = *top;
+        *top = old-&gt;link;
+        free(old);
+    }
+}                  /* afterwards *top == <span class="kw">NULL</span> */</code></pre>
+
+<p><code>stack_clear</code> removes the top node until the stack is empty. Three lines run in each turn of the loop: the address of the top node is taken into <code>old</code>, <code>*top</code> is advanced to the next node, and then <code>old</code> is released. The order is again the same: a node is never released before its link is saved. When the loop ends, <code>*top</code> is <code>NULL</code>; the caller's <code>top</code> thus designates an empty stack and does not remain as a dangling pointer. In a stack of <span class="m">n</span> nodes the loop runs <span class="m">n</span> times; the cost is <span class="m">Θ(n)</span>. The extra memory is just the pointer <code>old</code>, that is, <span class="m">O(1)</span>.</p>
+
+<p>One point deserves notice in this code: <code>old</code> is a pointer variable, not a new node. A common mistake in student code is to allocate room with <code>malloc</code> for every pointer: <code>node *old = malloc(sizeof *old); old = *top;</code>. The first line allocates room for one node; the second line overwrites <code>old</code> with the address of the top node. The address of the allocated block is now nowhere. One node leaks at every pop. <code>malloc</code> is applied to a pointer only when the pointer is going to point to a new object. To point to an existing node, an assignment is enough.</p>
+
+<p>That the linked stack runs without leaks was verified with a counting wrapper. The wrapper redirects calls to <code>malloc</code> and <code>free</code> to its own functions with the help of a macro and counts every successful call. The test program pushed 10, 20, 30 and popped four times, then pushed five more items, 1 through 5, and called <code>stack_clear</code>. The counter showed eight <code>malloc</code> calls and eight <code>free</code> calls; after the cleanup <code>top</code> was <code>NULL</code>. In the same program <code>sizeof(node)</code> came out as 16. The fields of the node are a 4-byte <code>int</code> and an 8-byte pointer; so that the pointer sits at an address that is a multiple of 8, the compiler inserts 4 bytes of padding. For this reason, on a 64-bit system a linked stack uses four times as much memory per <code>int</code> as an array does; the bookkeeping records that <code>malloc</code> keeps for each block come on top of that.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Changing the top first in push: <code>*top = new_node; new_node-&gt;link = *top;</code>. When the second line runs, <code>*top</code> is already <code>new_node</code>; the node points to itself and all the nodes of the old stack are lost. Any loop that walks the stack from the top then spins forever on the same node. The correct order: first <code>new_node-&gt;link = *top;</code>, then <code>*top = new_node;</code>.</p>
+</div>
+
+<h2 class="nt-pb" id="s6-6"><span class="nt-num">6.6</span>Array-based or linked?</h2>
+
+<p>So far two implementations have been built: the fixed-capacity array and the linked list. There is a third option in between: an array that grows itself when it fills up. This section first builds this third implementation, then justifies its cost with amortized analysis, and finally compares the three implementations.</p>
+
+<h3 id="s6-6-1"><span class="nt-num">6.6.1</span>The growable array</h3>
+
+<p>The problem with a fixed array is that the capacity must be known in advance. The solution is to keep the array in heap memory and, when it fills up, move it to a larger block with <code>realloc</code>. An array that is enlarged with <code>realloc</code> when full is called a <strong>dynamic array</strong>. The real question is how much to enlarge it. If the capacity is doubled at every fill-up, the average cost of the pushes stays constant. The implementation below follows the layout of the <code>struct</code> version:</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="kw">int</span> *data;
+    <span class="kw">int</span> top, cap;           /* top = -1 when empty */
+} DynStack;
+
+<span class="kw">bool</span> dyn_init(DynStack *s, <span class="kw">int</span> cap) {
+    s-&gt;data = malloc(cap * <span class="kw">sizeof</span> *s-&gt;data);
+    <span class="kw">if</span> (s-&gt;data == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;
+    s-&gt;top = -1;  s-&gt;cap = cap;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> dyn_push(DynStack *s, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (s-&gt;top == s-&gt;cap - 1) {          /* full: double the capacity */
+        <span class="kw">int</span> *bigger = realloc(s-&gt;data, 2 * s-&gt;cap * <span class="kw">sizeof</span> *bigger);
+        <span class="kw">if</span> (bigger == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">false</span>;  /* old block still valid */
+        s-&gt;data = bigger;
+        s-&gt;cap *= 2;
+    }
+    s-&gt;data[++s-&gt;top] = x;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> dyn_pop(DynStack *s, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (s-&gt;top &lt; 0) <span class="kw">return</span> <span class="kw">false</span>;
+    *x = s-&gt;data[s-&gt;top--];
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">void</span> dyn_destroy(DynStack *s) {
+    free(s-&gt;data);
+    s-&gt;data = <span class="kw">NULL</span>;  s-&gt;top = -1;  s-&gt;cap = 0;
+}</code></pre>
+
+<p>The <code>DynStack</code> structure carries three fields: the address of the array in heap memory, <code>data</code>; the top index, <code>top</code>; and the current capacity, <code>cap</code>. <code>dyn_init</code> allocates the array with the requested initial capacity. <code>dyn_pop</code> is identical to <code>pop</code> in the <code>struct</code> version.</p>
+
+<p>The difference is in <code>dyn_push</code>. If the stack is full, the routine does not return an error; it tries to double the capacity. <code>realloc(s-&gt;data, new_size)</code> brings the old block to the new size. If there is room right behind the old block, the block can grow in place. If not, <code>realloc</code> allocates a new block, copies the old contents there, releases the old block, and returns the address of the new block. The number of items copied is the current capacity.</p>
+
+<p>The result of <code>realloc</code> is not written directly to <code>s-&gt;data</code>; it is first taken into a temporary pointer named <code>bigger</code>. The reason is the failure case. If <code>realloc</code> fails, it returns <code>NULL</code> and leaves the old block alone. Had the result been written directly to <code>s-&gt;data</code>, the address of the old block would have been lost and all the items in it would have leaked. Thanks to the temporary pointer, on failure the stack remains valid as it was and the function returns <code>false</code>. On success, <code>data</code> and <code>cap</code> are updated, and then the item is written as usual.</p>
+
+<p>When 10, 20, 30, 40, 50 are pushed onto a stack whose initial capacity is 2, the capacity changes as follows: 10 and 20 find room (<code>cap</code> = 2). When 30 is pushed the stack is full; the capacity rises to 4 and 2 items are copied. 40 finds room. When 50 is pushed the capacity rises to 8 and 4 items are copied. These values were verified by printing them in a test program: after each push, the pairs (<code>top</code>, <code>cap</code>) were (0, 2), (1, 2), (2, 4), (3, 4), (4, 8). The counting wrapper counted two <code>malloc</code> calls and two <code>free</code> calls.</p>
+
+<h3 id="s6-6-2"><span class="nt-num">6.6.2</span>Amortized cost</h3>
+
+<p>In a growable array, the cost of a single push varies greatly with the situation. Most pushes write to one cell and are <span class="m">O(1)</span>. But the push made at the moment the capacity is full copies all the items and is <span class="m">O(n)</span>. Worst-case analysis therefore says "push is <span class="m">O(n)</span>." This is true but misleading: the expensive pushes are very rare. Finding the average cost per operation by dividing the total cost of a sequence of operations by the number of operations is called <strong>amortized analysis</strong>. The average here does not rest on probability; it holds even for the worst possible sequence of operations.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-amortize">
+  <span class="nt-box__title">Theorem 6.1 (Amortized cost of doubling)</span>
+  <p>Perform <span class="m">n</span> pushes in a row onto an empty growable-array stack of capacity 1, doubling the capacity each time it fills. The total number of items copied over all the enlargements is less than <span class="m">2n</span>. Therefore the total cost of <span class="m">n</span> pushes is <span class="m">O(n)</span> and the amortized cost per push is <span class="m">O(1)</span>.</p>
+</div>
+
+<p><em>Proof.</em> An enlargement happens when a push is made while the stack is full. Since the capacity goes 1, 2, 4, 8, …, enlargements occur at capacities 1, 2, 4, …, <span class="m">2<sup>k</sup></span>. An enlargement at capacity <span class="m">c</span> copies <span class="m">c</span> items. If the last enlargement happened at capacity <span class="m">2<sup>k</sup></span>, then at that moment the stack holds <span class="m">2<sup>k</sup></span> items and one more is being pushed; hence <span class="m">2<sup>k</sup> &lt; n</span>. The total number of copies is <span class="m">1 + 2 + 4 + … + 2<sup>k</sup> = 2<sup>k+1</sup> − 1</span>. Since <span class="m">2<sup>k</sup> ≤ n − 1</span>, this total is at most <span class="m">2n − 3</span>, a constant multiple of <span class="m">n</span>. Each push also does one write. The total work is bounded by <span class="m">n + (2n − 3) &lt; 3n</span>, which is under <span class="m">3</span> units per push. ∎</p>
+
+<p>The bound on the copies in the proof can be stated more tightly. The total of the copies is <span class="m">2<sup>k+1</sup> − 1</span> and the final capacity is <span class="m">2<sup>k+1</sup></span>; that is, the total number of copies is one less than the final capacity. The final capacity is also less than <span class="m">2n</span>. These numbers were verified with a test program: when 1000 pushes were made onto a stack of capacity 1, there were 10 enlargements, 1023 items were copied in total (fewer than <span class="m">2n</span> = 2000), and the final capacity reached 1024.</p>
+
+<p>The growth factor does not have to be two; what matters is that it is a constant factor greater than 1. If a factor of 1.5 is chosen, the copies increase somewhat and the idle capacity decreases; the amortized cost remains <span class="m">O(1)</span>. By contrast, if the capacity is raised by a fixed amount at each fill-up, say 10 cells, the amortized cost breaks. Over <span class="m">n</span> pushes there are about <span class="m">n/10</span> enlargements, and each copies all the current items. The total number of copies is <span class="m">10 + 20 + … + n ≈ n²/20</span>; the cost per push rises to <span class="m">Θ(n)</span>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing <code>s-&gt;data = realloc(s-&gt;data, …);</code>. If <code>realloc</code> fails, it returns <code>NULL</code> and this assignment erases the only address of the old block. All the contents of the stack are lost and the old block leaks. The result must first be taken into a temporary pointer and written to the real field only after it is seen not to be <code>NULL</code>.</p>
+</div>
+
+<h3 id="s6-6-3"><span class="nt-num">6.6.3</span>Comparison and measurements</h3>
+
+<p><a href="#tab-secim">Table 6.8</a> compares the three implementations on six criteria.</p>
+
+<div class="nt-tablewrap" id="tab-secim">
+<table class="nt-table nt-table--wide">
+  <caption>Table 6.8: A stack as a fixed array, a growable array, and a linked list.</caption>
+  <thead><tr><th scope="col">Criterion</th><th scope="col">Fixed array</th><th scope="col">Growable array</th><th scope="col">Linked list</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Capacity</th><td>Fixed at compile time</td><td>×2 as needed</td><td>Until memory runs out</td></tr>
+    <tr><th scope="row">push / pop</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span> amortized</td><td><span class="m">O(1)</span>, a <code>malloc</code> per push</td></tr>
+    <tr><th scope="row">Extra memory per item</th><td>None</td><td>None (except unused capacity)</td><td>One pointer (8 bytes) and padding</td></tr>
+    <tr><th scope="row">Cache behavior</th><td>Very good</td><td>Very good</td><td>Poor (nodes scattered)</td></tr>
+    <tr><th scope="row">Overflow</th><td>Possible</td><td>Only if <code>realloc</code> fails</td><td>Only if <code>malloc</code> fails</td></tr>
+    <tr><th scope="row">Bug risk</th><td>Bounds checks</td><td>The result of <code>realloc</code></td><td>Forgotten <code>free</code>, dangling pointer</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The "cache behavior" row needs an explanation. On every memory access, the processor brings into the <strong>cache</strong> not a single number but the 64-byte block around it. In an array stack, consecutive items lie side by side, so many items fit in one block and later accesses are served from the cache. In a linked stack, each node is a separate <code>malloc</code> block and where it will sit in memory is not known. Reaching consecutive nodes often requires fetching a new block.</p>
+
+<p>The asymptotic costs are the same, but the constant factors differ greatly. To see this, a program that performs <span class="m">10<sup>7</sup></span> pushes followed by <span class="m">10<sup>7</sup></span> pops on each of the three implementations was compiled with <code>-O2</code> and run three times. The fixed array took 25–35 ms, the growable array (initial capacity 16) 30–63 ms, and the linked stack 680–806 ms. These values vary from machine to machine, but the ratio is consistent: the linked stack is roughly twenty times slower than the array stacks. Most of the difference comes from the <code>malloc</code> at every push and the <code>free</code> at every pop, and the rest from cache misses.</p>
+
+<p>A practical rule for choosing is this. If the largest size the stack can reach is known, a fixed array is the simplest and fastest solution. If it is not known, a growable array is the fastest in practice. A linked stack suits cases where the nodes already live in other structures or where items are created and deleted one by one. For example, in a program whose items are large records that are shared with other lists, linking the nodes into the stack is cheaper than copying them into an array.</p>
+
+<h2 class="nt-pb" id="s6-7"><span class="nt-num">6.7</span>The call stack</h2>
+
+<p>The computer's most heavily used stack is not one that a programmer writes. Every C program uses a stack set up by the compiler and the operating system to manage function calls. It is called the <strong>call stack</strong>. This section explains how the call stack works, how it overflows, and how a recursive function can be written with our own stack instead of this one.</p>
+
+<h3 id="s6-7-1"><span class="nt-num">6.7.1</span>The frame</h3>
+
+<p>When a function is called, the information needed for the call to live is written to a block in memory. This block is called a <strong>stack frame</strong> (or <strong>activation record</strong>). The first part of the frame is the <strong>return address</strong>: it says from which instruction in the caller execution continues when the function ends. The frame also holds the function's parameters, its local variables, and the information needed to return to the caller's frame. A call pushes a new frame onto the call stack. <code>return</code> pops this frame and control passes to the return address. The function called last finishes first; this is why the call stack is a true stack.</p>
+
+<p>A recursive function shows this arrangement clearly:</p>
+
+<pre class="nt-code"><code><span class="kw">long</span> fact(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n &lt;= 1) <span class="kw">return</span> 1;          /* base case */
+    <span class="kw">return</span> n * fact(n - 1);        /* multiply when the call returns */
+}</code></pre>
+
+<p>Let <code>main</code> call <code>fact(5)</code>. To compute its result, <code>fact(5)</code> waits for the result of <code>fact(4)</code>; <code>fact(4)</code> calls <code>fact(3)</code>, which calls <code>fact(2)</code>, which calls <code>fact(1)</code>. Each call has its own <code>n</code>, and these values do not get mixed up, because each lives in a separate frame. <code>fact(1)</code> reaches the base case and returns 1. At that moment the stack has the most frames: six frames, counting <code>main</code>. Then the frames are popped in reverse order: <code>fact(2)</code> returns 2·1 = 2, <code>fact(3)</code> returns 3·2 = 6, <code>fact(4)</code> returns 4·6 = 24, and <code>fact(5)</code> returns 5·24 = 120. <a href="#tab-cerceve">Table 6.9</a> summarizes this process.</p>
+
+<div class="nt-tablewrap" id="tab-cerceve">
+<table class="nt-table">
+  <caption>Table 6.9: The call stack during <code>fact(5)</code> (the rightmost frame is on top).</caption>
+  <thead><tr><th scope="col">Moment</th><th scope="col">Call stack</th><th scope="col">Number of frames</th></tr></thead>
+  <tbody>
+    <tr><td><code>main</code> starts</td><td>main</td><td>1</td></tr>
+    <tr><td><code>fact(5)</code> is called</td><td>main | fact(5)</td><td>2</td></tr>
+    <tr><td><code>fact(4)</code> is called</td><td>main | fact(5) | fact(4)</td><td>3</td></tr>
+    <tr><td><code>fact(1)</code> is called</td><td>main | fact(5) | fact(4) | fact(3) | fact(2) | fact(1)</td><td>6 (maximum)</td></tr>
+    <tr><td><code>fact(1)</code> returns 1</td><td>main | fact(5) | fact(4) | fact(3) | fact(2)</td><td>5</td></tr>
+    <tr><td><code>fact(2)</code> returns 2</td><td>main | fact(5) | fact(4) | fact(3)</td><td>4</td></tr>
+    <tr><td><code>fact(5)</code> returns 120</td><td>main</td><td>1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>That frames really are stacked in memory can be seen with an experiment. At each call of <code>fact</code>, the address of the parameter <code>n</code> was printed (<code>-O0</code>, Windows x86-64). At every call the address was 96 bytes lower than at the previous one: from a local variable in <code>main</code> to the <code>n</code> of <code>fact(5)</code> was 80 bytes, and to the <code>n</code> of <code>fact(1)</code> it was 464 bytes. These numbers vary with the compiler, the optimization level, and the processor. The observation that does not change is this: on x86 processors the call stack grows from high addresses toward low addresses, and each call adds a frame of fixed size. <code>fact(n)</code> therefore uses <span class="m">Θ(n)</span> frames, that is, <span class="m">Θ(n)</span> stack memory.</p>
+
+<h3 id="s6-7-2"><span class="nt-num">6.7.2</span>How the call stack overflows</h3>
+
+<p>The capacity of the call stack is limited and fixed when the program starts. Typical values are a few megabytes: 8 MB on Linux, 1 MB on Windows with the Microsoft compiler. The <code>zig cc</code> compiler used for this work allocated 16 MB to Windows programs. When the stack fills up, the program crashes with a <strong>stack overflow</strong> error. Below are two typical causes and one bug that comes from the same stack layout.</p>
+
+<dl>
+  <dt>Infinite recursion</dt>
+  <dd>A recursion with no base case, or one that never reaches it, pushes a frame at every call and pops none. For example, had the condition in <code>fact</code> been written as <code>n == 1</code>, the call <code>fact(0)</code> would have descended forever through <span class="m">−1, −2, …</span>. In an experiment, an infinite recursion that keeps a 64-byte local array in each call stopped at a depth of about 104,000 calls with the Windows error <code>STATUS_STACK_OVERFLOW</code> (0xC00000FD).</dd>
+  <dt>Large local arrays</dt>
+  <dd>A local array such as <code>int a[1000000];</code> lives inside the frame and by itself takes 4 MB. It would overflow a 1 MB stack all on its own. In an experiment this array fit in a 16 MB stack, while an array of 5 million items (20 MB) crashed the program with the same error. Large data is kept in heap memory with <code>malloc</code> or defined as <code>static</code>.</dd>
+  <dt>Returning a local address</dt>
+  <dd>Writing <code>return &amp;local;</code> is not an overflow but a bug that comes from the same stack layout. When the function returns, its frame is popped. That region of memory is reused for the frame of the next call. The address returned now points to the local variables of another call; it is a dangling pointer.</dd>
+</dl>
+
+<p>Stack overflow must be kept in mind in every recursive routine in this course. For example, a function that frees a linked list recursively pushes one frame per node. For a list of a million nodes that means a million frames, and it can overflow the stack.</p>
+
+<h3 id="s6-7-3"><span class="nt-num">6.7.3</span>Turning recursion into a loop</h3>
+
+<p>Since the call stack is a stack, any recursive algorithm can be turned into a loop by doing, with our own stack, the work the call stack does. A recursive call puts "the work left unfinished for now" into a frame. In the loop version this unfinished work is pushed onto an explicit stack. For the factorial, the unfinished work is the information "multiply by <code>n</code> on return":</p>
+
+<pre class="nt-code"><code><span class="kw">long</span> fact_loop(<span class="kw">int</span> n) {
+    Stack st;  <span class="kw">int</span> k;  <span class="kw">long</span> result = 1;
+    stack_init(&amp;st);
+    <span class="kw">while</span> (n &gt; 1)                  /* push the "calls" on our own stack */
+        push(&amp;st, n--);
+    <span class="kw">while</span> (pop(&amp;st, &amp;k))            /* multiply on the "returns" */
+        result *= k;
+    <span class="kw">return</span> result;
+}</code></pre>
+
+<p>The first loop imitates the descending calls of the recursive version: it pushes <code>n</code> until it falls to 1. For 5, the stack from bottom to top becomes 5, 4, 3, 2. The second loop imitates the returns: it multiplies the result by each value popped from the stack. The products are made in the order 2, 3, 4, 5, the same as the order of returns in the recursive version. The result is 120. <code>fact_loop(0)</code> and <code>fact_loop(1)</code> gave 1, and <code>fact_loop(10)</code> gave 3628800, the same as the recursive <code>fact</code>.</p>
+
+<p>For the factorial this conversion is unnecessary; a simple <code>for</code> loop suffices. But in algorithms such as tree traversal, depth-first search, or backtracking, the unfinished work is not a single number. The unfinished work is a state, and that state is what gets pushed on the stack. Using our own stack has two benefits. First, our own stack can grow in heap memory; it is not bound by the few-megabyte limit of the call stack. Second, only the information that is needed is pushed onto the stack; there is none of the overhead of a frame, such as the return address and the saved registers.</p>
+<h2 class="nt-pb" id="s6-8"><span class="nt-num">6.8</span>Multiple stacks</h2>
+
+<p>A program can use more than one stack at a time. Giving each stack its own array is easy, but memory is wasted: when one stack fills up, the others may have free room that cannot be reached. This section deals with sharing several stacks in a single memory array.</p>
+
+<h3 id="s6-8-1"><span class="nt-num">6.8.1</span>Two stacks in one array</h3>
+
+<p>For two stacks there is a very neat solution. In an array of <span class="m">m</span> cells, the first stack grows upward from cell 0 and the second grows downward from cell <span class="m">m − 1</span>. The tops of the two stacks move toward each other.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-iki" style="--w:570px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 570 142" role="img" aria-label="Two stacks growing from the two ends of one array"><defs><marker id="n6-d04-ah94-s22_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-good)"/></marker></defs><g><text class="lbl" x="53" y="24" text-anchor="middle">0</text><rect class="box" x="20" y="30" width="66" height="36"/><text class="txt mono" x="53" y="53" text-anchor="middle">3</text></g><g><text class="lbl" x="119" y="24" text-anchor="middle">1</text><rect class="box" x="86" y="30" width="66" height="36"/><text class="txt mono" x="119" y="53" text-anchor="middle">8</text></g><g><text class="lbl" x="185" y="24" text-anchor="middle">2</text><rect class="box" x="152" y="30" width="66" height="36" style="fill:var(--ds-hot)"/><text class="txt mono" x="185" y="53" text-anchor="middle">1</text></g><g><text class="lbl" x="251" y="24" text-anchor="middle">3</text><rect class="box-empty" x="218" y="30" width="66" height="36"/></g><g><text class="lbl" x="317" y="24" text-anchor="middle">4</text><rect class="box-empty" x="284" y="30" width="66" height="36"/></g><g><text class="lbl" x="383" y="24" text-anchor="middle">5</text><rect class="box-empty" x="350" y="30" width="66" height="36"/></g><g><text class="lbl" x="449" y="24" text-anchor="middle">6</text><rect class="box" x="416" y="30" width="66" height="36" style="fill:var(--ds-hot)"/><text class="txt mono" x="449" y="53" text-anchor="middle">6</text></g><g><text class="lbl" x="515" y="24" text-anchor="middle">7</text><rect class="box" x="482" y="30" width="66" height="36"/><text class="txt mono" x="515" y="53" text-anchor="middle">2</text></g><text class="txt" x="185" y="95" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">▲ top1 = 2</text><text class="txt" x="449" y="95" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">▲ top2 = 6</text><path class="line" d="M40 118 L200 118" style="stroke:var(--ds-good);" marker-end="url(#n6-d04-ah94-s22_00-1)"/><text class="lbl" x="40" y="136" text-anchor="start">stack 1 grows right</text><path class="line" d="M540 118 L380 118" style="stroke:var(--ds-good);" marker-end="url(#n6-d04-ah94-s22_00-1)"/><text class="lbl" x="540" y="136" text-anchor="end">stack 2 grows left</text></svg></div>
+  <figcaption><b>Figure 6.10:</b> Two stacks in an array of eight cells. Stack 1 grows to the right from cell 0 and holds three items (3, 8, 1; <code>top1</code> = 2). Stack 2 grows to the left from cell 7 and holds two items (2, 6; <code>top2</code> = 6). The three cells in between are the free space shared by the two stacks.</figcaption>
+</figure>
+
+<p>When both are empty, <code>top1</code> = −1 and <code>top2</code> = <span class="m">m</span>; each points to an imaginary cell outside the array. Pushing onto stack 1 increments <code>top1</code>, and pushing onto stack 2 decrements <code>top2</code>. The array is full when the two tops become adjacent, that is, when <code>top1 + 1 == top2</code>. The advantage of this arrangement is that no cell is wasted. Even if one stack holds few items and the other many, the array fills only when the total reaches <span class="m">m</span> items. For three or more stacks this trick does not work, because an array has only two ends.</p>
+
+<h3 id="s6-8-2"><span class="nt-num">6.8.2</span><span class="m">n</span> stacks in one memory</h3>
+
+<p>For <span class="m">n</span> stacks, the solution of Horowitz and Sahni is to divide the <code>memory</code> array of <span class="m">m</span> cells into <span class="m">n</span> segments. Each stack grows within its own segment. Two helper arrays are used. <code>top[i]</code> is the index of the top item of stack <span class="m">i</span>. <code>boundary[i]</code> is the index of the cell just below the segment of stack <span class="m">i</span>. Stack <span class="m">i</span> uses the cells from <code>memory[boundary[i]+1]</code> to <code>memory[boundary[i+1]]</code>. To be able to write the upper bound of the last stack in the same way, <code>boundary[n]</code> = <span class="m">m − 1</span> is added.</p>
+
+<p>Initially memory is divided into equal parts and all stacks are empty: for <span class="m">i = 0, …, n − 1</span>, <code>top[i] = boundary[i] = (m/n)·i − 1</code>. A stack is empty when its top equals its own lower boundary: <code>top[i] == boundary[i]</code>. It is full when its top reaches the lower boundary of the next stack: <code>top[i] == boundary[i+1]</code>. Push and pop are written with these two tests:</p>
+
+<pre class="nt-code"><code>/* stack i: boundary[i]+1 .. boundary[i+1] */
+<span class="kw">bool</span> push(<span class="kw">int</span> i, <span class="kw">int</span> x) {
+  <span class="kw">if</span> (top[i] == boundary[i+1]) <span class="kw">return</span> <span class="kw">false</span>; /* full */
+  memory[++top[i]] = x;
+  <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> pop(<span class="kw">int</span> i, <span class="kw">int</span> *x) {
+  <span class="kw">if</span> (top[i] == boundary[i]) <span class="kw">return</span> <span class="kw">false</span>; /* empty */
+  *x = memory[top[i]--];
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>This code assumes that the arrays <code>memory</code>, <code>top</code>, and <code>boundary</code> are defined globally; it is kept short, as in the textbook. In a real program these three arrays are gathered in a <code>struct</code> and passed to the routines by address. The structure of the routines is the same as for a single stack; only the array <code>boundary</code> takes the place of the fixed limits. <code>push</code> returns <code>false</code> if the stack is full; otherwise it increments <code>top[i]</code> and writes the value. <code>pop</code> returns <code>false</code> if the stack is empty; otherwise it writes the top value to <code>*x</code> and decrements <code>top[i]</code>. Both are <span class="m">O(1)</span>.</p>
+
+<h3 id="s6-8-3"><span class="nt-num">6.8.3</span>Code trace</h3>
+
+<p>Let <span class="m">m</span> = 12 and <span class="m">n</span> = 3. Each stack gets four cells. Initially <code>top</code> = [−1, 3, 7] and <code>boundary</code> = [−1, 3, 7, 11]. Stack 0 uses cells 0–3, stack 1 uses cells 4–7, and stack 2 uses cells 8–11. The calls <code>push(0, 5)</code>, <code>push(1, 7)</code>, <code>push(0, 9)</code>, <code>push(2, 4)</code>, <code>push(0, 2)</code>, <code>push(0, 8)</code>, <code>push(0, 6)</code>, and <code>pop(1, &amp;x)</code> are made in turn. <a href="#tab-coklu-iz">Table 6.10</a> gives each call.</p>
+
+<div class="nt-tablewrap" id="tab-coklu-iz">
+<table class="nt-table">
+  <caption>Table 6.10: Trace of multiple stacks with <span class="m">m</span> = 12, <span class="m">n</span> = 3; <code>boundary</code> = [−1, 3, 7, 11] does not change.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Test</th><th scope="col">Action</th><th scope="col"><code>top</code></th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>—</td><td>—</td><td>[−1, 3, 7]</td></tr>
+    <tr><td><code>push(0, 5)</code></td><td>−1 == 3? No</td><td><code>memory[0] = 5</code></td><td>[0, 3, 7]</td></tr>
+    <tr><td><code>push(1, 7)</code></td><td>3 == 7? No</td><td><code>memory[4] = 7</code></td><td>[0, 4, 7]</td></tr>
+    <tr><td><code>push(0, 9)</code></td><td>0 == 3? No</td><td><code>memory[1] = 9</code></td><td>[1, 4, 7]</td></tr>
+    <tr><td><code>push(2, 4)</code></td><td>7 == 11? No</td><td><code>memory[8] = 4</code></td><td>[1, 4, 8]</td></tr>
+    <tr><td><code>push(0, 2)</code></td><td>1 == 3? No</td><td><code>memory[2] = 2</code></td><td>[2, 4, 8]</td></tr>
+    <tr><td><code>push(0, 8)</code></td><td>2 == 3? No</td><td><code>memory[3] = 8</code></td><td>[3, 4, 8]</td></tr>
+    <tr><td><code>push(0, 6)</code></td><td>3 == 3? <strong>Yes</strong></td><td><code>false</code>: stack 0 is full</td><td>[3, 4, 8]</td></tr>
+    <tr><td><code>pop(1, &amp;x)</code></td><td>4 == 3? No</td><td><code>x = memory[4]</code> = 7</td><td>[3, 3, 8]</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-coklu" style="--w:570px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 570 118" role="img" aria-label="Three stacks in a memory of 12 cells"><g><text class="lbl" x="42" y="20" text-anchor="middle">0</text><rect class="box-empty" x="20" y="26" width="44" height="34"/></g><g><text class="lbl" x="86" y="20" text-anchor="middle">1</text><rect class="box-empty" x="64" y="26" width="44" height="34"/></g><g><text class="lbl" x="130" y="20" text-anchor="middle">2</text><rect class="box-empty" x="108" y="26" width="44" height="34"/></g><g><text class="lbl" x="174" y="20" text-anchor="middle">3</text><rect class="box-empty" x="152" y="26" width="44" height="34"/></g><g><text class="lbl" x="218" y="20" text-anchor="middle">4</text><rect class="box-empty" x="196" y="26" width="44" height="34"/></g><g><text class="lbl" x="262" y="20" text-anchor="middle">5</text><rect class="box-empty" x="240" y="26" width="44" height="34"/></g><g><text class="lbl" x="306" y="20" text-anchor="middle">6</text><rect class="box-empty" x="284" y="26" width="44" height="34"/></g><g><text class="lbl" x="350" y="20" text-anchor="middle">7</text><rect class="box-empty" x="328" y="26" width="44" height="34"/></g><g><text class="lbl" x="394" y="20" text-anchor="middle">8</text><rect class="box-empty" x="372" y="26" width="44" height="34"/></g><g><text class="lbl" x="438" y="20" text-anchor="middle">9</text><rect class="box-empty" x="416" y="26" width="44" height="34"/></g><g><text class="lbl" x="482" y="20" text-anchor="middle">10</text><rect class="box-empty" x="460" y="26" width="44" height="34"/></g><g><text class="lbl" x="526" y="20" text-anchor="middle">11</text><rect class="box-empty" x="504" y="26" width="44" height="34"/></g><path d="M22 66 L22 72 L194 72 L194 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="108" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 0: top[0] = -1</text><path d="M198 66 L198 72 L370 72 L370 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="284" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 1: top[1] = 3</text><path d="M374 66 L374 72 L546 72 L546 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="460" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 2: top[2] = 7</text><text class="lbl mono" x="20" y="112" text-anchor="start">boundary = [-1, 3, 7, 11]</text></svg> <svg class="ds-svg" viewBox="0 0 570 118" role="img" aria-label="Three stacks in a memory of 12 cells"><g><text class="lbl" x="42" y="20" text-anchor="middle">0</text><rect class="box" x="20" y="26" width="44" height="34"/><text class="txt mono" x="42" y="48" text-anchor="middle">5</text></g><g><text class="lbl" x="86" y="20" text-anchor="middle">1</text><rect class="box" x="64" y="26" width="44" height="34"/><text class="txt mono" x="86" y="48" text-anchor="middle">9</text></g><g><text class="lbl" x="130" y="20" text-anchor="middle">2</text><rect class="box" x="108" y="26" width="44" height="34"/><text class="txt mono" x="130" y="48" text-anchor="middle">2</text></g><g><text class="lbl" x="174" y="20" text-anchor="middle">3</text><rect class="box" x="152" y="26" width="44" height="34"/><text class="txt mono" x="174" y="48" text-anchor="middle">8</text></g><g><text class="lbl" x="218" y="20" text-anchor="middle">4</text><rect class="box" x="196" y="26" width="44" height="34"/><text class="txt mono" x="218" y="48" text-anchor="middle">7</text></g><g><text class="lbl" x="262" y="20" text-anchor="middle">5</text><rect class="box-empty" x="240" y="26" width="44" height="34"/></g><g><text class="lbl" x="306" y="20" text-anchor="middle">6</text><rect class="box-empty" x="284" y="26" width="44" height="34"/></g><g><text class="lbl" x="350" y="20" text-anchor="middle">7</text><rect class="box-empty" x="328" y="26" width="44" height="34"/></g><g><text class="lbl" x="394" y="20" text-anchor="middle">8</text><rect class="box" x="372" y="26" width="44" height="34"/><text class="txt mono" x="394" y="48" text-anchor="middle">4</text></g><g><text class="lbl" x="438" y="20" text-anchor="middle">9</text><rect class="box-empty" x="416" y="26" width="44" height="34"/></g><g><text class="lbl" x="482" y="20" text-anchor="middle">10</text><rect class="box-empty" x="460" y="26" width="44" height="34"/></g><g><text class="lbl" x="526" y="20" text-anchor="middle">11</text><rect class="box-empty" x="504" y="26" width="44" height="34"/></g><path d="M22 66 L22 72 L194 72 L194 66" style="fill:none;stroke:var(--ds-bad);stroke-width:1.5"/><text class="txt" x="108" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-bad)">stack 0: top[0] = 3</text><path d="M198 66 L198 72 L370 72 L370 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="284" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 1: top[1] = 4</text><path d="M374 66 L374 72 L546 72 L546 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="460" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 2: top[2] = 8</text><text class="lbl mono" x="20" y="112" text-anchor="start">boundary = [-1, 3, 7, 11]</text></svg> <svg class="ds-svg" viewBox="0 0 570 118" role="img" aria-label="Three stacks in a memory of 12 cells"><g><text class="lbl" x="42" y="20" text-anchor="middle">0</text><rect class="box" x="20" y="26" width="44" height="34"/><text class="txt mono" x="42" y="48" text-anchor="middle">5</text></g><g><text class="lbl" x="86" y="20" text-anchor="middle">1</text><rect class="box" x="64" y="26" width="44" height="34"/><text class="txt mono" x="86" y="48" text-anchor="middle">9</text></g><g><text class="lbl" x="130" y="20" text-anchor="middle">2</text><rect class="box" x="108" y="26" width="44" height="34"/><text class="txt mono" x="130" y="48" text-anchor="middle">2</text></g><g><text class="lbl" x="174" y="20" text-anchor="middle">3</text><rect class="box" x="152" y="26" width="44" height="34"/><text class="txt mono" x="174" y="48" text-anchor="middle">8</text></g><g><text class="lbl" x="218" y="20" text-anchor="middle">4</text><rect class="box-empty" x="196" y="26" width="44" height="34"/></g><g><text class="lbl" x="262" y="20" text-anchor="middle">5</text><rect class="box-empty" x="240" y="26" width="44" height="34"/></g><g><text class="lbl" x="306" y="20" text-anchor="middle">6</text><rect class="box-empty" x="284" y="26" width="44" height="34"/></g><g><text class="lbl" x="350" y="20" text-anchor="middle">7</text><rect class="box-empty" x="328" y="26" width="44" height="34"/></g><g><text class="lbl" x="394" y="20" text-anchor="middle">8</text><rect class="box" x="372" y="26" width="44" height="34"/><text class="txt mono" x="394" y="48" text-anchor="middle">4</text></g><g><text class="lbl" x="438" y="20" text-anchor="middle">9</text><rect class="box-empty" x="416" y="26" width="44" height="34"/></g><g><text class="lbl" x="482" y="20" text-anchor="middle">10</text><rect class="box-empty" x="460" y="26" width="44" height="34"/></g><g><text class="lbl" x="526" y="20" text-anchor="middle">11</text><rect class="box-empty" x="504" y="26" width="44" height="34"/></g><path d="M22 66 L22 72 L194 72 L194 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="108" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 0: top[0] = 3</text><path d="M198 66 L198 72 L370 72 L370 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="284" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 1: top[1] = 3</text><path d="M374 66 L374 72 L546 72 L546 66" style="fill:none;stroke:var(--ds-muted);stroke-width:1.5"/><text class="txt" x="460" y="88" text-anchor="middle" style="font-size:13px;fill:var(--ds-link)">stack 2: top[2] = 8</text><text class="lbl mono" x="20" y="112" text-anchor="start">boundary = [-1, 3, 7, 11]</text></svg></div>
+  <figcaption><b>Figure 6.11:</b> Three stacks in a memory of twelve cells. At the top, the start: all stacks are empty. In the middle, after the seventh call: the four cells of stack 0 are full (5, 9, 2, 8) and <code>push(0, 6)</code> is rejected, although six cells of memory are free. At the bottom, <code>pop(1, &amp;x)</code> has removed 7; stack 1 is empty again.</figcaption>
+</figure>
+
+<p>The trace was verified with a test program; the <code>top</code> array after each call printed the same as in the table. The seventh call shows the weakness of the scheme. Stack 0 is full, because its top has reached the boundary of the next stack (<code>boundary[1]</code> = 3). Yet of the 12 cells in memory only six are occupied: stack 0 holds four items, stack 1 one, and stack 2 one. The remaining six cells are free. Even so, <code>push</code> says "full."</p>
+
+<h3 id="s6-8-4"><span class="nt-num">6.8.4</span>Making room and evaluation</h3>
+
+<p>Horowitz and Sahni solve this problem with a routine <code>stack_full(i)</code>. The routine is called when stack <span class="m">i</span> fills up. First it looks among the stacks to the right for the first one with free room. If it finds one, it shifts the stacks in between one cell to the right and so opens one cell for stack <span class="m">i</span>. If there is no room on the right, it makes the same search among the stacks on the left and shifts the ones in between, stack <span class="m">i</span> itself included, one cell to the left. If there is no free cell anywhere, memory is truly full. Below, only the half that shifts to the right is given, simplified:</p>
+
+<pre class="nt-code"><code>/* when stack i is full, look for room on the right; if found, shift
+   the stacks in between one cell right (Horowitz's idea, simplified) */
+<span class="kw">bool</span> make_room_right(<span class="kw">int</span> i) {
+    <span class="kw">int</span> j = i + 1, k;
+    <span class="kw">while</span> (j &lt; N &amp;&amp; top[j] == boundary[j + 1])   /* first stack with room */
+        j++;
+    <span class="kw">if</span> (j == N) <span class="kw">return</span> <span class="kw">false</span>;                 /* no room on the right */
+    <span class="kw">for</span> (k = top[j]; k &gt; boundary[i + 1]; k--)   /* memory[boundary[i+1]+1 .. top[j]] */
+        memory[k + 1] = memory[k];            /* shift one right */
+    <span class="kw">for</span> (k = i + 1; k &lt;= j; k++) {            /* boundaries and tops shift too */
+        boundary[k]++;
+        top[k]++;
+    }
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>The function tries the stacks to the right of <code>i</code> in turn. It skips those with <code>top[j] == boundary[j+1]</code>, that is, those that are themselves full, and stops at the first stack with free room. If none is found, it returns <code>false</code>. If one is found, the cells from <code>boundary[i+1]+1</code> to <code>top[j]</code> are copied one cell to the right. These cells hold the items of all the stacks from <span class="m">i + 1</span> to <span class="m">j</span>. The copying must start from the right; had it started from the left, each cell would have overwritten the next and values would have been lost. Finally both the lower boundaries and the tops of these stacks are incremented. The upper bound of stack <span class="m">i</span>, <code>boundary[i+1]</code>, has also grown by one; stack <span class="m">i</span> gains one cell.</p>
+
+<p>Applied to the situation in the trace: stack 0 is full; the stack to its right, stack 1, has room (<code>top[1]</code> = 4, <code>boundary[2]</code> = 7). The only item of stack 1, 7, moves from <code>memory[4]</code> to <code>memory[5]</code>. <code>boundary[1]</code> rises to 4 and <code>top[1]</code> to 5. After that, <code>push(0, 6)</code> succeeds and 6 is written to <code>memory[4]</code>. A test program verified these steps: after making room, <code>top</code> = [3, 5, 8] and <code>boundary</code> = [−1, 4, 7, 11]; after the push, stack 0 held "5 9 2 8 6," stack 1 "7," and stack 2 "4."</p>
+
+<p>The pros and cons of this approach are clear. Pros: a single array and a single <code>malloc</code> suffice and management is easy; push and pop are again <span class="m">O(1)</span>; the same idea can be used to keep <span class="m">n</span> queues in one array. Cons: when one segment fills up, a "full" error comes even though there is room in memory; shifting the stacks to make room is expensive. The number of items shifted can reach <span class="m">m</span>. When memory is nearly full, every push may require a shift, and in the worst case every push is <span class="m">O(m)</span>. It is also hard to estimate segment sizes in advance. If the stacks grow at different rates, equal division leads to frequent shifting.</p>
+
+<h2 class="nt-pb" id="s6-9"><span class="nt-num">6.9</span>Which output orders are possible?</h2>
+
+<p>To understand how a stack can change the order of its input, a classic question is asked. The numbers 1, 2, 3, 4 are to be pushed in this order. Any number of pops may be placed between the pushes, and at the end the stack is emptied. In what order can the numbers come out; that is, which permutations are possible as the <strong>output order</strong> of the pops?</p>
+
+<p>Some orders are easy to get. For 1 2 3 4, a pop is made right after each push. For 4 3 2 1, four pushes are made, followed by four pops. For 2 4 3 1, this sequence is enough: push 1, push 2, pop (2), push 3, push 4, pop (4), pop (3), pop (1). But can 3 1 4 2 be obtained? If 3 is to come out first, 1 and 2 must have been pushed before 3 is pushed; at the moment 3 comes out, the stack holds 1 and 2 from bottom to top. The next item out can be either 2 on top or 4, which has not been pushed yet. Since 1 lies beneath 2, it cannot come out before 2. 3 1 4 2 is therefore impossible.</p>
+
+<p>This reasoning turns into a general rule. At the moment an <span class="m">x</span> comes out, all the items pushed before <span class="m">x</span> and not yet popped are on the stack and must come out in the reverse of the order in which they were pushed. The rule can also be stated as a forbidden pattern.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-312">
+  <span class="nt-box__title">Theorem 6.2 (Orders obtainable with a stack)</span>
+  <p>If 1, 2, …, <span class="m">n</span> are pushed in this order, an output order <span class="m">p<sub>1</sub> p<sub>2</sub> … p<sub>n</sub></span> can be obtained if and only if there are no three positions <span class="m">i &lt; j &lt; k</span> with <span class="m">p<sub>j</sub> &lt; p<sub>k</sub> &lt; p<sub>i</sub></span>. In other words, the sequence contains no "large, small, medium" pattern.</p>
+</div>
+
+<p><em>Proof.</em> First we show that the pattern is impossible. When <span class="m">p<sub>i</sub></span> comes out, <span class="m">p<sub>j</sub></span> and <span class="m">p<sub>k</sub></span>, which are smaller than it, have already been pushed, since numbers are pushed in increasing order. Neither has come out yet, because they come after <span class="m">p<sub>i</sub></span> in the output order. So both are on the stack, and since <span class="m">p<sub>j</sub> &lt; p<sub>k</sub></span>, <span class="m">p<sub>k</sub></span> was pushed later, that is, it lies above <span class="m">p<sub>j</sub></span>. In this case <span class="m">p<sub>j</sub></span> cannot come out before <span class="m">p<sub>k</sub></span>; yet in the sequence it comes first. Contradiction.</p>
+
+<p>For the converse, a greedy method is used: if the next target is <span class="m">p</span>, push until <span class="m">p</span> has been pushed, then pop the top item. The method gets stuck only if the target is not currently on top of the stack and has already been pushed. In that case, above the target <span class="m">p<sub>j</sub></span> there is a larger item <span class="m">q</span> that has not yet come out. <span class="m">q</span> is at some position <span class="m">k</span> in the sequence after <span class="m">p<sub>j</sub></span>. All the items on the stack are smaller than the largest value that has come out so far, that is, than some <span class="m">p<sub>i</sub></span> at an earlier position. This gives the pattern <span class="m">p<sub>j</sub> &lt; q = p<sub>k</sub> &lt; p<sub>i</sub></span>. If there is no pattern, the method never gets stuck and the sequence is obtained. ∎</p>
+
+<p>In the sequence 3 1 4 2, the positions of 3, 1, 2 form this pattern: 3 is large, 1 is small, 2 is medium. So it is impossible. In 2 4 3 1 there is no such triple. The number of obtainable orders is also known. For <span class="m">n</span> items this number is the <span class="m">n</span>th <strong>Catalan number</strong>: <span class="m">C<sub>n</sub> = (2n)! / ((n + 1)! · n!)</span>. The first values are 1, 2, 5, 14, 42, 132. For <span class="m">n</span> = 4, only 14 of the 24 permutations are obtainable. For <span class="m">n</span> = 3, only one of the six permutations, 3 1 2, is impossible. These numbers were verified for <span class="m">n</span> = 1, …, 6 by a script that tries every permutation with the greedy method; the same script also checked that for <span class="m">n ≤ 7</span> the pattern condition and the greedy method give the same result on every permutation.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-sira">
+  <span class="nt-box__title">Example 6.3</span>
+  <p>1, 2, 3, 4, 5 will be pushed in this order. Can the orders 3 5 4 2 1 and 5 3 4 1 2 be obtained?</p>
+  <p>3 5 4 2 1: push 1, push 2, push 3, pop (3); the stack is [1, 2]. Push 4, push 5, pop (5); the stack is [1, 2, 4]. Pop (4), pop (2), pop (1). Each target was on top at the moment it was popped; the order is obtained. Searching for the pattern also finds no "large, small, medium" triple.</p>
+  <p>5 3 4 1 2: for 5 to come out, all five numbers must have been pushed; when 5 comes out, the stack is [1, 2, 3, 4] from bottom to top. The next target is 3, but 4 is on top. The order cannot be obtained. As a pattern, the triple 5, 3, 4 (large, small, medium) is found.</p>
+</div>
+
+<h2 class="nt-pb" id="s6-10"><span class="nt-num">6.10</span>Complexity summary</h2>
+
+<p><a href="#tab-karmasiklik">Table 6.11</a> gives the costs of the operations in this chapter for the three implementations side by side. Each value is justified in the relevant section.</p>
+
+<div class="nt-tablewrap" id="tab-karmasiklik">
+<table class="nt-table nt-table--wide">
+  <caption>Table 6.11: Costs of the stack implementations (<span class="m">n</span> is the number of items, <span class="m">m</span> the memory size in multiple stacks).</caption>
+  <thead><tr><th scope="col">Operation</th><th scope="col">Fixed array</th><th scope="col">Growable array</th><th scope="col">Linked</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">push</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span> amortized, worst case <span class="m">O(n)</span></td><td><span class="m">O(1)</span></td></tr>
+    <tr><th scope="row">pop</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td></tr>
+    <tr><th scope="row">peek / empty / full</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td></tr>
+    <tr><th scope="row">Memory for <span class="m">n</span> items</th><td>MAX (fixed)</td><td>≤ <span class="m">2n</span> cells</td><td><span class="m">n</span> · (item + pointer)</td></tr>
+    <tr><th scope="row">Clearing</th><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span> (a single <code>free</code>)</td><td><span class="m">Θ(n)</span></td></tr>
+    <tr><th scope="row">Call stack of <code>fact(n)</code></th><td colspan="3"><span class="m">Θ(n)</span> frames (independent of the implementation)</td></tr>
+    <tr><th scope="row">Multiple-stack push</th><td><span class="m">O(1)</span>; making room <span class="m">O(m)</span></td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The clearing row in the table stresses one difference. Array stacks sit in a single block; to clear a fixed array it is enough to set <code>top = -1</code>, and for a growable array a single <code>free</code> suffices. In a linked stack, however, each node is a separate block and <code>free</code> is called <span class="m">n</span> times for <span class="m">n</span> nodes. The bound "≤ <span class="m">2n</span>" in the memory row holds when the capacity starts at 1 and is doubled; if the capacity is never shrunk, after many pops the idle capacity can remain far above <span class="m">n</span>.</p>
+
+<h2 class="nt-pb" id="s6-11"><span class="nt-num">6.11</span>Common mistakes</h2>
+
+<p>Most of the bugs seen in stack code fall into a few patterns. The list below gathers the mistakes that can be met in each piece of code in this chapter.</p>
+
+<ol>
+  <li><strong>Skipping the bounds check.</strong> A pop from an empty stack or a push onto a full stack reads or writes the array outside its bounds. C does not check this; neighboring memory is corrupted and the error shows up much later, in an unrelated place.</li>
+  <li><strong>Writing <code>*top--</code>.</strong> The expression reads as <code>*(top--)</code> and decrements the pointer; the caller's top index does not change. The correct form is <code>(*top)--</code>. The compiler gives no warning.</li>
+  <li><strong>Confusing <code>top</code> with the item count.</strong> <code>top</code> is the index of the last item; the item count is <code>top + 1</code>. The full test is <code>top == MAX - 1</code>, not <code>top == MAX</code>.</li>
+  <li><strong>Writing <code>*top = new_node</code> first in a linked push.</strong> The address of the old list is lost and the new node points to itself.</li>
+  <li><strong>Reading the value after <code>free</code> in pop, or never releasing the node.</strong> The first is undefined behavior through a dangling pointer; the second is a memory leak.</li>
+  <li><strong>Calling <code>malloc</code> needlessly on a temporary pointer.</strong> <code>node *old = malloc(…); old = *top;</code> leaks a node at every call. An assignment is enough to point to an existing node.</li>
+  <li><strong>Writing the result of <code>realloc</code> straight into the real pointer.</strong> On failure, the address of the old block is lost.</li>
+  <li><strong>Ignoring <code>bool</code> results.</strong> The item of a failed push is silently lost; after a failed pop the old value goes on being used.</li>
+</ol>
+<h2 class="nt-pb" id="s6-12"><span class="nt-num">6.12</span>Exercises and solutions</h2>
+
+<p>The six questions on the exercise slide of the presentation are given below with their solutions. All the solutions were compiled and run with small test programs.</p>
+
+<h3 id="s6-12-1"><span class="nt-num">6.12.1</span>A <code>push</code> that returns an error</h3>
+
+<p><em>Question.</em> Rewrite <code>push</code> of the global-array stack to return a <code>bool</code> instead of calling <code>exit</code>.</p>
+
+<pre class="nt-code"><code><span class="kw">bool</span> push(<span class="kw">int</span> *top, element item) {
+    <span class="kw">if</span> (*top &gt;= MAX_STACK_SIZE - 1)
+        <span class="kw">return</span> <span class="kw">false</span>;          /* overflow: the caller decides */
+    stack[++*top] = item;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> pop(<span class="kw">int</span> *top, element *item) {
+    <span class="kw">if</span> (*top &lt; 0)
+        <span class="kw">return</span> <span class="kw">false</span>;          /* underflow */
+    *item = stack[(*top)--];
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>On overflow the function returns <code>false</code> and leaves the stack alone. If there is room, it writes the item and returns <code>true</code>. <code>pop</code> has to be written the same way; since the item can no longer be delivered as the return value, it is delivered through an output parameter, <code>element *item</code>. A test program that tried to push 10, 20, 30, 40 with capacity 3 printed "1 1 1 0": the fourth push was rejected. The loop that then emptied the stack gave 30, 20, 10, and <code>top</code> returned to −1. At no point did the program end through <code>exit</code>.</p>
+
+<h3 id="s6-12-2"><span class="nt-num">6.12.2</span>Two stacks in one array</h3>
+
+<p><em>Question.</em> Write the routines <code>push(k, x)</code> and <code>pop(k, &amp;x)</code> for two stacks in one array (<span class="m">k</span> = 1 or 2).</p>
+
+<pre class="nt-code"><code>#define M 10
+<span class="kw">int</span> buf[M];
+<span class="kw">int</span> top1 = -1, top2 = M;     /* both empty */
+
+<span class="kw">bool</span> push(<span class="kw">int</span> k, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (top1 + 1 == top2) <span class="kw">return</span> <span class="kw">false</span>;   /* tops have met: full */
+    <span class="kw">if</span> (k == 1) buf[++top1] = x;          /* stack 1 grows up */
+    <span class="kw">else</span>        buf[--top2] = x;          /* stack 2 grows down */
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> pop(<span class="kw">int</span> k, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (k == 1) {
+        <span class="kw">if</span> (top1 == -1) <span class="kw">return</span> <span class="kw">false</span>;     /* stack 1 empty */
+        *x = buf[top1--];
+    } <span class="kw">else</span> {
+        <span class="kw">if</span> (top2 == M) <span class="kw">return</span> <span class="kw">false</span>;      /* stack 2 empty */
+        *x = buf[top2++];
+    }
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>When both are empty, <code>top1</code> = −1 and <code>top2</code> = <code>M</code>. The full test is shared by the two stacks: <code>top1 + 1 == top2</code>. Pushing onto stack 1 is done with <code>buf[++top1]</code> and onto stack 2 with <code>buf[--top2]</code>; since stack 2 grows downward, its top decreases. In pop, the empty tests are separate: <code>top1 == -1</code> for stack 1 and <code>top2 == M</code> for stack 2. Popping from stack 2 is done with <code>buf[top2++]</code>.</p>
+
+<p>With <code>M</code> = 10, seven pushes onto stack 1 and five onto stack 2 were tried. All seven of stack 1 went in; the first three of stack 2 went in and the next two were rejected, because the ten cells in total were full (<code>top1</code> = 6, <code>top2</code> = 7). That one stack held many items and the other few wasted no cell. All the operations are <span class="m">O(1)</span>.</p>
+
+<h3 id="s6-12-3"><span class="nt-num">6.12.3</span>A linked stack that knows its size</h3>
+
+<p><em>Question.</em> Move the linked stack into a <code>struct</code> that keeps a <code>size</code> field along with <code>top</code>.</p>
+
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    node *top;
+    <span class="kw">int</span> size;
+} SizedStack;
+
+<span class="kw">void</span> sized_init(SizedStack *s) { s-&gt;top = <span class="kw">NULL</span>;  s-&gt;size = 0; }
+
+<span class="kw">bool</span> sized_push(SizedStack *s, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (!push(&amp;s-&gt;top, x)) <span class="kw">return</span> <span class="kw">false</span>;  /* reuse the linked push */
+    ++s-&gt;size;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">bool</span> sized_pop(SizedStack *s, <span class="kw">int</span> *x) {
+    <span class="kw">if</span> (!pop(&amp;s-&gt;top, x)) <span class="kw">return</span> <span class="kw">false</span>;
+    --s-&gt;size;
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="kw">void</span> sized_clear(SizedStack *s) {
+    stack_clear(&amp;s-&gt;top);
+    s-&gt;size = 0;
+}</code></pre>
+
+<p><code>SizedStack</code> keeps the top pointer and the item count together. The routines reuse the linked stack's <code>push</code>, <code>pop</code>, and <code>stack_clear</code>; they pass them <code>&amp;s-&gt;top</code>, that is, the address of the pointer field inside the structure. <code>size</code> changes only after successful operations: a failed push (out of memory) or a failed pop (empty stack) does not corrupt the counter. This way the number of items is known in <span class="m">O(1)</span> without counting the list. After six pushes and one pop <code>size</code> was 5; after clearing it was 0, and the counting wrapper counted six <code>free</code> calls against six <code>malloc</code> calls.</p>
+
+<h3 id="s6-12-4"><span class="nt-num">6.12.4</span>Reversing a string with a stack</h3>
+
+<p><em>Question.</em> Write a routine <code>void reverse(char *s)</code> that reverses a string using a stack.</p>
+
+<p><em>Solution.</em> This routine is the same as <code>reverse</code> traced in <a href="#tab-ters-iz">Table 6.5</a>: the characters are pushed in order, then popped and written back into the same array. The time is <span class="m">Θ(n)</span> and the extra memory is <span class="m">Θ(n)</span>. A robust version first finds the length of the string with <code>strlen</code> and creates the stack with that capacity (for example with <code>stack_create(n)</code>), so that the assumption about <code>CAP</code> is no longer needed.</p>
+
+<h3 id="s6-12-5"><span class="nt-num">6.12.5</span>The bottom item</h3>
+
+<p><em>Question.</em> Write a routine that returns the bottom item of a stack using only push and pop; an auxiliary stack may be used.</p>
+
+<pre class="nt-code"><code>/* if s is not empty, store the bottom item in *x; restore s */
+<span class="kw">bool</span> bottom(Stack *s, <span class="kw">int</span> *x) {
+    Stack aux;  <span class="kw">int</span> v;
+    <span class="kw">if</span> (stack_empty(s)) <span class="kw">return</span> <span class="kw">false</span>;
+    stack_init(&amp;aux);
+    <span class="kw">while</span> (pop(s, &amp;v))           /* move everything to the auxiliary stack */
+        push(&amp;aux, v);
+    *x = v;                      /* the last one out was the bottom */
+    <span class="kw">while</span> (pop(&amp;aux, &amp;v))       /* move back: order is preserved */
+        push(s, v);
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+<p>The routine moves all the items of the stack to the auxiliary stack. The item popped last during the transfer is the bottom item of the original stack; the variable <code>v</code> holds it when the loop ends. Then the items are moved from the auxiliary stack back to the original one. Since both transfers reverse the order, the original stack returns to its initial state. If the stack is empty to begin with, <code>v</code> would never be assigned, so the routine returns <code>false</code> at the very start. On a stack holding 4, 7, 1, 9 from bottom to top, the routine gave 4, and reading the stack from the top still gave 9, 1, 7, 4. In a stack of <span class="m">n</span> items, <span class="m">2n</span> pushes and <span class="m">2n + 2</span> pops are made; the time is <span class="m">Θ(n)</span> and the extra memory is <span class="m">Θ(n)</span>.</p>
+
+<h3 id="s6-12-6"><span class="nt-num">6.12.6</span>Number of frames in a <code>fact(5)</code> call</h3>
+
+<p><em>Question.</em> What is the maximum number of frames on the stack during the call <code>fact(5)</code>? Draw them, counting <code>main</code>.</p>
+
+<p><em>Solution.</em> Since the base case is <code>n &lt;= 1</code>, the calls are <code>fact(5)</code>, <code>fact(4)</code>, <code>fact(3)</code>, <code>fact(2)</code>, <code>fact(1)</code>. While <code>fact(1)</code> runs, these five frames and the frame of <code>main</code> are on the stack together: at most <strong>6</strong> frames. The drawing is the row "<code>fact(1)</code> is called" of <a href="#tab-cerceve">Table 6.9</a>: from bottom to top, main, fact(5), fact(4), fact(3), fact(2), fact(1). Had the base case been written as <code>n == 0</code>, <code>fact(0)</code> would be called too and the number would be 7.</p>
+
+<h2 class="nt-pb" id="s6-13"><span class="nt-num">6.13</span>Summary</h2>
+
+<ul>
+  <li>A <strong>stack</strong> is an ordered list in which insertion and deletion take place at the top end only. It is last in, first out (<strong>LIFO</strong>). Insertion is called <strong>push</strong>, removal <strong>pop</strong>, and reading without removing <strong>peek</strong>.</li>
+  <li>Adding to a full stack is <strong>overflow</strong>, and removing from an empty stack is <strong>underflow</strong>. The stack ADT defines the operations and these error conditions independently of the implementation.</li>
+  <li>In an <strong>array stack</strong>, <code>top</code> is the index of the top item: <code>top</code> = −1 means empty, <code>top</code> = MAX − 1 means full; the item count is <code>top + 1</code>. Push is written <code>stack[++*top] = item</code> and pop <code>return stack[(*top)--]</code>. <code>*top--</code> decrements the pointer and is wrong.</li>
+  <li>Routines that return <code>bool</code> leave the decision to the caller, unlike routines that end with <code>exit</code>. The array and the top index are kept in a <code>struct</code>; no global variables are used. An <strong>opaque type</strong> in the header file hides the implementation from the code that uses it.</li>
+  <li>In a <strong>linked stack</strong>, <code>top</code> is the head of the list; push and pop are <span class="m">O(1)</span>. In push, link first and then change the top; in pop, save the value and the link first and call <code>free</code> last. Every <code>malloc</code> must have a <code>free</code>; the stack is emptied in <span class="m">Θ(n)</span> with <code>stack_clear</code>.</li>
+  <li>A <strong>growable array</strong> doubles its capacity with <code>realloc</code> when it fills up. A single push can be <span class="m">O(n)</span>, but over <span class="m">n</span> pushes the total number of copies is less than <span class="m">2n</span>; the <strong>amortized</strong> cost of push is <span class="m">O(1)</span>. In practice array stacks are much faster than a linked stack that calls <code>malloc</code> at every push.</li>
+  <li>The <strong>call stack</strong> pushes a <strong>frame</strong> made of the return address, the parameters, and the locals for each call. Infinite recursion and large local arrays overflow it; returning the address of a local variable creates a dangling pointer. Every recursive algorithm can be turned into a loop that keeps its own stack.</li>
+  <li>With <strong>multiple stacks</strong>, one memory array is shared through <code>top[i]</code> and <code>boundary[i]</code>. Two stacks growing from the ends waste no cells. With <span class="m">n</span> stacks, when a segment fills up, room is made by shifting stacks; this can take <span class="m">O(m)</span>.</li>
+  <li>The output orders obtainable when 1, …, <span class="m">n</span> are pushed in this order are those that contain no "large, small, medium" pattern; their number is a Catalan number (14 for <span class="m">n</span> = 4).</li>
+</ul>
+
+<h2 id="s6-14"><span class="nt-num">6.14</span>Key terms</h2>
+
+<ul class="nt-concepts">
+  <li>stack</li>
+  <li>last in, first out (LIFO)</li>
+  <li>top</li>
+  <li>push</li>
+  <li>pop</li>
+  <li>overflow</li>
+  <li>underflow</li>
+  <li>abstract data type (ADT)</li>
+  <li>implementation</li>
+  <li>interface</li>
+  <li>header file</li>
+  <li>include guard</li>
+  <li>opaque type</li>
+  <li>incomplete type</li>
+  <li>global variable</li>
+  <li>call by value</li>
+  <li>operator precedence</li>
+  <li>associativity</li>
+  <li>const qualifier</li>
+  <li>linked list</li>
+  <li>node</li>
+  <li>malloc</li>
+  <li>free</li>
+  <li>realloc</li>
+  <li>memory leak</li>
+  <li>dangling pointer</li>
+  <li>dynamic array</li>
+  <li>capacity</li>
+  <li>amortized analysis</li>
+  <li>cache</li>
+  <li>call stack</li>
+  <li>stack frame (activation record)</li>
+  <li>return address</li>
+  <li>stack overflow</li>
+  <li>recursion</li>
+  <li>base case</li>
+  <li>balanced brackets</li>
+  <li>expression evaluation</li>
+  <li>postfix</li>
+  <li>backtracking</li>
+  <li>undo</li>
+  <li>depth-first search (DFS)</li>
+</ul>
+
+<h2 id="s6-15"><span class="nt-num">6.15</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>On a <code>struct</code> stack with <code>CAP</code> = 3, the following are applied in turn: <code>push 4</code>, <code>push 7</code>, <code>pop</code>, <code>push 1</code>, <code>push 6</code>, <code>push 2</code>; then the stack is emptied with the loop <code>while (pop(&amp;st, &amp;x))</code>. Which push returns <code>false</code>, and which values does the loop print?</p>
+    <details><summary>Answer</summary>
+      <p>4 and 7 go in; pop removes 7 and the stack is [4]. 1 and 6 go in; the stack is full with [4, 1, 6] (<code>top</code> = 2). So <code>push 2</code> returns <code>false</code>. The loop prints 6, 1, 4 and stops at the fourth pop.</p>
+    </details>
+  </li>
+  <li>
+    <p>In <code>pop</code>, <code>return stack[*top--];</code> has been written in place of <code>return stack[(*top)--];</code>. What does a loop that calls <code>pop</code> until the stack is empty do?</p>
+    <details><summary>Answer</summary>
+      <p><code>*top--</code> reads as <code>*(top--)</code>: what is decremented is the function's local pointer, and the caller's <code>top</code> does not change. Every call returns the same top item and the stack never empties; the loop runs forever. The compiler does not report this bug with a warning.</p>
+    </details>
+  </li>
+  <li>
+    <p>1, 2, 3, 4, 5 are pushed in this order. Which of the output orders 3 5 4 2 1 and 5 3 4 1 2 can be obtained?</p>
+    <details><summary>Answer</summary>
+      <p>3 5 4 2 1 can be obtained: push 1, 2, 3, pop (3), push 4, 5, pop (5), pop (4), pop (2), pop (1). 5 3 4 1 2 cannot: when 5 comes out the stack is [1, 2, 3, 4], and 3 lies beneath 4. As a pattern, the triple 5, 3, 4 is "large, small, medium."</p>
+    </details>
+  </li>
+  <li>
+    <p>On an empty linked stack, <code>push 10</code>, <code>push 20</code>, <code>push 30</code>, <code>pop</code>, <code>push 40</code> are applied. What does the stack look like from head to tail? How many <code>malloc</code> and how many <code>free</code> calls have been made so far? What is the total number of <code>free</code> calls after <code>stack_clear</code>?</p>
+    <details><summary>Answer</summary>
+      <p>The stack is 40 → 20 → 10 → NULL. Four pushes made four <code>malloc</code> calls and one pop made one <code>free</code>. <code>stack_clear</code> releases the remaining three nodes; the total number of <code>free</code> calls is 4, equal to the number of <code>malloc</code> calls.</p>
+    </details>
+  </li>
+  <li>
+    <p>9 pushes are made onto an empty growable-array stack of capacity 1, doubling the capacity each time it fills. How many enlargements happen, how many items are copied in total, and what is the final capacity?</p>
+    <details><summary>Answer</summary>
+      <p>The enlargements happen at the 2nd, 3rd, 5th, and 9th pushes, at capacities 1, 2, 4, and 8: 4 enlargements. The number of items copied is 1 + 2 + 4 + 8 = 15 (less than <span class="m">2n</span> = 18). The final capacity is 16.</p>
+    </details>
+  </li>
+  <li>
+    <p>In the linked pop, the line <code>free(old);</code> is moved before the line <code>*x = old-&gt;data;</code>. The program often works correctly in tests. Why is it wrong all the same?</p>
+    <details><summary>Answer</summary>
+      <p>After <code>free</code>, <code>old</code> is a dangling pointer and reading <code>old-&gt;data</code> is undefined behavior. Because released memory is not given to another use immediately, the old value often stays in place; that is why the tests pass. The value is corrupted when another <code>malloc</code> intervenes or when the allocator writes its own bookkeeping into the block.</p>
+    </details>
+  </li>
+  <li>
+    <p>With the multiple-stack structure for <span class="m">m</span> = 12, <span class="m">n</span> = 3 in its initial state, how many <code>push(1, ·)</code> calls in a row succeed? What does <code>pop(0, &amp;x)</code> return in the meantime?</p>
+    <details><summary>Answer</summary>
+      <p>Stack 1 uses cells 4–7; four pushes succeed while <code>top[1]</code> goes from 3 to 7, and the fifth is rejected because <code>top[1] == boundary[2]</code> (7 == 7). Stack 0 is empty (<code>top[0] == boundary[0]</code> = −1); <code>pop(0, &amp;x)</code> returns <code>false</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>Two stacks in one array (<code>M</code> = 10) start empty; 4 items are pushed onto stack 1 and 6 onto stack 2. What does the next <code>push(1, x)</code> return? Why?</p>
+    <details><summary>Answer</summary>
+      <p><code>top1</code> = 3 and <code>top2</code> = 4. Because <code>top1 + 1 == top2</code> is true, the array is full and the call returns <code>false</code>. All ten cells are occupied.</p>
+    </details>
+  </li>
+  <li>
+    <p>If the capacity were raised by 10 cells each time instead of being doubled, what would the total cost of <span class="m">n</span> pushes be?</p>
+    <details><summary>Answer</summary>
+      <p>There would be about <span class="m">n/10</span> enlargements, each copying all the current items: <span class="m">10 + 20 + … ≈ n²/20</span>. The total cost is <span class="m">Θ(n²)</span> and the amortized cost per push is <span class="m">Θ(n)</span>. For an amortized <span class="m">O(1)</span>, the capacity must grow by a constant factor.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s6-16"><span class="nt-num">6.16</span>Further reading</h2>
+
+<ul>
+  <li>E. Horowitz, S. Sahni, and S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em> (2nd ed.), Sections 3.1–3.2, 3.7, and 4.3: the source of the array stack, dynamic-array stack, multiple-stack, and linked-stack code these notes follow.</li>
+  <li>T. H. Cormen, C. E. Leiserson, R. L. Rivest, and C. Stein, <em>Introduction to Algorithms</em> (3rd ed.), Section 10.1 and Chapter 17: defines the stack briefly in pseudocode; gives the amortized analysis of dynamic tables in detail with the aggregate, accounting, and potential methods.</li>
+  <li>R. Sedgewick, <em>Algorithms in C, Parts 1–4</em>, Chapter 4: treats the stack in C as an example of an abstract data type, with the separation of interface and implementation.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming, Vol. 1: Fundamental Algorithms</em>, Sections 2.2.1–2.2.2: studies sequential implementations of stacks, the shifting management of multiple stacks, and the permutations obtainable with a stack, with exercises.</li>
+</ul>
+
+<h2 id="s6-17"><span class="nt-num">6.17</span>References</h2>
+
+<ol class="nt-refs">
+  <li>E. Horowitz, S. Sahni, S. Anderson-Freed, <em>Fundamentals of Data Structures in C</em>, 2nd ed., Sections 3.1–3.2, 3.7, and 4.3.</li>
+  <li>T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, <em>Introduction to Algorithms</em>, 3rd ed., MIT Press, Section 10.1 (stacks) and Chapter 17 (amortized analysis).</li>
+  <li>R. Sedgewick, <em>Algorithms in C, Parts 1–4</em>, 3rd ed., Addison-Wesley, Chapter 4.</li>
+  <li>D. E. Knuth, <em>The Art of Computer Programming, Vol. 1: Fundamental Algorithms</em>, 3rd ed., Addison-Wesley, 1997, Sections 2.2.1–2.2.2.</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_06_Stacks.html">Chapter 6 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>
