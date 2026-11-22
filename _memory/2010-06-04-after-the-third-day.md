@@ -1,7 +1,7 @@
 ---
 title: "After the Third Day"
 date: 2010-06-04
-description: "When the food his mother had prepared ran out, his father cooked; when dinner ended, his father gave him the dishes — family life is work kept moving between people without anyone writing a plan."
+description: "When his mother's prepared food ran out his father cooked, and after dinner handed him the dishes: family life is work passed between people without a plan."
 tags:
    - family
    - father

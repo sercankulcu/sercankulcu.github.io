@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Fun"
+seo_title: "Fun: Films, Games and Music · Sercan Külcü"
+description: "Writing about films, games, music, entertainment and other things I enjoy."
 permalink: /fun/
 author_profile: true
 ---

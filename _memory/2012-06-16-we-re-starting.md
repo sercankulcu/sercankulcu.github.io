@@ -1,7 +1,7 @@
 ---
 title: "We're Starting"
 date: 2012-06-16
-description: "The doctor entered the room and said 'Come on, kids. We're starting.' — and that sentence made the waiting room orderly through the confidence of someone who knew what came next."
+description: "The doctor entered and said 'Come on, kids. We're starting.' It made the waiting room orderly, through the confidence of someone who knew the next step."
 tags:
    - trust
    - fear

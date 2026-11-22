@@ -1,7 +1,7 @@
 ---
 title: "American Beauty"
 date: 2002-04-06
-description: "Almost everyone in the film has arrived at the life they wanted, and almost no one knows what to do there — the film's cruelest observation is that we can be genuinely unhappy inside a life that still contains things worth loving."
+description: "Almost everyone in the film has the life they wanted and no one knows what to do there; we can be truly unhappy inside a life that still holds lovable things."
 tags:
    - movie
    - childhood

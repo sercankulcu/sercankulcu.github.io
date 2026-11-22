@@ -1,6 +1,6 @@
 ---
 title: "Teoman ile Söyleşi"
-description: "This interview finds Teoman in a more established stage of his career. The central question is no longer whether he can become successful, or whether popularity will change him."
+description: "A 2006 interview with Coşkun Çokyiğit on what Teoman is trying to do as an artist: originality, commercial art, language, Istanbul and his audience."
 date: 2006-01-01
 interviewer: "Coşkun Çokyiğit"
 type: "interview"

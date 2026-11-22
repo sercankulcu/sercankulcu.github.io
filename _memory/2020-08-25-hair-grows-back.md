@@ -1,7 +1,7 @@
 ---
 title: "Hair Grows Back"
 date: 2020-08-25
-description: "His wife learned to cut his hair during the pandemic using him as training material — by August the result was reliable enough that paying someone else had become the stranger idea."
+description: "His wife learned to cut his hair in the pandemic, using him as training material; by August paying someone else had become the stranger idea."
 tags:
    - pandemic
    - family

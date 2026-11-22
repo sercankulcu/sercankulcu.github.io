@@ -1,7 +1,7 @@
 ---
 title: "Another Famous Sweet"
 date: 2010-07-12
-description: "Every few years his hometown produced another famous sweet, and outsiders began knowing its confectionery history better than he did — and then asked him to bring two kilos."
+description: "Every few years his hometown produced another famous sweet, and outsiders knew its confectionery history better than he did, then asked for two kilos."
 tags:
    - places
    - food

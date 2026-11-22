@@ -1,6 +1,8 @@
 ---
 permalink: /terms/
 title: "Terms and Privacy Policy"
+seo_title: "Terms and Privacy Policy · Point Zero"
+description: "Privacy policy and terms of use for this site: what information is collected, how cookies and analytics are used, and your choices."
 modified: 2016-06-06
 ---
 

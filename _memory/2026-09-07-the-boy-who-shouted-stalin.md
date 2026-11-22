@@ -1,7 +1,7 @@
 ---
 title: 'The Boy Who Shouted Stalin'
 date: 2026-09-07
-description: "When they returned to the dormitory that night there was blood on the walls and unusual quiet — the boy had been shouting 'Stalin!' and an ambulance had already taken him away."
+description: "Back at the dormitory that night there was blood on the walls and an unusual quiet: the boy had been shouting 'Stalin!' and an ambulance had already taken him."
 tags:
    - dormitory
    - university

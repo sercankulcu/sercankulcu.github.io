@@ -1,7 +1,7 @@
 ---
 title: "For Ninety Minutes"
 date: 2010-03-08
-description: "Standing quietly in a home supporters' section was not an acceptable strategy — for ninety minutes, the question of who they supported received a very practical answer."
+description: "Standing quietly in a home supporters' section was not a workable strategy; for ninety minutes the question of whom they supported got a very practical answer."
 tags:
    - eskisehir
    - football

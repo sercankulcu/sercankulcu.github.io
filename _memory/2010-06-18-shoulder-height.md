@@ -1,7 +1,7 @@
 ---
 title: "Shoulder Height"
 date: 2010-06-18
-description: "The wall he remembered as enormous barely reached his shoulder when he returned — childhood measures distances through effort, not meters, and both measurements were true."
+description: "The wall he remembered as enormous barely reached his shoulder when he returned: childhood measures distance by effort, not meters, and both were true."
 tags:
    - childhood
    - growing-up

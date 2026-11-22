@@ -1,7 +1,7 @@
 ---
 title: "Ticket Open"
 date: 2018-12-20
-description: "The domain redirect should have taken minutes; by day four the original technical problem had disappeared from his mind and the ticket itself had become the project."
+description: "A domain redirect should have taken minutes; by day four the original technical problem had vanished from his mind and the ticket itself had become the project."
 tags:
    - internet
    - work

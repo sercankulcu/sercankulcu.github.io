@@ -1,7 +1,7 @@
 ---
 title: "Léon: The Professional"
 date: 2003-07-12
-description: "Mathilda cannot teach Léon anything useful about violence; she teaches him attachment, which is much more dangerous for a man whose survival depends on remaining portable."
+description: "Mathilda cannot teach Léon anything useful about violence; she teaches him attachment, far more dangerous for a man whose survival depends on staying portable."
 tags:
    - movie
    - loneliness

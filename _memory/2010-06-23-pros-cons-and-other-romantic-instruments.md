@@ -1,7 +1,7 @@
 ---
 title: "Pros, Cons, and Other Romantic Instruments"
 date: 2010-06-23
-description: "If you are trying this hard to calculate whether you are in love, you probably are — indifference rarely requires a spreadsheet, and the person was already inside the problem."
+description: "If you work this hard to calculate whether you are in love, you probably are: indifference rarely needs a spreadsheet."
 tags:
    - relationships
    - love

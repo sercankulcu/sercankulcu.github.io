@@ -1,7 +1,7 @@
 ---
 title: "The Graduate Who Had Not Graduated"
 date: 2010-02-17
-description: "For two weeks he was a graduate in the past but not in the present — graduation is not one event: first you finish university, then the university finishes with you."
+description: "For two weeks he was a graduate in the past but not the present; graduation is not one event: first you finish university, then it finishes with you."
 tags:
    - university
    - graduation

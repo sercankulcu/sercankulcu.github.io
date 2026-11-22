@@ -1,6 +1,6 @@
 ---
 title: "Işıl Cinmen ile Koyu Antoloji Röportajı"
-description: "This is one of the darkest and most self-analytical Teoman interviews in the archive. At fifty, Teoman has spent more than two decades as a professional musician."
+description: "One of Teoman's darkest, most self-analytical interviews: at fifty, with older songs, press archives and a memoir around him, he faces versions of himself."
 date: 2018-01-20
 publication: "Posta"
 interviewer: "Işıl Cinmen"

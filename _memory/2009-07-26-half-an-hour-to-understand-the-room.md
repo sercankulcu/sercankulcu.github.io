@@ -1,7 +1,7 @@
 ---
 title: "Half an Hour to Understand the Room"
 date: 2009-07-26
-description: "The obvious differences in travel are easy because you expect them — the invisible rules everybody follows without knowing they are rules take about half an hour."
+description: "Obvious differences abroad are easy because you expect them; the invisible rules everyone follows without knowing they are rules take about half an hour."
 tags:
    - montreal
    - travel

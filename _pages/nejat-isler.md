@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Nejat İşler"
+seo_title: "Nejat İşler Archive: Interviews and Profiles"
+description: "Interviews, conversations, profiles and archival press material about the actor Nejat İşler, retold in English."
 permalink: /nejat-isler/
 author_profile: true
 ---

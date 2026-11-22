@@ -1,7 +1,7 @@
 ---
 title: "Seven Functions"
 date: 2011-04-21
-description: "An audio library with seven functions — no new philosophy, no objects to create other objects, just a tool that absorbed its own complexity and left him to solve his actual problem."
+description: "An audio library with seven functions: no new philosophy, no objects creating objects, just a tool that absorbed its own complexity and left him his problem."
 tags:
    - software
    - programming

@@ -2,6 +2,9 @@
 layout: single
 permalink: /bookmarks/
 title: "Bookmarks"
+lang: tr
+seo_title: "Yer İmleri: Yapay Zekâ, Araştırma ve Yazılım Araçları"
+description: "Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, belge düzenleme ve üretkenlik araçlarının listesi."
 author_profile: true
 ---
 

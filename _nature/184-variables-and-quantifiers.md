@@ -427,9 +427,7 @@ Even basic logic rests on conventions.
 
 Predicate logic can include the identity symbol:
 
-$$
-=
-$$
+$$=$$
 
 This allows claims such as:
 

@@ -1,7 +1,7 @@
 ---
 title: "What I Will Not Write Down"
 date: 2010-04-16
-description: "The professional version of the man was easy to record — the evenings after work were not, and that omission has kept him more alive in memory than any archive could."
+description: "The professional version of the man was easy to record; the evenings after work were not, and that omission keeps him more alive in memory than any archive."
 tags:
    - work
    - friendship

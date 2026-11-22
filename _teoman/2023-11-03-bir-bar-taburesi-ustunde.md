@@ -1,6 +1,6 @@
 ---
 title: "Bir Bar Taburesi Üstünde"
-description: "The title of this program is almost impossible to separate from Teoman. More than twenty years earlier, Paramparça had contained one of the most recognizable lines of his career:"
+description: "A conversation series named for the Paramparça lyric 'Bir bar taburesi üstünde': an image from a song that has become part of Teoman's public mythology."
 date: 2023-11-03
 publication: "KAFA TV"
 interviewer: "Candaş Tolga Işık"

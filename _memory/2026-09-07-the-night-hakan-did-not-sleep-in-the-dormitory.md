@@ -1,7 +1,7 @@
 ---
 title: 'The Night Hakan Did Not Sleep in the Dormitory'
 date: 2026-09-07
-description: "Hakan sent a link, he clicked it, his email password disappeared — the recovery ended with an IT office and a chase through the dormitory corridor, after which Hakan was too afraid to sleep there that night."
+description: "Hakan sent a link, he clicked it, and his email password vanished; recovery ended with an IT office, a corridor chase, and Hakan too afraid to sleep there."
 tags:
    - dormitory
    - university

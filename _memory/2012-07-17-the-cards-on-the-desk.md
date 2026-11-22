@@ -1,7 +1,7 @@
 ---
 title: "The Cards on the Desk"
 date: 2012-07-17
-description: "The intern spread playing cards on the desk and began telling fortunes — when the manager saw it, the problem traveled through hierarchy and arrived at the person who should have prevented it."
+description: "The intern spread playing cards on the desk and told fortunes; once the manager saw it, the problem went up the hierarchy to whoever should have prevented it."
 tags:
    - work
    - office-life

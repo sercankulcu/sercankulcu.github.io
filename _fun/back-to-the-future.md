@@ -1,7 +1,7 @@
 ---
 title: "Back to the Future"
 date: 1998-08-15
-description: "Meeting your parents before they became your parents reveals that the past was once as open and uncertain as the present feels — children enter their parents' lives halfway through, after the important choices have already been made."
+description: "Meeting your parents before they were your parents shows the past was once as open as the present; children join their parents' lives halfway through."
 tags:
    - movie
    - time

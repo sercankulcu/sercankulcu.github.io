@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Curriculum Vitae"
+seo_title: "Curriculum Vitae · Sercan Külcü"
+description: "CV of Sercan Külcü, Assistant Professor of Computer Engineering: education, academic and industry experience, research, publications and teaching."
 permalink: /cv/
 author_profile: true
 ---

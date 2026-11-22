@@ -1,7 +1,7 @@
 ---
 title: "Two Wrong Questions"
 date: 2010-06-04
-description: "He left the exam convinced he had become less intelligent than he believed — then learned two questions were wrong and the professor himself could not find their answers."
+description: "He left the exam sure he had become less intelligent than he believed, then learned two questions were wrong and the professor could not find their answers."
 tags:
    - university
    - mathematics

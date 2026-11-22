@@ -127,15 +127,11 @@ Arbitrariness and regularity coexist.
 
 Mathematics relies heavily on symbols.
 
-$$
-+
-$$
+$$+$$
 
 can represent addition.
 
-$$
-=
-$$
+$$=$$
 
 represents equality.
 

@@ -15,7 +15,7 @@
 {% if seo_c == "posts" %}{% assign seo_sfx = "Sercan Külcü" %}
 {% elsif seo_c == "teoman" %}{% assign seo_sfx = "Teoman Archive" %}
 {% elsif seo_c == "nejat-isler" %}{% assign seo_sfx = "Nejat İşler Archive" %}
-{% elsif seo_c == "poems" %}{% assign seo_sfx = "Şiir, Sercan Külcü" %}
+{% elsif seo_c == "poems" %}{% if page.poet %}{% assign seo_sfx = "Şiir, " | append: page.poet %}{% else %}{% assign seo_sfx = "Şiir" %}{% endif %}
 {% elsif seo_c == "pencils" %}{% assign seo_sfx = "Pencil Notes" %}
 {% elsif seo_c == "memory" %}{% assign seo_sfx = "Memoir by Sercan Külcü" %}
 {% elsif seo_c == "nature" or seo_c == "humanity" or seo_c == "thoughts" or seo_c == "fun" %}{% assign seo_sfx = "Essay by Sercan Külcü" %}
@@ -53,6 +53,7 @@
 <title>{{ seo_title | default: site.title }}{% if paginator %}{% unless paginator.page == 1 %} {{ site.title_separator }} {{ site.data.ui-text[site.locale].page | default: "Page" }} {{ paginator.page }}{% endunless %}{% endif %}</title>
 
 {% assign seo_description = page.description | default: page.excerpt | default: site.description %}
+{% if page.collection == "poems" and page.description == nil %}{% if page.poet %}{% assign seo_description = "Şiir: " | append: page.title | append: " — " | append: page.poet | append: "." %}{% else %}{% assign seo_description = "Şiir: " | append: page.title | append: "." %}{% endif %}{% endif %}
 {% if seo_description %}
   {% assign seo_description = seo_description | markdownify | strip_html | strip_newlines | strip %}
   {% comment %} Arama sonucu ~160 karakter gösterir: uzun açıklamada ilk cümle (kısaysa ilk iki cümle), o da uzunsa kelime sınırında kesilir {% endcomment %}
@@ -65,7 +66,22 @@
       {% if seo_sents.size > 2 %}{% assign seo_two = seo_two | append: "." %}{% endif %}
       {% if seo_two.size <= 170 %}{% assign seo_short = seo_two %}{% endif %}
     {% endif %}
-    {% if seo_short.size > 170 %}{% assign seo_short = seo_short | truncate: 160, "" | split: " " | pop | join: " " | append: "…" %}{% endif %}
+    {% comment %} Hala uzunsa: son tamamlanmis liste ogesinde (", ") kes ve nokta koy; acik kalan parantezi at. Liste yoksa kelime sinirinda "…" {% endcomment %}
+    {% if seo_short.size > 170 %}
+      {% assign seo_cut = seo_short | truncate: 160, "" %}
+      {% assign seo_items = seo_cut | split: ", " %}
+      {% if seo_items.size > 1 %}
+        {% assign seo_short = seo_items | pop | join: ", " %}
+        {% assign seo_open = seo_short | split: "(" | size %}
+        {% assign seo_close = seo_short | split: ")" | size %}
+        {% if seo_open > seo_close %}{% assign seo_short = seo_short | split: " (" | pop | join: " (" %}{% endif %}
+        {% assign seo_last = seo_short | slice: -1, 1 %}
+        {% if seo_last == ":" or seo_last == ";" or seo_last == "," %}{% assign seo_len = seo_short.size | minus: 1 %}{% assign seo_short = seo_short | slice: 0, seo_len %}{% endif %}
+        {% assign seo_short = seo_short | append: "." %}
+      {% else %}
+        {% assign seo_short = seo_cut | split: " " | pop | join: " " | append: "…" %}
+      {% endif %}
+    {% endif %}
     {% assign seo_description = seo_short %}
   {% endif %}
   {% assign seo_description = seo_description | escape_once %}

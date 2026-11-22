@@ -1,7 +1,7 @@
 ---
 title: "The Eraser on a String"
 date: 2010-07-12
-description: "He walked toward the children playing on his first day of school — and was gently turned toward the correct classroom by his mother, which was how education began."
+description: "On his first day of school he walked toward the children playing, and his mother gently turned him toward the correct classroom, which was how education began."
 tags:
    - childhood
    - school

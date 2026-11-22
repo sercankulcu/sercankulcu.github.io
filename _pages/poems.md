@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Poems"
+seo_title: "Poems I Return To · Sercan Külcü"
+description: "A small collection of Turkish poems I like and return to, by Nazım Hikmet, Attila İlhan, Orhan Veli, Can Yücel and others."
 permalink: /poems/
 author_profile: true
 ---

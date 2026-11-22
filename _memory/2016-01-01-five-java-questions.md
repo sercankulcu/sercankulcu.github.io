@@ -1,7 +1,7 @@
 ---
 title: "Five Java Questions"
 date: 2016-01-01
-description: "An academic exam I won in 2016 included five short Java questions. None of them was difficult, and every one of them asked whether I could see exactly what a few lines of code do."
+description: "An academic exam I won in 2016 had five short Java questions. None was difficult, and each asked whether I could see exactly what a few lines of code do."
 tags:
    - academia
    - programming

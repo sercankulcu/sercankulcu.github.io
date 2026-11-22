@@ -1,7 +1,7 @@
 ---
 title: "Not a Relevant Field"
 date: 2010-08-09
-description: "The same degree underlined at work became invisible in another institution — every place brings its own measuring tape, and you remain the same person while your official importance changes."
+description: "The same degree underlined at work became invisible at another institution: every place brings its own measuring tape while you stay the same person."
 tags:
    - education
    - work

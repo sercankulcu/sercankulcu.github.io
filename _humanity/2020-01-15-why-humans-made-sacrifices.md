@@ -1,5 +1,6 @@
 ---
 title: 'Why Humans Made Sacrifices'
+description: "Why people destroy something valuable for ritual: costly sacrifice makes belief visible, and the logic of gifts and social exchange was extended to gods."
 date: 2020-01-15
 permalink: /humanity/2020/01/why-humans-made-sacrifices/
 chapter: 8

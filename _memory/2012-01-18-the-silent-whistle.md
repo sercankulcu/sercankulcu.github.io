@@ -1,7 +1,7 @@
 ---
 title: "The Silent Whistle"
 date: 2012-01-18
-description: "The military whistle was never used during service — found years later and blown into, it produced no sound, which turned out to be the most honest thing it could say."
+description: "The military whistle was never used in service; found years later and blown, it made no sound, which was the most honest thing it could say."
 tags:
    - daily-life
    - military-service

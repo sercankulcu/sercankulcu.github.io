@@ -1,7 +1,7 @@
 ---
 title: "The Hidden Sentence"
 date: 2010-06-14
-description: "She heard criticism in a comment about temperature — and years later, the simpler explanation is that he had not said the hidden sentence out loud in the first place."
+description: "She heard criticism in a remark about temperature; years later the simpler explanation is that he never said the hidden sentence aloud."
 tags:
    - communication
    - relationships

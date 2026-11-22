@@ -401,13 +401,7 @@ This expresses evidential discrimination.
 
 Bayes can also be written:
 
-posterior odds
-
-=
-
-prior odds
-
-× likelihood ratio.
+posterior odds = prior odds × likelihood ratio.
 
 This is often a useful way to see evidence accumulating.
 

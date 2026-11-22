@@ -1,7 +1,7 @@
 ---
 title: "Second Attempt"
 date: 2020-08-30
-description: "The car needed two or three attempts to start most mornings — that required participation was exactly why it never disappeared into the background the way reliable machines do."
+description: "The car needed two or three tries to start most mornings, and that required participation is why it never faded into the background like reliable machines."
 tags:
    - cars
    - humor

@@ -1,7 +1,7 @@
 ---
 title: "Twenty Good Minutes"
 date: 2009-11-05
-description: "A cup of tea does not need to change your life — on the modest contract of twenty minutes of television and why not everything pleasant needs to become significant."
+description: "A cup of tea does not need to change your life: on the modest contract of twenty minutes of television, and why not everything pleasant must become significant."
 tags:
    - television
    - sleep

@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Memory"
+seo_title: "Memory: Personal Stories · Sercan Külcü"
+description: "Personal stories, memories and small moments from different periods of my life."
 permalink: /memory/
 author_profile: true
 ---

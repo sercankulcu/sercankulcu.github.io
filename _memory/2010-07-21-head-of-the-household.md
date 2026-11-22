@@ -1,7 +1,7 @@
 ---
 title: "Head of the Household"
 date: 2010-07-21
-description: "He had the key and paid the bills — but the cat had institutional memory, the sofa, and far more actual presence, so the transfer of power was formal and unanimous."
+description: "He had the key and paid the bills, but the cat had institutional memory, the sofa and far more presence, so the transfer of power was formal and unanimous."
 tags:
    - home
    - work

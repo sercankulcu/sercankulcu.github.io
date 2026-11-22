@@ -1,7 +1,7 @@
 ---
 title: "I Have Change"
 date: 2010-08-09
-description: "Two passengers announced they had change while the driver searched his own pockets — announcing the existence of a solution is not quite the same as providing one."
+description: "Two passengers announced they had change while the driver searched his own pockets; announcing that a solution exists is not quite the same as providing one."
 tags:
    - friends
    - driving

@@ -1,7 +1,7 @@
 ---
 title: "The Application Form"
 date: 2010-06-05
-description: "Before the coffee arrived, she asked how much he earned — a reasonable question eventually, but there is a difference between eventually and before the coffee arrives."
+description: "Before the coffee arrived, she asked how much he earned: a reasonable question eventually, but there is a difference between eventually and before the coffee."
 tags:
    - relationships
    - adulthood

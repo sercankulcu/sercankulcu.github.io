@@ -1,7 +1,7 @@
 ---
 title: "I Only Wanted Messenger"
 date: 2012-06-19
-description: "He only wanted Messenger — but it had returned from several years away carrying administrative responsibilities, and wanting it was probably not only wanting the software."
+description: "He only wanted Messenger, but it had returned from years away carrying administrative responsibilities, and wanting it was not only wanting the software."
 tags:
    - software
    - communication

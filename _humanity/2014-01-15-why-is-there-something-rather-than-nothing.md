@@ -1,5 +1,7 @@
 ---
 title: 'Why Is There Something Rather Than Nothing?'
+seo_title: "Why Is There Something Rather Than Nothing? · Humanity Series"
+description: "Why existence needs explaining at all: cosmology, the coherence of 'nothing', and how a universe produced minds able to ask the question."
 date: 2014-01-15
 permalink: /humanity/2014/01/why-is-there-something-rather-than-nothing/
 chapter: 1

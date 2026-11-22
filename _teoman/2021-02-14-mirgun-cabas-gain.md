@@ -1,6 +1,6 @@
 ---
 title: "Teoman & Mirgün Cabas Söyleşisi"
-description: "This long-form conversation captures a Teoman who has moved well beyond the central ambitions of his youth. He has already experienced fame at its highest level."
+description: "A long conversation with Mirgün Cabas shows a Teoman who has moved beyond his youthful ambitions: he has known fame at its highest, left music and returned."
 date: 2021-02-14
 publication: "GAİN"
 interviewer: "Mirgün Cabas"

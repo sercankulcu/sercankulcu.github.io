@@ -1,7 +1,7 @@
 ---
 title: "Friday at Noon"
 date: 2010-06-15
-description: "In the Montreal office, people sometimes left at noon on Friday after enough hours — a working arrangement that made his own office's rules feel designed rather than natural."
+description: "In the Montreal office, people sometimes left at noon on Friday after enough hours, which made his own office's rules feel designed rather than natural."
 tags:
    - montreal
    - work

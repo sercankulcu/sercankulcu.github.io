@@ -1,6 +1,6 @@
 ---
 title: "Popüler Olmak Bir Harika"
-description: "By the end of 2000, Teoman had crossed a threshold. He was no longer simply a successful alternative musician or a rising rock singer. His songs had entered mainstream popular culture."
+description: "By late 2000 Teoman's songs were mainstream, and here he says plainly that being popular is wonderful, without treating it as a compromise."
 date: 2000-12-19
 type: "interview"
 verification: "archived"

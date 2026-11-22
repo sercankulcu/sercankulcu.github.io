@@ -1,7 +1,7 @@
 ---
 title: "The Blisters"
 date: 2012-06-28
-description: "Fitness gloves looked ridiculous until his hands developed blisters — pain is especially persuasive; the body has little interest in maintaining an opinion for the sake of consistency."
+description: "Fitness gloves looked ridiculous until his hands blistered; pain is especially persuasive, and the body has no interest in keeping an opinion for consistency."
 tags:
    - fitness
    - learning

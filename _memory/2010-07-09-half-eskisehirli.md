@@ -1,7 +1,7 @@
 ---
 title: "Half Eskişehirli"
 date: 2010-07-09
-description: "After enough return trips the city stopped being directions — belonging rarely announces itself, but you notice it when you start complaining about the local water bottle being too full."
+description: "After enough return trips the city stopped being directions; belonging rarely announces itself, until you complain that the local water bottle is too full."
 tags:
    - eskisehir
    - travel

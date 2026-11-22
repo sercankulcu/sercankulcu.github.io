@@ -1,7 +1,7 @@
 ---
 title: "Şeytan Tüyü: The Ankara I Could Never Find Again"
 date: 2026-09-07
-description: "Şeytan Tüyü was the sound of an Ankara that existed for a few years at Baraka, Nil, and Motion — a live band culture where the same faces returned week after week and the night already had its own rhythm."
+description: "Şeytan Tüyü was the sound of an Ankara that lasted a few years at Baraka, Nil and Motion: live bands, the same faces weekly, a night with its own rhythm."
 tags:
    - seytan-tuyu
    - ankara
@@ -9,7 +9,6 @@ tags:
    - nightlife
 ---
 
-# Şeytan Tüyü: The Ankara I Could Never Find Again
 
 Some bands stay in your memory because of a song. You hear the first few seconds, and suddenly a certain year, a certain street, or a certain person comes back. Other bands are different. They are connected not only to music but also to a whole period of life, to places, friendships, habits, and nights that seemed ordinary at the time but became precious years later.
 

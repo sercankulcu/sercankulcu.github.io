@@ -1,6 +1,8 @@
 ---
 permalink: /ataturk/
 title: "Atatürk"
+seo_title: "Atatürk · Photographs"
+description: "A small collection of photographs of Mustafa Kemal Atatürk."
 author_profile: false
 ---
 

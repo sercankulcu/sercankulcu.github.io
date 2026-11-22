@@ -1,7 +1,7 @@
 ---
 title: "Two Bottles in the Refrigerator"
 date: 2010-06-24
-description: "Two bottles of mineral water he had always disliked were the only things left in the refrigerator — once every easier choice was gone, he discovered the dislike had been optional."
+description: "Two mineral water bottles he had always disliked were all that was left in the refrigerator; with easier choices gone, the dislike turned out to be optional."
 tags:
    - student-life
    - university

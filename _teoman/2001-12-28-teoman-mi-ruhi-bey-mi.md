@@ -1,6 +1,6 @@
 ---
 title: "Teoman mı? Ruhi Bey mi?"
-description: "With Gönülçelen, Teoman's songwriting begins to look increasingly like fiction. Earlier albums had already contained recurring images, private details and characters."
+description: "With Gönülçelen, Teoman's songwriting reads increasingly like fiction; he explains that several songs are episodes in the life of one figure, Ruhi."
 date: 2001-12-28
 publication: "Milliyet"
 interviewer: "Mefaret Aktaş"

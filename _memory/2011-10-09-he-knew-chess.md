@@ -1,7 +1,7 @@
 ---
 title: "He Knew Chess"
 date: 2011-10-09
-description: "He said he did not know how to play chess, which was not true — the problem was that once persuaded to sit down, a single move could take long enough to make the game a long-term project."
+description: "He said he did not know chess, which was untrue; once persuaded to sit down, a single move took so long that the game became a long-term project."
 tags:
    - friendship
    - learning

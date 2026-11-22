@@ -1,7 +1,7 @@
 ---
 title: "Before the Offer"
 date: 2012-06-10
-description: "He left the interview calculating how long he would need to resign properly — nobody had offered him anything yet, which became important when the silence stretched into months."
+description: "He left the interview calculating how long he would need to resign properly; nobody had offered him anything yet, which mattered when the silence ran to months."
 tags:
    - career
    - work

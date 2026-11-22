@@ -1,7 +1,7 @@
 ---
 title: 'The Dido DVD'
 date: 2026-09-07
-description: "He bought the Dido Live at Brixton Academy DVD as a gift, waited outside her workplace until eleven, managed to annoy her, gave the DVD away anyway — then never saw her again."
+description: "He bought the Dido Live at Brixton Academy DVD as a gift, waited outside her workplace until eleven, annoyed her, gave the DVD away, and never saw her again."
 tags:
    - dido
    - family

@@ -1,7 +1,7 @@
 ---
 title: "Terms and Conditions"
 date: 2010-07-17
-description: "The laptop had stopped being portable, stopped being stereo, and stopped using its own graphics driver — but it still worked, which meant they had moved from user-device to agreement."
+description: "The laptop had stopped being portable, stopped being stereo, and lost its graphics driver, but it still worked, so they moved from user-device to agreement."
 tags:
    - computers
    - laptops

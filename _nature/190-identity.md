@@ -74,9 +74,7 @@ Logic uses identity for the first.
 
 Formal logic often uses:
 
-$$
-=
-$$
+$$=$$
 
 to represent identity.
 

@@ -1,7 +1,7 @@
 ---
 title: "Downstairs"
 date: 2010-04-16
-description: "Two band members, in the same toilet queue, each saying urgently they were needed on stage — the kind of backstage access only a room too small for distance can produce."
+description: "Two band members in the same toilet queue, each urgently saying they were needed on stage: backstage access only a room too small for distance can produce."
 tags:
    - ankara
    - music

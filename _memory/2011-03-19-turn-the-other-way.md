@@ -1,7 +1,7 @@
 ---
 title: "Turn the Other Way"
 date: 2011-03-19
-description: "Every handle, door, and fixture in the place required his hand to forget years of habit and learn the local rule — its one outstanding feature was that parking outside was easy."
+description: "Every handle, door and fixture made his hand forget years of habit and learn the local rule; the place's one outstanding feature was easy parking outside."
 tags:
    - places
    - humor

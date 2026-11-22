@@ -1,5 +1,6 @@
 ---
 title: 'Borrowdale Graphite: The Deposit That Made Keswick a Pencil Town'
+description: "How the pure natural graphite of Seathwaite in Borrowdale, mined until 1891, helped turn Keswick in the Lake District into a major pencil-making town."
 date: 2026-08-08
 permalink: /pencils/2026/08/borrowdale-graphite-keswick/
 category: history

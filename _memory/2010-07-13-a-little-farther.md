@@ -1,7 +1,7 @@
 ---
 title: "A Little Farther"
 date: 2010-07-13
-description: "Generosity became accounting when the passenger left without enough thanks for the extra distance — and the next time, experience arrived in the car before the passenger did."
+description: "Generosity became accounting when the passenger gave too little thanks for the extra distance, and next time experience got in the car before the passenger."
 tags:
    - driving
    - travel

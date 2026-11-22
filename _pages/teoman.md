@@ -2,6 +2,8 @@
 
 layout: archive
 title: "Teoman"
+seo_title: "Teoman Archive: Interviews and Profiles"
+description: "Interviews, conversations, profiles and archival press material about the Turkish musician Teoman, retold in English."
 permalink: /teoman/
 author_profile: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Rüyalar ve Sayıklamalar"
-description: "By 2019, Nejat İşler had already been an actor for decades. But the Socrates interview reveals that acting was never the only creative identity available to him."
+description: "A 2019 Socrates interview shows acting was never Nejat İşler's only creative identity: writing came much earlier, before television fame."
 date: 2019-08-01
 publication: "Socrates"
 type: "interview"

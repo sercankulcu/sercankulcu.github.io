@@ -1,7 +1,7 @@
 ---
 title: "What Stayed From the Year"
 date: 2025-12-28
-description: "At the end of 2025 what returned first were not achievements but smaller things — a coffee beside the computer, a conversation that improved a bad day, an idea whose importance had evaporated by September."
+description: "At the end of 2025 what returned first was not achievements but small things: a coffee by the computer, a conversation that saved a bad day, a forgotten idea."
 tags:
    - year-end
    - technology

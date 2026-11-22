@@ -1,7 +1,7 @@
 ---
 title: "The House Before Memory"
 date: 2010-04-20
-description: "Two years lived before memory formed — the photograph proved he had been there, other people's stories proved what he was like, and neither helped him remember any of it."
+description: "Two years lived before memory began: a photograph proved he was there and other people's stories described him, but neither helped him remember any of it."
 tags:
    - childhood
    - memory

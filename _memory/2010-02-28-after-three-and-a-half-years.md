@@ -1,7 +1,7 @@
 ---
 title: "After Three and a Half Years"
 date: 2010-02-28
-description: "The sentence you swallow tells the story better than the one that leaves your mouth — on a rejection that revealed two people's entirely different versions of the same friendship."
+description: "The sentence you swallow tells the story better than the one you say: a rejection that revealed two very different versions of the same friendship."
 tags:
    - relationships
    - friendship

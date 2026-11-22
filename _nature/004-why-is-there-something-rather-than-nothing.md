@@ -1,5 +1,7 @@
 ---
 title: 'Why Is There Something Rather Than Nothing?'
+seo_title: "Why Is There Something Rather Than Nothing? · Philosophy Essay"
+description: "Leibniz's question examined: sufficient reason, contingent and necessary existence, brute facts, and why the quantum vacuum is not nothing."
 date: 2025-06-15
 permalink: /nature/004-why-is-there-something-rather-than-nothing/
 chapter: 1

@@ -1,5 +1,6 @@
 ---
 title: 'Judaism and the One God'
+description: "Judaism's monotheism: one God as creator, judge and source of covenant and law, making the bond between God and community ethical as well as ritual."
 date: 2020-04-15
 permalink: /humanity/2020/04/judaism-and-the-one-god/
 chapter: 8

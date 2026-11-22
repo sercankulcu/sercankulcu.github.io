@@ -1,7 +1,7 @@
 ---
 title: "The Pack in My Pocket"
 date: 2009-01-03
-description: "Walking through snow for half an hour at midnight to buy cigarettes — not drama, but practicality: for six years the habit had quietly made itself as necessary as keys."
+description: "Walking half an hour through midnight snow to buy cigarettes was not drama but practicality: after six years the habit had become as necessary as keys."
 tags:
    - habits
    - addiction

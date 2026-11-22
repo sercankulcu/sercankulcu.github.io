@@ -1,7 +1,7 @@
 ---
 title: "The Name From Home"
 date: 2012-06-24
-description: "Two names, never belonging equally to the same world — one carries family rooms and childhood; the other moves forward into offices and new friendships, and neither is more real."
+description: "Two names that never belong equally to one world: one carries family rooms and childhood, the other moves into offices and friendships; neither is more real."
 tags:
    - identity
    - names

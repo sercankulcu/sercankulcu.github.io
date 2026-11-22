@@ -1,7 +1,7 @@
 ---
 title: "Please Come In to Sign"
 date: 2020-06-12
-description: "During the pandemic, when everything moved online, the institution still required a physical signature — the exception landed at the exact point where a person needed to stay home."
+description: "During the pandemic, with everything online, the institution still demanded a physical signature, an exception exactly where a person needed to stay home."
 tags:
    - remote-work
    - university

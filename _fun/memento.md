@@ -1,7 +1,7 @@
 ---
 title: "Memento"
 date: 2002-06-15
-description: "A record is no more truthful than the information written into it — and the person who most desperately needs reliable evidence can manufacture the evidence that will later control him."
+description: "A record is only as truthful as what is written into it, and the man who most needs reliable evidence can manufacture the evidence that later controls him."
 tags:
    - movie
    - memory

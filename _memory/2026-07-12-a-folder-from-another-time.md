@@ -1,7 +1,7 @@
 ---
 title: "A Folder from Another Time"
 date: 2026-07-12
-description: "He opened an old folder and found code written years earlier — reading it he could almost see the person who had thought those choices were reasonable, still carrying him this far."
+description: "He opened an old folder and found code written years earlier; reading it, he could almost see the person who thought those choices reasonable."
 tags:
    - technology
    - nostalgia

@@ -1,7 +1,7 @@
 ---
 title: "One Week Before"
 date: 2020-09-02
-description: "His middle-school crush added him on Facebook about a week before getting married; a month later the marriage ended — the second time her Instagram became public, he just waited."
+description: "His middle-school crush added him on Facebook a week before her wedding; the marriage ended a month later, and when her Instagram went public again, he waited."
 tags:
    - social-media
    - school

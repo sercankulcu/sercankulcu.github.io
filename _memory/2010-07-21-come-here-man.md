@@ -1,7 +1,7 @@
 ---
 title: "Come Here, Man"
 date: 2010-07-21
-description: "The evening he imagined putting his arm around his father's neck and saying 'Come here, man' was the first time he understood his father was slowly becoming his friend."
+description: "The evening he imagined putting an arm around his father's neck and saying 'Come here, man' was when he saw his father was slowly becoming his friend."
 tags:
    - family
    - father

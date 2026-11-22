@@ -1,7 +1,7 @@
 ---
 title: "Whatever Was Left"
 date: 2010-06-24
-description: "A real student breakfast depended on inventory — you opened the refrigerator and discovered what yesterday had left, and the curriculum was presented entirely by shortage."
+description: "A real student breakfast depended on inventory: you opened the refrigerator to find what yesterday had left, and the menu was written entirely by shortage."
 tags:
    - university
    - student-life

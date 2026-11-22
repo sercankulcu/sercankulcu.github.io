@@ -1,5 +1,6 @@
 ---
 title: 'Why Graphite Shines'
+description: "Why a dark pencil line flashes silver when tilted to the light: graphite's layered carbon, flattened flakes, pressure, burnishing and pencil grade."
 date: 2025-05-03
 permalink: /pencils/2025/05/why-graphite-shines/
 category: materials

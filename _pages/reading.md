@@ -1,6 +1,9 @@
 ---
 permalink: /reading/
 title: "Reading"
+lang: tr
+seo_title: "Okuma: Sevdiğim'e Bir Mektup"
+description: "J. Yorgo Wiestmich imzalı, hayatın anlamı ve sevgi üzerine Türkçe bir mektup."
 author_profile: false
 ---
 

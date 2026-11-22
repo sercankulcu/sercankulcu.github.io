@@ -1,7 +1,7 @@
 ---
 title: "No Photograph"
 date: 2010-07-09
-description: "He had the diploma — what his mother wanted was a photograph proving she had been there to see it, and graduation ceremonies belong as much to families as to students."
+description: "He had the diploma, but his mother wanted a photograph proving she had been there to see it; graduation ceremonies belong as much to families as to students."
 tags:
    - university
    - graduation

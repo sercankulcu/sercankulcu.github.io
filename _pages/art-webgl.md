@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "WebGL studies"
+seo_title: "WebGL Studies · Generative Art in the Browser"
+description: "A second set of browser artworks, made with three.js and drawn at full resolution with physically based rendering."
 permalink: /art/webgl/
 author_profile: true
 ---

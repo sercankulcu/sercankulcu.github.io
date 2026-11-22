@@ -1,7 +1,7 @@
 ---
 title: "Eternal Sunshine of the Spotless Mind"
 date: 2005-05-14
-description: "Missing a period of life is not the same as wanting to return to it — some memories are valuable precisely because they are finished, and erasure would remove the evidence that something once mattered."
+description: "Missing a period of life is not wanting it back; some memories matter because they are finished, and erasing them removes the proof that something mattered."
 tags:
    - movie
    - memory

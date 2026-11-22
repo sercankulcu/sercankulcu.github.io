@@ -1,7 +1,7 @@
 ---
 title: "Before Lunch"
 date: 2010-07-19
-description: "Military paperwork, phone, internet, water, electricity — all before lunch despite the meter detour; adult life contains victories too small for a ceremony but too difficult to ignore."
+description: "Military paperwork, phone, internet, water and electricity, all done before lunch; adult life holds victories too small for a ceremony but too hard to ignore."
 tags:
    - ankara
    - bureaucracy

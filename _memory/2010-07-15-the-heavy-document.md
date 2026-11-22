@@ -1,7 +1,7 @@
 ---
 title: "The Heavy Document"
 date: 2010-07-15
-description: "A short answer looks suspiciously easy; a long answer arrives carrying evidence of labor — on the strange punishment of clarity and the incentive to produce quantity instead."
+description: "A short answer looks suspiciously easy, while a long one carries evidence of labor: on the odd punishment of clarity and the incentive to produce quantity."
 tags:
    - work
    - engineering

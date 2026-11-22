@@ -1,7 +1,7 @@
 ---
 title: "Adı İntikamdı: Sometimes We Pay for Wounds We Did Not Create"
 date: 2011-06-29
-description: "Do not make another person pay for a wound they did not create — on inherited pain, emotional revenge without an address, and the dual truth of understanding and refusing."
+description: "Do not make someone pay for a wound they did not create: on inherited pain, revenge without an address, and understanding someone while refusing the bill."
 tags:
    - music
    - mustafa-sandal

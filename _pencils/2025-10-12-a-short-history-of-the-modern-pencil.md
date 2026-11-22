@@ -1,5 +1,6 @@
 ---
 title: 'A Short History of the Modern Pencil'
+description: "How the pencil took shape: Borrowdale graphite, wooden casing in Nuremberg, Conté's clay-graphite core, industrial brands, grades, mechanical pencils."
 date: 2025-10-12
 permalink: /pencils/2025/10/a-short-history-of-the-modern-pencil/
 category: history

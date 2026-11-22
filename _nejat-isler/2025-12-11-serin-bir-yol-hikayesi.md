@@ -1,6 +1,6 @@
 ---
 title: "Serin Bir Yol Hikâyesi"
-description: "The December 2025 MediaCat interview is one of the richest late-period documents in Nejat İşler's archive. But very quickly, the book opens into larger questions:"
+description: "The December 2025 MediaCat interview with Nejat İşler begins with the book Miras and opens into larger questions, such as what we inherit."
 date: 2025-12-11
 publication: "MediaCat"
 interviewer: "Eylül Seren Altay"

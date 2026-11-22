@@ -1,6 +1,8 @@
 ---
 layout: archive
 title: "Art"
+seo_title: "Pixel Art Scenes Drawn in the Browser · Sercan Külcü"
+description: "Small looping scenes drawn pixel by pixel in the browser by hand-written software rasterisers: weather, light and places where nothing arrives."
 permalink: /art/
 author_profile: true
 ---

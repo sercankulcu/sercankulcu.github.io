@@ -1,7 +1,7 @@
 ---
 title: "Who Were You Calling?"
 date: 2010-05-09
-description: "Two calls, both opening with 'Who are you?' — the man who placed the call asked the person who answered to identify themselves first, and neither of them learned anything useful."
+description: "Two calls, both opening with 'Who are you?': the caller asked the person who answered to identify themselves first, and neither learned anything useful."
 tags:
    - communication
    - humor

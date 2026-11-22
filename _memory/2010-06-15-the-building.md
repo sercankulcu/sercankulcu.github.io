@@ -1,7 +1,7 @@
 ---
 title: "The Building"
 date: 2010-06-15
-description: "In an aerospace company so vast that a cigarette break became a journey, he learned that engineering also lived in the corridors, the cafeteria, and the security guard's conversation."
+description: "In an aerospace company so vast that a cigarette break was a journey, he learned engineering also lived in corridors, the cafeteria and the guard's talk."
 tags:
    - engineering
    - montreal

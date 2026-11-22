@@ -1,7 +1,7 @@
 ---
 title: "Two Things in the Same Year"
 date: 2022-12-29
-description: "He finished his doctorate in 2022 and experienced a serious family loss in the same year — the congratulations were completely correct and still incomplete at the same time."
+description: "He finished his doctorate in 2022 and suffered a serious family loss the same year; the congratulations were entirely correct and still incomplete."
 tags:
    - academia
    - grief

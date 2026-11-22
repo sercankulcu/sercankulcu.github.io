@@ -1,7 +1,7 @@
 ---
 title: "Meatballs After Midnight"
 date: 2010-04-23
-description: "Whether the meatballs near the metro exit were truly the best in Ankara or simply the right food at the right hour could never be determined — and that was not important."
+description: "Whether the meatballs near the metro exit were truly the best in Ankara or just the right food at the right hour could never be settled, and did not matter."
 tags:
    - ankara
    - food

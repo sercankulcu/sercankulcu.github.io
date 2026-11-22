@@ -1,7 +1,7 @@
 ---
 title: "Ten Minutes"
 date: 2011-09-04
-description: "He entered the anonymous chat website curious and left ten minutes later having exchanged more insults than in any other ten-minute period of his life — the place had recruited him into its behavior."
+description: "He entered an anonymous chat site curious and left ten minutes later having traded more insults than in any other ten minutes of his life."
 tags:
    - internet
    - social-media
