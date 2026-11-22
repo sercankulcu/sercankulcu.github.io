@@ -1,0 +1,329 @@
+---
+layout: without-sidebar
+title: "String Transformation: Burrows–Wheeler Transform"
+permalink: /files/algorithms/slides/Chapter_10_String_Transformation.html
+excerpt: "An interactive simulation of the Burrows–Wheeler transform, one step at a time."
+lang: en
+seo_title: "String Transformation: Burrows–Wheeler Transform · Algorithms, Chapter 10"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmalar.jpg
+hreflang:
+  tr: /files/algorithms/sunumlar/Bolum_10_String_Transformation.html
+  en: /files/algorithms/slides/Chapter_10_String_Transformation.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithms"
+  url: "/teaching/algorithms/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-bwt .algo-stage__body { display: flex; flex-direction: column; gap: 8px; }
+.algo-bwt .algo-bwt__controls { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: 8px; }
+.algo-bwt .algo-bwt__controls label, .algo-bwt .algo-bwt__controls input { margin: 0; }
+.algo-bwt .algo-bwt__controls label { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.algo-bwt .algo-bwt__controls input[type="text"] { width: 150px; font-family: Consolas, Monaco, monospace; letter-spacing: .06em; }
+.algo-bwt .algo-bwt__controls label.algo-bwt__check { text-transform: none; letter-spacing: 0; font-size: 14px; }
+.algo-bwt .algo-bwt__controls button { padding: 0 12px; }
+.algo-bwt .algo-bwt__phases { display: grid; flex: none; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.algo-bwt .algo-bwt__phase { padding: 4px 8px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-muted); font-size: 14px; font-weight: 700; text-align: center; }
+.algo-bwt .algo-bwt__phase.is-active { border-color: var(--ds-warn); background: color-mix(in srgb, var(--ds-warn) 18%, var(--ds-bg)); color: var(--ds-text); }
+.algo-bwt .algo-bwt__phase.is-done { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); color: var(--ds-text); }
+.algo-bwt .algo-bwt__main { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; }
+.algo-bwt .algo-bwt__card { min-width: 0; min-height: 0; padding: 8px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); overflow: hidden; }
+.algo-bwt .algo-bwt__card h2 { margin: 0 0 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-bwt .algo-bwt__side { display: flex; min-width: 0; min-height: 0; flex-direction: column; gap: 10px; }
+.algo-bwt .algo-bwt__table { width: 100%; margin: 0; border-collapse: collapse; font-size: 15px; }
+.algo-bwt .algo-bwt__table th, .algo-bwt .algo-bwt__table td { padding: 1px 8px; border: 1px solid var(--ds-border); text-align: center; line-height: 1.4; font-family: Consolas, Monaco, monospace; }
+.algo-bwt .algo-bwt__table th { background: var(--ds-surface-strong); font-family: inherit; font-size: 13px; }
+.algo-bwt .algo-bwt__table td.is-rot { text-align: left; letter-spacing: .12em; }
+.algo-bwt .algo-bwt__table td.is-rot .f { color: var(--ds-link); font-weight: 800; }
+.algo-bwt .algo-bwt__table td.is-rot .l { color: var(--ds-accent); font-weight: 800; }
+.algo-bwt .algo-bwt__table td.is-last { background: color-mix(in srgb, var(--ds-accent) 10%, var(--ds-bg)); color: var(--ds-accent); font-weight: 800; }
+.algo-bwt .algo-bwt__table tr.is-new td { background: color-mix(in srgb, var(--ds-warn) 22%, var(--ds-bg)); }
+.algo-bwt .algo-bwt__table tr.is-orig td { box-shadow: inset 0 2px 0 var(--ds-good), inset 0 -2px 0 var(--ds-good); }
+.algo-bwt .algo-bwt__empty { margin: 30px 0 0; color: var(--ds-muted); text-align: center; }
+.algo-bwt .algo-bwt__result { margin: 0; padding: 8px 10px; border-radius: 10px; background: var(--ds-surface-strong); font: 800 24px/1.3 Consolas, Monaco, monospace; letter-spacing: .14em; word-break: break-all; color: var(--ds-accent); }
+.algo-bwt .algo-bwt__meta { margin: 6px 0 0; color: var(--ds-muted); font-size: 14px; }
+.algo-bwt .algo-bwt__msg { flex: 1; }
+.algo-bwt .algo-bwt__msg p { margin: 0 0 4px; font-size: 15px; line-height: 1.45; }
+.algo-bwt .algo-bwt__status { font-weight: 700; }
+</style>
+
+<div class="algo-bwt algo-stage algo-stage--stage" lang="en">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Chapter 10 · Simulation</p><h1>String Transformation: Burrows–Wheeler Transform</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="algo-bwt-help" aria-label="Info and help">?</button>
+    <a class="algo-stage__back" href="Chapter_10_Advanced_String_Algorithms.html">← Chapter 10</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="algo-bwt__controls">
+      <label>Input <input id="algo-bwt-input" type="text" value="BANANA" maxlength="12" spellcheck="false" aria-label="Sample input"></label>
+      <label class="algo-bwt__check"><input id="algo-bwt-sentinel" type="checkbox" checked> Add $</label>
+      <button id="algo-bwt-load" type="button" class="is-primary">Load Input</button>
+      <button id="algo-bwt-step" type="button">Step</button>
+      <button id="algo-bwt-auto" type="button">Auto Play</button>
+      <button id="algo-bwt-reset" type="button">Reset</button>
+    </div>
+    <div class="algo-bwt__phases">
+      <div id="algo-bwt-phase-make" class="algo-bwt__phase">1. Generate Rotations</div>
+      <div id="algo-bwt-phase-sort" class="algo-bwt__phase">2. Sort Rotations</div>
+      <div id="algo-bwt-phase-last" class="algo-bwt__phase">3. Read Last Column</div>
+    </div>
+    <div class="algo-bwt__main">
+      <section class="algo-bwt__card">
+        <h2 id="algo-bwt-table-title">Rotation Table</h2>
+        <div id="algo-bwt-table"></div>
+      </section>
+      <div class="algo-bwt__side">
+        <section class="algo-bwt__card">
+          <h2>BWT Result</h2>
+          <p id="algo-bwt-result" class="algo-bwt__result">–</p>
+          <p id="algo-bwt-meta" class="algo-bwt__meta">Not built yet.</p>
+        </section>
+        <section class="algo-bwt__card algo-bwt__msg">
+          <h2>Step</h2>
+          <p id="algo-bwt-status" class="algo-bwt__status" role="status">Ready.</p>
+          <p id="algo-bwt-log"></p>
+        </section>
+      </div>
+    </div>
+  </div>
+  <dialog class="algo-stage__dialog" id="algo-bwt-help"><button type="button" class="algo-stage__close">Close</button>
+    <h2>Burrows–Wheeler Transform</h2>
+    <p>All circular rotations are generated, sorted lexicographically, and the last column is read off to obtain the BWT.</p>
+    <h3>How to use</h3>
+    <ul>
+      <li>Type a string of up to 12 characters and press <strong>Load Input</strong> (use <strong>Reset</strong> to start over with the same input).</li>
+      <li><strong>Add $</strong> appends the <code>$</code> end marker, which sorts before every letter and digit. The transform is also computed without the marker, but the original string can then be recovered only if the row index is stored as well.</li>
+      <li><strong>Step</strong> performs one step: first one rotation per step, then sorting, then reading the last column. <strong>Auto Play</strong> plays the remaining steps (press again to pause).</li>
+      <li>In the table, the first column (F) is shown in the link color and the last column (L) in red; the newest rotation is highlighted. After sorting, the framed row is the original string; <em>Shift</em> is the rotation amount (with <code>$</code>, this column is the suffix array).</li>
+    </ul>
+    <h3>Why is it useful?</h3>
+    <p>Sorting the rotations gathers the characters that precede similar contexts, so the last column contains long runs of equal characters (for example <code>BANANA$</code> → <code>ANNB$AA</code>). Run-length encoding (RLE) and move-to-front coding compress this well; this is the core of bzip2.</p>
+    <h3>Inverting the transform</h3>
+    <p>The first column F is the sorted version of the last column L. The LF mapping links the i-th occurrence of a character in L to its i-th occurrence in F; the original string is then rebuilt backwards, starting from the row that holds it.</p>
+    <h3>Complexity</h3>
+    <p>This brute-force method builds and sorts n rotations of length n: O(n² log n) time and O(n²) memory. Practical implementations derive the BWT from a suffix array in O(n) or O(n log n) time.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-bwt");
+    if (!root) return;
+
+    function q(id) { return root.querySelector("#" + id); }
+
+    var inputEl = q("algo-bwt-input");
+    var sentinelEl = q("algo-bwt-sentinel");
+    var loadBtn = q("algo-bwt-load");
+    var stepBtn = q("algo-bwt-step");
+    var autoBtn = q("algo-bwt-auto");
+    var resetBtn = q("algo-bwt-reset");
+    var statusEl = q("algo-bwt-status");
+    var tableEl = q("algo-bwt-table");
+    var tableTitle = q("algo-bwt-table-title");
+    var logEl = q("algo-bwt-log");
+    var resultEl = q("algo-bwt-result");
+    var metaEl = q("algo-bwt-meta");
+
+    var phaseMake = q("algo-bwt-phase-make");
+    var phaseSort = q("algo-bwt-phase-sort");
+    var phaseLast = q("algo-bwt-phase-last");
+
+    var MAX = 12;
+    var s = "";
+    var rotations = [];
+    var sorted = [];
+    var phase = "make";
+    var k = 0;
+    var bwt = "";
+    var done = false;
+    var stepNo = 0;
+    var timer = null;
+    var highlightRow = -1;
+
+    function updatePhases() {
+        [phaseMake, phaseSort, phaseLast].forEach(function (el) { el.classList.remove("is-active", "is-done"); });
+        if (phase === "make") phaseMake.classList.add("is-active");
+        if (phase === "sort") { phaseMake.classList.add("is-done"); phaseSort.classList.add("is-active"); }
+        if (phase === "last") { phaseMake.classList.add("is-done"); phaseSort.classList.add("is-done"); phaseLast.classList.add("is-active"); }
+        if (phase === "done" && s.length) { phaseMake.classList.add("is-done"); phaseSort.classList.add("is-done"); phaseLast.classList.add("is-done"); }
+    }
+
+    function stopAuto() {
+        clearInterval(timer);
+        timer = null;
+        autoBtn.textContent = "Auto Play";
+    }
+
+    function init() {
+        stopAuto();
+
+        var raw = inputEl.value.replace(/\s+/g, "").slice(0, MAX);
+        inputEl.value = raw;
+        s = raw;
+        if (s.length && sentinelEl.checked && s.indexOf("$") < 0) s += "$";
+
+        rotations = [];
+        sorted = [];
+        phase = "make";
+        k = 0;
+        bwt = "";
+        done = false;
+        stepNo = 0;
+        highlightRow = -1;
+
+        if (!s.length) {
+            done = true;
+            phase = "done";
+            statusEl.textContent = "The input cannot be empty.";
+            render("Enter a non-empty string and press Load Input.");
+            return;
+        }
+
+        statusEl.textContent = "Input loaded: " + s + " (n = " + s.length + ").";
+        render("Next: all " + s.length + " circular rotations will be generated.");
+    }
+
+    function rotationCell(rotation) {
+        if (!rotation.length) return "";
+        if (rotation.length === 1) return '<span class="f">' + escapeHtml(rotation) + "</span>";
+        return '<span class="f">' + escapeHtml(rotation[0]) + "</span>" +
+            escapeHtml(rotation.slice(1, -1)) +
+            '<span class="l">' + escapeHtml(rotation[rotation.length - 1]) + "</span>";
+    }
+
+    function render(message) {
+        updatePhases();
+
+        var isSorted = phase === "last" || phase === "done";
+        var rows = isSorted ? sorted : rotations;
+        tableTitle.textContent = isSorted ? "Sorted Rotations" : "Rotation Table";
+
+        if (!rows.length) {
+            tableEl.innerHTML = '<p class="algo-bwt__empty">No rotations yet.</p>';
+        } else {
+            var html = '<table class="algo-bwt__table"><thead><tr><th>#</th><th>Rotation (F … L)</th><th>Shift</th><th>L</th></tr></thead><tbody>';
+            rows.forEach(function (row, index) {
+                var cls = [];
+                if (index === highlightRow) cls.push("is-new");
+                if (isSorted && row.shift === 0) cls.push("is-orig");
+                var last = row.text.length ? row.text[row.text.length - 1] : "";
+                html += "<tr" + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + ">" +
+                    "<td>" + index + "</td>" +
+                    '<td class="is-rot">' + rotationCell(row.text) + "</td>" +
+                    "<td>" + row.shift + "</td>" +
+                    '<td class="is-last">' + escapeHtml(last) + "</td></tr>";
+            });
+            html += "</tbody></table>";
+            tableEl.innerHTML = html;
+        }
+
+        logEl.textContent = message;
+        if (bwt) {
+            resultEl.textContent = bwt;
+            var primary = sorted.findIndex(function (r) { return r.shift === 0; });
+            metaEl.textContent = "The original string is row " + primary + " of the sorted table" + (s.indexOf("$") >= 0 ? "; $ marks the end." : ".");
+        } else {
+            resultEl.textContent = "–";
+            metaEl.textContent = "Not built yet.";
+        }
+    }
+
+    function step() {
+        if (done) {
+            if (bwt) render("Burrows–Wheeler transform complete. Result = " + bwt + ".");
+            return false;
+        }
+
+        stepNo++;
+        highlightRow = -1;
+
+        if (phase === "make") {
+            if (k < s.length) {
+                var rotation = s.slice(k) + s.slice(0, k);
+                rotations.push({ text: rotation, shift: k });
+                highlightRow = rotations.length - 1;
+                statusEl.textContent = "Step " + stepNo + ": rotation " + k + " / " + (s.length - 1) + ".";
+                render(k === 0 ? "Rotation 0 is the string itself: " + rotation + "." : "Rotation " + k + " moves the first " + k + " characters to the end: " + rotation + ".");
+                k++;
+                return true;
+            }
+            phase = "sort";
+            statusEl.textContent = "Step " + stepNo + ": all rotations generated.";
+            render("Next: the rotations will be sorted lexicographically.");
+            return true;
+        }
+
+        if (phase === "sort") {
+            sorted = rotations.slice().sort(function (a, b) { return a.text < b.text ? -1 : a.text > b.text ? 1 : a.shift - b.shift; });
+            phase = "last";
+            statusEl.textContent = "Step " + stepNo + ": rotations sorted.";
+            render("The first column F is now sorted; the last column L will be the BWT output.");
+            return true;
+        }
+
+        if (phase === "last") {
+            bwt = sorted.map(function (r) { return r.text[r.text.length - 1]; }).join("");
+            phase = "done";
+            done = true;
+            statusEl.textContent = "Step " + stepNo + ": transform complete.";
+            render("The last character of each sorted rotation is read from top to bottom: BWT = " + bwt + ".");
+            return false;
+        }
+
+        return false;
+    }
+
+    function autoRun() {
+        if (timer) { stopAuto(); return; }
+        if (done) return;
+        autoBtn.textContent = "Pause";
+        timer = setInterval(function () {
+            if (!step()) stopAuto();
+        }, 600);
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (ch) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+        });
+    }
+
+    loadBtn.addEventListener("click", init);
+    stepBtn.addEventListener("click", function () { stopAuto(); step(); });
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", init);
+    inputEl.addEventListener("keydown", function (e) { if (e.key === "Enter") init(); });
+
+    init();
+})();
+</script>
+<script src="deck/stage.js"></script>

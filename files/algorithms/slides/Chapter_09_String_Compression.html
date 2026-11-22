@@ -1,0 +1,306 @@
+---
+layout: without-sidebar
+title: "String Compression Algorithms"
+permalink: /files/algorithms/slides/Chapter_09_String_Compression.html
+excerpt: "A simulation that shows the run-length encoding (RLE) and LZW string compression algorithms step by step."
+lang: en
+seo_title: "String Compression Algorithms · Algorithms, Chapter 9"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmalar.jpg
+hreflang:
+  tr: /files/algorithms/sunumlar/Bolum_09_String_Compression.html
+  en: /files/algorithms/slides/Chapter_09_String_Compression.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithms"
+  url: "/teaching/algorithms/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-compression .cmp-wrap { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.algo-compression .cmp-controls { display: flex; align-items: center; gap: 6px; }
+.algo-compression .cmp-controls label { color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-compression .cmp-controls input { flex: 1; min-width: 0; font-family: Consolas, Monaco, monospace; }
+.algo-compression .cmp-controls button { padding: 0 12px; font-size: 14px; }
+.algo-compression .panel { min-width: 0; padding: 8px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-compression .panel-title { margin: 0 0 6px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-compression .cmp-visual { flex: none; }
+.algo-compression .cmp-row { display: flex; align-items: center; gap: 8px; min-height: 30px; }
+.algo-compression .cmp-row + .cmp-row { margin-top: 6px; }
+.algo-compression .cmp-row-label { flex: 0 0 64px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-compression .cmp-chars { display: flex; gap: 3px; padding-top: 16px; }
+.algo-compression .cmp-char { position: relative; display: flex; align-items: center; justify-content: center; width: var(--cell, 34px); height: var(--cell, 34px); flex: none; border: 1.5px solid var(--ds-border); border-radius: 7px; background: var(--ds-bg); font: 700 15px Consolas, Monaco, monospace; }
+.algo-compression .cmp-char small { position: absolute; top: -17px; left: 0; right: 0; color: var(--ds-muted); font: 400 12px/1 system-ui, sans-serif; text-align: center; }
+.algo-compression .cmp-char.is-processed { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); }
+.algo-compression .cmp-char.is-active { border-color: var(--ds-warn); background: var(--ds-hot); }
+.algo-compression .cmp-wcw { font: 700 15px Consolas, Monaco, monospace; }
+.algo-compression .cmp-wcw span { color: var(--ds-muted); font-weight: 400; }
+.algo-compression .cmp-status { flex: none; min-height: 22px; margin: 0; padding: 0 2px; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-compression .cmp-out { flex: none; }
+.algo-compression .cmp-out-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.algo-compression .cmp-ratio { color: var(--ds-text); font-size: 13px; font-weight: 700; }
+.algo-compression .chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 26px; }
+.algo-compression .chip { display: inline-block; padding: 1px 5px; border: 1.5px solid var(--ds-link); border-radius: 6px; background: var(--ds-node); font: 700 13px/1.4 Consolas, Monaco, monospace; }
+.algo-compression .chip.is-new { border-color: var(--ds-warn); background: var(--ds-hot); }
+.algo-compression .chip.is-w { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); }
+.algo-compression .chip b { color: var(--ds-muted); font-weight: 400; }
+.algo-compression .muted { color: var(--ds-muted); font-size: 13px; }
+.algo-compression .cmp-table { flex: 1; min-height: 0; overflow: hidden; }
+.algo-compression .cmp-log { flex: none; height: 68px; margin: 0; padding: 4px 10px 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-surface); list-style: none; font: 13px/1.4 Consolas, Monaco, monospace; }
+.algo-compression .cmp-log li { margin: 0; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-compression .cmp-log li:first-child { font-weight: 700; }
+</style>
+
+<div class="algo-compression algo-stage algo-stage--stage" lang="en">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Chapter 9 · Simulation</p><h1>String Compression Algorithms</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="cmp-help" aria-label="Help">?</button>
+    <a class="algo-stage__back" href="Chapter_09_String_Matching_and_Compression.html">← Chapter 9</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="cmp-wrap">
+      <div class="cmp-controls">
+        <label for="algo-compression-input">Input</label>
+        <input id="algo-compression-input" value="AAAAABBBCCCCDDDABABABA" maxlength="24" spellcheck="false" autocomplete="off">
+        <select id="algo-compression-select" aria-label="Algorithm">
+          <option value="rle">RLE</option>
+          <option value="lzw">LZW</option>
+        </select>
+        <button id="algo-compression-prepare" type="button" class="is-primary">Prepare</button>
+        <button id="algo-compression-next" type="button" disabled>Next Step</button>
+        <button id="algo-compression-auto" type="button" disabled>Auto Play</button>
+        <button id="algo-compression-reset" type="button">Reset</button>
+      </div>
+
+      <section id="algo-compression-visual" class="panel cmp-visual" aria-label="Input view"></section>
+
+      <p id="algo-compression-step-info" class="cmp-status" role="status">Press Prepare to begin.</p>
+
+      <section class="panel cmp-out">
+        <div class="cmp-out-head">
+          <p class="panel-title">Compressed Output</p>
+          <span id="algo-compression-ratio" class="cmp-ratio">Ratio: —</span>
+        </div>
+        <div id="algo-compression-output" class="chips"><span class="muted">No result yet.</span></div>
+      </section>
+
+      <section class="panel cmp-table">
+        <p class="panel-title" id="algo-compression-table-title">Runs</p>
+        <div id="algo-compression-table" class="chips"><span class="muted">Runs appear here.</span></div>
+      </section>
+
+      <ul id="algo-compression-log" class="cmp-log" aria-label="Recent steps"></ul>
+    </div>
+  </div>
+  <dialog class="algo-stage__dialog" id="cmp-help"><button type="button" class="algo-stage__close">Close</button>
+    <h2>String Compression Algorithms</h2>
+    <p>Run-length encoding (RLE) and Lempel-Ziv-Welch (LZW) are shown step by step.</p>
+    <h3>How to use</h3>
+    <ul>
+      <li>Type an input text (up to 24 characters) and choose an algorithm. Changing the algorithm loads a suitable example.</li>
+      <li><b>Prepare</b> generates all the steps; <b>Next Step</b> advances one step, <b>Auto Play</b> plays the remaining steps, and <b>Reset</b> clears the run.</li>
+      <li>Yellow cell: the character being processed. Green cells: the current run (RLE).</li>
+      <li>The lines at the bottom keep the last few steps; the ratio appears when the run finishes.</li>
+    </ul>
+    <h3>Run-length encoding (RLE)</h3>
+    <p>RLE replaces each run of identical symbols with a count-symbol pair, for example <code>AAAAABB → 5A2B</code>. It works well when the input has long runs; otherwise it can make the output longer.</p>
+    <h3>Lempel-Ziv-Welch (LZW)</h3>
+    <p>LZW starts with a dictionary of the single characters in the input. While scanning, it extends the current string <code>w</code> with the next character <code>c</code>. If <code>wc</code> is in the dictionary, <code>w = wc</code>; otherwise it writes the code of <code>w</code> to the output, adds <code>wc</code> as a new code, and restarts with <code>w = c</code>. The dictionary grows as new strings appear.</p>
+    <p>In the dictionary panel, the green entry is the current <code>w</code> and the yellow entry is the code added in this step.</p>
+    <h3>Compression ratio</h3>
+    <p>Ratio = compressed units / original units. For RLE the units are the characters of the output pieces; for LZW they are the codes written.</p>
+    <h3>Complexity</h3>
+    <table>
+      <thead><tr><th>Algorithm</th><th>Time</th><th>Extra memory</th></tr></thead>
+      <tbody>
+        <tr><td>RLE</td><td>O(n)</td><td>O(1) besides the output</td></tr>
+        <tr><td>LZW</td><td>Expected O(n) (hash dictionary)</td><td>O(n) dictionary</td></tr>
+      </tbody>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.querySelector(".algo-compression");if(!root)return;
+function q(id){return root.querySelector("#"+id);}
+var inputEl=q("algo-compression-input"),selectEl=q("algo-compression-select"),prepareBtn=q("algo-compression-prepare"),nextBtn=q("algo-compression-next"),autoBtn=q("algo-compression-auto"),resetBtn=q("algo-compression-reset"),visual=q("algo-compression-visual"),stepInfo=q("algo-compression-step-info"),outputArea=q("algo-compression-output"),ratioArea=q("algo-compression-ratio"),tableArea=q("algo-compression-table"),tableTitle=q("algo-compression-table-title"),logArea=q("algo-compression-log");
+var input="",algorithm="rle",steps=[],currentStep=-1,outputTokens=[],timer=null,logLines=[];
+var LOG_MAX=3;
+
+function setExample(){
+  if(selectEl.value==="rle") inputEl.value="AAAAABBBCCCCDDDABABABA";
+  else inputEl.value="ABABCABABCA";
+  resetState(false);
+}
+
+function resetState(clearInput){
+  steps=[];currentStep=-1;outputTokens=[];clearInterval(timer);timer=null;logLines=[];renderLog();
+  algorithm=selectEl.value;input=inputEl.value;
+  visual.innerHTML="";stepInfo.textContent="Press Prepare to begin.";
+  renderOutput();ratioArea.textContent="Ratio: —";
+  renderTable(null);nextBtn.disabled=true;autoBtn.disabled=true;
+  if(clearInput) inputEl.value="";
+  renderVisual(null);
+}
+
+function prepare(){
+  input=inputEl.value;algorithm=selectEl.value;
+  if(!input.trim()){stepInfo.textContent="The input text cannot be empty.";return;}
+  steps=[];currentStep=-1;outputTokens=[];clearInterval(timer);timer=null;logLines=[];
+  if(algorithm==="rle")generateRLESteps();else generateLZWSteps();
+  nextBtn.disabled=false;autoBtn.disabled=false;appendLog("Algorithm prepared. Step through it.");
+  renderOutput();ratioArea.textContent="Ratio: —";
+  stepInfo.textContent="Total steps: "+steps.length;
+  renderVisual(null);renderTable(null);
+}
+
+function nextStep(){
+  if(currentStep+1>=steps.length){finish();return;}
+  currentStep++;var step=steps[currentStep];
+  if(step.outputToken!==undefined&&step.outputToken!==null)outputTokens.push(step.outputToken);
+  renderVisual(step);renderOutput();renderTable(step);updateInfo(step);appendLog(step.message);
+  if(currentStep+1>=steps.length)finish(false);
+}
+
+function autoRun(){
+  clearInterval(timer);
+  timer=setInterval(function(){
+    if(currentStep+1>=steps.length){finish();}
+    else nextStep();
+  },700);
+}
+
+function finish(updateMessage){
+  if(updateMessage!==false)stepInfo.textContent="Algorithm finished.";
+  nextBtn.disabled=true;autoBtn.disabled=true;clearInterval(timer);timer=null;calculateRatio();
+}
+
+function generateRLESteps(){
+  var i=0;
+  while(i<input.length){
+    var ch=input[i],count=1,j=i+1;
+    steps.push({type:"rle-start",index:i,startIndex:i,endIndex:i,currentChar:ch,count:count,message:"RLE: a new run of '"+ch+"' starts at index "+i+"."});
+    while(j<input.length&&input[j]===ch){
+      count++;
+      steps.push({type:"rle-count",index:j,startIndex:i,endIndex:j,currentChar:ch,count:count,message:"RLE: '"+ch+"' repeats at index "+j+". Count = "+count+"."});
+      j++;
+    }
+    var token=count+ch;
+    steps.push({type:"rle-output",index:i,startIndex:i,endIndex:j-1,currentChar:ch,count:count,outputToken:token,message:"RLE: run finished. Output piece '"+token+"'."});
+    i=j;
+  }
+}
+
+function generateLZWSteps(){
+  var dict={},unique=Array.from(new Set(input.split(""))).sort(),nextCode=0;
+  unique.forEach(function(ch){dict[ch]=nextCode++;});
+  steps.push({type:"lzw-init",index:0,w:"",c:"",wc:"",dictionary:Object.assign({},dict),message:"LZW: initial dictionary created."});
+  var w="";
+  for(var i=0;i<input.length;i++){
+    var c=input[i],wc=w+c;
+    steps.push({type:"lzw-check",index:i,w:w,c:c,wc:wc,dictionary:Object.assign({},dict),message:"LZW: look up '"+wc+"' in the dictionary."});
+    if(dict[wc]!==undefined){
+      w=wc;
+      steps.push({type:"lzw-exists",index:i,w:w,c:c,wc:wc,dictionary:Object.assign({},dict),message:"LZW: '"+wc+"' is in the dictionary. w becomes '"+w+"'."});
+    }else{
+      var outCode=dict[w];
+      dict[wc]=nextCode;
+      steps.push({type:"lzw-output",index:i,w:w,c:c,wc:wc,newCode:nextCode,dictionary:Object.assign({},dict),outputToken:outCode,message:"LZW: write code "+outCode+" for '"+w+"'; add '"+wc+"' with code "+nextCode+"."});
+      nextCode++;w=c;
+    }
+  }
+  if(w!=="")steps.push({type:"lzw-final",index:input.length-1,w:w,c:"",wc:w,dictionary:Object.assign({},dict),outputToken:dict[w],message:"LZW: write the final code "+dict[w]+" for '"+w+"'."});
+}
+
+function renderVisual(step){
+  var n=Math.max(1,input.length);
+  var cell=Math.max(22,Math.min(36,Math.floor(660/n)-3));
+  visual.style.setProperty("--cell",cell+"px");
+  var html='<div class="cmp-row"><div class="cmp-row-label">Input</div><div class="cmp-chars">';
+  for(var i=0;i<input.length;i++){
+    var cls="cmp-char";
+    if(step&&step.startIndex!==undefined&&i>=step.startIndex&&i<=step.endIndex)cls+=" is-processed";
+    if(step&&i===step.index)cls+=" is-active";
+    html+='<div class="'+cls+'"><small>'+i+'</small>'+escapeHtml(input[i])+'</div>';
+  }
+  html+='</div></div>';
+  if(algorithm==="lzw"){
+    html+='<div class="cmp-row"><div class="cmp-row-label">w / c / wc</div><div class="cmp-wcw">'+(step?escapeHtml(String(step.w||"∅"))+' <span>/</span> '+escapeHtml(String(step.c||"∅"))+' <span>/</span> '+escapeHtml(String(step.wc||"∅")):'<span>—</span>')+'</div></div>';
+  }
+  visual.innerHTML=html;
+}
+
+function renderOutput(){
+  outputArea.innerHTML="";
+  if(!outputTokens.length){outputArea.innerHTML='<span class="muted">No result yet.</span>';return;}
+  outputTokens.forEach(function(token){var s=document.createElement("span");s.className="chip";s.textContent=String(token);outputArea.appendChild(s);});
+}
+
+function renderTable(step){
+  if(algorithm==="rle"){
+    tableTitle.textContent="Runs";
+    var runs=[];
+    for(var k=0;k<=currentStep&&k<steps.length;k++){if(steps[k].type==="rle-output")runs.push(steps[k]);}
+    var html="";
+    runs.forEach(function(r){html+='<span class="chip">'+escapeHtml(r.currentChar)+'<b>×</b>'+r.count+'<b>→</b>'+escapeHtml(r.outputToken)+'</span>';});
+    if(step&&step.type!=="rle-output")html+='<span class="chip is-new">'+escapeHtml(step.currentChar)+'<b>×</b>'+step.count+'<b>→</b>…</span>';
+    tableArea.innerHTML=html||'<span class="muted">Runs appear here.</span>';
+  }else{
+    tableTitle.textContent="Dictionary";
+    if(!step||!step.dictionary){tableArea.innerHTML='<span class="muted">The dictionary appears here.</span>';return;}
+    tableArea.innerHTML=Object.keys(step.dictionary).sort(function(a,b){return step.dictionary[a]-step.dictionary[b];}).map(function(k){
+      var cls="chip";
+      if(step.newCode!==undefined&&step.dictionary[k]===step.newCode)cls+=" is-new";
+      else if(step.w&&k===step.w)cls+=" is-w";
+      return '<span class="'+cls+'">'+escapeHtml(k)+'<b>=</b>'+step.dictionary[k]+'</span>';
+    }).join("");
+  }
+}
+
+function calculateRatio(){
+  var original=input.length;
+  var compressed=algorithm==="rle"?outputTokens.join("").length:outputTokens.length;
+  if(!original){ratioArea.textContent="Ratio: —";return;}
+  var ratio=compressed/original;
+  ratioArea.textContent="Ratio = "+compressed+" / "+original+" = "+ratio.toFixed(2);
+}
+
+function updateInfo(step){stepInfo.textContent="Step "+(currentStep+1)+" / "+steps.length+": "+step.message;}
+function appendLog(message){logLines.unshift(message);if(logLines.length>LOG_MAX)logLines.length=LOG_MAX;renderLog();}
+function renderLog(){logArea.innerHTML="";logLines.forEach(function(t){var li=document.createElement("li");li.textContent=t;logArea.appendChild(li);});}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,function(ch){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch];});}
+
+selectEl.addEventListener("change",setExample);
+prepareBtn.addEventListener("click",prepare);
+nextBtn.addEventListener("click",nextStep);
+autoBtn.addEventListener("click",autoRun);
+resetBtn.addEventListener("click",function(){resetState(false);});
+resetState(false);
+})();
+</script>
+<script src="deck/stage.js"></script>

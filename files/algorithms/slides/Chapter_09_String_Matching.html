@@ -1,0 +1,790 @@
+---
+layout: without-sidebar
+title: "String Matching Algorithms"
+permalink: /files/algorithms/slides/Chapter_09_String_Matching.html
+excerpt: "A simulation that shows the brute-force, KMP, Boyer-Moore and Rabin-Karp string matching algorithms step by step."
+lang: en
+seo_title: "String Matching Algorithms · Algorithms, Chapter 9"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmalar.jpg
+hreflang:
+  tr: /files/algorithms/sunumlar/Bolum_09_String_Matching.html
+  en: /files/algorithms/slides/Chapter_09_String_Matching.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithms"
+  url: "/teaching/algorithms/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-matching .mt-wrap { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.algo-matching .mt-controls { display: flex; align-items: center; gap: 6px; }
+.algo-matching .mt-controls label { color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-matching .mt-controls input { min-width: 0; font-family: Consolas, Monaco, monospace; }
+.algo-matching #algo-matching-text { flex: 1.6; }
+.algo-matching #algo-matching-pattern { flex: 1; }
+.algo-matching .mt-controls select { flex: none; }
+.algo-matching .mt-buttons { display: flex; align-items: center; gap: 6px; }
+.algo-matching .mt-buttons button { padding: 0 14px; font-size: 14px; }
+.algo-matching .mt-legend { display: flex; gap: 12px; margin: 0 0 0 auto; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.algo-matching .mt-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 4px; border: 1.5px solid; border-radius: 3px; vertical-align: -1px; }
+.algo-matching .panel { min-width: 0; padding: 8px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-matching .panel-title { margin: 0 0 6px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.algo-matching .mt-visual { flex: none; min-height: 118px; }
+.algo-matching .mt-row { display: flex; align-items: flex-end; gap: 8px; }
+.algo-matching .mt-row + .mt-row { margin-top: 8px; }
+.algo-matching .mt-row-label { flex: 0 0 62px; padding-bottom: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-matching .mt-chars { display: flex; gap: 3px; }
+.algo-matching .mt-chars.has-index { padding-top: 16px; }
+.algo-matching .mt-char,
+.algo-matching .mt-empty { width: var(--cell, 34px); height: var(--cell, 34px); flex: none; }
+.algo-matching .mt-char { position: relative; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--ds-border); border-radius: 7px; background: var(--ds-bg); font: 700 15px Consolas, Monaco, monospace; }
+.algo-matching .mt-char small { position: absolute; top: -17px; left: 0; right: 0; color: var(--ds-muted); font: 400 12px/1 system-ui, sans-serif; text-align: center; }
+.algo-matching .mt-char.is-window { background: var(--ds-surface-strong); }
+.algo-matching .mt-char.is-found { border-color: var(--ds-link); background: var(--ds-node); }
+.algo-matching .mt-char.is-match { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 24%, var(--ds-bg)); }
+.algo-matching .mt-char.is-mismatch { border-color: var(--ds-bad); background: color-mix(in srgb, var(--ds-bad) 24%, var(--ds-bg)); }
+.algo-matching .mt-legend .lg-match { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 24%, var(--ds-bg)); }
+.algo-matching .mt-legend .lg-mismatch { border-color: var(--ds-bad); background: color-mix(in srgb, var(--ds-bad) 24%, var(--ds-bg)); }
+.algo-matching .mt-legend .lg-found { border-color: var(--ds-link); background: var(--ds-node); }
+.algo-matching .mt-status { flex: none; min-height: 22px; margin: 0; padding: 0 2px; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-matching .mt-cards { display: grid; flex: 1; grid-template-columns: 200px minmax(0, 1fr); gap: 8px; min-height: 0; }
+.algo-matching .mt-matches { color: var(--ds-link); font: 700 20px/1.3 Consolas, Monaco, monospace; overflow-wrap: anywhere; }
+.algo-matching .mt-matches.is-empty { color: var(--ds-muted); font: 400 14px/1.4 system-ui, sans-serif; }
+.algo-matching .mt-count { margin: 6px 0 0; color: var(--ds-muted); font-size: 13px; }
+.algo-matching .mt-extra { overflow: hidden; }
+.algo-matching .mt-extra p { margin: 0 0 4px; font-size: 14px; }
+.algo-matching .mt-extra table { border-collapse: collapse; font: 13px Consolas, Monaco, monospace; }
+.algo-matching .mt-extra th,
+.algo-matching .mt-extra td { min-width: 22px; padding: 2px 4px; border: 1.5px solid var(--ds-border); text-align: center; }
+.algo-matching .mt-extra th { background: var(--ds-surface-strong); }
+.algo-matching .mt-extra th.rowhead { color: var(--ds-muted); font-family: system-ui, sans-serif; font-size: 12px; text-align: left; white-space: nowrap; }
+.algo-matching .mt-extra td.is-hot { background: var(--ds-hot); font-weight: 700; }
+.algo-matching .mt-log { flex: none; height: 68px; margin: 0; padding: 4px 10px 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-surface); list-style: none; font: 13px/1.4 Consolas, Monaco, monospace; }
+.algo-matching .mt-log li { margin: 0; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.algo-matching .mt-log li:first-child { font-weight: 700; }
+</style>
+
+<div class="algo-matching algo-stage algo-stage--stage" lang="en">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Chapter 9 · Simulation</p><h1>String Matching Algorithms</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="mt-help" aria-label="Help">?</button>
+    <a class="algo-stage__back" href="Chapter_09_String_Matching_and_Compression.html">← Chapter 9</a>
+  </header>
+  <div class="algo-stage__body">
+    <div class="mt-wrap">
+      <div class="mt-controls">
+        <label for="algo-matching-text">Text</label>
+        <input id="algo-matching-text" value="ABABCABAB" maxlength="24" spellcheck="false" autocomplete="off">
+        <label for="algo-matching-pattern">Pattern</label>
+        <input id="algo-matching-pattern" value="ABAB" maxlength="12" spellcheck="false" autocomplete="off">
+        <select id="algo-matching-select" aria-label="Algorithm">
+          <option value="naive">Brute force</option>
+          <option value="kmp">Knuth-Morris-Pratt</option>
+          <option value="boyer">Boyer-Moore</option>
+          <option value="rabin">Rabin-Karp</option>
+        </select>
+      </div>
+      <div class="mt-buttons">
+        <button id="algo-matching-prepare" type="button" class="is-primary">Prepare</button>
+        <button id="algo-matching-next" type="button" disabled>Next Step</button>
+        <button id="algo-matching-auto" type="button" disabled>Auto Play</button>
+        <button id="algo-matching-reset" type="button">Reset</button>
+        <p class="mt-legend" aria-hidden="true"><span><i class="lg-match"></i>match</span><span><i class="lg-mismatch"></i>mismatch</span><span><i class="lg-found"></i>found</span></p>
+      </div>
+
+      <section id="algo-matching-visual" class="panel mt-visual" aria-label="Text and pattern"></section>
+
+      <p id="algo-matching-step-info" class="mt-status" role="status">Press Prepare to begin.</p>
+
+      <div class="mt-cards">
+        <section class="panel">
+          <p class="panel-title">Matches</p>
+          <div id="algo-matching-matches" class="mt-matches is-empty">No result yet.</div>
+          <p id="algo-matching-count" class="mt-count"></p>
+        </section>
+        <section class="panel mt-extra">
+          <p class="panel-title" id="algo-matching-extra-title">Preprocessing</p>
+          <div id="algo-matching-extra"><p>The selected algorithm's table appears here.</p></div>
+        </section>
+      </div>
+
+      <ul id="algo-matching-log" class="mt-log" aria-label="Recent steps"></ul>
+    </div>
+  </div>
+  <dialog class="algo-stage__dialog" id="mt-help"><button type="button" class="algo-stage__close">Close</button>
+    <h2>String Matching Algorithms</h2>
+    <p>Brute force, KMP, Boyer-Moore and Rabin-Karp are compared step by step on the same text and pattern.</p>
+    <h3>How to use</h3>
+    <ul>
+      <li>Enter a text T (up to 24 characters) and a pattern P (up to 12 characters), then choose an algorithm.</li>
+      <li><b>Prepare</b> generates all the steps; <b>Next Step</b> advances one step, <b>Auto Play</b> plays the remaining steps, and <b>Reset</b> clears the run.</li>
+      <li>The pattern row is drawn under the current alignment (shift). Green: the compared characters match; red: mismatch; blue: an occurrence was found.</li>
+      <li>The preprocessing panel shows the table the algorithm uses: the LPS table for KMP, the last-occurrence table for Boyer-Moore, and hash values for Rabin-Karp.</li>
+    </ul>
+    <h3>Brute force</h3>
+    <p>Tries every shift from 0 to n − m and compares characters from left to right until a mismatch.</p>
+    <h3>Knuth-Morris-Pratt (KMP)</h3>
+    <p>The LPS table (longest proper prefix that is also a suffix) tells how far the pattern can fall back after a mismatch, so the text index never moves backwards.</p>
+    <h3>Boyer-Moore (bad-character rule)</h3>
+    <p>Compares from right to left. On a mismatch the pattern is shifted (by at least one position) so that the last occurrence in the pattern of the mismatched text character lines up with it.</p>
+    <h3>Rabin-Karp</h3>
+    <p>The rolling hash of each text window is compared with the hash of the pattern (base 256, mod 101). Only windows with equal hash values are verified character by character, which weeds out spurious matches.</p>
+    <h3>Complexity</h3>
+    <table>
+      <thead><tr><th>Algorithm</th><th>Preprocessing</th><th>Matching (worst case)</th></tr></thead>
+      <tbody>
+        <tr><td>Brute force</td><td>—</td><td>O(n·m)</td></tr>
+        <tr><td>KMP</td><td>O(m)</td><td>O(n)</td></tr>
+        <tr><td>Boyer-Moore (bad character)</td><td>O(m + σ)</td><td>O(n·m); in practice often sublinear</td></tr>
+        <tr><td>Rabin-Karp</td><td>O(m)</td><td>Expected O(n + m), worst case O(n·m)</td></tr>
+      </tbody>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-matching");
+    if (!root) return;
+
+    function q(id) { return root.querySelector("#" + id); }
+
+    var textInput = q("algo-matching-text");
+    var patternInput = q("algo-matching-pattern");
+    var select = q("algo-matching-select");
+    var prepareBtn = q("algo-matching-prepare");
+    var nextBtn = q("algo-matching-next");
+    var autoBtn = q("algo-matching-auto");
+    var resetBtn = q("algo-matching-reset");
+    var visual = q("algo-matching-visual");
+    var stepInfo = q("algo-matching-step-info");
+    var matchesArea = q("algo-matching-matches");
+    var countArea = q("algo-matching-count");
+    var extraArea = q("algo-matching-extra");
+    var extraTitle = q("algo-matching-extra-title");
+    var logArea = q("algo-matching-log");
+
+    var text = "";
+    var pattern = "";
+    var algorithm = "naive";
+    var steps = [];
+    var currentStep = -1;
+    var foundMatches = [];
+    var timer = null;
+    var extraData = null;
+    var logLines = [];
+    var LOG_MAX = 3;
+
+    function resetState() {
+        steps = [];
+        currentStep = -1;
+        foundMatches = [];
+        extraData = null;
+        clearInterval(timer);
+        timer = null;
+        logLines = [];
+        renderLog();
+
+        text = textInput.value;
+        pattern = patternInput.value;
+        algorithm = select.value;
+
+        stepInfo.textContent = "Press Prepare to begin.";
+        matchesArea.textContent = "No result yet.";
+        matchesArea.classList.add("is-empty");
+        countArea.textContent = "";
+        extraTitle.textContent = "Preprocessing";
+        extraArea.innerHTML = "<p>The selected algorithm's table appears here.</p>";
+        nextBtn.disabled = true;
+        autoBtn.disabled = true;
+        renderVisual(null);
+    }
+
+    function prepare() {
+        text = textInput.value;
+        pattern = patternInput.value;
+        algorithm = select.value;
+
+        if (!text || !pattern) {
+            stepInfo.textContent = "The text and pattern cannot be empty.";
+            return;
+        }
+
+        if (pattern.length > text.length) {
+            stepInfo.textContent = "The pattern cannot be longer than the text.";
+            return;
+        }
+
+        steps = [];
+        currentStep = -1;
+        foundMatches = [];
+        clearInterval(timer);
+        timer = null;
+        logLines = [];
+
+        if (algorithm === "naive") generateNaive();
+        if (algorithm === "kmp") generateKMP();
+        if (algorithm === "boyer") generateBoyerMoore();
+        if (algorithm === "rabin") generateRabinKarp();
+
+        nextBtn.disabled = false;
+        autoBtn.disabled = false;
+        appendLog("Algorithm prepared. Step through it.");
+        matchesArea.textContent = "No result yet.";
+        matchesArea.classList.add("is-empty");
+        countArea.textContent = "";
+        stepInfo.textContent = "Total steps: " + steps.length;
+
+        renderVisual(null);
+        renderExtra(null);
+    }
+
+    function nextStep() {
+        if (currentStep + 1 >= steps.length) {
+            finish();
+            return;
+        }
+
+        currentStep++;
+        var step = steps[currentStep];
+
+        if (step.found && foundMatches.indexOf(step.shift) === -1) {
+            foundMatches.push(step.shift);
+            foundMatches.sort(function (a, b) { return a - b; });
+        }
+
+        renderVisual(step);
+        renderMatches();
+        renderExtra(step);
+        stepInfo.textContent =
+            "Step " + (currentStep + 1) + " / " + steps.length + ": " + step.message;
+        appendLog(step.message);
+
+        if (currentStep + 1 >= steps.length) {
+            finish(false);
+        }
+    }
+
+    function autoRun() {
+        clearInterval(timer);
+
+        timer = setInterval(function () {
+            if (currentStep + 1 >= steps.length) {
+                finish();
+            } else {
+                nextStep();
+            }
+        }, 650);
+    }
+
+    function finish(updateMessage) {
+        clearInterval(timer);
+        timer = null;
+        nextBtn.disabled = true;
+        autoBtn.disabled = true;
+
+        if (updateMessage !== false) {
+            stepInfo.textContent = "Algorithm finished.";
+        }
+
+        renderMatches();
+        countArea.textContent =
+            "Finished in " + steps.length + " steps; occurrences: " +
+            foundMatches.length + ".";
+    }
+
+    function generateNaive() {
+        extraData = null;
+
+        for (var shift = 0; shift <= text.length - pattern.length; shift++) {
+            var matched = true;
+
+            for (var j = 0; j < pattern.length; j++) {
+                var ok = text[shift + j] === pattern[j];
+
+                steps.push({
+                    shift: shift,
+                    textIndex: shift + j,
+                    patternIndex: j,
+                    match: ok,
+                    found: false,
+                    message:
+                        "Brute force: compare T[" + (shift + j) + "]='" + text[shift + j] +
+                        "' with P[" + j + "]='" + pattern[j] + "': " +
+                        (ok ? "match." : "mismatch.")
+                });
+
+                if (!ok) {
+                    matched = false;
+                    break;
+                }
+            }
+
+            if (matched) {
+                steps.push({
+                    shift: shift,
+                    textIndex: -1,
+                    patternIndex: -1,
+                    match: true,
+                    found: true,
+                    message: "Brute force: pattern found at index " + shift + "."
+                });
+            }
+        }
+    }
+
+    function buildLPS(pat) {
+        var lps = Array(pat.length).fill(0);
+        var len = 0;
+        var i = 1;
+
+        while (i < pat.length) {
+            if (pat[i] === pat[len]) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else if (len !== 0) {
+                len = lps[len - 1];
+            } else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+
+        return lps;
+    }
+
+    function generateKMP() {
+        var lps = buildLPS(pattern);
+        extraData = { type: "lps", values: lps };
+
+        var i = 0;
+        var j = 0;
+
+        while (i < text.length) {
+            var ok = text[i] === pattern[j];
+
+            steps.push({
+                shift: i - j,
+                textIndex: i,
+                patternIndex: j,
+                match: ok,
+                found: false,
+                message:
+                    "KMP: compare T[" + i + "]='" + text[i] +
+                    "' with P[" + j + "]='" + pattern[j] + "': " +
+                    (ok ? "match." : "mismatch.")
+            });
+
+            if (ok) {
+                i++;
+                j++;
+            }
+
+            if (j === pattern.length) {
+                var pos = i - j;
+
+                steps.push({
+                    shift: pos,
+                    textIndex: -1,
+                    patternIndex: -1,
+                    match: true,
+                    found: true,
+                    message: "KMP: pattern found at index " + pos + "."
+                });
+
+                j = lps[j - 1];
+            } else if (i < text.length && !ok) {
+                if (j !== 0) {
+                    var oldJ = j;
+                    j = lps[j - 1];
+
+                    steps.push({
+                        shift: i - j,
+                        textIndex: i,
+                        patternIndex: j,
+                        match: false,
+                        found: false,
+                        lpsIndex: oldJ - 1,
+                        fallback: true,
+                        message:
+                            "KMP: fall back with the LPS table: j=" + oldJ + " → j=" + j +
+                            "."
+                    });
+                } else {
+                    i++;
+                }
+            }
+        }
+    }
+
+    function buildBadChar(pat) {
+        var table = {};
+
+        for (var i = 0; i < pat.length; i++) {
+            table[pat[i]] = i;
+        }
+
+        return table;
+    }
+
+    function generateBoyerMoore() {
+        var badChar = buildBadChar(pattern);
+        extraData = { type: "badchar", values: badChar };
+
+        var shift = 0;
+
+        while (shift <= text.length - pattern.length) {
+            var j = pattern.length - 1;
+
+            while (j >= 0) {
+                var ok = pattern[j] === text[shift + j];
+
+                steps.push({
+                    shift: shift,
+                    textIndex: shift + j,
+                    patternIndex: j,
+                    match: ok,
+                    found: false,
+                    message:
+                        "Boyer-Moore: compare P[" + j + "]='" + pattern[j] +
+                        "' with T[" + (shift + j) + "]='" + text[shift + j] +
+                        "': " + (ok ? "match." : "mismatch.")
+                });
+
+                if (!ok) break;
+                j--;
+            }
+
+            if (j < 0) {
+                steps.push({
+                    shift: shift,
+                    textIndex: -1,
+                    patternIndex: -1,
+                    match: true,
+                    found: true,
+                    message: "Boyer-Moore: pattern found at index " + shift + "."
+                });
+
+                shift +=
+                    shift + pattern.length < text.length
+                        ? pattern.length - (badChar[text[shift + pattern.length]] ?? -1)
+                        : 1;
+            } else {
+                var bad = text[shift + j];
+                var jump = Math.max(1, j - (badChar[bad] ?? -1));
+
+                steps.push({
+                    shift: shift,
+                    textIndex: shift + j,
+                    patternIndex: j,
+                    match: false,
+                    found: false,
+                    badChar: bad,
+                    message:
+                        "Boyer-Moore: bad character '" + bad + "'; shift by " + jump +
+                        " position(s)."
+                });
+
+                shift += jump;
+            }
+        }
+    }
+
+    function generateRabinKarp() {
+        var base = 256;
+        var mod = 101;
+        var m = pattern.length;
+        var n = text.length;
+        var h = 1;
+
+        for (var i = 0; i < m - 1; i++) {
+            h = (h * base) % mod;
+        }
+
+        var pHash = 0;
+        var tHash = 0;
+
+        for (var j = 0; j < m; j++) {
+            pHash = (base * pHash + pattern.charCodeAt(j)) % mod;
+            tHash = (base * tHash + text.charCodeAt(j)) % mod;
+        }
+
+        extraData = {
+            type: "hash",
+            patternHash: pHash,
+            base: base,
+            mod: mod
+        };
+
+        for (var shift = 0; shift <= n - m; shift++) {
+            var sameHash = pHash === tHash;
+
+            steps.push({
+                shift: shift,
+                textIndex: shift,
+                patternIndex: 0,
+                match: sameHash,
+                found: false,
+                window: true,
+                hash: tHash,
+                message:
+                    "Rabin-Karp: window " + shift +
+                    ", hash = " + tHash +
+                    "; pattern hash = " + pHash + "."
+            });
+
+            if (sameHash) {
+                var exact = true;
+
+                for (var k = 0; k < m; k++) {
+                    var ok = text[shift + k] === pattern[k];
+
+                    steps.push({
+                        shift: shift,
+                        textIndex: shift + k,
+                        patternIndex: k,
+                        match: ok,
+                        found: false,
+                        hash: tHash,
+                        message:
+                            "Rabin-Karp verify: compare T[" + (shift + k) +
+                            "] with P[" + k + "]: " +
+                            (ok ? "match." : "mismatch.")
+                    });
+
+                    if (!ok) {
+                        exact = false;
+                        break;
+                    }
+                }
+
+                if (exact) {
+                    steps.push({
+                        shift: shift,
+                        textIndex: -1,
+                        patternIndex: -1,
+                        match: true,
+                        found: true,
+                        hash: tHash,
+                        message: "Rabin-Karp: pattern found at index " + shift + "."
+                    });
+                }
+            }
+
+            if (shift < n - m) {
+                tHash =
+                    (base * (tHash - text.charCodeAt(shift) * h) +
+                        text.charCodeAt(shift + m)) % mod;
+
+                if (tHash < 0) tHash += mod;
+            }
+        }
+    }
+
+    function renderVisual(step) {
+        var n = Math.max(1, text.length);
+        var cell = Math.max(22, Math.min(36, Math.floor(670 / n) - 3));
+        visual.style.setProperty("--cell", cell + "px");
+
+        var shift = step ? step.shift : 0;
+        var foundShift = step && step.found ? step.shift : -1;
+
+        var html =
+            '<div class="mt-row">' +
+            '<div class="mt-row-label">Text</div>' +
+            '<div class="mt-chars has-index">';
+
+        for (var i = 0; i < text.length; i++) {
+            var cls = "mt-char";
+
+            if (step && i >= shift && i < shift + pattern.length) {
+                cls += " is-window";
+            }
+
+            if (
+                foundShift >= 0 &&
+                i >= foundShift &&
+                i < foundShift + pattern.length
+            ) {
+                cls += " is-found";
+            }
+
+            if (step && i === step.textIndex) {
+                if (step.window) {
+                    cls += step.match ? " is-found" : "";
+                } else {
+                    cls += step.match ? " is-match" : " is-mismatch";
+                }
+            }
+
+            html +=
+                '<div class="' + cls + '"><small>' + i + "</small>" +
+                escapeHtml(text[i]) +
+                "</div>";
+        }
+
+        html +=
+            "</div></div>" +
+            '<div class="mt-row">' +
+            '<div class="mt-row-label">Pattern</div>' +
+            '<div class="mt-chars">';
+
+        for (var e = 0; e < shift; e++) {
+            html += '<div class="mt-empty"></div>';
+        }
+
+        for (var j = 0; j < pattern.length; j++) {
+            var pcls = "mt-char";
+
+            if (step && step.found) {
+                pcls += " is-found";
+            } else if (step && j === step.patternIndex && !step.window) {
+                pcls += step.match ? " is-match" : " is-mismatch";
+            }
+
+            html +=
+                '<div class="' + pcls + '">' +
+                escapeHtml(pattern[j]) +
+                "</div>";
+        }
+
+        html += "</div></div>";
+        visual.innerHTML = html;
+    }
+
+    function renderMatches() {
+        matchesArea.classList.toggle("is-empty", !foundMatches.length);
+        matchesArea.textContent =
+            foundMatches.length
+                ? foundMatches.join(", ")
+                : "No matches yet.";
+    }
+
+    function renderExtra(step) {
+        if (!extraData) {
+            extraTitle.textContent = "Preprocessing";
+            extraArea.innerHTML =
+                "<p>Brute-force matching needs no preprocessing.</p>";
+            return;
+        }
+
+        if (extraData.type === "lps") {
+            extraTitle.textContent = "Preprocessing: LPS table";
+            var hot = step && step.fallback ? step.lpsIndex : -1;
+            var idx = pattern
+                .split("")
+                .map(function (c, k) { return "<th>" + k + "</th>"; })
+                .join("");
+            var head = pattern
+                .split("")
+                .map(function (c, k) { return '<td' + (k === hot ? ' class="is-hot"' : '') + '>' + escapeHtml(c) + "</td>"; })
+                .join("");
+
+            var vals = extraData.values
+                .map(function (v, k) { return '<td' + (k === hot ? ' class="is-hot"' : '') + '>' + v + "</td>"; })
+                .join("");
+
+            extraArea.innerHTML =
+                '<table><tbody><tr><th class="rowhead">j</th>' + idx + '</tr>' +
+                '<tr><th class="rowhead">P[j]</th>' + head + '</tr>' +
+                '<tr><th class="rowhead">lps[j]</th>' + vals +
+                "</tr></tbody></table>";
+        }
+
+        if (extraData.type === "badchar") {
+            extraTitle.textContent = "Preprocessing: last occurrence";
+            var keys = Object.keys(extraData.values).sort();
+            var hotChar = step && step.badChar !== undefined ? step.badChar : null;
+            var chars = keys
+                .map(function (c) { return '<td' + (c === hotChar ? ' class="is-hot"' : '') + '>' + escapeHtml(c) + "</td>"; })
+                .join("");
+            var last = keys
+                .map(function (c) { return '<td' + (c === hotChar ? ' class="is-hot"' : '') + '>' + extraData.values[c] + "</td>"; })
+                .join("");
+
+            extraArea.innerHTML =
+                '<table><tbody><tr><th class="rowhead">char</th>' + chars + '</tr>' +
+                '<tr><th class="rowhead">last index</th>' + last + '</tr></tbody></table>' +
+                '<p style="margin-top:6px">Characters not in the pattern have last index −1.' +
+                (hotChar !== null && extraData.values[hotChar] === undefined
+                    ? " Bad character '" + escapeHtml(hotChar) + "' → −1."
+                    : "") + "</p>";
+        }
+
+        if (extraData.type === "hash") {
+            extraTitle.textContent = "Preprocessing: hash values";
+            extraArea.innerHTML =
+                "<p>Pattern hash: <strong>" + extraData.patternHash + "</strong></p>" +
+                "<p>Current window hash: <strong>" +
+                (step && step.hash !== undefined ? step.hash : "—") + "</strong></p>" +
+                "<p>Base: " + extraData.base + ", mod: " + extraData.mod + "</p>";
+        }
+    }
+
+    function appendLog(message) {
+        logLines.unshift(message);
+        if (logLines.length > LOG_MAX) logLines.length = LOG_MAX;
+        renderLog();
+    }
+
+    function renderLog() {
+        logArea.innerHTML = "";
+        logLines.forEach(function (t) {
+            var li = document.createElement("li");
+            li.textContent = t;
+            logArea.appendChild(li);
+        });
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (ch) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[ch];
+        });
+    }
+
+    prepareBtn.addEventListener("click", prepare);
+    nextBtn.addEventListener("click", nextStep);
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", resetState);
+
+    select.addEventListener("change", function () {
+        resetState();
+    });
+
+    resetState();
+})();
+</script>
+<script src="deck/stage.js"></script>

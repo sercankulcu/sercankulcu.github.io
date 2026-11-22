@@ -1,0 +1,367 @@
+---
+layout: without-sidebar
+title: "String Sorting: LSD Radix Sort"
+permalink: /files/algorithms/slides/Chapter_10_String_Sorting.html
+excerpt: "An interactive simulation of LSD radix sort for strings, one pass at a time."
+lang: en
+seo_title: "String Sorting: LSD Radix Sort · Algorithms, Chapter 10"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmalar.jpg
+hreflang:
+  tr: /files/algorithms/sunumlar/Bolum_10_String_Sorting.html
+  en: /files/algorithms/slides/Chapter_10_String_Sorting.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithms"
+  url: "/teaching/algorithms/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-string-sort .ss-body { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.algo-string-sort .ss-controls { display: flex; flex: none; align-items: center; gap: 8px; }
+.algo-string-sort .ss-controls label { color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-string-sort .ss-controls input { flex: 1; min-width: 0; font-size: 14px; }
+.algo-string-sort .ss-controls button { padding: 0 12px; font-size: 14px; }
+.algo-string-sort .ss-main { display: grid; flex: 1; min-height: 0; grid-template-columns: 250px minmax(0, 1fr); gap: 10px; }
+.algo-string-sort .ss-panel { min-width: 0; min-height: 0; overflow: hidden; padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-string-sort .ss-panel h2 { margin: 0 0 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-string-sort .ss-array { display: flex; flex-direction: column; gap: 3px; }
+.algo-string-sort .ss-row { display: flex; align-items: center; gap: 8px; }
+.algo-string-sort .ss-idx { width: 20px; color: var(--ds-muted); font-size: 12px; text-align: right; }
+.algo-string-sort .ss-word { display: inline-flex; gap: 2px; }
+.algo-string-sort .ss-char { display: inline-flex; width: 18px; height: 25px; align-items: center; justify-content: center; border: 1px solid var(--ds-border); border-radius: 4px; background: var(--ds-surface); font: 700 14px Consolas, Monaco, monospace; }
+.algo-string-sort .ss-char.is-pad { color: var(--ds-muted); background: transparent; border-style: dashed; }
+.algo-string-sort .ss-char.is-active { background: var(--ds-hot); border-color: var(--ds-accent); color: var(--ds-text); }
+.algo-string-sort .ss-char.is-done { background: color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+.algo-string-sort .ss-buckets { display: flex; flex-direction: column; gap: 4px; }
+.algo-string-sort .ss-bucket { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 8px; align-items: start; padding: 3px 6px; border: 1px solid var(--ds-border); border-radius: 8px; }
+.algo-string-sort .ss-bucket strong { font: 700 14px/24px Consolas, Monaco, monospace; color: var(--ds-accent); }
+.algo-string-sort .ss-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.algo-string-sort .ss-chip { padding: 1px 7px; border: 1px solid var(--ds-border); border-radius: 6px; background: var(--ds-surface); font: 700 14px/20px Consolas, Monaco, monospace; }
+.algo-string-sort .ss-chip b { color: var(--ds-accent); }
+.algo-string-sort .ss-empty { color: var(--ds-muted); font-size: 14px; }
+.algo-string-sort .ss-pass { color: var(--ds-text); font-weight: 700; }
+.algo-string-sort .ss-status { flex: none; margin: 0; overflow: hidden; font-size: 14px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.algo-string-sort .ss-msg { flex: none; margin: 0; overflow: hidden; color: var(--ds-muted); font-size: 13px; white-space: nowrap; text-overflow: ellipsis; }
+</style>
+
+<div class="algo-string-sort algo-stage algo-stage--stage" lang="en">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Chapter 10 · Simulation</p><h1>String Sorting: LSD Radix Sort</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="ss-help" aria-label="Info and help">?</button>
+    <a class="algo-stage__back" href="Chapter_10_Advanced_String_Algorithms.html">← Chapter 10</a>
+  </header>
+
+  <div class="algo-stage__body">
+    <div class="ss-body">
+      <div class="ss-controls">
+        <label for="algo-string-sort-input">Data</label>
+        <input id="algo-string-sort-input" value="cab, dab, bad, dad, fad, ace, bee, bed, add, ebb" spellcheck="false" autocomplete="off">
+        <button id="algo-string-sort-load" type="button" class="is-primary">Load Data</button>
+        <button id="algo-string-sort-step" type="button">Step</button>
+        <button id="algo-string-sort-auto" type="button">Auto Play</button>
+        <button id="algo-string-sort-reset" type="button">Reset</button>
+      </div>
+
+      <div class="ss-main">
+        <section class="ss-panel">
+          <h2>Current Array</h2>
+          <div id="algo-string-sort-array" class="ss-array"></div>
+        </section>
+        <section class="ss-panel">
+          <h2 id="algo-string-sort-bucket-title">Buckets</h2>
+          <div id="algo-string-sort-buckets" class="ss-buckets"></div>
+        </section>
+      </div>
+
+      <p id="algo-string-sort-log" class="ss-msg"></p>
+      <p id="algo-string-sort-status" class="ss-status" role="status">Ready.</p>
+    </div>
+  </div>
+
+  <dialog class="algo-stage__dialog" id="ss-help">
+    <button type="button" class="algo-stage__close">Close</button>
+    <h2>String Sorting: LSD Radix Sort</h2>
+    <p>Strings are sorted stably with buckets, from the rightmost character to the leftmost.</p>
+    <h3>How to use</h3>
+    <ul>
+      <li>Enter comma-separated strings (up to 12 strings of up to 10 characters) and press <strong>Load Data</strong>.</li>
+      <li><strong>Step</strong> performs one pass: each string goes into the bucket of its character at the current position, then the buckets are concatenated in character order. <strong>Auto Play</strong> runs the remaining passes; <strong>Reset</strong> reloads the input.</li>
+      <li>The highlighted column is the position used in the last pass; green columns were processed earlier.</li>
+    </ul>
+    <h3>Different lengths</h3>
+    <p>If the strings differ in length, shorter ones are padded on the right internally with a space character (shown as ·) so that every position can be processed. Since the space sorts before every character, a string comes before its extensions (for example "be" before "bed"), which is lexicographic order.</p>
+    <h3>Why does it work?</h3>
+    <p>Each pass is a stable distribution: strings that have the same character at the current position keep the order produced by earlier passes. After the pass at position 0, the strings are sorted by all positions.</p>
+    <h3>Complexity</h3>
+    <table>
+      <tr><th>Measure</th><th>Value</th></tr>
+      <tr><td>Time</td><td>O(W · (n + R)) for n strings of width W and an alphabet of size R</td></tr>
+      <tr><td>Extra memory</td><td>O(n + R)</td></tr>
+      <tr><td>Stable</td><td>Yes</td></tr>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-string-sort");
+    if (!root) return;
+
+    function q(id) { return root.querySelector("#" + id); }
+
+    var inputEl = q("algo-string-sort-input");
+    var loadBtn = q("algo-string-sort-load");
+    var stepBtn = q("algo-string-sort-step");
+    var autoBtn = q("algo-string-sort-auto");
+    var resetBtn = q("algo-string-sort-reset");
+    var arrayEl = q("algo-string-sort-array");
+    var logEl = q("algo-string-sort-log");
+    var bucketsEl = q("algo-string-sort-buckets");
+    var bucketTitle = q("algo-string-sort-bucket-title");
+    var statusEl = q("algo-string-sort-status");
+
+    var MAX_STRINGS = 12, MAX_LEN = 10;
+    var arr = [];
+    var width = 0;
+    var pos = 0;
+    var finished = false;
+    var stepNo = 0;
+    var lastBuckets = {};
+    var lastPos = -1;
+    var timer = null;
+
+    function visibleString(value) {
+        return value.replace(/ +$/, "");
+    }
+
+    function stopAuto() {
+        clearInterval(timer);
+        timer = null;
+        autoBtn.disabled = false;
+    }
+
+    function loadData() {
+        stopAuto();
+
+        var raw = inputEl.value
+            .split(",")
+            .map(function (x) { return x.trim(); })
+            .filter(Boolean);
+
+        arr = raw.slice(0, MAX_STRINGS).map(function (x) { return x.slice(0, MAX_LEN); });
+        var limited = raw.length > MAX_STRINGS || raw.some(function (x) { return x.length > MAX_LEN; });
+
+        lastPos = -1;
+
+        if (!arr.length) {
+            width = 0;
+            pos = -1;
+            finished = true;
+            lastBuckets = {};
+            statusEl.textContent = "No strings entered.";
+            render("Enter at least one comma-separated string.");
+            return;
+        }
+
+        width = Math.max.apply(
+            null,
+            arr.map(function (x) { return x.length; })
+        );
+
+        /* For LSD, short strings are padded on the RIGHT with spaces: a space is smaller than
+           every character, so "be" < "bed" (lexicographic order). Padding on the left would give wrong orders such as "b" > "ab". */
+        arr = arr.map(function (x) {
+            return x.padEnd(width, " ");
+        });
+
+        pos = width - 1;
+        finished = false;
+        stepNo = 0;
+        lastBuckets = {};
+
+        statusEl.textContent =
+            "Data loaded: " + arr.length + " strings, width " + width + ". First pass: position " + pos + "." +
+            (limited ? " (limited to " + MAX_STRINGS + " strings × " + MAX_LEN + " characters)" : "");
+
+        render("Press Step to sort by the rightmost character.");
+    }
+
+    function render(message) {
+        arrayEl.innerHTML = "";
+
+        arr.forEach(function (word, w) {
+            var row = document.createElement("div");
+            row.className = "ss-row";
+            var idx = document.createElement("span");
+            idx.className = "ss-idx";
+            idx.textContent = String(w);
+            row.appendChild(idx);
+
+            var box = document.createElement("span");
+            box.className = "ss-word";
+
+            Array.from(word).forEach(function (ch, index) {
+                var charEl = document.createElement("span");
+                charEl.className = "ss-char";
+
+                if (ch === " ") charEl.classList.add("is-pad");
+                if (lastPos === index) charEl.classList.add("is-active");
+                else if (lastPos >= 0 && index > lastPos) charEl.classList.add("is-done");
+
+                charEl.textContent = ch === " " ? "·" : ch;
+                box.appendChild(charEl);
+            });
+
+            row.appendChild(box);
+            arrayEl.appendChild(row);
+        });
+
+        logEl.textContent = message;
+        renderBuckets();
+    }
+
+    function renderBuckets() {
+        bucketsEl.innerHTML = "";
+
+        var keys = Object.keys(lastBuckets).sort();
+
+        if (!keys.length) {
+            bucketTitle.textContent = "Buckets";
+            var empty = document.createElement("p");
+            empty.className = "ss-empty";
+            empty.textContent = "No bucketing yet.";
+            bucketsEl.appendChild(empty);
+            return;
+        }
+
+        bucketTitle.textContent = "Buckets for position " + lastPos + " (pass " + stepNo + " / " + width + ")";
+
+        keys.forEach(function (key) {
+            var row = document.createElement("div");
+            row.className = "ss-bucket";
+
+            var label = document.createElement("strong");
+            label.textContent = key === " " ? "[·]" : "[" + key + "]";
+
+            var values = document.createElement("div");
+            values.className = "ss-chips";
+            lastBuckets[key].forEach(function (word) {
+                var chip = document.createElement("span");
+                chip.className = "ss-chip";
+                var shown = word.replace(/ /g, "·");
+                chip.appendChild(document.createTextNode(shown.slice(0, lastPos)));
+                var b = document.createElement("b");
+                b.textContent = shown[lastPos];
+                chip.appendChild(b);
+                chip.appendChild(document.createTextNode(shown.slice(lastPos + 1)));
+                values.appendChild(chip);
+            });
+
+            row.appendChild(label);
+            row.appendChild(values);
+            bucketsEl.appendChild(row);
+        });
+    }
+
+    function finalMessage() {
+        return "Final order: " + arr.map(visibleString).join(", ");
+    }
+
+    function step() {
+        if (finished || pos < 0) {
+            finished = true;
+            if (arr.length) {
+                statusEl.textContent = "Sorting complete.";
+                render(finalMessage());
+            }
+            return false;
+        }
+
+        stepNo++;
+        lastBuckets = {};
+        lastPos = pos;
+
+        arr.forEach(function (word) {
+            var ch = word[pos];
+
+            if (!lastBuckets[ch]) {
+                lastBuckets[ch] = [];
+            }
+
+            lastBuckets[ch].push(word);
+        });
+
+        arr = Object.keys(lastBuckets)
+            .sort()
+            .reduce(function (all, key) {
+                return all.concat(lastBuckets[key]);
+            }, []);
+
+        pos--;
+
+        if (pos < 0) {
+            finished = true;
+            statusEl.textContent = "Sorting completed in " + stepNo + " passes.";
+            render(finalMessage(), lastPos);
+        } else {
+            statusEl.textContent =
+                "Pass " + stepNo + " / " + width +
+                " done (position " + lastPos + "). Next: position " + pos + ".";
+            render(
+                "Pass " + stepNo + ": stable grouping by the character at position " + lastPos +
+                "; buckets concatenated in character order.",
+                lastPos
+            );
+        }
+
+        return !finished;
+    }
+
+    function autoRun() {
+        stopAuto();
+        if (finished) return;
+        autoBtn.disabled = true;
+
+        timer = setInterval(function () {
+            if (!step()) {
+                stopAuto();
+            }
+        }, 650);
+    }
+
+    loadBtn.addEventListener("click", loadData);
+    stepBtn.addEventListener("click", function () { stopAuto(); step(); });
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", loadData);
+    inputEl.addEventListener("keydown", function (e) { if (e.key === "Enter") loadData(); });
+
+    loadData();
+})();
+</script>
+<script src="deck/stage.js"></script>

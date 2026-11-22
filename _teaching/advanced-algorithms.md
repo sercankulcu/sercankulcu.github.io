@@ -125,9 +125,18 @@ Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalış
 
 ---
 
+## Textbook
+
+[📕 Advanced Algorithms — the course book (PDF, 8 MB)](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Advanced-Algorithms.pdf)
+
+---
+
 ## Getting Started
 
 * [Prerequisite: Algorithms (Chapters 1–11)](/teaching/algorithms/?lang=en)
+* [Important People in Advanced Algorithms (HTML)](/files/advanced_algorithms/Important_People.html)
+* [Prerequisites for Advanced Algorithms (HTML)](/files/advanced_algorithms/Prerequisites.html)
+* [Course Map (HTML)](/files/advanced_algorithms/Course_Map.html)
 * [Dictionary of Terms (HTML)](/files/advanced_algorithms/Dictionary.html)
 
 ---
@@ -139,6 +148,7 @@ Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalış
 Divide and conquer splits a problem into smaller instances of the same problem, solves them recursively and combines the answers. We set up the general template and its recurrence, solve recurrences with the Master Theorem, and revisit merge sort, quicksort and fast exponentiation in this light, noting why the approach breaks down when subproblems overlap. The chapter then works through Quickhull for convex hulls, the closest pair of points, Karatsuba's integer multiplication and Strassen's matrix multiplication.
 
 - [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_01_Divide_and_Conquer.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_01_Divide_and_Conquer.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_01_Divide_and_Conquer_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_01_Divide_and_Conquer_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter01/src)
+- 🕹️ **Simulators:** [Recurrences and the Master Theorem](/files/algorithms/slides/Chapter_02_Recurrence_Master_Theorem.html) · [Sorting Algorithms](/files/algorithms/slides/Chapter_03_Sorting.html)
 
 ---
 
@@ -147,6 +157,7 @@ Divide and conquer splits a problem into smaller instances of the same problem, 
 A greedy algorithm builds its answer one step at a time, always taking the choice that looks best right now and never revisiting it. We state the greedy-choice property and optimal substructure, and use coin change to see when greed is optimal and when it fails. Activity selection, scheduling with deadlines, the fractional knapsack, minimum spanning trees through the cut property, and Huffman coding follow, together with a proof that Huffman's code is an optimal prefix code.
 
 - [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_02_Greedy_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_02_Greedy_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_02_Greedy_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_02_Greedy_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter02/src)
+- 🕹️ **Simulators:** [Minimum Spanning Tree Simulator](/files/algorithms/slides/Chapter_07_MST.html) · [String Compression Algorithms](/files/algorithms/slides/Chapter_09_String_Compression.html)
 
 ---
 
@@ -173,6 +184,7 @@ Backtracking extends a partial solution step by step and, as soon as a branch ca
 Branch and bound explores the state-space tree while computing a bound at every node, and prunes any branch that provably cannot contain the best solution. We discuss how to choose bounds and when to prune, compare FIFO, LIFO and least-cost (LC) search, and contrast the method with backtracking. The 0/1 knapsack is solved with the fractional relaxation and the travelling salesman problem with three progressively tighter lower bounds; the assignment problem, integer linear programming and maximum clique serve as further examples. We close by relating branch and bound to A* and comparing the design paradigms side by side.
 
 - [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_05_Branch_and_Bound.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_05_Branch_and_Bound_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter05/src)
+- 🕹️ **Simulators:** [Traveling Salesman Problem Simulator](/files/advanced_algorithms/slides/Chapter_05_TSP.html)
 
 ---
 
@@ -181,6 +193,7 @@ Branch and bound explores the state-space tree while computing a bound at every 
 When finding the optimum of an NP-hard problem is too expensive, an approximation algorithm runs in polynomial time and returns a solution within a proven factor of the best one. We define the approximation ratio and separate approximation algorithms from heuristics and from approximation schemes. Topics include the nearest-neighbor heuristic, the MST-based 2-approximation for metric TSP and 2-opt local search; list scheduling and the longest-processing-time (LPT) rule; a 2-approximation for vertex cover and a reduction from 3-SAT; the ratio-sorted greedy method for knapsack; and power iteration for the dominant eigenvector.
 
 - [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_06_Approximation_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_06_Approximation_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_06_Approximation_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_06_Approximation_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter06/src)
+- 🕹️ **Simulators:** [Traveling Salesman Problem Simulator](/files/advanced_algorithms/slides/Chapter_05_TSP.html)
 
 ---
 
@@ -191,6 +204,7 @@ When finding the optimum of an NP-hard problem is too expensive, an approximatio
 Randomized algorithms make random choices while they run, which can buy a simpler design, a better expected running time or robustness against bad inputs. We distinguish Las Vegas from Monte Carlo algorithms and show how repeated runs drive the error probability down. The chapter covers the Fisher–Yates shuffle and the bias of the naive shuffle, BogoSort, randomized quicksort with its expected number of comparisons, and QuickSelect, followed by Monte Carlo estimation of π, the Miller–Rabin primality test, Karger's minimum-cut algorithm and pseudorandom number generation.
 
 - [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_07_Randomized_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_07_Randomized_Algorithms.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_07_Randomized_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_07_Randomized_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter07/src)
+- 🕹️ **Simulators:** [Estimating π with Monte Carlo](/files/advanced_algorithms/slides/Chapter_07_Monte_Carlo_Pi.html)
 
 ---
 

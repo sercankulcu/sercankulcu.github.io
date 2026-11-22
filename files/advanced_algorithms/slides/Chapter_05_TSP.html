@@ -1,0 +1,577 @@
+---
+layout: without-sidebar
+title: "Traveling Salesman Problem Simulator"
+permalink: /files/advanced_algorithms/slides/Chapter_05_TSP.html
+excerpt: "An interactive simulator that compares the nearest-neighbor heuristic for the traveling salesman problem with the optimal tour found by brute force."
+lang: en
+seo_title: "Traveling Salesman Problem Simulator · Advanced Algorithms, Chapter 5"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/ileri-algoritmalar.jpg
+hreflang:
+  tr: /files/advanced_algorithms/sunumlar/Bolum_05_TSP.html
+  en: /files/advanced_algorithms/slides/Chapter_05_TSP.html
+resource: "Interactive simulation"
+course:
+  name: "Advanced Algorithms"
+  url: "/teaching/advanced-algorithms/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-tsp .tsp-body { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.algo-tsp .tsp-controls { display: flex; flex: none; align-items: center; gap: 8px; }
+.algo-tsp .tsp-controls label { color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-tsp .tsp-controls input { width: 62px; font-size: 14px; }
+.algo-tsp .tsp-controls button { padding: 0 12px; font-size: 14px; }
+.algo-tsp .tsp-controls .tsp-sep { width: 1.5px; height: 24px; background: var(--ds-border); }
+.algo-tsp .tsp-main { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 210px; gap: 10px; }
+.algo-tsp .tsp-canvas-wrap { min-width: 0; min-height: 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-tsp .tsp-canvas { display: block; width: 100%; height: 100%; }
+.algo-tsp .tsp-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); overflow: hidden; }
+.algo-tsp .tsp-side h2 { margin: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.algo-tsp .tsp-metrics { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; margin: 0; font-size: 13px; line-height: 1.35; }
+.algo-tsp .tsp-metrics span { color: var(--ds-muted); }
+.algo-tsp .tsp-metrics b { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.algo-tsp .tsp-legend { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--ds-muted); }
+.algo-tsp .tsp-legend span::before { content: ""; display: inline-block; width: 18px; height: 0; margin-right: 6px; vertical-align: middle; border-top: 3px solid currentColor; }
+.algo-tsp .tsp-legend .is-current::before { border-color: var(--ds-good); }
+.algo-tsp .tsp-legend .is-best::before { border-color: var(--ds-accent); }
+.algo-tsp .tsp-legend .is-cand::before { border-top: 2px dashed var(--ds-link); }
+.algo-tsp .tsp-log { display: flex; flex-direction: column; gap: 2px; margin-top: auto; font-size: 12px; line-height: 1.35; }
+.algo-tsp .tsp-log div { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ds-muted); }
+.algo-tsp .tsp-log div:last-child { color: var(--ds-text); font-weight: 700; }
+.algo-tsp .tsp-status { flex: none; margin: 0; overflow: hidden; font-size: 14px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.algo-tsp .tsp-probe { position: absolute; width: 0; height: 0; overflow: hidden; transition: none !important; }
+</style>
+
+<div class="algo-tsp algo-stage algo-stage--stage" lang="en">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Chapter 6 · Simulation</p><h1>Traveling Salesman Problem</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="tsp-help">?</button>
+    <a class="algo-stage__back" href="Chapter_06_Approximation_Algorithms.html">← Chapter 6</a>
+  </header>
+
+  <div class="algo-stage__body">
+    <div class="tsp-body">
+      <div class="tsp-controls">
+        <label for="algo-tsp-city-count">Cities</label>
+        <input id="algo-tsp-city-count" type="number" min="2" max="10" value="5">
+        <button id="algo-tsp-generate" type="button">Generate</button>
+        <span class="tsp-sep" aria-hidden="true"></span>
+        <button id="algo-tsp-nearest" type="button" class="is-primary">Nearest Neighbor</button>
+        <button id="algo-tsp-bruteforce" type="button" class="is-primary">Brute Force</button>
+        <button id="algo-tsp-cancel" type="button">Cancel</button>
+      </div>
+
+      <div class="tsp-main">
+        <div class="tsp-canvas-wrap">
+          <canvas id="algo-tsp-canvas" class="tsp-canvas" aria-label="Traveling salesman view"></canvas>
+        </div>
+        <aside class="tsp-side">
+          <h2>Tours</h2>
+          <div class="tsp-metrics">
+            <span>Cities</span><b id="algo-tsp-m-cities">–</b>
+            <span>Possible tours</span><b id="algo-tsp-m-total">–</b>
+            <span>Tours tried</span><b id="algo-tsp-m-checked">–</b>
+            <span>Nearest neighbor</span><b id="algo-tsp-m-nn">–</b>
+            <span>Optimum (brute force)</span><b id="algo-tsp-m-opt">–</b>
+            <span>NN − optimum</span><b id="algo-tsp-m-gap">–</b>
+          </div>
+          <div class="tsp-legend" aria-hidden="true">
+            <span class="is-current">current tour</span>
+            <span class="is-best">best / result tour</span>
+            <span class="is-cand">candidate edges</span>
+          </div>
+          <h2>Log</h2>
+          <div id="algo-tsp-history" class="tsp-log" aria-live="polite"></div>
+        </aside>
+      </div>
+
+      <p id="algo-tsp-status" class="tsp-status" role="status">Ready.</p>
+    </div>
+    <span class="tsp-probe" aria-hidden="true"></span>
+  </div>
+
+  <dialog class="algo-stage__dialog" id="tsp-help" lang="en">
+    <button type="button" class="algo-stage__close">Close</button>
+    <h2>Traveling Salesman Problem</h2>
+    <p>Cities are generated; the fast nearest-neighbor heuristic is compared with an exact brute-force search. Distances are Euclidean distances on the canvas (in pixels).</p>
+    <h3>How to use</h3>
+    <ul>
+      <li>Choose the number of cities (2–10) and press <strong>Generate</strong>; the cities are placed at random.</li>
+      <li><strong>Nearest Neighbor</strong> shows, at each step, the candidate edges leaving the current city, then extends the tour.</li>
+      <li><strong>Brute Force</strong> tries every tour starting at city 0, one by one; the best tour found so far stays visible. It works with at most 9 cities.</li>
+      <li>When both are run on the same cities, the side panel shows how much longer the heuristic tour is than the optimum. <strong>Cancel</strong> stops the run.</li>
+    </ul>
+    <h3>Nearest neighbor</h3>
+    <p>At each step the tour goes from the current city to the nearest unvisited city. It is fast but does not guarantee an optimal tour.</p>
+    <h3>Brute force</h3>
+    <p>Fixes one city as the start and tries every possible tour. It finds the optimum, but because of factorial growth it is only usable on small inputs.</p>
+    <h3>Complexity</h3>
+    <table>
+      <tr><th>Method</th><th>Time</th><th>Result</th></tr>
+      <tr><td>Nearest neighbor</td><td>O(n²)</td><td>Heuristic, not always optimal</td></tr>
+      <tr><td>Brute force</td><td>O(n!) — (n − 1)! tours</td><td>Optimal</td></tr>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-tsp");
+    if (!root) return;
+
+    function q(id) {
+        return root.querySelector("#" + id);
+    }
+
+    var canvas = q("algo-tsp-canvas");
+    var ctx = canvas.getContext("2d");
+    var cityCountInput = q("algo-tsp-city-count");
+    var generateButton = q("algo-tsp-generate");
+    var nearestButton = q("algo-tsp-nearest");
+    var bruteForceButton = q("algo-tsp-bruteforce");
+    var cancelButton = q("algo-tsp-cancel");
+    var statusDiv = q("algo-tsp-status");
+    var historyDiv = q("algo-tsp-history");
+    var probe = root.querySelector(".tsp-probe");
+
+    var W = 530, H = 420;
+    var cities = [];
+    var activeToken = 0;
+    var bestTour = [];
+    var bestDistance = Infinity;
+    var nnDistance = null;
+    var optDistance = null;
+    var historyLines = [];
+    var lastScene = { tour: [], cand: [] };
+
+    /* canvas: internal resolution = display size × devicePixelRatio */
+    function sizeCanvas() {
+        var w = canvas.clientWidth, h = canvas.clientHeight;
+        if (w > 0 && h > 0) { W = w; H = h; }
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function col(name) {
+        probe.style.color = "var(" + name + ")";
+        return getComputedStyle(probe).color;
+    }
+
+    function colors() {
+        return {
+            background: col("--ds-bg"),
+            text: col("--ds-text"),
+            accent: col("--ds-link"),
+            nearest: col("--ds-good"),
+            candidate: col("--ds-link"),
+            best: col("--ds-accent")
+        };
+    }
+
+    function setBusy(isBusy) {
+        cityCountInput.disabled = isBusy;
+        generateButton.disabled = isBusy;
+        nearestButton.disabled = isBusy;
+        bruteForceButton.disabled = isBusy;
+        cancelButton.disabled = !isBusy;
+    }
+
+    function clearHistory() {
+        historyLines = [];
+        historyDiv.innerHTML = "";
+    }
+
+    /* log: only the last 5 lines are visible */
+    function addHistory(message) {
+        historyLines.push(message);
+        if (historyLines.length > 5) historyLines.shift();
+        historyDiv.innerHTML = "";
+        historyLines.forEach(function (m) {
+            var entry = document.createElement("div");
+            entry.textContent = m;
+            entry.title = m;
+            historyDiv.appendChild(entry);
+        });
+    }
+
+    function factorial(k) {
+        var f = 1;
+        for (var i = 2; i <= k; i++) f *= i;
+        return f;
+    }
+
+    function setMetric(id, text) {
+        q(id).textContent = text;
+    }
+
+    function updateMetrics(checked) {
+        setMetric("algo-tsp-m-cities", String(cities.length));
+        setMetric("algo-tsp-m-total", factorial(Math.max(0, cities.length - 1)).toLocaleString("en-US"));
+        if (checked !== undefined) setMetric("algo-tsp-m-checked", checked === null ? "–" : checked.toLocaleString("en-US"));
+        setMetric("algo-tsp-m-nn", nnDistance === null ? "–" : nnDistance.toFixed(1));
+        setMetric("algo-tsp-m-opt", optDistance === null ? "–" : optDistance.toFixed(1));
+        setMetric("algo-tsp-m-gap", nnDistance === null || optDistance === null || optDistance === 0
+            ? "–" : "+" + ((nnDistance / optDistance - 1) * 100).toFixed(1) + "%");
+    }
+
+    function distance(a, b) {
+        var dx = b.x - a.x;
+        var dy = b.y - a.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function tourDistance(path) {
+        var total = 0;
+
+        for (var i = 0; i < path.length - 1; i++) {
+            total += distance(cities[path[i]], cities[path[i + 1]]);
+        }
+
+        return total;
+    }
+
+    function drawScene(currentTour, candidateEdges) {
+        currentTour = currentTour || [];
+        candidateEdges = candidateEdges || [];
+        lastScene = { tour: currentTour, cand: candidateEdges };
+
+        var c = colors();
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = c.background;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.setLineDash([6, 5]);
+        candidateEdges.forEach(function (edge) {
+            drawEdge(edge.from, edge.to, c.candidate, 1.5);
+        });
+        ctx.setLineDash([]);
+
+        if (bestTour.length > 1) {
+            drawPath(bestTour, c.best, 5);
+        }
+
+        if (currentTour.length > 1) {
+            drawPath(currentTour, c.nearest, 2.5);
+        }
+
+        cities.forEach(function (city) {
+            drawCity(city, c);
+        });
+    }
+
+    function drawCity(city, c) {
+        ctx.beginPath();
+        ctx.arc(city.x, city.y, 13, 0, Math.PI * 2);
+        ctx.fillStyle = c.accent;
+        ctx.fill();
+        ctx.strokeStyle = c.text;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = c.background;
+        ctx.font = "bold 13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(String(city.index), city.x, city.y);
+    }
+
+    function drawPath(path, color, lineWidth) {
+        if (path.length < 2) return;
+
+        ctx.beginPath();
+        ctx.moveTo(cities[path[0]].x, cities[path[0]].y);
+
+        for (var i = 1; i < path.length; i++) {
+            ctx.lineTo(cities[path[i]].x, cities[path[i]].y);
+        }
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.lineJoin = "round";
+        ctx.stroke();
+    }
+
+    function drawEdge(from, to, color, lineWidth) {
+        ctx.beginPath();
+        ctx.moveTo(cities[from].x, cities[from].y);
+        ctx.lineTo(cities[to].x, cities[to].y);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+    }
+
+    function generateCities() {
+        activeToken++;
+
+        var count = parseInt(cityCountInput.value, 10);
+
+        if (!Number.isFinite(count)) {
+            count = 5;
+        }
+
+        count = Math.max(2, Math.min(10, count));
+        cityCountInput.value = count;
+
+        cities = [];
+        bestTour = [];
+        bestDistance = Infinity;
+        nnDistance = null;
+        optDistance = null;
+
+        var margin = 30;
+
+        /* cities must not overlap: at least 60 px apart */
+        for (var i = 0; i < count; i++) {
+            var city = null;
+            for (var attempt = 0; attempt < 300; attempt++) {
+                city = {
+                    index: i,
+                    x: margin + Math.random() * (W - margin * 2),
+                    y: margin + Math.random() * (H - margin * 2)
+                };
+                if (cities.every(function (o) { return distance(o, city) >= 60; })) break;
+            }
+            cities.push(city);
+        }
+
+        clearHistory();
+        addHistory(count + " cities generated.");
+        statusDiv.textContent = "Cities ready." + (count > 9 ? " Brute force works with at most 9 cities." : "");
+        setBusy(false);
+        updateMetrics(null);
+        drawScene();
+    }
+
+    function sleep(ms, token) {
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                resolve(token === activeToken);
+            }, ms);
+        });
+    }
+
+    async function runNearestNeighbor() {
+        if (cities.length < 2) return;
+
+        activeToken++;
+        var token = activeToken;
+
+        setBusy(true);
+        clearHistory();
+        bestTour = [];
+        bestDistance = Infinity;
+
+        var start = 0;
+        var current = start;
+        var unvisited = [];
+
+        for (var i = 0; i < cities.length; i++) {
+            if (i !== start) {
+                unvisited.push(i);
+            }
+        }
+
+        var tour = [start];
+        var total = 0;
+
+        addHistory("Nearest neighbor started at city 0.");
+        statusDiv.textContent = "Nearest neighbor running…";
+        updateMetrics(0);
+
+        while (unvisited.length > 0) {
+            if (token !== activeToken) return;
+
+            var nearest = -1;
+            var nearestDistance = Infinity;
+            var candidates = [];
+
+            unvisited.forEach(function (cityIndex) {
+                var d = distance(cities[current], cities[cityIndex]);
+                candidates.push({ from: current, to: cityIndex });
+
+                if (d < nearestDistance) {
+                    nearestDistance = d;
+                    nearest = cityIndex;
+                }
+            });
+
+            drawScene(tour, candidates);
+
+            if (!await sleep(650, token)) return;
+
+            tour.push(nearest);
+            total += nearestDistance;
+            current = nearest;
+            unvisited.splice(unvisited.indexOf(nearest), 1);
+
+            addHistory(
+                "Step " + (tour.length - 1) +
+                ": " + tour.join("→") +
+                " | " + total.toFixed(1)
+            );
+
+            drawScene(tour, []);
+
+            if (!await sleep(350, token)) return;
+        }
+
+        total += distance(cities[current], cities[start]);
+        tour.push(start);
+
+        bestTour = tour.slice();
+        bestDistance = total;
+        nnDistance = total;
+
+        /* the final tour is drawn only in the "best / result" color */
+        drawScene([], []);
+        addHistory("Tour: " + tour.join("→"));
+        addHistory("Length: " + total.toFixed(1));
+        updateMetrics(1);
+
+        statusDiv.textContent = "Nearest neighbor finished. Tour length: " + total.toFixed(1) + ".";
+        setBusy(false);
+    }
+
+    function permute(items) {
+        if (items.length <= 1) {
+            return [items.slice()];
+        }
+
+        var result = [];
+
+        for (var i = 0; i < items.length; i++) {
+            var first = items[i];
+            var rest = items.slice(0, i).concat(items.slice(i + 1));
+            var inner = permute(rest);
+
+            for (var j = 0; j < inner.length; j++) {
+                result.push([first].concat(inner[j]));
+            }
+        }
+
+        return result;
+    }
+
+    async function runBruteForce() {
+        if (cities.length < 2) return;
+
+        if (cities.length > 9) {
+            statusDiv.textContent = "Brute force is limited to 9 cities so the browser does not freeze.";
+            return;
+        }
+
+        activeToken++;
+        var token = activeToken;
+
+        setBusy(true);
+        clearHistory();
+        bestTour = [];
+        bestDistance = Infinity;
+
+        var otherCities = [];
+
+        for (var i = 1; i < cities.length; i++) {
+            otherCities.push(i);
+        }
+
+        var permutations = permute(otherCities);
+        var totalPermutations = permutations.length;
+
+        addHistory(totalPermutations.toLocaleString("en-US") + " tours will be tried.");
+        statusDiv.textContent = "Brute force running…";
+        updateMetrics(0);
+
+        for (var index = 0; index < permutations.length; index++) {
+            if (token !== activeToken) return;
+
+            var path = [0].concat(permutations[index], [0]);
+            var d = tourDistance(path);
+
+            if (d < bestDistance) {
+                bestDistance = d;
+                bestTour = path.slice();
+
+                addHistory(
+                    "#" + (index + 1).toLocaleString("en-US") +
+                    " best: " + path.join("→") +
+                    " | " + d.toFixed(1)
+                );
+            }
+
+            if (
+                index < 80 ||
+                index % Math.max(1, Math.floor(totalPermutations / 100)) === 0 ||
+                index === permutations.length - 1
+            ) {
+                drawScene(path, []);
+                updateMetrics(index + 1);
+
+                if (!await sleep(35, token)) return;
+            }
+        }
+
+        optDistance = bestDistance;
+        drawScene([], []);
+        addHistory("Optimum: " + bestTour.join("→"));
+        addHistory("Optimum length: " + bestDistance.toFixed(1));
+        updateMetrics(totalPermutations);
+
+        statusDiv.textContent = "Brute force finished. Optimum tour length: " + bestDistance.toFixed(1) + ".";
+        setBusy(false);
+    }
+
+    function cancelRun() {
+        activeToken++;
+        setBusy(false);
+        statusDiv.textContent = "Computation cancelled.";
+        drawScene();
+    }
+
+    generateButton.addEventListener("click", generateCities);
+    nearestButton.addEventListener("click", runNearestNeighbor);
+    bruteForceButton.addEventListener("click", runBruteForce);
+    cancelButton.addEventListener("click", cancelRun);
+
+    var observer = new MutationObserver(function () {
+        drawScene(lastScene.tour, lastScene.cand);
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class", "data-theme"]
+    });
+
+    sizeCanvas();
+    generateCities();
+})();
+</script>
+<script src="deck/stage.js"></script>
