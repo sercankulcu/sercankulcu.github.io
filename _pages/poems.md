@@ -10,21 +10,6 @@ author_profile: true
 
 Poems I like, remember, and return to.
 
-<style>
-.collection-entry {
-  margin-bottom: 1.15rem;
-}
-
-.collection-title {
-  font-weight: 600;
-}
-
-.collection-meta {
-  margin-top: 0.15rem;
-  font-size: 0.78em;
-  opacity: 0.6;
-}
-</style>
 
 {% assign entries = site.poems | sort: "order" %}
 {% for post in entries %}

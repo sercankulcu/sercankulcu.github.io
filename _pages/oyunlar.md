@@ -9,17 +9,6 @@ author_profile: true
 hreflang: {en: "/games/", tr: "/game/tr/"}
 ---
 
-<style>.apps-intro { font-size: 1.05em; margin: 0 0 1.6em; }
-.apps-group { margin: 2em 0 .8em; font-size: 1.15em; }
-.apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 0 0 1em; }
-a.app-card { display: flex; flex-direction: column; gap: .35em; padding: .9em 1em; border: 1px solid var(--global-border-color);
-  border-radius: 10px; background: var(--global-bg-color); color: var(--global-text-color); text-decoration: none;
-  transition: border-color .15s, transform .15s, box-shadow .15s; }
-a.app-card:hover, a.app-card:focus-visible { border-color: var(--global-link-color); transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,.08); }
-.app-head { display: flex; align-items: center; gap: .5em; font-weight: 600; color: var(--global-link-color); }
-.app-ico { font-size: 1.3em; line-height: 1; }
-.app-desc { font-size: .85em; line-height: 1.45; color: var(--global-text-color-light); }</style>
 
 <p class="apps-intro">Tarayıcıda oynanan 32 ücretsiz oyun: kelime oyunları, bulmacalar, bilgi yarışmaları ve arcade.
 İndirme ve üyelik gerekmez. <a href="/games/" hreflang="en" lang="en">English</a></p>

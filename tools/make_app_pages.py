@@ -217,8 +217,7 @@ json_ld: %s
 hreflang: {en: "/apps/", tr: "/apps/tr/"}
 ---
 
-<style>%s</style>
-
+%.0s
 <p class="apps-intro">%d free tools for everyday PDF, image and document work. Everything runs in your browser:
 your files are processed on your own device and are never uploaded to a server. No sign-up, no limits.
 <a href="/apps/tr/" hreflang="tr" lang="tr">Türkçe</a></p>

@@ -430,8 +430,7 @@ author_profile: true
 hreflang: {en: "/apps/", tr: "%s"}
 ---
 
-<style>%s</style>
-
+%.0s
 <p class="apps-intro">Günlük PDF, görsel ve belge işleri için %d ücretsiz araç. Hepsi tarayıcınızda çalışır:
 dosyalarınız kendi cihazınızda işlenir, hiçbir sunucuya yüklenmez. Üyelik yok, sınır yok.
 <a href="/apps/" hreflang="en" lang="en">English</a></p>
@@ -465,8 +464,7 @@ author_profile: true
 hreflang: {en: "/games/", tr: "%s"}
 ---
 
-<style>%s</style>
-
+%.0s
 <p class="apps-intro">Tarayıcıda oynanan %d ücretsiz oyun: kelime oyunları, bulmacalar, bilgi yarışmaları ve arcade.
 İndirme ve üyelik gerekmez. <a href="/games/" hreflang="en" lang="en">English</a></p>
 

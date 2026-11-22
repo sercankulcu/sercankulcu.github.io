@@ -7,28 +7,12 @@ permalink: /publications/
 author_profile: true
 ---
 
-<style>
-details summary,
-details a {
-  color: #2a7ae2 !important;
-}
-
-details summary {
-  cursor: pointer;
-  font-weight: normal;
-}
-
-details summary:hover,
-details a:hover {
-  text-decoration: underline;
-}
-</style>
 
 ## Journal Articles
 
 <div class="publication-title">2026 - Impact of Temporal Resampling Interval on Deep Learning-Based Vessel Trajectory Prediction Using AIS Data</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -44,7 +28,7 @@ This study treats the temporal resampling interval of AIS trajectories as an exp
 
 <div class="publication-title">2026 - Enhancing Radar PPI-Based Maritime Object Detection Using Hybrid Preprocessing and Deep Learning Approach</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -60,7 +44,7 @@ This study combines radar-specific preprocessing with YOLO-based deep learning t
 
 <div class="publication-title">2026 - Overcoming Resolution Constraints in Automated Colony Counting via a High-Performance Deep Learning Framework Using SAHI</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -76,7 +60,7 @@ This study addresses the loss of small bacterial colonies caused by resizing hig
 
 <div class="publication-title">2026 - Comparative Analysis of Target Localization Accuracy in Radar PPI Images Using Geometric Enclosures</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -92,7 +76,7 @@ This study compares bounding boxes, convex hulls, and concave hulls for estimati
 
 <div class="publication-title">2026 - Bias Mitigation in Ensemble-Based Meat Freshness Classification Using Grad-CAM</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -108,7 +92,7 @@ This study introduces a Grad-CAM-guided framework that reduces visual bias in me
 
 <div class="publication-title">2026 - High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -124,7 +108,7 @@ This study integrates tiled training, SAHI inference, and YOLOv11 oriented bound
 
 <div class="publication-title">2026 - Radar Image-Based Object Detection and Tracking for Autonomous Surface Vehicles</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -140,7 +124,7 @@ This study proposes a lightweight radar-image framework that combines HSV-based 
 
 <div class="publication-title">2021 - Integration of Steerable Smart Antennas to IETF 6TiSCH Protocol for High Reliability Wireless IoT Networks</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -156,7 +140,7 @@ This study presents mechanisms for integrating low-complexity steerable smart an
 
 <div class="publication-title">2019 - Enabling Space Time Division Multiple Access in IETF 6TiSCH Protocol</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -172,7 +156,7 @@ This study investigates the integration of low-complexity directional antennas w
 
 <div class="publication-title">2018 - Computer Vision Technology on Food Science</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -190,7 +174,7 @@ This review examines the use of computer vision for food quality assessment, inc
 
 <div class="publication-title">2026 - Impact of Input Resolution on Lightweight Small Ship Detection in SAR Imagery</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -206,7 +190,7 @@ This study compares 15 YOLO-based detectors on the HRSID SAR dataset and then tr
 
 <div class="publication-title">2025 - Nucleus Segmentation in Heterogeneous Microscopy Images on the Data Science Bowl 2018 Dataset</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -222,7 +206,7 @@ This study compares YOLOv11-seg and YOLOv12-seg for cell-nucleus instance segmen
 
 <div class="publication-title">2025 - Meta-Learner Ensemble Model for Brain Tumor Classification</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -238,7 +222,7 @@ This study combines EfficientNet-B0, DenseNet201, and ResNet50 with an MLP meta-
 
 <div class="publication-title">2025 - Transformer vs. CNN: Benchmarking RT-DETR and YOLO Models on the UATD Dataset</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -254,7 +238,7 @@ This study benchmarks Transformer-based RT-DETR-L against YOLOv12n and YOLOv8n f
 
 <div class="publication-title">2025 - Selection of the Most Suitable Parameters for Classification of Hazelnut Fruit Using ShuffleNet Deep Learning Algorithm</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -270,7 +254,7 @@ This study evaluates SGDM, ADAM, and RMSprop optimizers with ShuffleNet for clas
 
 <div class="publication-title">2025 - Comparison of the Performance of ResNet-50 and ShuffleNet Deep Learning Algorithms in Classification of Hazelnut Fruit</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -286,7 +270,7 @@ This study compares ResNet-50 and ShuffleNet on a 15,770-image hazelnut dataset 
 
 <div class="publication-title">2022 - Improving Synchronization Time in 6TiSCH Networks with Smart Antennas</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -302,7 +286,7 @@ This study proposes a new 6TiSCH message mechanism that allows nodes equipped wi
 
 <div class="publication-title">2022 - A New Routing Objective Function for IETF 6TiSCH Protocol</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -318,7 +302,7 @@ This study introduces a new RPL parent-selection objective function for IETF 6Ti
 
 <div class="publication-title">2016 - A Survey on Semantic Web and Big Data Technologies for Social Network Analysis</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -334,7 +318,7 @@ This survey reviews systems and technologies that combine Semantic Web methods, 
 
 <div class="publication-title">2016 - A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -350,7 +334,7 @@ This work presents a scalable framework that classifies Turkish tweets by sentim
 
 <div class="publication-title">2022 - Analysis of Smart Antenna Based Scheduling Algorithms for IoT Networks</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -368,7 +352,7 @@ This PhD thesis investigates the integration of smart and directional antennas w
 
 <div class="publication-title">2026 - Algoritmik Oyun Kuramı</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -384,7 +368,7 @@ Turkish-language course textbook on algorithmic game theory: decision theory, ga
 
 <div class="publication-title">2026 - Algoritmalar</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -400,7 +384,7 @@ Turkish-language course textbook on the analysis of algorithms and fundamental p
 
 <div class="publication-title">2026 - İleri Algoritmalar</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -416,7 +400,7 @@ Turkish-language course textbook on algorithm-design paradigms and hard problems
 
 <div class="publication-title">2026 - Bilgisayar ve Programlamaya Giriş</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -432,7 +416,7 @@ Turkish-language introductory textbook covering computer hardware, operating sys
 
 <div class="publication-title">2026 - Veri Yapıları</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -448,7 +432,7 @@ Turkish-language course textbook on data structures in Java: algorithm analysis,
 
 <div class="publication-title">2026 - Data Structures</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -464,7 +448,7 @@ Course textbook on data structures in Java: algorithm analysis, arrays, recursio
 
 <div class="publication-title">2026 - C ile Veri Yapıları ve Algoritmalar</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -480,7 +464,7 @@ Turkish-language textbook implementing classic data structures and algorithms in
 
 <div class="publication-title">2026 - Java ile Nesne Yönelimli Programlama</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -496,7 +480,7 @@ Turkish-language course textbook on object-oriented programming in Java: classes
 
 <div class="publication-title">2026 - Mikroişlemciler</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -512,7 +496,7 @@ Turkish-language course textbook on the 8086 microprocessor: architecture, regis
 
 <div class="publication-title">2026 - İşletim Sistemleri</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 
@@ -528,7 +512,7 @@ Turkish-language course textbook on operating systems: processes, threads, sched
 
 <div class="publication-title">2026 - Programming with C</div>
 
-<details markdown="1">
+<details class="pub" markdown="1">
 
 <summary>Details</summary>
 

@@ -10,21 +10,6 @@ author_profile: true
 
 Essays, observations, questions, and reflections on life, learning, people, and ideas.
 
-<style>
-.collection-entry {
-  margin-bottom: 1.15rem;
-}
-
-.collection-title {
-  font-weight: 600;
-}
-
-.collection-meta {
-  margin-top: 0.15rem;
-  font-size: 0.78em;
-  opacity: 0.6;
-}
-</style>
 
 {% assign entries = site.thoughts | sort: "date" | reverse %}
 {% for post in entries %}

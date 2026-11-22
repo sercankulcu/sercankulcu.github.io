@@ -10,21 +10,6 @@ author_profile: true
 
 Interviews, conversations, profiles, and archival material about Nejat İşler.
 
-<style>
-.collection-entry {
-  margin-bottom: 1.15rem;
-}
-
-.collection-title {
-  font-weight: 600;
-}
-
-.collection-meta {
-  margin-top: 0.15rem;
-  font-size: 0.78em;
-  opacity: 0.6;
-}
-</style>
 
 {% assign entries = site["nejat-isler"] | sort: "date" | reverse %}
 {% for post in entries %}

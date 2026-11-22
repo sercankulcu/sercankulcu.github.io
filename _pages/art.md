@@ -13,54 +13,6 @@ They have turned out to be about the same thing. Each one is a place where somet
 
 There is also a separate set of [WebGL studies](/art/webgl/) made with three.js, where those rules are set aside.
 
-<style>
-.art-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 1.7rem 1.4rem;
-  margin: 1.6rem 0 0.5rem;
-}
-
-.art-card {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-
-.art-card img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border: 1px solid var(--global-border-color, #d8d8d8);
-  background: #0c1013;
-  transition: border-color .18s;
-}
-
-.art-card:hover img {
-  border-color: var(--global-text-color, #494e52);
-}
-
-.art-card .art-title {
-  display: block;
-  margin-top: 0.55rem;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.art-card:hover .art-title {
-  text-decoration: underline;
-}
-
-.art-card .art-meta {
-  display: block;
-  margin-top: 0.18rem;
-  font-size: 0.78em;
-  line-height: 1.45;
-  opacity: 0.6;
-}
-</style>
 
 <div class="art-grid">
 

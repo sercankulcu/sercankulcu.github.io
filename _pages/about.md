@@ -4,7 +4,9 @@ permalink: /
 title: "About Me"
 og_title: "Sercan Külcü — Teaching, Research and Tools"
 description: "Sercan Külcü, computer engineer at Giresun University: bilingual course slides and notes, research publications, and free browser-based tools and games."
-seo_title: "Sercan Külcü · Computer Engineering: Teaching, Research and Tools"
+seo_title: "Sercan Külcü · Computer Engineering, Teaching & Research"
+og_description: "Courses, research and free browser tools by Sercan Külcü, computer engineer at Giresun University."
+og_image: https://sercankulcu.github.io/images/og/home.jpg
 author_profile: true
 ---
 

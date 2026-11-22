@@ -10,21 +10,6 @@ author_profile: true
 
 Films, games, music, entertainment, and other things I enjoy.
 
-<style>
-.collection-entry {
-  margin-bottom: 1.15rem;
-}
-
-.collection-title {
-  font-weight: 600;
-}
-
-.collection-meta {
-  margin-top: 0.15rem;
-  font-size: 0.78em;
-  opacity: 0.6;
-}
-</style>
 
 {% assign entries = site.fun | sort: "date" | reverse %}
 {% for post in entries %}

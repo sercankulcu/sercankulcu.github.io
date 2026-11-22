@@ -132,8 +132,7 @@ json_ld: %s
 hreflang: {en: "/games/", tr: "/game/tr/"}
 ---
 
-<style>%s</style>
-
+%.0s
 <p class="games-intro">%d free games that play right in your browser, on a phone or a computer.
 No download, no sign-up. The word games use Turkish words.
 <a href="/game/tr/" hreflang="tr" lang="tr">Türkçe</a></p>

@@ -256,13 +256,12 @@ def page(lang, title, kind, meta_tags, body, rel_pdf, year, permalink, json_ld=N
     fm.append('scholar_meta:')
     fm += ['  - [%s, %s]' % (k, json.dumps(v, ensure_ascii=False)) for k, v in tags]
     fm += ['---', '']
-    html_body = """<style>%(css)s</style>
-<div class="sch">
+    html_body = """<div class="sch">
 <p class="sch-kind">%(kind)s</p>
 %(body)s
 <p class="sch-meta" style="margin-top:2.4em">%(rights)s</p>
 </div>
-""" % dict(css=CSS.strip(), kind=e(kind), body=body, rights=e(t['rights'] % year))
+""" % dict(kind=e(kind), body=body, rights=e(t['rights'] % year))
     out = '\n'.join(fm) + html_body
     assert '{{' not in out and '{%' not in out
     return out

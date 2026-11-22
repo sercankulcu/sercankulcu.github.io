@@ -10,21 +10,6 @@ author_profile: true
 
 Personal stories, memories, and moments from different periods of my life.
 
-<style>
-.collection-entry {
-  margin-bottom: 1.15rem;
-}
-
-.collection-title {
-  font-weight: 600;
-}
-
-.collection-meta {
-  margin-top: 0.15rem;
-  font-size: 0.78em;
-  opacity: 0.6;
-}
-</style>
 
 {% assign entries = site.memory | sort: "date" | reverse %}
 {% for post in entries %}

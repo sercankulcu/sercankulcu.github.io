@@ -101,8 +101,29 @@ svg{position:absolute;right:60px;top:70px}
 <svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">%(motif)s</svg></div></body></html>'''
 
 
+HOME = '''<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1200px;height:630px;background:#fff;font-family:"Segoe UI",Arial,sans-serif}
+.c{position:relative;width:1200px;height:630px;overflow:hidden}
+.bar{position:absolute;left:0;top:0;width:1200px;height:14px;background:linear-gradient(90deg,%(B)s 0 25%%,%(R)s 25%% 50%%,%(G)s 50%% 75%%,%(P)s 75%%)}
+.t{position:absolute;left:72px;top:170px;width:640px}
+h1{margin:0;font:700 82px/1.05 Georgia,serif;color:%(INK)s;letter-spacing:-1px}
+p{margin:24px 0 0;font-size:31px;line-height:1.35;color:%(SOFT)s}
+.k{margin-top:30px;font-size:24px;color:%(INK)s;font-weight:600}
+.by{position:absolute;left:72px;bottom:60px;font-size:24px;color:%(SOFT)s}
+.ph{position:absolute;right:110px;top:135px;width:360px;height:360px;border-radius:50%%;overflow:hidden;
+    box-shadow:0 0 0 10px #fff,0 0 0 16px %(B)s}
+.ph img{width:100%%;height:100%%;object-fit:cover}
+</style></head><body><div class="c"><div class="bar"></div>
+<div class="t"><h1>Sercan Külcü</h1><p>Assistant Professor of Computer Engineering, Giresun University</p>
+<div class="k">Courses · Research · Free tools and games</div></div>
+<div class="by">sercankulcu.github.io · Point Zero</div>
+<div class="ph"><img src="data:image/jpeg;base64,%(photo)s" alt=""></div></div></body></html>'''
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
+    import base64
+    photo = base64.b64encode(open(os.path.join(os.path.dirname(HERE), 'images', 'profile.jpg'), 'rb').read()).decode()
     with sync_playwright() as p:
         b = p.chromium.launch(channel='msedge')
         pg = b.new_page(viewport={'width': 1200, 'height': 630})
@@ -111,6 +132,12 @@ def main():
             out = os.path.join(OUT, k + '.jpg')
             pg.screenshot(path=out, type='jpeg', quality=86)
             print(out, os.path.getsize(out) // 1024, 'KB')
+        # ana sayfa: ad, unvan ve profil fotografi
+        pg.set_content(HOME % dict(B=B, R=R, G=G, P=P, INK=INK, SOFT=SOFT, photo=photo))
+        pg.wait_for_timeout(300)
+        out = os.path.join(OUT, 'home.jpg')
+        pg.screenshot(path=out, type='jpeg', quality=86)
+        print(out, os.path.getsize(out) // 1024, 'KB')
         b.close()
 
 
