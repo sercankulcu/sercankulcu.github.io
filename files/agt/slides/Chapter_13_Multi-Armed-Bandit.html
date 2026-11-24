@@ -1,0 +1,402 @@
+---
+layout: without-sidebar
+title: "Multi-Armed Bandit"
+permalink: /files/agt/slides/Chapter_13_Multi-Armed-Bandit.html
+excerpt: "An interactive multi-armed bandit lab comparing epsilon-greedy and UCB1 on exploration, exploitation and regret."
+lang: en
+seo_title: "Multi-Armed Bandit · Algorithmic Game Theory, Chapter 13"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+hreflang:
+  tr: /files/agt/sunumlar/Bolum_13_Multi-Armed-Bandit.html
+  en: /files/agt/slides/Chapter_13_Multi-Armed-Bandit.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithmic Game Theory"
+  url: "/teaching/algorithmic-game-theory/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-bandit .agt-oyun__body{display:grid;grid-template-columns:212px minmax(0,1fr);gap:12px;font-size:14px}
+.agt-bandit .side,.agt-bandit .main{display:flex;flex-direction:column;gap:8px;min-height:0}
+.agt-bandit .box{background:var(--ds-bg);border:1.5px solid var(--ds-border);border-radius:12px;padding:10px 12px}
+.agt-bandit .side .box{display:grid;gap:7px}
+.agt-bandit label.field{display:grid;gap:2px;font-size:12px;font-weight:700;color:var(--ds-muted);text-transform:uppercase;letter-spacing:.05em}
+.agt-bandit select{width:100%;min-height:30px;font-size:13.5px;text-transform:none;letter-spacing:0}
+.agt-bandit .btn{width:100%;min-height:32px;font-size:14px;border:1.5px solid var(--ds-link);background:var(--ds-link);color:var(--ds-bg)}
+.agt-bandit .btn:hover:not(:disabled){background:color-mix(in srgb,var(--ds-link) 85%,var(--ds-text))}
+.agt-bandit .btn.secondary{background:var(--ds-bg);color:var(--ds-text)!important;border-color:var(--ds-border)}
+.agt-bandit .btn.secondary:hover:not(:disabled){background:var(--ds-surface-strong);border-color:var(--ds-link)}
+.agt-bandit .check{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.agt-bandit .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.agt-bandit .metric{padding:6px 2px;border:1.5px solid var(--ds-border);border-radius:10px;text-align:center;background:var(--ds-surface);font-size:11.5px;color:var(--ds-muted);font-weight:700}
+.agt-bandit .metric b{display:block;font-size:19px;color:var(--ds-accent);line-height:1.2}
+.agt-bandit .status{padding:8px 10px;border-radius:10px;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border);font-size:13px;line-height:1.35;min-height:58px}
+.agt-bandit .arms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.agt-bandit .choice{display:grid;gap:3px;justify-items:center;min-height:0;height:auto;padding:8px 6px;border:2px solid var(--ds-border);border-radius:12px;background:var(--ds-bg);color:var(--ds-text);font-size:14px;line-height:1.2}
+.agt-bandit .choice:hover:not(:disabled){border-color:var(--ds-link)}
+.agt-bandit .choice.is-rec{border-color:var(--ds-good);box-shadow:inset 0 0 0 1.5px var(--ds-good)}
+.agt-bandit .choice.is-last{background:var(--ds-surface-strong)}
+.agt-bandit .choice .arm-name{font-weight:800;font-size:15px}
+.agt-bandit .choice .arm-meta{font-size:12px;font-weight:600;color:var(--ds-muted)}
+.agt-bandit .choice .tag{min-height:15px;font-size:11.5px;font-weight:800;color:color-mix(in srgb,var(--ds-good) 75%,var(--ds-text))}
+.agt-bandit .meter{width:100%;height:8px;border-radius:99px;background:var(--ds-surface-strong);border:1px solid var(--ds-border);overflow:hidden;position:relative}
+.agt-bandit .meter span{display:block;height:100%;background:var(--ds-link)}
+.agt-bandit .meter i{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ds-accent)}
+.agt-bandit .chart-box{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px}
+.agt-bandit .chart-head{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ds-muted)}
+.agt-bandit .chart-head .k1{color:var(--ds-accent)}
+.agt-bandit .chart-head .k2{color:var(--ds-link)}
+.agt-bandit svg.chart{display:block;width:100%;flex:1;min-height:0}
+.agt-bandit .log{margin:0;padding:6px 10px;list-style:none;height:108px;overflow:hidden;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border);border-radius:10px;font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+.agt-bandit .log li{margin:0}
+.agt-bandit .log li:first-child{font-weight:700}
+.agt-bandit .agt-oyun__head a.agt-oyun__back{color:var(--ds-link)}
+.agt-bandit .side .box{gap:5px;padding:8px 10px}
+.agt-bandit.agt-oyun .agt-oyun__body{grid-template-columns:226px minmax(0,1fr)}
+.agt-bandit select{min-height:28px}
+.agt-bandit .side{gap:6px}
+.agt-bandit .choice .arm-name{font-size:13.5px;white-space:nowrap}
+.agt-bandit .side .btn{font-size:13px;line-height:1.2;min-height:30px}
+.agt-bandit .check{font-size:12.5px}
+.agt-bandit .status{min-height:0;font-size:12.5px}
+.agt-bandit .metric{padding:4px 2px}
+.agt-bandit .metric b{font-size:17px}
+.agt-bandit .log{height:90px;font-size:12px}
+.agt-bandit .choice .arm-meta{font-size:11.5px;text-align:center}
+.agt-bandit .choice .tag{font-size:11px;text-align:center}
+</style>
+
+<div class="agt-bandit agt-oyun agt-oyun--stage" lang="en">
+<header class="agt-oyun__head">
+<div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 13 · Simulation</p><h1>Multi-Armed Bandit</h1></div>
+<button type="button" class="agt-oyun__help" aria-controls="bandit-help" aria-label="Help">?</button>
+<a class="agt-oyun__back" href="Chapter_13_Learning_and_Adaptation.html">← Chapter 13</a>
+</header>
+
+<div class="agt-oyun__body">
+<aside class="side">
+<div class="box">
+<label class="field"><span>Mode</span>
+<select class="mode-select">
+<option value="human">Benchmark</option>
+<option value="cpu">With advice</option>
+<option value="demo">Computer learns</option>
+</select>
+</label>
+<label class="field"><span>Level</span>
+<select class="level-select">
+<option value="1">1: 3 arms</option>
+<option value="2">2: 4 arms</option>
+<option value="3">3: Changing</option>
+</select>
+</label>
+<label class="field"><span>Algorithm</span>
+<select class="alg-select">
+<option value="eg">ε-greedy</option>
+<option value="ucb">UCB1</option>
+</select>
+</label>
+<button class="btn reset-btn" type="button">New experiment</button>
+<button class="btn secondary run50-btn" type="button">Algorithm: 50 rounds</button>
+<label class="check"><input class="reveal-box" type="checkbox"> <span>True probabilities</span></label>
+</div>
+<div class="metrics">
+<div class="metric">Reward<b class="reward">0</b></div>
+<div class="metric">Round<b class="rounds">0</b></div>
+<div class="metric">Regret<b class="regret">0</b></div>
+</div>
+<div class="status" aria-live="polite"></div>
+</aside>
+
+<section class="main">
+<div class="arms"></div>
+<div class="box chart-box">
+<div class="chart-head"><span>Cumulative reward and best-arm expectation</span><span><span class="k2">■ reward</span> · <span class="k1">■ regret</span></span></div>
+<svg class="chart" viewBox="0 0 520 200" preserveAspectRatio="none" role="img" aria-label="Cumulative reward and regret chart"></svg>
+</div>
+<ul class="log" aria-live="polite"></ul>
+</section>
+</div>
+
+<dialog class="agt-oyun__dialog" id="bandit-help">
+<button type="button" class="agt-oyun__close">Close</button>
+<h2>How to play</h2>
+<p>Each arm is an action with a hidden probability of paying a reward of 1. Click an arm to pull it; every pull returns 1 or 0. The goal is to find out which arm is best while keeping cumulative <b>regret</b> low. Every new experiment draws new hidden probabilities, so memorizing the previous winner does not help.</p>
+<ul>
+<li><b>Reward</b> is the number of successes; <b>Round</b> counts all pulls.</li>
+<li>Each arm card shows the number of pulls and the observed average (bar). If “True probabilities” is checked, the red line shows the hidden value.</li>
+<li><b>Regret</b> = expected reward of always pulling the truly best arm − reward actually obtained.</li>
+<li>The “Algorithm: 50 rounds” button lets the selected algorithm continue the same experiment, for comparison.</li>
+</ul>
+<h3>Contribution to game theory</h3>
+<p>Bandit algorithms balance <b>exploration</b> of uncertain options against <b>exploitation</b> of the best known option. This is the basic learning problem behind repeated games, recommender systems and online advertising.</p>
+<h3>Modes</h3>
+<ul>
+<li><b>Benchmark</b>: you choose every arm and compare your reward and regret with the algorithm runs. Check whether you explored enough before deciding.</li>
+<li><b>With advice</b>: the arm the selected algorithm would exploit is marked “Recommended”. You can follow or reject the advice; useful for discussing automation bias.</li>
+<li><b>Computer learns</b>: the algorithm plays the first 50 rounds; continue in blocks of 50 to watch convergence.</li>
+</ul>
+<h3>Levels</h3>
+<ul>
+<li><b>Level 1: 3 arms</b>: stationary; the best introduction to the exploration–exploitation dilemma.</li>
+<li><b>Level 2: 4 arms</b>: stationary; the extra arm spreads out exploration and makes early commitment more costly.</li>
+<li><b>Level 3: Changing rewards</b>: four arms; after round 40 the hidden probabilities change. Old observations become misleading; watch whether the learner starts exploring again.</li>
+</ul>
+<h3>Algorithms</h3>
+<ul>
+<li><b>ε-greedy</b>: with probability ε = 0.15 a random arm is pulled, otherwise the arm with the highest observed average. It is simple and never stops exploring, so it can notice a change, but it wastes pulls on clearly weak arms.</li>
+<li><b>UCB1</b>: the arm with the highest score is pulled; score = average + √(2 ln t / pulls). Rarely pulled arms get a large bonus, so exploration is directed rather than random. It is strong in stationary environments and slow after abrupt changes, because old evidence stays in the averages.</li>
+</ul>
+<h3>Mode × level</h3>
+<table>
+<tr><th>Mode</th><th>Level 1</th><th>Level 2</th><th>Level 3</th></tr>
+<tr><th>Benchmark</th><td>The basic exploration–exploitation trade-off.</td><td>Is your attention spread fairly across four options?</td><td>Noticing the change and dropping old beliefs.</td></tr>
+<tr><th>Advice</th><td>A steady recommendation versus intuition.</td><td>Recommendations shift as evidence spreads out.</td><td>Does following the old advice delay adaptation?</td></tr>
+<tr><th>Computer</th><td>A fast-convergence baseline.</td><td>Comparing algorithms when more exploration is needed.</td><td>Recovery after the change; stale data.</td></tr>
+</table>
+<h3>Suggested order</h3>
+<ol>
+<li>Benchmark + Level 1 + ε-greedy: at least 20 manual pulls.</li>
+<li>Repeat with UCB1 and compare how evenly the arms are sampled.</li>
+<li>Level 2: see how an extra option raises the cost of exploration.</li>
+<li>Advice mode: deliberately reject some recommendations and judge the result.</li>
+<li>Computer learns + Level 3: compare the two algorithms after the change at round 40.</li>
+</ol>
+<p><b>Note on interpretation:</b> a single run is not enough to say that one algorithm is better. Rewards are random; compare several experiments by average reward, regret and speed of adaptation.</p>
+</dialog>
+</div>
+
+<script>
+(() => {
+  const root=document.querySelector('.agt-bandit');
+  if(!root)return;
+
+  const mode=root.querySelector('.mode-select');
+  const level=root.querySelector('.level-select');
+  const alg=root.querySelector('.alg-select');
+  const resetBtn=root.querySelector('.reset-btn');
+  const run50Btn=root.querySelector('.run50-btn');
+  const revealBox=root.querySelector('.reveal-box');
+  const arms=root.querySelector('.arms');
+  const reward=root.querySelector('.reward');
+  const rounds=root.querySelector('.rounds');
+  const regret=root.querySelector('.regret');
+  const statusEl=root.querySelector('.status');
+  const chart=root.querySelector('.chart');
+  const logEl=root.querySelector('.log');
+
+  const EPS=.15;
+  const MAX_ROUNDS=1000;
+  let probs=[];
+  let count=[];
+  let sum=[];
+  let t=0;
+  let totalR=0;
+  let bestSum=0;
+  let changed=false;
+  let last=-1;
+  let history=[];
+  let lines=[];
+  let armButtons=[];
+
+  function trSayi(x,d){return x.toFixed(d).replace('-', '−');}
+
+  function mean(i){
+    return count[i]?sum[i]/count[i]:0;
+  }
+
+  function argmax(values){
+    let best=0;
+    for(let i=1;i<values.length;i++){
+      if(values[i]>values[best])best=i;
+    }
+    return best;
+  }
+
+  /* the arm the algorithm would exploit now (deterministic, used for the recommendation) */
+  function exploitArm(){
+    if(alg.value==='eg'){
+      return argmax(count.map((c,i)=>c?mean(i):1));
+    }
+    return argmax(count.map((c,i)=>c?mean(i)+Math.sqrt(2*Math.log(Math.max(1,t))/c):Infinity));
+  }
+
+  function choose(){
+    if(alg.value==='eg' && Math.random()<EPS){
+      return Math.floor(Math.random()*probs.length);
+    }
+    return exploitArm();
+  }
+
+  function addLine(text){
+    lines.unshift(text);
+    lines=lines.slice(0,5);
+  }
+
+  function pull(index){
+    if(t>=MAX_ROUNDS)return;
+    if(level.value==='3' && t===40 && !changed){
+      changed=true;
+      probs=probs.map(p=>Math.min(.9,Math.max(.1,p+(Math.random()-.5)*.5)));
+      addLine('Round 40: the hidden probabilities changed!');
+    }
+
+    const r=Math.random()<probs[index]?1:0;
+
+    bestSum+=Math.max(...probs);
+    t++;
+    count[index]++;
+    sum[index]+=r;
+    totalR+=r;
+    last=index;
+    history.push([totalR,bestSum-totalR]);
+
+    addLine(`Round ${t}: Arm ${index+1} → reward ${r}`);
+  }
+
+  function auto(k){
+    for(let j=0;j<k && t<MAX_ROUNDS;j++){
+      pull(choose());
+    }
+    render();
+  }
+
+  function buildArms(){
+    arms.style.gridTemplateColumns=`repeat(${probs.length},minmax(0,1fr))`;
+    arms.innerHTML=probs.map((_,i)=>`
+      <button class="choice" data-arm="${i}" type="button">
+        <span class="arm-name">🎰 Arm ${i+1}</span>
+        <span class="arm-meta"></span>
+        <span class="meter"><span></span><i hidden></i></span>
+        <span class="tag"></span>
+      </button>`).join('');
+    armButtons=[...arms.querySelectorAll('[data-arm]')];
+    armButtons.forEach(button=>{
+      button.addEventListener('click',()=>{
+        if(mode.value==='demo')return;
+        pull(+button.dataset.arm);
+        render();
+      });
+    });
+  }
+
+  function drawChart(){
+    const W=520;
+    const H=200;
+    const n=Math.max(10,history.length);
+    const maxY=Math.max(5,...history.map(h=>Math.max(h[0],h[1])));
+    const grid=[0,.25,.5,.75,1].map(f=>{
+      const y=(H-6-f*(H-16)).toFixed(1);
+      return `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="var(--ds-border)" stroke-width="1" opacity=".5"/>`;
+    }).join('');
+    function path(k){
+      if(!history.length)return '';
+      const pts=[[0,0]].concat(history.map((h,i)=>[i+1,h[k]]));
+      return pts.map((p,i)=>(i?'L':'M')+(p[0]/n*W).toFixed(1)+','+(H-6-p[1]/maxY*(H-16)).toFixed(1)).join('');
+    }
+    const changeX=level.value==='3'?(40/n*W):-1;
+    chart.innerHTML=grid+
+      (changeX>=0&&changeX<=W?`<line x1="${changeX}" x2="${changeX}" y1="0" y2="${H}" stroke="var(--ds-warn)" stroke-dasharray="4 4" stroke-width="1.5"/>`:'')+
+      `<path d="${path(0)}" fill="none" stroke="var(--ds-link)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`+
+      `<path d="${path(1)}" fill="none" stroke="var(--ds-accent)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`+
+      `<text x="4" y="12" font-size="11" fill="var(--ds-muted)">max ${maxY.toFixed(0)}</text>`+
+      `<text x="${W-4}" y="${H-10}" font-size="11" fill="var(--ds-muted)" text-anchor="end">${history.length} rounds</text>`;
+  }
+
+  function render(){
+    const rec=mode.value==='cpu'?exploitArm():-1;
+    const demo=mode.value==='demo';
+    armButtons.forEach((button,i)=>{
+      const m=mean(i);
+      button.querySelector('.arm-meta').textContent=
+        `${count[i]} pulls · avg. ${count[i]?trSayi(m,2):'—'}`;
+      button.querySelector('.meter span').style.width=(m*100).toFixed(1)+'%';
+      const tick=button.querySelector('.meter i');
+      tick.hidden=!revealBox.checked;
+      tick.style.left=`calc(${(probs[i]*100).toFixed(1)}% - 1px)`;
+      button.querySelector('.tag').textContent=
+        [rec===i?'Recommended':'',revealBox.checked?'true'+' p = '+trSayi(probs[i],2):''].filter(Boolean).join(' · ');
+      button.classList.toggle('is-rec',rec===i);
+      button.classList.toggle('is-last',last===i);
+      button.disabled=demo || t>=MAX_ROUNDS;
+    });
+
+    reward.textContent=totalR;
+    rounds.textContent=t;
+    regret.textContent=trSayi(bestSum-totalR,1);
+
+    const algAd=alg.value==='eg'?'ε-greedy':'UCB1';
+    statusEl.innerHTML=
+      t>=MAX_ROUNDS
+        ? `The ${MAX_ROUNDS}-round limit was reached. Start a new experiment.`
+        : demo
+          ? `${algAd} is choosing. Press “50 rounds” to keep learning.`
+          : mode.value==='cpu'
+            ? `Pick an arm. ${algAd} suggests Arm ${rec+1}; the decision is yours.`
+            : 'Pick an arm. The reward probabilities are hidden.';
+    run50Btn.disabled=t>=MAX_ROUNDS;
+
+    logEl.innerHTML=lines.map(l=>`<li>${l}</li>`).join('');
+    while(logEl.children.length>1&&logEl.scrollHeight>logEl.clientHeight+1)logEl.lastElementChild.remove();
+    drawChart();
+  }
+
+  function resetGame(){
+    const n=level.value==='1'?3:4;
+    probs=Array.from({length:n},()=>.15+Math.random()*.7);
+    count=Array(n).fill(0);
+    sum=Array(n).fill(0);
+    t=0;
+    totalR=0;
+    bestSum=0;
+    changed=false;
+    last=-1;
+    history=[];
+    lines=['Experiment ready.'];
+    buildArms();
+    if(mode.value==='demo'){
+      auto(50);
+    }else{
+      render();
+    }
+  }
+
+  resetBtn.addEventListener('click',resetGame);
+  run50Btn.addEventListener('click',()=>auto(50));
+  revealBox.addEventListener('change',render);
+  level.addEventListener('change',resetGame);
+  mode.addEventListener('change',resetGame);
+  alg.addEventListener('change',()=>{
+    if(mode.value==='demo')resetGame();
+    else render();
+  });
+
+  resetGame();
+})();
+</script>
+<script src="deck/oyun.js"></script>

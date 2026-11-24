@@ -1,0 +1,387 @@
+---
+layout: without-sidebar
+title: "Blackjack Decision Lab"
+permalink: /files/agt/slides/Chapter_01_Blackjack.html
+excerpt: "An interactive blackjack decision lab on probability, stopping decisions, bankroll management, the dealer rule, hit/stand/double choices and simplified strategy hints."
+lang: en
+seo_title: "Blackjack Decision Lab · Algorithmic Game Theory, Chapter 1"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+hreflang:
+  tr: /files/agt/sunumlar/Bolum_01_Blackjack.html
+  en: /files/agt/slides/Chapter_01_Blackjack.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithmic Game Theory"
+  url: "/teaching/algorithmic-game-theory/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-blackjack .agt-oyun__body{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;font-size:14px}
+.agt-blackjack .side,.agt-blackjack .main{display:flex;flex-direction:column;gap:8px;min-height:0}
+.agt-blackjack .box{background:var(--ds-bg);border:1.5px solid var(--ds-border);border-radius:12px;padding:10px 12px}
+.agt-blackjack .side .box{display:grid;gap:7px}
+.agt-blackjack label.field{display:grid;gap:2px;font-size:12px;font-weight:700;color:var(--ds-muted);text-transform:uppercase;letter-spacing:.05em}
+.agt-blackjack select,.agt-blackjack input{width:100%;min-height:30px;font-size:13.5px;text-transform:none;letter-spacing:0}
+.agt-blackjack .btn{width:100%;min-height:34px;padding:0 8px;font-size:14px;border:1.5px solid var(--ds-link);background:var(--ds-link);color:var(--ds-bg)}
+.agt-blackjack .btn:hover:not(:disabled){background:color-mix(in srgb,var(--ds-link) 85%,var(--ds-text))}
+.agt-blackjack .btn.secondary{background:var(--ds-bg);color:var(--ds-text)!important;border-color:var(--ds-border)}
+.agt-blackjack.agt-oyun h1{font-size:24px}
+.agt-blackjack .side .btn{min-height:30px;font-size:13px;line-height:1.2}
+.agt-blackjack .side .box{gap:6px;padding:8px 10px}
+.agt-blackjack .metric b{font-size:17px}
+.agt-blackjack .metric{padding:4px 2px}
+.agt-blackjack .btn.secondary:hover:not(:disabled){background:var(--ds-surface-strong);border-color:var(--ds-link)}
+.agt-blackjack .pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.agt-blackjack .metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.agt-blackjack .metric{padding:6px 2px;border:1.5px solid var(--ds-border);border-radius:10px;text-align:center;background:var(--ds-surface);font-size:11.5px;color:var(--ds-muted);font-weight:700}
+.agt-blackjack .metric b{display:block;font-size:19px;color:var(--ds-accent);line-height:1.2}
+.agt-blackjack .metric.wide{grid-column:1/3}
+/* card-table felt and card faces are part of the game, so they stay literal */
+.agt-blackjack .felt{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-around;gap:6px;padding:10px 14px;border-radius:14px;background:#1f6b45;border:1.5px solid #164d32;color:#f8fafc}
+.agt-blackjack .seat h3{display:flex;justify-content:space-between;margin:0 0 6px;font-size:14px;color:#f8fafc;letter-spacing:.04em;text-transform:uppercase}
+.agt-blackjack .seat h3 b{font-size:16px;color:#fde68a}
+.agt-blackjack .cards{display:flex;flex-wrap:nowrap;gap:8px;min-height:92px}
+.agt-blackjack .cards.many .playing-card+.playing-card{margin-left:-26px}
+.agt-blackjack .playing-card{flex:none;width:62px;height:88px;border-radius:9px;background:#fdfdfb;color:#111827;display:grid;place-items:center;font-weight:900;font-size:19px;box-shadow:0 3px 8px rgba(0,0,0,.3);border:1.5px solid #cbd5e1;text-align:center;line-height:1.15}
+.agt-blackjack .playing-card.red{color:#c81e1e}
+.agt-blackjack .playing-card.back{background:repeating-linear-gradient(45deg,#1e3a8a 0 6px,#2a4ea8 6px 12px);border-color:#f8fafc}
+.agt-blackjack .divider{height:1px;background:rgba(255,255,255,.25)}
+.agt-blackjack .status{padding:8px 12px;border-radius:10px;background:var(--ds-surface-strong);border:1.5px solid var(--ds-border);font-weight:700;min-height:38px}
+.agt-blackjack .status.win{border-color:var(--ds-good);border-left-width:6px;color:color-mix(in srgb,var(--ds-good) 75%,var(--ds-text))}
+.agt-blackjack .status.lose{border-color:var(--ds-bad);border-left-width:6px;color:color-mix(in srgb,var(--ds-bad) 80%,var(--ds-text))}
+.agt-blackjack .hint{display:flex;gap:10px;align-items:center;min-height:30px;font-size:13.5px;color:var(--ds-muted);font-weight:600}
+.agt-blackjack .hint b{color:var(--ds-text)}
+.agt-blackjack .agt-oyun__head a.agt-oyun__back{color:var(--ds-link)}
+</style>
+
+<div class="agt-blackjack agt-oyun agt-oyun--stage" lang="en">
+<header class="agt-oyun__head">
+<div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 1 · Game</p><h1>Blackjack Decision Lab</h1></div>
+<button type="button" class="agt-oyun__help" aria-controls="blackjack-help" aria-label="Help">?</button>
+<a class="agt-oyun__back" href="Chapter_01_Decision_Theory.html">← Chapter 1</a>
+</header>
+
+<div class="agt-oyun__body">
+<aside class="side">
+<div class="box">
+<label class="field"><span>Difficulty</span>
+<select class="level-select">
+<option value="practice">Practice</option>
+<option value="standard" selected>Standard</option>
+<option value="strategy">Strategy</option>
+</select>
+</label>
+<label class="field"><span>Bet (TL)</span>
+<input class="bet-input" type="number" min="10" step="10" value="50">
+</label>
+<button class="btn deal-btn" type="button">Deal</button>
+<div class="pair">
+<button class="btn secondary hit-btn" type="button">Hit</button>
+<button class="btn secondary stand-btn" type="button">Stand</button>
+</div>
+<button class="btn secondary double-btn" type="button">Double down</button>
+<button class="btn secondary bank-btn" type="button">New bankroll</button>
+</div>
+<div class="metrics">
+<div class="metric wide">Bankroll (TL)<b class="bank">1000</b></div>
+<div class="metric">Wins<b class="won">0</b></div>
+<div class="metric">Losses<b class="lost">0</b></div>
+</div>
+</aside>
+
+<section class="main">
+<div class="felt">
+<div class="seat"><h3><span>Dealer</span> <b class="dealer-total">0</b></h3><div class="cards dealer-cards"></div></div>
+<div class="divider"></div>
+<div class="seat"><h3><span>Your hand <span class="bet-label"></span></span> <b class="player-total">0</b></h3><div class="cards player-cards"></div></div>
+</div>
+<div class="status bj-status" aria-live="polite"></div>
+<div class="hint strategy-hint"></div>
+</section>
+</div>
+
+<dialog class="agt-oyun__dialog" id="blackjack-help">
+<button type="button" class="agt-oyun__close">Close</button>
+<h2>How to play</h2>
+<ol>
+<li>Choose a bet (minimum 10) and press <b>Deal</b>.</li>
+<li>The goal is to finish closer to 21 than the dealer without going over 21.</li>
+<li>Number cards count their face value, J/Q/K count 10, and an Ace counts 11 or 1.</li>
+<li><b>Hit</b> takes one more card. <b>Stand</b> ends your decisions and the dealer plays.</li>
+<li><b>Double down</b> (first two cards only) doubles the bet, deals exactly one more card and then stands.</li>
+<li>The dealer follows a fixed rule: draw up to 16, stand on 17 and above.</li>
+</ol>
+<h3>Outcomes</h3>
+<p>Going over 21 is a bust and loses immediately. If the dealer busts while you are at 21 or below, you win. Otherwise the higher total wins; equal totals are a push (the bet is returned). A natural blackjack (an Ace plus a ten-value card) pays 3:2; two naturals make a push. No six-deck shoe is used: when fewer than 15 cards remain, a single 52-card deck is reshuffled. If your bankroll falls below the minimum bet, press <b>New bankroll</b>.</p>
+<h3>Difficulty</h3>
+<ul>
+<li><b>Practice</b>: a strategy hint and the probability of busting on the next card (computed from all unseen cards, including the dealer's hole card).</li>
+<li><b>Standard</b>: strategy hint only.</li>
+<li><b>Strategy</b>: no help; the decision is entirely yours.</li>
+</ul>
+<h3>Decision strategy</h3>
+<ul>
+<li>Compare your total with the dealer's up card.</li>
+<li>With low totals, drawing another card is usually worthwhile; with high totals the bust risk is large.</li>
+<li>If the dealer's up card is weak (2–6), standing on 13–16 makes sense because the dealer may bust.</li>
+<li>The hint is based on a simplified basic-strategy heuristic; it is a teaching tool, not gambling advice.</li>
+</ul>
+<h3>Link to decision theory</h3>
+<p>Blackjack is sequential decision making under uncertainty. Your own hand and one dealer card are known, but the hole card and later draws are not. Every action weighs expected reward against risk, which makes the game useful for discussing conditional probability, expected utility, stopping decisions, and why the best action depends on the situation rather than on one fixed rule.</p>
+</dialog>
+</div>
+
+<script>
+(() => {
+  const root=document.querySelector('.agt-blackjack');
+  if(!root)return;
+
+  const level=root.querySelector('.level-select');
+  const betInput=root.querySelector('.bet-input');
+  const dealBtn=root.querySelector('.deal-btn');
+  const hitBtn=root.querySelector('.hit-btn');
+  const standBtn=root.querySelector('.stand-btn');
+  const doubleBtn=root.querySelector('.double-btn');
+  const bankBtn=root.querySelector('.bank-btn');
+  const bankEl=root.querySelector('.bank');
+  const wonEl=root.querySelector('.won');
+  const lostEl=root.querySelector('.lost');
+  const betLabel=root.querySelector('.bet-label');
+  const playerTotalEl=root.querySelector('.player-total');
+  const dealerTotalEl=root.querySelector('.dealer-total');
+  const statusEl=root.querySelector('.bj-status');
+  const dealerCardsEl=root.querySelector('.dealer-cards');
+  const playerCardsEl=root.querySelector('.player-cards');
+  const hintEl=root.querySelector('.strategy-hint');
+
+  const MIN_BET=10;
+  let bank=1000;
+  let deck=[];
+  let player=[];
+  let dealer=[];
+  let active=false;
+  let currentBet=0;
+  let won=0;
+  let lost=0;
+  const recT={Hit:'Hit',Stand:'Stand',Double:'Double down'};
+
+  function makeDeck(){
+    const suits=['♠','♥','♦','♣'];
+    const ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    deck=[];
+    for(const s of suits){
+      for(const r of ranks)deck.push({s,r});
+    }
+    for(let i=deck.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [deck[i],deck[j]]=[deck[j],deck[i]];
+    }
+  }
+
+  function cardValue(card){
+    return card.r==='A'?11:['J','Q','K'].includes(card.r)?10:+card.r;
+  }
+
+  function value(hand){
+    let total=0;
+    let aces=0;
+    for(const card of hand){
+      total+=cardValue(card);
+      if(card.r==='A')aces++;
+    }
+    while(total>21&&aces){
+      total-=10;
+      aces--;
+    }
+    return total;
+  }
+
+  function cardMarkup(card,hide){
+    if(hide)return '<div class="playing-card back" aria-label="Face-down card"></div>';
+    return `<div class="playing-card ${['♥','♦'].includes(card.s)?'red':''}">${card.r}<br>${card.s}</div>`;
+  }
+
+  function bustChance(){
+    const unseen=deck.concat(dealer.length>1?[dealer[1]]:[]);
+    if(!unseen.length)return 0;
+    return unseen.filter(c=>value(player.concat([c]))>21).length/unseen.length;
+  }
+
+  function hint(){
+    if(!active||level.value==='strategy'){
+      hintEl.innerHTML=active?'':`<span>Choose a bet and press Deal.</span>`;
+      return;
+    }
+    const p=value(player);
+    const up=cardValue(dealer[0]);
+    const canDouble=player.length===2&&currentBet<=bank;
+    let rec=p<=11?'Hit':p>=17?'Stand':(p>=13&&up<=6?'Stand':(p===12&&up>=4&&up<=6?'Stand':'Hit'));
+    if(canDouble&&(p===11||(p===10&&up<=9)))rec='Double';
+    let html=`<span>Hint: <b>${recT[rec]}</b></span>`;
+    if(level.value==='practice'){
+      html+=`<span>· Bust chance if you hit: <b>${(bustChance()*100).toFixed(0)}%</b></span>`;
+    }
+    hintEl.innerHTML=html;
+  }
+
+  function render(reveal){
+    playerCardsEl.innerHTML=player.map(c=>cardMarkup(c,false)).join('');
+    dealerCardsEl.innerHTML=dealer.map((c,i)=>cardMarkup(c,!reveal&&active&&i===1)).join('');
+    playerCardsEl.classList.toggle('many',player.length>6);
+    dealerCardsEl.classList.toggle('many',dealer.length>6);
+    playerTotalEl.textContent=player.length?value(player):'–';
+    dealerTotalEl.textContent=!dealer.length?'–':active&&!reveal?value([dealer[0]])+' + ?':value(dealer);
+    betLabel.textContent=currentBet&&player.length?`(bet ${currentBet} TL)`:'';
+    bankEl.textContent=bank;
+    wonEl.textContent=won;
+    lostEl.textContent=lost;
+    dealBtn.disabled=active||bank<MIN_BET;
+    hitBtn.disabled=standBtn.disabled=!active;
+    doubleBtn.disabled=!active||player.length!==2||currentBet>bank;
+    betInput.disabled=active;
+    bankBtn.disabled=active;
+    hint();
+  }
+
+  function status(msg,kind){
+    statusEl.innerHTML=msg;
+    statusEl.className='status bj-status'+(kind?' '+kind:'');
+  }
+
+  function isNatural(hand){
+    return hand.length===2&&value(hand)===21;
+  }
+
+  function finish(msg,kind){
+    active=false;
+    if(kind==='win')won++;
+    if(kind==='lose')lost++;
+    render(true);
+    status(msg+(bank<MIN_BET?' Bankroll is gone; press New bankroll.':''),kind);
+  }
+
+  function deal(){
+    if(active)return;
+    let bet=Math.round((+betInput.value||MIN_BET)/10)*10;
+    bet=Math.max(MIN_BET,bet);
+    if(bet>bank){
+      if(bank<MIN_BET)status('Bankroll is gone; press New bankroll.','lose');
+      else status(`Bet too high: you only have ${bank} TL.`,'lose');
+      return;
+    }
+    betInput.value=bet;
+    currentBet=bet;
+    bank-=bet;
+    if(deck.length<15)makeDeck();
+    player=[deck.pop(),deck.pop()];
+    dealer=[deck.pop(),deck.pop()];
+    active=true;
+    if(isNatural(player)||isNatural(dealer)){
+      if(isNatural(player)&&isNatural(dealer)){
+        bank+=currentBet;
+        finish('Both have blackjack. Push.','');
+      }else if(isNatural(player)){
+        bank+=currentBet*2.5;
+        finish(`Blackjack! Paid 3:2 (+${currentBet*1.5} TL).`,'win');
+      }else{
+        finish('Dealer has blackjack. Dealer wins.','lose');
+      }
+      return;
+    }
+    render(false);
+    status('Your turn: Hit, Stand or Double down.','');
+  }
+
+  function hit(){
+    if(!active)return;
+    player.push(deck.pop());
+    if(value(player)>21){
+      finish(`You bust with ${value(player)}. Dealer wins.`,'lose');
+      return;
+    }
+    if(value(player)===21){
+      stand();
+      return;
+    }
+    render(false);
+  }
+
+  function stand(){
+    if(!active)return;
+    while(value(dealer)<17)dealer.push(deck.pop());
+    const p=value(player);
+    const d=value(dealer);
+    if(d>21||p>d){
+      bank+=currentBet*2;
+      if(d>21)finish(`Dealer busts with ${d}. You win: +${currentBet} TL!`,'win');
+      else finish(`You ${p}, dealer ${d}. You win: +${currentBet} TL!`,'win');
+    }else if(p===d){
+      bank+=currentBet;
+      finish(`Push at ${p}. Bet returned.`,'');
+    }else{
+      finish(`Dealer ${d}, you ${p}. Dealer wins.`,'lose');
+    }
+  }
+
+  function doubleDown(){
+    if(!active||player.length!==2||currentBet>bank)return;
+    bank-=currentBet;
+    currentBet*=2;
+    player.push(deck.pop());
+    if(value(player)>21){
+      finish('You bust after doubling down.','lose');
+    }else{
+      stand();
+    }
+  }
+
+  function newBankroll(){
+    if(active)return;
+    bank=1000;
+    won=0;
+    lost=0;
+    player=[];
+    dealer=[];
+    currentBet=0;
+    makeDeck();
+    render(false);
+    status('New bankroll: 1000 TL. Choose a bet and deal.','');
+  }
+
+  dealBtn.addEventListener('click',deal);
+  hitBtn.addEventListener('click',hit);
+  standBtn.addEventListener('click',stand);
+  doubleBtn.addEventListener('click',doubleDown);
+  bankBtn.addEventListener('click',newBankroll);
+  level.addEventListener('change',()=>render(false));
+
+  newBankroll();
+  status('Choose a bet and deal.','');
+})();
+</script>
+<script src="deck/oyun.js"></script>

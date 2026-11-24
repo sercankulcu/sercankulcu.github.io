@@ -1,0 +1,362 @@
+---
+layout: without-sidebar
+title: "Nim"
+permalink: /files/agt/slides/Chapter_02_Nim.html
+excerpt: "Interactive Nim game: two-player and computer modes, several heap layouts, and an XOR-based optimal AI."
+lang: en
+seo_title: "Nim · Algorithmic Game Theory, Chapter 2"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+hreflang:
+  tr: /files/agt/sunumlar/Bolum_02_Nim.html
+  en: /files/agt/slides/Chapter_02_Nim.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithmic Game Theory"
+  url: "/teaching/algorithmic-game-theory/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-nim .nim-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 14px;
+  height: 100%;
+}
+
+.agt-nim .panel {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+
+.agt-nim .controls { display: flex; flex-direction: column; gap: 10px; }
+
+.agt-nim .field label,
+.agt-nim .cap {
+  display: block;
+  margin: 0 0 3px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.agt-nim .field select { width: 100%; font-size: 13px; }
+.agt-nim .new-btn { width: 100%; padding-left: 6px; padding-right: 6px; font-size: 14px; white-space: nowrap; }
+
+.agt-nim .status {
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.agt-nim .status.is-over { color: var(--ds-accent); }
+
+.agt-nim .check { display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 1.25; font-weight: 700; cursor: pointer; }
+
+.agt-nim .score { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; }
+.agt-nim .score div { padding: 6px 8px; border-radius: 10px; background: var(--ds-surface-strong); text-align: center; }
+.agt-nim .score b { display: block; font-size: 20px; line-height: 1.2; }
+.agt-nim .score span { display: block; color: var(--ds-muted); font-size: 11px; font-weight: 700; line-height: 1.25; }
+
+.agt-nim .game { display: flex; flex-direction: column; gap: 10px; }
+
+.agt-nim .heaps { display: flex; flex-direction: column; gap: 8px; }
+
+.agt-nim .heap {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: 10px;
+  height: 66px;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.agt-nim .heap.is-empty { opacity: .55; }
+
+.agt-nim .heap-name { font-weight: 800; }
+.agt-nim .heap-name { line-height: 1.2; }
+.agt-nim .heap-name small { display: block; color: var(--ds-muted); font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+.agt-nim .tokens { display: flex; gap: 6px; }
+
+.agt-nim .tokens .tok {
+  width: 36px;
+  min-width: 0;
+  height: 36px;
+  min-height: 0;
+  padding: 0;
+  border: 2px solid var(--ds-link);
+  border-radius: 50%;
+  background: var(--ds-node);
+  color: transparent;
+  font-size: 0;
+}
+
+.agt-nim .tokens .tok.is-marked,
+.agt-nim .tokens .tok.is-gone {
+  border-style: dashed;
+  border-color: var(--ds-bad);
+  background: color-mix(in srgb, var(--ds-bad) 22%, var(--ds-bg));
+}
+
+.agt-nim .tokens .tok.is-gone { opacity: .35; }
+.agt-nim .tokens .tok:disabled { opacity: 1; cursor: default; }
+.agt-nim .tokens .tok.is-gone:disabled { opacity: .35; }
+
+.agt-nim .bin {
+  color: var(--ds-muted);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 15px;
+  text-align: right;
+}
+
+.agt-nim .nimsum {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr) 56px;
+  gap: 10px;
+  padding: 0 12px;
+  font-weight: 800;
+}
+
+.agt-nim .nimsum .bin { color: var(--ds-text); }
+.agt-nim .nimsum .zero { color: var(--ds-good); }
+.agt-nim .nimsum .nonzero { color: var(--ds-warn); }
+.agt-nim .hide-sum .bin,
+.agt-nim .hide-sum .nimsum { visibility: hidden; }
+
+.agt-nim .last {
+  margin: auto 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  color: var(--ds-muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.agt-nim .last b { color: var(--ds-text); }
+</style>
+
+<div class="agt-nim agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 2 · Game</p><h1>Nim</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="nim-help" aria-label="Help and rules">?</button>
+    <a class="agt-oyun__back" href="Chapter_02_Games_and_Representations.html">← Chapter 2</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="nim-layout">
+      <aside class="panel controls">
+        <div class="field">
+          <label for="nimMode">Mode</label>
+          <select id="nimMode">
+            <option value="ai">Computer</option>
+            <option value="human">Two players</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nimLevel">Heaps</label>
+          <select id="nimLevel">
+            <option value="1,3,5">Easy</option>
+            <option value="3,5,7" selected>Medium</option>
+            <option value="1,4,6,8">Hard</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nimAI">Computer</label>
+          <select id="nimAI">
+            <option value="Random">Random</option>
+            <option value="Optimal" selected>Optimal</option>
+          </select>
+        </div>
+        <button class="new-btn is-primary" id="nimNew" type="button">New game</button>
+        <label class="check"><input type="checkbox" id="nimShowSum"> <span>Binary + nim-sum</span></label>
+        <div class="status" id="nimStatus" aria-live="polite"></div>
+        <div class="score">
+          <div><b id="nimWins1">0</b><span id="nimName1">You</span></div>
+          <div><b id="nimWins2">0</b><span id="nimName2">Computer</span></div>
+        </div>
+      </aside>
+
+      <section class="panel game hide-sum" id="nimGame">
+        <div class="heaps" id="nimHeaps"></div>
+        <div class="nimsum"><span>Nim-sum</span><span id="nimSumText"></span><span class="bin" id="nimSumBin"></span></div>
+        <p class="last" id="nimLast">Click a token: it and every token to its right are taken.</p>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="nim-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>How to play</h2>
+    <ol>
+      <li>The game starts with several heaps holding different numbers of tokens.</li>
+      <li>On your turn you pick exactly one heap and take one or more tokens from it; you may take the whole heap.</li>
+      <li>Click a token on the board: it and all tokens to its right are taken (hovering shows a preview).</li>
+      <li>Under the normal play rule used here, the player who takes the last token wins.</li>
+    </ol>
+    <h3>The nim-sum</h3>
+    <p>Write each heap size in binary and combine the values with XOR. The result is the <b>nim-sum</b>. A position with nim-sum zero is lost for the player to move if the opponent plays perfectly; from any position with nonzero nim-sum there is at least one move that leaves the opponent a nim-sum of zero. Tick <b>Binary + nim-sum</b> to show the binary columns during play.</p>
+    <h3>Strategy tips</h3>
+    <ul>
+      <li>Do not pick a move just because it takes many tokens.</li>
+      <li>The goal is to leave a nim-sum of zero after your own move.</li>
+      <li>If the nim-sum is already zero, no move can keep it that way; the aim becomes leaving the opponent the hardest practical reply.</li>
+      <li>Comparing your intuition with the Optimal computer shows how the mathematical strategy works.</li>
+    </ul>
+    <h3>Link to game theory</h3>
+    <p>Nim is one of the clearest examples of a game with a complete mathematical solution. It illustrates winning and losing positions, backward induction, invariant-based strategies, and how a short algebraic description can replace brute-force search.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  var E = function (id) { return document.getElementById(id); };
+  var heaps = [], start = [], turn = 0, over = false, aiTimer = null, wins = [0, 0], last = '';
+
+  function vsAI() { return E('nimMode').value === 'ai'; }
+  function nameTr(p) { return vsAI() ? (p ? 'Computer' : 'You') : 'Player ' + (p + 1); }
+  function name(p) { return nameTr(p); }
+  function bits() { return Math.max.apply(null, start).toString(2).length; }
+  function bin(v) { var s = v.toString(2); while (s.length < bits()) s = '0' + s; return s; }
+
+  function reset() {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+    heaps = E('nimLevel').value.split(',').map(Number);
+    start = heaps.slice();
+    turn = 0;
+    over = false;
+    last = '';
+    render();
+    status('Starts: ' + nameTr(0));
+  }
+
+  function render() {
+    var blocked = over || (vsAI() && turn === 1);
+    E('nimHeaps').innerHTML = heaps.map(function (h, i) {
+      var toks = '';
+      for (var k = 0; k < start[i]; k++) {
+        var gone = k >= h;
+        toks += '<button type="button" class="tok' + (gone ? ' is-gone' : '') + '" data-i="' + i + '" data-k="' + k + '"' +
+          (gone || blocked ? ' disabled' : '') + ' aria-label="Heap ' + (i + 1) + ': take ' + (h - k) + '"></button>';
+      }
+      return '<div class="heap' + (h ? '' : ' is-empty') + '"><span class="heap-name">Heap ' + (i + 1) + '<small>' + h + ' left</small></span>' +
+        '<div class="tokens">' + toks + '</div><span class="bin">' + bin(h) + '</span></div>';
+    }).join('');
+    var x = heaps.reduce(function (a, b) { return a ^ b; }, 0);
+    E('nimSumBin').textContent = bin(x);
+    E('nimSumText').innerHTML = x ? '<span class="nonzero">' + x + ' · winning for the player to move</span>' : '<span class="zero">0 · losing for the player to move</span>';
+    if (last) E('nimLast').innerHTML = last;
+    E('nimGame').classList.toggle('hide-sum', !E('nimShowSum').checked);
+    ['1', '2'].forEach(function (n, p) {
+      E('nimName' + n).textContent = name(p);
+      E('nimWins' + n).textContent = wins[p];
+    });
+  }
+
+  function take(i, k, fromAI) {
+    if (over || !(k >= 1 && k <= heaps[i])) return;
+    if (!fromAI && vsAI() && turn === 1) return;
+    heaps[i] -= k;
+    last = '<b>' + nameTr(turn) + '</b> took ' + k + ' from heap ' + (i + 1) + '.';
+    if (heaps.every(function (x) { return x === 0; })) {
+      over = true;
+      wins[turn]++;
+      render();
+      status('The player who took the last token wins: ' + nameTr(turn) + '!', true);
+      return;
+    }
+    turn = 1 - turn;
+    render();
+    status('Turn: ' + nameTr(turn));
+    if (vsAI() && turn === 1) aiTimer = setTimeout(ai, 500);
+  }
+
+  function ai() {
+    aiTimer = null;
+    if (over || turn !== 1) return;
+    var x = heaps.reduce(function (a, b) { return a ^ b; }, 0);
+    var move = null;
+    if (E('nimAI').value === 'Optimal' && x) {
+      for (var i = 0; i < heaps.length; i++) {
+        var t = heaps[i] ^ x;
+        if (t < heaps[i]) { move = [i, heaps[i] - t]; break; }
+      }
+    }
+    if (!move) {
+      var ids = heaps.map(function (h, i) { return h ? i : -1; }).filter(function (i) { return i >= 0; });
+      var j = ids[Math.floor(Math.random() * ids.length)];
+      move = E('nimAI').value === 'Optimal' ? [j, 1] : [j, 1 + Math.floor(Math.random() * heaps[j])];
+    }
+    take(move[0], move[1], true);
+  }
+
+  function status(tr, end) {
+    E('nimStatus').textContent = tr;
+    E('nimStatus').classList.toggle('is-over', !!end);
+  }
+
+  function mark(ev, on) {
+    var b = ev.target.closest('.tok');
+    if (!b || b.disabled) return;
+    var i = +b.dataset.i, k = +b.dataset.k;
+    E('nimHeaps').querySelectorAll('.tok[data-i="' + i + '"]').forEach(function (t) {
+      t.classList.toggle('is-marked', on && +t.dataset.k >= k && +t.dataset.k < heaps[i]);
+    });
+  }
+
+  E('nimHeaps').addEventListener('click', function (ev) {
+    var b = ev.target.closest('.tok');
+    if (!b || b.disabled) return;
+    var i = +b.dataset.i, k = +b.dataset.k;
+    take(i, heaps[i] - k, false);
+    var next = E('nimHeaps').querySelector('.tok:not(:disabled)');
+    if (next && document.activeElement === document.body) next.focus();
+  });
+  E('nimHeaps').addEventListener('mouseover', function (ev) { mark(ev, true); });
+  E('nimHeaps').addEventListener('mouseout', function (ev) { mark(ev, false); });
+  E('nimHeaps').addEventListener('focusin', function (ev) { mark(ev, true); });
+  E('nimHeaps').addEventListener('focusout', function (ev) { mark(ev, false); });
+  E('nimNew').addEventListener('click', reset);
+  E('nimLevel').addEventListener('change', reset);
+  E('nimMode').addEventListener('change', function () { wins = [0, 0]; reset(); });
+  E('nimShowSum').addEventListener('change', render);
+  reset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

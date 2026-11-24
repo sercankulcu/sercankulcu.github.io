@@ -1,0 +1,392 @@
+---
+layout: without-sidebar
+title: "Minimax Tic-Tac-Toe"
+permalink: /files/agt/slides/Chapter_02_TicTacToe.html
+excerpt: "Interactive tic-tac-toe against a minimax AI with alpha-beta pruning and an animated search that shows each move's value."
+lang: en
+seo_title: "Minimax Tic-Tac-Toe · Algorithmic Game Theory, Chapter 2"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+hreflang:
+  tr: /files/agt/sunumlar/Bolum_02_TicTacToe.html
+  en: /files/agt/slides/Chapter_02_TicTacToe.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithmic Game Theory"
+  url: "/teaching/algorithmic-game-theory/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+  .agt-tictactoe .ttt-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 16px;
+    height: 100%;
+  }
+
+  .agt-tictactoe .board-area {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    border: 1.5px solid var(--ds-border);
+    border-radius: 12px;
+    background: var(--ds-bg);
+  }
+
+  .agt-tictactoe .board {
+    display: grid;
+    grid-template-columns: repeat(3, 132px);
+    gap: 8px;
+  }
+
+  .agt-tictactoe .cell {
+    display: flex;
+    width: 132px;
+    height: 132px;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--ds-border);
+    border-radius: 12px;
+    background: var(--ds-surface);
+    color: var(--ds-text);
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.15s;
+    user-select: none;
+  }
+
+  .agt-tictactoe .cell.x { color: var(--ds-p1); }
+  .agt-tictactoe .cell.o { color: var(--ds-p2); }
+  .agt-tictactoe .cell.filled { cursor: default; }
+  .agt-tictactoe .cell:not(.filled):hover { border-color: var(--ds-link); background: var(--ds-surface-strong); }
+
+  .agt-tictactoe .cell.exploring { background: var(--ds-hot); }
+
+  .agt-tictactoe .cell.evaluated { background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg)); }
+
+  .agt-tictactoe .cell.win {
+    border-color: var(--ds-good);
+    border-width: 3px;
+    background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  }
+
+  .agt-tictactoe .cell .sc {
+    color: var(--ds-text);
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .agt-tictactoe .cell:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ds-link) 30%, transparent);
+    outline-offset: 2px;
+  }
+
+  .agt-tictactoe .side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1.5px solid var(--ds-border);
+    border-radius: 12px;
+    background: var(--ds-bg);
+  }
+
+  .agt-tictactoe .cap {
+    margin: 0 0 3px;
+    color: var(--ds-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .agt-tictactoe .side select,
+  .agt-tictactoe .side .reset-btn { width: 100%; }
+
+  .agt-tictactoe .check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+  .agt-tictactoe .commentary {
+    min-height: 68px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--ds-surface-strong);
+    color: var(--ds-text);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .agt-tictactoe .commentary.is-over { color: var(--ds-accent); }
+
+  .agt-tictactoe .counter { color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+
+  .agt-tictactoe .score { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: auto; }
+  .agt-tictactoe .score div { padding: 6px 4px; border-radius: 10px; background: var(--ds-surface-strong); text-align: center; }
+  .agt-tictactoe .score b { display: block; font-size: 20px; line-height: 1.2; }
+  .agt-tictactoe .score > div > span { display: block; color: var(--ds-muted); font-size: 11px; font-weight: 700; line-height: 1.25; }
+</style>
+
+<div class="agt-tictactoe agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 2 · Game</p><h1>Minimax Tic-Tac-Toe</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ttt-help" aria-label="Help and rules">?</button>
+    <a class="agt-oyun__back" href="Chapter_02_Games_and_Representations.html">← Chapter 2</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="ttt-layout">
+      <div class="board-area"><div class="board"></div></div>
+      <aside class="side">
+        <div>
+          <p class="cap"><label for="tttFirst">First move</label></p>
+          <select id="tttFirst">
+            <option value="X">You</option>
+            <option value="O">AI</option>
+          </select>
+        </div>
+        <label class="check"><input type="checkbox" id="tttAnimate" checked> <span>Animate the search</span></label>
+        <button class="reset-btn is-primary" type="button">New game</button>
+        <div class="commentary" aria-live="polite">Your turn! Make a move.</div>
+        <div class="counter">Nodes examined: <span id="tttNodes">0</span></div>
+        <div class="score">
+          <div><b id="tttW">0</b><span>Wins</span></div>
+          <div><b id="tttD">0</b><span>Draws</span></div>
+          <div><b id="tttL">0</b><span>Losses</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ttt-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>How to play</h2>
+    <ol>
+      <li>You play X and the AI plays O. Click a square to place your mark (or focus it with Tab and press Enter).</li>
+      <li>The first player to fill three squares in a row, column, or diagonal wins; if the board fills up, the game is a draw.</li>
+      <li>The <b>First move</b> option decides who starts.</li>
+    </ol>
+    <h3>Minimax search</h3>
+    <p>For every empty square the AI tries all continuations to the end of the game. Wins score +10, losses −10, draws 0; depth is subtracted from the magnitude so that faster wins and later losses are preferred (10 − depth for a win, −10 + depth for a loss). On its own turn it picks the highest value, on the opponent's turn the lowest.</p>
+    <h3>Alpha-beta pruning</h3>
+    <p>As soon as a branch is known to be no better than an option already found, the rest of that branch is skipped. The result does not change; only fewer nodes are searched. The counter on the right shows how many nodes were examined for each move.</p>
+    <h3>Colors on the board</h3>
+    <ul>
+      <li><b>Orange</b> square: the search is trying this move right now.</li>
+      <li><b>Green</b> square and its number: the minimax value of this move (from the AI's point of view).</li>
+      <li>If <b>Animate the search</b> is off, the AI moves immediately.</li>
+    </ul>
+    <h3>Link to game theory</h3>
+    <p>Tic-tac-toe is a small, zero-sum game of perfect information. If both sides play perfectly the result is a draw: an opponent who plays minimax cannot be beaten, and the best you can hope for against it is a draw.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector(".agt-tictactoe");
+  if (!root) return;
+
+  var boardEl = root.querySelector(".board");
+  var commentaryEl = root.querySelector(".commentary");
+  var resetBtn = root.querySelector(".reset-btn");
+  var firstSel = document.getElementById("tttFirst");
+  var animateBox = document.getElementById("tttAnimate");
+  var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+  var gameBoard = ["", "", "", "", "", "", "", "", ""];
+  var gameOver = false;
+  var animating = false;
+  var gameVersion = 0;
+  var nodes = 0;
+  var score = { W: 0, D: 0, L: 0 };
+  var cells = [];
+
+  function eksi(x) { return String(x).replace('-', '−'); }
+
+  function say(tr, end) {
+    commentaryEl.textContent = tr;
+    commentaryEl.classList.toggle("is-over", !!end);
+  }
+
+  function buildBoard() {
+    boardEl.innerHTML = "";
+    cells = [];
+    for (var i = 0; i < 9; i++) {
+      (function (index) {
+        var cell = document.createElement("div");
+        cell.className = "cell";
+        cell.setAttribute("role", "button");
+        cell.setAttribute("tabindex", "0");
+        cell.addEventListener("click", function () { playerMove(index); });
+        cell.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            playerMove(index);
+          }
+        });
+        boardEl.appendChild(cell);
+        cells.push(cell);
+      })(i);
+    }
+  }
+
+  function drawBoard(winLine) {
+    cells.forEach(function (cell, index) {
+      var v = gameBoard[index];
+      cell.textContent = v;
+      cell.className = "cell" + (v ? " filled " + v.toLowerCase() : "") + (winLine && winLine.indexOf(index) >= 0 ? " win" : "");
+      cell.setAttribute("aria-label", "Square " + (index + 1) + (v ? ": " + v : ": empty"));
+    });
+  }
+
+  function winLineOf(b) {
+    for (var k = 0; k < LINES.length; k++) {
+      var l = LINES[k];
+      if (b[l[0]] && b[l[0]] === b[l[1]] && b[l[1]] === b[l[2]]) return l;
+    }
+    return null;
+  }
+
+  function checkWinner(b) {
+    var l = winLineOf(b);
+    if (l) return b[l[0]];
+    if (b.every(function (c) { return c !== ""; })) return "draw";
+    return null;
+  }
+
+  function playerMove(index) {
+    if (gameOver || animating || gameBoard[index] !== "") return;
+    gameBoard[index] = "X";
+    drawBoard();
+    var result = checkWinner(gameBoard);
+    if (result) { endGame(result); return; }
+    startAI();
+  }
+
+  function startAI() {
+    say("The AI is thinking...");
+    animating = true;
+    var version = gameVersion;
+    setTimeout(function () {
+      if (version === gameVersion && !gameOver) aiMove(version);
+    }, 300);
+  }
+
+  function sleep(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  async function aiMove(version) {
+    var anim = animateBox.checked;
+    var bestScore = -Infinity;
+    var move;
+    nodes = 0;
+    for (var i = 0; i < 9; i++) {
+      if (gameBoard[i] !== "") continue;
+      if (anim) { cells[i].classList.add("exploring"); await sleep(120); }
+      if (version !== gameVersion) return;
+      gameBoard[i] = "O";
+      var score = await minimax(gameBoard, 0, false, -Infinity, Infinity, version, anim);
+      gameBoard[i] = "";
+      if (version !== gameVersion) return;
+      if (anim) {
+        cells[i].classList.remove("exploring");
+        cells[i].classList.add("evaluated");
+        cells[i].innerHTML = '<span class="sc">' + eksi(score) + '</span>';
+        say("Square " + (i + 1) + " → value " + eksi(score));
+        await sleep(160);
+        if (version !== gameVersion) return;
+      }
+      if (score > bestScore) { bestScore = score; move = i; }
+    }
+    if (version !== gameVersion || gameOver) return;
+    gameBoard[move] = "O";
+    document.getElementById("tttNodes").textContent = nodes;
+    var result = checkWinner(gameBoard);
+    animating = false;
+    if (result) { endGame(result); return; }
+    drawBoard();
+    say("The AI chose square " + (move + 1) + " (value " + eksi(bestScore) + "). Your turn!");
+  }
+
+  async function minimax(b, depth, isMaximizing, alpha, beta, version, anim) {
+    nodes++;
+    if (version !== gameVersion) return 0;
+    var result = checkWinner(b);
+    if (result === "X") return -10 + depth;
+    if (result === "O") return 10 - depth;
+    if (result === "draw") return 0;
+    var show = anim && depth === 0;
+    var best = isMaximizing ? -Infinity : Infinity;
+    for (var i = 0; i < 9; i++) {
+      if (b[i] !== "") continue;
+      if (show) { cells[i].classList.add("exploring"); await sleep(40); }
+      b[i] = isMaximizing ? "O" : "X";
+      var v = await minimax(b, depth + 1, !isMaximizing, alpha, beta, version, anim);
+      b[i] = "";
+      if (show) cells[i].classList.remove("exploring");
+      if (version !== gameVersion) return 0;
+      if (isMaximizing) { best = Math.max(best, v); alpha = Math.max(alpha, v); }
+      else { best = Math.min(best, v); beta = Math.min(beta, v); }
+      if (beta <= alpha) break;
+    }
+    return best;
+  }
+
+  function endGame(result) {
+    gameOver = true;
+    animating = false;
+    drawBoard(winLineOf(gameBoard));
+    if (result === "draw") { score.D++; say("Draw! The expected result with perfect play.", true); }
+    else if (result === "X") { score.W++; say("You win!", true); }
+    else { score.L++; say("You lose! The AI played perfectly.", true); }
+    document.getElementById("tttW").textContent = score.W;
+    document.getElementById("tttD").textContent = score.D;
+    document.getElementById("tttL").textContent = score.L;
+  }
+
+  function resetGame() {
+    gameVersion++;
+    gameBoard = ["", "", "", "", "", "", "", "", ""];
+    gameOver = false;
+    animating = false;
+    nodes = 0;
+    document.getElementById("tttNodes").textContent = 0;
+    drawBoard();
+    if (firstSel.value === "O") startAI();
+    else say("Your turn! Make a move.");
+  }
+
+  resetBtn.addEventListener("click", resetGame);
+  firstSel.addEventListener("change", resetGame);
+
+  buildBoard();
+  drawBoard();
+})();
+</script>
+<script src="deck/oyun.js"></script>

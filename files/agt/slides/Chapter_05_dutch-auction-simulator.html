@@ -1,0 +1,253 @@
+---
+layout: without-sidebar
+title: "Dutch Auction"
+permalink: /files/agt/slides/Chapter_05_dutch-auction-simulator.html
+excerpt: "An interactive descending-price Dutch auction simulator with private valuations, the first-to-claim rule, winner's surplus and seller revenue."
+lang: en
+seo_title: "Dutch Auction · Algorithmic Game Theory, Chapter 5"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+hreflang:
+  tr: /files/agt/sunumlar/Bolum_05_dutch-auction-simulator.html
+  en: /files/agt/slides/Chapter_05_dutch-auction-simulator.html
+resource: "Interactive simulation"
+course:
+  name: "Algorithmic Game Theory"
+  url: "/teaching/algorithmic-game-theory/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+.agt-dutch-auction .da { display:grid; grid-template-columns:260px 1fr; gap:14px; height:100%; }
+.agt-dutch-auction .da-side { display:flex; flex-direction:column; gap:10px; min-height:0; }
+.agt-dutch-auction .clock { padding:14px; border-radius:14px; background:var(--ds-text); color:var(--ds-bg); text-align:center; }
+.agt-dutch-auction .clock .lbl { font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.85; }
+.agt-dutch-auction .current-price { font-size:46px; font-weight:800; line-height:1.1; font-variant-numeric:tabular-nums; }
+.agt-dutch-auction .clock-bar { height:6px; margin-top:8px; border-radius:3px; background:color-mix(in srgb,var(--ds-bg) 25%,transparent); overflow:hidden; }
+.agt-dutch-auction .clock-bar span { display:block; height:100%; width:100%; background:var(--ds-bg); }
+.agt-dutch-auction .controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.agt-dutch-auction .controls .start-btn { grid-column:1/-1; min-height:40px; font-size:16px; }
+.agt-dutch-auction .speed { display:flex; align-items:center; gap:8px; color:var(--ds-muted); font-size:14px; font-weight:700; }
+.agt-dutch-auction .speed select { flex:1; min-height:30px; }
+.agt-dutch-auction .status { margin:0; padding:10px 12px; border-radius:12px; background:var(--ds-surface-strong); font-size:15px; }
+.agt-dutch-auction .winner-box { flex:1; min-height:0; padding:10px 12px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); font-size:14.5px; line-height:1.45; }
+.agt-dutch-auction .winner-box.done { border-color:var(--ds-good); background:color-mix(in srgb,var(--ds-good) 10%,var(--ds-bg)); }
+.agt-dutch-auction .winner-box p { margin:0 0 3px; }
+.agt-dutch-auction .winner-box .big { font-size:19px; font-weight:800; color:var(--ds-good); }
+.agt-dutch-auction .neg { color:var(--ds-bad); font-weight:800; }
+.agt-dutch-auction .bidders { display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:1fr; gap:12px; align-content:start; min-height:0; }
+.agt-dutch-auction .bidder { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:12px; border:2px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); text-align:center; transition:background .3s,border-color .3s; }
+.agt-dutch-auction .bidder.waiting { background:var(--ds-surface); }
+.agt-dutch-auction .bidder.in-range { border-color:var(--ds-warn); background:var(--ds-hot); }
+.agt-dutch-auction .bidder.winner { border-color:var(--ds-good); background:color-mix(in srgb,var(--ds-good) 16%,var(--ds-bg)); box-shadow:0 0 0 4px color-mix(in srgb,var(--ds-good) 30%,transparent); }
+.agt-dutch-auction .bidder h3 { margin:0; font-size:20px; }
+.agt-dutch-auction .winner-box .idle { color:var(--ds-muted); }
+.agt-dutch-auction .valuation { color:var(--ds-muted); font-size:15px; font-weight:700; }
+.agt-dutch-auction .valuation b { color:var(--ds-text); }
+.agt-dutch-auction button.claim { min-height:38px; padding:0 18px; border-color:#17703d; background:#17703d; color:#fff; font-size:15px; letter-spacing:.02em; }
+.agt-dutch-auction button.claim:hover:not(:disabled) { border-color:#115a31; background:#115a31; }
+html[data-theme="dark"] .agt-dutch-auction button.claim { border-color:var(--ds-good); background:var(--ds-good); color:#111827; }
+html[data-theme="dark"] .agt-dutch-auction button.claim:hover:not(:disabled) { background:color-mix(in srgb,var(--ds-good) 85%,#fff); }
+.agt-dutch-auction button.claim:disabled { border-color:var(--ds-border); background:var(--ds-bg); color:var(--ds-muted); opacity:1; }
+.agt-dutch-auction .controls button { line-height:1.2; padding:4px 10px; }
+.agt-dutch-auction .speed { font-size:13px; grid-column:1/-1; }
+.agt-dutch-auction .controls .reset-btn { grid-column:1/-1; }
+.agt-dutch-auction .status { font-size:14px; }
+.agt-dutch-auction .winner-box { font-size:13.5px; line-height:1.4; }
+.agt-dutch-auction .winner-box .big { font-size:17px; }
+.agt-dutch-auction button.claim { line-height:1.15; padding:3px 14px; }
+</style>
+
+<div class="agt-dutch-auction agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 5 · Simulation</p><h1>Dutch Auction</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="da-help" aria-label="Description and rules">?</button>
+    <a class="agt-oyun__back" href="Chapter_05_Auctions.html">← Chapter 5</a>
+  </header>
+  <div class="agt-oyun__body">
+    <div class="da">
+      <aside class="da-side">
+        <div class="clock">
+          <div class="lbl">Current price</div>
+          <div class="current-price">200.00 TL</div>
+          <div class="clock-bar"><span></span></div>
+        </div>
+        <div class="controls">
+          <button class="start-btn is-primary" type="button">Start auction</button>
+          <button class="reset-btn" type="button">New bidders</button>
+          <label class="speed"><span>Speed</span> <select class="speed-select" aria-label="Clock speed"><option value="0.4">Slow</option><option value="0.75" selected>Normal</option><option value="1.5">Fast</option></select></label>
+        </div>
+        <p class="status" aria-live="polite">Press <strong>Start auction</strong> to start the falling clock.</p>
+        <div class="winner-box" aria-live="polite"></div>
+      </aside>
+      <div class="bidders"></div>
+    </div>
+  </div>
+  <dialog class="agt-oyun__dialog" id="da-help" lang="en">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>Dutch auction (descending price)</h2>
+    <p>The price starts high (200 TL) and falls continuously, as in the Dutch flower auctions. <strong>The first bidder to press “I'll take it!”</strong> wins the item and pays the current price. If nobody takes it by 0 TL, the item goes unsold.</p>
+    <h3>Usage</h3>
+    <ul>
+      <li>Each card shows a bidder's private valuation. When the price falls to or below that valuation, the card turns orange.</li>
+      <li>To buy on behalf of a bidder, click that bidder's <strong>I'll take it!</strong> button. Buying above the valuation gives negative surplus.</li>
+      <li><strong>Speed</strong> sets how fast the clock falls; <strong>New bidders</strong> draws new valuations.</li>
+    </ul>
+    <h3>What does it show?</h3>
+    <p>Waiting is a gamble: a lower price means a larger surplus, but someone else may buy first. Since a bidder must choose the price at which to stop the clock without learning anything useful about the others, the Dutch auction is strategically equivalent to the <strong>first-price sealed-bid auction</strong>. Under standard assumptions both yield the same expected revenue as the English and Vickrey auctions (revenue equivalence).</p>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  const root = document.querySelector('.agt-dutch-auction');
+  if (!root) return;
+
+  const biddersContainer = root.querySelector('.bidders');
+  const priceEl = root.querySelector('.current-price');
+  const barEl = root.querySelector('.clock-bar span');
+  const statusEl = root.querySelector('.status');
+  const resultEl = root.querySelector('.winner-box');
+  const startBtn = root.querySelector('.start-btn');
+  const resetBtn = root.querySelector('.reset-btn');
+  const speedSel = root.querySelector('.speed-select');
+
+  const START = 200;
+  const bidderNames = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank'];
+
+  let bidders = [];
+  let currentPrice = START;
+  let timer = null;
+  let auctionActive = false;
+
+  function money(v) { return (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' TL'; }
+
+  function initBidders() {
+    bidders = bidderNames.map(name => ({
+      name,
+      valuation: Math.round((Math.random() * 130 + 70) * 100) / 100
+    }));
+    biddersContainer.innerHTML = '';
+    bidders.forEach((bidder, index) => {
+      const div = document.createElement('div');
+      div.className = 'bidder waiting';
+      div.dataset.bidderIndex = index;
+      div.innerHTML = `<h3>${bidder.name}</h3><div class="valuation">Valuation<br><b>${money(bidder.valuation)}</b></div><button class="claim" type="button" data-claim="${index}" aria-label="${bidder.name}: I'll take it!" disabled>I'll take it!</button>`;
+      biddersContainer.appendChild(div);
+    });
+  }
+
+  function cards() { return biddersContainer.querySelectorAll('.bidder'); }
+  function setClaims(on) { biddersContainer.querySelectorAll('.claim').forEach(b => { b.disabled = !on; }); }
+
+  function updatePriceDisplay() {
+    priceEl.textContent = money(currentPrice);
+    barEl.style.width = (100 * currentPrice / START) + '%';
+  }
+
+  function tick() {
+    currentPrice = Math.max(0, Math.round((currentPrice - Number(speedSel.value)) * 100) / 100);
+    updatePriceDisplay();
+    bidders.forEach((bidder, index) => {
+      if (bidder.valuation >= currentPrice) cards()[index].classList.add('in-range');
+    });
+    if (currentPrice <= 0) endAuctionNoWinner();
+  }
+
+  function startAuction() {
+    if (auctionActive) return;
+    clearTimer();
+    auctionActive = true;
+    startBtn.disabled = true;
+    currentPrice = START;
+    cards().forEach(c => c.classList.remove('waiting', 'in-range', 'winner'));
+    setClaims(true);
+    statusEl.innerHTML = 'The price is falling… who will take it first?';
+    resultEl.className = 'winner-box';
+    resultEl.innerHTML = '';
+    updatePriceDisplay();
+    timer = window.setInterval(tick, 50);
+  }
+
+  function claim(index) {
+    if (!auctionActive) return;
+    clearTimer();
+    auctionActive = false;
+    const winner = bidders[index];
+    const surplus = winner.valuation - currentPrice;
+    cards()[index].classList.add('winner');
+    setClaims(false);
+    startBtn.disabled = false;
+    startBtn.innerHTML = 'Run again';
+    statusEl.innerHTML = `The clock stopped at <strong>${money(currentPrice)}</strong>.`;
+    resultEl.className = 'winner-box done';
+    resultEl.innerHTML = `<p class="big">${winner.name} wins</p><p>Payment: <strong>${money(currentPrice)}</strong> (seller revenue)</p><p>Valuation ${money(winner.valuation)} → surplus <strong class="${surplus < 0 ? 'neg' : ''}">${money(surplus)}</strong></p><p>Highest valuation: <strong>${money(Math.max(...bidders.map(b => b.valuation)))}</strong></p>`;
+    startBtn.focus();
+  }
+
+  function endAuctionNoWinner() {
+    clearTimer();
+    auctionActive = false;
+    setClaims(false);
+    startBtn.disabled = false;
+    startBtn.innerHTML = 'Run again';
+    statusEl.innerHTML = 'The price reached 0 TL.';
+    resultEl.className = 'winner-box';
+    resultEl.innerHTML = '<p><strong>No winner</strong>: the item went unsold.</p>';
+  }
+
+  function clearTimer() {
+    if (timer !== null) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function resetAuction() {
+    clearTimer();
+    auctionActive = false;
+    currentPrice = START;
+    startBtn.disabled = false;
+    startBtn.innerHTML = 'Start auction';
+    statusEl.innerHTML = 'Press <strong>Start auction</strong> to start the falling clock.';
+    resultEl.className = 'winner-box';
+    resultEl.innerHTML = '<p class="idle">Nobody has bought yet. The result appears here.</p>';
+    updatePriceDisplay();
+    initBidders();
+  }
+
+  biddersContainer.addEventListener('click', event => {
+    const button = event.target.closest('[data-claim]');
+    if (!button || button.disabled) return;
+    claim(+button.dataset.claim);
+  });
+
+  startBtn.addEventListener('click', startAuction);
+  resetBtn.addEventListener('click', resetAuction);
+
+  resetAuction();
+})();
+</script>
+<script src="deck/oyun.js"></script>

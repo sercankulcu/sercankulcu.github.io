@@ -34,7 +34,8 @@ PERSON = {'@type': 'Person', 'name': 'Sercan Külcü', 'url': SITE + '/',
 
 # kitap PDF'i -> (dil, ders sayfasi)
 BOOKS = [
-    ('agt/Algoritmik-Oyun-Kurami.pdf', 'tr', '/teaching/algorithmic-game-theory/'),
+    ('agt/Algoritmik-Oyun-Kurami.pdf', 'tr', '/teaching/algorithmic-game-theory/?lang=tr'),
+    ('agt/Algorithmic-Game-Theory.pdf', 'en', '/teaching/algorithmic-game-theory/?lang=en'),
     ('algorithms/Algoritmalar.pdf', 'tr', '/teaching/algorithms/?lang=tr'),
     ('algorithms/Algorithms.pdf', 'en', '/teaching/algorithms/?lang=en'),
     ('advanced_algorithms/Ileri-Algoritmalar.pdf', 'tr', '/teaching/advanced-algorithms/?lang=tr'),
@@ -54,6 +55,7 @@ BOOKS = [
 # kitap PDF'i -> (ders sayfasindaki gorsel, kartin vurgu rengi)
 ART = {
     'agt/Algoritmik-Oyun-Kurami.pdf': ('teaching-algorithmic-game-theory.webp', '#7048c8'),
+    'agt/Algorithmic-Game-Theory.pdf': ('teaching-algorithmic-game-theory.webp', '#7048c8'),
     'algorithms/Algoritmalar.pdf': ('teaching-algorithms.webp', '#3b5bdb'),
     'algorithms/Algorithms.pdf': ('teaching-algorithms.webp', '#3b5bdb'),
     'advanced_algorithms/Ileri-Algoritmalar.pdf': ('teaching-advanced-algorithms.webp', '#7048c8'),

@@ -1,0 +1,1574 @@
+---
+layout: without-sidebar
+title: "Chapter 7: Social Choice and Voting — Lecture Notes"
+permalink: /files/agt/notes/Chapter_07_Social_Choice_and_Voting_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 7 of Algorithmic Game Theory: preference profiles and social choice functions, plurality, Borda, approval, instant-runoff, and Condorcet rules, the Condorcet paradox and agenda manipulation, the Kemeny rule, strategic voting, the theorems of Arrow, Gibbard–Satterthwaite, and May, single-peaked preferences, computational social choice, judgment aggregation, and proportional representation; with worked examples and code traces."
+lang: en
+seo_title: "Chapter 7: Social Choice and Voting · Algorithmic Game Theory Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/algoritmik-oyun-kurami.jpg
+hreflang:
+  tr: /files/agt/notlar/Bolum_07_Sosyal_Secim_ve_Oylama_Ders_Notu.html
+  en: /files/agt/notes/Chapter_07_Social_Choice_and_Voting_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Algorithmic Game Theory"
+  url: "/teaching/algorithmic-game-theory/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Algorithmic Game Theory · Lecture Notes</p>
+  <h1>Chapter 7: Social Choice and Voting</h1>
+  <p class="nt-lead">When a group of people must decide together, not everyone wants the same thing. A club elects a president, a committee approves one of several projects, a search engine merges rankings from different sources into a single list. All of these decisions raise the same question: how can a single collective decision be extracted from individual preferences? The field that studies this question is social choice theory. When the most widely used voting rules are applied step by step to a single preference profile, the same ballots produce four different winners. Paradoxes such as the Condorcet cycle, the power of the agenda, and monotonicity violations, the Kemeny rule, and strategic voting, in which voters can change the outcome by lying, are all treated with numerical examples. The theorems of Arrow, Gibbard–Satterthwaite, and May, single-peaked preferences, computational social choice, judgment aggregation, and proportional representation are the remaining topics of these notes.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_07_Social_Choice_and_Voting.html">Slides</a></li>
+    <li><a href="../slides/Chapter_07_Social_Choice_and_Voting_Study_Questions.html">Study questions</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_07_Social_Choice_and_Voting.pdf">Slides PDF</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Counting</dt>
+    <dd>Apply majority, plurality, Borda, approval, instant-runoff, and Condorcet rules step by step to the same preference profile.</dd>
+    <dt>Paradoxes</dt>
+    <dd>Demonstrate the Condorcet cycle, the effect of the agenda order, and the monotonicity violation of IRV; find the Kemeny ranking.</dd>
+    <dt>Strategic voting</dt>
+    <dd>Show numerically tactical voting under plurality and the “burying” manipulation under Borda.</dd>
+    <dt>Theorems</dt>
+    <dd>Explain what the theorems of Arrow, Gibbard–Satterthwaite, and May say; recognize the escape route offered by single-peaked preferences.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s7-1">7.1 Social choice</a>
+      <ol>
+        <li><a href="#s7-1-1">7.1.1 A game to start with: the Condorcet paradox</a></li>
+        <li><a href="#s7-1-2">7.1.2 What is social choice?</a></li>
+        <li><a href="#s7-1-3">7.1.3 An example preference profile</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-2">7.2 Voting rules</a>
+      <ol>
+        <li><a href="#s7-2-1">7.2.1 Overview of the basic voting rules</a></li>
+        <li><a href="#s7-2-2">7.2.2 Majority, plurality, and the two-round system</a></li>
+        <li><a href="#s7-2-3">7.2.3 The Borda count</a></li>
+        <li><a href="#s7-2-4">7.2.4 Approval voting</a></li>
+        <li><a href="#s7-2-5">7.2.5 Positional scoring rules</a></li>
+        <li><a href="#s7-2-6">7.2.6 Instant-runoff voting</a></li>
+        <li><a href="#s7-2-7">7.2.7 Condorcet: pairwise comparisons</a></li>
+        <li><a href="#s7-2-8">7.2.8 The pairwise majority graph and Copeland</a></li>
+        <li><a href="#s7-2-9">7.2.9 The same profile, four different winners</a></li>
+        <li><a href="#s7-2-10">7.2.10 Code trace: borda()</a></li>
+        <li><a href="#s7-2-11">7.2.11 Code trace: irv()</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-3">7.3 The Condorcet paradox</a>
+      <ol>
+        <li><a href="#s7-3-1">7.3.1 The Condorcet cycle</a></li>
+        <li><a href="#s7-3-2">7.3.2 The agenda determines the winner</a></li>
+        <li><a href="#s7-3-3">7.3.3 Back to the game: how common are cycles?</a></li>
+        <li><a href="#s7-3-4">7.3.4 The Kemeny rule</a></li>
+        <li><a href="#s7-3-5">7.3.5 Code trace: kemeny()</a></li>
+        <li><a href="#s7-3-6">7.3.6 Which criteria do the rules satisfy?</a></li>
+        <li><a href="#s7-3-7">7.3.7 Monotonicity violation in instant-runoff voting</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-4">7.4 Strategic voting</a>
+      <ol>
+        <li><a href="#s7-4-1">7.4.1 Tactical voting under plurality</a></li>
+        <li><a href="#s7-4-2">7.4.2 Burying under Borda</a></li>
+        <li><a href="#s7-4-3">7.4.3 How much does strategic voting disrupt the system?</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-5">7.5 Impossibility theorems</a>
+      <ol>
+        <li><a href="#s7-5-1">7.5.1 Arrow’s conditions</a></li>
+        <li><a href="#s7-5-2">7.5.2 Borda and irrelevant alternatives</a></li>
+        <li><a href="#s7-5-3">7.5.3 The practical meaning of Arrow’s theorem</a></li>
+        <li><a href="#s7-5-4">7.5.4 The Gibbard–Satterthwaite theorem</a></li>
+        <li><a href="#s7-5-5">7.5.5 May’s theorem: simple majority for two candidates</a></li>
+        <li><a href="#s7-5-6">7.5.6 An escape route: single-peaked preferences</a></li>
+        <li><a href="#s7-5-7">7.5.7 The four results side by side</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-6">7.6 Computational social choice and applications</a>
+      <ol>
+        <li><a href="#s7-6-1">7.6.1 Computational social choice</a></li>
+        <li><a href="#s7-6-2">7.6.2 Judgment aggregation: the doctrinal paradox</a></li>
+        <li><a href="#s7-6-3">7.6.3 Voting rules in the real world</a></li>
+        <li><a href="#s7-6-4">7.6.4 Several seats: proportional representation and D’Hondt</a></li>
+        <li><a href="#s7-6-5">7.6.5 Which voting rule is fair?</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-7">7.7 Summary</a></li>
+    <li><a href="#s7-8">7.8 Key terms</a></li>
+    <li><a href="#s7-9">7.9 Test Yourself</a></li>
+    <li><a href="#s7-10">7.10 Further reading</a></li>
+    <li><a href="#s7-11">7.11 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s7-1"><span class="nt-num">7.1</span>Social choice</h2>
+
+<p>In the games of game theory, each player tries to maximize their own payoff, and the outcome results from combining the players' choices. Voting is similar: each voter reports a preference, a rule aggregates these reports, and a single outcome that applies to everyone is produced. The difference is that the outcome is determined by an explicitly written rule. The question of this chapter is: how should this rule be chosen, and what good and bad properties does the chosen rule have?</p>
+
+<h3 id="s7-1-1"><span class="nt-num">7.1.1</span>A game to start with: the Condorcet paradox</h3>
+
+<p>The chapter opens with a small game played in class. Three voters rank three candidates, A, B, and C, according to their own tastes. Then every pair of candidates is compared by pairwise majority: when A and B are compared, each voter votes for whichever of the two is higher in their own ranking. A candidate who beats all rivals this way is called a <strong>Condorcet winner</strong>. The name comes from the French mathematician Marquis de Condorcet, who studied such comparisons in the 18th century.</p>
+
+<p>At the first level of the game the voters' rankings are as follows: the first voter has A ≻ B ≻ C, the second B ≻ C ≻ A, and the third C ≻ A ≻ B. Here the symbol “≻” means “is preferred to”; A ≻ B ≻ C reads “I prefer A to B, and B to C.” <a href="#sekil-oyun">Figure 7.1</a> shows the three rankings as columns; the candidate at the top is preferred more. In the triangle on the right, each edge is a pairwise comparison, and the question mark shows that it is not yet known who wins that comparison.</p>
+
+<figure class="nt-fig" id="sekil-oyun" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 220" role="img" aria-label="Rankings of three voters: A≻B≻C, B≻C≻A, C≻A≻B; the pairwise majority relation between candidates is shown with question marks"><text class="txt" x="36" y="26" text-anchor="middle">1</text><rect class="box" x="16" y="34" width="40" height="34" rx="5"/><text class="txt" x="36" y="56" text-anchor="middle">A</text><rect class="box" x="16" y="78" width="40" height="34" rx="5"/><text class="txt" x="36" y="100" text-anchor="middle">B</text><rect class="box" x="16" y="122" width="40" height="34" rx="5"/><text class="txt" x="36" y="144" text-anchor="middle">C</text><text class="txt" x="88" y="26" text-anchor="middle">2</text><rect class="box" x="68" y="34" width="40" height="34" rx="5"/><text class="txt" x="88" y="56" text-anchor="middle">B</text><rect class="box" x="68" y="78" width="40" height="34" rx="5"/><text class="txt" x="88" y="100" text-anchor="middle">C</text><rect class="box" x="68" y="122" width="40" height="34" rx="5"/><text class="txt" x="88" y="144" text-anchor="middle">A</text><text class="txt" x="140" y="26" text-anchor="middle">3</text><rect class="box" x="120" y="34" width="40" height="34" rx="5"/><text class="txt" x="140" y="56" text-anchor="middle">C</text><rect class="box" x="120" y="78" width="40" height="34" rx="5"/><text class="txt" x="140" y="100" text-anchor="middle">A</text><rect class="box" x="120" y="122" width="40" height="34" rx="5"/><text class="txt" x="140" y="144" text-anchor="middle">B</text><text class="lbl" x="88" y="8" text-anchor="middle">voter</text><text class="lbl" x="16" y="190" text-anchor="start">top candidate</text><text class="lbl" x="16" y="207" text-anchor="start">is preferred more</text><line class="axis" x1="250" y1="44" x2="205" y2="130"/><text class="txt" x="215.5" y="92" text-anchor="middle" style="fill:var(--ds-accent)">?</text><line class="axis" x1="205" y1="130" x2="295" y2="130"/><text class="txt" x="250" y="153" text-anchor="middle" style="fill:var(--ds-accent)">?</text><line class="axis" x1="295" y1="130" x2="250" y2="44"/><text class="txt" x="284.5" y="92" text-anchor="middle" style="fill:var(--ds-accent)">?</text><circle class="box" cx="250" cy="44" r="17"/><text class="txt" x="250" y="49" text-anchor="middle">A</text><circle class="box" cx="205" cy="130" r="17"/><text class="txt" x="205" y="135" text-anchor="middle">B</text><circle class="box" cx="295" cy="130" r="17"/><text class="txt" x="295" y="135" text-anchor="middle">C</text><text class="lbl" x="250" y="190" text-anchor="middle">in pairwise majority</text><text class="lbl" x="250" y="207" text-anchor="middle">who beats whom?</text></svg></div>
+  <figcaption><b>Figure 7.1:</b> The first level of the Condorcet Paradox game. Left: the rankings of the three voters (the candidate at the top is preferred more). Right: the comparison triangle to be filled in with pairwise majority.</figcaption>
+</figure>
+
+<p>The game asks two questions. First: if each voter’s ranking is consistent in itself, must the community’s preference be consistent too? Second: if one person had the authority to set the order of the votes, could that person make any candidate they like win? The answers to both questions are computed in <a href="#s7-3">Section 7.3</a>. In short: the community’s preference can be inconsistent, and the person who sets the voting order can pick the outcome. These two observations show that what is called “the will of the people” is not always automatically well defined.</p>
+
+<h3 id="s7-1-2"><span class="nt-num">7.1.2</span>What is social choice?</h3>
+
+<p><strong>Social choice</strong> is the field that studies rules that turn individual preferences into a collective decision or a social ranking. The aim of the field is not to find a single universal definition of fairness. The aim is to understand which criteria rules satisfy and what trade-offs they create. A rule may satisfy some good properties while violating others; which property matters more depends on the context of the decision.</p>
+
+<p>The areas of application are broad: general elections, committee and club decisions, choosing which activity a class will go to, deciding how to use a shared resource, and online polls. The same questions arise in computer science. Merging the result lists of several search engines into one, having several classifiers vote on a decision, or producing a ranking from user ratings are all problems of extracting a collective ranking from individual rankings.</p>
+
+<p>The basic object of social choice is the preference. A voter’s preference is a ranking that orders the candidates from most liked to least liked. This ranking is assumed to have two properties.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-tercih">
+  <span class="nt-box__title">Definition 7.1</span>
+  <p>Let <span class="m">A</span> be the set of candidates. A voter’s <strong>preference</strong> is a ranking over <span class="m">A</span> written <span class="m">x ≻ y</span> (“prefers <span class="m">x</span> to <span class="m">y</span>”). This ranking is</p>
+  <ul>
+    <li><strong>complete</strong>: for every pair of distinct <span class="m">x, y</span>, either <span class="m">x ≻ y</span> or <span class="m">y ≻ x</span>;</li>
+    <li><strong>transitive</strong>: if <span class="m">x ≻ y</span> and <span class="m">y ≻ z</span>, then <span class="m">x ≻ z</span>.</li>
+  </ul>
+</div>
+
+<p>Completeness says that the voter can compare any two candidates; there is no “I don’t know” answer. Transitivity means that the ranking is free of internal contradiction. If someone who prefers A to B and B to C also prefers C to A, this person cannot give a consistent answer when asked which of A, B, and C to choose: whichever they pick, there is another candidate they like more. In this chapter every voter’s preference is assumed to be complete and transitive. One of the chapter’s surprising results is this: even if this assumption holds for individuals, it may fail for the community.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-profil">
+  <span class="nt-box__title">Definition 7.2</span>
+  <p>The list of the preferences of <span class="m">n</span> voters is called a <strong>preference profile</strong>: <span class="m">(≻<sub>1</sub>, ≻<sub>2</sub>, …, ≻<sub>n</sub>)</span>. The ranking a voter reports is called a <strong>ballot</strong>.</p>
+</div>
+
+<p>The ballot and the true preference are not the same thing. A voter who really thinks A ≻ B ≻ C may write B ≻ A ≻ C on the ballot. From the game-theoretic viewpoint, the ballot is the voter’s <em>strategy</em>: the voter can choose the ballot that makes the rule’s outcome best for their true preference. This viewpoint is the basis of strategic voting in <a href="#s7-4">Section 7.4</a>.</p>
+
+<p>A voting rule takes a preference profile as input and produces an outcome. Two kinds of rules are distinguished according to the type of outcome.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-scf">
+  <span class="nt-box__title">Definition 7.3</span>
+  <ul>
+    <li>A <strong>social choice function (SCF)</strong> assigns a single winning candidate to each profile: <span class="m">f(≻<sub>1</sub>, …, ≻<sub>n</sub>) ∈ A</span>.</li>
+    <li>A <strong>social welfare function (SWF)</strong> assigns a social ranking of the candidates to each profile: <span class="m">F(≻<sub>1</sub>, …, ≻<sub>n</sub>)</span> is a ranking over <span class="m">A</span>.</li>
+  </ul>
+</div>
+
+<p><a href="#sekil-akis">Figure 7.2</a> summarizes this structure. On the left is the input, the preference profile; each column is the ranking of a group of voters. In the middle stands the rule <span class="m">f</span>, which assigns an outcome to the profile. On the right are the two kinds of output: a single winner (SCF) at the top and a complete social ranking (SWF) at the bottom. In the example in the figure the rule is the Borda count; the winner is B and the ranking is B ≻ D ≻ A ≻ C. Where these numbers come from is computed step by step in <a href="#s7-2-3">Section 7.2.3</a>.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-akis" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 174" role="img" aria-label="A preference profile, a social choice rule, and the outcome: a winner or a social ranking"><defs><marker id="b06d-ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker></defs><rect class="box-empty" x="8" y="22" width="232" height="128" rx="10" style="stroke-dasharray:5 4"/><text class="lbl" x="124" y="16" text-anchor="middle">input: preference profile</text><text class="lbl" x="44" y="39" text-anchor="middle">4 voters</text><rect class="box" x="22" y="46" width="44" height="23" rx="4"/><text class="txt" x="44" y="62" text-anchor="middle">A</text><rect class="box" x="22" y="72" width="44" height="23" rx="4"/><text class="txt" x="44" y="88" text-anchor="middle">D</text><rect class="box" x="22" y="98" width="44" height="23" rx="4"/><text class="txt" x="44" y="114" text-anchor="middle">B</text><rect class="box" x="22" y="124" width="44" height="23" rx="4"/><text class="txt" x="44" y="140" text-anchor="middle">C</text><text class="lbl" x="98" y="39" text-anchor="middle">4 voters</text><rect class="box" x="76" y="46" width="44" height="23" rx="4"/><text class="txt" x="98" y="62" text-anchor="middle">C</text><rect class="box" x="76" y="72" width="44" height="23" rx="4"/><text class="txt" x="98" y="88" text-anchor="middle">B</text><rect class="box" x="76" y="98" width="44" height="23" rx="4"/><text class="txt" x="98" y="114" text-anchor="middle">D</text><rect class="box" x="76" y="124" width="44" height="23" rx="4"/><text class="txt" x="98" y="140" text-anchor="middle">A</text><text class="lbl" x="152" y="39" text-anchor="middle">3 voters</text><rect class="box" x="130" y="46" width="44" height="23" rx="4"/><text class="txt" x="152" y="62" text-anchor="middle">D</text><rect class="box" x="130" y="72" width="44" height="23" rx="4"/><text class="txt" x="152" y="88" text-anchor="middle">B</text><rect class="box" x="130" y="98" width="44" height="23" rx="4"/><text class="txt" x="152" y="114" text-anchor="middle">C</text><rect class="box" x="130" y="124" width="44" height="23" rx="4"/><text class="txt" x="152" y="140" text-anchor="middle">A</text><text class="lbl" x="206" y="39" text-anchor="middle">2 voters</text><rect class="box" x="184" y="46" width="44" height="23" rx="4"/><text class="txt" x="206" y="62" text-anchor="middle">A</text><rect class="box" x="184" y="72" width="44" height="23" rx="4"/><text class="txt" x="206" y="88" text-anchor="middle">B</text><rect class="box" x="184" y="98" width="44" height="23" rx="4"/><text class="txt" x="206" y="114" text-anchor="middle">C</text><rect class="box" x="184" y="124" width="44" height="23" rx="4"/><text class="txt" x="206" y="140" text-anchor="middle">D</text><path class="line" d="M248 86 L300 86" style="stroke-width:2.4;" marker-end="url(#b06d-ah1)"/><rect class="box" x="304" y="44" width="170" height="84" rx="12"/><text class="txt" x="389" y="74" text-anchor="middle">f : profile → outcome</text><text class="lbl" x="389" y="96" text-anchor="middle">the rule assigning an outcome to the profile</text><text class="lbl" x="389" y="114" text-anchor="middle">(plurality, Borda, IRV, …)</text><path class="line" d="M478 70 L528 52" style="stroke-width:2.4;" marker-end="url(#b06d-ah1)"/><path class="line" d="M478 104 L528 122" style="stroke-width:2.4;" marker-end="url(#b06d-ah1)"/><rect class="box" x="532" y="28" width="180" height="42" rx="10" style="fill:var(--ds-hot)"/><text class="txt" x="622" y="55" text-anchor="middle">Borda winner: B</text><rect class="box" x="532" y="102" width="180" height="42" rx="10"/><text class="txt" x="622" y="129" text-anchor="middle" style="font-size:14px">ranking: B ≻ D ≻ A ≻ C</text><text class="lbl" x="622" y="88" text-anchor="middle">SCF (social choice function)</text><text class="lbl" x="622" y="162" text-anchor="middle">SWF (social welfare function)</text><text class="lbl" x="124" y="168" text-anchor="middle">each column: the ranking of a group of voters</text><text class="lbl" x="389" y="150" text-anchor="middle" style="fill:var(--ds-accent);font-weight:700">ballot = strategy</text></svg></div>
+  <figcaption><b>Figure 7.2:</b> The input and output of a social choice rule. The preference profile goes into the rule; the output is either a single winner (SCF) or a social ranking (SWF). The ballot is the voter’s strategy.</figcaption>
+</figure>
+
+<p>The note “ballot = strategy” below the figure shows the chapter’s link with mechanism design. In mechanism design, a designer asks players to report their private information (their preferences) and picks an outcome according to these reports; often the designer also collects payments from the players or pays them. Voting is the <em>moneyless</em> special case of mechanism design: there are no payments, only rankings. Since there is no money, it is impossible to “punish” a voter for lying or to “reward” them for telling the truth. The consequences of this restriction are seen clearly in the Gibbard–Satterthwaite theorem in <a href="#s7-5-4">Section 7.5.4</a>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Confusing an SCF with an SWF. An SWF always yields an SCF: the first candidate in the social ranking is the winner. The converse is not true: knowing a winner does not give the social order of the remaining candidates. This distinction matters because Arrow’s theorem is about SWFs (rankings), while the Gibbard–Satterthwaite theorem is about SCFs (a single winner).</p>
+</div>
+
+<h3 id="s7-1-3"><span class="nt-num">7.1.3</span>An example preference profile</h3>
+
+<p>Most of the rules in this chapter are compared on a single preference profile. This makes it plain that different rules draw different outcomes from the same votes. The profile is given in <a href="#tablo-profil">Table 7.1</a>.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-profil">
+  <caption>Table 7.1: An example preference profile: 13 voters, 4 candidates. Each column is a group of voters who gave the same ranking.</caption>
+  <thead><tr><th scope="col">rank</th><th scope="col">4 voters</th><th scope="col">4 voters</th><th scope="col">3 voters</th><th scope="col">2 voters</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">1.</th><td>A</td><td>C</td><td>D</td><td>A</td></tr>
+    <tr><th scope="row">2.</th><td>D</td><td>B</td><td>B</td><td>B</td></tr>
+    <tr><th scope="row">3.</th><td>B</td><td>D</td><td>C</td><td>C</td></tr>
+    <tr><th scope="row">4.</th><td>C</td><td>A</td><td>A</td><td>D</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The table is read as follows. Voters who gave the same ranking are collected in one column; the column heading says how many voters gave that ranking. The first column means “4 voters gave the ranking A ≻ D ≻ B ≻ C.” For these four voters, A is the best and C the worst candidate. The four voters in the second column give C ≻ B ≻ D ≻ A, the three voters in the third column give D ≻ B ≻ C ≻ A, and the two voters in the fourth column give A ≻ B ≻ C ≻ D. Throughout the notes these four columns are referred to as <em>Group 1</em>, <em>Group 2</em>, <em>Group 3</em>, and <em>Group 4</em> (G1–G4 for short).</p>
+
+<p>The total number of voters is <span class="m">4 + 4 + 3 + 2 = 13</span>. In some rules a candidate needs more than half of the votes to win. Half of 13 is 6.5; more than half means at least 7 votes. This number is called the <strong>majority threshold</strong>, and in this profile it is 7.</p>
+
+<p>A few notable features of the profile can be noted in advance. A is the first choice of six voters (G1 and G4) but the last choice of seven voters (G2 and G3): A is a candidate who polarizes the voters. No voter puts B first, but nine voters put B second and nobody puts B last: B is the compromise candidate whom everyone calls “acceptable.” D is the first choice of three voters and the second choice of four. These features explain why each rule picks a different candidate: rules applied to the same profile give four different winners.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-okuma">
+  <span class="nt-box__title">Example 7.1</span>
+  <p>Question: how many voters in the profile prefer D to B? For each group, compare the positions of D and B.</p>
+  <ol class="nt-steps">
+    <li>G1 (A ≻ D ≻ B ≻ C): D is second and B third; D ≻ B. 4 voters.</li>
+    <li>G2 (C ≻ B ≻ D ≻ A): B is second and D third; B ≻ D. 0 voters.</li>
+    <li>G3 (D ≻ B ≻ C ≻ A): D is first and B second; D ≻ B. 3 voters.</li>
+    <li>G4 (A ≻ B ≻ C ≻ D): B is second and D fourth; B ≻ D. 0 voters.</li>
+  </ol>
+  <p>Total: <span class="m">4 + 3 = 7</span> voters prefer D to B, and <span class="m">4 + 2 = 6</span> voters prefer B to D. The two numbers add up to the number of voters (13), because in a complete ranking each voter puts exactly one of the two candidates ahead. This check is the easiest way to catch counting errors in pairwise comparisons.</p>
+</div>
+
+<h2 class="nt-pb" id="s7-2"><span class="nt-num">7.2</span>Voting rules</h2>
+
+<p>All of the most widely used voting rules are applied to the same profile in <a href="#tablo-profil">Table 7.1</a>. Three questions are asked for each rule: what does the voter report, how is the count done, and whom does the rule choose in this profile?</p>
+
+<h3 id="s7-2-1"><span class="nt-num">7.2.1</span>Overview of the basic voting rules</h3>
+
+<p>Rules are distinguished by two questions. First: what does the voter report on the ballot? In some rules only a single candidate is written; in some a complete ranking of the candidates is requested, and in others a set of acceptable candidates. Second: how are the reports counted and how is the winner determined? <a href="#tablo-kurallar">Table 7.2</a> summarizes six basic rules according to these two questions.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--wide" id="tablo-kurallar">
+  <caption>Table 7.2: Basic voting rules.</caption>
+  <thead><tr><th scope="col">Rule</th><th scope="col">What does the voter report?</th><th scope="col">Winner</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Majority</th><td>A single candidate</td><td>The candidate with more than half of the votes (no winner if none)</td></tr>
+    <tr><th scope="row">Plurality</th><td>A single candidate</td><td>The candidate with the most first choices; need not exceed half</td></tr>
+    <tr><th scope="row">Borda count</th><td>Full ranking</td><td>For <span class="m">m</span> candidates, rank positions get <span class="m">m − 1, m − 2, …, 0</span> points; the highest total</td></tr>
+    <tr><th scope="row">Approval</th><td>The set of approved candidates</td><td>The candidate with the most approvals</td></tr>
+    <tr><th scope="row">Instant-runoff voting (IRV)</th><td>Full ranking</td><td>The candidate with the fewest first choices is eliminated and their votes are transferred; repeat until a majority</td></tr>
+    <tr><th scope="row">Condorcet</th><td>Full ranking</td><td>The candidate who beats every rival in pairwise comparison (may not always exist)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Some of the rules in the table use only a part of the ranking. Majority and plurality look only at the first choice; the voter’s second and third choices are not counted at all. Borda, IRV, and Condorcet use the whole ranking. Using more information does not always give a “fairer” outcome, but it changes which information the outcome is sensitive to.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>The sentence “the one with the most votes wins” is the definition of plurality, not of majority. Majority rule requires more than 50% of the votes; if this threshold is not exceeded, there is no winner. In everyday language both are called “majority,” but their consequences differ: in the 13-voter profile, a candidate with 6 votes wins under plurality but does not satisfy majority rule.</p>
+</div>
+
+<h3 id="s7-2-2"><span class="nt-num">7.2.2</span>Majority, plurality, and the two-round system</h3>
+
+<div class="nt-box nt-box--tanim" id="tanim-cogulluk">
+  <span class="nt-box__title">Definition 7.4</span>
+  <p>Each voter reports only their first choice. A candidate’s <strong>first-choice count</strong> is the number of voters who put them first.</p>
+  <ul>
+    <li><strong>Majority rule</strong>: the candidate whose first-choice count is greater than <span class="m">n/2</span> wins; if there is no such candidate, there is no winner.</li>
+    <li><strong>Plurality rule</strong>: the candidate with the largest first-choice count wins.</li>
+  </ul>
+</div>
+
+<p>Both rules use the same count; the difference is only in how the winner is declared. Majority rule imposes the condition of more than <span class="m">n/2</span> votes. When this condition holds, it is certain that the winner has a majority of the voters behind them. But the condition does not always hold; then the rule cannot produce a winner and an additional method (such as a second round) is needed. Plurality always produces a winner (together with a tie-breaking rule), but the winner may have only a small minority of the voters behind them.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-cogulluk">
+  <span class="nt-box__title">Example 7.2</span>
+  <p>The first choices are counted for the profile in <a href="#tablo-profil">Table 7.1</a>. Only the first row of the table is looked at: A, C, D, A.</p>
+  <ol class="nt-steps">
+    <li>A: the 4 voters of G1 and the 2 voters of G4 put A first; <span class="m">4 + 2 = 6</span>.</li>
+    <li>B: no group puts B first; 0.</li>
+    <li>C: the 4 voters of G2; 4.</li>
+    <li>D: the 3 voters of G3; 3.</li>
+    <li>Check: <span class="m">6 + 0 + 4 + 3 = 13</span>, equal to the number of voters.</li>
+  </ol>
+  <p><strong>Majority:</strong> the threshold is 7 and the highest count is <span class="m">6 &lt; 7</span>; there is no winner. <strong>Plurality:</strong> A has the most first choices and wins. But A has only 6/13 of the votes behind them, about 46%.</p>
+</div>
+
+<p>In practice, the most common solution when a majority is not reached is the <strong>two-round system</strong> (runoff). The presidential elections in Türkiye and France use this system. If no candidate achieves a majority in the first round, the two candidates with the most votes in the first round go to the second round. In the second round only these two candidates compete; voters vote for whichever of the two they prefer.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-ikitur">
+  <span class="nt-box__title">Example 7.3</span>
+  <p>In the first round A got 6 and C got 4 votes, so A and C go to the second round. Each voter’s preference between these two candidates is read from their ranking.</p>
+  <ol class="nt-steps">
+    <li>G1 (A ≻ D ≻ B ≻ C): A is above C; 4 votes for A.</li>
+    <li>G2 (C ≻ B ≻ D ≻ A): 4 votes for C.</li>
+    <li>G3 (D ≻ B ≻ C ≻ A): their favorite D is not in the race; in their ranking C is third and A fourth, so 3 votes for C.</li>
+    <li>G4 (A ≻ B ≻ C ≻ D): 2 votes for A.</li>
+  </ol>
+  <p>Second round: <span class="m">A = 4 + 2 = 6</span>, <span class="m">C = 4 + 3 = 7</span>. C wins. A, the leader of the first round, lost the second round, because the 3 voters supporting D prefer C to A.</p>
+</div>
+
+<p>This example shows why the two-round system can give a different result from plurality: the second round gives the voters of eliminated candidates the opportunity to choose among the remaining candidates. But this opportunity is limited. A candidate who came third or fourth in the first round cannot reach the second round, even if they could beat everyone in a one-on-one race. This is exactly what happens in this profile: as will be seen in <a href="#s7-2-7">Section 7.2.7</a>, D beats all rivals in pairwise comparison, but because D gets only 3 votes in the first round, D cannot reach the second round.</p>
+
+<h3 id="s7-2-3"><span class="nt-num">7.2.3</span>The Borda count</h3>
+
+<p>Plurality takes no account of the voter’s second choice. A candidate can be everyone’s second choice and still receive zero votes. In the 18th century the French sailor and mathematician Jean-Charles de Borda noticed this problem and proposed a count that gives points to every rank.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-borda">
+  <span class="nt-box__title">Definition 7.5</span>
+  <p>With <span class="m">m</span> candidates, in the <strong>Borda count</strong> each voter reports a full ranking. The candidate in position <span class="m">k</span> in a voter’s ranking receives <span class="m">m − k</span> points from that voter: first place <span class="m">m − 1</span>, second place <span class="m">m − 2</span>, …, last place 0 points. A candidate’s Borda score is the sum of the points received from all voters; the candidate with the highest score wins.</p>
+</div>
+
+<p>The Borda score has a simple interpretation: the points <span class="m">x</span> receives in a voter’s ranking equal the number of candidates that voter places below <span class="m">x</span>. The candidate in first place leaves <span class="m">m − 1</span> candidates behind, and the last one leaves none. A candidate’s total Borda score is therefore the sum, over all voters, of the number of candidates that <span class="m">x</span> beats. This interpretation helps connect Borda with the pairwise comparisons of <a href="#s7-2-7">Section 7.2.7</a>: the Borda score equals a candidate’s row sum in the pairwise comparison table.</p>
+
+<p>For four candidates the points are 3 for first, 2 for second, 1 for third, and 0 for fourth place. A group’s contribution to a candidate is “number of voters × points.” The count is done group by group.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-borda">
+  <span class="nt-box__title">Example 7.4</span>
+  <ol class="nt-steps">
+    <li><strong>G1</strong> (4 voters, A ≻ D ≻ B ≻ C): A <span class="m">4 × 3 = 12</span>, D <span class="m">4 × 2 = 8</span>, B <span class="m">4 × 1 = 4</span>, C <span class="m">4 × 0 = 0</span>.</li>
+    <li><strong>G2</strong> (4 voters, C ≻ B ≻ D ≻ A): C <span class="m">4 × 3 = 12</span>, B <span class="m">4 × 2 = 8</span>, D <span class="m">4 × 1 = 4</span>, A 0. Running totals: A 12, B 12, C 12, D 12: after two groups the four candidates are tied.</li>
+    <li><strong>G3</strong> (3 voters, D ≻ B ≻ C ≻ A): D <span class="m">3 × 3 = 9</span>, B <span class="m">3 × 2 = 6</span>, C <span class="m">3 × 1 = 3</span>, A 0. Running totals: A 12, B 18, C 15, D 21.</li>
+    <li><strong>G4</strong> (2 voters, A ≻ B ≻ C ≻ D): A <span class="m">2 × 3 = 6</span>, B <span class="m">2 × 2 = 4</span>, C <span class="m">2 × 1 = 2</span>, D 0.</li>
+  </ol>
+  <p>The result is collected in <a href="#tablo-borda">Table 7.3</a>: B = 22, D = 21, A = 18, C = 17. The Borda winner is B.</p>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-borda">
+  <caption>Table 7.3: Contribution of the groups and totals in the Borda count (points 3, 2, 1, 0).</caption>
+  <thead><tr><th scope="col">candidate</th><th scope="col">G1</th><th scope="col">G2</th><th scope="col">G3</th><th scope="col">G4</th><th scope="col">total</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">A</th><td>12</td><td>0</td><td>0</td><td>6</td><td>18</td></tr>
+    <tr><th scope="row">B</th><td>4</td><td>8</td><td>6</td><td>4</td><td class="is-ne">22</td></tr>
+    <tr><th scope="row">C</th><td>0</td><td>12</td><td>3</td><td>2</td><td>17</td></tr>
+    <tr><th scope="row">D</th><td>8</td><td>4</td><td>9</td><td>0</td><td>21</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The most interesting aspect of the result is that no voter put B first. B’s strength is that no voter put B last and that nine voters put B second. Borda promotes such compromise candidates. This can be seen as a virtue (a candidate everyone can accept) or as a flaw (a candidate nobody really wants).</p>
+
+<p>There is an easy way to check the computation. Each voter distributes a total of <span class="m">3 + 2 + 1 + 0 = 6</span> points. 13 voters must distribute a total of <span class="m">13 × 6 = 78</span> points. Indeed <span class="m">18 + 22 + 17 + 21 = 78</span>. If the total does not match, a contribution has been miscomputed somewhere.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <ul>
+    <li><strong>Starting the points from 1:</strong> using 4, 3, 2, 1 points adds 1 extra point from each voter to every candidate. This does not change the winner, but the results then do not match the numbers in these notes, and it causes confusion when the number of candidates changes (when a candidate withdraws). The scale in the definition is <span class="m">m − 1, …, 0</span>.</li>
+    <li><strong>Forgetting the group size:</strong> a column is not one voter but a group of voters. G3's contribution to D is not 3 but <span class="m">3 × 3 = 9</span>.</li>
+  </ul>
+</div>
+
+<h3 id="s7-2-4"><span class="nt-num">7.2.4</span>Approval voting</h3>
+
+<div class="nt-box nt-box--tanim" id="tanim-onay">
+  <span class="nt-box__title">Definition 7.6</span>
+  <p>In <strong>approval voting</strong>, each voter marks the set of candidates they accept (approve); they may approve as many candidates as they like. Each approval gives a candidate 1 point; the candidate with the most approvals wins.</p>
+</div>
+
+<p>In approval voting, what the voter reports is not a ranking but a set. The voter says, “these candidates are acceptable to me, the others are not.” The outcome of approval voting therefore depends not only on the voters' rankings but also on <em>where each voter draws the line</em>. The preference profile alone does not determine the approval winner; how many candidates each voter approves must also be known. An assumption is therefore needed for the approval count.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-onay">
+  <span class="nt-box__title">Example 7.5</span>
+  <p>Assumption: each voter approves the first two candidates in their ranking. The first two rows of the table are read.</p>
+  <ol class="nt-steps">
+    <li>A: G1 (ranked 1st) 4 and G4 (ranked 1st) 2; <span class="m">4 + 2 = 6</span>.</li>
+    <li>B: G2 (ranked 2nd) 4, G3 (ranked 2nd) 3, G4 (ranked 2nd) 2; <span class="m">4 + 3 + 2 = 9</span>.</li>
+    <li>C: G2 (ranked 1st) 4; 4.</li>
+    <li>D: G1 (ranked 2nd) 4, G3 (ranked 1st) 3; <span class="m">4 + 3 = 7</span>.</li>
+    <li>Check: each voter gives 2 approvals; <span class="m">13 × 2 = 26 = 6 + 9 + 4 + 7</span>.</li>
+  </ol>
+  <p>The approval winner is B (9). If everyone approved only their first choice, the approval counts would be the same as the first-choice counts (A 6, B 0, C 4, D 3) and A would win.</p>
+</div>
+
+<p>The example shows two important points. First, when everyone approves their top two candidates, approval voting turns into the <em>2-approval</em> rule (<a href="#s7-2-5">Section 7.2.5</a>); when everyone approves only their top candidate, it turns into plurality. Approval voting sits flexibly between these two extremes. Second, the result depends on the approval threshold: with the same preferences, when the threshold changes the winner moves from A to B. Since the voter sets the threshold, the approval threshold is also a strategic decision. For example, a voter who supports A, if they know B is a strong rival, may give up approving their second choice B.</p>
+
+<p>Approval voting is used in some scientific society elections and in meeting polls of the “which times are suitable?” kind. In a meeting poll, each participant marks all the times they are available, and the time that suits the most people is chosen; this is exactly approval voting.</p>
+
+<h3 id="s7-2-5"><span class="nt-num">7.2.5</span>Positional scoring rules</h3>
+
+<p>Plurality, Borda, and approval voting (when everyone approves the same number of candidates) are in fact different forms of the same idea: a fixed score is given to each rank and the scores are added up. This common structure can be written with a single definition.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-puanlama">
+  <span class="nt-box__title">Definition 7.7</span>
+  <p>For <span class="m">m</span> candidates, a <strong>positional scoring rule</strong> is given by a score vector: <span class="m">s = (s<sub>1</sub>, s<sub>2</sub>, …, s<sub>m</sub>)</span>, with <span class="m">s<sub>1</sub> ≥ s<sub>2</sub> ≥ … ≥ s<sub>m</sub></span> and <span class="m">s<sub>1</sub> &gt; s<sub>m</sub></span>. The candidate in position <span class="m">k</span> of a voter’s ranking receives <span class="m">s<sub>k</sub></span> points; the candidate with the highest total score wins.</p>
+  <ul>
+    <li><strong>Plurality</strong>: <span class="m">s = (1, 0, …, 0)</span>.</li>
+    <li><strong>k-approval</strong>: the first <span class="m">k</span> positions get 1 point, the rest 0; for <span class="m">k = 2</span>, <strong>2-approval</strong>.</li>
+    <li><strong>Borda</strong>: <span class="m">s = (m − 1, m − 2, …, 0)</span>.</li>
+    <li><strong>Veto rule</strong>: <span class="m">s = (1, …, 1, 0)</span>; only the last position gets 0 points.</li>
+  </ul>
+</div>
+
+<p>The scores are in decreasing order so that a voter never gives fewer points to a candidate they like more. The name of the veto rule comes from its interpretation: each voter “vetoes” just one candidate, that is, rejects them; a candidate’s veto score is the number of voters who did not put them last. The veto rule looks for the candidate whom everyone objects to least.</p>
+
+<p><a href="#sekil-puan1">Figure 7.3</a> and <a href="#sekil-puan2">Figure 7.4</a> show the count of the same profile with two different score vectors. On the left is the profile; the orange cells are the positions that receive points. On the right, each candidate’s total score is drawn as a bar; the orange bar shows the winner.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-puan1" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 180" role="img" aria-label="Counting with the score vector (1, 0, 0, 0)"><text class="txt" x="16" y="22" text-anchor="start">s =</text><rect class="box" x="52" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="74" y="23" text-anchor="middle">1</text><text class="lbl" x="74" y="48" text-anchor="middle">1st</text><rect class="box" x="102" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="124" y="23" text-anchor="middle">0</text><text class="lbl" x="124" y="48" text-anchor="middle">2nd</text><rect class="box" x="152" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="174" y="23" text-anchor="middle">0</text><text class="lbl" x="174" y="48" text-anchor="middle">3rd</text><rect class="box" x="202" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="224" y="23" text-anchor="middle">0</text><text class="lbl" x="224" y="48" text-anchor="middle">4th</text><text class="txt" x="268" y="23" text-anchor="start" style="fill:var(--ds-accent)">plurality</text><text class="txt" x="458" y="23.5" text-anchor="middle">A</text><rect class="box" x="470" y="8" width="200" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="676" y="23.5" text-anchor="start">6</text><text class="txt" x="458" y="53.5" text-anchor="middle">B</text><rect class="box" x="470" y="38" width="2" height="21" rx="4"/><text class="txt" x="478" y="53.5" text-anchor="start">0</text><text class="txt" x="458" y="83.5" text-anchor="middle">C</text><rect class="box" x="470" y="68" width="133.333" height="21" rx="4"/><text class="txt" x="609.333" y="83.5" text-anchor="start">4</text><text class="txt" x="458" y="113.5" text-anchor="middle">D</text><rect class="box" x="470" y="98" width="100" height="21" rx="4"/><text class="txt" x="576" y="113.5" text-anchor="start">3</text><text class="lbl" x="46" y="71" text-anchor="middle">4 voters</text><rect class="box" x="24" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="46" y="93" text-anchor="middle">A</text><rect class="box" x="24" y="102" width="44" height="21" rx="4"/><text class="txt" x="46" y="117" text-anchor="middle">D</text><rect class="box" x="24" y="126" width="44" height="21" rx="4"/><text class="txt" x="46" y="141" text-anchor="middle">B</text><rect class="box" x="24" y="150" width="44" height="21" rx="4"/><text class="txt" x="46" y="165" text-anchor="middle">C</text><text class="lbl" x="100" y="71" text-anchor="middle">4 voters</text><rect class="box" x="78" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="100" y="93" text-anchor="middle">C</text><rect class="box" x="78" y="102" width="44" height="21" rx="4"/><text class="txt" x="100" y="117" text-anchor="middle">B</text><rect class="box" x="78" y="126" width="44" height="21" rx="4"/><text class="txt" x="100" y="141" text-anchor="middle">D</text><rect class="box" x="78" y="150" width="44" height="21" rx="4"/><text class="txt" x="100" y="165" text-anchor="middle">A</text><text class="lbl" x="154" y="71" text-anchor="middle">3 voters</text><rect class="box" x="132" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="154" y="93" text-anchor="middle">D</text><rect class="box" x="132" y="102" width="44" height="21" rx="4"/><text class="txt" x="154" y="117" text-anchor="middle">B</text><rect class="box" x="132" y="126" width="44" height="21" rx="4"/><text class="txt" x="154" y="141" text-anchor="middle">C</text><rect class="box" x="132" y="150" width="44" height="21" rx="4"/><text class="txt" x="154" y="165" text-anchor="middle">A</text><text class="lbl" x="208" y="71" text-anchor="middle">2 voters</text><rect class="box" x="186" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="208" y="93" text-anchor="middle">A</text><rect class="box" x="186" y="102" width="44" height="21" rx="4"/><text class="txt" x="208" y="117" text-anchor="middle">B</text><rect class="box" x="186" y="126" width="44" height="21" rx="4"/><text class="txt" x="208" y="141" text-anchor="middle">C</text><rect class="box" x="186" y="150" width="44" height="21" rx="4"/><text class="txt" x="208" y="165" text-anchor="middle">D</text></svg></div>
+  <figcaption><b>Figure 7.3:</b> Plurality, <span class="m">s = (1, 0, 0, 0)</span>. Only first place gets points: A = 6, C = 4, D = 3, B = 0; the winner is A.</figcaption>
+</figure>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-puan2" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 180" role="img" aria-label="Counting with the score vector (10, 5, 3, 0)"><text class="txt" x="16" y="22" text-anchor="start">s =</text><rect class="box" x="52" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="74" y="23" text-anchor="middle">10</text><text class="lbl" x="74" y="48" text-anchor="middle">1st</text><rect class="box" x="102" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="124" y="23" text-anchor="middle">5</text><text class="lbl" x="124" y="48" text-anchor="middle">2nd</text><rect class="box" x="152" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="174" y="23" text-anchor="middle">3</text><text class="lbl" x="174" y="48" text-anchor="middle">3rd</text><rect class="box" x="202" y="4" width="44" height="28" rx="5" style="fill:var(--ds-hot)"/><text class="txt" x="224" y="23" text-anchor="middle">0</text><text class="lbl" x="224" y="48" text-anchor="middle">4th</text><text class="txt" x="268" y="23" text-anchor="start" style="fill:var(--ds-accent)">another vector</text><text class="txt" x="458" y="23.5" text-anchor="middle">A</text><rect class="box" x="470" y="8" width="193.548" height="21" rx="4"/><text class="txt" x="669.548" y="23.5" text-anchor="start">60</text><text class="txt" x="458" y="53.5" text-anchor="middle">B</text><rect class="box" x="470" y="38" width="183.871" height="21" rx="4"/><text class="txt" x="659.871" y="53.5" text-anchor="start">57</text><text class="txt" x="458" y="83.5" text-anchor="middle">C</text><rect class="box" x="470" y="68" width="177.419" height="21" rx="4"/><text class="txt" x="653.419" y="83.5" text-anchor="start">55</text><text class="txt" x="458" y="113.5" text-anchor="middle">D</text><rect class="box" x="470" y="98" width="200" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="676" y="113.5" text-anchor="start">62</text><text class="lbl" x="46" y="71" text-anchor="middle">4 voters</text><rect class="box" x="24" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="46" y="93" text-anchor="middle">A</text><rect class="box" x="24" y="102" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="46" y="117" text-anchor="middle">D</text><rect class="box" x="24" y="126" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="46" y="141" text-anchor="middle">B</text><rect class="box" x="24" y="150" width="44" height="21" rx="4"/><text class="txt" x="46" y="165" text-anchor="middle">C</text><text class="lbl" x="100" y="71" text-anchor="middle">4 voters</text><rect class="box" x="78" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="100" y="93" text-anchor="middle">C</text><rect class="box" x="78" y="102" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="100" y="117" text-anchor="middle">B</text><rect class="box" x="78" y="126" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="100" y="141" text-anchor="middle">D</text><rect class="box" x="78" y="150" width="44" height="21" rx="4"/><text class="txt" x="100" y="165" text-anchor="middle">A</text><text class="lbl" x="154" y="71" text-anchor="middle">3 voters</text><rect class="box" x="132" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="154" y="93" text-anchor="middle">D</text><rect class="box" x="132" y="102" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="154" y="117" text-anchor="middle">B</text><rect class="box" x="132" y="126" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="154" y="141" text-anchor="middle">C</text><rect class="box" x="132" y="150" width="44" height="21" rx="4"/><text class="txt" x="154" y="165" text-anchor="middle">A</text><text class="lbl" x="208" y="71" text-anchor="middle">2 voters</text><rect class="box" x="186" y="78" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="208" y="93" text-anchor="middle">A</text><rect class="box" x="186" y="102" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="208" y="117" text-anchor="middle">B</text><rect class="box" x="186" y="126" width="44" height="21" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="208" y="141" text-anchor="middle">C</text><rect class="box" x="186" y="150" width="44" height="21" rx="4"/><text class="txt" x="208" y="165" text-anchor="middle">D</text></svg></div>
+  <figcaption><b>Figure 7.4:</b> Another vector, <span class="m">s = (10, 5, 3, 0)</span>. D = 62, A = 60, B = 57, C = 55; the winner is D. This vector selects D, the Condorcet winner.</figcaption>
+</figure>
+
+<p>The results of five different vectors are collected in <a href="#tablo-puan">Table 7.4</a>. All the computations are done with the same method: each group’s contribution to each candidate is “number of voters × the points of that position.”</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--wide" id="tablo-puan">
+  <caption>Table 7.4: Five score vectors on the same profile.</caption>
+  <thead><tr><th scope="col">Rule</th><th scope="col">s</th><th scope="col">Scores</th><th scope="col">Winner</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Plurality</th><td>(1, 0, 0, 0)</td><td>A 6, C 4, D 3, B 0</td><td>A</td></tr>
+    <tr><th scope="row">2-approval (top two)</th><td>(1, 1, 0, 0)</td><td>B 9, D 7, A 6, C 4</td><td>B</td></tr>
+    <tr><th scope="row">Borda</th><td>(3, 2, 1, 0)</td><td>B 22, D 21, A 18, C 17</td><td>B</td></tr>
+    <tr><th scope="row">Veto (0 for last)</th><td>(1, 1, 1, 0)</td><td>B 13, D 11, C 9, A 6</td><td>B</td></tr>
+    <tr><th scope="row">Another vector</th><td>(10, 5, 3, 0)</td><td>D 62, A 60, B 57, C 55</td><td>D</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-puan">
+  <span class="nt-box__title">Example 7.6</span>
+  <p><strong>Veto</strong>, <span class="m">s = (1, 1, 1, 0)</span>: a candidate’s score is the number of voters who did not put them last. Those put last are in the last row of the table: G1 puts C last, G2 and G3 put A last, and G4 puts D last.</p>
+  <ul>
+    <li><span class="m">4 + 3 = 7</span> voters put A last; A = <span class="m">13 − 7 = 6</span>.</li>
+    <li>Nobody puts B last; B = 13.</li>
+    <li>4 voters put C last; C = 9.</li>
+    <li>2 voters put D last; D = 11.</li>
+  </ul>
+  <p>The vector <strong>(10, 5, 3, 0)</strong>:</p>
+  <ul>
+    <li>A: 1st in G1 (<span class="m">4 × 10 = 40</span>), 4th in G2 and G3 (0), 1st in G4 (<span class="m">2 × 10 = 20</span>); A = 60.</li>
+    <li>B: 3rd in G1 (<span class="m">4 × 3 = 12</span>), 2nd in G2 (<span class="m">4 × 5 = 20</span>), 2nd in G3 (<span class="m">3 × 5 = 15</span>), 2nd in G4 (<span class="m">2 × 5 = 10</span>); B = 57.</li>
+    <li>C: 4th in G1 (0), 1st in G2 (40), 3rd in G3 (<span class="m">3 × 3 = 9</span>), 3rd in G4 (<span class="m">2 × 3 = 6</span>); C = 55.</li>
+    <li>D: 2nd in G1 (<span class="m">4 × 5 = 20</span>), 3rd in G2 (<span class="m">4 × 3 = 12</span>), 1st in G3 (30), 4th in G4 (0); D = 62.</li>
+  </ul>
+</div>
+
+<p>This table gives one of the chapter’s main messages in numbers: with the same ballots, changing only the score vector changes the winner among A, B, and D. There is no mathematical answer as to which score vector is “right.” Vectors that give a lot of weight to first place resemble plurality and promote polarizing candidates (A); vectors that leave equal gaps between positions promote compromise candidates (B).</p>
+
+<p>Scoring rules share one good property: they are <em>monotone</em>. If a voter moves the winning candidate up one position on their ballot, that candidate receives either the same number of points or more, because in a score vector a higher position gives at least as many points as a lower one. The other candidate, with whom the moved candidate swapped places, receives at most the same number of points. The winner’s margin over the other candidates therefore does not shrink, and the winner continues to win. This observation matters because instant-runoff voting does not satisfy this property (<a href="#s7-3-7">Section 7.3.7</a>).</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Mistaking instant-runoff voting for a scoring rule. IRV also uses a full ranking, but the vote counted for a candidate in a round depends on which candidates were eliminated earlier. The same ballot may count for A in one round and for C in the next. IRV therefore cannot be written with a single fixed score vector.</p>
+</div>
+
+<h3 id="s7-2-6"><span class="nt-num">7.2.6</span>Instant-runoff voting</h3>
+
+<p>One problem with the two-round system is that it takes voters to the polls twice. Another is that only two candidates remain for the second round, so the chances of a candidate who came third in the first round end at once. <strong>Instant-runoff voting</strong> (IRV; also known as ranked-choice voting) looks for a solution to both problems at once: a full ranking is collected from each voter once, and the rounds are then held “instantly,” by computer or by hand, on these rankings.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-irv">
+  <span class="nt-box__title">Definition 7.8</span>
+  <p>Each voter reports a full ranking. At the start all candidates are in the race. In each round:</p>
+  <ol>
+    <li>Each ballot is counted for the highest-ranked candidate on that ballot who is <em>still in the race</em>.</li>
+    <li>If a candidate’s vote count is more than half of the total votes, that candidate wins.</li>
+    <li>Otherwise the candidate with the fewest votes is eliminated; their ballots pass in the next round to the next candidate still in the race in the ranking.</li>
+  </ol>
+</div>
+
+<p>Under this rule no ballot is wasted: if the voter’s favorite is eliminated, the vote is transferred to the next candidate in the ranking. The difference from the two-round system is that candidates are eliminated one at a time and the votes are redistributed after each elimination.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-irv">
+  <span class="nt-box__title">Example 7.7</span>
+  <ol class="nt-steps">
+    <li><strong>Round 1:</strong> candidates in the race are A, B, C, D. First choices are A = 6, B = 0, C = 4, D = 3. A majority needs 7; nobody reaches it.</li>
+    <li><strong>Elimination:</strong> the candidate with the fewest votes is B (0 votes). B is eliminated. Since nobody put B first, there are no votes to transfer either.</li>
+    <li><strong>Round 2:</strong> A, C, D are in the race. Each ballot is counted for the highest-ranked candidate in the race; B’s elimination changes the candidate counted on no ballot. A = 6, C = 4, D = 3. Again there is no majority.</li>
+    <li><strong>Elimination:</strong> the candidate with the fewest votes is D (3). D is eliminated. G3's ballot is D ≻ B ≻ C ≻ A; since D and B have been eliminated, the next candidate in the race is C. 3 votes pass from D to C.</li>
+    <li><strong>Round 3:</strong> A and C are in the race. A = 6, C = <span class="m">4 + 3 = 7</span>. <span class="m">7 ≥ 7</span>: C wins with a majority.</li>
+  </ol>
+</div>
+
+<p>In this profile the result of IRV is the same as that of the two-round system: C. The reason is that after two candidates are eliminated, the remaining pair is the same as the pair that reaches the second round of the two-round system. In general, however, the two rules can give different results, because in IRV the elimination order can change as votes are transferred. Another notable point: IRV eliminates D, the Condorcet winner, in the second round. Because D’s first-choice count is small, D drops out at an early stage of the race even though D could beat all rivals one on one.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Transferring an eliminated candidate’s votes to the candidate ranked second on the ballot. The vote passes to the next candidate in the ranking who is <em>still in the race</em>. On G3's ballot B comes after D, but since B was eliminated earlier, the vote goes not to B but to C. If the candidate in second place has been eliminated, look at the third; if that one has also been eliminated, the fourth.</p>
+</div>
+
+<h3 id="s7-2-7"><span class="nt-num">7.2.7</span>Condorcet: pairwise comparisons</h3>
+
+<p>The rules so far evaluate the candidates all together. Condorcet’s proposal is different: every pair of candidates is compared separately, as if only those two were running. The contest between two candidates is decided by the number of voters who place one of them higher than the other.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-condorcet">
+  <span class="nt-box__title">Definition 7.9</span>
+  <p>Let <span class="m">N(x, y)</span> be the number of voters who prefer <span class="m">x</span> to <span class="m">y</span>. If <span class="m">N(x, y) &gt; N(y, x)</span>, then <span class="m">x</span> <strong>beats</strong> <span class="m">y</span> <strong>by pairwise majority</strong>.</p>
+  <ul>
+    <li>A candidate who beats all rivals is the <strong>Condorcet winner</strong>.</li>
+    <li>A candidate who loses to all rivals is the <strong>Condorcet loser</strong>.</li>
+  </ul>
+</div>
+
+<p>The idea of a Condorcet winner is very attractive. If the majority of voters prefer a candidate to each rival, then whoever is elected instead, a majority that wants this candidate in their place will be dissatisfied. But a Condorcet winner may not exist in every profile; this is the subject of <a href="#s7-3">Section 7.3</a>.</p>
+
+<p>For four candidates there are <span class="m">4 · 3 / 2 = 6</span> pairs. In general, for <span class="m">m</span> candidates the number of pairs is <span class="m">m(m − 1)/2</span>. The results are written in a table: cell (x, y) is <span class="m">N(x, y)</span>, the number of voters who prefer x to y.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-condorcet">
+  <span class="nt-box__title">Example 7.8</span>
+  <p>For each pair the groups are examined one by one. The numbers are numbers of voters; in each row the two numbers must add up to 13.</p>
+  <ol class="nt-steps">
+    <li><strong>A – B:</strong> those who say A ≻ B are G1 (4) and G4 (2); those who say B ≻ A are G2 (4) and G3 (3). 6 – 7: B wins.</li>
+    <li><strong>A – C:</strong> A ≻ C: G1 (4), G4 (2); C ≻ A: G2 (4), G3 (3). 6 – 7: C wins.</li>
+    <li><strong>A – D:</strong> A ≻ D: G1 (4), G4 (2); D ≻ A: G2 (4), G3 (3). 6 – 7: D wins.</li>
+    <li><strong>B – C:</strong> B ≻ C: G1 (4), G3 (3), G4 (2); C ≻ B: G2 (4). 9 – 4: B wins.</li>
+    <li><strong>B – D:</strong> B ≻ D: G2 (4), G4 (2); D ≻ B: G1 (4), G3 (3). 6 – 7: D wins.</li>
+    <li><strong>C – D:</strong> C ≻ D: G2 (4), G4 (2); D ≻ C: G1 (4), G3 (3). 6 – 7: D wins.</li>
+  </ol>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-ikili">
+  <caption>Table 7.5: Pairwise comparison table. Cell (x, y) = number of voters who prefer x to y; wins = the number of entries in the row greater than 6.5.</caption>
+  <thead><tr><th scope="col">x ╲ y</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th><th scope="col">wins</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">A</th><td>—</td><td>6</td><td>6</td><td>6</td><td>0</td></tr>
+    <tr><th scope="row">B</th><td>7</td><td>—</td><td>9</td><td>6</td><td>2</td></tr>
+    <tr><th scope="row">C</th><td>7</td><td>4</td><td>—</td><td>6</td><td>1</td></tr>
+    <tr><th scope="row">D</th><td class="is-ne">7</td><td class="is-ne">7</td><td class="is-ne">7</td><td>—</td><td class="is-ne">3</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Once <a href="#tablo-ikili">Table 7.5</a> is complete, the result is clear: D beats all three rivals 7–6 and is the Condorcet winner. A loses to everyone 6–7 and is the Condorcet loser. What is surprising is that plurality picked exactly this Condorcet loser, A. A has the highest first-choice count, but all seven voters who do not put A first put A last; these seven voters support every candidate running against A.</p>
+
+<p>The row sums of the table also say something: row A is <span class="m">6 + 6 + 6 = 18</span>, row B is <span class="m">7 + 9 + 6 = 22</span>, row C is <span class="m">7 + 4 + 6 = 17</span>, and row D is <span class="m">7 + 7 + 7 = 21</span>. These are exactly the Borda scores. This is a consequence of the interpretation in <a href="#s7-2-3">Section 7.2.3</a>: the Borda score is the sum of the votes a candidate collects in all pairwise comparisons. The difference between Borda and Condorcet is also seen here. Condorcet looks only at who wins (is 7 greater than 6?), while Borda also counts the size of the margin. B’s large 9–4 margin over C compensates in the Borda total for its small 6–7 loss to D.</p>
+
+<h3 id="s7-2-8"><span class="nt-num">7.2.8</span>The pairwise majority graph and Copeland</h3>
+
+<p>The results of pairwise comparisons can also be shown with a graph. In this graph each candidate is a vertex. If <span class="m">x</span> beats <span class="m">y</span> by pairwise majority, an arrow is drawn from <span class="m">x</span> to <span class="m">y</span>. This graph is called the <strong>pairwise majority graph</strong>.</p>
+
+<figure class="nt-fig" id="sekil-cizge" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 300" role="img" aria-label="Pairwise majority graph: D beats all three rivals, A loses to everyone"><defs><marker id="b06d-ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="b06d-ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-accent)"/></marker></defs><path class="line" d="M330 78 L330 220" marker-end="url(#b06d-ah2)"/><text class="txt" x="362" y="150" text-anchor="middle" style="font-size:14px">7–6</text><path class="line" d="M98 250 L300 250" marker-end="url(#b06d-ah2)"/><text class="txt" x="200" y="272" text-anchor="middle" style="font-size:14px">7–6</text><path class="line" d="M92.1935 67.0719 L306.221 231.709" style="stroke:var(--ds-accent);stroke-width:2.6;" marker-end="url(#b06d-ah3)"/><text class="txt" x="118" y="132" text-anchor="middle" style="font-size:14px;fill:var(--ds-accent)">7–6</text><path class="line" d="M307.807 67.0719 L93.7787 231.709" marker-end="url(#b06d-ah2)"/><text class="txt" x="282" y="132" text-anchor="middle" style="font-size:14px">9–4</text><path class="line" d="M98 50 L300 50" style="stroke:var(--ds-accent);stroke-width:2.6;" marker-end="url(#b06d-ah3)"/><text class="txt" x="200" y="36" text-anchor="middle" style="font-size:14px;fill:var(--ds-accent)">7–6</text><path class="line" d="M70 78 L70 220" style="stroke:var(--ds-accent);stroke-width:2.6;" marker-end="url(#b06d-ah3)"/><text class="txt" x="40" y="150" text-anchor="middle" style="font-size:14px;fill:var(--ds-accent)">7–6</text><circle class="box" cx="70" cy="50" r="26" style="fill:var(--ds-hot)"/><text class="txt" x="70" y="56" text-anchor="middle" style="font-size:18px">D</text><text class="lbl" x="70" y="16" text-anchor="middle">Copeland 3</text><circle class="box" cx="330" cy="50" r="26"/><text class="txt" x="330" y="56" text-anchor="middle" style="font-size:18px">B</text><text class="lbl" x="330" y="16" text-anchor="middle">Copeland 2</text><circle class="box" cx="70" cy="250" r="26"/><text class="txt" x="70" y="256" text-anchor="middle" style="font-size:18px">C</text><text class="lbl" x="70" y="294" text-anchor="middle">Copeland 1</text><circle class="box" cx="330" cy="250" r="26"/><text class="txt" x="330" y="256" text-anchor="middle" style="font-size:18px">A</text><text class="lbl" x="330" y="294" text-anchor="middle">Copeland 0</text></svg></div>
+  <figcaption><b>Figure 7.5:</b> The pairwise majority graph of the example profile. An arrow x → y shows that a majority prefers x to y; the labels are vote counts. The three arrows leaving D are highlighted. Copeland scores are written next to the vertices.</figcaption>
+</figure>
+
+<p>When the number of voters is odd, there can be no tie between two candidates; so there is exactly one arrow between every pair. Such a graph is called a <strong>tournament</strong>; the name comes from league matches in which every team plays every other team once. In <a href="#sekil-cizge">Figure 7.5</a> three arrows leave D and none enter D. The general rule is:</p>
+
+<ul>
+  <li><strong>Condorcet winner</strong> = the vertex that receives no arrows (D).</li>
+  <li><strong>Condorcet loser</strong> = the vertex that receives all arrows and gives none (A).</li>
+</ul>
+
+<p>If every candidate receives at least one arrow, that is, if there is no vertex that receives none, there is no Condorcet winner. In this case the graph contains a cycle: starting from a candidate and following the arrows, one can return to the same candidate. A cycle that covers all candidates causes the absence of a Condorcet winner.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-copeland">
+  <span class="nt-box__title">Definition 7.10</span>
+  <p>In the <strong>Copeland rule</strong> each candidate’s score is the number of wins in pairwise comparisons, that is, the number of arrows leaving that candidate in the graph. The candidate with the highest score wins. (Where ties are possible, ties earn half a point.)</p>
+</div>
+
+<p>In the example profile the Copeland scores are D 3, B 2, C 1, A 0; these scores are the same as the last column of <a href="#tablo-ikili">Table 7.5</a>. Copeland gives the ranking D ≻ B ≻ C ≻ A, and the winner is D. A good property of the Copeland rule is that it always selects the Condorcet winner if there is one: the Condorcet winner receives the highest possible score with <span class="m">m − 1</span> wins, and no other candidate can reach this score, because every other candidate loses at least once (to the Condorcet winner). If there is no Condorcet winner, Copeland still gives a ranking, but ties are frequent in this ranking.</p>
+
+<h3 id="s7-2-9"><span class="nt-num">7.2.9</span>The same profile, four different winners</h3>
+
+<p>So far the votes of the same 13 voters have been counted in seven different ways. The results are put side by side in <a href="#tablo-ozet">Table 7.6</a>. The Kemeny row of the table is computed in <a href="#s7-3-4">Section 7.3.4</a>.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--wide" id="tablo-ozet">
+  <caption>Table 7.6: The same profile, different rules.</caption>
+  <thead><tr><th scope="col">Rule</th><th scope="col">Count</th><th scope="col">Winner</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Majority</th><td>A 6 &lt; 7</td><td>none</td></tr>
+    <tr><th scope="row">Plurality</th><td>A 6, C 4, D 3, B 0</td><td>A</td></tr>
+    <tr><th scope="row">Two-round system</th><td>C 7 – A 6</td><td>C</td></tr>
+    <tr><th scope="row">Instant-runoff</th><td>C 7 – A 6 (round 3)</td><td>C</td></tr>
+    <tr><th scope="row">Borda</th><td>B 22, D 21, A 18, C 17</td><td>B</td></tr>
+    <tr><th scope="row">2-approval (top two)</th><td>B 9, D 7, A 6, C 4</td><td>B</td></tr>
+    <tr><th scope="row">Condorcet</th><td>D 3 wins</td><td>D</td></tr>
+    <tr><th scope="row">Kemeny</th><td>D ≻ B ≻ C ≻ A (44 agreements)</td><td>D</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two lessons can be drawn from the table. First: “the will of the people” depends on the rule. Although the voters' ballots do not change, the winner can be A, B, C, or D when the rule changes; that is, the outcome is determined by the rule as much as by the voters. Which rule will be used must therefore be decided explicitly before the vote. Second: some rules can give counterintuitive results. Plurality can select A, the Condorcet loser that loses to everyone; IRV can eliminate D, the Condorcet winner that beats everyone, early.</p>
+
+<p>Why each rule picks a different candidate is explained by the features of the profile noted in <a href="#s7-1-3">Section 7.1.3</a>. Because plurality looks only at first place, it picks A, who has the most “loyal” voters. The two-round system and IRV hold a final contest among the candidates with strong first choices and pick C. Borda and 2-approval, because they also count second places, pick the compromise candidate B. Condorcet and Kemeny, because they look at pairwise contests, pick D, who wins every pairwise contest.</p>
+
+<h3 id="s7-2-10"><span class="nt-num">7.2.10</span>Code trace: borda()</h3>
+
+<p>Counting under voting rules can be done with programs of a few lines. The short Python function below does the Borda count. The function’s input is a list called <code>ballots</code>. Each element of the list is a pair of the form <code>(count, order)</code>: <code>count</code> is the number of voters who gave that ranking, and <code>order</code> is a string that lists the candidates from most preferred. The example profile is written as follows:</p>
+
+<pre class="nt-code"><code>ballots = [(4, "ADBC"), (4, "CBDA"), (3, "DBCA"), (2, "ABCD")]</code></pre>
+
+<pre class="nt-code"><code><span class="kw">def</span> borda(ballots):
+  score = {}
+  <span class="kw">for</span> count, order <span class="kw">in</span> ballots:
+    m = len(order)
+    <span class="kw">for</span> k, cand <span class="kw">in</span> enumerate(order):
+      p = count * (m - 1 - k)
+      score[cand] = score.get(cand, 0) + p
+  winner = max(score, key=score.get)
+  <span class="kw">return</span> winner, score</code></pre>
+
+<p>The code works as follows:</p>
+<ul>
+  <li><code>score</code> is an empty dictionary; each candidate’s accumulated score is kept here.</li>
+  <li>The outer loop visits each voter group once: <code>count</code> is the size of the group and <code>order</code> is the group’s ranking.</li>
+  <li><code>m = len(order)</code> is the number of candidates; here 4.</li>
+  <li>The inner loop visits the candidates in the ranking together with their positions. <code>enumerate</code> gives the position to <code>k</code>, starting from 0: first place is <code>k = 0</code> and last place is <code>k = m − 1</code>.</li>
+  <li><code>p = count * (m - 1 - k)</code> is the group’s contribution to this candidate. For <code>k = 0</code> the score is <span class="m">m − 1 = 3</span>, and for <code>k = 3</code> it is 0. This is the point scale of the definition written with an index that starts from 0.</li>
+  <li><code>score.get(cand, 0)</code> returns 0 if the candidate is not yet in the dictionary; a candidate seen for the first time thus starts from 0.</li>
+  <li><code>max(score, key=score.get)</code> returns the key (candidate) with the largest score.</li>
+</ul>
+
+<p><a href="#tablo-borda-iz">Table 7.7</a> traces the inner loop of the first group step by step and the other groups in bulk.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-borda-iz">
+  <caption>Table 7.7: Trace of borda(). The last column is the score dictionary after the step.</caption>
+  <thead><tr><th scope="col">group</th><th scope="col">k</th><th scope="col">candidate</th><th scope="col">p</th><th scope="col">score (A, B, C, D)</th></tr></thead>
+  <tbody>
+    <tr><td>4 × ADBC</td><td>0</td><td>A</td><td>4 × (3 − 0) = 12</td><td>12, –, –, –</td></tr>
+    <tr><td>4 × ADBC</td><td>1</td><td>D</td><td>4 × (3 − 1) = 8</td><td>12, –, –, 8</td></tr>
+    <tr><td>4 × ADBC</td><td>2</td><td>B</td><td>4 × (3 − 2) = 4</td><td>12, 4, –, 8</td></tr>
+    <tr><td>4 × ADBC</td><td>3</td><td>C</td><td>4 × (3 − 3) = 0</td><td>12, 4, 0, 8</td></tr>
+    <tr><td>4 × CBDA</td><td>0–3</td><td>C, B, D, A</td><td>12, 8, 4, 0</td><td>12, 12, 12, 12</td></tr>
+    <tr><td>3 × DBCA</td><td>0–3</td><td>D, B, C, A</td><td>9, 6, 3, 0</td><td>12, 18, 15, 21</td></tr>
+    <tr><td>2 × ABCD</td><td>0–3</td><td>A, B, C, D</td><td>6, 4, 2, 0</td><td>18, 22, 17, 21</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-borda-iz" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 128" role="img" aria-label="Accumulation of Borda scores"><text class="lbl" x="60" y="21" text-anchor="end">4 voters</text><rect class="box" x="68" y="5" width="38" height="23" rx="4"/><text class="txt" x="87" y="21" text-anchor="middle" style="font-size:14px">A</text><rect class="box" x="110" y="5" width="38" height="23" rx="4"/><text class="txt" x="129" y="21" text-anchor="middle" style="font-size:14px">D</text><rect class="box" x="152" y="5" width="38" height="23" rx="4"/><text class="txt" x="171" y="21" text-anchor="middle" style="font-size:14px">B</text><rect class="box" x="194" y="5" width="38" height="23" rx="4"/><text class="txt" x="213" y="21" text-anchor="middle" style="font-size:14px">C</text><text class="lbl" x="60" y="47" text-anchor="end">4 voters</text><rect class="box" x="68" y="31" width="38" height="23" rx="4"/><text class="txt" x="87" y="47" text-anchor="middle" style="font-size:14px">C</text><rect class="box" x="110" y="31" width="38" height="23" rx="4"/><text class="txt" x="129" y="47" text-anchor="middle" style="font-size:14px">B</text><rect class="box" x="152" y="31" width="38" height="23" rx="4"/><text class="txt" x="171" y="47" text-anchor="middle" style="font-size:14px">D</text><rect class="box" x="194" y="31" width="38" height="23" rx="4"/><text class="txt" x="213" y="47" text-anchor="middle" style="font-size:14px">A</text><text class="lbl" x="60" y="73" text-anchor="end">3 voters</text><rect class="box" x="68" y="57" width="38" height="23" rx="4"/><text class="txt" x="87" y="73" text-anchor="middle" style="font-size:14px">D</text><rect class="box" x="110" y="57" width="38" height="23" rx="4"/><text class="txt" x="129" y="73" text-anchor="middle" style="font-size:14px">B</text><rect class="box" x="152" y="57" width="38" height="23" rx="4"/><text class="txt" x="171" y="73" text-anchor="middle" style="font-size:14px">C</text><rect class="box" x="194" y="57" width="38" height="23" rx="4"/><text class="txt" x="213" y="73" text-anchor="middle" style="font-size:14px">A</text><text class="lbl" x="60" y="99" text-anchor="end">2 voters</text><rect class="box" x="68" y="83" width="38" height="23" rx="4"/><text class="txt" x="87" y="99" text-anchor="middle" style="font-size:14px">A</text><rect class="box" x="110" y="83" width="38" height="23" rx="4"/><text class="txt" x="129" y="99" text-anchor="middle" style="font-size:14px">B</text><rect class="box" x="152" y="83" width="38" height="23" rx="4"/><text class="txt" x="171" y="99" text-anchor="middle" style="font-size:14px">C</text><rect class="box" x="194" y="83" width="38" height="23" rx="4"/><text class="txt" x="213" y="99" text-anchor="middle" style="font-size:14px">D</text><text class="lbl" x="150" y="124" text-anchor="middle">ballots: row = voter group; 1st place 3 points … 4th place 0</text><text class="txt" x="348" y="21" text-anchor="middle">A</text><rect class="box" x="360" y="6" width="245.455" height="20" rx="4"/><text class="txt" x="611.455" y="21" text-anchor="start">18</text><text class="txt" x="348" y="47" text-anchor="middle">B</text><rect class="box" x="360" y="32" width="300" height="20" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="666" y="47" text-anchor="start">22</text><text class="txt" x="348" y="73" text-anchor="middle">C</text><rect class="box" x="360" y="58" width="231.818" height="20" rx="4"/><text class="txt" x="597.818" y="73" text-anchor="start">17</text><text class="txt" x="348" y="99" text-anchor="middle">D</text><rect class="box" x="360" y="84" width="286.364" height="20" rx="4"/><text class="txt" x="652.364" y="99" text-anchor="start">21</text></svg></div>
+  <figcaption><b>Figure 7.6:</b> The final state of the borda() trace. On the left the four input groups, on the right the accumulated scores; the longest bar is B’s (22).</figcaption>
+</figure>
+
+<p>The function returns <code>("B", {"A": 18, "D": 21, "B": 22, "C": 17})</code>. <a href="#sekil-borda-iz">Figure 7.6</a> shows this final state. The candidate with the highest score is B (22), and no voter put B first.</p>
+
+<p>One subtlety of the code is the tie case. If two candidates receive the same highest score, <code>max</code> returns the one it saw first in the dictionary. For a voting rule this is an arbitrary choice: the outcome is determined by the order in which candidates entered the dictionary, that is, by the order of the input list. Real rules need instead a <strong>tie-breaking rule</strong> announced in advance: drawing lots, a fixed order of candidates, or a second criterion (for example the first-choice count).</p>
+
+<p>In terms of complexity, the function processes every candidate once for each group. With <span class="m">n</span> voter groups and <span class="m">m</span> candidates, the inner loop runs <span class="m">n · m</span> times in total; the running time is <span class="m">O(nm)</span>. Counting is easy; what is hard is understanding which properties the rule satisfies.</p>
+
+<h3 id="s7-2-11"><span class="nt-num">7.2.11</span>Code trace: irv()</h3>
+
+<p>The code for instant-runoff voting is a little longer than Borda’s, because the count is repeated in rounds. The function takes the <code>ballots</code> list and the list of candidates.</p>
+
+<pre class="nt-code"><code><span class="kw">def</span> irv(ballots, cands):
+  remaining = list(cands)
+  <span class="kw">while</span> <span class="kw">True</span>:
+    tally = {a: 0 <span class="kw">for</span> a <span class="kw">in</span> remaining}
+    <span class="kw">for</span> count, order <span class="kw">in</span> ballots:
+      top = next(a <span class="kw">for</span> a <span class="kw">in</span> order <span class="kw">if</span> a <span class="kw">in</span> remaining)
+      tally[top] += count
+    leader = max(tally, key=tally.get)
+    <span class="kw">if</span> 2 * tally[leader] &gt; sum(tally.values()):
+      <span class="kw">return</span> leader
+    loser = min(tally, key=tally.get)
+    remaining.remove(loser)</code></pre>
+
+<p>The code works as follows:</p>
+<ul>
+  <li><code>remaining</code> is the list of candidates still in the race; in a tie, the order in the candidate list decides (if a set were used, the order could change from run to run); at the start all candidates are in the race.</li>
+  <li>Each pass of the <code>while True</code> loop is one round. The loop is exited only through <code>return</code>, that is, when a winner is found.</li>
+  <li><code>tally</code> is a counter starting from 0 for each candidate in the race. The counters are reset in every round; the votes are counted from scratch each round.</li>
+  <li><code>next(a for a in order if a in remaining)</code> scans the ranking from the beginning and returns the first candidate <em>still in the race</em>. The transfer of votes happens by itself in this line: eliminated candidates are skipped because they are not in <code>remaining</code>.</li>
+  <li><code>leader</code> is the candidate with the most votes. The condition <code>2 * tally[leader] &gt; sum(tally.values())</code> tests whether the leader’s votes exceed half of the total. Multiplying both sides by 2 avoids dealing with fractional thresholds such as 6.5.</li>
+  <li>If there is no majority, <code>min(tally, key=tally.get)</code> finds the candidate with the fewest votes and <code>remaining.remove</code> takes them out of the race.</li>
+</ul>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-irv-iz">
+  <caption>Table 7.8: Trace of irv() (13 votes in total; majority condition 2 · tally &gt; 13).</caption>
+  <thead><tr><th scope="col">round</th><th scope="col">remaining</th><th scope="col">tally</th><th scope="col">leader</th><th scope="col">condition</th><th scope="col">result</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>A, B, C, D</td><td>A 6, B 0, C 4, D 3</td><td>A</td><td>12 ≤ 13</td><td>B eliminated</td></tr>
+    <tr><td>2</td><td>A, C, D</td><td>A 6, C 4, D 3</td><td>A</td><td>12 ≤ 13</td><td>D eliminated</td></tr>
+    <tr><td>3</td><td>A, C</td><td>A 6, C 7</td><td>C</td><td>14 &gt; 13</td><td>C returned</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the first round the four ballot groups are processed in turn: for the group ADBC the first candidate in the race is A and <code>tally[A] += 4</code>; for CBDA, <code>tally[C] += 4</code>; for DBCA, <code>tally[D] += 3</code>; for ABCD, <code>tally[A] += 2</code>. The result is A 6, B 0, C 4, D 3. The leader is A, but since <span class="m">2 × 6 = 12 ≤ 13</span>, there is no majority. B (0), with the fewest votes, is eliminated. In the second round the counters are reset and the count is repeated; since nobody put B first, the numbers do not change. D (3) is eliminated. In the third round the scan of the DBCA group skips D and B and stops at C: <code>tally[C] += 3</code>. This is the transfer of D’s votes to C. Since <span class="m">2 × 7 = 14 &gt; 13</span>, C is returned.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-irv-iz" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 94" role="img" aria-label="Instant-runoff count"><text class="lbl" x="60" y="29.5" text-anchor="end">4 voters</text><rect class="box" x="68" y="17" width="34" height="16" rx="4"/><text class="txt" x="85" y="29.5" text-anchor="middle" style="font-size:14px">A</text><rect class="box" x="106" y="17" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="123" y="29.5" text-anchor="middle" style="font-size:14px;opacity:.35">D</text><rect class="box" x="144" y="17" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="161" y="29.5" text-anchor="middle" style="font-size:14px;opacity:.35">B</text><rect class="box" x="182" y="17" width="34" height="16" rx="4"/><text class="txt" x="199" y="29.5" text-anchor="middle" style="font-size:14px">C</text><text class="lbl" x="60" y="48.5" text-anchor="end">4 voters</text><rect class="box" x="68" y="36" width="34" height="16" rx="4"/><text class="txt" x="85" y="48.5" text-anchor="middle" style="font-size:14px">C</text><rect class="box" x="106" y="36" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="123" y="48.5" text-anchor="middle" style="font-size:14px;opacity:.35">B</text><rect class="box" x="144" y="36" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="161" y="48.5" text-anchor="middle" style="font-size:14px;opacity:.35">D</text><rect class="box" x="182" y="36" width="34" height="16" rx="4"/><text class="txt" x="199" y="48.5" text-anchor="middle" style="font-size:14px">A</text><text class="lbl" x="60" y="67.5" text-anchor="end">3 voters</text><rect class="box" x="68" y="55" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="85" y="67.5" text-anchor="middle" style="font-size:14px;opacity:.35">D</text><rect class="box" x="106" y="55" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="123" y="67.5" text-anchor="middle" style="font-size:14px;opacity:.35">B</text><rect class="box" x="144" y="55" width="34" height="16" rx="4"/><text class="txt" x="161" y="67.5" text-anchor="middle" style="font-size:14px">C</text><rect class="box" x="182" y="55" width="34" height="16" rx="4"/><text class="txt" x="199" y="67.5" text-anchor="middle" style="font-size:14px">A</text><text class="lbl" x="60" y="86.5" text-anchor="end">2 voters</text><rect class="box" x="68" y="74" width="34" height="16" rx="4"/><text class="txt" x="85" y="86.5" text-anchor="middle" style="font-size:14px">A</text><rect class="box" x="106" y="74" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="123" y="86.5" text-anchor="middle" style="font-size:14px;opacity:.35">B</text><rect class="box" x="144" y="74" width="34" height="16" rx="4"/><text class="txt" x="161" y="86.5" text-anchor="middle" style="font-size:14px">C</text><rect class="box" x="182" y="74" width="34" height="16" rx="4" opacity="0.3"/><text class="txt" x="199" y="86.5" text-anchor="middle" style="font-size:14px;opacity:.35">D</text><text class="txt" x="318" y="29.5" text-anchor="middle">A</text><rect class="box" x="330" y="17" width="152.308" height="15" rx="4"/><text class="txt" x="488.308" y="29.5" text-anchor="start">6</text><text class="txt" x="318" y="48.5" text-anchor="middle">B</text><text class="lbl" x="336" y="48.5" text-anchor="start">eliminated</text><text class="txt" x="318" y="67.5" text-anchor="middle">C</text><rect class="box" x="330" y="55" width="177.692" height="15" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="513.692" y="67.5" text-anchor="start">7</text><text class="txt" x="318" y="86.5" text-anchor="middle">D</text><text class="lbl" x="336" y="86.5" text-anchor="start">eliminated</text><line class="line" x1="495" y1="9" x2="495" y2="89" style="stroke:var(--ds-accent);stroke-dasharray:5 4;stroke-width:1.6"/><text class="lbl" x="495" y="5" text-anchor="middle" style="fill:var(--ds-accent)">majority: 2·tally &gt; 13</text><text class="lbl" x="130" y="11" text-anchor="middle">faded = eliminated candidate</text></svg></div>
+  <figcaption><b>Figure 7.7:</b> The last round of the irv() trace. Faded cells are eliminated candidates; each group’s vote is counted for the first candidate in the race. A has 6, C has 7; C satisfies the majority condition.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <ul>
+    <li><strong>Using “≥ half” as the threshold:</strong> with an even number of voters, a candidate with exactly half of the votes does not have a majority. The condition is strict inequality: <code>2 * tally &gt; total</code>.</li>
+    <li><strong>Not thinking about ties:</strong> if the two candidates with the fewest votes are tied, <code>min</code> picks one of them. The code eliminates the one that comes first in the <code>remaining</code> list; this result is reproducible but arbitrary, because it depends on the order of the candidate list. In a real count a tie must be broken by a rule announced in advance.</li>
+  </ul>
+</div>
+
+<p>In each round, for <span class="m">n</span> groups the ranking is scanned in at most <span class="m">m</span> steps, so one round takes <span class="m">O(nm)</span>. Since there are at most <span class="m">m − 1</span> rounds, the total time is <span class="m">O(nm<sup>2</sup>)</span>. This is also a fast computation; the difficulties of IRV lie not in the counting but in its properties.</p>
+
+<h2 class="nt-pb" id="s7-3"><span class="nt-num">7.3</span>The Condorcet paradox</h2>
+
+<p>In the example profile there is a Condorcet winner: D. But not every profile has such a candidate. If there is no such candidate, the order of the votes can determine the outcome. The Kemeny rule produces a social ranking in this case too.</p>
+
+<h3 id="s7-3-1"><span class="nt-num">7.3.1</span>The Condorcet cycle</h3>
+
+<p>Consider the following profile with nine voters and three candidates: 4 voters have A ≻ B ≻ C, 3 voters have B ≻ C ≻ A, and 2 voters have C ≻ A ≻ B. Each voter’s ranking is consistent by itself, that is, transitive.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-dongu">
+  <caption>Table 7.9: The cycle profile: 9 voters, 3 candidates.</caption>
+  <thead><tr><th scope="col">rank</th><th scope="col">4 voters</th><th scope="col">3 voters</th><th scope="col">2 voters</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">1.</th><td>A</td><td>B</td><td>C</td></tr>
+    <tr><th scope="row">2.</th><td>B</td><td>C</td><td>A</td></tr>
+    <tr><th scope="row">3.</th><td>C</td><td>A</td><td>B</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-dongu">
+  <span class="nt-box__title">Example 7.9</span>
+  <ol class="nt-steps">
+    <li><strong>A – B:</strong> those who prefer A to B are column 1 (4) and column 3 (2): <span class="m">4 + 2 = 6</span>. Those who prefer B are column 2: 3. The majority is A ≻ B (6 – 3).</li>
+    <li><strong>B – C:</strong> those who prefer B are <span class="m">4 + 3 = 7</span>, and those who prefer C are 2. The majority is B ≻ C (7 – 2). Expectation of transitivity: since A ≻ B and B ≻ C, we should have A ≻ C.</li>
+    <li><strong>C – A:</strong> those who prefer C to A are column 2 (3) and column 3 (2): <span class="m">3 + 2 = 5</span>. Those who prefer A are 4. The majority is C ≻ A (5 – 4)!</li>
+  </ol>
+  <p>Result: A ≻ B ≻ C ≻ A. The social preference is cyclic. For every candidate there is a majority that beats them; there is no Condorcet winner.</p>
+</div>
+
+<figure class="nt-fig" id="sekil-dongu" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 380 218" role="img" aria-label="Condorcet cycle: A beats B, B beats C, C beats A"><defs><marker id="b06-ah1-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker></defs><line class="line" x1="210.1" y1="53.5" x2="308.5" y2="149.1" marker-end="url(#b06-ah1-5)" style="stroke:var(--ds-accent);stroke-width:3.2"/><text class="txt" x="294.0" y="96.0" text-anchor="middle">A ≻ B</text><text class="lbl" x="294.0" y="112.0" text-anchor="middle">6 – 3</text><line class="line" x1="302.0" y1="170.0" x2="80.0" y2="170.0" marker-end="url(#b06-ah1-5)" style="stroke:var(--ds-accent);stroke-width:3.2"/><text class="txt" x="190.0" y="196.0" text-anchor="middle">B ≻ C</text><text class="lbl" x="190.0" y="212.0" text-anchor="middle">7 – 2</text><line class="line" x1="70.1" y1="150.5" x2="168.5" y2="54.9" marker-end="url(#b06-ah1-5)" style="stroke:var(--ds-accent);stroke-width:3.2"/><text class="txt" x="86.0" y="96.0" text-anchor="middle">C ≻ A</text><text class="lbl" x="86.0" y="112.0" text-anchor="middle">5 – 4</text><circle class="box" cx="190" cy="34" r="24"/><text class="txt" x="190" y="39" text-anchor="middle">A</text><circle class="box" cx="330" cy="170" r="24"/><text class="txt" x="330" y="175" text-anchor="middle">B</text><circle class="box" cx="50" cy="170" r="24"/><text class="txt" x="50" y="175" text-anchor="middle">C</text></svg></div>
+  <figcaption><b>Figure 7.8:</b> The Condorcet cycle. A beats B (6 – 3), B beats C (7 – 2), and C beats A (5 – 4). The arrows form a circle; no vertex is left without an incoming arrow.</figcaption>
+</figure>
+
+<p><a href="#sekil-dongu">Figure 7.8</a> shows the situation with the pairwise majority graph. The three arrows form a circle: an arrow enters every vertex, so there is no Condorcet winner. This phenomenon is called the <strong>Condorcet paradox</strong> or <strong>Condorcet cycle</strong>.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-dongu">
+  <span class="nt-box__title">Definition 7.11</span>
+  <p>If the pairwise majority relation contains a sequence of candidates in which <span class="m">x<sub>1</sub></span> beats <span class="m">x<sub>2</sub></span>, <span class="m">x<sub>2</sub></span> beats <span class="m">x<sub>3</sub></span>, …, and <span class="m">x<sub>k</sub></span> beats <span class="m">x<sub>1</sub></span>, the profile has a <strong>Condorcet cycle</strong>. In this case the pairwise majority relation is not transitive.</p>
+</div>
+
+<p>The importance of the paradox is this: individuals being consistent does not guarantee that the community is consistent. The “majority” in the sentences “the majority prefers A to B” and “the majority prefers B to C” is not the same set of people. The first majority is made up of columns 1 and 3, the second of columns 1 and 2. Different majorities make different decisions, and when these decisions are put together, a cycle can arise.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking that the cycle comes from one of the voters being inconsistent. All three rankings in the profile are transitive. The cycle arises from <em>aggregating</em> consistent rankings by majority rule. Another mistake is to count the candidate with “the most pairwise wins” as the Condorcet winner when there is a cycle: in a cycle every candidate has one win, and by definition there is no Condorcet winner.</p>
+</div>
+
+<h3 id="s7-3-2"><span class="nt-num">7.3.2</span>The agenda determines the winner</h3>
+
+<p>The cycle has a practical consequence. Many committees and parliaments make decisions by <strong>sequential pairwise voting</strong>: first two options are voted on, the winner meets the next option, and this continues until the options run out. The order in which the options are voted on is called the <strong>agenda</strong>. In the cycle profile three different agendas are possible (one chooses which pair is voted on first; the remaining candidate is left for last).</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-gundem">
+  <span class="nt-box__title">Example 7.10</span>
+  <ol class="nt-steps">
+    <li><strong>Agenda 1: first A – B, then C.</strong> A – B: 6 – 3, A wins. A – C: 4 – 5, C wins. Winner: C.</li>
+    <li><strong>Agenda 2: first B – C, then A.</strong> B – C: 7 – 2, B wins. B – A: 3 – 6, A wins. Winner: A.</li>
+    <li><strong>Agenda 3: first A – C, then B.</strong> A – C: 4 – 5, C wins. C – B: 2 – 7, B wins. Winner: B.</li>
+  </ol>
+  <p>All three agendas produce different winners.</p>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table" id="tablo-gundem">
+  <caption>Table 7.10: Three agendas in the cycle profile.</caption>
+  <thead><tr><th scope="col">Agenda</th><th scope="col">First vote</th><th scope="col">Winner</th></tr></thead>
+  <tbody>
+    <tr><td>(A – B), then C</td><td>A</td><td>C</td></tr>
+    <tr><td>(B – C), then A</td><td>B</td><td>A</td></tr>
+    <tr><td>(A – C), then B</td><td>C</td><td>B</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The pattern in the example is a general rule: in a three-candidate cycle, <em>the candidate left for last wins</em>. The reason is this: in the first vote two candidates meet, and the winner meets the candidate left for last. In a three-candidate cycle each candidate beats exactly one candidate and loses to exactly one. The winner of the first vote has beaten the only candidate it can beat in the first vote; so the only candidate it loses to is the one left for last, and it loses the final vote. For example, in agenda 1, A beats B; the candidate in the cycle who beats A is C, and C is at the end.</p>
+
+<p>This gives great power to the person who sets the agenda (for example a committee chair). The chair can choose the outcome by putting the candidate they want to win last; and each vote is itself an honest majority vote. This situation is called <strong>agenda manipulation</strong>. In a profile with a Condorcet winner, however, this power does not exist: whichever order it is voted in, the Condorcet winner beats every candidate it meets and wins in the end.</p>
+
+<h3 id="s7-3-3"><span class="nt-num">7.3.3</span>Back to the game: how common are cycles?</h3>
+
+<p>The two questions of the game at the start of the chapter can now be answered. The profile at the game’s first level (A ≻ B ≻ C, B ≻ C ≻ A, C ≻ A ≻ B) is a cycle: A – B 2 – 1, B – C 2 – 1, C – A 2 – 1. The social preference is cyclic; there is no Condorcet winner. The answer to the first question is “no”: even if individuals are consistent, the community does not have to be. The answer to the second question is “yes”: the person who sets the agenda chooses the outcome by leaving the candidate they want to win for last. The results of the agendas follow the same pattern as in <a href="#tablo-gundem">Table 7.10</a>: C wins under the agenda (A – B) then C, A wins under (B – C) then A, and B wins under (A – C) then B.</p>
+
+<p>A natural question is how often cycles occur. For this a probability model is needed. The simplest model is that each voter chooses one of the six possible rankings with equal probability, independently of the others. For three voters and three candidates the number of possible profiles is <span class="m">6 × 6 × 6 = 6<sup>3</sup> = 216</span>. The number of these profiles containing a cycle can be counted: a cycle arises only when the voters' rankings are an arrangement of the triple A ≻ B ≻ C, B ≻ C ≻ A, C ≻ A ≻ B or of its reverse, the triple A ≻ C ≻ B, C ≻ B ≻ A, B ≻ A ≻ C. Each triple can be distributed among three voters in <span class="m">3! = 6</span> different ways; there are <span class="m">2 × 6 = 12</span> profiles with cycles in total. The probability is <span class="m">12/216 ≈ 0.056</span>, that is, about 5.6%.</p>
+
+<p>As the number of voters grows very large, in the same random model the probability of a cycle with three candidates rises to about 8.8% (Guilbaud, 1952). As the number of candidates grows, this rate rises quickly too. These numbers may look alarming, but in real election and survey data cycles are seen less often than this “random preference” calculation predicts (Regenwetter et al., 2006). The reason is that real preferences are not random: people’s preferences resemble one another and are often organized along a common axis (for example left–right). Why cycles do not arise with such orderly preferences is explained in <a href="#s7-5-6">Section 7.5.6</a>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Interpreting rates such as 5.6% or 8.8% as the frequency of cycles in real elections. These numbers are a consequence of the assumption that “every ranking is equally likely.” When the assumption changes, the number changes too; real data show lower rates.</p>
+</div>
+
+<h3 id="s7-3-4"><span class="nt-num">7.3.4</span>The Kemeny rule</h3>
+
+<p>When there is a cycle, the Condorcet idea cannot give a winner. A decision still has to be made. John Kemeny (1959) proposed to solve this problem as follows: choose the social ranking that <em>agrees most</em> with the voters' pairwise preferences.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kemeny">
+  <span class="nt-box__title">Definition 7.12</span>
+  <p>The <strong>agreement score</strong> of a ranking <span class="m">σ</span> of the candidates is the sum, over every pair <span class="m">(x, y)</span> in which <span class="m">x</span> comes before <span class="m">y</span> in <span class="m">σ</span>, of the number of voters who prefer <span class="m">x</span> to <span class="m">y</span>:</p>
+  <p class="nt-math nt-math--c"><span class="m">agree(σ) = Σ<sub>x before y (in σ)</sub> N(x, y)</span>.</p>
+  <p>The <strong>Kemeny rule</strong> chooses the ranking with the largest agreement score.</p>
+</div>
+
+<p>The agreement score has another interpretation. Between a voter’s ranking and <span class="m">σ</span> there is agreement on some pairs and disagreement on others. The agreement score is the sum, over all voters, of the number of pairs they agree on. Maximizing agreement is the same as minimizing the number of pairs they disagree on (the total “distance” between the rankings). In this sense the Kemeny ranking is the ranking “closest on average” to the voters' rankings.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kemeny-ana">
+  <span class="nt-box__title">Example 7.11</span>
+  <p>In the main profile, the agreement score of the ranking D ≻ B ≻ C ≻ A is read off <a href="#tablo-ikili">Table 7.5</a>. The six pairs in this ranking and the relevant numbers:</p>
+  <ul>
+    <li>D before B: <span class="m">N(D, B) = 7</span>; D before C: 7; D before A: 7.</li>
+    <li>B before C: <span class="m">N(B, C) = 9</span>; B before A: 7.</li>
+    <li>C before A: <span class="m">N(C, A) = 7</span>.</li>
+  </ul>
+  <p>Agreement: <span class="m">7 + 7 + 7 + 9 + 7 + 7 = 44</span>. In this ranking every pair points in the same direction as that pair’s pairwise majority; each pair’s contribution is the largest possible value. No other ranking can exceed 44; when all 24 rankings are tried, the closest competitors (D ≻ B ≻ A ≻ C and B ≻ D ≻ C ≻ A) stay at 43.</p>
+</div>
+
+<p>The example shows a general observation: if the pairwise majority relation is transitive (there is no cycle), the ranking that follows this relation receives the largest contribution on every pair and is the Kemeny ranking. In particular, if there is a Condorcet winner, it is placed first in the Kemeny ranking. The reason is this: if the Condorcet winner is not first in a ranking, swapping it with the candidate immediately above raises that pair’s contribution from the smaller number to the larger and changes no other pair; this raises the agreement.</p>
+
+<p>In a cycle too, Kemeny makes a decision. In a cycle profile the three pairwise majorities cannot all be satisfied together; at least one must be violated. Kemeny violates the majority whose violation loses the least agreement, that is, the <em>weakest</em> majority.</p>
+
+<figure class="nt-fig" id="sekil-kemeny" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 380 244" role="img" aria-label="In the cycle profile, the Kemeny ranking reverses the weakest edge"><defs><marker id="b06d-ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker><marker id="b06d-ah5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z" style="fill:var(--ds-muted)"/></marker></defs><path class="line" d="M209.799 59.799 L308.787 158.787" marker-end="url(#b06d-ah4)"/><text class="txt" x="300" y="110" text-anchor="middle" style="font-size:14px">A ≻ B  6–3</text><path class="line" d="M302 180 L80 180" marker-end="url(#b06d-ah4)"/><text class="txt" x="190" y="206" text-anchor="middle" style="font-size:14px">B ≻ C  7–2</text><path class="line" d="M69.799 160.201 L168.787 61.2132" style="stroke:var(--ds-muted);stroke-dasharray:5 4;" marker-end="url(#b06d-ah5)"/><text class="txt" x="76" y="110" text-anchor="middle" style="font-size:14px">C ≻ A  5–4</text><circle class="box" cx="190" cy="40" r="25" style="fill:var(--ds-hot)"/><text class="txt" x="190" y="46" text-anchor="middle" style="font-size:18px">A</text><circle class="box" cx="330" cy="180" r="25"/><text class="txt" x="330" y="186" text-anchor="middle" style="font-size:18px">B</text><circle class="box" cx="50" cy="180" r="25"/><text class="txt" x="50" y="186" text-anchor="middle" style="font-size:18px">C</text><text class="lbl" x="190" y="236" text-anchor="middle">dashed: the weakest majority Kemeny overrides (5–4)</text></svg></div>
+  <figcaption><b>Figure 7.9:</b> The Kemeny ranking in the cycle profile. The dashed arrow is the weakest majority, which Kemeny overrides (C ≻ A, 5 – 4). The remaining two majorities give the ranking A ≻ B ≻ C.</figcaption>
+</figure>
+
+<p><a href="#sekil-kemeny">Figure 7.9</a> shows the three edges of the cycle and the vote counts: A ≻ B 6 – 3, B ≻ C 7 – 2, C ≻ A 5 – 4. The edge with the narrowest margin is C ≻ A. When this edge is overridden, the remaining two edges give the ranking A ≻ B ≻ C. The agreement of this ranking is <span class="m">N(A, B) + N(A, C) + N(B, C) = 6 + 4 + 7 = 17</span>. A full comparison of the six rankings is in the code trace in <a href="#s7-3-5">Section 7.3.5</a>.</p>
+
+<p>The Kemeny rule has strong properties, but it also has a price: finding the best ranking is NP-hard (Bartholdi, Tovey, and Trick, 1989). For an NP-hard problem, all known algorithms take time that grows exponentially with the size of the input in the worst case. With few candidates all rankings can be tried, but with 15–20 candidates this is no longer practical. An important application of the Kemeny rule is <strong>rank aggregation</strong> (Dwork et al., 2001): merging the result lists of several search engines into one list, or combining the rankings of contest juries and committees.</p>
+
+<h3 id="s7-3-5"><span class="nt-num">7.3.5</span>Code trace: kemeny()</h3>
+
+<p>For a small number of candidates, the Kemeny ranking can be found by trying all rankings. The function below does exactly this. The function uses the <code>permutations</code> function from Python’s standard library; the line <code>from itertools import permutations</code> must therefore appear at the start of the program. <code>permutations(cands)</code> generates all orderings of the candidates one by one.</p>
+
+<pre class="nt-code"><code><span class="kw">def</span> kemeny(ballots, cands):
+  best, best_score = <span class="kw">None</span>, -1
+  <span class="kw">for</span> order <span class="kw">in</span> permutations(cands):
+    score = 0
+    <span class="kw">for</span> i, x <span class="kw">in</span> enumerate(order):
+      <span class="kw">for</span> y <span class="kw">in</span> order[i + 1:]:
+        score += sum(n <span class="kw">for</span> n, b <span class="kw">in</span> ballots
+                     <span class="kw">if</span> b.index(x) &lt; b.index(y))
+    <span class="kw">if</span> score &gt; best_score:
+      best, best_score = order, score
+  <span class="kw">return</span> best, best_score</code></pre>
+
+<p>The code works as follows:</p>
+<ul>
+  <li><code>best</code> holds the best ranking found so far and <code>best_score</code> its agreement score. The initial value is <span class="m">−1</span>; the first ranking tried (with a score of at least 0) is thus always accepted as the best.</li>
+  <li>The outer loop tries every ranking <code>order</code>.</li>
+  <li>The two inner loops run over all pairs <span class="m">(x, y)</span> in the ranking; <code>order[i + 1:]</code> gives only the candidates that come after <code>x</code>. Each pair is thus handled once, in the direction “<code>x</code> first in the ranking.”</li>
+  <li><code>b.index(x) &lt; b.index(y)</code> tests whether that voter group put <code>x</code> before <code>y</code>. The sizes <code>n</code> of the groups satisfying the condition are summed; this is <span class="m">N(x, y)</span>.</li>
+  <li>If a ranking’s score is strictly greater than the previous best, the best is updated. Among rankings with equal scores, the first one found is kept.</li>
+</ul>
+
+<p>The trace for the cycle profile <code>ballots = [(4, "ABC"), (3, "BCA"), (2, "CAB")]</code> is given in <a href="#tablo-kemeny-iz">Table 7.11</a>. For three candidates there are <span class="m">3! = 6</span> rankings, and each ranking contains <span class="m">3 · 2 / 2 = 3</span> pairs.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-kemeny-iz">
+  <caption>Table 7.11: Trace of kemeny() (cycle profile). In the pair columns, N(x, y) in the order of the ranking.</caption>
+  <thead><tr><th scope="col">order</th><th scope="col">pair 1</th><th scope="col">pair 2</th><th scope="col">pair 3</th><th scope="col">score</th><th scope="col">best</th></tr></thead>
+  <tbody>
+    <tr><td>A ≻ B ≻ C</td><td>A–B: 6</td><td>A–C: 4</td><td>B–C: 7</td><td class="is-ne">17</td><td>A ≻ B ≻ C (17 &gt; −1)</td></tr>
+    <tr><td>A ≻ C ≻ B</td><td>A–C: 4</td><td>A–B: 6</td><td>C–B: 2</td><td>12</td><td>unchanged</td></tr>
+    <tr><td>B ≻ A ≻ C</td><td>B–A: 3</td><td>B–C: 7</td><td>A–C: 4</td><td>14</td><td>unchanged</td></tr>
+    <tr><td>B ≻ C ≻ A</td><td>B–C: 7</td><td>B–A: 3</td><td>C–A: 5</td><td>15</td><td>unchanged</td></tr>
+    <tr><td>C ≻ A ≻ B</td><td>C–A: 5</td><td>C–B: 2</td><td>A–B: 6</td><td>13</td><td>unchanged</td></tr>
+    <tr><td>C ≻ B ≻ A</td><td>C–B: 2</td><td>C–A: 5</td><td>B–A: 3</td><td>10</td><td>unchanged</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-kemeny-iz" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 112" role="img" aria-label="Kemeny: agreement scores of the rankings"><text class="lbl" x="14" y="25" text-anchor="start">order:</text><rect class="box" x="52" y="6" width="36" height="28" rx="6" style="fill:var(--ds-hot)"/><text class="txt" x="70" y="26" text-anchor="middle">C</text><text class="txt" x="95" y="26" text-anchor="middle">≻</text><rect class="box" x="102" y="6" width="36" height="28" rx="6" style="fill:var(--ds-hot)"/><text class="txt" x="120" y="26" text-anchor="middle">B</text><text class="txt" x="145" y="26" text-anchor="middle">≻</text><rect class="box" x="152" y="6" width="36" height="28" rx="6" style="fill:var(--ds-hot)"/><text class="txt" x="170" y="26" text-anchor="middle">A</text><text class="lbl" x="20" y="62" text-anchor="start">C before B</text><text class="txt" x="20" y="82" text-anchor="start" style="fill:var(--ds-accent)">+2</text><text class="lbl" x="106" y="62" text-anchor="start">C before A</text><text class="txt" x="106" y="82" text-anchor="start" style="fill:var(--ds-accent)">+5</text><text class="lbl" x="192" y="62" text-anchor="start">B before A</text><text class="txt" x="192" y="82" text-anchor="start" style="fill:var(--ds-accent)">+3</text><text class="txt" x="20" y="104" text-anchor="start">score = 10</text><text class="txt" x="370" y="25" text-anchor="end" style="font-size:14px">A ≻ B ≻ C</text><rect class="box" x="378" y="11" width="110.5" height="19" rx="4" style="fill:var(--ds-hot)"/><text class="txt" x="494.5" y="25" text-anchor="start">17</text><text class="txt" x="370" y="55" text-anchor="end" style="font-size:14px">A ≻ C ≻ B</text><rect class="box" x="378" y="41" width="78" height="19" rx="4"/><text class="txt" x="462" y="55" text-anchor="start">12</text><text class="txt" x="370" y="85" text-anchor="end" style="font-size:14px">B ≻ A ≻ C</text><rect class="box" x="378" y="71" width="91" height="19" rx="4"/><text class="txt" x="475" y="85" text-anchor="start">14</text><text class="txt" x="585" y="25" text-anchor="end" style="font-size:14px">B ≻ C ≻ A</text><rect class="box" x="593" y="11" width="97.5" height="19" rx="4"/><text class="txt" x="696.5" y="25" text-anchor="start">15</text><text class="txt" x="585" y="55" text-anchor="end" style="font-size:14px">C ≻ A ≻ B</text><rect class="box" x="593" y="41" width="84.5" height="19" rx="4"/><text class="txt" x="683.5" y="55" text-anchor="start">13</text><text class="txt" x="585" y="85" text-anchor="end" style="font-size:14px">C ≻ B ≻ A</text><rect class="box" x="593" y="71" width="65" height="19" rx="4"/><text class="txt" x="664" y="85" text-anchor="start">10</text><text class="lbl" x="515" y="108" text-anchor="middle">orders tried (agreement score; orange = best)</text></svg></div>
+  <figcaption><b>Figure 7.10:</b> The last step of the kemeny() trace. At the top, the last ranking tried, C ≻ B ≻ A, and the contributions of its pairs (2 + 5 + 3 = 10); at the bottom, the agreement scores of the six rankings, with the best, A ≻ B ≻ C (17), in orange.</figcaption>
+</figure>
+
+<p>The function returns <code>(("A", "B", "C"), 17)</code>. The Kemeny ranking is A ≻ B ≻ C, and only the weakest majority, C ≻ A (5 – 4), has been overridden. The second-best ranking is B ≻ C ≻ A (15); this ranking overrides the majority A ≻ B (6 – 3) and loses 2 more points of agreement. A symmetry of the table is also notable: adding the score of a ranking and the score of its reverse always gives <span class="m">3 × 9 = 27</span> (17 + 10, 12 + 15, 14 + 13). The reason is that on every pair, a voter agrees with exactly one of the two rankings.</p>
+
+<p>The cost of this brute-force method grows quickly. For <span class="m">m</span> candidates, <span class="m">m!</span> rankings are tried; each ranking has <span class="m">m(m − 1)/2</span> pairs, and for each pair <span class="m">n</span> groups are scanned. The total work is of the order <span class="m">m! · m(m − 1)/2 · n</span>. For 4 candidates there are 24 rankings, for 10 candidates 3,628,800, and for 20 candidates about <span class="m">2.4 × 10<sup>18</sup></span>. That Kemeny is NP-hard says that there is no known general way to escape this exponential growth.</p>
+
+<h3 id="s7-3-6"><span class="nt-num">7.3.6</span>Which criteria do the rules satisfy?</h3>
+
+<p>Different rules choose different winners. Criteria are needed to argue about which is “better.” The criteria used to compare rules in social choice theory are also called <em>axioms</em>. Four basic criteria are defined below, and whether the rules satisfy them is collected in <a href="#tablo-olcut">Table 7.12</a>.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-olcut">
+  <span class="nt-box__title">Definition 7.13</span>
+  <ul>
+    <li><strong>Condorcet consistency:</strong> if there is a Condorcet winner, the rule selects it.</li>
+    <li><strong>Condorcet loser criterion:</strong> the rule never selects the Condorcet loser.</li>
+    <li><strong>Monotonicity</strong>: if a winning candidate is moved up on some voters' ballots (without changing the order of the other candidates relative to each other), it still wins. In short: supporting the winner should not make it lose.</li>
+    <li><strong>Strategy-proofness</strong>: no voter can obtain a better outcome, according to their true preference, by reporting a ranking different from their true preference.</li>
+  </ul>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--wide" id="tablo-olcut">
+  <caption>Table 7.12: Rules and criteria. The candidate in parentheses shows the violation in the example profile.</caption>
+  <thead><tr><th scope="col">Rule</th><th scope="col">Selects the Condorcet winner</th><th scope="col">Never selects the Condorcet loser</th><th scope="col">Monotone</th><th scope="col">Strategy-proof</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Plurality</th><td>no</td><td>no (A)</td><td>yes</td><td>no</td></tr>
+    <tr><th scope="row">Borda</th><td>no (B)</td><td>yes</td><td>yes</td><td>no</td></tr>
+    <tr><th scope="row">Instant-runoff</th><td>no (C)</td><td>yes</td><td>no</td><td>no</td></tr>
+    <tr><th scope="row">Approval</th><td>no</td><td>no</td><td>yes</td><td>no</td></tr>
+    <tr><th scope="row">Condorcet (Copeland)</th><td>yes</td><td>yes</td><td>yes</td><td>no</td></tr>
+    <tr><th scope="row">Kemeny</th><td>yes</td><td>yes</td><td>yes</td><td>no</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The table can be read row by row. In the example profile, plurality selects not the Condorcet winner D but A; A is also the Condorcet loser, so plurality violates both Condorcet criteria. Borda selects B instead of the Condorcet winner D. But Borda never selects the Condorcet loser. The reason is the observation in <a href="#s7-2-7">Section 7.2.7</a>: the Borda score is the sum of the votes received in pairwise comparisons. The Condorcet loser gets fewer than half of the votes in every comparison; its Borda score therefore stays below the average Borda score of the candidates. In the example profile the average is <span class="m">78 / 4 = 19.5</span>, and A’s score is 18. A candidate below the average cannot get the highest score.</p>
+
+<p>IRV eliminates the Condorcet winner D in the second round and selects C. IRV does not select the Condorcet loser: in the last round two candidates face each other, and the Condorcet loser loses this last contest. But IRV is not monotone (<a href="#s7-3-7">Section 7.3.7</a>). In approval voting, since the outcome depends on approval thresholds, no Condorcet criterion can be guaranteed. Copeland and Kemeny, being based on pairwise comparisons, satisfy both Condorcet criteria.</p>
+
+<p>All the “no” entries in the last column have a common cause: with three or more candidates, no reasonable rule other than a dictatorship is strategy-proof. This general result is the Gibbard–Satterthwaite theorem and is treated in <a href="#s7-5-4">Section 7.5.4</a>.</p>
+
+<p>A Condorcet winner does not exist in every profile; the plain Condorcet rule cannot find a winner in a cycle. Copeland may also fail to decide in a cycle: the scores come out equal (for example in the cycle profile all three candidates have one win each) and a tie-breaking rule is needed. One of the rules that remedies this deficiency is maximin.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-maksimin">
+  <span class="nt-box__title">Definition 7.14</span>
+  <p>In the <strong>maximin</strong> (Simpson) rule, for each candidate the <em>lowest</em> vote count received in pairwise comparisons is found: <span class="m">score(x) = min<sub>y ≠ x</sub> N(x, y)</span>. The candidate with the highest score wins.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-maksimin">
+  <span class="nt-box__title">Example 7.12</span>
+  <p>In the main profile the smallest number in each row of <a href="#tablo-ikili">Table 7.5</a> is taken:</p>
+  <ul>
+    <li>A: <span class="m">min(6, 6, 6) = 6</span>.</li>
+    <li>B: <span class="m">min(7, 9, 6) = 6</span>.</li>
+    <li>C: <span class="m">min(7, 4, 6) = 4</span>.</li>
+    <li>D: <span class="m">min(7, 7, 7) = 7</span>.</li>
+  </ul>
+  <p>The winner is D. In the cycle profile, A’s worst comparison is 4 against C, B’s is 3 against A, and C’s is 2 against B; maximin selects A. This is the same as the candidate at the head of the Kemeny ranking.</p>
+</div>
+
+<p>Maximin selects the Condorcet winner if there is one: the Condorcet winner gets more than half of the votes in every comparison, while every other candidate gets fewer than half in at least one comparison (against the Condorcet winner). It decides in a cycle too: the winner is the candidate whose worst defeat is the mildest.</p>
+
+<h3 id="s7-3-7"><span class="nt-num">7.3.7</span>Monotonicity violation in instant-runoff voting</h3>
+
+<p>Monotonicity seems to be one of the most basic properties one would expect of a voting rule: giving more support to a candidate should not hurt them. Scoring rules always satisfy this property (<a href="#s7-2-5">Section 7.2.5</a>). IRV does not. An example with 17 voters shows this.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-mono">
+  <caption>Table 7.13: A monotonicity example: 17 voters, 3 candidates (9 votes are needed for a majority).</caption>
+  <thead><tr><th scope="col">rank</th><th scope="col">6 voters</th><th scope="col">6 voters</th><th scope="col">5 voters</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">1.</th><td>A</td><td>B</td><td>C</td></tr>
+    <tr><th scope="row">2.</th><td>B</td><td>C</td><td>A</td></tr>
+    <tr><th scope="row">3.</th><td>C</td><td>A</td><td>B</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-mono">
+  <span class="nt-box__title">Example 7.13</span>
+  <p><strong>Before the campaign</strong> (<a href="#tablo-mono">Table 7.13</a>):</p>
+  <ol class="nt-steps">
+    <li>Round 1: A = 6, B = 6, C = 5. There is no majority (9); C, with the fewest votes, is eliminated.</li>
+    <li>C’s 5 votes pass to the next candidate, A. Round 2: A = <span class="m">6 + 5 = 11</span>, B = 6. A wins.</li>
+  </ol>
+  <p><strong>After the campaign:</strong> A campaigns, and 2 of the 6 voters who said B ≻ C ≻ A put A first; they now say A ≻ B ≻ C. The profile: 8 voters A ≻ B ≻ C, 4 voters B ≻ C ≻ A, 5 voters C ≻ A ≻ B. A’s support has only increased; nothing else has changed.</p>
+  <ol class="nt-steps">
+    <li>Round 1: A = 8, B = 4, C = 5. There is no majority; this time B, with the fewest votes, is eliminated (not C).</li>
+    <li>B’s 4 votes pass to the next candidate, C. Round 2: C = <span class="m">5 + 4 = 9</span>, A = 8. C wins.</li>
+  </ol>
+  <p>A lost because it gained more support: IRV is not monotone.</p>
+</div>
+
+<p>The mechanism of the violation is this. In IRV, whether a candidate wins depends not only on its own votes but also on <em>whom</em> it will face in the last round. In the first profile A faces B in the last round, and since C’s voters prefer A to B, A wins. The 2 voters who moved to A in the campaign were taken from B; B’s first-choice count falls from 6 to 4, and B drops below C. The elimination order changes: this time B is eliminated and A faces C in the last round. Since B’s voters prefer C to A, C wins. Moving A up changed the elimination order.</p>
+
+<p>The pairwise comparisons in this profile are interesting too: in the first profile A beats B 11 – 6, B beats C 12 – 5, and C beats A 11 – 6. The profile is a Condorcet cycle. Monotonicity violations are mostly seen in profiles like this, where there is no Condorcet winner or the race is very close.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Confusing a monotonicity violation with strategic voting. The 2 voters in the example do not lie; they really change their mind and begin to support A more. The problem is that the rule reacts perversely to this stronger support. Strategic voting, by contrast, is the voter reporting a ballot different from their true preference.</p>
+</div>
+
+<h2 class="nt-pb" id="s7-4"><span class="nt-num">7.4</span>Strategic voting</h2>
+
+<p>So far every voter has been assumed to write their true preference on the ballot. But as noted in <a href="#s7-1-2">Section 7.1.2</a>, the ballot is a strategy. A voter who knows how the rule works and how the other voters will vote can write a ballot different from their true preference and obtain a better outcome according to their true preference. This is called <strong>strategic voting</strong> or <strong>manipulation</strong>. The example profile shows two kinds of strategic voting with numbers.</p>
+
+<h3 id="s7-4-1"><span class="nt-num">7.4.1</span>Tactical voting under plurality</h3>
+
+<p>In honest voting the plurality winner is A: A 6, C 4, D 3, B 0. This is the outcome that bothers Group 3 (D ≻ B ≻ C ≻ A) most, because A is their worst candidate.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-taktik">
+  <span class="nt-box__title">Example 7.14</span>
+  <ol class="nt-steps">
+    <li><strong>Reading the situation:</strong> Group 3's favorite D gets only 3 votes; D has no chance of winning. The only candidate who can stop A is C, who is second with 4 votes. Group 3 prefers C to A (in their ranking C is third and A fourth).</li>
+    <li><strong>The strategic ballot:</strong> Group 3 votes for C instead of D; that is, writes C ≻ D ≻ B ≻ A on the ballot.</li>
+    <li><strong>The new count:</strong> A 6, C <span class="m">4 + 3 = 7</span>, B 0, D 0. C wins.</li>
+    <li><strong>The outcome for the group:</strong> according to their true preference D ≻ B ≻ C ≻ A, C is better than A. Lying has improved this group’s situation.</li>
+  </ol>
+</div>
+
+<p>This behavior is called <strong>tactical voting</strong>, or the “do not waste your vote” behavior: the voter votes not for their favorite but for the candidate who has a chance of winning and whom they find less bad. The cause of tactical voting is <strong>vote splitting</strong>: because the votes of the seven voters who oppose A were split between C and D, A was able to win with the support of a minority of voters.</p>
+
+<p>Tactical voting also has a long-term consequence. As voters think that voting for small candidates is wasted, votes concentrate on the two strongest candidates. In political science this observation is called <strong>Duverger’s law</strong>: a single-round plurality system pushes toward a two-party political structure. Single-member districts in the United Kingdom and the United States are frequently cited examples of this law.</p>
+
+<h3 id="s7-4-2"><span class="nt-num">7.4.2</span>Burying under Borda</h3>
+
+<p>The Borda count uses more information and is less affected by vote splitting. But it too is open to strategic behavior, and in a different way. In the honest Borda count B = 22 and D = 21. Group 3's favorite D loses by only 1 point.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-gomme">
+  <span class="nt-box__title">Example 7.15</span>
+  <ol class="nt-steps">
+    <li><strong>Manipulation:</strong> the 3 voters of Group 3 push the main rival B from 2nd place to 3rd. While the true ranking is D ≻ B ≻ C ≻ A, the ballot becomes D ≻ C ≻ B ≻ A.</li>
+    <li><strong>The point difference:</strong> for each manipulator, B gets 1 point instead of 2 and C gets 2 points instead of 1. For three voters, B <span class="m">−3</span> and C <span class="m">+3</span>. A’s and D’s scores do not change.</li>
+    <li><strong>New totals:</strong> A 18, B <span class="m">22 − 3 = 19</span>, C <span class="m">17 + 3 = 20</span>, D 21.</li>
+    <li><strong>Result:</strong> D wins. Group 3 got its favorite elected by lying.</li>
+  </ol>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-gomme">
+  <caption>Table 7.14: Burying under Borda: honest and strategic counts.</caption>
+  <thead><tr><th scope="col">candidate</th><th scope="col">honest</th><th scope="col">change</th><th scope="col">strategic</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">A</th><td>18</td><td>0</td><td>18</td></tr>
+    <tr><th scope="row">B</th><td class="is-ne">22</td><td>−3</td><td>19</td></tr>
+    <tr><th scope="row">C</th><td>17</td><td>+3</td><td>20</td></tr>
+    <tr><th scope="row">D</th><td>21</td><td>0</td><td class="is-ne">21</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>This manipulation is called <strong>burying</strong>: the voter “buries” the favorite’s main rival lower on their ballot than its true position. Under Borda, burying is very effective, because every difference in rank turns directly into a difference in points. Pushing a rival to the very bottom reduces the points given to it as much as possible.</p>
+
+<p>Burying has a risk: it can backfire. Pushing a rival down raises the score of another candidate who moves up in its place. If this other candidate is worse for the burying voters and rises enough, that candidate wins. For example, look at this profile with 9 voters: 4 × A ≻ B ≻ C, 3 × C ≻ B ≻ A, 2 × B ≻ C ≻ A. The honest Borda (2, 1, 0) scores are A 8, B 11, C 8, and B wins. If the A voters bury B and report A ≻ C ≻ B, C gains 4 points and B loses 4: A 8, B 7, C 12, and C wins. C is the worst candidate for the A voters; burying has made their situation worse. A successful burying requires accurate information about the other voters' ballots.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Measuring the success of a manipulation by whether the manipulator’s favorite wins. The criterion is whether the outcome improves according to the manipulator’s <em>true</em> preference. In the plurality example Group 3's favorite D does not win, but since the outcome moves from A to C, the group is better off; this too is a successful manipulation.</p>
+</div>
+
+<h3 id="s7-4-3"><span class="nt-num">7.4.3</span>How much does strategic voting disrupt the system?</h3>
+
+<p>The effect of strategic behavior differs by rule:</p>
+
+<ul>
+  <li><strong>Plurality:</strong> vote splitting is the basic problem. Two similar candidates share the votes and a third wins. Tactical voting is common and simple; the voter only needs to know who is ahead.</li>
+  <li><strong>Borda:</strong> burying the rival at the bottom is very effective. If everyone buries, the reported rankings drift away from the voters' true preferences, and the outcome can be a candidate nobody really wants.</li>
+  <li><strong>Instant-runoff:</strong> computing a manipulation is harder but possible; moreover the rule is not monotone. “IRV is immune to strategic voting” is a widespread but wrong belief.</li>
+  <li><strong>The computational barrier:</strong> for some rules (for example IRV and a variant of Copeland), finding a profitable manipulation is NP-hard (Bartholdi et al., 1989–91). This difficulty makes manipulation not impossible, but computationally expensive in the worst case.</li>
+</ul>
+
+<p>The effect of strategic voting depends on the distribution of preferences. In close races the strategic behavior of a few voters can change the winner; in races with large margins, the manipulation of small groups has no effect on the outcome. Transparent rules and clear information reduce some manipulations, but no general rule can eliminate strategic behavior in every case. This last sentence is not an observation but a theorem (<a href="#s7-5-4">Section 7.5.4</a>).</p>
+
+<h2 class="nt-pb" id="s7-5"><span class="nt-num">7.5</span>Impossibility theorems</h2>
+
+<p>In the previous sections a flaw was found in every rule: plurality can select the Condorcet loser, Borda is open to manipulation, IRV is not monotone, a Condorcet winner does not exist in every profile, and in a cycle a rule for a Condorcet extension (maximin, Kemeny) is needed. The natural question is: is there a more cleverly designed rule free of all these flaws? The answer of the theorems in this section, when there are three or more candidates, is “no.” These results teach not to give up the search for rules but to choose consciously which property to give up.</p>
+
+<h3 id="s7-5-1"><span class="nt-num">7.5.1</span>Arrow’s conditions</h3>
+
+<p>Kenneth Arrow (1951) asked the question in a very general form. Consider a rule that produces a social ranking, that is, a social welfare function (SWF). There are four conditions one might expect of such a rule that look very reasonable at first sight.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-arrow">
+  <span class="nt-box__title">Definition 7.15</span>
+  <p>For an SWF <span class="m">F</span>:</p>
+  <ul>
+    <li><strong>Unrestricted domain</strong>: every preference profile is admitted and the outcome is always a complete and transitive ranking.</li>
+    <li><strong>Pareto (unanimity)</strong>: if everyone prefers <span class="m">x</span> to <span class="m">y</span>, society prefers <span class="m">x</span> to <span class="m">y</span> too.</li>
+    <li><strong>Independence of irrelevant alternatives (IIA)</strong>: the social order of <span class="m">x</span> and <span class="m">y</span> depends only on the voters' <span class="m">x</span>–<span class="m">y</span> order. If in two profiles every voter orders <span class="m">x</span> and <span class="m">y</span> the same way, the social ranking also orders <span class="m">x</span> and <span class="m">y</span> the same way in the two profiles.</li>
+    <li><strong>Non-dictatorship</strong>: there is no single voter whose preference is society’s preference in every profile.</li>
+  </ul>
+</div>
+
+<p>Why each condition is reasonable can be explained briefly as follows. Unrestricted domain asks that the rule not restrict in advance what voters may think and that it give a consistent outcome in every case; the Condorcet cycle breaks the “transitive outcome” part of this condition for the majority ranking. Pareto is respect for unanimity: if all voters want the same thing, there is no reason for society to decide otherwise. IIA asks that the decision between two candidates not be affected by the presence or position of a third; for example, it would be odd for someone who says “between fish and chicken I would pick fish” to switch to chicken when pasta is added to the menu. The non-dictatorship condition is the most basic expectation of fairness.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-arrow">
+  <span class="nt-box__title">Theorem 7.1 (Arrow, 1951)</span>
+  <p>If there are at least 3 candidates, there is no social welfare function that satisfies unrestricted domain, Pareto, IIA, and non-dictatorship together. In other words, every SWF that satisfies unrestricted domain, Pareto, and IIA is a dictatorship.</p>
+</div>
+
+<p>The proof of the theorem is outside the scope of these notes; readable proofs can be found in the sources in <a href="#s7-10">Further reading</a>. The theorem does not hold for two candidates: with two candidates, simple majority satisfies all four conditions. This case is the subject of May’s theorem in <a href="#s7-5-5">Section 7.5.5</a>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Understanding IIA as “if a non-winning candidate withdraws, the winner should not change.” This is a common but incomplete interpretation. Arrow’s IIA can be violated with the candidate set fixed: a change in the social order of <span class="m">x</span> and <span class="m">y</span> when voters change only the positions of <em>other</em> candidates is also an IIA violation. The example in <a href="#s7-5-2">Section 7.5.2</a> shows both kinds.</p>
+</div>
+
+<h3 id="s7-5-2"><span class="nt-num">7.5.2</span>Borda and irrelevant alternatives</h3>
+
+<p>The Borda count satisfies unrestricted domain (in every profile the scores are added and a ranking comes out), satisfies Pareto (if everyone puts <span class="m">x</span> above <span class="m">y</span>, every voter gives <span class="m">x</span> more points), and is not a dictatorship. By Arrow’s theorem it must violate IIA. The example profile shows this violation clearly.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-iia">
+  <span class="nt-box__title">Example 7.16</span>
+  <ol class="nt-steps">
+    <li><strong>With four candidates:</strong> Borda B = 22 &gt; D = 21. Society puts B ahead of D.</li>
+    <li><strong>C withdraws from the race.</strong> C was neither winning nor second; C is an “irrelevant” candidate with respect to the B–D ranking. C is deleted from the rankings: 4 × A ≻ D ≻ B, 4 × B ≻ D ≻ A, 3 × D ≻ B ≻ A, 2 × A ≻ B ≻ D.</li>
+    <li><strong>Borda (2, 1, 0) for three candidates:</strong>
+      <ul>
+        <li>A: <span class="m">4 × 2 + 0 + 0 + 2 × 2 = 12</span>.</li>
+        <li>B: <span class="m">4 × 0 + 4 × 2 + 3 × 1 + 2 × 1 = 13</span>.</li>
+        <li>D: <span class="m">4 × 1 + 4 × 1 + 3 × 2 + 2 × 0 = 14</span>.</li>
+      </ul>
+    </li>
+    <li><strong>Result:</strong> D = 14 &gt; B = 13. The social order has flipped.</li>
+  </ol>
+  <p>No voter’s B–D order has changed: 6 voters prefer B to D and 7 prefer D to B, both before and after. But the social ranking has flipped from B ≻ D to D ≻ B. Borda violates IIA.</p>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-iia">
+  <caption>Table 7.15: Borda scores when C withdraws (4 candidates: 3, 2, 1, 0; 3 candidates: 2, 1, 0).</caption>
+  <thead><tr><th scope="col">candidate</th><th scope="col">4 candidates</th><th scope="col">without C</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">A</th><td>18</td><td>12</td></tr>
+    <tr><th scope="row">B</th><td class="is-ne">22</td><td>13</td></tr>
+    <tr><th scope="row">C</th><td>17</td><td>—</td></tr>
+    <tr><th scope="row">D</th><td>21</td><td class="is-ne">14</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Why does this happen? By the interpretation in <a href="#s7-2-3">Section 7.2.3</a>, a candidate’s Borda score is the number of candidates the voters put below it. When C withdraws, each candidate loses 1 point from every voter who put C below it. The voters who put C below B are G1, G3, and G4: <span class="m">4 + 3 + 2 = 9</span> people; B falls to <span class="m">22 − 9 = 13</span>. Those who put C below D are only G1 and G3: 7 people; D falls to <span class="m">21 − 7 = 14</span>. Those who put C below A are G1 and G4: 6 people; A falls to <span class="m">18 − 6 = 12</span>. C was giving B more “intermediate points” than it gave D; when C withdraws this difference disappears. The Borda score measures the <em>distance</em> between two candidates (how many candidates lie between them), and this distance depends on the other candidates. IIA, however, asks that only the relative order of the two candidates be looked at.</p>
+
+<p>IIA can also be violated without changing the candidate set. Let the 4-voter group A ≻ D ≻ B ≻ C only swap C and B and say A ≻ D ≻ C ≻ B. These voters' B–D order does not change (D is still ahead of B). But B’s score drops from 1 to 0 for each of them: B falls from 22 to <span class="m">22 − 4 = 18</span>. D stays at 21, while C rises to <span class="m">17 + 4 = 21</span>. The social B–D order flips again. Although no voter’s B–D order has changed, the social order of B and D has changed.</p>
+
+<h3 id="s7-5-3"><span class="nt-num">7.5.3</span>The practical meaning of Arrow’s theorem</h3>
+
+<p>Arrow’s theorem is often misinterpreted. What it says and what it does not say should be separated.</p>
+
+<ul>
+  <li><strong>What it says:</strong> collective decision rules cannot satisfy all reasonable criteria at once; every rule gives up one condition.</li>
+  <li><strong>What it does not say:</strong> it does not say that voting is meaningless. It does not ban or recommend any particular rule. Nor does it deny that most rules give reasonable results in most profiles; it says only that a condition will fail in <em>some</em> profiles.</li>
+  <li><strong>Who gives up what?</strong> Borda gives up IIA (<a href="#s7-5-2">Section 7.5.2</a>). The Condorcet or majority ranking gives up transitivity, and hence the “transitive outcome” part of unrestricted domain (the cycle). A dictatorship gives up fairness.</li>
+  <li><strong>For institutions:</strong> which criterion is given priority should be stated explicitly and documented. Choosing a rule is choosing which flaw to accept.</li>
+</ul>
+
+<p>The ways out of the theorem are to relax the conditions. The first is to restrict the domain of preferences: if not all profiles but only profiles of a certain structure are allowed, positive results are possible. The most important example is single-peaked preferences (<a href="#s7-5-6">Section 7.5.6</a>). The second is to use intensity information instead of rankings. In Arrow’s framework the voter reports only a ranking; there is no difference between “I slightly prefer A to B” and “I strongly prefer A to B.” Tools that carry intensity information, such as score voting or money, are outside this framework.</p>
+
+<h3 id="s7-5-4"><span class="nt-num">7.5.4</span>The Gibbard–Satterthwaite theorem</h3>
+
+<p>Arrow’s theorem is about social rankings and does not deal directly with strategic behavior. The question of strategic voting was answered by Allan Gibbard (1973) and Mark Satterthwaite (1975) independently of each other. Two conditions are needed to state the theorem.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-gs">
+  <span class="nt-box__title">Definition 7.16</span>
+  <p>For a social choice function (SCF) <span class="m">f</span>:</p>
+  <ul>
+    <li><strong>Surjectivity</strong> (onto): every candidate wins in at least one profile.</li>
+    <li><strong>Strategy-proofness</strong>: for every voter <span class="m">i</span>, every profile, and every false ballot <span class="m">≻'<sub>i</sub></span> of <span class="m">i</span>, the outcome <span class="m">f(≻<sub>i</sub>, ≻<sub>−i</sub>)</span> is not worse than <span class="m">f(≻'<sub>i</sub>, ≻<sub>−i</sub>)</span> according to <span class="m">i</span>'s true preference <span class="m">≻<sub>i</sub></span>. Here <span class="m">≻<sub>−i</sub></span> denotes the ballots of the other voters.</li>
+  </ul>
+</div>
+
+<div class="nt-box nt-box--teorem" id="teorem-gs">
+  <span class="nt-box__title">Theorem 7.2 (Gibbard 1973, Satterthwaite 1975)</span>
+  <p>If there are at least 3 candidates and each voter can report any strict ranking over the candidates (unrestricted domain), every social choice function that selects a single winner in every profile, is onto, and is strategy-proof is a dictatorship.</p>
+</div>
+
+<p>The definition of strategy-proofness reads in game-theoretic language as follows: the truthful ballot is a <em>dominant strategy</em> for every voter. Whatever the other voters report, telling the truth is at least as good for the voter as lying. The theorem says that this strong property, with three or more candidates and unrestricted preferences, is possible only for a dictatorship among single-winner rules in which every candidate can win (onto). (A constant rule that always picks the same candidate is also strategy-proof, but it is not onto.) A dictatorship really is strategy-proof: the dictator’s first choice wins, the dictator gains nothing by lying, and the ballots of the other voters do not affect the outcome at all.</p>
+
+<p>The example profile makes the theorem concrete. Group 3's tactical vote for C under plurality (<a href="#s7-4-1">Section 7.4.1</a>) and the burying of B under Borda (<a href="#s7-4-2">Section 7.4.2</a>) are proofs that these two rules are not strategy-proof. According to the theorem, this is not a flaw of these two rules alone: <em>every</em> onto rule other than a dictatorship can be manipulated in some profile.</p>
+
+<p>Its relation to Arrow: Arrow’s theorem is about rankings, and Gibbard–Satterthwaite is about a single winner. The two theorems are closely linked; the Gibbard–Satterthwaite theorem can be derived from Arrow’s theorem. In terms of mechanism design, the meaning is this: in a moneyless setting, there is no general incentive-compatible rule for choosing among three or more alternatives. When money can be used, the situation changes; payments allow the cost of lying to be adjusted, and strategy-proof mechanisms such as the VCG mechanism become possible.</p>
+
+<p>The goal of design is therefore not to eliminate strategic behavior but to limit it. Three ways of doing this are commonly used: voters knowing little about the other ballots (manipulation requires information about the profile), manipulation being computationally hard (<a href="#s7-6-1">Section 7.6.1</a>), and restricting the domain of preferences (<a href="#s7-5-6">Section 7.5.6</a>).</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Drawing from the theorem the conclusion that “every voter always lies.” The theorem says only that there is <em>at least one</em> profile in which the rule can be manipulated. In most profiles and for most voters, an honest vote may be the best option. Another mistake is to think the theorem also holds for two candidates; with two candidates the majority rule is strategy-proof.</p>
+</div>
+
+<h3 id="s7-5-5"><span class="nt-num">7.5.5</span>May’s theorem: simple majority for two candidates</h3>
+
+<p>The theorems of Arrow and of Gibbard–Satterthwaite both require at least three candidates. With two candidates the situation is much better. Kenneth May (1952) asked which rule is “fair” when there are two candidates (<span class="m">x</span> and <span class="m">y</span>) and showed that the only rule satisfying three conditions is simple majority. In <strong>simple majority</strong>, the candidate with more votes wins; if the votes are equal, the result is a tie.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-may">
+  <span class="nt-box__title">Definition 7.17</span>
+  <p>For a rule with two candidates:</p>
+  <ul>
+    <li><strong>Anonymity</strong>: voters' names do not matter; if the votes are permuted among the voters, the result stays the same.</li>
+    <li><strong>Neutrality</strong>: candidates' names do not matter; if every voter swaps <span class="m">x</span> and <span class="m">y</span>, the result also swaps.</li>
+    <li><strong>Positive responsiveness</strong>: if the result is a tie or <span class="m">x</span> is winning, and a voter changes their vote in favor of <span class="m">x</span> (the others staying the same), then <span class="m">x</span> strictly wins.</li>
+  </ul>
+</div>
+
+<div class="nt-box nt-box--teorem" id="teorem-may">
+  <span class="nt-box__title">Theorem 7.3 (May, 1952)</span>
+  <p>For two candidates, a rule satisfies anonymity, neutrality, and positive responsiveness if and only if it is simple majority.</p>
+</div>
+
+<p>One direction of the theorem is easy to see: simple majority satisfies all three conditions. It is anonymous, because the outcome depends only on how many votes each candidate gets; which voter cast which vote does not change the counts. It is neutral, because when every voter swaps <span class="m">x</span> and <span class="m">y</span>, the two candidates' vote counts swap and the winner swaps. It is positively responsive, because in a tie, one voter moving to <span class="m">x</span> puts <span class="m">x</span> one vote ahead; if <span class="m">x</span> is already ahead, it increases the margin. The real strength of the theorem lies in the other direction: there is no other rule satisfying these three conditions. Why each condition is necessary is seen from the rules that violate it.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--wide" id="tablo-may">
+  <caption>Table 7.16: The conditions of May’s theorem and the rules that violate them.</caption>
+  <thead><tr><th scope="col">Condition</th><th scope="col">Meaning</th><th scope="col">Violating rule</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Anonymity</th><td>Voters' names do not matter; if votes are permuted the result is the same</td><td>Dictator; weighted voting</td></tr>
+    <tr><th scope="row">Neutrality</th><td>Candidates' names do not matter; the two candidates are treated symmetrically</td><td>“The status quo does not change without ⅔” (qualified majority)</td></tr>
+    <tr><th scope="row">Positive responsiveness</th><td>In a tie, or when <span class="m">x</span> is winning, if a voter moves to <span class="m">x</span> then <span class="m">x</span> strictly wins</td><td>“Always a coin flip”; “whoever gets an odd number of votes wins”</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-may">
+  <span class="nt-box__title">Example 7.17</span>
+  <p>In a cooperative, 9 members vote on replacing the current bylaws (the status quo, <span class="m">x</span>) with new bylaws (<span class="m">y</span>). The rule: “the bylaws change only with at least ⅔ of the votes.” ⅔ of 9 is 6.</p>
+  <ul>
+    <li>5 members say <span class="m">y</span> and 4 say <span class="m">x</span>: <span class="m">y</span> does not reach 6; <span class="m">x</span> stays.</li>
+    <li>Now let every member reverse their vote: 5 members say <span class="m">x</span> and 4 say <span class="m">y</span>. <span class="m">x</span> stays again.</li>
+  </ul>
+  <p>Neutrality would require that when the votes are reversed, the outcome also be reversed (<span class="m">y</span> wins). The rule violates neutrality because it favors the status quo. The rule is anonymous (who votes does not matter).</p>
+</div>
+
+<p>Qualified majority rules are used deliberately for important decisions such as constitutional amendments; the aim is to make the status quo hard to change. May’s theorem says this has a price: such a rule does not treat the two options equally. The “always a coin flip” rule does not respond to the votes at all; in the “whoever gets an odd number of votes wins” rule, one voter moving to <span class="m">x</span> can make <span class="m">x</span> lose by turning its vote count from even to odd or from odd to even.</p>
+
+<p>The message of May’s theorem is this: with two candidates the debate over rules ends; simple majority is by far the most natural choice. The difficulties (the cycle, Arrow, Gibbard–Satterthwaite) begin with three or more candidates.</p>
+
+<h3 id="s7-5-6"><span class="nt-num">7.5.6</span>An escape route: single-peaked preferences</h3>
+
+<p>The common assumption of the Arrow and Gibbard–Satterthwaite theorems is unrestricted domain: every possible preference profile is allowed. But in many real situations preferences are not random; they have a certain structure. The most important of these structures is single-peakedness.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-tektepe">
+  <span class="nt-box__title">Definition 7.18</span>
+  <p>Let the candidates be ordered from left to right on an axis (for example the political left–right, an amount of budget, or a location on a street). If a voter has a most-liked position (the <strong>peak</strong>) and the voter’s utility falls in whichever direction a candidate moves away from this peak, the voter’s preference is <strong>single-peaked</strong>. If all voters' preferences are single-peaked with respect to the same axis, the profile is single-peaked.</p>
+</div>
+
+<figure class="nt-fig" id="sekil-tektepe" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 380 240" role="img" aria-label="Single-peaked utility curves of three voters on the left–right axis; the median peak is x3"><line class="axis" x1="30" y1="196" x2="360" y2="196"/><line class="axis" x1="50" y1="192" x2="50" y2="200"/><text class="lbl" x="50" y="216" text-anchor="middle">x1</text><line class="axis" x1="120" y1="192" x2="120" y2="200"/><text class="lbl" x="120" y="216" text-anchor="middle">x2</text><line class="axis" x1="190" y1="192" x2="190" y2="200"/><text class="lbl" x="190" y="216" text-anchor="middle">x3</text><line class="axis" x1="260" y1="192" x2="260" y2="200"/><text class="lbl" x="260" y="216" text-anchor="middle">x4</text><line class="axis" x1="330" y1="192" x2="330" y2="200"/><text class="lbl" x="330" y="216" text-anchor="middle">x5</text><text class="lbl" x="30" y="234" text-anchor="start">left</text><text class="lbl" x="360" y="234" text-anchor="end">right</text><polyline class="curve" points="50,120 120,40 190,90 260,140 330,175" style="stroke:var(--ds-link)"/><text class="lbl" x="110" y="36" text-anchor="end">voter 1</text><polyline class="curve" points="50,178 120,150 190,104 260,44 330,96" style="stroke:var(--ds-muted)"/><text class="lbl" x="270" y="40" text-anchor="start">voter 3</text><polyline class="curve" points="50,150 120,100 190,36 260,110 330,160" style="stroke:var(--ds-accent);stroke-width:3.4"/><text class="lbl" x="190" y="24" text-anchor="middle" style="font-weight:700;fill:var(--ds-accent)">voter 2 (median)</text><line class="line" x1="190" y1="40" x2="190" y2="192" style="stroke:var(--ds-accent);stroke-dasharray:5 4;stroke-width:1.4"/></svg></div>
+  <figcaption><b>Figure 7.11:</b> Positions x1–x5 on the left–right axis and the single-peaked utility curves of three voters. Voter 1's peak is x2, voter 2's is x3, and voter 3's is x4. The median peak is x3 (voter 2).</figcaption>
+</figure>
+
+<p>In <a href="#sekil-tektepe">Figure 7.11</a> each curve has a single summit and falls off on both sides of it. For example, suppose a city council votes on the budget to allocate to a park. Each member has an ideal amount in mind; proposals much higher or much lower please them less. Such preferences are naturally single-peaked.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-medyan">
+  <span class="nt-box__title">Theorem 7.4 (Median voter theorem; Black, 1948)</span>
+  <p>If preferences are single-peaked and the number of voters is odd, then when the peaks are sorted, the peak of the middle voter (the median voter) is the Condorcet winner. Moreover, no Condorcet cycle arises: since single-peakedness is preserved on every subset of candidates, every subset has a Condorcet winner; a subset consisting of the candidates in a cycle could not.</p>
+</div>
+
+<div class="nt-proof">
+  <p>Let the number of voters be <span class="m">n = 2k + 1</span> and the median peak <span class="m">t</span>. By definition there are at least <span class="m">k + 1</span> voters whose peak is at or to the left of <span class="m">t</span>, and at least <span class="m">k + 1</span> voters whose peak is at or to the right of <span class="m">t</span>. Consider a candidate <span class="m">z</span> to the right of <span class="m">t</span>. For a voter whose peak is at or to the left of <span class="m">t</span>, both <span class="m">t</span> and <span class="m">z</span> are to the right of the peak, and <span class="m">t</span> is closer to the peak. By single-peakedness, this voter prefers <span class="m">t</span> to <span class="m">z</span>. These voters number at least <span class="m">k + 1</span>, that is, they are a majority; <span class="m">t</span> beats <span class="m">z</span>. For a candidate to the left of <span class="m">t</span>, the same argument is made with the voters whose peak is at or to the right of <span class="m">t</span>. So <span class="m">t</span> beats every rival and is the Condorcet winner. <span class="nt-qed">□</span></p>
+</div>
+
+<p>The theorem has two important consequences. First, there are no Condorcet cycles in single-peaked profiles; this explains why the fact that real preferences are often organized along an axis makes cycles rare. Second, the rule “report your peak, pick the median” is strategy-proof. By reporting a false peak, a voter can only <em>move the median away</em> from their own peak. A voter whose peak is to the left of the median does not change the median by reporting a peak further left; by reporting a peak to the right, beyond the median, they shift the median to the right, that is, away from themselves. There is no lie that would bring the median closer to their own peak.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-medyan">
+  <span class="nt-box__title">Example 7.18</span>
+  <p>Let the peaks of five voters on the axis be 2, 3, 7, 8, 9. The value in the middle (third) of the sorted list is 7; the median peak is 7.</p>
+  <ul>
+    <li>Comparing 7 with a position to its left (for example 5), the 3 voters with peaks 7, 8, 9 choose 7; 7 wins 3 – 2.</li>
+    <li>Comparing 7 with a position to its right (for example 8.5), the 3 voters with peaks 2, 3, 7 choose 7; 7 again wins 3 – 2.</li>
+  </ul>
+  <p>The average of the peaks is <span class="m">(2 + 3 + 7 + 8 + 9)/5 = 5.8</span>, but the average is not the Condorcet winner: comparing 5.8 with 7, the 3 voters with peaks 7, 8, 9 choose 7. If the voter with peak 2 reports their peak as 0, the sorted list becomes 0, 3, 7, 8, 9 and the median is still 7; the lie gains nothing.</p>
+</div>
+
+<p>The median voter theorem does not contradict the Gibbard–Satterthwaite theorem; it removes one of its assumptions, unrestricted domain. The Gibbard–Satterthwaite theorem speaks about all profiles; once the domain is restricted to single-peaked profiles, the theorem no longer applies. The <strong>median mechanism</strong> used for facility location in mechanism design is an application of this idea: if a library or hospital is to be placed on a street and everyone wants the nearest location, the median of the reported locations is chosen and nobody can gain by reporting a false location.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <ul>
+    <li><strong>Taking the mean instead of the median:</strong> the mean is affected by extreme values and is not strategy-proof; a voter can pull the mean toward themselves by exaggerating their peak.</li>
+    <li><strong>Assuming every preference is single-peaked:</strong> single-peakedness is an assumption. For example, the preference of a voter who says “either a very large budget or no budget; the middle is the worst” is not single-peaked. If there are such voters, the median theorem cannot be applied.</li>
+  </ul>
+</div>
+
+<h3 id="s7-5-7"><span class="nt-num">7.5.7</span>The four results side by side</h3>
+
+<p>The four results in this section are compared in <a href="#tablo-teoremler">Table 7.17</a>.</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--wide" id="tablo-teoremler">
+  <caption>Table 7.17: Assumptions, conclusions, and escape routes of the four results.</caption>
+  <thead><tr><th scope="col">Theorem</th><th scope="col">Assumptions</th><th scope="col">Conclusion</th><th scope="col">Escape route</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Arrow (1951)</th><td>≥ 3 candidates, unrestricted domain, Pareto, IIA</td><td>The rule is a dictatorship</td><td>Restrict the preference domain (single-peaked); give up IIA; cardinal information instead of rankings (scores, intensity)</td></tr>
+    <tr><th scope="row">Gibbard–Satterthwaite (1973, 1975)</th><td>≥ 3 candidates, unrestricted domain, onto (every candidate can win), strategy-proof</td><td>The rule is a dictatorship</td><td>Single-peaked preferences; randomized rules (e.g. random dictator); money (VCG)</td></tr>
+    <tr><th scope="row">May (1952)</th><td>2 candidates; anonymity, neutrality, positive responsiveness</td><td>The rule is simple majority (and conversely)</td><td>Not needed: a characterization, not an impossibility</td></tr>
+    <tr><th scope="row">Single-peaked preferences (Black, 1948)</th><td>Candidates on an axis, each voter has a single peak, an odd number of voters</td><td>The median voter’s peak is the Condorcet winner; the median rule is strategy-proof</td><td>Is itself an escape route: restricts the unrestricted domain assumption</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The “random dictator” rule in the table deserves an explanation: one of the voters is chosen by lot and that voter’s first choice wins. This rule is strategy-proof (for the chosen voter, lying only costs them their favorite) and no voter is a dictator in advance. Since the Gibbard–Satterthwaite theorem holds only for deterministic (non-randomized) rules, this rule falls outside the theorem.</p>
+
+<p>In the theorems of Arrow and of Gibbard–Satterthwaite, the dictatorship appears when all the assumptions are demanded together. When one assumption is relaxed, positive results become possible: two candidates (May), single-peaked preferences (Black), randomness, or money. The practical value of these theorems is that they show the designer which doors are closed and which are open.</p>
+
+<h2 class="nt-pb" id="s7-6"><span class="nt-num">7.6</span>Computational social choice and applications</h2>
+
+<p>Social choice meets computer science and finds counterparts in real institutions. The computational cost of rules, collective decisions on propositions, the rules used in real elections, and proportional representation, in which several seats are allocated, are the main topics of this meeting.</p>
+
+<h3 id="s7-6-1"><span class="nt-num">7.6.1</span>Computational social choice</h3>
+
+<p><strong>Computational social choice</strong> is the intersection of computer science, economics, and social choice. In this field, rules are studied not only by which criteria they satisfy but also by their computational cost. Three kinds of questions stand out: how hard is it to compute the winner, how hard is it to compute a manipulation, and how much information must be collected from voters to determine the winner?</p>
+
+<p><strong>Computing the winner.</strong> Plurality and Borda are computed in <span class="m">O(nm)</span> time for <span class="m">n</span> voters and <span class="m">m</span> candidates; each ballot is read once (<a href="#s7-2-10">Section 7.2.10</a>). For Copeland, the pairwise comparison table is filled first: for each of the <span class="m">m(m − 1)/2</span> pairs, <span class="m">n</span> ballots are scanned; the time is <span class="m">O(nm<sup>2</sup>)</span>. By contrast, finding the winner under the Kemeny rule and the Dodgson rule is NP-hard (Bartholdi, Tovey, and Trick, 1989). The <strong>Dodgson rule</strong> was proposed by Lewis Carroll (real name Charles Dodgson), the author of <em>Alice in Wonderland</em>: the candidate who needs the fewest <em>adjacent swaps</em> (exchanging the positions of two neighboring candidates in a ranking) on the ballots to become the Condorcet winner wins. If a Condorcet winner exists, it needs zero changes and wins. The idea is natural, but computing this smallest number is in general very hard.</p>
+
+<p>There is an irony here: some rules that satisfy the Condorcet criteria and decide sensibly in a cycle (Kemeny, Dodgson) are the computationally most expensive rules. In practice with few candidates this is not a problem; with many candidates, approximation algorithms and integer programming solvers are used.</p>
+
+<p><strong>Computing manipulation.</strong> The Gibbard–Satterthwaite theorem says that manipulation is possible, but how hard it is to <em>find</em> a profitable false ballot is a separate question. A single manipulator finds a profitable ballot under plurality and Borda in polynomial time with a greedy algorithm: place the favorite first and fill in the remaining positions so as to threaten the favorite as little as possible. Under IRV, however, the problem is NP-hard (Bartholdi and Orlin, 1991). This hardness can be regarded as a “barrier” against manipulation. But the barrier holds only for the worst case: although some instances of an NP-hard problem are hard, most instances encountered in real elections can be solved easily.</p>
+
+<p><strong>Preference elicitation.</strong> How much information is needed to learn a voter’s full ranking? For <span class="m">m</span> candidates there are <span class="m">m!</span> different rankings. Each yes/no question (one bit) halves the number of possible rankings at best. A full ranking therefore needs at least <span class="m">log<sub>2</sub>(m!)</span> bits. For <span class="m">m = 10</span>, <span class="m">10! = 3,628,800</span> and <span class="m">log<sub>2</sub>(3,628,800) ≈ 21.8</span>, that is, about 22 bits. In large elections or online systems with many candidates this communication cost matters. <strong>Preference elicitation</strong> studies asking voters questions step by step and collecting only the information sufficient to determine the winner. For example, under plurality the first choice alone is enough; asking for the full ranking is unnecessary.</p>
+
+<p>The field has two more topics: <strong>fair division</strong> (sharing divisible or indivisible resources without creating envy) and <strong>judgment aggregation</strong> (<a href="#s7-6-2">Section 7.6.2</a>).</p>
+
+<h3 id="s7-6-2"><span class="nt-num">7.6.2</span>Judgment aggregation: the doctrinal paradox</h3>
+
+<p>Voting is not used only to choose among candidates. A panel of judges, a board of directors, or a scientific committee often decides on <em>propositions</em>: “is the contract valid?”, “was the contract breached?”. Turning individual judgments into a collective judgment is called <strong>judgment aggregation</strong>.</p>
+
+<p>Consider a court with three judges. The defendant pays damages only if both propositions <span class="m">p</span> (the contract is valid) and <span class="m">q</span> (the contract was breached) are true. The conclusion proposition is <span class="m">p ∧ q</span> (“<span class="m">p</span> and <span class="m">q</span>”).</p>
+
+<div class="nt-tablewrap">
+<table class="nt-table" id="tablo-doktrin">
+  <caption>Table 7.18: The doctrinal paradox: three judges, two premises, one conclusion.</caption>
+  <thead><tr><th scope="col">Judge</th><th scope="col">p</th><th scope="col">q</th><th scope="col">Conclusion: p ∧ q</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Judge 1</th><td>yes</td><td>yes</td><td>yes</td></tr>
+    <tr><th scope="row">Judge 2</th><td>yes</td><td>no</td><td>no</td></tr>
+    <tr><th scope="row">Judge 3</th><td>no</td><td>yes</td><td>no</td></tr>
+    <tr><th scope="row">Majority</th><td>yes (2–1)</td><td>yes (2–1)</td><td>no (1–2)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Each judge is consistent: Judge 1 accepts both premises and awards damages; Judges 2 and 3 each reject one of the premises and oppose damages. But when the propositions are voted on one by one, the majority says “<span class="m">p</span> is true, <span class="m">q</span> is true, <span class="m">p ∧ q</span> is false.” This is a logically inconsistent collective judgment. This situation is called the <strong>doctrinal paradox</strong> (discursive dilemma; Kornhauser and Sager, 1986).</p>
+
+<p>The practical consequence of the paradox is that the decision depends on procedure. If the court decides <em>by premises</em> (first <span class="m">p</span> and <span class="m">q</span> are voted on separately, and the conclusion is derived from them), the defendant pays. If it decides <em>by conclusion</em> (<span class="m">p ∧ q</span> is voted on directly), the defendant does not pay. Two different decisions come from the same judgments. This is the counterpart of the Condorcet cycle in judgments: individuals are consistent, the majority is inconsistent.</p>
+
+<p>List and Pettit (2002) turned this observation into a theorem: there is no aggregation rule that is anonymous, systematic (each proposition is decided by the same method and only according to the votes on that proposition), and always produces a consistent collective judgment. This is the counterpart of Arrow’s theorem for judgments.</p>
+
+<h3 id="s7-6-3"><span class="nt-num">7.6.3</span>Voting rules in the real world</h3>
+
+<p>Most of the rules in this chapter are used in real institutions:</p>
+
+<ul>
+  <li><strong>The two-round system:</strong> presidential elections in Türkiye and France. If no majority is reached in the first round, the top two candidates compete in the second round.</li>
+  <li><strong>Instant-runoff:</strong> elections to the Australian House of Representatives and some US cities. The voter gives a full ranking.</li>
+  <li><strong>Plurality:</strong> single-member districts in the United Kingdom and the United States. In each district the candidate with the most votes is elected.</li>
+  <li><strong>Borda-like scoring:</strong> in the Eurovision Song Contest, each country gives 12, 10, 8, 7, … points to the songs it likes; similar scoring is used in sports awards (for example in most valuable player votes).</li>
+  <li><strong>Approval:</strong> some scientific society elections; “times when I am available” polls.</li>
+  <li><strong>Online:</strong> Reddit and forum voting, community polls, class and club decisions.</li>
+</ul>
+
+<p>Eurovision’s score vector (12, 10, 8, 7, 6, 5, 4, 3, 2, 1, 0, …) is a positional scoring rule. Giving first place 2 points more than second place is meant to reward the first choice a little more than Borda does. This design choice is also an example of the discussion in <a href="#s7-2-5">Section 7.2.5</a>: the score vector sets the balance between compromise candidates and candidates with strong base support.</p>
+
+<h3 id="s7-6-4"><span class="nt-num">7.6.4</span>Several seats: proportional representation and D’Hondt</h3>
+
+<p>The rules so far choose a single winner. In parliamentary elections, however, several seats, say <span class="m">S</span>, are allocated from one electoral district. The aim then is not to find a winner but to share the seats among parties. According to the principle of <strong>proportional representation</strong>, each party’s share of seats should be close to its share of votes. Since seats are integers, exact proportionality is generally impossible, and how to round is a choice of method.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-dhondt">
+  <span class="nt-box__title">Definition 7.19</span>
+  <p><strong>D’Hondt method</strong>: each party’s votes are divided by 1, 2, 3, …. All the quotients of all the parties are sorted in a single list from largest to smallest; the largest <span class="m">S</span> quotients each win one seat. A party’s number of seats is the number of its own quotients among these <span class="m">S</span> quotients.</p>
+</div>
+
+<p>In Türkiye’s parliamentary elections the D’Hondt method is applied in each electoral district; in addition there is a nationwide threshold.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-dhondt">
+  <span class="nt-box__title">Example 7.19</span>
+  <p>6 seats; votes A 42,000, B 31,000, C 15,000, D 12,000 (100,000 in total).</p>
+  <ol class="nt-steps">
+    <li>Each party’s votes are divided by 1, 2, 3, 4 (<a href="#tablo-dhondt">Table 7.19</a>).</li>
+    <li>All the quotients are arranged from largest to smallest: 42,000 (A ÷ 1), 31,000 (B ÷ 1), 21,000 (A ÷ 2), 15,500 (B ÷ 2), 15,000 (C ÷ 1), 14,000 (A ÷ 3), 12,000 (D ÷ 1), ….</li>
+    <li>The largest six quotients get seats: three of A’s, two of B’s, and one of C’s. D’s 12,000, in seventh place, is left out.</li>
+  </ol>
+  <p>Result: A 3, B 2, C 1, D 0.</p>
+</div>
+
+<div class="nt-tablewrap">
+<table class="nt-table nt-table--matrix" id="tablo-dhondt">
+  <caption>Table 7.19: D’Hondt quotients. The highlighted cells are the largest six quotients.</caption>
+  <thead><tr><th scope="col">Divisor</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">÷1</th><td class="is-ne">42,000</td><td class="is-ne">31,000</td><td class="is-ne">15,000</td><td>12,000</td></tr>
+    <tr><th scope="row">÷2</th><td class="is-ne">21,000</td><td class="is-ne">15,500</td><td>7,500</td><td>6,000</td></tr>
+    <tr><th scope="row">÷3</th><td class="is-ne">14,000</td><td>10,333</td><td>5,000</td><td>4,000</td></tr>
+    <tr><th scope="row">÷4</th><td>10,500</td><td>7,750</td><td>3,750</td><td>3,000</td></tr>
+    <tr><th scope="row">Seats</th><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The division has an interpretation: a party’s <span class="m">k</span>th quotient is the number of “votes per seat” if the party takes one more seat when it already has <span class="m">k − 1</span> seats. Each seat is given to the party that would represent the most votes per seat at that moment. As a result, A takes 50% of the seats with 42% of the votes, and D, with 12% of the votes, gets no seats. D’Hondt slightly favors large parties.</p>
+
+<p>Another method is the <strong>largest remainder</strong> (Hare) method. Each party’s “entitled” number of seats is computed as vote share × <span class="m">S</span>: A <span class="m">0.42 × 6 = 2.52</span>, B <span class="m">0.31 × 6 = 1.86</span>, C <span class="m">0.15 × 6 = 0.90</span>, D <span class="m">0.12 × 6 = 0.72</span>. Each party first gets as many seats as the integer part of this number: A 2, B 1, C 0, D 0; 3 in total. The remaining 3 seats are given one by one to the parties with the largest fractional parts: C (0.90), B (0.86), D (0.72). A’s fractional part (0.52) is the smallest. Result: A 2, B 2, C 1, D 1. With the same votes, D’Hondt gives A 3 seats, and the largest remainder method gives D 1 seat.</p>
+
+<p>As with single-winner rules, every method here is a trade-off. D’Hondt emphasizes government stability, that is, the ability of large parties to form a majority; the largest remainder method emphasizes the representation of small parties.</p>
+
+<h3 id="s7-6-5"><span class="nt-num">7.6.5</span>Which voting rule is fair?</h3>
+
+<p>All the results of the chapter show that there is no single answer to this question. Judging fairness depends on criteria such as representation, majority support, protection of minorities, and strategy-proofness, and these criteria conflict with one another.</p>
+
+<ul>
+  <li><strong>Plurality</strong> is simple and fast, but it can lead to vote splitting and to a winner without majority support (in the example profile, A with 6/13 of the votes).</li>
+  <li><strong>Borda</strong> uses more preference information and promotes the compromise candidate (B), but it is open to strategic ranking, especially burying.</li>
+  <li><strong>Instant-runoff</strong> seeks majority support, but it does not fully solve the problems of monotonicity and strategic voting.</li>
+  <li><strong>Condorcet methods</strong> respect pairwise majorities but need an additional rule in a cycle; those that also decide in a cycle, such as Kemeny, are hard to compute.</li>
+</ul>
+
+<p>The choice of rule should be made according to the context of the decision and the priority criteria. For a club presidency, a fast and understandable plurality may be enough; for choosing a class activity with many candidates, a ranking-based rule (Borda or a Condorcet method) may give a more balanced outcome. What matters is that the rule is determined explicitly before the vote and that it is known which flaws are accepted.</p>
+
+<h2 class="nt-pb" id="s7-7"><span class="nt-num">7.7</span>Summary</h2>
+
+<ul>
+  <li><strong>Social choice</strong> studies rules that turn individual preferences (the preference profile) into a collective decision (SCF) or a social ranking (SWF). The ballot is the voter’s strategy; voting is a moneyless mechanism design problem.</li>
+  <li><strong>Rules:</strong> majority, plurality, the two-round system, Borda, approval, positional scoring, instant-runoff, Condorcet, Copeland, maximin, and Kemeny. In the 13-voter example profile these rules give four different winners: plurality A, two-round and IRV C, Borda and 2-approval B, Condorcet and Kemeny D.</li>
+  <li><strong>The Condorcet paradox:</strong> transitive individual preferences can produce a cyclic social preference (A ≻ B ≻ C ≻ A). In a cycle, whoever controls the agenda chooses the outcome; the candidate left for last wins. Kemeny chooses the ranking that disagrees least with the pairwise majorities (in a three-candidate cycle it overrides the weakest majority), but it is NP-hard to compute.</li>
+  <li><strong>Criteria:</strong> plurality can select the Condorcet loser; Borda and IRV may not select the Condorcet winner; IRV is not monotone; Copeland and Kemeny are Condorcet consistent.</li>
+  <li><strong>Strategic voting:</strong> tactical voting under plurality (avoiding vote splitting), burying under Borda. Honesty is not the best strategy under every rule; burying can also backfire.</li>
+  <li><strong>Arrow:</strong> with at least 3 candidates, unrestricted domain, Pareto, IIA, and non-dictatorship cannot all hold together. Borda violates IIA.</li>
+  <li><strong>Gibbard–Satterthwaite:</strong> with at least 3 candidates, every strategy-proof and onto rule is a dictatorship.</li>
+  <li><strong>May and single-peakedness:</strong> with 2 candidates, simple majority is the only rule satisfying anonymity, neutrality, and positive responsiveness. With single-peaked preferences, the median voter’s peak is the Condorcet winner and the median rule is strategy-proof.</li>
+  <li><strong>Computational social choice:</strong> plurality and Borda <span class="m">O(nm)</span>, Copeland <span class="m">O(nm<sup>2</sup>)</span>; Kemeny and Dodgson are NP-hard; manipulation under IRV is NP-hard. The doctrinal paradox is the counterpart of the cycle for judgments. D’Hondt slightly favors large parties.</li>
+</ul>
+
+<h2 id="s7-8"><span class="nt-num">7.8</span>Key terms</h2>
+
+
+<ul class="nt-concepts">
+  <li>social choice</li>
+  <li>preference profile</li>
+  <li>ballot</li>
+  <li>transitivity</li>
+  <li>social welfare function (SWF)</li>
+  <li>majority rule</li>
+  <li>plurality rule</li>
+  <li>two-round (runoff) system</li>
+  <li>Borda count</li>
+  <li>approval voting</li>
+  <li>positional scoring rule</li>
+  <li>k-approval</li>
+  <li>2-approval</li>
+  <li>veto rule</li>
+  <li>instant-runoff voting (IRV)</li>
+  <li>Condorcet winner</li>
+  <li>Condorcet loser</li>
+  <li>pairwise majority graph</li>
+  <li>tournament</li>
+  <li>Copeland rule</li>
+  <li>tie-breaking rule</li>
+  <li>Condorcet paradox / cycle</li>
+  <li>sequential pairwise voting</li>
+  <li>agenda (manipulation)</li>
+  <li>Kemeny rule</li>
+  <li>rank aggregation</li>
+  <li>monotonicity</li>
+  <li>maximin (Simpson) rule</li>
+  <li>strategic voting</li>
+  <li>tactical voting (plurality)</li>
+  <li>vote splitting</li>
+  <li>Duverger’s law</li>
+  <li>burying</li>
+  <li>Arrow’s impossibility theorem</li>
+  <li>unrestricted domain</li>
+  <li>Pareto (unanimity) condition</li>
+  <li>independence of irrelevant alternatives (IIA)</li>
+  <li>non-dictatorship</li>
+  <li>Gibbard–Satterthwaite theorem</li>
+  <li>surjectivity (onto)</li>
+  <li>May’s theorem</li>
+  <li>simple majority</li>
+  <li>anonymity</li>
+  <li>neutrality</li>
+  <li>positive responsiveness</li>
+  <li>qualified majority</li>
+  <li>single-peaked preferences</li>
+  <li>median voter theorem</li>
+  <li>median mechanism</li>
+  <li>computational social choice</li>
+  <li>Dodgson rule</li>
+  <li>preference elicitation</li>
+  <li>judgment aggregation</li>
+  <li>doctrinal paradox</li>
+  <li>proportional representation</li>
+  <li>D’Hondt method</li>
+  <li>largest remainder (Hare) method</li>
+</ul>
+
+<h2 id="s7-9"><span class="nt-num">7.9</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>11 voters: 5 × A ≻ B ≻ C, 4 × B ≻ C ≻ A, 2 × C ≻ B ≻ A. Who are the majority, plurality, IRV, Borda (2, 1, 0), and Condorcet winners? Is there a Condorcet loser in the profile?</p>
+    <details><summary>Answer</summary>
+      <p>First choices are A 5, B 4, C 2. The threshold is 6; since <span class="m">5 &lt; 6</span> there is no majority winner. Plurality selects A. IRV: C (2) is eliminated and the votes pass to the next candidate, B; B <span class="m">4 + 2 = 6</span>, A 5; B wins. Borda: A <span class="m">5 × 2 = 10</span>, B <span class="m">5 × 1 + 4 × 2 + 2 × 1 = 15</span>, C <span class="m">4 × 1 + 2 × 2 = 8</span>; B wins. Pairwise: B – A 6 – 5, B – C 9 – 2, C – A 6 – 5. B is the Condorcet winner. A loses 5 – 6 to both rivals: A is the Condorcet loser, and plurality selected exactly A.</p>
+    </details>
+  </li>
+  <li>
+    <p>In the same profile consider the scoring rules <span class="m">s = (1, a, 0)</span> (<span class="m">0 ≤ a ≤ 1</span>). What is each candidate’s score in terms of <span class="m">a</span>? For which values of <span class="m">a</span> does A win? Can C ever win?</p>
+    <details><summary>Answer</summary>
+      <p>A is never second in any ranking: A = 5. B is the first choice of 4 voters and the second choice of <span class="m">5 + 2 = 7</span> voters: B = <span class="m">4 + 7a</span>. C is the first choice of 2 voters and the second choice of 4 voters: C = <span class="m">2 + 4a</span>. For A to beat B we need <span class="m">5 &gt; 4 + 7a</span>, that is, <span class="m">a &lt; 1/7</span> (at <span class="m">a = 1/7</span>, A and B are tied). In this range A also beats C (<span class="m">5 &gt; 2 + 4a</span>). C cannot win for any <span class="m">a</span>, because <span class="m">4 + 7a &gt; 2 + 4a</span> for every <span class="m">a ≥ 0</span>.</p>
+    </details>
+  </li>
+  <li>
+    <p>In the same profile the honest plurality winner is A. (a) How can the 2 voters with C ≻ B ≻ A vote under plurality to get a better outcome according to their preferences? (b) If Borda (2, 1, 0) is used, what happens if the A voters bury the main rival B and report A ≻ C ≻ B?</p>
+    <details><summary>Answer</summary>
+      <p>(a) C (2 votes) has no chance of winning. If these two voters vote for B, B gets <span class="m">4 + 2 = 6</span>, A gets 5, and B wins. According to their true ranking C ≻ B ≻ A, B is better than A: the tactical vote is profitable. (b) For each A voter, B gets 0 points instead of 1 and C gets 1 point instead of 0: B <span class="m">15 − 5 = 10</span>, C <span class="m">8 + 5 = 13</span>, A 10. C wins. C is the worst candidate for the A voters; the burying has backfired.</p>
+    </details>
+  </li>
+  <li>
+    <p>7 voters: 3 × A ≻ B ≻ C, 2 × B ≻ C ≻ A, 2 × C ≻ A ≻ B. What are the results of the pairwise comparisons, the Kemeny ranking, and the maximin winner? How should the agenda be set up in sequential pairwise voting for B to win?</p>
+    <details><summary>Answer</summary>
+      <p>A – B: <span class="m">3 + 2 = 5</span> – 2, A ≻ B. B – C: <span class="m">3 + 2 = 5</span> – 2, B ≻ C. C – A: <span class="m">2 + 2 = 4</span> – 3, C ≻ A. There is a cycle. Agreement scores: A ≻ B ≻ C <span class="m">5 + 3 + 5 = 13</span>, B ≻ C ≻ A 11, C ≻ A ≻ B 11, A ≻ C ≻ B 10, B ≻ A ≻ C 10, C ≻ B ≻ A 8. The Kemeny ranking is A ≻ B ≻ C; the weakest majority, C ≻ A (4 – 3), is overridden. Maximin: A’s worst comparison is 3 (against C), B’s is 2, and C’s is 2; A wins. For B to win, B is left for last: first A – C (C wins 4 – 3), then C – B (B wins 5 – 2).</p>
+    </details>
+  </li>
+  <li>
+    <p>Three rules are proposed for decisions with two options (<span class="m">x</span> and <span class="m">y</span>): (i) “The chair’s vote counts double, and whoever gets the most votes wins”; (ii) “at least ⅗ of the votes are needed to accept <span class="m">y</span>, otherwise <span class="m">x</span> stays”; (iii) “if the number of votes for <span class="m">x</span> is even, <span class="m">x</span> wins; if odd, <span class="m">y</span> wins.” Which condition of May’s theorem does each violate?</p>
+    <details><summary>Answer</summary>
+      <p>(i) Anonymity: the outcome can change when the votes of the chair and another member are swapped. (ii) Neutrality: the two options are not symmetric. For example, with 11 members, if 6 members say <span class="m">y</span> and 5 say <span class="m">x</span>, <span class="m">x</span> stays since <span class="m">6/11 &lt; 3/5</span>. When the votes are reversed (6 members say <span class="m">x</span>, 5 say <span class="m">y</span>), <span class="m">x</span> stays again; the outcome does not reverse. (iii) Positive responsiveness: when <span class="m">x</span> is winning, one voter moving to <span class="m">x</span> makes the count odd and makes <span class="m">x</span> lose.</p>
+    </details>
+  </li>
+  <li>
+    <p>The peaks of 7 voters with single-peaked preferences on an axis are 1, 1, 2, 4, 6, 9, 10. Which position is the Condorcet winner? What is the average of the peaks? In the rule “report your peak, pick the median,” what happens if the voter with peak 10 reports their peak as 20 or as 3?</p>
+    <details><summary>Answer</summary>
+      <p>The median is the fourth value of the sorted list: 4. By the median voter theorem the Condorcet winner is 4. The average is <span class="m">33/7 ≈ 4.71</span>; comparing 4 with 4.71, the 4 voters with peaks 1, 1, 2, 4 choose 4. If the voter reports 20, the list becomes 1, 1, 2, 4, 6, 9, 20 and the median is still 4; the exaggeration does not work. If they report 3, the list becomes 1, 1, 2, 3, 4, 6, 9 and the median falls to 3; the outcome moves even farther from this voter’s peak. Lying does not pay.</p>
+    </details>
+  </li>
+  <li>
+    <p>7 seats; votes A 47,000, B 33,000, C 20,000. What is the seat allocation under the D’Hondt and largest remainder (Hare) methods?</p>
+    <details><summary>Answer</summary>
+      <p>D’Hondt quotients: A 47,000, 23,500, 15,667, 11,750; B 33,000, 16,500, 11,000; C 20,000, 10,000. The largest seven quotients are 47,000 (A), 33,000 (B), 23,500 (A), 20,000 (C), 16,500 (B), 15,667 (A), 11,750 (A): A 4, B 2, C 1. Hare: the entitled numbers are A <span class="m">0.47 × 7 = 3.29</span>, B 2.31, C 1.40; the integer parts are 3, 2, 1 (6 in total). The remaining 1 seat goes to the largest fractional part (C, 0.40): A 3, B 2, C 2. D’Hondt gives the large party one seat more.</p>
+    </details>
+  </li>
+  <li>
+    <p>A Kemeny count with 8 candidates is to be done by brute force. How many rankings are tried, and how many pairs are examined in each ranking? At least how many bits are needed to learn one voter’s full ranking?</p>
+    <details><summary>Answer</summary>
+      <p><span class="m">8! = 40,320</span> rankings are tried. Each ranking has <span class="m">8 · 7 / 2 = 28</span> pairs; in total <span class="m">40,320 × 28 = 1,128,960</span> pair evaluations are needed (each one a scan of <span class="m">n</span> groups). A full ranking needs <span class="m">log<sub>2</sub>(8!) = log<sub>2</sub>(40,320) ≈ 15.3</span>, that is, at least 16 bits (the number of bits must be an integer).</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s7-10"><span class="nt-num">7.10</span>Further reading</h2>
+
+<ul>
+  <li>F. Brandt, V. Conitzer, U. Endriss, J. Lang, A. D. Procaccia (eds.), <em>Handbook of Computational Social Choice</em>, Cambridge University Press, 2016. The main reference for computational social choice; its chapters on Kemeny, Dodgson, the complexity of manipulation, and judgment aggregation elaborate the topics of these notes.</li>
+  <li>D. Easley, J. Kleinberg, <em>Networks, Crowds, and Markets</em>, Cambridge University Press, 2010, Chapter 23 (Voting). Presents a short and readable proof of Arrow’s theorem and single-peaked preferences with little mathematics.</li>
+  <li>A. Karlin, Y. Peres, <em>Game Theory, Alive</em>, AMS, 2017. The chapter on social choice and voting gives proofs of the Arrow and Gibbard–Satterthwaite theorems.</li>
+  <li>N. Nisan, T. Roughgarden, É. Tardos, V. Vazirani (eds.), <em>Algorithmic Game Theory</em>, Cambridge University Press, 2007, Chapter 9. Places social choice in the framework of mechanism design and contains a proof of the Gibbard–Satterthwaite theorem.</li>
+</ul>
+
+<h2 id="s7-11"><span class="nt-num">7.11</span>References</h2>
+
+<ol class="nt-refs">
+  <li>K. J. Arrow, <em>Social Choice and Individual Values</em>, Wiley, 1951.</li>
+  <li>M. Balinski, H. P. Young, <em>Fair Representation</em>, Yale University Press, 1982.</li>
+  <li>J. J. Bartholdi, J. B. Orlin, “Single transferable vote resists strategic voting”, <em>Social Choice and Welfare</em> 8(4), 1991.</li>
+  <li>J. J. Bartholdi, C. A. Tovey, M. A. Trick, “The computational difficulty of manipulating an election”, <em>Social Choice and Welfare</em> 6, 1989.</li>
+  <li>J. J. Bartholdi, C. A. Tovey, M. A. Trick, “Voting schemes for which it can be difficult to tell who won the election”, <em>Social Choice and Welfare</em> 6, 1989.</li>
+  <li>D. Black, “On the rationale of group decision-making”, <em>Journal of Political Economy</em> 56(1), 1948.</li>
+  <li>F. Brandt, V. Conitzer, U. Endriss, J. Lang, A. D. Procaccia (ed.), <em>Handbook of Computational Social Choice</em>, Cambridge University Press, 2016.</li>
+  <li>C. Dwork, R. Kumar, M. Naor, D. Sivakumar, “Rank aggregation methods for the web”, <em>WWW</em>, 2001.</li>
+  <li>D. Easley, J. Kleinberg, <em>Networks, Crowds, and Markets</em>, Cambridge University Press, 2010 (Chapter 23).</li>
+  <li>A. Gibbard, “Manipulation of voting schemes: a general result”, <em>Econometrica</em> 41(4), 1973.</li>
+  <li>G.-Th. Guilbaud, “Les théories de l’intérêt général et le problème logique de l’agrégation”, <em>Économie appliquée</em> 5(4), 1952.</li>
+  <li>A. Karlin, Y. Peres, <em>Game Theory, Alive</em>, AMS, 2017.</li>
+  <li>J. G. Kemeny, “Mathematics without numbers”, <em>Daedalus</em> 88(4), 1959.</li>
+  <li>L. A. Kornhauser, L. G. Sager, “Unpacking the court”, <em>Yale Law Journal</em> 96(1), 1986.</li>
+  <li>C. List, P. Pettit, “Aggregating sets of judgments: an impossibility result”, <em>Economics and Philosophy</em> 18(1), 2002.</li>
+  <li>K. O. May, “A set of independent necessary and sufficient conditions for simple majority decision”, <em>Econometrica</em> 20(4), 1952.</li>
+  <li>N. Nisan, T. Roughgarden, É. Tardos, V. Vazirani (eds.), <em>Algorithmic Game Theory</em>, Cambridge University Press, 2007 (Chapter 9).</li>
+  <li>M. Regenwetter, B. Grofman, A. A. J. Marley, I. M. Tsetlin, <em>Behavioral Social Choice</em>, Cambridge University Press, 2006.</li>
+  <li>M. A. Satterthwaite, “Strategy-proofness and Arrow’s conditions”, <em>Journal of Economic Theory</em> 10, 1975.</li>
+</ol>
+
+<p class="nt-foot">Course pages: <a href="https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html">Procaccia 15-896 (CMU)</a> · <a href="https://www.cs.toronto.edu/~nisarg/teaching/304f19/">Shah CSC304 (Toronto)</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* open the Test Yourself answers when printing, then restore them */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>

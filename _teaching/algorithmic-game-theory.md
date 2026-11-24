@@ -187,13 +187,28 @@ Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik da
 
 ---
 
+## Textbook
+
+[📕 Algorithmic Game Theory — the course book (PDF, 14 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algorithmic-Game-Theory.pdf)
+
+---
+
+## Getting Started
+
+* [Important People in Algorithmic Game Theory (HTML)](/files/agt/Important_People.html)
+* [Prerequisites for Algorithmic Game Theory (HTML)](/files/agt/Prerequisites.html)
+* [Course Map (HTML)](/files/agt/Course_Map.html)
+* [Dictionary of Terms (HTML)](/files/agt/Dictionary.html)
+
+---
+
 ## Part I: Tools and Foundations
 
 ### Chapter 0: Preliminaries
 
 This chapter reviews the mathematics the course actually uses, always through small game examples. It covers set and function notation, the summation sign, max and argmax, probability and expected value, and the idea of a mixed strategy. Students then practice reading a payoff matrix, finding best responses, solving indifference equations and applying backward induction on a game tree.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_00_Preliminaries.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_00_Preliminaries.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_00_Preliminaries.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_00_Preliminaries.pdf) · [📖 Notes](/files/agt/notes/Chapter_00_Preliminaries_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_00_Preliminaries_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter00)
 
 ---
 
@@ -201,7 +216,8 @@ This chapter reviews the mathematics the course actually uses, always through sm
 
 Before turning to strategic interaction, we study a single decision maker. Topics include expected utility and the von Neumann–Morgenstern axioms, the transformations under which a utility scale is unique, and the Allais and Ellsberg paradoxes. The chapter continues with risk attitudes and certainty equivalents, decision criteria under uncertainty, Bayesian decision making, backward induction in decision trees and the value of information.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_01_Decision_Theory.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_01_Decision_Theory.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_01_Decision_Theory.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_01_Decision_Theory.pdf) · [📖 Notes](/files/agt/notes/Chapter_01_Decision_Theory_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_01_Decision_Theory_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter01)
+- 🕹️ **Games and simulators:** [Bayesian Decision Lab](/files/agt/slides/Chapter_01_Bayesian-Decision-Lab.html) · [Blackjack Decision Lab](/files/agt/slides/Chapter_01_Blackjack.html) · [Poker](/files/agt/slides/Chapter_01_Poker.html) · [Backgammon AI](/files/agt/slides/Chapter_01_Backgammon.html) · [Minesweeper](/files/agt/slides/Chapter_01_Minesweeper.html) · [Pisti](/files/agt/slides/Chapter_01_Pisti.html) · [Hokm](/files/agt/slides/Chapter_01_Hokm.html)
 
 ---
 
@@ -209,8 +225,9 @@ Before turning to strategic interaction, we study a single decision maker. Topic
 
 This chapter defines what a game is and how to write one down: players, strategies, payoffs and information, in normal and extensive form, along with a classification of games. It covers the Prisoner's Dilemma and Pareto optimality, the classic 2×2 games, the guess-2/3-of-the-average game and level-k reasoning, and combinatorial games solved by minimax. Alpha-beta pruning, depth-limited search and evaluation functions show how minimax is made fast, and sequential games lead to backward induction, subgame-perfect equilibrium and trigger strategies. A supplementary deck treats minimax and alpha-beta pruning in more depth.
 
-- **Games and Representations** — [🖼️ Slides](/files/agt/slides/Chapter_02_Games_and_Representations.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_02_Games_and_Representations.pdf)
-- **Minimax and Alpha-Beta Pruning** — [🖼️ Slides](/files/agt/slides/Chapter_02_Minimax_and_Alpha_Beta_Pruning.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_02_Minimax_and_Alpha_Beta_Pruning.pdf)
+- **Games and Representations** — [🖼️ Slides](/files/agt/slides/Chapter_02_Games_and_Representations.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_02_Games_and_Representations.pdf) · [📖 Notes](/files/agt/notes/Chapter_02_Games_and_Representations_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_02_Games_and_Representations_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter02)
+- **Minimax and Alpha-Beta Pruning** — [🖼️ Slides](/files/agt/slides/Chapter_02_Minimax_and_Alpha_Beta_Pruning.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_02_Minimax_and_Alpha_Beta_Pruning.pdf) · [📝 Questions](/files/agt/slides/Chapter_02_Minimax_and_Alpha_Beta_Pruning_Study_Questions.html)
+- 🕹️ **Games and simulators:** [Guess 2/3 of the Average](/files/agt/slides/Chapter_02_Guess_Average.html) · [Minimax Tic-Tac-Toe](/files/agt/slides/Chapter_02_TicTacToe.html) · [Nim](/files/agt/slides/Chapter_02_Nim.html) · [Don't Say 21](/files/agt/slides/Chapter_02_Dont-Say-21.html) · [Connect Four](/files/agt/slides/Chapter_02_Connect-Four.html) · [Hex](/files/agt/slides/Chapter_02_Hex.html) · [Othello](/files/agt/slides/Chapter_02_Othello.html) · [Mangala](/files/agt/slides/Chapter_02_Mangala.html) · [Chess (vs. AI)](/files/agt/slides/Chapter_02_Chess.html) · [Checkers](/files/agt/slides/Chapter_02_Checkers.html) · [Fox and Geese](/files/agt/slides/Chapter_02_Fox-and-Geese.html) · [Nine Men's Morris](/files/agt/slides/Chapter_02_Nine-Mens-Morris.html)
 
 ---
 
@@ -218,7 +235,8 @@ This chapter defines what a game is and how to write one down: players, strategi
 
 A Nash equilibrium is a strategy profile from which no player can gain by deviating alone. The chapter develops best responses, Cournot and Bertrand competition, iterated elimination of dominated strategies, and mixed-strategy equilibria with the indifference principle. It then covers Nash's existence theorem, equilibrium selection, correlated equilibrium, minimax in zero-sum games, security games and the PPAD complexity of computing an equilibrium.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_03_Nash_Equilibrium.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_03_Nash_Equilibrium.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_03_Nash_Equilibrium.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_03_Nash_Equilibrium.pdf) · [📖 Notes](/files/agt/notes/Chapter_03_Nash_Equilibrium_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_03_Nash_Equilibrium_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter03)
+- 🕹️ **Games and simulators:** [Prisoner's Dilemma Simulator](/files/agt/slides/Chapter_03_Prisoners_Dilemma.html) · [Matrix Game and Nash Equilibrium Lab](/files/agt/slides/Chapter_03_Matrix-Nash.html) · [Rock Paper Scissors](/files/agt/slides/Chapter_03_Rock_Scissors_Paper.html) · [Colonel Blotto](/files/agt/slides/Chapter_03_Colonel-Blotto.html)
 
 ---
 
@@ -228,7 +246,8 @@ A Nash equilibrium is a strategy profile from which no player can gain by deviat
 
 Mechanism design turns the question around: once the goal is fixed, which rules lead self-interested participants to act toward it? We study social choice functions, the revelation principle, incentive compatibility and individual rationality, Myerson's lemma and the VCG mechanism. Applications include Gale–Shapley stable matching, the median mechanism and Top Trading Cycles (TTC), and the chapter closes with Bayesian games.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_04_Mechanism_Design.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_04_Mechanism_Design.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_04_Mechanism_Design.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_04_Mechanism_Design.pdf) · [📖 Notes](/files/agt/notes/Chapter_04_Mechanism_Design_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_04_Mechanism_Design_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter04)
+- 🕹️ **Games and simulators:** [Ultimatum Game](/files/agt/slides/Chapter_04_Ultimatum-Game.html) · [Stable Matching Simulator](/files/agt/slides/Chapter_04_Stable-Matching.html) · [Incentive Compatibility Lab](/files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
 
 ---
 
@@ -236,7 +255,8 @@ Mechanism design turns the question around: once the goal is fixed, which rules 
 
 Auctions are the most widely used mechanisms for allocating goods and setting prices. We compare the four basic formats (English, Dutch, first-price and second-price sealed-bid), derive equilibrium bidding strategies, and examine revenue equivalence and the role of information. The chapter ends with double-auction markets, in which both buyers and sellers submit bids.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_05_Auctions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_05_Auctions.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_05_Auctions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_05_Auctions.pdf) · [📖 Notes](/files/agt/notes/Chapter_05_Auctions_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_05_Auctions_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter05)
+- 🕹️ **Games and simulators:** [Vickrey Auction](/files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html) · [English Auction](/files/agt/slides/Chapter_05_english-auction-simulator.html) · [Dutch Auction](/files/agt/slides/Chapter_05_dutch-auction-simulator.html) · [First-Price Sealed-Bid Auction](/files/agt/slides/Chapter_05_first-price-auction-simulator.html) · [Double Auction Market](/files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html) · [Monopoly](/files/agt/slides/Chapter_05_Monopoly.html)
 
 ---
 
@@ -244,7 +264,8 @@ Auctions are the most widely used mechanisms for allocating goods and setting pr
 
 Digital platforms bring self-interested users together and set the rules of the game they play. The chapter covers two-sided markets, network effects and critical mass, and two-sided pricing. It then analyzes sponsored-search auctions (GSP and VCG), budget-constrained online allocation, reputation systems and competition between platforms.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_06_Online_Platforms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_06_Online_Platforms.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_06_Online_Platforms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_06_Online_Platforms.pdf) · [📖 Notes](/files/agt/notes/Chapter_06_Online_Platforms_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_06_Online_Platforms_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter06)
+- 🕹️ **Games and simulators:** [Two-Sided Platform Pricing](/files/agt/slides/Chapter_06_Two-Sided-Platform-Pricing.html) · [Sponsored Search Ad Auction](/files/agt/slides/Chapter_06_Sponsored-Search-Ad-Auction-Game.html)
 
 ---
 
@@ -252,7 +273,8 @@ Digital platforms bring self-interested users together and set the rules of the 
 
 Social choice studies how individual preferences are turned into a collective decision. Working from a single preference profile, we count the majority, plurality, Borda, approval, instant-runoff and Condorcet rules and see how their winners differ. The chapter then examines Condorcet cycles and strategic voting, and closes with the theorems of Arrow, Gibbard–Satterthwaite and May.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_07_Social_Choice_and_Voting.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_07_Social_Choice_and_Voting.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_07_Social_Choice_and_Voting.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_07_Social_Choice_and_Voting.pdf) · [📖 Notes](/files/agt/notes/Chapter_07_Social_Choice_and_Voting_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_07_Social_Choice_and_Voting_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter07)
+- 🕹️ **Games and simulators:** [Voting Rules and Manipulation](/files/agt/slides/Chapter_07_Voting-Rules.html) · [Condorcet Paradox](/files/agt/slides/Chapter_07_Condorcet-Voting-Paradox.html) · [Facility Location](/files/agt/slides/Chapter_07_Facility_Location.html)
 
 ---
 
@@ -262,7 +284,8 @@ Social choice studies how individual preferences are turned into a collective de
 
 When every driver or packet picks its own route, the outcome can differ from what a central planner would choose. We start with the basics of routing and selfish routing, then compare Wardrop equilibrium with the system optimum. Braess's paradox, congestion games with Rosenthal's potential, and network formation games complete the chapter.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_08_Network_Design_and_Routing.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_08_Network_Design_and_Routing.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_08_Network_Design_and_Routing.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_08_Network_Design_and_Routing.pdf) · [📖 Notes](/files/agt/notes/Chapter_08_Network_Design_and_Routing_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_08_Network_Design_and_Routing_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter08)
+- 🕹️ **Games and simulators:** [Braess's Paradox](/files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html) · [Selfish Routing and PoA](/files/agt/slides/Chapter_08_Selfish-Routing.html) · [Network Formation Game](/files/agt/slides/Chapter_08_Network-Formation.html)
 
 ---
 
@@ -270,7 +293,8 @@ When every driver or packet picks its own route, the outcome can differ from wha
 
 The price of anarchy measures how much efficiency selfish behavior costs by comparing the worst equilibrium with the optimum; the price of stability makes the same comparison for the best equilibrium. We compute both ratios on a two-road network and on Pigou's network, prove the 4/3 bound for linear latencies and introduce smoothness arguments. The chapter also covers the Braess network, load balancing, the logarithmic bound on the price of stability, congestion pricing and other interventions.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_09_Price_of_Anarchy.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_09_Price_of_Anarchy.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_09_Price_of_Anarchy.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_09_Price_of_Anarchy.pdf) · [📖 Notes](/files/agt/notes/Chapter_09_Price_of_Anarchy_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_09_Price_of_Anarchy_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter09)
+- 🕹️ **Games and simulators:** [Load Balancing and PoA](/files/agt/slides/Chapter_09_Load-Balancing-Price-of-Anarchy-Game.html)
 
 ---
 
@@ -280,7 +304,8 @@ The price of anarchy measures how much efficiency selfish behavior costs by comp
 
 Multi-agent systems consist of autonomous agents that cooperate or compete in a shared environment. The chapter describes the properties of agents, cooperation and competition, and task allocation with the contract net protocol. It then introduces coalitional games, the Shapley value and the core, and closes with free riding in public goods.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_10_Multi_Agent_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_10_Multi_Agent_Systems.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_10_Multi_Agent_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_10_Multi_Agent_Systems.pdf) · [📖 Notes](/files/agt/notes/Chapter_10_Multi_Agent_Systems_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_10_Multi_Agent_Systems_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter10)
+- 🕹️ **Games and simulators:** [Shapley Coalition Game](/files/agt/slides/Chapter_10_Shapley-Coalition-Game.html)
 
 ---
 
@@ -288,7 +313,8 @@ Multi-agent systems consist of autonomous agents that cooperate or compete in a 
 
 Algorithmic decisions and allocations affect individuals and groups in different ways. We define fairness criteria computed from the confusion matrix (demographic parity, equalized odds, predictive parity and calibration) and show why they cannot all hold at once. The chapter then treats fair division through cut-and-choose, proportionality and envy-freeness, and ends with ethical principles and algorithmic auditing.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_11_Algorithmic_Fairness_and_Ethics.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_11_Algorithmic_Fairness_and_Ethics.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_11_Algorithmic_Fairness_and_Ethics.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_11_Algorithmic_Fairness_and_Ethics.pdf) · [📖 Notes](/files/agt/notes/Chapter_11_Algorithmic_Fairness_and_Ethics_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_11_Algorithmic_Fairness_and_Ethics_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter11)
+- 🕹️ **Games and simulators:** [Fair Division Game](/files/agt/slides/Chapter_11_Fair-Division-Game.html)
 
 ---
 
@@ -296,7 +322,8 @@ Algorithmic decisions and allocations affect individuals and groups in different
 
 Real people depart from the rational model, and groups face dilemmas that no single individual meets on their own. Topics include bounded rationality, prospect theory, loss aversion and framing, and the tragedy of the commons with best-response dynamics. We then look at institutional remedies such as taxes, quotas and sanctions, public goods experiments and measures of social welfare.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_12_Behavioral_and_Collective_Decisions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_12_Behavioral_and_Collective_Decisions.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_12_Behavioral_and_Collective_Decisions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_12_Behavioral_and_Collective_Decisions.pdf) · [📖 Notes](/files/agt/notes/Chapter_12_Behavioral_and_Collective_Decisions_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_12_Behavioral_and_Collective_Decisions_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter12)
+- 🕹️ **Games and simulators:** [Public Goods Game](/files/agt/slides/Chapter_12_Public-Goods-Game.html)
 
 ---
 
@@ -306,7 +333,8 @@ Real people depart from the rational model, and groups face dilemmas that no sin
 
 How do agents that learn from experience reach an equilibrium, and why do they sometimes fail to? The chapter studies best-response dynamics, fictitious play, regret and multiplicative weights. It continues with multi-armed bandit problems (epsilon-greedy and UCB), replicator dynamics and the repeated Prisoner's Dilemma.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_13_Learning_and_Adaptation.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_13_Learning_and_Adaptation.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_13_Learning_and_Adaptation.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_13_Learning_and_Adaptation.pdf) · [📖 Notes](/files/agt/notes/Chapter_13_Learning_and_Adaptation_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_13_Learning_and_Adaptation_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter13)
+- 🕹️ **Games and simulators:** [Multi-Armed Bandit](/files/agt/slides/Chapter_13_Multi-Armed-Bandit.html) · [Repeated Prisoner’s Dilemma Tournament](/files/agt/slides/Chapter_13_Repeated-Prisoners-Dilemma-Tournament.html) · [Replicator Dynamics](/files/agt/slides/Chapter_13_Replicator-Dynamics.html)
 
 ---
 
@@ -314,6 +342,7 @@ How do agents that learn from experience reach an equilibrium, and why do they s
 
 The final chapter surveys open problems at the frontier of the field: AI agents and algorithmic collusion, mechanisms learned from data and their sample complexity, and differential privacy. It also covers transaction-fee mechanisms on blockchains and MEV. The course closes with an overall map that ties its topics together.
 
-- [🖼️ Slides](/files/agt/slides/Chapter_14_Future_Directions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_14_Future_Directions.pdf)
+- [🖼️ Slides](/files/agt/slides/Chapter_14_Future_Directions.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Chapter_14_Future_Directions.pdf) · [📖 Notes](/files/agt/notes/Chapter_14_Future_Directions_Lecture_Notes.html) · [📝 Questions](/files/agt/slides/Chapter_14_Future_Directions_Study_Questions.html) · [💻 Code (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python-en/tree/main/Chapter14)
+- 🕹️ **Games and simulators:** [AI Agent Strategy Tournament](/files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html) · [Age of Cotanak](/files/agt/slides/Chapter_14_Age-of-Cotanak.html)
 
 </div>
