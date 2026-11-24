@@ -20,10 +20,13 @@
     "@media print{.dsq-score{display:none}}";
   document.head.appendChild(css);
 
+  /* English decks (lang="en" on #ds-deck) get English counter text */
+  var deckEl = document.getElementById("ds-deck");
+  var EN = String((deckEl && deckEl.getAttribute("lang")) || "tr").toLowerCase().indexOf("en") === 0;
   var score = document.createElement("div");
   score.className = "dsq-score";
   score.innerHTML = '<span class="dsq-score__txt" aria-live="polite" aria-atomic="true"></span>' +
-    '<button type="button" class="ds-deck__button dsq-score__reset" title="Çoktan seçmeli soruları baştan başlat">Sıfırla</button>';
+    '<button type="button" class="ds-deck__button dsq-score__reset" title="' + (EN ? "Restart the multiple-choice questions" : "Çoktan seçmeli soruları baştan başlat") + '">' + (EN ? "Reset" : "Sıfırla") + '</button>';
   var txt = score.querySelector(".dsq-score__txt");
   var bar = document.querySelector(".ds-deck__bar");
   var full = document.getElementById("ds-deck-full");
@@ -43,8 +46,10 @@
       answered++;
       if (!box.querySelector(".dsq-opt.is-wrong")) right++;
     });
-    txt.innerHTML = "Doğru <b>" + right + "</b> / Yanıtlanan " + answered + " · Toplam " + boxes.length;
-    txt.setAttribute("aria-label", "Doğru " + right + ", yanıtlanan " + answered + ", toplam " + boxes.length + " çoktan seçmeli soru");
+    txt.innerHTML = EN ? "Correct <b>" + right + "</b> / Answered " + answered + " · Total " + boxes.length
+                    : "Doğru <b>" + right + "</b> / Yanıtlanan " + answered + " · Toplam " + boxes.length;
+    txt.setAttribute("aria-label", EN ? right + " correct, " + answered + " answered, " + boxes.length + " multiple-choice questions in total"
+                                  : "Doğru " + right + ", yanıtlanan " + answered + ", toplam " + boxes.length + " çoktan seçmeli soru");
   }
 
   score.querySelector(".dsq-score__reset").addEventListener("click", function () {

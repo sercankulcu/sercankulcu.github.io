@@ -45,6 +45,8 @@ Depo: `C:\Users\Sercan\Documents\GitHub\sercankulcu.github.io` (Jekyll / GitHub 
 - Türkçe simülatörlere/sunumlara (`../sunumlar/…`), Türkçe kod reposuna (`algorithms-java`) bağlantı VERME; tek içerik onlarsa o kutuyu/paragrafı çıkar. Başka bölüme gönderme varsa `Chapter_NN_…_Lecture_Notes.html` (aynı klasör) adlarıyla ver. Kaynakça (kitap, makale, dış site) kalır.
 
 ## Yasaklar
+- `nt-proof` kutularına elle "Proof." / "<em>Proof.</em>" YAZMA: CSS İngilizce notlarda "Proof." etiketini kendisi ekler (elle yazılınca "Proof. Proof." çıkıyor).
+- Kod adlarını önce o bölümün İngilizce sunumundaki (slides/) koddan al; sunumda olmayanlara kısa, deyimsel İngilizce ad ver. Kod reposu bu notlara göre düzenlenecek.
 - Inline `<script>` içinde `//` satır yorumu yazma (`/* */`); hiçbir yerde `{{` ya da `{%` yazma (Liquid derlemeyi düşürür); `:kelime:` biçiminde iki nokta arasında kelime yazma (jemoji).
 - Yalnız görevindeki dosyalara dokun (ders sayfası, chapters.tsv, ortak betikler ana oturumda). Commit etme; `git stash/checkout/reset` kullanma. `check_site` çalıştırma.
 - Geçici dosyaları scratchpad'in içinde kendine ait benzersiz bir alt klasöre yaz (ör. `scratchpad/alg_notes_03/`).

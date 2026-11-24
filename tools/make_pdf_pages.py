@@ -46,7 +46,8 @@ BOOKS = [
     ('dsa_c/Data-Structures-and-Algorithms-with-C.pdf', 'en', '/teaching/data-structures-and-algorithms-with-c/?lang=en'),
     ('java/Java-ile-Nesne-Yonelimli-Programlama.pdf', 'tr', '/teaching/object-oriented-programming-with-java/'),
     ('microprocessors/Mikroislemciler.pdf', 'tr', '/teaching/microprocessors/'),
-    ('os/Isletim-Sistemleri.pdf', 'tr', '/teaching/operating-systems/'),
+    ('os/Isletim-Sistemleri.pdf', 'tr', '/teaching/operating-systems/?lang=tr'),
+    ('os/Operating-Systems.pdf', 'en', '/teaching/operating-systems/?lang=en'),
     ('c/Programming-with-C.pdf', 'en', '/teaching/programming-with-c/'),
 ]
 
@@ -65,6 +66,7 @@ ART = {
     'java/Java-ile-Nesne-Yonelimli-Programlama.pdf': ('teaching-object-oriented-programming.webp', '#d9483b'),
     'microprocessors/Mikroislemciler.pdf': ('teaching-microprocessors.webp', '#2f9e6e'),
     'os/Isletim-Sistemleri.pdf': ('teaching-operating-systems.webp', '#3b5bdb'),
+    'os/Operating-Systems.pdf': ('teaching-operating-systems.webp', '#3b5bdb'),
     'c/Programming-with-C.pdf': ('teaching-procedural-programming-c.webp', '#d9483b'),
 }
 

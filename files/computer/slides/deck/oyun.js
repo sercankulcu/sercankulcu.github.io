@@ -3,6 +3,8 @@
 (function () {
   var stages = Array.prototype.slice.call(document.querySelectorAll(".agt-oyun--stage"));
   var W = 800, H = 600;
+  /* English edition: a lab whose stage (or an ancestor) has lang="en" gets English interface text */
+  var isEn = function (el) { var l = el && el.closest ? el.closest("[lang]") : null; return !!l && String(l.getAttribute("lang")).toLowerCase().indexOf("en") === 0 && l !== document.documentElement; };
   /* kaydırma çubuğunun yeri sabit: çubuk açılıp kapanınca genişlik ve ölçek salınmasın */
   if (stages.length) document.documentElement.style.scrollbarGutter = "stable";
 
@@ -38,7 +40,8 @@
       var help = head.querySelector(".agt-oyun__help");
       head.insertBefore(full, help || null);
       var label = function () {
-        var t = isFull() ? "Tam ekrandan çık" : "Tam ekran";
+        var en = isEn(stage);
+        var t = isFull() ? (en ? "Exit full screen" : "Tam ekrandan çık") : (en ? "Full screen" : "Tam ekran");
         full.setAttribute("aria-label", t);
         full.title = t;
         full.setAttribute("aria-pressed", String(isFull()));
@@ -58,7 +61,7 @@
     var dlg = document.getElementById(btn.getAttribute("aria-controls"));
     if (!dlg) return;
     btn.setAttribute("aria-haspopup", "dialog");
-    if (!btn.getAttribute("aria-label")) btn.setAttribute("aria-label", "Açıklama ve kurallar");
+    if (!btn.getAttribute("aria-label")) btn.setAttribute("aria-label", isEn(btn) ? "About this simulator" : "Açıklama ve kurallar");
     /* dialog sahnenin dışında, belgenin kökünde dursun: ölçeklenmesin */
     document.body.appendChild(dlg);
     btn.addEventListener("click", function () {
