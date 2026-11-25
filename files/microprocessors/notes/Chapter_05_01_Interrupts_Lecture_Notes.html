@@ -1,0 +1,1375 @@
+---
+layout: without-sidebar
+title: "Chapter 5.1: Interrupts — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_05_01_Interrupts_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 5.1 of Microprocessors: the interrupt concept, polling versus interrupts, software, hardware and internal interrupts, the interrupt vector table, the effect of INT and IRET on the stack, divide error, INTO, single step and breakpoint, INTR and NMI, interrupt priority, the 8259A and masking, interrupt latency, and writing your own interrupt service routine; with worked examples and code traces."
+lang: en
+seo_title: "Chapter 5.1: Interrupts · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_05_01_Kesmeler_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_05_01_Interrupts_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* chapter-specific SVG classes of the slides (same as Chapter_05_01_Interrupts.html; scoped to .ds-notes) */
+.ds-notes .ds-svg .mono, .ds-notes .ds-svg .mt-mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-fig { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-wire { stroke: var(--ds-link); stroke-width: 2.4; fill: none; }
+.ds-notes .ds-svg .mt-wire0 { stroke: var(--ds-muted); stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+.ds-notes .ds-svg .mt-sig { stroke: var(--ds-text); stroke-width: 2; fill: none; }
+.ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 290px; min-width: 0; max-width: calc(50% - 0.7rem); }
+@media (max-width: 560px) { .ds-notes .nt-fig__row--2 > svg.ds-svg { max-width: 100%; } }
+.ds-notes .n51-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 5.1: Interrupts</h1>
+  <p class="nt-lead">A processor that only ran its own program would know nothing of the outside world. A key is pressed, a timer produces a pulse, a disk drive has data ready; the processor must respond to these events in time. An interrupt lets the processor drop what it is doing at an instruction boundary, run a routine that belongs to the event, and then resume where it left off. These notes begin with what an interrupt is and how it differs from polling. They then cover the 8086 interrupt vector table and the effect of INT and IRET on the stack, followed by exceptions generated by the processor itself, hardware interrupts on the INTR and NMI pins, the 8259A interrupt controller, and interrupt latency. The last part writes an interrupt service routine from scratch, installs its vector, and restores the old vector when the program ends. Every piece of code is traced step by step together with the registers, flags, vector table and stack.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_05_01_Interrupts.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_05_01_Interrupts.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_05_01_Interrupts_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/Chapter_05_Interrupt-Vector.html">Interrupt Vector Table</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Stack, CALL and RET</a></li>
+    <li><a href="../slides/CPU_Simulator.html">CPU Simulator</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Explain the interrupt concept</dt>
+    <dd>Explain what an interrupt is, how it differs from polling, and where software, hardware and internal interrupts come from.</dd>
+    <dt>Compute a vector address</dt>
+    <dd>Use the interrupt vector table to find the vector address for type n (n × 4), then the ISR's CS:IP from the bytes stored there and its physical address.</dd>
+    <dt>Trace INT and IRET on the stack</dt>
+    <dd>Show step by step the order in which FLAGS, CS and IP are pushed during INT n and IRET, how SP changes, and why IF and TF are cleared.</dd>
+    <dt>Recognize exceptions</dt>
+    <dd>Explain the two causes of a divide error (INT 0), the condition under which INTO (INT 4) fires, and the single-step (INT 1) and breakpoint (INT 3) mechanisms.</dd>
+    <dt>Follow hardware interrupts</dt>
+    <dd>Follow INTR acknowledgment, interrupt priorities, the 8259A's IRR, IMR and ISR registers, and the masking of a single IRQ with the IMR; compute interrupt latency in clock cycles.</dd>
+    <dt>Write an interrupt service routine</dt>
+    <dd>Write your own ISR, install its vector safely, save and restore the old vector, and follow the rules for writing ISRs.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s5-1-1">5.1.1 The interrupt concept</a>
+      <ol>
+        <li><a href="#s5-1-1-1">5.1.1.1 What is an interrupt?</a></li>
+        <li><a href="#s5-1-1-2">5.1.1.2 Polling or interrupts?</a></li>
+        <li><a href="#s5-1-1-3">5.1.1.3 Interrupt kinds and type numbers</a></li>
+        <li><a href="#s5-1-1-4">5.1.1.4 Comparing the three sources</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-2">5.1.2 The interrupt vector table</a>
+      <ol>
+        <li><a href="#s5-1-2-1">5.1.2.1 Structure of the table</a></li>
+        <li><a href="#s5-1-2-2">5.1.2.2 The vector address step by step</a></li>
+        <li><a href="#s5-1-2-3">5.1.2.3 From table to routine and back</a></li>
+        <li><a href="#s5-1-2-4">5.1.2.4 How the PC divides up the type numbers</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-3">5.1.3 INT and IRET</a>
+      <ol>
+        <li><a href="#s5-1-3-1">5.1.3.1 The steps of INT n</a></li>
+        <li><a href="#s5-1-3-2">5.1.3.2 The stack step by step: INT 10h</a></li>
+        <li><a href="#s5-1-3-3">5.1.3.3 INT/IRET versus CALL/RET</a></li>
+        <li><a href="#s5-1-3-4">5.1.3.4 An ISR that ends with RET: code trace</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-4">5.1.4 Exceptions</a>
+      <ol>
+        <li><a href="#s5-1-4-1">5.1.4.1 Divide error (INT 0)</a></li>
+        <li><a href="#s5-1-4-2">5.1.4.2 Our own INT 0 handler: code trace</a></li>
+        <li><a href="#s5-1-4-3">5.1.4.3 INTO and the overflow interrupt (INT 4)</a></li>
+        <li><a href="#s5-1-4-4">5.1.4.4 Single step (INT 1)</a></li>
+        <li><a href="#s5-1-4-5">5.1.4.5 Breakpoint (INT 3)</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-5">5.1.5 Hardware interrupts</a>
+      <ol>
+        <li><a href="#s5-1-5-1">5.1.5.1 The INTR and NMI pins</a></li>
+        <li><a href="#s5-1-5-2">5.1.5.2 The INTR acknowledge sequence</a></li>
+        <li><a href="#s5-1-5-3">5.1.5.3 Priority and the PC interrupt map</a></li>
+        <li><a href="#s5-1-5-4">5.1.5.4 The 8259A interrupt controller</a></li>
+        <li><a href="#s5-1-5-5">5.1.5.5 Masking with the IMR: code trace</a></li>
+        <li><a href="#s5-1-5-6">5.1.5.6 When an interrupt is held off</a></li>
+        <li><a href="#s5-1-5-7">5.1.5.7 Interrupt latency</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-6">5.1.6 Writing our own interrupt service routine</a>
+      <ol>
+        <li><a href="#s5-1-6-1">5.1.6.1 Installing a vector: INT 90h</a></li>
+        <li><a href="#s5-1-6-2">5.1.6.2 Our own ISR on INT 60h: code trace</a></li>
+        <li><a href="#s5-1-6-3">5.1.6.3 Save, replace and restore a vector: code trace</a></li>
+        <li><a href="#s5-1-6-4">5.1.6.4 Rules for writing an ISR</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5-1-7">5.1.7 Exercises and solutions</a></li>
+    <li><a href="#s5-1-8">5.1.8 Summary</a></li>
+    <li><a href="#s5-1-9">5.1.9 Key terms</a></li>
+    <li><a href="#s5-1-10">5.1.10 Test Yourself</a></li>
+    <li><a href="#s5-1-11">5.1.11 Further reading</a></li>
+    <li><a href="#s5-1-12">5.1.12 References</a></li>
+  </ol>
+</nav>
+
+<h2 id="s5-1-1"><span class="nt-num">5.1.1</span>The interrupt concept</h2>
+
+<h3 id="s5-1-1-1"><span class="nt-num">5.1.1.1</span>What is an interrupt?</h3>
+
+<p>While a program runs, the processor fetches, decodes and executes instructions in order. After each instruction IP points to the next one, and apart from jumps and calls this order is never disturbed. Yet events that have nothing to do with the program happen all around the computer. A user presses a key, the timer chip produces pulses at fixed intervals, a character arrives on the serial port. The processor must not miss these events and must respond to them quickly.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kesme">
+  <span class="nt-box__title">Definition 5.1.1</span>
+  <p>An <strong>interrupt</strong> is an event that makes the processor temporarily set aside its current work and run a special routine. This routine is called an <strong>interrupt service routine</strong> (ISR). When the ISR finishes, the processor resumes the program with the instruction after the one that was interrupted.</p>
+</div>
+
+<p>The last sentence of the definition is the important one. The interrupted program does not notice that it was interrupted. Its registers, flags and memory continue with the values they would have had without the interrupt. Guaranteeing this is the job of both the processor and the programmer who writes the ISR. The processor saves the return address and the flags on its own. The ISR saves the registers it uses and restores them on exit.</p>
+
+<p>An everyday analogy captures the steps of an interrupt. You are reading a book when the phone rings. You first mark your page, then answer the phone and talk. When the call ends, you return to the marked page and carry on reading. Marking the page is saving the return address; the phone call is the ISR; returning to the marked page is the IRET instruction. If you forget to mark the page, you will not know where to continue. The processor would be in the same position if it entered an ISR without pushing the return address on the stack.</p>
+
+<figure class="nt-fig" id="sekil-kesme" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 96" role="img" aria-label="The main program is interrupted, the ISR runs, and IRET returns to where it left off"><defs><marker id="n51-1-mt2-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-acc" x="4" y="30" width="230" height="30" rx="4"/><text class="mt-s" x="119" y="50" text-anchor="middle">main program</text><rect class="mt-acc" x="366" y="30" width="230" height="30" rx="4"/><text class="mt-s" x="481" y="50" text-anchor="middle">main program (resumes)</text><path class="mt-wire" d="M234 45 Q250 8 270 8 H330 Q350 8 362 40" marker-end="url(#n51-1-mt2-5)"/><rect class="mt-hot" x="262" y="62" width="76" height="28" rx="4"/><text class="mt-v" x="300" y="81" text-anchor="middle">ISR</text><path class="line" d="M236 52 L262 72" marker-end="url(#n51-1-mt2-5)"/><path class="line" d="M338 72 L364 54" marker-end="url(#n51-1-mt2-5)"/><text class="lbl" x="232" y="92" text-anchor="end" style="font-size:11px">INT / request</text><text class="lbl" x="368" y="92" text-anchor="start" style="font-size:11px">IRET</text><text class="lbl" x="300" y="30" text-anchor="middle" style="font-size:11px">return address on stack</text></svg></div>
+  <figcaption><b>Figure 5.1.1:</b> The main program is interrupted by a request or an INT instruction, the ISR runs, and IRET returns to where it left off. The return address stays on the stack for the whole time.</figcaption>
+</figure>
+
+<p><a href="#sekil-kesme">Figure 5.1.1</a> shows this flow on a time axis. The main program stops at some point, control passes to the ISR, and the last instruction of the ISR, IRET, hands control back to the main program. An interrupt can be started in two ways: the program executes an INT instruction, or a request arrives from outside the processor. In both cases what the processor does afterwards is the same.</p>
+
+<p>Interrupts have a second, more everyday use. On an 8086-based PC there are ready-made routines for writing a character to the screen, reading a key from the keyboard, accessing the disk, or ending a program. These are the routines of the BIOS, which sits in ROM on the motherboard, and of the operating system, DOS. A program calls them with an INT instruction, without knowing their addresses. To write a character to the screen, for example, it does not need dozens of instructions that drive the video hardware; <code>INT 10h</code> does the job. For this reason software interrupts are also seen as ready-made services that make programming easier. The details of the interrupt functions that work with hardware such as the screen, the keyboard, the disk drive and memory management are the subject of the notes of Chapter 5.2, Interrupt Functions. These notes cover the interrupt mechanism itself: how the processor accepts an interrupt and how it returns.</p>
+
+<h3 id="s5-1-1-2"><span class="nt-num">5.1.1.2</span>Polling or interrupts?</h3>
+
+<p>A processor can learn the state of a device in two ways. The first is to keep asking the device, "Is the data ready?" This method is called <strong>polling</strong>. In a loop the processor reads the device's status port, checks the ready bit, and reads again if it is not set. The second is for the device to announce itself. When its data is ready, the device drives a pin of the processor; the processor finishes the current instruction and switches to the ISR. This is the interrupt method.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-yoklama" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 210" role="img" aria-label="In polling the CPU keeps asking the device; with interrupts the device alerts the CPU when it is ready, the ISR runs, and control returns to the main program."><defs><marker id="n51-2-m05k-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="10" y="22" text-anchor="start">Polling</text><rect class="box" x="10" y="34" width="60" height="30" rx="3"/><text class="lbl" x="40" y="54" text-anchor="middle">ready?</text><rect class="box" x="80" y="34" width="60" height="30" rx="3"/><text class="lbl" x="110" y="54" text-anchor="middle">ready?</text><rect class="box" x="150" y="34" width="60" height="30" rx="3"/><text class="lbl" x="180" y="54" text-anchor="middle">ready?</text><rect class="box" x="220" y="34" width="60" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="lbl" x="250" y="54" text-anchor="middle">ready?</text><rect class="box" x="290" y="34" width="60" height="30" rx="3"/><text class="lbl" x="320" y="54" text-anchor="middle">ready?</text><rect class="box" x="360" y="34" width="60" height="30" rx="3"/><text class="lbl" x="390" y="54" text-anchor="middle">ready?</text><rect class="box" x="430" y="34" width="60" height="30" rx="3"/><text class="lbl" x="460" y="54" text-anchor="middle">ready?</text><rect class="box" x="500" y="34" width="60" height="30" rx="3"/><text class="lbl" x="530" y="54" text-anchor="middle">ready?</text><rect class="box" x="570" y="34" width="60" height="30" rx="3"/><text class="lbl" x="600" y="54" text-anchor="middle">ready?</text><rect class="box" x="640" y="34" width="60" height="30" rx="3"/><text class="lbl" x="670" y="54" text-anchor="middle">ready?</text><text class="lbl" x="10" y="86" text-anchor="start">The CPU keeps asking the device; most checks are wasted and data may be noticed late.</text><text class="txt" x="10" y="122" text-anchor="start">Interrupt</text><rect class="box" x="10" y="134" width="250" height="30" rx="3"/><text class="lbl" x="135" y="154" text-anchor="middle">main program</text><rect class="box" x="270" y="134" width="120" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt" x="330" y="154" text-anchor="middle">ISR</text><rect class="box" x="400" y="134" width="310" height="30" rx="3"/><text class="lbl" x="555" y="154" text-anchor="middle">main program (where it left off)</text><path class="line" d="M265 106 L265 130" marker-end="url(#n51-2-m05k-m1)"/><text class="lbl" x="270" y="104" text-anchor="start">device: “data ready”</text><path class="line" d="M330 168 C330 196 400 196 400 170" marker-end="url(#n51-2-m05k-m1)"/><text class="lbl" x="410" y="196" text-anchor="start">return with IRET</text></svg></div>
+  <figcaption><b>Figure 5.1.2:</b> Top, polling: the processor keeps asking the device "ready?" and most queries are wasted. Bottom, interrupt: the processor runs the main program, the device signals when data is ready, the ISR runs, and IRET returns.</figcaption>
+</figure>
+
+<p><a href="#sekil-yoklama">Figure 5.1.2</a> compares the two methods on the same time axis. The cost of polling can be seen in a single number. The shortest polling loop that asks for the keyboard's state has three instructions: an <code>IN</code> that reads the port, a <code>TEST</code> that checks the ready bit, and a conditional jump that goes back to the start if the device is not ready.</p>
+
+<pre class="nt-code"><code><span class="cm">; polling loop (port number and bit are examples)</span>
+poll:  <span class="kw">IN</span>   AL, 64h      <span class="cm">; read the status port (10 clocks)</span>
+       <span class="kw">TEST</span> AL, 01h      <span class="cm">; data-ready bit (4 clocks)</span>
+       <span class="kw">JZ</span>   poll         <span class="cm">; not ready: ask again (16 clocks)</span></code></pre>
+
+<p>According to Intel's 8086 manual, an <code>IN</code> with a fixed port takes 10 clock cycles, a <code>TEST</code> of a register with an immediate takes 4, and a taken <code>JZ</code> takes 16. One pass of the loop is 30 clock cycles; on a 5 MHz 8086 a clock cycle is 200 ns, so the loop turns once every 6 µs. The processor asks the device about 166,000 times per second. A fast typist presses ten keys per second. Of those 166,000 queries only ten get a "yes" and the rest are wasted. Worse, the processor can do nothing else in the meantime.</p>
+
+<p>Polling less often saves processor time, but then the event is noticed late. If the program asks every 10 ms, the response to a key press can be delayed by up to 10 ms. The longer the interval, the greater the risk of losing data. For example, characters arriving on a serial port at 9600 bit/s are about 1 ms apart. If the device has a one-character buffer, a character that is not read within 1 ms is overwritten by the next.</p>
+
+<p>With interrupts this dilemma disappears. The processor runs the main program as long as there is no event; the moment an event occurs, at the latest when the current instruction finishes, it switches to the ISR. The price is the machinery. A routine must be written for each event, its address placed in a table, the stack used for the return address, and the hardware needs lines that carry the request to the processor. <a href="#tab-yoklama">Table 5.1.1</a> compares the two methods.</p>
+
+<div class="nt-tablewrap" id="tab-yoklama">
+<table class="nt-table">
+  <caption>Table 5.1.1: Comparison of polling and interrupts.</caption>
+  <thead><tr><th scope="col">Criterion</th><th scope="col">Polling</th><th scope="col">Interrupt</th></tr></thead>
+  <tbody>
+    <tr><td>Hardware</td><td>simple; no extra line needed</td><td>a request line and, if needed, an interrupt controller</td></tr>
+    <tr><td>Processor time</td><td>wasted; most queries return "no"</td><td>spent only when an event occurs</td></tr>
+    <tr><td>Response time</td><td>depends on the polling interval; an event may be noticed late</td><td>short; at the latest when the running instruction finishes</td></tr>
+    <tr><td>Software structure</td><td>a single loop</td><td>vector table, stack and ISR</td></tr>
+    <tr><td>Suited to</td><td>single-task, simple systems; very fast, continuous data</td><td>rare events at unpredictable times; multitasking systems</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Polling is not always bad. If a small microcontroller circuit is only waiting for one button, polling is the simplest solution. If a very fast device produces data every few microseconds, a tight polling loop can be faster than bearing the overhead of the interrupt machinery for every item. A general-purpose computer, on the other hand, has independent events at unpredictable times: keyboard, timer, disk and serial port. Polling all of them in one loop both keeps the processor busy and slows the response. This is why the PC architecture is built on interrupts.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Generalizing "with an interrupt the processor never waits for the device" to "an interrupt is always faster than polling." The interrupt mechanism itself takes time: on the 8086, accepting a hardware interrupt takes 61 clock cycles and IRET takes 24. For an event that arrives thousands of times per second, this overhead can exceed the cost of polling. The advantage of interrupts is that for rare events the processor does not wait in vain.</p>
+</div>
+
+<h3 id="s5-1-1-3"><span class="nt-num">5.1.1.3</span>Interrupt kinds and type numbers</h3>
+
+<p>The 8086 distinguishes up to 256 different interrupts. Each interrupt has a <strong>type number</strong> between 0 and 255 (00h–FFh). When the processor accepts an interrupt, the first thing it does is determine this number; it then reads from a table which routine to go to for that number. Interrupts fall into three groups, according to where the type number comes from and what starts the interrupt.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-turler">
+  <span class="nt-box__title">Definition 5.1.2</span>
+  <p>A <strong>software interrupt</strong> is one called deliberately by an <code>INT n</code> instruction in the program; the type number n is inside the instruction. A <strong>hardware interrupt</strong> is one started when an external device drives the processor's INTR or NMI pin. An <strong>internal interrupt</strong>, or <strong>exception</strong>, is one the processor generates itself while executing an instruction; division by zero is the best-known example.</p>
+</div>
+
+<p><strong>Software interrupts.</strong> BIOS and DOS services are used this way: <code>INT 10h</code> is the screen, <code>INT 16h</code> the keyboard, <code>INT 21h</code> the DOS services. Two more special instructions belong to this group. <code>INT 3</code> is the breakpoint instruction used by debuggers and is encoded in a single byte. <code>INTO</code> calls INT 4 when the overflow flag OF = 1 and does nothing when OF = 0. Because they serve debugging and error trapping, these two instructions are often mentioned together with exceptions.</p>
+
+<p><strong>Hardware interrupts.</strong> The 8086 has two input pins for interrupt requests. <strong>INTR</strong> (interrupt request) is the maskable input: while IF = 0 the processor ignores this pin. Requests from the keyboard, timer, disk and serial port arrive on it. <strong>NMI</strong> (non-maskable interrupt) is the non-maskable input; it is accepted whatever IF is. It is reserved for urgent events that a program cannot switch off and ignore, such as a memory parity error or loss of power.</p>
+
+<p><strong>Internal interrupts.</strong> The processor turns some conditions into interrupts by itself. When DIV or IDIV divides by zero, or the quotient does not fit in the destination register, INT 0 is generated. While the trap flag TF = 1, INT 1 is generated after every instruction; this lets debuggers run a program one step at a time.</p>
+
+<p><a href="#tab-tipler">Table 5.1.2</a> gives the role of the first five type numbers. The 8086 itself uses these five types; their numbers are fixed and a programmer must not use them for anything else.</p>
+
+<div class="nt-tablewrap" id="tab-tipler">
+<table class="nt-table">
+  <caption>Table 5.1.2: Reserved interrupt types of the 8086.</caption>
+  <thead><tr><th scope="col">Type</th><th scope="col">Source</th><th scope="col">Description</th></tr></thead>
+  <tbody>
+    <tr><td>00h</td><td>internal</td><td>Divide error: DIV/IDIV by zero, or the quotient does not fit</td></tr>
+    <tr><td>01h</td><td>internal</td><td>Single step (TF = 1); used by debuggers</td></tr>
+    <tr><td>02h</td><td>hardware</td><td>NMI pin (non-maskable)</td></tr>
+    <tr><td>03h</td><td>software</td><td>Breakpoint; the one-byte INT 3 (CCh)</td></tr>
+    <tr><td>04h</td><td>software</td><td>INTO: overflow interrupt if OF = 1</td></tr>
+    <tr><td>05h–FFh</td><td>—</td><td>Intel reserved 05h–1Fh for later processors; on the PC the BIOS, DOS and user programs use them</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Intel stated explicitly in its documentation that it was reserving the range 05h–1Fh for its future processors. The designers of the IBM PC did not heed this warning and placed BIOS services in the range 05h and 08h–1Fh. For example, the BIOS routine that prints the screen on the printer uses type 05h. With the 80186 and 80286, type 05h became the bound-range-exceeded interrupt of the BOUND instruction. The same number thus acquired two different meanings, and PC software wrestled with this collision for years. The story is a good illustration of why reserved numbers must stay reserved.</p>
+
+<h3 id="s5-1-1-4"><span class="nt-num">5.1.1.4</span>Comparing the three sources</h3>
+
+<p>At first glance the three kinds of interrupt look very different: one is an instruction, one is a pin, one is an error condition. They differ in only two respects: where the type number comes from and when the interrupt occurs. <a href="#tab-kaynak">Table 5.1.3</a> puts these differences side by side.</p>
+
+<div class="nt-tablewrap" id="tab-kaynak">
+<table class="nt-table">
+  <caption>Table 5.1.3: Comparison of software, hardware and internal interrupts.</caption>
+  <thead><tr><th scope="col"></th><th scope="col">Software (INT n)</th><th scope="col">Hardware (INTR / NMI)</th><th scope="col">Internal (exception)</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Triggered by</th><td>an instruction in the program</td><td>an external device, a pin</td><td>the processor itself</td></tr>
+    <tr><th scope="row">Timing</th><td>synchronous: always at the same place</td><td>asynchronous: after any instruction</td><td>synchronous: at the faulting instruction</td></tr>
+    <tr><th scope="row">Type number</th><td>inside the instruction</td><td>INTR: from the 8259A, via INTA; NMI: always 2</td><td>fixed: 0, 1</td></tr>
+    <tr><th scope="row">When IF = 0</th><td>still runs</td><td>INTR waits, NMI runs</td><td>still runs</td></tr>
+    <tr><th scope="row">Typical use</th><td>BIOS/DOS service, INT 3, INTO</td><td>keyboard, timer, disk</td><td>divide error, single step</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The words <strong>synchronous</strong> and <strong>asynchronous</strong> are used here with respect to the program flow. A software interrupt occurs at the same point of the program, in the same way, on every run. An exception is the same: the same DIV instruction with the same data gives the same error every time. A hardware interrupt, on the other hand, is an event whose instruction in the program cannot be known in advance. The user presses a key once at the start of a loop and once in the middle. For this reason the ISR of a hardware interrupt must be written as if it could run at any point of the program. This is where the obligation of ISRs to save registers comes from.</p>
+
+<p>There is an important common point under the table. Once the type number is determined, all three kinds follow the same steps: FLAGS, CS and IP are pushed, IF and TF are cleared, and CS:IP is loaded from the vector table. In other words there is a single interrupt mechanism inside the processor; the sources only determine with which number and at what moment that mechanism is entered.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Assuming that the <code>CLI</code> instruction turns off all interrupts. CLI only clears IF and affects only the INTR input. Software interrupts such as <code>INT 21h</code>, exceptions such as division by zero, and NMI still run while IF = 0. When CLI is used to "protect a critical piece of code from interrupts", remember that NMI can still arrive.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-2"><span class="nt-num">5.1.2</span>The interrupt vector table</h2>
+
+<h3 id="s5-1-2-1"><span class="nt-num">5.1.2.1</span>Structure of the table</h3>
+
+<p>After the processor learns the type number of an interrupt, it must find where the ISR for that interrupt is. On the 8086 this information is kept in a table at the very beginning of memory. The location of the table is fixed; on every interrupt the hardware looks at the same address.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ivt">
+  <span class="nt-box__title">Definition 5.1.3</span>
+  <p>An <strong>interrupt vector</strong> is the 4-byte far address of the service routine of an interrupt type: 2 bytes of IP (offset) and 2 bytes of CS (segment). The <strong>interrupt vector table</strong> (IVT) is the 1 KB table that holds the vectors of the 256 interrupt types in order and occupies physical addresses 00000h–003FFh.</p>
+</div>
+
+<p>The size of the table is easy to compute: 256 types × 4 bytes = 1024 bytes = 1 KB. The vector of type 0 starts at 00000h, that of type 1 at 00004h, that of type 2 at 00008h, and so on. The vector of the last type, FFh, is in bytes 003FCh–003FFh. The address at which the vector of type n starts is therefore a simple multiplication:</p>
+
+<p class="nt-math nt-math--c">vector address = n × 4 &nbsp;&nbsp; (within segment 0000h)</p>
+
+<p>The layout of the four bytes of a vector is also fixed. <a href="#sekil-ivt">Figure 5.1.3</a> shows the table. The word at the lower address (n × 4 and n × 4 + 1) holds the IP value. The word at the higher address (n × 4 + 2 and n × 4 + 3) is the CS value. Both words are stored in little-endian order, like all words on the 8086: low byte first, then high byte.</p>
+
+<figure class="nt-fig" id="sekil-ivt" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 310" role="img" aria-label="Interrupt vector table"><text class="lbl" x="70" y="16" text-anchor="middle">address (0000:…)</text><text class="lbl" x="260" y="16" text-anchor="middle">+0, +1</text><text class="lbl" x="400" y="16" text-anchor="middle">+2, +3</text><text class="txt mono" x="70" y="44" text-anchor="middle" style="font-size:14px">0000h</text><rect class="box" x="190" y="24" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="43" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="24" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="43" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="43" text-anchor="start">INT 00h</text><text class="txt mono" x="70" y="72" text-anchor="middle" style="font-size:14px">0004h</text><rect class="box" x="190" y="52" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="71" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="52" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="71" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="71" text-anchor="start">INT 01h</text><text class="txt mono" x="70" y="100" text-anchor="middle" style="font-size:14px">0008h</text><rect class="box" x="190" y="80" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="99" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="80" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="99" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="99" text-anchor="start">INT 02h</text><text class="txt mono" x="70" y="128" text-anchor="middle" style="font-size:14px">000Ch</text><rect class="box" x="190" y="108" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="127" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="108" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="127" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="127" text-anchor="start">INT 03h</text><text class="lbl" x="330" y="150" text-anchor="middle">⋮</text><text class="txt mono" x="70" y="176" text-anchor="middle" style="font-size:14px">0040h</text><rect class="box" x="190" y="156" width="140" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="260" y="175" text-anchor="middle" style="font-size:13.5px">IP = F065h</text><rect class="box" x="330" y="156" width="140" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="400" y="175" text-anchor="middle" style="font-size:13.5px">CS = F000h</text><text class="lbl" x="482" y="175" text-anchor="start">INT 10h</text><text class="lbl" x="330" y="198" text-anchor="middle">⋮</text><text class="txt mono" x="70" y="224" text-anchor="middle" style="font-size:14px">0084h</text><rect class="box" x="190" y="204" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="223" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="204" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="223" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="223" text-anchor="start">INT 21h</text><text class="lbl" x="330" y="246" text-anchor="middle">⋮</text><text class="txt mono" x="70" y="272" text-anchor="middle" style="font-size:14px">03FCh</text><rect class="box" x="190" y="252" width="140" height="28" rx="3"/><text class="txt mono" x="260" y="271" text-anchor="middle" style="font-size:13.5px">IP</text><rect class="box" x="330" y="252" width="140" height="28" rx="3"/><text class="txt mono" x="400" y="271" text-anchor="middle" style="font-size:13.5px">CS</text><text class="lbl" x="482" y="271" text-anchor="start">INT FFh</text><text class="lbl" x="10" y="302" text-anchor="start">256 entries × 4 bytes = 1024 bytes (0000:0000 – 0000:03FF)</text></svg></div>
+  <figcaption><b>Figure 5.1.3:</b> The interrupt vector table. Each row is the 4-byte vector of one interrupt type: IP first, then CS. The value F000:F065 in the INT 10h row is the address of the video routine in the original IBM PC BIOS and is given as an example.</figcaption>
+</figure>
+
+<p>The answer to why the table is at the very beginning of memory lies in the design of the 8086. The hardware does not have to look at any register to find the table; the address is produced from the type number alone. The operation n × 4 is a two-bit shift in the circuit. The 8 bits of the type number are placed on address lines A2–A9; A0, A1 and A10–A19 are zero. Reading a vector therefore needs no extra adder or register. The price is that the first 1 KB of memory must always be RAM. Programs have to be able to change the table; if it were in ROM, no program could install its own ISR.</p>
+
+<p>The table is an ordinary region of memory with no special protection. Any program that sets a segment register to 0000h can read and write any byte of the table. This flexibility lets programs install their own ISRs; it also means that a faulty program can corrupt the table and crash the whole system. Later processors with protected mode solve this problem by moving the table into a protected structure. In the real mode of the 8086, the safety of the table is left entirely to the programmer.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking of the four bytes of a vector in the order "CS first, then IP". The notation CS:IP writes the segment first and so invites this error. In memory the order is reversed: at address n × 4 is the low byte of IP, and at n × 4 + 2 is the low byte of CS.</p>
+</div>
+
+<h3 id="s5-1-2-2"><span class="nt-num">5.1.2.2</span>The vector address step by step</h3>
+
+<p>It helps to follow the rule in action on an example. Suppose the program is executing <code>INT 10h</code>. The processor finds the vector and switches to the ISR in four steps.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-int10">
+  <span class="nt-box__title">Example 5.1.1</span>
+  <p>Let us find the vector address for INT 10h, the ISR's CS:IP, and its physical address. Suppose the four bytes of the table starting at address 0000:0040h are, in order, <code>65 F0 00 F0</code>.</p>
+  <ol class="nt-steps">
+    <li><strong>Type number.</strong> The second byte of the instruction is the type number: n = 10h = 16.</li>
+    <li><strong>Vector address.</strong> n × 4 = 10h × 4 = 40h (decimal: 16 × 4 = 64). The vector is in bytes 0000:0040h–0000:0043h. In binary, shifting 0001 0000b left by two bits gives 0100 0000b = 40h.</li>
+    <li><strong>Reading the bytes.</strong> At 0040h there is 65h and at 0041h F0h; the low word is IP = F065h. At 0042h there is 00h and at 0043h F0h; the high word is CS = F000h.</li>
+    <li><strong>Physical address.</strong> CS × 16 + IP = F0000h + F065h = FF065h. The ISR starts inside the BIOS ROM in the topmost 64 KB of memory.</li>
+  </ol>
+</div>
+
+<figure class="nt-fig" id="sekil-vadim" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 140" role="img" aria-label="bytes 0040h–0043h: 65 F0 00 F0"><text class="txt mono" x="150" y="34" text-anchor="end" style="font-size:14px">0040h</text><rect class="box" x="160" y="14" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="34" text-anchor="middle">65h</text><text class="txt mono" x="150" y="64" text-anchor="end" style="font-size:14px">0041h</text><rect class="box" x="160" y="44" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="64" text-anchor="middle">F0h</text><text class="txt mono" x="150" y="94" text-anchor="end" style="font-size:14px">0042h</text><rect class="box" x="160" y="74" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="94" text-anchor="middle">00h</text><text class="txt mono" x="150" y="124" text-anchor="end" style="font-size:14px">0043h</text><rect class="box" x="160" y="104" width="70" height="28" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="195" y="124" text-anchor="middle">F0h</text><text class="txt mono" x="250" y="49" text-anchor="start">} IP = F065h</text><text class="txt mono" x="250" y="109" text-anchor="start">} CS = F000h</text></svg><svg class="ds-svg" viewBox="0 0 720 130" role="img" aria-label="Physical address FF065h"><text class="txt" x="360" y="40" text-anchor="middle" style="font-size:20px">physical address = CS × 16 + IP</text><text class="txt mono" x="360" y="80" text-anchor="middle" style="font-size:26px;fill:var(--ds-accent)">F0000h + F065h = FF065h</text></svg></div>
+  <figcaption><b>Figure 5.1.4:</b> Top, bytes 0040h–0043h: low word IP = F065h, high word CS = F000h. Bottom, the physical address calculation: F0000h + F065h = FF065h.</figcaption>
+</figure>
+
+<p>The bytes read in the example are shown in <a href="#sekil-vadim">Figure 5.1.4</a>. The processor fetches these two words with two separate memory reads. The 8086 reads a word at an even address in a single bus cycle. Because both n × 4 and n × 4 + 2 are even, each word arrives in one cycle. The 4-byte alignment of the vector table is also convenient in this respect.</p>
+
+<p>The physical address calculation in the fourth step is the segmentation rule the 8086 uses for all memory accesses: the 16-bit segment value is shifted left by four bits (multiplied by 16) and the offset is added. The segment CS = F000h starts at F0000h. IP = F065h is a position inside this segment. The result is the 20-bit address FF065h.</p>
+
+<p>There is an important detail about the order here. Before the processor reads the vector and loads CS:IP, it writes the return information to the stack. So while the first instruction of the ISR is fetched from FF065h, the old CS, IP and FLAGS are already on the stack. If this order were broken, that is, if CS:IP were loaded first, the return address would be lost. The exact order of the steps is in <a href="#tab-int">Table 5.1.5</a>.</p>
+
+<h3 id="s5-1-2-3"><span class="nt-num">5.1.2.3</span>From table to routine and back</h3>
+
+<p>Two-way calculations are done on the vector table. In the first direction one goes from a type number to the address of the vector; this is the multiplication n × 4. In the second direction one finds, from an address in the table, which type's vector it is; this is a division of the address by 4. The second direction is needed when looking at a byte sequence in a memory dump and working out what it is.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-ters">
+  <span class="nt-box__title">Example 5.1.2</span>
+  <p>In a memory dump the bytes <code>2E E8 00 F0</code> are seen starting at address 0000:0058h. a) Which interrupt's vector is it? b) What are the ISR's CS:IP and physical address? c) At which addresses is the vector of type 1Ch in the same table?</p>
+  <ol class="nt-steps">
+    <li>a) 58h / 4 = 16h. Because the address is a multiple of 4, it is the start of a vector: type 16h, that is, the BIOS keyboard service INT 16h.</li>
+    <li>b) Low word: 2Eh, E8h → IP = E82Eh. High word: 00h, F0h → CS = F000h. Physical address F0000h + E82Eh = FE82Eh.</li>
+    <li>c) 1Ch × 4 = 70h. IP is in bytes 00070h–00071h and CS in bytes 00072h–00073h.</li>
+  </ol>
+  <p>If the address were not exactly divisible by 4, for example 005Ah, it would not be the start of a vector but the CS half of the vector of type 16h (5Ah = 4 × 16h + 2).</p>
+</div>
+
+<p>The calculation is the same for all types: IP is at n × 4 and n × 4 + 1, CS at n × 4 + 2 and n × 4 + 3. For type 00h the address comes out as 0000h, for type FFh as 03FCh; all addresses in between are multiples of 4.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Mistaking the type number for the address directly (INT 21h → 00021h) or multiplying by 2 instead of 4 (INT 21h → 00042h). The correct value is 21h × 4 = 84h. To avoid slips in hexadecimal multiplication, one way is to convert to decimal first: 21h = 33, 33 × 4 = 132 = 84h.</p>
+</div>
+
+<h3 id="s5-1-2-4"><span class="nt-num">5.1.2.4</span>How the PC divides up the type numbers</h3>
+
+<p>The first five of the 256 type numbers belong to the 8086. The rest are left to the designers of the system that uses the processor. On the IBM PC and DOS the numbers are divided up roughly as follows (<a href="#tab-pc">Table 5.1.4</a>).</p>
+
+<div class="nt-tablewrap" id="tab-pc">
+<table class="nt-table">
+  <caption>Table 5.1.4: Frequently used interrupt types on the IBM PC and DOS.</caption>
+  <thead><tr><th scope="col">Type</th><th scope="col">Vector address</th><th scope="col">Role</th></tr></thead>
+  <tbody>
+    <tr><td>00h–04h</td><td>000h–013h</td><td>the 8086's own types (divide error, single step, NMI, breakpoint, overflow)</td></tr>
+    <tr><td>05h</td><td>014h</td><td>BIOS: print the screen</td></tr>
+    <tr><td>08h–0Fh</td><td>020h–03Fh</td><td>hardware interrupts IRQ0–IRQ7 (08h timer, 09h keyboard)</td></tr>
+    <tr><td>10h</td><td>040h</td><td>BIOS: video / screen services</td></tr>
+    <tr><td>13h</td><td>04Ch</td><td>BIOS: disk services</td></tr>
+    <tr><td>16h</td><td>058h</td><td>BIOS: keyboard services</td></tr>
+    <tr><td>1Ah</td><td>068h</td><td>BIOS: clock / date</td></tr>
+    <tr><td>20h</td><td>080h</td><td>DOS: terminate program</td></tr>
+    <tr><td>21h</td><td>084h</td><td>DOS: general services (selected with AH)</td></tr>
+    <tr><td>33h</td><td>0CCh</td><td>mouse driver</td></tr>
+    <tr><td>60h–67h</td><td>180h–19Fh</td><td>reserved for user programs</td></tr>
+    <tr><td>70h–77h</td><td>1C0h–1DFh</td><td>IRQ8–IRQ15 of the second 8259A on the PC/AT</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The practical conclusion from this table is that a program that installs its own ISR should choose an unused type. The range 60h–67h is set aside for this purpose. The examples in these notes that install their own ISR therefore use types 60h, 61h and 90h. A program that changes the vector of a type in use, for example INT 21h, redirects all DOS services to its own routine. This is sometimes done on purpose. For example, a program changes the vector of type 0 so that its own routine runs instead of DOS's divide error routine. In that case it is mandatory to restore the old vector when the program ends.</p>
+
+<h2 class="nt-pb" id="s5-1-3"><span class="nt-num">5.1.3</span>INT and IRET</h2>
+
+<h3 id="s5-1-3-1"><span class="nt-num">5.1.3.1</span>The steps of INT n</h3>
+
+<p>The <code>INT n</code> instruction is two bytes: the opcode CDh and the type number n. For example <code>INT 21h</code> sits in memory as <code>CD 21</code>. While executing it the processor does a series of things the programmer cannot see. They resemble a procedure call but include more. <a href="#tab-int">Table 5.1.5</a> gives the steps in order.</p>
+
+<div class="nt-tablewrap" id="tab-int">
+<table class="nt-table">
+  <caption>Table 5.1.5: The steps of the INT n instruction and the effect of each on the stack, registers and bus.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Operation</th><th scope="col">Effect</th><th scope="col">Bus cycle</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>FLAGS is pushed on the stack</td><td>SP ← SP − 2, [SS:SP] ← FLAGS</td><td>memory write</td></tr>
+    <tr><td>2</td><td>IF and TF are cleared</td><td>IF = 0, TF = 0</td><td>—</td></tr>
+    <tr><td>3</td><td>CS is pushed on the stack</td><td>SP ← SP − 2, [SS:SP] ← CS</td><td>memory write</td></tr>
+    <tr><td>4</td><td>IP is pushed on the stack (the address of the instruction after INT)</td><td>SP ← SP − 2, [SS:SP] ← IP</td><td>memory write</td></tr>
+    <tr><td>5</td><td>vector is read</td><td>IP ← [0000:n×4], CS ← [0000:n×4+2]</td><td>two memory reads</td></tr>
+    <tr><td>6</td><td>the ISR runs and ends with IRET</td><td>IP, CS, FLAGS are popped from the stack in that order</td><td>three memory reads</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Every row of the table has a reason. <strong>Step 1</strong> saves the flags. The result of the interrupted program's last comparison, for example ZF, may change during the ISR. If the program is interrupted between a <code>CMP</code> and a <code>JE</code> and the flags are not saved, JE jumps the wrong way. Saving the flags automatically is therefore essential. The CALL instruction does not save the flags, because the program knows when a procedure will be called.</p>
+
+<p><strong>Step 2</strong> clears IF and TF. IF = 0 prevents the ISR from being interrupted by another maskable interrupt at its very first instruction. TF = 0 prevents the ISR from being stopped step by step by the single-step interrupt. It matters that this clearing is done <em>after</em> FLAGS has been pushed. The copy on the stack carries the old IF and TF values. When IRET restores that copy, IF and TF return to their values from before the interrupt.</p>
+
+<p><strong>Steps 3 and 4</strong> save the return address. Because the ISR may be in another segment, IP alone is not enough; CS is saved too. The IP written to the stack is not the address of the INT instruction itself but the address of the instruction <em>after</em> INT. The processor has already advanced IP by two bytes when fetching INT.</p>
+
+<p><strong>Step 5</strong> reads the vector and loads it into CS:IP. From this moment the first instruction the processor fetches is the first instruction of the ISR. The BIU's prefetch queue is also flushed; the bytes in the queue belonged to the instructions after INT and are now invalid.</p>
+
+<p>A total of 6 bytes, that is 3 words, is written to the stack. The whole of INT n takes 51 clock cycles on the 8086. A significant part of these cycles is spent on five memory accesses: three writes to the stack and two reads from the vector table. Flushing the queue and refetching the first bytes of the ISR also take time.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-iret">
+  <span class="nt-box__title">Definition 5.1.4</span>
+  <p><strong>IRET</strong> (interrupt return) is the return instruction from an interrupt service routine. It pops IP, CS and FLAGS from the stack in that order; SP increases by 2 on each pop. It is a single byte (CFh) and takes 24 clock cycles on the 8086.</p>
+</div>
+
+<p>IRET reads back in reverse order what INT wrote to the stack. This is natural because the stack works last in, first out: the IP pushed last is popped first, and the FLAGS pushed first are popped last. When FLAGS comes back, IF and TF take their old values too. A program that had IF = 1 before the interrupt therefore continues with IF = 1 after IRET.</p>
+
+<p><a href="#tab-kodlama">Table 5.1.6</a> gives the encoding and timing of the interrupt instructions that appear in these notes.</p>
+
+<div class="nt-tablewrap" id="tab-kodlama">
+<table class="nt-table">
+  <caption>Table 5.1.6: Machine code, length and clock cycles of the 8086 interrupt instructions (8086 manual).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Machine code</th><th scope="col">Length</th><th scope="col">Clock cycles</th></tr></thead>
+  <tbody>
+    <tr><td><code>INT n</code></td><td>CD n</td><td>2 bytes</td><td>51</td></tr>
+    <tr><td><code>INT 3</code></td><td>CC</td><td>1 byte</td><td>52</td></tr>
+    <tr><td><code>INTO</code></td><td>CE</td><td>1 byte</td><td>53 (OF = 1) / 4 (OF = 0)</td></tr>
+    <tr><td><code>IRET</code></td><td>CF</td><td>1 byte</td><td>24</td></tr>
+    <tr><td><code>CLI</code> / <code>STI</code></td><td>FA / FB</td><td>1 byte</td><td>2</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="s5-1-3-2"><span class="nt-num">5.1.3.2</span>The stack step by step: INT 10h</h3>
+
+<p>Let us follow the effect of the steps on the stack with concrete numbers. Suppose the <code>INT 10h</code> instruction in a .COM program is at address 0700:0104. When emu8086 loads a .COM program, CS = DS = SS = 0700h and SP = FFFEh. Initially only IF = 1; because bit 1 and bits 12–15 of the 8086 FLAGS register always read as 1, FLAGS = F202h. Suppose the vector of INT 10h is F000:F065, as in <a href="#ornek-int10">Example 5.1.1</a>.</p>
+
+<div class="nt-tablewrap" id="tab-yigin">
+<table class="nt-table">
+  <caption>Table 5.1.7: The stack and registers during INT 10h at 0700:0104 and the IRET at the end of the ISR (SS = 0700h).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Operation</th><th scope="col">SP</th><th scope="col">[FFF8h]</th><th scope="col">[FFFAh]</th><th scope="col">[FFFCh]</th><th scope="col">CS:IP</th><th scope="col">FLAGS</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>start</td><td>FFFEh</td><td>—</td><td>—</td><td>—</td><td>0700:0104</td><td>F202h</td></tr>
+    <tr><td>1</td><td>FLAGS pushed</td><td class="n51-chg">FFFCh</td><td>—</td><td>—</td><td class="n51-chg">F202h</td><td>0700:0104</td><td>F202h</td></tr>
+    <tr><td>2</td><td>IF = TF = 0</td><td>FFFCh</td><td>—</td><td>—</td><td>F202h</td><td>0700:0104</td><td class="n51-chg">F002h</td></tr>
+    <tr><td>3</td><td>CS pushed</td><td class="n51-chg">FFFAh</td><td>—</td><td class="n51-chg">0700h</td><td>F202h</td><td>0700:0104</td><td>F002h</td></tr>
+    <tr><td>4</td><td>IP pushed</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0106h</td><td>0700h</td><td>F202h</td><td>0700:0104</td><td>F002h</td></tr>
+    <tr><td>5</td><td>CS:IP ← vector</td><td>FFF8h</td><td>0106h</td><td>0700h</td><td>F202h</td><td class="n51-chg">F000:F065</td><td>F002h</td></tr>
+    <tr><td>6</td><td>IRET: IP, CS popped</td><td class="n51-chg">FFFCh</td><td>0106h</td><td>0700h</td><td>F202h</td><td class="n51-chg">0700:0106</td><td>F002h</td></tr>
+    <tr><td>7</td><td>IRET: FLAGS popped</td><td class="n51-chg">FFFEh</td><td>0106h</td><td>0700h</td><td>F202h</td><td>0700:0106</td><td class="n51-chg">F202h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rows of <a href="#tab-yigin">Table 5.1.7</a> read as follows. In <strong>step 1</strong> SP is first decreased by 2 and becomes FFFCh, and the current value of FLAGS, F202h, is written to this address. In <strong>step 2</strong> IF and TF in the register are cleared; with bit 9 (IF) of F202h cleared, FLAGS = F002h. The copy on the stack stays F202h. In <strong>step 3</strong> SP becomes FFFAh and CS = 0700h is written. In <strong>step 4</strong> SP becomes FFF8h and the return address is written. Because INT 10h is two bytes, the return address is 0104h + 2 = 0106h. In <strong>step 5</strong> CS:IP is loaded from the vector and the ISR starts running. In this example the ISR writes a character to the screen.</p>
+
+<figure class="nt-fig" id="sekil-yigin1" style="--w:620px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Stack and registers"><text class="lbl" x="450" y="16" text-anchor="middle">stack (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt" x="520" y="142" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">0700h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">0104h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFFCh</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F202h</text></svg> <svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Stack and registers"><text class="lbl" x="450" y="16" text-anchor="middle">stack (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px">0106h</text><text class="txt" x="520" y="78" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px">0700h</text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">0700h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">0104h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFF8h</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F002h</text></svg></div></div>
+  <figcaption><b>Figure 5.1.5:</b> Left, after FLAGS is pushed (SP = FFFCh); right, after the return address 0106h is pushed (SP = FFF8h). Toward the top of the stack the three words are laid out as FLAGS, CS, IP.</figcaption>
+</figure>
+
+<p>When the ISR finishes and IRET runs, the stack empties in the opposite direction. In <strong>step 6</strong> the 0106h at [FFF8h] is popped into IP, the 0700h at [FFFAh] into CS, and SP = FFFCh. In <strong>step 7</strong> the F202h at [FFFCh] is popped into FLAGS and SP returns to FFFEh. IF is 1 again. The program continues from 0700:0106, that is, from the instruction after INT 10h.</p>
+
+<figure class="nt-fig" id="sekil-yigin2" style="--w:620px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Stack and registers"><text class="lbl" x="450" y="16" text-anchor="middle">stack (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px">0106h</text><text class="txt" x="520" y="78" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px">0700h</text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">F000h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">F065h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFF8h</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F002h</text></svg> <svg class="ds-svg" viewBox="0 0 600 190" role="img" aria-label="Stack and registers"><text class="lbl" x="450" y="16" text-anchor="middle">stack (SS = 0700h)</text><text class="txt mono" x="390" y="46" text-anchor="end" style="font-size:13.5px">FFF6h</text><rect class="box" x="400" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="46" text-anchor="middle" style="font-size:14px"></text><text class="txt mono" x="390" y="78" text-anchor="end" style="font-size:13.5px">FFF8h</text><rect class="box" x="400" y="58" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="78" text-anchor="middle" style="font-size:14px">0106h</text><text class="txt mono" x="390" y="110" text-anchor="end" style="font-size:13.5px">FFFAh</text><rect class="box" x="400" y="90" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="110" text-anchor="middle" style="font-size:14px">0700h</text><text class="txt mono" x="390" y="142" text-anchor="end" style="font-size:13.5px">FFFCh</text><rect class="box" x="400" y="122" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="142" text-anchor="middle" style="font-size:14px">F202h</text><text class="txt mono" x="390" y="174" text-anchor="end" style="font-size:13.5px">FFFEh</text><rect class="box" x="400" y="154" width="110" height="30" rx="3"/><text class="txt mono" x="455" y="174" text-anchor="middle" style="font-size:14px"></text><text class="txt" x="520" y="174" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="64" y="46.0" text-anchor="end" style="font-size:14px">CS</text><rect class="box" x="70" y="26" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="46.0" text-anchor="middle">0700h</text><text class="txt mono" x="64" y="86.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="70" y="66" width="110" height="30" rx="3"/><text class="txt mono" x="125.0" y="86.0" text-anchor="middle">0106h</text><text class="txt mono" x="64" y="126.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="70" y="106" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="126.0" text-anchor="middle">FFFEh</text><text class="txt mono" x="64" y="166.0" text-anchor="end" style="font-size:14px">FLAGS</text><rect class="box" x="70" y="146" width="110" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="125.0" y="166.0" text-anchor="middle">F202h</text></svg></div></div>
+  <figcaption><b>Figure 5.1.6:</b> Left, while the ISR runs: CS:IP = F000:F065, FLAGS = F002h. Right, after IRET: CS:IP = 0700:0106, SP = FFFEh, FLAGS = F202h. The three words on the stack are not erased; only SP moves back.</figcaption>
+</figure>
+
+<p>A detail in the last row deserves attention: after IRET the three words on the stack remain in memory (<a href="#sekil-yigin2">Figure 5.1.6</a>). POP and IRET do not erase memory; they only increase SP. The region above SP is now considered "free", and the next PUSH or interrupt overwrites these values. This is why old values are visible when you look at the stack window of a debugger.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-yigin">
+  <span class="nt-box__title">Example 5.1.3</span>
+  <p>When the same program is run in emu8086 with its own ISR placed in the INT 10h vector, the words written to the stack can be read. The code is:</p>
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ah, 0Eh      <span class="cm">; 0100h, 2 bytes</span>
+<span class="kw">mov</span> al, <span class="str">'A'</span>      <span class="cm">; 0102h, 2 bytes</span>
+<span class="kw">int</span> 10h         <span class="cm">; 0104h, 2 bytes (CD 10)</span>
+<span class="kw">ret</span>             <span class="cm">; 0106h: return address</span></code></pre>
+  <p>Right after INT 10h executes, SP = FFF8h and the stack holds the words [FFF8h] = 0106h, [FFFAh] = 0700h, [FFFCh] = F202h. After IRET, SP = FFFEh. The values are exactly the same as in Table 5.1.7.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Taking the IP pushed on the stack to be the address of the INT instruction itself (0104h in this example). The value pushed is the address of the next instruction (0106h). Otherwise IRET would take the processor back to the INT and the program would enter an infinite loop.</p>
+</div>
+
+<h3 id="s5-1-3-3"><span class="nt-num">5.1.3.3</span>INT/IRET versus CALL/RET</h3>
+
+<p>The similarity between INT and a procedure call is obvious: both write the return address to the stack and jump elsewhere. The differences show why ISRs need a separate return instruction. <a href="#tab-call">Table 5.1.8</a> compares the two pairs.</p>
+
+<div class="nt-tablewrap" id="tab-call">
+<table class="nt-table">
+  <caption>Table 5.1.8: Comparison of CALL/RET and INT n/IRET.</caption>
+  <thead><tr><th scope="col"></th><th scope="col">CALL / RET</th><th scope="col">INT n / IRET</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Target address</th><td>in the instruction (a label)</td><td>from the vector table (n × 4)</td></tr>
+    <tr><th scope="row">Pushed on the stack</th><td>IP (near) or CS + IP (far)</td><td>FLAGS + CS + IP (6 bytes)</td></tr>
+    <tr><th scope="row">Flags</th><td>unchanged</td><td>IF = 0, TF = 0</td></tr>
+    <tr><th scope="row">Return</th><td>RET: pops IP (and CS)</td><td>IRET: pops IP, CS, FLAGS</td></tr>
+    <tr><th scope="row">Instruction length</th><td>3 bytes (near CALL)</td><td>2 bytes (INT 3: 1 byte)</td></tr>
+    <tr><th scope="row">Invoked by</th><td>only the program</td><td>the program, the processor (exception) or hardware</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The most important row is the last. Only the program calls a procedure; at that point the program knows the state of the flags and, if necessary, saves them itself. An ISR, on the other hand, can be invoked by a hardware event without the program's knowledge. That is why the job of saving the flags is given to the processor.</p>
+
+<p>The target address row also gives an important flexibility. The assembler writes the target of a CALL into the instruction, and this value does not change. The target of INT is read from the table at run time. Changing the vector redirects every INT call to another routine without changing any code. This is how DOS, drivers and resident programs can add their own functions to the BIOS services. The technique of <strong>interrupt chaining</strong> rests on this flexibility. The new routine does its own work and then jumps to the old vector, so that the old routine runs too.</p>
+
+<p>In the instruction length row, INT being 2 bytes is also an advantage. A far CALL is 5 bytes; calling a BIOS routine with a far CALL means both longer code and a fixed address that depends on the BIOS version. INT 10h, by contrast, is the same two bytes on every BIOS.</p>
+
+<h3 id="s5-1-3-4"><span class="nt-num">5.1.3.4</span>An ISR that ends with RET: code trace</h3>
+
+<p>To see the practical consequence of the difference in Table 5.1.8, we trace a deliberately faulty program. The program installs its own ISR on type 61h and calls it with INT 61h, but ends the ISR with a near RET instead of IRET.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[61h*4], <span class="dir">offset</span> isr
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[61h*4+2], cs
+<span class="kw">int</span> 61h
+<span class="kw">hlt</span>              <span class="cm">; SP = ?</span>
+isr:
+<span class="kw">ret</span>              <span class="cm">; BUG!</span></code></pre>
+
+<p>The code runs line by line as follows. <code>mov ax, 0</code> and <code>mov es, ax</code> set ES to 0000h. Because an immediate value cannot be loaded directly into a segment register, 0 is put into AX first. From then on every address written with <code>es:[…]</code> is inside the vector table. The third line writes the offset of the <code>isr</code> label to the IP half of the vector of type 61h, at address 61h × 4 = 184h. The assembler computes the expression <code>61h*4</code> itself and puts 0184h in the instruction. The fourth line writes the value of CS to address 186h. CS and the ISR are in the same segment, so the vector points to 0700:0114.</p>
+
+<p>Counting the bytes of the program makes the IP values in the trace table easier to understand. The lengths and addresses of the instructions are: <code>mov ax, 0</code> 3 bytes (0100h–0102h), <code>mov es, ax</code> 2 bytes (0103h–0104h), the word write with an ES prefix 7 bytes (0105h–010Bh), the CS write 5 bytes (010Ch–0110h), <code>int 61h</code> 2 bytes (0111h–0112h), <code>hlt</code> 1 byte (0113h) and <code>ret</code> 1 byte (0114h). So the <code>isr</code> label is 0114h and the return address of INT 61h is 0113h.</p>
+
+<div class="nt-tablewrap" id="tab-retisr">
+<table class="nt-table">
+  <caption>Table 5.1.9: Trace of the program whose ISR ends with RET (state after each line executes; SS = 0700h).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">CS:IP (next)</th><th scope="col">SP</th><th scope="col">IF</th><th scope="col">Stack / memory</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov ax, 0</code></td><td>0700:0103</td><td>FFFEh</td><td>1</td><td>[FFFEh] = 0000h</td></tr>
+    <tr><td>3</td><td><code>mov es, ax</code></td><td>0700:0105</td><td>FFFEh</td><td>1</td><td>ES = 0000h</td></tr>
+    <tr><td>4</td><td><code>mov … [61h*4], offset isr</code></td><td>0700:010C</td><td>FFFEh</td><td>1</td><td>[0000:0184h] = 0114h</td></tr>
+    <tr><td>5</td><td><code>mov … [61h*4+2], cs</code></td><td>0700:0111</td><td>FFFEh</td><td>1</td><td>[0000:0186h] = 0700h</td></tr>
+    <tr><td>6</td><td><code>int 61h</code></td><td class="n51-chg">0700:0114</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0</td><td>[FFF8h] = 0113h, [FFFAh] = 0700h, [FFFCh] = F202h</td></tr>
+    <tr><td>9</td><td><code>ret</code> (wrong)</td><td class="n51-chg">0700:0113</td><td class="n51-chg">FFFAh</td><td>0</td><td>[FFFAh] = 0700h, [FFFCh] = F202h left on the stack</td></tr>
+    <tr><td>7</td><td><code>hlt</code></td><td>0700:0114</td><td>FFFAh</td><td>0</td><td>processor halted, IF = 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two lines of the trace are critical (<a href="#tab-retisr">Table 5.1.9</a>). In <strong>line 6</strong>, <code>int 61h</code> writes 6 bytes to the stack: FLAGS (F202h), CS (0700h) and the return IP (0113h). SP = FFF8h and IF = 0, and CS:IP is loaded from the vector as 0700:0114. In <strong>line 9</strong>, the near <code>ret</code> in the ISR pops only the word at the top of the stack: IP = 0113h. CS does not change; because the ISR and the program are in the same segment, this time we happen to return to the right segment. SP, however, increases by only 2 and becomes FFFAh. The expected value is FFFEh; the stack is off by 4 bytes. Because FLAGS was not popped from the stack, IF remains 0.</p>
+
+<figure class="nt-fig" id="sekil-retisr" style="--w:620px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="Ending the ISR with RET, step 5: stack, SP and IF"><text class="lbl" x="103" y="16" text-anchor="middle" style="font-size:11px">stack (SS = 0700h)</text><rect class="mt-hot" x="60" y="22" width="86" height="24" rx="2"/><text class="lbl" x="56" y="38" text-anchor="end" style="font-size:10.5px">FFF8</text><text class="mt-m" x="103" y="39" text-anchor="middle" style="font-size:12.5px">0113h</text><text class="mt-l" x="150" y="38" text-anchor="start" style="font-size:12px">← SP</text><rect class="mt-hot" x="60" y="48" width="86" height="24" rx="2"/><text class="lbl" x="56" y="64" text-anchor="end" style="font-size:10.5px">FFFA</text><text class="mt-m" x="103" y="65" text-anchor="middle" style="font-size:12.5px">0700h</text><rect class="mt-hot" x="60" y="74" width="86" height="24" rx="2"/><text class="lbl" x="56" y="90" text-anchor="end" style="font-size:10.5px">FFFC</text><text class="mt-m" x="103" y="91" text-anchor="middle" style="font-size:12.5px">F202h</text><rect class="box" x="60" y="100" width="86" height="24" rx="2"/><text class="lbl" x="56" y="116" text-anchor="end" style="font-size:10.5px">FFFE</text><text class="mt-m" x="103" y="117" text-anchor="middle" style="font-size:12.5px">0000h</text><rect class="mt-hot" x="210" y="98" width="110" height="28" rx="4"/><text class="lbl" x="265" y="93" text-anchor="middle">CS:IP (next)</text><text class="mt-v" x="265" y="117.5" text-anchor="middle" style="font-size:13px">0700:0114</text><rect class="mt-hot" x="330" y="98" width="62" height="28" rx="4"/><text class="lbl" x="361" y="93" text-anchor="middle">SP</text><text class="mt-v" x="361" y="117.5" text-anchor="middle" style="font-size:13px">FFF8h</text><text class="mt-a" x="8" y="148" text-anchor="start">IF = 0</text><text class="mt-m" x="80" y="148" text-anchor="start">FLAGS = F002h</text></svg> <svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="Ending the ISR with RET, step 6: stack, SP and IF"><text class="lbl" x="103" y="16" text-anchor="middle" style="font-size:11px">stack (SS = 0700h)</text><rect class="mt-dim" x="60" y="22" width="86" height="24" rx="2"/><text class="lbl" x="56" y="38" text-anchor="end" style="font-size:10.5px">FFF8</text><rect class="mt-hot" x="60" y="48" width="86" height="24" rx="2"/><text class="lbl" x="56" y="64" text-anchor="end" style="font-size:10.5px">FFFA</text><text class="mt-m" x="103" y="65" text-anchor="middle" style="font-size:12.5px">0700h</text><text class="mt-l" x="150" y="64" text-anchor="start" style="font-size:12px">← SP</text><rect class="mt-hot" x="60" y="74" width="86" height="24" rx="2"/><text class="lbl" x="56" y="90" text-anchor="end" style="font-size:10.5px">FFFC</text><text class="mt-m" x="103" y="91" text-anchor="middle" style="font-size:12.5px">F202h</text><rect class="box" x="60" y="100" width="86" height="24" rx="2"/><text class="lbl" x="56" y="116" text-anchor="end" style="font-size:10.5px">FFFE</text><text class="mt-m" x="103" y="117" text-anchor="middle" style="font-size:12.5px">0000h</text><text class="mt-a" x="196" y="64" text-anchor="start">leftover data: CS, FLAGS</text><rect class="mt-hot" x="210" y="98" width="110" height="28" rx="4"/><text class="lbl" x="265" y="93" text-anchor="middle">CS:IP (next)</text><text class="mt-v" x="265" y="117.5" text-anchor="middle" style="font-size:13px">0700:0113</text><rect class="mt-hot" x="330" y="98" width="62" height="28" rx="4"/><text class="lbl" x="361" y="93" text-anchor="middle">SP</text><text class="mt-v" x="361" y="117.5" text-anchor="middle" style="font-size:13px">FFFAh</text><text class="mt-a" x="8" y="148" text-anchor="start">IF = 0</text><text class="mt-m" x="80" y="148" text-anchor="start">FLAGS = F002h</text></svg></div></div>
+  <figcaption><b>Figure 5.1.7:</b> Left, after <code>int 61h</code>: three words on the stack, SP = FFF8h, IF = 0. Right, after the faulty <code>ret</code>: only IP has been popped; CS and FLAGS remain on the stack as leftover data, SP = FFFAh, IF is still 0.</figcaption>
+</figure>
+
+<p>When the program reaches <code>hlt</code>, there are two problems at once (<a href="#sekil-retisr">Figure 5.1.7</a>). First, interrupts are off. HLT stops the processor until an interrupt arrives. Because IF = 0, no request from INTR can wake the processor; only NMI or RESET can. In this small program the processor waits forever. Second, the stack is out of step. If there were a <code>ret</code> instead of HLT, it would take the 0700h at the top of the stack for the return address and jump to 0700:0700. There is no meaningful code to execute there.</p>
+
+<p>Trying to fix the problem with RETF is not enough either. The far return instruction pops IP and CS and increases SP by 4. The 2 bytes of FLAGS still remain on the stack and IF does not return to its old state. The rule is therefore absolute: ISRs always end with IRET.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing an ISR inside PROC/ENDP and putting <code>RET</code> at the end out of habit. The assembler does not object, because RET is a valid instruction. The error shows up only at run time, often long after the ISR, as a wrong return address or as interrupts that never come again. The symptom being far from the cause makes this bug hard to find.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-4"><span class="nt-num">5.1.4</span>Exceptions</h2>
+
+<p>Exceptions are the way the processor reports to the program the special situations it meets while executing an instruction. The 8086 has two true exceptions: divide error (INT 0) and single step (INT 1). The breakpoint (INT 3) and overflow interrupt (INT 4 via INTO) are really software interrupts called by an instruction. But because both are used for debugging and error trapping, they are treated together with exceptions. Intel's 8086 manual groups these four interrupts, together with INT n, under the heading "internal interrupts".</p>
+
+<h3 id="s5-1-4-1"><span class="nt-num">5.1.4.1</span>Divide error (INT 0)</h3>
+
+<p>The DIV and IDIV instructions write the quotient to a fixed-size register. In an 8-bit division the dividend is in AX, the quotient is written to AL and the remainder to AH. In a 16-bit division the dividend is in DX:AX, the quotient goes to AX and the remainder to DX. If the quotient does not fit in the destination register, there is no way to produce a correct result. In this case the processor does not write the result and raises the type 0 interrupt.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-bolme">
+  <span class="nt-box__title">Definition 5.1.5</span>
+  <p>A <strong>divide error</strong> is the type 0 interrupt that the processor raises when, in a DIV or IDIV instruction, the divisor is zero or the quotient does not fit in the destination register. The destination is AL in an 8-bit division and AX in a 16-bit division.</p>
+</div>
+
+<p>The second condition in the definition is often overlooked. A divide error can occur even without division by zero.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-tasma">
+  <span class="nt-box__title">Example 5.1.4</span>
+  <p><code>DIV BL</code> runs with AX = 1000 (03E8h) and BL = 2. What happens? How can the same division be done without an error?</p>
+  <ol class="nt-steps">
+    <li>8-bit division: AX / BL = 1000 / 2 = 500. The quotient is to be written to AL.</li>
+    <li>AL can hold at most 255. Since 500 > 255, the quotient does not fit. Although the divisor is not zero, the processor raises INT 0.</li>
+    <li>The solution is a 16-bit division: DX = 0, AX = 1000, BX = 2 and <code>DIV BX</code>. The dividend DX:AX = 0000:03E8h = 1000. The quotient 500 = 01F4h is written to AX and the remainder 0 to DX. AX can hold at most 65,535, and 500 fits easily.</li>
+  </ol>
+  <p>A smaller borderline example: AX = 01FEh (510) / 2 = 255 = FFh fits; AX = 0200h (512) / 2 = 256 does not fit and raises INT 0. These values were verified by running them in emu8086.</p>
+</div>
+
+<p>The rule can be put briefly: in an 8-bit DIV, if AH ≥ BL, that is, if the high half of the dividend is not smaller than the divisor, the quotient exceeds 255 and the error occurs. In the example AH = 03h and BL = 02h, and since 03h ≥ 02h the error is unavoidable. For a 16-bit DIV the condition is DX ≥ divisor. This check can be made before the division with a CMP.</p>
+
+<p>In the signed division IDIV the limits are the signed range. On the 8086 the quotient of an 8-bit IDIV must lie between −127 and +127; for a 16-bit IDIV the range is −32,767 to +32,767. This limit leaves out the smallest value possible in two's complement (−128 or −32,768). For example, with AX = −128 (FF80h) and BL = 1, <code>IDIV BL</code> finds the quotient −128 and on the 8086 still raises INT 0. Later processors accept this smallest value.</p>
+
+<p><strong>Return address.</strong> The IP that the 8086 pushes on a divide error is the address of the instruction <em>after</em> DIV. So IRET resumes the program by skipping the division. Execution continues as if the division had never been done; the destination registers keep their old values. On the 80286 and later processors this behavior was changed, and the address of the faulting instruction itself is pushed. The error routine can then remove the cause and retry the instruction. An error routine written for the 8086 does not have this option; it can only report to the program in some way that the result is invalid.</p>
+
+<p><strong>What does DOS do?</strong> When a program starts, the vector of INT 0 points to DOS's own routine. This routine prints "Divide overflow" on the screen and terminates the program. A program can change this behavior by installing its own routine. The simplest form of this is seen in the trace below.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking of a divide error only as "division by zero" and checking only whether the divisor is zero. When the dividend is large and the divisor small, the quotient does not fit in the destination and the same interrupt occurs. Checking before the division both that the divisor is nonzero and that the quotient will fit (AH &lt; divisor for 8 bits, DX &lt; divisor for 16 bits) prevents INT 0 in the first place.</p>
+</div>
+
+<h3 id="s5-1-4-2"><span class="nt-num">5.1.4.2</span>Our own INT 0 handler: code trace</h3>
+
+<p>The following program redirects the vector of type 0 to its own routine and deliberately divides by zero. The routine leaves the program an "invalid result" marker by writing FFFFh to AX.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax           <span class="cm">; ES = 0: IVT</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[0*4], <span class="dir">offset</span> div_err
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[0*4+2], cs
+<span class="kw">mov</span> ax, 100
+<span class="kw">mov</span> bl, 0
+<span class="kw">div</span> bl               <span class="cm">; INT 0!</span>
+<span class="kw">mov</span> dl, al           <span class="cm">; returns here</span>
+<span class="kw">ret</span>
+div_err:
+<span class="kw">mov</span> ax, 0FFFFh       <span class="cm">; error flag</span>
+<span class="kw">iret</span></code></pre>
+
+<p>The first two lines set ES to 0000h. <code>es:[0*4]</code> is the IP half of the vector of type 0, that is, the very start of the table. The third line writes the offset of the <code>div_err</code> label there, and the fourth line writes CS to 0000:0002h. Before the program, the vector pointed to the emulator's default routine; in this trace the old value is taken to be F000:1000h. In this short example the old vector is not saved. In a real program it is saved and restored before exit.</p>
+
+<p>Let us count the offsets: <code>mov ax, 0</code> is 3 bytes, <code>mov es, ax</code> 2, the two vector writes 7 and 5, <code>mov ax, 100</code> 3, <code>mov bl, 0</code> 2, <code>div bl</code> 2, <code>mov dl, al</code> 2 and <code>ret</code> 1 byte. So <code>div bl</code> is at 0116h, <code>mov dl, al</code> at 0118h and the <code>div_err</code> label at 011Bh.</p>
+
+<div class="nt-tablewrap" id="tab-bolme">
+<table class="nt-table">
+  <caption>Table 5.1.10: Trace of the program with our own INT 0 handler (state after each line executes).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BL</th><th scope="col">DL</th><th scope="col">CS:IP (next)</th><th scope="col">SP</th><th scope="col">IF</th><th scope="col">Vector 0 / stack</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov ax, 0</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:0103</td><td>FFFEh</td><td>1</td><td>F000:1000</td></tr>
+    <tr><td>3</td><td><code>mov es, ax</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:0105</td><td>FFFEh</td><td>1</td><td>F000:1000</td></tr>
+    <tr><td>4</td><td><code>mov … [0*4], offset div_err</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:010C</td><td>FFFEh</td><td>1</td><td class="n51-chg">F000:011B</td></tr>
+    <tr><td>5</td><td><code>mov … [0*4+2], cs</code></td><td>0000h</td><td>00h</td><td>00h</td><td>0700:0111</td><td>FFFEh</td><td>1</td><td class="n51-chg">0700:011B</td></tr>
+    <tr><td>6</td><td><code>mov ax, 100</code></td><td class="n51-chg">0064h</td><td>00h</td><td>00h</td><td>0700:0114</td><td>FFFEh</td><td>1</td><td>0700:011B</td></tr>
+    <tr><td>7</td><td><code>mov bl, 0</code></td><td>0064h</td><td>00h</td><td>00h</td><td>0700:0116</td><td>FFFEh</td><td>1</td><td>0700:011B</td></tr>
+    <tr><td>8</td><td><code>div bl</code> → INT 0</td><td>0064h</td><td>00h</td><td>00h</td><td class="n51-chg">0700:011B</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0</td><td>[FFF8h] = 0118h, [FFFAh] = 0700h, [FFFCh] = F202h</td></tr>
+    <tr><td>12</td><td><code>mov ax, 0FFFFh</code></td><td class="n51-chg">FFFFh</td><td>00h</td><td>00h</td><td>0700:011E</td><td>FFF8h</td><td>0</td><td>stack unchanged</td></tr>
+    <tr><td>13</td><td><code>iret</code></td><td>FFFFh</td><td>00h</td><td>00h</td><td class="n51-chg">0700:0118</td><td class="n51-chg">FFFEh</td><td class="n51-chg">1</td><td>stack emptied</td></tr>
+    <tr><td>9</td><td><code>mov dl, al</code></td><td>FFFFh</td><td>00h</td><td class="n51-chg">FFh</td><td>0700:011A</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>10</td><td><code>ret</code></td><td>FFFFh</td><td>00h</td><td>FFh</td><td class="n51-chg">0700:0000</td><td class="n51-chg">0000h</td><td>1</td><td>return to DOS</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rows of <a href="#tab-bolme">Table 5.1.10</a> read in three phases. <strong>Lines 4–5</strong> change the vector in two pieces. After line 4, half of the vector is new and half is old: F000:011B. This intermediate state points to no routine. In this program the intermediate state is harmless, because only the program's own DIV can trigger type 0. When the vectors of hardware interrupts are changed, however, this intermediate state is a serious danger.</p>
+
+<p>In <strong>line 8</strong>, <code>div bl</code> divides by zero. The processor does not write the quotient and starts the type 0 interrupt. FLAGS (F202h), CS (0700h) and the return IP are pushed on the stack. The IP pushed is not the address of DIV, 0116h, but the address of the next instruction, 0118h. SP = FFF8h and IF = 0, CS:IP ← 0700:011B. AX has not changed; the dividend stays 0064h.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bolme" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 420 186" role="img" aria-label="Vector table, stack and registers"><text class="mt-s" x="8" y="14" text-anchor="start" style="font-size:12px;">IVT 0000:0000h (type 00h)</text><rect class="box" x="8" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="27" y="40" text-anchor="middle" style="font-size:13.5px;">1B</text><rect class="box" x="46" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="65" y="40" text-anchor="middle" style="font-size:13.5px;">01</text><rect class="box" x="84" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="103" y="40" text-anchor="middle" style="font-size:13.5px;">00</text><rect class="box" x="122" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="141" y="40" text-anchor="middle" style="font-size:13.5px;">07</text><text class="lbl" x="46" y="62" text-anchor="middle" style="font-size:11px;">IP</text><text class="lbl" x="122" y="62" text-anchor="middle" style="font-size:11px;">CS</text><text class="mt-m" x="8" y="80" text-anchor="start" style="font-size:12px;">vector = 0700:011Bh</text><text class="lbl" x="348" y="14" text-anchor="middle" style="font-size:11px;">stack (SS = 0700)</text><rect class="mt-dim" x="310" y="20" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="36" text-anchor="end" style="font-size:10.5px;">FFF6</text><text class="lbl" x="348" y="36" text-anchor="middle" style="font-size:12.5px;">····</text><rect class="box" x="310" y="45" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="61" text-anchor="end" style="font-size:10.5px;">FFF8</text><text class="txt mono" x="348" y="61" text-anchor="middle" style="font-size:12.5px;">0118</text><text class="mt-l" x="389" y="61" text-anchor="start" style="font-size:11.5px;">← SP</text><rect class="box" x="310" y="70" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="86" text-anchor="end" style="font-size:10.5px;">FFFA</text><text class="txt mono" x="348" y="86" text-anchor="middle" style="font-size:12.5px;">0700</text><rect class="box" x="310" y="95" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="111" text-anchor="end" style="font-size:10.5px;">FFFC</text><text class="txt mono" x="348" y="111" text-anchor="middle" style="font-size:12.5px;">F202</text><rect class="box" x="310" y="120" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="136" text-anchor="end" style="font-size:10.5px;">FFFE</text><text class="txt mono" x="348" y="136" text-anchor="middle" style="font-size:12.5px;">0000</text><text class="lbl" x="33" y="109" text-anchor="middle" style="font-size:12px;">AX</text><rect class="mt-hot" x="8" y="114" width="50" height="26" rx="3"/><text class="txt mono" x="33" y="132" text-anchor="middle" style="font-size:13px;">FFFF</text><text class="lbl" x="82" y="109" text-anchor="middle" style="font-size:12px;">BL</text><rect class="box" x="65" y="114" width="34" height="26" rx="3"/><text class="txt mono" x="82" y="132" text-anchor="middle" style="font-size:13px;">00</text><text class="lbl" x="123" y="109" text-anchor="middle" style="font-size:12px;">DL</text><rect class="box" x="106" y="114" width="34" height="26" rx="3"/><text class="txt mono" x="123" y="132" text-anchor="middle" style="font-size:13px;">00</text><text class="lbl" x="189" y="109" text-anchor="middle" style="font-size:12px;">CS:IP</text><rect class="mt-hot" x="147" y="114" width="84" height="26" rx="3"/><text class="txt mono" x="189" y="132" text-anchor="middle" style="font-size:13px;">0700:011E</text><text class="lbl" x="253" y="109" text-anchor="middle" style="font-size:12px;">IF</text><rect class="box" x="238" y="114" width="30" height="26" rx="3"/><text class="txt mono" x="253" y="132" text-anchor="middle" style="font-size:13px;">0</text></svg></div>
+  <figcaption><b>Figure 5.1.8:</b> After <code>div bl</code> triggers INT 0: the vector of type 0 is 0700:011Bh, the stack holds the return IP 0118h, CS and FLAGS; IF = 0 and CS:IP is at the first instruction of the routine.</figcaption>
+</figure>
+
+<p><strong>Lines 12–13</strong> are the routine. <code>mov ax, 0FFFFh</code> puts an invalid marker in the result register. <code>iret</code> pops IP = 0118h, CS = 0700h and FLAGS = F202h; SP = FFFEh and IF = 1. The DIV does not run again. In <strong>line 9</strong> the main program moves AL into DL with <code>mov dl, al</code> and learns of the error from DL = FFh. The <code>ret</code> on the last line takes the 0000h at the top of the stack in a .COM program and returns to DOS through the INT 20h at the start of the PSP.</p>
+
+<p>The marking method in this program has a weakness. FFh can also be the result of a real division: 255 / 1 = 255. In real programs the error information is returned instead in a separate variable or in a flag, for example CF. To change CF, the ISR must modify the copy of FLAGS on the stack, because IRET restores that copy.</p>
+
+<h3 id="s5-1-4-3"><span class="nt-num">5.1.4.3</span>INTO and the overflow interrupt (INT 4)</h3>
+
+<p>In signed addition and subtraction, OF = 1 if the result does not fit in the signed range. The processor does not raise an interrupt by itself in this case; testing OF is the program's job. <code>INTO</code> (interrupt on overflow) makes this test in a single byte.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-into">
+  <span class="nt-box__title">Definition 5.1.6</span>
+  <p><strong>INTO</strong> is a one-byte (CEh) instruction that calls the type 4 interrupt if OF = 1 and does nothing if OF = 0. It is written immediately after a signed addition or subtraction.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-into">
+  <span class="nt-box__title">Example 5.1.5</span>
+  <p><code>ADD AL, BL</code> followed by <code>INTO</code> runs with AL = 64h and BL = 32h. Then the same operation is repeated with BL = F6h. In each case, what are AL, OF and CF, and is INT 4 called?</p>
+  <ol class="nt-steps">
+    <li>64h + 32h = 96h. In the unsigned reading, 100 + 50 = 150 ≤ 255; there is no carry, CF = 0. In the signed reading, the sum of two positive numbers is +150, which exceeds +127. The top bit of 96h is 1; the result looks like −106. OF = 1 and INTO calls INT 4. AL stays 96h; INTO does not correct the result.</li>
+    <li>64h + F6h = 15Ah; AL = 5Ah and CF = 1. In the signed reading +100 + (−10) = +90 is correct; the sum of two numbers of different signs cannot overflow: OF = 0. INTO does nothing. CF = 1 does not affect INTO.</li>
+  </ol>
+  <p>Running the two cases in emu8086 gives the same result: in the first the INT 4 routine runs, in the second it does not.</p>
+</div>
+
+<p>The cost of INTO is small: with OF = 0 it takes only 4 clock cycles. A program that does signed arithmetic can therefore put an INTO after every important operation and catch overflows in a central routine. In practice, though, DOS does not install a meaningful routine for INT 4. The default vector often points to an empty routine consisting only of IRET. A program that is going to use INTO must install its own INT 4 routine.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Assuming that INTO looks at CF. INTO looks only at OF; an unsigned overflow (CF = 1) does not trigger INTO. A program that works with unsigned numbers catches overflow with <code>JC</code>, not with INTO.</p>
+</div>
+
+<h3 id="s5-1-4-4"><span class="nt-num">5.1.4.4</span>Single step (INT 1)</h3>
+
+<p>The most effective way to find a bug in a program is to execute it instruction by instruction and look at the registers after each one. The 8086 supports this in hardware. While the trap flag TF, bit 8 of the FLAGS register, is 1, the processor raises the type 1 interrupt after every instruction. The INT 1 routine, which is part of the debugger, prints the registers on the screen and waits for the user to press a key. It then returns to the program with IRET, the program executes one more instruction, and the cycle repeats.</p>
+
+<p>There is no instruction that changes TF directly. CLC/STC, CLD/STD and CLI/STI have no counterpart for TF. TF is changed through the stack: FLAGS is pushed, popped into a register, bit 8 is set, and the value is loaded back into FLAGS.</p>
+
+<pre class="nt-code"><code><span class="kw">PUSHF</span>
+<span class="kw">POP</span>  AX
+<span class="kw">OR</span>   AH, 01h      <span class="cm">; bit 8 = TF</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">POPF</span>              <span class="cm">; TF = 1</span></code></pre>
+
+<p>If FLAGS = F202h at the start, then after <code>PUSHF</code> and <code>POP AX</code> AX = F202h. Bit 0 of AH is bit 8 of FLAGS; <code>OR AH, 01h</code> makes AX F302h. <code>POPF</code> loads this value into FLAGS and TF = 1. To clear TF, the same sequence is written with <code>AND AH, 0FEh</code>.</p>
+
+<p>There is a subtle but important point here. The INT 1 routine is also a sequence of instructions. If every instruction of this routine also raised INT 1 while TF = 1, the routine would interrupt itself forever. What prevents this is the second of the INT n steps: on entering an interrupt, the processor pushes FLAGS on the stack and clears TF. The INT 1 routine runs with TF = 0, so its own instructions are not single-stepped. When the routine returns with IRET, the copy of FLAGS on the stack restores TF = 1 and tracing continues.</p>
+
+<p>The single-step interrupt has the lowest priority of all interrupts (<a href="#tab-oncelik">Table 5.1.12</a>). If another request is also waiting at the same instruction boundary, that one is serviced first.</p>
+
+<h3 id="s5-1-4-5"><span class="nt-num">5.1.4.5</span>Breakpoint (INT 3)</h3>
+
+<p>Single stepping is too slow for stopping at every instruction of a long program. Often you want the program to run at full speed up to a certain point and stop there. This point is called a <strong>breakpoint</strong>. On the 8086 breakpoints are set with INT 3.</p>
+
+<p>INT 3 has a special one-byte encoding: CCh. Written in the general <code>INT n</code> form it would be the two-byte <code>CD 03</code>. A debugger sets and removes a breakpoint in four steps:</p>
+
+<ol class="nt-steps">
+  <li>It saves the first byte of the instruction to stop at and writes CCh in its place.</li>
+  <li>The program runs at full speed. When that address is reached, CCh, that is INT 3, executes. FLAGS, CS and the address after INT 3 are pushed on the stack; the debugger's INT 3 routine shows the registers.</li>
+  <li>The debugger writes the saved byte back and decreases the return IP on the stack by 1. The return address then becomes the address where CCh was, that is, where the original instruction starts.</li>
+  <li>With IRET the original instruction is executed from the beginning, undamaged.</li>
+</ol>
+
+<p>The reason for the one-byte encoding lies in the first step. The shortest instructions of the 8086 are a single byte: <code>INC AX</code>, <code>PUSH BX</code>, <code>CLC</code> and so on. If the two-byte <code>CD 03</code> were written in place of such an instruction, the second byte would corrupt the first byte of the next instruction. If the program reached that next instruction by a jump, a corrupted instruction would now be executed. CCh, on the other hand, fits in place of the first byte of any instruction and affects only that instruction. Decreasing the return IP by 1 also depends on INT 3 being a single byte.</p>
+
+<p>The "single step" button of emu8086 does the same job inside the emulator. On a real 8086 system, DOS's DEBUG program and similar tools work by installing their own routines on the INT 1 and INT 3 vectors.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Taking the CCh bytes for the program's own instructions when the code of a program running under a debugger is dumped from memory. At addresses where a breakpoint is set, CCh temporarily sits in memory. If the program reads its own code or computes a checksum, it may find a different result under the debugger.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-5"><span class="nt-num">5.1.5</span>Hardware interrupts</h2>
+
+<h3 id="s5-1-5-1"><span class="nt-num">5.1.5.1</span>The INTR and NMI pins</h3>
+
+<p>External devices send interrupt requests to the 8086 over two pins. The behavior of the two pins differs from the way they are triggered to the way the type number is determined.</p>
+
+<p><strong>INTR</strong> (pin 18) is the maskable interrupt request input. It is level-triggered: the processor samples the pin during the last clock cycle of each instruction and sees the request if the pin is 1 at that moment. If IF = 0 the request is ignored; if the pin stays at 1 it is seen as soon as IF = 1. The type number is not fixed inside the processor. When the processor accepts the request, it produces two pulses on the INTA̅ output (pin 24, interrupt acknowledge) and reads the type number from the data bus. This arrangement makes it possible to connect many devices behind a single INTR pin; each device can be given a different type number.</p>
+
+<p><strong>NMI</strong> (pin 17) is the non-maskable interrupt input. It is rising-edge triggered: the 0-to-1 transition of the pin is recorded in a latch inside the processor, so the request is not lost. IF is not consulted; it cannot be turned off with CLI. The type number is always 2, so no INTA cycle is needed and the vector is read directly from 00008h. On the IBM PC, NMI is used to report memory parity errors. Circuits that sense loss of power also use NMI to give the processor a few milliseconds to save important data before the supply fails completely.</p>
+
+<div class="nt-tablewrap" id="tab-pin">
+<table class="nt-table">
+  <caption>Table 5.1.11: Comparison of INTR and NMI.</caption>
+  <thead><tr><th scope="col"></th><th scope="col">INTR</th><th scope="col">NMI</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Pin</th><td>18</td><td>17</td></tr>
+    <tr><th scope="row">Triggering</th><td>level (sampled at the end of an instruction)</td><td>rising edge (latched internally)</td></tr>
+    <tr><th scope="row">When IF = 0</th><td>held off</td><td>accepted</td></tr>
+    <tr><th scope="row">Type number</th><td>from the data bus via INTA (08h–0Fh on the PC)</td><td>fixed at 2</td></tr>
+    <tr><th scope="row">Use</th><td>keyboard, timer, disk, serial port</td><td>parity error, power loss</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Level triggering has a consequence. The device must hold INTR at 1 until the processor accepts the request. If the request comes as a very short pulse and the processor is running with IF = 0 at that moment, the request is lost. On the PC, the 8259A between the devices and the processor solves this problem. The 8259A stores incoming requests in its own register and holds INTR until the request is serviced.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking that the vector of NMI is also read with INTA. The INTA cycle is only for INTR. The type of NMI is fixed (2) and the processor does not ask outside for it. In the same way, the types of INT 0, INT 1, INT 3 and INT 4 are fixed and have nothing to do with external hardware.</p>
+</div>
+
+<h3 id="s5-1-5-2"><span class="nt-num">5.1.5.2</span>The INTR acknowledge sequence</h3>
+
+<p>Let us follow step by step the chain of events from the moment a key is pressed to the execution of the first instruction of the keyboard ISR. On the PC the keyboard controller is connected to input IRQ1 of the 8259A.</p>
+
+<ol class="nt-steps">
+  <li>The keyboard controller activates the IRQ1 line. The 8259A records the request and, if the mask allows, drives the INTR pin to 1.</li>
+  <li>The 8086 finishes the instruction it is executing. Interrupts are not accepted in the middle of an instruction; the processor samples INTR only at instruction boundaries.</li>
+  <li>If IF = 0 the request is held off and INTR stays at 1. If IF = 1 the request is accepted.</li>
+  <li>The processor produces two INTA̅ pulses. The first tells the 8259A to "get ready". On the second pulse the 8259A puts the type number on data bus lines D0–D7; on the PC this is 09h for the keyboard.</li>
+  <li>From here on it is the same as INT n: FLAGS, CS, IP are pushed on the stack; IF = TF = 0; CS:IP ← [n × 4], that is, [0000:0024h].</li>
+  <li>When the ISR has read the key and finished its work, it sends the 8259A an EOI (end of interrupt) and returns with IRET.</li>
+</ol>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-intr" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 84" role="img" aria-label="Timeline from an INTR request to the ISR"><defs><marker id="n51-13-mt2-8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-dim" x="4" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="52" y="40" text-anchor="middle" style="font-size:11.5px">INTR = 1</text><text class="lbl" x="52" y="12" text-anchor="middle" style="font-size:10.5px">1</text><rect class="box" x="103" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="151" y="40" text-anchor="middle" style="font-size:11.5px">instruction ends</text><text class="lbl" x="151" y="12" text-anchor="middle" style="font-size:10.5px">2</text><rect class="mt-acc" x="202" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="250" y="40" text-anchor="middle" style="font-size:11.5px">IF = 1?</text><text class="lbl" x="250" y="12" text-anchor="middle" style="font-size:10.5px">3</text><rect class="mt-hot" x="301" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="349" y="40" text-anchor="middle" style="font-size:11.5px">INTA̅ ×2 → 09h</text><text class="lbl" x="349" y="12" text-anchor="middle" style="font-size:10.5px">4</text><rect class="box" x="400" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="448" y="40" text-anchor="middle" style="font-size:11.5px">pushed on stack</text><text class="lbl" x="448" y="12" text-anchor="middle" style="font-size:10.5px">5</text><rect class="mt-good" x="499" y="18" width="96" height="34" rx="5"/><text class="mt-s" x="547" y="40" text-anchor="middle" style="font-size:11.5px">ISR … IRET</text><text class="lbl" x="547" y="12" text-anchor="middle" style="font-size:10.5px">6</text><path class="axis" d="M4 66 H592" marker-end="url(#n51-13-mt2-8)"/><text class="lbl" x="596" y="80" text-anchor="end" style="font-size:11px">time</text></svg></div>
+  <figcaption><b>Figure 5.1.9:</b> Timeline from an INTR request to the ISR: the request arrives, the running instruction finishes, IF is tested, the type number is read with two INTA pulses, the return information is pushed on the stack, and the ISR ends with IRET.</figcaption>
+</figure>
+
+<p>The fourth step in <a href="#sekil-intr">Figure 5.1.9</a> is the only step that separates a hardware interrupt from a software interrupt. The INTA cycle resembles a read bus cycle: the processor puts no meaningful address on the address bus, activates INTA̅ instead of RD̅, and takes the byte on the data bus. Between the two pulses, in maximum mode, the LOCK̅ signal is also held active so that no other bus master can take the bus in the meantime. Once the type number is received, the processor behaves as if there were an <code>INT 09h</code> instruction in the program.</p>
+
+<p>The rule in the second step, that an interrupt is accepted only at an instruction boundary, is the foundation of ISR design. An instruction is never left half done. For example, while <code>ADD [BX], AX</code> reads and writes memory, no interrupt comes in between; the ISR always sees memory either as it was before the instruction or as it is after it. A task done by two separate instructions, however, can be interrupted between the two. This must be kept in mind for data shared by the ISR and the main program.</p>
+
+<h3 id="s5-1-5-3"><span class="nt-num">5.1.5.3</span>Priority and the PC interrupt map</h3>
+
+<p>If several interrupt requests are waiting at the same instruction boundary, the processor decides which to look at first by a fixed order. <a href="#tab-oncelik">Table 5.1.12</a> gives the priority order of the 8086.</p>
+
+<div class="nt-tablewrap" id="tab-oncelik">
+<table class="nt-table">
+  <caption>Table 5.1.12: Interrupt priority order of the 8086.</caption>
+  <thead><tr><th scope="col">Rank</th><th scope="col">Source</th><th scope="col">Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>1 (highest)</td><td>divide error, INT n, INTO</td><td>arises from the instruction being executed; it is part of that instruction</td></tr>
+    <tr><td>2</td><td>NMI</td><td>urgent hardware event; non-maskable</td></tr>
+    <tr><td>3</td><td>INTR</td><td>ordinary hardware request; can be held off by IF</td></tr>
+    <tr><td>4 (lowest)</td><td>single step (TF)</td><td>debugging; waiting costs nothing</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The logic of the order is clear. An interrupt produced by an instruction itself is part of that instruction's execution and is handled first. Among external requests, NMI comes before INTR because it is an urgent event that a program cannot turn off. Single step is for a person to look at the registers; waiting a few microseconds costs nothing.</p>
+
+<p>This priority is among the processor's <em>own</em> inputs. The priority of the eight devices behind INTR relative to one another is decided by the 8259A. In the PC's standard setting IRQ0 has the highest priority and IRQ7 the lowest. <a href="#tab-irq">Table 5.1.13</a> gives the hardware interrupts of the IBM PC. At boot the BIOS programs the 8259A so that IRQ0 gets type 08h; the type of IRQ n is therefore 08h + n.</p>
+
+<div class="nt-tablewrap" id="tab-irq">
+<table class="nt-table">
+  <caption>Table 5.1.13: IBM PC hardware interrupts (type = 08h + IRQ number).</caption>
+  <thead><tr><th scope="col">IRQ</th><th scope="col">Device</th><th scope="col">Type</th><th scope="col">Vector address</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>timer (18.2 Hz)</td><td>08h</td><td>00020h</td></tr>
+    <tr><td>1</td><td>keyboard</td><td>09h</td><td>00024h</td></tr>
+    <tr><td>3 / 4</td><td>serial ports (COM2 / COM1)</td><td>0Bh / 0Ch</td><td>0002Ch / 00030h</td></tr>
+    <tr><td>6</td><td>floppy disk</td><td>0Eh</td><td>00038h</td></tr>
+    <tr><td>7</td><td>printer</td><td>0Fh</td><td>0003Ch</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The timer's 18.2 Hz frequency comes from an interesting calculation. The PC's 8253 timer chip is fed by a 1,193,182 Hz clock. When the counter is run with the largest divisor, 65,536, the output frequency is 1,193,182 / 65,536 ≈ 18.2 Hz. That means an INT 08h about every 55 ms. The BIOS uses this interrupt to count the time of day.</p>
+
+<p>The keyboard example also shows the division of labor between a hardware interrupt and a software interrupt. When a key is pressed, the hardware interrupt INT 09h runs first. This ISR reads the key's code from the keyboard controller and puts it into the BIOS keyboard buffer. When a program wants to read a key, it calls the software interrupt INT 16h; INT 16h reads from this buffer. This way the user can press keys even while the program is busy. The keys wait in the buffer and are taken in order when the program is ready. The details of the buffer and the INT 16h services are the subject of the notes of Chapter 5.2, Interrupt Functions.</p>
+
+<h3 id="s5-1-5-4"><span class="nt-num">5.1.5.4</span>The 8259A interrupt controller</h3>
+
+<p>The 8086 has a single INTR pin, while the PC has at least six interrupt sources. The chip that gathers these sources onto one pin, sets a priority order among them and gives the processor the right type number is the 8259A.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-8259">
+  <span class="nt-box__title">Definition 5.1.7</span>
+  <p>The <strong>programmable interrupt controller</strong> (8259A) is a chip that puts eight interrupt request inputs (IRQ0–IRQ7) into a priority order, masks them, and places the corresponding type number on the data bus during the processor's INTA cycle. On the PC it is at ports 20h and 21h.</p>
+</div>
+
+<p>Inside the 8259A are three registers, each eight bits wide with each bit corresponding to one IRQ (<a href="#sekil-8259">Figure 5.1.10</a>).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-8259" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 640 128" role="img" aria-label="8259A registers and the INTR line"><defs><marker id="n51-14-m05s7-a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="mt-s" x="40" y="18" text-anchor="middle">IRQ0–7</text><path class="line" d="M40 26 L40 56 L92 56" marker-end="url(#n51-14-m05s7-a1)"/><rect class="mt-acc" x="96" y="38" width="120" height="36" rx="4"/><text class="mt-s" x="156" y="61" text-anchor="middle">IRR (request)</text><path class="line" d="M216 56 L254 56" marker-end="url(#n51-14-m05s7-a1)"/><rect class="mt-bad" x="258" y="38" width="120" height="36" rx="4"/><text class="mt-s" x="318" y="61" text-anchor="middle">IMR (mask)</text><path class="line" d="M378 56 L416 56" marker-end="url(#n51-14-m05s7-a1)"/><rect class="mt-good" x="420" y="38" width="120" height="36" rx="4"/><text class="mt-s" x="480" y="54" text-anchor="middle">priority +</text><text class="mt-s" x="480" y="68" text-anchor="middle">ISR (in service)</text><path class="line" d="M540 56 L600 56" marker-end="url(#n51-14-m05s7-a1)"/><text class="mt-a" x="608" y="60" text-anchor="start">INTR</text><text class="lbl" x="318" y="96" text-anchor="middle" style="font-size:12px">port 21h: bit = 1 → that IRQ blocked</text><text class="lbl" x="480" y="96" text-anchor="middle" style="font-size:12px">EOI: port 20h ← 20h</text><text class="lbl" x="156" y="96" text-anchor="middle" style="font-size:12px">pending requests</text><text class="lbl" x="320" y="120" text-anchor="middle" style="font-size:12px">INTA: the 8259A puts the type number (base + IRQ no.) on the data bus</text></svg></div>
+  <figcaption><b>Figure 5.1.10:</b> Inside the 8259A. Requests IRQ0–7 are written to the IRR, those masked in the IMR are filtered out, the priority resolver selects the highest-priority request and drives INTR. During INTA the type number (base + IRQ no.) is put on the data bus and the request's bit moves to the ISR register.</figcaption>
+</figure>
+
+<ul>
+  <li><strong>IRR</strong> (interrupt request register): holds requests that have arrived but have not yet been serviced. When an IRQ line becomes active, the corresponding bit becomes 1.</li>
+  <li><strong>IMR</strong> (interrupt mask register): holds one mask bit for each IRQ. If the bit is 1, the request on that line is not passed on to the processor. While IF shuts off the whole INTR input, the IMR shuts off lines one by one. On the PC it is read and written at port 21h.</li>
+  <li><strong>ISR</strong> (in-service register): marks the IRQ currently being serviced. During INTA the bit of the selected request moves from the IRR to the ISR. Until the EOI arrives this bit stays 1, and the same or lower-priority IRQs are held off.</li>
+</ul>
+
+<p>The third register's name, ISR, is the same as the abbreviation of interrupt service routine. To avoid confusion, these notes say "ISR register" when speaking of the register.</p>
+
+<p><strong>EOI.</strong> The bit in the ISR register does not clear by itself. When the service routine has finished its work, it must tell the 8259A so. This notification is called <strong>end of interrupt</strong> (EOI). On the PC it is done with two instructions:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AL, 20h     <span class="cm">; non-specific EOI command</span>
+<span class="kw">OUT</span> 20h, AL     <span class="cm">; to the 8259A's command port</span></code></pre>
+
+<p>This command clears the highest-priority 1 bit in the ISR register. That the port number and the command value are both 20h is a coincidence. If the EOI is forgotten, the 8259A thinks that IRQ is still in service. The same and lower-priority IRQs never reach the processor again. For example, if the EOI is forgotten in the timer ISR, then because IRQ0 has the highest priority, the keyboard, disk and serial port interrupts all stop. The system appears frozen.</p>
+
+<p><strong>Cascading.</strong> Eight inputs are sometimes not enough. 8259As can be cascaded: if a slave 8259A is connected to each input of a master 8259A, the count rises to 8 × 8 = 64 IRQs. The IBM PC/AT connects a second 8259A to input IRQ2 of the master chip. The inputs of the second chip are called IRQ8–IRQ15 and map to types 70h–77h. On the AT, IRQ8 is the real-time clock and IRQ14 is the interrupt of the hard disk.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Reading a 1 bit in the IMR as "interrupt allowed". The IMR is a mask register: 1 blocks, 0 allows. For IF the situation is the opposite: IF = 1 allows. To avoid mixing up the two rules, it helps to read a 1 in the IMR as "masked" and a 1 in IF as "open".</p>
+</div>
+
+<h3 id="s5-1-5-5"><span class="nt-num">5.1.5.5</span>Masking with the IMR: code trace</h3>
+
+<p>Sometimes a program needs to block the interrupt of just one device for a short time. For example, a piece of code that changes the keyboard buffer directly does not want the keyboard ISR to run in the meantime, but wants the timer to keep counting. CLI is too crude here, because it shuts off the whole INTR input. The right tool is the IMR.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">in</span>  al, 21h        <span class="cm">; read the IMR</span>
+<span class="kw">or</span>  al, 00000010b  <span class="cm">; mask IRQ1</span>
+<span class="kw">out</span> 21h, al
+<span class="kw">mov</span> cx, 3          <span class="cm">; critical work</span>
+<span class="kw">in</span>  al, 21h
+<span class="kw">and</span> al, 11111101b  <span class="cm">; unmask IRQ1</span>
+<span class="kw">out</span> 21h, al
+<span class="kw">ret</span></code></pre>
+
+<p>The program applies the <strong>read–modify–write</strong> pattern twice. Only one bit of the IMR is to be changed; the other seven bits are the settings of other programs, the BIOS or the operating system. So the IMR is read first, the wanted bit is set with OR or cleared with AND, and the result is written back. Writing <code>MOV AL, 02h / OUT 21h, AL</code> directly would mask IRQ1, but it would unmask all the other IRQs.</p>
+
+<p>In the trace the initial value of the IMR is taken, as an example, to be B8h: 1011 1000b. In this value IRQ3, 4, 5 and 7 are masked; IRQ0 (timer), IRQ1 (keyboard), IRQ2 and IRQ6 (floppy disk) are enabled.</p>
+
+<div class="nt-tablewrap" id="tab-imr">
+<table class="nt-table">
+  <caption>Table 5.1.14: Trace of the program that masks IRQ1 with the IMR (IMR initially B8h).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">AL (binary)</th><th scope="col">AL</th><th scope="col">CX</th><th scope="col">IMR</th><th scope="col">IRQ1</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>in al, 21h</code></td><td>1011 1000</td><td class="n51-chg">B8h</td><td>0000h</td><td>B8h</td><td>enabled</td></tr>
+    <tr><td>3</td><td><code>or al, 00000010b</code></td><td>1011 10<b>1</b>0</td><td class="n51-chg">BAh</td><td>0000h</td><td>B8h</td><td>enabled</td></tr>
+    <tr><td>4</td><td><code>out 21h, al</code></td><td>1011 1010</td><td>BAh</td><td>0000h</td><td class="n51-chg">BAh</td><td class="n51-chg">masked</td></tr>
+    <tr><td>5</td><td><code>mov cx, 3</code></td><td>1011 1010</td><td>BAh</td><td class="n51-chg">0003h</td><td>BAh</td><td>masked</td></tr>
+    <tr><td>6</td><td><code>in al, 21h</code></td><td>1011 1010</td><td>BAh</td><td>0003h</td><td>BAh</td><td>masked</td></tr>
+    <tr><td>7</td><td><code>and al, 11111101b</code></td><td>1011 10<b>0</b>0</td><td class="n51-chg">B8h</td><td>0003h</td><td>BAh</td><td>masked</td></tr>
+    <tr><td>8</td><td><code>out 21h, al</code></td><td>1011 1000</td><td>B8h</td><td>0003h</td><td class="n51-chg">B8h</td><td class="n51-chg">enabled</td></tr>
+    <tr><td>9</td><td><code>ret</code></td><td>1011 1000</td><td>B8h</td><td>0003h</td><td>B8h</td><td>enabled</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-imr">Table 5.1.14</a> reads as follows. In <strong>line 2</strong> the IMR is read: AL = B8h. In <strong>line 3</strong> <code>or al, 02h</code> sets only bit 1: 1011 1000 OR 0000 0010 = 1011 1010 = BAh. The other bits are preserved. The IMR has not changed yet; only AL has. In <strong>line 4</strong> <code>out</code> writes the value to the 8259A and IMR = BAh. From this moment a request on IRQ1 does not reach INTR; IF and the other IRQs are not affected.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-imr" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 168" role="img" aria-label="AL and the IMR bits"><text class="mt-s" x="36" y="44" text-anchor="end" style="font-size:13px;">AL</text><rect class="box" x="44" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="64" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="64" y="20" text-anchor="middle" style="font-size:10px;">IRQ7</text><rect class="box" x="84" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="104" y="44" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl mono" x="104" y="20" text-anchor="middle" style="font-size:10px;">IRQ6</text><rect class="box" x="124" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="144" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="144" y="20" text-anchor="middle" style="font-size:10px;">IRQ5</text><rect class="box" x="164" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="184" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="184" y="20" text-anchor="middle" style="font-size:10px;">IRQ4</text><rect class="box" x="204" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="224" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="224" y="20" text-anchor="middle" style="font-size:10px;">IRQ3</text><rect class="box" x="244" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="264" y="44" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl mono" x="264" y="20" text-anchor="middle" style="font-size:10px;">IRQ2</text><rect class="box" x="284" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="304" y="44" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl mono" x="304" y="20" text-anchor="middle" style="font-size:10px;">IRQ1</text><rect class="box" x="324" y="26" width="40" height="26" rx="1"/><text class="txt mono" x="344" y="44" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl mono" x="344" y="20" text-anchor="middle" style="font-size:10px;">IRQ0</text><text class="mt-m" x="372" y="44" text-anchor="start" style="font-size:12.5px;">BAh</text><text class="mt-s" x="36" y="100" text-anchor="end" style="font-size:13px;">IMR</text><rect class="mt-bad" x="44" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="64" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="84" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="104" y="100" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-bad" x="124" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="144" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-bad" x="164" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="184" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-bad" x="204" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="224" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="244" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="264" y="100" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="284" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="304" y="100" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="324" y="82" width="40" height="26" rx="1"/><text class="txt mono" x="344" y="100" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="372" y="100" text-anchor="start" style="font-size:12.5px;">BAh</text><text class="lbl" x="344" y="128" text-anchor="middle" style="font-size:9.5px;">timer</text><text class="lbl" x="304" y="128" text-anchor="middle" style="font-size:9.5px;">keyboard</text><text class="lbl" x="224" y="128" text-anchor="middle" style="font-size:9.5px;">COM2</text><text class="lbl" x="184" y="128" text-anchor="middle" style="font-size:9.5px;">COM1</text><text class="lbl" x="104" y="128" text-anchor="middle" style="font-size:9.5px;">floppy</text><text class="lbl" x="64" y="128" text-anchor="middle" style="font-size:9.5px;">printer</text><text class="lbl" x="8" y="156" text-anchor="start" style="font-size:11.5px;">red = masked (1) · port 21h = IMR</text></svg></div>
+  <figcaption><b>Figure 5.1.11:</b> The AL and IMR bits after <code>out 21h, al</code>: both are BAh. The masked bits (1) are IRQ3, 4, 5, 7 and the newly masked IRQ1; IRQ0, IRQ2 and IRQ6 are enabled.</figcaption>
+</figure>
+
+<p><strong>Line 5</strong> stands in for the work that must not be interrupted. If the keyboard is pressed in the meantime, the request is not lost: the 8259A stores it in the IRR. <strong>Lines 6–8</strong> remove the mask with the same pattern. With <code>and al, 0FDh</code>, the mask 1111 1101b clears only bit 1: 1011 1010 AND 1111 1101 = 1011 1000 = B8h. With <code>out</code> the IMR becomes B8h again. If a keyboard request is waiting in the IRR, it now reaches INTR and is serviced. In <strong>line 9</strong> the program returns; the mask is back to its original state and nobody else's bits have been touched.</p>
+
+<p>The difference between the IMR and CLI is plain in this trace. CLI holds off all maskable interrupts; the timer's pulses wait too, and the clock may fall behind. The IMR holds off only the selected device. The price is that access to the IMR takes two IN/OUT instructions and, because it writes to an I/O port, is slower than CLI.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing to the IMR without reading it first: <code>MOV AL, 02h</code> and <code>OUT 21h, AL</code>. These two lines mask IRQ1 but unmask IRQ3, 4, 5 and 7. If a device with no ISR installed is connected to those lines, the first request that arrives sends the processor to a meaningless vector.</p>
+</div>
+
+<h3 id="s5-1-5-6"><span class="nt-num">5.1.5.6</span>When an interrupt is held off</h3>
+
+<p>The 8086 accepts an interrupt only at instruction boundaries. In some cases this boundary is deliberately moved forward by one instruction. <a href="#tab-bekle">Table 5.1.15</a> collects these cases.</p>
+
+<div class="nt-tablewrap" id="tab-bekle">
+<table class="nt-table">
+  <caption>Table 5.1.15: Situations in which INTR is not accepted immediately.</caption>
+  <thead><tr><th scope="col">Situation</th><th scope="col">Behavior</th><th scope="col">Reason</th></tr></thead>
+  <tbody>
+    <tr><td>in the middle of an instruction</td><td>the request waits until the running instruction finishes</td><td>so that no instruction is left half done</td></tr>
+    <tr><td>prefixes (LOCK, REP, segment prefix)</td><td>no interrupt is accepted between a prefix and its instruction</td><td>the prefix is part of the instruction</td></tr>
+    <tr><td>after <code>MOV SS, …</code> or <code>POP SS</code></td><td>no interrupt arrives until the next instruction has also finished</td><td>so that the following <code>MOV SP, …</code> completes safely</td></tr>
+    <tr><td>after <code>STI</code></td><td>one more instruction executes, then the interrupt is accepted</td><td>so that no interrupt slips between <code>STI</code> / <code>IRET</code> or <code>STI</code> / <code>HLT</code></td></tr>
+    <tr><td>string instruction with REP</td><td>can be interrupted between iterations; after IRET it continues for the remaining CX</td><td>so that a long copy does not increase the delay</td></tr>
+    <tr><td><code>HLT</code> and <code>WAIT</code></td><td>INTR or NMI wakes the processor</td><td>the wait ends with an interrupt</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>After SS is loaded.</strong> Moving the stack takes two instructions: <code>MOV SS, AX</code> and <code>MOV SP, 0FFFEh</code>. If an interrupt arrived between the two, the processor would push FLAGS, CS and IP at the address given by the new SS and the old SP. This address is most likely on top of some other data. For this reason the 8086 postpones interrupts by one instruction after every instruction that writes a segment register. For this to work safely, <code>MOV SP</code> must be written immediately after <code>MOV SS</code>.</p>
+
+<p><strong>After STI.</strong> STI enables interrupts not immediately but after the instruction following it has finished. This small delay makes two common patterns safe. The first is the <code>STI</code> / <code>IRET</code> sequence at the end of an ISR: a new interrupt cannot arrive before IRET finishes and the stack is emptied. The second is the <code>STI</code> / <code>HLT</code> sequence. The program wants to say "enable interrupts and wait until an interrupt arrives". If an interrupt slipped in between STI and HLT, the ISR would run and return, and HLT would wait needlessly until the next interrupt.</p>
+
+<p><strong>String instructions with REP.</strong> A copy of 60,000 bytes with <code>REP MOVSB</code> takes hundreds of thousands of clock cycles. Interrupts cannot be allowed to wait for all that time. The 8086 therefore can interrupt a REP instruction between iterations. The return address pushed on the stack is the address of the REP prefix; SI, DI and CX hold the progress so far. After IRET the instruction restarts and runs for the remaining CX iterations. This scheme has a flaw specific to the 8086: on return from an interrupt the processor remembers only one prefix. If an instruction with two prefixes such as <code>REP ES: MOVSB</code> is interrupted, the segment prefix is lost on return and the copy continues from the wrong segment. For this reason such a line is put between CLI and STI, or written so that no segment prefix is needed.</p>
+
+<p><strong>HLT and WAIT.</strong> HLT halts the processor. INTR (with IF = 1) or NMI wakes the processor; the ISR runs and IRET returns to the instruction after HLT. This is the most economical way of writing a main program as "sleep until something happens". WAIT waits for the 8087 coprocessor to finish its work; an interrupt that arrives during this wait is also accepted.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Loading SP first and then SS when moving the stack, or putting another instruction between the two. The postponement protects only the <em>one</em> instruction after the one that writes a segment register. The correct order is <code>MOV SS, AX</code> followed immediately by <code>MOV SP, …</code>; the safest approach is to put these two lines between CLI and STI as well.</p>
+</div>
+
+<h3 id="s5-1-5-7"><span class="nt-num">5.1.5.7</span>Interrupt latency</h3>
+
+<p>When a device requests an interrupt, the ISR is expected to start running at once. In reality this time is not zero and for some devices it is bounded.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-gecikme">
+  <span class="nt-box__title">Definition 5.1.8</span>
+  <p><strong>Interrupt latency</strong> is the time between the arrival of an interrupt request and the start of the first instruction of the ISR.</p>
+</div>
+
+<p>Latency has two parts. The first is waiting for the instruction that is running when the request arrives to finish. The second is the acceptance process itself: the INTA cycles, three stack writes, two vector reads and refilling the queue. <a href="#tab-tur">Table 5.1.16</a> gives the relevant times.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Table 5.1.16: Clock cycle counts of interrupt-related operations on the 8086 (8086 manual).</caption>
+  <thead><tr><th scope="col">Operation</th><th scope="col">Clock cycles</th><th scope="col">Time at 5 MHz</th></tr></thead>
+  <tbody>
+    <tr><td>INT n</td><td>51</td><td>10,2 µs</td></tr>
+    <tr><td>INT 3</td><td>52</td><td>10,4 µs</td></tr>
+    <tr><td>INTO (OF = 1 / OF = 0)</td><td>53 / 4</td><td>10,6 / 0,8 µs</td></tr>
+    <tr><td>INTR acceptance (including two INTA)</td><td>61</td><td>12,2 µs</td></tr>
+    <tr><td>IRET</td><td>24</td><td>4,8 µs</td></tr>
+    <tr><td>16-bit IDIV (register)</td><td>165–184</td><td>33–36,8 µs</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-gecikme">
+  <span class="nt-box__title">Example 5.1.6</span>
+  <p>On a 5 MHz 8086 an INTR arrives just after a 16-bit IDIV has started. What is the worst-case interrupt latency in clock cycles and in µs? What would it be if the processor ran at 8 MHz?</p>
+  <ol class="nt-steps">
+    <li>In the worst case the running instruction must finish: IDIV takes at most 184 cycles.</li>
+    <li>Then the acceptance process: 61 cycles. The total is 184 + 61 = 245 cycles.</li>
+    <li>At 5 MHz a clock cycle is 1 / 5 MHz = 200 ns. 245 × 200 ns = 49 µs.</li>
+    <li>At 8 MHz a cycle is 125 ns: 245 × 125 ns ≈ 30.6 µs.</li>
+  </ol>
+  <p>If the program had turned interrupts off with CLI at that moment, the time spent with them off adds directly to this latency. A 100 µs CLI–STI interval raises the worst-case latency to about 149 µs at 5 MHz.</p>
+</div>
+
+<p>What these numbers mean depends on the device. For the timer interrupt, which arrives 18.2 times per second, 49 µs is negligible; there are 55 ms between two interrupts. A serial port is different. Characters arriving at 9600 bit/s are about 1.04 ms apart, and at 115,200 bit/s about 87 µs apart. With a serial port controller that has a one-character buffer, the ISR must read the previous character before the next one arrives. If the latency plus the ISR's running time exceeds this interval, a character is lost.</p>
+
+<p>This calculation gives directly the two basic rules of ISR writing. First, the CLI–STI interval must be kept short, because this time adds to the latency of all devices. Second, the ISR itself must be kept short. While an ISR runs, IF = 0 and the same or lower-priority IRQs wait until the EOI. A long ISR has the same effect on all the other devices as a long CLI.</p>
+
+<p>The share of the processor an ISR takes can also be computed. Suppose the timer ISR takes 200 clock cycles. Running 18.2 times per second, it spends 200 × 18.2 = 3640 cycles. That is only 0.07% of the 5,000,000 cycles per second of a 5 MHz processor. The advantage of interrupts over polling is clear in this figure.</p>
+
+<h2 class="nt-pb" id="s5-1-6"><span class="nt-num">5.1.6</span>Writing our own interrupt service routine</h2>
+
+<h3 id="s5-1-6-1"><span class="nt-num">5.1.6.1</span>Installing a vector: INT 90h</h3>
+
+<p>Installing an interrupt service routine takes three jobs: writing the routine, choosing an unused type, and writing the routine's address into that type's vector. The following program does these three jobs in the simplest form and calls its own interrupt once.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax                         <span class="cm">; ES = 0: IVT segment</span>
+<span class="kw">cli</span>                               <span class="cm">; interrupts off</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[90h*4], <span class="dir">offset</span> isr <span class="cm">; IP</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[90h*4+2], cs        <span class="cm">; CS</span>
+<span class="kw">sti</span>                               <span class="cm">; interrupts on</span>
+<span class="kw">int</span> 90h                           <span class="cm">; our own interrupt</span>
+<span class="kw">ret</span>
+isr:
+<span class="kw">mov</span> ah, 0Eh
+<span class="kw">mov</span> al, <span class="str">'*'</span>
+<span class="kw">int</span> 10h
+<span class="kw">iret</span>                              <span class="cm">; not RET!</span></code></pre>
+
+<p>Every decision in the program has a reason.</p>
+
+<ul>
+  <li><strong>Choice of type.</strong> 90h is a type that neither the BIOS nor DOS uses on the PC. Its vector is at address 90h × 4 = 240h; IP is at 0000:0240h–0241h and CS at 0000:0242h–0243h.</li>
+  <li><strong>ES = 0.</strong> The vector table is in segment 0000h. Since DS points to the program's own data, the table is accessed through ES, with the <code>es:</code> prefix. Because an immediate value cannot be loaded into a segment register, 0 is put into AX first.</li>
+  <li><strong>CLI / STI.</strong> The vector is written as two words with two separate MOVs. After the first MOV, the IP half of the vector is new and the CS half is old. If an interrupt of this type arrived at that moment, the processor would jump to a meaningless address. CLI holds off maskable interrupts during this short interval. Since only the program itself calls type 90h, there is no danger in this example; but for hardware types the same pattern is mandatory, and applying it every time a vector is written is a good habit.</li>
+  <li><strong>The end of the ISR.</strong> The ISR writes an asterisk to the screen with the BIOS INT 10h teletype service and returns with IRET. Another software interrupt can be called from inside an ISR; with nested interrupts, 6 more bytes are added to the stack for each level.</li>
+</ul>
+
+<p>When the program runs, <code>*</code> is printed on the screen and the program returns to DOS. This short example does not save and restore the old vector. After the program ends, the vector of type 90h keeps pointing to memory into which another program will now be loaded. If another program calls INT 90h, the random bytes there are executed as instructions. The correct form, which saves and restores the old vector, is traced separately below.</p>
+
+<p>Under DOS, instead of writing vectors directly in memory, two DOS services can be used: <code>INT 21h</code> with AH = 25h sets a vector and AH = 35h reads one. These services manage interrupts themselves while a vector is written and make the operating system aware of the vectors. That makes this the safer way. The register layout of the services is given in the notes of Chapter 5.2, Interrupt Functions; here the direct-write method is used to show how the vector table works.</p>
+
+<h3 id="s5-1-6-2"><span class="nt-num">5.1.6.2</span>Our own ISR on INT 60h: code trace</h3>
+
+<p>A slightly different form of the same arrangement passes a parameter to the ISR in a register. The main program puts the character to be written in AL; the ISR only prepares AH and calls INT 10h. Type 60h, which is reserved for user programs, is used.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> ax, 0
+<span class="kw">mov</span> es, ax           <span class="cm">; ES = 0: IVT</span>
+<span class="kw">cli</span>
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[60h*4], <span class="dir">offset</span> isr
+<span class="kw">mov</span> <span class="dir">word ptr</span> es:[60h*4+2], cs
+<span class="kw">sti</span>
+<span class="kw">mov</span> al, <span class="str">'#'</span>
+<span class="kw">int</span> 60h              <span class="cm">; our own interrupt</span>
+<span class="kw">ret</span>
+isr:
+<span class="kw">mov</span> ah, 0Eh
+<span class="kw">int</span> 10h
+<span class="kw">iret</span></code></pre>
+
+<p>The offsets are as follows: <code>mov ax, 0</code> 0100h, <code>mov es, ax</code> 0103h, <code>cli</code> 0105h, the two vector writes 0106h and 010Dh, <code>sti</code> 0112h, <code>mov al, '#'</code> 0113h, <code>int 60h</code> 0115h, <code>ret</code> 0117h and <code>isr</code> 0118h. The vector is at address 60h × 4 = 180h.</p>
+
+<div class="nt-tablewrap" id="tab-isr60">
+<table class="nt-table">
+  <caption>Table 5.1.17: Trace of the INT 60h program (state after each line executes; SS = 0700h).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">ES</th><th scope="col">CS:IP (next)</th><th scope="col">SP</th><th scope="col">FLAGS</th><th scope="col">IVT 0180h–0183h / stack</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov ax, 0</code></td><td>0000h</td><td>0700h</td><td>0700:0103</td><td>FFFEh</td><td>F202h</td><td>?? ?? ?? ??</td><td></td></tr>
+    <tr><td>3</td><td><code>mov es, ax</code></td><td>0000h</td><td class="n51-chg">0000h</td><td>0700:0105</td><td>FFFEh</td><td>F202h</td><td>?? ?? ?? ??</td><td></td></tr>
+    <tr><td>4</td><td><code>cli</code></td><td>0000h</td><td>0000h</td><td>0700:0106</td><td>FFFEh</td><td class="n51-chg">F002h</td><td>?? ?? ?? ??</td><td></td></tr>
+    <tr><td>5</td><td><code>mov … [60h*4], offset isr</code></td><td>0000h</td><td>0000h</td><td>0700:010D</td><td>FFFEh</td><td>F002h</td><td class="n51-chg">18 01 ?? ??</td><td></td></tr>
+    <tr><td>6</td><td><code>mov … [60h*4+2], cs</code></td><td>0000h</td><td>0000h</td><td>0700:0112</td><td>FFFEh</td><td>F002h</td><td class="n51-chg">18 01 00 07</td><td></td></tr>
+    <tr><td>7</td><td><code>sti</code></td><td>0000h</td><td>0000h</td><td>0700:0113</td><td>FFFEh</td><td class="n51-chg">F202h</td><td>18 01 00 07</td><td></td></tr>
+    <tr><td>8</td><td><code>mov al, '#'</code></td><td class="n51-chg">0023h</td><td>0000h</td><td>0700:0115</td><td>FFFEh</td><td>F202h</td><td>18 01 00 07</td><td></td></tr>
+    <tr><td>9</td><td><code>int 60h</code></td><td>0023h</td><td>0000h</td><td class="n51-chg">0700:0118</td><td class="n51-chg">FFF8h</td><td class="n51-chg">F002h</td><td>[FFF8h] = 0117h, [FFFAh] = 0700h, [FFFCh] = F202h</td><td></td></tr>
+    <tr><td>12</td><td><code>mov ah, 0Eh</code></td><td class="n51-chg">0E23h</td><td>0000h</td><td>0700:011A</td><td>FFF8h</td><td>F002h</td><td>stack unchanged</td><td></td></tr>
+    <tr><td>13</td><td><code>int 10h</code></td><td>0E23h</td><td>0000h</td><td>0700:011C</td><td>FFF8h</td><td>F002h</td><td>stack unchanged</td><td class="n51-chg">#</td></tr>
+    <tr><td>14</td><td><code>iret</code></td><td>0E23h</td><td>0000h</td><td class="n51-chg">0700:0117</td><td class="n51-chg">FFFEh</td><td class="n51-chg">F202h</td><td>stack emptied</td><td>#</td></tr>
+    <tr><td>10</td><td><code>ret</code></td><td>0E23h</td><td>0000h</td><td class="n51-chg">0700:0000</td><td class="n51-chg">0000h</td><td>F202h</td><td>return to DOS</td><td>#</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-isr60">Table 5.1.17</a> divides into four phases. <strong>Preparation (lines 2–3).</strong> ES is initially 0700h, like the other segment registers of a .COM program. After <code>mov es, ax</code>, ES = 0000h and <code>es:[180h]</code> now points to byte 0000:0180h in the vector table. The value of these four bytes of the table before the program is unknown; it is shown as "??" in the trace.</p>
+
+<p><strong>Writing the vector (lines 4–7).</strong> <code>cli</code> clears IF and FLAGS drops from F202h to F002h. Line 5 writes offset isr = 0118h to the IP half; in memory, in little-endian order, <code>18 01</code> is seen. Line 6 writes 0700h to the CS half: <code>00 07</code>. The vector is now 0700:0118. With <code>sti</code>, IF = 1 and FLAGS = F202h. Because bit 1 and bits 12–15 of FLAGS on the 8086 are always 1, IF alone makes a difference of 0200h.</p>
+
+<p><strong>The interrupt (lines 8–9).</strong> <code>mov al, '#'</code> puts 23h in AL. This value is the parameter passed to the ISR in a register. <code>int 60h</code> pushes FLAGS (F202h), CS (0700h) and the return IP 0117h on the stack. INT 60h starts at 0115h and is two bytes; the return address is 0117h. IF = 0 and CS:IP is loaded as 0700:0118 from the vector at 0000:0180h.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-isr60" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 180" role="img" aria-label="Our own interrupt routine, step 8: vector table, stack and CS:IP"><text class="lbl" x="8" y="14" text-anchor="start">IVT 0000:0180h (type 60h)</text><rect class="box" x="8" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="28" y="38" text-anchor="middle" style="font-size:13px">18</text><rect class="box" x="52" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="72" y="38" text-anchor="middle" style="font-size:13px">01</text><rect class="box" x="96" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="116" y="38" text-anchor="middle" style="font-size:13px">00</text><rect class="box" x="140" y="20" width="40" height="26" rx="3"/><text class="mt-v" x="160" y="38" text-anchor="middle" style="font-size:13px">07</text><text class="lbl" x="50" y="60" text-anchor="middle">IP</text><text class="lbl" x="138" y="60" text-anchor="middle">CS</text><text class="mt-m" x="8" y="80" text-anchor="start">vector = 0700:0118h</text><text class="lbl" x="311" y="16" text-anchor="middle" style="font-size:11px">stack (SS = 0700h)</text><rect class="mt-hot" x="268" y="22" width="86" height="24" rx="2"/><text class="lbl" x="264" y="38" text-anchor="end" style="font-size:10.5px">FFF8</text><text class="mt-m" x="311" y="39" text-anchor="middle" style="font-size:12.5px">0117h</text><text class="mt-l" x="358" y="38" text-anchor="start" style="font-size:12px">← SP</text><rect class="mt-hot" x="268" y="48" width="86" height="24" rx="2"/><text class="lbl" x="264" y="64" text-anchor="end" style="font-size:10.5px">FFFA</text><text class="mt-m" x="311" y="65" text-anchor="middle" style="font-size:12.5px">0700h</text><rect class="mt-hot" x="268" y="74" width="86" height="24" rx="2"/><text class="lbl" x="264" y="90" text-anchor="end" style="font-size:10.5px">FFFC</text><text class="mt-m" x="311" y="91" text-anchor="middle" style="font-size:12.5px">F202h</text><rect class="box" x="268" y="100" width="86" height="24" rx="2"/><text class="lbl" x="264" y="116" text-anchor="end" style="font-size:10.5px">FFFE</text><text class="mt-m" x="311" y="117" text-anchor="middle" style="font-size:12.5px">0000h</text><rect class="mt-hot" x="8" y="112" width="118" height="28" rx="4"/><text class="lbl" x="67" y="107" text-anchor="middle">CS:IP (next)</text><text class="mt-v" x="67" y="131.5" text-anchor="middle" style="font-size:13px">0700:0118</text><rect class="mt-hot" x="136" y="112" width="70" height="28" rx="4"/><text class="lbl" x="171" y="107" text-anchor="middle">FLAGS</text><text class="mt-v" x="171" y="131.5" text-anchor="middle" style="font-size:13px">F002h</text><text class="mt-a" x="8" y="166" text-anchor="start">IF = 0</text><text class="mt-m" x="80" y="166" text-anchor="start">screen: </text></svg></div>
+  <figcaption><b>Figure 5.1.12:</b> After <code>int 60h</code> executes: the vector of type 60h is 0700:0118h, the stack holds the return IP 0117h, CS and FLAGS; SP = FFF8h, IF = 0 and CS:IP is at the first instruction of the ISR.</figcaption>
+</figure>
+
+<p><strong>The ISR and the return (lines 12–14 and 10).</strong> In the ISR, <code>mov ah, 0Eh</code> makes AX 0E23h. AH = 0Eh selects the BIOS teletype service; the character in AL will be written. <code>int 10h</code> writes <code>#</code> on the screen. This is a second interrupt called from inside an interrupt. The BIOS releases its own stack use, and when it returns SP is again FFF8h. <code>iret</code> pops IP = 0117h, CS = 0700h and FLAGS = F202h; SP = FFFEh and IF = 1. The <code>ret</code> in the main program returns to DOS.</p>
+
+<p>Note that the ISR changes AX. The main program continues after the interrupt with AX = 0E23h. In this program AL is passed to the ISR as a parameter on purpose, so the change in AX causes no problem. But if the ISR were attached to a hardware interrupt, the main program would suddenly find AH equal to 0Eh. An ISR of this kind must save every register it uses.</p>
+
+<h3 id="s5-1-6-3"><span class="nt-num">5.1.6.3</span>Save, replace and restore a vector: code trace</h3>
+
+<p>What the previous two programs lack is that they change the table and leave it that way. A correct program first saves the old vector and restores it when done. The following program does this for type 3 and also shows how the ISR protects the main program's registers.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">xor</span> ax, ax
+<span class="kw">mov</span> es, ax          <span class="cm">; ES = 0: IVT</span>
+<span class="kw">mov</span> ax, <span class="dir">offset</span> isr3
+<span class="kw">xchg</span> ax, es:[3*4]   <span class="cm">; new IP ↔ old</span>
+<span class="kw">mov</span> old_vec, ax
+<span class="kw">mov</span> ax, cs
+<span class="kw">xchg</span> ax, es:[3*4+2] <span class="cm">; new CS ↔ old</span>
+<span class="kw">mov</span> old_vec+2, ax
+<span class="kw">mov</span> ax, 1234h
+<span class="kw">int</span> 3               <span class="cm">; our ISR</span>
+<span class="kw">mov</span> bx, old_vec
+<span class="kw">mov</span> es:[3*4], bx    <span class="cm">; restore</span>
+<span class="kw">mov</span> bx, old_vec+2
+<span class="kw">mov</span> es:[3*4+2], bx
+<span class="kw">ret</span>
+isr3: <span class="kw">push</span> ax
+<span class="kw">mov</span> ax, 0E21h       <span class="cm">; AH=0Eh, AL='!'</span>
+<span class="kw">int</span> 10h
+<span class="kw">pop</span> ax
+<span class="kw">iret</span>
+old_vec <span class="dir">dw</span> ?, ?</code></pre>
+
+<p>The new element in the program is the <code>XCHG</code> instruction. <code>xchg ax, es:[3*4]</code> swaps AX with the word in memory in a single instruction: while the new IP is written to memory, the old IP comes into AX. If the read and the write were done with two separate MOVs, a gap of two instructions would remain between them. With XCHG it is impossible for the new value to be written without the old one being read, or for the old value to be lost before it is read. The old vector is saved in a two-word variable named <code>old_vec</code>. <code>xor ax, ax</code> zeroes AX; it is one byte shorter than MOV but changes the flags: ZF = 1 and PF = 1. That is why FLAGS is F246h in this program.</p>
+
+<p>The type 3 vector before the program is F000:1003h: emu8086 sets the default vector for each type n to F000:(1000h + n) (F000:1000h for type 0). On a real PC this value varies with the BIOS and any debugger that is loaded; the correctness of the program does not depend on it. The offsets: <code>int 3</code> is at 011Ch and is one byte, <code>isr3</code> is at 0130h, <code>old_vec</code> at 0138h.</p>
+
+<div class="nt-tablewrap" id="tab-sakla">
+<table class="nt-table">
+  <caption>Table 5.1.18: Trace of the program that saves, replaces and restores the vector (SS = 0700h).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">Type 3 vector</th><th scope="col">CS:IP (next)</th><th scope="col">SP</th><th scope="col">IF</th><th scope="col">Stack / output</th></tr></thead>
+  <tbody>
+    <tr><td>2–3</td><td><code>xor ax, ax</code> / <code>mov es, ax</code></td><td>0000h</td><td>0000h</td><td>F000:1003</td><td>0700:0104</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>4</td><td><code>mov ax, offset isr3</code></td><td class="n51-chg">0130h</td><td>0000h</td><td>F000:1003</td><td>0700:0107</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>5</td><td><code>xchg ax, es:[3*4]</code></td><td class="n51-chg">1003h</td><td>0000h</td><td class="n51-chg">F000:0130</td><td>0700:010C</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>6</td><td><code>mov old_vec, ax</code></td><td>1003h</td><td>0000h</td><td>F000:0130</td><td>0700:010F</td><td>FFFEh</td><td>1</td><td>old_vec = 1003h</td></tr>
+    <tr><td>7</td><td><code>mov ax, cs</code></td><td class="n51-chg">0700h</td><td>0000h</td><td>F000:0130</td><td>0700:0111</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>8</td><td><code>xchg ax, es:[3*4+2]</code></td><td class="n51-chg">F000h</td><td>0000h</td><td class="n51-chg">0700:0130</td><td>0700:0116</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>9</td><td><code>mov old_vec+2, ax</code></td><td>F000h</td><td>0000h</td><td>0700:0130</td><td>0700:0119</td><td>FFFEh</td><td>1</td><td>old_vec+2 = F000h</td></tr>
+    <tr><td>10</td><td><code>mov ax, 1234h</code></td><td class="n51-chg">1234h</td><td>0000h</td><td>0700:0130</td><td>0700:011C</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>11</td><td><code>int 3</code></td><td>1234h</td><td>0000h</td><td>0700:0130</td><td class="n51-chg">0700:0130</td><td class="n51-chg">FFF8h</td><td class="n51-chg">0</td><td>[FFF8h] = 011Dh, [FFFAh] = 0700h, [FFFCh] = F246h</td></tr>
+    <tr><td>17</td><td><code>push ax</code></td><td>1234h</td><td>0000h</td><td>0700:0130</td><td>0700:0131</td><td class="n51-chg">FFF6h</td><td>0</td><td>[FFF6h] = 1234h</td></tr>
+    <tr><td>18</td><td><code>mov ax, 0E21h</code></td><td class="n51-chg">0E21h</td><td>0000h</td><td>0700:0130</td><td>0700:0134</td><td>FFF6h</td><td>0</td><td>—</td></tr>
+    <tr><td>19</td><td><code>int 10h</code></td><td>0E21h</td><td>0000h</td><td>0700:0130</td><td>0700:0136</td><td>FFF6h</td><td>0</td><td class="n51-chg">output: !</td></tr>
+    <tr><td>20</td><td><code>pop ax</code></td><td class="n51-chg">1234h</td><td>0000h</td><td>0700:0130</td><td>0700:0137</td><td class="n51-chg">FFF8h</td><td>0</td><td>—</td></tr>
+    <tr><td>21</td><td><code>iret</code></td><td>1234h</td><td>0000h</td><td>0700:0130</td><td class="n51-chg">0700:011D</td><td class="n51-chg">FFFEh</td><td class="n51-chg">1</td><td>stack emptied</td></tr>
+    <tr><td>12–13</td><td><code>mov bx, old_vec</code> / <code>mov es:[3*4], bx</code></td><td>1234h</td><td class="n51-chg">1003h</td><td class="n51-chg">0700:1003</td><td>0700:0126</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>14–15</td><td><code>mov bx, old_vec+2</code> / <code>mov es:[3*4+2], bx</code></td><td>1234h</td><td class="n51-chg">F000h</td><td class="n51-chg">F000:1003</td><td>0700:012F</td><td>FFFEh</td><td>1</td><td>—</td></tr>
+    <tr><td>16</td><td><code>ret</code></td><td>1234h</td><td>F000h</td><td>F000:1003</td><td class="n51-chg">0700:0000</td><td class="n51-chg">0000h</td><td>1</td><td>return to DOS</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first phase of <a href="#tab-sakla">Table 5.1.18</a> is changing the vector. In <strong>line 5</strong> XCHG writes the new IP (0130h) to the table and brings the old IP (1003h) into AX. The vector is then F000:0130: half new, half old. In <strong>line 8</strong> the second XCHG writes the new CS (0700h) and brings the old CS (F000h) into AX. The vector is now 0700:0130, and the old vector F000:1003 is saved in the variable <code>old_vec</code>. Because only the program calls type 3, CLI was not needed in this example. When the vector of a hardware type is changed, these lines are put between CLI and STI.</p>
+
+<p>The second phase is the interrupt. In <strong>line 10</strong> AX = 1234h; this is the main program's value that must be protected. In <strong>line 11</strong> <code>int 3</code> is a single byte (CCh). FLAGS (F246h), CS (0700h) and the return IP 011Dh are pushed on the stack. The return address is 011Ch + 1 = 011Dh; the one-byte nature of INT 3 is visible here as well. CS:IP ← 0700:0130.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sakla" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 420 186" role="img" aria-label="Vector table, stack and registers"><text class="mt-s" x="8" y="14" text-anchor="start" style="font-size:12px;">IVT 0000:000Ch (type 03h)</text><rect class="box" x="8" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="27" y="40" text-anchor="middle" style="font-size:13.5px;">30</text><rect class="box" x="46" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="65" y="40" text-anchor="middle" style="font-size:13.5px;">01</text><rect class="box" x="84" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="103" y="40" text-anchor="middle" style="font-size:13.5px;">00</text><rect class="box" x="122" y="22" width="38" height="26" rx="1"/><text class="txt mono" x="141" y="40" text-anchor="middle" style="font-size:13.5px;">07</text><text class="lbl" x="46" y="62" text-anchor="middle" style="font-size:11px;">IP</text><text class="lbl" x="122" y="62" text-anchor="middle" style="font-size:11px;">CS</text><text class="mt-m" x="8" y="80" text-anchor="start" style="font-size:12px;">vector = 0700:0130h</text><text class="lbl" x="348" y="14" text-anchor="middle" style="font-size:11px;">stack (SS = 0700)</text><rect class="mt-hot" x="310" y="20" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="36" text-anchor="end" style="font-size:10.5px;">FFF6</text><text class="txt mono" x="348" y="36" text-anchor="middle" style="font-size:12.5px;">1234</text><text class="mt-l" x="389" y="36" text-anchor="start" style="font-size:11.5px;">← SP</text><rect class="box" x="310" y="45" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="61" text-anchor="end" style="font-size:10.5px;">FFF8</text><text class="txt mono" x="348" y="61" text-anchor="middle" style="font-size:12.5px;">011D</text><rect class="box" x="310" y="70" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="86" text-anchor="end" style="font-size:10.5px;">FFFA</text><text class="txt mono" x="348" y="86" text-anchor="middle" style="font-size:12.5px;">0700</text><rect class="box" x="310" y="95" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="111" text-anchor="end" style="font-size:10.5px;">FFFC</text><text class="txt mono" x="348" y="111" text-anchor="middle" style="font-size:12.5px;">F246</text><rect class="box" x="310" y="120" width="76" height="23" rx="2"/><text class="lbl mono" x="306" y="136" text-anchor="end" style="font-size:10.5px;">FFFE</text><text class="txt mono" x="348" y="136" text-anchor="middle" style="font-size:12.5px;">0000</text><text class="lbl" x="33" y="109" text-anchor="middle" style="font-size:12px;">AX</text><rect class="box" x="8" y="114" width="50" height="26" rx="3"/><text class="txt mono" x="33" y="132" text-anchor="middle" style="font-size:13px;">1234</text><text class="lbl" x="90" y="109" text-anchor="middle" style="font-size:12px;">BX</text><rect class="box" x="65" y="114" width="50" height="26" rx="3"/><text class="txt mono" x="90" y="132" text-anchor="middle" style="font-size:13px;">0000</text><text class="lbl" x="164" y="109" text-anchor="middle" style="font-size:12px;">CS:IP</text><rect class="mt-hot" x="122" y="114" width="84" height="26" rx="3"/><text class="txt mono" x="164" y="132" text-anchor="middle" style="font-size:13px;">0700:0131</text><text class="lbl" x="228" y="109" text-anchor="middle" style="font-size:12px;">IF</text><rect class="box" x="213" y="114" width="30" height="26" rx="3"/><text class="txt mono" x="228" y="132" text-anchor="middle" style="font-size:13px;">0</text><text class="mt-m" x="8" y="172" text-anchor="start" style="font-size:12px;">output: </text></svg></div>
+  <figcaption><b>Figure 5.1.13:</b> After the ISR's first instruction <code>push ax</code>: there are four words on the stack. At the bottom the FLAGS, CS and IP pushed by the interrupt, on top the AX = 1234h saved by the ISR; SP = FFF6h.</figcaption>
+</figure>
+
+<p>The third phase is the ISR. In <strong>line 17</strong> the ISR first pushes the AX it will use: SP = FFF6h and [FFF6h] = 1234h (<a href="#sekil-sakla">Figure 5.1.13</a>). <strong>Lines 18–19</strong> write <code>!</code> on the screen with AX = 0E21h. In <strong>line 20</strong> <code>pop ax</code> restores 1234h; SP = FFF8h and the top of the stack is again the IP pushed by the interrupt. At this point the number of PUSHes and POPs must be equal. If they were not, IRET would take the wrong words for the return address. In <strong>line 21</strong> <code>iret</code> pops IP = 011Dh, CS = 0700h and FLAGS = F246h; SP = FFFEh and IF = 1.</p>
+
+<p>The last phase is the restoration. <strong>Lines 12–15</strong> write the two words in the <code>old_vec</code> variable back to the table. Here too the vector passes for a moment through a meaningless intermediate value such as 0700:1003. In <strong>line 16</strong>, when the program returns, AX = 1234h is preserved and the vector table is as it was before the program. This is what it means for a program to exit without leaving a trace in the vector table.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Forgetting to restore the vector on every exit path of the program. If the program restores only at its normal end, but returns early to DOS in an error case, the vector points to code that is no longer loaded. The next INT 3 or hardware interrupt crashes the system. The restoration code must be placed at a single point through which all the program's exits pass.</p>
+</div>
+
+<h3 id="s5-1-6-4"><span class="nt-num">5.1.6.4</span>Rules for writing an ISR</h3>
+
+<p>The previous traces brought out the rules of ISR writing one by one. <a href="#tab-kural">Table 5.1.19</a> collects these rules and the symptoms that appear when they are not followed.</p>
+
+<div class="nt-tablewrap" id="tab-kural">
+<table class="nt-table">
+  <caption>Table 5.1.19: Rules for writing an ISR and the problems that appear when they are ignored.</caption>
+  <thead><tr><th scope="col">Rule</th><th scope="col">If ignored</th></tr></thead>
+  <tbody>
+    <tr><td>Every register used is protected with PUSH/POP (the processor protects FLAGS).</td><td>The main program continues with a register whose value has changed on its own; the bug appears at random moments.</td></tr>
+    <tr><td>A hardware ISR sends the 8259A an EOI: <code>MOV AL, 20h</code> · <code>OUT 20h, AL</code>.</td><td>The 8259A does not clear the bit in the ISR register; the same and lower-priority IRQs never arrive again.</td></tr>
+    <tr><td>The ISR is kept short; long work is left to the main program through a flag variable.</td><td>Interrupt latency grows and data from fast devices is lost.</td></tr>
+    <tr><td>INT 21h is not called from a hardware ISR.</td><td>DOS is not reentrant; the data of the interrupted DOS call gets corrupted.</td></tr>
+    <tr><td>The vector is written with CLI or with AH = 25h, and the old one is restored on exit.</td><td>After the program ends, the interrupt jumps to memory where something else now lives.</td></tr>
+    <tr><td>The ISR ends with IRET.</td><td>The stack is off by 4 bytes and IF stays off.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Protecting registers.</strong> A hardware ISR can run after any instruction of the program. It cannot be known which register the program is using at that moment. For this reason the ISR pushes every register it uses on entry and pops them in reverse order on exit. There is no need to save the flags; INT and IRET do that themselves. Segment registers must not be forgotten either. If the ISR changes DS to reach its own data, it must save DS too.</p>
+
+<p><strong>A short ISR and a flag variable.</strong> Work that takes long is not done inside the ISR. The ISR does only the urgent part: it reads the data from the device, puts it in a buffer and sets a variable to 1. The main program looks at this variable in its loop and does the long work with interrupts enabled. This pattern looks like polling, but what is polled is a variable in memory rather than a slow device, and the ISR has removed the risk of losing data.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-reentrant">
+  <span class="nt-box__title">Definition 5.1.9</span>
+  <p>A <strong>reentrant</strong> routine is one that works correctly even when it is called again before an earlier call has finished, for example because of an interrupt. To achieve this, the routine keeps its persistent state not in fixed memory cells but on the stack or in registers.</p>
+</div>
+
+<p><strong>Not calling DOS.</strong> While running, DOS keeps its internal variables and its own stack in fixed memory areas. If a hardware interrupt arrives while the program is in the middle of an INT 21h call and the ISR calls INT 21h again, the second call overwrites the variables and the stack of the first. When the first call is resumed, the data are corrupted. Because DOS is not reentrant, hardware ISRs do not use DOS services. BIOS services such as INT 10h are often safer in this respect; the example ISRs above use INT 10h for this reason and are called by a software interrupt.</p>
+
+<p><strong>STI inside an ISR.</strong> An ISR starts with IF = 0. A long ISR can allow higher-priority hardware interrupts at the start of its work with STI; the 8259A already holds off the same and lower-priority IRQs until the EOI. In this case the ISR itself must also be written to be reentrant, because the interrupt of another device can run another routine in the middle of the ISR and touch the variables the ISR shares.</p>
+
+<p>The skeleton of a typical hardware ISR that applies these rules is as follows. The code is written to show the order of the rules; the lines in the middle change with the device.</p>
+
+<pre class="nt-code"><code>isr_irq:
+    <span class="kw">push</span> ax              <span class="cm">; save the registers used</span>
+    <span class="kw">push</span> ds
+    <span class="kw">mov</span>  ax, <span class="dir">seg</span> data    <span class="cm">; the ISR's own data segment</span>
+    <span class="kw">mov</span>  ds, ax
+    <span class="kw">in</span>   al, 60h          <span class="cm">; get data from the device (example port)</span>
+    <span class="kw">mov</span>  last_code, al    <span class="cm">; put in the buffer / variable</span>
+    <span class="kw">mov</span>  ready, 1         <span class="cm">; flag for the main program</span>
+    <span class="kw">mov</span>  al, 20h          <span class="cm">; EOI</span>
+    <span class="kw">out</span>  20h, al
+    <span class="kw">pop</span>  ds               <span class="cm">; restore in reverse order</span>
+    <span class="kw">pop</span>  ax
+    <span class="kw">iret</span>                  <span class="cm">; not RET</span></code></pre>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Putting an EOI in an ISR called by a software interrupt. EOI is only for hardware interrupts coming from the 8259A. If the ISR of a software interrupt such as INT 60h sends an EOI, the 8259A clears the bit of some other IRQ that is in service at that moment, and the interrupt scheme of that device is disrupted.</p>
+</div>
+
+<h2 class="nt-pb" id="s5-1-7"><span class="nt-num">5.1.7</span>Exercises and solutions</h2>
+
+<p>The six exercises in the slides are solved here with their intermediate steps.</p>
+
+<p><strong>1. At which physical addresses is the INT 13h vector located?</strong></p>
+<p>13h × 4 = 4Ch (decimal: 19 × 4 = 76). The vector is in bytes 0004Ch–0004Fh. IP is at 0004Ch–0004Dh and CS at 0004Eh–0004Fh.</p>
+
+<p><strong>2. If SP = FFFEh before INT 21h runs, what is SP inside the ISR? What is on the stack?</strong></p>
+<p>INT pushes three words, 6 bytes: FFFEh − 6 = FFF8h. At the top of the stack, at [FFF8h], is the return IP; at [FFFAh], CS; at [FFFCh], FLAGS. The copy of FLAGS on the stack carries IF = 1; the FLAGS in the register has IF = TF = 0.</p>
+
+<p><strong>3. With IMR = B8h, write the instructions that also mask IRQ0 (the timer) alone. What does the IMR become?</strong></p>
+<p>The read–modify–write pattern is used: <code>IN AL, 21h</code> · <code>OR AL, 01h</code> · <code>OUT 21h, AL</code>. 1011 1000 OR 0000 0001 = 1011 1001 = B9h. IRQ3, 4, 5 and 7 stay masked, and IRQ0 is masked too. As long as the timer stays masked the time of day does not advance; for this reason such a mask is kept very short.</p>
+
+<p><strong>4. The vector of type 61h is to be made 0700:0120h. Which bytes are written to which physical addresses?</strong></p>
+<p>61h × 4 = 184h. IP is written first, then CS; both are written in little-endian order. 00184h ← 20h, 00185h ← 01h, 00186h ← 00h, 00187h ← 07h. The physical address of this ISR is 07000h + 0120h = 07120h.</p>
+
+<p><strong>5. On a 5 MHz 8086, an INTR arrives just after MUL BX (at most 133 cycles) has started. What is the maximum interrupt latency?</strong></p>
+<p>The MUL must finish first: 133 cycles. Then acceptance: 61 cycles. The total is 194 cycles. 194 × 200 ns = 38.8 µs ≈ 39 µs.</p>
+
+<p><strong>6. What problems does an ISR cause by ending with RET instead of IRET?</strong></p>
+<p>A near RET pops only IP. CS and FLAGS stay on the stack and SP is off by 4 bytes. Because FLAGS is not restored, IF stays 0 and maskable interrupts are never accepted again. If the ISR is in another segment, CS is also left wrong and the program continues in the wrong segment. The first RET or POP afterwards takes the CS left on the stack for data or a return address. All of these cases are seen in the trace of the ISR that ends with RET.</p>
+
+<h2 class="nt-pb" id="s5-1-8"><span class="nt-num">5.1.8</span>Summary</h2>
+
+<ul>
+  <li>An <strong>interrupt</strong> makes the processor drop its current work at an instruction boundary, run an interrupt service routine (ISR), and return to where it left off with IRET. The interrupted program does not notice that it was interrupted.</li>
+  <li>In <strong>polling</strong> the processor keeps asking the device and wastes most of its time; with an <strong>interrupt</strong> the device alerts the processor when it is ready. The price of interrupts is the vector table, stack and ISR machinery.</li>
+  <li>Interrupts come from three sources: <strong>software</strong> (INT n, INT 3, INTO), <strong>hardware</strong> (INTR, NMI) and <strong>internal</strong> (divide error INT 0, single step INT 1). Once the type number is determined, all three follow the same steps.</li>
+  <li>The <strong>interrupt vector table</strong> is at 00000h–003FFh: 256 types × 4 bytes. The vector of type n is at address n × 4; the low word is IP, the high word is CS, and both are stored little-endian.</li>
+  <li><strong>INT n</strong>: FLAGS is pushed, IF = TF = 0, CS and IP are pushed (SP − 6), CS:IP ← vector. The IP pushed is the address of the instruction after INT. <strong>IRET</strong> pops IP, CS and FLAGS; IF and TF return to their old values.</li>
+  <li>Ending an ISR with RET shifts the stack by 4 bytes and leaves IF off; RETF does not pop FLAGS either. ISRs always end with IRET.</li>
+  <li>A <strong>divide error</strong> occurs both when the divisor is zero and when the quotient does not fit in the destination. The 8086 pushes the address of the instruction after DIV. <strong>INTO</strong> calls INT 4 only when OF = 1. While <strong>TF</strong> = 1, INT 1 is raised after every instruction; TF is changed through the stack. <strong>INT 3</strong> is a single byte (CCh) and is used for breakpoints.</li>
+  <li><strong>INTR</strong> is level-triggered, accepted only when IF = 1 and at an instruction boundary; the type number is read from the 8259A on the second INTA pulse. <strong>NMI</strong> is rising-edge triggered, non-maskable, and always type 2.</li>
+  <li><strong>Priority</strong>: divide error / INT n / INTO, then NMI, then INTR, and last single step. On the PC the type of IRQ n is 08h + n; timer 08h, keyboard 09h.</li>
+  <li>In the <strong>8259A</strong>, the IRR holds pending requests, the IMR holds the masks (port 21h, bit 1 = blocked), and the ISR register holds the IRQ in service. A hardware ISR sends an EOI at its end: <code>MOV AL, 20h</code> · <code>OUT 20h, AL</code>. The IMR is changed with the read–modify–write pattern.</li>
+  <li>After a load of SS and after STI, an interrupt is postponed by one instruction; string instructions with REP can be interrupted between iterations.</li>
+  <li><strong>Interrupt latency</strong> = the remaining time of the running instruction + the acceptance time (61 cycles for INTR). Time spent with interrupts off by CLI adds to latency; the CLI–STI interval and the ISR are kept short.</li>
+  <li>To install your own ISR, an unused type is chosen and the vector is written between CLI/STI (or with INT 21h, AH = 25h). The old vector is saved and restored on exit. The ISR protects the registers it uses and ends with IRET.</li>
+</ul>
+
+<h2 id="s5-1-9"><span class="nt-num">5.1.9</span>Key terms</h2>
+
+
+<ul class="nt-concepts">
+  <li>interrupt</li>
+  <li>interrupt service routine (ISR)</li>
+  <li>polling</li>
+  <li>hardware / software interrupt</li>
+  <li>exception</li>
+  <li>interrupt vector</li>
+  <li>interrupt vector table (IVT)</li>
+  <li>interrupt flag (IF)</li>
+  <li>trap flag (TF)</li>
+  <li>single-step</li>
+  <li>breakpoint (INT 3)</li>
+  <li>maskable / non-maskable interrupt</li>
+  <li>interrupt acknowledge (INTA)</li>
+  <li>programmable interrupt controller (8259A)</li>
+  <li>interrupt mask register (IMR)</li>
+  <li>end of interrupt (EOI)</li>
+  <li>interrupt latency</li>
+  <li>reentrant</li>
+  <li>stack</li>
+  <li>offset</li>
+  <li>physical address</li>
+</ul>
+
+<h2 id="s5-1-10"><span class="nt-num">5.1.10</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>In a memory dump the bytes <code>A5 FE 00 F0</code> are seen starting at address 0000:0020h. Which type's vector is it, and which device does it belong to on the PC? What is the physical address of the ISR?</p>
+    <details><summary>Answer</summary>
+      <p>20h / 4 = 08h: type 08h, that is, the timer interrupt attached to IRQ0. IP = FEA5h, CS = F000h. Physical address F0000h + FEA5h = FFEA5h.</p>
+    </details>
+  </li>
+  <li>
+    <p>Before the <code>INT 21h</code> at 0700:0200 runs, SP = FFF0h and FLAGS = F246h. At the first instruction of the ISR, what are SP, the three words on the stack, and FLAGS?</p>
+    <details><summary>Answer</summary>
+      <p>SP = FFF0h − 6 = FFEAh. [FFEAh] = 0202h (INT 21h is two bytes), [FFECh] = 0700h, [FFEEh] = F246h. In the FLAGS register IF (bit 9) is cleared: F246h − 0200h = F046h. TF is already 0.</p>
+    </details>
+  </li>
+  <li>
+    <p>With BL = 2, what does <code>DIV BL</code> give for AX = 01FEh and for AX = 0200h?</p>
+    <details><summary>Answer</summary>
+      <p>510 / 2 = 255 = FFh fits in AL: AL = FFh, AH = 00h. 512 / 2 = 256 does not fit; INT 0 is raised even though the divisor is not zero. A quick check: in the second case AH = 02h ≥ BL = 02h.</p>
+    </details>
+  </li>
+  <li>
+    <p>With IMR = 00h, what instruction sequence masks the timer and keyboard interrupts together? What is the new IMR? What happens if a key is pressed in the meantime?</p>
+    <details><summary>Answer</summary>
+      <p><code>IN AL, 21h</code> · <code>OR AL, 03h</code> · <code>OUT 21h, AL</code>; the IMR becomes 03h. The request of the key that was pressed waits in the 8259A's IRR; it is serviced when the mask is lifted.</p>
+    </details>
+  </li>
+  <li>
+    <p>On an 8 MHz 8086, an INTR arrives just after an IDIV of at most 184 cycles has started. What is the worst-case interrupt latency in µs?</p>
+    <details><summary>Answer</summary>
+      <p>184 + 61 = 245 cycles. At 8 MHz a cycle is 125 ns: 245 × 125 ns ≈ 30.6 µs.</p>
+    </details>
+  </li>
+  <li>
+    <p>To move the stack, a program writes <code>MOV SP, 0FFFEh</code> first and then <code>MOV SS, AX</code>. Why is this order not safe?</p>
+    <details><summary>Answer</summary>
+      <p>The postponement protects only the instruction after the one that writes a segment register. An interrupt can arrive between the two instructions, that is, after MOV SP. At that moment SP is new and SS is old, and FLAGS, CS and IP are pushed to a wrong place. The correct order is <code>MOV SS</code> first, followed immediately by <code>MOV SP</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>A hardware ISR uses BX and DX but pushes and pops only BX. What symptom is seen in the main program?</p>
+    <details><summary>Answer</summary>
+      <p>Because an interrupt can arrive after any instruction of the program, DX changes at moments the main program does not know about. The program usually works correctly, but gives a wrong result in the rare cases when the interrupt arrives exactly while DX is in use. The bug is hard to reproduce and looks random.</p>
+    </details>
+  </li>
+  <li>
+    <p>A debugger has written CCh in place of a one-byte instruction at address 0150h. Which IP does INT 3 push on the stack? Why does the debugger change this value?</p>
+    <details><summary>Answer</summary>
+      <p>Because INT 3 is a single byte, the IP pushed is 0151h. The debugger writes the saved original byte back to 0150h and decreases the IP on the stack by 1, making it 0150h. After IRET the original instruction is executed from the beginning, undamaged.</p>
+    </details>
+  </li>
+  <li>
+    <p>A memory parity error occurs while a program has interrupts turned off with CLI. Is the interrupt accepted? From which address is the vector read?</p>
+    <details><summary>Answer</summary>
+      <p>On the PC a parity error is reported through NMI. NMI is non-maskable; it is accepted even when IF = 0. Its type is fixed at 2 and the vector is read from bytes 2 × 4 = 00008h–0000Bh. No INTA cycle is performed.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s5-1-11"><span class="nt-num">5.1.11</span>Further reading</h2>
+
+<ul>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979), the Interrupts section: interrupt types, priority order, the timing of INTR and NMI, and instruction clock cycle counts are found in this source. The values in Tables 5.1.6 and 5.1.16 are taken from it.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8th ed.), Chapter 12: interrupts in real mode, programming and cascading the 8259A, the PC interrupt scheme.</li>
+  <li>A. S. Tanenbaum, <em>Modern Operating Systems</em> (3rd ed.): the place of interrupts in the operating system, device drivers, and the comparison of interrupts and polling.</li>
+  <li>R. Brown, <em>Ralf Brown's Interrupt List</em>: a number-by-number reference list of all BIOS, DOS and driver interrupts on the PC.</li>
+</ul>
+
+<h2 id="s5-1-12"><span class="nt-num">5.1.12</span>References</h2>
+
+<ol class="nt-refs">
+  <li>A. S. Tanenbaum, <em>Modern Operating Systems</em>, 3rd ed., Pearson, 2008.</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979 — Interrupts section.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8th ed., Pearson, 2009 — Chapters 6 and 12.</li>
+  <li>emu8086 help documents: the "Interrupts" and "Supported interrupts" pages.</li>
+  <li>R. Brown, <em>Ralf Brown's Interrupt List</em> (BIOS/DOS interrupt reference).</li>
+</ol>
+
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>

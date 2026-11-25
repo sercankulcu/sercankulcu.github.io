@@ -1,0 +1,1533 @@
+---
+layout: without-sidebar
+title: "Chapter 9.2: The emu8086.inc Library — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_09_02_The_emu8086_inc_Library_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 9.2 of Microprocessors: the emu8086.inc library, the INCLUDE directive, the PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF and CURSORON macros, using procedures with DEFINE_ and CALL, PRINT_STRING, PTHIS, GET_STRING, CLEAR_SCREEN, SCAN_NUM, PRINT_NUM and PRINT_NUM_UNS, code traces and example programs."
+lang: en
+seo_title: "Chapter 9.2: The emu8086.inc Library · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_09_02_emu8086_inc_Kutuphanesi_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_09_02_The_emu8086_inc_Library_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* the slides' SVGs use the general .ds-svg classes (notlar.css); only layout and emphasis here */
+.ds-notes .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 260px; min-width: 0; max-width: calc(50% - 0.7rem); }
+.ds-notes .nt-fig__row--3 > svg.ds-svg { flex: 1 1 200px; min-width: 0; max-width: calc(33.3% - 0.95rem); }
+@media (max-width: 560px) {
+  .ds-notes .nt-fig__row--2 > svg.ds-svg, .ds-notes .nt-fig__row--3 > svg.ds-svg { max-width: 100%; }
+}
+.ds-notes .nt-code .dir { font-weight: 700; }
+.ds-notes .n92-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 9.2: The emu8086.inc Library</h1>
+  <p class="nt-lead">Almost every program written in assembly prints something to the screen, reads something from the keyboard or shows a number in decimal. Each of these jobs takes several BIOS and DOS services called in the right order. emu8086 collects these frequently needed jobs in a ready-made library called emu8086.inc. These notes begin by showing how the library is brought into a program with the INCLUDE directive and what determines the size of the program. They then treat the screen macros (PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF, CURSORON) together with their expansions. Next come the procedures used with DEFINE_ and CALL: PRINT_STRING and PTHIS, which print strings, GET_STRING, which reads a string from the keyboard, CLEAR_SCREEN, which clears the screen, SCAN_NUM, which reads a number, and PRINT_NUM and PRINT_NUM_UNS, which print one. The logic of each procedure is traced register by register with a plain equivalent code. The last sections are given to example programs that put all the parts together and to the mistakes most often made when using the library.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_09_02_The_emu8086_inc_Library.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_09_02_The_emu8086_inc_Library.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_09_02_The_emu8086_inc_Library_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Stack, CALL and RET</a></li>
+    <li><a href="../slides/Chapter_01_Twos-Complement-Lab.html">Two's Complement Lab</a></li>
+    <li><a href="../slides/CPU_Simulator.html">CPU Simulator</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Explain the INCLUDE directive</dt>
+    <dd>Explain that a library file is added to the source as text during assembly, which folders the assembler searches for the file, and that program size is determined only by the macros that are used and the procedures that are defined.</dd>
+    <dt>Use the screen macros</dt>
+    <dd>Show which BIOS service and which instruction sequence the macros PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF and CURSORON expand to; work out the cursor position, the end of line and screen scrolling in advance.</dd>
+    <dt>Define and call procedures correctly</dt>
+    <dd>Add procedures to the program with the DEFINE_ macros, call them with CALL, know the input and output registers of each procedure, and say which registers are preserved.</dd>
+    <dt>Trace the string and number procedures</dt>
+    <dd>Trace the logic of PRINT_STRING, PTHIS, GET_STRING, SCAN_NUM, PRINT_NUM and PRINT_NUM_UNS step by step at the level of registers, stack and buffer; explain the difference between the signed and unsigned interpretations.</dd>
+    <dt>Write example programs</dt>
+    <dd>Write programs that read numbers, compute, print the result and arrange the screen using the library's macros and procedures; recognize the common mistakes.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s9-2-1">9.2.1 The library and INCLUDE</a>
+      <ol>
+        <li><a href="#s9-2-1-1">9.2.1.1 A library of common functions</a></li>
+        <li><a href="#s9-2-1-2">9.2.1.2 The INCLUDE directive</a></li>
+        <li><a href="#s9-2-1-3">9.2.1.3 The source after INCLUDE</a></li>
+        <li><a href="#s9-2-1-4">9.2.1.4 What is in the library?</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-2">9.2.2 Screen macros</a>
+      <ol>
+        <li><a href="#s9-2-2-1">9.2.2.1 The text screen, the cursor and BIOS services</a></li>
+        <li><a href="#s9-2-2-2">9.2.2.2 What do PUTC and GOTOXY expand to?</a></li>
+        <li><a href="#s9-2-2-3">9.2.2.3 PRINT and PRINTN</a></li>
+        <li><a href="#s9-2-2-4">9.2.2.4 Example: a screen with macros</a></li>
+        <li><a href="#s9-2-2-5">9.2.2.5 CURSOROFF and CURSORON</a></li>
+        <li><a href="#s9-2-2-6">9.2.2.6 Control characters</a></li>
+        <li><a href="#s9-2-2-7">9.2.2.7 CR and LF separately: a code trace</a></li>
+        <li><a href="#s9-2-2-8">9.2.2.8 End of line and screen scrolling</a></li>
+        <li><a href="#s9-2-2-9">9.2.2.9 GOTOXY and video memory</a></li>
+        <li><a href="#s9-2-2-10">9.2.2.10 Printing two digits: a code trace</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-3">9.2.3 Using the procedures</a>
+      <ol>
+        <li><a href="#s9-2-3-1">9.2.3.1 DEFINE_ and CALL</a></li>
+        <li><a href="#s9-2-3-2">9.2.3.2 Input and output registers</a></li>
+        <li><a href="#s9-2-3-3">9.2.3.3 PRINT_STRING and PTHIS</a></li>
+        <li><a href="#s9-2-3-4">9.2.3.4 Ways to print a string</a></li>
+        <li><a href="#s9-2-3-5">9.2.3.5 How does PTHIS work?</a></li>
+        <li><a href="#s9-2-3-6">9.2.3.6 GET_STRING and CLEAR_SCREEN</a></li>
+        <li><a href="#s9-2-3-7">9.2.3.7 The logic of GET_STRING: a code trace</a></li>
+        <li><a href="#s9-2-3-8">9.2.3.8 GET_STRING in detail and backspace handling</a></li>
+        <li><a href="#s9-2-3-9">9.2.3.9 Buffer size and overflow</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-4">9.2.4 Number procedures</a>
+      <ol>
+        <li><a href="#s9-2-4-1">9.2.4.1 SCAN_NUM, PRINT_NUM and PRINT_NUM_UNS</a></li>
+        <li><a href="#s9-2-4-2">9.2.4.2 The logic of SCAN_NUM: a code trace</a></li>
+        <li><a href="#s9-2-4-3">9.2.4.3 The checks in SCAN_NUM</a></li>
+        <li><a href="#s9-2-4-4">9.2.4.4 The logic of PRINT_NUM_UNS: a code trace</a></li>
+        <li><a href="#s9-2-4-5">9.2.4.5 The library's method: a decreasing divisor</a></li>
+        <li><a href="#s9-2-4-6">9.2.4.6 PRINT_NUM and the minus sign: a code trace</a></li>
+        <li><a href="#s9-2-4-7">9.2.4.7 Extracting digits: comparing the two methods</a></li>
+        <li><a href="#s9-2-4-8">9.2.4.8 The same bits, two interpretations</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-5">9.2.5 Example programs</a>
+      <ol>
+        <li><a href="#s9-2-5-1">9.2.5.1 Read a number and print it</a></li>
+        <li><a href="#s9-2-5-2">9.2.5.2 The sum of two numbers</a></li>
+        <li><a href="#s9-2-5-3">9.2.5.3 A framed title</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-2-6">9.2.6 Common mistakes</a></li>
+    <li><a href="#s9-2-7">9.2.7 Exercises and solutions</a></li>
+    <li><a href="#s9-2-8">9.2.8 Summary</a></li>
+    <li><a href="#s9-2-9">9.2.9 Key terms</a></li>
+    <li><a href="#s9-2-10">9.2.10 Test Yourself</a></li>
+    <li><a href="#s9-2-11">9.2.11 Further reading</a></li>
+    <li><a href="#s9-2-12">9.2.12 References</a></li>
+  </ol>
+</nav>
+
+<h2 id="s9-2-1"><span class="nt-num">9.2.1</span>The library and INCLUDE</h2>
+
+<h3 id="s9-2-1-1"><span class="nt-num">9.2.1.1</span>A library of common functions</h3>
+
+<p>Even printing a single character on the 8086 takes several instructions. The character goes in AL, the service number in AH, and the BIOS screen interrupt <code>INT 10h</code> is called. In the process the old value of AX is destroyed; if the value is needed it must be pushed on the stack first and popped afterwards. Printing a number in decimal is longer still: the number is divided by 10, the remainders become digits, the digits are converted to ASCII codes and printed in the right order. Reading a multi-digit number from the keyboard is the same job in reverse. These patterns are needed again in almost every program. Rewriting them every time is both a waste of time and a source of bugs.</p>
+
+<p>emu8086 solves this with a library. The <code>emu8086.inc</code> file that comes with the installation contains ready-made macros and procedures for screen, keyboard and number handling. The programmer adds this file at the top of the source and uses the functions in it by name. The library brings no new capability: everything in it is built from BIOS and DOS interrupts, that is, from instructions the programmer could have written too. The gain is the reuse of tested code.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kutuphane">
+  <span class="nt-box__title">Definition 9.2.1</span>
+  <p>A <strong>library</strong> is a source file that contains ready-made macros and procedures and is used by being added to other programs. The library of emu8086 is the file <code>emu8086.inc</code>; the extension <em>inc</em> shows that it is an include file.</p>
+</div>
+
+<p>One limit of the library should be known from the start. emu8086.inc is specific to the emu8086 environment. Another assembler such as MASM or TASM does not recognize this file, and the library's macros may not be fully compatible with the macro language of those assemblers. The code inside, however, consists of ordinary 8086 instructions. Understanding how the library works therefore also teaches how to write code that does the same job in other environments. For this purpose the trace sections of these notes show the logic of each procedure with a plain equivalent code.</p>
+
+<h3 id="s9-2-1-2"><span class="nt-num">9.2.1.2</span>The INCLUDE directive</h3>
+
+<p>Definitions in another file are brought into the source with the <code>INCLUDE</code> directive. For emu8086.inc the line is:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'</code></pre>
+
+<div class="nt-box nt-box--tanim" id="tanim-include">
+  <span class="nt-box__title">Definition 9.2.2</span>
+  <p><strong>INCLUDE</strong> is the directive that tells the assembler to put the text of the named file in place of this line. The directive produces no processor instruction; its job is finished during assembly. A running program contains no instruction called "INCLUDE".</p>
+</div>
+
+<p>The file name may be written with or without quotes: <code>include 'emu8086.inc'</code> and <code>include emu8086.inc</code> do the same job. Letter case does not matter either. The assembler searches for the file in two places (<a href="#sekil-include">Figure 9.2.1</a>). First it looks in the folder of the source file being assembled. If the file is not there, it looks in the <code>Inc</code> folder of the emu8086 installation. Because emu8086.inc is placed in this folder by the installation, in most programs it is found in the second step. If the programmer writes a library of their own and puts it in the same folder as the source, it is found in the first step. If a file with the same name also exists in the source folder, the one in the source folder wins.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-include" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 150" role="img" aria-label="The include line is searched for first in the source file's folder and, if not found, in the Inc folder." style="max-width:720px"><defs><marker id="n92-1-m05l-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="40" width="170" height="50" rx="3"/><text class="txt mono" x="95" y="62" text-anchor="middle">include</text><text class="txt mono" x="95" y="80" text-anchor="middle" style="font-size:13px">'emu8086.inc'</text><path class="line" d="M180 65 L236 65" marker-end="url(#n92-1-m05l-m1)"/><rect class="box" x="240" y="30" width="190" height="70" rx="3" style="fill:var(--ds-hot);"/><text class="txt" x="335" y="58" text-anchor="middle" style="font-size:14px">1. the source file's</text><text class="txt" x="335" y="78" text-anchor="middle" style="font-size:14px">folder</text><path class="line" d="M430 65 L486 65" marker-end="url(#n92-1-m05l-m1)"/><text class="lbl" x="458" y="56" text-anchor="middle">if missing</text><rect class="box" x="490" y="30" width="210" height="70" rx="3"/><text class="txt" x="595" y="58" text-anchor="middle" style="font-size:14px">2. in the emu8086 install,</text><text class="txt" x="595" y="78" text-anchor="middle" style="font-size:14px">the Inc folder</text><text class="lbl" x="335" y="128" text-anchor="middle" style="font-size:14px">the content of the file found is inserted in place of the include line</text></svg></div>
+  <figcaption><b>Figure 9.2.1:</b> The INCLUDE line is searched for first in the source file's folder and, if not found, in the Inc folder of the emu8086 installation. The content of the file found is inserted in place of the line.</figcaption>
+</figure>
+
+<p>The position of the directive matters too. A macro can be used only after its definition; the assembler reads the source from top to bottom and, if it meets a macro name whose definition it has not seen, takes it for an instruction and reports an error. The <code>include</code> line is therefore written at the very beginning of the source, before <code>ORG 100h</code>. Since the line itself produces no bytes, putting it first does not change the program's addresses.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing the <code>include</code> line at the end of the program, right before <code>END</code>. When the assembler reaches a line such as <code>PUTC 'A'</code> it has not yet seen the definition of PUTC and reports an unknown-instruction error. The definitions of macros must come before their uses.</p>
+</div>
+
+<h3 id="s9-2-1-3"><span class="nt-num">9.2.1.3</span>The source after INCLUDE</h3>
+
+<p>The easiest way to see what INCLUDE does is to think about the source the assembler sees. The assembler deletes the include line and puts the whole text of emu8086.inc in its place. It then assembles the resulting single piece of source. A simplified picture looks like this:</p>
+
+<pre class="nt-code"><code><span class="cm">; in place of the include line:</span>
+<span class="dir">PUTC</span> <span class="dir">MACRO</span> char     <span class="cm">; template: 0 bytes</span>
+  ...
+<span class="dir">ENDM</span>
+<span class="dir">GOTOXY</span> <span class="dir">MACRO</span> col, row
+  ...
+<span class="dir">ENDM</span>
+<span class="dir">DEFINE_SCAN_NUM</span> <span class="dir">MACRO</span>
+  ...               <span class="cm">; procedure template</span>
+<span class="dir">ENDM</span>
+<span class="cm">; the program itself:</span>
+<span class="dir">ORG</span>  100h
+<span class="dir">PUTC</span> 'A'            <span class="cm">; 8 bytes here</span>
+<span class="kw">RET</span></code></pre>
+
+<p>Three conclusions follow from this picture. First, most of the library consists of <code>MACRO … ENDM</code> blocks. A macro definition is only a template; the assembler notes it down somewhere but produces no bytes for it. A macro that is never used adds not a single byte to the program. Second, code is generated where the macro is used. In the program above, the line <code>PUTC 'A'</code>, once expanded, produces a sequence of five instructions and 8 bytes. The whole program consists of these 8 bytes plus the 1 byte of <code>RET</code>: 9 bytes.</p>
+
+<p>The third conclusion concerns procedures. The procedures in the library are also stored not directly as code but inside macros. For example, the whole code of the SCAN_NUM procedure is the body of a macro called <code>DEFINE_SCAN_NUM</code>. If the program does not write the <code>DEFINE_SCAN_NUM</code> line, the macro is never expanded and the code of SCAN_NUM does not enter the program. Thus including the whole library does not enlarge the program. Program size is determined by only two things: every use of the macros that are used, and the procedures defined with DEFINE_.</p>
+
+<div class="nt-tablewrap" id="tab-boyut">
+<table class="nt-table">
+  <caption>Table 9.2.1: When do bytes from emu8086.inc enter the program?</caption>
+  <thead><tr><th scope="col">In the source</th><th scope="col">Code produced</th><th scope="col">When?</th></tr></thead>
+  <tbody>
+    <tr><td><code>include 'emu8086.inc'</code></td><td>none</td><td>definitions are only read</td></tr>
+    <tr><td>macro use (<code>PUTC 'A'</code>)</td><td>the macro's body, with the parameters substituted</td><td>again at every use</td></tr>
+    <tr><td><code>DEFINE_SCAN_NUM</code></td><td>the whole code of the procedure</td><td>once, at the place of the line</td></tr>
+    <tr><td><code>CALL scan_num</code></td><td>a 3-byte CALL instruction</td><td>at every call</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Nothing called "emu8086.inc" is left inside the running program. In memory there are only expanded macro instructions and defined procedures. In emu8086's memory window or disassembler, PUSH, MOV, INT and POP instructions are seen where PUTC was. This matters for debugging: when single-stepping, one macro line corresponds to several instruction steps.</p>
+
+<h3 id="s9-2-1-4"><span class="nt-num">9.2.1.4</span>What is in the library?</h3>
+
+<p>The contents of emu8086.inc fall into two groups (<a href="#tab-makrolar">Table 9.2.2</a>, <a href="#tab-prosedurler">Table 9.2.3</a>). Macros are written directly by name. Procedures are first defined with a DEFINE_ macro and then called with CALL.</p>
+
+<div class="nt-tablewrap" id="tab-makrolar">
+<table class="nt-table">
+  <caption>Table 9.2.2: The macros in the library (used directly).</caption>
+  <thead><tr><th scope="col">Macro</th><th scope="col">Task</th><th scope="col">In the background</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUTC char</code></td><td>writes a single character where the cursor is</td><td>INT 10h, AH = 0Eh</td></tr>
+    <tr><td><code>GOTOXY col, row</code></td><td>moves the cursor to the given column and row</td><td>INT 10h, AH = 02h</td></tr>
+    <tr><td><code>PRINT string</code></td><td>prints a string</td><td>character by character with 0Eh</td></tr>
+    <tr><td><code>PRINTN string</code></td><td>prints a string, then moves to a new line</td><td>character by character with 0Eh; 13, 10 at the end</td></tr>
+    <tr><td><code>CURSOROFF</code></td><td>hides the cursor</td><td>INT 10h, AH = 01h</td></tr>
+    <tr><td><code>CURSORON</code></td><td>shows the cursor</td><td>INT 10h, AH = 01h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-tablewrap" id="tab-prosedurler">
+<table class="nt-table">
+  <caption>Table 9.2.3: The procedures in the library (defined with DEFINE_, called with CALL).</caption>
+  <thead><tr><th scope="col">Procedure</th><th scope="col">Task</th><th scope="col">Definition line</th></tr></thead>
+  <tbody>
+    <tr><td><code>PRINT_STRING</code></td><td>prints the zero-terminated string at DS:SI</td><td><code>DEFINE_PRINT_STRING</code></td></tr>
+    <tr><td><code>PTHIS</code></td><td>prints the string right after the CALL</td><td><code>DEFINE_PTHIS</code></td></tr>
+    <tr><td><code>GET_STRING</code></td><td>reads a string from the keyboard</td><td><code>DEFINE_GET_STRING</code></td></tr>
+    <tr><td><code>CLEAR_SCREEN</code></td><td>clears the screen</td><td><code>DEFINE_CLEAR_SCREEN</code></td></tr>
+    <tr><td><code>SCAN_NUM</code></td><td>reads a signed number from the keyboard into CX</td><td><code>DEFINE_SCAN_NUM</code></td></tr>
+    <tr><td><code>PRINT_NUM</code></td><td>prints AX as a signed number</td><td><code>DEFINE_PRINT_NUM</code> + <code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+    <tr><td><code>PRINT_NUM_UNS</code></td><td>prints AX as an unsigned number</td><td><code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The difference between the two groups is the basic difference between a macro and a procedure. A macro is copied to every place where it is used; it suits short, frequent jobs. The code of a procedure exists once in memory and every use goes there with CALL; it suits long jobs. The library makes this distinction sensibly. PUTC is 8 bytes, and the cost of a CALL and RET would be close to the job itself; that is why it is a macro. SCAN_NUM, on the other hand, is hundreds of bytes of code that checks the minus sign, backspace and overflow. Copying it at every use would swell the program quickly; that is why it is a procedure.</p>
+
+<p>The time of a procedure call can be computed too. On the 8086 a direct CALL within the same segment takes 19 clock cycles and a near RET 8. On a 5 MHz 8086 one cycle is 200 ns, so the cost of calling and returning is 27 × 200 ns = 5.4 µs. An <code>INT 10h</code> that writes a character, however, runs hundreds of instructions inside the BIOS. For screen and keyboard jobs the time of CALL/RET is therefore negligible; what really decides is the space taken in memory.</p>
+
+<h2 id="s9-2-2"><span class="nt-num">9.2.2</span>Screen macros</h2>
+
+<h3 id="s9-2-2-1"><span class="nt-num">9.2.2.1</span>The text screen, the cursor and BIOS services</h3>
+
+<p>The output window of emu8086 imitates the standard text screen of the PC. The screen consists of 80 columns and 25 rows. Each cell holds one character. The position of a cell is given as a (column, row) pair: the top-left corner is (0, 0) and the bottom-right corner is (79, 24). Counting starts at zero; "column 10" is therefore the eleventh cell from the left.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-imlec">
+  <span class="nt-box__title">Definition 9.2.3</span>
+  <p>The <strong>cursor</strong> is the position on the screen where the next character will be written. The BIOS keeps the cursor's column and row in its own data area. The services that write characters put the character in the cell where the cursor is and advance the cursor one position to the right.</p>
+</div>
+
+<p>Behind the screen there is a region of memory. In colour text mode the memory of the video card starts at segment B800h in the processor's address space. Each cell holds two bytes: the ASCII code of the character and an attribute byte that determines its colour. The video card reads this memory tens of times a second and draws it on the screen. The most direct way to put a character on the screen is to write to this memory with <code>MOV</code>. For the processor this is an ordinary memory write bus cycle; a physical address such as B8xxxh appears on the address bus and the character code on the data bus.</p>
+
+<p>The library's macros do not write to this memory directly; they use the BIOS screen services. The <code>INT 10h</code> instruction takes the processor to a BIOS routine in the ROM on the motherboard. The routine decides what to do by looking at the service number in AH. The BIOS takes care of details such as advancing the cursor, moving to the next line at the end of a line, and scrolling the screen on the last row. The three services the library uses are in <a href="#tab-int10">Table 9.2.4</a>.</p>
+
+<div class="nt-tablewrap" id="tab-int10">
+<table class="nt-table">
+  <caption>Table 9.2.4: The INT 10h services used by the screen macros.</caption>
+  <thead><tr><th scope="col">AH</th><th scope="col">Service</th><th scope="col">Inputs</th><th scope="col">Used by</th></tr></thead>
+  <tbody>
+    <tr><td>01h</td><td>set the cursor shape</td><td>CH = start, CL = end scan line</td><td>CURSOROFF, CURSORON</td></tr>
+    <tr><td>02h</td><td>set the cursor position</td><td>BH = page, DH = row, DL = column</td><td>GOTOXY</td></tr>
+    <tr><td>0Eh</td><td>write a character and advance the cursor (teletype)</td><td>AL = character</td><td>PUTC, PRINT, PRINTN</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The name of the 0Eh service comes from old typewriter-telegraph machines. Like those machines, the service writes the character and advances the paper, that is, the cursor. It also interprets control characters as such a machine would: 13 takes the cursor to the start of the line, 10 to the next line, 8 moves it one position left and 7 makes a sound. This feature explains most of the behavior of the screen macros.</p>
+
+<h3 id="s9-2-2-2"><span class="nt-num">9.2.2.2</span>What do PUTC and GOTOXY expand to?</h3>
+
+<p>PUTC takes a single parameter: the character to print. The parameter may be a constant (<code>PUTC 65</code>), a character constant (<code>PUTC 'B'</code>) or an 8-bit register or variable (<code>PUTC AL</code>). When expanding the macro, the assembler puts this text where the parameter is written. <code>PUTC 'A'</code> expands to these five instructions:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> AX        <span class="cm">; save AX</span>
+<span class="kw">MOV</span>  AL, 'A'   <span class="cm">; the parameter</span>
+<span class="kw">MOV</span>  AH, 0Eh   <span class="cm">; teletype</span>
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX        <span class="cm">; restore AX</span></code></pre>
+
+<p>The instructions do the following in order. <code>PUSH AX</code> decreases SP by 2 and writes the current value of AX to the stack. <code>MOV AL, 'A'</code> puts 41h in AL and does not touch AH. <code>MOV AH, 0Eh</code> puts the service number in AH; AX = 0E41h now. <code>INT 10h</code> pushes the flags, CS and IP on the stack and passes to the BIOS. The BIOS writes 'A' to the cell where the cursor is, moves the cursor one position to the right and returns with <code>IRET</code>. <code>POP AX</code> restores the old value from the stack into AX and increases SP by 2. On leaving the macro, AX, SP and the flags are back to their values at entry. The calling code does not notice that AX changed temporarily.</p>
+
+<p>The size of the expansion is computed from the machine codes: <code>PUSH AX</code> 1 byte (50h), <code>MOV AL, 41h</code> 2 bytes (B0 41), <code>MOV AH, 0Eh</code> 2 bytes (B4 0E), <code>INT 10h</code> 2 bytes (CD 10), <code>POP AX</code> 1 byte (58h). The total is 8 bytes.</p>
+
+<p>GOTOXY takes two parameters: the column first, then the row. <code>GOTOXY 10, 5</code> expands like this:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> BX
+<span class="kw">PUSH</span> DX
+<span class="kw">MOV</span>  AH, 02h   <span class="cm">; set cursor position</span>
+<span class="kw">MOV</span>  DH, 5     <span class="cm">; row</span>
+<span class="kw">MOV</span>  DL, 10    <span class="cm">; column</span>
+<span class="kw">MOV</span>  BH, 0     <span class="cm">; page 0</span>
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  DX
+<span class="kw">POP</span>  BX
+<span class="kw">POP</span>  AX</code></pre>
+
+<p>The macro uses AH, BH, DH and DL; that is why it saves AX, BX and DX. The POPs are done in the reverse order of the PUSHes: DX, the last one pushed, is restored first. The expansion is 16 bytes: three PUSHes and three POPs take 6 bytes, four <code>MOV r8, constant</code> take 8 bytes, and <code>INT 10h</code> takes 2 bytes. BH = 0 selects the first display page of the text mode. The memory of a colour text card has room for several screen pages; emu8086 programs always use page 0.</p>
+
+<p>The order of the parameters is the point most often confused. The macro uses the mathematical (x, y) order: the horizontal position (column) first, then the vertical position (row). The BIOS, however, expects the row in DH and the column in DL. The macro does this conversion itself: it puts the second parameter in DH and the first in DL.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing <code>GOTOXY 5, 10</code> and expecting the cursor to go to row 5. The macro takes 5 as the column and 10 as the row; the cursor goes to column 5 of row 10. A similar trap is to keep the position in AH: in the expansion of <code>GOTOXY AL, AH</code>, <code>MOV AH, 02h</code> runs first and then <code>MOV DH, AH</code> writes 2 as the row. For example with AL = 20 and AH = 7 the cursor goes not to row 7 but to row 2, to position (20, 2). The position must first be moved into registers the macro does not use.</p>
+</div>
+
+<h3 id="s9-2-2-3"><span class="nt-num">9.2.2.3</span>PRINT and PRINTN</h3>
+
+<p>PRINT prints a string. Its parameter is a constant text given in quotes in the source: <code>PRINT 'Hello World!'</code>. The macro embeds this text in the code and prints it character by character with service 0Eh. The expansion of PRINT in emu8086.inc has the following structure (the local label names are simplified):</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> SI
+<span class="kw">JMP</span>  skip           <span class="cm">; jump over the string</span>
+str <span class="dir">DB</span> 'Hello World!', 0
+skip:
+<span class="kw">LEA</span>  SI, str
+next:
+<span class="kw">MOV</span>  AL, CS:[SI]    <span class="cm">; read the character from the code segment</span>
+<span class="kw">CMP</span>  AL, 0
+<span class="kw">JZ</span>   done
+<span class="kw">INC</span>  SI
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">JMP</span>  next
+done:
+<span class="kw">POP</span>  SI
+<span class="kw">POP</span>  AX</code></pre>
+
+<p>The most interesting aspect of the expansion is the position of the string. The string sits in the middle of the code, and a <code>JMP</code> jumps over it so that the processor does not take it for instructions. The labels specific to the macro get unique names at every expansion through the <code>LOCAL</code> directive; when PRINT is used a second time there is no label clash. Because the string is inside the code, it is in the code segment, and the characters are read with <code>CS:[SI]</code>. In a .COM program CS = DS, so the prefix makes no difference; but thanks to the prefix the macro also works correctly when DS points to another segment.</p>
+
+<p>The expansion saves SI and AX. Its size depends on the length of the string: for a string of n characters, n + 1 bytes of data and 23 bytes of code, 24 + n bytes in all. <code>PRINT 'Hello World!'</code> takes 36 bytes for its 12 characters. The loop code is copied again at every use of PRINT.</p>
+
+<p>PRINTN does the same job and merely appends the bytes 13 and 10 to the end of the string. The macro defines the string as <code>DB 'text', 13, 10, 0</code>. 13 (CR, carriage return) takes the cursor to column 0 of the line and 10 (LF, line feed) takes it one line down. Together they move to a new line (<a href="#sekil-printn">Figure 9.2.2</a>). <code>PRINT 'a'</code> followed by <code>PRINT 'b'</code> leaves <em>ab</em> on the screen. <code>PRINTN 'a'</code> followed by <code>PRINT 'b'</code>, however, writes <em>a</em> on one line and <em>b</em> at the start of the next line. The expansion of PRINTN is 2 bytes longer than that of PRINT.</p>
+
+<figure class="nt-fig" id="sekil-printn" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 280 56" role="img" aria-label="CR takes the cursor to the start of the line and LF one line down; a, and b on the next line." style="max-width:280px;margin-top:4px"><rect class="box-empty" x="10" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="32" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="54" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="76" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="98" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="120" y="8" width="22" height="22" rx="3"/><rect class="box-empty" x="10" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="32" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="54" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="76" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="98" y="30" width="22" height="22" rx="3"/><rect class="box-empty" x="120" y="30" width="22" height="22" rx="3"/><text class="txt mono" x="21.0" y="24" text-anchor="middle" style="font-size:14px">a</text><text class="txt mono" x="21.0" y="46" text-anchor="middle" style="font-size:14px">b</text><path class="line" d="M43.0 17.0 L32.0 17.0"/><path class="ah" d="M25.0 17.0 L32.0 13.1 L32.0 20.9 z"/><text class="lbl" x="160" y="22" text-anchor="start" style="font-size:12px">CR (13): carriage return</text><path class="line" d="M15.0 26.0 L15.0 29.0"/><path class="ah" d="M15.0 36.0 L11.1 29.0 L18.9 29.0 z"/><text class="lbl" x="160" y="44" text-anchor="start" style="font-size:12px">LF (10): line feed</text></svg></div>
+  <figcaption><b>Figure 9.2.2:</b> PRINTN 'a' followed by PRINT 'b': CR takes the cursor to the start of the line and LF one line down; b is written at the start of the next line.</figcaption>
+</figure>
+
+<p>The parameter of PRINT must be a constant text known at assembly time. Because the macro embeds the text in the code, it cannot print a string that is created at run time, for example a name read from the keyboard. When <code>PRINT name</code> is written, the assembler produces the line <code>DB name, 0</code>. This line tries to define the address of the variable name as a byte; the result is either an error or a meaningless byte. Strings created at run time are printed with PRINT_STRING.</p>
+
+<h3 id="s9-2-2-4"><span class="nt-num">9.2.2.4</span>Example: a screen with macros</h3>
+
+<p>The first example in emu8086's library documentation uses three macros together:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> emu8086.<span class="kw">inc</span>
+<span class="dir">ORG</span>    100h
+<span class="dir">PRINT</span> 'Hello World!'
+<span class="dir">GOTOXY</span> 10, 5
+<span class="dir">PUTC</span> 65           <span class="cm">; 65 - is an ASCII code for 'A'</span>
+<span class="dir">PUTC</span> 'B'
+<span class="kw">RET</span>               <span class="cm">; return to operating system.</span>
+<span class="dir">END</span>               <span class="cm">; directive to stop the compiler.</span></code></pre>
+
+<p>The first two lines produce no code. <code>include</code> adds the macro definitions, and <code>ORG 100h</code> tells the assembler that the program starts at offset 0100h. In .COM programs the first 256 bytes (0000h–00FFh) are reserved for DOS's program segment prefix (PSP), so the code starts at 0100h. When the program starts the screen is empty and the cursor is at (0, 0).</p>
+
+<p><code>PRINT 'Hello World!'</code> writes 12 characters to columns 0–11 of row 0. Because the BIOS moves the cursor one position right after each character, the cursor ends at (12, 0). <code>GOTOXY 10, 5</code> moves the cursor to column 10, row 5; it writes nothing to the screen. <code>PUTC 65</code> uses the number as a character code: 65 = 41h, which is 'A' in ASCII. 'A' is written to cell (10, 5) and the cursor moves on to (11, 5). <code>PUTC 'B'</code> does the same job with a character constant; the assembler converts <code>'B'</code> to 42h. 'B' is written to (11, 5) and the cursor moves on to (12, 5). <code>RET</code> ends the program. The <code>END</code> directive only tells the assembler that the source is over; it produces no code.</p>
+
+<div class="nt-tablewrap" id="tab-iz-ekran">
+<table class="nt-table">
+  <caption>Table 9.2.5: Trace of the screen program with macros (the state after each line has run).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Cursor (column, row)</th><th scope="col">Written to the screen</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td><code>include emu8086.inc</code></td><td>(0, 0)</td><td>—</td><td>the macro definitions are added, no code</td></tr>
+    <tr><td><code>ORG 100h</code></td><td>(0, 0)</td><td>—</td><td>the .COM program starts at 0100h</td></tr>
+    <tr><td><code>PRINT 'Hello World!'</code></td><td class="n92-chg">(12, 0)</td><td>Hello World! (columns 0–11, row 0)</td><td>12 characters</td></tr>
+    <tr><td><code>GOTOXY 10, 5</code></td><td class="n92-chg">(10, 5)</td><td>—</td><td>only the cursor moves</td></tr>
+    <tr><td><code>PUTC 65</code></td><td class="n92-chg">(11, 5)</td><td>A into cell (10, 5)</td><td>65 = 41h = 'A'</td></tr>
+    <tr><td><code>PUTC 'B'</code></td><td class="n92-chg">(12, 5)</td><td>B into cell (11, 5)</td><td>character constant</td></tr>
+    <tr><td><code>RET</code></td><td>(12, 5)</td><td>—</td><td>return to DOS</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-ekran" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="cursor 10,5" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="190" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="B printed" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="222" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="txt mono" x="198.0" y="133" text-anchor="middle" style="font-size:14px">A</text><text class="txt mono" x="214.0" y="133" text-anchor="middle" style="font-size:14px">B</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg></div></div>
+  <figcaption><b>Figure 9.2.3:</b> After GOTOXY 10, 5 (left) the cursor is at (10, 5); after the two PUTCs (right) AB is written on row 5 of the screen.</figcaption>
+</figure>
+
+<p>The machine code of the program runs from 0100h to 0144h. The 36-byte PRINT expansion occupies 0100h–0123h, the 16-byte GOTOXY expansion 0124h–0133h and the two PUTC expansions 0134h–0143h; <code>RET</code> is at 0144h. Although eight lines show in the source, the processor runs 35 different instructions. Because the PRINT loop runs 12 times, the number of instructions executed exceeds a hundred.</p>
+
+<h3 id="s9-2-2-5"><span class="nt-num">9.2.2.5</span>CURSOROFF and CURSORON</h3>
+
+<p>The cursor on the text screen is a small line that the video card makes blink. The height of the line is given in scan lines of the character cell. In colour text mode a character cell is 8 or 16 scan lines high; the cursor normally covers a line or two at the bottom of the cell. Service 01h of INT 10h sets the shape of the cursor: CH is the start and CL the end scan line.</p>
+
+<p>Bit 5 of CH has a special meaning. If this bit is set to 1, the cursor is not drawn on the screen at all. CURSOROFF in the library writes 28h to CH: 28h = 0010 1000b, and its bit 5 is 1. CURSORON loads a normal shape with bit 5 equal to 0 through the same service. Both macros save and restore AX and CX.</p>
+
+<pre class="nt-code"><code><span class="dir">PRINTN</span> 'Full name:'   <span class="cm">; print, then go to the next line</span>
+<span class="dir">CURSOROFF</span>
+<span class="dir">GOTOXY</span> 30, 12
+<span class="dir">PRINT</span> 'Welcome'
+<span class="dir">CURSORON</span></code></pre>
+
+<p>In this fragment "Full name:" is printed first and the cursor moves to the start of the next line. CURSOROFF hides the cursor. GOTOXY moves the cursor to (30, 12) and "Welcome" is written to columns 30–36. During this the blinking cursor does not wander over the screen. CURSORON makes the cursor visible again; the cursor is at (37, 12). Hiding the cursor changes only the display; the cursor's position is still kept in the BIOS and the writing services keep advancing it. On game and menu screens the blinking cursor is hidden because it distracts.</p>
+
+<h3 id="s9-2-2-6"><span class="nt-num">9.2.2.6</span>Control characters</h3>
+
+<p>The first 32 codes of the ASCII table do not correspond to a printable shape. These codes are called <strong>control characters</strong>. Service 0Eh interprets four of them like a typewriter (<a href="#tab-kontrol">Table 9.2.6</a>). When PUTC is used with these codes it writes no shape on the screen but steers the cursor.</p>
+
+<div class="nt-tablewrap" id="tab-kontrol">
+<table class="nt-table">
+  <caption>Table 9.2.6: Control characters given to PUTC.</caption>
+  <thead><tr><th scope="col">Code</th><th scope="col">Name</th><th scope="col">Effect</th></tr></thead>
+  <tbody>
+    <tr><td>07h</td><td>BEL (bell)</td><td>a short beep from the speaker; the cursor does not move</td></tr>
+    <tr><td>08h</td><td>BS (backspace)</td><td>the cursor moves one position left; it does not erase the character; no effect at column 0</td></tr>
+    <tr><td>0Ah</td><td>LF (line feed)</td><td>the cursor moves down one line, the column is unchanged; on the last row the screen scrolls up one line</td></tr>
+    <tr><td>0Dh</td><td>CR (carriage return)</td><td>the cursor returns to column 0 of the same line; the text on the line stays in place</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A new line is therefore written with two characters: CR first, then LF. The 13, 10 pair that PRINTN appends is the combination of these two movements. Even with the order reversed (10, 13) the cursor ends up in the same place: it first moves down one line and then returns to the start of that line. This is why the line ending in DOS and Windows text files is the CR LF pair.</p>
+
+<p>To erase a character from the screen, BS alone is not enough; it moves the cursor left but the character stays. Erasing is done in three steps. <code>PUTC 8</code> moves the cursor left. <code>PUTC ' '</code> writes a space over the character and moves the cursor right again. The second <code>PUTC 8</code> brings the cursor back to the emptied cell. The library's procedures that handle the backspace key fix the screen with this triple.</p>
+
+<h3 id="s9-2-2-7"><span class="nt-num">9.2.2.7</span>CR and LF separately: a code trace</h3>
+
+<p>To see what CR and LF do separately, the program below uses INT 10h without macros. AH = 0Eh is loaded once; since the BIOS does not change AH in service 0Eh, it stays valid for the later calls too.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AH, 0Eh     <span class="cm">; teletype</span>
+<span class="kw">MOV</span>  AL, 'a'
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 'b'
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 10      <span class="cm">; LF only</span>
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 'c'
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 13      <span class="cm">; CR only</span>
+<span class="kw">INT</span>  10h
+<span class="kw">MOV</span>  AL, 'd'
+<span class="kw">INT</span>  10h
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz-crlf">
+<table class="nt-table">
+  <caption>Table 9.2.7: The separate effects of CR and LF.</caption>
+  <thead><tr><th scope="col">Instructions</th><th scope="col">AL</th><th scope="col">Cursor (column, row)</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AH, 0Eh</code> / <code>MOV AL, 'a'</code> / <code>INT 10h</code></td><td>61h</td><td>(1, 0)</td><td>a</td></tr>
+    <tr><td><code>MOV AL, 'b'</code> / <code>INT 10h</code></td><td>62h</td><td>(2, 0)</td><td>ab</td></tr>
+    <tr><td><code>MOV AL, 10</code> / <code>INT 10h</code></td><td>0Ah</td><td class="n92-chg">(2, 1)</td><td>ab</td></tr>
+    <tr><td><code>MOV AL, 'c'</code> / <code>INT 10h</code></td><td>63h</td><td>(3, 1)</td><td>ab / ··c</td></tr>
+    <tr><td><code>MOV AL, 13</code> / <code>INT 10h</code></td><td>0Dh</td><td class="n92-chg">(0, 1)</td><td>ab / ··c</td></tr>
+    <tr><td><code>MOV AL, 'd'</code> / <code>INT 10h</code></td><td>64h</td><td>(1, 1)</td><td>ab / d·c</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the table "/" marks a line break and "·" an empty cell. When only LF is sent, the cursor moves down a line but stays in column 2; 'c' is written to column 2 of the next line, and the lines drift like a staircase. When only CR is sent, the cursor returns to the start of the same line; the 'c' on the line is not erased. 'd' is written to column 0, and the screen shows "d c" under "ab" (<a href="#sekil-crlf">Figure 9.2.4</a>). A proper new line needs both codes together.</p>
+
+<figure class="nt-fig" id="sekil-crlf" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 330 120" role="img" aria-label="AL, cursor position and the first two rows of the screen" style="max-width:330px;max-height:120px"><text class="lbl" x="38" y="16" text-anchor="middle" style="font-size:12px;">AL</text><rect class="box" x="8" y="20" width="60" height="26" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="38" y="38" text-anchor="middle" style="font-size:14px;">0Ah</text><text class="lbl" x="84" y="14" text-anchor="start" style="font-size:12px;">cursor (column, row)</text><rect class="box" x="84" y="20" width="120" height="26" rx="3"/><text class="txt mono" x="144" y="38" text-anchor="middle" style="font-size:14px;">(2, 1)</text><text class="lbl" x="64" y="78" text-anchor="end" style="font-size:12px;">screen</text><rect class="box-empty" x="70" y="64" width="184" height="54" rx="3"/><text class="txt mono" x="85" y="81" text-anchor="middle" style="font-size:14px;">a</text><text class="txt mono" x="107" y="81" text-anchor="middle" style="font-size:14px;">b</text><rect x="118" y="91" width="22" height="24" rx="2" style="fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1"/></svg><svg class="ds-svg" viewBox="0 0 330 120" role="img" aria-label="AL, cursor position and the first two rows of the screen" style="max-width:330px;max-height:120px"><text class="lbl" x="38" y="16" text-anchor="middle" style="font-size:12px;">AL</text><rect class="box" x="8" y="20" width="60" height="26" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="38" y="38" text-anchor="middle" style="font-size:14px;">64h</text><text class="lbl" x="84" y="14" text-anchor="start" style="font-size:12px;">cursor (column, row)</text><rect class="box" x="84" y="20" width="120" height="26" rx="3"/><text class="txt mono" x="144" y="38" text-anchor="middle" style="font-size:14px;">(1, 1)</text><text class="lbl" x="64" y="78" text-anchor="end" style="font-size:12px;">screen</text><rect class="box-empty" x="70" y="64" width="184" height="54" rx="3"/><text class="txt mono" x="85" y="81" text-anchor="middle" style="font-size:14px;">a</text><text class="txt mono" x="107" y="81" text-anchor="middle" style="font-size:14px;">b</text><text class="txt mono" x="85" y="105" text-anchor="middle" style="font-size:14px;">d</text><rect x="96" y="91" width="22" height="24" rx="2" style="fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1"/><text class="txt mono" x="129" y="105" text-anchor="middle" style="font-size:14px;">c</text></svg></div></div>
+  <figcaption><b>Figure 9.2.4:</b> After LF alone the cursor is at (2, 1) (left); after CR alone and 'd', the screen shows ab and, below it, d c (right).</figcaption>
+</figure>
+
+<p>INT 10h/0Eh changes no register except AX; in this program AH also stays 0Eh throughout the calls. This behavior is a documented feature of the BIOS, but it must not be generalized to other services. Some INT 10h services change AX, others BP. That the library macros save AX at every use is therefore a safe habit.</p>
+
+<h3 id="s9-2-2-8"><span class="nt-num">9.2.2.8</span>End of line and screen scrolling</h3>
+
+<p>After service 0Eh writes a character to column 79, it moves the cursor to the start of the next line by itself. This is how PRINT continues a long string without cutting it off. If the cursor is on the last row (24) and has to move to the next line, the BIOS scrolls the whole screen up one line. The top row disappears, an empty row appears at the bottom and the cursor moves to this new row. Scrolling is the copying of the lower 24 rows of video memory up by one row.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kayma">
+  <span class="nt-box__title">Example 9.2.1</span>
+  <p><code>GOTOXY 75, 24</code> is followed by <code>PRINT 'Welcome'</code>. Let us find where the text ends up on the screen and the final position of the cursor.</p>
+  <ol class="nt-steps">
+    <li>The cursor is at (75, 24). "W", "e", "l", "c", "o" are written to columns 75, 76, 77, 78 and 79 in turn.</li>
+    <li>After writing to column 79 the cursor must move to the next row. Since the cursor is on the last row, the screen scrolls up one line. "Welco" moves up to row 23; row 24 is emptied and the cursor comes to (0, 24).</li>
+    <li>"m" and "e" are written to columns 0 and 1 of row 24. The cursor stays at (2, 24).</li>
+  </ol>
+  <p>In the end "Welco" is in columns 75–79 of row 23, "me" at the start of row 24, and the cursor is at (2, 24) (<a href="#sekil-kayma">Figure 9.2.5</a>).</p>
+</div>
+
+<figure class="nt-fig" id="sekil-kayma" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 128" role="img" aria-label="The last two rows of the screen: Welco in columns 75 to 79 of row 23, me at the start of row 24" style="max-width:560px;max-height:128px"><text class="lbl" x="60" y="14" text-anchor="start" style="font-size:12px;">column</text><text class="lbl mono" x="128" y="32" text-anchor="middle" style="font-size:11px;">0</text><text class="lbl mono" x="164" y="32" text-anchor="middle" style="font-size:11px;">1</text><text class="lbl mono" x="200" y="32" text-anchor="middle" style="font-size:11px;">2</text><text class="lbl mono" x="236" y="32" text-anchor="middle" style="font-size:11px;">3</text><text class="lbl mono" x="272" y="32" text-anchor="middle" style="font-size:11px;">4</text><text class="lbl mono" x="308" y="32" text-anchor="middle" style="font-size:11px;">…</text><text class="lbl mono" x="344" y="32" text-anchor="middle" style="font-size:11px;">75</text><text class="lbl mono" x="380" y="32" text-anchor="middle" style="font-size:11px;">76</text><text class="lbl mono" x="416" y="32" text-anchor="middle" style="font-size:11px;">77</text><text class="lbl mono" x="452" y="32" text-anchor="middle" style="font-size:11px;">78</text><text class="lbl mono" x="488" y="32" text-anchor="middle" style="font-size:11px;">79</text><text class="lbl" x="100" y="62" text-anchor="end" style="font-size:12px;">row 23</text><rect class="box-empty" x="110" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="146" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="182" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="218" y="40" width="34" height="30" rx="3"/><rect class="box-empty" x="254" y="40" width="34" height="30" rx="3"/><text class="lbl" x="308" y="62" text-anchor="middle" style="font-size:13px;">…</text><rect class="box" x="326" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="343" y="61" text-anchor="middle" style="font-size:15px;">W</text><rect class="box" x="362" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="379" y="61" text-anchor="middle" style="font-size:15px;">e</text><rect class="box" x="398" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="415" y="61" text-anchor="middle" style="font-size:15px;">l</text><rect class="box" x="434" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="451" y="61" text-anchor="middle" style="font-size:15px;">c</text><rect class="box" x="470" y="40" width="34" height="30" rx="3"/><text class="txt mono" x="487" y="61" text-anchor="middle" style="font-size:15px;">o</text><text class="lbl" x="100" y="100" text-anchor="end" style="font-size:12px;">row 24</text><rect class="box" x="110" y="78" width="34" height="30" rx="3"/><text class="txt mono" x="127" y="99" text-anchor="middle" style="font-size:15px;">m</text><rect class="box" x="146" y="78" width="34" height="30" rx="3"/><text class="txt mono" x="163" y="99" text-anchor="middle" style="font-size:15px;">e</text><rect class="box-empty" x="182" y="78" width="34" height="30" rx="3" style="fill:var(--ds-hot)"/><rect class="box-empty" x="218" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="254" y="78" width="34" height="30" rx="3"/><text class="lbl" x="308" y="100" text-anchor="middle" style="font-size:13px;">…</text><rect class="box-empty" x="326" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="362" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="398" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="434" y="78" width="34" height="30" rx="3"/><rect class="box-empty" x="470" y="78" width="34" height="30" rx="3"/><text class="txt" x="199" y="124" text-anchor="middle" style="font-size:12px;fill:var(--ds-link)">cursor</text></svg></div>
+  <figcaption><b>Figure 9.2.5:</b> The last two rows of the screen: "Welco" in columns 75–79 of row 23, "me" at the start of row 24; the cursor at (2, 24).</figcaption>
+</figure>
+
+<p>GOTOXY and PUTC do not check positions. For a call such as <code>GOTOXY 85, 3</code> the BIOS's behavior is not defined; the cursor may go somewhere invisible and later writes appear in unexpected places. The programmer must keep positions within 0–79 (column) and 0–24 (row).</p>
+
+<h3 id="s9-2-2-9"><span class="nt-num">9.2.2.9</span>GOTOXY and video memory</h3>
+
+<p>A chosen cell on the screen can be described in three different ways: with the macro call (<code>GOTOXY 10, 5</code>), with the register values that go to the BIOS (AH = 02h, DH = 5, DL = 10, BH = 0), and with the cell's address in video memory. The last is useful for understanding what happens inside the BIOS.</p>
+
+<p>In video memory the cells are laid out row by row, from left to right. Since each cell takes two bytes, the offset of the (column, row) cell is computed as follows:</p>
+
+<p style="text-align:center"><code>offset = (row × 80 + column) × 2</code></p>
+
+<p>The byte at an even address is the ASCII code of the character, and the byte at an odd address is the attribute byte. For <code>GOTOXY 10, 5</code> followed by <code>PUTC 'A'</code> the computation is: (5 × 80 + 10) × 2 = 410 × 2 = 820 = 0334h. 'A' (41h) is written to B800:0334h and the attribute byte (07h, light gray on black) to B800:0335h. The physical address is B8000h + 0334h = B8334h. For the bottom-right corner of the screen, (79, 24), the offset is (24 × 80 + 79) × 2 = 3998 = 0F9Eh. A page of 80 × 25 cells takes 4000 bytes.</p>
+
+<p>Knowing these addresses also makes it possible to do what the macros do by writing to memory directly. For example, the sequence <code>MOV AX, 0B800h</code>, <code>MOV ES, AX</code>, <code>MOV BYTE PTR ES:[0334h], 'A'</code> writes 'A' to the same cell. The difference is that the cursor does not advance and the screen does not scroll: direct writing leaves all the details the BIOS takes care of to the programmer. The library macros are slower but do not require thinking about these details.</p>
+
+<h3 id="s9-2-2-10"><span class="nt-num">9.2.2.10</span>Printing two digits: a code trace</h3>
+
+<p>That PUTC preserves AX may look like a small detail. The example below shows why this detail is useful. The program prints a number from 0 to 99 in AL as two decimal digits. The <code>AAM</code> instruction is used to separate the digits. In the code the expansions of two PUTCs are written out explicitly instead of as macros:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AL, 58
+<span class="kw">AAM</span>              <span class="cm">; AH = 5, AL = 8</span>
+<span class="kw">ADD</span>  AX, 3030h   <span class="cm">; '5', '8'</span>
+<span class="kw">PUSH</span> AX          <span class="cm">; PUTC AH expansion</span>
+<span class="kw">MOV</span>  AL, AH
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX          <span class="cm">; AX restored: 3538h</span>
+<span class="kw">PUSH</span> AX          <span class="cm">; PUTC AL expansion</span>
+<span class="kw">MOV</span>  AL, AL
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-box nt-box--tanim" id="tanim-aam">
+  <span class="nt-box__title">Definition 9.2.4</span>
+  <p><strong>AAM</strong> (ASCII adjust after multiply) divides AL by 10: it writes the quotient to AH and the remainder to AL. For a number from 0 to 99, the tens digit is left in AH and the units digit in AL. SF, ZF and PF are set according to AL. On the 8086, AAM takes 83 clock cycles.</p>
+</div>
+
+<p><code>MOV AL, 58</code> puts 58 = 3Ah in AL. <code>AAM</code> divides 58 by 10: AH = 5, AL = 8, that is, AX = 0508h. Since only AL is divided, the number must be in the range 0–99; from 100 on, the quotient is no longer a single digit. <code>ADD AX, 3030h</code> adds 30h to both bytes at once. Adding 30h to a digit converts it to an ASCII digit: 5 + 30h = 35h = '5', 8 + 30h = 38h = '8'. No carry arises between the two bytes in the addition, because 08h + 30h = 38h fits in 8 bits.</p>
+
+<p>The first expansion prints the tens digit. <code>PUSH AX</code> puts 3538h on the stack, SP = FFFCh. <code>MOV AL, AH</code> copies '5' to AL and <code>MOV AH, 0Eh</code> loads the service number; AX = 0E35h. The units digit has been erased from the register. <code>INT 10h</code> prints 5 on the screen. <code>POP AX</code> brings back 3538h; '8' is in AL again. The second expansion prints the units digit with the same pattern. <code>MOV AL, AL</code> changes nothing but is harmless; the macro produces this instruction when the parameter is AL.</p>
+
+<div class="nt-tablewrap" id="tab-iz-aam">
+<table class="nt-table">
+  <caption>Table 9.2.8: Trace of printing two digits with AAM and PUTC.</caption>
+  <thead><tr><th scope="col">Instruction(s)</th><th scope="col">AH</th><th scope="col">AL</th><th scope="col">SP</th><th scope="col">[FFFCh]</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AL, 58</code></td><td>00h</td><td class="n92-chg">3Ah</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td><code>AAM</code></td><td class="n92-chg">05h</td><td class="n92-chg">08h</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td><code>ADD AX, 3030h</code></td><td class="n92-chg">35h</td><td class="n92-chg">38h</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td><code>PUSH AX</code></td><td>35h</td><td>38h</td><td class="n92-chg">FFFCh</td><td class="n92-chg">3538h</td><td></td></tr>
+    <tr><td><code>MOV AL, AH</code> / <code>MOV AH, 0Eh</code> / <code>INT 10h</code></td><td class="n92-chg">0Eh</td><td class="n92-chg">35h</td><td>FFFCh</td><td>3538h</td><td>5</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n92-chg">35h</td><td class="n92-chg">38h</td><td class="n92-chg">FFFEh</td><td>—</td><td>5</td></tr>
+    <tr><td>second expansion (5 instructions)</td><td>35h</td><td>38h</td><td>FFFEh</td><td>—</td><td>58</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>At the end of the program 58 is on the screen and AX is again 3538h (<a href="#tab-iz-aam">Table 9.2.8</a>). Because PUTC preserves AX, the two digits could be printed one after the other without being copied to a separate register. Had the macro not preserved AX, the first PUTC would have erased '8' and the programmer would have had to move the units digit into another register beforehand. Written with macros in the source, the same program contains only the lines <code>PUTC AH</code> and <code>PUTC AL</code>.</p>
+
+<h2 id="s9-2-3"><span class="nt-num">9.2.3</span>Using the procedures</h2>
+
+<h3 id="s9-2-3-1"><span class="nt-num">9.2.3.1</span>DEFINE_ and CALL</h3>
+
+<p>Using a procedure from the library takes two steps. First the procedure is defined once: for this, the macro whose name starts with <code>DEFINE_</code> is written. Then the procedure is called with <code>CALL</code> wherever the program needs it. A typical skeleton looks like this:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span> 100h
+    ...
+    <span class="kw">CALL</span> print_num   <span class="cm">; use</span>
+    ...
+<span class="kw">RET</span>
+<span class="dir">DEFINE_PRINT_NUM</span>    <span class="cm">; define</span>
+<span class="dir">DEFINE_PRINT_NUM_UNS</span>
+<span class="dir">END</span></code></pre>
+
+<div class="nt-box nt-box--tanim" id="tanim-define">
+  <span class="nt-box__title">Definition 9.2.5</span>
+  <p>A <strong>DEFINE_ macro</strong> is a macro whose body carries the entire code of a library procedure. Where the macro is expanded, it places the procedure as a <code>PROC … ENDP</code> block. Each procedure is defined at most once in a program; if it is defined twice, the same label is created twice and the assembler reports an error.</p>
+</div>
+
+<p>The place where the macro is expanded is the procedure's place in memory. In the source the DEFINE_ lines are usually written between the main program's final <code>RET</code> and the <code>END</code> directive (<a href="#sekil-yerlesim">Figure 9.2.6</a>). In memory the main code comes first, then the RET, then the code of the procedures. The processor runs the main code from top to bottom, returns to DOS with the RET, and enters the code of the procedures only through CALL.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-yerlesim" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 80" role="img" aria-label="In memory the main code and RET come first, then the procedures expanded by DEFINE_, and END last; CALL jumps to the procedure." style="max-width:640px"><rect class="box" x="10" y="30" width="230" height="28" rx="3"/><text class="txt mono" x="125.0" y="49" text-anchor="middle" style="font-size:12.5px">main code … CALL print_num …</text><rect class="box" x="240" y="30" width="60" height="28" rx="3"/><text class="txt mono" x="270.0" y="49" text-anchor="middle" style="font-size:12.5px">RET</text><rect class="box" x="300" y="30" width="170" height="28" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="385.0" y="49" text-anchor="middle" style="font-size:12.5px">print_num</text><rect class="box" x="470" y="30" width="170" height="28" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="555.0" y="49" text-anchor="middle" style="font-size:12.5px">print_num_uns</text><rect class="box" x="640" y="30" width="50" height="28" rx="3"/><text class="txt mono" x="665.0" y="49" text-anchor="middle" style="font-size:12.5px">END</text><path class="line" d="M190 30 C 220 4, 330 4, 360 26"/><path class="line" d="M355.0 22.0 L357.1 24.1"/><path class="ah" d="M362.0 29.0 L354.3 26.8 L359.8 21.3 z"/><text class="lbl" x="275" y="12" text-anchor="middle" style="font-size:11.5px">CALL</text><text class="lbl" x="125" y="74" text-anchor="middle" style="font-size:11.5px">flow runs top to bottom</text><text class="lbl" x="470" y="74" text-anchor="middle" style="font-size:11.5px">where the DEFINE_… macros expand</text></svg></div>
+  <figcaption><b>Figure 9.2.6:</b> In memory the main code and RET come first, followed by the procedures expanded by the DEFINE_ macros; CALL jumps to the procedure.</figcaption>
+</figure>
+
+<p>This layout is the usual one but not the only safe place. Every DEFINE_ macro in emu8086.inc contains a guard: at the start of the body there is a <code>JMP</code> that jumps over the procedure. The structure of DEFINE_SCAN_NUM is roughly this:</p>
+
+<pre class="nt-code"><code><span class="kw">JMP</span> skip_proc_scan_num   <span class="cm">; keep the flow out of the body</span>
+SCAN_NUM <span class="dir">PROC</span> NEAR
+    ...                  <span class="cm">; the procedure's code</span>
+    <span class="kw">RET</span>
+SCAN_NUM <span class="dir">ENDP</span>
+skip_proc_scan_num:</code></pre>
+
+<p>Even if a DEFINE_ line is written by mistake right below <code>ORG 100h</code>, the program works correctly. The first instruction the processor runs is this JMP, which jumps past the body to the start of the main program. The price is an extra JMP instruction in the program. Still, collecting the DEFINE_ lines between RET and END keeps the program readable and avoids needless jumps.</p>
+
+<p>Procedure names are written in lowercase in the source: <code>CALL print_num</code>, <code>CALL scan_num</code>. emu8086 does not distinguish case in labels; <code>CALL PRINT_NUM</code> goes to the same label. Lowercase is the notation used in the documentation, and it visually separates the procedure name from the macro name (<code>DEFINE_PRINT_NUM</code>).</p>
+
+<p>If a procedure calls another procedure, the two must be defined together. After printing the sign of the number, PRINT_NUM has PRINT_NUM_UNS print the absolute value. If only <code>DEFINE_PRINT_NUM</code> is written, the assembler cannot find the label at the line <code>CALL PRINT_NUM_UNS</code> inside PRINT_NUM and reports an undefined-label error. The reverse causes no error: PRINT_NUM_UNS can be defined alone.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing <code>CALL scan_num</code> and forgetting <code>DEFINE_SCAN_NUM</code>. That the library has been included does not mean the procedure is defined; unless the macro is expanded, the label scan_num does not exist. emu8086 reports an "undefined" error for this label during assembly.</p>
+</div>
+
+<p>The memory cost of a macro and a procedure can be compared with a concrete example. Suppose a program prints ten different messages. With PRINT every message carries its own loop code: every expansion holds 23 bytes of code plus the bytes of the message. With PRINT_STRING the loop exists once in memory; for each message only a 3-byte <code>LEA SI, msg</code> and a 3-byte <code>CALL print_string</code> are added. With ten seven-character messages the program takes about 310 bytes using PRINT and about 160 bytes using PRINT_STRING. The price of the saving is time: every call spends an extra 27 clock cycles on CALL and RET.</p>
+
+<h3 id="s9-2-3-2"><span class="nt-num">9.2.3.2</span>Input and output registers</h3>
+
+<p>A procedure receives its parameters in registers and returns its result in a register. What each register means is written in the procedure's documentation, and the programmer must follow it (<a href="#tab-yazmaclar">Table 9.2.9</a>).</p>
+
+<div class="nt-tablewrap" id="tab-yazmaclar">
+<table class="nt-table">
+  <caption>Table 9.2.9: Input and output registers of the library procedures.</caption>
+  <thead><tr><th scope="col">Procedure</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Details</th></tr></thead>
+  <tbody>
+    <tr><td>PRINT_STRING</td><td>DS:SI = address of the string</td><td>—</td><td>the string must end with 0</td></tr>
+    <tr><td>PTHIS</td><td>the string right after the CALL</td><td>—</td><td>advances the return address itself</td></tr>
+    <tr><td>GET_STRING</td><td>DS:DI = buffer, DX = size</td><td>a 0-terminated string in the buffer</td><td>at most DX − 1 characters</td></tr>
+    <tr><td>CLEAR_SCREEN</td><td>—</td><td>—</td><td>the cursor goes to (0, 0)</td></tr>
+    <tr><td>SCAN_NUM</td><td>keyboard</td><td>CX (signed)</td><td>the old value in CX is lost</td></tr>
+    <tr><td>PRINT_NUM</td><td>AX (signed)</td><td>—</td><td>PRINT_NUM_UNS must be defined too</td></tr>
+    <tr><td>PRINT_NUM_UNS</td><td>AX (unsigned)</td><td>—</td><td>0 … 65,535</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The library's procedures push the other registers they use on the stack on entry and pop them on exit. For example GET_STRING saves AX, CX, DI and DX, and SCAN_NUM saves DX, AX and SI. The only register that changes for the calling program is the output register. The flags, however, are not preserved: the CMP and arithmetic instructions inside the procedure change them. A flag set before a CALL must not be relied on after the CALL.</p>
+
+<p>The output register has a consequence too. Because SCAN_NUM writes its result to CX, the old value in CX is lost. A program that keeps a loop counter in CX must save the counter itself before calling SCAN_NUM:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  CX, 3          <span class="cm">; three numbers to read</span>
+again: <span class="kw">PUSH</span> CX        <span class="cm">; save the counter</span>
+<span class="kw">CALL</span> scan_num       <span class="cm">; CX = the number read</span>
+<span class="kw">MOV</span>  AX, CX
+<span class="kw">ADD</span>  BX, AX         <span class="cm">; add to the sum</span>
+<span class="kw">POP</span>  CX             <span class="cm">; restore the counter</span>
+<span class="kw">LOOP</span> again</code></pre>
+
+<p>Without the PUSH CX, LOOP would use the number the user entered as the counter. If the user enters 0, LOOP decrements CX to FFFFh and the loop runs another 65,535 times.</p>
+
+<h3 id="s9-2-3-3"><span class="nt-num">9.2.3.3</span>PRINT_STRING and PTHIS</h3>
+
+<p>The library has two procedures that print strings. Both print a string marked at its end with a 0 byte; they differ in where they get the string's address.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-nulldizgi">
+  <span class="nt-box__title">Definition 9.2.6</span>
+  <p>A <strong>null-terminated string</strong> is a string that ends with a byte of value 0 after its characters. The length is not stored separately; the code that reads the string stops when it sees the 0 byte. Strings in the C language have this form too.</p>
+</div>
+
+<p>PRINT_STRING takes the string's address from DS:SI. Its use takes two instructions:</p>
+
+<pre class="nt-code"><code><span class="kw">LEA</span>  SI, msg
+<span class="kw">CALL</span> print_string
+...
+msg <span class="dir">DB</span> 'Hello', 0</code></pre>
+
+<p><code>LEA SI, msg</code> loads the offset of msg into SI. emu8086 assembles this LEA with a direct address to the same 3-byte code as <code>MOV SI, OFFSET msg</code> (BE ll hh); in real MASM the same instruction is 4 bytes. The procedure saves AX and SI, then reads the bytes that SI points to in turn. If a byte is not 0 it is printed with service 0Eh and SI is incremented. When 0 is read, SI and AX are restored and the procedure returns. The string sits in the program's data area; the same string can be printed again in different places of the program.</p>
+
+<p>PTHIS takes its name from the English phrase <em>print this</em>. It takes the string's address not from a register but from the stack. The string is written right after the CALL instruction:</p>
+
+<pre class="nt-code"><code><span class="kw">CALL</span> pthis
+<span class="dir">DB</span> 'Hello', 0
+<span class="cm">; execution continues here</span></code></pre>
+
+<p>The PRINT macro copies its loop code at every use; PRINT_STRING and PTHIS print any number of strings with a single copy of code. PTHIS's advantage over PRINT_STRING is convenience: there is no need to name the string and define it in a separate data area.</p>
+
+<h3 id="s9-2-3-4"><span class="nt-num">9.2.3.4</span>Ways to print a string</h3>
+
+<p>With the library there are four ways to print a string on the screen (<a href="#tab-dizgi">Table 9.2.10</a>). The fourth is a DOS service outside the library but is included in the table for comparison.</p>
+
+<div class="nt-tablewrap" id="tab-dizgi">
+<table class="nt-table">
+  <caption>Table 9.2.10: Comparison of the ways to print a string.</caption>
+  <thead><tr><th scope="col">Method</th><th scope="col">Where is the string?</th><th scope="col">Terminator</th><th scope="col">Address</th><th scope="col">Suitable when</th></tr></thead>
+  <tbody>
+    <tr><td><code>PRINT 'text'</code></td><td>inside the code (macro expansion)</td><td>0 (added by the macro)</td><td>the macro takes it itself (CS:SI)</td><td>a constant message printed once</td></tr>
+    <tr><td>PRINT_STRING</td><td>in the data area</td><td>0</td><td>DS:SI</td><td>a string printed in several places or created at run time</td></tr>
+    <tr><td>PTHIS</td><td>right after the CALL</td><td>0</td><td>the return address on the stack</td><td>many short constant messages</td></tr>
+    <tr><td>INT 21h, AH = 09h</td><td>in the data area</td><td>'$'</td><td>DS:DX</td><td>a DOS program without the library</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The terminator itself cannot be printed. In a string ending in '$' the '$' character, and in a string ending in 0 the 0 byte, counts as the end of the string. In a program that prints prices, the message "100 $" cannot be printed with INT 21h/09h; the message ends before the '$'. The same message prints without trouble with PRINT_STRING.</p>
+
+<p>The buffer must match the method too. The buffer that GET_STRING fills ends with 0 and is printed directly with PRINT_STRING. If the same buffer is printed with INT 21h/09h, DOS looks for '$'. Because there is no '$' in the buffer, DOS dumps the bytes beyond the buffer onto the screen as well and continues until it meets the first '$'. Meaningless characters appear on the screen.</p>
+
+<h3 id="s9-2-3-5"><span class="nt-num">9.2.3.5</span>How does PTHIS work?</h3>
+
+<p>PTHIS relies on knowing what CALL pushes on the stack. CALL pushes the address of the instruction after it, that is, the <strong>return address</strong>, on the stack and jumps to the procedure. The processor does not check whether there is an instruction at the "next instruction"; it merely adds the length of the CALL to IP. If a string sits right after the CALL, the pushed address is the address of the string's first byte. PTHIS uses this address as the address of the string.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-pthis" style="--w:720px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS memory and stack" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">code segment (memory, addresses increase to the right)</text><text class="lbl" x="10" y="98" text-anchor="start">stack:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">address(0Dh)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS memory and stack" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">code segment (memory, addresses increase to the right)</text><text class="lbl" x="10" y="98" text-anchor="start">stack:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">address(CALL print_num)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg></div></div>
+  <figcaption><b>Figure 9.2.7:</b> After CALL pthis the stack holds the address of the string's first byte (0Dh) (left). After PTHIS has printed the string, it replaces the address on the stack with one past the 0 byte, the address of CALL print_num (right).</figcaption>
+</figure>
+
+<p>The procedure does four things (<a href="#sekil-pthis">Figure 9.2.7</a>). First it takes the return address from the stack into SI with <code>POP SI</code>. Then it reads and prints the bytes SI points to until a 0; SI increases after every read. When 0 is read, SI points one past the 0 byte: this address is the first instruction after the string. The procedure puts this address back on the stack with <code>PUSH SI</code>. Finally <code>RET</code> takes the new address on the stack into IP. The processor skips the string and continues from the instruction after it; the string's bytes are never mistaken for instructions and executed.</p>
+
+<p>The PTHIS in the library also preserves the caller's SI and AX. AX is pushed on the stack. SI cannot be pushed, because the return address sits on top of the stack and has to be taken first. The procedure therefore stores the old value of SI in a 2-byte variable in the code segment (<code>CS:temp1</code>) and restores it from there at the end. Since the string's bytes are also in the code segment, they are read with <code>CS:[SI]</code>.</p>
+
+<p>Tracing with addresses makes the mechanism concrete. In the example program that reads and prints a number, <code>CALL pthis</code> is at 010Bh and is 3 bytes long. After it comes a 21-byte string starting at 010Eh: 13, 10, "You have entered: " and 0. The string occupies 010Eh–0122h; <code>CALL print_num</code> is at 0123h.</p>
+
+<div class="nt-tablewrap" id="tab-iz-pthis">
+<table class="nt-table">
+  <caption>Table 9.2.11: The stack and SI during the PTHIS call (the read-a-number-and-print-it program).</caption>
+  <thead><tr><th scope="col">Moment</th><th scope="col">SP</th><th scope="col">Top of stack</th><th scope="col">SI</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>before <code>CALL pthis</code></td><td>FFFEh</td><td>0000h</td><td>msg1</td><td>IP = 010Bh</td></tr>
+    <tr><td>after <code>CALL pthis</code></td><td class="n92-chg">FFFCh</td><td class="n92-chg">010Eh</td><td>msg1</td><td>return address = the string's first byte</td></tr>
+    <tr><td>after <code>POP SI</code></td><td class="n92-chg">FFFEh</td><td>0000h</td><td class="n92-chg">010Eh</td><td>the old SI is in CS:temp1</td></tr>
+    <tr><td>when 0 is read</td><td>FFFEh</td><td>0000h</td><td class="n92-chg">0123h</td><td>21 bytes read, 20 characters printed</td></tr>
+    <tr><td>after <code>PUSH SI</code></td><td class="n92-chg">FFFCh</td><td class="n92-chg">0123h</td><td>0123h</td><td>the new return address</td></tr>
+    <tr><td>after <code>RET</code></td><td class="n92-chg">FFFEh</td><td>0000h</td><td>msg1</td><td>IP = 0123h: CALL print_num</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The "0000h" in the table is the word DOS puts on the stack when a .COM program starts (<a href="#tab-iz-pthis">Table 9.2.11</a>). In the library version AX is also pushed after the POP SI, so the stack's inner state is one word deeper than shown in the table; the table shows only the steps concerning the return address.</p>
+
+<p>The same idea exists in the PRINT macro: PRINT also embeds the data in the code. The difference is that PRINT jumps over the data with a JMP, whereas PTHIS changes the address RET will return to. Changing the return address is a powerful but dangerous technique. If the string is not terminated with 0, PTHIS also prints the instruction bytes after the string and returns to a random place where it finds a 0; the program may hang.</p>
+
+<h3 id="s9-2-3-6"><span class="nt-num">9.2.3.6</span>GET_STRING and CLEAR_SCREEN</h3>
+
+<p>GET_STRING reads a line of text from the user. The characters read are written to the memory area that DS:DI points to. This area is called a <strong>buffer</strong>; the programmer reserves it beforehand with a definition such as <code>DB n DUP(0)</code>. DX is the size of the buffer in bytes. Because the procedure puts a 0 at the end of the string, it accepts at most DX − 1 characters. Reading ends when the user presses Enter.</p>
+
+<p>CLEAR_SCREEN clears the screen and takes the cursor to the top-left corner, (0, 0). It has no input or output register. The procedure first fills the whole screen with blank lines using service 06h of INT 10h (scroll window up), then moves the cursor to (0, 0) with service 02h. It reads the number of rows and columns of the screen from the BIOS data area: the byte at 0040:0084h holds the number of rows minus one, and the word at 0040:004Ah the number of columns. For this it sets DS temporarily to 0040h; it saves DS and the other registers it uses on the stack.</p>
+
+<pre class="nt-code"><code><span class="kw">LEA</span>  DI, buf          <span class="cm">; buffer</span>
+<span class="kw">MOV</span>  DX, 20          <span class="cm">; size</span>
+<span class="kw">CALL</span> get_string
+<span class="kw">CALL</span> clear_screen
+<span class="kw">LEA</span>  SI, buf
+<span class="kw">CALL</span> print_string
+<span class="kw">RET</span>
+buf <span class="dir">DB</span> 20 <span class="dir">DUP</span>(0)</code></pre>
+
+<p>This program reads a name of at most 19 characters, clears the screen and prints the name in the top-left corner. Because GET_STRING ends the buffer with 0, the same buffer is given to PRINT_STRING without any conversion. For the three procedures the program uses, the lines <code>DEFINE_GET_STRING</code>, <code>DEFINE_CLEAR_SCREEN</code> and <code>DEFINE_PRINT_STRING</code> must be added after the RET.</p>
+
+<h3 id="s9-2-3-7"><span class="nt-num">9.2.3.7</span>The logic of GET_STRING: a code trace</h3>
+
+<p>The GET_STRING in the library is long because it also handles backspace and a full buffer. The essence of the reading loop can be traced with the plain equivalent below. The buffer is 4 bytes and the user will type "Ece".</p>
+
+<pre class="nt-code"><code><span class="kw">LEA</span>  DI, buf      <span class="cm">; buffer address</span>
+<span class="kw">MOV</span>  DX, 4       <span class="cm">; buffer size</span>
+get_key: <span class="kw">CMP</span> DX, 1   <span class="cm">; keep 1 byte for the 0</span>
+<span class="kw">JBE</span>  done
+<span class="kw">MOV</span>  AH, 01h
+<span class="kw">INT</span>  21h         <span class="cm">; AL = key (echoed)</span>
+<span class="kw">CMP</span>  AL, 13      <span class="cm">; Enter?</span>
+<span class="kw">JE</span>   done
+<span class="kw">MOV</span>  [DI], AL    <span class="cm">; store in the buffer</span>
+<span class="kw">INC</span>  DI
+<span class="kw">DEC</span>  DX
+<span class="kw">JMP</span>  get_key
+done: <span class="kw">MOV</span> <span class="dir">BYTE</span> <span class="dir">PTR</span> [DI], 0
+<span class="kw">RET</span>
+buf  <span class="dir">DB</span> 4 <span class="dir">DUP</span>(?)</code></pre>
+
+<p>The program starts at 0100h. <code>LEA DI, buf</code> is 3 bytes, <code>MOV DX, 4</code> 3 and <code>CMP DX, 1</code> 3; the rest of the loop, <code>MOV BYTE PTR [DI], 0</code> and <code>RET</code> end at 011Ch. The buffer starts at 011Dh: buf+0 = 011Dh, buf+3 = 0120h.</p>
+
+<p>The <code>CMP DX, 1</code> / <code>JBE done</code> pair at the start of the loop checks the remaining room. DX is the number of bytes left. If DX ≤ 1, only the final 0 has room and reading ends. JBE makes an unsigned comparison; it also jumps when DX is 0. Service 01h of INT 21h waits for a key, writes the key's ASCII code to AL and echoes the character to the screen. If it is not Enter (13), the character is written to the buffer, DI advances and the remaining room DX decreases by one.</p>
+
+<div class="nt-tablewrap" id="tab-iz-getstr">
+<table class="nt-table">
+  <caption>Table 9.2.12: Trace of the GET_STRING reading loop (DX = 4, input "Ece").</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">AL</th><th scope="col">DI</th><th scope="col">DX</th><th scope="col">ZF</th><th scope="col">Buffer (buf+0…3)</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>LEA DI, ad</code> / <code>MOV DX, 4</code></td><td>00h</td><td class="n92-chg">011Dh</td><td class="n92-chg">0004h</td><td>0</td><td>? ? ? ?</td><td></td></tr>
+    <tr><td><code>CMP DX, 1</code> / <code>JBE</code> (4 &gt; 1, no jump)</td><td>00h</td><td>011Dh</td><td>0004h</td><td>0</td><td>? ? ? ?</td><td></td></tr>
+    <tr><td><code>INT 21h</code> ('E'), <code>CMP AL, 13</code></td><td class="n92-chg">45h</td><td>011Dh</td><td>0004h</td><td>0</td><td>? ? ? ?</td><td>E</td></tr>
+    <tr><td><code>MOV [DI], AL</code> / <code>INC DI</code> / <code>DEC DX</code></td><td>45h</td><td class="n92-chg">011Eh</td><td class="n92-chg">0003h</td><td>0</td><td>E ? ? ?</td><td>E</td></tr>
+    <tr><td>2nd pass ('c')</td><td class="n92-chg">63h</td><td class="n92-chg">011Fh</td><td class="n92-chg">0002h</td><td>0</td><td>E c ? ?</td><td>Ec</td></tr>
+    <tr><td>3rd pass ('e')</td><td class="n92-chg">65h</td><td class="n92-chg">0120h</td><td class="n92-chg">0001h</td><td>0</td><td>E c e ?</td><td>Ece</td></tr>
+    <tr><td><code>CMP DX, 1</code> / <code>JBE done</code> (jumps)</td><td>65h</td><td>0120h</td><td>0001h</td><td class="n92-chg">1</td><td>E c e ?</td><td>Ece</td></tr>
+    <tr><td><code>MOV BYTE PTR [DI], 0</code></td><td>65h</td><td>0120h</td><td>0001h</td><td>1</td><td class="n92-chg">E c e 0</td><td>Ece</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>At the start of the fourth pass DX = 1: only the final 0 has room (<a href="#tab-iz-getstr">Table 9.2.12</a>). <code>CMP DX, 1</code> finds equality and ZF = 1; JBE jumps. Even if the user typed more, it would not be read; at most DX − 1 = 3 characters have been accepted. The buffer becomes 'E', 'c', 'e', 0 and can be printed with PRINT_STRING. The plain version ends by itself when the buffer is full; the version in the library, however, waits for Enter.</p>
+
+<figure class="nt-fig" id="sekil-getstr" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 172" role="img" aria-label="Buffer, the DI pointer and the screen" style="max-width:330px;max-height:172px"><text class="lbl" x="43.0" y="14" text-anchor="middle" style="font-size:12px">AL</text><rect class="box" x="8" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="43.0" y="36.0" text-anchor="middle" style="font-size:14px">65h</text><text class="lbl" x="121.0" y="14" text-anchor="middle" style="font-size:12px">DI</text><rect class="box" x="86" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="121.0" y="36.0" text-anchor="middle" style="font-size:14px">0120h</text><text class="lbl" x="199.0" y="14" text-anchor="middle" style="font-size:12px">DX</text><rect class="box" x="164" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="199.0" y="36.0" text-anchor="middle" style="font-size:14px">0001h</text><text class="lbl" x="265.0" y="14" text-anchor="middle" style="font-size:11.5px">ZF</text><rect class="box" x="252" y="18" width="26" height="24" rx="3"/><text class="txt mono" x="265.0" y="35" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="297.0" y="14" text-anchor="middle" style="font-size:11.5px">CF</text><rect class="box" x="284" y="18" width="26" height="24" rx="3"/><text class="txt mono" x="297.0" y="35" text-anchor="middle" style="font-size:14px">0</text><text class="lbl" x="8" y="86" text-anchor="start" style="font-size:12px">buffer</text><rect class="box" x="70" y="70" width="48" height="26" rx="3"/><text class="txt mono" x="94.0" y="88.0" text-anchor="middle" style="font-size:13.5px">'E'</text><text class="lbl mono" x="94.0" y="66" text-anchor="middle" style="font-size:10.5px">buf+0</text><rect class="box" x="118" y="70" width="48" height="26" rx="3"/><text class="txt mono" x="142.0" y="88.0" text-anchor="middle" style="font-size:13.5px">'c'</text><text class="lbl mono" x="142.0" y="66" text-anchor="middle" style="font-size:10.5px">buf+1</text><rect class="box" x="166" y="70" width="48" height="26" rx="3"/><text class="txt mono" x="190.0" y="88.0" text-anchor="middle" style="font-size:13.5px">'e'</text><text class="lbl mono" x="190.0" y="66" text-anchor="middle" style="font-size:10.5px">buf+2</text><rect class="box" x="214" y="70" width="48" height="26" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="238.0" y="88.0" text-anchor="middle" style="font-size:13.5px">0</text><text class="lbl mono" x="238.0" y="66" text-anchor="middle" style="font-size:10.5px">buf+3</text><path class="line" d="M238.0 120 L238.0 105"/><path class="ah" d="M238.0 98 L234.0 106 L242.0 106 z"/><text class="txt" x="238.0" y="132" text-anchor="middle" style="font-size:12px;fill:var(--ds-link)">DI</text><text class="txt" x="272" y="86" text-anchor="start" style="font-size:13.5px">DX = 1</text><text class="lbl" x="64" y="155" text-anchor="end" style="font-size:12px">screen</text><rect class="box-empty" x="70" y="138" width="200" height="26" rx="3"/><text class="txt mono" x="78" y="156" text-anchor="start" style="font-size:14.5px">Ece▌</text></svg></div>
+  <figcaption><b>Figure 9.2.8:</b> The buffer at the end of the loop: 'E', 'c', 'e' and the final 0; DI points to buf+3 (0120h).</figcaption>
+</figure>
+
+<h3 id="s9-2-3-8"><span class="nt-num">9.2.3.8</span>GET_STRING in detail and backspace handling</h3>
+
+<p>The GET_STRING in the library differs from the plain version in four respects.</p>
+
+<ul>
+  <li><strong>Echo control.</strong> The key is read without echo: service 00h of INT 16h writes the key to AL (ASCII) and AH (scan code) but prints nothing on the screen. The procedure prints on the screen, with service 0Eh, only the character it has taken into the buffer. Keys that are not accepted thus leave no trace on the screen.</li>
+  <li><strong>Full buffer.</strong> After DX − 1 characters have been taken, new letters are ignored. The procedure does not finish by itself; it waits for Enter or backspace. The user can erase the last wrongly typed letter and correct it.</li>
+  <li><strong>Backspace (8).</strong> If there are letters in the buffer, DI is moved back by one and 8, ' ', 8 are printed on the screen. If the buffer is empty the key is ignored; the cursor does not go back past the start of the input and the prompt on the screen is not erased.</li>
+  <li><strong>Enter (13).</strong> Enter is not written to the buffer. A 0 is put in its place and the procedure returns. If DX ≤ 1 is given, no reading is done and the buffer is not touched.</li>
+</ul>
+
+<p>The hardware side of keyboard reading should be known too. When a key is pressed, the keyboard controller activates the IRQ1 line of the 8259 interrupt controller. The processor drops what it is doing and runs the BIOS routine INT 09h. The routine reads the key's scan code from port 60h, finds its ASCII equivalent and writes both to the keyboard buffer in segment 0040h. INT 16h/00h reads from this buffer; if the buffer is empty it waits until a key arrives. The "waiting" of GET_STRING lies inside this loop.</p>
+
+<p>When GET_STRING returns, the cursor is right after the text entered. The procedure does not print Enter on the screen; the next output starts on the same line. To move to the next line, <code>PUTC 13</code> and <code>PUTC 10</code> are added after the call.</p>
+
+<p>The logic of backspace is again traced with a plain equivalent. The code below reads keys without echo, appends letters to the buffer, on backspace erases the last letter from the buffer and the screen, and on Enter ends the buffer with 0. The user will press A, b, backspace, c and Enter in turn.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">LEA</span>  DI, buf
+get_key: <span class="kw">MOV</span> AH, 0
+<span class="kw">INT</span>  16h         <span class="cm">; AL = key (no echo)</span>
+<span class="kw">CMP</span>  AL, 13      <span class="cm">; Enter?</span>
+<span class="kw">JE</span>   done
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">CMP</span>  AL, 8       <span class="cm">; backspace?</span>
+<span class="kw">JNE</span>  store
+<span class="kw">CMP</span>  DI, <span class="dir">OFFSET</span> buf
+<span class="kw">JE</span>   get_key         <span class="cm">; no letter to erase</span>
+<span class="kw">DEC</span>  DI
+<span class="kw">INT</span>  10h         <span class="cm">; 8: cursor left</span>
+<span class="kw">MOV</span>  AL, ' '
+<span class="kw">INT</span>  10h         <span class="cm">; a space over the letter</span>
+<span class="kw">MOV</span>  AL, 8
+<span class="kw">INT</span>  10h         <span class="cm">; left again</span>
+<span class="kw">JMP</span>  get_key
+store: <span class="kw">MOV</span> [DI], AL
+<span class="kw">INC</span>  DI
+<span class="kw">INT</span>  10h         <span class="cm">; echo</span>
+<span class="kw">JMP</span>  get_key
+done: <span class="kw">MOV</span> <span class="dir">BYTE</span> <span class="dir">PTR</span> [DI], 0
+<span class="kw">RET</span>
+buf  <span class="dir">DB</span> 6 <span class="dir">DUP</span>(?)</code></pre>
+
+<p>Two details of the code need attention. <code>MOV AH, 0Eh</code> is done before the comparisons; AH is thus ready for both the echo and the erase triple. Because MOV does not change the flags, the result of the CMP that follows is not affected. The <code>INT 10h</code> in the backspace branch moves the cursor left because AL still holds 8; the key's code is used directly as a control character.</p>
+
+<div class="nt-tablewrap" id="tab-iz-gerisil">
+<table class="nt-table">
+  <caption>Table 9.2.13: Trace of reading that handles backspace (A, b, backspace, c, Enter).</caption>
+  <thead><tr><th scope="col">Event</th><th scope="col">AL</th><th scope="col">DI</th><th scope="col">Cursor column</th><th scope="col">Buffer</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>LEA DI, ad</code></td><td>00h</td><td>buf+0</td><td>0</td><td>? ? ? ? ? ?</td><td></td></tr>
+    <tr><td>INT 16h: 'A'; not Enter or backspace</td><td class="n92-chg">41h</td><td>buf+0</td><td>0</td><td>? ? ? ? ? ?</td><td></td></tr>
+    <tr><td><code>store</code>: write, advance, echo</td><td>41h</td><td class="n92-chg">buf+1</td><td class="n92-chg">1</td><td class="n92-chg">A ? ? ? ? ?</td><td>A</td></tr>
+    <tr><td>same path for 'b'</td><td class="n92-chg">62h</td><td class="n92-chg">buf+2</td><td class="n92-chg">2</td><td class="n92-chg">A b ? ? ? ?</td><td>Ab</td></tr>
+    <tr><td>INT 16h: backspace; <code>CMP AL, 8</code> → ZF = 1</td><td class="n92-chg">08h</td><td>buf+2</td><td>2</td><td>A b ? ? ? ?</td><td>Ab</td></tr>
+    <tr><td><code>CMP DI, OFFSET ad</code> (not equal) / <code>DEC DI</code></td><td>08h</td><td class="n92-chg">buf+1</td><td>2</td><td>A b ? ? ? ?</td><td>Ab</td></tr>
+    <tr><td>the 8, ' ', 8 triple</td><td>08h</td><td>buf+1</td><td class="n92-chg">1</td><td>A b ? ? ? ?</td><td>A</td></tr>
+    <tr><td>'c': written over the byte of 'b'</td><td class="n92-chg">63h</td><td class="n92-chg">buf+2</td><td class="n92-chg">2</td><td class="n92-chg">A c ? ? ? ?</td><td>Ac</td></tr>
+    <tr><td>Enter: <code>JE done</code>, 0 is written</td><td class="n92-chg">0Dh</td><td>buf+2</td><td>2</td><td class="n92-chg">A c 0 ? ? ?</td><td>Ac</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>DEC DI</code> does not erase the byte of 'b' from memory; that byte merely falls outside the string and the next letter is written over it (<a href="#tab-iz-gerisil">Table 9.2.13</a>). The erasing is done in two places at once: moving DI back in the buffer, and printing the triple on the screen. If one of the two is forgotten, the screen and the buffer no longer agree. For example, if the triple is forgotten, "Abc" stays on the screen and "Ac" in the buffer. With the same input the library version makes the buffer 'A', 'c', 0; it sends 'A', 'b', 8, ' ', 8 and 'c' to the screen, and "Ac" appears on the screen.</p>
+
+<h3 id="s9-2-3-9"><span class="nt-num">9.2.3.9</span>Buffer size and overflow</h3>
+
+<p>GET_STRING does not know the real size of the buffer; it trusts only the number the programmer gives in DX. If DX is larger than the buffer's real size, the procedure overwrites the variables after the buffer.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-tasma">
+  <span class="nt-box__title">Example 9.2.2</span>
+  <p>In memory <code>buf DB 4 DUP(0)</code> is defined, followed by <code>value DW 0</code> and <code>last DB 5</code>. The program calls GET_STRING with <code>MOV DX, 8</code> and the user types "Istanbul" and presses Enter.</p>
+  <ol class="nt-steps">
+    <li>Since DX = 8, the procedure accepts at most 7 characters: "Istanbu". The eighth letter, 'l', is ignored.</li>
+    <li>The first four characters, "Ista", are written to the four bytes of the buffer.</li>
+    <li>'n' (6Eh) and 'b' (62h) are written to the two bytes of value. Since the word is read little-endian, value = 626Eh.</li>
+    <li>'u' (75h = 117) is written over last; last = 117.</li>
+    <li>The final 0 is written to the byte after last. That byte may belong to another variable or to code.</li>
+  </ol>
+  <p>No error message appears in the program. value and last have been silently corrupted.</p>
+</div>
+
+<p>This error is called a <strong>buffer overflow</strong>. In assembly there is no mechanism that checks array bounds; every memory write looks only at the address. The safe rule is simple: DX is always given equal to the size reserved with DUP. One way to guarantee this automatically is to put a label right after the buffer and write <code>MOV DX, buf_end - buf</code>; then when the buffer is enlarged, DX changes by itself.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Taking DX to be "the number of characters to read". DX is the size of the buffer and includes the final 0. To read a name of 10 characters the buffer must be <code>DB 11 DUP(0)</code> and DX = 11. With <code>DB 10 DUP(0)</code> and DX = 10 only 9 characters are accepted.</p>
+</div>
+
+<h2 id="s9-2-4"><span class="nt-num">9.2.4</span>Number procedures</h2>
+
+<h3 id="s9-2-4-1"><span class="nt-num">9.2.4.1</span>SCAN_NUM, PRINT_NUM and PRINT_NUM_UNS</h3>
+
+<p>The processor keeps numbers in binary; the user, however, writes and reads numbers with decimal digits. The "307" that comes from the keyboard is three separate ASCII codes: 33h, 30h and 37h. For the program to compute, these codes must be converted into the binary number 0133h. When printing a number on the screen the job runs the other way: the digits of 0133h are found and each is converted to an ASCII code. The library's three number procedures perform these two conversions (<a href="#tab-sayi">Table 9.2.14</a>).</p>
+
+<div class="nt-tablewrap" id="tab-sayi">
+<table class="nt-table">
+  <caption>Table 9.2.14: The number procedures.</caption>
+  <thead><tr><th scope="col">Procedure</th><th scope="col">What does it do?</th><th scope="col">Input / output</th><th scope="col">Definition</th></tr></thead>
+  <tbody>
+    <tr><td>SCAN_NUM</td><td>reads a multi-digit signed number from the keyboard; ends with Enter</td><td>output: CX</td><td><code>DEFINE_SCAN_NUM</code></td></tr>
+    <tr><td>PRINT_NUM</td><td>prints the signed number in AX in decimal</td><td>input: AX</td><td><code>DEFINE_PRINT_NUM</code> + <code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+    <tr><td>PRINT_NUM_UNS</td><td>prints the unsigned number in AX in decimal</td><td>input: AX</td><td><code>DEFINE_PRINT_NUM_UNS</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The difference between the two print procedures is how the 16 bits in AX are interpreted. In the unsigned interpretation the 16 bits denote the range 0 … 65,535. In the signed interpretation two's complement is used and the range is −32,768 … 32,767. For numbers whose most significant bit is 0, the two interpretations agree. For numbers whose most significant bit is 1, the signed value is found by subtracting 65,536 from the unsigned value.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ikiyetumleyen">
+  <span class="nt-box__title">Definition 9.2.7</span>
+  <p>In <strong>two's complement</strong> representation, −x is written by inverting all the bits of x and adding 1. In 16 bits this equals 65,536 − x. The 8086 instruction <code>NEG</code> takes the two's complement of a number.</p>
+</div>
+
+<p>For example, the unsigned value of FFE7h is 65,511. Because its most significant bit is 1, its signed value is 65,511 − 65,536 = −25. Seen the other way round, 25 = 0019h; inverting the bits gives FFE6h and adding 1 gives FFE7h. The same FFE7h is printed as "-25" by PRINT_NUM and as "65511" by PRINT_NUM_UNS. The bits do not change; only the interpretation does.</p>
+
+<h3 id="s9-2-4-2"><span class="nt-num">9.2.4.2</span>The logic of SCAN_NUM: a code trace</h3>
+
+<p>When a decimal number is read from left to right, every new digit shifts the previous result one place to the left. For "307", 3 is read; when 0 arrives, the result becomes 3 × 10 + 0 = 30; when 7 arrives, 30 × 10 + 7 = 307. The rule in short is <em>result ← result × 10 + digit</em>. This method is also known as Horner's method and does not require knowing the length of the number in advance. The essence of SCAN_NUM is the plain equivalent below; the minus sign and the overflow check have been left out.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">XOR</span>  CX, CX      <span class="cm">; result = 0</span>
+get_key: <span class="kw">MOV</span> AH, 01h
+<span class="kw">INT</span>  21h         <span class="cm">; AL = key (echoed)</span>
+<span class="kw">CMP</span>  AL, 13      <span class="cm">; Enter?</span>
+<span class="kw">JE</span>   done
+<span class="kw">SUB</span>  AL, '0'     <span class="cm">; ASCII → digit</span>
+<span class="kw">CBW</span>              <span class="cm">; AX = digit</span>
+<span class="kw">XCHG</span> AX, CX      <span class="cm">; AX=result, CX=digit</span>
+<span class="kw">MOV</span>  BX, 10
+<span class="kw">MUL</span>  BX          <span class="cm">; AX = result × 10</span>
+<span class="kw">ADD</span>  CX, AX      <span class="cm">; CX = result×10 + digit</span>
+<span class="kw">JMP</span>  get_key
+done: <span class="kw">RET</span></code></pre>
+
+<p>Every line of the code serves a purpose. <code>XOR CX, CX</code> clears CX; XORing a register with itself is shorter than <code>MOV CX, 0</code> (2 bytes against 3) and sets ZF to 1. <code>SUB AL, '0'</code> finds the value of the digit by subtracting 30h from the ASCII code. <code>CBW</code> extends AL to AX as a signed value; for digits 0–9, AH = 0. <code>XCHG AX, CX</code> swaps the two registers: the result moves to AX for the multiplication, and the digit waits in CX. The swap is necessary because <code>MUL</code> always expects the multiplicand in AX. <code>MUL BX</code> performs DX:AX ← AX × BX; as long as the result fits in 16 bits, DX stays 0. <code>ADD CX, AX</code> adds the product to the digit and writes the new result into CX again.</p>
+
+<div class="nt-tablewrap" id="tab-iz-scan">
+<table class="nt-table">
+  <caption>Table 9.2.15: Trace of the SCAN_NUM logic (input 307, then Enter).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">BX</th><th scope="col">ZF</th><th scope="col">CX (decimal)</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>XOR CX, CX</code></td><td>0000h</td><td>0000h</td><td>0000h</td><td>1</td><td>0</td><td></td></tr>
+    <tr><td><code>MOV AH, 01h</code> / <code>INT 21h</code>: '3'</td><td class="n92-chg">0133h</td><td>0000h</td><td>0000h</td><td>1</td><td>0</td><td>3</td></tr>
+    <tr><td><code>CMP</code> / <code>JE</code> / <code>SUB AL, '0'</code></td><td class="n92-chg">0103h</td><td>0000h</td><td>0000h</td><td class="n92-chg">0</td><td>0</td><td>3</td></tr>
+    <tr><td><code>CBW</code> / <code>XCHG AX, CX</code></td><td class="n92-chg">0000h</td><td class="n92-chg">0003h</td><td>0000h</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td><code>MOV BX, 10</code> / <code>MUL BX</code> / <code>ADD CX, AX</code></td><td>0000h</td><td>0003h</td><td class="n92-chg">000Ah</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td>'0' is read, <code>SUB</code>, <code>CBW</code>, <code>XCHG</code></td><td class="n92-chg">0003h</td><td class="n92-chg">0000h</td><td>000Ah</td><td>1</td><td>0</td><td>30</td></tr>
+    <tr><td><code>MUL BX</code> / <code>ADD CX, AX</code></td><td class="n92-chg">001Eh</td><td class="n92-chg">001Eh</td><td>000Ah</td><td>0</td><td>30</td><td>30</td></tr>
+    <tr><td>'7' is read, <code>SUB</code>, <code>CBW</code></td><td class="n92-chg">0007h</td><td>001Eh</td><td>000Ah</td><td>0</td><td>30</td><td>307</td></tr>
+    <tr><td><code>XCHG</code> / <code>MUL BX</code> / <code>ADD CX, AX</code></td><td class="n92-chg">012Ch</td><td class="n92-chg">0133h</td><td>000Ah</td><td>0</td><td>307</td><td>307</td></tr>
+    <tr><td>Enter: AL = 0Dh, <code>CMP AL, 13</code></td><td class="n92-chg">010Dh</td><td>0133h</td><td>000Ah</td><td class="n92-chg">1</td><td>307</td><td>307</td></tr>
+    <tr><td><code>JE done</code> / <code>RET</code></td><td>010Dh</td><td>0133h</td><td>000Ah</td><td>1</td><td>307</td><td>307</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A few points of the table need explanation (<a href="#tab-iz-scan">Table 9.2.15</a>). INT 21h/01h writes the key to AL but does not touch AH; AH stays at 01h, the service number, and AX appears as 0133h. When '0' is read, the result of SUB is 0 and ZF = 1. 30 × 10 = 300 = 012Ch; adding 7 gives CX = 307 = 0133h. When Enter is read, CMP finds equality, ZF = 1 and JE leaves the loop. The result is in CX, as in SCAN_NUM.</p>
+
+<p>Multiplication is the most expensive step of this loop. On the 8086 <code>MUL r16</code> takes 118–133 clock cycles; at 5 MHz about 25 µs. For a three-digit number three multiplications are made. This time is negligible next to the speed at which the user presses keys. Still, multiplying by 10 can also be done with shifts. Since x × 10 = x × 8 + x × 2, the product can be computed with <code>SHL</code> and <code>ADD</code> instructions in far fewer cycles.</p>
+
+<h3 id="s9-2-4-3"><span class="nt-num">9.2.4.3</span>The checks in SCAN_NUM</h3>
+
+<p>The SCAN_NUM in the library adds five checks on top of the plain equivalent:</p>
+
+<ul>
+  <li><strong>The minus sign.</strong> The '-' key sets a sign flag. When Enter is pressed and the flag is set, <code>NEG CX</code> is applied.</li>
+  <li><strong>A key that is not a digit.</strong> The procedure first prints every key on the screen and then checks it. If the key is not in the range '0'–'9', it is erased from the screen (8, ' ', 8) and does not join the number.</li>
+  <li><strong>Backspace.</strong> It discards the last digit: CX ← CX / 10. The last character is erased from the screen as well.</li>
+  <li><strong>Overflow.</strong> If the number would not fit in 16 bits, the last digit is not accepted. If DX ≠ 0 after the multiplication or CF = 1 in the addition, the procedure restores the previous value and erases the last digit from the screen.</li>
+  <li><strong>The echo of Enter.</strong> Enter is also printed on the screen. Code 13 returns the cursor to the start of the line but does not move it down a line.</li>
+</ul>
+
+<p>The last item is the most surprising behavior in practice. When SCAN_NUM returns, the cursor is at the start of the line that holds the number entered. Anything printed right afterwards overwrites the number entered and the prompt. This is why example programs add <code>PUTC 13</code>, <code>PUTC 10</code> after SCAN_NUM, or start the next message with 13, 10.</p>
+
+<div class="nt-tablewrap" id="tab-scan-girdi">
+<table class="nt-table">
+  <caption>Table 9.2.16: Inputs given to SCAN_NUM, the result in CX and the value PRINT_NUM prints.</caption>
+  <thead><tr><th scope="col">Input</th><th scope="col">CX</th><th scope="col">PRINT_NUM</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>307</td><td>0133h</td><td>307</td><td>the usual case</td></tr>
+    <tr><td>-25</td><td>FFE7h</td><td>-25</td><td>NEG at Enter: 0019h → FFE7h</td></tr>
+    <tr><td>12a3</td><td>007Bh</td><td>123</td><td>'a' is erased from the screen and does not join the number</td></tr>
+    <tr><td>40000</td><td>9C40h</td><td>-25536</td><td>fits in 16 bits but exceeds the signed range</td></tr>
+    <tr><td>70000</td><td>1B58h</td><td>7000</td><td>the last 0 is not accepted: 7000 × 10 = 70,000 &gt; 65,535</td></tr>
+    <tr><td>-40000</td><td>63C0h</td><td>25536</td><td>the two's complement of 9C40h is 63C0h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The last three rows of the table show a limit of the procedure (<a href="#tab-scan-girdi">Table 9.2.16</a>). Digits are accumulated as an unsigned 16-bit number and the sign is applied at the end. The overflow check looks only at the 65,535 limit. Inputs between 32,768 and 65,535 are therefore accepted without error but appear negative in the signed interpretation. For example 40,000 = 9C40h; its signed value is 40,000 − 65,536 = −25,536. When −40,000 is entered, the two's complement of 9C40h, 63C0h = 25,536, results, and an input with a minus sign gives a positive result. For a correct result the user's input must stay in the range −32,768 … 32,767.</p>
+
+<h3 id="s9-2-4-4"><span class="nt-num">9.2.4.4</span>The logic of PRINT_NUM_UNS: a code trace</h3>
+
+<p>The decimal digits of a number are found by dividing it repeatedly by 10. The remainder of each division is a digit, and the quotient is the number for the next step. The problem is that the digits come out from right to left, that is, in reverse order: the first remainder of 1205 is 5 and the last is 1. On the screen, however, 1 must be printed first. The stack is a natural tool for this reversal: the remainders are pushed in order and then popped in reverse order.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AX, 1205    <span class="cm">; the number to print</span>
+<span class="kw">MOV</span>  BX, 10
+<span class="kw">XOR</span>  CX, CX      <span class="cm">; digit counter</span>
+divide: <span class="kw">XOR</span> DX, DX
+<span class="kw">DIV</span>  BX          <span class="cm">; AX=quotient, DX=remainder</span>
+<span class="kw">PUSH</span> DX          <span class="cm">; digit onto the stack</span>
+<span class="kw">INC</span>  CX
+<span class="kw">OR</span>   AX, AX      <span class="cm">; quotient 0?</span>
+<span class="kw">JNZ</span>  divide
+emit: <span class="kw">POP</span> AX      <span class="cm">; most significant first</span>
+<span class="kw">ADD</span>  AL, '0'
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">LOOP</span> emit
+<span class="kw">RET</span></code></pre>
+
+<p><code>DIV BX</code> divides the 32-bit DX:AX by BX: it writes the quotient to AX and the remainder to DX. <code>XOR DX, DX</code> before the division is mandatory. If the previous remainder is left in DX, the dividend DX:AX becomes too large; if the quotient does not fit in 16 bits, the processor generates interrupt type 0 (divide error). CX counts how many digits have been pushed; in the second loop, LOOP makes sure the same number of POPs is done. <code>OR AX, AX</code> does not change AX but sets the flags: if the quotient is 0, ZF = 1 and the loop ends.</p>
+
+<div class="nt-tablewrap" id="tab-iz-uns">
+<table class="nt-table">
+  <caption>Table 9.2.17: Trace of digit extraction with the stack (AX = 1205 = 04B5h).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">AX</th><th scope="col">DX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">Stack (from the top)</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>start (<code>MOV</code>, <code>MOV</code>, <code>XOR</code>)</td><td>04B5h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>—</td><td></td></tr>
+    <tr><td>1st division: 1205 / 10</td><td class="n92-chg">0078h</td><td class="n92-chg">0005h</td><td class="n92-chg">0001h</td><td class="n92-chg">FFFCh</td><td>5</td><td></td></tr>
+    <tr><td>2nd division: 120 / 10</td><td class="n92-chg">000Ch</td><td class="n92-chg">0000h</td><td class="n92-chg">0002h</td><td class="n92-chg">FFFAh</td><td>0, 5</td><td></td></tr>
+    <tr><td>3rd division: 12 / 10</td><td class="n92-chg">0001h</td><td class="n92-chg">0002h</td><td class="n92-chg">0003h</td><td class="n92-chg">FFF8h</td><td>2, 0, 5</td><td></td></tr>
+    <tr><td>4th division: 1 / 10</td><td class="n92-chg">0000h</td><td class="n92-chg">0001h</td><td class="n92-chg">0004h</td><td class="n92-chg">FFF6h</td><td>1, 2, 0, 5</td><td></td></tr>
+    <tr><td><code>OR AX, AX</code> → ZF = 1, JNZ does not jump</td><td>0000h</td><td>0001h</td><td>0004h</td><td>FFF6h</td><td>1, 2, 0, 5</td><td></td></tr>
+    <tr><td>1st print: POP, add '0', INT 10h, LOOP</td><td class="n92-chg">0E31h</td><td>0001h</td><td class="n92-chg">0003h</td><td class="n92-chg">FFF8h</td><td>2, 0, 5</td><td>1</td></tr>
+    <tr><td>2nd print</td><td class="n92-chg">0E32h</td><td>0001h</td><td class="n92-chg">0002h</td><td class="n92-chg">FFFAh</td><td>0, 5</td><td>12</td></tr>
+    <tr><td>3rd print</td><td class="n92-chg">0E30h</td><td>0001h</td><td class="n92-chg">0001h</td><td class="n92-chg">FFFCh</td><td>5</td><td>120</td></tr>
+    <tr><td>4th print, LOOP ends</td><td class="n92-chg">0E35h</td><td>0001h</td><td class="n92-chg">0000h</td><td class="n92-chg">FFFEh</td><td>—</td><td>1205</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>After four divisions the most significant digit, 1, is on top of the stack (<a href="#tab-iz-uns">Table 9.2.17</a>). The print loop pops the digits in the order 1, 2, 0, 5 and prints them. After each POP, <code>ADD AL, '0'</code> converts the digit to ASCII and <code>MOV AH, 0Eh</code> loads the service number; this is where AX values such as 0E31h and 0E32h come from. When the loop ends, SP is FFFEh again: four POPs have matched four PUSHes. The stack column of the table does not show DOS's 0000h word at FFFEh.</p>
+
+<figure class="nt-fig" id="sekil-uns" style="--w:440px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 146" role="img" aria-label="AX, DX, CX, stack and screen" style="max-width:400px;max-height:146px"><text class="lbl" x="43.0" y="14" text-anchor="middle" style="font-size:12px">AX</text><rect class="box" x="8" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="43.0" y="36.0" text-anchor="middle" style="font-size:14px">0000h</text><text class="lbl" x="121.0" y="14" text-anchor="middle" style="font-size:12px">DX</text><rect class="box" x="86" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="121.0" y="36.0" text-anchor="middle" style="font-size:14px">0001h</text><text class="lbl" x="199.0" y="14" text-anchor="middle" style="font-size:12px">CX</text><rect class="box" x="164" y="18" width="70" height="26" rx="3"/><text class="txt mono" x="199.0" y="36.0" text-anchor="middle" style="font-size:14px">0004h</text><text class="lbl" x="8" y="84" text-anchor="start" style="font-size:12.5px">AX decimal:</text><text class="txt mono" x="76" y="84" text-anchor="start" style="font-size:15px">0</text><text class="lbl" x="328.0" y="18" text-anchor="middle" style="font-size:12px">stack</text><rect class="box" x="296" y="24" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="39" text-anchor="end" style="font-size:11.5px">FFF6</text><text class="txt mono" x="328.0" y="39.5" text-anchor="middle" style="font-size:13px">0001h</text><path class="line" d="M394 35.0 L368 35.0"/><path class="ah" d="M361 35.0 L369 31.0 L369 39.0 z"/><text class="txt" x="398" y="39.0" text-anchor="start" style="font-size:12.5px;fill:var(--ds-link)">SP</text><rect class="box" x="296" y="46" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="61" text-anchor="end" style="font-size:11.5px">FFF8</text><text class="txt mono" x="328.0" y="61.5" text-anchor="middle" style="font-size:13px">0002h</text><rect class="box" x="296" y="68" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="83" text-anchor="end" style="font-size:11.5px">FFFA</text><text class="txt mono" x="328.0" y="83.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="296" y="90" width="64" height="22" rx="3"/><text class="lbl mono" x="291" y="105" text-anchor="end" style="font-size:11.5px">FFFC</text><text class="txt mono" x="328.0" y="105.5" text-anchor="middle" style="font-size:13px">0005h</text><text class="lbl" x="54" y="129" text-anchor="end" style="font-size:12px">screen</text><rect class="box-empty" x="60" y="112" width="150" height="26" rx="3"/><text class="txt mono" x="68" y="130" text-anchor="start" style="font-size:14.5px">▌</text></svg></div>
+  <figcaption><b>Figure 9.2.9:</b> When the divisions are finished, the digits 1, 2, 0 and 5 sit on the stack from FFF6h toward FFFCh; SP = FFF6h.</figcaption>
+</figure>
+
+<h3 id="s9-2-4-5"><span class="nt-num">9.2.4.5</span>The library's method: a decreasing divisor</h3>
+
+<p>PRINT_NUM_UNS in the library produces the same output with another method. Instead of always dividing the number by 10, it divides by the place values: first by 10,000, then by 1000, 100, 10 and 1. The quotient of each division is a digit and is printed the moment it is computed. The remainder becomes the number for the next pass. Because the digits come out from left to right, no stack or reversal is needed.</p>
+
+<ul>
+  <li>The divisor BX starts at 10,000 and is divided by 10 after every pass. When BX becomes 0, printing ends.</li>
+  <li>The quotient (0–9) is a digit; it is converted to ASCII with <code>ADD AL, 30h</code> and printed with PUTC. Since 65,535 ÷ 10,000 = 6, the quotient always fits in AL.</li>
+  <li>CX is used as a flag. While CX = 1, a pass is skipped if the number is smaller than the divisor; this way leading zeros are not printed. Once the first digit has been printed CX becomes 0, and the zeros in between are printed from then on.</li>
+  <li>There is a separate branch for AX = 0 that prints '0' directly. Without this branch every pass would be skipped and nothing would be printed on the screen.</li>
+</ul>
+
+<div class="nt-tablewrap" id="tab-azalan">
+<table class="nt-table">
+  <caption>Table 9.2.18: Printing 3007 with a decreasing divisor (the state at the start of each pass).</caption>
+  <thead><tr><th scope="col">Divisor (BX)</th><th scope="col">Flag (CX)</th><th scope="col">Number (AX)</th><th scope="col">Action</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>10.000</td><td>1</td><td>3007</td><td>number &lt; divisor and no digit yet: skip</td><td>—</td></tr>
+    <tr><td>1000</td><td>1</td><td>3007</td><td>3007 ÷ 1000 = 3, remainder 7; CX = 0</td><td>3</td></tr>
+    <tr><td>100</td><td>0</td><td>7</td><td>7 ÷ 100 = 0, remainder 7</td><td>30</td></tr>
+    <tr><td>10</td><td>0</td><td>7</td><td>7 ÷ 10 = 0, remainder 7</td><td>300</td></tr>
+    <tr><td>1</td><td>0</td><td>7</td><td>7 ÷ 1 = 7, remainder 0</td><td>3007</td></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>divisor 0: done</td><td>3007</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The 3007 example shows clearly why the flag is needed (<a href="#tab-azalan">Table 9.2.18</a>). In the first pass, since 3007 &lt; 10,000, the quotient would be 0; this zero is a leading zero and must not be printed. In the passes that divide by 100 and 10 the quotient is also 0, but these zeros are inside the number and must be printed. The difference is told apart only by the question "has the first digit been printed?"; CX holds this information. For 40,000, in the first pass 40,000 ÷ 10,000 = 4 is printed and CX becomes 0. In the next four passes four 0s are printed; 40000 appears on the screen.</p>
+
+<p>Reducing the divisor is also a division: the library does <code>BX ← BX / 10</code> with DIV. During this the number in AX is saved on the stack. The procedure pushes AX, BX, CX and DX on entry and pops them on exit; no register changes for the caller.</p>
+
+<h3 id="s9-2-4-6"><span class="nt-num">9.2.4.6</span>PRINT_NUM and the minus sign: a code trace</h3>
+
+<p>PRINT_NUM uses PRINT_NUM_UNS to print a signed number. If the number is negative, '-' is printed first, and then the absolute value of the number is printed as unsigned. The code below is the equivalent of PRINT_NUM in the library:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AX, -25       <span class="cm">; AX = FFE7h</span>
+<span class="kw">CALL</span> print_num
+<span class="kw">RET</span>
+print_num <span class="dir">PROC</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">OR</span>   AX, AX        <span class="cm">; SF = sign bit</span>
+<span class="kw">JNS</span>  positive
+<span class="kw">NEG</span>  AX            <span class="cm">; AX = 0019h</span>
+<span class="kw">PUSH</span> AX            <span class="cm">; PUTC '-' expansion</span>
+<span class="kw">MOV</span>  AL, '-'
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX
+positive: <span class="kw">CALL</span> print_num_uns
+<span class="kw">POP</span>  AX            <span class="cm">; AX = FFE7h restored</span>
+<span class="kw">RET</span>
+print_num <span class="dir">ENDP</span></code></pre>
+
+<p>At the line <code>MOV AX, -25</code> the assembler computes the two's complement of −25 and produces the instruction that loads FFE7h into AX. <code>CALL print_num</code> is at 0103h and is 3 bytes long; the return address 0106h is pushed on the stack. The procedure first saves AX, because NEG will change it. <code>OR AX, AX</code> sets the flags without changing the number: since the most significant bit is 1, SF = 1. <code>JNS</code> (jump if no sign) does not jump. <code>NEG AX</code> computes 0 − FFE7h = 0019h = 25; since the result is positive, SF = 0. The expansion of PUTC '-' prints the minus sign. <code>CALL print_num_uns</code> prints the digits of 25. Finally <code>POP AX</code> restores FFE7h into AX.</p>
+
+<div class="nt-tablewrap" id="tab-iz-pnum">
+<table class="nt-table">
+  <caption>Table 9.2.19: Trace of the PRINT_NUM equivalent (AX = −25).</caption>
+  <thead><tr><th scope="col">Instruction(s)</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">SF</th><th scope="col">Stack (FFFAh, FFFCh)</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, -25</code></td><td class="n92-chg">FFE7h</td><td>FFFEh</td><td>0</td><td>—, —</td><td></td></tr>
+    <tr><td><code>CALL print_num</code></td><td>FFE7h</td><td class="n92-chg">FFFCh</td><td>0</td><td>—, 0106h</td><td></td></tr>
+    <tr><td><code>PUSH AX</code> / <code>OR AX, AX</code></td><td>FFE7h</td><td class="n92-chg">FFFAh</td><td class="n92-chg">1</td><td>FFE7h, 0106h</td><td></td></tr>
+    <tr><td><code>JNS</code> (no jump) / <code>NEG AX</code></td><td class="n92-chg">0019h</td><td>FFFAh</td><td class="n92-chg">0</td><td>FFE7h, 0106h</td><td></td></tr>
+    <tr><td>PUTC '-' expansion (5 instructions)</td><td>0019h</td><td>FFFAh</td><td>0</td><td>FFE7h, 0106h</td><td>-</td></tr>
+    <tr><td><code>CALL print_num_uns</code> (after it returns)</td><td>0019h</td><td>FFFAh</td><td>0</td><td>FFE7h, 0106h</td><td>-25</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n92-chg">FFE7h</td><td class="n92-chg">FFFCh</td><td>0</td><td>—, 0106h</td><td>-25</td></tr>
+    <tr><td><code>RET</code> (from print_num)</td><td>FFE7h</td><td class="n92-chg">FFFEh</td><td>0</td><td>—, —</td><td>-25</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>After the number has been printed it is still in AX (<a href="#tab-iz-pnum">Table 9.2.19</a>). The calling program can go on using the same number for another job. Because PRINT_NUM_UNS saves all the registers it uses, the steps inside it are reduced to a single row of the table. The PRINT_NUM in the library also contains a branch that prints '0' directly for AX = 0. It also tests the sign with <code>CMP AX, 0</code> instead of <code>OR</code>; the two instructions set SF in the same way.</p>
+
+<p>One consequence of this design is remarkable: for −32,768 (8000h), NEG again produces 8000h, because +32,768 does not exist in the 16-bit signed range. PRINT_NUM first prints '-' and then gives 8000h to PRINT_NUM_UNS. PRINT_NUM_UNS prints 8000h as the unsigned 32,768, and the correct result, −32768, appears on the screen. Printing the absolute value as unsigned solves this edge case by itself.</p>
+
+<h3 id="s9-2-4-7"><span class="nt-num">9.2.4.7</span>Extracting digits: comparing the two methods</h3>
+
+<div class="nt-tablewrap" id="tab-yontem">
+<table class="nt-table">
+  <caption>Table 9.2.20: Comparison of the stack method and the decreasing-divisor method.</caption>
+  <thead><tr><th scope="col">Criterion</th><th scope="col">Stack method (divide by 10, push, pop in reverse order)</th><th scope="col">Decreasing divisor (10,000, 1000, …)</th></tr></thead>
+  <tbody>
+    <tr><td>Number of divisions</td><td>as many as there are digits</td><td>up to five; plus one division each to reduce the divisor</td></tr>
+    <tr><td>Stack use</td><td>2 bytes per digit</td><td>only the saved registers</td></tr>
+    <tr><td>Leading zeros</td><td>do not arise by themselves</td><td>skipped with the flag</td></tr>
+    <tr><td>Fixed width (00042)</td><td>extra code needed</td><td>automatic when the flag is cleared</td></tr>
+    <tr><td>Other bases</td><td>the divisor becomes 2, 8 or 16; in base 16 digits above 9 become 'A'–'F'</td><td>the divisor sequence changes with the base (4096, 256, 16, 1 in base 16)</td></tr>
+    <tr><td>Output order</td><td>first onto the stack, then to the screen in reverse order</td><td>left to right, the moment it is computed</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The two methods give the same output: for 1205 both print the digits 1, 2, 0, 5 (<a href="#tab-yontem">Table 9.2.20</a>). The choice is decided by stack use, fixed width and the need for other bases. In time, the cost of DIV is decisive. On the 8086 <code>DIV r16</code> takes 144–162 clock cycles. For 1205 the stack method does 4 divisions. The decreasing-divisor method does four divisions by 1000, 100, 10 and 1, and five more divisions to reduce the divisor; the division is skipped in the first pass. The stack method is therefore about twice as fast. The library's choice was made for not using the stack and for easy adaptation to fixed width.</p>
+
+<h3 id="s9-2-4-8"><span class="nt-num">9.2.4.8</span>The same bits, two interpretations</h3>
+
+<p>When the outputs of the two procedures for a value given in AX are put side by side, the difference of interpretation is clearly visible (<a href="#tab-yorum">Table 9.2.21</a>).</p>
+
+<div class="nt-tablewrap" id="tab-yorum">
+<table class="nt-table">
+  <caption>Table 9.2.21: The same 16 bits, two procedures.</caption>
+  <thead><tr><th scope="col">AX</th><th scope="col">Most significant bit</th><th scope="col">PRINT_NUM</th><th scope="col">PRINT_NUM_UNS</th></tr></thead>
+  <tbody>
+    <tr><td>0000h</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>7FFFh</td><td>0</td><td>32767</td><td>32767</td></tr>
+    <tr><td>8000h</td><td>1</td><td>-32768</td><td>32768</td></tr>
+    <tr><td>9C40h</td><td>1</td><td>-25536</td><td>40000</td></tr>
+    <tr><td>FFE7h</td><td>1</td><td>-25</td><td>65511</td></tr>
+    <tr><td>FFFFh</td><td>1</td><td>-1</td><td>65535</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rule is single: if the most significant bit is 0, the two procedures print the same thing; if it is 1, PRINT_NUM prints the unsigned value minus 65,536. The program must know which interpretation is correct; the processor does not. The addition and subtraction instructions produce the same bits for both interpretations; only the reading of the flags changes. CF shows unsigned overflow and OF signed overflow. Values that cannot be negative, such as a counter, an address or a length, are printed with PRINT_NUM_UNS; values that can be negative, such as a temperature or a difference, with PRINT_NUM.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Printing an unsigned value that can exceed 32,767 with PRINT_NUM. AX = 40,000 (9C40h) appears as −25536 with PRINT_NUM. If the value's meaning is unsigned, PRINT_NUM_UNS must be used.</p>
+</div>
+
+<h2 id="s9-2-5"><span class="nt-num">9.2.5</span>Example programs</h2>
+
+<h3 id="s9-2-5-1"><span class="nt-num">9.2.5.1</span>Read a number and print it</h3>
+
+<p>The second example in emu8086's library documentation uses four procedures together. The program asks the user for a number, reads it and prints it back:</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span>    100h
+<span class="kw">LEA</span>    SI, msg1       <span class="cm">; ask for the number</span>
+<span class="kw">CALL</span>   print_string   <span class="cm">;</span>
+<span class="kw">CALL</span>   scan_num       <span class="cm">; get number in CX.</span>
+<span class="kw">MOV</span>    AX, CX         <span class="cm">; copy the number to AX.</span>
+<span class="kw">CALL</span>   pthis          <span class="cm">; print the following string:</span>
+<span class="dir">DB</span>  13, 10, 'You have entered: ', 0
+<span class="kw">CALL</span>   print_num      <span class="cm">; print number in AX.</span>
+<span class="kw">RET</span>                   <span class="cm">; return to operating system.</span>
+msg1   <span class="dir">DB</span>  'Enter the number: ', 0
+<span class="dir">DEFINE_SCAN_NUM</span>
+<span class="dir">DEFINE_PRINT_STRING</span>
+<span class="dir">DEFINE_PRINT_NUM</span>
+<span class="dir">DEFINE_PRINT_NUM_UNS</span>  <span class="cm">; required for print_num.</span>
+<span class="dir">DEFINE_PTHIS</span>
+<span class="dir">END</span>                   <span class="cm">; directive to stop the compiler.</span></code></pre>
+
+<p>The flow of the program is short. <code>LEA SI, msg1</code> loads the address of the prompt string into SI and PRINT_STRING prints it. SCAN_NUM reads the number and puts it in CX. <code>MOV AX, CX</code> moves the number to the register PRINT_NUM expects. PTHIS prints the string after the CALL: since the string starts with 13, 10, it first moves to the next line. PRINT_NUM prints the number as signed and RET ends the program. The lines after msg1 are data and procedure definitions; the flow never reaches them after the RET.</p>
+
+<p>The layout of the main program in memory is in <a href="#tab-yerlesim">Table 9.2.22</a>. All the CALLs are 3-byte near calls (E8 and a 16-bit displacement). Note that the string sits in the middle of the code area: 010Eh–0122h is data, not instructions.</p>
+
+<div class="nt-tablewrap" id="tab-yerlesim">
+<table class="nt-table">
+  <caption>Table 9.2.22: Layout of the main part of the read-a-number-and-print-it program.</caption>
+  <thead><tr><th scope="col">Address</th><th scope="col">Bytes</th><th scope="col">Line</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td>3</td><td><code>LEA SI, msg1</code> (BE 27 01)</td></tr>
+    <tr><td>0103h</td><td>3</td><td><code>CALL print_string</code></td></tr>
+    <tr><td>0106h</td><td>3</td><td><code>CALL scan_num</code></td></tr>
+    <tr><td>0109h</td><td>2</td><td><code>MOV AX, CX</code> (8B C1)</td></tr>
+    <tr><td>010Bh</td><td>3</td><td><code>CALL pthis</code></td></tr>
+    <tr><td>010Eh</td><td>21</td><td><code>DB 13, 10, 'You have entered: ', 0</code></td></tr>
+    <tr><td>0123h</td><td>3</td><td><code>CALL print_num</code></td></tr>
+    <tr><td>0126h</td><td>1</td><td><code>RET</code> (C3)</td></tr>
+    <tr><td>0127h</td><td>19</td><td><code>msg1 DB 'Enter the number: ', 0</code></td></tr>
+    <tr><td>013Ah</td><td>…</td><td>procedures expanded by the DEFINE_ macros</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Suppose the user types -25 and presses Enter. In the trace table, two moments are shown for the CALL lines: inside the procedure (while the return address is on the stack) and the return (<a href="#tab-iz-sayi">Table 9.2.23</a>).</p>
+
+<div class="nt-tablewrap" id="tab-iz-sayi">
+<table class="nt-table">
+  <caption>Table 9.2.23: Trace of the read-a-number-and-print-it program (input −25).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">SI</th><th scope="col">CX</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td><code>LEA SI, msg1</code></td><td class="n92-chg">0127h</td><td>(size)</td><td>0000h</td><td>FFFEh</td><td></td></tr>
+    <tr><td><code>CALL print_string</code> (inside)</td><td>0127h</td><td>(size)</td><td>0000h</td><td class="n92-chg">FFFCh</td><td>Enter the number:␣</td></tr>
+    <tr><td><code>CALL scan_num</code> (inside)</td><td>0127h</td><td>…</td><td>0000h</td><td>FFFCh</td><td>Enter the number: -25</td></tr>
+    <tr><td><code>CALL scan_num</code> (return)</td><td>0127h</td><td class="n92-chg">FFE7h</td><td>0000h</td><td class="n92-chg">FFFEh</td><td>Enter the number: -25</td></tr>
+    <tr><td><code>MOV AX, CX</code></td><td>0127h</td><td>FFE7h</td><td class="n92-chg">FFE7h</td><td>FFFEh</td><td>Enter the number: -25</td></tr>
+    <tr><td><code>CALL pthis</code></td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td class="n92-chg">FFFCh</td><td>…</td></tr>
+    <tr><td>the string is printed</td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td>FFFCh</td><td>… / You have entered:␣</td></tr>
+    <tr><td><code>CALL print_num</code> (inside)</td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td>FFFCh</td><td>… / You have entered: -25</td></tr>
+    <tr><td><code>RET</code></td><td>0127h</td><td>FFE7h</td><td>FFE7h</td><td class="n92-chg">0000h</td><td>… / You have entered: -25</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A few details of the table need explanation. SI stays at 0127h throughout the program, because PRINT_STRING and PTHIS save and restore SI. AX is also 0000h after SCAN_NUM; SCAN_NUM saves AX. The only register that changes is the output register CX: the two's complement of −25, FFE7h. The initial value of CX is shown as "(size)". When emu8086 loads a .COM program it puts the program's size in bytes into CX. This value is lost when SCAN_NUM clears CX and does not affect the result. The last RET takes the 0000h that DOS put on the stack into IP; SP = FFFEh + 2 = 0000h. The processor goes to the <code>INT 20h</code> at the start of the PSP and the program ends.</p>
+
+<p>The final state of the screen is two lines. The first line reads "Enter the number: -25" and the second "You have entered: -25". Because SCAN_NUM echoed Enter only as CR, the cursor had returned to the start of the first line. The 13 and 10 at the start of the PTHIS string take the cursor to the start of the second line. Had the string not started with 13, 10, "You have entered: " would have been written over the first line and the prompt would have been erased.</p>
+
+<h3 id="s9-2-5-2"><span class="nt-num">9.2.5.2</span>The sum of two numbers</h3>
+
+<p>The second example reads two numbers and prints their sum. Signed overflow is checked too.</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span>  100h
+<span class="kw">CALL</span> scan_num     <span class="cm">; 1st number → CX</span>
+<span class="kw">MOV</span>  BX, CX       <span class="cm">; save</span>
+<span class="dir">PUTC</span> 13
+<span class="dir">PUTC</span> 10           <span class="cm">; next line</span>
+<span class="kw">CALL</span> scan_num     <span class="cm">; 2nd number → CX</span>
+<span class="dir">PUTC</span> 13
+<span class="dir">PUTC</span> 10
+<span class="kw">MOV</span>  AX, BX
+<span class="kw">ADD</span>  AX, CX       <span class="cm">; signed sum</span>
+<span class="kw">JO</span>   overflow
+<span class="kw">CALL</span> print_num
+<span class="kw">RET</span>
+overflow: <span class="dir">PUTC</span> '?'
+<span class="kw">RET</span>
+<span class="dir">DEFINE_SCAN_NUM</span>
+<span class="dir">DEFINE_PRINT_NUM</span>
+<span class="dir">DEFINE_PRINT_NUM_UNS</span>
+<span class="dir">END</span></code></pre>
+
+<p>Three details of the program are important. First, the second SCAN_NUM also writes its result to CX; so that the first number is not lost, it is moved to BX first. The choice of BX is not random: SCAN_NUM does not use BX, and PUTC touches only AX. Second, because Enter only returns to the start of the line, <code>PUTC 13</code> and <code>PUTC 10</code> follow every SCAN_NUM; the second number and the result are printed on separate lines. Third, <code>JO</code> catches signed overflow.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-of">
+  <span class="nt-box__title">Definition 9.2.8</span>
+  <p>The <strong>overflow flag</strong> (OF) becomes 1 when the result of a signed operation does not fit in the 16-bit signed range (−32,768 … 32,767). In an addition OF = 1 if the two operands have the same sign and the result has the opposite sign. The <code>JO</code> instruction jumps if OF = 1.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-toplam">
+<table class="nt-table">
+  <caption>Table 9.2.24: The sum-of-two-numbers program with different inputs.</caption>
+  <thead><tr><th scope="col">Inputs</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">AX = BX + CX</th><th scope="col">OF</th><th scope="col">Last line</th></tr></thead>
+  <tbody>
+    <tr><td>120, −45</td><td>0078h</td><td>FFD3h</td><td>004Bh</td><td>0</td><td>75</td></tr>
+    <tr><td>−7, −8</td><td>FFF9h</td><td>FFF8h</td><td>FFF1h</td><td>0</td><td>-15</td></tr>
+    <tr><td>30000, 5000</td><td>7530h</td><td>1388h</td><td>88B8h</td><td class="n92-chg">1</td><td>?</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the first two rows the result is in the signed range (<a href="#tab-toplam">Table 9.2.24</a>). In the addition 120 + (−45), CF = 1, because as unsigned numbers 0078h + FFD3h exceeds 16 bits. This carry is meaningless in signed arithmetic and OF stays 0. In the third row the sum of the two positive numbers is 35,000 and exceeds 32,767. The most significant bit of the result 88B8h is 1; the sum of two positive numbers appears negative and OF = 1. JO jumps and '?' is printed on the screen. Without the JO, PRINT_NUM would have printed 88B8h as −30536.</p>
+
+<h3 id="s9-2-5-3"><span class="nt-num">9.2.5.3</span>A framed title</h3>
+
+<p>The third example clears the screen and draws a framed heading starting at column 10. The library macros are used together with the programmer's own procedure.</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span>  100h
+<span class="kw">CALL</span> clear_screen
+<span class="dir">GOTOXY</span> 10, 2
+<span class="kw">CALL</span> rule
+<span class="dir">GOTOXY</span> 10, 3
+<span class="dir">PRINT</span> '|  REPORT  |'
+<span class="dir">GOTOXY</span> 10, 4
+<span class="kw">CALL</span> rule
+<span class="dir">GOTOXY</span> 0, 6       <span class="cm">; cursor below</span>
+<span class="kw">RET</span>
+rule <span class="dir">PROC</span>        <span class="cm">; +----------+</span>
+<span class="dir">PUTC</span> '+'
+<span class="kw">MOV</span>  CX, 10
+dash: <span class="dir">PUTC</span> '-'
+<span class="kw">LOOP</span> dash
+<span class="dir">PUTC</span> '+'
+<span class="kw">RET</span>
+rule <span class="dir">ENDP</span>
+<span class="dir">DEFINE_CLEAR_SCREEN</span>
+<span class="dir">END</span></code></pre>
+
+<p>The rule procedure prints a '+', prints '-' ten times and ends with a '+': the 12-character "+----------+". The string in the heading line is also 12 characters: two edge bars, two spaces, "REPORT" and two spaces. The three lines are therefore aligned one above the other in columns 10–21 (<a href="#sekil-cerceve">Figure 9.2.10</a>). The final <code>GOTOXY 0, 6</code> takes the cursor below the frame; when the program ends, whatever emu8086 prints does not land on top of the heading.</p>
+
+<figure class="nt-fig" id="sekil-cerceve" style="--w:360px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 190" role="img" aria-label="The top-left part of the screen: the framed REPORT heading in rows 2 to 4 starting at column 10" style="max-width:330px;max-height:190px"><text class="lbl mono" x="22" y="34" text-anchor="end" style="font-size:11px;">0</text><text class="lbl mono" x="22" y="56" text-anchor="end" style="font-size:11px;">1</text><text class="lbl mono" x="22" y="78" text-anchor="end" style="font-size:11px;">2</text><text class="lbl mono" x="22" y="100" text-anchor="end" style="font-size:11px;">3</text><text class="lbl mono" x="22" y="122" text-anchor="end" style="font-size:11px;">4</text><text class="lbl mono" x="22" y="144" text-anchor="end" style="font-size:11px;">5</text><text class="lbl mono" x="22" y="166" text-anchor="end" style="font-size:11px;">6</text><rect class="box-empty" x="28" y="14" width="296" height="160" rx="3"/><text class="txt mono" x="160" y="78" text-anchor="middle" style="font-size:13px;">+</text><text class="txt mono" x="172" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="184" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="196" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="208" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="220" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="232" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="244" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="256" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="268" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="280" y="78" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="292" y="78" text-anchor="middle" style="font-size:13px;">+</text><text class="txt mono" x="160" y="100" text-anchor="middle" style="font-size:13px;">|</text><text class="txt mono" x="196" y="100" text-anchor="middle" style="font-size:13px;">R</text><text class="txt mono" x="208" y="100" text-anchor="middle" style="font-size:13px;">E</text><text class="txt mono" x="220" y="100" text-anchor="middle" style="font-size:13px;">P</text><text class="txt mono" x="232" y="100" text-anchor="middle" style="font-size:13px;">O</text><text class="txt mono" x="244" y="100" text-anchor="middle" style="font-size:13px;">R</text><text class="txt mono" x="256" y="100" text-anchor="middle" style="font-size:13px;">T</text><text class="txt mono" x="292" y="100" text-anchor="middle" style="font-size:13px;">|</text><text class="txt mono" x="160" y="122" text-anchor="middle" style="font-size:13px;">+</text><text class="txt mono" x="172" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="184" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="196" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="208" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="220" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="232" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="244" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="256" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="268" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="280" y="122" text-anchor="middle" style="font-size:13px;">-</text><text class="txt mono" x="292" y="122" text-anchor="middle" style="font-size:13px;">+</text><rect x="34" y="150" width="12" height="18" rx="2" style="fill:var(--ds-hot);stroke:var(--ds-link);stroke-width:1"/><text class="lbl" x="176" y="184" text-anchor="middle" style="font-size:12px;">columns 10 … 21</text></svg></div>
+  <figcaption><b>Figure 9.2.10:</b> The top-left part of the screen: the framed REPORT heading in rows 2–4 starting at column 10; the cursor is at (0, 6).</figcaption>
+</figure>
+
+<p>Two points of the program show the relationship between a macro and a loop. The <code>PUTC '-'</code> in the loop is written once in the source, so it is expanded once; the 8-byte expansion runs 10 times but is not copied 10 times. The copying of the macro happens at assembly time, the repetition of the loop at run time. The second point concerns registers. The LOOP counter is in CX. Because PUTC uses only AX and restores it, it does not touch CX and the counter is safe. Had a procedure that clobbers CX, such as SCAN_NUM, been called in the loop, the counter would have had to be protected with PUSH CX / POP CX. The definition of rule is also after the RET, like the library procedures.</p>
+
+<h2 id="s9-2-6"><span class="nt-num">9.2.6</span>Common mistakes</h2>
+
+<p>The mistakes made when using the library are mostly not noticed during assembly; the program runs but gives a wrong result. The mistakes below are the ones students working with emu8086 meet most often.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Forgetting the DEFINE_ line.</strong> If there is a <code>CALL scan_num</code> but no <code>DEFINE_SCAN_NUM</code>, the assembler cannot find the label and reports an "undefined" error. For PRINT_NUM, <code>DEFINE_PRINT_NUM_UNS</code> is also needed.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Not terminating the string with 0.</strong> PRINT_STRING and PTHIS print until they see a 0. With a definition without 0 such as <code>msg DB 'Number: '</code>, the bytes after the string are also dumped to the screen. These are often procedure code, and meaningless characters appear on the screen. With PTHIS, in addition, the return address slips to a wrong place and the program may hang.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Looking for the result in AX.</strong> SCAN_NUM writes its result to CX. If <code>MOV AX, CX</code> is forgotten before PRINT_NUM, the old value in AX is printed. General rule: if the documentation of a procedure does not say that a register is preserved, the register must not be assumed to be preserved.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Expecting a new line after Enter.</strong> After SCAN_NUM the cursor is at the start of the line where the input is. The next output is written over the number entered and the prompt. If 42 is read with the prompt "Num: " and PRINT_NUM is called right away, "42m: 42" is left on the screen. <code>PUTC 13</code>, <code>PUTC 10</code> must be inserted in between.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Giving too large a buffer size.</strong> If DX is larger than the buffer's real size, GET_STRING overwrites the variables after the buffer. The error appears only when those variables are used.</p>
+</div>
+
+<p>The position of the DEFINE_ lines, however, is not a source of errors. Because every DEFINE_ macro begins with a JMP that jumps over the procedure body, the processor does not enter the body even if the line is put at the start of the program (<a href="#sekil-yer">Figure 9.2.11</a>). The price is an extra jump instruction. The usual place is between RET and END.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-yer" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 760 148" role="img" aria-label="Even if the DEFINE_ line is put below ORG 100h, the macro's first instruction, a JMP, skips the procedure body; the usual place is between RET and END." style="max-width:700px"><text class="txt" x="130" y="14" text-anchor="middle" style="font-size:14px;fill:var(--ds-muted)">At the top: a needless JMP</text><rect class="box" x="20" y="24" width="220" height="24" rx="3"/><text class="txt mono" x="130" y="41" text-anchor="middle" style="font-size:12.5px">ORG 100h</text><rect class="box" x="20" y="48" width="220" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="130" y="65" text-anchor="middle" style="font-size:12.5px">DEFINE_SCAN_NUM</text><rect class="box" x="20" y="72" width="220" height="24" rx="3"/><text class="txt mono" x="130" y="89" text-anchor="middle" style="font-size:12.5px">main program</text><rect class="box" x="20" y="96" width="220" height="24" rx="3"/><text class="txt mono" x="130" y="113" text-anchor="middle" style="font-size:12.5px">RET</text><text class="txt" x="510" y="14" text-anchor="middle" style="font-size:14px;fill:var(--ds-good)">The usual place</text><rect class="box" x="400" y="24" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="41" text-anchor="middle" style="font-size:12.5px">ORG 100h</text><rect class="box" x="400" y="48" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="65" text-anchor="middle" style="font-size:12.5px">main program</text><rect class="box" x="400" y="72" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="89" text-anchor="middle" style="font-size:12.5px">RET</text><rect class="box" x="400" y="96" width="220" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="510" y="113" text-anchor="middle" style="font-size:12.5px">DEFINE_SCAN_NUM</text><rect class="box" x="400" y="120" width="220" height="24" rx="3"/><text class="txt mono" x="510" y="137" text-anchor="middle" style="font-size:12.5px">END</text><text class="lbl" x="248" y="58" text-anchor="start" style="font-size:12.5px">← skipped by the JMP</text><text class="lbl" x="628" y="106" text-anchor="start" style="font-size:12.5px">← entered only by CALL</text></svg></div>
+  <figcaption><b>Figure 9.2.11:</b> Even if DEFINE_SCAN_NUM is put below ORG 100h, the macro's first instruction, a JMP, skips the procedure body (left). The usual place is between RET and END; the procedure is entered only through CALL (right).</figcaption>
+</figure>
+
+<h2 id="s9-2-7"><span class="nt-num">9.2.7</span>Exercises and solutions</h2>
+
+<p><strong>Exercise 1.</strong> Write, with macros, the program that prints "CENTER" in the middle of the screen (column 35, row 12).</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span> 100h
+<span class="dir">GOTOXY</span> 35, 12
+<span class="dir">PRINT</span> 'CENTER'
+<span class="kw">RET</span></code></pre>
+
+<p>"CENTER" is written to columns 35–40 of row 12 and the cursor stays at (41, 12). For a six-character text to sit exactly in the middle, the start column must be (80 − 6) / 2 = 37; 35 is an approximate middle. General rule for centering: start column = (80 − length) / 2.</p>
+
+<p><strong>Exercise 2.</strong> Write the program that reads two numbers from the user and prints their sum.</p>
+
+<p>The solution is the sum-of-two-numbers example. The parts needed: <code>CALL scan_num</code> → <code>MOV BX, CX</code> → <code>PUTC 13</code>, <code>PUTC 10</code> → <code>CALL scan_num</code> → <code>MOV AX, BX</code> → <code>ADD AX, CX</code> → <code>CALL print_num</code>; the definitions <code>DEFINE_SCAN_NUM</code>, <code>DEFINE_PRINT_NUM</code> and <code>DEFINE_PRINT_NUM_UNS</code>. If PUTC 13 and PUTC 10 are forgotten, the second number is written over the first and only the last things written can be read on the screen.</p>
+
+<p><strong>Exercise 3.</strong> If the PRINT macro is used 10 times, how many times do the strings and the loop code exist? Compare with PRINT_STRING.</p>
+
+<p>With PRINT there are 10 copies: every expansion carries its own string and its own 23-byte loop code. With PRINT_STRING the loop code exists once; memory holds 10 strings and, for each string, one <code>LEA SI</code> and one <code>CALL</code> (3 + 3 bytes). With ten seven-character messages the program with PRINT is about 310 bytes and the one with PRINT_STRING about 160 bytes. The gap grows as the number of messages grows; on the other hand every CALL/RET pair adds 27 clock cycles.</p>
+
+<p><strong>Exercise 4.</strong> What do PRINT_NUM and PRINT_NUM_UNS print when AX = 8000h?</p>
+
+<p>The unsigned value of 8000h is 32,768; PRINT_NUM_UNS prints "32768". Because its most significant bit is 1, its signed value is 32,768 − 65,536 = −32,768; PRINT_NUM prints "-32768". This is the smallest number of the 16-bit signed range, and NEG does not change it; PRINT_NUM still prints correctly, because it prints the absolute value as unsigned.</p>
+
+<p><strong>Exercise 5.</strong> What happens if <code>DEFINE_PTHIS</code> is written right below <code>ORG 100h</code>?</p>
+
+<p>The program still works correctly. The first instruction of the macro is <code>JMP skip_proc_pthis</code>; the processor jumps over the body of PTHIS and reaches the first instruction of the main program. The price is an extra JMP, and the addresses of the main program shift forward by the size of the body. Without the protective JMP the processor would have entered the code of PTHIS directly: <code>POP SI</code> would take DOS's 0000h word from the stack, print the bytes of the PSP as a string and return to an invalid address.</p>
+
+<p><strong>Exercise 6.</strong> Get the user's name with GET_STRING and print "Hello, name!".</p>
+
+<pre class="nt-code"><code><span class="dir">include</span> 'emu8086.inc'
+<span class="dir">ORG</span> 100h
+<span class="kw">LEA</span>  DI, buf
+<span class="kw">MOV</span>  DX, 20
+<span class="kw">CALL</span> get_string
+<span class="dir">PUTC</span> 13
+<span class="dir">PUTC</span> 10
+<span class="dir">PRINT</span> 'Hello, '
+<span class="kw">LEA</span>  SI, buf
+<span class="kw">CALL</span> print_string
+<span class="dir">PUTC</span> '!'
+<span class="kw">RET</span>
+buf <span class="dir">DB</span> 20 <span class="dir">DUP</span>(0)
+<span class="dir">DEFINE_GET_STRING</span>
+<span class="dir">DEFINE_PRINT_STRING</span>
+<span class="dir">END</span></code></pre>
+
+<p>If the user types "Ece" and presses Enter, "Ece" appears on the first line of the screen and "Hello, Ece!" on the second. Without PUTC 13 and PUTC 10, after GET_STRING the cursor would stay right after "Ece" and "EceHello, Ece!" would appear on a single line. The buffer is 20 bytes and DX = 20; a name of at most 19 characters is accepted.</p>
+
+<h2 class="nt-pb" id="s9-2-8"><span class="nt-num">9.2.8</span>Summary</h2>
+
+<ul>
+  <li><strong>emu8086.inc</strong> is the library that contains ready-made macros and procedures for screen, keyboard and number jobs. Everything in it is ordinary 8086 code built on BIOS and DOS interrupts.</li>
+  <li><strong>INCLUDE</strong> is a directive: it puts the text of the file in place of the line during assembly and produces no code. The file is searched for first in the source folder, then in emu8086's Inc folder. The line is written at the start of the source.</li>
+  <li>A macro definition and a procedure whose DEFINE_ has not been written add no bytes to the program. Program size is determined by every use of the macros that are used and the procedures defined with DEFINE_.</li>
+  <li><strong>The screen macros</strong> are built on INT 10h: PUTC and PRINT use service 0Eh, GOTOXY 02h, CURSOROFF and CURSORON 01h. The macros save the registers they use; PUTC is 8 bytes, GOTOXY 16 bytes.</li>
+  <li><strong>GOTOXY</strong> uses the column, row order; the BIOS expects the row in DH and the column in DL. The top-left is (0, 0), the bottom-right (79, 24). The address of a cell in video memory is B800h:(row × 80 + column) × 2.</li>
+  <li><strong>PRINT</strong> embeds the string in the code and jumps over it with a JMP; the loop code is copied at every use. <strong>PRINTN</strong> appends 13, 10. A new line needs CR (13) and LF (10) together. After column 79 the cursor moves to the next line, and on the last row the screen scrolls.</li>
+  <li><strong>Procedures</strong> are defined once with DEFINE_ and called with CALL. Every DEFINE_ macro begins with a JMP that jumps over the body; the usual place is between RET and END. PRINT_NUM also requires PRINT_NUM_UNS.</li>
+  <li>Input and output registers: PRINT_STRING DS:SI, GET_STRING DS:DI and DX, SCAN_NUM → CX, PRINT_NUM and PRINT_NUM_UNS ← AX. The other registers are preserved, the flags are not.</li>
+  <li><strong>PTHIS</strong> uses the return address that CALL pushed on the stack as the address of the string; after printing the string it moves the address past the 0, and RET returns to the instruction after the string.</li>
+  <li><strong>GET_STRING</strong> reads at most DX − 1 characters, ends the buffer with 0, handles backspace and does not print Enter. If DX is given larger than the real size of the buffer, the variables after the buffer are overwritten.</li>
+  <li><strong>SCAN_NUM</strong> accumulates digits with the rule result ← result × 10 + digit; it applies the minus sign at the end with NEG, rejects keys that are not digits and digits that push the number past 65,535. Enter returns only to the start of the line.</li>
+  <li><strong>PRINT_NUM_UNS</strong> prints the digits left to right with a decreasing divisor (10,000, 1000, …); it skips leading zeros with a flag. The stack method gives the same result by dividing by 10 and popping the digits from the stack in reverse order. <strong>PRINT_NUM</strong> prints '-' for a negative number and then the absolute value as unsigned.</li>
+  <li>The same 16 bits are read in two ways: if the most significant bit is 1, the signed value = the unsigned value − 65,536 (FFE7h = −25 = 65,511).</li>
+</ul>
+
+<h2 id="s9-2-9"><span class="nt-num">9.2.9</span>Key terms</h2>
+
+
+
+<ul class="nt-concepts">
+  <li>library</li>
+  <li>directive</li>
+  <li>macro</li>
+  <li>macro expansion</li>
+  <li>procedure</li>
+  <li>procedure call</li>
+  <li>return address</li>
+  <li>parameter passing</li>
+  <li>register preservation</li>
+  <li>cursor</li>
+  <li>string</li>
+  <li>control character</li>
+  <li>ASCII</li>
+  <li>BIOS</li>
+  <li>service</li>
+  <li>video memory (text mode)</li>
+  <li>keyboard buffer</li>
+  <li>signed / unsigned number</li>
+  <li>two's complement</li>
+  <li>label</li>
+</ul>
+
+<h2 id="s9-2-10"><span class="nt-num">9.2.10</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>In the expansion of <code>GOTOXY 3, 7</code>, what are AH, BH, DH and DL just before INT 10h is called? How many bytes is the expansion and which registers does it save?</p>
+    <details><summary>Answer</summary>
+      <p>AH = 02h, BH = 0, DH = 7 (row), DL = 3 (column). The expansion is 16 bytes: three PUSHes and three POPs take 6 bytes, four <code>MOV r8, constant</code> take 8 bytes, and <code>INT 10h</code> takes 2 bytes. AX, BX and DX are saved on the stack and restored in reverse order.</p>
+    </details>
+  </li>
+  <li>
+    <p>In colour text mode, at which offset in video memory does the character in cell (35, 12) sit? What is its physical address?</p>
+    <details><summary>Answer</summary>
+      <p>(12 × 80 + 35) × 2 = 995 × 2 = 1990 = 07C6h. The character is at B800:07C6h and the attribute byte at B800:07C7h. The physical address is B8000h + 07C6h = B87C6h.</p>
+    </details>
+  </li>
+  <li>
+    <p>On an empty screen with the cursor at (0, 0), <code>PRINTN 'Hello'</code> and then <code>PUTC 'X'</code> run. Which cell is X written to? Where is the cursor at the end?</p>
+    <details><summary>Answer</summary>
+      <p>"Hello" is written to columns 0–4 of row 0. The 13 that PRINTN appends takes the cursor to (0, 0) and the 10 to (0, 1). X is written to (0, 1) and the cursor moves to (1, 1).</p>
+    </details>
+  </li>
+  <li>
+    <p>While SCAN_NUM runs, the user presses the keys 5, b, 0 and Enter in turn. What is CX when the procedure returns? What is left on the screen?</p>
+    <details><summary>Answer</summary>
+      <p>Because 'b' is not a digit, it is printed on the screen, then erased with 8, ' ', 8 and does not join the number. The number becomes 5 × 10 + 0 = 50: CX = 0032h. "50" is left on the screen; Enter returns the cursor to the start of the line.</p>
+    </details>
+  </li>
+  <li>
+    <p>What does the stack digit-extraction code (divide by 10, push, pop with LOOP) print for AX = 0? Why does the library's decreasing-divisor method need a separate branch for AX = 0?</p>
+    <details><summary>Answer</summary>
+      <p>The stack code enters the loop at least once: 0 / 10 = 0, the remainder 0 is pushed and CX = 1. OR AX, AX makes ZF = 1, the print loop runs once and "0" is printed. In the decreasing-divisor method, while the flag CX = 1 a pass is skipped if the number is smaller than the divisor. Since AX = 0 is smaller than every divisor, all the passes are skipped and nothing is printed; the separate branch therefore prints '0'.</p>
+    </details>
+  </li>
+  <li>
+    <p>GET_STRING is called with <code>MOV DX, 1</code> and the user types "abc" and presses Enter. What is written to the buffer?</p>
+    <details><summary>Answer</summary>
+      <p>Nothing. With DX ≤ 1 the buffer has room only for the final 0, and the procedure returns without reading anything; not even a 0 is written to the buffer, and the old contents stay as they were. The keys pressed wait in the keyboard buffer and the next read service picks them up.</p>
+    </details>
+  </li>
+  <li>
+    <p>In a .COM program <code>CALL pthis</code> is at 0100h, followed right after by <code>DB 'Hello', 13, 10, 0</code>. Which address does CALL push on the stack? Which address does the RET of PTHIS return to?</p>
+    <details><summary>Answer</summary>
+      <p>CALL is 3 bytes; 0103h is pushed on the stack, the address of the string's first byte, 'H'. The string is 5 + 2 + 1 = 8 bytes and occupies 0103h–010Ah. When PTHIS reads the 0 at 010Ah, SI = 010Bh; this value is put on the stack and RET returns to 010Bh.</p>
+    </details>
+  </li>
+  <li>
+    <p>What do PRINT_NUM and PRINT_NUM_UNS print when AX = C350h?</p>
+    <details><summary>Answer</summary>
+      <p>C350h = 50,000; PRINT_NUM_UNS prints "50000". Because the most significant bit is 1, the signed value is 50,000 − 65,536 = −15,536; PRINT_NUM prints "-15536".</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s9-2-11"><span class="nt-num">9.2.11</span>Further reading</h2>
+
+<ul>
+  <li>The <code>Inc/emu8086.inc</code> file in the emu8086 installation: the source code of all the macros and procedures in the library. The overflow check of SCAN_NUM and the decreasing-divisor loop of PRINT_NUM_UNS can be read there line by line.</li>
+  <li>The emu8086 help documents, the pages "emu8086.inc — library of common functions" and "Macros": usage examples of the library and the general rules of macros.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8th ed.): procedures, macros and BIOS video services; converting decimal numbers to binary and back.</li>
+  <li>R. Brown, "Ralf Brown's Interrupt List": a detailed list of the INT 10h, INT 16h and INT 21h services with their input and output registers.</li>
+</ul>
+
+<h2 id="s9-2-12"><span class="nt-num">9.2.12</span>References</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 help documents: the pages "emu8086.inc — library of common functions" and "Macros".</li>
+  <li>The Inc/emu8086.inc file in the emu8086 installation (source code of the macros and procedures).</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8th ed., Pearson, 2009 — procedures and macros.</li>
+  <li>A. S. Tanenbaum, <em>Modern Operating Systems</em>, 3rd ed., Pearson, 2008.</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979 — definitions of the CALL, RET, MUL, DIV and AAM instructions and their clock-cycle counts.</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_09_02_The_emu8086_inc_Library.html">Chapter 9.2 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>

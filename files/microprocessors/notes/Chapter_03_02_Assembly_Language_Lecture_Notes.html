@@ -1,0 +1,1218 @@
+---
+layout: without-sidebar
+title: "Chapter 3.2: Assembly Language — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_03_02_Assembly_Language_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 3.2 of Microprocessors: assembly language and the machine instruction, the assembler and emu8086, the structure of an instruction line, instructions, directives and macros, labels and names, register, immediate and memory operands, implicit operands, instruction timing, IP and the flags, a first .COM program and its bytes, the emulator window, writing rules, and common errors; with worked examples and code traces."
+lang: en
+seo_title: "Chapter 3.2: Assembly Language · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_03_02_Assembly_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_03_02_Assembly_Language_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* chapter-specific classes of the slides' SVGs (same as Chapter_03_02_Assembly_Language.html; scoped to .ds-notes) */
+.ds-notes .ds-svg .ptr { fill: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.5; }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-wire { stroke: var(--ds-link); stroke-width: 2.4; fill: none; }
+.ds-notes .ds-svg .mt-wire0 { stroke: var(--ds-muted); stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+.ds-notes .ds-svg .mt-sig { stroke: var(--ds-text); stroke-width: 2; fill: none; }
+.ds-notes .n32-ok { color: var(--ds-good); font-weight: 700; }
+.ds-notes .n32-bad { color: var(--ds-bad); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 3.2: Assembly Language</h1>
+  <p class="nt-lead">Assembly language writes a processor's machine instructions as human-readable abbreviations. Every instruction line corresponds to a single machine instruction. For that reason, anyone writing assembly manages registers, memory, and flags directly; every detail a compiler would hide becomes visible. These notes treat 8086 assembly in the emu8086 environment. First come the fields of a line, the difference between an instruction and a directive, and the naming rules. Then we examine operand types, the implicit operands that instructions do not spell out, and the cost of a memory access in clock periods. We trace step by step how IP advances on every instruction and which instructions change the flags. The last sections write a first .COM program, read the bytes it occupies in memory one by one, run it in the emu8086 window, and classify the most common mistakes together with their causes.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_03_02_Assembly_Language.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_03_02_Assembly_Language.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_03_02_Assembly_Language_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/CPU_Simulator.html">CPU Simulator</a></li>
+    <li><a href="../slides/Chapter_02_Register-Explorer.html">Register Explorer</a></li>
+    <li><a href="../slides/Chapter_06_Flags-Lab.html">Flags Lab</a></li>
+    <li><a href="../slides/Chapter_11_Instruction-Encoding.html">Instruction Encoding</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Explain where assembly fits</dt>
+    <dd>Show the one-to-one relationship between assembly language and machine language, and how it differs from high-level languages, through the three views of a single instruction.</dd>
+    <dt>Read the structure of a line</dt>
+    <dd>Separate the label, instruction, operand, and comment fields; tell an instruction from a directive and a macro; recognize valid and invalid names.</dd>
+    <dt>Recognize operands</dt>
+    <dd>Identify register, immediate, and memory operands, and the implicit operands of instructions such as MUL, DIV, LOOP, CBW, PUSH, and XLAT.</dd>
+    <dt>Compute instruction timing</dt>
+    <dd>Find the time difference between instructions with register and memory operands using clock periods and effective address calculation; explain the difference through bus cycles.</dd>
+    <dt>Trace IP and the flags</dt>
+    <dd>Trace step by step how IP advances by the instruction length and what instructions that change or leave the flags alone do.</dd>
+    <dt>Write the first program</dt>
+    <dd>Write a .COM program in emu8086, read its bytes, run it one step at a time; tell a syntax error from a logic error.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s3-2-1">3.2.1 Assembly language</a>
+      <ol>
+        <li><a href="#s3-2-1-1">3.2.1.1 Mnemonics and the machine instruction</a></li>
+        <li><a href="#s3-2-1-2">3.2.1.2 The assembler and emu8086</a></li>
+        <li><a href="#s3-2-1-3">3.2.1.3 When is assembly used?</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-2">3.2.2 The structure of an instruction line</a>
+      <ol>
+        <li><a href="#s3-2-2-1">3.2.2.1 The fields of a line</a></li>
+        <li><a href="#s3-2-2-2">3.2.2.2 Instruction, directive, and macro</a></li>
+        <li><a href="#s3-2-2-3">3.2.2.3 Labels and names</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-3">3.2.3 Operands</a>
+      <ol>
+        <li><a href="#s3-2-3-1">3.2.3.1 Register, immediate value, and memory</a></li>
+        <li><a href="#s3-2-3-2">3.2.3.2 Implicit operands</a></li>
+        <li><a href="#s3-2-3-3">3.2.3.3 Code trace: MUL, SHR, and LOOP</a></li>
+        <li><a href="#s3-2-3-4">3.2.3.4 Register or memory?</a></li>
+        <li><a href="#s3-2-3-5">3.2.3.5 Instruction timing</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-4">3.2.4 IP and the flags</a>
+      <ol>
+        <li><a href="#s3-2-4-1">3.2.4.1 How does IP advance?</a></li>
+        <li><a href="#s3-2-4-2">3.2.4.2 Which instructions change the flags?</a></li>
+        <li><a href="#s3-2-4-3">3.2.4.3 Code trace: the flags</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-5">3.2.5 The first program</a>
+      <ol>
+        <li><a href="#s3-2-5-1">3.2.5.1 The .COM program template</a></li>
+        <li><a href="#s3-2-5-2">3.2.5.2 Code trace: a .COM program in memory</a></li>
+        <li><a href="#s3-2-5-3">3.2.5.3 The program in memory: byte by byte</a></li>
+        <li><a href="#s3-2-5-4">3.2.5.4 The emu8086 emulator window</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-6">3.2.6 Writing rules</a></li>
+    <li><a href="#s3-2-7">3.2.7 Errors</a>
+      <ol>
+        <li><a href="#s3-2-7-1">3.2.7.1 Operand restrictions of MOV</a></li>
+        <li><a href="#s3-2-7-2">3.2.7.2 Other syntax errors</a></li>
+        <li><a href="#s3-2-7-3">3.2.7.3 Assembly errors and logic errors</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3-2-8">3.2.8 Exercises and solutions</a></li>
+    <li><a href="#s3-2-9">3.2.9 Summary</a></li>
+    <li><a href="#s3-2-10">3.2.10 Key terms</a></li>
+    <li><a href="#s3-2-11">3.2.11 Test Yourself</a></li>
+    <li><a href="#s3-2-12">3.2.12 Further reading</a></li>
+    <li><a href="#s3-2-13">3.2.13 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s3-2-1"><span class="nt-num">3.2.1</span>Assembly language</h2>
+
+<h3 id="s3-2-1-1"><span class="nt-num">3.2.1.1</span>Mnemonics and the machine instruction</h3>
+
+<p>A microprocessor decodes the bytes it reads from memory and turns each byte sequence into an operation. The language made of these bytes is called <strong>machine language</strong>. Machine language is the only language the processor understands directly, but it is hard for people to read. Someone looking at the bytes <code>B8 05 00</code> can work out that they mean “load 5 into register AX” only by consulting a table. When a program reaches hundreds of instructions, this method breaks down.</p>
+
+<p><strong>Assembly language</strong> was born to solve this problem. Every machine instruction is given a short, memorable name: <code>MOV</code> for moving, <code>ADD</code> for addition, <code>JMP</code> for jumping. These short names are called <strong>mnemonics</strong>. Operands are also written by name instead of by number: registers as AX and BX, and memory locations by names the programmer chooses.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-assembly">
+  <span class="nt-box__title">Definition 3.2.1</span>
+  <p><strong>Assembly language</strong> is a low-level programming language that writes a processor's machine instructions with mnemonics and symbolic names. Each instruction line in assembly source corresponds to a single machine instruction of the processor. This one-to-one relationship makes the language processor-dependent: every processor family has its own assembly language.</p>
+</div>
+
+<p>The easiest way to see the one-to-one relationship is to write a single line in three different forms. <a href="#tab-uc-gorunum">Table 3.2.1</a> shows the line <code>MOV AX, 5</code> side by side as the programmer, the assembler, and the processor see it.</p>
+
+<div class="nt-tablewrap" id="tab-uc-gorunum">
+<table class="nt-table">
+  <caption>Table 3.2.1: One line, three views.</caption>
+  <thead><tr><th scope="col">View</th><th scope="col">Notation</th><th scope="col">Who uses it?</th></tr></thead>
+  <tbody>
+    <tr><td>Assembly</td><td><code>MOV AX, 5</code></td><td>programmer</td></tr>
+    <tr><td>Hexadecimal machine code</td><td><code>B8 05 00</code></td><td>listing, emulator, debugger</td></tr>
+    <tr><td>Binary machine code</td><td><code>10111000 00000101 00000000</code></td><td>processor (voltage levels on the data bus)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first byte <code>B8</code> is the <strong>opcode</strong> of the operation “load an immediate value into a 16-bit register.” In this instruction family the number of the destination register is added to the opcode. Since AX is number 0, the code is B8h + 0 = B8h. BX is number 3; that is why the first byte of <code>MOV BX, 3</code> is BBh. The remaining two bytes of the instruction carry the 16-bit constant. The value 0005h is stored in memory <strong>low byte first</strong>: 05 first, then 00. This byte order of the 8086 is called <em>little-endian</em>.</p>
+
+<p>The binary line is what the processor actually sees. The 8086 reads instruction bytes over the address/data lines (AD0–AD15). Each bit is a high or low voltage on one line. Seen through the eyes of an electronic circuit, <code>MOV AX, 5</code> is nothing but a 24-bit pattern arriving at the input of the instruction decoder. The decoder turns this pattern into control signals that drive the ALU, the write input of the register file, and the internal buses.</p>
+
+<p>This closeness is also what separates assembly from high-level languages. A programmer who writes <code>x = a * b;</code> in C does not know in which register the multiplication will be done; the compiler chooses. In assembly, it is the programmer's responsibility that the multiplicand sits in AL, that the result is written to AX, and that the old value in AH is wiped out. The power of the language and its difficulty both come from here. Writing assembly requires knowing the registers, the memory, and the system bus. In return, how a program runs in hardware can be seen in every detail.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-mov-bx">
+  <span class="nt-box__title">Example 3.2.1</span>
+  <p>What is the machine code of <code>MOV BX, 1234h</code>? How many bytes does it occupy in memory?</p>
+  <p>The instruction family is the same: an immediate value into a 16-bit register. The opcode is B8h + the register number. Since BX is number 3, the first byte is BBh. The constant 1234h is written low byte first: 34h, then 12h. The instruction is <code>BB 34 12</code> and occupies three bytes. There is a separate family for 8-bit registers: <code>MOV AL, 5</code> is encoded in two bytes as <code>B0 05</code>, because the constant is a single byte.</p>
+</div>
+
+<h3 id="s3-2-1-2"><span class="nt-num">3.2.1.2</span>The assembler and emu8086</h3>
+
+<p>Assembly source is a plain text file. The processor cannot run this text; it must first be translated into machine code. The program that does this translation is called an <strong>assembler</strong>. The assembler translates mnemonics into opcodes, labels into addresses, and variable names into relative locations. The translation is one-to-one: one instruction line yields one machine instruction. MASM, TASM, and NASM are common assemblers for the 8086 family.</p>
+
+<p>The translated code is written to a file. For simple programs this file is directly a runnable <strong>.COM</strong> file. Multi-segment programs are first translated into an <strong>object file</strong> (.obj); then the <strong>linker</strong> combines the object files and produces an <strong>.EXE</strong> file. To run the program, the operating system's <strong>loader</strong> copies the file into RAM, sets the segment registers, and hands control to the program's first instruction. <a href="#sekil-zincir">Figure 3.2.1</a> shows this chain.</p>
+
+<figure class="nt-fig" id="sekil-zincir" style="--w:640px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 126" role="img" aria-label="The source file is translated into machine code by the assembler, and the loader loads it into memory"><defs><marker id="n32-1-m03p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="150" height="60" rx="8"/><text class="txt" x="85" y="56" text-anchor="middle">source.asm</text><text class="lbl" x="85" y="76" text-anchor="middle">text</text><path class="line" d="M162 60 L196 60" marker-end="url(#n32-1-m03p1)"/><rect class="ptr" x="190" y="30" width="150" height="60" rx="8"/><text class="txt" x="265" y="56" text-anchor="middle">Assembler</text><text class="lbl" x="265" y="76" text-anchor="middle">translates one-to-one</text><path class="line" d="M342 60 L376 60" marker-end="url(#n32-1-m03p1)"/><rect class="box" x="370" y="30" width="150" height="60" rx="8"/><text class="txt" x="445" y="56" text-anchor="middle">object / .COM</text><text class="lbl" x="445" y="76" text-anchor="middle">machine code</text><path class="line" d="M522 60 L556 60" marker-end="url(#n32-1-m03p1)"/><rect class="ptr" x="550" y="30" width="150" height="60" rx="8"/><text class="txt" x="625" y="56" text-anchor="middle">Loader</text><text class="lbl" x="625" y="76" text-anchor="middle">loads into RAM</text><text class="lbl" x="445" y="118" text-anchor="middle">for EXE the linker comes in between: .obj → .exe</text><text class="lbl" x="625" y="118" text-anchor="middle"></text></svg></div>
+  <figcaption><b>Figure 3.2.1:</b> From source file to memory. The assembler translates the text one-to-one into machine code, and the loader places the result in RAM. For .EXE files the linker comes in between.</figcaption>
+</figure>
+
+<p><strong>emu8086</strong>, used in this course, gathers all the links of the chain in a single window. It contains a text editor, an assembler, and an 8086 <strong>emulator</strong>. An emulator is a program that imitates the 8086 in software. In a real processor the insides of the registers are not visible from outside; the emulator, by contrast, shows the registers, memory, and flags on the screen after every instruction. A program can be advanced one instruction at a time, stepped back, and stopped wherever you like. While learning assembly this is the most valuable tool, because the effect of every instruction can be predicted and tested immediately.</p>
+
+<p>The difference between the .COM and .EXE formats also determines the structure of the program. <a href="#tab-com-exe">Table 3.2.2</a> compares the two formats.</p>
+
+<div class="nt-tablewrap" id="tab-com-exe">
+<table class="nt-table">
+  <caption>Table 3.2.2: .COM and .EXE programs.</caption>
+  <thead><tr><th scope="col">Feature</th><th scope="col">.COM</th><th scope="col">.EXE</th></tr></thead>
+  <tbody>
+    <tr><td>Number of segments</td><td>a single segment; code, data, and stack within the same 64 KB</td><td>multiple segments (separate code, data, and stack)</td></tr>
+    <tr><td>Size limit</td><td>64 KB minus 256 bytes (PSP) and room for the stack</td><td>the 64 KB limit applies to each segment separately</td></tr>
+    <tr><td>File header</td><td>none; the file is copied into memory as it is</td><td>present; contains a relocation table and initial values</td></tr>
+    <tr><td>Start address</td><td><code>ORG 100h</code>, IP = 0100h</td><td>the label given in the <code>END</code> directive</td></tr>
+    <tr><td>Segment registers</td><td>CS = DS = ES = SS</td><td>the program loads DS itself</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>All the examples in these notes are in the .COM format and are written in emu8086 syntax. Most of the examples also assemble unchanged with MASM and TASM. The byte values of the instructions and the IP and register traces were obtained by running them on an 8086 emulator.</p>
+
+<h3 id="s3-2-1-3"><span class="nt-num">3.2.1.3</span>When is assembly used?</h3>
+
+<p>A program written in assembly is generally smaller and faster than a high-level program that does the same job. The reason is simple: the program contains only the instructions the programmer wrote. There is no startup code added by a compiler, no library calls, and no general-purpose helper routines. Why every instruction is there is known.</p>
+
+<p>A more important advantage than speed is direct access to the hardware. Some 8086 instructions have no counterpart in standard C. <code>OUT</code> writes a byte to an I/O port, <code>CLI</code> disables interrupts, and <code>PUSHF</code> pushes the flags register onto the stack. Bootloaders, device drivers, interrupt service routines, and small embedded systems are therefore written wholly or partly in assembly. The first code that runs when a computer is powered on is assembly anyway, since the stack and memory layout have not yet been set up.</p>
+
+<p>The price of the language is also heavy. <a href="#tab-arti-eksi">Table 3.2.3</a> summarizes both sides.</p>
+
+<div class="nt-tablewrap" id="tab-arti-eksi">
+<table class="nt-table">
+  <caption>Table 3.2.3: Pros and cons of programming in assembly.</caption>
+  <thead><tr><th scope="col">Pros</th><th scope="col">Cons</th></tr></thead>
+  <tbody>
+    <tr><td>Takes less space; there is no unnecessary code.</td><td>Not portable: 8086 code does not run on an ARM processor.</td></tr>
+    <tr><td>Fast, because it performs only the necessary operations.</td><td>Laborious to write, read, and debug.</td></tr>
+    <tr><td>Gives port I/O, interrupt handling, and direct access to the flags.</td><td>Low productivity in large projects.</td></tr>
+    <tr><td>Indispensable in bootloaders, drivers, and embedded systems.</td><td>Modern compilers often produce code that is fast enough.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In practice the two sides are used together. Most of the program is written in a language such as C. Small time-critical pieces, such as the entry of an interrupt routine or the inside of a frequently called loop, are written in assembly. This <strong>mixed</strong> approach preserves both development speed and run speed. Another benefit of knowing assembly is reading high-level code. An engineer who can look at the assembly output a compiler produced can find out why the code runs slowly or why a variable took an unexpected value.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Believing “assembly is always faster.”</strong> Hand-written assembly is fast only if the programmer knows the processor better than the compiler does. A loop counter kept in memory, memory reads repeated needlessly, or a badly chosen instruction yield a program slower than the code a good compiler would produce. Speed comes less from the language than from choosing register and memory use correctly.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-2"><span class="nt-num">3.2.2</span>The structure of an instruction line</h2>
+
+<h3 id="s3-2-2-1"><span class="nt-num">3.2.2.1</span>The fields of a line</h3>
+
+<p>Assembly source is read line by line. Each line carries at most one instruction or one directive. The general form of an instruction line is as follows; the fields in square brackets are optional:</p>
+
+<div class="nt-math nt-math--c"><code>[label:]&nbsp;&nbsp;instruction&nbsp;&nbsp;[destination], [source]&nbsp;&nbsp;[; comment]</code></div>
+
+<p><a href="#sekil-satir">Figure 3.2.2</a> shows these fields on the line <code>start: MOV AX, 5 ; AX ← 5</code>. The <strong>label</strong> is the name given to the address of the line. The <strong>instruction</strong> field carries the mnemonic. After the instruction come at most two <strong>operands</strong> separated by a comma. The part from the semicolon to the end of the line is the <strong>comment</strong>.</p>
+
+<figure class="nt-fig" id="sekil-satir" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 70" role="img" aria-label="Fields of an instruction line: label, instruction, destination, source, comment"><rect class="mt-dim" x="60" y="6" width="70" height="30" rx="4"/><text class="mt-m" x="95" y="26" text-anchor="middle">start:</text><text class="lbl" x="95" y="56" text-anchor="middle">label</text><rect class="mt-hot" x="144" y="6" width="56" height="30" rx="4"/><text class="mt-m" x="172" y="26" text-anchor="middle">MOV</text><text class="lbl" x="172" y="56" text-anchor="middle">instruction</text><rect class="mt-acc" x="214" y="6" width="44" height="30" rx="4"/><text class="mt-m" x="236" y="26" text-anchor="middle">AX</text><text class="lbl" x="236" y="56" text-anchor="middle">destination</text><text class="mt-v" x="268" y="28" text-anchor="middle">,</text><rect class="mt-good" x="280" y="6" width="34" height="30" rx="4"/><text class="mt-m" x="297" y="26" text-anchor="middle">5</text><text class="lbl" x="297" y="56" text-anchor="middle">source</text><rect class="mt-dim" x="328" y="6" width="96" height="30" rx="4"/><text class="mt-m" x="376" y="26" text-anchor="middle">; AX ← 5</text><text class="lbl" x="376" y="56" text-anchor="middle">comment</text><text class="mt-a" x="470" y="26" text-anchor="start">→ AX ← 5</text></svg></div>
+  <figcaption><b>Figure 3.2.2:</b> The fields of an instruction line. The label <code>start</code>, the instruction <code>MOV</code>, <code>AX</code> the destination operand, <code>5</code> the source operand, and everything after the semicolon is a comment. The effect of the line is the assignment AX ← 5.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--tanim" id="tanim-islenen">
+  <span class="nt-box__title">Definition 3.2.2</span>
+  <p>An <strong>operand</strong> is the value, register, or memory location an instruction operates on. In two-operand instructions in Intel syntax, the left operand is the <strong>destination</strong> and the right one is the <strong>source</strong>. The instruction reads the source and writes the result to the destination. The source does not change; the old value of the destination is lost.</p>
+</div>
+
+<p>The destination–source order is where everyone learning assembly first stumbles. <code>MOV AX, BX</code> is read not as “move AX to BX” but as “AX ← BX.” This order is the same as assignment in C: <code>ax = bx;</code>. Two-operand arithmetic instructions follow the same rule. When <code>SUB CX, AX</code> runs, CX ← CX − AX; AX does not change. Thus the destination operand is both the first input and the place where the result is written.</p>
+
+<p>Not every instruction takes two operands. <a href="#tab-satirlar">Table 3.2.4</a> splits three lines with different numbers of operands into their fields.</p>
+
+<div class="nt-tablewrap" id="tab-satirlar">
+<table class="nt-table">
+  <caption>Table 3.2.4: The fields of three lines.</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Label</th><th scope="col">Instruction</th><th scope="col">Operands</th><th scope="col">Comment</th></tr></thead>
+  <tbody>
+    <tr><td><code>start: MOV AX, 5 ; AX ← 5</code></td><td><code>start</code></td><td><code>MOV</code></td><td><code>AX</code>, <code>5</code></td><td><code>; AX ← 5</code></td></tr>
+    <tr><td><code>INC AX</code></td><td>—</td><td><code>INC</code></td><td><code>AX</code></td><td>—</td></tr>
+    <tr><td><code>RET</code></td><td>—</td><td><code>RET</code></td><td>none</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>INC AX</code> has one operand: AX is both source and destination, and AX ← AX + 1. <code>RET</code> writes no operand at all, but it still does work: it reads a word from the stack and puts it into IP. These unwritten operands are treated in detail under <a href="#s3-2-3-2">implicit operands</a>.</p>
+
+<p>The assembler is case-insensitive. <code>mov ax, bx</code>, <code>MOV AX, BX</code>, and <code>Mov Ax, Bx</code> give the same machine code. The number of spaces and tabs is also unimportant; aligning the fields one under another is only for readability. Comments never enter the machine code. When the assembler sees a semicolon, it skips the rest of the line. A comment can therefore be as long as you like without affecting the size or speed of the program.</p>
+
+<p>Comments matter more in assembly than in high-level languages. The line <code>ADD AX, BX</code> already says what it does; it does not say why. Whether AX holds a running total, an address, or a counter cannot be told from the code. A good comment does not repeat the instruction as “AX ← AX + BX”; it states the purpose, such as “add this student's grade to the total.”</p>
+
+<h3 id="s3-2-2-2"><span class="nt-num">3.2.2.2</span>Instruction, directive, and macro</h3>
+
+<p>Not every line in an assembly source produces machine code. Lines fall into three kinds.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-direktif">
+  <span class="nt-box__title">Definition 3.2.3</span>
+  <p>An <strong>instruction</strong> is an operation the processor executes at run time and is translated into a single machine instruction. A <strong>directive</strong> is information given to the assembler: it states where the code will be placed, how much space to reserve, and what a name will stand for. A directive produces no machine instruction; data-definition directives produce only data bytes. A <strong>macro</strong> is a named text pattern that is replaced by several lines at assembly time.</p>
+</div>
+
+<p>The difference between an instruction and a directive is in timing. The instruction is executed by the processor while the program runs. A directive carries meaning only at assembly time; when the program starts to run, no trace of it remains. <a href="#tab-direktif">Table 3.2.5</a> gives frequently used lines with their kinds and what they produce in memory.</p>
+
+<div class="nt-tablewrap" id="tab-direktif">
+<table class="nt-table">
+  <caption>Table 3.2.5: Line kinds and what they produce in memory.</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Kind</th><th scope="col">What does it produce in memory?</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 5</code></td><td>instruction</td><td>machine code: <code>B8 05 00</code></td></tr>
+    <tr><td><code>ORG 100h</code></td><td>directive</td><td>nothing; sets the location counter to 0100h</td></tr>
+    <tr><td><code>num DB 0</code></td><td>directive (data definition)</td><td>1 byte of data: <code>00</code></td></tr>
+    <tr><td><code>k EQU 5</code></td><td>directive</td><td>nothing; the name <code>k</code> takes the value 5</td></tr>
+    <tr><td><code>END</code></td><td>directive</td><td>nothing; the source ends here</td></tr>
+    <tr><td><code>PUTC 'A'</code></td><td>macro call</td><td>the code of the instructions in the macro body</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>To understand how directives work, one must know the assembler's <strong>location counter</strong>. While reading the source from top to bottom, the assembler keeps in a counter the relative location where the next byte will be placed. Each instruction or data definition advances the counter by the number of bytes it produces. <code>ORG 100h</code> sets the counter directly to 0100h; it produces no bytes itself. <code>EQU</code>, on the other hand, never touches the counter: it only binds a name to a constant. The assembler writes 5 wherever it sees the name <code>k</code>. The line <code>num DB 0</code> binds the current value of the counter to the name <code>num</code>, reserves one byte, and puts 0 into it.</p>
+
+<p>The small program below makes this difference concrete. The comments on the right show the addresses and bytes in the assembler's listing.</p>
+
+<pre class="nt-code"><code>ORG 100h            <span class="cm">; no bytes; location counter = 0100h</span>
+k EQU 5             <span class="cm">; no bytes; k = 5</span>
+MOV AX, 5           <span class="cm">; 0100h: B8 05 00</span>
+MOV BX, k           <span class="cm">; 0103h: BB 05 00  (5 in place of k)</span>
+MOV AL, num         <span class="cm">; 0106h: A0 0A 01  (num = 010Ah)</span>
+RET                 <span class="cm">; 0109h: C3</span>
+num DB 0            <span class="cm">; 010Ah: 00</span>
+END                 <span class="cm">; no bytes</span></code></pre>
+
+<p>Of the eight lines only five produce bytes, and the program is 11 bytes. The codes of <code>MOV AX, 5</code> and <code>MOV BX, k</code> are the same apart from the register number, because the assembler put 5 in place of <code>k</code>. A constant defined with <code>EQU</code> occupies no memory. The situation is different in the line <code>MOV AL, num</code>. <code>num</code> is a memory location; the instruction reads the byte at that location. The assembler writes the location's address into the instruction: 010Ah, low byte first, <code>0A 01</code>. This address is not known until the assembler reaches the <code>num</code> line. How the assembler resolves this forward reference is explained by two-pass assembly; what matters here is that the address is computed at assembly time and embedded in the instruction.</p>
+
+<p>The macro is the third kind. <code>PUTC 'A'</code>, from the <code>emu8086.inc</code> library that ships with emu8086, is the name of a pattern of a few instructions that prints one character on the screen. When the assembler sees this line, it copies the body of the macro in place of the line and translates the copy. A macro call is not a subroutine call: the body is rewritten at every use and the program grows accordingly. Macros are a separate topic; they are mentioned here only to show that one line can produce more than one machine instruction.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Treating an EQU constant as a variable.</strong> After the definition <code>k EQU 5</code>, writing <code>MOV k, 7</code> means “5 ← 7” and the assembler reports an error. An EQU name occupies no memory; its value is fixed at assembly time and cannot be changed at run time. A quantity whose value will change is defined with <code>DB</code> or <code>DW</code>.</p>
+</div>
+
+<h3 id="s3-2-2-3"><span class="nt-num">3.2.2.3</span>Labels and names</h3>
+
+<p>In an assembly program, addresses are written as names instead of numbers. The name given to the address of an instruction is called a <strong>code label</strong>, and the name given to a data area is called a <strong>variable name</strong>. Both are bound to an address in the assembler's symbol table, but they are used differently.</p>
+
+<pre class="nt-code"><code>start:  MOV CX, 3   <span class="cm">; code label</span>
+again:  INC AX
+        LOOP again  <span class="cm">; again = address</span>
+        RET
+num     DB 7        <span class="cm">; data name</span></code></pre>
+
+<p>A code label ends with a colon. The label itself produces no machine code; it only stands for the address of the instruction that follows it, that is, its relative location within CS. If this program is assumed to start with <code>ORG 100h</code>, <code>start</code> = 0100h. <code>MOV CX, 3</code> is three bytes (<code>B9 03 00</code>); <code>again</code> = 0103h. <code>INC AX</code> is a single byte (<code>40</code>), and <code>LOOP again</code> is two bytes (<code>E2 FD</code>). <code>RET</code> is at 0106h and <code>num</code> at 0107h.</p>
+
+<p>The second byte of <code>LOOP again</code>, FDh, is noteworthy. The instruction stores not the address but the <strong>displacement</strong>. When LOOP executes, IP already points to the next instruction, that is, 0106h. Since the target is 0103h, the displacement is 0103h − 0106h = −3. −3 is written as FDh in 8-bit two's complement. The label spares the programmer this calculation: the programmer writes <code>again</code> and the assembler computes the displacement. When a new instruction is added to the program and addresses shift, the calculation is renewed automatically.</p>
+
+<p>A variable name is written without a colon. For a variable name, the assembler keeps three pieces of information: its address, its segment, and its <strong>type</strong>. A name defined with <code>DB</code> has type byte, and one defined with <code>DW</code> has type word. The type information lets the assembler check sizes. If <code>MOV AX, num</code> is written after the definition <code>num DB 7</code>, the assembler notices that an 8-bit variable is being moved into a 16-bit register and reports an error.</p>
+
+<p>The rules for names are as follows:</p>
+<ul>
+  <li>A name begins with a letter or an underscore; it cannot begin with a digit. Any string that begins with a digit is a number to the assembler.</li>
+  <li>The rest of the name may contain letters, digits, and underscores.</li>
+  <li>Instruction, register, and directive names (MOV, AX, DB, END …) cannot be used as names; these are <strong>reserved words</strong>.</li>
+  <li>Case is not distinguished. <code>again</code> and <code>AGAIN</code> are the same label; defining both gives a “defined twice” error.</li>
+</ul>
+
+<div class="nt-tablewrap" id="tab-adlar">
+<table class="nt-table">
+  <caption>Table 3.2.6: Examples of names.</caption>
+  <thead><tr><th scope="col">Name</th><th scope="col">Valid?</th><th scope="col">Why?</th></tr></thead>
+  <tbody>
+    <tr><td><code>_count</code></td><td><span class="n32-ok">yes</span></td><td>begins with an underscore</td></tr>
+    <tr><td><code>total2</code></td><td><span class="n32-ok">yes</span></td><td>begins with a letter, the digit comes later</td></tr>
+    <tr><td><code>2total</code></td><td><span class="n32-bad">no</span></td><td>begins with a digit; the assembler takes it for an invalid number</td></tr>
+    <tr><td><code>cx</code></td><td><span class="n32-bad">no</span></td><td>it is a register name (same as CX)</td></tr>
+    <tr><td><code>last-value</code></td><td><span class="n32-bad">no</span></td><td>− is an operator; the assembler reads <code>last</code> minus <code>value</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The last row is instructive. <code>last-value</code> is parsed as an expression. If the names <code>last</code> and <code>value</code> do not exist in the program, the assembler reports an “undefined symbol” error; if they do, it computes the difference of the two addresses and produces a number the programmer never wanted. Underscores are therefore used in names made of several words: <code>last_value</code>.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Thinking <code>Num</code> and <code>num</code> are two different variables.</strong> C and Java distinguish case; 8086 assemblers do not. A programmer who writes <code>MOV Num, 3</code> after the definition <code>num DB 7</code> may think a new variable has been created, but the instruction writes 3 to the same byte and the 7 is lost. The assembler does not count this as an error, because the line is valid. Different quantities are given different names.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-3"><span class="nt-num">3.2.3</span>Operands</h2>
+
+<h3 id="s3-2-3-1"><span class="nt-num">3.2.3.1</span>Register, immediate value, and memory</h3>
+
+<p>The operand of an instruction can come from three places: a register inside the processor, the instruction's own bytes, or memory. These three kinds behave differently both in syntax and in hardware.</p>
+
+<div class="nt-tablewrap" id="tab-islenen">
+<table class="nt-table">
+  <caption>Table 3.2.7: Three operand types.</caption>
+  <thead><tr><th scope="col">Type</th><th scope="col">Example</th><th scope="col">Where does the value come from?</th><th scope="col">Restriction</th></tr></thead>
+  <tbody>
+    <tr><td>Register</td><td><code>MOV AX, BX</code></td><td>from the register file inside the processor</td><td>the fastest type</td></tr>
+    <tr><td>Immediate value</td><td><code>MOV AX, 5</code></td><td>from within the bytes of the instruction</td><td>can only be a source</td></tr>
+    <tr><td>Memory</td><td><code>MOV AX, [BX]</code></td><td>from memory, with a bus cycle</td><td>at most one per instruction</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A <strong>register operand</strong> is inside the processor. The 8086's execution unit (EU) has eight general-purpose 16-bit registers: AX, BX, CX, DX, SP, BP, SI, and DI. The first four can also be used through their 8-bit halves: AH and AL, BH and BL, CH and CL, DH and DL. An instruction with register operands never goes out onto the external bus. The value travels over the internal bus to the ALU, and the result returns to the register over the internal bus.</p>
+
+<p>An <strong>immediate value</strong> is a constant embedded in the instruction. The bytes <code>05 00</code> of <code>MOV AX, 5</code> are this constant. Because the value is fetched along with the instruction, it need not be read separately; it is already waiting in the instruction queue. An immediate value can only be a source, because writing to a constant is meaningless: <code>ADD 5, AX</code> would mean “let the new value of 5 be 5 + AX.”</p>
+
+<p>A <strong>memory operand</strong> is given by an address. In <code>MOV AX, [BX]</code> the square brackets mean “the number in BX is an address; take the word at that address.” The processor first computes the address, then gives the bus interface unit (BIU) a read request. The BIU puts the address on the address bus, reads the data from memory, and passes it to the execution unit. This external access adds at least four clock periods compared with a register operand.</p>
+
+<p>The basic rules among the three kinds are these. The two operands must be the same size: a 16-bit register cannot be moved into an 8-bit register. At most one memory operand can appear in an instruction; <code>MOV [BX], [SI]</code> is invalid. An immediate value cannot be loaded into a segment register (CS, DS, ES, SS). All these rules come from the 8086's instruction encoding. The instruction format has a single field that specifies a memory address; there is no room to encode a second memory operand. No opcode that loads a constant into a segment register was designed either.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-islenen">
+  <span class="nt-box__title">Example 3.2.2</span>
+  <p>Identify the operand types of the following instructions: <code>ADD CL, 10</code>, <code>MOV [BX], AX</code>, <code>SUB DX, counter</code>.</p>
+  <p><code>ADD CL, 10</code>: the destination is a register (CL), the source is an immediate value (10). CL ← CL + 10. There is no memory access.</p>
+  <p><code>MOV [BX], AX</code>: the destination is memory, the source is a register. The two bytes of AX are written to the address BX points to, low byte first. One bus cycle (write) is needed.</p>
+  <p><code>SUB DX, counter</code>: the destination is a register, the source is memory (<code>counter</code> is a variable name, which the assembler turns directly into an address). If <code>counter</code> is a <code>DW</code> variable, DX ← DX − [counter]; if it is a <code>DB</code> variable, a size-mismatch error results.</p>
+</div>
+
+<h3 id="s3-2-3-2"><span class="nt-num">3.2.3.2</span>Implicit operands</h3>
+
+<p>Some instructions, besides the operands that are written, also use or change registers that do not appear in the instruction line at all. Which registers these are is built into the definition of the instruction.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ortuk">
+  <span class="nt-box__title">Definition 3.2.4</span>
+  <p>An <strong>implicit operand</strong> is a register or memory location that an instruction reads or changes although it is not written in the instruction line. Implicit operands are fixed in the instruction's opcode; the programmer cannot choose them and only has to know them.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-ortuk">
+<table class="nt-table">
+  <caption>Table 3.2.8: Implicit operands of some instructions.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Written operand</th><th scope="col">Implicit operand(s)</th><th scope="col">Operation</th></tr></thead>
+  <tbody>
+    <tr><td><code>MUL BL</code></td><td>BL</td><td>AL (multiplicand), AX (result)</td><td>AX ← AL × BL</td></tr>
+    <tr><td><code>DIV BL</code></td><td>BL</td><td>AX (dividend), AL (quotient), AH (remainder)</td><td>AL ← AX ÷ BL, AH ← AX mod BL</td></tr>
+    <tr><td><code>LOOP don</code></td><td>again</td><td>CX (counter)</td><td>CX ← CX − 1; jump if CX ≠ 0</td></tr>
+    <tr><td><code>CBW</code></td><td>—</td><td>AL → AX</td><td>the sign bit of AL is copied to all bits of AH</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>AX</td><td>SS:SP (top of the stack)</td><td>SP ← SP − 2; [SS:SP] ← AX</td></tr>
+    <tr><td><code>XLAT</code></td><td>—</td><td>AL (index and result), BX (table address)</td><td>AL ← [DS:BX + AL]</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The implicit uses in the table are also the source of the names of the 8086 registers. AX is the <strong>accumulator</strong>: the result of multiplication and division is always written there. CX is the <strong>count</strong> register: LOOP decrements it automatically, and multi-bit shifts read the count from its lower half CL. BX is the <strong>base</strong> register: XLAT looks for the start of the table there. SP points to the top of the stack and changes automatically on every PUSH and POP. The “special duties” of registers are really hardwired connections of these instructions in the hardware. One input of the multiplier circuit is connected directly to AL and its output directly to AX.</p>
+
+<p>The practical consequence of implicit-operand knowledge is this: an instruction can also change a register that is not written. In the line <code>MUL BL</code>, AH is never mentioned, but the instruction wipes AH out, because the 16-bit result is written to the whole of AX. A value saved in AH is lost after this line. A program that wants to preserve a register's value must know the implicit operands of the instructions it uses.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-div">
+  <span class="nt-box__title">Example 3.2.3</span>
+  <p><code>DIV BL</code> runs with AX = 100 (0064h) and BL = 7. What are AL, AH, and AX?</p>
+  <p>In 8-bit division the dividend is implicitly the whole of AX, and the divisor is the written BL. The quotient of 100 ÷ 7 is 14 and the remainder 2 (7 × 14 = 98, 100 − 98 = 2). The quotient is written to AL and the remainder to AH: AL = 0Eh, AH = 02h. Read together, the two halves give AX = <strong>020Eh</strong>. The value AX had before the division is lost. Had the quotient not fit in 8 bits, for example with AX = 1000 and BL = 2, the processor would have generated a divide-error interrupt (INT 0).</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-cbw">
+  <span class="nt-box__title">Example 3.2.4</span>
+  <p><code>CBW</code> runs with AL = F6h. What is AX? What would the difference have been if <code>MOV AH, 0</code> had done the same job?</p>
+  <p>In two's complement F6h is −10; its sign bit (bit 7) is 1. CBW copies this bit into the eight bits of AH: AH = FFh, AX = <strong>FFF6h</strong>. FFF6h is also −10 in 16 bits; the signed value is preserved. <code>MOV AH, 0</code>, however, gives AX = 00F6h = 246. This result is correct if AL is an unsigned number and wrong if it is signed. CBW has no written operand at all; both its source (AL) and its destination (AX) are implicit.</p>
+</div>
+
+<h3 id="s3-2-3-3"><span class="nt-num">3.2.3.3</span>Code trace: MUL, SHR, and LOOP</h3>
+
+<p>The following program uses three instructions with implicit operands in a row. In the program CX is written only once, and AX appears to be written only in the ADD line. The trace shows how many times these registers actually change.</p>
+
+<pre class="nt-code"><code>ORG 100h
+MOV AL, 12
+MOV BL, 10
+MUL BL         <span class="cm">; AX = AL × BL</span>
+MOV CL, 2
+SHR AX, CL     <span class="cm">; count in CL</span>
+MOV CX, 3      <span class="cm">; LOOP counter</span>
+again:
+ADD AX, 1
+LOOP again     <span class="cm">; CX decrements</span>
+RET</code></pre>
+
+<p>At the start of the program the initial state of .COM programs applies: the general registers are 0 and the status flags are 0. <a href="#tab-ortuk-iz">Table 3.2.9</a> gives the state after each instruction. The address column is the instruction's relative location and the bytes column is the machine code.</p>
+
+<div class="nt-tablewrap" id="tab-ortuk-iz">
+<table class="nt-table">
+  <caption>Table 3.2.9: Trace of the implicit-operand program (each row is the state after the instruction executes).</caption>
+  <thead><tr><th scope="col">Address</th><th scope="col">Bytes</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">Comment</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>B0 0C</code></td><td><code>MOV AL, 12</code></td><td>000Ch</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>AL = 12</td></tr>
+    <tr><td>0102h</td><td><code>B3 0A</code></td><td><code>MOV BL, 10</code></td><td>000Ch</td><td>000Ah</td><td>0000h</td><td>0</td><td>0</td><td>BL = 10</td></tr>
+    <tr><td>0104h</td><td><code>F6 E3</code></td><td><code>MUL BL</code></td><td>0078h</td><td>000Ah</td><td>0000h</td><td>0</td><td>?</td><td>AX ← AL × BL = 120</td></tr>
+    <tr><td>0106h</td><td><code>B1 02</code></td><td><code>MOV CL, 2</code></td><td>0078h</td><td>000Ah</td><td>0002h</td><td>0</td><td>?</td><td>shift count</td></tr>
+    <tr><td>0108h</td><td><code>D3 E8</code></td><td><code>SHR AX, CL</code></td><td>001Eh</td><td>000Ah</td><td>0002h</td><td>0</td><td>0</td><td>120 ÷ 4 = 30</td></tr>
+    <tr><td>010Ah</td><td><code>B9 03 00</code></td><td><code>MOV CX, 3</code></td><td>001Eh</td><td>000Ah</td><td>0003h</td><td>0</td><td>0</td><td>the 2 in CL is overwritten</td></tr>
+    <tr><td>010Dh</td><td><code>05 01 00</code></td><td><code>ADD AX, 1</code></td><td>001Fh</td><td>000Ah</td><td>0003h</td><td>0</td><td>0</td><td>iteration 1</td></tr>
+    <tr><td>0110h</td><td><code>E2 FB</code></td><td><code>LOOP again</code></td><td>001Fh</td><td>000Ah</td><td>0002h</td><td>0</td><td>0</td><td>CX ≠ 0 → again</td></tr>
+    <tr><td>010Dh</td><td></td><td><code>ADD AX, 1</code></td><td>0020h</td><td>000Ah</td><td>0002h</td><td>0</td><td>0</td><td>iteration 2</td></tr>
+    <tr><td>0110h</td><td></td><td><code>LOOP again</code></td><td>0020h</td><td>000Ah</td><td>0001h</td><td>0</td><td>0</td><td>CX ≠ 0 → again</td></tr>
+    <tr><td>010Dh</td><td></td><td><code>ADD AX, 1</code></td><td>0021h</td><td>000Ah</td><td>0001h</td><td>0</td><td>0</td><td>iteration 3</td></tr>
+    <tr><td>0110h</td><td></td><td><code>LOOP again</code></td><td>0021h</td><td>000Ah</td><td>0000h</td><td>0</td><td>0</td><td>CX = 0 → falls through</td></tr>
+    <tr><td>0112h</td><td><code>C3</code></td><td><code>RET</code></td><td>0021h</td><td>000Ah</td><td>0000h</td><td>0</td><td>0</td><td>result 33</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The MUL step.</strong> In the line <code>MUL BL</code> only BL is written. The multiplicand is implicitly AL (12), and the result is implicitly AX. 12 × 10 = 120 = 0078h. Since the result fits in 8 bits, AH = 00h and CF = OF = 0 remain. On the 8086, MUL sets these two flags according to the question “is the upper half of the result significant?” SF, ZF, AF, and PF, on the other hand, are <strong>undefined</strong> after MUL: the processor writes some value into them, but Intel does not document that value. This is why a question mark is placed for ZF in the table. For a program to rely on ZF, an instruction that sets the flag in a defined way must follow.</p>
+
+<p><strong>The SHR step.</strong> To shift a register by more than one bit on the 8086, the shift count can be given only in CL. The form <code>SHR AX, 2</code> arrived with the 80186. The program therefore first writes <code>MOV CL, 2</code>. A right shift halves the value at every bit: 0078h = 0111 1000b shifted two bits to the right becomes 0001 1110b = 001Eh = 30. The last bit shifted out is written into CF. Since the two bits shifted out are 0 and 0, CF = 0. Since the result is nonzero, ZF = 0. With this instruction ZF has become defined again.</p>
+
+<p><strong>The MOV CX, 3 step.</strong> This line writes 3 into CX. CL is the lower half of CX; the 2 written to CL in the previous step is thereby erased. The loss is unimportant because the shifting is finished, but had the order been reversed, that is, had CX been set first and then 2 written to CL, the loop would have run 2 times instead of 3. One physical register being known under two names becomes a frequent source of errors when combined with implicit operands.</p>
+
+<p><strong>The LOOP steps.</strong> The instruction <code>LOOP again</code> does two jobs in one instruction: it decrements CX by 1 and jumps to the label <code>again</code> if CX is not zero. No line in the program decrements CX, yet the trace shows CX changing three times, 3 → 2 → 1 → 0. LOOP's decrement does not affect the flags; LOOP is an instruction that does not change flags. On each iteration <code>ADD AX, 1</code> increments AX by one: 30 → 31 → 32 → 33. At the third LOOP, CX drops to zero, the jump is not taken, and the flow falls through to RET.</p>
+
+<p>At the end of the program AX = 0021h = 33. Read line by line, the result is not surprising, but someone who thinks AX is written only in the ADD line would miss that MUL and SHR changed AX. <a href="#sekil-ortuk">Figure 3.2.3</a> shows three moments of the trace with drawings from the slides.</p>
+
+<figure class="nt-fig" id="sekil-ortuk" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="Registers AX, BX, CX and the flags; after the step"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0078h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">?</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 120 (decimal)</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">implicit: AL, AX</text></svg><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="Registers AX, BX, CX and the flags; after the step"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="mt-hot" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">001Eh</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="mt-hot" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0002h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 30 (decimal)</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">count in CL</text></svg><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="Registers AX, BX, CX and the flags; after the step"><text class="lbl" x="46" y="19" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="box" x="8" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="46" y="44" text-anchor="middle" style="font-size:14px;">0021h</text><text class="lbl" x="130" y="19" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="92" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="130" y="44" text-anchor="middle" style="font-size:14px;">000Ah</text><text class="lbl" x="214" y="19" text-anchor="middle" style="font-size:11.5px;">CX</text><rect class="box" x="176" y="24" width="76" height="30" rx="4"/><text class="mt-v" x="214" y="44" text-anchor="middle" style="font-size:14px;">0000h</text><rect class="box" x="270" y="22" width="36" height="34" rx="3"/><text class="lbl" x="288" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="288" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="311" y="22" width="36" height="34" rx="3"/><text class="lbl" x="329" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="329" y="51" text-anchor="middle" style="font-size:14px;">0</text><text class="mt-m" x="8" y="84" text-anchor="start" style="font-size:13px;">AX = 33 (decimal)</text></svg></div>
+  <figcaption><b>Figure 3.2.3:</b> Three moments of the implicit-operand trace. At the top, after <code>MUL BL</code>: AX = 0078h, ZF undefined. In the middle, after <code>SHR AX, CL</code>: AX = 001Eh, CX = 0002h. At the bottom, at RET: AX = 0021h, CX = 0000h. Highlighted boxes are the registers that changed in that step.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Assuming MUL preserves AH.</strong> A program that keeps a counter or an intermediate result in AH loses that value when it runs <code>MUL BL</code>. The 16-bit <code>MUL BX</code> changes an even wider area: the result is written to the pair DX:AX, and the old value of DX is erased too. A register that must be preserved is moved to another register or to the stack before the MUL.</p>
+</div>
+
+<h3 id="s3-2-3-4"><span class="nt-num">3.2.3.4</span>Register or memory?</h3>
+
+<p>A value is held either in a register or in memory. The choice between the two is the decision that affects a program's speed the most. <a href="#sekil-yazmac-bellek">Figure 3.2.4</a> shows how far the two places are from the processor.</p>
+
+<figure class="nt-fig" id="sekil-yazmac-bellek" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 92" role="img" aria-label="The register is inside the CPU; the memory is at the other end of the system bus"><defs><marker id="n32-6-mt2-12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-dim" x="6" y="6" width="200" height="80" rx="8"/><text class="lbl" x="20" y="24" text-anchor="start">CPU</text><rect class="mt-hot" x="20" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="40" y="54" text-anchor="middle">AX</text><rect class="mt-hot" x="65" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="85" y="54" text-anchor="middle">BX</text><rect class="mt-hot" x="110" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="130" y="54" text-anchor="middle">CX</text><rect class="mt-hot" x="155" y="36" width="40" height="26" rx="3"/><text class="mt-m" x="175" y="54" text-anchor="middle">DX</text><text class="mt-g" x="106" y="80" text-anchor="middle" style="font-size:12px">0 bus cycles</text><path class="mt-wire" d="M210 46 H370" marker-end="url(#n32-6-mt2-12)" marker-start="url(#n32-6-mt2-12)"/><text class="lbl" x="290" y="38" text-anchor="middle">system bus</text><text class="mt-a" x="290" y="68" text-anchor="middle" style="font-size:12px">every access ≥ 4 clock periods</text><rect class="box" x="376" y="6" width="178" height="80" rx="8"/><text class="mt-s" x="465" y="28" text-anchor="middle">Memory (1 MB)</text><text class="lbl" x="465" y="50" text-anchor="middle">code · variables</text><text class="lbl" x="465" y="68" text-anchor="middle">arrays · stack</text></svg></div>
+  <figcaption><b>Figure 3.2.4:</b> Registers are inside the CPU; memory is at the other end of the system bus. Accessing a register needs no bus cycle; every memory access is a bus cycle that lasts at least four clock periods.</figcaption>
+</figure>
+
+<p>The 8086 has <strong>14 registers</strong> visible to the programmer: 8 general-purpose registers (AX, BX, CX, DX, SP, BP, SI, DI), 4 segment registers (CS, DS, ES, SS), the instruction pointer IP, and the FLAGS register. All are 16 bits. Registers are small, very fast memory cells built from flip-flops. The value of a register reaches the ALU directly over the internal bus; it never goes out onto the external lines.</p>
+
+<p>Memory, on the other hand, is outside the CPU and on the 8086 can grow up to 1 MB. Program code, variables, arrays, and the stack live here. To read a word from memory, the processor has to execute a <strong>bus cycle</strong>.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-yol-dongusu">
+  <span class="nt-box__title">Definition 3.2.5</span>
+  <p>A <strong>bus cycle</strong> is the operation in which the processor reads or writes a memory or I/O location over the system bus. On the 8086 a bus cycle consists of at least four <strong>T states</strong> (T1–T4); each T state is one clock period. If the memory is slow, wait states (Tw) are inserted between T3 and T4.</p>
+</div>
+
+<p>In a read cycle, at T1 the processor puts the 20-bit address on the lines AD0–AD15 and A16–A19 and has the address captured by external latches with the ALE signal. At T2 the same lines are released for data and the RD signal becomes active. At T3 the memory puts the data on the data bus. At T4 the processor takes the data and the signals are withdrawn. With a register operand none of these four steps exists. A memory access is therefore many times longer than a register access.</p>
+
+<p>A memory access has one more cost. The 8086's data bus is 16 bits wide, and in one bus cycle it can read as a whole a word that starts at an even address. If the word starts at an odd address, two separate bus cycles are needed: one for the low byte and one for the high byte. In this case the access is four clock periods longer.</p>
+
+<p>This difference sets the rule of good assembly code: frequently used values are kept in registers, and memory is visited only when necessary. Keeping a loop counter in CX instead of in memory makes the loop faster. The elements of an array have to stay in memory, but the sum of the elements can be accumulated in a register during the loop and written to memory once at the end.</p>
+
+<h3 id="s3-2-3-5"><span class="nt-num">3.2.3.5</span>Instruction timing</h3>
+
+<p>The Intel 8086 data sheet gives how many clock periods each instruction takes. For instructions with memory operands, an <strong>effective address</strong> (EA) time is added to this for computing the address. The effective address is the memory operand's relative location within the segment; it can be a direct constant, a register, or the sum of a register and a constant.</p>
+
+<div class="nt-tablewrap" id="tab-sure">
+<table class="nt-table">
+  <caption>Table 3.2.10: Timings of some 8086 instructions (best case, clock periods).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Operands</th><th scope="col">Clock periods</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, BX</code></td><td>register, register</td><td>2</td></tr>
+    <tr><td><code>MOV AX, 5</code></td><td>register, immediate</td><td>4</td></tr>
+    <tr><td><code>MOV AX, num</code></td><td>accumulator, direct memory</td><td>10</td></tr>
+    <tr><td><code>MOV CX, [BX]</code></td><td>register, memory</td><td>8 + 5 = 13</td></tr>
+    <tr><td><code>ADD AX, BX</code></td><td>register, register</td><td>3</td></tr>
+    <tr><td><code>ADD AX, num</code></td><td>register, memory</td><td>9 + 6 = 15</td></tr>
+    <tr><td><code>INC CX</code></td><td>16-bit register</td><td>2</td></tr>
+    <tr><td><code>INC counter</code></td><td>memory (word)</td><td>15 + 6 = 21</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nt-tablewrap" id="tab-ea">
+<table class="nt-table">
+  <caption>Table 3.2.11: Time of the effective address calculation.</caption>
+  <thead><tr><th scope="col">Address form</th><th scope="col">Example</th><th scope="col">EA time (periods)</th></tr></thead>
+  <tbody>
+    <tr><td>base or index only</td><td><code>[BX]</code>, <code>[SI]</code></td><td>5</td></tr>
+    <tr><td>direct address</td><td><code>num</code>, <code>[0200h]</code></td><td>6</td></tr>
+    <tr><td>base + index</td><td><code>[BX+SI]</code>, <code>[BP+DI]</code></td><td>7</td></tr>
+    <tr><td>base + index</td><td><code>[BX+DI]</code>, <code>[BP+SI]</code></td><td>8</td></tr>
+    <tr><td>base or index + constant</td><td><code>[BX+4]</code></td><td>9</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The differences in the table are due to the hardware. <code>MOV AX, BX</code> is an internal transfer: 2 periods. <code>MOV AX, 5</code> takes 4 periods, because the 16-bit constant must be pulled from the instruction queue. <code>MOV CX, [BX]</code> first computes the effective address (5 periods), then executes a bus cycle. <code>MOV AX, num</code> is a special case. Loading AX from a direct address uses the short <strong>accumulator form</strong> (opcode <code>A1</code>), which carries the address inside the instruction and needs no EA calculation: 10 periods. Instructions that write to memory are the longest. <code>INC counter</code> first reads the word, increments it in the ALU, then writes it back; it contains two bus cycles and takes 21 periods.</p>
+
+<p>The values in the table are best-case timings. A word access at an odd address adds 4 periods to each access. If the instruction queue is empty after a jump, the processor waits for the bytes to arrive. If a segment prefix is used, 2 more periods are added. The real time may therefore be longer than the table's. The ratio does not change, though: an instruction with a memory operand is several times slower than its register counterpart.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-sure">
+  <span class="nt-box__title">Example 3.2.5</span>
+  <p>On a 5 MHz 8086, in a loop that runs 1000 times, a counter is incremented once per iteration. How long do the increments take in total when the counter is kept in CX and when it is kept in memory?</p>
+  <p>At 5 MHz one clock period is 1 / (5 × 10<sup>6</sup>) s = 0.2 µs. If the counter is in CX, each increment with <code>INC CX</code> takes 2 periods: 1000 × 2 = 2000 periods = 2000 × 0.2 µs = <strong>0.4 ms</strong>. If the counter is in memory, each increment with <code>INC counter</code> takes 21 periods: 1000 × 21 = 21,000 periods = <strong>4.2 ms</strong>. Only the counter's location changed, and the time grew more than tenfold. Since the other instructions of the loop remain the same, the difference in total time is also 3.8 ms.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-com-sure">
+  <span class="nt-box__title">Example 3.2.6</span>
+  <p>How many clock periods does the sequence <code>MOV AX, 5</code>, <code>MOV BX, 3</code>, <code>ADD AX, BX</code>, <code>MOV CL, AL</code> take? What would change if the second line were <code>MOV BX, num</code> (direct address, word)?</p>
+  <p>An immediate value into a register takes 4, register-to-register addition 3, and an 8-bit register-to-register MOV 2 periods: 4 + 4 + 3 + 2 = <strong>13 periods</strong>; at 5 MHz, 2.6 µs. If the second line reads from memory, the accumulator form cannot be used because the destination is BX, not AX; the time becomes 8 + 6 = 14 periods. The total is 4 + 14 + 3 + 2 = <strong>23 periods</strong>, that is, 4.6 µs. A single memory operand has roughly doubled the time of the sequence.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Confusing instruction length with instruction time.</strong> A short instruction is not necessarily a fast one. <code>MUL BL</code> is only two bytes (<code>F6 E3</code>) but takes 70–77 clock periods; the three-byte <code>ADD AX, 1234h</code> (<code>05 34 12</code>) takes 4. The number of bytes determines the space the instruction occupies in memory and how far IP will advance. The time is determined by the instruction's internal operation and the number of bus cycles.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-4"><span class="nt-num">3.2.4</span>IP and the flags</h2>
+
+<h3 id="s3-2-4-1"><span class="nt-num">3.2.4.1</span>How does IP advance?</h3>
+
+<p>IP is never written in programs, yet every instruction changes it. The <strong>instruction pointer</strong> (IP) holds the relative location, within the code segment, of the next instruction. The physical address is computed from CS and IP: CS × 10h + IP. This pair is called <strong>CS:IP</strong>.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ip">
+  <span class="nt-box__title">Definition 3.2.6</span>
+  <p>After an ordinary (non-jumping) instruction executes, IP advances by the instruction's length in bytes: IP<sub>new</sub> = IP<sub>old</sub> + instruction length. Jump, call, return, and interrupt instructions, on the other hand, write a new value into IP. IP cannot be written with <code>MOV</code>.</p>
+</div>
+
+<p>8086 instructions range in length from 1 to 6 bytes. To know how far IP will advance, you must know each instruction's length. In the program below the lengths are written as comments.</p>
+
+<pre class="nt-code"><code>ORG 100h
+MOV AX, 5     <span class="cm">; 3 bytes</span>
+MOV BX, 2     <span class="cm">; 3 bytes</span>
+INC AX        <span class="cm">; 1 byte</span>
+ADD AX, BX    <span class="cm">; 2 bytes</span>
+RET           <span class="cm">; 1 byte</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-ip-iz">
+<table class="nt-table">
+  <caption>Table 3.2.12: IP trace (each row is the state after the instruction executes).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Instruction address</th><th scope="col">Bytes</th><th scope="col">Instruction</th><th scope="col">IP</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>—</td><td>—</td><td>(loaded)</td><td>0100h</td><td>0000h</td><td>0000h</td><td>FFFEh</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>B8 05 00</code></td><td><code>MOV AX, 5</code></td><td>0103h</td><td>0005h</td><td>0000h</td><td>FFFEh</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>BB 02 00</code></td><td><code>MOV BX, 2</code></td><td>0106h</td><td>0005h</td><td>0002h</td><td>FFFEh</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>40</code></td><td><code>INC AX</code></td><td>0107h</td><td>0006h</td><td>0002h</td><td>FFFEh</td></tr>
+    <tr><td>4</td><td>0107h</td><td><code>03 C3</code></td><td><code>ADD AX, BX</code></td><td>0109h</td><td>0008h</td><td>0002h</td><td>FFFEh</td></tr>
+    <tr><td>5</td><td>0109h</td><td><code>C3</code></td><td><code>RET</code></td><td>0000h</td><td>0008h</td><td>0002h</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In step 0 the program has been loaded at offset 0100h of the segment, and IP = 0100h points to the first instruction. In step 1 the processor reads the byte <code>B8</code>, understands that a two-byte constant follows this opcode, and takes all three bytes together. IP advances to 0103h; when the instruction executes, AX = 0005h. In step 2 the same happens for BX: 3 more bytes, IP = 0106h.</p>
+
+<p>The <code>INC AX</code> in step 3 is a single byte. The code of the 16-bit register increment instructions is 40h + register number; for AX, 40h. IP advances by only 1: 0107h. In step 4, <code>ADD AX, BX</code> is two bytes: the opcode 03h and a byte that defines the operands (C3h). IP = 0109h, and AX = 0006h + 0002h = 0008h.</p>
+
+<p>Step 5 is not an ordinary instruction. <code>RET</code> takes the word at the top of the stack into IP. When a .COM program starts, the top of the stack (SS:FFFEh) holds the 0000h that DOS placed there. RET writes this value into IP and increases SP by 2: FFFEh + 2 = 10000h, which does not fit in 16 bits, so SP = 0000h. IP = 0000h now points not to the program but to the first byte of the PSP at the start of the segment. There sits the <code>INT 20h</code> instruction (<code>CD 20</code>), which ends the program.</p>
+
+<figure class="nt-fig" id="sekil-ip" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP"><defs><marker id="n32-7-m03i12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><path class="line" d="M10 118 L10 70" marker-end="url(#n32-7-m03i12)"/><text class="txt mono" x="10" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0100h</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP"><defs><marker id="n32-8-m03i15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><path class="line" d="M276 118 L276 70" marker-end="url(#n32-8-m03i15)"/><text class="txt mono" x="276" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0107h</text><rect class="box" x="348" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text></svg><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="Code bytes and IP"><defs><marker id="n32-9-m03i17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="6" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="63.0" y="52" text-anchor="middle" style="font-size:12.5px">B8 05 00</text><text class="lbl mono" x="8" y="22" text-anchor="start" style="font-size:10.5px">0100</text><text class="lbl mono" x="63.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="120" y="30" width="114" height="34" rx="2"/><text class="txt mono" x="177.0" y="52" text-anchor="middle" style="font-size:12.5px">BB 02 00</text><text class="lbl mono" x="122" y="22" text-anchor="start" style="font-size:10.5px">0103</text><text class="lbl mono" x="177.0" y="84" text-anchor="middle" style="font-size:11px">MOV</text><rect class="box" x="234" y="30" width="38" height="34" rx="2"/><text class="txt mono" x="253.0" y="52" text-anchor="middle" style="font-size:12.5px">40</text><text class="lbl mono" x="236" y="22" text-anchor="start" style="font-size:10.5px">0106</text><text class="lbl mono" x="253.0" y="84" text-anchor="middle" style="font-size:11px">INC</text><rect class="box" x="272" y="30" width="76" height="34" rx="2"/><text class="txt mono" x="310.0" y="52" text-anchor="middle" style="font-size:12.5px">03 C3</text><text class="lbl mono" x="274" y="22" text-anchor="start" style="font-size:10.5px">0107</text><text class="lbl mono" x="310.0" y="84" text-anchor="middle" style="font-size:11px">ADD</text><rect class="box" x="348" y="30" width="38" height="34" rx="2" style="fill:var(--ds-hot);"/><text class="txt mono" x="367.0" y="52" text-anchor="middle" style="font-size:12.5px">C3</text><text class="lbl mono" x="350" y="22" text-anchor="start" style="font-size:10.5px">0109</text><text class="lbl mono" x="367.0" y="84" text-anchor="middle" style="font-size:11px">RET</text><text class="txt mono" x="200" y="134" text-anchor="middle" style="font-size:13px;fill:var(--ds-accent)">IP = 0000h (return to the PSP)</text></svg></div>
+  <figcaption><b>Figure 3.2.5:</b> The instruction bytes in memory and IP. At the top the program has been loaded, IP = 0100h. In the middle three instructions have executed, IP = 0107h. At the bottom RET has taken 0000h from the stack and IP has returned to the start of the PSP. The width of each box shows the instruction's byte count.</figcaption>
+</figure>
+
+<p>The relationship between IP and the hardware hides a subtlety here. The 8086's bus interface unit prefetches instruction bytes and holds them in a 6-byte queue. The address the BIU reads from memory is a few bytes ahead of the address of the instruction being executed. The IP the programmer sees, however, is always the address of the next instruction <strong>to be executed</strong>. When a jump occurs, the queue is flushed and the BIU starts fetching from the new IP. The queue is invisible to the programmer; it shows up only in the timings.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-ip">
+  <span class="nt-box__title">Example 3.2.7</span>
+  <p>A program starts at 0100h and executes in order four instructions of lengths 3, 2, 1, and 4 bytes. None of the instructions is a jump. What is IP after the fourth instruction? What is the address of the third instruction?</p>
+  <p>IP advances by the length on every instruction: 0100h → 0103h → 0105h → 0106h → 010Ah. The four instructions total 3 + 2 + 1 + 4 = 10 bytes, and IP = 0100h + 0Ah = <strong>010Ah</strong>. The third instruction starts where the first two end, at address <strong>0105h</strong>.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Advancing IP by the number of instructions.</strong> The thought “three instructions have executed, so IP is 0103h” is wrong. IP counts bytes, not instructions. Because instruction lengths on the 8086 vary, computing IP requires knowing the length of every instruction. The lengths can be read from emu8086's memory view or from the assembler's listing.</p>
+</div>
+
+<h3 id="s3-2-4-2"><span class="nt-num">3.2.4.2</span>Which instructions change the flags?</h3>
+
+<p>The flags register (FLAGS) carries information about the result of the last arithmetic or logic operation. The status flags are CF (carry), ZF (zero), SF (sign), OF (overflow), AF (auxiliary carry), and PF (parity). Conditional jump instructions decide by looking at these flags. Which instruction changes which flag therefore directly determines the flow of the program.</p>
+
+<p>The basic rule is that the flags are written only by instructions that <em>compute</em> a result. Instructions that move data compute no result; they do not touch the flags. <a href="#tab-bayrak-kural">Table 3.2.13</a> groups instructions by their effect on the flags.</p>
+
+<div class="nt-tablewrap" id="tab-bayrak-kural">
+<table class="nt-table">
+  <caption>Table 3.2.13: Effect of instructions on the status flags.</caption>
+  <thead><tr><th scope="col">Group</th><th scope="col">Instructions</th><th scope="col">Effect</th></tr></thead>
+  <tbody>
+    <tr><td>Data movement</td><td><code>MOV</code>, <code>XCHG</code>, <code>LEA</code>, <code>PUSH</code>, <code>POP</code>, <code>CBW</code></td><td>no flags change</td></tr>
+    <tr><td>Loops and jumps</td><td><code>JMP</code>, <code>Jcc</code>, <code>LOOP</code>, <code>CALL</code>, <code>RET</code></td><td>no flags change</td></tr>
+    <tr><td>NOT</td><td><code>NOT</code></td><td>no flags change</td></tr>
+    <tr><td>Increment, decrement</td><td><code>INC</code>, <code>DEC</code></td><td>ZF, SF, OF, AF, PF are rewritten; <strong>CF is unchanged</strong></td></tr>
+    <tr><td>Addition, subtraction, comparison</td><td><code>ADD</code>, <code>ADC</code>, <code>SUB</code>, <code>SBB</code>, <code>CMP</code>, <code>NEG</code></td><td>all six status flags are rewritten</td></tr>
+    <tr><td>Logic</td><td><code>AND</code>, <code>OR</code>, <code>XOR</code>, <code>TEST</code></td><td>CF = OF = 0; ZF, SF, PF according to the result</td></tr>
+    <tr><td>Multiplication</td><td><code>MUL</code>, <code>IMUL</code></td><td>CF, OF defined; ZF, SF, AF, PF undefined</td></tr>
+    <tr><td>Direct setting</td><td><code>STC</code>, <code>CLC</code>, <code>CMC</code></td><td>CF only</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two rows of the table are surprising. The first is NOT. NOT is a logic operation and computes a new value, but on the 8086 it changes no flag. A program that wants to test the result after NOT must follow it with <code>TEST AL, AL</code> or <code>CMP</code>. The second is INC and DEC. These two instructions do not touch CF. The aim of the design is loops working on multi-byte numbers: while the loop counter or index is changed with INC/DEC, the carry carried by ADC is not lost. To see that INC has taken a number from FFFFh to 0000h, look not at CF but at ZF.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-bayrak">
+  <span class="nt-box__title">Definition 3.2.7</span>
+  <p>The flag a conditional jump looks at shows the result of <strong>the last instruction that wrote</strong> that flag before it. Flag-preserving instructions in between, such as MOV, NOT, and LOOP, do not disturb this relationship; an INC, ADD, or CMP in between does.</p>
+</div>
+
+<h3 id="s3-2-4-3"><span class="nt-num">3.2.4.3</span>Code trace: the flags</h3>
+
+<p>The following program tests the flag rules one by one. The comment on each line tells in advance what that line does to the flags; the trace confirms these predictions.</p>
+
+<pre class="nt-code"><code>ORG 100h
+STC              <span class="cm">; CF = 1</span>
+MOV AL, 0FFh     <span class="cm">; flags kept</span>
+INC AL           <span class="cm">; CF untouched</span>
+MOV CX, 0        <span class="cm">; ZF kept</span>
+DEC AL
+ADD AL, 1        <span class="cm">; new CF</span>
+CLC
+NOT AL           <span class="cm">; flags kept</span>
+RET</code></pre>
+
+<div class="nt-tablewrap" id="tab-bayrak-iz">
+<table class="nt-table">
+  <caption>Table 3.2.14: Flag trace (each row is the state after the instruction executes).</caption>
+  <thead><tr><th scope="col">Address</th><th scope="col">Bytes</th><th scope="col">Instruction</th><th scope="col">AL</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">AF</th><th scope="col">PF</th><th scope="col">Which flags were written?</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>F9</code></td><td><code>STC</code></td><td>00h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>CF only</td></tr>
+    <tr><td>0101h</td><td><code>B0 FF</code></td><td><code>MOV AL, 0FFh</code></td><td>FFh</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>none</td></tr>
+    <tr><td>0103h</td><td><code>FE C0</code></td><td><code>INC AL</code></td><td>00h</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>all except CF</td></tr>
+    <tr><td>0105h</td><td><code>B9 00 00</code></td><td><code>MOV CX, 0</code></td><td>00h</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>none</td></tr>
+    <tr><td>0108h</td><td><code>FE C8</code></td><td><code>DEC AL</code></td><td>FFh</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>all except CF</td></tr>
+    <tr><td>010Ah</td><td><code>04 01</code></td><td><code>ADD AL, 1</code></td><td>00h</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>all</td></tr>
+    <tr><td>010Ch</td><td><code>F8</code></td><td><code>CLC</code></td><td>00h</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>CF only</td></tr>
+    <tr><td>010Dh</td><td><code>F6 D0</code></td><td><code>NOT AL</code></td><td>FFh</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>none</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>STC and MOV.</strong> <code>STC</code> (<em>set carry</em>) sets CF directly to 1. It is one of the few instructions that change a flag without being the result of an operation. <code>MOV AL, 0FFh</code> writes 255 to AL; none of the flags changes. MOV computes no result; it only copies.</p>
+
+<p><strong>INC AL.</strong> FFh + 1 = 100h does not fit in 8 bits and AL = 00h. Had the addition been done with ADD, this carry would have been written to CF. INC does not touch CF; CF is the 1 left over from STC. Since the result is zero, ZF = 1, and since a carry passes from bit 3 to bit 4, AF = 1. The number of one bits in 00h is zero, that is, even; PF = 1. In the signed interpretation −1 + 1 = 0 is a correct result, with no overflow: OF = 0.</p>
+
+<p><strong>MOV CX, 0.</strong> Zero is written to CX. Although the result is zero, ZF is not recomputed; the 1 in ZF is left over from the previous INC. Had a <code>JZ</code> followed this line, the jump would have been taken, but the reason would be AL, not CX.</p>
+
+<p><strong>DEC AL.</strong> 00h − 1 = FFh. Since the top bit is 1, SF = 1, and since the result is not zero, ZF = 0. Because a borrow comes from bit 4, AF = 1, and because the eight one bits of FFh are an even count, PF = 1. In the unsigned interpretation, subtracting 1 from 0 causes a borrow. SUB would write this to CF; DEC does not, and CF stays 1.</p>
+
+<p><strong>ADD AL, 1.</strong> FFh + 1 = 100h, AL = 00h. This time ADD does the addition, and ADD rewrites all six status flags. CF = 1; the value in the table looks the same as in the previous row, but it is no longer the 1 left from STC; it is the carry ADD produced. ZF = 1, SF = 0, AF = 1, PF = 1, OF = 0.</p>
+
+<p><strong>CLC and NOT.</strong> <code>CLC</code> sets CF to 0. <code>NOT AL</code> inverts all the bits of AL: 00h → FFh. Although AL is no longer zero, ZF is still 1, because NOT writes no flags. To test after this line whether AL is zero, <code>TEST AL, AL</code> is needed.</p>
+
+<figure class="nt-fig" id="sekil-bayrak" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and the flags; after the step"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">00h</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF preserved</text></svg><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and the flags; after the step"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="mt-hot" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="mt-hot" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">CF preserved</text></svg><svg class="ds-svg" viewBox="0 0 400 120" role="img" aria-label="AL and the flags; after the step"><text class="lbl" x="39" y="19" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="8" y="24" width="62" height="30" rx="4"/><text class="mt-v" x="39" y="44" text-anchor="middle" style="font-size:14px;">FFh</text><rect class="box" x="90" y="22" width="40" height="34" rx="3"/><text class="lbl" x="110" y="35" text-anchor="middle" style="font-size:10.5px;">CF</text><text class="mt-v" x="110" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="135" y="22" width="40" height="34" rx="3"/><text class="lbl" x="155" y="35" text-anchor="middle" style="font-size:10.5px;">ZF</text><text class="mt-v" x="155" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="180" y="22" width="40" height="34" rx="3"/><text class="lbl" x="200" y="35" text-anchor="middle" style="font-size:10.5px;">SF</text><text class="mt-v" x="200" y="51" text-anchor="middle" style="font-size:14px;">0</text><rect class="box" x="225" y="22" width="40" height="34" rx="3"/><text class="lbl" x="245" y="35" text-anchor="middle" style="font-size:10.5px;">AF</text><text class="mt-v" x="245" y="51" text-anchor="middle" style="font-size:14px;">1</text><rect class="box" x="270" y="22" width="40" height="34" rx="3"/><text class="lbl" x="290" y="35" text-anchor="middle" style="font-size:10.5px;">PF</text><text class="mt-v" x="290" y="51" text-anchor="middle" style="font-size:14px;">1</text><text class="mt-a" x="8" y="96" text-anchor="start" style="font-size:13px;">no flags</text></svg></div>
+  <figcaption><b>Figure 3.2.6:</b> Three moments of the flag trace. At the top, after <code>INC AL</code>: AL = 00h, ZF = 1, CF preserved. In the middle, after <code>DEC AL</code>: AL = FFh, SF = 1, CF again preserved. At the bottom, after <code>NOT AL</code>: although AL = FFh, ZF = 1 remains.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Not checking who set the flag before a conditional jump.</strong> Inserting a <code>MOV AX, [BX]</code> between <code>DEC CX</code> and <code>JZ done</code> does not disturb the flow; MOV writes no flags. Inserting an <code>ADD SI, 2</code> does: JZ now looks not at CX but at the sum in SI. Before a jump, the question “which instruction wrote this flag last?” should be asked.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-5"><span class="nt-num">3.2.5</span>The first program</h2>
+
+<h3 id="s3-2-5-1"><span class="nt-num">3.2.5.1</span>The .COM program template</h3>
+
+<p>When a new file is opened in emu8086 with <strong>COM template</strong> selected, the editor opens with an empty .COM template. The skeleton of a .COM program has only three parts: <code>ORG 100h</code>, which states the starting location, the instructions, and the <code>RET</code> that ends the program. Variables, if any, come after the RET.</p>
+
+<pre class="nt-code"><code>ORG 100h          <span class="cm">; .COM: code starts at 0100h</span>
+
+MOV AX, 5         <span class="cm">; AX = 5</span>
+MOV BX, 3         <span class="cm">; BX = 3</span>
+ADD AX, BX        <span class="cm">; AX = AX + BX = 8</span>
+MOV CL, AL        <span class="cm">; CL = 08h</span>
+
+RET               <span class="cm">; back to DOS</span>
+
+num DB 0          <span class="cm">; variables go after RET</span></code></pre>
+
+<p><strong>ORG 100h.</strong> When DOS loads a .COM program, it first picks a segment and writes a header called the <strong>PSP</strong> (program segment prefix) into the first 256 bytes of this segment (0000h–00FFh). The PSP holds the program's command line, its end address, and other information DOS uses. The program's bytes are copied right after the PSP, starting at 0100h. <code>ORG 100h</code> tells the assembler this fact. Without the directive, the assembler would assume the first byte is at 0000h and compute all variable addresses 256 bytes too low.</p>
+
+<p><strong>Sequential execution.</strong> Instructions execute from top to bottom in order. If there is no jump instruction, after each instruction the processor moves on to the bytes right after it in memory. Blank lines and comments add nothing to this order.</p>
+
+<p><strong>RET.</strong> When the program ends, control must return to the operating system. RET does this indirectly: it takes 0000h from the stack into IP, the processor executes the <code>INT 20h</code> instruction at the start of the PSP, and DOS terminates the program. If RET is forgotten, the processor cannot know that the program has ended. It goes on decoding the bytes after the instructions, that is, the variables and the random memory contents after them, as instructions.</p>
+
+<p><strong>Where variables go.</strong> That is why variables are placed at the end of the code, after the RET. The processor that reaches RET returns and never touches the bytes of the variables. If the variables are to be placed before the code, the first instruction must be a <code>JMP</code> that jumps over the data.</p>
+
+<p><strong>The initial state.</strong> A .COM program has a single segment: code, data, and stack are in the same 64 KB. The loader therefore puts the same value into all four segment registers: CS = DS = ES = SS. emu8086 uses 0700h for this value. IP = 0100h and SP = FFFEh; the stack starts at the very end of the segment and grows downward. At the top of the stack, at address FFFEh, sits the word 0000h that makes RET's return work. The general registers are zero.</p>
+
+<div class="nt-tablewrap" id="tab-baslangic">
+<table class="nt-table">
+  <caption>Table 3.2.15: Initial state of a .COM program in emu8086.</caption>
+  <thead><tr><th scope="col">Register</th><th scope="col">Value</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>CS, DS, ES, SS</td><td>0700h</td><td>single segment; the segment starts at physical address 07000h</td></tr>
+    <tr><td>IP</td><td>0100h</td><td>the first instruction after the PSP</td></tr>
+    <tr><td>SP</td><td>FFFEh</td><td>top of the stack; [FFFEh] = 0000h</td></tr>
+    <tr><td>AX, BX, CX, DX, SI, DI, BP</td><td>0000h</td><td>—</td></tr>
+    <tr><td>FLAGS</td><td>IF = 1, others 0</td><td>interrupts enabled</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The job of the four instructions in the template is simple: 5 is written to AX, 3 to BX, the two are added, and the low byte of the result is copied to CL. The purpose of the program is not a calculation but to show how a .COM program sits in memory and how it runs.</p>
+
+<h3 id="s3-2-5-2"><span class="nt-num">3.2.5.2</span>Code trace: a .COM program in memory</h3>
+
+<p><a href="#tab-com-iz">Table 3.2.16</a> gives the state of the template program after each instruction. The physical address column is 07000h + the relative location for segment 0700h.</p>
+
+<div class="nt-tablewrap" id="tab-com-iz">
+<table class="nt-table">
+  <caption>Table 3.2.16: Trace of the .COM program (each row is the state after the instruction executes).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Instruction (address)</th><th scope="col">Physical address</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CL</th><th scope="col">IP</th><th scope="col">SP</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>(loaded)</td><td>—</td><td>0000h</td><td>0000h</td><td>00h</td><td>0100h</td><td>FFFEh</td></tr>
+    <tr><td>1</td><td><code>MOV AX, 5</code> (0100h)</td><td>07100h</td><td>0005h</td><td>0000h</td><td>00h</td><td>0103h</td><td>FFFEh</td></tr>
+    <tr><td>2</td><td><code>MOV BX, 3</code> (0103h)</td><td>07103h</td><td>0005h</td><td>0003h</td><td>00h</td><td>0106h</td><td>FFFEh</td></tr>
+    <tr><td>3</td><td><code>ADD AX, BX</code> (0106h)</td><td>07106h</td><td>0008h</td><td>0003h</td><td>00h</td><td>0108h</td><td>FFFEh</td></tr>
+    <tr><td>4</td><td><code>MOV CL, AL</code> (0108h)</td><td>07108h</td><td>0008h</td><td>0003h</td><td>08h</td><td>010Ah</td><td>FFFEh</td></tr>
+    <tr><td>5</td><td><code>RET</code> (010Ah)</td><td>0710Ah</td><td>0008h</td><td>0003h</td><td>08h</td><td>0000h</td><td>0000h</td></tr>
+    <tr><td>6</td><td><code>INT 20h</code> (PSP, 0000h)</td><td>07000h</td><td colspan="5">program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Steps 1–4 are ordinary instructions, and IP advances on each by the instruction length: 3, 3, 2, and 2 bytes. The addition in step 3 also writes the flags: 5 + 3 = 8, the result is nonzero (ZF = 0), the sign bit is 0 (SF = 0), and there is no carry or overflow (CF = OF = 0). Since 08h has a single 1 bit, the parity is odd and PF = 0. The <code>MOV CL, AL</code> in step 4 copies the low byte of AX into CL; CH is unchanged and CX = 0008h.</p>
+
+<p>In step 5, RET reads a word from the stack. SS:SP = 0700:FFFEh, that is, the word at physical address 16FFEh is 0000h. This value is written to IP, and SP returns to 0000h by increasing 2. In step 6 the processor executes the two bytes at 0700:0000, <code>CD 20</code>, that is, <code>INT 20h</code>. DOS's terminate service removes the program from memory. The <code>num</code> byte at 010Bh was not executed in any step; it is only data.</p>
+
+<figure class="nt-fig" id="sekil-com" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 1: segment 0700h, IP and SP"><defs><marker id="n32-13-mt2-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="box" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="mt-hot" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0100h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = FFFEh</text><path class="line" d="M140 41.5 H200" marker-end="url(#n32-13-mt2-6)"/><text class="mt-l" x="136" y="45.5" text-anchor="end" style="font-size:11.5px">CS:IP</text><path class="line" d="M140 164 H200" marker-end="url(#n32-13-mt2-6)"/><text class="mt-l" x="136" y="168" text-anchor="end" style="font-size:11.5px">SS:SP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0000h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">00h</text></svg><svg class="ds-svg" viewBox="0 0 400 178" role="img" aria-label="Memory layout of the .COM program, step 6: segment 0700h, IP and SP"><defs><marker id="n32-14-mt2-11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="322" y="12" text-anchor="middle">segment 0700h</text><rect class="mt-hot" x="250" y="16" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="28" text-anchor="end" style="font-size:11px">0000h</text><text class="mt-m" x="256" y="28" text-anchor="start" style="font-size:11.5px">PSP (256 bytes)</text><rect class="box" x="250" y="33.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="45.5" text-anchor="end" style="font-size:11px">0100h</text><text class="mt-m" x="256" y="45.5" text-anchor="start" style="font-size:11.5px">MOV AX, 5</text><rect class="box" x="250" y="51" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="63" text-anchor="end" style="font-size:11px">0103h</text><text class="mt-m" x="256" y="63" text-anchor="start" style="font-size:11.5px">MOV BX, 3</text><rect class="box" x="250" y="68.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="80.5" text-anchor="end" style="font-size:11px">0106h</text><text class="mt-m" x="256" y="80.5" text-anchor="start" style="font-size:11.5px">ADD AX, BX</text><rect class="box" x="250" y="86" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="98" text-anchor="end" style="font-size:11px">0108h</text><text class="mt-m" x="256" y="98" text-anchor="start" style="font-size:11.5px">MOV CL, AL</text><rect class="box" x="250" y="103.5" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="115.5" text-anchor="end" style="font-size:11px">010Ah</text><text class="mt-m" x="256" y="115.5" text-anchor="start" style="font-size:11.5px">RET</text><rect class="mt-acc" x="250" y="121" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="133" text-anchor="end" style="font-size:11px">010Bh</text><text class="mt-m" x="256" y="133" text-anchor="start" style="font-size:11.5px">num = 00</text><text class="lbl" x="322" y="151.5" text-anchor="middle">⋮</text><rect class="box" x="250" y="156" width="146" height="16" rx="2"/><text class="mt-m" x="246" y="168" text-anchor="end" style="font-size:11px">FFFEh</text><text class="mt-m" x="256" y="168" text-anchor="start" style="font-size:11.5px">stack: 0000h</text><text class="mt-l" x="8" y="16" text-anchor="start">IP = 0000h</text><text class="mt-l" x="8" y="36" text-anchor="start">SP = 0000h</text><path class="line" d="M140 24 H200" marker-end="url(#n32-14-mt2-11)"/><text class="mt-l" x="136" y="28" text-anchor="end" style="font-size:11.5px">CS:IP</text><rect class="box" x="30" y="62" width="64" height="26" rx="4"/><text class="lbl" x="62" y="57" text-anchor="middle">AX</text><text class="mt-v" x="62" y="80.5" text-anchor="middle" style="font-size:13px">0008h</text><rect class="box" x="30" y="106" width="64" height="26" rx="4"/><text class="lbl" x="62" y="101" text-anchor="middle">BX</text><text class="mt-v" x="62" y="124.5" text-anchor="middle" style="font-size:13px">0003h</text><rect class="box" x="30" y="150" width="44" height="26" rx="4"/><text class="lbl" x="52" y="145" text-anchor="middle">CL</text><text class="mt-v" x="52" y="168.5" text-anchor="middle" style="font-size:13px">08h</text></svg></div>
+  <figcaption><b>Figure 3.2.7:</b> The layout of the .COM program within the segment. At the top the program has been loaded: PSP at 0000h–00FFh, code from 0100h, <code>num</code> at 010Bh, the top of the stack at FFFEh; CS:IP points to the first instruction and SS:SP to the top of the stack. At the bottom RET has executed and control has returned to the PSP with IP = 0000h.</figcaption>
+</figure>
+
+<p>This trace can also be read from the point of view of the system bus. The BIU fetches the bytes of each instruction from the code segment. The physical address used for fetching is CS × 10h + IP: 07000h + 0100h = 07100h for the first byte. The program's four arithmetic instructions read no data from memory; all their operands are registers or immediate values. A bus cycle for data happens only at RET: a word is read from the stack. RET is also a jump; the instruction queue is flushed and the BIU starts fetching again from 07000h.</p>
+
+<h3 id="s3-2-5-3"><span class="nt-num">3.2.5.3</span>The program in memory: byte by byte</h3>
+
+<p>The bytes the assembler produces from the template program are as in <a href="#tab-baytlar">Table 3.2.17</a>. A .COM file consists of exactly these bytes.</p>
+
+<div class="nt-tablewrap" id="tab-baytlar">
+<table class="nt-table">
+  <caption>Table 3.2.17: Machine code of the template program.</caption>
+  <thead><tr><th scope="col">Relative location</th><th scope="col">Bytes</th><th scope="col">Source line</th><th scope="col">Decoding</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>B8 05 00</code></td><td><code>MOV AX, 5</code></td><td>B8 + register no. (AX = 0); constant low byte first</td></tr>
+    <tr><td>0103h</td><td><code>BB 03 00</code></td><td><code>MOV BX, 3</code></td><td>B8 + 3 (BX)</td></tr>
+    <tr><td>0106h</td><td><code>03 C3</code></td><td><code>ADD AX, BX</code></td><td>C3 = 11 000 011: register–register, AX, BX</td></tr>
+    <tr><td>0108h</td><td><code>8A C8</code></td><td><code>MOV CL, AL</code></td><td>C8 = 11 001 000: CL, AL</td></tr>
+    <tr><td>010Ah</td><td><code>C3</code></td><td><code>RET</code></td><td>single-byte instruction</td></tr>
+    <tr><td>010Bh</td><td><code>00</code></td><td><code>num DB 0</code></td><td>data; not an instruction</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first two instructions are from the “immediate value into a register” family, and the opcode contains the register number. The 16-bit register numbers of the 8086 are: AX = 0, CX = 1, DX = 2, BX = 3, SP = 4, BP = 5, SI = 6, DI = 7. Note that the order is not alphabetical; BX is number 3. For the 8-bit registers the same numbers are used in the order AL, CL, DL, BL, AH, CH, DH, BH.</p>
+
+<p>The third and fourth instructions work between two registers. In these instructions the first byte defines the operation and the second byte defines the operands. The second byte is called the <strong>ModR/M byte</strong> and is divided into three fields: the 2-bit <strong>MOD</strong>, the 3-bit <strong>REG</strong>, and the 3-bit <strong>R/M</strong>. MOD = 11 means “both operands are registers.” For <code>ADD AX, BX</code>, the opcode 03h has the form “REG ← REG + R/M.” REG = 000 (AX) gives the destination and R/M = 011 (BX) the source. Combined, the bits give 11 000 011 = C3h. For <code>MOV CL, AL</code>, the opcode 8Ah has the form “8-bit REG ← R/M.” REG = 001 (CL) and R/M = 000 (AL), and 11 001 000 = C8h results.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kodla">
+  <span class="nt-box__title">Example 3.2.8</span>
+  <p>What are the machine codes of <code>ADD DX, CX</code> and <code>MOV BL, AH</code>?</p>
+  <p><code>ADD DX, CX</code>: opcode 03h (REG ← REG + R/M), MOD = 11, REG = DX = 010, R/M = CX = 001. ModR/M = 11 010 001 = D1h. The instruction is <code>03 D1</code>.</p>
+  <p><code>MOV BL, AH</code>: opcode 8Ah, MOD = 11, REG = BL = 011, R/M = AH = 100. ModR/M = 11 011 100 = DCh. The instruction is <code>8A DC</code>. Both instructions are two bytes; IP advances by 2 on each.</p>
+</div>
+
+<p>Four conclusions from the table matter. First, the .COM file is exactly these 12 bytes. There is no header; DOS copies the file's bytes into memory as they are, starting at 0100h. Second, the line <code>ORG 100h</code> has no bytes at all; the directive only sets the location of the first byte.</p>
+
+<p>Third, the same instruction can have more than one encoding. The register–register instructions of the 8086 have a direction bit: 03h means “REG is the destination” and 01h means “R/M is the destination.” <code>ADD AX, BX</code> can also be written with 01h; then REG = BX, R/M = AX, and the code is <code>01 D8</code>. MASM chooses 03 C3; another assembler may choose 01 D8. Both do the same job in the same time. A listing may therefore show different bytes in different assemblers.</p>
+
+<p>Fourth and most important, there is no marker in memory between instruction and data. The <code>00</code> byte at 010Bh is a variable, but had the processor arrived there with IP = 010Bh, it would have decoded it as an instruction. On the 8086, 00h is the opcode of an <code>ADD</code> instruction, and the byte after it would be read as ModR/M. Whether a byte is an instruction or data is determined only by the flow of the program. This is why variables are placed after the RET.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Writing variables right below <code>ORG 100h</code>.</strong> In high-level languages variables are declared at the start of the program; when this habit is carried into assembly, the program does not work. <code>num DB 0</code> lands at 0100h, and the processor executes the byte 00h, the start of an ADD, as its first instruction. The result is a random memory write and shifted instruction boundaries. Data is either put after the RET or jumped over with a JMP at the start of the code.</p>
+</div>
+
+<h3 id="s3-2-5-4"><span class="nt-num">3.2.5.4</span>The emu8086 emulator window</h3>
+
+<p>After the source is written, the <strong>emulate</strong> button in emu8086 assembles the program and loads it into the emulator window. <a href="#sekil-emu">Figure 3.2.8</a> shows the main parts of this window in a simplified drawing.</p>
+
+<figure class="nt-fig" id="sekil-emu" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 236" role="img" aria-label="A simplified drawing of the emu8086 emulator window: buttons at the top, registers on the left, memory in the middle, instruction list on the right"><rect class="mt-dim" x="4" y="4" width="552" height="228" rx="6"/><rect class="box" x="14" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="62" y="30" text-anchor="middle" style="font-size:12.5px;">Load</text><rect class="box" x="118" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="166" y="30" text-anchor="middle" style="font-size:12.5px;">reload</text><rect class="box" x="222" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="270" y="30" text-anchor="middle" style="font-size:12.5px;">step back</text><rect class="mt-hot" x="326" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="374" y="30" text-anchor="middle" style="font-size:12.5px;">single step</text><rect class="box" x="430" y="12" width="96" height="26" rx="4"/><text class="mt-s" x="478" y="30" text-anchor="middle" style="font-size:12.5px;">run</text><rect class="box" x="14" y="48" width="150" height="140" rx="4"/><text class="mt-s" x="89" y="64" text-anchor="middle" style="font-size:12px;">registers (H / L)</text><text class="mt-m" x="26" y="86" text-anchor="start" style="font-size:12.5px;">AX</text><text class="mt-m" x="150" y="86" text-anchor="end" style="font-size:12.5px;">00 05</text><text class="mt-m" x="26" y="106" text-anchor="start" style="font-size:12.5px;">BX</text><text class="mt-m" x="150" y="106" text-anchor="end" style="font-size:12.5px;">00 00</text><text class="mt-m" x="26" y="126" text-anchor="start" style="font-size:12.5px;">CX</text><text class="mt-m" x="150" y="126" text-anchor="end" style="font-size:12.5px;">00 00</text><text class="mt-m" x="26" y="146" text-anchor="start" style="font-size:12.5px;">IP</text><text class="mt-m" x="150" y="146" text-anchor="end" style="font-size:12.5px;">0103</text><text class="mt-m" x="26" y="166" text-anchor="start" style="font-size:12.5px;">SP</text><text class="mt-m" x="150" y="166" text-anchor="end" style="font-size:12.5px;">FFFE</text><rect class="box" x="174" y="48" width="180" height="140" rx="4"/><text class="mt-s" x="264" y="64" text-anchor="middle" style="font-size:12px;">memory</text><text class="mt-m" x="184" y="86" text-anchor="start" style="font-size:12px;">07100</text><text class="mt-m" x="260" y="86" text-anchor="start" style="font-size:12px;">B8</text><text class="mt-m" x="184" y="106" text-anchor="start" style="font-size:12px;">07101</text><text class="mt-m" x="260" y="106" text-anchor="start" style="font-size:12px;">05</text><text class="mt-m" x="184" y="126" text-anchor="start" style="font-size:12px;">07102</text><text class="mt-m" x="260" y="126" text-anchor="start" style="font-size:12px;">00</text><text class="mt-m" x="184" y="146" text-anchor="start" style="font-size:12px;">07103</text><text class="mt-m" x="260" y="146" text-anchor="start" style="font-size:12px;">BB</text><text class="mt-m" x="184" y="166" text-anchor="start" style="font-size:12px;">07104</text><text class="mt-m" x="260" y="166" text-anchor="start" style="font-size:12px;">03</text><rect class="box" x="364" y="48" width="182" height="140" rx="4"/><text class="mt-s" x="455" y="64" text-anchor="middle" style="font-size:12px;">instruction list</text><text class="mt-m" x="374" y="86" text-anchor="start" style="font-size:12px;">MOV AX, 00005h</text><rect class="mt-hot" x="368" y="92" width="174" height="19" rx="2"/><text class="mt-m" x="374" y="106" text-anchor="start" style="font-size:12px;">MOV BX, 00003h</text><text class="mt-m" x="374" y="126" text-anchor="start" style="font-size:12px;">ADD AX, BX</text><text class="mt-m" x="374" y="146" text-anchor="start" style="font-size:12px;">MOV CL, AL</text><text class="mt-m" x="374" y="166" text-anchor="start" style="font-size:12px;">RET</text><rect class="box" x="14" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="62" y="216" text-anchor="middle" style="font-size:12.5px;">screen</text><rect class="box" x="118" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="166" y="216" text-anchor="middle" style="font-size:12.5px;">vars</text><rect class="box" x="222" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="270" y="216" text-anchor="middle" style="font-size:12.5px;">stack</text><rect class="box" x="326" y="198" width="96" height="26" rx="4"/><text class="mt-s" x="374" y="216" text-anchor="middle" style="font-size:12.5px;">flags</text></svg></div>
+  <figcaption><b>Figure 3.2.8:</b> A simplified drawing of the emu8086 emulator window. At the top are the control buttons; on the left the registers with their high and low bytes; in the middle the memory with its physical addresses; on the right the instruction list. The drawing shows the moment after the first instruction of the template program has executed: AX = 0005h, IP = 0103h, and the highlighted line is the next instruction, <code>MOV BX, 00003h</code>.</figcaption>
+</figure>
+
+<p>The parts of the window are as follows:</p>
+<ul>
+  <li><strong>Control buttons.</strong> <em>single step</em> executes one instruction and stops; the registers and memory that changed are visible immediately. <em>step back</em> undoes the last step, which makes it easy to go back to the cause of an error. <em>run</em> runs the program to the end, and <em>reload</em> loads the program again from the start.</li>
+  <li><strong>Registers.</strong> Each register is shown with its high (H) and low (L) bytes separately: AX = 0005h appears as “00 05.” This layout makes it clear that AH and AL are the two halves of the same register.</li>
+  <li><strong>Memory.</strong> The address column shows physical addresses: 0700:0100 = 07000h + 0100h = 07100h. The program bytes start at this address: B8, 05, 00, BB, 03 …</li>
+  <li><strong>Instruction list.</strong> This is the bytes in memory translated back into instructions. The highlighted line is the <strong>next</strong> instruction, that is, the one CS:IP points to, not the one just executed. The list shows constants in hexadecimal with 5 digits: <code>MOV AX, 00005h</code>.</li>
+  <li><strong>Extra windows.</strong> <em>screen</em> shows the screen output, <em>vars</em> the variables, <em>stack</em> the stack, and <em>flags</em> the flags, each in a separate window.</li>
+</ul>
+
+<p>The meaning of the highlight in the instruction list often misleads beginners. In the situation in the figure the highlighted line is <code>MOV BX, 00003h</code>, but BX is still 0000h. This is not a mistake: the highlighted instruction has not executed yet. The next single step executes it; BX = 0003h and the highlight moves to the line <code>ADD AX, BX</code>. The register values are always the result of the instructions <em>before</em> the highlighted line.</p>
+
+<p>The method of examining a program in the emulator is simple. Before each single step, predict how the next instruction will change which register and flag. Take the step and compare the prediction with the value the window shows. The trace tables in these notes are exactly the written-out form of such predictions.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Confusing the address in the memory column with the relative location.</strong> While the emulator's memory column shows 07100h, the program uses 0100h. 07100h is the physical address; 0100h is the relative location within the segment CS = 0700h. The instruction <code>MOV AL, [0100h]</code> reads the byte at 07100h, not the one at 00100h. The relationship between the two is always segment × 10h + relative location.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-6"><span class="nt-num">3.2.6</span>Writing rules</h2>
+
+<p>The assembler recognizes numbers, characters, and names by how they are written. The rules are few, but forgetting one yields either an assembly error or a wrong value that is hard to notice.</p>
+
+<p><strong>Number bases.</strong> The base of a number is indicated by a letter added at its end. If there is no letter, the number is decimal. <a href="#tab-taban">Table 3.2.18</a> gives the same value, 25, in four bases. The assembler converts all of them to the same byte, 19h; every one of the <code>MOV AL, …</code> lines becomes <code>B0 19</code>.</p>
+
+<div class="nt-tablewrap" id="tab-taban">
+<table class="nt-table">
+  <caption>Table 3.2.18: Writing number bases (all 25).</caption>
+  <thead><tr><th scope="col">Base</th><th scope="col">Suffix</th><th scope="col">Written as</th><th scope="col"><code>MOV AL, …</code> code</th></tr></thead>
+  <tbody>
+    <tr><td>decimal</td><td>none or <code>d</code></td><td><code>25</code>, <code>25d</code></td><td><code>B0 19</code></td></tr>
+    <tr><td>hexadecimal</td><td><code>h</code></td><td><code>19h</code></td><td><code>B0 19</code></td></tr>
+    <tr><td>binary</td><td><code>b</code></td><td><code>00011001b</code></td><td><code>B0 19</code></td></tr>
+    <tr><td>octal</td><td><code>o</code></td><td><code>31o</code></td><td><code>B0 19</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The choice of base is only for readability; the processor sees no difference. When a port mask or flag pattern is written in binary, which bit is set is clear at once: <code>00100000b</code> is bit 5. An address is written in hexadecimal, because segment and relative-location calculations are done in hexadecimal. Loop counts and everyday quantities are written in decimal.</p>
+
+<p><strong>Hexadecimal numbers that begin with a letter.</strong> Hexadecimal digits include the letters A–F. When <code>FFh</code> is written, the assembler cannot tell whether it is a number or a label named <code>FFh</code>; by the rule, any string that begins with a letter is a name. That is why a <code>0</code> is put in front of hexadecimal numbers that begin with a letter: <code>0FFh</code>, <code>0B800h</code>. The leading zero does not change the value; it only declares that the string is a number. <code>MOV AX, 0B800h</code> is encoded as <code>B8 00 B8</code>.</p>
+
+<p><strong>Characters.</strong> A character in quotes stands for its ASCII code. Since <code>'A'</code> = 41h, <code>MOV CL, 'A'</code> and <code>MOV CL, 41h</code> produce the same machine code: <code>B1 41</code>. Character notation removes the burden of memorizing codes and makes clear what the program does. When a program that prints a digit on the screen writes <code>ADD DL, '0'</code>, it is immediately clear that it converts a value between 0 and 9 into the character '0'–'9'.</p>
+
+<p><strong>Signed numbers.</strong> A constant with a minus sign is stored in two's complement. <code>-1</code> becomes FFh in 8 bits and FFFFh in 16 bits: <code>MOV AL, -1</code> = <code>B0 FF</code>, <code>MOV AX, -1</code> = <code>B8 FF FF</code>. The constants that can be written into an 8-bit register lie between −128 and 255: negative values fit under the signed interpretation and large positive values under the unsigned one. <code>MOV AL, 256</code> or <code>MOV AL, -129</code> gives an error.</p>
+
+<p><strong>Case.</strong> The assembler is case-insensitive: <code>mov</code>, <code>MOV</code>, and <code>Mov</code> are the same; <code>var1</code> and <code>VAR1</code> are the same name. A consistent style is chosen for readability. In these notes, instructions and registers are written in upper case, and variable and label names in lower case.</p>
+
+<p><strong>Comments.</strong> Everything after the <code>;</code> sign is a comment. In assembly almost every line gets a comment, because the instructions themselves do not explain the purpose. A good habit is to write in the comment not “what” the instruction does but “why” it is done. <code>INC SI ; SI = SI + 1</code> gives no information; <code>INC SI ; next element of the array</code> does.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Forgetting the suffix.</strong> <code>MOV AL, 10</code> and <code>MOV AL, 10h</code> are different values: 10 and 16. Writing a hexadecimal value without the suffix is an error where the assembler gives no complaint but the program works wrongly. A programmer who writes the screen memory segment B800h as <code>MOV AX, B800</code> forgets both the suffix and the leading zero; the assembler takes <code>B800</code> for an undefined name.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-7"><span class="nt-num">3.2.7</span>Errors</h2>
+
+<h3 id="s3-2-7-1"><span class="nt-num">3.2.7.1</span>Operand restrictions of MOV</h3>
+
+<p>MOV is the most frequently used instruction and the one with which errors are most often made. Almost all the errors come from writing an operand combination that does not exist in the 8086's instruction encoding. <a href="#tab-hata1">Table 3.2.19</a> gives the six most common.</p>
+
+<div class="nt-tablewrap" id="tab-hata1">
+<table class="nt-table">
+  <caption>Table 3.2.19: Common MOV errors.</caption>
+  <thead><tr><th scope="col">Wrong</th><th scope="col">Why?</th><th scope="col">Correct</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AL, BX</code></td><td>sizes differ (8 ↔ 16 bits)</td><td><code>MOV AL, BL</code> or <code>MOV AX, BX</code></td></tr>
+    <tr><td><code>MOV DS, 1234h</code></td><td>a constant cannot be assigned to a segment register</td><td><code>MOV AX, 1234h</code> · <code>MOV DS, AX</code></td></tr>
+    <tr><td><code>MOV AL, [AX]</code></td><td>only BX, SI, DI, BP in addressing</td><td><code>MOV BX, AX</code> · <code>MOV AL, [BX]</code></td></tr>
+    <tr><td><code>MOV AL, FFh</code></td><td><code>FFh</code> is taken for a name</td><td><code>MOV AL, 0FFh</code></td></tr>
+    <tr><td><code>MOV IP, 200h</code></td><td>IP cannot be written with MOV</td><td>jump with <code>JMP</code></td></tr>
+    <tr><td><code>MOV AL, 300</code></td><td>300 &gt; 255, does not fit in 8 bits</td><td><code>MOV AX, 300</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Size mismatch.</strong> The two operands of MOV must be the same width, because the opcode carries a single width bit: either 8 bits or 16 bits. In <code>MOV AL, BX</code> it is unclear which half of a 16-bit value is to be taken. A programmer who wants the low byte writes <code>MOV AL, BL</code>. The reverse <code>MOV CX, AL</code> is wrong for the same reason; to widen an 8-bit value to 16 bits, the upper half is set separately: <code>MOV CL, AL</code> and <code>MOV CH, 0</code>.</p>
+
+<p><strong>A constant into a segment register.</strong> On the 8086, a MOV that writes to a segment register reads only from a general register or from memory. There is no form that loads an immediate value. Setting a segment to reach screen memory therefore takes two lines: <code>MOV AX, 0B800h</code> and <code>MOV DS, AX</code>.</p>
+
+<p><strong>Address register.</strong> On the 8086 only BX, BP, SI, and DI can be used inside square brackets. The reason is the R/M field of the ModR/M byte: in the memory modes these three bits encode only certain combinations of these four registers. There is no code for using AX as an address.</p>
+
+<p><strong>Writing to IP.</strong> IP cannot be the operand of any data instruction. The only way to change IP is the flow instructions: JMP, Jcc, CALL, RET, INT, and IRET. The assembler does not recognize <code>IP</code> as a register name; it rejects the line with a “destination cannot be a constant” or “undefined name” error.</p>
+
+<p><strong>A constant that does not fit.</strong> An 8-bit register holds at most 255 in the unsigned interpretation and −128 to 127 in the signed one. 300 needs nine bits. The assembler rejects the line; the value is written to a 16-bit register.</p>
+
+<h3 id="s3-2-7-2"><span class="nt-num">3.2.7.2</span>Other syntax errors</h3>
+
+<div class="nt-tablewrap" id="tab-hata2">
+<table class="nt-table">
+  <caption>Table 3.2.20: Other syntax errors.</caption>
+  <thead><tr><th scope="col">Wrong</th><th scope="col">Why?</th><th scope="col">Correct</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV CS, AX</code></td><td>CS changes only with JMP, CALL, RET, INT</td><td>far jump</td></tr>
+    <tr><td><code>MOV ES, DS</code></td><td>there is no segment-to-segment MOV</td><td><code>MOV AX, DS</code> · <code>MOV ES, AX</code></td></tr>
+    <tr><td><code>MOV [BX], [SI]</code></td><td>two memory operands</td><td><code>MOV AL, [SI]</code> · <code>MOV [BX], AL</code></td></tr>
+    <tr><td><code>INC [BX]</code></td><td>size is ambiguous</td><td><code>INC BYTE PTR [BX]</code></td></tr>
+    <tr><td><code>MOV AL, [BX+BP]</code></td><td>two base registers cannot be combined</td><td><code>[BX+SI]</code> or <code>[BP+DI]</code></td></tr>
+    <tr><td><code>ADD 5, AX</code></td><td>the destination cannot be a constant</td><td><code>ADD AX, 5</code></td></tr>
+    <tr><td><code>PUSH 5</code></td><td>not available before the 80186</td><td><code>MOV AX, 5</code> · <code>PUSH AX</code></td></tr>
+    <tr><td><code>SHL AX, 2</code></td><td>on the 8086 the count can only be 1 or CL</td><td><code>MOV CL, 2</code> · <code>SHL AX, CL</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Writing to CS.</strong> Changing CS with MOV would mean switching to another segment in the middle of the code; but IP stays the same and the processor continues from a random address. CS and IP have to change together. Far JMP, far CALL, far RET, INT, and IRET do this.</p>
+
+<p><strong>Segment to segment.</strong> There is no direct transfer between two segment registers. The value is carried in two steps through a general register. A memory-to-memory transfer is done the same way: an instruction has at most one memory operand, so the value is first taken into a register.</p>
+
+<p><strong>Ambiguous size.</strong> In the line <code>INC [BX]</code> it is not clear whether the operand is a byte or a word; no operand is a register from which the size could be inferred. The assembler therefore requires the size to be written explicitly: <code>INC BYTE PTR [BX]</code> or <code>INC WORD PTR [BX]</code>. The same rule applies to <code>MOV [BX], 5</code>. emu8086 also accepts the abbreviations <code>b.[bx]</code> and <code>w.[bx]</code>.</p>
+
+<p><strong>Address combinations.</strong> The address forms the 8086 accepts are combinations of a base register (BX or BP), an index register (SI or DI), and a constant. Two bases (<code>[BX+BP]</code>) or two indexes (<code>[SI+DI]</code>) cannot be used together; the ModR/M byte has no code for them.</p>
+
+<p><strong>Instructions of later processors.</strong> <code>PUSH 5</code> and <code>SHL AX, 2</code> arrived with the 80186. When assembling for the 8086, MASM reports an error on these lines. emu8086 accepts these forms; the assembled code runs in the emulator, but on a real 8086 the processor does not recognize these bytes. In a program written for the 8086, a constant is pushed onto the stack through a register, and for a multi-bit shift the count is put in CL.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-hata">
+  <span class="nt-box__title">Example 3.2.9</span>
+  <p><code>wvar DW 1234h</code> and <code>bvar DB 5</code> are defined. Why is the line <code>MOV wvar, bvar</code> wrong, and how is it fixed?</p>
+  <p>The line has two errors at once. Both operands are memory, and their sizes differ (16 ↔ 8 bits). The value is carried through a register and the upper byte is zeroed separately:</p>
+<pre class="nt-code"><code>MOV AL, bvar      <span class="cm">; AL = 05h</span>
+MOV AH, 0         <span class="cm">; AX = 0005h</span>
+MOV wvar, AX      <span class="cm">; wvar = 0005h</span></code></pre>
+  <p>If <code>bvar</code> were a signed number, <code>CBW</code> would be used instead of the second line.</p>
+</div>
+
+<h3 id="s3-2-7-3"><span class="nt-num">3.2.7.3</span>Assembly errors and logic errors</h3>
+
+<p>An assembly program has two kinds of errors. Knowing the difference determines how to look for the error.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-hata">
+  <span class="nt-box__title">Definition 3.2.8</span>
+  <p>An <strong>assembly error</strong> (syntax error) is an error the assembler finds while translating the source. The assembler reports the line number and the reason; the program is never produced. A <strong>logic error</strong>, on the other hand, is the case where the program assembles and runs but gives a wrong result. The assembler cannot know this, because each line is valid on its own.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-hata-tur">
+<table class="nt-table">
+  <caption>Table 3.2.21: Examples of assembly and logic errors.</caption>
+  <thead><tr><th scope="col">Assembly error</th><th scope="col">Logic error</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AL, BX</code>: size mismatch</td><td>forgetting <code>RET</code>: data is taken for instructions</td></tr>
+    <tr><td><code>JMP strat</code>: undefined label</td><td>using <code>JA</code> for signed numbers</td></tr>
+    <tr><td><code>MOV AL, 300</code>: a constant that does not fit</td><td><code>ADD</code> instead of <code>ADC</code>: the carry is lost</td></tr>
+    <tr><td><code>MOV DS, 1234h</code>: a constant into a segment</td><td>not loading DS in an .EXE program</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>An assembly error is the easy kind: the assembler shows where, and the fix is usually a single line. A logic error is silent. The program runs, perhaps gives the right result for most inputs, and goes wrong only in some cases. The examples in the table are typical of this kind. <code>JA</code> is the jump of an unsigned comparison; when comparing −1 with 1, it counts −1 as FFFFh, a large number. A multi-byte addition done with <code>ADD</code> does not carry the carry from the low bytes into the high bytes. If DS is not loaded in an .EXE program, the variables are looked for in the segment where the PSP is, and entirely different bytes are read.</p>
+
+<p>The way to find a logic error is single-step execution. The program is advanced instruction by instruction in the emulator. Before each step, the expected register and flag values are computed; after the step, they are compared with what the window shows. The first instruction where the values diverge is where the error lies. The error may be in this instruction itself. The instruction may also be correct; then an earlier line has left it a wrong value. emu8086's <em>step back</em> button eases this search: on seeing the wrong value, go back a few steps and trace where the value came from.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-mantik">
+  <span class="nt-box__title">Example 3.2.10</span>
+  <p>A student wants to multiply the number in AL by 3 and get the result in AX, and writes this code: <code>MOV BL, 3</code> · <code>MUL BL</code>. For AL = 7 the program gives AX = 0015h, that is, 21. When the same code runs elsewhere with AH = 12h, the student asks why AH was erased. Is this a bug?</p>
+  <p>The code is correct; the misunderstanding is in the expectation. The result of MUL is implicitly written to the whole of AX: 7 × 3 = 21 = 0015h, AH = 00h. The expectation that the 12h in AH is preserved is a logic error, but the error is not in the code; it is in the assumption that the program will keep AH. If the value in AH is needed, it is moved to another register before the MUL. Single-step execution shows this at once: after the MUL step, the AH column changes from 12 to 00.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Running the program as a whole and looking only at the result.</strong> Running a program that gives a wrong result with <em>run</em> and starting to rewrite it just moves the error somewhere else. First go step by step and find the first deviation. If single-stepping a long loop is tedious, compare the state before and after the loop, narrowing the error first to a region and then to a line.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-8"><span class="nt-num">3.2.8</span>Exercises and solutions</h2>
+
+<p>The six exercises in the slides are solved below with their intermediate steps. All register and flag values were checked by running them in the emulator.</p>
+
+<div class="nt-box nt-box--ornek" id="alistirma-1">
+  <span class="nt-box__title">Exercise 1</span>
+  <p>With AX = 0ABCDh, what are AX, AL, and BX after <code>MOV AH, 0</code>?</p>
+  <p>In AX = ABCDh the high half is AH = ABh and the low half AL = CDh. <code>MOV AH, 0</code> writes only to AH: AH = 00h. AL is left untouched. The result is AX = <strong>00CDh</strong>, AL = <strong>CDh</strong>. BX is neither written nor implicit in the instruction; its value stays whatever it was. This instruction is the shortest way to widen an unsigned 8-bit value to 16 bits.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-2">
+  <span class="nt-box__title">Exercise 2</span>
+  <p>With AX = 1234h and BL = 03h, what is AX after <code>MUL BL</code>? What happens to the 12h in AH?</p>
+  <p>In 8-bit MUL the multiplicand is implicitly not AX but AL: AL = 34h = 52. 52 × 3 = 156 = <strong>009Ch</strong>. The result is implicitly written to the whole of AX; AH = 00h, AL = 9Ch. The 12h in AH is erased. Since the upper half is zero, CF = OF = 0. Someone who thinks all of AX is multiplied by 3 finds 1234h × 3 = 369Ch; that result needs <code>MUL BX</code> and is written to DX:AX.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-3">
+  <span class="nt-box__title">Exercise 3</span>
+  <p>On an 8 MHz 8086, in a loop that runs 2000 times, if the counter is incremented with <code>INC CX</code> (2 periods) instead of <code>INC counter</code> (21 periods), how many clock periods and how many milliseconds are saved?</p>
+  <p>The saving per iteration is 21 − 2 = 19 clock periods. Over 2000 iterations, 2000 × 19 = <strong>38,000</strong> clock periods are saved. At 8 MHz one clock period is 1 / (8 × 10<sup>6</sup>) s = 0.125 µs. The saving is 38,000 × 0.125 µs = 4750 µs = <strong>4.75 ms</strong>.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-4">
+  <span class="nt-box__title">Exercise 4</span>
+  <p>With AL = 80h, what are AL, CF, ZF, SF, and OF after <code>ADD AL, 80h</code>?</p>
+  <p>80h + 80h = 100h. The result needs nine bits; the low eight bits are written to AL: AL = <strong>00h</strong>. The ninth bit goes to CF: CF = 1. The result is zero: ZF = 1. The top bit is 0: SF = 0. In the signed interpretation 80h = −128, and −128 + (−128) = −256 does not fit in the 8-bit range (−128 … 127): OF = 1. In addition, PF = 1 because the number of one bits in 00h is even, and AF = 0 because there is no carry out of bit 3.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-5">
+  <span class="nt-box__title">Exercise 5</span>
+  <p>The program starts at 0100h: what is IP after four instructions of 3 + 2 + 1 + 4 bytes have executed?</p>
+  <p>Since there are no jumps, IP advances by the length on every instruction: 0100h → 0103h → 0105h → 0106h → 010Ah. The total is 10 bytes = 0Ah, so IP = 0100h + 0Ah = <strong>010Ah</strong>.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="alistirma-6">
+  <span class="nt-box__title">Exercise 6</span>
+  <p>Why are <code>MOV CX, AL</code> and <code>MOV ES, 0B800h</code> wrong? What are their correct forms?</p>
+  <p><code>MOV CX, AL</code>: the operands are of different sizes (16 ↔ 8 bits). If the aim is only to copy the low byte, write <code>MOV CL, AL</code>. If the value of AL is wanted in the whole of CX as an unsigned number, the upper half is also zeroed: <code>MOV CL, AL</code> · <code>MOV CH, 0</code>.</p>
+  <p><code>MOV ES, 0B800h</code>: an immediate value cannot be loaded into a segment register. The value is carried through a general register: <code>MOV AX, 0B800h</code> · <code>MOV ES, AX</code>.</p>
+</div>
+
+<h2 class="nt-pb" id="s3-2-9"><span class="nt-num">3.2.9</span>Summary</h2>
+
+<ul>
+  <li><strong>Assembly language</strong> is a low-level language that maps one-to-one onto machine code. Each instruction line is translated into a single machine instruction: <code>MOV AX, 5</code> = <code>B8 05 00</code>. It produces small and fast code and accesses the hardware directly, but it is not portable.</li>
+  <li>The <strong>assembler</strong> translates mnemonics into opcodes and names into addresses. emu8086 combines an editor, an assembler, and an emulator; it shows the registers, memory, and flags step by step.</li>
+  <li>The line structure is <code>[label:] instruction destination, source ; comment</code>. The destination is on the left; the source does not change. The assembler is case-insensitive; comments do not enter the machine code.</li>
+  <li><strong>Directives</strong> (ORG, EQU, END) produce no machine instruction; they give information to the assembler. DB and DW produce only data bytes. A macro call stands for several instructions.</li>
+  <li>A name begins with a letter or an underscore; reserved words cannot be names. A code label ends with a colon and denotes an address; a variable name carries an address and a type together.</li>
+  <li>Operand types: <strong>register</strong> (fastest), <strong>immediate value</strong> (source only), and <strong>memory</strong> (needs a bus cycle, at most one per instruction). The two operands must be the same size.</li>
+  <li><strong>Implicit operands</strong> are not written in the instruction but are changed: MUL writes AX, DIV writes AL and AH; LOOP decrements CX; CBW fills AH; PUSH changes SP.</li>
+  <li>A memory access is a bus cycle of at least four T states. Instructions with memory operands, with the effective address time, take several times longer than their register counterparts: <code>INC CX</code> takes 2 and <code>INC counter</code> 21 periods.</li>
+  <li><strong>IP</strong> is the relative location of the next instruction and advances by the instruction length. Only flow instructions write a new value into IP.</li>
+  <li>MOV, XCHG, LEA, PUSH, POP, NOT, and LOOP do not change the flags. INC and DEC do not touch CF. ADD, SUB, and CMP rewrite all six status flags. After MUL, ZF, SF, AF, and PF are undefined.</li>
+  <li>A .COM program starts at 0100h with <code>ORG 100h</code>; the first 256 bytes are the PSP. Initially CS = DS = ES = SS, IP = 0100h, SP = FFFEh. RET returns, through the 0000h on the stack, to the <code>INT 20h</code> in the PSP. Data goes after the RET.</li>
+  <li>There is no marker in memory between instruction and data; the flow of the program determines the meaning of a byte. The same instruction can have more than one valid encoding.</li>
+  <li>The assembler finds <strong>assembly errors</strong>; a <strong>logic error</strong> can be found only by single-stepping and comparing the expected values with those in the emulator.</li>
+</ul>
+
+<h2 id="s3-2-10"><span class="nt-num">3.2.10</span>Key terms</h2>
+
+
+<ul class="nt-concepts">
+  <li>assembly language</li>
+  <li>mnemonic</li>
+  <li>instruction</li>
+  <li>opcode</li>
+  <li>operand</li>
+  <li>implicit operand</li>
+  <li>immediate value</li>
+  <li>comment</li>
+  <li>label</li>
+  <li>variable</li>
+  <li>directive</li>
+  <li>constant (EQU)</li>
+  <li>location counter ($)</li>
+  <li>macro</li>
+  <li>assembler</li>
+  <li>emulator</li>
+  <li>.COM program</li>
+  <li>program segment prefix (PSP)</li>
+  <li>accumulator</li>
+  <li>counter register</li>
+  <li>bus cycle</li>
+  <li>T state</li>
+  <li>clock cycle</li>
+  <li>effective address (EA)</li>
+  <li>instruction pointer (IP)</li>
+  <li>flags register (FLAGS)</li>
+  <li>ModR/M byte</li>
+  <li>little-endian</li>
+  <li>single-step</li>
+  <li>syntax error / logic error</li>
+</ul>
+
+<h2 id="s3-2-11"><span class="nt-num">3.2.11</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>The instructions <code>STC</code>, <code>MOV AX, 0FFFFh</code>, <code>INC AX</code> run in order. What are AX, CF, and ZF at the end?</p>
+    <details><summary>Answer</summary>
+      <p>FFFFh + 1 = 10000h does not fit in 16 bits, and AX = 0000h. The result is zero: ZF = 1. INC does not touch CF; CF is the 1 left from STC. Since MOV also changes no flags, the CF = 1 was never disturbed. Had the same addition been done with <code>ADD AX, 1</code>, CF would also be 1, but this time because of the carry out.</p>
+    </details>
+  </li>
+  <li>
+    <p>In a program that begins with <code>ORG 100h</code> there are, in order, the lines <code>MOV AL, 5</code>, <code>MOV BX, 1234h</code>, <code>INC BX</code>, <code>RET</code>, and <code>data DB 9</code>. What are the bytes of the program, and what is the relative location of <code>data</code>?</p>
+    <details><summary>Answer</summary>
+      <p><code>MOV AL, 5</code> = <code>B0 05</code> (0100h), <code>MOV BX, 1234h</code> = <code>BB 34 12</code> (0102h), <code>INC BX</code> = <code>43</code> (0105h; 40h + 3), <code>RET</code> = <code>C3</code> (0106h), <code>data</code> = <code>09</code> (0107h). The instructions are 2 + 3 + 1 + 1 = 7 bytes; <code>data</code> is at 0100h + 7 = <strong>0107h</strong>. The program is 8 bytes in total, and at the end BX = 1235h.</p>
+    </details>
+  </li>
+  <li>
+    <p>In the best case, how many clock periods and how many microseconds do the instructions <code>MOV AX, [BX+SI]</code> and <code>ADD [BX], AX</code> take on a 5 MHz 8086? (A read from memory into a register takes 8 + EA, and an addition into memory 16 + EA periods.)</p>
+    <details><summary>Answer</summary>
+      <p>For <code>[BX+SI]</code>, EA = 7 periods: MOV takes 8 + 7 = 15 periods. For <code>[BX]</code>, EA = 5 periods: ADD takes 16 + 5 = 21 periods. The total is 36 periods; at 5 MHz, 36 × 0.2 µs = <strong>7.2 µs</strong>. The reason ADD takes long is that it both reads and writes memory: two bus cycles.</p>
+    </details>
+  </li>
+  <li>
+    <p>With AX = 25, <code>MOV BL, 4</code> and <code>DIV BL</code> run. What are AL, AH, and AX?</p>
+    <details><summary>Answer</summary>
+      <p>The dividend is implicitly AX = 25. 25 ÷ 4 = 6, remainder 1. The quotient is written to AL and the remainder to AH: AL = 06h, AH = 01h, AX = <strong>0106h</strong>. Someone who reads AX as a single number sees 262; after DIV the two halves of AX carry separate meanings.</p>
+    </details>
+  </li>
+  <li>
+    <p>How many lines of the following program produce bytes, and how many bytes is the program? <code>ORG 100h</code> · <code>k EQU 5</code> · <code>MOV AX, 5</code> · <code>MOV BX, k</code> · <code>MOV AL, num</code> · <code>RET</code> · <code>num DB 0</code> · <code>END</code>. What are the bytes of the line <code>MOV AL, num</code>?</p>
+    <details><summary>Answer</summary>
+      <p>ORG, EQU, and END produce no bytes. Three MOVs of 3 bytes each, RET of 1 byte, DB of 1 byte: five lines, <strong>11 bytes</strong>. <code>num</code> is at 0100h + 10 = 010Ah. <code>MOV AL, num</code> is the accumulator form that reads from a direct address into AL: <code>A0 0A 01</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV AL, 0F0h</code>, <code>ADD AL, 20h</code>, <code>MOV BL, AL</code>, <code>NOT BL</code> run. What are AL, BL, CF, and ZF at the end?</p>
+    <details><summary>Answer</summary>
+      <p>F0h + 20h = 110h: AL = 10h, CF = 1, ZF = 0. With MOV, BL = 10h; the flags do not change. NOT BL = EFh; NOT changes no flags either. The result is AL = 10h, BL = EFh, CF = 1, ZF = 0. The flags are as ADD left them.</p>
+    </details>
+  </li>
+  <li>
+    <p>In emu8086, single step is pressed three times in the template program (<code>MOV AX, 5</code>, <code>MOV BX, 3</code>, <code>ADD AX, BX</code>, <code>MOV CL, AL</code>, <code>RET</code>). Which line is highlighted in the instruction list, and what are IP and AX? At which physical address does the first byte of this instruction appear in the memory column?</p>
+    <details><summary>Answer</summary>
+      <p>Three instructions have executed: AX = 0008h, BX = 0003h. IP = 0100h + 3 + 3 + 2 = <strong>0108h</strong>. The highlighted line is the next instruction, <code>MOV CL, AL</code>; CL is still 00h. The physical address is 07000h + 0108h = <strong>07108h</strong>; the byte <code>8A</code> appears there.</p>
+    </details>
+  </li>
+  <li>
+    <p>What are the machine codes of <code>MOV DX, 0Ah</code> and <code>INC CX</code>? If the two are consecutive and start at 0103h, at which address does the next instruction start?</p>
+    <details><summary>Answer</summary>
+      <p>The register number of DX is 2. <code>MOV DX, 0Ah</code> = B8h + 2 = BAh with the constant low byte first: <code>BA 0A 00</code> (3 bytes). <code>INC CX</code> = 40h + 1 = <code>41</code> (1 byte). The two instructions are 4 bytes; the next instruction starts at 0103h + 4 = <strong>0107h</strong>.</p>
+    </details>
+  </li>
+  <li>
+    <p>A program sets up a shift count with <code>MOV CL, 3</code>, then sets up a loop counter with <code>MOV CX, 10</code>, and at the end writes <code>SHL AX, CL</code>. Does the program assemble? By how many bits does AX shift?</p>
+    <details><summary>Answer</summary>
+      <p>The program assembles; every line is valid. But CL is the lower half of CX. <code>MOV CX, 10</code> makes CL 0Ah, and the shift is <strong>10 bits</strong>, not 3. This is a logic error. The shift count must be written to CL right before the shift.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s3-2-12"><span class="nt-num">3.2.12</span>Further reading</h2>
+
+<ul>
+  <li>The emu8086 documentation, <em>8086 assembler tutorial for beginners</em>: number systems, memory access, variables, and the instruction set reference; it is the source closest to emu8086 syntax.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8th ed.), Chapters 4 and 6: data movement instructions, ModR/M encoding, and the structure of .COM and .EXE programs.</li>
+  <li>M. A. Mazidi, J. G. Mazidi, <em>The 80x86 IBM PC and Compatible Computers</em>, Chapters 1–2: the structure of an assembly program, directives, sample programs, and working with a debugger.</li>
+  <li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> data sheet: the T states of the bus cycle and the table of instruction timings.</li>
+</ul>
+
+<h2 id="s3-2-13"><span class="nt-num">3.2.13</span>References</h2>
+
+<ol class="nt-refs">
+  <li>The emu8086 documentation, <em>8086 assembler tutorial for beginners</em> (part 1: numbering systems, part 2: memory access).</li>
+  <li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> data sheet.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8th edition, Pearson.</li>
+  <li>M. A. Mazidi, J. G. Mazidi, <em>The 80x86 IBM PC and Compatible Computers</em>, Pearson.</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_03_02_Assembly_Language.html">Chapter 3.2 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* show the Test Yourself answers when printing; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();</script>

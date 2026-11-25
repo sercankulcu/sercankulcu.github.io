@@ -1,0 +1,1196 @@
+---
+layout: without-sidebar
+title: "Chapter 8.1: The Stack — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_08_01_The_Stack_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 8.1 of Microprocessors: the 8086 stack, the stack segment and SS:SP, downward growth of the stack, the PUSH and POP instructions, little-endian byte order, saving registers, swap and array-reversal examples, PUSHF and POPF, stack overflow, and stack safety; with worked examples and code traces."
+lang: en
+seo_title: "Chapter 8.1: The Stack · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_08_01_Yigin_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_08_01_The_Stack_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* chapter-specific SVG classes of the slides (same as Chapter_08_01_The_Stack.html; scope limited to .ds-notes) */
+.ds-notes .nt-fig__row--2 > svg.ds-svg { flex: 1 1 260px; min-width: 0; max-width: calc(50% - 0.7rem); }
+.ds-notes .nt-fig__row--3 > svg.ds-svg { flex: 1 1 200px; min-width: 0; max-width: calc(33.3% - 0.95rem); }
+@media (max-width: 560px) {
+  .ds-notes .nt-fig__row--2 > svg.ds-svg, .ds-notes .nt-fig__row--3 > svg.ds-svg { max-width: 100%; }
+}
+.ds-notes .n81-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 8.1: The Stack</h1>
+  <p class="nt-lead">While a program runs, many values have to be set aside for a short time: the old value of a register, the return address of a procedure, the flags of an interrupted program, to name the first. For these jobs the 8086 uses a region of memory as the stack. The value put on the stack last is the first to be taken back. This note begins with the stack concept and the last-in, first-out discipline. It then explains how the stack is addressed through the SS and SP registers, why it grows downward, and which bus cycles the 8086 uses to reach it. Next it takes up, one by one, the effect of PUSH, POP, PUSHF, and POPF on registers, flags, and memory. Every example in the slides is traced step by step together with the registers and the stack: saving a value, swapping, rotating three registers, and reversing an array with the stack. The last section covers errors such as unbalanced PUSH and POP, stack overflow, and underflow, and the ways to guard against them.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_08_01_The_Stack.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_08_01_The_Stack.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_08_01_The_Stack_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Stack, CALL and RET</a></li>
+    <li><a href="../slides/CPU_Simulator.html">CPU Simulator</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Explain the stack model</dt>
+    <dd>Explain the last-in, first-out (LIFO) discipline of the stack, how the 8086 stack is addressed with SS:SP, and why it grows downward; compute the physical address of the top of the stack.</dd>
+    <dt>Trace PUSH and POP</dt>
+    <dd>Know the valid operand types for PUSH and POP, and show step by step, at byte level, how SP and stack memory change with each instruction.</dd>
+    <dt>Save and swap registers</dt>
+    <dd>Use the stack in the right order to preserve and restore a register's value, swap two registers, and reverse an array.</dd>
+    <dt>Preserve the flags</dt>
+    <dd>Save the flags register on the stack with PUSHF and POPF, restore flags that an operation has destroyed, and interpret the flags word bit by bit.</dd>
+    <dt>Recognize stack errors</dt>
+    <dd>Recognize the symptoms of unbalanced PUSH and POP, wrong ordering, stack overflow, and underflow, and apply the coding rules that prevent them.</dd>
+    <dt>Trace the stack in emu8086</dt>
+    <dd>Interpret the register panel, the stack window, and the memory view while single-stepping a program.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s8-1-1">8.1.1 The stack concept</a>
+      <ol>
+        <li><a href="#s8-1-1-1">8.1.1.1 What is a stack?</a></li>
+        <li><a href="#s8-1-1-2">8.1.1.2 Last in, first out (LIFO)</a></li>
+        <li><a href="#s8-1-1-3">8.1.1.3 The stack segment: SS and SP</a></li>
+        <li><a href="#s8-1-1-4">8.1.1.4 The stack grows downward</a></li>
+        <li><a href="#s8-1-1-5">8.1.1.5 Stack access in hardware</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-2">8.1.2 PUSH and POP</a>
+      <ol>
+        <li><a href="#s8-1-2-1">8.1.2.1 The PUSH instruction</a></li>
+        <li><a href="#s8-1-2-2">8.1.2.2 The POP instruction</a></li>
+        <li><a href="#s8-1-2-3">8.1.2.3 How PUSH and POP work</a></li>
+        <li><a href="#s8-1-2-4">8.1.2.4 Byte order on the stack</a></li>
+        <li><a href="#s8-1-2-5">8.1.2.5 What changes and what does not?</a></li>
+        <li><a href="#s8-1-2-6">8.1.2.6 Machine codes and clock cycles</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-3">8.1.3 Examples: code traces</a>
+      <ol>
+        <li><a href="#s8-1-3-1">8.1.3.1 First example: PUSH AX / POP BX</a></li>
+        <li><a href="#s8-1-3-2">8.1.3.2 LIFO order: 1, 2, 3 go in, 3, 2, 1 come out</a></li>
+        <li><a href="#s8-1-3-3">8.1.3.3 Saving a register's value</a></li>
+        <li><a href="#s8-1-3-4">8.1.3.4 Swapping two registers with the stack</a></li>
+        <li><a href="#s8-1-3-5">8.1.3.5 Three registers: POP in the same order</a></li>
+        <li><a href="#s8-1-3-6">8.1.3.6 Reversing an array with the stack</a></li>
+        <li><a href="#s8-1-3-7">8.1.3.7 What happens to the registers?</a></li>
+        <li><a href="#s8-1-3-8">8.1.3.8 Comparing swap methods</a></li>
+        <li><a href="#s8-1-3-9">8.1.3.9 The interactive stack simulator</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-4">8.1.4 Saving the flags: PUSHF and POPF</a>
+      <ol>
+        <li><a href="#s8-1-4-1">8.1.4.1 The flags word</a></li>
+        <li><a href="#s8-1-4-2">8.1.4.2 PUSHF and POPF: code trace</a></li>
+        <li><a href="#s8-1-4-3">8.1.4.3 Changing the flags word</a></li>
+        <li><a href="#s8-1-4-4">8.1.4.4 Instructions that use the stack automatically</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-5">8.1.5 Stack safety</a>
+      <ol>
+        <li><a href="#s8-1-5-1">8.1.5.1 The balance rule and the end of a .COM program</a></li>
+        <li><a href="#s8-1-5-2">8.1.5.2 Error example: an unbalanced PUSH</a></li>
+        <li><a href="#s8-1-5-3">8.1.5.3 Extra POP and wrong order</a></li>
+        <li><a href="#s8-1-5-4">8.1.5.4 Stack overflow and underflow</a></li>
+        <li><a href="#s8-1-5-5">8.1.5.5 Good practices</a></li>
+        <li><a href="#s8-1-5-6">8.1.5.6 Tracing the stack in emu8086</a></li>
+      </ol>
+    </li>
+    <li><a href="#s8-1-6">8.1.6 Exercises and solutions</a></li>
+    <li><a href="#s8-1-7">8.1.7 Summary</a></li>
+    <li><a href="#s8-1-8">8.1.8 Key terms</a></li>
+    <li><a href="#s8-1-9">8.1.9 Test Yourself</a></li>
+    <li><a href="#s8-1-10">8.1.10 Further reading</a></li>
+    <li><a href="#s8-1-11">8.1.11 References</a></li>
+  </ol>
+</nav>
+
+<h2 id="s8-1-1"><span class="nt-num">8.1.1</span>The stack concept</h2>
+
+<h3 id="s8-1-1-1"><span class="nt-num">8.1.1.1</span>What is a stack?</h3>
+
+<p>The 8086 has eight general-purpose registers. A program often uses all of them, and at some point space runs short. For example, AX may hold a sum while AX is also needed for something else. One solution is to write the sum to a variable and read it back later. But defining a separate variable for every intermediate value clutters the program. Besides, it is not always known in advance how many values will have to be saved. One procedure can call another, and that one yet another. The return address of every call has to be kept somewhere, and the depth of calls depends on the flow of the program.</p>
+
+<p>These needs share one property: the value saved last is the first one asked back. The innermost procedure finishes first, and its return address is the address saved last. When a register is borrowed temporarily, too, the value saved last is the first one restored. The 8086 supports a memory region that follows this discipline at the hardware level.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-yigin">
+  <span class="nt-box__title">Definition 8.1.1</span>
+  <p>A <strong>stack</strong> is an area of memory set aside for temporary data and used in last-in, first-out order. On the 8086 the location of the stack is determined by the registers SS (stack segment) and SP (stack pointer). Putting a value on the stack is called a <strong>push</strong>; taking a value from the stack is called a <strong>pop</strong>.</p>
+</div>
+
+<p>The programmer reaches the stack with two instructions. <code>PUSH</code> puts a 16-bit value on the stack. <code>POP</code> takes a 16-bit value off the stack and writes it to a destination. The stack is an area used not only by the programmer but by the processor as well. When the <code>CALL</code> instruction calls a procedure, it puts the return address on the stack. The <code>RET</code> at the end of the procedure takes this address off the stack and returns there. When <code>INT</code> calls an interrupt, similar work is done. The flags register, the code segment (CS), and the instruction pointer (IP) are saved on the stack; with <code>IRET</code> the interrupt is returned from and the three values are restored. The interrupt routines of the operating system and the BIOS use the same stack to preserve registers.</p>
+
+<p>Having so many users of the stack also brings a responsibility. Every value the programmer puts on the stack sits in the same area as the processor's return addresses. If the programmer leaves a value on the stack or takes one extra, the processor's return address shifts and the program returns to a wrong address. Stack safety is therefore treated in a section of its own.</p>
+
+<p>On the 8086 the unit of the stack is the word. Always 2 bytes are written to the stack and always 2 bytes are read from it. An 8-bit operand such as in <code>PUSH AL</code> is therefore invalid. If a byte has to be saved, the 16-bit register that contains it is pushed; <code>PUSH AX</code> puts both AL and AH on the stack. The stack also has a direction. It grows from high addresses toward low ones, that is, downward. These two rules determine every detail of the PUSH and POP instructions.</p>
+
+<div class="nt-tablewrap" id="tab-kullanicilar">
+<table class="nt-table">
+  <caption>Table 8.1.1: Who uses the stack on the 8086, and what they put on it.</caption>
+  <thead><tr><th scope="col">User</th><th scope="col">Instruction</th><th scope="col">Put on the stack</th><th scope="col">Taken back by</th></tr></thead>
+  <tbody>
+    <tr><td>programmer</td><td><code>PUSH</code>, <code>PUSHF</code></td><td>register, segment register, memory word, flags</td><td><code>POP</code>, <code>POPF</code></td></tr>
+    <tr><td>processor (procedure)</td><td><code>CALL</code></td><td>return address (IP for a near call, CS and IP for a far call)</td><td><code>RET</code>, <code>RETF</code></td></tr>
+    <tr><td>processor (interrupt)</td><td><code>INT n</code>, hardware interrupt</td><td>FLAGS, CS, and IP</td><td><code>IRET</code></td></tr>
+    <tr><td>operating system, BIOS</td><td>interrupt routines</td><td>the registers the routine uses</td><td>the POPs at the end of the routine</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-kullanicilar">Table 8.1.1</a> summarizes the four users of the stack. The subject of this note is the first row: the programmer's use of the stack with PUSH, POP, PUSHF, and POPF. The effect of CALL and RET on the stack is mentioned only briefly, from the stack's point of view. The definition of procedures, parameter passing, and the stack frame are the subject of the Procedures note.</p>
+
+<h3 id="s8-1-1-2"><span class="nt-num">8.1.1.2</span>Last in, first out (LIFO)</h3>
+
+<p>The word stack describes this discipline well in its everyday meaning, too. Think of plates piled on a table. A new plate is always put on top. When a plate is to be taken, the top one is taken. To reach a plate in the middle, all those above it have to be lifted off first. The plate put down last is taken first, and the plate put down first is taken last.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-lifo">
+  <span class="nt-box__title">Definition 8.1.2</span>
+  <p><strong>LIFO</strong> (last in, first out) is the discipline “the last one in is the first one out”. The last element added to a structure is the first element removed from it. The stack works in LIFO order; only the topmost element is accessible. The topmost element is called the <strong>top of the stack</strong>.</p>
+</div>
+
+<p>The opposite of LIFO is FIFO (first in, first out): the first one in is the first one out. A queue at a bank or a keyboard buffer works in FIFO order. The difference between the two disciplines is easiest to see with a sequence of numbers. Let 1, 2, 3, 4, and 5 be put on the stack in that order. The first value taken is 5. Then 4, 3, and 2 are taken, and 1 last. Had the same values been put in a FIFO queue, they would come out in the order 1, 2, 3, 4, 5.</p>
+
+<figure class="nt-fig" id="sekil-lifo" style="--w:640px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--3"><svg class="ds-svg" viewBox="0 0 420 280" role="img" aria-label="Stack: 1, 2, 3, 4, 5"><defs><marker id="n81-1-m8ah6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><path class="axis" d="M120 40 V250 H220 V40"/><rect class="box" x="126" y="210" width="88" height="36" rx="3"/><text class="txt" x="170" y="233" text-anchor="middle">1</text><rect class="box" x="126" y="170" width="88" height="36" rx="3"/><text class="txt" x="170" y="193" text-anchor="middle">2</text><rect class="box" x="126" y="130" width="88" height="36" rx="3"/><text class="txt" x="170" y="153" text-anchor="middle">3</text><rect class="box" x="126" y="90" width="88" height="36" rx="3"/><text class="txt" x="170" y="113" text-anchor="middle">4</text><rect class="box" x="126" y="50" width="88" height="36" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="170" y="73" text-anchor="middle">5</text><text class="lbl" x="170" y="270" text-anchor="middle">stack</text><path class="line" d="M60 40 V100" marker-end="url(#n81-1-m8ah6)"/><text class="txt" x="60" y="30" text-anchor="middle">PUSH</text><path class="line" d="M280 100 V40" marker-end="url(#n81-1-m8ah6)"/><text class="txt" x="280" y="120" text-anchor="middle">POP</text></svg><svg class="ds-svg" viewBox="0 0 420 280" role="img" aria-label="Stack: 1, 2, 3"><defs><marker id="n81-2-m8ah8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><path class="axis" d="M120 40 V250 H220 V40"/><rect class="box" x="126" y="210" width="88" height="36" rx="3"/><text class="txt" x="170" y="233" text-anchor="middle">1</text><rect class="box" x="126" y="170" width="88" height="36" rx="3"/><text class="txt" x="170" y="193" text-anchor="middle">2</text><rect class="box" x="126" y="130" width="88" height="36" rx="3"/><text class="txt" x="170" y="153" text-anchor="middle">3</text><text class="lbl" x="170" y="270" text-anchor="middle">stack</text><path class="line" d="M60 40 V100" marker-end="url(#n81-2-m8ah8)"/><text class="txt" x="60" y="30" text-anchor="middle">PUSH</text><path class="line" d="M280 100 V40" marker-end="url(#n81-2-m8ah8)"/><text class="txt" x="280" y="120" text-anchor="middle">POP</text><rect class="box-empty" x="320" y="30" width="60" height="32" rx="3"/><text class="txt" x="350" y="52" text-anchor="middle">4</text><text class="lbl" x="350" y="80" text-anchor="middle">popped</text></svg><svg class="ds-svg" viewBox="0 0 420 280" role="img" aria-label="Stack:"><defs><marker id="n81-3-m8ah11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><path class="axis" d="M120 40 V250 H220 V40"/><text class="lbl" x="170" y="270" text-anchor="middle">stack</text><path class="line" d="M60 40 V100" marker-end="url(#n81-3-m8ah11)"/><text class="txt" x="60" y="30" text-anchor="middle">PUSH</text><path class="line" d="M280 100 V40" marker-end="url(#n81-3-m8ah11)"/><text class="txt" x="280" y="120" text-anchor="middle">POP</text><rect class="box-empty" x="320" y="30" width="60" height="32" rx="3"/><text class="txt" x="350" y="52" text-anchor="middle">1</text><text class="lbl" x="350" y="80" text-anchor="middle">popped</text></svg></div></div>
+  <figcaption><b>Figure 8.1.1:</b> The LIFO discipline. On the left, five values from 1 to 5 have been pushed, and 5 is at the top of the stack. In the middle, after two POPs, 5 and 4 have come out and 3 is on top. On the right, after five POPs the stack is empty; the order of output has been 5, 4, 3, 2, 1.</figcaption>
+</figure>
+
+<p><a href="#sekil-lifo">Figure 8.1.1</a> shows this process at three moments. The stack in the figure is a conceptual drawing; there are no memory addresses yet. What matters is that each POP takes the value that is on top at that moment. The third POP takes 3, because 5 and 4 have been taken earlier and 2 and 1 remain on the stack.</p>
+
+<p>The LIFO discipline has two consequences in programming. The first is that the stack gives values back in reverse order. This property can be used deliberately: pushing an array onto the stack in order and then popping it reverses the array. The second is that if several registers are saved and later restored to their old places, the POP order must be the reverse of the PUSH order. If AX, BX, and CX were pushed in this order, the restore order is CX, BX, AX. This rule is called <strong>mirror order</strong>. Written one below the other, the PUSHes and POPs stand like an image in a mirror.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Pushing registers in the order <code>PUSH AX</code>, <code>PUSH BX</code> and restoring them in the order <code>POP AX</code>, <code>POP BX</code>. This sequence does not preserve the registers; it swaps their values: since BX was pushed last, the first POP writes it into AX. The error is not noticed at assembly time, because all four instructions are valid. The program just produces a wrong result.</p>
+</div>
+
+<h3 id="s8-1-1-3"><span class="nt-num">8.1.1.3</span>The stack segment: SS and SP</h3>
+
+<p>The memory of the 8086 is divided into segments. In every memory access a 16-bit segment value and a 16-bit offset are combined. For code, CS and IP are used; for data, most often DS and an addressing expression. There is a dedicated register pair for the stack as well.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-sssp">
+  <span class="nt-box__title">Definition 8.1.3</span>
+  <p><strong>SS</strong> (stack segment) is the segment register that holds the start of the 64 KB segment in which the stack lives. <strong>SP</strong> (stack pointer) is the 16-bit register that holds the offset, within that segment, of the word on top of the stack. SS:SP always points at the top of the stack, that is, at the word put there last. The physical address of the top of the stack is SS × 10h + SP.</p>
+</div>
+
+<p>The physical address computation is the same as for code and data accesses. The segment value is multiplied by 16; in hexadecimal this means appending a 0 to the right of the number. Then the offset is added and the 20-bit address is found.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-fiziksel">
+  <span class="nt-box__title">Example 8.1.1</span>
+  <p>When emu8086 loads a .COM program, it sets all the segment registers to 0700h and SP to FFFEh. The physical address of the top of the stack is found as follows:</p>
+  <ol class="nt-steps">
+    <li>Stack segment: SS = 0700h.</li>
+    <li>The segment value is multiplied by 16: 0700h × 10h = 07000h.</li>
+    <li>The offset is added: 07000h + FFFEh = 16FFEh.</li>
+  </ol>
+  <p>The top of the stack is at physical address 16FFEh. The addition produces a carry: 7000h + FFFEh = 16FFEh, so the result exceeds 16 bits. Because the address bus is 20 bits wide, this overflow is not lost; it appears as bit 16 of the 20-bit address.</p>
+</div>
+
+<figure class="nt-fig" id="sekil-fiziksel" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 210" role="img" aria-label="Physical stack address computation"><defs><marker id="n81-4-m8ah15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="150" y="51" text-anchor="end">SS</text><rect class="box" x="170" y="30" width="150" height="32" rx="4"/><text class="txt mono" x="245" y="51" text-anchor="middle">0700h</text><text class="txt" x="150" y="95" text-anchor="end">SS × 16</text><rect class="box" x="170" y="74" width="150" height="32" rx="4"/><text class="txt mono" x="245" y="95" text-anchor="middle">07000h</text><text class="txt" x="150" y="139" text-anchor="end">+ SP</text><rect class="box" x="170" y="118" width="150" height="32" rx="4"/><text class="txt mono" x="245" y="139" text-anchor="middle">FFFEh</text><text class="txt" x="150" y="183" text-anchor="end">Physical address</text><rect class="box" x="170" y="162" width="150" height="32" rx="4" style="fill:var(--ds-hot)"/><text class="txt mono" x="245" y="183" text-anchor="middle">16FFEh</text><path class="axis" d="M170 158 H320"/></svg></div>
+  <figcaption><b>Figure 8.1.2:</b> The physical address of the top of the stack. SS = 0700h is multiplied by 16 (07000h), SP = FFFEh is added, and the 20-bit address 16FFEh results.</figcaption>
+</figure>
+
+<p>The initial values of SS and SP are usually determined not by the programmer but by the operating system that loads the program into memory (<a href="#sekil-fiziksel">Figure 8.1.2</a>). In a .COM program, code, data, and stack share a single 64 KB segment. The loader makes SS the same as CS and sets SP to the end of the segment, FFFEh. In an .EXE program, on the other hand, the stack is a separate segment. The location of the segment and the initial value of SP are written in the header of the .EXE file; the loader puts these values into SS and SP. In the source code, a directive such as <code>.STACK 100h</code> reserves a 256-byte stack segment. In emu8086, an .EXE program written with <code>.stack 100h</code>, <code>.data</code>, and <code>.code</code> in that order starts with SS = 0710h and SP = 0100h. The top of the stack is then at physical address 07100h + 0100h = 07200h; the first PUSH writes to 071FEh.</p>
+
+<p>The stack is not reached through SP alone. BP (the base pointer) also uses the SS segment by default. An instruction such as <code>MOV AX, [BP+4]</code> reads address SS:BP+4 even though no segment prefix is written. BP is therefore the right register for reaching data inside the stack, for example parameters passed to a procedure on the stack. SP, on the other hand, cannot be used in an addressing expression on the 8086: <code>MOV AX, [SP]</code> is invalid. To read the value on top of the stack without removing it, SP is first copied into BX or BP.</p>
+
+<p>It is also possible for a program to move the stack itself. For this, new values are loaded into SS and SP. If an interrupt arrives between these two loads, the processor writes FLAGS, CS, and IP to an address that is half old and half new. The 8086 contains a safeguard against this danger. After an instruction that writes to a segment register with <code>MOV</code> or <code>POP</code>, no interrupt is accepted until the next instruction finishes. That is why, when changing the stack, SS is loaded first and SP immediately after:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 2000h
+<span class="kw">MOV</span>  SS, AX        <span class="cm">; interrupts held off one instruction</span>
+<span class="kw">MOV</span>  SP, 0100h     <span class="cm">; SS:SP = 2000:0100, consistent</span></code></pre>
+
+<p>If the order of the two lines is swapped, the protection does not work. The deferral covers only the instruction following the one that writes to the segment register.</p>
+
+<h3 id="s8-1-1-4"><span class="nt-num">8.1.1.4</span>The stack grows downward</h3>
+
+<p>In a .COM program there are three regions inside the single 64 KB segment. The first 256 bytes of the segment (0000h–00FFh) are the program segment prefix (PSP). DOS fills this area when it loads the program; the command line and return information are here. The program starts at address 0100h, as the <code>ORG 100h</code> directive demands; code and data are laid out upward. The stack starts at the very top of the segment, at FFFEh, and grows downward.</p>
+
+<figure class="nt-fig" id="sekil-yerlesim" style="--w:470px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 470 330" role="img" aria-label="Layout of the PSP, code, and stack in a 64 KB segment"><defs><marker id="n81-5-m8ah16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="120" y="20" width="200" height="300" rx="4"/><rect class="box" x="120" y="270" width="200" height="50" rx="2"/><text class="txt" x="220" y="300" text-anchor="middle">PSP (0000–00FFh)</text><rect class="box" x="120" y="215" width="200" height="55" rx="2"/><text class="txt" x="220" y="240" text-anchor="middle">Code + data</text><text class="lbl" x="220" y="258" text-anchor="middle">starts at ORG 100h</text><path class="line" d="M220 212 V180" marker-end="url(#n81-5-m8ah16)"/><text class="lbl" x="232" y="196">program grows</text><rect class="box" x="120" y="20" width="200" height="60" rx="2" style="fill:var(--ds-hot)"/><text class="txt" x="220" y="46" text-anchor="middle">Stack</text><text class="lbl" x="220" y="66" text-anchor="middle">starts at SP = FFFEh</text><path class="line" d="M220 84 V120" marker-end="url(#n81-5-m8ah16)"/><text class="lbl" x="232" y="108">stack grows (SP decreases)</text><text class="lbl" x="220" y="152" text-anchor="middle">free space</text><text class="lbl mono" x="110" y="28" text-anchor="end">FFFFh</text><text class="lbl mono" x="110" y="324" text-anchor="end">0000h</text><text class="lbl mono" x="110" y="274" text-anchor="end">0100h</text><text class="lbl" x="330" y="160">CS = DS = SS = ES</text><text class="lbl" x="330" y="178">= 0700h</text><text class="lbl" x="330" y="196">(a single 64 KB segment)</text></svg></div>
+  <figcaption><b>Figure 8.1.3:</b> Layout of the 64 KB segment in a .COM program. The PSP is at the bottom, code and data go upward from 0100h, and the stack goes downward from FFFEh. Both use the free space in between.</figcaption>
+</figure>
+
+<p>The logic of this layout is clear in <a href="#sekil-yerlesim">Figure 8.1.3</a>. The program and the stack grow toward each other from the two ends of the segment. How much room the program takes is known at assembly time. How deep the stack will get is determined at run time, by the number of calls and PUSHes. Placing the two regions at opposite ends lets whichever needs it use all of the free space in between. Had the stack grown upward, a fixed size would have had to be reserved after the end of the program, and that size would have been either too much or too little.</p>
+
+<p>The downward growth of the stack shows up in the instructions in a simple way. Each PUSH decreases SP by 2. Each POP increases SP by 2. As the value of SP gets smaller, the stack gets deeper. The number of words on the stack can also be computed from SP. For example, if SP = FFFEh at the start and SP = FFF8h now, (FFFEh − FFF8h) / 2 = 3 words have been pushed onto the stack.</p>
+
+<p>How deep the stack can get in a .COM program can also be computed. The example program that reverses an array with the stack is 26 bytes and occupies addresses 0100h–0119h. The first free byte after the program is 011Ah. The stack starts at FFFEh; after n PUSHes SP = FFFEh − 2n. For the stack not to overwrite the program, SP ≥ 011Ah must hold. From this, n ≤ (FFFEh − 011Ah) / 2 = (65,534 − 282) / 2 = 32,626. In this program up to 32,626 words can be put on the stack. In practice this limit is hardly approached, but an infinite loop or infinite recursion exceeds it in no time.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Understanding “top of the stack” as “the highest address”. The top of the stack is the place where the word put last is found and where SP points. Because the stack grows downward, this place is the <em>lowest</em> address among the items on the stack. If small addresses are drawn at the top in figures, the word “top” is also visually right; the stack figures in this note use this layout.</p>
+</div>
+
+<h3 id="s8-1-1-5"><span class="nt-num">8.1.1.5</span>Stack access in hardware</h3>
+
+<p>PUSH and POP are a single instruction from the software point of view. In hardware, two units of the 8086 work together. The execution unit (EU) decodes the instruction and decreases or increases SP by 2 in its own arithmetic-logic unit. The bus interface unit (BIU) computes the physical address and accesses memory. The address adder in the BIU shifts SS left by 4 bits and adds SP. The resulting 20-bit address is put out on the address/data lines in a memory write (PUSH) or read (POP) bus cycle.</p>
+
+<p>The data bus of the 8086 is 16 bits wide. If a word sits at an even address, it is transferred in a single bus cycle, that is, in four clock cycles (T1–T4). In this cycle A0 = 0 and BHE = 0; the low byte passes on lines D0–D7 and the high byte on D8–D15. As long as SP is even, every PUSH is a single write cycle and every POP a single read cycle. If SP falls to an odd value, the word is transferred in two separate cycles and each access takes four clock cycles longer. Loaders therefore always start SP with an even value, and programs never change SP by an odd amount.</p>
+
+<p>There is one more detail that tells outside circuits about stack access. In the T2–T4 interval of each bus cycle, the 8086 puts status bits on lines A16/S3–A19/S6. The bits S4 and S3 tell which segment register is used in that cycle. If S4 = 0 and S3 = 1, that cycle is an access to the SS segment, that is, to the stack. A designer can decode these bits to route stack accesses to a separate memory bank and thus use a memory area larger than 1 MB. In ordinary PCs these bits are not used, but on a logic analyzer they are useful for seeing when a program accesses the stack.</p>
+
+<div class="nt-tablewrap" id="tab-s4s3">
+<table class="nt-table">
+  <caption>Table 8.1.2: The S4 and S3 status bits of the 8086 (during T2–T4 of the bus cycle).</caption>
+  <thead><tr><th scope="col">S4</th><th scope="col">S3</th><th scope="col">Segment used</th><th scope="col">Example access</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>ES (extra segment)</td><td>destination of string instructions, access with an ES prefix</td></tr>
+    <tr><td>0</td><td>1</td><td>SS (stack segment)</td><td>PUSH, POP, CALL, RET, BP-based access</td></tr>
+    <tr><td>1</td><td>0</td><td>CS or no segment</td><td>instruction fetch, I/O and interrupt acknowledge cycles</td></tr>
+    <tr><td>1</td><td>1</td><td>DS (data segment)</td><td>ordinary variable access</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>On the 8088 the situation is different. The external data bus of the 8088 is 8 bits wide; every word is transferred in two separate byte cycles. So on the 8088 every PUSH and POP takes two memory cycles even when SP is even. From the programming point of view the two processors are the same; only the timings differ. All the examples in this note are for the 8086.</p>
+
+<h2 class="nt-pb" id="s8-1-2"><span class="nt-num">8.1.2</span>PUSH and POP</h2>
+
+<h3 id="s8-1-2-1"><span class="nt-num">8.1.2.1</span>The PUSH instruction</h3>
+
+<p>The <code>PUSH source</code> instruction puts a copy of the 16-bit source on top of the stack. The source does not change; a copy of it appears on the stack. The source can be of four kinds: a general-purpose or pointer register, a segment register, a word in memory, and, from the 80186 on, an immediate value. <a href="#tab-push">Table 8.1.3</a> gives these kinds with examples.</p>
+
+<div class="nt-tablewrap" id="tab-push">
+<table class="nt-table">
+  <caption>Table 8.1.3: Operand types of the PUSH instruction.</caption>
+  <thead><tr><th scope="col">Form</th><th scope="col">Valid operands</th><th scope="col">Example</th></tr></thead>
+  <tbody>
+    <tr><td>PUSH register</td><td>AX, BX, CX, DX, SI, DI, BP, SP</td><td><code>PUSH AX</code></td></tr>
+    <tr><td>PUSH segment register</td><td>CS, DS, SS, ES</td><td><code>PUSH DS</code></td></tr>
+    <tr><td>PUSH memory</td><td><code>[BX]</code>, <code>[BX+SI+7]</code>, 16-bit variable</td><td><code>PUSH [BX]</code>, <code>PUSH num</code></td></tr>
+    <tr><td>PUSH immediate</td><td>5, −24, 3Fh, 10001101b</td><td><code>PUSH 3Fh</code> (not on the 8086)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The last row of the table carries a warning. PUSH with an immediate value is not in the instruction set of the 8086 and 8088; it arrived with the 80186. emu8086 accepts and runs this instruction. But in a program written for a real 8086, a constant is first loaded into a register, and then the register is pushed:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 5
+<span class="kw">PUSH</span> AX          <span class="cm">; instead of PUSH 5 on the 8086</span></code></pre>
+
+<p>For PUSH with a memory operand, the size of the operand must be a word. For a variable defined as <code>num DW 0BEEFh</code>, <code>PUSH num</code> is valid; the two bytes of the variable are copied to the stack. A byte variable defined with <code>DB</code>, however, cannot be pushed. The same rule applies to registers: <code>PUSH AL</code> and <code>PUSH byte_var</code> give an assembly error. The flags register cannot be written as an ordinary operand; it has a separate instruction, <code>PUSHF</code>.</p>
+
+<p>Pushing SP itself carries an interesting detail. The <code>PUSH SP</code> instruction both decrements SP and writes it to the stack, and which happens first changes the result. The 8086 first decrements SP and then writes the <em>decremented</em> value. With SP = FFFEh, <code>PUSH SP</code> puts FFFCh on the stack. The 80286 and later processors write the value from before the decrement, FFFEh. This difference was used in old programs to tell whether the processor was an 8086 or an 80286. In a portable program <code>PUSH SP</code> is not relied on; if the value of SP is needed, it is first copied into another register.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Taking <code>PUSH 5</code> for an 8086 instruction because it worked in emu8086. emu8086 accepts some 80186 instructions and only gives a warning. When the same code runs on a real 8086 or 8088, the processor interprets these bytes as some other instruction and the program behaves unexpectedly.</p>
+</div>
+
+<h3 id="s8-1-2-2"><span class="nt-num">8.1.2.2</span>The POP instruction</h3>
+
+<p>The <code>POP destination</code> instruction reads the word on top of the stack, writes it to the destination, and moves the top of the stack up by one word. The destination types resemble the source types of PUSH, but with two omissions (<a href="#tab-pop">Table 8.1.4</a>).</p>
+
+<div class="nt-tablewrap" id="tab-pop">
+<table class="nt-table">
+  <caption>Table 8.1.4: Operand types of the POP instruction.</caption>
+  <thead><tr><th scope="col">Form</th><th scope="col">Valid operands</th><th scope="col">Example</th></tr></thead>
+  <tbody>
+    <tr><td>POP register</td><td>AX, BX, CX, DX, SI, DI, BP, SP</td><td><code>POP BX</code></td></tr>
+    <tr><td>POP segment register</td><td>DS, SS, ES (not CS)</td><td><code>POP DS</code></td></tr>
+    <tr><td>POP memory</td><td><code>[BX]</code>, <code>[BX+SI+7]</code>, 16-bit variable</td><td><code>POP result</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Why is there no POP CS?</strong> CS determines the segment from which instructions are fetched. Had <code>POP CS</code> changed CS and left IP as it was, the next instruction would be fetched from the same offset in a completely different segment. The program flow would jump to a random place. That is why CS changes only together with IP: far <code>JMP</code> and <code>CALL</code>, <code>RETF</code>, <code>INT</code>, and <code>IRET</code> load CS and IP in the same instruction. Assemblers do not accept <code>POP CS</code>. On the first 8086s the code of this instruction (0Fh) worked in an undocumented way; Intel used this code on the 80286 as the prefix of new two-byte instructions.</p>
+
+<p><strong>Why is there no POP constant?</strong> <code>POP 5</code> is meaningless. POP takes a value from the stack, and a place is needed to write that value to. A constant is not a place a value can be written to. If the value on top of the stack is not needed and is only to be discarded, there are two ways. The value is taken into a register that is not in use, or 2 is added directly to SP (<code>ADD SP, 2</code>). The second way changes the flags; the first does not.</p>
+
+<p><strong>Flags.</strong> PUSH and POP do not touch the flags. Even if 0000h arrives in AX with <code>POP AX</code>, ZF does not change; what changes ZF is an arithmetic or logic operation, not a data transfer. The only exception to this rule is <code>POPF</code>. POPF loads the word it takes from the stack into the whole flags register.</p>
+
+<p><strong>Copying between segment registers.</strong> On the 8086 there is no direct <code>MOV</code> from one segment register to another; <code>MOV DS, CS</code> is invalid. This copy is done in two ways. Either the value is passed through a general-purpose register (<code>MOV AX, CS</code> and <code>MOV DS, AX</code>), or the stack is used:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSH</span> CS          <span class="cm">; value of CS onto the stack</span>
+<span class="kw">POP</span>  DS          <span class="cm">; DS ← CS</span>
+<span class="kw">PUSH</span> DS          <span class="cm">; value of DS onto the stack</span>
+<span class="kw">POP</span>  ES          <span class="cm">; ES ← DS</span></code></pre>
+
+<p>The advantage of copying through the stack is that it disturbs no general-purpose register. If the value of AX is to be preserved, the first way requires saving AX separately; the second does not. The idiom <code>PUSH CS</code> with <code>POP DS</code> is common in programs whose data sits in the code segment and at the start of interrupt routines. In emu8086, if DS is set to 1234h and these four instructions are run, ES = 1234h and DS = 0700h; SP returns to FFFEh.</p>
+
+<h3 id="s8-1-2-3"><span class="nt-num">8.1.2.3</span>How PUSH and POP work</h3>
+
+<p>Both instructions consist of two steps. The order of the steps determines what SP points at at each moment.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-pushpop">
+  <span class="nt-box__title">Definition 8.1.4</span>
+  <p><strong>PUSH source</strong>: (1) SP ← SP − 2; (2) [SS:SP] ← source. <strong>POP destination</strong>: (1) destination ← [SS:SP]; (2) SP ← SP + 2. PUSH first decrements and then writes; POP first reads and then increments. SP therefore always points at the topmost occupied cell.</p>
+</div>
+
+<p>This ordering is called the “full stack” convention. The cell SP points at always holds a valid value. Some processors use the opposite convention: SP points at the next free cell, and PUSH first writes and then decrements. Whichever convention is chosen, PUSH and POP must be exact opposites. On the 8086, PUSH is “decrement, write” and POP is “read, increment”.</p>
+
+<figure class="nt-fig" id="sekil-pushpop" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFEh"><defs><marker id="n81-6-m8ah17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><path class="line" d="M256 97 L216 97" marker-end="url(#n81-6-m8ah17)"/><text class="txt" x="260" y="102" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:offset · small addresses at the top</text><text class="txt" x="10" y="138"></text></svg><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFCh"><defs><marker id="n81-7-m8ah18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">····</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><path class="line" d="M256 72 L216 72" marker-end="url(#n81-7-m8ah18)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:offset · small addresses at the top</text><text class="txt" x="10" y="138">PUSH AX · 1</text></svg><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFCh"><defs><marker id="n81-8-m8ah19" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">1234h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><path class="line" d="M256 72 L216 72" marker-end="url(#n81-8-m8ah19)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:offset · small addresses at the top</text><text class="txt" x="10" y="138">PUSH AX · 2</text></svg><svg class="ds-svg" viewBox="0 0 330 146" role="img" aria-label="SP=FFFEh"><defs><marker id="n81-9-m8ah21" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF8</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle" style="opacity:.45">1234h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFC</text><rect class="box" x="92" y="85" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="102" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFE</text><path class="line" d="M256 97 L216 97" marker-end="url(#n81-9-m8ah21)"/><text class="txt" x="260" y="102" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="126" text-anchor="middle">SS:offset · small addresses at the top</text><text class="txt" x="10" y="138">POP BX · 2</text></svg></div></div>
+  <figcaption><b>Figure 8.1.4:</b> PUSH AX and POP BX with AX = 1234h. Top left, the start: SP = FFFEh, where the 0000h put by DOS sits. Top right, the first step of PUSH: SP = FFFCh, the new cell not yet written. Bottom left, the second step: [FFFCh] ← 1234h. Bottom right, POP BX has finished: BX = 1234h, SP = FFFEh; the 1234h at FFFCh has not been erased, it has only fallen outside the stack.</figcaption>
+</figure>
+
+<p><a href="#sekil-pushpop">Figure 8.1.4</a> shows the two instructions at four moments. At the start SP = FFFEh and AX = 1234h. At address FFFEh sits the word 0000h that DOS put for the .COM program; the job of this word is explained at the end of the program.</p>
+
+<ol>
+  <li><strong>PUSH AX, step 1.</strong> SP ← FFFEh − 2 = FFFCh. The top of the stack moves down by one word. The cell at FFFCh holds, for now, an old, meaningless value.</li>
+  <li><strong>PUSH AX, step 2.</strong> [SS:FFFCh] ← 1234h. A copy of AX is written into the new top cell. AX does not change.</li>
+  <li><strong>POP BX, step 1.</strong> BX ← [SS:FFFCh] = 1234h. The value is read from the top of the stack.</li>
+  <li><strong>POP BX, step 2.</strong> SP ← FFFCh + 2 = FFFEh. The top of the stack moves up by one word.</li>
+</ol>
+
+<p>The last step has an important consequence. POP does not erase the value it reads from memory. The 1234h at FFFCh stays there; it is just now above SP, that is, outside the stack. In the figure this cell is drawn faded. The next PUSH overwrites the same cell. For this reason, trying to reach a value that has been taken off the stack by reading memory again is not reliable. If an interrupt arrives in between, the processor writes FLAGS, CS, and IP to exactly those cells, and the old value is lost.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking that after a POP the value is erased from memory and 0 is written in its place. POP only reads and increments SP. In the memory window of emu8086 the old values remain visible. These values are not “on the stack”; the stack is only the region from SP up to FFFEh.</p>
+</div>
+
+<h3 id="s8-1-2-4"><span class="nt-num">8.1.2.4</span>Byte order on the stack</h3>
+
+<p>The stack works with words, while memory is addressed in bytes. When a word is written to memory, its two bytes get two separate addresses. For this the 8086 uses the little-endian convention: the low byte of the word is written to the lower address and the high byte to the next address. The rule is the same for the stack.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-bayt" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 172" role="img" aria-label="The word 1234h split into bytes on the stack"><defs><marker id="n81-10-m8ah22" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="20" y="22">Word view</text><rect class="box" x="20" y="32" width="140" height="34" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="90" y="55" text-anchor="middle">1234h</text><text class="lbl mono" x="170" y="55">SS:FFFC</text><text class="lbl" x="300" y="22">Byte view (memory)</text><rect class="box" x="300" y="32" width="80" height="30" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="340" y="52" text-anchor="middle">34h</text><text class="lbl mono" x="390" y="52">FFFC</text><rect class="box" x="300" y="66" width="80" height="30" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="340" y="86" text-anchor="middle">12h</text><text class="lbl mono" x="390" y="86">FFFD</text><rect class="box" x="300" y="100" width="80" height="30" rx="2"/><text class="txt mono" x="340" y="120" text-anchor="middle">00h</text><text class="lbl mono" x="390" y="120">FFFE</text><rect class="box" x="300" y="134" width="80" height="30" rx="2"/><text class="txt mono" x="340" y="154" text-anchor="middle">00h</text><text class="lbl mono" x="390" y="154">FFFF</text><text class="lbl" x="440" y="52">← low byte (AL)</text><text class="lbl" x="440" y="86">← high byte (AH)</text><text class="lbl" x="440" y="136">DOS’s 0000h word</text></svg></div>
+  <figcaption><b>Figure 8.1.5:</b> The stack after PUSH AX (AX = 1234h). On the left, the word view: 1234h at SS:FFFC. On the right, the byte view: [FFFCh] = 34h (AL), [FFFDh] = 12h (AH); the 0000h word of DOS at FFFEh and FFFFh.</figcaption>
+</figure>
+
+<p>When <code>PUSH AX</code> runs with AX = 1234h, SP = FFFCh. The low byte of the word, 34h (AL), is written to address FFFCh, and the high byte, 12h (AH), to address FFFDh (<a href="#sekil-bayt">Figure 8.1.5</a>). SP always points at the low byte of the word, that is, at the smaller address. The stack window of emu8086 shows words and writes 1234h on this line. The memory window, however, shows bytes in order: first 34, then 12. The two windows present the same data in different ways. That the value looks “reversed” in the memory window is not an error but a natural result of the little-endian convention.</p>
+
+<p>This convention can also be tested with a program. To read the bytes on top of the stack, SP is copied into a base register, because the 8086 has no <code>[SP]</code> addressing expression:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 1234h
+<span class="kw">PUSH</span> AX
+<span class="kw">MOV</span>  BX, SP        <span class="cm">; BX = FFFCh</span>
+<span class="kw">MOV</span>  CL, [BX]      <span class="cm">; CL = 34h, low byte</span>
+<span class="kw">MOV</span>  CH, [BX+1]    <span class="cm">; CH = 12h, high byte</span>
+<span class="kw">POP</span>  DX            <span class="cm">; DX = 1234h</span></code></pre>
+
+<p>The program runs as follows. <code>PUSH AX</code> makes SP FFFCh and writes the bytes 34h and 12h to FFFCh and FFFDh. <code>MOV BX, SP</code> makes BX FFFCh. <code>[BX]</code> uses the DS segment by default. In a .COM program DS = SS, so DS:FFFCh is the same physical address as the top of the stack: 07000h + FFFCh = 16FFCh. <code>MOV CL, [BX]</code> reads 34h from there, and <code>MOV CH, [BX+1]</code> reads 12h from 16FFDh. CX = 1234h. Finally <code>POP DX</code> reads the two bytes again as a word: DX = 1234h. In an .EXE program DS and SS may differ. Then <code>[BX]</code> reads the data segment, not the stack; in that case one must write <code>SS:[BX]</code> or use BP instead of BX.</p>
+
+<p>SP staying even is related to this byte-level structure too. As long as SP is even, every stack word starts at an even address and the 8086 moves it in a single bus cycle. If SP were odd, the low byte of the word would fall on an odd address and the high byte on an even one, and two separate cycles would be needed. The program would still run correctly, just more slowly.</p>
+
+<h3 id="s8-1-2-5"><span class="nt-num">8.1.2.5</span>What changes and what does not?</h3>
+
+<p>All instructions that use the stack change SP. Whether they write to memory, whether they change a destination, and their effect on the flags differ, however. <a href="#tab-degisir">Table 8.1.5</a> gives these effects side by side.</p>
+
+<div class="nt-tablewrap" id="tab-degisir">
+<table class="nt-table">
+  <caption>Table 8.1.5: Effect of the stack instructions on SP, memory, the destination, and the flags.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">SP</th><th scope="col">Memory</th><th scope="col">Destination</th><th scope="col">Flags</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSH src</code></td><td>−2</td><td>[SS:SP] ← source</td><td>—</td><td>unchanged</td></tr>
+    <tr><td><code>POP dest</code></td><td>+2</td><td>read, not erased</td><td>destination ← [SS:SP]</td><td>unchanged</td></tr>
+    <tr><td><code>PUSHF</code></td><td>−2</td><td>[SS:SP] ← FLAGS</td><td>—</td><td>unchanged</td></tr>
+    <tr><td><code>POPF</code></td><td>+2</td><td>read</td><td>FLAGS ← [SS:SP]</td><td>all loaded</td></tr>
+    <tr><td><code>CALL</code> (near)</td><td>−2</td><td>[SS:SP] ← return IP</td><td>IP ← target</td><td>unchanged</td></tr>
+    <tr><td><code>RET</code> (near)</td><td>+2</td><td>read</td><td>IP ← [SS:SP]</td><td>unchanged</td></tr>
+    <tr><td><code>INT n</code></td><td>−6</td><td>FLAGS, CS, IP</td><td>CS:IP ← vector</td><td>IF = TF = 0</td></tr>
+    <tr><td><code>IRET</code></td><td>+6</td><td>read</td><td>IP, CS, FLAGS</td><td>all loaded</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The most important column of the table is the last one. PUSH, POP, and PUSHF do not touch the flags. This means the result of a comparison, that is, the flags, can be carried safely across PUSH and POP. In the code below, <code>CMP</code> sets ZF to 1. Then AX is put on the stack, changed, and taken back. Since these three instructions do not touch ZF, <code>JE</code> is still taken:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 5
+<span class="kw">CMP</span>  AX, 5         <span class="cm">; ZF = 1</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">MOV</span>  AX, 7         <span class="cm">; MOV does not change flags</span>
+<span class="kw">POP</span>  AX            <span class="cm">; AX = 5, ZF still 1</span>
+<span class="kw">JE</span>   equal         <span class="cm">; taken</span></code></pre>
+
+<p>Had an instruction that changes the flags come in between, an <code>ADD</code> for instance, the result of the comparison would have been lost. In that case <code>PUSHF</code> and <code>POPF</code> are used to save the flags. The stack effect of CALL and RET is very similar to that of PUSH and POP: CALL pushes the return address and RET pops it. The difference is that the destination is IP, not a register. INT pushes three words, that is, 6 bytes, and is the only push instruction among these that changes the flags: on entering the interrupt routine, IF and TF are cleared.</p>
+
+<h3 id="s8-1-2-6"><span class="nt-num">8.1.2.6</span>Machine codes and clock cycles</h3>
+
+<p>The stack instructions are among the shortest on the 8086. Pushing or popping a register takes a single byte. Five bits of the opcode determine the instruction and the remaining three the register. The code is 50h + r for <code>PUSH</code> and 58h + r for <code>POP</code>. The register numbers follow the general order of the 8086: AX = 0, CX = 1, DX = 2, BX = 3, SP = 4, BP = 5, SI = 6, DI = 7. So <code>PUSH AX</code> = 50h, <code>PUSH BX</code> = 53h, <code>POP BX</code> = 5Bh, and <code>POP DI</code> = 5Fh.</p>
+
+<p>Segment registers are single bytes too. The push code is 06h + 8 × s and the pop code is 07h + 8 × s, where s is the number ES = 0, CS = 1, SS = 2, DS = 3. <code>PUSH ES</code> = 06h, <code>PUSH CS</code> = 0Eh, <code>PUSH SS</code> = 16h, <code>PUSH DS</code> = 1Eh; <code>POP ES</code> = 07h, <code>POP SS</code> = 17h, <code>POP DS</code> = 1Fh. In this scheme the code of <code>POP CS</code> would have been 0Fh; this code fell out of use along with POP CS. The forms with a memory operand use a ModR/M byte: <code>PUSH memory</code> = FFh /6, <code>POP memory</code> = 8Fh /0. For example, for a variable at address 0109h, <code>PUSH num</code> = FF 36 09 01, four bytes. <code>PUSHF</code> = 9Ch and <code>POPF</code> = 9Dh.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Table 8.1.6: Codes and 8086 clock cycles of the stack instructions (Intel 8086 manual; EA = time of the effective address computation).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">Bytes</th><th scope="col">Clock cycles</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSH register</code></td><td>50h + r</td><td>1</td><td>11</td></tr>
+    <tr><td><code>PUSH seg</code></td><td>06h + 8s</td><td>1</td><td>10</td></tr>
+    <tr><td><code>PUSH memory</code></td><td>FFh /6</td><td>2–4</td><td>16 + EA</td></tr>
+    <tr><td><code>POP register</code></td><td>58h + r</td><td>1</td><td>8</td></tr>
+    <tr><td><code>POP seg</code></td><td>07h + 8s</td><td>1</td><td>8</td></tr>
+    <tr><td><code>POP memory</code></td><td>8Fh /0</td><td>2–4</td><td>17 + EA</td></tr>
+    <tr><td><code>PUSHF</code></td><td>9Ch</td><td>1</td><td>10</td></tr>
+    <tr><td><code>POPF</code></td><td>9Dh</td><td>1</td><td>8</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The timings in <a href="#tab-tur">Table 8.1.6</a> are for the case where the words sit at even addresses. A PUSH takes 11 clock cycles; on a 5 MHz 8086 one clock cycle is 200 ns, so this is 2.2 µs. Four cycles of this time are the memory write cycle; the rest is decoding the instruction and decrementing SP. The forms with a memory operand have two memory accesses: one to the variable and one to the stack. The time is therefore longer, and the time of the effective address computation is added. On the 8088 four more cycles are added to each word access.</p>
+
+<h2 class="nt-pb" id="s8-1-3"><span class="nt-num">8.1.3</span>Examples: code traces</h2>
+
+<p>All the programs in this section were run in emu8086 as .COM programs. At the start CS = DS = SS = ES = 0700h, IP = 0100h, and SP = FFFEh; unless stated otherwise the other registers are 0000h. In the trace tables each row gives the state <em>after</em> that instruction has executed. The values that change in that row are highlighted. The stack column shows only the occupied cells that SP points at and below; the 0000h at FFFEh is the word DOS put for the .COM program.</p>
+
+<h3 id="s8-1-3-1"><span class="nt-num">8.1.3.1</span>First example: PUSH AX / POP BX</h3>
+
+<p>The first program copies a value from AX to BX through the stack. This could also have been done with <code>MOV BX, AX</code>; the aim is to see the working of the stack in its plainest form.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>    100h
+<span class="kw">MOV</span>    AX, 42     <span class="cm">; AX = 42</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; push AX</span>
+<span class="kw">POP</span>    BX         <span class="cm">; pop into BX</span>
+<span class="kw">RET</span>               <span class="cm">; return to the OS</span>
+<span class="dir">END</span></code></pre>
+
+<p>The program consists of four instructions and 6 bytes: <code>MOV AX, 42</code> is 3 bytes (B8 2A 00, 0100h–0102h), <code>PUSH AX</code> is 1 byte (50, 0103h), <code>POP BX</code> is 1 byte (5B, 0104h), and <code>RET</code> is 1 byte (C3, 0105h).</p>
+
+<p>In the line <code>MOV AX, 42</code> the number has no h at the end. The assembler reads it as a decimal number: 42 = 2 × 16 + 10 = 2Ah. AX = 002Ah, not 0042h. This small detail is one of the points beginners stumble on most often in emu8086. <code>PUSH AX</code> makes SP FFFEh − 2 = FFFCh and writes [FFFCh] ← 002Ah; at byte level [FFFCh] = 2Ah and [FFFDh] = 00h. <code>POP BX</code> takes the 002Ah at FFFCh into BX and brings SP back to FFFEh. The value has been copied from AX to BX through the stack; AX keeps its value too.</p>
+
+<div class="nt-tablewrap" id="tab-iz1">
+<table class="nt-table">
+  <caption>Table 8.1.7: Trace of the PUSH AX / POP BX program.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">IP (next)</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Stack (from the top)</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>0100h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV AX, 42</code></td><td>0103h</td><td class="n81-chg">002Ah</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0104h</td><td>002Ah</td><td>0000h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">002Ah, 0000h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0105h</td><td>002Ah</td><td class="n81-chg">002Ah</td><td class="n81-chg">FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>RET</code></td><td class="n81-chg">0000h</td><td>002Ah</td><td>002Ah</td><td class="n81-chg">0000h</td><td>(empty)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The last row shows the role of the stack at the end of the program (<a href="#tab-iz1">Table 8.1.7</a>). <code>RET</code> takes the word on top of the stack as the return address. The stack holds only the 0000h put by DOS; IP = 0000h and SP = FFFEh + 2 = 0000h. SP wraps around in 16 bits. The processor goes to address 0700:0000, the start of the PSP. The first two bytes of the PSP are CD 20, which is the <code>INT 20h</code> instruction that terminates the program. The program thus ends properly. This mechanism works only if the stack is balanced: when RET is reached, DOS's 0000h must be on top of the stack.</p>
+
+<h3 id="s8-1-3-2"><span class="nt-num">8.1.3.2</span>LIFO order: 1, 2, 3 go in, 3, 2, 1 come out</h3>
+
+<p>The second program shows the LIFO discipline with real registers. AX is loaded with 1, 2, and 3 in turn, and each value is pushed onto the stack. Then <code>POP BX</code> is done three times.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>    AX, 1      <span class="cm">; AX = 1</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; push 1</span>
+<span class="kw">MOV</span>    AX, 2      <span class="cm">; AX = 2</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; push 2</span>
+<span class="kw">MOV</span>    AX, 3      <span class="cm">; AX = 3</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; push 3</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← 3</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← 2</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← 1</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz2">
+<table class="nt-table">
+  <caption>Table 8.1.8: Trace of the LIFO order program.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Stack (from the top, DOS word excluded)</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td><code>MOV AX, 1</code></td><td class="n81-chg">0001h</td><td>0000h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0001h</td><td>0000h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">0001h</td></tr>
+    <tr><td><code>MOV AX, 2</code></td><td class="n81-chg">0002h</td><td>0000h</td><td>FFFCh</td><td>0001h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0002h</td><td>0000h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">0002h, 0001h</td></tr>
+    <tr><td><code>MOV AX, 3</code></td><td class="n81-chg">0003h</td><td>0000h</td><td>FFFAh</td><td>0002h, 0001h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0003h</td><td>0000h</td><td class="n81-chg">FFF8h</td><td class="n81-chg">0003h, 0002h, 0001h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0003h</td><td class="n81-chg">0003h</td><td class="n81-chg">FFFAh</td><td>0002h, 0001h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0003h</td><td class="n81-chg">0002h</td><td class="n81-chg">FFFCh</td><td>0001h</td></tr>
+    <tr><td><code>POP BX</code></td><td>0003h</td><td class="n81-chg">0001h</td><td class="n81-chg">FFFEh</td><td>(empty)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two points stand out in the trace (<a href="#tab-iz2">Table 8.1.8</a>). First, when a new value is loaded into AX, the old value is not lost; the preceding PUSH has copied it onto the stack. When AX = 0002h, 0001h is safe on the stack. Second, the values arriving in BX are in the reverse of the order they went in: first 3, then 2, then 1. Since three PUSHes and three POPs were done, SP returns to where it started, FFFEh. At the end of the program AX = 0003h remains, because the last value loaded into AX is 3 and the POPs change only BX.</p>
+
+<h3 id="s8-1-3-3"><span class="nt-num">8.1.3.3</span>Saving a register's value</h3>
+
+<p>The most common use of the stack is to borrow a register temporarily for another job and then return it to its old value. The program first loads AX with 1234h. Then it saves AX, writes another value into AX, and restores the saved value.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>    100h
+<span class="kw">MOV</span>    AX, 1234h
+<span class="kw">PUSH</span>   AX         <span class="cm">; save AX</span>
+<span class="kw">MOV</span>    AX, 5678h  <span class="cm">; change AX</span>
+<span class="kw">POP</span>    AX         <span class="cm">; restore old value</span>
+<span class="kw">RET</span>
+<span class="dir">END</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz3">
+<table class="nt-table">
+  <caption>Table 8.1.9: Trace of the value-saving program.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">[FFFCh]</th><th scope="col">Note</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 1234h</code></td><td class="n81-chg">1234h</td><td>FFFEh</td><td>—</td><td>value to be preserved</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>1234h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">1234h</td><td>a copy of AX on the stack</td></tr>
+    <tr><td><code>MOV AX, 5678h</code></td><td class="n81-chg">5678h</td><td>FFFCh</td><td>1234h</td><td>AX is being used for another job</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n81-chg">1234h</td><td class="n81-chg">FFFEh</td><td>1234h</td><td>the old value is back; the cell was not erased</td></tr>
+    <tr><td><code>RET</code></td><td>1234h</td><td class="n81-chg">0000h</td><td>1234h</td><td>IP ← 0000h, INT 20h in the PSP</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The program is 9 bytes: two three-byte MOVs and one-byte PUSH, POP, and RET. The fourth column of <a href="#tab-iz3">Table 8.1.9</a> shows once more that POP does not erase memory: [FFFCh] = 1234h after the POP too. This pattern is the same as procedures PUSHing the registers they use on entry and POPping them on exit. If a procedure is going to destroy AX, it writes <code>PUSH AX</code> on entry and <code>POP AX</code> on exit. The program that called the procedure does not notice that AX was changed. This method is called preserving registers.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-hesap">
+  <span class="nt-box__title">Example 8.1.2</span>
+  <p>AX holds the counter of a loop and BX the address of an array. In the middle of the loop a character is to be printed on the screen by loading AH = 02h and DL = the character and calling <code>INT 21h</code>. Function 02h of INT 21h also changes AL: when the function ends, AL is the character printed. Since both halves of AX will be disturbed, the printing is wrapped like this:</p>
+  <pre class="nt-code"><code><span class="kw">PUSH</span> AX          <span class="cm">; save the counter</span>
+<span class="kw">PUSH</span> DX          <span class="cm">; DX will be disturbed too</span>
+<span class="kw">MOV</span>  AH, 2
+<span class="kw">MOV</span>  DL, '*'
+<span class="kw">INT</span>  21h         <span class="cm">; AL = '*'</span>
+<span class="kw">POP</span>  DX          <span class="cm">; mirror order: DX first</span>
+<span class="kw">POP</span>  AX          <span class="cm">; the counter is back</span></code></pre>
+  <p>Since the PUSH order is AX, DX, the POP order is DX, AX. BX is not touched, so it is not saved. Each register saved costs two instructions and 19 clock cycles (11 + 8); only registers that are really disturbed are saved.</p>
+</div>
+
+<h3 id="s8-1-3-4"><span class="nt-num">8.1.3.4</span>Swapping two registers with the stack</h3>
+
+<p>The opposite of mirror order, that is, POPping in the same order, swaps the values. This is sometimes a mistake and sometimes a method used deliberately.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>    100h
+<span class="kw">MOV</span>    AX, 1212h  <span class="cm">; AX ← 1212h</span>
+<span class="kw">MOV</span>    BX, 3434h  <span class="cm">; BX ← 3434h</span>
+<span class="kw">PUSH</span>   AX         <span class="cm">; push AX</span>
+<span class="kw">PUSH</span>   BX         <span class="cm">; push BX</span>
+<span class="kw">POP</span>    AX         <span class="cm">; AX ← old BX</span>
+<span class="kw">POP</span>    BX         <span class="cm">; BX ← old AX</span>
+<span class="kw">RET</span>
+<span class="dir">END</span></code></pre>
+
+<p>When emu8086 loads this program, CX shows 000Bh. This value is the byte count of the program: the two MOVs are 3 bytes each, the four stack instructions and RET one byte each, 3 + 3 + 1 + 1 + 1 + 1 + 1 = 11 bytes in all. After loading, emu8086 writes the size of the .COM program into CX; the DOS DEBUG program likewise writes the length of the file it loaded into BX:CX. This is a custom, not a rule. A program must not trust the initial value of CX and must load CX itself before using it. In the other traces of this note the initial value of CX is taken as 0000h; since the swap program does not use CX, the result does not change.</p>
+
+<div class="nt-tablewrap" id="tab-iz4">
+<table class="nt-table">
+  <caption>Table 8.1.10: Trace of the swap program (CX = 000Bh throughout).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Stack (from the top)</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV AX, 1212h</code></td><td class="n81-chg">1212h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV BX, 3434h</code></td><td>1212h</td><td class="n81-chg">3434h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>1212h</td><td>3434h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">1212h, 0000h</td></tr>
+    <tr><td><code>PUSH BX</code></td><td>1212h</td><td>3434h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">3434h, 1212h, 0000h</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n81-chg">3434h</td><td>3434h</td><td class="n81-chg">FFFCh</td><td>1212h, 0000h</td></tr>
+    <tr><td><code>POP BX</code></td><td>3434h</td><td class="n81-chg">1212h</td><td class="n81-chg">FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>RET</code></td><td>3434h</td><td>1212h</td><td class="n81-chg">0000h</td><td>(empty); IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The secret of the swap is LIFO (<a href="#tab-iz4">Table 8.1.10</a>). Since BX was pushed last, it is on top of the stack and the first <code>POP AX</code> takes it. Then <code>POP BX</code> takes the next value, AX's old value 1212h. For a moment AX and BX are both 3434h; during this time the stack holds 1212h safely. Had the POPs been done in mirror order, that is, <code>POP BX</code> first and then <code>POP AX</code>, the values would have stayed where they were.</p>
+
+<h3 id="s8-1-3-5"><span class="nt-num">8.1.3.5</span>Three registers: POP in the same order</h3>
+
+<p>With three registers the same experiment gives a more interesting result. This program was loaded as a .BIN file in the slides. emu8086 starts a .BIN file with CS = SS = 0100h and IP = 0000h; SP is again FFFEh. Because the segment value is different, the physical addresses change, but the offsets and the SP values are the same as in the .COM program.</p>
+
+<pre class="nt-code"><code><span class="kw">mov</span> ax, 2
+<span class="kw">mov</span> bx, 4
+<span class="kw">mov</span> cx, 8
+<span class="kw">push</span> ax
+<span class="kw">push</span> bx
+<span class="kw">push</span> cx
+<span class="kw">pop</span>  ax
+<span class="kw">pop</span>  bx
+<span class="kw">pop</span>  cx</code></pre>
+
+<div class="nt-tablewrap" id="tab-iz5">
+<table class="nt-table">
+  <caption>Table 8.1.11: Trace of the three-register stack program.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">Stack (from the top)</th></tr></thead>
+  <tbody>
+    <tr><td><code>mov ax, 2</code></td><td class="n81-chg">0002h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td><code>mov bx, 4</code></td><td>0002h</td><td class="n81-chg">0004h</td><td>0000h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td><code>mov cx, 8</code></td><td>0002h</td><td>0004h</td><td class="n81-chg">0008h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td><code>push ax</code></td><td>0002h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">0002h</td></tr>
+    <tr><td><code>push bx</code></td><td>0002h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">0004h, 0002h</td></tr>
+    <tr><td><code>push cx</code></td><td>0002h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFF8h</td><td class="n81-chg">0008h, 0004h, 0002h</td></tr>
+    <tr><td><code>pop ax</code></td><td class="n81-chg">0008h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFAh</td><td>0004h, 0002h</td></tr>
+    <tr><td><code>pop bx</code></td><td>0008h</td><td>0004h</td><td>0008h</td><td class="n81-chg">FFFCh</td><td>0002h</td></tr>
+    <tr><td><code>pop cx</code></td><td>0008h</td><td>0004h</td><td class="n81-chg">0002h</td><td class="n81-chg">FFFEh</td><td>(empty)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the end AX = 0008h, BX = 0004h, and CX = 0002h (<a href="#tab-iz5">Table 8.1.11</a>). AX and CX have changed places and BX stayed where it was. The reason is that the middle value is in the middle both when pushing and when popping. In general, if n registers are pushed in one order and popped in the same order, the register sequence is reversed: the first register gets the value of the last, and the last gets the value of the first. With three registers, the middle one is the fixed point. At the line <code>pop bx</code>, 0004h is written to BX again; since the value does not change, it is not highlighted in the table, but the instruction was executed and SP increased.</p>
+
+<h3 id="s8-1-3-6"><span class="nt-num">8.1.3.6</span>Reversing an array with the stack</h3>
+
+<p>The reversing property of LIFO can be applied to a string as well. The program pushes the characters of the string 'ABC' onto the stack in order, then pops them from the stack and prints them on the screen. CBA appears on the screen.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  SI, <span class="dir">OFFSET</span> msg
+<span class="kw">MOV</span>  CX, 3
+put: <span class="kw">MOV</span>  AL, [SI]
+     <span class="kw">PUSH</span> AX       <span class="cm">; save the char</span>
+     <span class="kw">INC</span>  SI
+     <span class="kw">LOOP</span> put
+<span class="kw">MOV</span>  CX, 3
+prt: <span class="kw">POP</span>  DX       <span class="cm">; DL = char</span>
+     <span class="kw">MOV</span>  AH, 2
+     <span class="kw">INT</span>  21h      <span class="cm">; print DL</span>
+     <span class="kw">LOOP</span> prt
+<span class="kw">RET</span>
+msg <span class="dir">DB</span> 'ABC'     <span class="cm">; 0117h</span></code></pre>
+
+<p>First the layout of the program in memory is worked out, because the address of the variable <code>msg</code> comes after the code. <a href="#tab-ters-kod">Table 8.1.12</a> gives the address and machine code of every instruction. The code takes 23 bytes, from 0100h to 0116h. The following <code>msg</code> is at addresses 0117h–0119h; the bytes 41h, 42h, and 43h are the ASCII codes of the characters 'A', 'B', and 'C'. The program is 26 bytes in all.</p>
+
+<div class="nt-tablewrap" id="tab-ters-kod">
+<table class="nt-table">
+  <caption>Table 8.1.12: Addresses and machine codes of the reversal program.</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Address</th><th scope="col">Code</th><th scope="col">Instruction</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td>0100h</td><td>BE 17 01</td><td><code>MOV SI, OFFSET msg</code></td></tr>
+    <tr><td>3</td><td>0103h</td><td>B9 03 00</td><td><code>MOV CX, 3</code></td></tr>
+    <tr><td>4</td><td>0106h</td><td>8A 04</td><td><code>put: MOV AL, [SI]</code></td></tr>
+    <tr><td>5</td><td>0108h</td><td>50</td><td><code>PUSH AX</code></td></tr>
+    <tr><td>6</td><td>0109h</td><td>46</td><td><code>INC SI</code></td></tr>
+    <tr><td>7</td><td>010Ah</td><td>E2 FA</td><td><code>LOOP put</code></td></tr>
+    <tr><td>8</td><td>010Ch</td><td>B9 03 00</td><td><code>MOV CX, 3</code></td></tr>
+    <tr><td>9</td><td>010Fh</td><td>5A</td><td><code>prt: POP DX</code></td></tr>
+    <tr><td>10</td><td>0110h</td><td>B4 02</td><td><code>MOV AH, 2</code></td></tr>
+    <tr><td>11</td><td>0112h</td><td>CD 21</td><td><code>INT 21h</code></td></tr>
+    <tr><td>12</td><td>0114h</td><td>E2 F9</td><td><code>LOOP prt</code></td></tr>
+    <tr><td>13</td><td>0116h</td><td>C3</td><td><code>RET</code></td></tr>
+    <tr><td>14</td><td>0117h</td><td>41 42 43</td><td><code>msg DB 'ABC'</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The second byte of the LOOP instructions is the relative jump displacement. <code>LOOP put</code> is at 010Ah and is two bytes; the next instruction is at 010Ch. To return to 0106h the displacement must be 0106h − 010Ch = −6; the 8-bit two's complement of −6 is FAh. For <code>LOOP prt</code> the displacement is 010Fh − 0116h = −7 = F9h.</p>
+
+<p><strong>First loop: pushing the characters.</strong> SI holds the string and CX the loop counter. In each iteration <code>MOV AL, [SI]</code> reads a character into AL. Since a byte cannot be pushed onto the stack, <code>PUSH AX</code> pushes AL together with AH as a word. Because AH = 00h at the start of the program, 0041h, 0042h, and 0043h go onto the stack. <code>INC SI</code> points at the next character; <code>LOOP put</code> decrements CX by 1 and returns to the top if CX ≠ 0. After three iterations SI = 011Ah and SP = FFF8h. On top of the stack is the 'C' pushed last.</p>
+
+<div class="nt-tablewrap" id="tab-ters-1">
+<table class="nt-table">
+  <caption>Table 8.1.13: Trace of the first loop (DX = 0000h).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">SI</th><th scope="col">SP</th><th scope="col">Stack (from the top, DOS word excluded)</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>MOV SI, OFFSET msg</code></td><td>0000h</td><td>0000h</td><td class="n81-chg">0117h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td>3</td><td><code>MOV CX, 3</code></td><td>0000h</td><td class="n81-chg">0003h</td><td>0117h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td>4</td><td><code>MOV AL, [SI]</code></td><td class="n81-chg">0041h</td><td>0003h</td><td>0117h</td><td>FFFEh</td><td>(empty)</td></tr>
+    <tr><td>5</td><td><code>PUSH AX</code></td><td>0041h</td><td>0003h</td><td>0117h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">0041h</td></tr>
+    <tr><td>6</td><td><code>INC SI</code></td><td>0041h</td><td>0003h</td><td class="n81-chg">0118h</td><td>FFFCh</td><td>0041h</td></tr>
+    <tr><td>7</td><td><code>LOOP put</code></td><td>0041h</td><td class="n81-chg">0002h</td><td>0118h</td><td>FFFCh</td><td>0041h</td></tr>
+    <tr><td>4</td><td><code>MOV AL, [SI]</code></td><td class="n81-chg">0042h</td><td>0002h</td><td>0118h</td><td>FFFCh</td><td>0041h</td></tr>
+    <tr><td>5</td><td><code>PUSH AX</code></td><td>0042h</td><td>0002h</td><td>0118h</td><td class="n81-chg">FFFAh</td><td class="n81-chg">0042h, 0041h</td></tr>
+    <tr><td>6</td><td><code>INC SI</code></td><td>0042h</td><td>0002h</td><td class="n81-chg">0119h</td><td>FFFAh</td><td>0042h, 0041h</td></tr>
+    <tr><td>7</td><td><code>LOOP put</code></td><td>0042h</td><td class="n81-chg">0001h</td><td>0119h</td><td>FFFAh</td><td>0042h, 0041h</td></tr>
+    <tr><td>4</td><td><code>MOV AL, [SI]</code></td><td class="n81-chg">0043h</td><td>0001h</td><td>0119h</td><td>FFFAh</td><td>0042h, 0041h</td></tr>
+    <tr><td>5</td><td><code>PUSH AX</code></td><td>0043h</td><td>0001h</td><td>0119h</td><td class="n81-chg">FFF8h</td><td class="n81-chg">0043h, 0042h, 0041h</td></tr>
+    <tr><td>6</td><td><code>INC SI</code></td><td>0043h</td><td>0001h</td><td class="n81-chg">011Ah</td><td>FFF8h</td><td>0043h, 0042h, 0041h</td></tr>
+    <tr><td>7</td><td><code>LOOP put</code></td><td>0043h</td><td class="n81-chg">0000h</td><td>011Ah</td><td>FFF8h</td><td>0043h, 0042h, 0041h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>There is also a small detail about the flags in the first loop. <code>INC SI</code> updates the arithmetic flags other than CF. When SI = 0118h, the low byte 18h = 0001 1000b contains two 1 bits; PF = 1. At SI = 0119h and 011Ah the number of 1s in the low bytes is odd and PF = 0. These flags do not affect the result of the program, because <code>LOOP</code> does not look at the flags; it tests only CX.</p>
+
+<figure class="nt-fig" id="sekil-ters" style="--w:700px">
+  <div class="nt-fig__box"><div class="nt-fig__row nt-fig__row--2"><svg class="ds-svg" viewBox="0 0 330 155" role="img" aria-label="Stack memory, SP=FFF8h"><defs><marker id="n81-11-m8ah76" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF6</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0043h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFF8</text><path class="line" d="M256 47 L216 47" marker-end="url(#n81-11-m8ah76)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0042h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFA</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0041h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFC</text><rect class="box" x="92" y="110" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="127" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="127" text-anchor="end">FFFE</text><text class="lbl" x="151" y="151" text-anchor="middle">SS:offset · small addresses at the top</text></svg><svg class="ds-svg" viewBox="0 0 330 155" role="img" aria-label="Stack memory, SP=FFFAh"><defs><marker id="n81-12-m8ah78" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFF6</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">0043h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFF8</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">0042h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFA</text><path class="line" d="M256 72 L216 72" marker-end="url(#n81-12-m8ah78)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="85" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="102" text-anchor="middle">0041h</text><text class="lbl mono" x="84" y="102" text-anchor="end">FFFC</text><rect class="box" x="92" y="110" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="127" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="127" text-anchor="end">FFFE</text><text class="lbl" x="151" y="151" text-anchor="middle">SS:offset · small addresses at the top</text></svg></div></div>
+  <figcaption><b>Figure 8.1.6:</b> On the left, the stack when the first loop ends: 0043h ('C') on top, SP = FFF8h. On the right, after the first POP DX of the second loop: 'C' has been taken into DX, SP = FFFAh; the 0043h at FFF8h is now outside the stack.</figcaption>
+</figure>
+
+<p><strong>Second loop: popping and printing.</strong> CX is set to 3 again. In each iteration <code>POP DX</code> takes the word on top of the stack into DX; DL is the character and DH is 00h. <code>MOV AH, 2</code> selects the DOS character output function, and <code>INT 21h</code> prints the character in DL (<a href="#sekil-ters">Figure 8.1.6</a>). Function 02h of INT 21h has a side effect: when the function ends, AL is the character printed. AX therefore changes after every INT 21h. In the first iteration AL is already 43h, so no difference shows; in the following iterations AL = 42h and AL = 41h. The first to come off the stack is 'C', then 'B', and 'A' last.</p>
+
+<div class="nt-tablewrap" id="tab-ters-2">
+<table class="nt-table">
+  <caption>Table 8.1.14: Trace of the second loop (SI = 011Ah).</caption>
+  <thead><tr><th scope="col">Line</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">SP</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>8</td><td><code>MOV CX, 3</code></td><td>0043h</td><td class="n81-chg">0003h</td><td>0000h</td><td>FFF8h</td><td></td></tr>
+    <tr><td>9</td><td><code>POP DX</code></td><td>0043h</td><td>0003h</td><td class="n81-chg">0043h</td><td class="n81-chg">FFFAh</td><td></td></tr>
+    <tr><td>10</td><td><code>MOV AH, 2</code></td><td class="n81-chg">0243h</td><td>0003h</td><td>0043h</td><td>FFFAh</td><td></td></tr>
+    <tr><td>11</td><td><code>INT 21h</code></td><td>0243h</td><td>0003h</td><td>0043h</td><td>FFFAh</td><td class="n81-chg">C</td></tr>
+    <tr><td>12</td><td><code>LOOP prt</code></td><td>0243h</td><td class="n81-chg">0002h</td><td>0043h</td><td>FFFAh</td><td>C</td></tr>
+    <tr><td>9</td><td><code>POP DX</code></td><td>0243h</td><td>0002h</td><td class="n81-chg">0042h</td><td class="n81-chg">FFFCh</td><td>C</td></tr>
+    <tr><td>10</td><td><code>MOV AH, 2</code></td><td>0243h</td><td>0002h</td><td>0042h</td><td>FFFCh</td><td>C</td></tr>
+    <tr><td>11</td><td><code>INT 21h</code></td><td class="n81-chg">0242h</td><td>0002h</td><td>0042h</td><td>FFFCh</td><td class="n81-chg">CB</td></tr>
+    <tr><td>12</td><td><code>LOOP prt</code></td><td>0242h</td><td class="n81-chg">0001h</td><td>0042h</td><td>FFFCh</td><td>CB</td></tr>
+    <tr><td>9</td><td><code>POP DX</code></td><td>0242h</td><td>0001h</td><td class="n81-chg">0041h</td><td class="n81-chg">FFFEh</td><td>CB</td></tr>
+    <tr><td>10</td><td><code>MOV AH, 2</code></td><td>0242h</td><td>0001h</td><td>0041h</td><td>FFFEh</td><td>CB</td></tr>
+    <tr><td>11</td><td><code>INT 21h</code></td><td class="n81-chg">0241h</td><td>0001h</td><td>0041h</td><td>FFFEh</td><td class="n81-chg">CBA</td></tr>
+    <tr><td>12</td><td><code>LOOP prt</code></td><td>0241h</td><td class="n81-chg">0000h</td><td>0041h</td><td>FFFEh</td><td>CBA</td></tr>
+    <tr><td>13</td><td><code>RET</code></td><td>0241h</td><td>0000h</td><td>0041h</td><td class="n81-chg">0000h</td><td>CBA</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the last row of <a href="#tab-ters-2">Table 8.1.14</a>, SP = 0000h and IP = 0000h; RET has taken DOS's 0000h word. The program executes 28 instructions in all and ends with the INT 20h in the PSP. Because the two loops run the same number of iterations, three POPs correspond to three PUSHes and the stack is balanced. Had the loop counts been different, for example had the second loop mistakenly started with CX = 2, 'A' would have stayed on the stack and RET would have taken it for the return address: IP = 0041h. The program would jump into the middle of the PSP and not terminate properly.</p>
+
+<p>The same method can also be used to reverse a string in place in memory without printing it. In the second loop the character is taken with <code>POP AX</code> and written back into the string from the start with <code>MOV [SI], AL</code>; for this, SI is first brought back to the start of the string. The stack acts here as an intermediate buffer. There is no need to define a separate buffer array, but each character takes 2 bytes on the stack.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Assuming AX does not change after an INT 21h call. Function AH = 02h makes AL equal to the printed character; function AH = 09h leaves 24h ('$') in AL. If a loop counter or an intermediate result is kept in AL, write <code>PUSH AX</code> before the call and <code>POP AX</code> after it.</p>
+</div>
+
+<h3 id="s8-1-3-7"><span class="nt-num">8.1.3.7</span>What happens to the registers?</h3>
+
+<p>The prediction question in the slides is a piece of code in which PUSHes and POPs are used in a mixed order. At the start SP = FFFEh.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 1111h
+<span class="kw">MOV</span> BX, 2222h
+<span class="kw">MOV</span> CX, 3333h
+<span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> BX
+<span class="kw">PUSH</span> CX
+<span class="kw">POP</span> AX
+<span class="kw">POP</span> CX
+<span class="kw">PUSH</span> AX
+<span class="kw">POP</span> BX
+<span class="kw">POP</span> BX</code></pre>
+
+<p>The solution is found by writing down the contents of the stack step by step. After the three PUSHes the stack, from top to bottom, is 3333h, 2222h, 1111h and SP = FFF8h. <code>POP AX</code> takes the top 3333h: AX = 3333h. <code>POP CX</code> takes the next 2222h: CX = 2222h, SP = FFFCh. Only 1111h is left on the stack. <code>PUSH AX</code> pushes 3333h again and <code>POP BX</code> takes it right away: BX = 3333h. The last <code>POP BX</code> takes the 1111h on the stack and overwrites BX's value from a moment ago: BX = 1111h.</p>
+
+<p>The result is AX = 3333h, BX = 1111h, CX = 2222h, and SP = FFFEh. Since four PUSHes and four POPs were done, the stack is balanced. The values have gone one full turn among the registers: AX took CX's old value, CX took BX's, and BX took AX's. In questions like this the most reliable method is to draw the stack as a column on paper and mark the top cell at every instruction.</p>
+
+<h3 id="s8-1-3-8"><span class="nt-num">8.1.3.8</span>Comparing swap methods</h3>
+
+<p>There are three ways to swap two registers. Swapping with the stack takes four instructions: <code>PUSH AX</code>, <code>PUSH BX</code>, <code>POP AX</code>, <code>POP BX</code>. Swapping with a temporary register takes three <code>MOV</code>s: <code>MOV CX, AX</code>, <code>MOV AX, BX</code>, <code>MOV BX, CX</code>. The third way is the 8086's swap instruction: <code>XCHG AX, BX</code>.</p>
+
+<figure class="nt-fig" id="sekil-takas" style="--w:460px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 460 90" role="img" aria-label="Code size: swapping with the stack 4 bytes, with a temporary register 6 bytes, with XCHG 1 byte."><text class="lbl" x="120" y="23" text-anchor="end" style="font-size:12.5px">stack</text><rect class="box" x="130" y="6" width="32" height="22" rx="3"/><rect class="box" x="164" y="6" width="32" height="22" rx="3"/><rect class="box" x="198" y="6" width="32" height="22" rx="3"/><rect class="box" x="232" y="6" width="32" height="22" rx="3"/><text class="txt" x="274" y="23" text-anchor="start" style="font-size:12.5px">4 bytes</text><text class="lbl" x="120" y="51" text-anchor="end" style="font-size:12.5px">temporary register</text><rect class="box" x="130" y="34" width="32" height="22" rx="3"/><rect class="box" x="164" y="34" width="32" height="22" rx="3"/><rect class="box" x="198" y="34" width="32" height="22" rx="3"/><rect class="box" x="232" y="34" width="32" height="22" rx="3"/><rect class="box" x="266" y="34" width="32" height="22" rx="3"/><rect class="box" x="300" y="34" width="32" height="22" rx="3"/><text class="txt" x="342" y="51" text-anchor="start" style="font-size:12.5px">6 bytes</text><text class="lbl" x="120" y="79" text-anchor="end" style="font-size:12.5px">XCHG</text><rect class="box" x="130" y="62" width="32" height="22" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="172" y="79" text-anchor="start" style="font-size:12.5px">1 byte</text></svg></div>
+  <figcaption><b>Figure 8.1.7:</b> Code size of the three swap methods: 4 bytes with the stack, 6 bytes with a temporary register, 1 byte with XCHG.</figcaption>
+</figure>
+
+<div class="nt-tablewrap" id="tab-takas">
+<table class="nt-table">
+  <caption>Table 8.1.15: Comparison of swap methods (8086 clock cycles).</caption>
+  <thead><tr><th scope="col">Method</th><th scope="col">Bytes</th><th scope="col">Memory accesses</th><th scope="col">Clock cycles</th><th scope="col">Side effect and scope</th></tr></thead>
+  <tbody>
+    <tr><td>with the stack</td><td>4</td><td>4</td><td>2 × 11 + 2 × 8 = 38</td><td>no register is disturbed; also works for segment registers</td></tr>
+    <tr><td>with a temporary register</td><td>6</td><td>0</td><td>3 × 2 = 6</td><td>the value of CX is destroyed</td></tr>
+    <tr><td><code>XCHG AX, BX</code></td><td>1 (93h)</td><td>0</td><td>3</td><td>shortest and fastest; cannot be used with segment registers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-takas">Table 8.1.15</a> gives a clear conclusion: the best way to swap two general-purpose registers is <code>XCHG</code>. The instruction is one byte. For <code>XCHG</code> swapping AX with another 16-bit register there are short codes of the form 90h + r; since the number of BX is 3, the code is 93h. At 5 MHz, swapping with the stack takes 38 × 200 ns = 7.6 µs, and XCHG takes 0.6 µs. The real value of the stack method is not swapping but saving. Preserving registers during a procedure or an interrupt, holding intermediate results temporarily, and copying segment registers (<code>PUSH DS</code>, <code>POP ES</code>) are the real jobs of the stack. Since segment registers cannot be swapped with <code>XCHG</code>, swapping them is also done with the stack: <code>PUSH DS</code>, <code>PUSH ES</code>, <code>POP DS</code>, <code>POP ES</code>.</p>
+
+<h3 id="s8-1-3-9"><span class="nt-num">8.1.3.9</span>The interactive stack simulator</h3>
+
+<p>The interactive simulator in the slides shows the registers AX, BX, CX, and SP and the stack cells around SS:SP. The register values can be edited in hexadecimal. Six buttons run the instructions <code>PUSH AX</code>, <code>PUSH BX</code>, <code>PUSH CX</code>, <code>POP AX</code>, <code>POP BX</code>, and <code>POP CX</code>, and the instructions run accumulate in a list. With the simulator all the ordering examples of this note can be tried again: mirror order, swapping, rotating three registers.</p>
+
+<p>An important case the simulator shows is POP from an empty stack. The real 8086 does not prevent it. If POP is done when the stack is empty, SP still increases by 2 and whatever is at that address in the segment is read. There is no way for the processor to know whether the stack is empty or full; SP is just a number. Keeping track of the limits of the stack is entirely the programmer's job.</p>
+
+<h2 class="nt-pb" id="s8-1-4"><span class="nt-num">8.1.4</span>Saving the flags: PUSHF and POPF</h2>
+
+<h3 id="s8-1-4-1"><span class="nt-num">8.1.4.1</span>The flags word</h3>
+
+<p>The flags register (FLAGS) of the 8086 is a 16-bit register, but only nine of its bits are used. Six status flags describe the result of the last arithmetic or logic operation: CF (carry, bit 0), PF (parity, bit 2), AF (auxiliary carry, bit 4), ZF (zero, bit 6), SF (sign, bit 7), and OF (overflow, bit 11). Three control flags determine the behavior of the processor: TF (trap, bit 8), IF (interrupt, bit 9), and DF (direction, bit 10). The remaining bits are unused. On the 8086, bit 1 and bits 12–15 always read as 1; bit 3 and bit 5 are 0.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-pushf">
+  <span class="nt-box__title">Definition 8.1.5</span>
+  <p><strong>PUSHF</strong> pushes the 16-bit word of the flags register onto the stack: SP ← SP − 2, [SS:SP] ← FLAGS. <strong>POPF</strong> loads the word on top of the stack into the flags register: FLAGS ← [SS:SP], SP ← SP + 2. PUSHF does not change the flags; POPF can change all the flags at once.</p>
+</div>
+
+<p>In a program the flags are read one at a time: <code>JC</code> looks at CF and <code>JZ</code> at ZF. There is no <code>MOV</code> that accesses the whole flags register directly. <code>LAHF</code> copies only the low byte (SF, ZF, AF, PF, CF) into AH; it does not reach OF, DF, IF, and TF. The only way to save and restore the whole flags register is the stack. The stack is also used to bring the flags word into a register: <code>PUSHF</code> followed by <code>POP AX</code>. At the start of a .COM program these two instructions bring F202h into AX. F000h is the four constant 1 bits, 0200h is IF = 1, and 0002h is the constant 1 in bit 1. After <code>STC</code> the same two instructions give F203h; the difference is bit 0, CF.</p>
+
+<h3 id="s8-1-4-2"><span class="nt-num">8.1.4.2</span>PUSHF and POPF: code trace</h3>
+
+<p>The program below saves the flags of an addition, puts in between another addition that destroys the flags, and restores the saved flags.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>   100h
+<span class="kw">MOV</span>   AX, 0FFFFh
+<span class="kw">ADD</span>   AX, 1      <span class="cm">; CF=1, ZF=1</span>
+<span class="kw">PUSHF</span>            <span class="cm">; save flags</span>
+<span class="kw">MOV</span>   BX, 5
+<span class="kw">ADD</span>   BX, 3      <span class="cm">; CF=0, ZF=0</span>
+<span class="kw">POPF</span>             <span class="cm">; restore flags</span>
+<span class="kw">RET</span></code></pre>
+
+<p>The number in the first line is written as 0FFFFh. If a hexadecimal number starts with a letter, a 0 is added in front so the assembler does not take it for a name; writing FFFFh gives an error. <code>ADD AX, 1</code> computes FFFFh + 1 = 1 0000h. The result is 17 bits; the low 16 bits, 0000h, are written to AX and the 1 carried out goes to CF. Since the result is zero, ZF = 1. The low byte of 0000h has no 1 bits, that is, an even number of them, and PF = 1. In the low nibble F + 1 = 10h produces a carry, so AF = 1. SF = 0 and OF = 0: −1 + 1 = 0 is correct as signed, too.</p>
+
+<p><code>PUSHF</code> pushes the flags word at this moment. The value of the word is computed from the bits: the constant bits F000h + 0002h, 0200h for IF, 0040h for ZF, 0010h for AF, 0004h for PF, and 0001h for CF. The total is F257h. [FFFCh] = 57h and [FFFDh] = F2h. <code>MOV BX, 5</code> does not change the flags. <code>ADD BX, 3</code> computes 5 + 3 = 8: no carry, the result is not zero. CF, ZF, PF, and AF all become 0. 8 = 0000 1000b has a single 1 bit, so PF = 0. The flags of the first addition are lost. <code>POPF</code> loads F257h into the flags register, and CF = 1, ZF = 1, PF = 1, AF = 1 come back. AX and BX are not touched; AX = 0000h and BX = 0008h remain.</p>
+
+<div class="nt-tablewrap" id="tab-iz-pushf">
+<table class="nt-table">
+  <caption>Table 8.1.16: Trace of the PUSHF/POPF program (IF = 1 throughout; flags in the order ODITSZAPC, capital letter = 1).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">Flags</th><th scope="col">Stack (from the top)</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 0FFFFh</code></td><td class="n81-chg">FFFFh</td><td>0000h</td><td>FFFEh</td><td>odItszapc</td><td>0000h</td></tr>
+    <tr><td><code>ADD AX, 1</code></td><td class="n81-chg">0000h</td><td>0000h</td><td>FFFEh</td><td class="n81-chg">odItsZAPC</td><td>0000h</td></tr>
+    <tr><td><code>PUSHF</code></td><td>0000h</td><td>0000h</td><td class="n81-chg">FFFCh</td><td>odItsZAPC</td><td class="n81-chg">F257h, 0000h</td></tr>
+    <tr><td><code>MOV BX, 5</code></td><td>0000h</td><td class="n81-chg">0005h</td><td>FFFCh</td><td>odItsZAPC</td><td>F257h, 0000h</td></tr>
+    <tr><td><code>ADD BX, 3</code></td><td>0000h</td><td class="n81-chg">0008h</td><td>FFFCh</td><td class="n81-chg">odItszapc</td><td>F257h, 0000h</td></tr>
+    <tr><td><code>POPF</code></td><td>0000h</td><td>0008h</td><td class="n81-chg">FFFEh</td><td class="n81-chg">odItsZAPC</td><td>0000h</td></tr>
+    <tr><td><code>RET</code></td><td>0000h</td><td>0008h</td><td class="n81-chg">0000h</td><td>odItsZAPC</td><td>(empty); IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The final state of the program is seen in <a href="#tab-iz-pushf">Table 8.1.16</a>. What would have happened had <code>POP BX</code> been written instead of POPF? F257h would again have been taken from the stack, but this time written to BX: BX = F257h. The flags would have stayed CF = 0 and ZF = 0 as after the second addition. This experiment shows the difference between POPF and POP clearly. Both instructions take the same word from the stack; only their destinations differ.</p>
+
+<p>The program is 15 bytes. <code>ADD BX, 3</code> is encoded with three bytes (83 C3 03): the opcode 83h says the 8-bit immediate is sign-extended to 16 bits. <code>ADD AX, 1</code>, on the other hand, is encoded with the short form special to AX as 05 01 00. PUSHF (9Ch) and POPF (9Dh) are one byte each.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Pushing another value onto the stack before restoring the flags saved with PUSHF, and then loading that value into the flags register with POPF. In the sequence <code>PUSHF</code>, <code>PUSH AX</code>, …, <code>POPF</code>, <code>POP AX</code>, POPF loads the value of AX as flags, and the old flags word arrives in AX. Flags and registers obey mirror order too: <code>PUSH AX</code>, <code>PUSHF</code>, …, <code>POPF</code>, <code>POP AX</code>.</p>
+</div>
+
+<h3 id="s8-1-4-3"><span class="nt-num">8.1.4.3</span>Changing the flags word</h3>
+
+<p>There are direct instructions for CF, DF, and IF: <code>STC</code>/<code>CLC</code>/<code>CMC</code>, <code>STD</code>/<code>CLD</code>, <code>STI</code>/<code>CLI</code>. There is no instruction that changes TF. The only way to set TF to 1 goes through the stack. The flags word is pushed onto the stack, taken into a register, bit 8 is changed, the word is pushed again, and it is loaded into the flags register with POPF:</p>
+
+<pre class="nt-code"><code><span class="kw">PUSHF</span>
+<span class="kw">POP</span>  AX
+<span class="kw">OR</span>   AX, 0100h     <span class="cm">; bit 8 = TF</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">POPF</span>               <span class="cm">; TF = 1</span></code></pre>
+
+<p>Debuggers use this pattern to run a program one step at a time. When TF = 1, the processor generates a type 1 interrupt after every instruction. OF can be changed the same way; there is no instruction that sets OF directly either. In this pattern AX is destroyed; if AX is to be preserved, the pattern is placed between <code>PUSH AX</code> and <code>POP AX</code>.</p>
+
+<p>Another use of changing the flags word on the stack is in interrupt routines. If an interrupt routine wants to return error information to the calling program through CF, it changes bit 0 of the FLAGS copy on the stack. When IRET restores this copy, the calling program sees CF. Most DOS functions report errors this way, as CF = 1.</p>
+
+<h3 id="s8-1-4-4"><span class="nt-num">8.1.4.4</span>Instructions that use the stack automatically</h3>
+
+<p>Some instructions do by themselves what PUSHF and POPF do. <code>INT n</code> first pushes the flags word, then CS and IP; it then clears IF and TF. <code>IRET</code> restores IP, CS, and the flags word. Interrupt routines therefore do not save the flags themselves; INT does this automatically. In ordinary code, PUSHF and POPF are needed to preserve a result, because CALL does not save the flags.</p>
+
+<p><code>CALL</code> and <code>RET</code> also use the stack automatically. A near CALL pushes the offset of the instruction after it, that is, the return address, and decrements SP by 2. RET pops this address into IP and increments SP by 2. A far CALL pushes CS first and then IP; RETF takes the two back in reverse order. From the stack's point of view, these instructions are PUSHes and POPs whose destination is IP. If a PUSH inside a procedure does not have a matching POP, RET takes the forgotten value instead of the return address. All the stack safety rules rest on this simple observation.</p>
+
+<div class="nt-tablewrap" id="tab-otomatik">
+<table class="nt-table">
+  <caption>Table 8.1.17: The words pushed and popped by instructions that use the stack automatically.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Pushes (in order)</th><th scope="col">Popped by</th><th scope="col">SP difference</th></tr></thead>
+  <tbody>
+    <tr><td><code>CALL</code> (near)</td><td>IP</td><td><code>RET</code></td><td>2 bytes</td></tr>
+    <tr><td><code>CALL</code> (far)</td><td>CS, IP</td><td><code>RETF</code></td><td>4 bytes</td></tr>
+    <tr><td><code>INT n</code>, hardware interrupt</td><td>FLAGS, CS, IP</td><td><code>IRET</code></td><td>6 bytes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s8-1-5"><span class="nt-num">8.1.5</span>Stack safety</h2>
+
+<h3 id="s8-1-5-1"><span class="nt-num">8.1.5.1</span>The balance rule and the end of a .COM program</h3>
+
+<p>The PUSH and POP instructions hold temporary data while the program runs. The integrity of the stack is kept by an equal number of PUSHes and POPs. This rule must hold not on just one path of the program but on every path and in every branch. If the numbers of PUSHes and POPs are not equal, the stack is corrupted and it may not be possible to return to the operating system.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-denge">
+  <span class="nt-box__title">Definition 8.1.6</span>
+  <p>A piece of code is <strong>stack-balanced</strong> if the value of SP at its exit equals the value of SP at its entry. In a balanced piece every PUSH (and PUSHF) has a matching POP (or POPF). If the piece has more than one exit, the balance must hold for each exit separately.</p>
+</div>
+
+<p>Why balance matters so much shows at the end of a .COM program. RET expects a return address on top of the stack. When DOS starts a .COM program, it puts 0000h on the stack. If the program is balanced, the final RET takes this word and goes to CS:0000h, the start of the PSP. The <code>INT 20h</code> there terminates the program. If the program is not balanced, RET takes some other word.</p>
+
+<figure class="nt-fig" id="sekil-guvenlik" style="--w:440px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 84" role="img" aria-label="An extra PUSH: the value of AX is left on top of the stack instead of the return address; RET takes it into IP."><rect class="box" x="60" y="8" width="110" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="lbl mono" x="54" y="24" text-anchor="end" style="font-size:11.5px">FFFA</text><text class="txt" x="115" y="24" text-anchor="middle" style="font-size:12.5px">AX value</text><rect class="box" x="60" y="32" width="110" height="24" rx="3"/><text class="lbl mono" x="54" y="48" text-anchor="end" style="font-size:11.5px">FFFC</text><text class="txt" x="115" y="48" text-anchor="middle" style="font-size:12.5px">return IP</text><rect class="box" x="60" y="56" width="110" height="24" rx="3"/><text class="lbl mono" x="54" y="72" text-anchor="end" style="font-size:11.5px">FFFE</text><text class="txt" x="115" y="72" text-anchor="middle" style="font-size:12.5px">0000h</text><path class="line" d="M214.0 20.0 L181.0 20.0"/><path class="ah" d="M174.0 20.0 L181.0 16.1 L181.0 23.9 z"/><text class="txt" x="220" y="24" text-anchor="start" style="font-size:12.5px;fill:var(--ds-bad)">RET takes this into IP</text><text class="lbl" x="220" y="46" text-anchor="start" style="font-size:12px">the POP for PUSH AX was forgotten</text></svg></div>
+  <figcaption><b>Figure 8.1.8:</b> An extra PUSH: instead of the return address, the value of AX is left on top of the stack, and RET takes it into IP.</figcaption>
+</figure>
+
+<p>Stack errors come in three forms, and each gives different symptoms (<a href="#sekil-guvenlik">Figure 8.1.8</a>). With an <strong>extra PUSH</strong>, RET takes the data put last instead of the return address and jumps to a random address. With an <strong>extra POP</strong>, the return address is “eaten” into a register; RET takes the word after it and again returns to the wrong place. With the <strong>wrong order</strong>, the stack is balanced and the program returns to the right place, but the values get mixed up. The program silently runs wrong. The third is the hardest to find, because the program does not crash.</p>
+
+<h3 id="s8-1-5-2"><span class="nt-num">8.1.5.2</span>Error example: an unbalanced PUSH</h3>
+
+<p>In the program below AX is put on the stack but never taken back.</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>   100h
+<span class="kw">MOV</span>   AX, 1234h
+<span class="kw">PUSH</span>  AX         <span class="cm">; no POP!</span>
+<span class="kw">RET</span>              <span class="cm">; IP ← ?</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-iz-deng">
+<table class="nt-table">
+  <caption>Table 8.1.18: Trace of the unbalanced PUSH program.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">IP (next)</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">Stack (from the top)</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>0100h</td><td>0000h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>MOV AX, 1234h</code></td><td>0103h</td><td class="n81-chg">1234h</td><td>FFFEh</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>0104h</td><td>1234h</td><td class="n81-chg">FFFCh</td><td class="n81-chg">1234h, 0000h</td></tr>
+    <tr><td><code>RET</code></td><td class="n81-chg">1234h</td><td>1234h</td><td class="n81-chg">FFFEh</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>RET takes the word on top of the stack for the return address (<a href="#tab-iz-deng">Table 8.1.18</a>). IP = 1234h and SP goes up to FFFEh. The processor starts executing the bytes at address 0700:1234h as instructions. This program is only 5 bytes; there is no program at address 1234h, only whatever was left in that region of memory. The program crashes or freezes. The odd thing is that DOS's 0000h word is still on the stack. The information needed for the return has not been lost; one word has just been left below.</p>
+
+<p>The fix is easy: add a <code>POP AX</code> before RET, or do not write the PUSH at all. The real difficulty is that the imbalance often hides in one branch. In the code below, AX is pushed on both branches but popped on only one:</p>
+
+<pre class="nt-code"><code>       <span class="kw">PUSH</span> AX
+       <span class="kw">CMP</span>  BX, 0
+       <span class="kw">JE</span>   done         <span class="cm">; no POP on this branch!</span>
+       <span class="cm">; … work using AX …</span>
+       <span class="kw">POP</span>  AX
+done:  <span class="kw">RET</span></code></pre>
+
+<p>As long as BX ≠ 0 the program works correctly. The first time BX = 0, RET jumps to the value of AX. Errors of this kind are not easily caught in testing. The rule is: the number of PUSHes and POPs of each branch (JMP, Jcc) is counted separately. The safest solution is to put the POP under a single exit label and direct all branches there. In this example the fix is to jump to a label before the POP instead of <code>JE done</code>.</p>
+
+<h3 id="s8-1-5-3"><span class="nt-num">8.1.5.3</span>Extra POP and wrong order</h3>
+
+<p>The effect of an extra POP can also be seen in a trace:</p>
+
+<pre class="nt-code"><code><span class="dir">ORG</span>  100h
+<span class="kw">MOV</span>  AX, 5
+<span class="kw">PUSH</span> AX
+<span class="kw">POP</span>  BX
+<span class="kw">POP</span>  CX            <span class="cm">; extra POP</span>
+<span class="kw">RET</span></code></pre>
+
+<p><code>PUSH AX</code> and <code>POP BX</code> are balanced; BX = 0005h and SP = FFFEh. The extra <code>POP CX</code> takes DOS's 0000h word into CX and makes SP FFFEh + 2 = 0000h. SP has wrapped around in 16 bits. RET now reads the word at SS:0000h. This address is the start of the PSP, and its first two bytes are CD 20. In little-endian order this word is 20CDh. IP = 20CDh and the processor jumps to an address unrelated to the program. The return address, 0000h, has been “eaten” by CX.</p>
+
+<p>The wrong order gives a different symptom. The sequence <code>PUSH AX</code>, <code>PUSH BX</code>, …, <code>POP AX</code>, <code>POP BX</code> is balanced; RET returns to the right place. But the values of AX and BX have been swapped. The program that called the procedure expects to find in AX the value it left there and continues with a wrong value. The error shows up only when this value is used, and often far from the procedure.</p>
+
+<h3 id="s8-1-5-4"><span class="nt-num">8.1.5.4</span>Stack overflow and underflow</h3>
+
+<p>If the imbalance is repeated continuously instead of once, the stack goes beyond its limits. The 8086 does not check these limits; there is no error interrupt, only corruption.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-tasma">
+  <span class="nt-box__title">Definition 8.1.7</span>
+  <p><strong>Stack overflow</strong> is the pushing of more values than the area set aside for the stack can hold, so that SP goes below the stack area. <strong>Stack underflow</strong> is the popping of a value that was never pushed, so that SP goes above the stack area.</p>
+</div>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-tasma" style="--w:690px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 690 118" role="img" aria-label="In a .COM program the PSP, code, and data are at the bottom of the segment; the stack grows downward from FFFEh. On overflow it descends into the code; on underflow SP wraps to 0000h."><rect class="box" x="10" y="26" width="70" height="30" rx="3"/><text class="txt" x="45.0" y="46" text-anchor="middle" style="font-size:13px">PSP</text><text class="lbl mono" x="10" y="18" text-anchor="start" style="font-size:11.5px">0000h</text><rect class="box" x="80" y="26" width="170" height="30" rx="3"/><text class="txt" x="165.0" y="46" text-anchor="middle" style="font-size:13px">code + data</text><text class="lbl mono" x="80" y="18" text-anchor="start" style="font-size:11.5px">0100h</text><rect class="box-empty" x="250" y="26" width="250" height="30" rx="3"/><text class="lbl" x="375.0" y="46" text-anchor="middle" style="font-size:13px">free space</text><rect class="box" x="500" y="26" width="170" height="30" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="585.0" y="46" text-anchor="middle" style="font-size:13px">stack ↓</text><text class="lbl mono" x="670" y="18" text-anchor="end" style="font-size:11.5px">FFFEh</text><path class="line" d="M500.0 72.0 L337.0 72.0"/><path class="ah" d="M330.0 72.0 L337.0 68.2 L337.0 75.8 z"/><text class="lbl" x="415" y="88" text-anchor="middle" style="font-size:12px">overflow: SP decreases, descends into the code</text><path class="line" style="stroke-dasharray:4 3" d="M670 58 C 690 110, 10 110, 12 60"/><text class="lbl" x="340" y="112" text-anchor="middle" style="font-size:12px">underflow: SP = FFFEh + 2 → 0000h (wraps)</text></svg></div>
+  <figcaption><b>Figure 8.1.9:</b> In a .COM program the PSP, code, and data are at the bottom of the segment; the stack grows downward from FFFEh. On overflow SP gets smaller and descends into the code; on underflow SP wraps from FFFEh to 0000h.</figcaption>
+</figure>
+
+<p>Typical causes of <strong>overflow</strong> are infinite recursion and a PUSH without a POP inside a loop. As SP gets smaller the stack descends and, in a .COM program, overwrites the data in the same segment and then the code (<a href="#sekil-tasma">Figure 8.1.9</a>). After the code is overwritten, in the next round the processor executes stack data as instructions. The symptom is often seen far from where the overflow began.</p>
+
+<p>A small example of a PUSH without a POP in a loop is:</p>
+
+<pre class="nt-code"><code>        <span class="dir">ORG</span>  100h
+        <span class="kw">MOV</span>  CX, 3
+        <span class="kw">MOV</span>  AX, 0100h
+again:  <span class="kw">PUSH</span> AX
+        <span class="kw">INC</span>  AX
+        <span class="kw">LOOP</span> again
+        <span class="kw">RET</span></code></pre>
+
+<p>The loop runs three iterations and pushes 0100h, 0101h, and 0102h onto the stack. SP = FFF8h. RET takes the 0102h on top of the stack and IP = 0102h. This address is inside the program but is not the start of an instruction: <code>MOV CX, 3</code> occupies 0100h–0102h and 0102h is its last byte. The processor takes the 00h byte for the start of a new instruction and begins executing a meaningless sequence. Instead of three iterations, a loop that starts with CX = 0 runs 65,536. In that case about 128 KB of values are pushed onto the stack. The 64 KB segment cannot hold that much: SP wraps around and the stack overwrites the code of the program.</p>
+
+<p><strong>Underflow</strong> is popping a value that was never pushed. If POP is done with SP = FFFEh, SP = 0000h; the 16-bit addition wraps. The value read is garbage or, in a .COM program, DOS's 0000h. The next PUSH takes SP down to FFFEh and overwrites DOS's word. The program then cannot terminate properly with RET, because the 0000h needed for the return has been overwritten.</p>
+
+<p>The way to prevent overflow is to choose a stack area of sufficient size. The size of the stack area is chosen from the deepest call chain and the largest number of PUSHes of the program. Each CALL takes 2 bytes (4 bytes for a far call), each PUSH 2 bytes, and each interrupt 6 bytes. Interrupts can arrive at any moment of the program; hardware interrupt routines use the same stack and need room for the registers they save. In .EXE programs a separate stack segment of sufficient size is reserved with a directive such as <code>.STACK 100h</code>. A separate segment has another advantage: even if the stack overflows it does not overwrite the code, it only corrupts the memory below its own segment.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-boyut">
+  <span class="nt-box__title">Example 8.1.3</span>
+  <p>A program makes at most four levels of nested near CALLs. Each procedure pushes three registers on entry. A hardware interrupt can arrive at any moment of the program, and the interrupt routine pushes four registers. How deep can the stack get at most?</p>
+  <ol class="nt-steps">
+    <li>Calls: 4 levels × (2 bytes return address + 3 × 2 bytes registers) = 4 × 8 = 32 bytes.</li>
+    <li>Interrupt: 6 bytes (FLAGS, CS, IP) + 4 × 2 bytes of registers = 14 bytes.</li>
+    <li>Total: 32 + 14 = 46 bytes.</li>
+  </ol>
+  <p>The stack gets at most 46 bytes deep. The 256 bytes reserved with <code>.STACK 100h</code> are more than enough for this program; the margin is left for procedures added later and for the BIOS routines' own use.</p>
+</div>
+
+<h3 id="s8-1-5-5"><span class="nt-num">8.1.5.5</span>Good practices</h3>
+
+<p>Most stack errors are prevented with a few coding habits. The six rules in the slides are:</p>
+
+<ol>
+  <li><strong>Mirror order.</strong> The reverse of the order <code>PUSH AX</code>, <code>PUSH BX</code>, <code>PUSH CX</code> is <code>POP CX</code>, <code>POP BX</code>, <code>POP AX</code>. Written one below the other, the code should look like a mirror image.</li>
+  <li><strong>Single exit.</strong> Use a single exit label in a procedure instead of several RETs. The POPs are written once and all branches pass through them.</li>
+  <li><strong>Do not touch SP.</strong> SP is changed directly for only two jobs: clearing the parameters passed on the stack (<code>ADD SP, n</code>) and reserving room for local variables (<code>SUB SP, n</code>). n must always be even.</li>
+  <li><strong>The BP frame.</strong> Data on the stack cannot be reached with <code>[SP+n]</code>, because on the 8086 SP is not a base register. Do <code>MOV BP, SP</code> and use <code>[BP+n]</code>; BP addresses the SS segment by default.</li>
+  <li><strong>Protect the segments.</strong> Routines that change DS or ES must PUSH and POP them as well. The calling program cannot know that its data segment has changed.</li>
+  <li><strong>Check with emu8086.</strong> Open the stack window and check that SP returns to its value at entry before RET.</li>
+</ol>
+
+<figure class="nt-fig" id="sekil-ayna" style="--w:420px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 380 98" role="img" aria-label="The reverse of the order PUSH AX, BX, CX is POP CX, BX, AX: the lines join the same register."><rect class="box" x="10" y="8" width="110" height="22" rx="3"/><text class="txt mono" x="65" y="24" text-anchor="middle" style="font-size:12.5px">PUSH AX</text><rect class="box" x="260" y="8" width="110" height="22" rx="3"/><text class="txt mono" x="315" y="24" text-anchor="middle" style="font-size:12.5px">POP  CX</text><path class="line" style="stroke-dasharray:3 3" d="M122 19 L258 67"/><rect class="box" x="10" y="32" width="110" height="22" rx="3"/><text class="txt mono" x="65" y="48" text-anchor="middle" style="font-size:12.5px">PUSH BX</text><rect class="box" x="260" y="32" width="110" height="22" rx="3"/><text class="txt mono" x="315" y="48" text-anchor="middle" style="font-size:12.5px">POP  BX</text><path class="line" style="stroke-dasharray:3 3" d="M122 43 L258 43"/><rect class="box" x="10" y="56" width="110" height="22" rx="3"/><text class="txt mono" x="65" y="72" text-anchor="middle" style="font-size:12.5px">PUSH CX</text><rect class="box" x="260" y="56" width="110" height="22" rx="3"/><text class="txt mono" x="315" y="72" text-anchor="middle" style="font-size:12.5px">POP  AX</text><path class="line" style="stroke-dasharray:3 3" d="M122 67 L258 19"/><text class="lbl" x="190" y="92" text-anchor="middle" style="font-size:12px">mirror image</text></svg></div>
+  <figcaption><b>Figure 8.1.10:</b> Mirror order. The reverse of the order PUSH AX, BX, CX is POP CX, BX, AX; the lines join the same register and do not cross.</figcaption>
+</figure>
+
+<p><a href="#sekil-ayna">Figure 8.1.10</a> gives mirror order visually. The lines between the PUSHes and POPs form nested arcs. If the lines cross, the order is wrong. This picture resembles the nesting of opening and closing parentheses: the parenthesis opened last is closed first.</p>
+
+<p>The skeleton below shows all these rules together:</p>
+
+<pre class="nt-code"><code>my_proc <span class="dir">PROC</span>
+       <span class="kw">PUSH</span> AX          <span class="cm">; registers in use</span>
+       <span class="kw">PUSH</span> BX
+       <span class="kw">PUSH</span> DS          <span class="cm">; a segment will change too</span>
+       <span class="cm">; … work …</span>
+       <span class="kw">JC</span>   done          <span class="cm">; the error branch also leaves through the exit</span>
+       <span class="cm">; … work …</span>
+done:  <span class="kw">POP</span>  DS            <span class="cm">; mirror order</span>
+       <span class="kw">POP</span>  BX
+       <span class="kw">POP</span>  AX
+       <span class="kw">RET</span>
+my_proc <span class="dir">ENDP</span></code></pre>
+
+<h3 id="s8-1-5-6"><span class="nt-num">8.1.5.6</span>Tracing the stack in emu8086</h3>
+
+<p>All the trace tables of this note can be reproduced step by step in emu8086. The method has four steps.</p>
+
+<ol>
+  <li><strong>Compile and load.</strong> The program is assembled with the compile button and loaded into the emulator with emulate. The register panel shows the initial values of CS, IP, SS, and SP: for a .COM program 0700h, 0100h, 0700h, and FFFEh.</li>
+  <li><strong>Single step.</strong> The single step button runs one instruction per press, and the registers that change are highlighted. Step back undoes the last step; it is handy for seeing the effect of a PUSH again.</li>
+  <li><strong>The stack window.</strong> The stack button at the bottom opens a window that shows the words around SS:SP. The row SP points at is marked. With every PUSH the marker moves up a row (to a smaller address), and with every POP down a row.</li>
+  <li><strong>The memory view.</strong> The list in the middle of the emulator shows the bytes in hexadecimal, decimal, and ASCII. The bytes <code>B8 12 12</code> are the instruction <code>MOV AX, 1212h</code>. The little-endian convention shows up here: <code>MOV AX, 1234h</code> is encoded as B8 34 12.</li>
+</ol>
+
+<p>After loading, CX shows the byte count of the program; in the swap example this value is 000Bh, that is, 11 bytes. A program must not rely on this value and must load CX itself before using it. The 0000h seen on the FFFEh row of the emu8086 stack window is not a coincidence either; it is the return address for the RET at the end of the program. Looking at this row before every RET of a program is the shortest way to check the stack balance.</p>
+
+<h2 class="nt-pb" id="s8-1-6"><span class="nt-num">8.1.6</span>Exercises and solutions</h2>
+
+<p>The five exercises from the slides are solved here with intermediate steps.</p>
+
+<p><strong>1. With SS = 2000h and SP = 0100h, what are the physical addresses of the bytes written after PUSH AX?</strong></p>
+<p>PUSH first decrements SP: SP = 0100h − 2 = 00FEh. The new top of the stack is 2000h × 10h + 00FEh = 20000h + 00FEh = 200FEh. In little-endian order AL is written to 200FEh and AH to 200FFh. With AX = 1234h, [200FEh] = 34h and [200FFh] = 12h.</p>
+
+<p><strong>2. After MOV AX,1 / MOV BX,2 / MOV CX,3 / PUSH AX / PUSH BX / PUSH CX / POP BX / POP CX / POP AX, what are AX, BX, CX?</strong></p>
+<p>After the three PUSHes the stack, from top to bottom, is 3, 2, 1. <code>POP BX</code> takes 3, <code>POP CX</code> takes 2, and <code>POP AX</code> takes 1. The result is AX = 1, BX = 3, CX = 2. AX stays where it was, and BX and CX are swapped. AX stays fixed because it is both the first register pushed and the last one popped.</p>
+
+<p><strong>3. Copy the value of DS into ES using only PUSH and POP.</strong></p>
+<p><code>PUSH DS</code> followed by <code>POP ES</code>. The two instructions are two bytes (1Eh, 07h) and disturb no general-purpose register. The stack stays balanced.</p>
+
+<p><strong>4. With SP = FFFEh, PUSH AX / PUSH BX / PUSHF / POP CX are executed. What is SP, and what arrives in CX?</strong></p>
+<p>Three pushes decrease SP by 6, and one pop increases it by 2: FFFEh − 6 + 2 = FFFAh. CX receives the word pushed last, that is, the flags word at the moment of PUSHF. At the start of a .COM program this value is F202h. Copies of AX and BX remain on the stack; if the program were ended with RET in this state, it would return to the value of BX.</p>
+
+<p><strong>5. Write a PUSH/POP sequence that preserves AX and the flags during an operation.</strong></p>
+<p><code>PUSH AX</code>, <code>PUSHF</code>, … operation …, <code>POPF</code>, <code>POP AX</code>. Since the flags were pushed last, they are popped first; the sequence obeys mirror order. For example, with AX = 0000h and CF = ZF = 1, let <code>MOV AX, 7</code> and <code>ADD AX, 1</code> run inside the wrapper. At the end of the wrapper AX = 0000h, CF = 1, ZF = 1, and SP = FFFEh.</p>
+
+<h2 class="nt-pb" id="s8-1-7"><span class="nt-num">8.1.7</span>Summary</h2>
+
+<ul>
+  <li>The <strong>stack</strong> is an area of memory set aside for temporary data and working in last-in, first-out (<strong>LIFO</strong>) order. The programmer (PUSH, POP), the processor (CALL, INT), and the operating system use the same stack.</li>
+  <li>The top of the stack is <strong>SS:SP</strong>; its physical address is SS × 10h + SP. In a .COM program SS = CS and SP = FFFEh; in an .EXE program the values in the header are used. BP also addresses the SS segment by default; SP cannot be used in an addressing expression.</li>
+  <li>The stack <strong>grows downward</strong>: PUSH decreases SP by 2 and POP increases it by 2. The unit is always the word; <code>PUSH AL</code> is invalid. In a .COM program the code grows up and the stack down, and they share the free space in between.</li>
+  <li><strong>PUSH</strong>: first SP ← SP − 2, then [SS:SP] ← source. <strong>POP</strong>: first destination ← [SS:SP], then SP ← SP + 2. POP does not erase memory. SP always points at the topmost occupied cell.</li>
+  <li>PUSH takes a register, a segment register, or a memory word; PUSH with an immediate exists only on the 80186 and later. There are no POP CS and no POP constant. On the 8086, <code>PUSH SP</code> writes the decremented value.</li>
+  <li>A word is written to the stack <strong>little-endian</strong>: the low byte at the address SP points at, the high byte one above. SP is kept even; an odd SP makes every access take two bus cycles.</li>
+  <li>PUSH, POP, and PUSHF <strong>do not change the flags</strong>; POPF loads all the flags. The result of a CMP is carried safely across PUSH and POP.</li>
+  <li>When saving registers, the POP order is the reverse of the PUSH order (<strong>mirror order</strong>); POPping in the same order swaps or reverses the values. An array can be reversed with the stack. The best way to swap two registers is XCHG; the real job of the stack is saving.</li>
+  <li><strong>PUSHF/POPF</strong> save and restore the whole flags register. The flags word is brought into a register with PUSHF and POP; TF is changed this way. INT pushes the flags automatically; CALL does not.</li>
+  <li>An <strong>equal number of PUSHes and POPs</strong> is done on every path and in every branch. In a .COM program the final RET takes the 0000h DOS put there, and the INT 20h in the PSP ends the program. With an extra PUSH, RET returns to data; with an extra POP, to beyond the stack.</li>
+  <li>The 8086 does <strong>not check overflow and underflow</strong>: SP wraps in 16 bits and the stack can overwrite the code. The stack area is chosen taking into account the deepest call chain, the largest number of PUSHes, and interrupts.</li>
+</ul>
+
+<h2 id="s8-1-8"><span class="nt-num">8.1.8</span>Key terms</h2>
+
+
+<ul class="nt-concepts">
+  <li>stack</li>
+  <li>LIFO (last in, first out)</li>
+  <li>push / pop (PUSH / POP)</li>
+  <li>stack segment (SS)</li>
+  <li>pointer register (SP, BP)</li>
+  <li>base pointer (BP)</li>
+  <li>flags register (FLAGS)</li>
+  <li>stack overflow / underflow</li>
+  <li><a href="../Sozluk.html">little-endian / big-endian</a></li>
+  <li>segment:offset (logical address)</li>
+  <li>physical address</li>
+  <li>default segment</li>
+  <li>return address</li>
+  <li>register preservation</li>
+  <li>data transfer instruction</li>
+</ul>
+
+<h2 id="s8-1-9"><span class="nt-num">8.1.9</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>With SS = 3000h and SP = 0000h, <code>PUSH AX</code> runs. What is SP? To which physical addresses are the two bytes of AX written?</p>
+    <details><summary>Answer</summary>
+      <p>SP = 0000h − 2 = FFFEh; the 16-bit subtraction wraps. The top of the stack is 30000h + FFFEh = 3FFFEh. AL is written to 3FFFEh and AH to 3FFFFh. The initial value SP = 0000h can be used so that the stack starts at the very top of the segment; the first PUSH writes to the last word of the segment.</p>
+    </details>
+  </li>
+  <li>
+    <p>After the sequence <code>MOV AX, 1A2Bh</code>, <code>PUSH AX</code>, <code>MOV BX, SP</code>, <code>MOV DL, [BX+1]</code>, <code>MOV DH, [BX]</code>, <code>POP AX</code> (.COM program, starting with SP = FFFEh), what are BX and DX?</p>
+    <details><summary>Answer</summary>
+      <p>BX = FFFCh. [FFFCh] = 2Bh (low byte), [FFFDh] = 1Ah (high byte). DL = 1Ah, DH = 2Bh; DX = 2B1Ah. Because the bytes were read into the opposite places, DX is AX with its bytes exchanged.</p>
+    </details>
+  </li>
+  <li>
+    <p>With AX = AAAAh, BX = BBBBh, CX = CCCCh, <code>PUSH AX</code>, <code>PUSH BX</code>, <code>PUSH CX</code>, <code>POP BX</code>, <code>POP AX</code>, <code>POP CX</code> run. What are the three registers in the end?</p>
+    <details><summary>Answer</summary>
+      <p>The stack, from top to bottom, is CCCCh, BBBBh, AAAAh. BX = CCCCh, AX = BBBBh, CX = AAAAh. Each register has taken the value of another; the stack is balanced.</p>
+    </details>
+  </li>
+  <li>
+    <p>After the sequence <code>STC</code>, <code>PUSHF</code>, <code>CLC</code>, <code>POPF</code>, what is CF? If <code>POP AX</code> had been written instead of <code>POPF</code>, what would CF and AX be (at the start of the program IF = 1, the other flags 0)?</p>
+    <details><summary>Answer</summary>
+      <p>POPF restores the word saved after STC: CF = 1. With POP AX, CF stays 0 as CLC left it, and AX = F203h (constant bits F002h, IF 0200h, CF 0001h).</p>
+    </details>
+  </li>
+  <li>
+    <p>A .COM program ends with <code>MOV AX, 5</code>, <code>PUSH AX</code>, <code>PUSH AX</code>, <code>POP BX</code>, <code>RET</code>. What is IP after RET? Does the program terminate properly?</p>
+    <details><summary>Answer</summary>
+      <p>Two PUSHes are matched by one POP; the second 0005h is left on top of the stack. RET takes this value: IP = 0005h. The processor jumps to an address inside the PSP; the program never reaches INT 20h and does not terminate properly.</p>
+    </details>
+  </li>
+  <li>
+    <p>The 26-byte program that reverses an array with the stack occupies 0100h–0119h. How many words can be pushed at most onto a stack starting from SP = FFFEh without overwriting the program?</p>
+    <details><summary>Answer</summary>
+      <p>After n pushes SP = FFFEh − 2n, and SP ≥ 011Ah must hold. n ≤ (FFFEh − 011Ah) / 2 = (65,534 − 282) / 2 = 32,626. At most 32,626 words can be pushed.</p>
+    </details>
+  </li>
+  <li>
+    <p>A student puts <code>PUSH CX</code>, <code>INC CX</code>, <code>POP CX</code> between <code>CMP AX, BX</code> and <code>JE</code>. Does JE jump on the result of the comparison?</p>
+    <details><summary>Answer</summary>
+      <p>No. PUSH and POP do not change the flags, but <code>INC CX</code> sets ZF again according to the new value of CX. JE now looks at the result of INC, not of CMP. The fix is to put PUSHF/POPF in between, or to move the INC before the comparison.</p>
+    </details>
+  </li>
+  <li>
+    <p>How many clock cycles does swapping with the stack (two PUSHes, two POPs) take on the 8086, compared with <code>XCHG AX, BX</code>? What is the difference in µs at 5 MHz?</p>
+    <details><summary>Answer</summary>
+      <p>With the stack: 2 × 11 + 2 × 8 = 38 cycles. XCHG AX, BX: 3 cycles. The difference is 35 cycles; at 5 MHz one cycle is 200 ns, so 35 × 200 ns = 7 µs.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s8-1-10"><span class="nt-num">8.1.10</span>Further reading</h2>
+
+<ul>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979): the exact definitions, encodings, and clock cycle counts of PUSH, POP, PUSHF, POPF, CALL, RET, INT, and IRET; the meaning of the S3–S6 status bits. The values in Tables 8.1.2 and 8.1.6 are from this source.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8th ed.), Chapter 4: the stack instructions among the data transfer instructions, initializing the stack, and detailed examples of PUSH/POP.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em> (7th ed.), the section on stack operations: the runtime stack, preserving registers, and the example of reversing a string with the stack.</li>
+</ul>
+
+<h2 id="s8-1-11"><span class="nt-num">8.1.11</span>References</h2>
+
+<ol class="nt-refs">
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979 — instruction definitions of PUSH, POP, CALL, RET, INT, IRET.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8th ed., Pearson, 2009 — Chapters 4 and 6.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, 7th ed., Pearson, 2014 — stack operations and procedures.</li>
+  <li>emu8086 help documentation: 8086 Assembler Tutorial, Part 9 (The Stack).</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_08_01_The_Stack.html">Chapter 8.1 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>

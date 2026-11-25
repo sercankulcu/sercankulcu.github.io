@@ -1,0 +1,1570 @@
+---
+layout: without-sidebar
+title: "Chapter 2.2: 8086 Registers — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_02_02_8086_Registers_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 2.2 of Microprocessors: the register concept, the 14 registers of the 8086 and their implicit roles, AX = AH:AL, the data, pointer, and index registers, the stack and BP frames, the segment registers and IP, the flags register with its six status flags and three control flags, and the instructions that change the flags; with 8086 code traces."
+lang: en
+seo_title: "Chapter 2.2: 8086 Registers · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_02_02_8086_Yazmaclari_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_02_02_8086_Registers_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* chapter-specific classes of the SVGs in the slides (scoped to .ds-notes) */
+.ds-notes .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .sm { font-size: 12px; }
+.ds-notes .ds-svg .hotbox { fill: var(--ds-hot); stroke: color-mix(in srgb, var(--ds-hot) 70%, var(--ds-text)); stroke-width: 1.8; }
+.ds-notes .ds-svg .seg { fill: color-mix(in srgb, var(--ds-good) 16%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.5; }
+.ds-notes .ds-svg .ctl { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.5; }
+.ds-notes .ds-svg .off { fill: var(--ds-surface-strong); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .dim { opacity: .45; }
+.ds-notes .ds-svg .acc { fill: var(--ds-accent); }
+.ds-notes .ds-svg .good { fill: var(--ds-good); }
+.ds-notes .ds-svg .lnk { fill: var(--ds-link); }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+.ds-notes .n22-chg { color: var(--ds-link); font-weight: 700; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 2.2: 8086 Registers</h1>
+  <p class="nt-lead">Most of what an assembly program does happens in a few small memory cells inside the processor. These cells are called registers. The 8086 has fourteen registers, and the name of each describes a job: AX is the accumulator, CX is the counter, SP points to the top of the stack, and IP holds the place of the next instruction. This chapter first explains what a register is and why it is so much faster than memory. It then examines the 8086’s register set group by group: the 8-bit and 16-bit uses of the four data registers, how instructions use these registers implicitly, access to the stack and to strings through the pointer and index registers, and the segment registers and IP. The second half of the chapter is devoted to the flags register. It shows with examples in which results the six status flags are set, how the ALU produces these bits in hardware, and how the three control flags change the way the processor works. Every piece of code is traced line by line with the values of the registers, flags, and memory at each step.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_02_02_8086_Registers.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_02_02_8086_Registers.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_02_02_8086_Registers_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/Chapter_02_Register-Explorer.html">Register Explorer</a></li>
+    <li><a href="../slides/Chapter_06_Flags-Lab.html">Flags Lab</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Stack, CALL and RET</a></li>
+    <li><a href="../slides/CPU_Simulator.html">CPU Simulator</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Recognize the register set</dt>
+    <dd>Count the fourteen registers of the 8086 by group; explain which ones can be split into two 8-bit halves and why writing to one half does not change the other.</dd>
+    <dt>Know the implicit roles</dt>
+    <dd>State which registers MUL, DIV, LOOP, REP, IN, OUT, PUSH, POP, and the string instructions use without the registers being written in the instruction.</dd>
+    <dt>Use register pairs</dt>
+    <dd>Know in which access each of the pairs CS:IP, SS:SP, SS:BP, DS:BX, DS:SI, and ES:DI is used, and compute the physical address.</dd>
+    <dt>Compute the status flags</dt>
+    <dd>Find the CF, PF, AF, ZF, SF, and OF flags by hand after an addition or subtraction; explain the difference between CF and OF in the unsigned and signed interpretations.</dd>
+    <dt>Manage the control flags</dt>
+    <dd>Explain how DF, IF, and TF change the processor’s behavior; read and write the flags with CLD/STD, CLI/STI, LAHF/SAHF, and PUSHF/POPF.</dd>
+    <dt>Trace code</dt>
+    <dd>Trace a short 8086 program by writing the state of the registers, flags, memory, and stack at each step in table form.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s2-2-1">2.2.1 The register concept</a>
+      <ol>
+        <li><a href="#s2-2-1-1">2.2.1.1 What is a register?</a></li>
+        <li><a href="#s2-2-1-2">2.2.1.2 Registers and memory: the speed gap</a></li>
+        <li><a href="#s2-2-1-3">2.2.1.3 There is no memory-to-memory operation</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-2">2.2.2 The 8086 register set</a>
+      <ol>
+        <li><a href="#s2-2-2-1">2.2.2.1 Fourteen registers and their groups</a></li>
+        <li><a href="#s2-2-2-2">2.2.2.2 Where the registers sit in the BIU and EU</a></li>
+        <li><a href="#s2-2-2-3">2.2.2.3 General-purpose registers and implicit roles</a></li>
+        <li><a href="#s2-2-2-4">2.2.2.4 8-bit and 16-bit use: AX = AH : AL</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-3">2.2.3 The data registers</a>
+      <ol>
+        <li><a href="#s2-2-3-1">2.2.3.1 AX: the accumulator</a></li>
+        <li><a href="#s2-2-3-2">2.2.3.2 BX: the base register</a></li>
+        <li><a href="#s2-2-3-3">2.2.3.3 CX: the count register</a></li>
+        <li><a href="#s2-2-3-4">2.2.3.4 DX: the data register</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-4">2.2.4 The pointer and index registers</a>
+      <ol>
+        <li><a href="#s2-2-4-1">2.2.4.1 SP: the stack pointer</a></li>
+        <li><a href="#s2-2-4-2">2.2.4.2 BP: the base pointer</a></li>
+        <li><a href="#s2-2-4-3">2.2.4.3 SI and DI: the index registers</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-5">2.2.5 The segment registers and IP</a>
+      <ol>
+        <li><a href="#s2-2-5-1">2.2.5.1 Writing to the segment registers</a></li>
+        <li><a href="#s2-2-5-2">2.2.5.2 Register pairs</a></li>
+        <li><a href="#s2-2-5-3">2.2.5.3 IP: the instruction pointer</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-6">2.2.6 The flags register and the status flags</a>
+      <ol>
+        <li><a href="#s2-2-6-1">2.2.6.1 Structure of the flags register</a></li>
+        <li><a href="#s2-2-6-2">2.2.6.2 How are flags produced in hardware?</a></li>
+        <li><a href="#s2-2-6-3">2.2.6.3 SF: the sign flag</a></li>
+        <li><a href="#s2-2-6-4">2.2.6.4 ZF and PF: the zero and parity flags</a></li>
+        <li><a href="#s2-2-6-5">2.2.6.5 AF: the auxiliary carry flag</a></li>
+        <li><a href="#s2-2-6-6">2.2.6.6 CF: the carry flag</a></li>
+        <li><a href="#s2-2-6-7">2.2.6.7 OF: the overflow flag</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-7">2.2.7 The control flags</a>
+      <ol>
+        <li><a href="#s2-2-7-1">2.2.7.1 DF: the direction flag</a></li>
+        <li><a href="#s2-2-7-2">2.2.7.2 Code trace: overlapping copy with DF = 1</a></li>
+        <li><a href="#s2-2-7-3">2.2.7.3 IF: the interrupt flag</a></li>
+        <li><a href="#s2-2-7-4">2.2.7.4 TF: the trap flag</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-8">2.2.8 Instructions that change the flags</a>
+      <ol>
+        <li><a href="#s2-2-8-1">2.2.8.1 The effect of instructions on the flags</a></li>
+        <li><a href="#s2-2-8-2">2.2.8.2 Code trace: LAHF, SAHF, and CMC</a></li>
+        <li><a href="#s2-2-8-3">2.2.8.3 All the flags with PUSHF and POPF</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2-2-9">2.2.9 Common mistakes</a></li>
+    <li><a href="#s2-2-10">2.2.10 Exercises and solutions</a></li>
+    <li><a href="#s2-2-11">2.2.11 Summary</a></li>
+    <li><a href="#s2-2-12">2.2.12 Key terms</a></li>
+    <li><a href="#s2-2-13">2.2.13 Test Yourself</a></li>
+    <li><a href="#s2-2-14">2.2.14 Further reading</a></li>
+    <li><a href="#s2-2-15">2.2.15 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s2-2-1"><span class="nt-num">2.2.1</span>The register concept</h2>
+
+<h3 id="s2-2-1-1"><span class="nt-num">2.2.1.1</span>What is a register?</h3>
+
+<p>In a digital design course, when D flip-flops are lined up side by side and connected to a common clock signal, a <strong>register</strong> results. At the rising edge of the clock the bits at the input are loaded into the flip-flops and stay there until the next load. The registers inside a microprocessor are built this way. The difference is in their number and roles: the processor uses a few dozen registers at the same time and reaches each of them through instructions.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-yazmac">
+  <span class="nt-box__title">Definition 2.2.1</span>
+  <p>A <strong>register</strong> is a very fast, small memory cell inside the processor. The 8086’s registers are 16 bits wide. All the registers the programmer can read and write directly with instructions are called the <strong>register set</strong>; the 8086’s register set has fourteen registers.</p>
+</div>
+
+<p>There are also registers inside the processor that the programmer cannot see. The instruction register that holds the instruction being decoded, the temporary registers that feed the ALU’s inputs, and the prefetch queue are among them. In this chapter “register” means the fourteen registers the programmer can use by name.</p>
+
+<p>While a program runs, temporary data, memory addresses, loop counters, and results of operations are kept in registers. <a href="#sekil-yazmac">Figure 2.2.1</a> shows the relationship between the processor and memory. The registers are inside the processor and connected to the ALU by short internal paths. Memory is outside the processor, at the other end of the address and data buses.</p>
+
+<figure class="nt-fig" id="sekil-yazmac" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 300 230" role="img" aria-label="Registers inside the processor and memory outside; register access is much faster than memory access."><defs><marker id="n22-1-m02a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="10" y="10" width="130" height="210" rx="10"/><text class="txt" x="75" y="30" text-anchor="middle">CPU</text><rect class="box" x="30" y="50" width="90" height="30" rx="3"/><text class="txt mono" x="75" y="70" text-anchor="middle">AX</text><rect class="box" x="30" y="88" width="90" height="30" rx="3"/><text class="txt mono" x="75" y="108" text-anchor="middle">BX</text><rect class="box" x="30" y="126" width="90" height="30" rx="3"/><text class="txt" x="75" y="146" text-anchor="middle">…</text><text class="lbl" x="75" y="190" text-anchor="middle">≈ 1 cycle</text><rect class="off" x="200" y="10" width="90" height="210" rx="6"/><text class="txt" x="245" y="30" text-anchor="middle">Memory</text><rect class="box-empty" x="212" y="44" width="66" height="22" rx="2"/><rect class="box-empty" x="212" y="70" width="66" height="22" rx="2"/><rect class="box-empty" x="212" y="96" width="66" height="22" rx="2"/><rect class="box-empty" x="212" y="122" width="66" height="22" rx="2"/><rect class="box-empty" x="212" y="148" width="66" height="22" rx="2"/><rect class="box-empty" x="212" y="174" width="66" height="22" rx="2"/><path class="line" d="M140 115 H196" marker-end="url(#n22-1-m02a)"/><path class="line" d="M196 135 H144" marker-end="url(#n22-1-m02a)"/><text class="lbl sm" x="168" y="160" text-anchor="middle">data bus</text><text class="lbl sm" x="168" y="175" text-anchor="middle">4+ cycles</text></svg></div>
+  <figcaption><b>Figure 2.2.1:</b> The registers are inside the processor and the memory is outside. A register access ends on the processor’s internal path; a memory access takes at least four clock cycles over the external data bus.</figcaption>
+</figure>
+
+<h3 id="s2-2-1-2"><span class="nt-num">2.2.1.2</span>Registers and memory: the speed gap</h3>
+
+<p>The 8086 talks to external memory in <strong>bus cycles</strong>. A bus cycle consists of at least four clock cycles (T1, T2, T3, T4). In T1 the address is put on the bus, in T2 the read or write signal is issued, in T3 the data is ready on the bus, and in T4 the cycle closes. If the memory is slow, wait cycles are added in between. On a 5 MHz 8086 one clock cycle takes 200 ns; so a single memory read is at least 800 ns.</p>
+
+<p>A register access never goes out on the external bus. The contents of the register reach the ALU within the same clock cycle. <a href="#tab-tur">Table 2.2.1</a> gives a few examples from the clock-cycle counts in Intel’s 8086 manual. EA is the extra cycles spent computing the effective address. Its value depends on the address form: 5 for a single-register address like <code>[BX]</code>, 6 for a direct address like <code>[0500h]</code>, and 9 for register plus constant like <code>[BX+2]</code>.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Table 2.2.1: Clock-cycle counts of doing the same job with registers and with memory (8086 manual).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Operands</th><th scope="col">Clock cycles</th><th scope="col">Time at 5 MHz</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, BX</code></td><td>register ← register</td><td>2</td><td>0.4 µs</td></tr>
+    <tr><td><code>MOV AX, [BX]</code></td><td>register ← memory</td><td>8 + 5 = 13</td><td>2.6 µs</td></tr>
+    <tr><td><code>ADD AX, BX</code></td><td>register ← register + register</td><td>3</td><td>0.6 µs</td></tr>
+    <tr><td><code>ADD AX, [BX]</code></td><td>register ← register + memory</td><td>9 + 5 = 14</td><td>2.8 µs</td></tr>
+    <tr><td><code>ADD [BX], AX</code></td><td>memory ← memory + register</td><td>16 + 5 = 21</td><td>4.2 µs</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The table gives a clear result: the same addition takes about five times as long when one of the operands is in memory, and seven times as long when the result is written to memory. The <code>ADD [BX], AX</code> instruction reads memory first and then writes; it spends two bus cycles. That is why a well-written assembly program keeps frequently used values in registers and goes to memory only when necessary. Compilers for high-level languages work on the same principle: they place a loop’s counter and intermediate results in registers as much as possible.</p>
+
+<p>The number of registers, however, is small. Every register takes space on the processor chip. Inside an instruction there is also a field that selects the register: in 8086 instructions this field is 3 bits and selects one of 2<sup>3</sup> = 8 registers. Increasing the number of registers both enlarges the chip and lengthens the instructions. With 1978 technology the 8086’s designers made do with eight general-purpose registers.</p>
+
+<h3 id="s2-2-1-3"><span class="nt-num">2.2.1.3</span>There is no memory-to-memory operation</h3>
+
+<p>In the 8086’s two-operand instructions (MOV, ADD, SUB, AND, CMP …) at least one of the operands must be a register or a constant. There is no MOV or ADD that copies one memory cell directly to another or adds two memory cells. This rule comes from the instruction format: inside an instruction there is room to describe only one memory address.</p>
+
+<pre class="nt-code"><code>x  DW 1
+y  DW 2
+   <span class="kw">MOV</span> x, y        <span class="cm">; ERROR: no memory-to-memory MOV</span>
+
+   <span class="kw">MOV</span> AX, y       <span class="cm">; right: first into a register</span>
+   <span class="kw">MOV</span> x, AX       <span class="cm">; then into memory</span></code></pre>
+
+<p>The assembler does not accept the first line and gives an error message. The correct way is to carry the value through a register. The register works here like a relay station. The only exception to this rule is the string instructions. <code>MOVSB</code> moves a byte directly from DS:SI to ES:DI. It takes both addresses implicitly from the SI and DI registers without writing them in the instruction.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking of variables as in a high-level language and writing <code>MOV total, number</code> or <code>ADD result, value</code>. Because both operands are in memory, the assembler does not accept these lines. One of the values is first taken into a register.</p>
+</div>
+
+<h2 class="nt-pb" id="s2-2-2"><span class="nt-num">2.2.2</span>The 8086 register set</h2>
+
+<h3 id="s2-2-2-1"><span class="nt-num">2.2.2.1</span>Fourteen registers and their groups</h3>
+
+<p>The 8086’s fourteen registers are gathered into four groups by role (<a href="#sekil-kume">Figure 2.2.2</a>):</p>
+
+<ul>
+  <li><strong>Data registers</strong>: AX, BX, CX, DX. Each is 16 bits and can be split into two 8-bit halves: AH/AL, BH/BL, CH/CL, DH/DL.</li>
+  <li><strong>Pointer and index registers</strong>: SP (stack pointer), BP (base pointer), SI (source index), DI (destination index). These point to a location in memory; they have no 8-bit parts.</li>
+  <li><strong>Segment registers</strong>: CS (code), DS (data), SS (stack), ES (extra). Each determines the start of a segment in memory.</li>
+  <li><strong>Special registers</strong>: IP (instruction pointer) and FLAGS (the flags register).</li>
+</ul>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-kume" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 262" role="img" aria-label="The 8086 register set: AX, BX, CX, DX (with their 8-bit halves), SP, BP, SI, DI, CS, DS, SS, ES, IP, and FLAGS."><text class="txt" x="10" y="18" text-anchor="start" style="font-size:14px">General-purpose (data) registers</text><text class="lbl sm" x="70" y="36" text-anchor="start">15</text><text class="lbl sm" x="178" y="36" text-anchor="end">8</text><text class="lbl sm" x="186" y="36" text-anchor="start">7</text><text class="lbl sm" x="296" y="36" text-anchor="end">0</text><text class="txt mono" x="56" y="63" text-anchor="end">AX</text><rect class="box" x="64" y="42" width="118" height="28" rx="2"/><rect class="box" x="182" y="42" width="118" height="28" rx="2"/><text class="txt mono" x="123" y="61" text-anchor="middle">AH</text><text class="txt mono" x="241" y="61" text-anchor="middle">AL</text><text class="lbl" x="308" y="61" text-anchor="start">accumulator</text><text class="txt mono" x="56" y="99" text-anchor="end">BX</text><rect class="box" x="64" y="78" width="118" height="28" rx="2"/><rect class="box" x="182" y="78" width="118" height="28" rx="2"/><text class="txt mono" x="123" y="97" text-anchor="middle">BH</text><text class="txt mono" x="241" y="97" text-anchor="middle">BL</text><text class="lbl" x="308" y="97" text-anchor="start">base</text><text class="txt mono" x="56" y="135" text-anchor="end">CX</text><rect class="box" x="64" y="114" width="118" height="28" rx="2"/><rect class="box" x="182" y="114" width="118" height="28" rx="2"/><text class="txt mono" x="123" y="133" text-anchor="middle">CH</text><text class="txt mono" x="241" y="133" text-anchor="middle">CL</text><text class="lbl" x="308" y="133" text-anchor="start">count</text><text class="txt mono" x="56" y="171" text-anchor="end">DX</text><rect class="box" x="64" y="150" width="118" height="28" rx="2"/><rect class="box" x="182" y="150" width="118" height="28" rx="2"/><text class="txt mono" x="123" y="169" text-anchor="middle">DH</text><text class="txt mono" x="241" y="169" text-anchor="middle">DL</text><text class="lbl" x="308" y="169" text-anchor="start">data</text><text class="txt" x="420" y="18" text-anchor="start" style="font-size:14px">Pointer and index registers</text><text class="txt mono" x="452" y="61" text-anchor="end">SP</text><rect class="box" x="460" y="42" width="120" height="28" rx="2"/><text class="lbl" x="588" y="61" text-anchor="start">stack pointer</text><text class="txt mono" x="452" y="97" text-anchor="end">BP</text><rect class="box" x="460" y="78" width="120" height="28" rx="2"/><text class="lbl" x="588" y="97" text-anchor="start">base pointer</text><text class="txt mono" x="452" y="133" text-anchor="end">SI</text><rect class="box" x="460" y="114" width="120" height="28" rx="2"/><text class="lbl" x="588" y="133" text-anchor="start">source index</text><text class="txt mono" x="452" y="169" text-anchor="end">DI</text><rect class="box" x="460" y="150" width="120" height="28" rx="2"/><text class="lbl" x="588" y="169" text-anchor="start">destination index</text><text class="txt" x="10" y="200" text-anchor="start" style="font-size:14px">Segment registers</text><rect class="seg" x="10" y="210" width="88" height="28" rx="2"/><text class="txt mono" x="54" y="229" text-anchor="middle">CS</text><text class="lbl" x="54" y="254" text-anchor="middle">code</text><rect class="seg" x="110" y="210" width="88" height="28" rx="2"/><text class="txt mono" x="154" y="229" text-anchor="middle">DS</text><text class="lbl" x="154" y="254" text-anchor="middle">data</text><rect class="seg" x="210" y="210" width="88" height="28" rx="2"/><text class="txt mono" x="254" y="229" text-anchor="middle">SS</text><text class="lbl" x="254" y="254" text-anchor="middle">stack</text><rect class="seg" x="310" y="210" width="88" height="28" rx="2"/><text class="txt mono" x="354" y="229" text-anchor="middle">ES</text><text class="lbl" x="354" y="254" text-anchor="middle">ek</text><text class="txt" x="420" y="200" text-anchor="start" style="font-size:14px">Special registers</text><rect class="ctl" x="420" y="210" width="88" height="28" rx="2"/><text class="txt mono" x="464" y="229" text-anchor="middle">IP</text><text class="lbl" x="464" y="254" text-anchor="middle">instruction pointer</text><rect class="ctl" x="540" y="210" width="120" height="28" rx="2"/><text class="txt mono" x="600" y="229" text-anchor="middle">FLAGS</text><text class="lbl" x="600" y="254" text-anchor="middle">flags register</text></svg></div>
+  <figcaption><b>Figure 2.2.2:</b> The 8086 register set. Four data registers with their 8-bit halves, four pointer and index registers, four segment registers, IP, and FLAGS. All are 16 bits; only AX, BX, CX, and DX can be split in two.</figcaption>
+</figure>
+
+<p>The count is as follows: 4 data + 4 pointer/index + 4 segment + IP + FLAGS = 14. In this course the first eight registers, that is, AX, BX, CX, DX, SP, BP, SI, and DI, are counted as <strong>general-purpose registers</strong>. What these eight have in common is that they can be used freely as operands in instructions like MOV, ADD, and AND. <code>ADD SI, 4</code> and <code>MOV BP, AX</code> are valid instructions. The segment registers, IP, and FLAGS, however, cannot be operands in arithmetic instructions.</p>
+
+<p>The letter X in the register names stands for “extended.” The 8080 processor before the 8086 had 8-bit registers such as A, B, C, and D. The 8086 extended them to 16 bits and named them AX, BX, CX, and DX; the 8-bit halves were called with the letters H (high) and L (low). This naming was chosen so that 8080 programs could be ported easily to the 8086. It continues in today’s x86 processors: in 32-bit processors the lowest 16 bits of the register EAX, and in 64-bit processors of RAX, is still AX.</p>
+
+<h3 id="s2-2-2-2"><span class="nt-num">2.2.2.2</span>Where the registers sit in the BIU and EU</h3>
+
+<p>The 8086 consists of two units: the <strong>bus interface unit</strong> (BIU), which accesses memory and I/O, and the <strong>execution unit</strong> (EU), which decodes and executes instructions. The fourteen registers are shared between these two units, and this sharing makes it easier to understand the roles of the registers.</p>
+
+<div class="nt-tablewrap" id="tab-birim">
+<table class="nt-table">
+  <caption>Table 2.2.2: The unit where the registers sit and their role in address generation.</caption>
+  <thead><tr><th scope="col">Unit</th><th scope="col">Registers</th><th scope="col">Role in address generation</th></tr></thead>
+  <tbody>
+    <tr><td>EU</td><td>AX, BX, CX, DX</td><td>data; BX can also hold an offset</td></tr>
+    <tr><td>EU</td><td>SP, BP, SI, DI</td><td>16-bit offset</td></tr>
+    <tr><td>EU</td><td>FLAGS</td><td>none; it holds the ALU result and the control bits</td></tr>
+    <tr><td>BIU</td><td>CS, DS, SS, ES</td><td>segment start (paragraph number)</td></tr>
+    <tr><td>BIU</td><td>IP</td><td>offset within the code segment</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The EU works only with 16-bit numbers. When a memory operand is needed, it computes the effective address, that is, the offset within the segment, from BX, BP, SI, DI, and the constant in the instruction, and gives it to the BIU. It is the BIU that combines the 20-bit physical address with the segment register. That is the reason the segment registers and IP sit in the BIU: independently of the EU, the BIU prefetches the next instruction bytes from CS:IP and puts them in the queue. This arrangement also settles the question “which register gives which part of the address?” The segment register gives the upper part of the address; the pointer and index registers give the position within the segment.</p>
+
+<h3 id="s2-2-2-3"><span class="nt-num">2.2.2.3</span>General-purpose registers and implicit roles</h3>
+
+<p>As their name suggests, general-purpose registers can be used interchangeably in most instructions. It is possible to write <code>ADD SI, DX</code> in place of <code>ADD AX, BX</code>. Even so, some instructions use a particular register without its name appearing in the instruction.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ortuk">
+  <span class="nt-box__title">Definition 2.2.2</span>
+  <p>An <strong>implicit operand</strong> is an operand that does not appear in the way the instruction is written but is read or written by the definition of the instruction. In the <code>MUL BX</code> instruction only BX is written; AX, which is multiplied, and DX, which receives the high half of the result, are implicit operands.</p>
+</div>
+
+<p><a href="#tab-ortuk">Table 2.2.3</a> gives the names of the eight general-purpose registers and their implicit roles together. The English names of the registers are abbreviations of their roles, and this makes the table easier to remember.</p>
+
+<div class="nt-tablewrap" id="tab-ortuk">
+<table class="nt-table">
+  <caption>Table 2.2.3: General-purpose registers and their implicit uses.</caption>
+  <thead><tr><th scope="col">Register</th><th scope="col">Ad</th><th scope="col">8-bit halves</th><th scope="col">Implicit use (examples)</th></tr></thead>
+  <tbody>
+    <tr><td><code>AX</code></td><td>accumulator</td><td>AH, AL</td><td>MUL, DIV, IN, OUT, LODS/STOS</td></tr>
+    <tr><td><code>BX</code></td><td>base</td><td>BH, BL</td><td>memory addressing <code>[BX]</code>, XLAT</td></tr>
+    <tr><td><code>CX</code></td><td>count</td><td>CH, CL</td><td>LOOP, REP, shift count CL</td></tr>
+    <tr><td><code>DX</code></td><td>data</td><td>DH, DL</td><td>upper half of MUL/DIV, port address</td></tr>
+    <tr><td><code>SP</code></td><td>stack pointer</td><td>—</td><td>PUSH, POP, CALL, RET</td></tr>
+    <tr><td><code>BP</code></td><td>base pointer</td><td>—</td><td>stack frame <code>[BP+n]</code></td></tr>
+    <tr><td><code>SI</code></td><td>source index</td><td>—</td><td>string source DS:SI</td></tr>
+    <tr><td><code>DI</code></td><td>destination index</td><td>—</td><td>string destination ES:DI</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Implicit roles were chosen to shorten the 8086’s instruction encoding. If the LOOP instruction had to say which register holds the counter, a register field would have to be added to every LOOP. Because the counter is always CX, LOOP is only two bytes: the opcode and the jump displacement. The price is flexibility. If CX is being used for another job in a program, it must be saved before LOOP. A programmer who does not know the implicit roles may not notice that a MUL instruction silently erased the value in DX.</p>
+
+<h3 id="s2-2-2-4"><span class="nt-num">2.2.2.4</span>8-bit and 16-bit use: AX = AH : AL</h3>
+
+<p>AX, BX, CX, and DX can be used both as a single 16-bit register and as two separate 8-bit registers. The high-order 8 bits of AX (bits 15–8) are called <strong>AH</strong> and the low-order 8 bits (bits 7–0) <strong>AL</strong>. These are not separate hardware; they are the two halves of the same 16 flip-flops. That is why the following equality holds at every moment:</p>
+
+<p class="nt-math nt-math--c">AX = AH × 256 + AL &nbsp;&nbsp; (in hexadecimal: AX = AH : AL)</p>
+
+<p>When an instruction writes to AL, only the lower 8 flip-flops are loaded; the upper half stays in place. The best way to see this behavior is to trace a short program. The code is the same as the program in the slides:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 1234h   <span class="cm">; AH=12h, AL=34h</span>
+<span class="kw">MOV</span> AL, 0FFh    <span class="cm">; low half only</span>
+<span class="kw">ADD</span> AL, 1       <span class="cm">; 8-bit add</span>
+<span class="kw">MOV</span> AX, 12FFh
+<span class="kw">ADD</span> AX, 1       <span class="cm">; 16-bit add</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-ahal">
+<table class="nt-table">
+  <caption>Table 2.2.4: Trace of the AX = AH : AL program (the state after each row has executed).</caption>
+  <thead><tr><th scope="col">Row</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">AH</th><th scope="col">AL</th><th scope="col">CF</th><th scope="col">ZF</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>MOV AX, 1234h</code></td><td>1234h</td><td>12h</td><td>34h</td><td>0</td><td>0</td></tr>
+    <tr><td>2</td><td><code>MOV AL, 0FFh</code></td><td>12FFh</td><td>12h</td><td class="n22-chg">FFh</td><td>0</td><td>0</td></tr>
+    <tr><td>3</td><td><code>ADD AL, 1</code></td><td>1200h</td><td>12h</td><td class="n22-chg">00h</td><td class="n22-chg">1</td><td class="n22-chg">1</td></tr>
+    <tr><td>4</td><td><code>MOV AX, 12FFh</code></td><td>12FFh</td><td>12h</td><td>FFh</td><td>1</td><td>1</td></tr>
+    <tr><td>5</td><td><code>ADD AX, 1</code></td><td>1300h</td><td class="n22-chg">13h</td><td>00h</td><td class="n22-chg">0</td><td class="n22-chg">0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first row writes 1234h into AX. In hexadecimal notation every two digits are a byte; so AH = 12h and AL = 34h. The second row changes only AL: AL = FFh, AH = 12h stays, and AX = 12FFh. The third row is the most instructive. <code>ADD AL, 1</code> is an 8-bit addition: FFh + 01h = 100h. The result is 9 bits but the destination is 8 bits. The lower 8 bits, 00h, are written to AL. The overflowing 1 is not added to AH; it goes to the <strong>carry flag</strong> (CF). Because the result is zero, the zero flag is also set (ZF = 1). AX is now 1200h (<a href="#sekil-ahal">Figure 2.2.3</a>).</p>
+
+<figure class="nt-fig" id="sekil-ahal" style="--w:350px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 350 86" role="img" aria-label="The AX register: AH = 12h, AL = 00h"><text class="txt mono" x="30" y="34" text-anchor="end">AX</text><rect class="box" x="40" y="12" width="150" height="34" rx="3"/><rect class="hotbox" x="190" y="12" width="150" height="34" rx="3"/><text class="txt mono" x="115" y="35" text-anchor="middle">AH = 12h</text><text class="txt mono" x="265" y="35" text-anchor="middle">AL = 00h</text><text class="lbl mono" x="115" y="64" text-anchor="middle">0001 0010</text><text class="lbl mono" x="265" y="64" text-anchor="middle">0000 0000</text><text class="lbl sm" x="40" y="82" text-anchor="start">15</text><text class="lbl sm" x="340" y="82" text-anchor="end">0</text></svg></div>
+  <figcaption><b>Figure 2.2.3:</b> AX after <code>ADD AL, 1</code>. AL = FFh + 1 = 00h; the carry does not pass to AH but goes to CF. AH = 12h stays in place.</figcaption>
+</figure>
+
+<p>The fourth row makes AX 12FFh again. Because MOV does not change the flags, CF = 1 and ZF = 1 are preserved. The fifth row does the same “+1” operation, this time on 16 bits: 12FFh + 0001h = 1300h. This time the carry out of the low byte passes to AH, and 12h becomes 13h. Because the 16-bit result fits in 16 bits, CF = 0. Since the result is not zero, ZF is 0 too.</p>
+
+<p>The difference between these two additions comes from the width at which the ALU works. The processor understands the operation width from the name of the operands: AL is an 8-bit register and AX a 16-bit one. In the instruction code this information is carried by a single bit, the W bit: W = 0 means a byte operation and W = 1 a word operation. <code>ADD AL, 1</code> is encoded as <code>04 01</code> and <code>ADD AX, 1</code> as <code>05 01 00</code>; the opcodes differ only in the lowest bit.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-yari">
+  <span class="nt-box__title">Example 2.2.1</span>
+  <p>If <code>INC BL</code> executes with BX = 12FFh, what does BX become?</p>
+  <p>INC works on the 8-bit BL: FFh + 1 = 100h, and 00h is written to BL. The carry does not pass to BH; BH = 12h stays and BX = 1200h. ZF = 1. The INC instruction never changes the carry flag; CF keeps its previous value. If CF had been set to 1 beforehand, it stays 1 after INC.</p>
+</div>
+
+<p>The 8-bit halves are also related to the low-byte-first layout in memory. If <code>MOV [0300h], AX</code> executes with AX = 1234h, the 34h in AL is written to address 0300h and the 12h in AH to address 0301h. The low byte goes to the low address. The same rule holds when reading from memory: <code>MOV AX, [0300h]</code> fills AL from 0300h and AH from 0301h.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking that when AL is written the whole of AX changes. <code>MOV AL, 5</code> does not touch AH. If AX was 1234h before, it becomes 1205h after the instruction, not 0005h. If the whole of AX is wanted to be 5, <code>MOV AX, 5</code> is written.</p>
+</div>
+
+<p>Only the four data registers have halves. A notation like <code>MOV SL, 5</code> or <code>MOV BPL, 0</code> does not exist on the 8086. A program that wants to reach the low byte of SI first copies SI to AX and works on AL.</p>
+
+<h2 class="nt-pb" id="s2-2-3"><span class="nt-num">2.2.3</span>The data registers</h2>
+
+<h3 id="s2-2-3-1"><span class="nt-num">2.2.3.1</span>AX: the accumulator</h3>
+
+<p>AX is the most used register of the 8086. It takes its name from the <strong>accumulator</strong> of older processors. In a processor with an accumulator every arithmetic operation takes one operand from the accumulator and writes the result back there; the results “accumulate” there. The 8086 has dropped this requirement: <code>ADD BX, CX</code> works without touching the accumulator. Still, many instructions use AX or AL implicitly:</p>
+
+<ul>
+  <li><code>MUL</code>, <code>IMUL</code>, <code>DIV</code>, <code>IDIV</code>: the multiplicand and dividend sit in AX (or AL, or DX:AX), and the result is written to AX.</li>
+  <li><code>IN</code> and <code>OUT</code>: the data read from a port comes into AL or AX; the data to be written to a port is in AL or AX.</li>
+  <li><code>CBW</code>: extends the signed byte in AL into AX. <code>DAA</code> and <code>DAS</code>: correct the BCD result in AL.</li>
+  <li><code>LODSB</code> loads a byte into AL, and <code>STOSB</code> writes the byte in AL to memory.</li>
+</ul>
+
+<p>The privilege of AX shows in instruction length too. Many 8086 instructions have a short form specific to the accumulator. <a href="#tab-kisa">Table 2.2.5</a> puts the machine codes the assembler produces side by side.</p>
+
+<div class="nt-tablewrap" id="tab-kisa">
+<table class="nt-table">
+  <caption>Table 2.2.5: Machine code of instructions with and without the accumulator.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Machine code</th><th scope="col">Length</th></tr></thead>
+  <tbody>
+    <tr><td><code>ADD AX, 1234h</code></td><td><code>05 34 12</code></td><td>3 bytes</td></tr>
+    <tr><td><code>ADD BX, 1234h</code></td><td><code>81 C3 34 12</code></td><td>4 bytes</td></tr>
+    <tr><td><code>MOV AX, [0300h]</code></td><td><code>A1 00 03</code></td><td>3 bytes</td></tr>
+    <tr><td><code>MOV BX, [0300h]</code></td><td><code>8B 1E 00 03</code></td><td>4 bytes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the general form, after the opcode comes a byte that describes the operands (the ModR/M byte: <code>C3</code>, <code>1E</code>). In the accumulator form the fact that the destination is AX is hidden inside the opcode; this byte is not needed. One byte less is a gain both in memory space and in a bus cycle in the prefetch queue. That is why compilers and experienced programmers build frequent computations on AX.</p>
+
+<p>The short example in the slides adds AX to itself:</p>
+
+<pre class="nt-code"><code><span class="kw">ADD</span> AX, AX     <span class="cm">; AX = AX + AX</span>
+<span class="kw">MOV</span> AX, 0005h
+<span class="kw">ADD</span> AX, AX     <span class="cm">; AX = 000Ah</span>
+<span class="kw">MOV</span> AH, 4Ch    <span class="cm">; DOS: exit</span>
+<span class="kw">INT</span> 21h</code></pre>
+
+<div class="nt-tablewrap" id="tab-axax">
+<table class="nt-table">
+  <caption>Table 2.2.6: Trace of the program that adds AX to itself (a .COM program, AX = 0 at the start).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">Note</th></tr></thead>
+  <tbody>
+    <tr><td><code>ADD AX, AX</code></td><td>0000h</td><td>0 + 0 = 0; ZF = 1, PF = 1</td></tr>
+    <tr><td><code>MOV AX, 0005h</code></td><td>0005h</td><td>5 is written to AX</td></tr>
+    <tr><td><code>ADD AX, AX</code></td><td>000Ah</td><td>5 + 5 = 10 = 000Ah; ZF = 0</td></tr>
+    <tr><td><code>MOV AH, 4Ch</code></td><td>4C0Ah</td><td>only AH changes; AL = 0Ah stays</td></tr>
+    <tr><td><code>INT 21h</code></td><td>4C0Ah</td><td>DOS service 4Ch: the program ends, exit code AL = 10</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Adding a value to itself is multiplying by 2. In a binary number this is a shift of all the bits one place left: 0101b + 0101b = 1010b. The last two rows are interesting too. DOS service 4Ch expects the service number in AH and the program’s exit code in AL. Because <code>MOV AH, 4Ch</code> does not touch AL, the program ends with exit code 10. If the exit code is to be 0, <code>MOV AX, 4C00h</code> is written; this single instruction fills both AH and AL.</p>
+
+<h3 id="s2-2-3-2"><span class="nt-num">2.2.3.2</span>BX: the base register</h3>
+
+<p>BX is 16 bits like AX and is split into BH and BL. What sets it apart from the other data registers is that it can be used in <strong>memory addressing</strong>. A register inside square brackets says that the register’s value will be used as an offset. <code>[BX]</code> means “the memory cell BX points to.”</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-taban">
+  <span class="nt-box__title">Definition 2.2.3</span>
+  <p>A <strong>base register</strong> is a register that holds the base part of the address in indirect addressing. On the 8086 the base registers are BX and BP. The registers that can be used inside square brackets are only BX, BP, SI, and DI; <code>[AX]</code>, <code>[CX]</code>, and <code>[DX]</code> cannot be written.</p>
+</div>
+
+<p>This restriction too comes from instruction encoding. The 8086’s addressing field (the R/M field) selects one of eight address forms with a 3-bit code: <code>[BX+SI]</code>, <code>[BX+DI]</code>, <code>[BP+SI]</code>, <code>[BP+DI]</code>, <code>[SI]</code>, <code>[DI]</code>, <code>[BP]</code> (or a direct address), and <code>[BX]</code>. AX, CX, and DX are not in the list. The line <code>MOV AX, [CX]</code> therefore gets an error from the assembler. If an address in CX has to be used, it is first copied to BX: <code>MOV BX, CX</code> and <code>MOV AX, [BX]</code>.</p>
+
+<p>The meaning of the square brackets is the point beginners confuse most often. <a href="#sekil-bl">Figure 2.2.4</a> shows the difference.</p>
+
+<figure class="nt-fig" id="sekil-bl" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 160" role="img" aria-label="The instruction MOV BL, [0500h] copies the byte 25h at address DS:0500h into the BL register."><defs><marker id="n22-4-m02b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="10" y="18" text-anchor="start">DS segment</text><rect class="box" x="20" y="30" width="70" height="32" rx="2"/><text class="txt mono" x="55" y="52" text-anchor="middle">3Ah</text><text class="lbl mono sm" x="55" y="78" text-anchor="middle">04FFh</text><rect class="hotbox" x="94" y="30" width="70" height="32" rx="2"/><text class="txt mono" x="129" y="52" text-anchor="middle">25h</text><text class="lbl mono sm" x="129" y="78" text-anchor="middle">0500h</text><rect class="box" x="168" y="30" width="70" height="32" rx="2"/><text class="txt mono" x="203" y="52" text-anchor="middle">17h</text><text class="lbl mono sm" x="203" y="78" text-anchor="middle">0501h</text><rect class="box" x="242" y="30" width="70" height="32" rx="2"/><text class="txt mono" x="277" y="52" text-anchor="middle">9Ch</text><text class="lbl mono sm" x="277" y="78" text-anchor="middle">0502h</text><path class="line" d="M129 86 V118" marker-end="url(#n22-4-m02b)"/><rect class="box" x="84" y="122" width="90" height="30" rx="2"/><text class="txt mono" x="129" y="142" text-anchor="middle">BL = 25h</text><text class="lbl mono" x="190" y="142" text-anchor="start">MOV BL, [0500h]</text></svg></div>
+  <figcaption><b>Figure 2.2.4:</b> The instruction <code>MOV BL, [0500h]</code> copies the byte 25h at address DS:0500h into BL. The number 500h is not written to BL; the square brackets mean “the value at this address.”</figcaption>
+</figure>
+
+<p><code>MOV BL, [0500h]</code> reads from memory: if address DS:0500h holds 25h, BL = 25h. <code>MOV BX, 0500h</code>, on the other hand, never goes to memory; it writes the number 0500h into BX. The first instruction is 4 bytes and spends a bus cycle. The second is 3 bytes and the number is inside the instruction. This distinction is the basic distinction between a constant and memory contents. To put a number in a register, square brackets are not used.</p>
+
+<p>The trace program in the slides uses BX as a pointer. Suppose the bytes 25h, 17h, 00h, and 9Ch are at memory addresses 0500h–0503h.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> BX, 0500h     <span class="cm">; BX = address</span>
+<span class="kw">MOV</span> AL, [BX]      <span class="cm">; AL = [0500h]</span>
+<span class="kw">MOV</span> DL, [0501h]   <span class="cm">; direct address</span>
+<span class="kw">ADD</span> AL, DL        <span class="cm">; AL = 25h + 17h</span>
+<span class="kw">MOV</span> [BX+2], AL    <span class="cm">; [0502h] = AL</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-bx">
+<table class="nt-table">
+  <caption>Table 2.2.7: Trace of indirect access with BX. The memory column is the bytes 0500h–0503h.</caption>
+  <thead><tr><th scope="col">Row</th><th scope="col">Instruction</th><th scope="col">BX</th><th scope="col">AL</th><th scope="col">DL</th><th scope="col">0500h–0503h</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>MOV BX, 0500h</code></td><td class="n22-chg">0500h</td><td>00h</td><td>00h</td><td>25 17 00 9C</td></tr>
+    <tr><td>2</td><td><code>MOV AL, [BX]</code></td><td>0500h</td><td class="n22-chg">25h</td><td>00h</td><td>25 17 00 9C</td></tr>
+    <tr><td>3</td><td><code>MOV DL, [0501h]</code></td><td>0500h</td><td>25h</td><td class="n22-chg">17h</td><td>25 17 00 9C</td></tr>
+    <tr><td>4</td><td><code>ADD AL, DL</code></td><td>0500h</td><td class="n22-chg">3Ch</td><td>17h</td><td>25 17 00 9C</td></tr>
+    <tr><td>5</td><td><code>MOV [BX+2], AL</code></td><td>0500h</td><td>3Ch</td><td>17h</td><td>25 17 <span class="n22-chg">3C</span> 9C</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first row writes a number to BX; from now on this number will be used as an address. In the second row <code>[BX]</code> is the byte BX points to: AL = 25h. The third row does the same kind of read by writing the address inside the instruction, and DL = 17h. The fourth row adds two registers: 25h + 17h = 3Ch. In the fifth row the effective address of <code>[BX+2]</code> is 0500h + 2 = 0502h; AL is written to this address. BX does not change; what changes is memory (<a href="#sekil-bxiz">Figure 2.2.5</a>).</p>
+
+<figure class="nt-fig" id="sekil-bxiz" style="--w:340px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 340 102" role="img" aria-label="Memory 0500h-0503h and the BX pointer"><defs><marker id="n22-5-m02c-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="26" width="76" height="32" rx="2"/><text class="txt mono" x="48" y="48" text-anchor="middle">25h</text><text class="lbl mono sm" x="48" y="18" text-anchor="middle">0500h</text><rect class="box" x="92" y="26" width="76" height="32" rx="2"/><text class="txt mono" x="130" y="48" text-anchor="middle">17h</text><text class="lbl mono sm" x="130" y="18" text-anchor="middle">0501h</text><rect class="hotbox" x="174" y="26" width="76" height="32" rx="2"/><text class="txt mono" x="212" y="48" text-anchor="middle">3Ch</text><text class="lbl mono sm" x="212" y="18" text-anchor="middle">0502h</text><rect class="box" x="256" y="26" width="76" height="32" rx="2"/><text class="txt mono" x="294" y="48" text-anchor="middle">9Ch</text><text class="lbl mono sm" x="294" y="18" text-anchor="middle">0503h</text><path class="line" d="M48 84 V64" marker-end="url(#n22-5-m02c-5)"/><text class="txt mono" x="48" y="98" text-anchor="middle" style="fill:var(--ds-link)">BX</text></svg></div>
+  <figcaption><b>Figure 2.2.5:</b> Memory at the end of the program. BX still points to 0500h; 3Ch has been written to address 0502h with <code>[BX+2]</code>.</figcaption>
+</figure>
+
+<p>The addresses in the program are offsets. The processor looks them up within the DS segment, because the default segment for accesses made with BX is DS. emu8086 loads a .COM program with DS = 0700h. In this case the physical address of the offset 0500h is 0700h × 10h + 0500h = 07000h + 0500h = 07500h. The byte written in the fifth row appears in emu8086’s memory window at physical address 07502h.</p>
+
+<p>That BX can hold an address makes it indispensable in array and table operations. While BX points to the start of an array, the form <code>[BX+SI]</code> reaches the SI-th element of the array; the array is walked by incrementing SI on each pass. The XLAT instruction also uses BX implicitly: it treats AL as an index into the table BX points to and does <code>AL ← [BX+AL]</code> in a single instruction.</p>
+
+<h3 id="s2-2-3-3"><span class="nt-num">2.2.3.3</span>CX: the count register</h3>
+
+<p>CX is a 16-bit register split into CH and CL. It is used in loops, repetition, and counting; its name comes from this (count register). Three kinds of instructions use CX implicitly:</p>
+
+<ul>
+  <li><code>LOOP label</code>: first does CX ← CX − 1, then jumps to the label if CX ≠ 0. It does not affect the flags.</li>
+  <li>The <code>REP</code> prefix: repeats the string instruction after it CX times; CX decreases by one each pass.</li>
+  <li>Shift and rotate instructions: if the count is greater than 1 it is given in CL: <code>SHL AX, CL</code>.</li>
+</ul>
+
+<div class="nt-box nt-box--tanim" id="tanim-loop">
+  <span class="nt-box__title">Definition 2.2.4</span>
+  <p>The <code>LOOP label</code> instruction does the following two steps in a single instruction: (1) CX ← CX − 1; (2) if CX ≠ 0, IP ← the address of the label, otherwise move on to the next instruction. The decrement is done <strong>before</strong> the test.</p>
+</div>
+
+<p>The program in the slides computes the sum 5 + 4 + 3 + 2 + 1. CX is both the counter and the value being added.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> CX, 5          <span class="cm">; counter</span>
+<span class="kw">MOV</span> AX, 0          <span class="cm">; sum</span>
+AGAIN: <span class="kw">ADD</span> AX, CX
+<span class="kw">LOOP</span> AGAIN         <span class="cm">; CX--, jump if ≠0</span>
+<span class="kw">MOV</span> DX, AX         <span class="cm">; result</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-loop">
+<table class="nt-table">
+  <caption>Table 2.2.8: Trace of the sum 5 + 4 + 3 + 2 + 1 with CX and LOOP.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Instruction</th><th scope="col">CX</th><th scope="col">AX</th><th scope="col">DX</th><th scope="col">Next</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>MOV CX, 5</code></td><td>0005h</td><td>0000h</td><td>0000h</td><td>row 2</td></tr>
+    <tr><td>2</td><td><code>MOV AX, 0</code></td><td>0005h</td><td>0000h</td><td>0000h</td><td>AGAIN</td></tr>
+    <tr><td>3</td><td><code>ADD AX, CX</code></td><td>0005h</td><td class="n22-chg">0005h</td><td>0000h</td><td>LOOP</td></tr>
+    <tr><td>4</td><td><code>LOOP AGAIN</code></td><td class="n22-chg">0004h</td><td>0005h</td><td>0000h</td><td>jumps</td></tr>
+    <tr><td>5</td><td><code>ADD AX, CX</code></td><td>0004h</td><td class="n22-chg">0009h</td><td>0000h</td><td>LOOP</td></tr>
+    <tr><td>6</td><td><code>LOOP AGAIN</code></td><td class="n22-chg">0003h</td><td>0009h</td><td>0000h</td><td>jumps</td></tr>
+    <tr><td>7</td><td><code>ADD AX, CX</code></td><td>0003h</td><td class="n22-chg">000Ch</td><td>0000h</td><td>LOOP</td></tr>
+    <tr><td>8</td><td><code>LOOP AGAIN</code></td><td class="n22-chg">0002h</td><td>000Ch</td><td>0000h</td><td>jumps</td></tr>
+    <tr><td>9</td><td><code>ADD AX, CX</code></td><td>0002h</td><td class="n22-chg">000Eh</td><td>0000h</td><td>LOOP</td></tr>
+    <tr><td>10</td><td><code>LOOP AGAIN</code></td><td class="n22-chg">0001h</td><td>000Eh</td><td>0000h</td><td>jumps</td></tr>
+    <tr><td>11</td><td><code>ADD AX, CX</code></td><td>0001h</td><td class="n22-chg">000Fh</td><td>0000h</td><td>LOOP</td></tr>
+    <tr><td>12</td><td><code>LOOP AGAIN</code></td><td class="n22-chg">0000h</td><td>000Fh</td><td>0000h</td><td>falls through</td></tr>
+    <tr><td>13</td><td><code>MOV DX, AX</code></td><td>0000h</td><td>000Fh</td><td class="n22-chg">000Fh</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The loop body runs five times with CX = 5, 4, 3, 2, 1. The fifth LOOP lowers CX from 1 to 0 and does not jump; the program leaves the loop. The body does <strong>not</strong> run at all with CX = 0. The total is 15 = 000Fh. Check with Gauss’s formula: 5 × 6 / 2 = 15.</p>
+
+<p>The time of the loop is also easy to compute. When LOOP jumps it takes 17 clock cycles and when it does not jump it takes 5; <code>ADD AX, CX</code> is 3 cycles. For five passes 5 × 3 + 4 × 17 + 5 = 88 cycles are spent. This value also shows how the share of loop control in the total time shrinks as the body grows.</p>
+
+<h4>The CX = 0 trap</h4>
+
+<p>Because LOOP decrements before it tests, entering the loop with CX = 0 gives an unexpected result. The first LOOP computes 0000h − 1 = FFFFh. FFFFh is not zero; the processor jumps. The loop then runs with FFFFh, FFFEh, …, 0001h, and the total number of passes is 65,536.</p>
+
+<pre class="nt-code"><code>    <span class="kw">MOV</span> CX, 0
+    <span class="kw">MOV</span> BX, 0
+    <span class="kw">MOV</span> DX, 0
+D:  <span class="kw">ADD</span> BX, 1      <span class="cm">; pass counter (low word)</span>
+    <span class="kw">ADC</span> DX, 0      <span class="cm">; high word</span>
+    <span class="kw">LOOP</span> D</code></pre>
+
+<p>This program counts the number of passes in the 32-bit pair DX:BX. When the program ends, DX:BX = 0001:0000h = 65,536. Note that the pass count does not fit in 16 bits; had the counter been BX alone, it would have returned to 0 after 65,536 passes and one would think the loop never ran.</p>
+
+<p>The way to protect against this trap is the <code>JCXZ</code> instruction: “jump if CX is zero.” It is placed right before the loop and skips the whole loop if the counter is zero.</p>
+
+<pre class="nt-code"><code>     <span class="kw">MOV</span> CX, 0
+     <span class="kw">MOV</span> AX, 0
+     <span class="kw">JCXZ</span> skip        <span class="cm">; if CX = 0, do not enter the loop</span>
+D:   <span class="kw">ADD</span> AX, CX
+     <span class="kw">LOOP</span> D
+skip: <span class="kw">MOV</span> DX, AX</code></pre>
+
+<p>In this program JCXZ jumps straight to the label skip; the loop body does not run even once and AX = DX = 0 remains. JCXZ, like LOOP, does not look at the flags; it tests CX directly.</p>
+
+<h4>Shifting with CL</h4>
+
+<p>On the 8086, shift and rotate instructions take the count either as 1 or in CL. The notation <code>SHL AX, 4</code> does not exist on the 8086; it came with the 80186. For the 8086 the same job is written like this:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 0003h
+<span class="kw">MOV</span> CL, 4
+<span class="kw">SHL</span> AX, CL       <span class="cm">; AX = 0030h</span></code></pre>
+
+<p>A four-bit left shift is multiplication by 2<sup>4</sup> = 16: 3 × 16 = 48 = 0030h. In hexadecimal notation this means appending a 0 to the number. The same operation appears when a segment register is converted to a physical address.</p>
+
+<h3 id="s2-2-3-4"><span class="nt-num">2.2.3.4</span>DX: the data register</h3>
+
+<p>DX is split into DH and DL. It has two important implicit roles: holding the high half of AX in wide multiplication and division, and carrying the I/O port number.</p>
+
+<p><strong>Multiplication.</strong> The product of two 16-bit numbers can grow to 32 bits: FFFFh × FFFFh = FFFE0001h. The result does not fit in a single 16-bit register. The 8086 therefore splits the result of a 16-bit multiplication across two registers: the high 16 bits are written to DX and the low 16 bits to AX. This pair is written <strong>DX:AX</strong> (<a href="#sekil-mul">Figure 2.2.6</a>). In an 8-bit multiplication, however, the result is 16 bits and fits entirely in AX: <code>MUL BL</code> → AX = AL × BL. In this case DX does not change.</p>
+
+<figure class="nt-fig" id="sekil-mul" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 300 150" role="img" aria-label="MUL BX: AX is multiplied by BX, and the 32-bit result is written to the pair DX:AX."><text class="txt mono" x="150" y="18" text-anchor="middle">MUL BX  (16 bit × 16 bit)</text><rect class="box" x="20" y="34" width="120" height="32" rx="3"/><text class="txt mono" x="80" y="55" text-anchor="middle">AX</text><text class="txt" x="150" y="55" text-anchor="middle">×</text><rect class="box" x="160" y="34" width="120" height="32" rx="3"/><text class="txt mono" x="220" y="55" text-anchor="middle">BX</text><path class="axis" d="M150 72 V88"/><rect class="hotbox" x="20" y="96" width="130" height="34" rx="3"/><text class="txt mono" x="85" y="118" text-anchor="middle">DX (high)</text><rect class="box" x="150" y="96" width="130" height="34" rx="3"/><text class="txt mono" x="215" y="118" text-anchor="middle">AX (low)</text><text class="lbl" x="150" y="146" text-anchor="middle">32-bit product</text></svg></div>
+  <figcaption><b>Figure 2.2.6:</b> <code>MUL BX</code>: AX is multiplied by BX, and the 32-bit result is written to the pair DX:AX. DX is the high half and AX the low half.</figcaption>
+</figure>
+
+<p><strong>Division.</strong> In a 16-bit division the dividend is the 32-bit DX:AX. The quotient is written to AX and the remainder to DX. For example, with DX = 0012h, AX = 3405h, and BX = 0100h, <code>DIV BX</code> computes 00123405h ÷ 0100h. The quotient is 1234h and the remainder 0005h: AX = 1234h, DX = 0005h. If the quotient does not fit in 16 bits, the processor raises a type 0 interrupt (divide error). That is why DX is cleared before dividing a 16-bit number; if a leftover value remains in DX, the dividend becomes much larger than expected.</p>
+
+<p><strong>Port number.</strong> The IN and OUT instructions take the port number in two ways. Ports between 0 and 255 can be written into the instruction as a constant: <code>IN AL, 60h</code>. For ports above 255 the number is put in DX: <code>OUT DX, AL</code>. On the PC the first serial port (COM1) starts at 03F8h and the printer port at 0378h; these are reached only with DX. DX being 16 bits covers the whole 65,536-port I/O address space.</p>
+
+<p><strong>DOS calls.</strong> Many INT 21h services expect a memory address in DX. Service 09h, which writes a string to the screen, takes the address of the string from DS:DX: <code>LEA DX, message</code>.</p>
+
+<p>The program in the slides shows two of these roles together:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 1234h
+<span class="kw">MOV</span> BX, 0100h
+<span class="kw">MUL</span> BX          <span class="cm">; DX:AX = AX*BX</span>
+<span class="kw">MOV</span> AX, 00FFh
+<span class="kw">MOV</span> BL, 2
+<span class="kw">MUL</span> BL          <span class="cm">; AX = AL*BL</span>
+<span class="kw">MOV</span> DX, 03F8h   <span class="cm">; port address</span>
+<span class="kw">OUT</span> DX, AL      <span class="cm">; write to port</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-mul">
+<table class="nt-table">
+  <caption>Table 2.2.9: Trace of the MUL and OUT program. “?” shows the flags that are undefined after MUL.</caption>
+  <thead><tr><th scope="col">Row</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">DX</th><th scope="col">CF</th><th scope="col">OF</th><th scope="col">SF ZF AF PF</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>MOV AX, 1234h</code></td><td>1234h</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>0 0 0 0</td></tr>
+    <tr><td>2</td><td><code>MOV BX, 0100h</code></td><td>1234h</td><td>0100h</td><td>0000h</td><td>0</td><td>0</td><td>0 0 0 0</td></tr>
+    <tr><td>3</td><td><code>MUL BX</code></td><td class="n22-chg">3400h</td><td>0100h</td><td class="n22-chg">0012h</td><td class="n22-chg">1</td><td class="n22-chg">1</td><td>? ? ? ?</td></tr>
+    <tr><td>4</td><td><code>MOV AX, 00FFh</code></td><td>00FFh</td><td>0100h</td><td>0012h</td><td>1</td><td>1</td><td>? ? ? ?</td></tr>
+    <tr><td>5</td><td><code>MOV BL, 2</code></td><td>00FFh</td><td class="n22-chg">0102h</td><td>0012h</td><td>1</td><td>1</td><td>? ? ? ?</td></tr>
+    <tr><td>6</td><td><code>MUL BL</code></td><td class="n22-chg">01FEh</td><td>0102h</td><td>0012h</td><td>1</td><td>1</td><td>? ? ? ?</td></tr>
+    <tr><td>7</td><td><code>MOV DX, 03F8h</code></td><td>01FEh</td><td>0102h</td><td class="n22-chg">03F8h</td><td>1</td><td>1</td><td>? ? ? ?</td></tr>
+    <tr><td>8</td><td><code>OUT DX, AL</code></td><td>01FEh</td><td>0102h</td><td>03F8h</td><td>1</td><td>1</td><td>? ? ? ?</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the third row 1234h × 0100h = 00123400h is computed. Multiplying by 0100h shifts the hexadecimal number two digits to the left. The 32-bit result is split in two: DX = 0012h, AX = 3400h. MUL sets CF = OF = 1 if the high half of the result is not zero. These two flags mean “the result did not fit in the lower half; DX must be looked at too.” After MUL, SF, ZF, AF, and PF are <strong>undefined</strong>: Intel has not specified the value of these flags and a program must not rely on them. The “?” mark in the table shows this.</p>
+
+<p>The fifth row changes only BL. Because BX was 0100h beforehand, BH = 01h stays and BX = 0102h. The sixth row is an 8-bit multiplication: AL × BL = FFh × 02h = 255 × 2 = 510 = 01FEh. The result is written to the whole of AX; the 0012h in DX stays as it is. Because the high half AH = 01h is not zero, CF = OF = 1 again.</p>
+
+<p>In the seventh row DX holds not data this time but a port number: 03F8h is the data register of the first serial port. The eighth row sends the FEh in AL to this port. OUT uses only the low byte of AX; the 01h in AH does not go to the port. A single byte, FEh, is written to the port.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking the result of MUL is only in AX and going on using DX for another job. A 16-bit MUL always erases the value in DX; DX is written even if the result is small. If there is a value that must be kept in DX, it is pushed onto the stack before the MUL.</p>
+</div>
+
+<div class="nt-box nt-box--ornek" id="ornek-mul">
+  <span class="nt-box__title">Example 2.2.2</span>
+  <p>With AL = 10h and BL = 03h, what are AX, CF, and OF after <code>MUL BL</code>?</p>
+  <p>10h × 03h = 16 × 3 = 48 = 0030h. AX = 0030h. Because the high half AH = 00h, the result fit in AL and CF = OF = 0. In this case the program can go on by looking only at AL. Had CF been 1, the result would have to be sought in the whole of AX.</p>
+</div>
+
+<h2 class="nt-pb" id="s2-2-4"><span class="nt-num">2.2.4</span>The pointer and index registers</h2>
+
+<p>The SP, BP, SI, and DI registers are 16 bits and have no 8-bit halves. All four mostly hold not data but an <strong>offset</strong>: the distance of a cell in memory from the start of the segment it belongs to. SP and BP work in the stack segment (SS), and SI and DI in the data segments (DS, ES). They can also be used in arithmetic instructions: <code>ADD SI, 2</code> is the usual way to advance an index while walking an array.</p>
+
+<h3 id="s2-2-4-1"><span class="nt-num">2.2.4.1</span>SP: the stack pointer</h3>
+
+<div class="nt-box nt-box--tanim" id="tanim-yigin">
+  <span class="nt-box__title">Definition 2.2.5</span>
+  <p>The <strong>stack</strong> is a region of memory that works in last-in, first-out (LIFO) order. The <strong>stack pointer</strong> (SP) holds the offset of the topmost item of the stack. The physical address of the stack is always given by the pair <code>SS:SP</code>.</p>
+</div>
+
+<p>The 8086’s stack is recognized by three properties. First, items are always <strong>16 bits</strong>: <code>PUSH AX</code> is valid, <code>PUSH AL</code> is not. The assembler counts the line <code>PUSH AL</code> as an error. Second, the stack grows <strong>downward</strong> in memory; each PUSH writes to a lower address. Third, the order of operation is fixed:</p>
+
+<ul>
+  <li><code>PUSH source</code>: first SP ← SP − 2, then [SS:SP] ← source. The low byte is written to SP and the high byte to SP + 1.</li>
+  <li><code>POP destination</code>: first destination ← [SS:SP], then SP ← SP + 2.</li>
+</ul>
+
+<p>SP always points to the last valid item on the stack. When a new item is to be put on the stack, room is made first and then it is written. POP does not erase the cell it reads; the value stays in memory, but since SP has moved above it, it is no longer considered part of the stack. The next PUSH writes over that cell.</p>
+
+<p>Tracing the following program makes these rules concrete. Assume the stack is empty and SP starts from 0000h.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 1111h
+<span class="kw">PUSH</span> AX
+<span class="kw">MOV</span>  BX, 2222h
+<span class="kw">PUSH</span> BX
+<span class="kw">POP</span>  CX
+<span class="kw">POP</span>  DX</code></pre>
+
+<div class="nt-tablewrap" id="tab-yigin">
+<table class="nt-table">
+  <caption>Table 2.2.10: Trace of PUSH and POP (SP = 0000h at the start). The stack column gives the items from SP upward.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">SP</th><th scope="col">Stack (address: value)</th><th scope="col">CX</th><th scope="col">DX</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 1111h</code></td><td>0000h</td><td>empty</td><td>0000h</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td class="n22-chg">FFFEh</td><td>FFFEh: 1111h</td><td>0000h</td><td>0000h</td></tr>
+    <tr><td><code>MOV BX, 2222h</code></td><td>FFFEh</td><td>FFFEh: 1111h</td><td>0000h</td><td>0000h</td></tr>
+    <tr><td><code>PUSH BX</code></td><td class="n22-chg">FFFCh</td><td>FFFCh: 2222h, FFFEh: 1111h</td><td>0000h</td><td>0000h</td></tr>
+    <tr><td><code>POP CX</code></td><td class="n22-chg">FFFEh</td><td>FFFEh: 1111h</td><td class="n22-chg">2222h</td><td>0000h</td></tr>
+    <tr><td><code>POP DX</code></td><td class="n22-chg">0000h</td><td>empty</td><td>2222h</td><td class="n22-chg">1111h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first PUSH makes SP FFFEh by computing 0000h − 2. In 16-bit arithmetic, going below 0 means wrapping to the top; so SP = 0000h is a start from which the whole 64 KB stack segment can be used. The value 1111h is written to the bytes FFFEh–FFFFh. The second PUSH lowers SP to FFFCh and puts 2222h there. <a href="#sekil-sp">Figure 2.2.7</a> shows the stack at this moment. SP points to the topmost item, that is, the most recently pushed 2222h.</p>
+
+<figure class="nt-fig" id="sekil-sp" style="--w:250px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 250 250" role="img" aria-label="The stack segment: 1111h is at address FFFEh and 2222h at address FFFCh; SP = FFFCh points to the top. The stack grows toward low addresses."><defs><marker id="n22-7-m02d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="125" y="16" text-anchor="middle">SS segment</text><rect class="off" x="80" y="26" width="100" height="30" rx="2"/><text class="lbl mono sm" x="70" y="46" text-anchor="end">FFF6h</text><text class="txt mono" x="130" y="46" text-anchor="middle"></text><rect class="off" x="80" y="60" width="100" height="30" rx="2"/><text class="lbl mono sm" x="70" y="80" text-anchor="end">FFF8h</text><text class="txt mono" x="130" y="80" text-anchor="middle"></text><rect class="off" x="80" y="94" width="100" height="30" rx="2"/><text class="lbl mono sm" x="70" y="114" text-anchor="end">FFFAh</text><text class="txt mono" x="130" y="114" text-anchor="middle"></text><rect class="hotbox" x="80" y="128" width="100" height="30" rx="2"/><text class="lbl mono sm" x="70" y="148" text-anchor="end">FFFCh</text><text class="txt mono" x="130" y="148" text-anchor="middle">2222h</text><rect class="box" x="80" y="162" width="100" height="30" rx="2"/><text class="lbl mono sm" x="70" y="182" text-anchor="end">FFFEh</text><text class="txt mono" x="130" y="182" text-anchor="middle">1111h</text><path class="line" d="M228 128 H186" marker-end="url(#n22-7-m02d)"/><text class="txt mono" x="232" y="133" text-anchor="start" style="fill:var(--ds-link)">SP</text><path class="axis" d="M30 200 V40" marker-end="url(#n22-7-m02d)"/><text class="lbl sm" x="14" y="230" text-anchor="start">growth direction</text></svg></div>
+  <figcaption><b>Figure 2.2.7:</b> The stack segment after two PUSHes: 1111h at FFFEh and 2222h at FFFCh. SP = FFFCh points to the top. The stack grows toward low addresses.</figcaption>
+</figure>
+
+<p>The POPs run in the reverse order. <code>POP CX</code> takes the topmost 2222h and SP rises to FFFEh. <code>POP DX</code> takes 1111h and SP becomes 0000h again. In the end CX = 2222h and DX = 1111h: the values have come back in the reverse of the order they were pushed. That is what LIFO order means. To save and restore AX and BX in a program, <code>PUSH AX</code>, <code>PUSH BX</code> and then <code>POP BX</code>, <code>POP AX</code> are written; the POP order is the reverse of the PUSH order.</p>
+
+<p>The fact “SP = FFFEh when the stack is empty” is not a general rule. When DOS loads a .COM program it makes SP FFFEh and puts the word 0000h at address FFFEh. So the <code>RET</code> at the end of the program takes this zero into IP and returns to the DOS exit code at the start of the program. emu8086 also starts .COM programs this way. If the same program were run as a .COM file, SP would drop first to FFFCh and then to FFFAh; the values and order would not change.</p>
+
+<p>The implicit users of SP are not only PUSH and POP. <code>CALL</code> pushes the return address onto the stack and <code>RET</code> takes it from the stack. An interrupt pushes FLAGS, CS, and IP; <code>IRET</code> takes all three back. <code>PUSHF</code> and <code>POPF</code> move the flags register. All these instructions update SP themselves. If the programmer writes to SP directly (<code>MOV SP, …</code>), the position of the stack is changed; this is done only at the start of a program or when changing the stack segment.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Not balancing the number of PUSHes and POPs. If an extra PUSH is left inside a procedure, RET takes that value into IP instead of the return address and the program jumps to a random address. Skipping a POP in a conditional branch gives the same result. On every exit path the stack must return to the state it had at entry.</p>
+</div>
+
+<h3 id="s2-2-4-2"><span class="nt-num">2.2.4.2</span>BP: the base pointer</h3>
+
+<p>BP (base pointer) is used to point to a <strong>fixed location</strong> on the stack. Memory accesses made with BP use the SS segment by default: <code>[BP+4]</code> is the address SS:BP+4. <code>[BX+4]</code>, written with BX, goes to the DS segment. The only difference between the two base registers is this default segment.</p>
+
+<p>SP points to the top of the stack but keeps changing inside a procedure: every PUSH and POP moves it. Reaching parameters relative to SP is therefore laborious; after a PUSH the offset of the same parameter grows by 2 bytes. BP solves this problem. At the start of the procedure the current value of SP is copied to BP. From then on, however much SP changes, BP stays fixed and each parameter is always at the same distance from BP.</p>
+
+<pre class="nt-code"><code>      <span class="kw">MOV</span>  BX, 1234h
+      <span class="kw">PUSH</span> BX          <span class="cm">; parameter</span>
+      <span class="kw">CALL</span> ADDP
+      <span class="kw">MOV</span>  DX, AX      <span class="cm">; result</span>
+      <span class="kw">RET</span>
+
+ADDP <span class="kw">PROC</span>
+  <span class="kw">PUSH</span> BP
+  <span class="kw">MOV</span>  BP, SP     <span class="cm">; frame base</span>
+  <span class="kw">MOV</span>  AX, [BP+4] <span class="cm">; 1st param</span>
+  <span class="kw">POP</span>  BP
+  <span class="kw">RET</span>  2
+ADDP <span class="kw">ENDP</span></code></pre>
+
+<p>The procedure body is the same as the one in the slides. The calling part has been added with three lines that push the parameter onto the stack and take the result into DX. The program starts as a .COM program with SP = FFFEh.</p>
+
+<div class="nt-tablewrap" id="tab-bp">
+<table class="nt-table">
+  <caption>Table 2.2.11: Trace of the stack frame. The stack column goes upward from SP.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">SP</th><th scope="col">BP</th><th scope="col">AX</th><th scope="col">Stack (address: value)</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV BX, 1234h</code></td><td>FFFEh</td><td>0000h</td><td>0000h</td><td>FFFE: 0000</td></tr>
+    <tr><td><code>PUSH BX</code></td><td class="n22-chg">FFFCh</td><td>0000h</td><td>0000h</td><td>FFFC: 1234, FFFE: 0000</td></tr>
+    <tr><td><code>CALL ADDP</code></td><td class="n22-chg">FFFAh</td><td>0000h</td><td>0000h</td><td>FFFA: 0107, FFFC: 1234, …</td></tr>
+    <tr><td><code>PUSH BP</code></td><td class="n22-chg">FFF8h</td><td>0000h</td><td>0000h</td><td>FFF8: 0000, FFFA: 0107, FFFC: 1234, …</td></tr>
+    <tr><td><code>MOV BP, SP</code></td><td>FFF8h</td><td class="n22-chg">FFF8h</td><td>0000h</td><td>same</td></tr>
+    <tr><td><code>MOV AX, [BP+4]</code></td><td>FFF8h</td><td>FFF8h</td><td class="n22-chg">1234h</td><td>same</td></tr>
+    <tr><td><code>POP BP</code></td><td class="n22-chg">FFFAh</td><td class="n22-chg">0000h</td><td>1234h</td><td>FFFA: 0107, FFFC: 1234, …</td></tr>
+    <tr><td><code>RET 2</code></td><td class="n22-chg">FFFEh</td><td>0000h</td><td>1234h</td><td>FFFE: 0000</td></tr>
+    <tr><td><code>MOV DX, AX</code></td><td>FFFEh</td><td>0000h</td><td>1234h</td><td>FFFE: 0000</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>CALL pushes the return address 0107h onto the stack. This is the address of the instruction after the CALL, that is, of <code>MOV DX, AX</code>: the program starts at 0100h, <code>MOV BX, 1234h</code> is 3 bytes, <code>PUSH BX</code> is 1 byte, <code>CALL</code> is 3 bytes, and 0100h + 7 = 0107h. The <code>PUSH BP</code> at procedure entry saves the caller’s BP value. With <code>MOV BP, SP</code>, BP = FFF8h and the base of the frame is fixed. Now the frame reads like this:</p>
+
+<ul>
+  <li><code>[BP]</code> = FFF8h: the saved old BP;</li>
+  <li><code>[BP+2]</code> = FFFAh: the return address 0107h;</li>
+  <li><code>[BP+4]</code> = FFFCh: the first parameter 1234h.</li>
+</ul>
+
+<p><code>MOV AX, [BP+4]</code> takes the parameter into AX. <code>POP BP</code> restores the caller’s BP. <code>RET 2</code> does two jobs: it takes the return address into IP and also adds 2 to SP, discarding the parameter on the stack. SP returns to the value FFFEh it had at entry; the stack is in the state it had before the call. Even if an extra PUSH had been done in the procedure, <code>[BP+4]</code> would not have changed; that is the worth of BP.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-bp">
+  <span class="nt-box__title">Example 2.2.3</span>
+  <p>Let ADDP be called with two parameters: first <code>PUSH a</code>, then <code>PUSH b</code>. At which addresses are a and b inside the procedure, and how many bytes must RET discard on return?</p>
+  <p>The last pushed, b, is right above the return address: <code>[BP+4]</code> = b, and a, pushed before it, is at <code>[BP+6]</code>. Two parameters take 4 bytes; the return is done with <code>RET 4</code>. Each time the number of parameters grows, the offset of the first parameter grows by 2 bytes, but the last parameter is always at <code>[BP+4]</code>.</p>
+</div>
+
+<h3 id="s2-2-4-3"><span class="nt-num">2.2.4.3</span>SI and DI: the index registers</h3>
+
+<p>SI (source index) and DI (destination index) take their names from their roles in the string instructions. String instructions work on consecutive bytes or words in memory: copy (MOVS), compare (CMPS), scan (SCAS), load (LODS), and store (STOS). The operands of these instructions are not written in the instruction; they are implicit:</p>
+
+<ul>
+  <li>The source is always <strong>DS:SI</strong>: MOVSB, CMPSB, and LODSB read from here.</li>
+  <li>The destination is always <strong>ES:DI</strong>: MOVSB, STOSB, and SCASB write or compare here.</li>
+  <li>After each step SI and DI increase or decrease by 1 (byte) or 2 (word) according to the DF flag.</li>
+</ul>
+
+<p>Outside the string instructions, SI and DI are ordinary index registers. When <code>MOV AL, [SI]</code> or <code>MOV [DI], AL</code> is written, both use the <strong>DS</strong> segment by default. The ES:DI rule is only for the destination of string instructions. This distinction matters when DS and ES point to different segments.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-indis">
+  <span class="nt-box__title">Definition 2.2.6</span>
+  <p>An <strong>index register</strong> is a register that holds a position within an array or string. The 8086’s index registers are SI and DI. When used together with a base register (<code>[BX+SI]</code>, <code>[BP+DI+5]</code>), the effective address is the sum of the two registers and the constant.</p>
+</div>
+
+<p>The program in the slides copies the string “ABC” from 0200h to 0300h. In a .COM program DS = ES, so the two areas are in the same segment.</p>
+
+<pre class="nt-code"><code><span class="kw">CLD</span>              <span class="cm">; DF=0: addresses go up</span>
+<span class="kw">MOV</span> SI, 0200h    <span class="cm">; source</span>
+<span class="kw">MOV</span> DI, 0300h    <span class="cm">; destination</span>
+<span class="kw">MOV</span> CX, 3        <span class="cm">; byte count</span>
+<span class="kw">REP</span> <span class="kw">MOVSB</span>        <span class="cm">; ES:[DI] ← DS:[SI]</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-movsb">
+<table class="nt-table">
+  <caption>Table 2.2.12: Trace of REP MOVSB. Each pass of REP is a separate row.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Instruction</th><th scope="col">SI</th><th scope="col">DI</th><th scope="col">CX</th><th scope="col">DF</th><th scope="col">0300h–0302h</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>CLD</code></td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>— — —</td></tr>
+    <tr><td>2</td><td><code>MOV SI, 0200h</code></td><td class="n22-chg">0200h</td><td>0000h</td><td>0000h</td><td>0</td><td>— — —</td></tr>
+    <tr><td>3</td><td><code>MOV DI, 0300h</code></td><td>0200h</td><td class="n22-chg">0300h</td><td>0000h</td><td>0</td><td>— — —</td></tr>
+    <tr><td>4</td><td><code>MOV CX, 3</code></td><td>0200h</td><td>0300h</td><td class="n22-chg">0003h</td><td>0</td><td>— — —</td></tr>
+    <tr><td>5</td><td><code>REP MOVSB</code> (pass 1)</td><td class="n22-chg">0201h</td><td class="n22-chg">0301h</td><td class="n22-chg">0002h</td><td>0</td><td>A — —</td></tr>
+    <tr><td>6</td><td><code>REP MOVSB</code> (pass 2)</td><td class="n22-chg">0202h</td><td class="n22-chg">0302h</td><td class="n22-chg">0001h</td><td>0</td><td>A B —</td></tr>
+    <tr><td>7</td><td><code>REP MOVSB</code> (pass 3)</td><td class="n22-chg">0203h</td><td class="n22-chg">0303h</td><td class="n22-chg">0000h</td><td>0</td><td>A B C</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>CLD clears DF: SI and DI will increase at every step. SI points to the start of the source and DI to the start of the destination; CX says how many bytes will be copied. On each pass REP MOVSB does four things: it copies the byte at DS:SI to ES:DI, increments SI by 1, increments DI by 1, and decrements CX by 1. When CX reaches zero the repetition ends. After three passes “ABC” has been copied to the destination, and SI and DI point just past the copied area (<a href="#sekil-movsb">Figure 2.2.8</a>).</p>
+
+<figure class="nt-fig" id="sekil-movsb" style="--w:360px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 130" role="img" aria-label="Source and destination memory areas"><defs><marker id="n22-8-m02g-18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl mono sm" x="54" y="39" text-anchor="end">0200h</text><rect class="box" x="60" y="18" width="52" height="30" rx="2"/><text class="txt mono" x="86" y="38" text-anchor="middle">'A'</text><rect class="box" x="116" y="18" width="52" height="30" rx="2"/><text class="txt mono" x="142" y="38" text-anchor="middle">'B'</text><rect class="hotbox" x="172" y="18" width="52" height="30" rx="2"/><text class="txt mono" x="198" y="38" text-anchor="middle">'C'</text><rect class="box" x="228" y="18" width="52" height="30" rx="2"/><text class="txt mono" x="254" y="38" text-anchor="middle">—</text><path class="line" d="M254 66 V52" marker-end="url(#n22-8-m02g-18)"/><text class="txt mono sm" x="258" y="68" text-anchor="start" style="fill:var(--ds-link)">SI</text><text class="lbl" x="296" y="38" text-anchor="start">source</text><text class="lbl mono sm" x="54" y="101" text-anchor="end">0300h</text><rect class="box" x="60" y="80" width="52" height="30" rx="2"/><text class="txt mono" x="86" y="100" text-anchor="middle">'A'</text><rect class="box" x="116" y="80" width="52" height="30" rx="2"/><text class="txt mono" x="142" y="100" text-anchor="middle">'B'</text><rect class="hotbox" x="172" y="80" width="52" height="30" rx="2"/><text class="txt mono" x="198" y="100" text-anchor="middle">'C'</text><rect class="box" x="228" y="80" width="52" height="30" rx="2"/><text class="txt mono" x="254" y="100" text-anchor="middle">—</text><path class="line" d="M254 128 V114" marker-end="url(#n22-8-m02g-18)"/><text class="txt mono sm" x="258" y="130" text-anchor="start" style="fill:var(--ds-link)">DI</text><text class="lbl" x="296" y="100" text-anchor="start">destination</text></svg></div>
+  <figcaption><b>Figure 2.2.8:</b> The source and destination areas after the third pass. The bytes 'A', 'B', 'C' have been written starting at 0300h; SI = 0203h, DI = 0303h, CX = 0.</figcaption>
+</figure>
+
+<p>The REP prefix uses CX and MOVSB uses SI and DI implicitly. A single two-byte instruction (<code>F3 A4</code>) does the work of an entire loop. Writing the same copy with <code>MOV AL, [SI]</code>, <code>MOV [DI], AL</code>, <code>INC SI</code>, <code>INC DI</code>, and <code>LOOP</code> takes five instructions and more clock cycles on every pass. The clearest gain from giving the registers implicit roles in the 8086’s design is seen here.</p>
+
+<h2 class="nt-pb" id="s2-2-5"><span class="nt-num">2.2.5</span>The segment registers and IP</h2>
+
+<p>The 8086’s address bus is 20 bits and addresses 1 MB of memory. Its registers, however, are 16 bits and by themselves can point to only 64 KB. The two ends are reconciled by dividing memory into <strong>segments</strong>: every memory access consists of a segment register and a 16-bit offset. This section treats segmentation from the registers’ point of view: how to write to the segment registers, which register pairs with which segment, and how IP advances.</p>
+
+<h3 id="s2-2-5-1"><span class="nt-num">2.2.5.1</span>Writing to the segment registers</h3>
+
+<p>There are four segment registers: <strong>CS</strong> (code segment), <strong>DS</strong> (data segment), <strong>SS</strong> (stack segment), and <strong>ES</strong> (extra segment). Each holds a 16-bit paragraph number. The physical address where a segment starts is 16 times this number; the segment extends from there for at most 64 KB.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-fiziksel">
+  <span class="nt-box__title">Definition 2.2.7</span>
+  <p>The <strong>physical address</strong> (20 bits) = segment register × 10h + offset. Multiplying by 10h (16) is appending a 0 to the end of the hexadecimal number. If DS = 2000h and BX = 0500h, the physical address of the access <code>[BX]</code> is 20000h + 0500h = 20500h.</p>
+</div>
+
+<p>The rules for writing to the segment registers are stricter than for the other registers:</p>
+
+<ul>
+  <li><strong>A constant cannot be loaded.</strong> <code>MOV DS, 2000h</code> cannot be written; the assembler rejects the line. The value is first put in a general-purpose register: <code>MOV AX, 2000h</code> and <code>MOV DS, AX</code>.</li>
+  <li><strong>CS cannot be written with MOV.</strong> A change in CS means the program jumps somewhere else; this is done with far JMP, far CALL, RETF, INT, and IRET. The line <code>MOV CS, AX</code> is also rejected.</li>
+  <li><strong>There is no MOV from segment to segment.</strong> <code>MOV ES, DS</code> cannot be written. The value is transferred either through a register (<code>MOV AX, DS</code>, <code>MOV ES, AX</code>) or through the stack (<code>PUSH DS</code>, <code>POP ES</code>).</li>
+  <li><strong>Arithmetic cannot be done with the segment registers.</strong> <code>ADD DS, 10h</code> or <code>INC ES</code> do not exist.</li>
+</ul>
+
+<p>The reason for these restrictions is that the segment registers are in the BIU, not the EU. The ALU’s output is not directly connected to the segment registers; data reaches the segment registers only through MOV and POP, from a register or a memory word. The following short program sets up and uses a data segment. Suppose the byte 5Ah is at physical address 20500h.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 2000h
+<span class="kw">MOV</span> DS, AX       <span class="cm">; DS = 2000h: segment starts at 20000h</span>
+<span class="kw">MOV</span> BX, 0500h
+<span class="kw">MOV</span> AL, [BX]     <span class="cm">; AL ← [20500h]</span>
+<span class="kw">MOV</span> [BX+1], AL   <span class="cm">; [20501h] ← AL</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-kesim">
+<table class="nt-table">
+  <caption>Table 2.2.13: Setting up and using the DS register.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">DS</th><th scope="col">BX</th><th scope="col">Physical address</th><th scope="col">20500h–20501h</th></tr></thead>
+  <tbody>
+    <tr><td><code>MOV AX, 2000h</code></td><td class="n22-chg">2000h</td><td>0700h</td><td>0000h</td><td>—</td><td>5A 00</td></tr>
+    <tr><td><code>MOV DS, AX</code></td><td>2000h</td><td class="n22-chg">2000h</td><td>0000h</td><td>—</td><td>5A 00</td></tr>
+    <tr><td><code>MOV BX, 0500h</code></td><td>2000h</td><td>2000h</td><td class="n22-chg">0500h</td><td>—</td><td>5A 00</td></tr>
+    <tr><td><code>MOV AL, [BX]</code></td><td class="n22-chg">205Ah</td><td>2000h</td><td>0500h</td><td>20500h (read)</td><td>5A 00</td></tr>
+    <tr><td><code>MOV [BX+1], AL</code></td><td>205Ah</td><td>2000h</td><td>0500h</td><td>20501h (write)</td><td>5A <span class="n22-chg">5A</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>DS is initially 0700h, given by the .COM loader. After the second row, every access made with BX is relative to the base 20000h. When 5Ah is read into AL, the 20h in AH stays in place, so AX = 205Ah; the independence of the 8-bit halves is seen here too.</p>
+
+<h3 id="s2-2-5-2"><span class="nt-num">2.2.5.2</span>Register pairs</h3>
+
+<p>An offset by itself is not an address; which segment it belongs to must also be known. The 8086 chooses a segment register by default for each type of access. Since the programmer does not write this, these pairs are also part of the implicit roles (<a href="#tab-cift">Table 2.2.14</a>).</p>
+
+<div class="nt-tablewrap" id="tab-cift">
+<table class="nt-table">
+  <caption>Table 2.2.14: Register pairs and the accesses they are used in.</caption>
+  <thead><tr><th scope="col">Pair</th><th scope="col">Use</th><th scope="col">Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>CS:IP</code></td><td>next instruction</td><td>every instruction fetch</td></tr>
+    <tr><td><code>SS:SP</code></td><td>top of the stack</td><td>PUSH, POP, CALL, RET, INT</td></tr>
+    <tr><td><code>SS:BP</code></td><td>stack frame</td><td><code>MOV AX, [BP+4]</code></td></tr>
+    <tr><td><code>DS:BX</code>, <code>DS:SI</code>, <code>DS:DI</code></td><td>data</td><td><code>MOV AL, [BX+SI]</code></td></tr>
+    <tr><td><code>DS:SI → ES:DI</code></td><td>string instructions</td><td><code>MOVSB</code>, <code>CMPSB</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rule can be summarized briefly: if the address contains BP the segment is SS, and if not it is DS. <code>[BP+SI]</code> uses SS and <code>[BX+SI]</code> uses DS. The destination of string instructions is always ES. The default segment can be changed by adding a <strong>segment prefix</strong> in front of the instruction: <code>MOV AL, ES:[BX]</code> reads the data from the ES segment. A prefix cannot be used for instruction fetch (CS:IP) and stack operations (SS:SP). The string destination ES:DI cannot be changed either; only the segment of the source DS:SI can be redirected to another segment with a prefix.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-cift">
+  <span class="nt-box__title">Example 2.2.4</span>
+  <p>With DS = 1000h, SS = 3000h, SI = 0020h, and BP = 0020h, which physical addresses do <code>MOV AL, [SI]</code> and <code>MOV AL, [BP]</code> read?</p>
+  <p><code>[SI]</code> does not contain BP; the segment is DS: 1000h × 10h + 0020h = 10000h + 0020h = 10020h. <code>[BP]</code>, on the other hand, uses the SS segment: 30000h + 0020h = 30020h. The two instructions have the same offset but their physical addresses are 128 KB apart.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Trying to access an array with BP. If <code>MOV BP, OFFSET array</code> and <code>MOV AL, [BP]</code> are written, the access goes to the SS segment. In .COM programs the mistake stays hidden because DS = SS; in a .EXE program where DS and SS differ, the wrong memory is read. For data arrays BX, SI, or DI is used.</p>
+</div>
+
+<h3 id="s2-2-5-3"><span class="nt-num">2.2.5.3</span>IP: the instruction pointer</h3>
+
+<div class="nt-box nt-box--tanim" id="tanim-ip">
+  <span class="nt-box__title">Definition 2.2.8</span>
+  <p>The <strong>instruction pointer</strong> (IP) holds the offset of the next instruction to be executed within the code segment. The physical address of the next instruction is CS × 10h + IP. In other processors this register is called the program counter (PC).</p>
+</div>
+
+<p>While an instruction executes, IP is advanced by the length of the instruction and points to the next instruction. 8086 instructions are between 1 and 6 bytes; so IP does not grow in regular steps. The addresses in the AX = AH : AL program of Table 2.2.4 are a good example of this (<a href="#tab-ip">Table 2.2.15</a>).</p>
+
+<div class="nt-tablewrap" id="tab-ip">
+<table class="nt-table">
+  <caption>Table 2.2.15: How IP advances according to instruction lengths (.COM program, ORG 100h).</caption>
+  <thead><tr><th scope="col">Address of the instruction</th><th scope="col">Instruction</th><th scope="col">Machine code</th><th scope="col">Length</th><th scope="col">Next IP</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>MOV AX, 1234h</code></td><td><code>B8 34 12</code></td><td>3</td><td>0103h</td></tr>
+    <tr><td>0103h</td><td><code>MOV AL, 0FFh</code></td><td><code>B0 FF</code></td><td>2</td><td>0105h</td></tr>
+    <tr><td>0105h</td><td><code>ADD AL, 1</code></td><td><code>04 01</code></td><td>2</td><td>0107h</td></tr>
+    <tr><td>0107h</td><td><code>MOV AX, 12FFh</code></td><td><code>B8 FF 12</code></td><td>3</td><td>010Ah</td></tr>
+    <tr><td>010Ah</td><td><code>ADD AX, 1</code></td><td><code>05 01 00</code></td><td>3</td><td>010Dh</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Instructions that carry a 16-bit constant are 3 bytes, and those that carry an 8-bit constant are 2 bytes. The low byte of a constant in machine code comes first: 1234h is written as <code>34 12</code>.</p>
+
+<p>The instructions that take IP out of sequence are these: JMP and the conditional jumps, LOOP, CALL, RET, INT, and IRET. IP cannot be written with <code>MOV</code> and cannot be read with <code>MOV</code>; IP is not an operand the programmer reaches by name. There is an indirect way to learn the value of IP: the <code>CALL</code> instruction pushes the return address onto the stack, and with a <code>POP</code> this value can be taken into a register.</p>
+
+<p>Because of the BIU’s prefetch arrangement, inside the processor the bytes in the queue and the address IP points to may differ for a moment. From the programmer’s point of view this difference is invisible; IP always gives the address of the next instruction to be executed. When a jump occurs the queue is flushed and fetching starts again from the new CS:IP.</p>
+
+<h2 class="nt-pb" id="s2-2-6"><span class="nt-num">2.2.6</span>The flags register and the status flags</h2>
+
+<h3 id="s2-2-6-1"><span class="nt-num">2.2.6.1</span>Structure of the flags register</h3>
+
+<p>When an addition is done, the processor produces not only the result but also records a few facts about it. Is the result zero? Negative? Did it fit in 8 bits? These facts are one-bit indicators and are called <strong>flags</strong>. The 8086 gathers its flags in the 16-bit <strong>flags register</strong> (FLAGS). This register is also called the status register.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-flags" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 104" role="img" aria-label="The 16-bit flags register: bit 0 CF, 2 PF, 4 AF, 6 ZF, 7 SF, 8 TF, 9 IF, 10 DF, 11 OF; the other bits are unused."><rect class="box" x="650" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="670" y="22" text-anchor="middle">0</text><text class="txt mono" x="670" y="52" text-anchor="middle" style="font-size:13px">CF</text><rect class="off" x="608" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="628" y="22" text-anchor="middle">1</text><text class="lbl" x="628" y="52" text-anchor="middle">–</text><rect class="box" x="566" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="586" y="22" text-anchor="middle">2</text><text class="txt mono" x="586" y="52" text-anchor="middle" style="font-size:13px">PF</text><rect class="off" x="524" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="544" y="22" text-anchor="middle">3</text><text class="lbl" x="544" y="52" text-anchor="middle">–</text><rect class="box" x="482" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="502" y="22" text-anchor="middle">4</text><text class="txt mono" x="502" y="52" text-anchor="middle" style="font-size:13px">AF</text><rect class="off" x="440" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="460" y="22" text-anchor="middle">5</text><text class="lbl" x="460" y="52" text-anchor="middle">–</text><rect class="box" x="398" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="418" y="22" text-anchor="middle">6</text><text class="txt mono" x="418" y="52" text-anchor="middle" style="font-size:13px">ZF</text><rect class="box" x="356" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="376" y="22" text-anchor="middle">7</text><text class="txt mono" x="376" y="52" text-anchor="middle" style="font-size:13px">SF</text><rect class="ctl" x="314" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="334" y="22" text-anchor="middle">8</text><text class="txt mono" x="334" y="52" text-anchor="middle" style="font-size:13px">TF</text><rect class="ctl" x="272" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="292" y="22" text-anchor="middle">9</text><text class="txt mono" x="292" y="52" text-anchor="middle" style="font-size:13px">IF</text><rect class="ctl" x="230" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="250" y="22" text-anchor="middle">10</text><text class="txt mono" x="250" y="52" text-anchor="middle" style="font-size:13px">DF</text><rect class="box" x="188" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="208" y="22" text-anchor="middle">11</text><text class="txt mono" x="208" y="52" text-anchor="middle" style="font-size:13px">OF</text><rect class="off" x="146" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="166" y="22" text-anchor="middle">12</text><text class="lbl" x="166" y="52" text-anchor="middle">–</text><rect class="off" x="104" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="124" y="22" text-anchor="middle">13</text><text class="lbl" x="124" y="52" text-anchor="middle">–</text><rect class="off" x="62" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="82" y="22" text-anchor="middle">14</text><text class="lbl" x="82" y="52" text-anchor="middle">–</text><rect class="off" x="20" y="30" width="40" height="34" rx="2"/><text class="lbl sm" x="40" y="22" text-anchor="middle">15</text><text class="lbl" x="40" y="52" text-anchor="middle">–</text><rect class="box" x="20" y="84" width="14" height="14" rx="2"/><text class="lbl" x="40" y="96" text-anchor="start">status flag (affected by the result)</text><rect class="ctl" x="330" y="84" width="14" height="14" rx="2"/><text class="lbl" x="350" y="96" text-anchor="start">control flag (set by the programmer)</text></svg></div>
+  <figcaption><b>Figure 2.2.9:</b> The 16-bit flags register. Bit 0 CF, 2 PF, 4 AF, 6 ZF, 7 SF, 8 TF, 9 IF, 10 DF, 11 OF; the other bits are unused.</figcaption>
+</figure>
+
+<p>Only 9 of the register’s 16 bits are used (<a href="#sekil-flags">Figure 2.2.9</a>). They fall into two groups:</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-bayrak">
+  <span class="nt-box__title">Definition 2.2.9</span>
+  <p>The <strong>status flags</strong> are CF, PF, AF, ZF, SF, and OF. After arithmetic and logic instructions the processor sets (1) or clears (0) them itself according to the result. The <strong>control flags</strong> are DF, IF, and TF. They are not affected by results; the programmer changes how the processor works by setting them.</p>
+</div>
+
+<p>The main users of the status flags are the conditional jump instructions. <code>JZ</code> looks at ZF, <code>JC</code> at CF, <code>JS</code> at SF, and <code>JO</code> at OF; signed comparisons such as <code>JG</code> and <code>JL</code> evaluate SF and OF together. Every <code>if</code> and every loop condition in a high-level language becomes, in assembly, a comparison followed by a jump that looks at the flags. Knowing when and how the flags are set is therefore fundamental to 8086 programming.</p>
+
+<p>The bit order of the flags is not random. The five flags in the low byte (SF, ZF, AF, PF, CF) are in the same places as in the flags byte of the 8080 processor. This arrangement was kept to ease the translation of 8080 programs, and it is the reason the LAHF/SAHF instructions exist. OF and the control flags were added with the 8086 and put in the high byte.</p>
+
+<h3 id="s2-2-6-2"><span class="nt-num">2.2.6.2</span>How are flags produced in hardware?</h3>
+
+<p>The status flags are produced from the ALU’s output with a few simple gates. With digital design knowledge, building this circuit is not hard. In an n-bit adder, let r<sub>i</sub> be the i-th bit of the result and c<sub>i</sub> the carry into the i-th bit; c<sub>n</sub> is the carry out of the top bit. In an 8-bit operation n = 8.</p>
+
+<div class="nt-tablewrap" id="tab-donanim">
+<table class="nt-table">
+  <caption>Table 2.2.16: Producing the status flags from the adder output (8-bit operation).</caption>
+  <thead><tr><th scope="col">Flag</th><th scope="col">Logic expression</th><th scope="col">Circuit</th></tr></thead>
+  <tbody>
+    <tr><td>CF</td><td>c<sub>8</sub> (borrow in subtraction)</td><td>carry out of the last full adder</td></tr>
+    <tr><td>AF</td><td>c<sub>4</sub></td><td>carry from bit 3 to bit 4</td></tr>
+    <tr><td>ZF</td><td>¬(r<sub>7</sub> + r<sub>6</sub> + … + r<sub>0</sub>)</td><td>8-input NOR gate</td></tr>
+    <tr><td>SF</td><td>r<sub>7</sub></td><td>copy of the top bit (no gate)</td></tr>
+    <tr><td>PF</td><td>¬(r<sub>7</sub> ⊕ r<sub>6</sub> ⊕ … ⊕ r<sub>0</sub>)</td><td>XOR tree and a NOT gate at the output</td></tr>
+    <tr><td>OF</td><td>c<sub>7</sub> ⊕ c<sub>8</sub></td><td>XOR of the carries into and out of the top bit</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In a 16-bit operation c<sub>16</sub> is used for CF, r<sub>15</sub> for SF, and c<sub>15</sub> ⊕ c<sub>16</sub> for OF; ZF looks at all 16 bits. AF and PF, however, are produced from only the low byte even in a 16-bit operation. The point to notice in the table is that all the flags are produced at the same time and together with the result. The processor does not ask “signed or unsigned?”; after every addition it sets all six flags at once. The program decides which one is meaningful.</p>
+
+<p>Subtraction is done in the ALU as addition of the two’s complement: A − B = A + ¬B + 1. A carry out of the top bit in this addition means no borrow was taken. The 8086 sets CF in subtraction as the inverse of this carry; thus CF = 1 always means “a borrow was taken.” The same inversion is done for AF.</p>
+
+<h3 id="s2-2-6-3"><span class="nt-num">2.2.6.3</span>SF: the sign flag</h3>
+
+<p>The <strong>sign flag</strong> (SF) is a copy of the most significant bit (MSB) of the result. It is bit 7 in an 8-bit operation and bit 15 in a 16-bit operation. In two’s complement the MSB is the sign bit: if 1 the number is negative, if 0 it is positive or zero. SF therefore says whether the result is negative when interpreted as signed.</p>
+
+<div class="nt-tablewrap" id="tab-sf">
+<table class="nt-table">
+  <caption>Table 2.2.17: SF in 8-bit results.</caption>
+  <thead><tr><th scope="col">Result (8 bits)</th><th scope="col">Binary</th><th scope="col">Signed value</th><th scope="col">MSB</th><th scope="col">SF</th></tr></thead>
+  <tbody>
+    <tr><td><code>35h</code></td><td>0011 0101</td><td>+53</td><td>0</td><td>0</td></tr>
+    <tr><td><code>7Fh</code></td><td>0111 1111</td><td>+127</td><td>0</td><td>0</td></tr>
+    <tr><td><code>80h</code></td><td>1000 0000</td><td>−128</td><td>1</td><td>1</td></tr>
+    <tr><td><code>C2h</code></td><td>1100 0010</td><td>−62</td><td>1</td><td>1</td></tr>
+    <tr><td><code>FFh</code></td><td>1111 1111</td><td>−1</td><td>1</td><td>1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rule is short: for results from 00h to 7Fh, SF = 0, and for those from 80h to FFh, SF = 1. In 16 bits the boundary is between 7FFFh and 8000h. The processor does not know whether a number is signed or unsigned. The byte C2h is 194 as unsigned and −62 as signed; in both interpretations SF = 1. Reading SF as “negative” is the programmer’s choice and is meaningful only when working with signed numbers.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Thinking SF gives the sign of the true mathematical result. In 70h + 10h = 80h two positive numbers are added and the true result is +128. Even so SF = 1, because the MSB of the 8-bit result is 1. The result did not fit in the signed range; OF shows this. SF gives the correct sign only when OF = 0.</p>
+</div>
+
+<h3 id="s2-2-6-4"><span class="nt-num">2.2.6.4</span>ZF and PF: the zero and parity flags</h3>
+
+<p>The <strong>zero flag</strong> (ZF) is 1 if all bits of the result are zero; otherwise it is 0. The value of the flag and the value of the result look opposite: ZF = 1 means “the result is zero.” This confusion is cleared by reading the flag as a question: “is the result zero?” If yes, 1.</p>
+
+<p>ZF is used most in equality tests. <code>CMP AX, BX</code> computes AX − BX but writes the result nowhere; it only sets the flags. If AX = BX the difference is zero and ZF = 1. The following <code>JE</code> (jump if equal, the same instruction as <code>JZ</code>) looks at ZF. With AX = BX = 1234h, after CMP ZF = 1, PF = 1, and the other status flags are 0.</p>
+
+<p>Three ways of clearing a register give an interesting comparison in terms of ZF. <code>SUB AL, AL</code> and <code>XOR AL, AL</code> make the result zero, so they set ZF = 1 and CF = 0. <code>MOV AL, 0</code>, however, does not touch the flags at all; the flags left from the previous operation stay. If the register is to be cleared right before a conditional jump, this difference matters.</p>
+
+<p>The <strong>parity flag</strong> (PF) is 1 if the number of 1s in the <strong>low 8 bits</strong> of the result is even, and 0 if it is odd. In 16-bit operations too only the low byte is looked at. <a href="#sekil-pf">Figure 2.2.10</a> gives two examples.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-pf" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 56" role="img" aria-label="Parity: the low byte of 03h has two 1s, PF = 1; the low byte of 07h has three 1s, PF = 0"><text class="mt-m" x="40" y="20" text-anchor="end">03h</text><rect class="box" x="50" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="63" y="19" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="80" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="93" y="19" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="110" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="123" y="19" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="140" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="153" y="19" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="170" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="183" y="19" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="200" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="213" y="19" text-anchor="middle" style="font-size:12px">0</text><rect class="mt-hot" x="230" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="243" y="19" text-anchor="middle" style="font-size:12px">1</text><rect class="mt-hot" x="260" y="2" width="26" height="24" rx="3"/><text class="mt-m" x="273" y="19" text-anchor="middle" style="font-size:12px">1</text><text class="mt-s" x="300" y="20" text-anchor="start" style="font-size:12.5px">2 ones → even → PF = 1</text><text class="mt-m" x="40" y="48" text-anchor="end">07h</text><rect class="box" x="50" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="63" y="47" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="80" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="93" y="47" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="110" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="123" y="47" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="140" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="153" y="47" text-anchor="middle" style="font-size:12px">0</text><rect class="box" x="170" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="183" y="47" text-anchor="middle" style="font-size:12px">0</text><rect class="mt-hot" x="200" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="213" y="47" text-anchor="middle" style="font-size:12px">1</text><rect class="mt-hot" x="230" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="243" y="47" text-anchor="middle" style="font-size:12px">1</text><rect class="mt-hot" x="260" y="30" width="26" height="24" rx="3"/><text class="mt-m" x="273" y="47" text-anchor="middle" style="font-size:12px">1</text><text class="mt-a" x="300" y="48" text-anchor="start" style="font-size:12.5px">3 ones → odd → PF = 0</text></svg></div>
+  <figcaption><b>Figure 2.2.10:</b> The parity flag. The low byte of 03h has two 1s, PF = 1; 07h has three 1s, PF = 0.</figcaption>
+</figure>
+
+<p>The number zero has no 1s at all; since zero is an even number, PF = 1 for 00h. PF’s historical use was error checking in serial communication. A parity bit is added to every character sent, and the receiver checks the parity of the byte it receives; a single-bit corruption changes the parity and is noticed. In today’s programs PF is rarely used, but every arithmetic and logic operation of the 8086 still sets it. The <code>JP</code> and <code>JNP</code> instructions look at this flag.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-pf">
+  <span class="nt-box__title">Example 2.2.5</span>
+  <p>After <code>ADD AX, 0009h</code> with AX = 7FF8h, what are ZF and PF?</p>
+  <p>7FF8h + 0009h = 8001h. The result is not zero: ZF = 0. For PF only the low byte 01h = 0000 0001b is looked at. It has one 1, an odd number: PF = 0. The 1 in the high byte 80h is not counted.</p>
+</div>
+
+<h3 id="s2-2-6-5"><span class="nt-num">2.2.6.5</span>AF: the auxiliary carry flag</h3>
+
+<p>The <strong>auxiliary carry flag</strong> (AF) is 1 if during the operation there is a carry (in addition) or a borrow (in subtraction) from bit 3 to bit 4, and 0 if not. In other words, it shows whether there was an overflow from the low nibble (a group of 4 bits) to the upper nibble.</p>
+
+<figure class="nt-fig" id="sekil-af" style="--w:280px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 280 150" role="img" aria-label="08h + 09h = 11h; because a carry came out of the low nibble, AF = 1. The DAA correction makes the result BCD 17."><text class="txt mono" x="250" y="24" text-anchor="end">0000 1000</text><text class="lbl mono" x="30" y="24" text-anchor="start">08h</text><text class="txt mono" x="250" y="50" text-anchor="end">+ 0000 1001</text><text class="lbl mono" x="30" y="50" text-anchor="start">09h</text><path class="axis" d="M120 60 H254"/><text class="txt mono" x="250" y="80" text-anchor="end">0001 0001</text><text class="lbl mono" x="30" y="80" text-anchor="start">11h</text><rect class="box-empty" x="185" y="64" width="18" height="22" rx="3" style="stroke:var(--ds-accent)"/><text class="lbl" x="194" y="108" text-anchor="middle" style="fill:var(--ds-accent)">↑ carry from bit 3 → bit 4</text><text class="txt" x="150" y="134" text-anchor="middle" style="font-size:13.5px">AF = 1 → DAA gives 17h (BCD 17)</text></svg></div>
+  <figcaption><b>Figure 2.2.11:</b> 08h + 09h = 11h. When the low nibbles are added, 8 + 9 = 17 and a carry comes out from bit 3 to bit 4: AF = 1. DAA uses this information to correct the result to BCD 17.</figcaption>
+</figure>
+
+<p>This flag is specific to <strong>binary-coded decimal</strong> (BCD) arithmetic. In BCD each decimal digit is held in a separate nibble: the number 17 is written 0001 0111 = 17h. When BCD numbers are added with a binary adder, the result is not always valid BCD. In the example in Figure 2.2.11, 08h + 09h gives 11h; the correct BCD answer is 17. Because the low nibble passed 16, the 6 of the decimal system has “been lost.” AF = 1 says this loss happened. The <code>DAA</code> (decimal adjust after addition) instruction looks at AF and adds 6 to the low nibble: 11h + 06h = 17h. After DAA, AL = 17h.</p>
+
+<p>One property of AF is that the programmer cannot reach it directly. There is no conditional jump instruction that tests AF. There is no special instruction that sets or clears AF either. Only DAA, DAS, AAA, and AAS use it. AF can still be read and written: <code>LAHF</code> and <code>PUSHF</code> copy it together with the other flags into a register or onto the stack; <code>SAHF</code> and <code>POPF</code> write it back.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-af">
+  <span class="nt-box__title">Example 2.2.6</span>
+  <p>What is AF in the operations <code>05h − 07h</code> and <code>9Ch + 64h</code>?</p>
+  <p>In 05h − 07h the low nibbles are 5 − 7; since 5 is less than 7, a borrow is taken from bit 4: AF = 1. In 9Ch + 64h the low nibbles are C + 4 = 12 + 4 = 16; since it exceeds 15, a carry passes to bit 4: AF = 1.</p>
+</div>
+
+<h3 id="s2-2-6-6"><span class="nt-num">2.2.6.6</span>CF: the carry flag</h3>
+
+<p>The <strong>carry flag</strong> (CF) is 1 if in an n-bit addition the result does not fit in n bits, that is, a carry comes out beyond the top bit. In subtraction, if a larger number is subtracted from a smaller one and a <strong>borrow</strong> is taken, CF = 1 as well. CF is the overflow indicator for <strong>unsigned</strong> numbers.</p>
+
+<div class="nt-tablewrap" id="tab-cf">
+<table class="nt-table">
+  <caption>Table 2.2.18: CF in 8-bit operations. The unsigned interpretation explains why the result does or does not fit.</caption>
+  <thead><tr><th scope="col">Operation (8 bits)</th><th scope="col">Unsigned interpretation</th><th scope="col">Result</th><th scope="col">CF</th></tr></thead>
+  <tbody>
+    <tr><td><code>FFh + 01h</code></td><td>255 + 1 = 256 &gt; 255</td><td>00h</td><td>1</td></tr>
+    <tr><td><code>80h + 80h</code></td><td>128 + 128 = 256 &gt; 255</td><td>00h</td><td>1</td></tr>
+    <tr><td><code>70h + 10h</code></td><td>112 + 16 = 128 ≤ 255</td><td>80h</td><td>0</td></tr>
+    <tr><td><code>05h − 07h</code></td><td>5 − 7 &lt; 0 (borrow)</td><td>FEh</td><td>1</td></tr>
+    <tr><td><code>07h − 05h</code></td><td>7 − 5 = 2</td><td>02h</td><td>0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the example 05h − 07h the result is FEh. In the unsigned interpretation this is 254 and is not the true result −2; CF = 1 reports this. The same FEh is −2 in the signed interpretation and is correct. So in a signed subtraction CF = 1 is not an error; whether there is an error is told by OF.</p>
+
+<p>CF has a few properties that differ from the other flags:</p>
+
+<ul>
+  <li><strong>The programmer can change it.</strong> <code>STC</code> makes CF 1, <code>CLC</code> makes it 0, and <code>CMC</code> flips it. CF is the only status flag that can be set and cleared directly.</li>
+  <li><strong>INC and DEC do not touch CF.</strong> With AL = FFh, <code>ADD AL, 1</code> makes CF = 1; <code>INC AL</code> produces the same result but leaves CF at its previous value. This design is so that changing a loop counter with INC/DEC does not disturb the carry of a multiword addition.</li>
+  <li>In <strong>shift and rotate</strong> instructions the last bit pushed out goes to CF. <code>SHL AL, 1</code> with AL = 81h gives AL = 02h and CF = 1.</li>
+  <li><strong>Multiword arithmetic.</strong> <code>ADC</code> (add with carry) adds CF to the sum, and <code>SBB</code> (subtract with borrow) subtracts CF. In this way a 16-bit processor can add 32- or 64-bit numbers piece by piece.</li>
+</ul>
+
+<p>A 32-bit addition is the best-known use of ADC. Let 1 be added to DX:AX = 0001FFFFh:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 0FFFFh   <span class="cm">; low word</span>
+<span class="kw">MOV</span> DX, 0001h    <span class="cm">; high word</span>
+<span class="kw">ADD</span> AX, 1        <span class="cm">; AX = 0000h, CF = 1</span>
+<span class="kw">ADC</span> DX, 0        <span class="cm">; DX = 0001h + 0 + CF = 0002h</span></code></pre>
+
+<p>In the low word FFFFh + 1 = 10000h; AX = 0000h and the overflowing 1 waits in CF. ADC adds both the 0 and CF to the high word: DX = 0002h. The result is DX:AX = 00020000h. Just as in a decimal addition the carry moves to the digit on the left, here CF has been carried from word to word.</p>
+
+<h3 id="s2-2-6-7"><span class="nt-num">2.2.6.7</span>OF: the overflow flag</h3>
+
+<p>The <strong>overflow flag</strong> (OF) is 1 if the result, interpreted as <strong>signed</strong>, does not fit in the number of bits used. In 8 bits the signed range is −128 … +127, and in 16 bits −32,768 … +32,767. CF shows unsigned overflow and OF shows signed overflow.</p>
+
+<p>There are two equivalent ways to find OF for addition:</p>
+
+<ul>
+  <li><strong>The sign rule.</strong> If two positive numbers are added and the result is negative, or two negative numbers are added and the result is positive, OF = 1. The sum of two numbers of different signs never overflows, because the result stays between the two numbers.</li>
+  <li><strong>The carry rule.</strong> If the carry into the MSB and the carry out of the MSB differ, OF = 1 (c<sub>7</sub> ⊕ c<sub>8</sub> in Table 2.2.16).</li>
+</ul>
+
+<p>For subtraction the sign rule is adapted as follows: if a negative is subtracted from a positive and a negative result is found, or a positive is subtracted from a negative and a positive result is found, OF = 1. For example, in 80h − 01h = 7Fh, −128 − 1 = −129 was meant to be computed and the result came out +127: OF = 1. The difference of two numbers with the same sign never overflows.</p>
+
+<p><a href="#tab-of">Table 2.2.19</a> gives the four possible combinations of CF and OF with an example each. Each row must be read both as unsigned and as signed.</p>
+
+<div class="nt-tablewrap" id="tab-of">
+<table class="nt-table nt-table--wide">
+  <caption>Table 2.2.19: The four combinations of CF and OF (8-bit addition).</caption>
+  <thead><tr><th scope="col">Operation</th><th scope="col">Unsigned interpretation</th><th scope="col">Signed interpretation</th><th scope="col">Result</th><th scope="col">CF</th><th scope="col">OF</th></tr></thead>
+  <tbody>
+    <tr><td><code>05h + 03h</code></td><td>5 + 3 = 8</td><td>5 + 3 = 8</td><td>08h</td><td>0</td><td>0</td></tr>
+    <tr><td><code>7Fh + 01h</code></td><td>127 + 1 = 128</td><td>127 + 1 ≠ −128</td><td>80h</td><td>0</td><td><b>1</b></td></tr>
+    <tr><td><code>FFh + 01h</code></td><td>255 + 1 ≠ 0</td><td>−1 + 1 = 0</td><td>00h</td><td><b>1</b></td><td>0</td></tr>
+    <tr><td><code>80h + 80h</code></td><td>128 + 128 ≠ 0</td><td>−128 + (−128) ≠ 0</td><td>00h</td><td><b>1</b></td><td><b>1</b></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The rows can also be checked with the carry rule. In 7Fh + 01h all of the low seven bits are 1; in the addition a carry goes into bit 7 (c<sub>7</sub> = 1) but no carry comes out of bit 7 (c<sub>8</sub> = 0). The two differ: OF = 1. In FFh + 01h both c<sub>7</sub> and c<sub>8</sub> are 1: OF = 0, CF = 1. In 80h + 80h no carry goes into bit 7 (c<sub>7</sub> = 0), but the sum of the two 1s produces a carry out of bit 7 (c<sub>8</sub> = 1): OF = 1, CF = 1.</p>
+
+<p>CF and OF are independent of each other; all four combinations are seen in the table. The processor always computes both. If the program works with unsigned numbers it looks at CF (and jumps such as <code>JA</code> and <code>JB</code>), and if it works with signed numbers it looks at OF (and jumps such as <code>JG</code>, <code>JL</code>, and <code>JO</code>).</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-of">
+  <span class="nt-box__title">Example 2.2.7</span>
+  <p>After <code>MOV AL, 0C8h</code> and <code>ADD AL, 64h</code>, what are AL and the six status flags?</p>
+  <p>C8h + 64h = 12Ch. The low byte 2Ch is written to AL, and the overflowing 1 goes to CF: CF = 1. In the signed interpretation C8h = −56 and 64h = +100; −56 + 100 = 44 = 2Ch is correct, and the sum of numbers of different signs does not overflow: OF = 0. 2Ch = 0010 1100b; since the MSB is 0, SF = 0, and since the result is not zero, ZF = 0. The low byte has three 1s: PF = 0. The low nibbles are 8 + 4 = 12, which does not exceed 15: AF = 0.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Using the word “overflow” for both flags and counting CF = 1 as an error in a signed computation. In −1 + 1 (FFh + 01h), CF = 1 but the signed result 0 is perfectly correct. Only OF tells whether a signed computation is correct.</p>
+</div>
+
+<p>INC and DEC set OF too. With AL = 7Fh, <code>INC AL</code> makes AL = 80h; +127 + 1 has exceeded the signed range and OF = 1, SF = 1. In the NEG instruction the only overflow case is the smallest negative number: <code>NEG AL</code> with AL = 80h again produces 80h, because +128 cannot be represented in 8 bits; in this case OF = 1.</p>
+
+<h2 class="nt-pb" id="s2-2-7"><span class="nt-num">2.2.7</span>The control flags</h2>
+
+<p>DF, IF, and TF do not describe the result of an operation; they determine how the processor will work from now on. Arithmetic instructions do not touch these flags. The programmer sets them with special instructions or by changing the flags register through the stack.</p>
+
+<h3 id="s2-2-7-1"><span class="nt-num">2.2.7.1</span>DF: the direction flag</h3>
+
+<p>The <strong>direction flag</strong> (DF) determines in which direction the string instructions walk through memory (<a href="#sekil-df">Figure 2.2.12</a>):</p>
+
+<ul>
+  <li><strong>DF = 0</strong>: from a low address toward a high one; at each step SI and DI <strong>increase</strong>. The <code>CLD</code> instruction makes DF 0.</li>
+  <li><strong>DF = 1</strong>: from a high address toward a low one; at each step SI and DI <strong>decrease</strong>. The <code>STD</code> instruction makes DF 1.</li>
+</ul>
+
+<figure class="nt-fig" id="sekil-df" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 300 170" role="img" aria-label="With DF = 0 the addresses increase, with DF = 1 they decrease."><defs><marker id="n22-12-m02h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="150" y="16" text-anchor="middle">CLD (DF = 0)</text><rect class="box" x="20" y="26" width="48" height="28" rx="2"/><text class="lbl mono sm" x="44" y="45" text-anchor="middle">100</text><rect class="box" x="72" y="26" width="48" height="28" rx="2"/><text class="lbl mono sm" x="96" y="45" text-anchor="middle">101</text><rect class="box" x="124" y="26" width="48" height="28" rx="2"/><text class="lbl mono sm" x="148" y="45" text-anchor="middle">102</text><rect class="box" x="176" y="26" width="48" height="28" rx="2"/><text class="lbl mono sm" x="200" y="45" text-anchor="middle">103</text><rect class="box" x="228" y="26" width="48" height="28" rx="2"/><text class="lbl mono sm" x="252" y="45" text-anchor="middle">104</text><path class="line" d="M30 66 H270" marker-end="url(#n22-12-m02h)"/><text class="lbl mono" x="150" y="82" text-anchor="middle">SI, DI ++</text><text class="txt" x="150" y="106" text-anchor="middle">STD (DF = 1)</text><rect class="box" x="20" y="116" width="48" height="28" rx="2"/><text class="lbl mono sm" x="44" y="135" text-anchor="middle">100</text><rect class="box" x="72" y="116" width="48" height="28" rx="2"/><text class="lbl mono sm" x="96" y="135" text-anchor="middle">101</text><rect class="box" x="124" y="116" width="48" height="28" rx="2"/><text class="lbl mono sm" x="148" y="135" text-anchor="middle">102</text><rect class="box" x="176" y="116" width="48" height="28" rx="2"/><text class="lbl mono sm" x="200" y="135" text-anchor="middle">103</text><rect class="box" x="228" y="116" width="48" height="28" rx="2"/><text class="lbl mono sm" x="252" y="135" text-anchor="middle">104</text><path class="line" d="M270 156 H30" marker-end="url(#n22-12-m02h)"/><text class="lbl mono" x="150" y="170" text-anchor="middle">SI, DI −−</text></svg></div>
+  <figcaption><b>Figure 2.2.12:</b> With DF = 0 the string instructions advance by increasing the addresses, and with DF = 1 by decreasing them.</figcaption>
+</figure>
+
+<p>The step size depends on the width of the instruction: 1 for byte instructions (MOVSB, LODSB …) and 2 for word instructions (MOVSW, LODSW …). DF affects only the string instructions. An ordinary instruction such as <code>MOV AL, [SI]</code> never changes SI.</p>
+
+<p>DF = 0 is enough to process an array from start to end, and most programs use it. For this reason, instead of trusting the value of DF, it is a good habit to write <code>CLD</code> or <code>STD</code> before every string operation. If another routine has left DF at 1, a copy loop that does not write CLD walks through memory in the reverse direction.</p>
+
+<p>The real justification for walking backward is <strong>overlapping areas</strong>. If the source and destination overlap in memory, the direction of the copy determines the result. If the destination is ahead of the source (at a higher address), the copy must be done from the end to the start. Otherwise the not-yet-read bytes of the source get overwritten by the bytes written to the destination.</p>
+
+<h3 id="s2-2-7-2"><span class="nt-num">2.2.7.2</span>Code trace: overlapping copy with DF = 1</h3>
+
+<p>The program in the slides shifts the string “KLMN” in memory one byte to the right. The source is arr..arr+3 and the destination is arr+1..arr+4; the two areas overlap in three bytes.</p>
+
+<pre class="nt-code"><code>org 100h
+mov si, offset arr+3 <span class="cm">; source</span>
+mov di, offset arr+4 <span class="cm">; destination</span>
+mov cx, 4
+std                   <span class="cm">; DF = 1</span>
+rep movsb
+cld
+ret
+arr db 'KLMN', 0</code></pre>
+
+<p>The program starts at 0100h. The instructions take 3 + 3 + 3 + 1 + 2 + 1 + 1 = 14 bytes; so <code>arr</code> is placed at address 010Eh. 'K' is at 010Eh, 'L' at 010Fh, 'M' at 0110h, 'N' at 0111h, and the terminating 0 at 0112h. SI is set to point to the last byte of the source (arr+3 = 0111h) and DI to the last byte of the destination (arr+4 = 0112h).</p>
+
+<figure class="nt-fig" id="sekil-std1" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 150" role="img" aria-label="Backward overlapping copy, step 4: bytes of arr, SI, and DI"><text class="lbl" x="4" y="14" text-anchor="start">arr (010Eh–0112h)</text><rect class="box" x="40" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="69" y="65" text-anchor="middle">K</text><text class="lbl" x="69" y="98" text-anchor="middle" style="font-size:11px">010Eh</text><rect class="box" x="104" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="133" y="65" text-anchor="middle">L</text><text class="lbl" x="133" y="98" text-anchor="middle" style="font-size:11px">010Fh</text><rect class="box" x="168" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="197" y="65" text-anchor="middle">M</text><text class="lbl" x="197" y="98" text-anchor="middle" style="font-size:11px">0110h</text><rect class="box" x="232" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="261" y="65" text-anchor="middle">N</text><text class="lbl" x="261" y="98" text-anchor="middle" style="font-size:11px">0111h</text><rect class="box" x="296" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="325" y="65" text-anchor="middle">·</text><text class="lbl" x="325" y="98" text-anchor="middle" style="font-size:11px">0112h</text><text class="mt-l" x="261" y="30" text-anchor="middle">SI</text><text class="mt-a" x="325" y="120" text-anchor="middle">DI</text><text class="mt-m" x="4" y="144" text-anchor="start">DF = 1 · CX = 4</text></svg></div>
+  <figcaption><b>Figure 2.2.13:</b> After <code>std</code>, before the copy: SI = 0111h ('N'), DI = 0112h, CX = 4, DF = 1.</figcaption>
+</figure>
+
+<div class="nt-tablewrap" id="tab-std">
+<table class="nt-table">
+  <caption>Table 2.2.20: Trace of the backward overlapping copy. The memory column is the bytes 010Eh–0112h (· = 0).</caption>
+  <thead><tr><th scope="col">Row</th><th scope="col">Instruction</th><th scope="col">SI</th><th scope="col">DI</th><th scope="col">CX</th><th scope="col">DF</th><th scope="col">010Eh … 0112h</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov si, offset arr+3</code></td><td class="n22-chg">0111h</td><td>0000h</td><td>0</td><td>0</td><td>K L M N ·</td></tr>
+    <tr><td>3</td><td><code>mov di, offset arr+4</code></td><td>0111h</td><td class="n22-chg">0112h</td><td>0</td><td>0</td><td>K L M N ·</td></tr>
+    <tr><td>4</td><td><code>mov cx, 4</code></td><td>0111h</td><td>0112h</td><td class="n22-chg">4</td><td>0</td><td>K L M N ·</td></tr>
+    <tr><td>5</td><td><code>std</code></td><td>0111h</td><td>0112h</td><td>4</td><td class="n22-chg">1</td><td>K L M N ·</td></tr>
+    <tr><td>6</td><td><code>rep movsb</code> (pass 1)</td><td class="n22-chg">0110h</td><td class="n22-chg">0111h</td><td class="n22-chg">3</td><td>1</td><td>K L M N <span class="n22-chg">N</span></td></tr>
+    <tr><td>6</td><td><code>rep movsb</code> (pass 2)</td><td class="n22-chg">010Fh</td><td class="n22-chg">0110h</td><td class="n22-chg">2</td><td>1</td><td>K L M <span class="n22-chg">M</span> N</td></tr>
+    <tr><td>6</td><td><code>rep movsb</code> (pass 3)</td><td class="n22-chg">010Eh</td><td class="n22-chg">010Fh</td><td class="n22-chg">1</td><td>1</td><td>K L <span class="n22-chg">L</span> M N</td></tr>
+    <tr><td>6</td><td><code>rep movsb</code> (pass 4)</td><td class="n22-chg">010Dh</td><td class="n22-chg">010Eh</td><td class="n22-chg">0</td><td>1</td><td>K <span class="n22-chg">K</span> L M N</td></tr>
+    <tr><td>7</td><td><code>cld</code></td><td>010Dh</td><td>010Eh</td><td>0</td><td class="n22-chg">0</td><td>K K L M N</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the first pass the 'N' at 0111h is copied to 0112h. The terminating zero is overwritten, but this byte is not part of the source. In the second pass the 'M' at 0110h is written to 0111h. The 'N' at 0111h had already been read and moved in the previous pass; overwriting it does no harm. Each pass overwrites the byte read in the previous pass, not the byte to be read in the next. After the fourth pass memory holds “KKLMN”: the string has shifted one place right, and the 'K' at the start has stayed in place (<a href="#sekil-std2">Figure 2.2.14</a>). The <code>cld</code> on the last line returns DF to the value the rest of the program expects.</p>
+
+<figure class="nt-fig" id="sekil-std2" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 150" role="img" aria-label="Backward overlapping copy, step 8: bytes of arr, SI, and DI"><defs><marker id="n22-14-mtry-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="4" y="14" text-anchor="start">arr (010Eh–0112h)</text><rect class="mt-good" x="40" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="69" y="65" text-anchor="middle">K</text><text class="lbl" x="69" y="98" text-anchor="middle" style="font-size:11px">010Eh</text><rect class="mt-hot" x="104" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="133" y="65" text-anchor="middle">K</text><text class="lbl" x="133" y="98" text-anchor="middle" style="font-size:11px">010Fh</text><rect class="box" x="168" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="197" y="65" text-anchor="middle">L</text><text class="lbl" x="197" y="98" text-anchor="middle" style="font-size:11px">0110h</text><rect class="box" x="232" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="261" y="65" text-anchor="middle">M</text><text class="lbl" x="261" y="98" text-anchor="middle" style="font-size:11px">0111h</text><rect class="box" x="296" y="40" width="58" height="40" rx="3"/><text class="mt-v" x="325" y="65" text-anchor="middle">N</text><text class="lbl" x="325" y="98" text-anchor="middle" style="font-size:11px">0112h</text><text class="mt-l" x="5" y="30" text-anchor="middle">SI</text><text class="mt-a" x="69" y="120" text-anchor="middle">DI</text><path class="line" d="M92 60 H110" marker-end="url(#n22-14-mtry-4)"/><text class="mt-m" x="4" y="144" text-anchor="start">DF = 1 · CX = 0</text></svg></div>
+  <figcaption><b>Figure 2.2.14:</b> After four passes memory is “KKLMN.” SI and DI point one byte before the copied area; CX = 0.</figcaption>
+</figure>
+
+<p>Let us try the same shift in the forward direction with CLD: SI = arr, DI = arr+1, CX = 4. The first pass writes 'K' to 010Fh and overwrites 'L'. The second pass reads from 010Fh, but 'K' is there now; 'K' is written to 0110h. Every pass reads the 'K' written by the previous pass. The result is “KKKKK.” The rule is summarized like this: if the destination is ahead of the source, copy backward (STD); if behind it, copy forward (CLD).</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Setting SI and DI to the <strong>start</strong> of the areas when copying backward with STD. With DF = 1 the string instruction decrements addresses; SI and DI must point to the <strong>last</strong> byte of the areas. In a word copy (MOVSW) the address of the last word is given, that is, the address one before the last byte.</p>
+</div>
+
+<h3 id="s2-2-7-3"><span class="nt-num">2.2.7.3</span>IF: the interrupt flag</h3>
+
+<p>The 8086 has an input pin called INTR. When a peripheral such as the keyboard, a timer, or a serial port wants service from the processor, it activates this pin. The processor finishes the current instruction, interrupts the program, and runs an interrupt service routine (ISR). The <strong>interrupt flag</strong> (IF) determines whether these requests are accepted:</p>
+
+<ul>
+  <li><strong>IF = 1</strong>: maskable interrupt requests coming on INTR are accepted. <code>STI</code> makes IF 1.</li>
+  <li><strong>IF = 0</strong>: these requests are ignored, that is, <strong>masked</strong>. <code>CLI</code> makes IF 0.</li>
+</ul>
+
+<p>IF does not block everything. The <strong>non-maskable interrupt</strong> coming on the NMI pin is not affected by IF; it is reserved for events that cannot be postponed, such as a power failure or a memory parity error. Software interrupts the program starts itself with the <code>INT n</code> instruction do not look at IF either. IF filters only the requests that come from outside, on the INTR pin.</p>
+
+<p>The stack example shows well why a program may want to turn interrupts off. To move the stack, both SS and SP are changed. If an interrupt arrives after SS has changed but before SP has, the processor pushes FLAGS, CS, and IP onto a half-built, wrong stack. These two instructions are a unit that must not be interrupted:</p>
+
+<pre class="nt-code"><code><span class="kw">CLI</span>             <span class="cm">; disable interrupts</span>
+<span class="kw">MOV</span> AX, 9000h
+<span class="kw">MOV</span> SS, AX       <span class="cm">; new stack segment</span>
+<span class="kw">MOV</span> SP, 0FFFEh   <span class="cm">; new stack top</span>
+<span class="kw">STI</span>             <span class="cm">; enable interrupts</span></code></pre>
+
+<p>The 8086 itself takes a precaution against this danger: after an instruction that writes to a segment register, it accepts no interrupt until the next instruction completes. If <code>MOV SP, …</code> is written right after <code>MOV SS, AX</code>, the two instructions run uninterrupted. Even so, the CLI/STI pair shows the intent clearly. Keeping interrupts off for a long time is harmful: keystrokes can be lost and the clock can fall behind. The code between CLI and STI is kept as short as possible.</p>
+
+<p>When the processor accepts an interrupt it makes IF 0 itself; so the ISR is not immediately interrupted by a new interrupt of the same kind. The <code>IRET</code> at the end of the routine restores the old FLAGS from the stack, and IF returns to its old value, that is, 1.</p>
+
+<h3 id="s2-2-7-4"><span class="nt-num">2.2.7.4</span>TF: the trap flag</h3>
+
+<p>The <strong>trap flag</strong> (TF) was put in for on-chip debugging. When TF = 1 the processor works in <strong>single-step</strong> mode: after each instruction finishes, it automatically raises a type 1 interrupt (INT 1) (<a href="#sekil-tf">Figure 2.2.15</a>).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-tf" style="--w:680px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 64" role="img" aria-label="With TF = 1, INT 1 occurs after every instruction: the flags, CS, and IP are pushed onto the stack, the single-step routine runs, and IRET returns to the next instruction"><defs><marker id="n22-15-mtry-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="4" y="14" width="108" height="34" rx="6"/><text class="mt-s" x="58" y="36" text-anchor="middle" style="font-size:12px">instruction executes</text><path class="line" d="M112 31 H122" marker-end="url(#n22-15-mtry-5)"/><rect class="mt-hot" x="126" y="14" width="104" height="34" rx="6"/><text class="mt-s" x="178" y="36" text-anchor="middle" style="font-size:12px">TF = 1 → INT 1</text><path class="line" d="M230 31 H240" marker-end="url(#n22-15-mtry-5)"/><rect class="mt-acc" x="244" y="14" width="180" height="34" rx="6"/><text class="mt-s" x="334" y="36" text-anchor="middle" style="font-size:12px">FLAGS, CS, IP onto the stack; TF = 0</text><path class="line" d="M424 31 H434" marker-end="url(#n22-15-mtry-5)"/><rect class="box" x="438" y="14" width="118" height="34" rx="6"/><text class="mt-s" x="497" y="36" text-anchor="middle" style="font-size:12px">single-step routine</text><path class="line" d="M556 31 H566" marker-end="url(#n22-15-mtry-5)"/><rect class="mt-good" x="570" y="14" width="146" height="34" rx="6"/><text class="mt-s" x="643" y="36" text-anchor="middle" style="font-size:12px">IRET → next instruction</text></svg></div>
+  <figcaption><b>Figure 2.2.15:</b> With TF = 1, INT 1 occurs after every instruction: FLAGS, CS, and IP are pushed onto the stack, TF is cleared, the single-step routine runs, and IRET returns to the next instruction.</figcaption>
+</figure>
+
+<p>The flow is as follows. The program executes an instruction. Because TF = 1, the processor pushes FLAGS, CS, and IP onto the stack, clears TF and IF, and jumps to the routine the type 1 interrupt vector points to. This routine is part of a debugger: it prints the registers on the screen and waits for the user to press a key. While the routine runs, TF = 0, so it is not itself single-stepped. The IRET at the end takes FLAGS from the stack; TF becomes 1 again and the program’s next instruction is executed. Then the cycle repeats. The <code>T</code> (trace) command in DOS’s DEBUG program and emu8086’s “single step” button use this arrangement.</p>
+
+<p>There is no instruction that sets or clears TF directly. There are STC/CLC for CF, STD/CLD for DF, and STI/CLI for IF; for TF there is none. TF is set by changing the whole flags register through the stack. TF is bit 8 of the flags register and its mask is 0100h; the step-by-step trace of the method is in <a href="#tab-pushf">Table 2.2.26</a>.</p>
+
+<div class="nt-tablewrap" id="tab-kontrol">
+<table class="nt-table">
+  <caption>Table 2.2.21: Comparison of the control flags.</caption>
+  <thead><tr><th scope="col">Flag</th><th scope="col">Bit</th><th scope="col">When 1</th><th scope="col">When 0</th><th scope="col">Instructions that set/clear</th></tr></thead>
+  <tbody>
+    <tr><td>DF</td><td>10</td><td>string addresses decrease</td><td>string addresses increase</td><td><code>STD</code> / <code>CLD</code></td></tr>
+    <tr><td>IF</td><td>9</td><td>INTR interrupts are accepted</td><td>INTR interrupts are masked</td><td><code>STI</code> / <code>CLI</code></td></tr>
+    <tr><td>TF</td><td>8</td><td>INT 1 after every instruction</td><td>normal operation</td><td>none; use PUSHF/POPF</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="nt-pb" id="s2-2-8"><span class="nt-num">2.2.8</span>Instructions that change the flags</h2>
+
+<h3 id="s2-2-8-1"><span class="nt-num">2.2.8.1</span>The effect of instructions on the flags</h3>
+
+<p>The flags change in two ways: some instructions set or clear them directly, while arithmetic and logic instructions update them as a side effect. <a href="#tab-dogrudan">Table 2.2.22</a> gives the direct instructions.</p>
+
+<div class="nt-tablewrap" id="tab-dogrudan">
+<table class="nt-table">
+  <caption>Table 2.2.22: Instructions that change the flags directly.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Effect</th><th scope="col">Instruction</th><th scope="col">Effect</th></tr></thead>
+  <tbody>
+    <tr><td><code>CLC</code></td><td>CF = 0</td><td><code>CLD</code></td><td>DF = 0</td></tr>
+    <tr><td><code>STC</code></td><td>CF = 1</td><td><code>STD</code></td><td>DF = 1</td></tr>
+    <tr><td><code>CMC</code></td><td>CF = ¬CF</td><td><code>CLI</code> / <code>STI</code></td><td>IF = 0 / 1</td></tr>
+    <tr><td><code>LAHF</code></td><td>AH ← SF ZF – AF – PF – CF</td><td><code>SAHF</code></td><td>AH → low flags byte</td></tr>
+    <tr><td><code>PUSHF</code></td><td>push FLAGS onto the stack</td><td><code>POPF</code></td><td>load FLAGS from the stack</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The effect of instruction groups on the status flags is collected in <a href="#tab-grup">Table 2.2.23</a>. The table helps find which instruction last changed the flags before a conditional jump.</p>
+
+<div class="nt-tablewrap" id="tab-grup">
+<table class="nt-table">
+  <caption>Table 2.2.23: The effect of instruction groups on the status flags.</caption>
+  <thead><tr><th scope="col">Instruction group</th><th scope="col">Effect on the flags</th></tr></thead>
+  <tbody>
+    <tr><td>ADD, ADC, SUB, SBB, CMP, NEG</td><td>all of CF, PF, AF, ZF, SF, OF are updated</td></tr>
+    <tr><td>INC, DEC</td><td>all except CF are updated</td></tr>
+    <tr><td>AND, OR, XOR, TEST</td><td>CF = OF = 0; PF, ZF, SF are updated; AF undefined</td></tr>
+    <tr><td>MUL, IMUL</td><td>CF = OF = whether the high half of the result is significant; SF, ZF, AF, PF undefined</td></tr>
+    <tr><td>DIV, IDIV</td><td>all six status flags undefined</td></tr>
+    <tr><td>SHL, SHR, SAR</td><td>CF = the last bit shifted out; PF, ZF, SF are updated</td></tr>
+    <tr><td>ROL, ROR, RCL, RCR</td><td>only CF and OF change</td></tr>
+    <tr><td>MOV, PUSH, POP, XCHG, LEA, LOOP, JMP, Jcc</td><td>do <strong>not</strong> affect the flags</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The word “undefined” means that Intel has not documented the value of the flag after that instruction. The real processor leaves some value, but this value can vary with the processor model. A correct program does not look at an undefined flag. Another subtle point is TEST and CMP: both compute like AND and SUB but do not write the result, only set the flags. For example, <code>TEST AL, 80h</code> tests bit 7 of AL. With AL = B5h the result is 80h, giving ZF = 0 and SF = 1; AL does not change.</p>
+
+<h3 id="s2-2-8-2"><span class="nt-num">2.2.8.2</span>Code trace: LAHF, SAHF, and CMC</h3>
+
+<p><strong>LAHF</strong> (load AH from flags) copies the low byte of the flags register into AH. <strong>SAHF</strong> (store AH into flags) works in the opposite direction: it writes AH into the low byte of the flags register. The layout of the low byte is as follows:</p>
+
+<div class="nt-tablewrap" id="tab-lahf">
+<table class="nt-table">
+  <caption>Table 2.2.24: The low byte of the flags register (the LAHF/SAHF layout).</caption>
+  <thead><tr><th scope="col">Bit</th><th scope="col">7</th><th scope="col">6</th><th scope="col">5</th><th scope="col">4</th><th scope="col">3</th><th scope="col">2</th><th scope="col">1</th><th scope="col">0</th></tr></thead>
+  <tbody>
+    <tr><td>Flag</td><td>SF</td><td>ZF</td><td>–</td><td>AF</td><td>–</td><td>PF</td><td>–</td><td>CF</td></tr>
+    <tr><td>Value</td><td>SF</td><td>ZF</td><td>0</td><td>AF</td><td>0</td><td>PF</td><td>1</td><td>CF</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Bit 1 always reads as 1 on the 8086; bits 3 and 5 are 0. Because OF, DF, IF, and TF are in the high byte, LAHF and SAHF cannot reach them. The program in the slides traces these two instructions together with three instructions that change CF:</p>
+
+<pre class="nt-code"><code>org 100h
+mov al, 0FFh
+add al, 1       <span class="cm">; CF ZF AF PF = 1</span>
+lahf            <span class="cm">; AH ← flags</span>
+cmc             <span class="cm">; flip CF</span>
+clc             <span class="cm">; CF = 0</span>
+stc             <span class="cm">; CF = 1</span>
+mov ah, 0C1h    <span class="cm">; 1100 0001b</span>
+sahf            <span class="cm">; flags ← AH</span>
+ret</code></pre>
+
+<div class="nt-tablewrap" id="tab-lahfiz">
+<table class="nt-table">
+  <caption>Table 2.2.25: Trace of LAHF, SAHF, and CMC.</caption>
+  <thead><tr><th scope="col">Row</th><th scope="col">Instruction</th><th scope="col">AH</th><th scope="col">SF</th><th scope="col">ZF</th><th scope="col">AF</th><th scope="col">PF</th><th scope="col">CF</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td><code>mov al, 0FFh</code></td><td>00h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>3</td><td><code>add al, 1</code></td><td>00h</td><td>0</td><td class="n22-chg">1</td><td class="n22-chg">1</td><td class="n22-chg">1</td><td class="n22-chg">1</td></tr>
+    <tr><td>4</td><td><code>lahf</code></td><td class="n22-chg">57h</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>5</td><td><code>cmc</code></td><td>57h</td><td>0</td><td>1</td><td>1</td><td>1</td><td class="n22-chg">0</td></tr>
+    <tr><td>6</td><td><code>clc</code></td><td>57h</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+    <tr><td>7</td><td><code>stc</code></td><td>57h</td><td>0</td><td>1</td><td>1</td><td>1</td><td class="n22-chg">1</td></tr>
+    <tr><td>8</td><td><code>mov ah, 0C1h</code></td><td class="n22-chg">C1h</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>9</td><td><code>sahf</code></td><td>C1h</td><td class="n22-chg">1</td><td>1</td><td class="n22-chg">0</td><td class="n22-chg">0</td><td>1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the third row FFh + 1 = 00h is computed. Four flags are set at once: the result did not fit in 8 bits (CF = 1), the result is zero (ZF = 1), the low nibble F + 1 overflowed (AF = 1), and 00h has zero 1s and zero is even (PF = 1). SF = 0, because the MSB of 00h is 0.</p>
+
+<p>In the fourth row LAHF copies this state to AH. Written from left to right the bits are SF = 0, ZF = 1, 0, AF = 1, 0, PF = 1, 1, CF = 1: 0101 0111b = 57h (<a href="#sekil-lahf">Figure 2.2.16</a>). If the fixed 1 of bit 1 is forgotten, 55h is found; this is a common calculation mistake.</p>
+
+<figure class="nt-fig" id="sekil-lahf" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 150" role="img" aria-label="Flags byte and AH, row 5"><text class="lbl" x="4" y="16" text-anchor="start">flags (low byte)</text><rect class="box" x="4" y="22" width="42" height="40" rx="4"/><text class="lbl" x="25" y="36" text-anchor="middle" style="font-size:11px">SF</text><text class="mt-v" x="25" y="56" text-anchor="middle">0</text><rect class="box" x="50" y="22" width="42" height="40" rx="4"/><text class="lbl" x="71" y="36" text-anchor="middle" style="font-size:11px">ZF</text><text class="mt-v" x="71" y="56" text-anchor="middle">1</text><rect class="mt-dim" x="96" y="22" width="42" height="40" rx="4"/><text class="lbl" x="117" y="36" text-anchor="middle" style="font-size:11px">–</text><text class="mt-v" x="117" y="56" text-anchor="middle">0</text><rect class="box" x="142" y="22" width="42" height="40" rx="4"/><text class="lbl" x="163" y="36" text-anchor="middle" style="font-size:11px">AF</text><text class="mt-v" x="163" y="56" text-anchor="middle">1</text><rect class="mt-dim" x="188" y="22" width="42" height="40" rx="4"/><text class="lbl" x="209" y="36" text-anchor="middle" style="font-size:11px">–</text><text class="mt-v" x="209" y="56" text-anchor="middle">0</text><rect class="box" x="234" y="22" width="42" height="40" rx="4"/><text class="lbl" x="255" y="36" text-anchor="middle" style="font-size:11px">PF</text><text class="mt-v" x="255" y="56" text-anchor="middle">1</text><rect class="mt-dim" x="280" y="22" width="42" height="40" rx="4"/><text class="lbl" x="301" y="36" text-anchor="middle" style="font-size:11px">–</text><text class="mt-v" x="301" y="56" text-anchor="middle">1</text><rect class="mt-hot" x="326" y="22" width="42" height="40" rx="4"/><text class="lbl" x="347" y="36" text-anchor="middle" style="font-size:11px">CF</text><text class="mt-v" x="347" y="56" text-anchor="middle">0</text><text class="lbl" x="4" y="92" text-anchor="start">AH</text><rect class="box" x="4" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="25" y="119" text-anchor="middle">0</text><rect class="box" x="50" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="71" y="119" text-anchor="middle">1</text><rect class="box" x="96" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="117" y="119" text-anchor="middle">0</text><rect class="box" x="142" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="163" y="119" text-anchor="middle">1</text><rect class="box" x="188" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="209" y="119" text-anchor="middle">0</text><rect class="box" x="234" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="255" y="119" text-anchor="middle">1</text><rect class="box" x="280" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="301" y="119" text-anchor="middle">1</text><rect class="box" x="326" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="347" y="119" text-anchor="middle">1</text><text class="mt-m" x="396" y="146" text-anchor="end">AH = 57h</text></svg></div>
+  <figcaption><b>Figure 2.2.16:</b> The flags byte and AH after <code>lahf</code>. AH = 57h = 0101 0111b; bit 1 is always 1.</figcaption>
+</figure>
+
+<p>In the fifth row CMC flips CF from 1 to 0. The CLC in the sixth row makes CF 0; since CF is already 0, there is no visible change. In the seventh row STC makes CF 1. These three instructions touch only CF; the table shows clearly that ZF, AF, and PF do not change. These instructions are used, for example, when a routine reports success or failure with CF, and to prepare the carry at the start of an ADC/SBB chain.</p>
+
+<p>The eighth row writes C1h = 1100 0001b to AH. If this bit pattern is read in the layout of the flags byte, bit 7 (SF), bit 6 (ZF), and bit 0 (CF) are 1; AF (bit 4) and PF (bit 2) are 0. In the ninth row SAHF writes this byte into the flags: SF = 1, ZF = 1, CF = 1, AF = 0, PF = 0 (<a href="#sekil-sahf">Figure 2.2.17</a>). SF and ZF both being 1 is a situation a normal operation cannot produce: a result cannot be both zero and negative. SAHF brings the flags to the desired value independently of any result. OF, DF, IF, and TF are not affected by this instruction.</p>
+
+<figure class="nt-fig" id="sekil-sahf" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 150" role="img" aria-label="Flags byte and AH, row 9"><text class="lbl" x="4" y="16" text-anchor="start">flags (low byte)</text><rect class="mt-hot" x="4" y="22" width="42" height="40" rx="4"/><text class="lbl" x="25" y="36" text-anchor="middle" style="font-size:11px">SF</text><text class="mt-v" x="25" y="56" text-anchor="middle">1</text><rect class="box" x="50" y="22" width="42" height="40" rx="4"/><text class="lbl" x="71" y="36" text-anchor="middle" style="font-size:11px">ZF</text><text class="mt-v" x="71" y="56" text-anchor="middle">1</text><rect class="mt-dim" x="96" y="22" width="42" height="40" rx="4"/><text class="lbl" x="117" y="36" text-anchor="middle" style="font-size:11px">–</text><text class="mt-v" x="117" y="56" text-anchor="middle">0</text><rect class="mt-hot" x="142" y="22" width="42" height="40" rx="4"/><text class="lbl" x="163" y="36" text-anchor="middle" style="font-size:11px">AF</text><text class="mt-v" x="163" y="56" text-anchor="middle">0</text><rect class="mt-dim" x="188" y="22" width="42" height="40" rx="4"/><text class="lbl" x="209" y="36" text-anchor="middle" style="font-size:11px">–</text><text class="mt-v" x="209" y="56" text-anchor="middle">0</text><rect class="mt-hot" x="234" y="22" width="42" height="40" rx="4"/><text class="lbl" x="255" y="36" text-anchor="middle" style="font-size:11px">PF</text><text class="mt-v" x="255" y="56" text-anchor="middle">0</text><rect class="mt-dim" x="280" y="22" width="42" height="40" rx="4"/><text class="lbl" x="301" y="36" text-anchor="middle" style="font-size:11px">–</text><text class="mt-v" x="301" y="56" text-anchor="middle">1</text><rect class="box" x="326" y="22" width="42" height="40" rx="4"/><text class="lbl" x="347" y="36" text-anchor="middle" style="font-size:11px">CF</text><text class="mt-v" x="347" y="56" text-anchor="middle">1</text><text class="lbl" x="4" y="92" text-anchor="start">AH</text><rect class="box" x="4" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="25" y="119" text-anchor="middle">1</text><rect class="box" x="50" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="71" y="119" text-anchor="middle">1</text><rect class="box" x="96" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="117" y="119" text-anchor="middle">0</text><rect class="box" x="142" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="163" y="119" text-anchor="middle">0</text><rect class="box" x="188" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="209" y="119" text-anchor="middle">0</text><rect class="box" x="234" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="255" y="119" text-anchor="middle">0</text><rect class="box" x="280" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="301" y="119" text-anchor="middle">0</text><rect class="box" x="326" y="98" width="42" height="32" rx="3"/><text class="mt-m" x="347" y="119" text-anchor="middle">1</text><text class="txt" x="376" y="84" text-anchor="middle">↓</text><text class="mt-m" x="396" y="146" text-anchor="end">AH = C1h</text></svg></div>
+  <figcaption><b>Figure 2.2.17:</b> After <code>sahf</code>: AH = C1h has been written into the flags byte; SF = ZF = CF = 1, AF = PF = 0.</figcaption>
+</figure>
+
+<div class="nt-box nt-box--ornek" id="ornek-lahf">
+  <span class="nt-box__title">Example 2.2.8</span>
+  <p>After <code>MOV AL, 5</code>, <code>CMP AL, 5</code>, and <code>LAHF</code>, what is AH?</p>
+  <p>CMP computes 5 − 5 = 0: ZF = 1; since the result is 00h, PF = 1; since there is no borrow, CF = 0; since there is no nibble borrow, AF = 0; since the MSB is 0, SF = 0. The flags byte SF ZF 0 AF 0 PF 1 CF = 0 1 0 0 0 1 1 0 = 0100 0110b = 46h.</p>
+</div>
+
+<h3 id="s2-2-8-3"><span class="nt-num">2.2.8.3</span>All the flags with PUSHF and POPF</h3>
+
+<p>LAHF and SAHF reach only the low byte. All 16 bits of the flags register are pushed onto the stack with <strong>PUSHF</strong> and taken back from the stack with <strong>POPF</strong>. Between the two instructions the word on the stack can be taken into a register and the desired bit changed. This is the only way to set TF, which has no direct instruction. The following program shows the same method on DF; DF is bit 10 and its mask is 0400h.</p>
+
+<pre class="nt-code"><code><span class="kw">PUSHF</span>            <span class="cm">; FLAGS → stack</span>
+<span class="kw">POP</span>  AX          <span class="cm">; AX = FLAGS</span>
+<span class="kw">OR</span>   AX, 0400h   <span class="cm">; bit 10 (DF) ← 1</span>
+<span class="kw">PUSH</span> AX
+<span class="kw">POPF</span>             <span class="cm">; FLAGS ← AX</span>
+<span class="kw">PUSHF</span>            <span class="cm">; check:</span>
+<span class="kw">POP</span>  BX          <span class="cm">; BX = new FLAGS</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-pushf">
+<table class="nt-table">
+  <caption>Table 2.2.26: Setting a flag with PUSHF/POPF (.COM start: IF = 1, other flags 0).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">SP</th><th scope="col">DF</th><th scope="col">Top of the stack</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSHF</code></td><td>0000h</td><td>0000h</td><td class="n22-chg">FFFCh</td><td>0</td><td>F202h</td></tr>
+    <tr><td><code>POP AX</code></td><td class="n22-chg">F202h</td><td>0000h</td><td class="n22-chg">FFFEh</td><td>0</td><td>0000h</td></tr>
+    <tr><td><code>OR AX, 0400h</code></td><td class="n22-chg">F602h</td><td>0000h</td><td>FFFEh</td><td>0</td><td>0000h</td></tr>
+    <tr><td><code>PUSH AX</code></td><td>F602h</td><td>0000h</td><td class="n22-chg">FFFCh</td><td>0</td><td>F602h</td></tr>
+    <tr><td><code>POPF</code></td><td>F602h</td><td>0000h</td><td class="n22-chg">FFFEh</td><td class="n22-chg">1</td><td>0000h</td></tr>
+    <tr><td><code>PUSHF</code></td><td>F602h</td><td>0000h</td><td class="n22-chg">FFFCh</td><td>1</td><td>F602h</td></tr>
+    <tr><td><code>POP BX</code></td><td>F602h</td><td class="n22-chg">F602h</td><td class="n22-chg">FFFEh</td><td>1</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>At the start IF = 1 and the other flags are 0. The word PUSHF pushes is F202h. Its breakdown is instructive: the F000h part is bits 12–15, which always read as 1 on the 8086; 0200h is bit 9, that is, IF = 1; 0002h is bit 1 and is always 1. <code>OR AX, 0400h</code> sets only bit 10 to 1 and keeps the other bits: F602h. POPF loads this value into the flags register and DF = 1. The last two rows are the check: when the flags are read again, BX = F602h.</p>
+
+<p>For TF the same code is written with <code>OR AX, 0100h</code>. To clear a bit, AND with an inverted mask is used instead of OR: <code>AND AX, 0FEFFh</code> clears TF and <code>AND AX, 0FBFFh</code> clears DF. One benefit of working through the stack is that it preserves the other flags. When the change is finished, SP returns to the value it had at entry; the numbers of PUSHes and POPs are equal.</p>
+
+<p>Another use of PUSHF/POPF is saving the flags across a routine. If a routine does PUSHF at its start and POPF at its end, the caller’s flags are not disturbed, whatever arithmetic is done inside. Interrupts work on the same principle: the processor pushes FLAGS onto the stack on entering an interrupt, and IRET takes it back.</p>
+
+<h2 class="nt-pb" id="s2-2-9"><span class="nt-num">2.2.9</span>Common mistakes</h2>
+
+<p>The assembler cannot catch most mistakes about registers and flags; the program runs but gives a wrong result. The following mistakes are the most common in beginners’ programs.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Thinking the carry of an 8-bit operation passes to the neighboring half.</strong> With AX = 12FFh, <code>ADD AL, 1</code> gives 1200h, not 1300h. The carry of an 8-bit operation goes to CF. If the carry is to be passed to AH, <code>ADC AH, 0</code> is written next, or the operation is done on 16 bits from the start.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Forgetting the square brackets or putting them in unnecessarily.</strong> <code>MOV AX, BX</code> copies the value of BX; <code>MOV AX, [BX]</code> reads the memory word BX points to. <code>MOV SI, [array]</code> loads into SI not the address of the array but its first word; for the address <code>MOV SI, OFFSET array</code> or <code>LEA SI, array</code> is written.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Not accounting for implicit operands.</strong> Changing CL for <code>SHL AX, CL</code> inside a loop while CX is the loop counter, or using a 16-bit MUL or DIV while keeping a value in DX. Which registers instructions silently change is collected in <a href="#tab-ortuk">Table 2.2.3</a>; a conflicting register is pushed onto the stack and popped back afterward.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Not clearing DX before DIV.</strong> To divide a 16-bit number in AX by BX, if only <code>DIV BX</code> is written, the dividend is DX:AX. If DX holds a leftover value from a previous operation, the quotient may not fit in 16 bits and the processor raises a divide-error interrupt. Before an unsigned division <code>MOV DX, 0</code> is written, and before a signed one <code>CWD</code>.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Thinking MOV changes the flags.</strong> Writing <code>MOV AX, 0</code> and then <code>JZ</code> does not test whether AX is zero; JZ looks at the ZF of the last arithmetic operation before the MOV. Whether a register is zero is tested with <code>CMP AX, 0</code>, <code>TEST AX, AX</code>, or <code>OR AX, AX</code>.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Confusing CF and OF.</strong> Testing overflow with OF in a program that works with unsigned numbers, or with CF in one that works with signed numbers. In 7Fh + 01h, CF = 0 but the signed result is wrong; in FFh + 01h, CF = 1 but the signed result is correct.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Forgetting bit 1 in the LAHF byte calculation.</strong> In the byte LAHF produces, bit 1 is always 1. With the flags SF = 0, ZF = 1, AF = 1, PF = 1, CF = 1, AH = 57h, not 55h.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Writing a constant to a segment register or confusing the segment with BP.</strong> <code>MOV DS, @data</code> cannot be written; it is taken into AX first. An access <code>[BP+SI]</code> is made in SS, not DS.</p>
+</div>
+
+<h2 class="nt-pb" id="s2-2-10"><span class="nt-num">2.2.10</span>Exercises and solutions</h2>
+
+<p>The five exercises in the slides are solved here with their intermediate steps. The results can be checked by running them in emu8086.</p>
+
+<p><strong>1. With AX = 3A7Fh, what is AX after <code>MOV AL, 0</code> and then <code>INC AH</code>?</strong></p>
+<p><code>MOV AL, 0</code> changes only the low byte: AH = 3Ah stays, AL = 00h, and AX = 3A00h. <code>INC AH</code> increments only the high byte: 3Ah + 1 = 3Bh. The result is AX = <strong>3B00h</strong>. Neither instruction touches the other half.</p>
+
+<p><strong>2. Find AL, CF, ZF, SF, OF, and PF after <code>MOV AL, 9Ch</code> / <code>ADD AL, 64h</code>.</strong></p>
+<p>First the binary addition: 1001 1100 + 0110 0100 = 1 0000 0000. The result is 100h; the low byte 00h is written to AL and the overflowing 1 goes to CF: CF = 1. Since the result is zero, ZF = 1, and since the MSB is 0, SF = 0. In the signed interpretation 9Ch = −100 and 64h = +100; −100 + 100 = 0 is correct, and the sum of two numbers of different signs does not overflow: OF = 0. 00h has zero 1s, an even number: PF = 1. The low nibbles are C + 4 = 16; a carry comes out of bit 3: AF = 1.</p>
+
+<p><strong>3. <code>MOV AL, 50h</code> / <code>ADD AL, 50h</code>: what are CF and OF? Why do they differ?</strong></p>
+<p>50h + 50h = A0h. In the unsigned interpretation 80 + 80 = 160, which is less than 255; the result fits in 8 bits: CF = 0. In the signed interpretation two positive numbers, +80 and +80, were added; +160 exceeds the upper limit of the signed range, +127. Because the MSB of A0h is 1, the result looks like −96. The sum of two positives came out negative: OF = 1 (SF is 1 too). The two flags are answers to different questions: CF reports unsigned overflow and OF signed overflow.</p>
+
+<p><strong>4. What is SP after 3 PUSHes and 1 POP when SP = 0100h?</strong></p>
+<p>Each PUSH subtracts 2 from SP and each POP adds 2: 0100h − 3 × 2 + 2 = 0100h − 6 + 2 = 0100h − 4 = <strong>00FCh</strong>. The intermediate values are 00FEh, 00FCh, 00FAh, and after the POP 00FCh. Two items remain on the stack.</p>
+
+<p><strong>5. How many times does a LOOP loop that starts with <code>MOV CX, 0</code> run?</strong></p>
+<p>LOOP decrements first and then tests. The first LOOP computes 0 − 1 = FFFFh and jumps. As CX goes down from FFFFh to 1 the loop runs 65,535 more times; with the first pass it runs <strong>65,536</strong> times in total. If the pass count is counted in the 32-bit pair DX:BX, 0001:0000h = 65,536 results. To prevent this case, <code>JCXZ</code> is put before the loop.</p>
+
+<h2 class="nt-pb" id="s2-2-11"><span class="nt-num">2.2.11</span>Summary</h2>
+
+<ul>
+  <li>A <strong>register</strong> is a very fast, small memory cell inside the processor. A register access does not go out on the external bus; a memory access takes a bus cycle of at least four clock cycles. On the 8086 there is no memory-to-memory MOV or ADD.</li>
+  <li>The 8086 has <strong>14 registers</strong>: 4 data registers (AX, BX, CX, DX), 4 pointer and index registers (SP, BP, SI, DI), 4 segment registers (CS, DS, SS, ES), IP, and FLAGS. All are 16 bits; only AX, BX, CX, and DX are split into two 8-bit halves. Writing to one half does not change the other, and the carry of an 8-bit operation goes to CF, not to the neighboring half.</li>
+  <li>Some instructions use registers <strong>implicitly</strong>: MUL/DIV → AX and DX; LOOP/REP → CX; shift count → CL; IN/OUT → AL/AX and, for ports above 255, DX; PUSH/POP/CALL/RET → SP; string instructions → DS:SI and ES:DI.</li>
+  <li>Inside square brackets only <strong>BX, BP, SI, and DI</strong> can be used. Addresses that contain BP use SS, the others use DS.</li>
+  <li><strong>SP</strong> points to the top of the stack. PUSH first decrements SP by 2 and then writes; POP first reads and then increments SP by 2. <strong>BP</strong>, staying fixed throughout a procedure, allows parameters to be reached at fixed distances such as <code>[BP+4]</code>.</li>
+  <li>A constant cannot be loaded into a segment register, and CS cannot be written with MOV. <strong>Physical address</strong> = segment × 10h + offset. <strong>IP</strong> is the offset of the next instruction; it advances by the instruction length and cannot be written with MOV.</li>
+  <li>9 bits of the flags register are used. <strong>Status flags</strong>: CF (unsigned overflow, borrow), PF (an even number of 1s in the low byte), AF (carry from bit 3 to bit 4), ZF (the result is zero), SF (the MSB of the result), OF (signed overflow). <strong>Control flags</strong>: DF (string direction), IF (permission for INTR interrupts), TF (single step).</li>
+  <li>In hardware CF is the last carry, ZF is a NOR gate, SF is a copy of the MSB, PF is the inverse of an XOR tree, and OF is the XOR of the carries into and out of the MSB.</li>
+  <li>CLC/STC/CMC change CF, CLD/STD change DF, and CLI/STI change IF. LAHF copies the low byte of the flags into AH, SAHF writes AH to this byte; PUSHF/POPF move the whole flags register to and from the stack. TF can be changed only with PUSHF/POPF.</li>
+  <li>MOV, PUSH, POP, XCHG, LEA, LOOP, and the jump instructions do not affect the flags; INC and DEC do not touch CF; after MUL and DIV some flags are undefined.</li>
+</ul>
+
+<h2 id="s2-2-12"><span class="nt-num">2.2.12</span>Key terms</h2>
+
+<ul class="nt-concepts">
+  <li>register</li>
+  <li>register set</li>
+  <li>general-purpose register</li>
+  <li>accumulator</li>
+  <li>base register</li>
+  <li>counter register</li>
+  <li>high / low byte</li>
+  <li>implicit operand</li>
+  <li>pointer register</li>
+  <li>stack pointer (SP)</li>
+  <li>base pointer (BP)</li>
+  <li>index register</li>
+  <li>source / destination index (DI)</li>
+  <li>stack</li>
+  <li>stack frame</li>
+  <li>segment register</li>
+  <li>offset</li>
+  <li>physical address</li>
+  <li>default segment</li>
+  <li>instruction pointer (IP)</li>
+  <li>flag</li>
+  <li>flags register (FLAGS)</li>
+  <li>status flag</li>
+  <li>control flag</li>
+  <li>carry flag (CF)</li>
+  <li>parity flag (PF)</li>
+  <li>auxiliary carry flag (AF)</li>
+  <li>zero flag (ZF)</li>
+  <li>sign flag (SF)</li>
+  <li>overflow flag (OF)</li>
+  <li>direction flag (DF)</li>
+  <li>interrupt flag (IF)</li>
+  <li>trap flag (TF)</li>
+  <li>single-step</li>
+  <li>maskable / non-maskable interrupt</li>
+  <li>string instruction</li>
+</ul>
+
+<h2 id="s2-2-13"><span class="nt-num">2.2.13</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p><code>INC BL</code> executes with BX = 12FFh and CF = 1. What do BX, ZF, and CF become?</p>
+    <details><summary>Answer</summary>
+      <p>INC works on the 8-bit BL: FFh + 1 = 00h, BH does not change, and BX = 1200h. Because the result is zero, ZF = 1. Because INC does not touch CF, CF stays 1; the reason it is 1 is not this INC but the earlier state.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV AL, 0F0h</code>, <code>ADD AL, 10h</code>, and <code>ADC AH, 0</code> execute with AX = 0000h. What are AX and CF?</p>
+    <details><summary>Answer</summary>
+      <p>F0h + 10h = 100h: AL = 00h, CF = 1. ADC adds CF together with 0 to AH: AH = 00h + 0 + 1 = 01h. AX = 0100h. Because ADC’s own addition produces no carry, CF = 0 in the end. Together the two instructions have done a 16-bit addition by carrying the 8-bit carry into the upper byte.</p>
+    </details>
+  </li>
+  <li>
+    <p>At the start of a .COM program (SP = FFFEh), <code>PUSH AX</code> executes with AX = ABCDh. What does SP become, and which byte is written to which address?</p>
+    <details><summary>Answer</summary>
+      <p>PUSH first decrements SP by 2: SP = FFFCh. The word is written low byte first: SS:FFFCh ← CDh, SS:FFFDh ← ABh. The word 0000h at FFFEh stays in place.</p>
+    </details>
+  </li>
+  <li>
+    <p>Is there a difference between <code>XOR AX, AX</code> and <code>MOV AX, 0</code> as far as AX is concerned? What is the difference as far as the flags are concerned?</p>
+    <details><summary>Answer</summary>
+      <p>Both give AX = 0000h. XOR sets the flags according to the result: ZF = 1, PF = 1, SF = 0, CF = OF = 0 (AF undefined). MOV changes no flag; the flags left from the previous operation are preserved. XOR is also 2 bytes, while <code>MOV AX, 0</code> is 3 bytes.</p>
+    </details>
+  </li>
+  <li>
+    <p>After <code>MOV AX, 0FFFFh</code>, <code>MOV BX, 0002h</code>, <code>MUL BX</code>, what are DX, AX, CF, and OF?</p>
+    <details><summary>Answer</summary>
+      <p>FFFFh × 2 = 1FFFEh (65,535 × 2 = 131,070). The 32-bit result is 0001FFFEh: DX = 0001h, AX = FFFEh. Because the high half is not zero, CF = OF = 1. SF, ZF, AF, and PF are undefined.</p>
+    </details>
+  </li>
+  <li>
+    <p>What are CF and OF in the 8-bit operations <code>80h − 01h</code> and <code>7Fh − FFh</code>?</p>
+    <details><summary>Answer</summary>
+      <p>80h − 01h = 7Fh. Unsigned 128 − 1 = 127 is correct, no borrow: CF = 0. Signed −128 − 1 = −129 does not fit; the result came out +127: OF = 1. 7Fh − FFh = 80h. Unsigned 127 − 255 is negative, a borrow is taken: CF = 1. Signed +127 − (−1) = +128 does not fit: OF = 1.</p>
+    </details>
+  </li>
+  <li>
+    <p>With DF = 1 and SI = 0205h, if addresses 0204h and 0205h hold 11h and 22h, what are AL and SI after two <code>LODSB</code>s?</p>
+    <details><summary>Answer</summary>
+      <p>The first LODSB takes the 22h at DS:0205h into AL, and SI = 0204h. The second LODSB takes the 11h at 0204h, and SI = 0203h. The result is AL = 11h, SI = 0203h.</p>
+    </details>
+  </li>
+  <li>
+    <p><code>MOV AL, 7Fh</code> and then <code>INC AL</code>: what do AL, SF, OF, and CF become?</p>
+    <details><summary>Answer</summary>
+      <p>AL = 80h. Because the MSB is 1, SF = 1. +127 + 1 = +128 does not fit in the signed range: OF = 1. INC does not change CF; CF keeps its previous value (0 in this program).</p>
+    </details>
+  </li>
+  <li>
+    <p>Why are interrupts turned off automatically at the start of an interrupt service routine? Is NMI blocked during this time too?</p>
+    <details><summary>Answer</summary>
+      <p>When accepting an interrupt, the processor pushes FLAGS onto the stack and then clears IF and TF. Because IF = 0, new requests coming from INTR cannot interrupt the routine right away; if it wants, the routine turns interrupts on with STI. IRET restores the old FLAGS. Because NMI is not affected by IF, it is accepted during this time too.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s2-2-14"><span class="nt-num">2.2.14</span>Further reading</h2>
+
+<ul>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979), Chapter 2: the register model, the full definition of the flags, and the clock-cycle count of every instruction are in this source; the values in Table 2.2.1 are taken from here.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8th edition), Chapters 2 and 3: the programming model, addressing modes, and default segments, along with the extension from the 8086 to the current x86.</li>
+  <li>M. A. Mazidi, J. G. Mazidi, <em>The x86 PC: Assembly Language, Design, and Interfacing</em> (5th edition), Chapter 1: registers, the flags register, and many examples in which the flags are computed by hand.</li>
+  <li>M. Morris Mano, <em>Digital Design</em>: the gate-level design of adders, parity generators, and registers; for the digital-design basis of the flag circuits.</li>
+</ul>
+
+<h2 id="s2-2-15"><span class="nt-num">2.2.15</span>References</h2>
+
+<ol class="nt-refs">
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979.</li>
+  <li>Barry B. Brey, <em>The Intel Microprocessors</em>, 8th edition, Pearson, 2009.</li>
+  <li>Muhammad Ali Mazidi, Janice G. Mazidi, <em>The x86 PC: Assembly Language, Design, and Interfacing</em>, 5th edition, 2010.</li>
+  <li>emu8086 documentation: the <em>8086 instructions</em> and <em>Addressing modes</em> sections.</li>
+  <li>Mehmet Bodur, <em>Mikroişlemcilere Giriş: Assembler ile Yazılım ve Arayüz</em>.</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_02_02_8086_Registers.html">Chapter 2.2 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* yazdırırken Kendini Dene cevapları açık görünsün; sonra eski hâline dönsün */
+  var kapali = [];
+  window.addEventListener("beforeprint", function () {
+    kapali = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    kapali.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    kapali.forEach(function (d) { d.open = false; });
+    kapali = [];
+  });
+})();
+</script>

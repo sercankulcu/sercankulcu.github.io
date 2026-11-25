@@ -1,0 +1,1687 @@
+---
+layout: without-sidebar
+title: "Chapter 9.1: Macros — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_09_01_Macros_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 9.1 of Microprocessors: macro definition and expansion, parameters as substituted text, parameter pitfalls and operator precedence, macros versus procedures in size and speed, RET inside a macro, unique labels with LOCAL, PUTC and register preservation, the POWER macro and its boundary cases, nested macros, macro libraries, macro operators, the REPT, IRP and IRPC repeat blocks, conditional assembly, debugging macros; with worked examples and code traces."
+lang: en
+seo_title: "Chapter 9.1: Macros · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_09_01_Makrolar_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_09_01_Macros_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* chapter-specific classes of the SVG figures (same as Chapter_09_01_Macros.html; scoped to .ds-notes) */
+.ds-notes .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-dim { fill: var(--ds-surface); stroke: var(--ds-border); stroke-width: 1.2; }
+.ds-notes .ds-svg .mt-good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-bad { fill: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-acc { fill: color-mix(in srgb, var(--ds-accent) 14%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.6; }
+.ds-notes .ds-svg .mt-v { fill: var(--ds-text); font: 700 15px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-m { fill: var(--ds-text); font: 600 13px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-notes .ds-svg .mt-s { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-a { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-g { fill: var(--ds-good); font: 700 13px system-ui, sans-serif; }
+.ds-notes .ds-svg .mt-l { fill: var(--ds-link); font: 700 13px system-ui, sans-serif; }
+/* trace tables: keep numeric cells unbroken, let the explanation column wrap */
+.ds-notes .nt-trace td { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ds-notes .nt-trace td:last-child { white-space: normal; min-width: 12em; }
+.ds-notes .nt-trace td small { color: var(--ds-muted); }
+.ds-notes .nt-trace caption { white-space: normal; }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 9.1: Macros</h1>
+  <p class="nt-lead">The same few instructions keep turning up side by side in assembly programs: print a character, save a few registers on the stack, add two numbers and store the sum. A procedure removes this repetition at run time, with CALL and RET. A macro does the same job at assembly time: wherever the assembler sees the macro's name, it writes the macro's body again. The processor never sees the macro; it executes only the instructions that result. These notes first show how a macro is defined and expanded and why its parameters behave like text. They then weigh the trade-off in size and speed between macros and procedures, and the problem that the LOCAL directive solves. The PUTC and POWER macros serve to treat register preservation and boundary cases. The last sections cover repeat blocks and conditional assembly, the more advanced text processing the assembler performs on the source. Every example is shown at the level of registers and memory, with a step-by-step trace of the expanded code.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_09_01_Macros.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_09_01_Macros.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_09_01_Macros_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/Chapter_08_Stack-Call.html">Stack, CALL and RET</a></li>
+    <li><a href="../slides/Chapter_11_Instruction-Encoding.html">Instruction Encoding</a></li>
+    <li><a href="../slides/Chapter_07_Jump-Conditions.html">Conditional Jumps</a></li>
+    <li><a href="../slides/CPU_Simulator.html">CPU Simulator</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Macro definition</dt>
+    <dd>Write a parameterized macro with MACRO and ENDM; explain why a macro must be defined before the line that uses it.</dd>
+    <dt>Expansion</dt>
+    <dd>Work out by hand which instructions a macro call expands to, by substituting the parameters as text.</dd>
+    <dt>Macro or procedure?</dt>
+    <dd>Compute code size byte by byte and the extra time in clock cycles, and choose a macro or a procedure for a given job with a justification.</dd>
+    <dt>LOCAL</dt>
+    <dd>Explain the cause of the <i>Duplicate declaration</i> error in macros that contain labels, and give each expansion a unique label with LOCAL.</dd>
+    <dt>Side effects and boundary cases</dt>
+    <dd>Protect the registers a macro clobbers with PUSH and POP; spot parameter pitfalls, operator-precedence errors and the CX = 0 trap of LOOP.</dd>
+    <dt>Advanced macro features</dt>
+    <dd>Generate code and tables at assembly time with REPT, IRP and IRPC; assemble conditionally with IF, IFB and IFIDN.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s9-1-1">9.1.1 The macro concept</a>
+      <ol>
+        <li><a href="#s9-1-1-1">9.1.1.1 The text processing done by the assembler</a></li>
+        <li><a href="#s9-1-1-2">9.1.1.2 Defining a macro</a></li>
+        <li><a href="#s9-1-1-3">9.1.1.3 Expansion step by step</a></li>
+        <li><a href="#s9-1-1-4">9.1.1.4 Code trace: running the expanded code</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-2">9.1.2 Parameters</a>
+      <ol>
+        <li><a href="#s9-1-2-1">9.1.2.1 A parameter is text: the swap trap</a></li>
+        <li><a href="#s9-1-2-2">9.1.2.2 Kinds of parameters and their validity</a></li>
+        <li><a href="#s9-1-2-3">9.1.2.3 Code trace: two expansions of ADD3</a></li>
+        <li><a href="#s9-1-2-4">9.1.2.4 Expressions and operator precedence</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-3">9.1.3 Macros and procedures</a>
+      <ol>
+        <li><a href="#s9-1-3-1">9.1.3.1 Properties of a procedure</a></li>
+        <li><a href="#s9-1-3-2">9.1.3.2 Properties of a macro</a></li>
+        <li><a href="#s9-1-3-3">9.1.3.3 Size calculation and the break-even point</a></li>
+        <li><a href="#s9-1-3-4">9.1.3.4 Speed: CALL, RET and the prefetch queue</a></li>
+        <li><a href="#s9-1-3-5">9.1.3.5 Selection criteria</a></li>
+        <li><a href="#s9-1-3-6">9.1.3.6 Code trace: the macro prepares, the procedure works</a></li>
+        <li><a href="#s9-1-3-7">9.1.3.7 Code trace: RET inside a macro</a></li>
+        <li><a href="#s9-1-3-8">9.1.3.8 EQU, macros and procedures</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-4">9.1.4 Labels and LOCAL</a>
+      <ol>
+        <li><a href="#s9-1-4-1">9.1.4.1 The same label twice</a></li>
+        <li><a href="#s9-1-4-2">9.1.4.2 The LOCAL directive</a></li>
+        <li><a href="#s9-1-4-3">9.1.4.3 Code trace: MyMacro2</a></li>
+        <li><a href="#s9-1-4-4">9.1.4.4 Code trace: the two copies of DELAY</a></li>
+        <li><a href="#s9-1-4-5">9.1.4.5 Code trace: MAX2 and signed comparison</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-5">9.1.5 PUTC and preserving registers</a>
+      <ol>
+        <li><a href="#s9-1-5-1">9.1.5.1 The PUTC macro</a></li>
+        <li><a href="#s9-1-5-2">9.1.5.2 Code trace: PUTC 'A' and PUTC 'B'</a></li>
+        <li><a href="#s9-1-5-3">9.1.5.3 Register-saving macros</a></li>
+        <li><a href="#s9-1-5-4">9.1.5.4 Nested macros</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-6">9.1.6 The POWER macro</a>
+      <ol>
+        <li><a href="#s9-1-6-1">9.1.6.1 Exponentiation: MUL and LOOP</a></li>
+        <li><a href="#s9-1-6-2">9.1.6.2 Code trace: POWER 2, 3</a></li>
+        <li><a href="#s9-1-6-3">9.1.6.3 Four pitfalls</a></li>
+        <li><a href="#s9-1-6-4">9.1.6.4 Code trace: the corrected POWER</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-7">9.1.7 Macro libraries</a>
+      <ol>
+        <li><a href="#s9-1-7-1">9.1.7.1 INCLUDE and emu8086.inc</a></li>
+        <li><a href="#s9-1-7-2">9.1.7.2 Code trace: expansion of PRINT 'OK'</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-8">9.1.8 Macro operators</a></li>
+    <li><a href="#s9-1-9">9.1.9 Repeat blocks</a>
+      <ol>
+        <li><a href="#s9-1-9-1">9.1.9.1 REPT, IRP and IRPC</a></li>
+        <li><a href="#s9-1-9-2">9.1.9.2 Code trace: a table of squares with REPT</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-10">9.1.10 Conditional assembly</a>
+      <ol>
+        <li><a href="#s9-1-10-1">9.1.10.1 The IF family</a></li>
+        <li><a href="#s9-1-10-2">9.1.10.2 Code trace: SHIFTN</a></li>
+      </ol>
+    </li>
+    <li><a href="#s9-1-11">9.1.11 Debugging and common mistakes</a></li>
+    <li><a href="#s9-1-12">9.1.12 Exercises and solutions</a></li>
+    <li><a href="#s9-1-13">9.1.13 Summary</a></li>
+    <li><a href="#s9-1-14">9.1.14 Key terms</a></li>
+    <li><a href="#s9-1-15">9.1.15 Test Yourself</a></li>
+    <li><a href="#s9-1-16">9.1.16 Further reading</a></li>
+    <li><a href="#s9-1-17">9.1.17 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s9-1-1"><span class="nt-num">9.1.1</span>The macro concept</h2>
+
+<h3 id="s9-1-1-1"><span class="nt-num">9.1.1.1</span>The text processing done by the assembler</h3>
+
+<p>An assembly program goes through two separate stages. First the assembler reads the source file and translates it into machine code. Then the processor fetches this machine code from memory and executes it. Everything written in the source has a meaning in the first stage, but not every line becomes machine code. Directives such as <code>ORG 100h</code>, <code>DB</code> and <code>EQU</code> give information to the assembler; some of them emit bytes and some emit none. A macro is also a tool of this first stage.</p>
+
+<p>A macro gives a name to a piece of code that repeats. In this respect it resembles a procedure. The difference is where the name is processed. The name of a procedure becomes an address in the machine code; at run time the processor goes to that address with <code>CALL</code> and comes back with <code>RET</code>. The name of a macro never enters the machine code. The assembler deletes every line that uses the macro and writes the macro's body in its place. This operation is called macro expansion. After expansion the source no longer contains macros, only ordinary instructions.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-makro">
+  <span class="nt-box__title">Definition 9.1.1</span>
+  <p>A <strong>macro</strong> is a code template, written between the <code>MACRO</code> and <code>ENDM</code> directives, that has a name and optional parameters. The assembler replaces every line that uses the macro's name like an instruction with a copy of the body in which the parameters have been substituted. This replacement is called <strong>macro expansion</strong>; it takes place at assembly time, before the program runs.</p>
+</div>
+
+<p><a href="#sekil-makro">Figure 9.1.1</a> summarizes the process. The single source line <code>PUTC 'A'</code> turns into five instructions after it passes through the assembler. The machine code contains no call, no return address and no jump. To the processor these five instructions are no different from five instructions written by hand.</p>
+
+<figure class="nt-fig" id="sekil-makro" style="--w:380px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 226" role="img" aria-label="The assembler expands a macro call into real instructions"><defs><marker id="n91-1-m8ah130" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="20" width="130" height="60" rx="6"/><text class="txt" x="75" y="46" text-anchor="middle">Source code</text><text class="lbl mono" x="75" y="66" text-anchor="middle">PUTC 'A'</text><path class="line" d="M144 50 H186" marker-end="url(#n91-1-m8ah130)"/><rect class="box" x="190" y="20" width="130" height="60" rx="6" style="fill:var(--ds-hot)"/><text class="txt" x="255" y="46" text-anchor="middle">Assembler</text><text class="lbl" x="255" y="66" text-anchor="middle">expands the macro</text><path class="line" d="M255 84 V116" marker-end="url(#n91-1-m8ah130)"/><rect class="box" x="160" y="120" width="190" height="96" rx="6"/><text class="lbl mono" x="172" y="142">push ax</text><text class="lbl mono" x="172" y="160">mov al, 'A'</text><text class="lbl mono" x="172" y="178">mov ah, 0Eh</text><text class="lbl mono" x="172" y="196">int 10h / pop ax</text><text class="lbl" x="10" y="160">machine code</text><text class="lbl" x="10" y="178">(no call)</text></svg></div>
+  <figcaption><b>Figure 9.1.1:</b> A macro call is expanded at assembly time. In place of the source line <code>PUTC 'A'</code> the assembler writes the body; the machine code contains no call.</figcaption>
+</figure>
+
+<p>Three important consequences follow from this view. First, a macro that is never used adds not a single byte to the machine code. The assembler reads the definition and records the name and body in a table, but it generates no code from the body. Code is produced only when the macro is used, and at the place where it is used. For this reason, including a library file with hundreds of macros does not enlarge the program.</p>
+
+<p>Second, a macro must be defined before the line that uses it. The assembler reads the source file from top to bottom. If it reaches the line <code>PUTC 'A'</code> and does not yet know PUTC, it treats the line as an unknown instruction and reports an error. A procedure has no such ordering restriction. Because the assembler makes two passes, it finds the address of a procedure in the second pass even if the procedure is written at the end of the file. A macro, however, is not an address but a text, and the assembler cannot substitute a text it does not know.</p>
+
+<p>Third, every use of a macro enlarges the program. If the same macro is used in ten places, the body is written ten times. The body of a procedure, by contrast, sits in memory once. This difference is the basis of the choice between a macro and a procedure.</p>
+
+<h3 id="s9-1-1-2"><span class="nt-num">9.1.1.2</span>Defining a macro</h3>
+
+<p>The definition of a macro has three parts: a header line, a body and an end line. The general form is:</p>
+
+<pre class="nt-code"><code>name    <span class="kw">MACRO</span>  [parameter1, parameter2, ...]
+        &lt;instructions&gt;
+        <span class="kw">ENDM</span></code></pre>
+
+<p><code>name</code> is the name of the macro. When the macro is used, this name is written in the place of an instruction: <code>PUTC</code> is written where <code>MOV</code> would be. The name is followed by comma-separated parameter names. These are formal names; in the definition they are merely placeholders. The values given in the call replace these names as text. A macro may have no parameters at all: some macros just give a name to a pattern.</p>
+
+<p>The body consists of the lines that are rewritten each time the macro is used. It may contain instructions, directives, calls to other macros, even data definitions. <code>ENDM</code> (<span lang="en">end macro</span>) ends the body. Unlike the <code>name ENDP</code> pattern of a procedure, the macro's name is not written before <code>ENDM</code>.</p>
+
+<p>The parameter names mark the text to be substituted in the body. The assembler compares every word in the body with the parameter names. In place of a matching word it writes the corresponding text from the call. <a href="#sekil-param">Figure 9.1.2</a> shows this mapping for the call <code>MyMacro 4, 5, DX</code>: the first parameter p1 maps to 4, the second p2 to 5, and the third p3 to DX. The line <code>MOV CX, p3</code> in the body thus becomes <code>MOV CX, DX</code>.</p>
+
+<figure class="nt-fig" id="sekil-param" style="--w:560px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 560 86" role="img" aria-label="The values in the call replace the parameters as text: p1 = 4, p2 = 5, p3 = DX" style="display:block;margin:8px auto 0;max-width:560px"><defs><marker id="n91-2-m4t8-33" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="mt-m" x="10" y="22" text-anchor="start" style="font-size:15px">MyMacro</text><text class="mt-m" x="10" y="78" text-anchor="start" style="font-size:15px">MyMacro</text><text class="mt-m" x="96" y="22" text-anchor="start" style="font-size:15px">p1,</text><text class="mt-m" x="96" y="78" text-anchor="start" style="font-size:15px">4,</text><path class="line" d="M105 29 V58" marker-end="url(#n91-2-m4t8-33)"/><text class="mt-m" x="142" y="22" text-anchor="start" style="font-size:15px">p2,</text><text class="mt-m" x="142" y="78" text-anchor="start" style="font-size:15px">5,</text><path class="line" d="M151 29 V58" marker-end="url(#n91-2-m4t8-33)"/><text class="mt-m" x="188" y="22" text-anchor="start" style="font-size:15px">p3</text><text class="mt-m" x="188" y="78" text-anchor="start" style="font-size:15px">DX</text><path class="line" d="M197 29 V58" marker-end="url(#n91-2-m4t8-33)"/><text class="lbl" x="250" y="22" text-anchor="start">definition: formal names</text><text class="lbl" x="250" y="78" text-anchor="start">call: the substituted text</text><text class="mt-m" x="250" y="52" text-anchor="start" style="font-size:13px">MOV CX, p3  →</text><rect class="mt-acc" x="380" y="34" width="130" height="28" rx="5"/><text class="mt-m" x="445" y="53" text-anchor="middle">MOV CX, DX</text></svg></div>
+  <figcaption><b>Figure 9.1.2:</b> Parameter mapping. The formal names in the definition are paired in order with the texts in the call; the line <code>MOV CX, p3</code> becomes <code>MOV CX, DX</code>.</figcaption>
+</figure>
+
+<p>There is a critical point here. The assembler does not care whether a parameter is a register, a memory operand or a constant. It only replaces text. Whether the resulting line is a valid 8086 instruction is checked <em>after</em> expansion, like any ordinary line. A macro definition may therefore be free of errors and yet a particular call may produce one.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing the macro at the end of the program, next to the procedures. The placement that is right for a procedure causes an error for a macro: when the assembler reaches the call line it does not know the macro, so it treats the line as an unknown instruction. Macro definitions are written at the beginning of the file or in a library file added with INCLUDE.</p>
+</div>
+
+<h3 id="s9-1-1-3"><span class="nt-num">9.1.1.3</span>Expansion step by step</h3>
+
+<p>Expansion is best understood through a concrete example. The macro MyMacro, which has three parameters, loads a value into each of three registers:</p>
+
+<pre class="nt-code"><code>MyMacro  <span class="kw">MACRO</span>  p1, p2, p3
+         <span class="kw">MOV</span> AX, p1
+         <span class="kw">MOV</span> BX, p2
+         <span class="kw">MOV</span> CX, p3
+<span class="kw">ENDM</span>
+
+<span class="kw">ORG</span> 100h
+         MyMacro 1, 2, 3
+         MyMacro 4, 5, DX
+         <span class="kw">RET</span></code></pre>
+
+<p>When the assembler reads the first four lines it generates no code. It records the name MyMacro, the three parameter names and the three body lines in a macro table. <code>ORG 100h</code> sets the location counter to 0100h. Then comes the line <code>MyMacro 1, 2, 3</code>. The assembler finds MyMacro in its table and pairs up the parameters: p1 = 1, p2 = 2, p3 = 3. Then it copies the body line by line:</p>
+
+<ol>
+  <li>In the line <code>MOV AX, p1</code>, the word p1 is replaced by 1: <code>MOV AX, 1</code>.</li>
+  <li>The line <code>MOV BX, p2</code> becomes <code>MOV BX, 2</code>.</li>
+  <li>The line <code>MOV CX, p3</code> becomes <code>MOV CX, 3</code>.</li>
+</ol>
+
+<p>These three lines take the place of the call line and are translated into machine code like ordinary instructions. For the second call, <code>MyMacro 4, 5, DX</code>, the same process repeats with a new mapping: p1 = 4, p2 = 5, p3 = DX. The result is <code>MOV AX, 4</code>, <code>MOV BX, 5</code> and <code>MOV CX, DX</code>. The DX in the last line is not a number but a register name. The assembler does not notice this; it simply substitutes the text "DX". The resulting <code>MOV CX, DX</code> is a valid register-to-register copy.</p>
+
+<p>emu8086 shows the expanded code in the emulator window like this:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> AX, 00001h
+<span class="kw">MOV</span> BX, 00002h
+<span class="kw">MOV</span> CX, 00003h
+<span class="kw">MOV</span> AX, 00004h
+<span class="kw">MOV</span> BX, 00005h
+<span class="kw">MOV</span> CX, DX
+<span class="kw">RET</span></code></pre>
+
+<p>The constants are written in hexadecimal with five digits; this is merely a display habit. What matters is that the two macro calls expand into six instructions and that the macro name never appears in the listing. Single-stepping in the emulator also advances over these six instructions. The programmer wrote two lines in the source; the processor executed six instructions.</p>
+
+<p>The machine code of these instructions can also be computed. The <code>MOV r16, imm16</code> instruction, which loads an immediate value into a 16-bit register, is 3 bytes: the opcode B8h + register number and two data bytes. <code>MOV AX, 1</code> = <code>B8 01 00</code>, <code>MOV BX, 2</code> = <code>BB 02 00</code>, <code>MOV CX, 3</code> = <code>B9 03 00</code>. The register-to-register <code>MOV CX, DX</code> is 2 bytes (<code>8B CA</code>). <code>RET</code> is a single byte (<code>C3</code>). The total size of the program is 5 × 3 + 2 + 1 = 18 bytes, that is, 12h bytes.</p>
+
+<h3 id="s9-1-1-4"><span class="nt-num">9.1.1.4</span>Code trace: running the expanded code</h3>
+
+<p>Running the expanded code is no different from running an ordinary program. Still, one detail matters for understanding the trace table. When emu8086 loads a .COM program into memory, it writes the program's size in bytes into register CX. This behavior comes from the DOS program loader. Since the size of this program is 18 bytes, CX = 0012h at load time. The other general-purpose registers are zero, and SP is FFFEh. The word 0000h sits at address FFFEh, which SP points to; the RET at the end of the program will pop this word.</p>
+
+<p><a href="#tab-mymacro">Table 9.1.1</a> gives the trace of the expanded code. The first three steps are the instructions produced by the first call, the next three those of the second call. The small text under the instruction column shows which macro expansion the instruction comes from.</p>
+
+<div class="nt-tablewrap" id="tab-mymacro">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.1: Trace of the expanded code of the two MyMacro calls. Each row shows the state after the instruction has executed; at load time CX = 0012h (the program size).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">SP</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, 1</code><br><small>MyMacro expansion</small></td><td>0001h</td><td>0000h</td><td>0012h</td><td>0000h</td><td>FFFEh</td><td>1st expansion, p1 = 1: AX = 0001h</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>MOV BX, 2</code><br><small>MyMacro expansion</small></td><td>0001h</td><td>0002h</td><td>0012h</td><td>0000h</td><td>FFFEh</td><td>p2 = 2: BX = 0002h</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>MOV CX, 3</code><br><small>MyMacro expansion</small></td><td>0001h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>FFFEh</td><td>p3 = 3: CX = 0003h; the load value 0012h is overwritten</td></tr>
+    <tr><td>4</td><td>0109h</td><td><code>MOV AX, 4</code><br><small>MyMacro expansion</small></td><td>0004h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>FFFEh</td><td>2nd expansion, p1 = 4</td></tr>
+    <tr><td>5</td><td>010Ch</td><td><code>MOV BX, 5</code><br><small>MyMacro expansion</small></td><td>0004h</td><td>0005h</td><td>0003h</td><td>0000h</td><td>FFFEh</td><td>p2 = 5</td></tr>
+    <tr><td>6</td><td>010Fh</td><td><code>MOV CX, DX</code><br><small>MyMacro expansion</small></td><td>0004h</td><td>0005h</td><td>0000h</td><td>0000h</td><td>FFFEh</td><td>p3 = DX: register-to-register copy, CX = DX = 0000h</td></tr>
+    <tr><td>7</td><td>0111h</td><td><code>RET</code><br><small>main program</small></td><td>0004h</td><td>0005h</td><td>0000h</td><td>0000h</td><td>0000h</td><td>0000h at the top of the stack → IP; SP = 0000h</td></tr>
+    <tr><td>8</td><td>0000h</td><td><code>INT 20h (PSP:0000h)</code><br><small>PSP</small></td><td>0004h</td><td>0005h</td><td>0000h</td><td>0000h</td><td>0000h</td><td>the INT 20h at PSP:0000h ends the program</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>A few points in the table deserve attention. The load value of CX, 0012h, stays unchanged in the first two steps and is overwritten with 0003h in the third. The last instruction of the second call copies DX into CX; since DX is initially zero, CX becomes 0000h. SP does not change in any step. As long as the macro body contains no PUSH or POP, the macro does not touch the stack. If the same job were done with a procedure, every CALL would decrease SP by 2 and write the return address to the stack. The last RET does not belong to the macro; it is the main program's RET. It takes the word 0000h from the top of the stack into IP and goes to the <code>INT 20h</code> instruction in the program segment prefix (PSP).</p>
+
+<p>The running time of this program can also be computed in clock cycles. On the 8086, <code>MOV r16, imm16</code> takes 4 cycles and <code>MOV r16, r16</code> takes 2. The six instructions take 5 × 4 + 2 = 22 cycles. In a version written with a procedure, the CALL and RET times would be added to this for every call.</p>
+
+<h2 class="nt-pb" id="s9-1-2"><span class="nt-num">9.1.2</span>Parameters</h2>
+
+<h3 id="s9-1-2-1"><span class="nt-num">9.1.2.1</span>A parameter is text: the swap trap</h3>
+
+<p>In a high-level language, the value of a parameter passed to a function is computed at the moment of the call, and that value is what the function receives. Nothing of the kind happens in a macro. A macro parameter carries not a value but a text. The assembler writes this text at every place where the parameter occurs in the body. The value of the register or variable that the text refers to is read only at run time, when the line executes. This distinction looks small, but a large share of macro bugs come from it.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-param">
+  <span class="nt-box__title">Definition 9.1.2</span>
+  <p>A <strong>macro parameter</strong> is a formal name written as a placeholder in the macro definition. Its counterpart in the call is not a value but a text. The assembler writes this text at every place in the body where the parameter occurs. If the text is a register or variable name, its value is read when the expanded line executes at run time.</p>
+</div>
+
+<p>Suppose a programmer wants to use MyMacro to swap AX and BX. Since the first line of the macro puts p1 into AX and the second puts p2 into BX, the call <code>MyMacro BX, AX, 0</code> looks as if it does "AX ← BX, BX ← AX". After this call the programmer expects AX = 2222h and BX = 1111h. Writing out the expansion changes the picture:</p>
+
+<pre class="nt-code"><code><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 1111h
+<span class="kw">MOV</span>  BX, 2222h
+<span class="kw">MOV</span>  AX, BX      <span class="cm">; MyMacro BX, AX, 0</span>
+<span class="kw">MOV</span>  BX, AX      <span class="cm">; p2 = AX (broken!)</span>
+<span class="kw">MOV</span>  CX, 0
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-tuzak">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.2: Trace of the swap attempt with <code>MyMacro BX, AX, 0</code>.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, 1111h</code><br><small>main program</small></td><td>1111h</td><td>0000h</td><td>0000h</td><td>AX = 1111h</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>MOV BX, 2222h</code><br><small>main program</small></td><td>1111h</td><td>2222h</td><td>0000h</td><td>BX = 2222h</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>MOV AX, BX</code><br><small>MyMacro expansion</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>p1 = BX: AX ← BX; 1111h is lost here</td></tr>
+    <tr><td>4</td><td>0108h</td><td><code>MOV BX, AX</code><br><small>MyMacro expansion</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>p2 = AX: the <b>current</b> value of AX is read, BX = 2222h</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>MOV CX, 0</code><br><small>MyMacro expansion</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>p3 = 0</td></tr>
+    <tr><td>6</td><td>010Dh</td><td><code>RET</code><br><small>main program</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>result: AX = BX = 2222h</td></tr>
+    <tr><td>7</td><td>0000h</td><td><code>INT 20h (PSP:0000h)</code><br><small>PSP</small></td><td>2222h</td><td>2222h</td><td>0000h</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>In the third step AX is filled with the value of BX, that is, 2222h. The old value of AX, 1111h, no longer exists anywhere. The <code>MOV BX, AX</code> of the fourth step does not read the "old AX" the programmer had in mind but the current value of AX. As a result both registers hold 2222h. In a high-level language this error could not occur, because parameters are evaluated at the moment of the call. In a macro, p2 = AX does not mean "the value of AX at the time of the call"; it is just the text "AX".</p>
+
+<p>The general rule behind this trap is: a register that the macro body modifies must not be passed as a parameter that the body reads after that modification. MyMacro first writes AX and then reads p2, so passing AX as p2 is wrong. For a real swap the 8086 has the single instruction <code>XCHG AX, BX</code>. A macro that swaps must either use XCHG or save one of the values on the stack first.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Treating a macro parameter like a by-value parameter of a high-level language. In a call such as <code>ADD2 CX, AX</code>, if the body first writes CX into AX and then does <code>ADD AX, AX</code>, the result is 2 × CX rather than the expected CX + AX. The registers that a macro uses for itself are documented, and they are not passed as parameters.</p>
+</div>
+
+<h3 id="s9-1-2-2"><span class="nt-num">9.1.2.2</span>Kinds of parameters and their validity</h3>
+
+<p>Because the assembler gives a parameter no type, the same macro can be called in very different ways. Which call is valid is decided not by the macro itself but by the instruction that results from the expansion. The ADD3 macro below shows this well:</p>
+
+<pre class="nt-code"><code>ADD3 <span class="kw">MACRO</span> x, y, z
+  <span class="kw">MOV</span> AX, x
+  <span class="kw">ADD</span> AX, y
+  <span class="kw">MOV</span> z, AX
+<span class="kw">ENDM</span></code></pre>
+
+<p>The macro adds x and y and writes the result to z. One may ask why it does not simply write something like <code>ADD z, x</code>. The 8086 instruction set does not combine two memory operands in one instruction. In instructions such as <code>ADD</code>, <code>MOV</code> and <code>CMP</code>, at most one operand can be in memory. This restriction comes from the hardware: the ModR/M byte of an instruction can specify only one memory address. The macro therefore does the addition through AX. AX is an intermediate register here, and the macro clobbers it.</p>
+
+<div class="nt-tablewrap" id="tab-param-tur">
+<table class="nt-table">
+  <caption>Table 9.1.3: Expansions and validity of different calls of the ADD3 macro.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Expansion (problem line)</th><th scope="col">Status</th></tr></thead>
+  <tbody>
+    <tr><td><code>ADD3 a, b, c</code></td><td><code>MOV AX, a</code> · <code>ADD AX, b</code> · <code>MOV c, AX</code></td><td>valid; three variables</td></tr>
+    <tr><td><code>ADD3 BX, 5, CX</code></td><td><code>MOV AX, BX</code> · <code>ADD AX, 5</code> · <code>MOV CX, AX</code></td><td>valid; register, constant, register</td></tr>
+    <tr><td><code>ADD3 a, b, 7</code></td><td><code>MOV 7, AX</code></td><td>error: the destination cannot be a constant</td></tr>
+    <tr><td><code>ADD3 k, b, c</code> (k DB)</td><td><code>MOV AX, k</code></td><td>error: size mismatch (16 bits ← 8 bits)</td></tr>
+    <tr><td><code>ADD3 a, b</code></td><td><code>MOV , AX</code></td><td>error: missing operand</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-param-tur">Table 9.1.3</a> compares five calls. In the first two calls the parameters are of different kinds, but the expansion produces valid instructions. In the third call z = 7, so the last line becomes <code>MOV 7, AX</code>. A constant cannot be written to; a constant is a number embedded in the instruction, not a memory cell or register that can be written. In the fourth call k is a byte variable. <code>MOV AX, k</code> tries to copy an 8-bit memory cell into a 16-bit register. The assembler catches this mismatch because it knows the variable's size from its definition. In the fifth call the third parameter is missing. The assembler replaces the missing parameter with empty text, and the last line turns into the meaningless <code>MOV , AX</code>.</p>
+
+<p>All of these errors are reported at the line where the macro is used, although their cause is a line in the body. The way to understand the error message is to write out the expansion, in your head or on paper. If the same error message appears at several different lines of the program, the cause is usually in the body of the macro that all those lines use.</p>
+
+<p>MASM offers two features for catching the missing-parameter problem at the definition level. If <code>:REQ</code> is written after a parameter name (for example <code>z:REQ</code>), that parameter becomes required, and a clear error message is produced when it is omitted. The form <code>y:=&lt;1&gt;</code> gives the parameter a default value; if y is left out of the call, 1 is used. These features are specific to MASM; in simpler assemblers a missing parameter always remains empty text.</p>
+
+<h3 id="s9-1-2-3"><span class="nt-num">9.1.2.3</span>Code trace: two expansions of ADD3</h3>
+
+<p>In the following program the ADD3 macro is called in two different ways. In the first call all three parameters are variables. In the second call a constant is given in place of y, and the result of the first call is used as input:</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+ADD3 a, b, c       <span class="cm">; c = a + b</span>
+ADD3 c, 5, d       <span class="cm">; d = c + 5</span>
+<span class="kw">ret</span>
+a <span class="kw">dw</span> 1200h
+b <span class="kw">dw</span> 0345h
+c <span class="kw">dw</span> ?
+d <span class="kw">dw</span> ?</code></pre>
+
+<p>The expanded code is six instructions and a RET. The addresses of the variables depend on the size of the code, so the byte count must be worked out first. The instruction <code>MOV AX, a</code> is encoded in a short form specific to AX: the opcode <code>A1</code> and a two-byte address, 3 bytes in all. <code>ADD AX, b</code> uses the general memory-operand form: <code>03 06</code> and a two-byte address, 4 bytes in all. <code>MOV c, AX</code> is again the short form (<code>A3</code> + address), 3 bytes. The first expansion is 3 + 4 + 3 = 10 bytes.</p>
+
+<p>In the second expansion the middle line is <code>ADD AX, 5</code>. The 8086 has a short form that adds an immediate value to AX: the opcode <code>05</code> and two data bytes, 3 bytes in all. The second expansion is therefore 3 + 3 + 3 = 9 bytes. The same macro has produced code of different lengths depending on the parameter. The code is 10 + 9 = 19 bytes, 20 bytes with the RET. Since the program starts at 0100h, a is at address 0100h + 14h = 0114h. b is at 0116h, c at 0118h and d at 011Ah.</p>
+
+<figure class="nt-fig" id="sekil-topla" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 128" role="img" aria-label="Variables a, b, c, d and AX after the last step"><rect class="box" x="30" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="68" y="46" text-anchor="middle" style="font-size:13.5px;">1200h</text><text class="lbl" x="68" y="22" text-anchor="middle" style="font-size:10px;">a · 0114</text><rect class="box" x="106" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="144" y="46" text-anchor="middle" style="font-size:13.5px;">0345h</text><text class="lbl" x="144" y="22" text-anchor="middle" style="font-size:10px;">b · 0116</text><rect class="box" x="182" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="220" y="46" text-anchor="middle" style="font-size:13.5px;">1545h</text><text class="lbl" x="220" y="22" text-anchor="middle" style="font-size:10px;">c · 0118</text><rect class="mt-hot" x="258" y="26" width="76" height="30" rx="3"/><text class="mt-v" x="296" y="46" text-anchor="middle" style="font-size:13.5px;">154Ah</text><text class="lbl" x="296" y="22" text-anchor="middle" style="font-size:10px;">d · 011A</text><text class="lbl" x="70" y="81" text-anchor="middle" style="font-size:11.5px;">AX</text><rect class="box" x="30" y="86" width="80" height="30" rx="4"/><text class="mt-v" x="70" y="106" text-anchor="middle" style="font-size:14px;">154Ah</text></svg></div>
+  <figcaption><b>Figure 9.1.3:</b> Memory and AX after the last instruction of the second expansion. The words a, b, c, d lie one after another starting at 0114h; 154Ah has been written to d.</figcaption>
+</figure>
+
+<div class="nt-tablewrap" id="tab-topla">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.4: Trace of the expansions of <code>ADD3 a, b, c</code> and <code>ADD3 c, 5, d</code> (a = 0114h, b = 0116h, c = 0118h, d = 011Ah).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">a</th><th scope="col">b</th><th scope="col">c</th><th scope="col">d</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, a</code><br><small>ADD3 expansion</small></td><td>1200h</td><td>1200h</td><td>0345h</td><td>0000h</td><td>0000h</td><td>x = a: AX ← [0114h]</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>ADD AX, b</code><br><small>ADD3 expansion</small></td><td>1545h</td><td>1200h</td><td>0345h</td><td>0000h</td><td>0000h</td><td>y = b: 1200h + 0345h = 1545h</td></tr>
+    <tr><td>3</td><td>0107h</td><td><code>MOV c, AX</code><br><small>ADD3 expansion</small></td><td>1545h</td><td>1200h</td><td>0345h</td><td>1545h</td><td>0000h</td><td>z = c: [0118h] ← 1545h</td></tr>
+    <tr><td>4</td><td>010Ah</td><td><code>MOV AX, c</code><br><small>ADD3 expansion</small></td><td>1545h</td><td>1200h</td><td>0345h</td><td>1545h</td><td>0000h</td><td>2nd expansion, x = c: AX ← [0118h]</td></tr>
+    <tr><td>5</td><td>010Dh</td><td><code>ADD AX, 5</code><br><small>ADD3 expansion</small></td><td>154Ah</td><td>1200h</td><td>0345h</td><td>1545h</td><td>0000h</td><td>y = 5 is a constant: short AX form <code>05 05 00</code></td></tr>
+    <tr><td>6</td><td>0110h</td><td><code>MOV d, AX</code><br><small>ADD3 expansion</small></td><td>154Ah</td><td>1200h</td><td>0345h</td><td>1545h</td><td>154Ah</td><td>z = d: [011Ah] ← 154Ah</td></tr>
+    <tr><td>7</td><td>0113h</td><td><code>ret</code><br><small>main program</small></td><td>154Ah</td><td>1200h</td><td>0345h</td><td>1545h</td><td>154Ah</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p><a href="#tab-topla">Table 9.1.4</a> gives the details of the trace. In the first step AX is loaded with the value of a, 1200h. In the second step 0345h is added: 1200h + 0345h = 1545h. In the third step this sum is written to c. The second expansion reads c, adds 5 and writes the result to d: 1545h + 5 = 154Ah. Although the two expansions come from the same body, in one y is a memory address and in the other a constant. The assembler infers this difference from the text alone and chooses the appropriate machine code.</p>
+
+<p>The memory accesses can also be examined at the hardware level. While <code>MOV AX, a</code> executes, the BIU reads a word from DS:0114h, that is, from physical address 07114h. Since a is at an even address, the read finishes in a single bus cycle. Had the address been odd, the 8086 would have had to fetch the word with two separate byte reads. The macro does not change this detail. Every instruction in the expansion makes exactly the memory accesses that its hand-written equivalent would.</p>
+
+<p>Another lesson from this example is that the macro clobbers AX. A calling program that expects an old value in AX after ADD3 is mistaken. Which registers a macro modifies must be stated explicitly in the macro's documentation. Register preservation is treated separately with the PUTC macro.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-topla-elde">
+  <span class="nt-box__title">Example 9.1.1</span>
+  <p>For <code>s1 dw 1234h</code> and <code>s2 dw 0F00Fh</code>, what are s3 and CF after the call <code>ADD3 s1, s2, s3</code>?</p>
+  <p>The expansion is <code>MOV AX, s1</code>, <code>ADD AX, s2</code>, <code>MOV s3, AX</code>. 1234h + F00Fh = 10243h, a 17-bit result. The low 16 bits, 0243h, fit in AX and the top bit goes to CF: CF = 1. Because MOV does not change flags, CF is still 1 after the macro. s3 = 0243h. Since the macro writes the carry nowhere, the correct result of the unsigned addition has been lost. The calling program can catch this situation with <code>JC</code> right after the macro.</p>
+</div>
+
+<h3 id="s9-1-2-4"><span class="nt-num">9.1.2.4</span>Expressions and operator precedence</h3>
+
+<p>Since a parameter is text, an expression can also be given in the call: for instance <code>AREA 2+3, 4</code>. The assembler does not evaluate this expression first; it substitutes it as it stands. Operator precedence is applied again on the line where the expression has been substituted. This leads to unexpected results:</p>
+
+<pre class="nt-code"><code>AREA <span class="kw">MACRO</span> wd, ht
+  <span class="kw">MOV</span> AX, wd*ht
+<span class="kw">ENDM</span>
+
+DIFF <span class="kw">MACRO</span> p, q
+  <span class="kw">MOV</span> CX, p-q
+<span class="kw">ENDM</span></code></pre>
+
+<p>In the call <code>AREA 2+3, 4</code>, wd = "2+3" and ht = "4". The expansion is the line <code>MOV AX, 2+3*4</code>. The assembler evaluates this expression at assembly time, and since multiplication comes before addition it finds 2 + 12 = 14. The value (2 + 3) × 4 = 20 that the programmer expected does not appear. The DIFF macro has the same problem: the call <code>DIFF 10, 4+1</code> becomes <code>MOV CX, 10-4+1</code>, and evaluated from left to right it gives CX = 7, not the expected 5.</p>
+
+<div class="nt-tablewrap" id="tab-oncelik">
+<table class="nt-table">
+  <caption>Table 9.1.5: Expansion of expression parameters and their value at assembly time.</caption>
+  <thead><tr><th scope="col">Call</th><th scope="col">Expansion</th><th scope="col">Machine code</th><th scope="col">Result</th></tr></thead>
+  <tbody>
+    <tr><td><code>ALAN 2+3, 4</code></td><td><code>MOV AX, 2+3*4</code></td><td><code>B8 0E 00</code></td><td>AX = 000Eh (14)</td></tr>
+    <tr><td>corrected <code>AREA 2+3, 4</code></td><td><code>MOV AX, (2+3)*(4)</code></td><td><code>B8 14 00</code></td><td>AX = 0014h (20)</td></tr>
+    <tr><td><code>FARK 10, 4+1</code></td><td><code>MOV CX, 10-4+1</code></td><td><code>B9 07 00</code></td><td>CX = 0007h</td></tr>
+    <tr><td>corrected <code>DIFF 10, 4+1</code></td><td><code>MOV CX, (10)-(4+1)</code></td><td><code>B9 05 00</code></td><td>CX = 0005h</td></tr>
+    <tr><td><code>ALAN BX, 2</code></td><td><code>MOV AX, BX*2</code></td><td>–</td><td>error: * works only on constants</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The solution is to put every parameter in parentheses in the body: <code>MOV AX, (wd)*(ht)</code> and <code>MOV CX, (p)-(q)</code>. Then whatever text arrives is evaluated within itself first. <a href="#tab-oncelik">Table 9.1.5</a> compares the two forms with their machine codes. Note that the machine code contains no multiply or add instruction. The expression was evaluated at assembly time, and the result is embedded in the <code>MOV</code> instruction as an immediate value. The processor merely loads the number 000Eh or 0014h into AX.</p>
+
+<p>The last row shows the limit of this point. The call <code>AREA BX, 2</code> produces the line <code>MOV AX, BX*2</code>. The value of BX is not known at assembly time; it is known only at run time. The assembler cannot multiply a register, so it reports an error. Multiplying a register's value takes an instruction that runs at run time: <code>MUL</code>, or <code>SHL</code> for powers of 2. This distinction between an expression evaluated at assembly time and an instruction executed at run time is the key to understanding macros.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Using parameters without parentheses in the body: write <code>(wd)*(ht)</code> instead of <code>wd*ht</code>. If the macro is tried only with parameters that consist of a single number, no error shows; at the first call with an expression the result is silently wrong. The assembler gives no warning, because <code>2+3*4</code> is a valid expression.</p>
+</div>
+
+<h2 class="nt-pb" id="s9-1-3"><span class="nt-num">9.1.3</span>Macros and procedures</h2>
+
+<p>A macro and a procedure are two different solutions to the same problem: gathering repeated code under a name. One does the job at assembly time, the other at run time. This difference shows up in code size, speed, stack usage and the behavior of labels. This section first defines the two methods separately and then compares them with byte and clock-cycle calculations.</p>
+
+<h3 id="s9-1-3-1"><span class="nt-num">9.1.3.1</span>Properties of a procedure</h3>
+
+<p>A procedure is a block of code written between the <code>PROC</code> and <code>ENDP</code> directives, called with <code>CALL</code> and left with <code>RET</code>. Its body sits at one address in memory as a single copy. The PRINT_A procedure below writes 'A' to the screen:</p>
+
+<pre class="nt-code"><code>PRINT_A <span class="kw">PROC</span>
+      <span class="kw">PUSH</span> AX
+      <span class="kw">MOV</span>  AL, 'A'
+      <span class="kw">MOV</span>  AH, 0Eh
+      <span class="kw">INT</span>  10h
+      <span class="kw">POP</span>  AX
+      <span class="kw">RET</span>
+PRINT_A <span class="kw">ENDP</span>
+
+      <span class="kw">CALL</span> PRINT_A  <span class="cm">; 3 bytes</span>
+      <span class="kw">CALL</span> PRINT_A  <span class="cm">; 3 bytes</span></code></pre>
+
+<p>When a near <code>CALL</code> instruction executes, the processor does three things. First it decreases SP by 2. Then it writes the address of the instruction after the CALL, the return address, to SS:SP. Finally it loads IP with the address of the procedure. <code>RET</code> does the opposite: it takes the word at SS:SP into IP and increases SP by 2. Because the return address is kept on the stack, the same procedure can be called from different places in the program; each time it returns to the right place.</p>
+
+<figure class="nt-fig" id="sekil-proc" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 104" role="img" aria-label="A procedure is a single copy in memory: two CALLs go to the same routine and RET returns to the caller each time" style="display:block;margin:8px auto 0;max-width:620px"><defs><marker id="n91-4-m4t8-30" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="8" width="170" height="88" rx="6"/><text class="lbl" x="95" y="26" text-anchor="middle">main program</text><rect class="mt-acc" x="24" y="36" width="142" height="22" rx="4"/><text class="mt-m" x="95" y="52" text-anchor="middle">CALL PRINT_A</text><rect class="mt-acc" x="24" y="64" width="142" height="22" rx="4"/><text class="mt-m" x="95" y="80" text-anchor="middle">CALL PRINT_A</text><rect class="mt-good" x="380" y="14" width="200" height="76" rx="6"/><text class="mt-s" x="480" y="34" text-anchor="middle">PRINT_A (single copy)</text><text class="mt-m" x="480" y="56" text-anchor="middle" style="font-size:12px">PUSH AX … POP AX</text><text class="mt-m" x="480" y="78" text-anchor="middle">RET</text><path class="line" d="M166 47 C260 47 290 36 378 36" marker-end="url(#n91-4-m4t8-30)"/><path class="line" d="M166 75 C260 75 290 58 378 58" marker-end="url(#n91-4-m4t8-30)"/><path class="axis" d="M380 80 C300 98 240 96 168 88" marker-end="url(#n91-4-m4t8-30)"/><text class="lbl" x="272" y="30" text-anchor="middle" style="font-size:11px">3 bytes, return address to stack</text><text class="lbl" x="272" y="104" text-anchor="middle" style="font-size:11px">RET: return to the address on the stack</text></svg></div>
+  <figcaption><b>Figure 9.1.4:</b> A procedure is a single copy in memory. Two CALLs go to the same body; each time, RET returns to the return address on the stack, that is, to the caller.</figcaption>
+</figure>
+
+<p>A near CALL instruction is 3 bytes: the opcode <code>E8</code> and a two-byte relative displacement. The displacement is found by subtracting the address of the instruction after the CALL from the address of the procedure. Even if the same procedure is called a hundred times, the body is written once; each call adds only 3 bytes. Parameters are passed in registers, in memory or on the stack. Because the name of a procedure turns into an address in the machine code, a procedure can be defined anywhere in the file, even after the call.</p>
+
+<h3 id="s9-1-3-2"><span class="nt-num">9.1.3.2</span>Properties of a macro</h3>
+
+<p>The PUTC macro that does the same job is written as follows:</p>
+
+<pre class="nt-code"><code>PUTC <span class="kw">MACRO</span> char
+     <span class="kw">PUSH</span> AX
+     <span class="kw">MOV</span>  AL, char
+     <span class="kw">MOV</span>  AH, 0Eh
+     <span class="kw">INT</span>  10h
+     <span class="kw">POP</span>  AX
+<span class="kw">ENDM</span>
+
+     PUTC 'A'  <span class="cm">; 8 bytes</span>
+     PUTC 'B'  <span class="cm">; 8 bytes</span></code></pre>
+
+<p>A macro is used just by writing its name; there is no CALL. The parameter is written after the macro name. Because the assembler rewrites the body at every use, two uses of PUTC produce two separate 8-byte copies in the program (<a href="#sekil-makro-kopya">Figure 9.1.5</a>). The bytes of the body are: <code>PUSH AX</code> 1 byte (<code>50</code>), <code>MOV AL, 'A'</code> 2 bytes (<code>B0 41</code>), <code>MOV AH, 0Eh</code> 2 bytes (<code>B4 0E</code>), <code>INT 10h</code> 2 bytes (<code>CD 10</code>), <code>POP AX</code> 1 byte (<code>58</code>). The total is 8 bytes. Note that the macro contains no RET; a macro is not a piece of code that is called but one that is written in place.</p>
+
+<figure class="nt-fig" id="sekil-makro-kopya" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 108" role="img" aria-label="A macro is expanded in place at every use: two PUTC uses produce two separate 8-byte copies" style="display:block;margin:8px auto 0;max-width:620px"><defs><marker id="n91-5-m4t8-31" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="mt-m" x="10" y="30" text-anchor="start">PUTC 'A'</text><text class="mt-m" x="10" y="76" text-anchor="start">PUTC 'B'</text><path class="line" d="M86 25 H120" marker-end="url(#n91-5-m4t8-31)"/><path class="line" d="M86 71 H120" marker-end="url(#n91-5-m4t8-31)"/><rect class="box" x="126" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="146" y="30" text-anchor="middle" style="font-size:13px">50</text><rect class="box" x="170" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="190" y="30" text-anchor="middle" style="font-size:13px">B0</text><rect class="mt-hot" x="214" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="234" y="30" text-anchor="middle" style="font-size:13px">41</text><rect class="box" x="258" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="278" y="30" text-anchor="middle" style="font-size:13px">B4</text><rect class="box" x="302" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="322" y="30" text-anchor="middle" style="font-size:13px">0E</text><rect class="box" x="346" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="366" y="30" text-anchor="middle" style="font-size:13px">CD</text><rect class="box" x="390" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="410" y="30" text-anchor="middle" style="font-size:13px">10</text><rect class="box" x="434" y="12" width="40" height="26" rx="3"/><text class="mt-m" x="454" y="30" text-anchor="middle" style="font-size:13px">58</text><text class="lbl" x="484" y="30" text-anchor="start" style="font-size:11.5px">8 bytes</text><rect class="box" x="126" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="146" y="76" text-anchor="middle" style="font-size:13px">50</text><rect class="box" x="170" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="190" y="76" text-anchor="middle" style="font-size:13px">B0</text><rect class="mt-hot" x="214" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="234" y="76" text-anchor="middle" style="font-size:13px">42</text><rect class="box" x="258" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="278" y="76" text-anchor="middle" style="font-size:13px">B4</text><rect class="box" x="302" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="322" y="76" text-anchor="middle" style="font-size:13px">0E</text><rect class="box" x="346" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="366" y="76" text-anchor="middle" style="font-size:13px">CD</text><rect class="box" x="390" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="410" y="76" text-anchor="middle" style="font-size:13px">10</text><rect class="box" x="434" y="58" width="40" height="26" rx="3"/><text class="mt-m" x="454" y="76" text-anchor="middle" style="font-size:13px">58</text><text class="lbl" x="484" y="76" text-anchor="start" style="font-size:11.5px">8 bytes</text><text class="lbl" x="126" y="104" text-anchor="start" style="font-size:11px">push ax · mov al, char · mov ah, 0Eh · int 10h · pop ax  (highlighted: the parameter)</text></svg></div>
+  <figcaption><b>Figure 9.1.5:</b> A macro is expanded in place at every use. Two PUTC uses produce two separate 8-byte copies one after the other; the stack is not used.</figcaption>
+</figure>
+
+<p>There is also an important difference with labels. The body of a procedure is a single copy, so the labels inside it are defined once. The body of a macro is rewritten at every use. If the body contains a label and the macro is used twice, the same label is defined twice and the assembler reports a <i>Duplicate declaration</i> error. The LOCAL directive, which solves this problem, is treated in its own section.</p>
+
+<div class="nt-tablewrap" id="tab-karsilastirma">
+<table class="nt-table">
+  <caption>Table 9.1.6: Comparison of a macro and a procedure.</caption>
+  <thead><tr><th scope="col">Criterion</th><th scope="col">Macro</th><th scope="col">Procedure</th></tr></thead>
+  <tbody>
+    <tr><td>When is it processed?</td><td>at assembly time (text substitution)</td><td>at run time (CALL/RET)</td></tr>
+    <tr><td>>Use</td><td><code>PUTC 'A'</code></td><td><code>CALL PRINT_A</code></td></tr>
+    <tr><td>Code size</td><td>grows by the body at every use</td><td>body once + 3 bytes per call</td></tr>
+    <tr><td>Speed</td><td>no CALL/RET and no stack access</td><td>CALL + RET time at every call</td></tr>
+    <tr><td>Parameters</td><td>text after the name</td><td>register, memory or stack</td></tr>
+    <tr><td>Stack</td><td>not used (unless the body uses it)</td><td>used for the return address</td></tr>
+    <tr><td>Where defined</td><td>before use</td><td>anywhere</td></tr>
+    <tr><td>End</td><td><code>ENDM</code></td><td><code>name ENDP</code></td></tr>
+    <tr><td>Labels</td><td>LOCAL needed</td><td>no problem (single copy)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-karsilastirma">Table 9.1.6</a> puts the two methods side by side on nine criteria. The first row is the reason for all the others. Because a macro is processed at assembly time, it leaves no cost at run time, but it takes space at every use. Because a procedure is processed at run time, it saves space, but it spends time at every call.</p>
+
+<h3 id="s9-1-3-3"><span class="nt-num">9.1.3.3</span>Size calculation and the break-even point</h3>
+
+<p>Two simple formulas suffice to compute code size as a function of the number of uses. Let a job whose body is n bytes be used in k places. In a macro the body is written k times: the size is k · n bytes. In a procedure the body is written once, a 1-byte RET is added at the end, and every use is a 3-byte CALL: the size is (n + 1) + 3k bytes.</p>
+
+<p class="nt-math nt-math--c">macro = k · n &nbsp;&nbsp;&nbsp;&nbsp; procedure = (n + 1) + 3k</p>
+
+<p>The body of PUTC is n = 8 bytes. For a single use the macro takes 8 bytes and the procedure 8 + 1 + 3 = 12 bytes; the macro is smaller. For ten uses the macro grows to 80 bytes and the procedure to 9 + 30 = 39 bytes. For a hundred uses the gap widens: the macro is 800 bytes, the procedure 9 + 300 = 309 bytes. <a href="#sekil-boyut">Figure 9.1.6</a> shows these three cases with bars. The macro's bar grows in direct proportion to the number of uses; the procedure's bar adds only 3 bytes per use on top of a fixed 9-byte block.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-boyut" style="--w:680px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 680 190" role="img" aria-label="Code size of a macro and a procedure"><defs><marker id="n91-6-m8ah133" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="10" y="16">Code size (bytes) · PUTC body 8 bytes; procedure = the same 8 bytes + RET (1 byte)</text><text class="txt" x="10" y="56">1 use</text><rect class="box" x="110" y="30" width="4" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="120" y="45">macro: 1 × 8 = 8</text><rect class="box" x="110" y="54" width="6" height="20" rx="2"/><text class="lbl" x="122" y="69">procedure:9 + 1 × 3 = 12</text><text class="txt" x="10" y="108">10 uses</text><rect class="box" x="110" y="82" width="40" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="156" y="97">macro: 10 × 8 = 80</text><rect class="box" x="110" y="106" width="20" height="20" rx="2"/><text class="lbl" x="136" y="121">procedure:9 + 10 × 3 = 39</text><text class="txt" x="10" y="160">100 uses</text><rect class="box" x="110" y="134" width="400" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="516" y="149">macro: 100 × 8 = 800</text><rect class="box" x="110" y="158" width="154" height="20" rx="2"/><text class="lbl" x="270" y="173">procedure:9 + 100 × 3 = 309</text></svg></div>
+  <figcaption><b>Figure 9.1.6:</b> Code size for the PUTC body with 1, 10 and 100 uses: macro (8k bytes) versus procedure (9 + 3k bytes). The gap grows with the number of uses.</figcaption>
+</figure>
+
+<p>The number of uses at which a macro starts to be larger than a procedure can be called the break-even point. For the procedure to be smaller we need k · n &gt; (n + 1) + 3k. Collecting terms gives k · (n − 3) &gt; n + 1. Two conclusions follow from this inequality.</p>
+
+<ul>
+  <li>If n ≤ 3, the left side is zero or negative and the inequality holds for no k. If the body is as short as a CALL, the macro is always smaller. In that case a procedure does not reduce code size; it only adds RET and call time.</li>
+  <li>If n &gt; 3, the break-even point is k &gt; (n + 1) / (n − 3). For n = 8, k &gt; 9/5 = 1.8, so from two uses on the procedure is smaller: 15 bytes against 16. For n = 5, k &gt; 3, that is, from four uses on. For n = 4, k &gt; 5; at five uses both take 20 bytes, and at six uses the procedure pulls ahead with 23 bytes against 24.</li>
+</ul>
+
+<div class="nt-box nt-box--ornek" id="ornek-boyut">
+  <span class="nt-box__title">Example 9.1.2</span>
+  <p>The PUTC macro is used 50 times. What would the code sizes be if the same job were done with a procedure?</p>
+  <p>Macro: 50 × 8 = 400 bytes. Procedure: the body and RET once (8 + 1 = 9 bytes), the CALLs 50 × 3 = 150 bytes; 159 bytes in all. The procedure is 241 bytes smaller. A frequent arithmetic mistake is to count only the CALLs (150 bytes) for the procedure, or to count the macro copy as 9 bytes with a RET. A macro has no RET.</p>
+</div>
+
+<p>Why does this calculation matter? The code, data and stack of a .COM program must all fit in a single 64 KB segment. In an embedded system the program is written to a small ROM and every byte is a cost. Using a macro with a long body in hundreds of places quickly strains these limits.</p>
+
+<h3 id="s9-1-3-4"><span class="nt-num">9.1.3.4</span>Speed: CALL, RET and the prefetch queue</h3>
+
+<p>On the speed side the table turns around. Every call of a procedure executes a CALL and a RET in addition to the job itself. According to Intel's 8086 data sheet, a near direct CALL takes 19 clock cycles and a near RET takes 8. Each call thus adds 27 cycles. On a 4.77 MHz 8086 one cycle is about 209.6 ns; 27 cycles come to about 5.66 µs. At 5 MHz one cycle is 200 ns and 27 cycles are 5.4 µs.</p>
+
+<p>Behind this number lies what happens in the hardware. The CALL instruction writes the return address to the stack; this is a memory write bus cycle. A bus cycle lasts at least four clock cycles (T1–T4). RET reads a word from the stack, which is a read bus cycle. More importantly, both instructions change the flow of the program. In the 8086, while the execution unit (EU) executes one instruction, the bus interface unit (BIU) prefetches the following instruction bytes. These bytes wait in the six-byte prefetch queue. When the flow changes with a jump, the bytes in the queue become useless. The BIU flushes the queue and starts fetching again from the new address. The EU waits until the first instruction byte arrives. This is one reason why CALL and RET take so long.</p>
+
+<p>In the expansion of a macro, by contrast, the flow is a straight line. The instructions sit one after another in memory, the BIU fetches them in order, and the queue is never flushed. No return address is written to or read from the stack. The body of PUTC takes about 78 cycles by itself: PUSH 11, two MOVs 4 each, INT 51, POP 8. To this are added the BIOS routine itself and its IRET. In the procedure version, 27 more cycles are added to the same job at every call.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Table 9.1.7: Duration of the PUTC body and of the CALL/RET overhead in clock cycles (8086 data sheet; the BIOS routine's own time excluded).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Bytes</th><th scope="col">Clock cycles</th><th scope="col">Memory/stack access</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUSH AX</code></td><td>1</td><td>11</td><td>1 write (stack)</td></tr>
+    <tr><td><code>MOV AL, 'A'</code></td><td>2</td><td>4</td><td>none</td></tr>
+    <tr><td><code>MOV AH, 0Eh</code></td><td>2</td><td>4</td><td>none</td></tr>
+    <tr><td><code>INT 10h</code></td><td>2</td><td>51</td><td>3 writes (FLAGS, CS, IP) + vector read</td></tr>
+    <tr><td><code>POP AX</code></td><td>1</td><td>8</td><td>1 read (stack)</td></tr>
+    <tr><td><b>macro copy, total</b></td><td><b>8</b></td><td><b>78</b></td><td></td></tr>
+    <tr><td><code>CALL</code> (near, direct)</td><td>3</td><td>19</td><td>1 write (return address)</td></tr>
+    <tr><td><code>RET</code> (near)</td><td>1</td><td>8</td><td>1 read (return address)</td></tr>
+    <tr><td><b>procedure call, total</b></td><td><b>3 (+ 9 once)</b></td><td><b>105</b></td><td></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-tur">Table 9.1.7</a> compares the two versions in bytes and cycles. The extra time per call is small but it accumulates. A procedure called 10,000 times in a loop adds 10,000 × 27 = 270,000 cycles, about 56.6 ms at 4.77 MHz. For a short job this overhead can be even longer than the job itself. For example, if a two-instruction job taking 6–8 cycles in all is turned into a procedure, every call makes it four or five times as slow.</p>
+
+<h3 id="s9-1-3-5"><span class="nt-num">9.1.3.5</span>Selection criteria</h3>
+
+<p>Weighing size and speed together gives the general rule. Short code that runs often and needs speed suits a macro; long code used in many places suits a procedure. Five typical cases make the rule concrete:</p>
+
+<ol>
+  <li><b>Printing a single character, in 200 places.</b> The body is short (8 bytes), but 200 copies come to 1600 bytes. The procedure takes 9 + 600 = 609 bytes. If size matters, choose the procedure; if speed matters, the macro. Since printing already involves a BIOS call, the extra 27 cycles are usually negligible; here the procedure is the wiser choice.</li>
+  <li><b>A one-line job that swaps two registers.</b> <code>XCHG</code> is already a single instruction. A macro may improve readability; a procedure would add a burden of 27 cycles and 4 bytes to a one-instruction job. Choose the macro.</li>
+  <li><b>A 300-byte sorting algorithm, in 3 places.</b> The macro takes 900 bytes, the procedure about 300 + 9 bytes. Next to the running time of a sort, 27 cycles are negligible. Clearly a procedure.</li>
+  <li><b>A two-instruction job done on every iteration of a tight loop.</b> The CALL/RET time exceeds the job itself. When the loop runs thousands of times, the difference becomes measurable. A macro.</li>
+  <li><b>Putting parameters in registers and calling shared code.</b> The two methods are used together: the macro places the parameters in registers and calls the procedure. Use is as convenient as a macro and the size as small as a procedure. The emu8086.inc library also uses this pattern.</li>
+</ol>
+
+<h3 id="s9-1-3-6"><span class="nt-num">9.1.3.6</span>Code trace: the macro prepares, the procedure works</h3>
+
+<p>Let us trace the fifth case with a small program. The PUT_DIGIT macro puts a digit in AL and calls the print_digit procedure. The procedure converts the digit to its ASCII code and writes it to the screen:</p>
+
+<pre class="nt-code"><code>PUT_DIGIT <span class="kw">MACRO</span> d
+    <span class="kw">mov</span>  al, d
+    <span class="kw">call</span> print_digit
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    PUT_DIGIT 4
+    PUT_DIGIT 7
+    <span class="kw">ret</span>
+print_digit:
+    <span class="kw">add</span>  al, '0'     <span class="cm">; digit → ASCII</span>
+    <span class="kw">mov</span>  ah, 0Eh
+    <span class="kw">int</span>  10h
+    <span class="kw">ret</span></code></pre>
+
+<p>Each macro copy is only 5 bytes: a 2-byte <code>MOV AL, imm8</code> and a 3-byte <code>CALL</code>. The first copy occupies 0100h–0104h and the second 0105h–0109h. The main program's RET is at 010Ah and the procedure starts at 010Bh. The body of the procedure is 2 + 2 + 2 + 1 = 7 bytes. If the macro were used in ten places the code would take 10 × 5 + 7 = 57 bytes. Had the whole body (<code>MOV AL</code>, <code>ADD AL</code>, <code>MOV AH</code>, <code>INT</code>) been in the macro, every copy would be 8 bytes and ten copies 80 bytes.</p>
+
+<div class="nt-tablewrap" id="tab-rakam">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.8: Joint trace of the PUT_DIGIT macro and the print_digit procedure. The [SS:SP] column shows the word at the top of the stack.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AL</th><th scope="col">AH</th><th scope="col">SP</th><th scope="col">[SS:SP]</th><th scope="col">Next IP</th><th scope="col">Screen</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov al, 4</code><br><small>PUT_DIGIT expansion</small></td><td>04h</td><td>00h</td><td>FFFEh</td><td>0000h</td><td>0102h</td><td>–</td><td>1st expansion: AL ← 4</td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>call print_digit</code><br><small>PUT_DIGIT expansion</small></td><td>04h</td><td>00h</td><td>FFFCh</td><td>0105h</td><td>010Bh</td><td>–</td><td>return address 0105h to the stack; IP ← 010Bh</td></tr>
+    <tr><td>3</td><td>010Bh</td><td><code>add al, &#x27;0&#x27;</code><br><small>print_digit procedure</small></td><td>34h</td><td>00h</td><td>FFFCh</td><td>0105h</td><td>010Dh</td><td>–</td><td>4 + 30h = 34h ('4')</td></tr>
+    <tr><td>4</td><td>010Dh</td><td><code>mov ah, 0Eh</code><br><small>print_digit procedure</small></td><td>34h</td><td>0Eh</td><td>FFFCh</td><td>0105h</td><td>010Fh</td><td>–</td><td>AH = 0Eh: teletype output</td></tr>
+    <tr><td>5</td><td>010Fh</td><td><code>int 10h</code><br><small>print_digit procedure</small></td><td>34h</td><td>0Eh</td><td>FFFCh</td><td>0105h</td><td>0111h</td><td><code>4</code></td><td>4 to the screen</td></tr>
+    <tr><td>6</td><td>0111h</td><td><code>ret</code><br><small>print_digit procedure</small></td><td>34h</td><td>0Eh</td><td>FFFEh</td><td>0000h</td><td>0105h</td><td><code>4</code></td><td>0105h from the stack to IP</td></tr>
+    <tr><td>7</td><td>0105h</td><td><code>mov al, 7</code><br><small>PUT_DIGIT expansion</small></td><td>07h</td><td>0Eh</td><td>FFFEh</td><td>0000h</td><td>0107h</td><td><code>4</code></td><td>2nd expansion: AL ← 7</td></tr>
+    <tr><td>8</td><td>0107h</td><td><code>call print_digit</code><br><small>PUT_DIGIT expansion</small></td><td>07h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>010Bh</td><td><code>4</code></td><td>this time the return address is 010Ah</td></tr>
+    <tr><td>9</td><td>010Bh</td><td><code>add al, &#x27;0&#x27;</code><br><small>print_digit procedure</small></td><td>37h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>010Dh</td><td><code>4</code></td><td>37h ('7')</td></tr>
+    <tr><td>10</td><td>010Dh</td><td><code>mov ah, 0Eh</code><br><small>print_digit procedure</small></td><td>37h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>010Fh</td><td><code>4</code></td><td></td></tr>
+    <tr><td>11</td><td>010Fh</td><td><code>int 10h</code><br><small>print_digit procedure</small></td><td>37h</td><td>0Eh</td><td>FFFCh</td><td>010Ah</td><td>0111h</td><td><code>47</code></td><td>47 on the screen</td></tr>
+    <tr><td>12</td><td>0111h</td><td><code>ret</code><br><small>print_digit procedure</small></td><td>37h</td><td>0Eh</td><td>FFFEh</td><td>0000h</td><td>010Ah</td><td><code>47</code></td><td>return to 010Ah</td></tr>
+    <tr><td>13</td><td>010Ah</td><td><code>ret</code><br><small>main program</small></td><td>37h</td><td>0Eh</td><td>0000h</td><td>–</td><td>0000h</td><td><code>47</code></td><td>the main program's RET</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-rakam" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="Macro and procedure, step 2: AL, AH, stack and screen"><defs><marker id="n91-7-m4t8-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="8" y="20" width="70" height="34" rx="4"/><text class="lbl" x="43" y="16" text-anchor="middle" style="font-size:11.5px">AL</text><text class="mt-v" x="43" y="42" text-anchor="middle" style="font-size:14px">04h</text><rect class="box" x="84" y="20" width="70" height="34" rx="4"/><text class="lbl" x="119" y="16" text-anchor="middle" style="font-size:11.5px">AH</text><text class="mt-v" x="119" y="42" text-anchor="middle" style="font-size:14px">00h</text><rect class="mt-hot" x="160" y="20" width="70" height="34" rx="4"/><text class="lbl" x="195" y="16" text-anchor="middle" style="font-size:11.5px">SP</text><text class="mt-v" x="195" y="42" text-anchor="middle" style="font-size:14px">FFFCh</text><text class="mt-m" x="8" y="84" text-anchor="start">IP next: 010Bh</text><text class="mt-s" x="8" y="106" text-anchor="start">now: macro copy 1</text><rect class="mt-dim" x="8" y="124" width="200" height="30" rx="4"/><text class="lbl" x="14" y="120" text-anchor="start" style="font-size:11px">screen</text><text class="mt-m" x="16" y="144" text-anchor="start" style="font-size:14px">▌</text><text class="lbl" x="300" y="14" text-anchor="middle" style="font-size:11px">stack (offset from SS)</text><rect class="mt-dim" x="268" y="22" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="38.5" text-anchor="middle" style="opacity:.45">····</text><text class="lbl" x="263" y="38.5" text-anchor="end" style="font-size:11px">FFF8</text><rect class="mt-dim" x="268" y="48" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="64.5" text-anchor="middle" style="opacity:.45">····</text><text class="lbl" x="263" y="64.5" text-anchor="end" style="font-size:11px">FFFA</text><rect class="mt-hot" x="268" y="74" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="90.5" text-anchor="middle">0105h</text><text class="lbl" x="263" y="90.5" text-anchor="end" style="font-size:11px">FFFC</text><text class="mt-a" x="228" y="90.5" text-anchor="end" style="font-size:11px">return</text><path class="line" d="M382 86 H342" marker-end="url(#n91-7-m4t8-2)"/><text class="mt-l" x="386" y="90.5" text-anchor="start">SP</text><rect class="box" x="268" y="100" width="70" height="24" rx="3"/><text class="mt-m" x="303" y="116.5" text-anchor="middle">0000h</text><text class="lbl" x="263" y="116.5" text-anchor="end" style="font-size:11px">FFFE</text></svg></div>
+  <figcaption><b>Figure 9.1.7:</b> Right after the first CALL: the return address 0105h has been written to the stack, SP has become FFFCh, and IP has reached the start of the procedure, 010Bh.</figcaption>
+</figure>
+
+<p><a href="#tab-rakam">Table 9.1.8</a> and <a href="#sekil-rakam">Figure 9.1.7</a> should be read together. In the second step the CALL executes. The return address is 0105h, the address of the instruction after the CALL. This word is written to SS:FFFCh; since SS = 0700h, the physical address is 07000h + FFFCh = 16FFCh. SP becomes FFFCh and IP jumps to 010Bh. The procedure adds 30h to 4, obtaining the ASCII '4' (34h), and writes it with INT 10h. The RET in the sixth step takes 0105h from the top of the stack into IP and restores SP to FFFEh.</p>
+
+<p>The second copy calls the same procedure, but this time the return address is 010Ah. The same single body has been called from two different places and has returned to the right place each time. 47 appears on the screen. The last RET belongs to the main program; it takes the 0000h at the top of the stack and ends the program. In this arrangement the macro acts as a thin wrapper that prepares the parameter; the work itself is in the procedure, in a single copy.</p>
+
+<h3 id="s9-1-3-7"><span class="nt-num">9.1.3.7</span>Code trace: RET inside a macro</h3>
+
+<p>Writing RET at the end of a macro out of procedure habit is one of the most instructive mistakes with macros. The EMIT macro below writes a character and ends with RET:</p>
+
+<pre class="nt-code"><code>EMIT <span class="kw">MACRO</span> c
+    <span class="kw">MOV</span> AL, c
+    <span class="kw">MOV</span> AH, 0Eh
+    <span class="kw">INT</span> 10h
+    <span class="kw">RET</span>              <span class="cm">; wrong</span>
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    EMIT 'A'
+    EMIT 'B'
+    <span class="kw">ret</span></code></pre>
+
+<p>The program assembles; to the assembler, RET is an ordinary instruction. The expanded code contains two copies of EMIT, each ending in a RET. The programmer expects AB on the screen.</p>
+
+<div class="nt-tablewrap" id="tab-makroret">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.9: Trace of a program that uses the EMIT macro, whose body contains a RET, twice.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">SP</th><th scope="col">Next IP</th><th scope="col">Screen</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AL, &#x27;A&#x27;</code><br><small>EMIT expansion</small></td><td>0041h</td><td>FFFEh</td><td>0102h</td><td>–</td><td>1st expansion: AL ← 'A'</td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>MOV AH, 0Eh</code><br><small>EMIT expansion</small></td><td>0E41h</td><td>FFFEh</td><td>0104h</td><td>–</td><td>AX = 0E41h</td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>INT 10h</code><br><small>EMIT expansion</small></td><td>0E41h</td><td>FFFEh</td><td>0106h</td><td><code>A</code></td><td>A to the screen</td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>RET</code><br><small>EMIT expansion</small></td><td>0E41h</td><td>0000h</td><td>0000h</td><td><code>A</code></td><td>the macro's RET takes the 0000h at the top of the stack</td></tr>
+    <tr><td>5</td><td>0000h</td><td><code>INT 20h (PSP:0000h)</code><br><small>PSP</small></td><td>0E41h</td><td>0000h</td><td>–</td><td><code>A</code></td><td>the INT 20h in the PSP ends the program; nothing after 0107h ever runs</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p><a href="#tab-makroret">Table 9.1.9</a> shows that what was expected does not happen. The first copy writes 'A'. The RET in the fourth step is the macro's RET. Since the macro was not entered with a CALL, there is no return address on the stack. RET nevertheless takes whatever it finds at the top of the stack into IP. In this .COM program the top holds the word 0000h that DOS placed there. IP becomes 0000h and the processor goes to the <code>INT 20h</code> instruction at the start of the PSP. The program ends. The copy of EMIT 'B' and the main program's RET never run; only A is on the screen.</p>
+
+<p>This program ends luckily: the top of the stack happens to hold an address that terminates the program. Had the macro been used inside a procedure or after something was pushed on the stack, RET would have jumped to an arbitrary word on the stack and the program could have hung. RET makes sense only in a procedure entered with CALL.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing RET at the end of a macro body. A macro is not called with CALL; the RET in the body takes the return address of the code that uses the macro (or whatever is on the stack). A macro "ends" by itself on reaching ENDM: after the last instruction of the expansion, the instruction that follows the call line executes.</p>
+</div>
+
+<h3 id="s9-1-3-8"><span class="nt-num">9.1.3.8</span>EQU, macros and procedures</h3>
+
+<p>Another tool of the assembler that works on text is the EQU directive. When <code>WIDTH EQU 80</code> is written, the assembler writes 80 wherever it sees the name WIDTH. This is like a one-line macro without parameters. The three tools are compared in <a href="#tab-equ">Table 9.1.10</a>.</p>
+
+<div class="nt-tablewrap" id="tab-equ">
+<table class="nt-table">
+  <caption>Table 9.1.10: EQU, macro and procedure.</caption>
+  <thead><tr><th scope="col">Criterion</th><th scope="col">EQU</th><th scope="col">Macro</th><th scope="col">Procedure</th></tr></thead>
+  <tbody>
+    <tr><td>What is substituted?</td><td>a single value or expression</td><td>one or more lines</td><td>nothing; control goes there with CALL</td></tr>
+    <tr><td>Parameters</td><td>none</td><td>yes (text)</td><td>register, stack or memory</td></tr>
+    <tr><td>When?</td><td>assembly</td><td>assembly</td><td>run time</td></tr>
+    <tr><td>In memory</td><td>takes no space</td><td>the body at every use</td><td>single copy + 3 bytes per call</td></tr>
+    <tr><td>Example</td><td><code>WIDTH EQU 80</code></td><td><code>PUTC 'A'</code></td><td><code>CALL PRINT_NUM</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>What EQU and a macro have in common is that both are text operations the assembler performs on the source. The processor never sees either; it executes only the instructions they produce. An EQU constant by itself does not even produce a byte; only when it is used inside an instruction does it become that instruction's immediate value. The rule of choice is simple. Use EQU to name a single number, a macro for a short pattern of a few instructions, and a procedure for a long or widely shared job.</p>
+
+<h2 class="nt-pb" id="s9-1-4"><span class="nt-num">9.1.4</span>Labels and LOCAL</h2>
+
+<h3 id="s9-1-4-1"><span class="nt-num">9.1.4.1</span>The same label twice</h3>
+
+<p>The body of every macro that contains a loop or a conditional jump contains a label. A label is a name that the assembler gives to an address. In a program each label may be defined only once; otherwise the same name would point to two different addresses and the target of a jump would become ambiguous. Because the body of a macro is rewritten at every use, this rule is easily broken in macros. A simple delay loop shows this:</p>
+
+<pre class="nt-code"><code>DELAY <span class="kw">MACRO</span>
+lp:  <span class="kw">DEC</span> CX
+      <span class="kw">JNZ</span> lp
+<span class="kw">ENDM</span>
+
+<span class="kw">MOV</span> CX, 5
+DELAY
+<span class="kw">MOV</span> CX, 9
+DELAY</code></pre>
+
+<p>With a single use of the macro there would be no problem. After two uses, the code the assembler sees is this:</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span> CX, 5
+lp:  <span class="kw">DEC</span> CX    <span class="cm">; copy 1</span>
+      <span class="kw">JNZ</span> lp
+<span class="kw">MOV</span> CX, 9
+lp:  <span class="kw">DEC</span> CX    <span class="cm">; copy 2 !</span>
+      <span class="kw">JNZ</span> lp</code></pre>
+
+<figure class="nt-fig" id="sekil-etiket" style="--w:620px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 620 98" role="img" aria-label="The same label lp in both expansions: JNZ lp cannot tell which of the two addresses to jump to" style="display:block;margin:8px auto 0;max-width:620px"><defs><marker id="n91-8-m4t8-32" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="20" y="8" width="220" height="62" rx="6"/><text class="lbl" x="30" y="24" text-anchor="start" style="font-size:11px">copy 1</text><rect class="mt-bad" x="28" y="30" width="44" height="20" rx="3"/><text class="mt-m" x="50" y="44" text-anchor="middle">lp:</text><text class="mt-m" x="82" y="44" text-anchor="start">DEC CX</text><text class="mt-m" x="82" y="63" text-anchor="start">JNZ lp</text><rect class="box" x="330" y="8" width="220" height="62" rx="6"/><text class="lbl" x="340" y="24" text-anchor="start" style="font-size:11px">copy 2</text><rect class="mt-bad" x="338" y="30" width="44" height="20" rx="3"/><text class="mt-m" x="360" y="44" text-anchor="middle">lp:</text><text class="mt-m" x="392" y="44" text-anchor="start">DEC CX</text><text class="mt-m" x="392" y="63" text-anchor="start">JNZ lp</text><path class="axis" d="M144 70 C190 96 300 96 356 54" marker-end="url(#n91-8-m4t8-32)"/><path class="axis" d="M90 70 C80 84 40 78 46 54" marker-end="url(#n91-8-m4t8-32)"/><text class="mt-a" x="250" y="92" text-anchor="middle" style="font-size:16px">?</text><text class="mt-a" x="600" y="92" text-anchor="end" style="font-size:12px">same name twice → Duplicate declaration</text></svg></div>
+  <figcaption><b>Figure 9.1.8:</b> The same label <code>lp</code> in two expansions. <code>JNZ lp</code> cannot tell which of the two addresses to jump to; the assembler reports a <i>Duplicate declaration</i> error.</figcaption>
+</figure>
+
+<p>When the assembler reaches the second <code>lp:</code> line, it already finds this name in the symbol table. emu8086 reports a <i>Duplicate declaration</i> error and the program does not assemble. The error message points to the second DELAY line; when the programmer looks at that line, all that is visible is the macro's name. To understand the cause of the error one again has to think of the expansion.</p>
+
+<h3 id="s9-1-4-2"><span class="nt-num">9.1.4.2</span>The LOCAL directive</h3>
+
+<p>The solution is to give the label a different name in each expansion. The programmer cannot do this by hand, because the body is written in one place. The assembler takes over this job with the LOCAL directive.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-local">
+  <span class="nt-box__title">Definition 9.1.3</span>
+  <p>The <strong>LOCAL directive</strong> is written on the first line of a macro body and makes the names that follow it local to the macro. At every expansion the assembler replaces these names with a unique name that has not been used so far. MASM and emu8086 generate these names as <code>??0000</code>, <code>??0001</code>, <code>??0002</code>… with a counter that keeps increasing across all expansions in the program.</p>
+</div>
+
+<pre class="nt-code"><code>MyMacro2 <span class="kw">MACRO</span>
+    <span class="kw">LOCAL</span> label1, label2
+    <span class="kw">CMP</span>  AX, 2
+    <span class="kw">JE</span>   label1
+    <span class="kw">CMP</span>  AX, 3
+    <span class="kw">JE</span>   label2
+label1:
+    <span class="kw">INC</span>  AX
+label2:
+    <span class="kw">ADD</span>  AX, 2
+<span class="kw">ENDM</span></code></pre>
+
+<p>MyMacro2 declares two local labels. At the first use label1 becomes <code>??0000</code> and label2 becomes <code>??0001</code>. At the second use the counter continues where it left off: label1 becomes <code>??0002</code> and label2 <code>??0003</code>. The counter belongs to the program, not to the macro; the local labels of another macro take numbers from the same sequence. Names starting with <code>??</code> are chosen deliberately: there is no chance of a clash with the programmer's own labels.</p>
+
+<p>LOCAL must be the first line of the body; it must come right after the MACRO line. The assembler wants to know the local names before applying them to the rest of the body. LOCAL is used not only for labels but also for variable and procedure names defined inside the macro. If a macro defines a string inside itself (as in the PRINT macro), the name of the string must be local too.</p>
+
+<p>The listing of a program with two uses shows the naming and the addresses together:</p>
+
+<pre class="nt-code"><code>0100  3D 02 00   CMP AX, 2     <span class="cm">; 1st MyMacro2</span>
+0103  74 05      JE  ??0000
+0105  3D 03 00   CMP AX, 3
+0108  74 01      JE  ??0001
+010A  40         ??0000: INC AX
+010B  05 02 00   ??0001: ADD AX, 2
+010E  3D 02 00   CMP AX, 2     <span class="cm">; 2nd MyMacro2</span>
+0111  74 05      JE  ??0002
+0113  3D 03 00   CMP AX, 3
+0116  74 01      JE  ??0003
+0118  40         ??0002: INC AX
+0119  05 02 00   ??0003: ADD AX, 2
+011C  C3         RET</code></pre>
+
+<p>The machine code of the conditional jumps is instructive too. <code>JE ??0000</code> = <code>74 05</code>: 74h is the opcode and 05h is the relative displacement. The jump target is found by adding 5 to the address of the instruction after the JE (0105h): 0105h + 5 = 010Ah. The <code>JE ??0002</code> in the second copy is also <code>74 05</code>: 0113h + 5 = 0118h. The machine code of the two copies is identical byte for byte, because the 8086's short jumps store the displacement, not the address. What differs is the names of the labels and the absolute addresses they point to.</p>
+
+<h3 id="s9-1-4-3"><span class="nt-num">9.1.4.3</span>Code trace: MyMacro2</h3>
+
+<p>What MyMacro2 does depends on the value of AX. If AX = 2 it jumps to label1, INC and ADD run, and AX becomes 2 + 1 + 2 = 5. If AX = 3 it jumps to label2, only ADD runs, and again AX becomes 5. For any other value neither jump is taken and the flow falls through to label1; AX increases by 3. The trace of the program that starts with <code>MOV AX, 2</code> is in <a href="#tab-mymacro2">Table 9.1.11</a>.</p>
+
+<pre class="nt-code"><code><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 2       <span class="cm">; before MyMacro2</span>
+<span class="kw">CMP</span>  AX, 2       <span class="cm">; MyMacro2 starts</span>
+<span class="kw">JE</span>   ??0000
+<span class="kw">CMP</span>  AX, 3
+<span class="kw">JE</span>   ??0001
+??0000:
+<span class="kw">INC</span>  AX
+??0001:
+<span class="kw">ADD</span>  AX, 2       <span class="cm">; MyMacro2 ends</span>
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-mymacro2">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.11: Trace of MyMacro2 with AX = 2; the LOCAL labels became ??0000 (010Dh) and ??0001 (010Eh).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">ZF</th><th scope="col">SF</th><th scope="col">CF</th><th scope="col">Next IP</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, 2</code><br><small>main program</small></td><td>0002h</td><td>0</td><td>0</td><td>0</td><td>0103h</td><td>AX = 2</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>CMP AX, 2</code><br><small>MyMacro2 expansion</small></td><td>0002h</td><td>1</td><td>0</td><td>0</td><td>0106h</td><td>2 − 2 = 0: ZF = 1</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>JE ??0000</code><br><small>MyMacro2 expansion</small></td><td>0002h</td><td>1</td><td>0</td><td>0</td><td>010Dh</td><td>ZF = 1: jump to ??0000 (label1)</td></tr>
+    <tr><td>4</td><td>010Dh</td><td><code>INC AX</code><br><small>MyMacro2 expansion</small></td><td>0003h</td><td>0</td><td>0</td><td>0</td><td>010Eh</td><td>AX = 3</td></tr>
+    <tr><td>5</td><td>010Eh</td><td><code>ADD AX, 2</code><br><small>MyMacro2 expansion</small></td><td>0005h</td><td>0</td><td>0</td><td>0</td><td>0111h</td><td>AX = 5</td></tr>
+    <tr><td>6</td><td>0111h</td><td><code>RET</code><br><small>main program</small></td><td>0005h</td><td>0</td><td>0</td><td>0</td><td>0000h</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>In the second step <code>CMP AX, 2</code> subtracts 2 from AX but writes the result nowhere; it only sets the flags. Since 2 − 2 = 0, ZF = 1. The <code>JE</code> in the third step looks at ZF and jumps to ??0000, that is, to 010Dh. The Next IP column shows this jump: 010Dh instead of 0108h. <code>CMP AX, 3</code> and the second <code>JE</code> are never executed. INC AX gives 3 and ADD AX, 2 gives 5. Had AX been 3 at the start of the program, the first JE would not jump, the second JE would jump to label2, and the result would again be 5. Had AX been 7, neither jump would be taken, INC and ADD would run and AX would be 10. A program that starts with AX = 0 would end with 3.</p>
+
+<h3 id="s9-1-4-4"><span class="nt-num">9.1.4.4</span>Code trace: the two copies of DELAY</h3>
+
+<p>When <code>LOCAL lp</code> is added to the DELAY macro, the error disappears:</p>
+
+<pre class="nt-code"><code>DELAY <span class="kw">MACRO</span>
+      <span class="kw">LOCAL</span> ilk
+ilk:  <span class="kw">DEC</span> CX
+      <span class="kw">JNZ</span> ilk
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    <span class="kw">mov</span> cx, 3
+    DELAY
+    <span class="kw">mov</span> cx, 2
+    DELAY
+    <span class="kw">ret</span></code></pre>
+
+<p>In the first copy the label lp gets the name <code>??0000</code> and is at 0103h. In the second copy it becomes <code>??0001</code> and is at 0109h. Each copy loops back to its own label.</p>
+
+<div class="nt-tablewrap" id="tab-bekle">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.12: Trace of two copies of the DELAY macro with the label declared LOCAL lp.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">CX</th><th scope="col">ZF</th><th scope="col">Next IP</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov cx, 3</code><br><small>main program</small></td><td>0003h</td><td>0</td><td>0103h</td><td>counter of copy 1</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>??0000: DEC CX</code><br><small>DELAY expansion</small></td><td>0002h</td><td>0</td><td>0104h</td><td>1st pass: CX = 2</td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>JNZ ??0000</code><br><small>DELAY expansion</small></td><td>0002h</td><td>0</td><td>0103h</td><td>ZF = 0: loop back to ??0000 (0103h)</td></tr>
+    <tr><td>4</td><td>0103h</td><td><code>??0000: DEC CX</code><br><small>DELAY expansion</small></td><td>0001h</td><td>0</td><td>0104h</td><td>2nd pass</td></tr>
+    <tr><td>5</td><td>0104h</td><td><code>JNZ ??0000</code><br><small>DELAY expansion</small></td><td>0001h</td><td>0</td><td>0103h</td><td>0103h again</td></tr>
+    <tr><td>6</td><td>0103h</td><td><code>??0000: DEC CX</code><br><small>DELAY expansion</small></td><td>0000h</td><td>1</td><td>0104h</td><td>3rd pass: CX = 0, ZF = 1</td></tr>
+    <tr><td>7</td><td>0104h</td><td><code>JNZ ??0000</code><br><small>DELAY expansion</small></td><td>0000h</td><td>1</td><td>0106h</td><td>no jump; copy 1 is done</td></tr>
+    <tr><td>8</td><td>0106h</td><td><code>mov cx, 2</code><br><small>main program</small></td><td>0002h</td><td>1</td><td>0109h</td><td>counter of copy 2</td></tr>
+    <tr><td>9</td><td>0109h</td><td><code>??0001: DEC CX</code><br><small>DELAY expansion</small></td><td>0001h</td><td>0</td><td>010Ah</td><td>1st pass: CX = 1</td></tr>
+    <tr><td>10</td><td>010Ah</td><td><code>JNZ ??0001</code><br><small>DELAY expansion</small></td><td>0001h</td><td>0</td><td>0109h</td><td>loop back to ??0001 (0109h), not to 0103h</td></tr>
+    <tr><td>11</td><td>0109h</td><td><code>??0001: DEC CX</code><br><small>DELAY expansion</small></td><td>0000h</td><td>1</td><td>010Ah</td><td>CX = 0, ZF = 1</td></tr>
+    <tr><td>12</td><td>010Ah</td><td><code>JNZ ??0001</code><br><small>DELAY expansion</small></td><td>0000h</td><td>1</td><td>010Ch</td><td>no jump</td></tr>
+    <tr><td>13</td><td>010Ch</td><td><code>ret</code><br><small>main program</small></td><td>0000h</td><td>1</td><td>0000h</td><td>the program ends; 5 DECs in all</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-bekle" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="LOCAL labels, step 6: CX, ZF and jump targets"><defs><marker id="n91-9-m4t8-11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-hot" x="8" y="20" width="78" height="34" rx="4"/><text class="lbl" x="47" y="16" text-anchor="middle" style="font-size:11.5px">CX</text><text class="mt-v" x="47" y="42" text-anchor="middle" style="font-size:14px">0001h</text><rect class="box" x="100" y="22" width="38" height="32" rx="4"/><text class="lbl" x="119" y="34" text-anchor="middle" style="font-size:10.5px">ZF</text><text class="mt-v" x="119" y="49" text-anchor="middle" style="font-size:13px">0</text><rect class="box" x="8" y="70" width="250" height="36" rx="5"/><text class="mt-s" x="18" y="85" text-anchor="start">copy 1 · lp → ??0000</text><text class="lbl" x="18" y="100" text-anchor="start" style="font-size:11.5px">label address 0103h</text><rect class="mt-hot" x="8" y="116" width="250" height="36" rx="5"/><text class="mt-s" x="18" y="131" text-anchor="start">copy 2 · lp → ??0001</text><text class="lbl" x="18" y="146" text-anchor="start" style="font-size:11.5px">label address 0109h</text><path class="line" d="M258 144 C300 144 300 122 262 124" marker-end="url(#n91-9-m4t8-11)"/><text class="mt-a" x="304" y="138" text-anchor="start">JNZ: jump</text><text class="mt-m" x="200" y="36" text-anchor="start">IP next: 0109h</text></svg></div>
+  <figcaption><b>Figure 9.1.9:</b> The first pass of the second copy: <code>JNZ ??0001</code> loops back to 0109h, not to the label at 0103h of the first copy.</figcaption>
+</figure>
+
+<p>In <a href="#tab-bekle">Table 9.1.12</a> the first copy loops three times. DEC CX decreases CX by one on every pass and sets ZF according to the result. As long as CX stays nonzero, ZF = 0 and JNZ jumps back to 0103h. On the third pass CX becomes 0, ZF becomes 1 and JNZ does not jump. The second copy runs two passes with CX = 2 and each time loops back to 0109h (<a href="#sekil-bekle">Figure 9.1.9</a>). Five DECs are executed in all. Recall also that DEC does not touch CF; it changes only ZF, SF, OF, AF and PF.</p>
+
+<p>The delay time can be computed in clock cycles. <code>DEC r16</code> takes 2 cycles. <code>JNZ</code> takes 16 cycles when it jumps and 4 when it does not; because the prefetch queue is flushed on a jump, the difference is large. With CX = 3 the first copy takes 2 × (2 + 16) + (2 + 4) = 42 cycles. Such a loop produces a crude delay that depends on the processor clock.</p>
+
+<h3 id="s9-1-4-5"><span class="nt-num">9.1.4.5</span>Code trace: MAX2 and signed comparison</h3>
+
+<p>The last example combines LOCAL with a signed comparison. The MAX2 macro writes the larger of p and q to r:</p>
+
+<pre class="nt-code"><code>MAX2 <span class="kw">MACRO</span> p, q, r
+    <span class="kw">LOCAL</span> ok
+    <span class="kw">MOV</span> AX, p
+    <span class="kw">CMP</span> AX, q
+    <span class="kw">JGE</span> ok
+    <span class="kw">MOV</span> AX, q
+ok: <span class="kw">MOV</span> r, AX
+<span class="kw">ENDM</span>
+
+<span class="kw">org</span> 100h
+    MAX2 x, y, m1
+    MAX2 y, 4, m2
+    <span class="kw">ret</span>
+x  <span class="kw">dw</span> 7
+y  <span class="kw">dw</span> -3
+m1 <span class="kw">dw</span> ?
+m2 <span class="kw">dw</span> ?</code></pre>
+
+<p>In the first call all three parameters are variables. In the second q is a constant, so <code>CMP AX, 4</code> and <code>MOV AX, 4</code> use the immediate form. y = −3 is stored as FFFDh in two's complement.</p>
+
+<div class="nt-tablewrap" id="tab-buyuk">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.13: Trace of the expansions of <code>MAX2 x, y, m1</code> and <code>MAX2 y, 4, m2</code> (x = 7, y = −3).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">m1</th><th scope="col">m2</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AX, x</code><br><small>MAX2 expansion</small></td><td>0007h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0000h</td><td>0000h</td><td>p = x: AX = 7</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>CMP AX, y</code><br><small>MAX2 expansion</small></td><td>0007h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0000h</td><td>0000h</td><td>7 − (−3) = 10: SF = 0, OF = 0</td></tr>
+    <tr><td>3</td><td>0107h</td><td><code>JGE ??0000</code><br><small>MAX2 expansion</small></td><td>0007h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0000h</td><td>0000h</td><td>SF = OF: jump to ??0000</td></tr>
+    <tr><td>4</td><td>010Ch</td><td><code>??0000: MOV m1, AX</code><br><small>MAX2 expansion</small></td><td>0007h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0007h</td><td>0000h</td><td>m1 = 7</td></tr>
+    <tr><td>5</td><td>010Fh</td><td><code>MOV AX, y</code><br><small>MAX2 expansion</small></td><td>FFFDh</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0007h</td><td>0000h</td><td>p = y: AX = FFFDh (−3)</td></tr>
+    <tr><td>6</td><td>0112h</td><td><code>CMP AX, 4</code><br><small>MAX2 expansion</small></td><td>FFFDh</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0000h</td><td>−3 − 4 = −7: SF = 1, OF = 0</td></tr>
+    <tr><td>7</td><td>0115h</td><td><code>JGE ??0001</code><br><small>MAX2 expansion</small></td><td>FFFDh</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0000h</td><td>SF ≠ OF: no jump</td></tr>
+    <tr><td>8</td><td>0117h</td><td><code>MOV AX, 4</code><br><small>MAX2 expansion</small></td><td>0004h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0000h</td><td>q = 4 is the larger one</td></tr>
+    <tr><td>9</td><td>011Ah</td><td><code>??0001: MOV m2, AX</code><br><small>MAX2 expansion</small></td><td>0004h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0004h</td><td>m2 = 4</td></tr>
+    <tr><td>10</td><td>011Dh</td><td><code>ret</code><br><small>main program</small></td><td>0004h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0007h</td><td>0004h</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>The <code>CMP AX, y</code> of the second step performs 7 − (−3). Under the signed interpretation the result is 10: positive (SF = 0) with no overflow (OF = 0). <code>JGE</code> (jump if greater or equal) looks at the result of the signed comparison with the condition SF = OF. Since the condition holds, control jumps to ??0000 and m1 = 7. Under the unsigned interpretation the same subtraction is 0007h − FFFDh; because a larger number is subtracted from a smaller one, a borrow occurs and CF = 1. Since JGE does not look at CF, this flag does not matter here.</p>
+
+<p>In the second expansion AX = FFFDh (−3) and <code>CMP AX, 4</code> gives −3 − 4 = −7: SF = 1, OF = 0. Since SF ≠ OF, JGE does not jump. The flow continues with <code>MOV AX, 4</code> and m2 = 4. The label of the second copy is ??0001; it does not clash with the first one's.</p>
+
+<p>The choice of conditional jump matters in this example. Had <code>JAE</code>, which compares as unsigned, been used instead of JGE, the second comparison would have treated FFFDh and 4 as unsigned numbers. FFFDh = 65,533 is greater than 4; there is no borrow (CF = 0) and JAE jumps. m2 would receive FFFDh, that is −3, instead of 4. Even though the macro stays the same, a single conditional jump instruction decides whether the result is right. With signed numbers use JG, JGE, JL, JLE; with unsigned numbers use JA, JAE, JB, JBE.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Forgetting LOCAL because a macro with a label worked correctly when tried once. The error appears only when the macro is used a second time, and then the error message points not to the body but to the line of use. Every macro that has a label gets a LOCAL, no matter how many times it will be used.</p>
+</div>
+
+<h2 class="nt-pb" id="s9-1-5"><span class="nt-num">9.1.5</span>PUTC and preserving registers</h2>
+
+<h3 id="s9-1-5-1"><span class="nt-num">9.1.5.1</span>The PUTC macro</h3>
+
+<p>PUTC is a short macro that writes a single character to the screen. It is identical to the PUTC macro of the emu8086.inc library:</p>
+
+<pre class="nt-code"><code><span class="cm">; prints a character, advances the cursor</span>
+PUTC  <span class="kw">MACRO</span>  char
+      <span class="kw">push</span>  ax
+      <span class="kw">mov</span>   al, char
+      <span class="kw">mov</span>   ah, 0eh
+      <span class="kw">int</span>   10h
+      <span class="kw">pop</span>   ax
+<span class="kw">ENDM</span>
+
+<span class="kw">ORG</span>  100h
+START:
+      PUTC  'A'
+      PUTC  'B'
+      <span class="kw">RET</span></code></pre>
+
+<p>The real work of the macro is done by <code>INT 10h</code>. AH = 0Eh is the BIOS teletype output service. The character in AL is written where the cursor is and the cursor advances one position to the right. At the end of a line the cursor moves to the next line; at the end of the screen the screen scrolls by one line. Control characters such as 0Dh (carriage return), 0Ah (line feed), 07h (bell) and 08h (backspace) are not printed but interpreted.</p>
+
+<p>Because the service uses AH and AL, the macro has to modify AX. The <code>push ax</code> at the start of the macro and the <code>pop ax</code> at the end hide this change from the caller. On leaving the macro, AX returns to the value it had before the macro was entered. The macro has no visible side effect. This principle holds for all library macros: a macro may use registers for its own work but restores them on exit.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-koruma">
+  <span class="nt-box__title">Definition 9.1.4</span>
+  <p><strong>Register preservation</strong> means that a macro or procedure saves the registers it modifies with PUSH at the start and restores them with POP in reverse order at the end. The values in the caller's registers are thus not corrupted by the use; only the registers explicitly designated for returning a result change.</p>
+</div>
+
+<p>The RET at the end of the program matters too. After the two PUTC copies the program's code ends in memory. Without the RET the processor would take the bytes after the last POP AX for instructions and keep executing. The processor does not distinguish code from data; it decodes every byte that IP points to as an opcode. Whatever is left in memory would run as random instructions and the system could hang. Macro expansion does not add this RET by itself.</p>
+
+<h3 id="s9-1-5-2"><span class="nt-num">9.1.5.2</span>Code trace: PUTC 'A' and PUTC 'B'</h3>
+
+<p>The expanded code is two 8-byte copies and a RET, 17 bytes in all. Because emu8086 writes the program size into CX at load time, CX = 0011h at the start of the trace. This value does not change during the program, because PUTC does not touch CX. AX is initially 0000h. The machine code of each copy is the same except for the character byte: <code>50 B0 41 B4 0E CD 10 58</code> and <code>50 B0 42 B4 0E CD 10 58</code>.</p>
+
+<div class="nt-tablewrap" id="tab-putc">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.14: Trace of the expansions of <code>PUTC 'A'</code> and <code>PUTC 'B'</code>; at load time CX = 0011h (17 bytes).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">[SS:SP]</th><th scope="col">Screen</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>push ax</code><br><small>PUTC expansion</small></td><td>0000h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td>–</td><td>the caller's AX (0000h) to the stack; SP = FFFCh</td></tr>
+    <tr><td>2</td><td>0101h</td><td><code>mov al, &#x27;A&#x27;</code><br><small>PUTC expansion</small></td><td>0041h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td>–</td><td>AL ← 41h</td></tr>
+    <tr><td>3</td><td>0103h</td><td><code>mov ah, 0eh</code><br><small>PUTC expansion</small></td><td>0E41h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td>–</td><td>AX = 0E41h</td></tr>
+    <tr><td>4</td><td>0105h</td><td><code>int 10h</code><br><small>PUTC expansion</small></td><td>0E41h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>A to the screen; cursor one position right</td></tr>
+    <tr><td>5</td><td>0107h</td><td><code>pop ax</code><br><small>PUTC expansion</small></td><td>0000h</td><td>0011h</td><td>FFFEh</td><td>0000h</td><td><code>A</code></td><td>AX has its old value back; SP = FFFEh</td></tr>
+    <tr><td>6</td><td>0108h</td><td><code>push ax</code><br><small>PUTC expansion</small></td><td>0000h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>2nd copy: AX is saved again</td></tr>
+    <tr><td>7</td><td>0109h</td><td><code>mov al, &#x27;B&#x27;</code><br><small>PUTC expansion</small></td><td>0042h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>AL ← 42h</td></tr>
+    <tr><td>8</td><td>010Bh</td><td><code>mov ah, 0eh</code><br><small>PUTC expansion</small></td><td>0E42h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>A</code></td><td>AX = 0E42h</td></tr>
+    <tr><td>9</td><td>010Dh</td><td><code>int 10h</code><br><small>PUTC expansion</small></td><td>0E42h</td><td>0011h</td><td>FFFCh</td><td>0000h</td><td><code>AB</code></td><td>AB on the screen</td></tr>
+    <tr><td>10</td><td>010Fh</td><td><code>pop ax</code><br><small>PUTC expansion</small></td><td>0000h</td><td>0011h</td><td>FFFEh</td><td>0000h</td><td><code>AB</code></td><td>AX = 0000h: the caller's AX was not corrupted</td></tr>
+    <tr><td>11</td><td>0110h</td><td><code>RET</code><br><small>main program</small></td><td>0000h</td><td>0011h</td><td>0000h</td><td>–</td><td><code>AB</code></td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-putc" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Stack memory, SP=FFFCh"><defs><marker id="n91-10-m8ah135" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#n91-10-m8ah135)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">offset from SS · low address at top</text></svg></div>
+  <figcaption><b>Figure 9.1.10:</b> The stack after <code>push ax</code>: the caller's AX (0000h) has been saved at address FFFCh and SP = FFFCh.</figcaption>
+</figure>
+
+<p>In <a href="#tab-putc">Table 9.1.14</a> the first step pushes AX on the stack. SP decreases by 2 to FFFCh and 0000h is written to the word at SS:FFFCh (<a href="#sekil-putc">Figure 9.1.10</a>). The second and third steps load 'A' (41h) into AL and 0Eh into AH; AX becomes 0E41h. In the fourth step INT 10h writes A to the screen and advances the cursor. The INT instruction itself pushes FLAGS, CS and IP on the stack, goes to the BIOS routine and returns with IRET; this internal detail appears as a single step in the trace. The POP AX of the fifth step takes the 0000h from the stack into AX and restores SP to FFFEh. The second copy follows the same path with 'B', and AB appears on the screen. In the final state AX = 0000h: the macro has not corrupted the caller's AX.</p>
+
+<p>In this trace the stack grows and shrinks by one word in each copy. As long as PUSH and POP are paired within the same macro, the stack is balanced: SP is the same on leaving the macro as on entering it. If this balance is broken, for example if a conditional jump in the body skips the POP, an extra word stays on the stack. The main program's RET takes this word for the return address and the program goes to a wrong place.</p>
+
+<h3 id="s9-1-5-3"><span class="nt-num">9.1.5.3</span>Register-saving macros</h3>
+
+<p>The <code>push ax</code> / <code>pop ax</code> pattern of PUTC grows to four registers in larger macros. This pattern can itself be a macro:</p>
+
+<pre class="nt-code"><code>SAVE <span class="kw">MACRO</span>
+  <span class="kw">PUSH</span> AX
+  <span class="kw">PUSH</span> BX
+  <span class="kw">PUSH</span> CX
+  <span class="kw">PUSH</span> DX
+<span class="kw">ENDM</span>
+
+RESTORE <span class="kw">MACRO</span>
+  <span class="kw">POP</span> DX
+  <span class="kw">POP</span> CX
+  <span class="kw">POP</span> BX
+  <span class="kw">POP</span> AX
+<span class="kw">ENDM</span></code></pre>
+
+<p>RESTORE pops the registers in the reverse of the order in which SAVE pushed them. The stack works on the last-in, first-out (LIFO) principle: DX, the last one pushed, must be the first one popped. Suppose SAVE is used while AX = 1111h, BX = 2222h, CX = 3333h, DX = 4444h and the registers are then cleared. After RESTORE all four registers return to their old values. If the pops are written in the same order as the pushes (<code>POP AX</code>, <code>POP BX</code>, <code>POP CX</code>, <code>POP DX</code>), the result is AX = 4444h, BX = 3333h, CX = 2222h, DX = 1111h: AX and DX swap, and so do BX and CX. This error is not caught at assembly time, because every line is valid by itself.</p>
+
+<p>Each SAVE and RESTORE pair adds 8 bytes; every PUSH and POP is a single byte. In time, on the 8086 <code>PUSH r16</code> takes 11 cycles and <code>POP r16</code> takes 8: 4 × 11 + 4 × 8 = 76 cycles. Within this time eight stack accesses, that is, eight bus cycles, are made. In a short macro this time can exceed that of the body itself; a macro should therefore save only the registers it really modifies.</p>
+
+<p>The two macros must be used together in the same body. If there is a conditional exit in between (for instance a jump to the end of the body in an error case), this exit must also pass through RESTORE; otherwise the stack is left unbalanced. On the 80186 and later processors the single instructions <code>PUSHA</code> and <code>POPA</code> save and restore all the general-purpose registers. The 8086 does not have these instructions, which is why the same job is written as a macro.</p>
+
+<h3 id="s9-1-5-4"><span class="nt-num">9.1.5.4</span>Nested macros</h3>
+
+<p>The body of a macro may contain a call to another macro. PRINT2 below uses PUTC twice to print two characters:</p>
+
+<pre class="nt-code"><code>PRINT2 <span class="kw">MACRO</span> c1, c2
+       PUTC c1
+       PUTC c2
+<span class="kw">ENDM</span>
+
+PRINT2 'O', 'K'</code></pre>
+
+<p>The assembler expands in two levels. It first expands the outer macro: the line <code>PRINT2 'O', 'K'</code> turns into the lines <code>PUTC 'O'</code> and <code>PUTC 'K'</code>. These two lines are macro calls as well, and the assembler expands them too. In the end the one-line call becomes ten instructions and 16 bytes (<a href="#sekil-icice">Figure 9.1.11</a>). OK appears on the screen.</p>
+
+<figure class="nt-fig" id="sekil-icice" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 118" role="img" aria-label="Nested macro expansion: PRINT2 expands into two PUTC calls, each PUTC into five instructions" style="display:block;margin:8px auto 0;max-width:330px"><defs><marker id="n91-11-m4t8-34" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="mt-acc" x="65" y="4" width="200" height="24" rx="5"/><text class="mt-m" x="165" y="21" text-anchor="middle">PRINT2 'O', 'K'</text><rect class="box" x="4" y="44" width="156" height="24" rx="5"/><text class="mt-m" x="82" y="61" text-anchor="middle">PUTC 'O'</text><path class="line" d="M165 28 L82 43" marker-end="url(#n91-11-m4t8-34)"/><rect class="mt-good" x="7" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="38" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="69" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="100" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="131" y="76" width="27" height="16" rx="3"/><text class="lbl" x="82" y="108" text-anchor="middle" style="font-size:11px">5 instructions · 8 bytes</text><rect class="box" x="170" y="44" width="156" height="24" rx="5"/><text class="mt-m" x="248" y="61" text-anchor="middle">PUTC 'K'</text><path class="line" d="M165 28 L248 43" marker-end="url(#n91-11-m4t8-34)"/><rect class="mt-good" x="173" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="204" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="235" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="266" y="76" width="27" height="16" rx="3"/><rect class="mt-good" x="297" y="76" width="27" height="16" rx="3"/><text class="lbl" x="248" y="108" text-anchor="middle" style="font-size:11px">5 instructions · 8 bytes</text></svg></div>
+  <figcaption><b>Figure 9.1.11:</b> Nested expansion: PRINT2 expands into two PUTC calls, and each PUTC into five instructions.</figcaption>
+</figure>
+
+<p>With nesting, the order of definition matters again. PUTC must be defined before the line where PRINT2 is used. A macro calling itself (recursion) is a boundary case. In a procedure, recursion is limited by the stack and stopped by a condition. In a macro the stopping condition must be an assembly-time one, not a run-time one; otherwise the expansion never ends. Conditional assembly directives make such a stop possible.</p>
+
+<h2 class="nt-pb" id="s9-1-6"><span class="nt-num">9.1.6</span>The POWER macro</h2>
+
+<h3 id="s9-1-6-1"><span class="nt-num">9.1.6.1</span>Exponentiation: MUL and LOOP</h3>
+
+<p>The POWER macro computes the power of a base: r = b<sup>e</sup>. The method is the simplest one. The running result is initialized to 1 and multiplied by the base e times:</p>
+
+<pre class="nt-code"><code>POWER <span class="kw">macro</span> b, e, r
+    <span class="kw">mov</span> ax, 1        <span class="cm">; result so far = 1</span>
+    <span class="kw">mov</span> cx, e        <span class="cm">; exponent → CX</span>
+    <span class="kw">mov</span> bx, b        <span class="cm">; base → BX</span>
+powerloop:
+    <span class="kw">mul</span> bx           <span class="cm">; DX:AX = AX * BX</span>
+    <span class="kw">loop</span> powerloop   <span class="cm">; repeat e times</span>
+    <span class="kw">mov</span> r, ax        <span class="cm">; store result</span>
+<span class="kw">endm</span>
+
+<span class="kw">ORG</span> 100h
+start:
+    POWER base, exponent, result
+    <span class="kw">ret</span>
+base     <span class="kw">dw</span> 2     <span class="cm">; base</span>
+exponent <span class="kw">dw</span> 3     <span class="cm">; exponent</span>
+result   <span class="kw">dw</span> ?     <span class="cm">; result</span></code></pre>
+
+<p>The macro uses two important instructions. <code>MUL BX</code> is unsigned multiplication: it multiplies AX by BX and writes the 32-bit result to the register pair DX:AX. The high 16 bits go to DX and the low 16 bits to AX. MUL therefore always modifies DX, even though DX is not named as an operand. If the high half of the result is nonzero, CF and OF become 1; if it is zero, both are 0. SF, ZF, AF and PF are undefined after MUL.</p>
+
+<p><code>LOOP label</code> decrements CX by 1 and jumps to the label if CX is nonzero. It does not change the flags. CX is the loop counter here; the macro loads it with the exponent. On the 8086, LOOP takes 17 cycles when it jumps and 5 when it does not. A 16-bit MUL takes between 118 and 133 cycles depending on the operand values; it is one of the slowest instructions in the instruction set.</p>
+
+<p>The size of the expansion can also be computed. <code>mov ax, 1</code> is 3 bytes, <code>mov cx, exponent</code> and <code>mov bx, base</code> are 4 bytes each with the general memory-operand form, <code>mul bx</code> is 2 bytes, <code>loop</code> is 2 bytes, and <code>mov result, ax</code> is 3 bytes with the short AX-specific form. The total is 18 bytes; with the RET, 19 bytes (13h). The variables start right after the code: base is at 0113h, exponent at 0115h and result at 0117h.</p>
+
+<h3 id="s9-1-6-2"><span class="nt-num">9.1.6.2</span>Code trace: POWER 2, 3</h3>
+
+<p>The expanded code is:</p>
+
+<pre class="nt-code"><code><span class="kw">ORG</span> 100h
+<span class="kw">mov</span> ax, 1        <span class="cm">; POWER expansion</span>
+<span class="kw">mov</span> cx, exponent
+<span class="kw">mov</span> bx, base
+powerloop:
+<span class="kw">mul</span> bx
+<span class="kw">loop</span> powerloop
+<span class="kw">mov</span> result, ax
+<span class="kw">ret</span>
+base     <span class="kw">dw</span> 2    <span class="cm">; 0113h</span>
+exponent <span class="kw">dw</span> 3    <span class="cm">; 0115h</span>
+result   <span class="kw">dw</span> ?    <span class="cm">; 0117h</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-power">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.15: Trace of the expansion of <code>POWER base, exponent, result</code> (base = 0113h, exponent = 0115h, result = 0117h).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">CF</th><th scope="col">result</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov ax, 1</code><br><small>POWER expansion</small></td><td>0001h</td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>0000h</td><td>result so far is 1</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov cx, exponent</code><br><small>POWER expansion</small></td><td>0001h</td><td>0000h</td><td>0003h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX ← [0115h] = 3</td></tr>
+    <tr><td>3</td><td>0107h</td><td><code>mov bx, base</code><br><small>POWER expansion</small></td><td>0001h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>0</td><td>0000h</td><td>BX ← [0113h] = 2</td></tr>
+    <tr><td>4</td><td>010Bh</td><td><code>mul bx</code><br><small>POWER expansion</small></td><td>0002h</td><td>0002h</td><td>0003h</td><td>0000h</td><td>0</td><td>0000h</td><td>1st pass: DX:AX = 1 × 2</td></tr>
+    <tr><td>5</td><td>010Dh</td><td><code>loop powerloop</code><br><small>POWER expansion</small></td><td>0002h</td><td>0002h</td><td>0002h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX = 2 ≠ 0: powerloop</td></tr>
+    <tr><td>6</td><td>010Bh</td><td><code>mul bx</code><br><small>POWER expansion</small></td><td>0004h</td><td>0002h</td><td>0002h</td><td>0000h</td><td>0</td><td>0000h</td><td>2nd pass: 2 × 2</td></tr>
+    <tr><td>7</td><td>010Dh</td><td><code>loop powerloop</code><br><small>POWER expansion</small></td><td>0004h</td><td>0002h</td><td>0001h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX = 1</td></tr>
+    <tr><td>8</td><td>010Bh</td><td><code>mul bx</code><br><small>POWER expansion</small></td><td>0008h</td><td>0002h</td><td>0001h</td><td>0000h</td><td>0</td><td>0000h</td><td>3rd pass: 4 × 2</td></tr>
+    <tr><td>9</td><td>010Dh</td><td><code>loop powerloop</code><br><small>POWER expansion</small></td><td>0008h</td><td>0002h</td><td>0000h</td><td>0000h</td><td>0</td><td>0000h</td><td>CX = 0: leave the loop</td></tr>
+    <tr><td>10</td><td>010Fh</td><td><code>mov result, ax</code><br><small>POWER expansion</small></td><td>0008h</td><td>0002h</td><td>0000h</td><td>0000h</td><td>0</td><td>0008h</td><td>[0117h] ← 0008h</td></tr>
+    <tr><td>11</td><td>0112h</td><td><code>ret</code><br><small>main program</small></td><td>0008h</td><td>0002h</td><td>0000h</td><td>0000h</td><td>0</td><td>0008h</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p><a href="#tab-power">Table 9.1.15</a> shows the three passes of the loop. In the first pass MUL computes 1 × 2 = 2: DX:AX = 0000:0002h. Since the high half is zero, CF = 0. LOOP decreases CX from 3 to 2 and returns to powerloop. In the second pass AX = 4, in the third AX = 8. The third LOOP makes CX 0 and does not jump. <code>mov result, ax</code> writes 0008h to the word at 0117h; 2<sup>3</sup> = 8.</p>
+
+<p>The table shows that DX is 0000h after every MUL. This holds as long as the result fits in 16 bits. Had the result exceeded 16 bits, for example if 2<sup>16</sup> were computed, after the last MUL DX = 0001h, AX = 0000h and CF = OF = 1. Because the macro writes only AX to result, result would be 0; the high part of the correct result stays in DX and is lost.</p>
+
+<h3 id="s9-1-6-3"><span class="nt-num">9.1.6.3</span>Four pitfalls</h3>
+
+<p>The POWER macro is small but hides four separate bugs. Each represents a kind of problem that is common when writing macros.</p>
+
+<p><b>1. Exponent zero.</b> In mathematics b<sup>0</sup> = 1; the macro starting with AX = 1 looks as if it would give this result. But MUL runs at least once, because the loop condition is checked at the end. Worse, LOOP first decrements CX and then compares with zero. With CX = 0 the decrement makes CX FFFFh; this is not zero and the loop continues. The loop ends only when CX becomes 0 again, that is, after 65,536 passes. For base = 2, after 2<sup>16</sup> the low 16 bits of AX are zero and stay so; result = 0000h. For base = 1, result = 1. This is correct by accident; 65,536 needless MULs have still been executed. Since each MUL takes about 120 cycles, this wasted time exceeds one and a half seconds at 4.77 MHz.</p>
+
+<p><b>2. The label.</b> <code>powerloop</code> is not declared with LOCAL. When the macro is used a second time the label is defined twice and a <i>Duplicate declaration</i> error occurs.</p>
+
+<p><b>3. Register corruption.</b> The macro puts the result in AX; that is an expected change. But it loads BX with the base and CX with the counter, and because of MUL it also modifies DX. The caller's values in these three registers are lost.</p>
+
+<p><b>4. Overflow.</b> If the result exceeds 65,535, the high part stays in DX and is not written. The macro also does not report this to the caller through CF; the CF of the last MUL remains after the macro, but any later instruction can erase it.</p>
+
+<p>The corrected version fixes the first three problems:</p>
+
+<pre class="nt-code"><code>POWER <span class="kw">MACRO</span> b, e, r
+      <span class="kw">LOCAL</span> p_loop, p_end
+      <span class="kw">PUSH</span> BX
+      <span class="kw">PUSH</span> CX
+      <span class="kw">PUSH</span> DX
+      <span class="kw">MOV</span>  AX, 1
+      <span class="kw">MOV</span>  CX, e
+      <span class="kw">MOV</span>  BX, b
+      <span class="kw">JCXZ</span> p_end   <span class="cm">; e = 0 → 1</span>
+p_loop: <span class="kw">MUL</span> BX
+      <span class="kw">LOOP</span> p_loop
+p_end: <span class="kw">MOV</span> r, AX
+      <span class="kw">POP</span>  DX
+      <span class="kw">POP</span>  CX
+      <span class="kw">POP</span>  BX
+<span class="kw">ENDM</span></code></pre>
+
+<p><code>JCXZ</code> (jump if CX is zero) checks the counter before LOOP. If CX = 0 it skips the whole loop and the 1 in AX is written directly to the result. LOCAL makes the two labels unique in every expansion. PUSH and POP preserve BX, CX and DX; the macro now modifies only AX. The overflow problem remains in this version too. To solve it, either the result must be written as 32 bits (DX:AX) or the overflow must be reported to the caller through CF.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Starting a LOOP-controlled loop when the counter may be zero. LOOP decrements first and checks afterwards; with CX = 0 it runs 65,536 times. Every loop whose counter comes from a variable or a parameter gets a <code>JCXZ</code> in front of it.</p>
+</div>
+
+<h3 id="s9-1-6-4"><span class="nt-num">9.1.6.4</span>Code trace: the corrected POWER</h3>
+
+<p>The expansion of the corrected macro, <code>POWER base, expn, res</code>, is traced for base = 7 and expn = 2. To see the effect of register preservation, let the caller's registers hold BX = 0AAAh, CX = 0BBBh, DX = 0CCCh:</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">push</span> bx          <span class="cm">; POWER expansion</span>
+<span class="kw">push</span> cx
+<span class="kw">push</span> dx
+<span class="kw">mov</span>  ax, 1
+<span class="kw">mov</span>  cx, expn
+<span class="kw">mov</span>  bx, base
+<span class="kw">jcxz</span> ??0001      <span class="cm">; expn = 0 → 1</span>
+??0000: <span class="kw">mul</span> bx
+<span class="kw">loop</span> ??0000
+??0001: <span class="kw">mov</span> res, ax
+<span class="kw">pop</span>  dx
+<span class="kw">pop</span>  cx
+<span class="kw">pop</span>  bx
+<span class="kw">ret</span>
+base <span class="kw">dw</span> 7
+expn<span class="kw">dw</span> 2
+res <span class="kw">dw</span> ?</code></pre>
+
+<p>The expansion is 26 bytes (up to 011Ah); the RET is at 011Ah, base at 011Bh, expn at 011Dh and res at 011Fh. The LOCAL names are ??0000 for p_loop and ??0001 for p_end.</p>
+
+<div class="nt-tablewrap" id="tab-powerfix">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.16: Expansion of <code>POWER base, expn, res</code> of the corrected POWER macro (base = 7, expn = 2); the caller's registers are BX = 0AAAh, CX = 0BBBh, DX = 0CCCh.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">SP</th><th scope="col">res</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>PUSH BX</code><br><small>POWER expansion</small></td><td>0000h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFFCh</td><td>0000h</td><td>BX saved</td></tr>
+    <tr><td>2</td><td>0101h</td><td><code>PUSH CX</code><br><small>POWER expansion</small></td><td>0000h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFFAh</td><td>0000h</td><td>CX saved</td></tr>
+    <tr><td>3</td><td>0102h</td><td><code>PUSH DX</code><br><small>POWER expansion</small></td><td>0000h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>DX saved; SP = FFF8h</td></tr>
+    <tr><td>4</td><td>0103h</td><td><code>MOV AX, 1</code><br><small>POWER expansion</small></td><td>0001h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>result so far is 1</td></tr>
+    <tr><td>5</td><td>0106h</td><td><code>MOV CX, expn</code><br><small>POWER expansion</small></td><td>0001h</td><td>0AAAh</td><td>0002h</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>CX ← expn = 2</td></tr>
+    <tr><td>6</td><td>010Ah</td><td><code>MOV BX, base</code><br><small>POWER expansion</small></td><td>0001h</td><td>0007h</td><td>0002h</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>BX ← base = 7</td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>JCXZ ??0001</code><br><small>POWER expansion</small></td><td>0001h</td><td>0007h</td><td>0002h</td><td>0CCCh</td><td>FFF8h</td><td>0000h</td><td>CX ≠ 0: no jump</td></tr>
+    <tr><td>8</td><td>0110h</td><td><code>??0000: MUL BX</code><br><small>POWER expansion</small></td><td>0007h</td><td>0007h</td><td>0002h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>1 × 7; MUL also writes DX</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>LOOP ??0000</code><br><small>POWER expansion</small></td><td>0007h</td><td>0007h</td><td>0001h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>CX = 1</td></tr>
+    <tr><td>10</td><td>0110h</td><td><code>??0000: MUL BX</code><br><small>POWER expansion</small></td><td>0031h</td><td>0007h</td><td>0001h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>7 × 7 = 49 = 0031h</td></tr>
+    <tr><td>11</td><td>0112h</td><td><code>LOOP ??0000</code><br><small>POWER expansion</small></td><td>0031h</td><td>0007h</td><td>0000h</td><td>0000h</td><td>FFF8h</td><td>0000h</td><td>CX = 0: the loop ends</td></tr>
+    <tr><td>12</td><td>0114h</td><td><code>??0001: MOV res, AX</code><br><small>POWER expansion</small></td><td>0031h</td><td>0007h</td><td>0000h</td><td>0000h</td><td>FFF8h</td><td>0031h</td><td>[011Fh] ← 0031h</td></tr>
+    <tr><td>13</td><td>0117h</td><td><code>POP DX</code><br><small>POWER expansion</small></td><td>0031h</td><td>0007h</td><td>0000h</td><td>0CCCh</td><td>FFFAh</td><td>0031h</td><td>DX = 0CCCh</td></tr>
+    <tr><td>14</td><td>0118h</td><td><code>POP CX</code><br><small>POWER expansion</small></td><td>0031h</td><td>0007h</td><td>0BBBh</td><td>0CCCh</td><td>FFFCh</td><td>0031h</td><td>CX = 0BBBh</td></tr>
+    <tr><td>15</td><td>0119h</td><td><code>POP BX</code><br><small>POWER expansion</small></td><td>0031h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>FFFEh</td><td>0031h</td><td>BX = 0AAAh; SP = FFFEh</td></tr>
+    <tr><td>16</td><td>011Ah</td><td><code>ret</code><br><small>main program</small></td><td>0031h</td><td>0AAAh</td><td>0BBBh</td><td>0CCCh</td><td>0000h</td><td>0031h</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-powerfix" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="Corrected POWER, step 1: registers, res and stack"><defs><marker id="n91-12-m4t8-12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="8" y="20" width="70" height="34" rx="4"/><text class="lbl" x="43" y="16" text-anchor="middle" style="font-size:11.5px">AX</text><text class="mt-v" x="43" y="42" text-anchor="middle" style="font-size:14px">0000h</text><rect class="box" x="84" y="20" width="70" height="34" rx="4"/><text class="lbl" x="119" y="16" text-anchor="middle" style="font-size:11.5px">BX</text><text class="mt-v" x="119" y="42" text-anchor="middle" style="font-size:14px">0AAAh</text><rect class="box" x="8" y="74" width="70" height="34" rx="4"/><text class="lbl" x="43" y="70" text-anchor="middle" style="font-size:11.5px">CX</text><text class="mt-v" x="43" y="96" text-anchor="middle" style="font-size:14px">0BBBh</text><rect class="box" x="84" y="74" width="70" height="34" rx="4"/><text class="lbl" x="119" y="70" text-anchor="middle" style="font-size:11.5px">DX</text><text class="mt-v" x="119" y="96" text-anchor="middle" style="font-size:14px">0CCCh</text><text class="lbl" x="8" y="136" text-anchor="start" style="font-size:11.5px">res</text><rect class="box" x="50" y="122" width="70" height="24" rx="3"/><text class="mt-m" x="85" y="139" text-anchor="middle">????</text><text class="lbl" x="300" y="14" text-anchor="middle" style="font-size:11px">stack</text><rect class="mt-hot" x="262" y="22" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="38.5" text-anchor="middle">0CCCh</text><text class="lbl" x="257" y="38.5" text-anchor="end" style="font-size:11px">FFF8</text><text class="mt-a" x="222" y="38.5" text-anchor="end" style="font-size:11px">DX</text><path class="line" d="M376 34 H336" marker-end="url(#n91-12-m4t8-12)"/><text class="mt-l" x="380" y="38.5" text-anchor="start">SP</text><rect class="box" x="262" y="48" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="64.5" text-anchor="middle">0BBBh</text><text class="lbl" x="257" y="64.5" text-anchor="end" style="font-size:11px">FFFA</text><text class="mt-a" x="222" y="64.5" text-anchor="end" style="font-size:11px">CX</text><rect class="box" x="262" y="74" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="90.5" text-anchor="middle">0AAAh</text><text class="lbl" x="257" y="90.5" text-anchor="end" style="font-size:11px">FFFC</text><text class="mt-a" x="222" y="90.5" text-anchor="end" style="font-size:11px">BX</text><rect class="box" x="262" y="100" width="70" height="24" rx="3"/><text class="mt-m" x="297" y="116.5" text-anchor="middle">0000h</text><text class="lbl" x="257" y="116.5" text-anchor="end" style="font-size:11px">FFFE</text></svg></div>
+  <figcaption><b>Figure 9.1.12:</b> After three PUSHes: the caller's BX, CX and DX values are on the stack, SP = FFF8h.</figcaption>
+</figure>
+
+<p>In <a href="#tab-powerfix">Table 9.1.16</a> the first three steps save the caller's registers on the stack (<a href="#sekil-powerfix">Figure 9.1.12</a>). The stack grows downward: 0AAAh is written to FFFCh, 0BBBh to FFFAh, 0CCCh to FFF8h. In the next three steps the registers pass into the macro's use: AX = 1, CX = 2, BX = 7. JCXZ does not jump, since CX ≠ 0. The first MUL gives 1 × 7 = 7 and makes DX 0000h. The second MUL gives 7 × 7 = 49 = 0031h. When LOOP brings CX down to 0 the loop ends and 0031h is written to res.</p>
+
+<p>The last three steps unwind the stack in reverse order. POP DX restores 0CCCh, POP CX restores 0BBBh, POP BX restores 0AAAh; SP is FFFEh again. When the macro is left, the values of BX, CX and DX are the same as on entry. Only AX has changed, and AX carries the result anyway. Had it been run with expn = 0, JCXZ would have jumped straight to ??0001, res = 1, and not a single MUL would have run.</p>
+
+<h2 class="nt-pb" id="s9-1-7"><span class="nt-num">9.1.7</span>Macro libraries</h2>
+
+<h3 id="s9-1-7-1"><span class="nt-num">9.1.7.1</span>INCLUDE and emu8086.inc</h3>
+
+<p>Frequently used macros are not rewritten in every program; they are collected in a separate file. Such a file is called a macro library. The <code>INCLUDE</code> directive inserts the text of the library file into the source at assembly time, at the place of the directive. To the assembler this is no different from typing the macros at the start of the program by hand. Because unused macros generate no code, including a large library does not enlarge the program; only the macros that are used are expanded.</p>
+
+<pre class="nt-code"><code>include 'emu8086.inc'
+<span class="kw">ORG</span> 100h
+    GOTOXY 10, 5
+    PRINT 'Hello'
+    PUTC  '!'
+    <span class="kw">RET</span></code></pre>
+
+<p>The emu8086.inc file that comes with emu8086 is a ready-made example of this arrangement. It contains macros that write characters and text to the screen (PUTC, PRINT, PRINTN), move the cursor (GOTOXY) and hide it (CURSOROFF). For longer jobs such as reading and printing numbers, the library also offers procedures. These procedures are added to the program once with special macros such as <code>DEFINE_SCAN_NUM</code> and called with CALL. The library thus follows the pattern in which macros and procedures work together: short jobs are macros, long jobs are single-copy procedures. The library's macros and procedures are treated in detail in the notes on the emu8086.inc library.</p>
+
+<h3 id="s9-1-7-2"><span class="nt-num">9.1.7.2</span>Code trace: expansion of PRINT 'OK'</h3>
+
+<p>The PRINT macro of the library uses all the techniques so far together: register preservation, LOCAL labels and data defined inside the macro. The call <code>PRINT 'OK'</code> expands to the following code (the LOCAL names are as the assembler generates them):</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">push</span> ax          <span class="cm">; PRINT 'OK'</span>
+<span class="kw">push</span> si
+<span class="kw">jmp</span>  ??0003      <span class="cm">; skip the data</span>
+??0001 <span class="kw">db</span> 'OK', 0
+??0003: <span class="kw">lea</span> si, ??0001
+??0000: <span class="kw">mov</span> al, cs:[si]
+<span class="kw">cmp</span>  al, 0
+<span class="kw">jz</span>   ??0002
+<span class="kw">inc</span>  si
+<span class="kw">mov</span>  ah, 0Eh
+<span class="kw">int</span>  10h
+<span class="kw">jmp</span>  ??0000
+??0002: <span class="kw">pop</span> si
+<span class="kw">pop</span>  ax
+<span class="kw">ret</span></code></pre>
+
+<p>The string 'OK' and the 0 byte after it are embedded in the code, at the place where the macro was expanded: 4Fh, 4Bh, 00h starting at 0104h. Because the processor does not distinguish code from data, it might take these three bytes for instructions. To prevent this, the macro first jumps over the string with <code>JMP</code>. The name of the string is LOCAL too (<code>??0001</code>); a second PRINT in the same program defines its own string under another name.</p>
+
+<p>Because the string sits in the code segment, the instruction that reads it uses the CS: segment prefix: <code>MOV AL, CS:[SI]</code>. Without the prefix the read would use the default segment, DS. In a .COM program CS = DS, so the result would be the same, but the macro must also work in .EXE programs where DS points to another segment. In machine code the prefix is the byte 2Eh and it makes the instruction one byte longer.</p>
+
+<p>In emu8086 the instruction <code>LEA SI, ??0001</code> assembles to the same 3-byte code as <code>MOV SI, OFFSET ??0001</code>: <code>BE 04 01</code>. In real MASM, a LEA with a direct address takes 4 bytes (<code>8D 36</code> + address) and the expansion would be one byte longer. The total size of the expansion is 26 bytes (0100h–0119h), 3 bytes of which are data. In general, for a text of n characters the PRINT expansion takes 24 + n bytes.</p>
+
+<div class="nt-tablewrap" id="tab-printok">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.17: Trace of the expansion of <code>PRINT 'OK'</code>; the string is at 0104h, inside the code.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AL</th><th scope="col">SI</th><th scope="col">SP</th><th scope="col">ZF</th><th scope="col">Screen</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>push ax</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0000h</td><td>FFFCh</td><td>0</td><td>–</td><td>AX saved</td></tr>
+    <tr><td>2</td><td>0101h</td><td><code>push si</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0000h</td><td>FFFAh</td><td>0</td><td>–</td><td>SI saved; SP = FFFAh</td></tr>
+    <tr><td>3</td><td>0102h</td><td><code>jmp ??0003</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0000h</td><td>FFFAh</td><td>0</td><td>–</td><td>jump over the string's bytes</td></tr>
+    <tr><td>4</td><td>0107h</td><td><code>??0003: lea si, ??0001</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>SI ← 0104h</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>??0000: mov al, cs:[si]</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>AL ← CS:[0104h] = 'O'</td></tr>
+    <tr><td>6</td><td>010Dh</td><td><code>cmp al, 0</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>4Fh ≠ 0: ZF = 0</td></tr>
+    <tr><td>7</td><td>010Fh</td><td><code>jz ??0002</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0104h</td><td>FFFAh</td><td>0</td><td>–</td><td>no jump</td></tr>
+    <tr><td>8</td><td>0111h</td><td><code>inc si</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td>–</td><td>SI = 0105h</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>mov ah, 0Eh</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td>–</td><td></td></tr>
+    <tr><td>10</td><td>0114h</td><td><code>int 10h</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>O to the screen</td></tr>
+    <tr><td>11</td><td>0116h</td><td><code>jmp ??0000</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Fh</td><td>0105h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>back to the loop start</td></tr>
+    <tr><td>12</td><td>010Ah</td><td><code>??0000: mov al, cs:[si]</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Bh</td><td>0105h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>AL = 'K'</td></tr>
+    <tr><td>15</td><td>0111h</td><td><code>inc si</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Bh</td><td>0106h</td><td>FFFAh</td><td>0</td><td><code>O</code></td><td>SI = 0106h</td></tr>
+    <tr><td>17</td><td>0114h</td><td><code>int 10h</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>4Bh</td><td>0106h</td><td>FFFAh</td><td>0</td><td><code>OK</code></td><td>OK on the screen</td></tr>
+    <tr><td>19</td><td>010Ah</td><td><code>??0000: mov al, cs:[si]</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0106h</td><td>FFFAh</td><td>0</td><td><code>OK</code></td><td>AL = 00h</td></tr>
+    <tr><td>20</td><td>010Dh</td><td><code>cmp al, 0</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0106h</td><td>FFFAh</td><td>1</td><td><code>OK</code></td><td>terminator: ZF = 1</td></tr>
+    <tr><td>21</td><td>010Fh</td><td><code>jz ??0002</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0106h</td><td>FFFAh</td><td>1</td><td><code>OK</code></td><td>jump to the exit</td></tr>
+    <tr><td>22</td><td>0118h</td><td><code>??0002: pop si</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0000h</td><td>FFFCh</td><td>1</td><td><code>OK</code></td><td>SI = 0000h</td></tr>
+    <tr><td>23</td><td>0119h</td><td><code>pop ax</code><br><small>PRINT &#x27;OK&#x27; expansion</small></td><td>00h</td><td>0000h</td><td>FFFEh</td><td>1</td><td><code>OK</code></td><td>AX restored; SP = FFFEh</td></tr>
+    <tr><td>24</td><td>011Ah</td><td><code>ret</code><br><small>main program</small></td><td>00h</td><td>0000h</td><td>0000h</td><td>1</td><td><code>OK</code></td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-print" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 160" role="img" aria-label="PRINT expansion, step 2: the embedded string, SI, AL and stack"><defs><marker id="n91-13-m4t8-22" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="8" y="14" text-anchor="start" style="font-size:11px">string in the code segment</text><rect class="box" x="8" y="20" width="50" height="28" rx="3"/><text class="mt-m" x="33" y="39" text-anchor="middle">'O'</text><text class="lbl" x="33" y="62" text-anchor="middle" style="font-size:10.5px">0104h</text><rect class="box" x="62" y="20" width="50" height="28" rx="3"/><text class="mt-m" x="87" y="39" text-anchor="middle">'K'</text><text class="lbl" x="87" y="62" text-anchor="middle" style="font-size:10.5px">0105h</text><rect class="box" x="116" y="20" width="50" height="28" rx="3"/><text class="mt-m" x="141" y="39" text-anchor="middle">00h</text><text class="lbl" x="141" y="62" text-anchor="middle" style="font-size:10.5px">0106h</text><rect class="box" x="8" y="112" width="66" height="34" rx="4"/><text class="lbl" x="41" y="108" text-anchor="middle" style="font-size:11.5px">AL</text><text class="mt-v" x="41" y="134" text-anchor="middle" style="font-size:14px">00h</text><rect class="box" x="80" y="112" width="66" height="34" rx="4"/><text class="lbl" x="113" y="108" text-anchor="middle" style="font-size:11.5px">SI</text><text class="mt-v" x="113" y="134" text-anchor="middle" style="font-size:14px">0000h</text><rect class="mt-dim" x="172" y="112" width="80" height="34" rx="4"/><text class="lbl" x="178" y="108" text-anchor="start" style="font-size:11px">screen</text><text class="mt-m" x="180" y="132" text-anchor="start" style="font-size:14px">▌</text><text class="lbl" x="310" y="14" text-anchor="middle" style="font-size:11px">stack</text><rect class="mt-hot" x="280" y="22" width="66" height="24" rx="3"/><text class="mt-m" x="313" y="38.5" text-anchor="middle">0000h</text><text class="lbl" x="275" y="38.5" text-anchor="end" style="font-size:11px">FFFA</text><path class="line" d="M390 34 H350" marker-end="url(#n91-13-m4t8-22)"/><text class="mt-l" x="394" y="38.5" text-anchor="start">SP</text><rect class="box" x="280" y="48" width="66" height="24" rx="3"/><text class="mt-m" x="313" y="64.5" text-anchor="middle">0000h</text><text class="lbl" x="275" y="64.5" text-anchor="end" style="font-size:11px">FFFC</text><rect class="box" x="280" y="74" width="66" height="24" rx="3"/><text class="mt-m" x="313" y="90.5" text-anchor="middle">0000h</text><text class="lbl" x="275" y="90.5" text-anchor="end" style="font-size:11px">FFFE</text></svg></div>
+  <figcaption><b>Figure 9.1.13:</b> The string embedded in the code: 'O', 'K' and the terminating 0 starting at 0104h. The JMP jumps over these bytes.</figcaption>
+</figure>
+
+<p><a href="#tab-printok">Table 9.1.17</a> shows the three passes of the loop; the repeated MOV AH and INT steps are abbreviated. In the first pass AL = 4Fh ('O') is read. <code>CMP AL, 0</code> gives ZF = 0 and JZ does not jump. SI advances by one, INT 10h writes 'O' and JMP returns to the loop start. The second pass writes 'K'. In the third pass AL = 00h is read; CMP gives ZF = 1 and JZ jumps to the exit (??0002). The 0 byte at the end is the terminator that marks the end of the string. The two POPs return SI and AX to their old values; SP is FFFEh again. OK has been printed and the caller's registers are intact.</p>
+
+<p>This expansion shows the power and the cost of the macro together. The single source line <code>PRINT 'OK'</code> has produced 26 bytes. If twenty different texts are printed with PRINT in a program, each carries its own loop. The same job takes far less space with an arrangement that keeps the strings in a separate place and calls a single print procedure. The library's procedures such as PRINT_STRING exist for exactly this purpose.</p>
+
+<h2 class="nt-pb" id="s9-1-8"><span class="nt-num">9.1.8</span>Macro operators</h2>
+
+<p>Since macro expansion is a text operation, special marks are needed to split and join text. MASM and TASM define five macro operators for this purpose. These operators have meaning only inside macro definitions and calls.</p>
+
+<div class="nt-tablewrap" id="tab-islecler">
+<table class="nt-table">
+  <caption>Table 9.1.18: Macro operators.</caption>
+  <thead><tr><th scope="col">Operator</th><th scope="col">Role</th><th scope="col">Example and expansion</th></tr></thead>
+  <tbody>
+    <tr><td><code>&amp;</code></td><td>joins a parameter to adjacent text</td><td><code>CLEAR MACRO r</code> · <code>XOR r&amp;X, r&amp;X</code> → <code>CLEAR B</code>: <code>XOR BX, BX</code></td></tr>
+    <tr><td><code>&lt; &gt;</code></td><td>makes text containing commas or spaces a single parameter</td><td><code>EMIT &lt;'A', 'B'&gt;</code> → one parameter: <code>'A', 'B'</code></td></tr>
+    <tr><td><code>!</code></td><td>makes the next character an ordinary character</td><td><code>&lt;5 !&gt; 3&gt;</code> → text: <code>5 &gt; 3</code></td></tr>
+    <tr><td><code>%</code></td><td>evaluates an expression and substitutes the result as text</td><td><code>SHOW %(4*8)</code> → parameter <code>32</code></td></tr>
+    <tr><td><code>;;</code></td><td>macro comment; not copied into the expansion</td><td><code>;; visible only in the definition</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The <code>&amp;</code> (concatenation) operator is the most frequently used. The assembler looks for parameter names in the body as whole words. Had <code>XOR rX, rX</code> been written, "rX" would count as a single word and would not match the parameter r; the expansion would remain <code>XOR rX, rX</code> and give an unknown-name error. Writing <code>r&amp;X</code> states that r is a parameter name and that the X that follows is to be glued to it. In the call <code>CLEAR B</code>, r = B and the expansion is <code>XOR BX, BX</code>. XORing a register with itself clears it and is a 2-byte, 3-cycle instruction; <code>MOV BX, 0</code> takes 3 bytes and 4 cycles.</p>
+
+<p>The angle brackets <code>&lt; &gt;</code> make it possible to pass text containing commas as a single parameter. Without the brackets, <code>EMIT 'A', 'B'</code> would count as two separate parameters. The <code>!</code> operator removes the special meaning of the character after it; the first <code>&gt;</code> in <code>&lt;5 !&gt; 3&gt;</code> does not close the bracket but becomes part of the text. The <code>%</code> operator passes the parameter not as text but as a value: <code>%(4*8)</code> is first evaluated to 32, and the text "32" goes to the macro. This is an alternative to parentheses as protection against the operator-precedence trap.</p>
+
+<p>The last operator concerns comments. A comment written with a single <code>;</code> is part of the body and is written to the listing file again at every expansion. A comment written with a double <code>;;</code> stays in the definition and is not copied into the expansion. For a macro used a hundred times, this saves the listing file hundreds of needless lines.</p>
+
+<h2 class="nt-pb" id="s9-1-9"><span class="nt-num">9.1.9</span>Repeat blocks</h2>
+
+<h3 id="s9-1-9-1"><span class="nt-num">9.1.9.1</span>REPT, IRP and IRPC</h3>
+
+<p>Sometimes one wants a piece of code written several times in place, without having to define a macro. Repeat blocks do this job.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-tekrar">
+  <span class="nt-box__title">Definition 9.1.5</span>
+  <p>A <strong>repeat block</strong> is a macro that has no name and is expanded immediately where it is defined. <code>REPT n</code> writes the body n times, <code>IRP p, &lt;list&gt;</code> writes it once for each item of the list (with p replaced by that item), and <code>IRPC p, text</code> writes it once for each character of the text. The block ends with <code>ENDM</code>. In MASM 6, IRP and IRPC are also written as FOR and FORC.</p>
+</div>
+
+<pre class="nt-code"><code><span class="kw">REPT</span> 3
+  <span class="kw">SHL</span> AX, 1
+<span class="kw">ENDM</span>                 <span class="cm">; → SHL AX, 1 · SHL AX, 1 · SHL AX, 1</span>
+
+<span class="kw">IRP</span> r, &lt;AX,BX,CX&gt;
+  <span class="kw">PUSH</span> r
+<span class="kw">ENDM</span>                 <span class="cm">; → PUSH AX · PUSH BX · PUSH CX</span>
+
+<span class="kw">IRPC</span> c, OK
+  PUTC '&amp;c'
+<span class="kw">ENDM</span>                 <span class="cm">; → PUTC 'O' · PUTC 'K'</span></code></pre>
+
+<p>The REPT example shifts AX left by one bit three times, that is, multiplies it by 8: with AX = 5 the result is 40 (0028h). The IRP example pushes three registers on the stack; it is a short way of writing the SAVE macro. In the IRPC example c becomes the characters O and K in turn. For c to be recognized as a parameter inside the quotes, <code>&amp;c</code> is written; the text inside quotes would otherwise stay as it is. Since both PUTCs in the expansion are macros, the expansion is nested, and OK is written on the screen.</p>
+
+<p>A repeat block is not a loop. It needs no loop counter, but the code grows: <code>REPT 100</code> copies the body a hundred times. The three SHLs of the REPT example take 6 bytes and run in 3 × 2 = 6 cycles. The same shift can be written in 4 bytes with <code>MOV CL, 3</code> and <code>SHL AX, CL</code>. But on the 8086 a shift by CL adds 4 cycles per bit, and the job takes 4 + (8 + 4 × 3) = 24 cycles. For short repetitions REPT is both fast and of reasonable size; <code>REPT 100</code>, however, takes 200 bytes, and the same job is done with a counted LOOP in a single copy.</p>
+
+<p>The most common use of repeat blocks is to generate tables at assembly time. This needs an assembler symbol whose value can be changed. A constant defined with <code>EQU</code> cannot be redefined. A symbol defined with <code>=</code>, however, can take a new value at every assignment. The block below generates the squares of the numbers from 0 to 7:</p>
+
+<pre class="nt-code"><code>n = 0
+squares <span class="kw">LABEL BYTE</span>
+<span class="kw">REPT</span> 8
+    <span class="kw">DB</span> n*n
+    n = n + 1
+<span class="kw">ENDM</span></code></pre>
+
+<p><code>squares LABEL BYTE</code> gives the current address a name of type byte but reserves no space. The body of REPT is expanded eight times. In each expansion <code>DB n*n</code> writes the square of the current n as one byte, and <code>n = n + 1</code> increments the symbol. As a result the bytes 0, 1, 4, 9, 16, 25, 36, 49 sit one after another in memory. n is not a variable; it has no place in memory. It is a number that lives only at assembly time, in the assembler's table. The same method generates tables such as masks, powers of 2 or precomputed sine values.</p>
+
+<h3 id="s9-1-9-2"><span class="nt-num">9.1.9.2</span>Code trace: a table of squares with REPT</h3>
+
+<p>The generated table can be used to find the square of a number without multiplying, with the XLAT instruction:</p>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">lea</span>  bx, squares
+<span class="kw">mov</span>  al, 5
+<span class="kw">xlat</span>           <span class="cm">; AL = squares[5]</span>
+<span class="kw">mov</span>  dl, al
+<span class="kw">mov</span>  al, 7
+<span class="kw">xlat</span>           <span class="cm">; AL = squares[7]</span>
+<span class="kw">add</span>  al, dl
+<span class="kw">ret</span>
+squares <span class="kw">db</span> 0, 1, 4, 9, 16, 25, 36, 49   <span class="cm">; the bytes generated by the REPT block</span></code></pre>
+
+<p><code>XLAT</code> (translate by table) uses AL as an index into the table that BX points to: AL ← DS:[BX + AL]. The address of the table must first be loaded into BX. The size of the code is 3 + 2 + 1 + 2 + 2 + 1 + 2 + 1 = 14 bytes; since LEA takes 3 bytes in emu8086, the table starts at 0100h + 0Eh = 010Eh.</p>
+
+<div class="nt-tablewrap" id="tab-kare">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.19: Reading with XLAT from the table of squares generated by REPT; the table starts at 010Eh.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">BX</th><th scope="col">AL</th><th scope="col">DL</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>lea bx, squares</code><br><small>main program</small></td><td>010Eh</td><td>00h</td><td>00h</td><td>BX ← 010Eh (offset of squares)</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov al, 5</code><br><small>main program</small></td><td>010Eh</td><td>05h</td><td>00h</td><td>the number to look up, and index 5</td></tr>
+    <tr><td>3</td><td>0105h</td><td><code>xlat</code><br><small>main program</small></td><td>010Eh</td><td>19h</td><td>00h</td><td>AL ← [BX + AL] = [0113h] = 25</td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>mov dl, al</code><br><small>main program</small></td><td>010Eh</td><td>19h</td><td>19h</td><td>first result in DL</td></tr>
+    <tr><td>5</td><td>0108h</td><td><code>mov al, 7</code><br><small>main program</small></td><td>010Eh</td><td>07h</td><td>19h</td><td>index 7</td></tr>
+    <tr><td>6</td><td>010Ah</td><td><code>xlat</code><br><small>main program</small></td><td>010Eh</td><td>31h</td><td>19h</td><td>AL ← [0115h] = 49</td></tr>
+    <tr><td>7</td><td>010Bh</td><td><code>add al, dl</code><br><small>main program</small></td><td>010Eh</td><td>4Ah</td><td>19h</td><td>25 + 49 = 74 = 4Ah</td></tr>
+    <tr><td>8</td><td>010Dh</td><td><code>ret</code><br><small>main program</small></td><td>010Eh</td><td>4Ah</td><td>19h</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<figure class="nt-fig" id="sekil-xlat" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="The squares table, BX, AL and DL after the step"><rect class="box" x="12" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="35" y="46" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl" x="35" y="22" text-anchor="middle" style="font-size:10px;">squares+0</text><rect class="box" x="58" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="81" y="46" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl" x="81" y="22" text-anchor="middle" style="font-size:10px;">squares+1</text><rect class="box" x="104" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="127" y="46" text-anchor="middle" style="font-size:14px;">4</text><text class="lbl" x="127" y="22" text-anchor="middle" style="font-size:10px;">squares+2</text><rect class="box" x="150" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="173" y="46" text-anchor="middle" style="font-size:14px;">9</text><text class="lbl" x="173" y="22" text-anchor="middle" style="font-size:10px;">squares+3</text><rect class="box" x="196" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="219" y="46" text-anchor="middle" style="font-size:14px;">16</text><text class="lbl" x="219" y="22" text-anchor="middle" style="font-size:10px;">squares+4</text><rect class="mt-hot" x="242" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="265" y="46" text-anchor="middle" style="font-size:14px;">25</text><text class="lbl" x="265" y="22" text-anchor="middle" style="font-size:10px;">squares+5</text><rect class="box" x="288" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="311" y="46" text-anchor="middle" style="font-size:14px;">36</text><text class="lbl" x="311" y="22" text-anchor="middle" style="font-size:10px;">squares+6</text><rect class="box" x="334" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="357" y="46" text-anchor="middle" style="font-size:14px;">49</text><text class="lbl" x="357" y="22" text-anchor="middle" style="font-size:10px;">squares+7</text><text class="lbl" x="49" y="85" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="12" y="90" width="74" height="30" rx="4"/><text class="mt-v" x="49" y="110" text-anchor="middle" style="font-size:14px;">010Eh</text><text class="lbl" x="124" y="85" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="94" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="124" y="110" text-anchor="middle" style="font-size:14px;">19h</text><text class="lbl" x="192" y="85" text-anchor="middle" style="font-size:11.5px;">DL</text><rect class="box" x="162" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="192" y="110" text-anchor="middle" style="font-size:14px;">00h</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">[BX + AL]</text></svg></div>
+  <figcaption><b>Figure 9.1.14:</b> The first XLAT: with index AL = 5, the 25 (19h) at address squares + 5 = 0113h is read.</figcaption>
+</figure>
+
+<p>In <a href="#tab-kare">Table 9.1.19</a> the first XLAT reads the byte at address 010Eh + 5 = 0113h: 25 = 19h (<a href="#sekil-xlat">Figure 9.1.14</a>). This value is saved in DL. The second XLAT reads 49 = 31h from address 010Eh + 7 = 0115h. ADD AL, DL adds the two: 25 + 49 = 74 = 4Ah, that is, 5² + 7². No multiply instruction has run anywhere in the program.</p>
+
+<p>The speed difference is clear. XLAT finishes in 11 cycles. An 8-bit MUL on the 8086 takes 70–77 cycles. The price of the table is memory: eight bytes. This is the classic trade-off between memory and time, and REPT keeps it as short as a single line in the source. Because the table is generated at assembly time, no time is spent computing it at run time either.</p>
+
+<h2 class="nt-pb" id="s9-1-10"><span class="nt-num">9.1.10</span>Conditional assembly</h2>
+
+<h3 id="s9-1-10-1"><span class="nt-num">9.1.10.1</span>The IF family</h3>
+
+<p>Conditional assembly chooses whether a section of source code is included in the program at assembly time. It is the assembly counterpart of the <code>#if</code> and <code>#ifdef</code> preprocessor directives of C.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-kosullu">
+  <span class="nt-box__title">Definition 9.1.6</span>
+  <p><strong>Conditional assembly</strong> is the selection, with directives such as <code>IF</code>, <code>IFB</code>, <code>ELSE</code> and <code>ENDIF</code>, of whether a source section is included in the code at assembly time. The condition is evaluated at assembly time; a branch that is not selected never enters the machine code.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-if">
+<table class="nt-table">
+  <caption>Table 9.1.20: Conditional assembly directives.</caption>
+  <thead><tr><th scope="col">Directive</th><th scope="col">When is the branch taken?</th><th scope="col">Typical use</th></tr></thead>
+  <tbody>
+    <tr><td><code>IF expression</code></td><td>expression ≠ 0</td><td>test builds, options</td></tr>
+    <tr><td><code>IFE expression</code></td><td>expression = 0</td><td>the opposite of IF</td></tr>
+    <tr><td><code>IFB &lt;p&gt;</code></td><td>the parameter is blank</td><td>optional parameter</td></tr>
+    <tr><td><code>IFNB &lt;p&gt;</code></td><td>the parameter is not blank</td><td>optional parameter</td></tr>
+    <tr><td><code>IFIDN &lt;a&gt;,&lt;b&gt;</code></td><td>the two texts are identical</td><td>checking a register name</td></tr>
+    <tr><td><code>IFDIF &lt;a&gt;,&lt;b&gt;</code></td><td>the two texts differ</td><td>checking a register name</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Every conditional block ends with <code>ENDIF</code> and may carry an optional <code>ELSE</code> branch. The condition does not look at a flag or register at run time. It looks at what the assembler knows at assembly time: the values of symbols and the text of macro parameters. Conditional assembly therefore produces no instruction, comparison or jump at run time.</p>
+
+<p>The first area of use is producing different versions of a program from the same source:</p>
+
+<pre class="nt-code"><code>DEBUG = 1
+<span class="kw">IF</span> DEBUG
+  PUTC '*'         <span class="cm">; test build only</span>
+<span class="kw">ENDIF</span></code></pre>
+
+<p>With DEBUG = 1, PUTC is expanded and the program grows by 8 bytes; a star is printed on the screen first. When the symbol is set to 0, these lines are not assembled at all and leave no trace in the program. Debug output or checks are thus removed from the final version without being deleted from the source.</p>
+
+<p>The second area of use is inside macros. <code>IFB</code> and <code>IFNB</code> (blank, not blank) make optional parameters possible. The SHIFTN macro below shifts a register left; if the shift count is not given, 1 is assumed:</p>
+
+<pre class="nt-code"><code>SHIFTN <span class="kw">MACRO</span> r, n
+  <span class="kw">IFB</span> &lt;n&gt;          <span class="cm">;; was n omitted?</span>
+    <span class="kw">SHL</span> r, 1
+  <span class="kw">ELSE</span>
+    <span class="kw">MOV</span> CL, n
+    <span class="kw">SHL</span> r, CL
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDM</span></code></pre>
+
+<p>On the 8086 the shift count is either 1 or given in CL. An immediate count such as <code>SHL AX, 3</code> came with the 80186. The macro hides this rule from the user: if n is blank it produces a one-bit shift, otherwise a shift by CL. Writing the parameter inside angle brackets (<code>&lt;n&gt;</code>) lets even an empty text be compared as a text.</p>
+
+<p><code>IFIDN</code> and <code>IFDIF</code> set up a safety net against parameter pitfalls. SHIFTN clobbers CL; the call <code>SHIFTN CX, 2</code> therefore gives a wrong result. <code>MOV CL, 2</code> overwrites the low byte of CX, and the value being shifted is no longer the programmer's CX. A block starting with <code>IFIDN &lt;r&gt;, &lt;CX&gt;</code> can be added to the body to produce an error message in this case. The <code>EXITM</code> directive ends the expansion at that point; the remaining body lines are not written. Used together with conditional assembly, it also provides the stopping condition of a recursive macro.</p>
+
+<h3 id="s9-1-10-2"><span class="nt-num">9.1.10.2</span>Code trace: SHIFTN</h3>
+
+<pre class="nt-code"><code><span class="kw">org</span> 100h
+<span class="kw">mov</span> ax, 5
+<span class="kw">mov</span> bx, 3
+SHIFTN AX          <span class="cm">; → shl ax, 1</span>
+SHIFTN BX, 3       <span class="cm">; → mov cl, 3 · shl bx, cl</span>
+<span class="kw">ret</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-kaydir">
+<table class="nt-table nt-trace">
+  <caption>Table 9.1.21: The expanded code of the calls <code>SHIFTN AX</code> and <code>SHIFTN BX, 3</code>.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CL</th><th scope="col">CF</th><th scope="col">Explanation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov ax, 5</code><br><small>main program</small></td><td>0005h</td><td>0000h</td><td>00h</td><td>0</td><td>AX = 5</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov bx, 3</code><br><small>main program</small></td><td>0005h</td><td>0003h</td><td>00h</td><td>0</td><td>BX = 3</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>SHL AX, 1</code><br><small>SHIFTN expansion</small></td><td>000Ah</td><td>0003h</td><td>00h</td><td>0</td><td>n is blank, IFB branch: AX = 5 × 2</td></tr>
+    <tr><td>4</td><td>0108h</td><td><code>MOV CL, 3</code><br><small>SHIFTN expansion</small></td><td>000Ah</td><td>0003h</td><td>03h</td><td>0</td><td>n = 3, ELSE branch: the count goes to CL</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>SHL BX, CL</code><br><small>SHIFTN expansion</small></td><td>000Ah</td><td>0018h</td><td>03h</td><td>0</td><td>3 × 2³ = 24 = 0018h</td></tr>
+    <tr><td>6</td><td>010Ch</td><td><code>ret</code><br><small>main program</small></td><td>000Ah</td><td>0018h</td><td>03h</td><td>0</td><td>the program ends</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<p>In the first call n is blank; the assembler selects the IFB branch and writes a single <code>SHL AX, 1</code> (2 bytes, <code>D1 E0</code>). AX = 5 × 2 = 000Ah. In the second call n = 3; the ELSE branch is selected and two instructions are written: <code>MOV CL, 3</code> (<code>B1 03</code>) and <code>SHL BX, CL</code> (<code>D3 E3</code>), 4 bytes in all. BX = 3 × 2³ = 24 = 0018h. The same macro has produced code of two different lengths. The first expansion does not touch CL; only the second expansion changes CL.</p>
+
+<p>The trace contains no comparison or jump. The assembler decided which branch to write, and the processor merely executed the result. Had the same choice been made at run time, every call would have needed a CMP and a conditional jump; the code would have grown and the prefetch queue would have been flushed.</p>
+
+<h2 class="nt-pb" id="s9-1-11"><span class="nt-num">9.1.11</span>Debugging and common mistakes</h2>
+
+<p>Macros shorten the code in the source but make debugging harder, because the code that runs is not written in the source. Four habits reduce this difficulty.</p>
+
+<p><b>Look at the expansion.</b> The instruction listing in emu8086's emulator window shows not the macro names but the expanded instructions; single-stepping also advances over these instructions. Because macro labels get names such as <code>??0000</code> through LOCAL, jump targets do not appear under their source names. These numbers show which copy is running.</p>
+
+<p><b>The listing file.</b> In MASM, <code>.LISTMACROALL</code> writes all lines of the expansion to the listing file. <code>.LISTMACRO</code> writes only the lines that generate code, and <code>.NOLISTMACRO</code> hides the expansion completely. Because the listing file gives the address and machine code of every line side by side, it is the most reliable source for byte counting and address checking.</p>
+
+<p><b>Read the error line correctly.</b> An error in the body is reported separately at every line where the macro is used. If the same error message is seen several times, the cause is usually in the body.</p>
+
+<p><b>Expand by hand first.</b> A new macro is developed by first writing its body as plain code and trying it out. Once the code works correctly with one parameter value, it is turned into a parameterized macro. Then it is tried separately with parameters of different kinds (register, variable, constant, expression).</p>
+
+<div class="nt-tablewrap" id="tab-hatalar">
+<table class="nt-table">
+  <caption>Table 9.1.22: Common macro mistakes and their consequences.</caption>
+  <thead><tr><th scope="col">Mistake</th><th scope="col">Result</th><th scope="col">Fix</th></tr></thead>
+  <tbody>
+    <tr><td>defining after use</td><td>the call is treated as an unknown instruction</td><td>put definitions at the top of the file or in an INCLUDE file</td></tr>
+    <tr><td>forgetting ENDM</td><td>the rest of the file counts as the body; the error shows up far below</td><td>check the ENDM of every MACRO</td></tr>
+    <tr><td>not making a label LOCAL</td><td><i>Duplicate declaration</i> at the second use</td><td><code>LOCAL</code> as the first line of the body</td></tr>
+    <tr><td>RET in the body</td><td>RET takes the caller's return address or an arbitrary word</td><td>do not write RET in a macro</td></tr>
+    <tr><td>passing a register the body clobbers as a parameter</td><td>in calls such as <code>ADD3 AX, BX, CX</code> the parameter changes before it is read</td><td>document the registers used; check with IFIDN</td></tr>
+    <tr><td>expression without parentheses</td><td>operator precedence changes</td><td><code>(wd)*(ht)</code></td></tr>
+    <tr><td>mistaking a macro for a loop</td><td><code>REPT 1000</code> produces 1000 copies</td><td>LOOP for repetition at run time</td></tr>
+    <tr><td>using a long body many times</td><td>code size grows with the number of uses</td><td>move the job into a procedure, make the macro a wrapper</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><a href="#tab-hatalar">Table 9.1.22</a> collects the eight common mistakes. They all share the same root: a macro is a text pattern, not a unit that is called. The most reliable way to understand what a macro does is to expand it and read the resulting instructions like an ordinary program.</p>
+
+<h2 class="nt-pb" id="s9-1-12"><span class="nt-num">9.1.12</span>Exercises and solutions</h2>
+
+<p><b>Exercise 1.</b> What is the expanded form of the call <code>MyMacro AX, BX, CX</code>? Which lines are unnecessary?</p>
+
+<p><i>Solution.</i> p1 = AX, p2 = BX, p3 = CX. The expansion is the lines <code>MOV AX, AX</code>, <code>MOV BX, BX</code>, <code>MOV CX, CX</code>. All three are valid instructions and assemble to 2 bytes each (<code>8B C0</code>, <code>8B DB</code>, <code>8B C9</code>). But none of them changes a register; MOV does not affect the flags either. All three lines are unnecessary: 6 bytes and 6 cycles are wasted. A program that starts with AX = 1, BX = 2, CX = 3 carries the same values after the macro. The macro assembles without error but does nothing; the assembler gives no warning for such ineffective expansions.</p>
+
+<p><b>Exercise 2.</b> Write an <code>ADD3 a, b, c</code> macro that adds two word variables and writes the sum to a third.</p>
+
+<p><i>Solution.</i></p>
+<pre class="nt-code"><code>ADD3 <span class="kw">MACRO</span> a, b, c
+    <span class="kw">MOV</span> AX, a
+    <span class="kw">ADD</span> AX, b
+    <span class="kw">MOV</span> c, AX
+<span class="kw">ENDM</span></code></pre>
+<p>Because the 8086 has no memory-to-memory addition, AX is the intermediate register. The macro modifies AX; this must be stated in the macro's documentation. With s1 = 1234h and s2 = F00Fh, the call <code>ADD3 s1, s2, s3</code> gives s3 = 0243h and CF = 1; the 17th bit of the unsigned sum is in the carry.</p>
+
+<p><b>Exercise 3.</b> What are the code sizes if the PUTC macro is used 50 times, and if a procedure doing the same job is called 50 times?</p>
+
+<p><i>Solution.</i> Macro: 50 × 8 = 400 bytes. Procedure: body 8 bytes + RET 1 byte = 9 bytes once, plus 50 × 3 = 150 bytes of CALLs; 159 bytes in all. In time, the procedure adds 50 × 27 = 1350 cycles.</p>
+
+<p><b>Exercise 4.</b> What error occurs when the first POWER macro, <code>POWER base, exponent, result</code>, is used twice, with a second call? How is it fixed?</p>
+
+<p><i>Solution.</i> The second expansion redefines the label <code>powerloop:</code>; the assembler reports a <i>Duplicate declaration</i> (powerloop) error and the program does not assemble. The fix is to add <code>LOCAL powerloop</code> as the first line of the macro. The label is then ??0000 in the first expansion and ??0001 in the second, and each LOOP returns to the label of its own copy.</p>
+
+<p><b>Exercise 5.</b> How many times does the first POWER macro execute MUL when exponent = 0?</p>
+
+<p><i>Solution.</i> 65,536 times. Since MUL is at the start of the loop, it runs once first. LOOP decrements CX from 0 to FFFFh and jumps. The loop continues until CX is 0 again: CX = 0 → FFFFh → … → 1 → 0. With base = 2, result = 0000h; with base = 1, result = 0001h. If the counter is checked beforehand with JCXZ, no MUL runs and result = 1.</p>
+
+<p><b>Exercise 6.</b> Which instructions must be added so that a macro corrupts no register except AX?</p>
+
+<p><i>Solution.</i> At the start of the body, one PUSH for every register the macro modifies (except AX); at the end, POPs for the same registers in reverse order. In the corrected POWER these are <code>PUSH BX</code>, <code>PUSH CX</code>, <code>PUSH DX</code> and <code>POP DX</code>, <code>POP CX</code>, <code>POP BX</code>. Instructions that modify registers implicitly deserve particular attention (MUL changes DX, LOOP changes CX, INT services change their return registers). If the flags must also be preserved, PUSHF and POPF are used.</p>
+
+<h2 id="s9-1-13"><span class="nt-num">9.1.13</span>Summary</h2>
+
+<ul>
+  <li>A macro is a code template defined with <code>name MACRO p1, p2 … ENDM</code>. The assembler writes the body in place of every line that uses the macro; this is called expansion. The processor never sees the macro.</li>
+  <li>A macro must be defined before the line that uses it. A macro that is never used generates no code.</li>
+  <li>Parameters are text, not values. Their values are read when the expanded line executes. A register that the body modifies must not be passed as a parameter; expression parameters must be parenthesized in the body.</li>
+  <li>Which call is valid is decided by the instruction produced in the expansion; the error is reported at the line of use, but its cause is in the body.</li>
+  <li>Size: a macro takes k · n bytes, a procedure (n + 1) + 3k bytes. If the body is longer than 3 bytes, the procedure is smaller beyond the break-even point.</li>
+  <li>Speed: every procedure call adds CALL + RET, 19 + 8 = 27 cycles, two stack accesses and two queue flushes. A macro has no such cost.</li>
+  <li>RET is not written in a macro; RET takes the caller's return address or whatever is on the stack.</li>
+  <li>Macros with labels are written with LOCAL; the assembler generates unique names such as ??0000, ??0001 … at every expansion.</li>
+  <li>The registers a macro modifies are saved with PUSH and restored with POP in reverse order (PUTC, the corrected POWER).</li>
+  <li>LOOP with CX = 0 runs 65,536 times; a JCXZ goes in front of loops whose counter is a variable. MUL also changes DX.</li>
+  <li>INCLUDE inserts the library text into the source; emu8086.inc offers short jobs as macros and long jobs as procedures.</li>
+  <li>The macro operators &amp;, &lt;&gt;, !, % and ;; join, group and evaluate text.</li>
+  <li>REPT, IRP and IRPC are unnamed repeat blocks expanded in place; with the <code>=</code> symbol they generate tables at assembly time.</li>
+  <li>IF, IFE, IFB, IFNB, IFIDN and IFDIF evaluate the condition at assembly time; the branch not selected never enters the machine code.</li>
+</ul>
+
+<h2 id="s9-1-14"><span class="nt-num">9.1.14</span>Key terms</h2>
+
+<ul class="nt-concepts">
+  <li>macro</li>
+  <li>macro expansion</li>
+  <li>LOCAL directive</li>
+  <li>conditional assembly</li>
+  <li>repeat block (REPT / IRP / IRPC)</li>
+  <li>directive</li>
+  <li>assembler</li>
+  <li>procedure</li>
+  <li>procedure call</li>
+  <li>return address</li>
+  <li>register preservation</li>
+  <li>label</li>
+  <li>library</li>
+  <li>clock cycle</li>
+  <li>prefetch queue</li>
+  <li>bus cycle</li>
+  <li>listing file</li>
+  <li>emulator</li>
+</ul>
+
+<h2 id="s9-1-15"><span class="nt-num">9.1.15</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>The ADD3 macro (<code>MOV AX, x</code> · <code>ADD AX, y</code> · <code>MOV z, AX</code>) is called as <code>ADD3 BX, AX, CX</code> with AX = 5 and BX = 7. What does CX become?</p>
+    <details><summary>Answer</summary>
+      <p>The expansion is <code>MOV AX, BX</code> · <code>ADD AX, AX</code> · <code>MOV CX, AX</code>. The first line makes AX 7; the text y = AX now refers to 7. ADD gives 7 + 7 = 14: CX = <strong>000Eh</strong>, not the expected 12.</p>
+    </details>
+  </li>
+  <li>
+    <p>What does the call <code>AREA 10-2, 3</code> of the macro <code>AREA MACRO wd, ht</code> / <code>MOV AX, wd*ht</code> / <code>ENDM</code> load into AX? What does the parenthesized version load?</p>
+    <details><summary>Answer</summary>
+      <p>The expansion is <code>MOV AX, 10-2*3</code>; multiplication comes first: 10 − 6 = <strong>4</strong>. The parenthesized <code>(10-2)*(3)</code> gives <strong>24</strong> (0018h). In both cases the multiplication is done at assembly time and the machine code contains only one MOV.</p>
+    </details>
+  </li>
+  <li>
+    <p>From how many uses on does a job with a 4-byte body take less space as a procedure?</p>
+    <details><summary>Answer</summary>
+      <p>Macro 4k, procedure 5 + 3k bytes. 4k &gt; 5 + 3k gives k &gt; 5. At five uses both take 20 bytes; from <strong>six</strong> uses on the procedure is smaller (23 bytes against 24).</p>
+    </details>
+  </li>
+  <li>
+    <p>If a macro that contains a label but does not use LOCAL is used only once in a program, is there an assembly error?</p>
+    <details><summary>Answer</summary>
+      <p>No. With a single expansion the label is defined once and the program assembles. The error appears as <i>Duplicate declaration</i> the moment the macro is used a second time. This is why LOCAL is written even if the macro will be used only once.</p>
+    </details>
+  </li>
+  <li>
+    <p>MyMacro2 (jumps to label1 if AX = 2 and to label2 if AX = 3; label1: INC AX, label2: ADD AX, 2) is run with AX = 0. What does AX become?</p>
+    <details><summary>Answer</summary>
+      <p>Neither JE jumps and the flow falls into label1. INC AX gives 1 and ADD AX, 2 then gives <strong>3</strong>.</p>
+    </details>
+  </li>
+  <li>
+    <p>The SHIFTN macro (when n is given: <code>MOV CL, n</code> · <code>SHL r, CL</code>) is called as <code>SHIFTN CX, 2</code> with CX = 5. The programmer expects 5 × 4 = 20. What does CX become?</p>
+    <details><summary>Answer</summary>
+      <p><code>MOV CL, 2</code> overwrites the low byte of CX: CX = 0002h. <code>SHL CX, CL</code> shifts 2 left by 2 bits: CX = <strong>0008h</strong>. A register that the body clobbers (CL, and therefore CX) has been passed as a parameter; IFIDN can catch this call.</p>
+    </details>
+  </li>
+  <li>
+    <p>Which bytes does the block <code>n = 1</code> · <code>table LABEL BYTE</code> · <code>REPT 4</code> · <code>DB n</code> · <code>n = n * 2</code> · <code>ENDM</code> write to memory? How many instructions does this block execute at run time?</p>
+    <details><summary>Answer</summary>
+      <p>01h, 02h, 04h, 08h. The block produces only data; n is a symbol that lives at assembly time. <strong>No</strong> instruction is executed at run time.</p>
+    </details>
+  </li>
+  <li>
+    <p>A procedure is called 1000 times on a 5 MHz 8086. How much extra time do CALL and RET add?</p>
+    <details><summary>Answer</summary>
+      <p>1000 × (19 + 8) = 27,000 cycles. Since one cycle is 200 ns, 27,000 × 200 ns = <strong>5.4 ms</strong>. With a macro this time would not exist, but the code would grow by 1000 copies.</p>
+    </details>
+  </li>
+  <li>
+    <p>How many bytes does the PRINT macro of emu8086.inc produce for <code>PRINT 'Hello'</code>? Although the string is inside the code, why does the processor not execute it as instructions?</p>
+    <details><summary>Answer</summary>
+      <p>26 bytes for 'OK'; every extra character adds one byte. For a 5-character text, 24 + 5 = <strong>29 bytes</strong>. The macro puts a JMP in front of the string and the processor jumps over the string's bytes; the string is accessed only as data, with <code>MOV AL, CS:[SI]</code>.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s9-1-16"><span class="nt-num">9.1.16</span>Further reading</h2>
+
+<ul>
+  <li>Microsoft, <em>MASM Programmer's Guide</em>: the reference description of macro definition, LOCAL, macro operators, repeat blocks and conditional assembly directives.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, Chapter 10: treats macros, conditional assembly and repeat blocks with many examples.</li>
+  <li>emu8086 help documents, <em>8086 Assembler Tutorial, Part 10 (Macros)</em>: writing macros in emu8086 and the emu8086.inc library.</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>: treats the choice between a macro and a procedure together with 8086 instruction timings and the hardware structure.</li>
+</ul>
+
+<h2 id="s9-1-17"><span class="nt-num">9.1.17</span>References</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 help documents: <em>8086 Assembler Tutorial, Part 10 (Macros)</em> and <code>emu8086.inc</code>.</li>
+  <li>Microsoft, <em>MASM Programmer's Guide</em> — the MACRO, ENDM and LOCAL directives.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, 7th ed., Pearson, 2014 — Chapter 10 (Macros).</li>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em>, 8th ed., Pearson, 2009.</li>
+  <li>Intel, <em>8086 16-Bit HMOS Microprocessor</em> data sheet (instruction timings).</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_09_01_Macros.html">Chapter 9.1 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>

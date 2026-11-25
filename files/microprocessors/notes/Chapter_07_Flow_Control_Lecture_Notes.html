@@ -1,0 +1,1660 @@
+---
+layout: without-sidebar
+title: "Chapter 7: Flow Control — Lecture Notes"
+permalink: /files/microprocessors/notes/Chapter_07_Flow_Control_Lecture_Notes.html
+excerpt: "Lecture notes for Chapter 7 of Microprocessors: IP and sequential execution, the prefetch queue, the unconditional JMP in its short, near, far, and indirect forms, labels, computing the jump displacement, conditional jumps that test a single flag, synonymous instructions and opcodes, CMP and the flags, the signed and unsigned comparison families, the SF = OF rule, if/else and while patterns, out-of-range conditional jumps, LOOP, LOOPE, LOOPNE, and JCXZ, nested loops, clock cycle comparisons, and example programs traced step by step."
+lang: en
+seo_title: "Chapter 7: Flow Control · Microprocessors Lecture Notes"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/mikroislemciler.jpg
+hreflang:
+  tr: /files/microprocessors/notlar/Bolum_07_Akis_Kontrolu_Ders_Notu.html
+  en: /files/microprocessors/notes/Chapter_07_Flow_Control_Lecture_Notes.html
+resource: "Lecture notes"
+course:
+  name: "Microprocessors"
+  url: "/teaching/microprocessors/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="../notlar/notlar.css">
+<style>
+/* chapter-specific SVG classes of the slides (same as Chapter_07_Flow_Control.html; scope limited to .ds-notes) */
+.ds-notes .ds-svg .hot { fill: var(--ds-hot); stroke: var(--ds-link); stroke-width: 1.5; }
+.ds-notes .ds-svg .acc { fill: var(--ds-accent); }
+.ds-notes .ds-svg .good { fill: var(--ds-good); }
+.ds-notes .ds-svg .bad { fill: var(--ds-bad); }
+.ds-notes .ds-svg .lnk { fill: var(--ds-link); }
+.ds-notes .ds-svg .acc-line { stroke: var(--ds-accent); stroke-width: 2; fill: none; }
+.ds-notes .nt-code .dir { color: var(--ds-accent); font-weight: 700; }
+.ds-notes .nt-code .str { color: var(--ds-good); }
+.ds-notes .nt-ops { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 1rem 0 1.4rem; font-size: 0.92em; }
+.ds-notes .nt-ops div { padding: 4px 8px; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-surface); }
+.ds-notes .nt-ops b { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; color: var(--ds-link); margin-right: 6px; }
+@media (max-width: 520px) { .ds-notes .nt-ops { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<article class="ds-notes" id="ds-notes" lang="en">
+<header class="nt-head">
+  <p class="nt-kicker">Microprocessors · Lecture Notes</p>
+  <h1>Chapter 7: Flow Control</h1>
+  <p class="nt-lead">Left to itself, the processor executes instructions in the order they sit in memory. After each instruction the instruction pointer, IP, grows by the length of that instruction and points at the next one. Any program that makes a decision, repeats a task, or branches off on an error has to break this straight line. Flow control instructions do so by loading a new value into IP. This note first covers the unconditional jump (JMP) and how the jump displacement is written into machine code. It then turns to conditional jumps that test the flags, the CMP instruction, and the reason signed and unsigned numbers need separate families of jumps. Next it builds the assembly counterparts of the if/else and while constructs of high-level languages. Finally it studies the LOOP family, which uses CX as a counter, and JCXZ. Every example program is traced step by step at the level of registers, flags, and memory; the effect of a jump on the prefetch queue and on clock cycles is explained as well.</p>
+  <ul class="nt-links" aria-label="Related links">
+    <li><a href="../slides/Chapter_07_Flow_Control.html">Slides</a></li>
+    <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_07_Flow_Control.pdf">Slides PDF</a></li>
+    <li><a href="../slides/Chapter_07_Flow_Control_Study_Questions.html">Study questions</a></li>
+    <li><a href="../Dictionary.html">Glossary</a></li>
+    <li><a href="../slides/Chapter_07_Jump-Conditions.html">Conditional Jumps</a></li>
+    <li><a href="../slides/Chapter_06_Flags-Lab.html">Flags Lab</a></li>
+    <li><a href="../slides/Chapter_11_Instruction-Encoding.html">Instruction Encoding</a></li>
+  </ul>
+</header>
+
+<section class="nt-goals" aria-labelledby="ciktilar">
+  <h2 id="ciktilar">Learning outcomes</h2>
+  <dl>
+    <dt>Jump mechanism</dt>
+    <dd>Direct program flow with JMP and labels; explain how IP changes and how the jump displacement (relative offset) is computed; distinguish short, near, far, and indirect jumps.</dd>
+    <dt>Conditional jumps</dt>
+    <dd>State which flag (ZF, CF, SF, OF, PF) each conditional jump tests, find its opposite and its synonyms, and compute its machine code.</dd>
+    <dt>Comparing correctly</dt>
+    <dd>After CMP, choose the JA/JB family for unsigned numbers and the JG/JL family for signed numbers; explain through overflow why the rule is SF = OF.</dd>
+    <dt>High-level constructs</dt>
+    <dd>Write if/else, while, and for constructs with patterns that jump on the opposite condition; fix an out-of-range conditional jump with the inverted condition plus JMP.</dd>
+    <dt>Loops</dt>
+    <dd>Write counted loops with LOOP, LOOPE/LOOPZ, LOOPNE/LOOPNZ, and JCXZ; explain the CX = 0 trap and why a nested loop must save its counter; trace the example programs step by step.</dd>
+  </dl>
+</section>
+
+<nav class="nt-toc" aria-labelledby="icindekiler">
+  <h2 id="icindekiler">Contents</h2>
+  <ol>
+    <li><a href="#s7-1">7.1 Sequential execution and flow control</a>
+      <ol>
+        <li><a href="#s7-1-1">7.1.1 IP and the prefetch queue</a></li>
+        <li><a href="#s7-1-2">7.1.2 Types of flow control instructions</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-2">7.2 The unconditional jump: JMP</a>
+      <ol>
+        <li><a href="#s7-2-1">7.2.1 JMP and its forms</a></li>
+        <li><a href="#s7-2-2">7.2.2 Labels</a></li>
+        <li><a href="#s7-2-3">7.2.3 Code trace: forward and backward with JMP</a></li>
+        <li><a href="#s7-2-4">7.2.4 Computing the jump displacement</a></li>
+        <li><a href="#s7-2-5">7.2.5 The hardware cost of a jump</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-3">7.3 Conditional jumps</a>
+      <ol>
+        <li><a href="#s7-3-1">7.3.1 The idea of a conditional jump</a></li>
+        <li><a href="#s7-3-2">7.3.2 Jumps that test a single flag</a></li>
+        <li><a href="#s7-3-3">7.3.3 Encoding and synonyms</a></li>
+        <li><a href="#s7-3-4">7.3.4 Code trace: JNC = JNB = JAE</a></li>
+        <li><a href="#s7-3-5">7.3.5 Computing a jump code by hand</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-4">7.4 Comparison: CMP</a>
+      <ol>
+        <li><a href="#s7-4-1">7.4.1 The CMP instruction</a></li>
+        <li><a href="#s7-4-2">7.4.2 CMP flags step by step</a></li>
+        <li><a href="#s7-4-3">7.4.3 Jumps for signed numbers</a></li>
+        <li><a href="#s7-4-4">7.4.4 Why SF = OF?</a></li>
+        <li><a href="#s7-4-5">7.4.5 Jumps for unsigned numbers</a></li>
+        <li><a href="#s7-4-6">7.4.6 Above/Below or Greater/Less?</a></li>
+        <li><a href="#s7-4-7">7.4.7 Code trace: same bits, JA and JG</a></li>
+        <li><a href="#s7-4-8">7.4.8 Code trace: CMP + JE and CMP + JA</a></li>
+        <li><a href="#s7-4-9">7.4.9 Code trace: compare and print</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-5">7.5 Counterparts of high-level constructs</a>
+      <ol>
+        <li><a href="#s7-5-1">7.5.1 The if/else pattern</a></li>
+        <li><a href="#s7-5-2">7.5.2 The while, do-while, and for patterns</a></li>
+        <li><a href="#s7-5-3">7.5.3 Code trace: if/else and while</a></li>
+        <li><a href="#s7-5-4">7.5.4 Conditional jumps out of range</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-6">7.6 Loop instructions</a>
+      <ol>
+        <li><a href="#s7-6-1">7.6.1 The LOOP family</a></li>
+        <li><a href="#s7-6-2">7.6.2 How LOOP works</a></li>
+        <li><a href="#s7-6-3">7.6.3 Code trace: LOOP</a></li>
+        <li><a href="#s7-6-4">7.6.4 Code trace: nested loops</a></li>
+        <li><a href="#s7-6-5">7.6.5 Code trace: searching with LOOPNE</a></li>
+        <li><a href="#s7-6-6">7.6.6 JCXZ; LOOP mu, DEC–JNZ mi?</a></li>
+        <li><a href="#s7-6-7">7.6.7 Code trace: JCXZ guard and DEC–JNZ</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-7">7.7 Example programs</a>
+      <ol>
+        <li><a href="#s7-7-1">7.7.1 Sum of array elements</a></li>
+        <li><a href="#s7-7-2">7.7.2 Printing Hello on the screen</a></li>
+        <li><a href="#s7-7-3">7.7.3 Palindrome check: the idea</a></li>
+        <li><a href="#s7-7-4">7.7.4 Palindrome: setup</a></li>
+        <li><a href="#s7-7-5">7.7.5 Palindrome: the comparison loop</a></li>
+        <li><a href="#s7-7-6">7.7.6 Palindrome: different inputs</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7-8">7.8 Common mistakes</a></li>
+    <li><a href="#s7-9">7.9 Exercises and solutions</a></li>
+    <li><a href="#s7-10">7.10 Summary</a></li>
+    <li><a href="#s7-11">7.11 Key terms</a></li>
+    <li><a href="#s7-12">7.12 Test Yourself</a></li>
+    <li><a href="#s7-13">7.13 Further reading</a></li>
+    <li><a href="#s7-14">7.14 References</a></li>
+  </ol>
+</nav>
+
+<h2 class="nt-pb" id="s7-1"><span class="nt-num">7.1</span>Sequential execution and flow control</h2>
+
+<h3 id="s7-1-1"><span class="nt-num">7.1.1</span>IP and the prefetch queue</h3>
+
+<p>The instructions the 8086 executes are bytes laid out one after another in the code segment. The processor knows which of these bytes starts the next instruction from two registers: <strong>CS</strong> (the code segment) and <strong>IP</strong> (the instruction pointer). CS holds the start of the segment, and IP holds the offset of the next instruction within it. As with every other memory access, the physical address of the instruction is CS × 10h + IP. In a .COM program with CS = 0700h and the first instruction at 0100h, the processor fetches the first instruction from 07000h + 0100h = 07100h.</p>
+
+<p>A program cannot write to IP with MOV; there is no <code>MOV IP, AX</code>. Only the processor itself changes IP. In the ordinary case the change is simple: once an instruction is decoded, IP grows by that instruction's byte count. If the three-byte <code>MOV AX, 5</code> (<code>B8 05 00</code>) sits at 0100h, IP = 0103h when it finishes. The two-byte <code>MOV AL, 25</code> (<code>B0 19</code>) advances IP by two. This pattern is called <strong>sequential execution</strong>.</p>
+
+<p>Sequential execution has a hardware counterpart in the 8086. The processor consists of two units. The <strong>bus interface unit</strong> (BIU) manages the address and data buses and reads instruction bytes from memory. The <strong>execution unit</strong> (EU) decodes those bytes and carries out the operation. The BIU does not wait for the EU to finish: whenever the bus is idle, it reads ahead of CS:IP and stores the bytes in a six-byte <strong>prefetch queue</strong>. By the time the EU moves on to the next instruction, its bytes are usually already waiting in the queue. Reading from memory and executing instructions thus overlap, which makes this a simple pipeline.</p>
+
+<p>The queue rests on one assumption: the next instruction follows immediately in memory. Flow control instructions break that assumption. When a jump executes, IP moves to a different address, and the bytes in the queue now belong to the wrong instructions. The EU flushes the queue and the BIU starts reading again from the new CS:IP. Much of the clock-cycle cost of a jump comes from this refill.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-ip">
+  <span class="nt-box__title">Definition 7.1</span>
+  <p>The <strong>instruction pointer</strong> (IP) is the 16-bit register that holds the offset, within the code segment, of the next instruction to execute. The physical address of the instruction is CS × 10h + IP. A <strong>flow control instruction</strong> is one that loads IP (and, for a far jump, CS as well) with a value other than the one given by the instruction length.</p>
+</div>
+
+<h3 id="s7-1-2"><span class="nt-num">7.1.2</span>Types of flow control instructions</h3>
+
+<p>The flow control instructions of the 8086 fall into three groups. The first is the <strong>unconditional jump</strong>: <code>JMP label</code> jumps in every case. The second is the <strong>conditional jumps</strong> (<code>Jcc</code>). These test one or more flags in the flags register: if the condition holds they jump, otherwise execution continues with the next instruction. Conditional jumps split into three subgroups: those that test a single flag (JZ, JC, JS, JO, JP and their opposites), those for signed numbers (the JG, JL family), and those for unsigned numbers (the JA, JB family). The third group is the <strong>loop instructions</strong>: <code>LOOP</code>, <code>LOOPE/LOOPZ</code>, <code>LOOPNE/LOOPNZ</code>, and <code>JCXZ</code>. They use CX as the counter.</p>
+
+<p>Other instructions change the flow too. <code>CALL</code> and <code>RET</code> go to a subroutine and come back, keeping the return address on the stack. <code>INT</code> and <code>IRET</code> go to an interrupt service routine and return. The <code>RET</code> that ends every program in this note is also a flow control instruction. When a .COM program starts, the top of the stack holds 0000h, and <code>RET</code> loads this value into IP. At offset 0000h sits the PSP (program segment prefix) that DOS places at the start of the program. The first two bytes of the PSP are <code>INT 20h</code>, and that is how the program terminates. This is why the last row of the trace tables shows IP = 0000h and SP = 0000h.</p>
+
+<p>In high-level languages, flow control appears as decision structures (if/else, switch) and loops (for, while, do-while). The compiler translates all of them into compare, conditional jump, and unconditional jump instructions. An assembly programmer does this translation by hand. Figure 7.1 compares how the same piece of program is traversed under sequential execution and under execution with jumps.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-sirali" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 430 245" role="img" aria-label="On the left, instructions execute in order; on the right, jmp instructions change IP and steer the flow to the labels calc, back, and stop." style="max-width:430px"><defs><marker id="n7-0-c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="93" y="18" text-anchor="middle" style="font-size:13.5px">Sequential (IP += length)</text><text class="txt" x="275" y="18" text-anchor="middle" style="font-size:13.5px">Jump (IP ← target)</text><rect class="box" x="18" y="30" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="48" style="font-size:13px">mov ax, 5</text><rect class="box" x="200" y="30" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="48" style="font-size:13px">mov ax, 5</text><rect class="box" x="18" y="60" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="78" style="font-size:13px">mov bx, 2</text><rect class="box" x="200" y="60" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="78" style="font-size:13px">mov bx, 2</text><rect class="box" x="18" y="90" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="108" style="font-size:13px">jmp calc</text><rect class="hot" x="200" y="90" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="108" style="font-size:13px">jmp calc</text><rect class="box" x="18" y="120" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="138" style="font-size:13px">back: jmp stop</text><rect class="hot" x="200" y="120" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="138" style="font-size:13px">back: jmp stop</text><rect class="box" x="18" y="150" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="168" style="font-size:13px">calc: add ax, bx</text><rect class="box" x="200" y="150" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="168" style="font-size:13px">calc: add ax, bx</text><rect class="box" x="18" y="180" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="198" style="font-size:13px">jmp back</text><rect class="hot" x="200" y="180" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="198" style="font-size:13px">jmp back</text><rect class="box" x="18" y="210" width="150" height="26" rx="4"/><text class="txt mono" x="26" y="228" style="font-size:13px">stop: ret</text><rect class="box" x="200" y="210" width="150" height="26" rx="4"/><text class="txt mono" x="208" y="228" style="font-size:13px">stop: ret</text><path class="line" d="M8 38 L8 62" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 68 L8 92" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 98 L8 122" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 128 L8 152" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 158 L8 182" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="line" d="M8 188 L8 212" marker-end="url(#n7-0-c1)" style="stroke-width:1.5"/><path class="acc-line" d="M350 103 C380 103 380 163 354 163" marker-end="url(#n7-0-c1)"/><path class="acc-line" d="M350 193 C395 193 395 133 354 133" marker-end="url(#n7-0-c1)"/><path class="acc-line" d="M350 133 C420 133 420 223 354 223" marker-end="url(#n7-0-c1)"/></svg></div>
+  <figcaption><b>Figure 7.1:</b> On the left, instructions execute in memory order and IP grows by the instruction length at every step. On the right, the <code>jmp</code> instructions load a new value into IP, and the flow leaps to the labels calc, back, and stop.</figcaption>
+</figure>
+
+<h2 class="nt-pb" id="s7-2"><span class="nt-num">7.2</span>The unconditional jump: JMP</h2>
+
+<h3 id="s7-2-1"><span class="nt-num">7.2.1</span>JMP and its forms</h3>
+
+<p>The <code>JMP label</code> instruction transfers control to another point in the program under all conditions. It can jump forward or backward. It changes no flag; the flags that held before the jump are still valid after it. This matters: the flags set by a CMP can still be read after an intervening JMP.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-jmp">
+  <span class="nt-box__title">Definition 7.2</span>
+  <p>An <strong>unconditional jump</strong> makes execution continue at the specified target address regardless of the flags. On the 8086 it is performed by the <code>JMP</code> instruction. The target is given inside the instruction either as a <strong>displacement</strong>, as an absolute CS:IP pair, or indirectly through a register or memory word.</p>
+</div>
+
+<p>The 8086 recognizes four forms of the JMP instruction. Which one is used depends on how far away the target is and where it is written. Table 7.1 summarizes these forms.</p>
+
+<div class="nt-tablewrap" id="tab-jmp">
+<table class="nt-table">
+  <caption>Table 7.1: The forms of the JMP instruction, their machine codes, and their timings on the 8086.</caption>
+  <thead><tr><th scope="col">Form</th><th scope="col">Code</th><th scope="col">Bytes</th><th scope="col">Range</th><th scope="col">Changes</th><th scope="col">Clock cycles</th></tr></thead>
+  <tbody>
+    <tr><td>short (<code>JMP SHORT</code>)</td><td><code>EB rel8</code></td><td>2</td><td>−128…+127</td><td>IP</td><td>15</td></tr>
+    <tr><td>near (<code>JMP NEAR</code>)</td><td><code>E9 rel16</code></td><td>3</td><td>anywhere in the segment</td><td>IP</td><td>15</td></tr>
+    <tr><td>far (<code>JMP FAR</code>)</td><td><code>EA ofs seg</code></td><td>5</td><td>anywhere in 1 MB</td><td>CS and IP</td><td>15</td></tr>
+    <tr><td>indirect, register (<code>JMP BX</code>)</td><td><code>FF E3</code></td><td>2</td><td>within the segment</td><td>IP</td><td>11</td></tr>
+    <tr><td>indirect, memory (<code>JMP [BX]</code>)</td><td><code>FF 27</code></td><td>2–4</td><td>within the segment</td><td>IP</td><td>18 + EA</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A <strong>short jump</strong> is two bytes: the opcode EBh and an 8-bit signed displacement (rel8). The displacement ranges from −128 to +127, counted from the address of the instruction immediately after the jump. Most loops and short if blocks fit in this range, so the short jump is the most common form.</p>
+
+<p>A <strong>near jump</strong> is three bytes: E9h and a 16-bit displacement (rel16). Because 16-bit addition wraps around, rel16 reaches every offset (0000h–FFFFh) in the 64 KB of the code segment. Read as signed, the displacement means ±32 KB, but thanks to the wraparound the jump can also reach the other end of the segment. In short and near jumps only IP changes and CS stays the same, so both are <strong>intrasegment</strong> jumps.</p>
+
+<p>A <strong>far jump</strong> is five bytes: EAh, followed by the 16-bit offset and the 16-bit segment value of the target. The byte order is little-endian, so the low byte of the offset comes first. For example, a far jump to 0800h:0000h is encoded as <code>EA 00 00 00 08</code>. The instruction loads 0000h into IP and 0800h into CS, and execution continues at physical address 08000h. This is the only way to move to another segment, and it is called an <strong>intersegment</strong> jump.</p>
+
+<p>In an <strong>indirect jump</strong> the target is not written in the instruction. <code>JMP BX</code> loads the value of BX into IP. <code>JMP [BX]</code> reads the word at address DS:BX and loads it into IP. Indirect jumps suit cases where the target is computed at run time. A typical example is going to a different function according to the number chosen in a menu. The programmer builds a <strong>jump table</strong>: <code>table dw task0, task1, task2</code>. The selection number is multiplied by 2 and placed in SI, and <code>JMP table[SI]</code> goes to the right address. The machine code of this instruction consists of <code>FF A4</code> and the 16-bit address of the table, four bytes in all.</p>
+
+<p>The programmer often does not need to choose a form. If the assembler knows the target and the target is within short range, it picks the 2-byte short form itself. If the target lies further down in the code and is not yet defined, some assemblers first reserve 3 bytes. Multi-pass assemblers (emu8086 is one) shrink to the short form once the addresses are final. Writing <code>JMP SHORT label</code> forces the short form; if the target is out of range, the assembler reports an error. Writing <code>JMP NEAR PTR label</code> forces the 3-byte form even when the target is close.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>The claim “JMP can go at most 127 bytes forward” is wrong. That limit applies only to the short form. A near JMP reaches anywhere in the code segment, and a far JMP reaches anywhere in the 1 MB address space. The 127-byte limit matters mainly for the 8086's <em>conditional</em> jumps, because they have no 16-bit form.</p>
+</div>
+
+<h3 id="s7-2-2"><span class="nt-num">7.2.2</span>Labels</h3>
+
+<p>An assembly programmer writes a jump target not as an address but as a <strong>label</strong>. A label is a name given to an address. To define one, write the name followed by a colon: <code>loop_top:</code>. A label can stand on a line of its own or in front of an instruction: <code>back: jmp stop</code>. In both forms the label receives the address of the first instruction that follows it.</p>
+
+<p>A label takes no space in memory. While reading the source, the assembler keeps a <strong>location counter</strong>. It adds each instruction's byte count to the counter, and when it meets a label it records the counter's current value as the label's address. Later, when encoding a line such as <code>jmp loop_top</code>, it uses that address. In Figure 7.2 the label <code>loop_top</code> becomes the address of the <code>DEC CX</code> instruction that follows it, 0103h. In machine code there is no such thing as <code>loop_top</code>; only the displacement byte of the <code>JNZ</code> instruction holds a number leading to that address.</p>
+
+<figure class="nt-fig" id="sekil-etiket" style="--w:600px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 600 88" role="img" aria-label="The label loop_top becomes the address (0103h) of the DEC CX instruction that follows it; JNZ loop_top jumps to this address." style="max-width:560px"><text class="lbl mono" x="60" y="25" text-anchor="end" style="font-size:12px">0100h</text><rect class="box" x="66" y="8" width="170" height="24" rx="3"/><text class="txt mono" x="76" y="25" text-anchor="start" style="font-size:13px">MOV CX, 3</text><text class="lbl mono" x="60" y="51" text-anchor="end" style="font-size:12px">0103h</text><rect class="box" x="66" y="34" width="170" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt mono" x="76" y="51" text-anchor="start" style="font-size:13px">loop_top: DEC CX</text><text class="lbl mono" x="60" y="77" text-anchor="end" style="font-size:12px">0104h</text><rect class="box" x="66" y="60" width="170" height="24" rx="3"/><text class="txt mono" x="76" y="77" text-anchor="start" style="font-size:13px">JNZ loop_top</text><path class="line" d="M246.0 59.0 L323.0 59.0"/><path class="ah" d="M330.0 59.0 L323.0 62.9 L323.0 55.1 z"/><text class="txt" x="340" y="52" text-anchor="start" style="font-size:13px">assembler: loop_top = 0103h</text><text class="lbl" x="340" y="72" text-anchor="start" style="font-size:12px">a label occupies no bytes; it is an address</text></svg></div>
+  <figcaption><b>Figure 7.2:</b> The label <code>loop_top</code> becomes the address (0103h) of the <code>DEC CX</code> instruction that follows it; <code>JNZ loop_top</code> jumps to that address. The label occupies no bytes in memory.</figcaption>
+</figure>
+
+<p>There are a few rules for label names. A name consists of characters such as letters, digits, and underscores, but it cannot start with a digit. It cannot contain spaces. Instruction names (<code>mov</code>, <code>loop</code>) and register names (<code>ax</code>, <code>cx</code>) cannot be labels, because the assembler first tries to recognize the word at the start of a line as an instruction or a register. A label is defined once in a program; a second definition would make it ambiguous which address is meant and causes an error.</p>
+
+<div class="nt-tablewrap" id="tab-etiket">
+<table class="nt-table">
+  <caption>Table 7.2: Examples of valid and invalid labels.</caption>
+  <thead><tr><th scope="col">Label</th><th scope="col">Status</th><th scope="col">Reason</th></tr></thead>
+  <tbody>
+    <tr><td><code>loop_top:</code></td><td>valid</td><td>made of letters</td></tr>
+    <tr><td><code>next_char:</code></td><td>valid</td><td>underscores are allowed</td></tr>
+    <tr><td><code>k1:</code>, <code>calc:</code></td><td>valid</td><td>a digit is not the first character</td></tr>
+    <tr><td><code>1start:</code></td><td>invalid</td><td>starts with a digit</td></tr>
+    <tr><td><code>mov:</code></td><td>invalid</td><td>instruction name</td></tr>
+    <tr><td><code>two words:</code></td><td>invalid</td><td>contains a space</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>A label also has a type. Labels inside code are of type near: they carry only an offset, which is why they are used in intrasegment jumps. The names of data definitions (<code>msg db 'Hello', 0</code>) are addresses as well, but they are called variables and have data types (byte, word). The difference matters for JMP. Writing <code>jmp calc</code> makes the assembler produce a displacement leading to the address of calc. But when the name of a variable such as <code>table dw 0103h</code> is written, <code>jmp table</code> is encoded as an indirect jump (<code>FF 26</code> and the address of the table). The processor reads the word inside the table and loads it into IP. Although the syntax looks alike, one jumps to a label and the other to the contents of a variable.</p>
+
+<h3 id="s7-2-3"><span class="nt-num">7.2.3</span>Code trace: forward and backward with JMP</h3>
+
+<p>The program below shows that JMP can jump both forward and backward. It loads two numbers, jumps forward to the <code>calc</code> block that does the addition, returns from there backward to the line <code>back</code>, and finally jumps forward again to the line <code>stop</code>. In the source, the order of the lines differs from the order of execution.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span>    100h
+<span class="kw">mov</span>    ax, 5          <span class="cm">; ax = 5</span>
+<span class="kw">mov</span>    bx, 2          <span class="cm">; bx = 2</span>
+<span class="kw">jmp</span>    calc           <span class="cm">; go to 'calc'</span>
+back:  <span class="kw">jmp</span> stop       <span class="cm">; go to 'stop'</span>
+calc:
+<span class="kw">add</span>    ax, bx         <span class="cm">; ax = ax + bx</span>
+<span class="kw">jmp</span>    back           <span class="cm">; back to 'back'</span>
+stop:
+<span class="kw">ret</span>                   <span class="cm">; return to the OS</span></code></pre>
+
+<p>The <code>org 100h</code> directive is not an instruction. It tells the assembler to start the location counter at 0100h, because DOS loads a .COM program at offset 0100h of the segment. The first instruction, <code>mov ax, 5</code>, is therefore at 0100h. When the processor starts the program, IP = 0100h.</p>
+
+<p>Table 7.3 gives each instruction of the program, its address, its machine code, and the state after the instruction completes. The IP in the last column is the address of the next instruction.</p>
+
+<div class="nt-tablewrap" id="tab-jmp-iz">
+<table class="nt-table">
+  <caption>Table 7.3: Trace of the JMP example (CS = 0700h; values are the state after the instruction has executed).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">IP (after)</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>—</td><td>start</td><td>—</td><td>0000h</td><td>0000h</td><td>0100h</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>mov ax, 5</code></td><td><code>B8 05 00</code></td><td>0005h</td><td>0000h</td><td>0103h</td></tr>
+    <tr><td>2</td><td>0103h</td><td><code>mov bx, 2</code></td><td><code>BB 02 00</code></td><td>0005h</td><td>0002h</td><td>0106h</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>jmp calc</code></td><td><code>EB 02</code></td><td>0005h</td><td>0002h</td><td>010Ah</td></tr>
+    <tr><td>4</td><td>010Ah</td><td><code>add ax, bx</code></td><td><code>01 D8</code></td><td>0007h</td><td>0002h</td><td>010Ch</td></tr>
+    <tr><td>5</td><td>010Ch</td><td><code>jmp back</code></td><td><code>EB FA</code></td><td>0007h</td><td>0002h</td><td>0108h</td></tr>
+    <tr><td>6</td><td>0108h</td><td><code>jmp stop</code></td><td><code>EB 04</code></td><td>0007h</td><td>0002h</td><td>010Eh</td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>ret</code></td><td><code>C3</code></td><td>0007h</td><td>0002h</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The first two steps are sequential execution: IP grows first by 3, then by 3 again. In the third step <code>jmp calc</code> executes. With sequential execution IP would be 0108h. The jump loads IP with the address of calc, 010Ah. The <code>back: jmp stop</code> instruction at 0108h, which lies in between, is not executed on this pass. In the fourth step <code>add ax, bx</code> makes AX 5 + 2 = 7. ADD affects the flags too. The result is not zero (ZF = 0), the sign bit is 0 (SF = 0), and there is no carry or overflow (CF = OF = 0). Because 07h = 0000 0111b contains three 1 bits, the parity is odd (PF = 0).</p>
+
+<p>The fifth step is the backward jump. <code>jmp back</code> sits at 010Ch and pulls IP to 0108h, an address before itself. In the sixth step the <code>jmp stop</code> at 0108h is finally executed and IP becomes 010Eh. In the seventh step <code>ret</code> takes the value 0000h from the stack; IP = 0000h and SP = FFFEh + 2 = 0000h. The <code>INT 20h</code> in the PSP ends the program. The result is AX = 0007h. In terms of source lines, the execution order is 2 → 3 → 4 → 7 → 8 → 5 → 10. Since none of the three JMPs touches the flags, the flags set by ADD stay the same until the end of the program.</p>
+
+<p>The code <code>01 D8</code> given for <code>add ax, bx</code> in the table is ADD's “register/memory ← register” form. The same instruction can also be encoded in the “register ← register/memory” form as <code>03 C3</code>, and some assemblers produce that. Both encodings are two bytes and do the same job; addresses and jump displacements do not change.</p>
+
+<h3 id="s7-2-4"><span class="nt-num">7.2.4</span>Computing the jump displacement</h3>
+
+<p>In the machine code of a short or near jump, the address of the target is not written. Instead, what is written is the signed displacement of the target relative to the address of <em>the instruction after the jump</em>. This approach is called <strong>relative addressing</strong>. The computation is:</p>
+
+<p class="nt-math nt-math--c">displacement = target − (address of the jump instruction + length of the jump instruction)</p>
+
+<p>The sum in parentheses is the value of IP at the moment the processor has read and finished the jump instruction. While executing the jump, the processor adds the displacement to this IP: IP ← IP + displacement. A negative displacement is stored in two's complement, and the addition is done by the same circuit.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-uzaklik">
+  <span class="nt-box__title">Definition 7.3</span>
+  <p>The <strong>jump displacement</strong> is the signed difference between the jump target and the address of the instruction following the jump. It is 8 bits (rel8, −128…+127) in the short jump and in all conditional jumps of the 8086, and 16 bits (rel16) in the near jump. When executing, the processor computes IP ← IP + sign-extended displacement.</p>
+</div>
+
+<p>Figure 7.3 derives the code of the first jump in the JMP example, <code>jmp calc</code>. The instruction is at 0106h and is two bytes long. When the processor finishes it, IP = 0108h. The target calc = 010Ah. The displacement is 010Ah − 0108h = +2, and the machine code is <code>EB 02</code>. These two bytes mean skipping over the two-byte <code>jmp stop</code> instruction at 0108h.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-rel-ileri" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 256" role="img" aria-label="Machine code listing and offset computation" style="max-width:720px"><defs><marker id="n7-2-d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="20" y="18">address</text><text class="lbl" x="92" y="18">machine code</text><text class="lbl" x="208" y="18">instruction</text><rect class="box" x="12" y="26" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="45" style="font-size:14px">0100h</text><text class="txt mono" x="92" y="45" style="font-size:14px">B8 05 00</text><text class="txt mono" x="208" y="45" style="font-size:14px">mov ax, 5</text><rect class="box" x="12" y="58" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="77" style="font-size:14px">0103h</text><text class="txt mono" x="92" y="77" style="font-size:14px">BB 02 00</text><text class="txt mono" x="208" y="77" style="font-size:14px">mov bx, 2</text><rect class="hot" x="12" y="90" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="109" style="font-size:14px">0106h</text><text class="txt mono" x="92" y="109" style="font-size:14px">EB 02</text><text class="txt mono" x="208" y="109" style="font-size:14px">jmp calc</text><rect class="box" x="12" y="122" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="141" style="font-size:14px">0108h</text><text class="txt mono" x="92" y="141" style="font-size:14px">EB 04</text><text class="txt mono" x="208" y="141" style="font-size:14px">back: jmp stop</text><rect class="box" style="stroke:var(--ds-accent);stroke-width:2.5" x="12" y="154" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="173" style="font-size:14px">010Ah</text><text class="txt mono" x="92" y="173" style="font-size:14px">01 D8</text><text class="txt mono" x="208" y="173" style="font-size:14px">calc: add ax, bx</text><rect class="box" x="12" y="186" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="205" style="font-size:14px">010Ch</text><text class="txt mono" x="92" y="205" style="font-size:14px">EB FA</text><text class="txt mono" x="208" y="205" style="font-size:14px">jmp back</text><rect class="box" x="12" y="218" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="237" style="font-size:14px">010Eh</text><text class="txt mono" x="92" y="237" style="font-size:14px">C3</text><text class="txt mono" x="208" y="237" style="font-size:14px">stop: ret</text><path class="acc-line" d="M392 104 C440 104 440 168 396 168" marker-end="url(#n7-2-d1)"/><text class="txt mono" x="470" y="60" style="font-size:14.5px">jmp calc @ 0106h (2 bytes)</text><text class="txt mono" x="470" y="90" style="font-size:14.5px">next IP = 0108h</text><text class="txt mono" x="470" y="120" style="font-size:14.5px">target calc = 010Ah</text><text class="txt mono" x="470" y="150" style="font-size:14.5px">rel8 = 010A − 0108 = +2</text><text class="txt mono" x="470" y="180" style="font-size:14.5px">code: EB 02</text></svg></div>
+  <figcaption><b>Figure 7.3:</b> Forward jump: <code>jmp calc</code> at 0106h, next instruction at 0108h, target at 010Ah. Displacement 010Ah − 0108h = +2, code <code>EB 02</code>.</figcaption>
+</figure>
+
+<p>The computation for <code>jmp stop</code> at 0108h is the same. The next instruction is at 010Ah and the target stop = 010Eh. The displacement is 010Eh − 010Ah = +4 and the code is <code>EB 04</code>. During execution the processor computes IP ← 010Ah + 4 = 010Eh.</p>
+
+<p>In a backward jump the displacement is negative. After the <code>jmp back</code> instruction at 010Ch, IP = 010Eh; the target back = 0108h. The displacement is 0108h − 010Eh = −6. The 8-bit two's complement of −6 is found like this: 6 = 0000 0110b; inverting the bits gives 1111 1001b; adding 1 gives 1111 1010b = FAh. The machine code is <code>EB FA</code> (Figure 7.4).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-rel-geri" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 256" role="img" aria-label="Machine code listing and offset computation" style="max-width:720px"><defs><marker id="n7-4-d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="20" y="18">address</text><text class="lbl" x="92" y="18">machine code</text><text class="lbl" x="208" y="18">instruction</text><rect class="box" x="12" y="26" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="45" style="font-size:14px">0100h</text><text class="txt mono" x="92" y="45" style="font-size:14px">B8 05 00</text><text class="txt mono" x="208" y="45" style="font-size:14px">mov ax, 5</text><rect class="box" x="12" y="58" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="77" style="font-size:14px">0103h</text><text class="txt mono" x="92" y="77" style="font-size:14px">BB 02 00</text><text class="txt mono" x="208" y="77" style="font-size:14px">mov bx, 2</text><rect class="box" x="12" y="90" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="109" style="font-size:14px">0106h</text><text class="txt mono" x="92" y="109" style="font-size:14px">EB 02</text><text class="txt mono" x="208" y="109" style="font-size:14px">jmp calc</text><rect class="box" style="stroke:var(--ds-accent);stroke-width:2.5" x="12" y="122" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="141" style="font-size:14px">0108h</text><text class="txt mono" x="92" y="141" style="font-size:14px">EB 04</text><text class="txt mono" x="208" y="141" style="font-size:14px">back: jmp stop</text><rect class="box" x="12" y="154" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="173" style="font-size:14px">010Ah</text><text class="txt mono" x="92" y="173" style="font-size:14px">01 D8</text><text class="txt mono" x="208" y="173" style="font-size:14px">calc: add ax, bx</text><rect class="hot" x="12" y="186" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="205" style="font-size:14px">010Ch</text><text class="txt mono" x="92" y="205" style="font-size:14px">EB FA</text><text class="txt mono" x="208" y="205" style="font-size:14px">jmp back</text><rect class="box" x="12" y="218" width="380" height="28" rx="4"/><text class="txt mono" x="20" y="237" style="font-size:14px">010Eh</text><text class="txt mono" x="92" y="237" style="font-size:14px">C3</text><text class="txt mono" x="208" y="237" style="font-size:14px">stop: ret</text><path class="acc-line" d="M392 200 C440 200 440 136 396 136" marker-end="url(#n7-4-d3)"/><text class="txt mono" x="470" y="60" style="font-size:14.5px">jmp back @ 010Ch</text><text class="txt mono" x="470" y="90" style="font-size:14.5px">next IP = 010Eh</text><text class="txt mono" x="470" y="120" style="font-size:14.5px">target back = 0108h</text><text class="txt mono" x="470" y="150" style="font-size:14.5px">rel8 = 0108 − 010E = −6</text><text class="txt mono" x="470" y="180" style="font-size:14.5px">−6 = FAh (two's complement)</text><text class="txt mono" x="470" y="210" style="font-size:14.5px">code: EB FA</text></svg></div>
+  <figcaption><b>Figure 7.4:</b> Backward jump: <code>jmp back</code> at 010Ch, next IP 010Eh, target 0108h. Displacement −6, FAh in two's complement; code <code>EB FA</code>.</figcaption>
+</figure>
+
+<p>Before adding this eight-bit number to IP, the processor performs <strong>sign extension</strong>: since the most significant bit is 1, the upper eight bits are filled with 1s and FAh becomes FFFAh. The addition is 16-bit: 010Eh + FFFAh = 1 0108h. The seventeenth bit does not fit in the register and is discarded; IP = 0108h. A positive displacement goes through the same process, except that the upper bits fill with 0s: 02h → 0002h.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-uzaklik">
+  <span class="nt-box__title">Example 7.1</span>
+  <p>A short JMP at address 0150h wants to jump to 0140h. What is its machine code?</p>
+  <p>The instruction is two bytes, so the next IP = 0152h. Displacement = 0140h − 0152h = −12h = −18. 18 = 0001 0010b; inverted 1110 1101b; adding 1 gives 1110 1110b = EEh. The code is <code>EB EE</code>. Check: 0152h + FFEEh = 1 0140h → IP = 0140h.</p>
+  <p>Had the jump to the same target been made from 0100h, the displacement would be 0140h − 0102h = +3Eh and the code <code>EB 3E</code>. From 0300h the displacement would be 0140h − 0302h = −1C2h = −450. This number is less than −128, so the short form cannot be used. The assembler chooses the near form: the instruction is 3 bytes, the next IP = 0303h, the displacement is 0140h − 0303h = −1C3h = FE3Dh, and the code is <code>E9 3D FE</code>.</p>
+</div>
+
+<p>Relative addressing has an important benefit. When the code is moved elsewhere in memory, the displacements do not change, because both the jump instruction and its target shift by the same amount. Such code is called <strong>position-independent code</strong>. Whatever segment DOS loads a .COM program into, the short and near jumps within the segment work correctly. A far jump, on the other hand, contains an absolute segment value, which must be fixed up if the program is moved.</p>
+
+<h3 id="s7-2-5"><span class="nt-num">7.2.5</span>The hardware cost of a jump</h3>
+
+<p>Table 7.1 shows that JMP takes 15 clock cycles. That is a long time for a two-byte instruction; <code>ADD AX, BX</code>, which adds two registers, takes only 3. The reason is the prefetch queue. When a jump executes, the EU tells the BIU to flush the queue and start reading from the new address. The BIU puts the new CS:IP on the address bus and reads two bytes in one bus cycle (four clock cycles). The EU waits until the first byte of the new instruction arrives in the queue. A significant part of the 15 cycles is this wait.</p>
+
+<p>For conditional jumps the cost is even more visible. If the condition holds and the jump is taken, the instruction takes 16 cycles. If the condition does not hold, it takes only 4, because IP points at the next instruction and the bytes in the queue remain valid. Between the two cases of the same instruction there is a fourfold difference. For this reason, in frequently executed loops, writing the jump so that it falls on the “mostly not taken” side gains speed even on the 8086.</p>
+
+<div class="nt-tablewrap" id="tab-tur">
+<table class="nt-table">
+  <caption>Table 7.4: Clock cycle counts of flow control instructions on the 8086 (Intel 8086 manual).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">If taken</th><th scope="col">If not taken</th></tr></thead>
+  <tbody>
+    <tr><td><code>JMP</code> short / near / far</td><td>15</td><td>—</td></tr>
+    <tr><td><code>JMP</code> register / memory</td><td>11 / 18 + EA</td><td>—</td></tr>
+    <tr><td><code>Jcc</code> (all conditional jumps)</td><td>16</td><td>4</td></tr>
+    <tr><td><code>LOOP</code></td><td>17</td><td>5</td></tr>
+    <tr><td><code>LOOPE</code> / <code>LOOPZ</code></td><td>18</td><td>6</td></tr>
+    <tr><td><code>LOOPNE</code> / <code>LOOPNZ</code></td><td>19</td><td>5</td></tr>
+    <tr><td><code>JCXZ</code></td><td>18</td><td>6</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>These numbers become concrete on a 5 MHz 8086. One clock cycle is 1 / 5 MHz = 200 ns. A 15-cycle JMP takes 3 µs. A conditional jump not taken takes 0.8 µs, and one taken takes 3.2 µs. The loop instruction alone of a thousand-iteration loop can therefore take milliseconds.</p>
+
+<p>A jump has one more side effect. If the target address is odd, the BIU can fetch only one byte in the first bus cycle. The 8086 data bus is 16 bits wide and can read a word in a single bus cycle only from an even address. Aligning frequently used loop heads to an even address (the <code>EVEN</code> directive) therefore gives a small gain. The 8088, with its 8-bit data bus, has no such difference, but because every byte needs its own bus cycle, filling the queue takes even longer.</p>
+
+<h2 class="nt-pb" id="s7-3"><span class="nt-num">7.3</span>Conditional jumps</h2>
+
+<h3 id="s7-3-1"><span class="nt-num">7.3.1</span>The idea of a conditional jump</h3>
+
+<p>An unconditional jump cannot decide anything on its own; it goes to the same place every time. To decide, a jump must depend on a condition. On the 8086 this condition is always read from the flags in the <strong>flags register</strong>. The general name of the conditional jump instructions is <code>Jcc</code>; in place of cc comes the abbreviation of the condition (Z, NZ, C, A, G …). The meaning of <code>Jcc label</code> is this: if the condition is true, IP ← label; otherwise IP keeps pointing at the next instruction.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-jcc">
+  <span class="nt-box__title">Definition 7.4</span>
+  <p>A <strong>conditional jump</strong> is an instruction that, depending on the state of one or more flags in the flags register, either jumps to the target or moves on to the next instruction. A conditional jump only reads the flags; it changes none of them.</p>
+</div>
+
+<p>The flags are set by an instruction that comes before the conditional jump. This instruction is most often <code>CMP</code>, but arithmetic and logic instructions such as <code>SUB</code>, <code>ADD</code>, <code>TEST</code>, <code>AND</code>, <code>INC</code>, and <code>DEC</code> set the flags too. Instructions that do not touch the flags (<code>MOV</code>, <code>JMP</code>, <code>LOOP</code>, <code>PUSH</code>, <code>POP</code>) may come between the flag-setting instruction and the jump that reads the flags; the decision is still made from the result of the first instruction. If an instruction that changes the flags comes in between, the decision is made from that instruction instead. This is one of the main sources of errors in flow control.</p>
+
+<p>The status flags used by jumps are the following:</p>
+
+<ul>
+  <li><strong>ZF</strong> (zero flag): 1 if the result is zero.</li>
+  <li><strong>CF</strong> (carry flag): 1 if addition produces a carry out of the most significant bit, or subtraction needs a borrow.</li>
+  <li><strong>SF</strong> (sign flag): the most significant bit of the result; 1 if the result is negative in the signed interpretation.</li>
+  <li><strong>OF</strong> (overflow flag): 1 if the result does not fit in the destination's bit width in the signed interpretation.</li>
+  <li><strong>PF</strong> (parity flag): 1 if the low byte of the result has an even number of 1 bits.</li>
+  <li><strong>AF</strong> (auxiliary carry flag): 1 if there is a carry or borrow at bit 3. No jump tests this flag; AF is used only by the BCD adjust instructions (DAA, DAS, AAA, AAS).</li>
+</ul>
+
+<p>Figure 7.5 summarizes the flow of a conditional jump. After the instruction that sets the flags, the processor reaches a fork. If the condition holds it goes to the label, and if not it goes to the next instruction. Every if in a high-level language is an instance of this fork.</p>
+
+<figure class="nt-fig" id="sekil-jcc" style="--w:330px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 330 250" role="img" aria-label="Flowchart of a conditional jump: if the condition holds, jump to the label; otherwise continue with the next instruction." style="max-width:330px"><defs><marker id="n7-5-f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="85" y="6" width="160" height="34" rx="6"/><text class="txt mono" x="165" y="28" text-anchor="middle">cmp / sub / …</text><path class="line" d="M165 40 L165 62" marker-end="url(#n7-5-f1)"/><path class="hot" d="M165 66 L250 110 L165 154 L80 110 Z"/><text class="txt" x="165" y="106" text-anchor="middle">flags</text><text class="txt" x="165" y="124" text-anchor="middle">condition met?</text><path class="line" d="M250 110 L282 110 L282 196" marker-end="url(#n7-5-f1)"/><text class="lbl" x="258" y="102">yes</text><rect class="box" x="230" y="200" width="96" height="34" rx="6"/><text class="txt mono" x="278" y="222" text-anchor="middle">label:</text><path class="line" d="M165 154 L165 196" marker-end="url(#n7-5-f1)"/><text class="lbl" x="172" y="180">no</text><rect class="box" x="70" y="200" width="150" height="34" rx="6"/><text class="txt" x="145" y="222" text-anchor="middle">next instruction</text></svg></div>
+  <figcaption><b>Figure 7.5:</b> Flowchart of a conditional jump: after the instruction that sets the flags, if the condition is true the jump goes to the label; otherwise execution continues with the next instruction.</figcaption>
+</figure>
+
+<h3 id="s7-3-2"><span class="nt-num">7.3.2</span>Jumps that test a single flag</h3>
+
+<p>The simplest conditional jumps look at a single flag. For each flag there are two instructions: one jumps when the flag is 1, the other when it is 0. The letter N in an instruction name means “not”: <code>JZ</code> jumps if zero, <code>JNZ</code> if not zero. Table 7.5 gives these instructions, their conditions, and their opposites.</p>
+
+<div class="nt-tablewrap" id="tab-tek">
+<table class="nt-table">
+  <caption>Table 7.5: Conditional jumps that test a single flag.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Meaning</th><th scope="col">Condition</th><th scope="col">Opposite</th></tr></thead>
+  <tbody>
+    <tr><td><code>JZ</code>, <code>JE</code></td><td>jump if zero / equal</td><td>ZF = 1</td><td><code>JNZ</code>, <code>JNE</code></td></tr>
+    <tr><td><code>JC</code>, <code>JB</code>, <code>JNAE</code></td><td>jump if carry / below</td><td>CF = 1</td><td><code>JNC</code>, <code>JNB</code>, <code>JAE</code></td></tr>
+    <tr><td><code>JS</code></td><td>jump if the result is negative</td><td>SF = 1</td><td><code>JNS</code></td></tr>
+    <tr><td><code>JO</code></td><td>jump if signed overflow</td><td>OF = 1</td><td><code>JNO</code></td></tr>
+    <tr><td><code>JPE</code>, <code>JP</code></td><td>jump if parity is even</td><td>PF = 1</td><td><code>JPO</code>, <code>JNP</code></td></tr>
+    <tr><td><code>JNZ</code>, <code>JNE</code></td><td>jump if not zero / not equal</td><td>ZF = 0</td><td><code>JZ</code>, <code>JE</code></td></tr>
+    <tr><td><code>JNC</code>, <code>JNB</code>, <code>JAE</code></td><td>jump if no carry / not below</td><td>CF = 0</td><td><code>JC</code>, <code>JB</code>, <code>JNAE</code></td></tr>
+    <tr><td><code>JNS</code></td><td>jump if the result is not negative</td><td>SF = 0</td><td><code>JS</code></td></tr>
+    <tr><td><code>JNO</code></td><td>jump if no overflow</td><td>OF = 0</td><td><code>JO</code></td></tr>
+    <tr><td><code>JPO</code>, <code>JNP</code></td><td>jump if parity is odd</td><td>PF = 0</td><td><code>JPE</code>, <code>JP</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>These instructions have different areas of use. <code>JZ/JNZ</code> are the most common: with them one tests whether a counter has reached zero, whether two values are equal, or whether the 0 byte at the end of a string has been reached. <code>JC/JNC</code> catch overflow in unsigned addition and a borrow in subtraction. Some DOS and BIOS services also report an error through CF, and <code>JC error</code> is written after the service call. <code>JS/JNS</code> look at the sign of a result. <code>JO/JNO</code> catch overflow in signed arithmetic. <code>JP/JNP</code> are rarely used; they are useful for jobs such as parity checking in serial communication.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>The C in JC is the carry flag; overflow is OF. They are different concepts. CF reports a failure to fit in the unsigned interpretation, and OF a failure to fit in the signed interpretation. In the addition 7Fh + 01h = 80h, CF = 0 (127 + 1 = 128 fits in a byte), but OF = 1 (signed +127 + 1 = +128 does not fit in the range −128…127).</p>
+</div>
+
+<h3 id="s7-3-3"><span class="nt-num">7.3.3</span>Encoding and synonyms</h3>
+
+<p>On the 8086 all conditional jumps have a fixed length: <strong>2 bytes</strong>. The first byte is the opcode and the second is the 8-bit signed displacement (rel8). A conditional jump can therefore go at most 128 bytes backward or 127 bytes forward relative to the instruction after it. Conditional jumps with a 16-bit displacement (the <code>0F 8x</code> opcodes) arrived only with the 80386; the 8086 does not have them.</p>
+
+<p>The same condition can have more than one name. For example, the condition CF = 1 can be read in three ways: “carry set” (JC), “below” (JB, unsigned less than), and “not above or equal” (JNAE). These names are called <strong>synonym</strong> instructions. The assembler translates all of them to the same machine code; the processor does not know which name was written. The programmer chooses the name that best fits the meaning of the condition in that program. Writing <code>JE</code> when testing the equality of two numbers and <code>JZ</code> when testing whether a counter has reached zero keeps the code readable.</p>
+
+<div class="nt-ops" id="tab-opkod" role="list" aria-label="Opcodes of the conditional jump and loop instructions">
+  <div role="listitem"><b>70</b>JO</div><div role="listitem"><b>71</b>JNO</div><div role="listitem"><b>72</b>JB / JC / JNAE</div><div role="listitem"><b>73</b>JAE / JNB / JNC</div>
+  <div role="listitem"><b>74</b>JE / JZ</div><div role="listitem"><b>75</b>JNE / JNZ</div><div role="listitem"><b>76</b>JBE / JNA</div><div role="listitem"><b>77</b>JA / JNBE</div>
+  <div role="listitem"><b>78</b>JS</div><div role="listitem"><b>79</b>JNS</div><div role="listitem"><b>7A</b>JP / JPE</div><div role="listitem"><b>7B</b>JNP / JPO</div>
+  <div role="listitem"><b>7C</b>JL / JNGE</div><div role="listitem"><b>7D</b>JGE / JNL</div><div role="listitem"><b>7E</b>JLE / JNG</div><div role="listitem"><b>7F</b>JG / JNLE</div>
+  <div role="listitem"><b>E0</b>LOOPNE / LOOPNZ</div><div role="listitem"><b>E1</b>LOOPE / LOOPZ</div><div role="listitem"><b>E2</b>LOOP</div><div role="listitem"><b>E3</b>JCXZ</div>
+</div>
+
+<p>There is a pattern in the opcode sequence above. The conditional jumps all lie in the range 70h–7Fh and pair up two by two. In each pair the lowest bit of the opcode inverts the condition: 74h is JE while 75h is JNE, 72h is JB while 73h is JAE, 7Ch is JL while 7Dh is JGE. The upper bits select which flag or combination of flags is tested. The processor's condition circuit first computes this combination, then inverts the result if the lowest bit is 1. This pattern makes it easy to find the opposite of a condition: changing the last bit of the opcode is enough. The loop instructions also sit side by side, in the range E0h–E3h. The code of the short JMP is EBh.</p>
+
+<h3 id="s7-3-4"><span class="nt-num">7.3.4</span>Code trace: JNC = JNB = JAE</h3>
+
+<p>A small program shows that synonym instructions really produce the same machine code. The program contains three synonymous jumps in a row; all three go to the same label <code>a</code>.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">jnc</span> a          <span class="cm">; 0100h: 73 07</span>
+<span class="kw">jnb</span> a          <span class="cm">; 0102h: 73 05</span>
+<span class="kw">jae</span> a          <span class="cm">; 0104h: 73 03</span>
+<span class="kw">mov</span> ax, 4      <span class="cm">; 0106h: B8 04 00</span>
+a: <span class="kw">mov</span> ax, 5   <span class="cm">; 0109h: B8 05 00</span>
+<span class="kw">ret</span>            <span class="cm">; 010Ch: C3</span></code></pre>
+
+<p>The opcode of all three jumps is 73h; all three test the condition CF = 0. Only their second bytes differ, because each stands at a different address and so has a different distance to the target. <code>jnc a</code> is at 0100h: the next address is 0102h, displacement 0109h − 0102h = 7. <code>jnb a</code> is at 0102h: displacement 0109h − 0104h = 5. <code>jae a</code> is at 0104h: displacement 0109h − 0106h = 3.</p>
+
+<div class="nt-tablewrap" id="tab-es-iz">
+<table class="nt-table">
+  <caption>Table 7.6: Trace of the synonymous jumps program (CF = 0 at the start).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">CF</th><th scope="col">AX</th><th scope="col">IP (after)</th><th scope="col">Note</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>—</td><td>start</td><td>0</td><td>0000h</td><td>0100h</td><td>.COM start</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>jnc a</code></td><td>0</td><td>0000h</td><td>0109h</td><td>CF = 0 → jumps: 0102h + 07h</td></tr>
+    <tr><td>2</td><td>0109h</td><td><code>mov ax, 5</code></td><td>0</td><td>0005h</td><td>010Ch</td><td>the three instructions in between were not executed</td></tr>
+    <tr><td>3</td><td>010Ch</td><td><code>ret</code></td><td>0</td><td>0005h</td><td>0000h</td><td>return to the PSP</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>When the program starts, all the status flags are 0, CF included. The first instruction, <code>jnc a</code>, therefore jumps and IP = 0109h. <code>jnb</code>, <code>jae</code>, and <code>mov ax, 4</code> are never executed. AX = 0005h and the program ends. Had CF been 1 at the start (say, with an <code>STC</code> added at the top), none of the three jumps would be taken. The processor would pass through the three instructions in turn, and AX would become 4 and then 5. The final value is the same either way, but the number of instructions executed differs: 3 when CF = 0, 6 when CF = 1.</p>
+
+<h3 id="s7-3-5"><span class="nt-num">7.3.5</span>Computing a jump code by hand</h3>
+
+<p>The jump code calculator in the slides finds the machine code of a jump instruction from its address and its target. The same computation can be done by hand in three steps. First determine the instruction length: JMP SHORT, all Jcc instructions, and the LOOP family are 2 bytes, and JMP NEAR is 3 bytes. Then compute the displacement: displacement = target − (address + length). Finally check whether the displacement fits the range and write it in two's complement.</p>
+
+<div class="nt-box nt-box--ornek" id="ornek-kod">
+  <span class="nt-box__title">Example 7.2</span>
+  <p>(a) A <code>JNE</code> at 0120h is to jump to 0100h. Next IP = 0122h; displacement = 0100h − 0122h = −22h. 22h = 0010 0010b; inverted 1101 1101b; plus 1: 1101 1110b = DEh. Code <code>75 DE</code>. The processor computes 0122h + FFDEh = 1 0100h → IP = 0100h.</p>
+  <p>(b) A <code>LOOP</code> at 0105h is to return to 0100h. Displacement = 0100h − 0107h = −7 = F9h. Code <code>E2 F9</code>.</p>
+  <p>(c) A <code>JE</code> at 0100h is to jump to 0190h. Displacement = 0190h − 0102h = 8Eh = 142. This number is greater than +127; as an 8-bit signed number, 8Eh would be read as −114. The short form cannot be used, and the 8086 has no long form of the conditional jump. The solution is to invert the condition and use a near JMP.</p>
+  <p>(d) A <code>JMP NEAR</code> at 0100h is to jump to 0190h. The instruction is 3 bytes, the next IP = 0103h, and the displacement = 008Dh. Code <code>E9 8D 00</code> (little-endian: low byte first).</p>
+</div>
+
+<p>If the result does not fit in the range −128…+127 in the short form, classic assemblers report a “relative jump out of range” error. This error says the displacement does not fit in one byte; the fix is to change the instruction or rearrange the code.</p>
+
+<h2 class="nt-pb" id="s7-4"><span class="nt-num">7.4</span>Comparison: CMP</h2>
+
+<h3 id="s7-4-1"><span class="nt-num">7.4.1</span>The CMP instruction</h3>
+
+<p>A program often compares two values and decides according to the result: is the number greater than 100, is the character 'A', has the counter run out. The <code>CMP destination, source</code> instruction is used for this. CMP performs the subtraction that SUB does: destination − source. It does not store the result anywhere, however. It only sets the flags (CF, ZF, SF, OF, PF, AF) according to the result of the subtraction. Both operands are left unchanged.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-cmp">
+  <span class="nt-box__title">Definition 7.5</span>
+  <p><strong>Compare</strong> (CMP) is the instruction that performs the subtraction destination − source, discards the result, and only sets the flags. The flags are set by the same rules as in SUB. The conditional jump that follows CMP decides by looking at these flags.</p>
+</div>
+
+<p>CMP's operand rules are the same as SUB's. Register–register, register–memory, memory–register, and register-or-memory–constant combinations are valid. There cannot be two memory operands; <code>CMP [SI], [DI]</code> cannot be written. The two operands must be the same size. When memory is compared with a constant, the size must be specified: <code>CMP BYTE PTR [SI], 3</code>. If a variable name is used, the size follows from the variable's type: <code>cmp arr[si], 3</code> is a byte comparison because arr is defined with DB.</p>
+
+<p>CMP's execution time depends on the operands. Register–register takes 3 clock cycles and register–constant takes 4. With a memory operand the effective address is computed first and memory is read in one bus cycle: register–memory takes 9 + EA, memory–constant 10 + EA cycles. A comparison and the conditional jump behind it together make up the cost of one decision: <code>CMP AL, BL</code> + a <code>JE</code> not taken is 3 + 4 = 7 cycles, and with the <code>JE</code> taken it is 3 + 16 = 19 cycles.</p>
+
+<div class="nt-tablewrap" id="tab-cmp-ornek">
+<table class="nt-table">
+  <caption>Table 7.7: Two simple CMP examples.</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Subtraction</th><th scope="col">ZF</th><th scope="col">CF</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">JE / JZ</th></tr></thead>
+  <tbody>
+    <tr><td><code>CMP 05h, 02h</code></td><td>5 − 2 = 3 → 03h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>not taken</td></tr>
+    <tr><td><code>CMP 07h, 07h</code></td><td>7 − 7 = 0 → 00h</td><td>1</td><td>0</td><td>0</td><td>0</td><td>taken</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The notation in the table is conceptual; the 8086 has no instruction that compares two constants, so one operand must be a register or memory. In the first example the difference is not zero and ZF = 0. In the second example the difference is zero: ZF = 1, and <code>JE</code> or <code>JZ</code> is taken. That is all there is to an equality test: if two numbers are equal, their difference is zero.</p>
+
+<h3 id="s7-4-2"><span class="nt-num">7.4.2</span>CMP flags step by step</h3>
+
+<p>Equality looks only at ZF. Decisions of “greater” and “less” depend on how the numbers are interpreted. The same eight bits carry a value in the range 0–255 as an unsigned number and −128…127 as a signed number. CMP does not make this distinction; it subtracts the bits and writes into the flags the information needed for both interpretations. The answer for the unsigned interpretation is in CF and ZF, and the answer for the signed interpretation is in SF, OF, and ZF. Table 7.8 shows how <code>CMP AL, BL</code> sets the flags for five different inputs.</p>
+
+<div class="nt-tablewrap" id="tab-cmp5">
+<table class="nt-table">
+  <caption>Table 7.8: Flags set by <code>CMP AL, BL</code> for five inputs, and the resulting jump decisions.</caption>
+  <thead><tr><th scope="col">AL</th><th scope="col">BL</th><th scope="col">AL − BL</th><th scope="col">CF</th><th scope="col">ZF</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">PF</th><th scope="col">AF</th><th scope="col">Unsigned</th><th scope="col">Signed</th></tr></thead>
+  <tbody>
+    <tr><td>05h (5)</td><td>02h (2)</td><td>03h</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>5 &gt; 2: JA</td><td>5 &gt; 2: JG</td></tr>
+    <tr><td>07h (7)</td><td>07h (7)</td><td>00h</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>equal: JE</td><td>equal: JE</td></tr>
+    <tr><td>05h (5)</td><td>07h (7)</td><td>FEh</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>5 &lt; 7: JB</td><td>5 &lt; 7: JL</td></tr>
+    <tr><td>7Fh (127)</td><td>80h (128 / −128)</td><td>FFh</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>127 &lt; 128: JB</td><td>127 &gt; −128: JG</td></tr>
+    <tr><td>FBh (251 / −5)</td><td>03h (3)</td><td>F8h</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>251 &gt; 3: JA</td><td>−5 &lt; 3: JL</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the first row the difference is positive and no flag is raised except PF; PF = 1 because 03h = 0000 0011b contains two 1 bits. In the second row the difference is zero and ZF = 1. In both the signed and the unsigned view the numbers are equal.</p>
+
+<p>In the third row a larger number is subtracted from a smaller one. The operation 5 − 7 needs a borrow, so CF = 1. The result is FEh: 254 unsigned, −2 signed. Because the most significant bit of the result is 1, SF = 1. Since −2 fits in eight bits, there is no overflow: OF = 0. The low nibble also borrows in 5 − 7, so AF = 1. FEh = 1111 1110b contains seven 1 bits; PF = 0.</p>
+
+<p>The fourth and fifth rows are the really interesting cases. In these two rows the signed and the unsigned interpretation give different answers (Figures 7.6 and 7.7).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-cmp-7f80" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 196" role="img" aria-label="Flags after CMP 7Fh, 80h" style="max-width:720px"><text class="lbl" x="20" y="22">AL</text><text class="txt mono" x="70" y="22">0111 1111</text><text class="txt mono" x="170" y="22">7Fh</text><text class="lbl" x="300" y="22">unsigned 127 · signed 127</text><text class="lbl" x="20" y="50">BL</text><text class="txt mono" x="70" y="50">1000 0000</text><text class="txt mono" x="170" y="50">80h</text><text class="lbl" x="300" y="50">unsigned 128 · signed -128</text><path class="axis" d="M20 60 L230 60"/><text class="lbl" x="20" y="82">AL−BL</text><text class="txt mono" x="70" y="82">1111 1111</text><text class="txt mono" x="170" y="82">FFh</text><text class="lbl" x="300" y="82">the result is not stored, only the flags</text><rect class="hot" x="20" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="53" y="120" text-anchor="middle">CF=1</text><rect class="box" x="96" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="129" y="120" text-anchor="middle">ZF=0</text><rect class="hot" x="172" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="205" y="120" text-anchor="middle">SF=1</text><rect class="hot" x="248" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="281" y="120" text-anchor="middle">OF=1</text><rect class="hot" x="324" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="357" y="120" text-anchor="middle">PF=1</text><rect class="box" x="400" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="433" y="120" text-anchor="middle">AF=0</text><text class="txt" x="20" y="162">unsigned: AL < BL</text><text class="txt" x="300" y="162">signed: AL > BL</text><text class="lbl" x="20" y="184">CF=1, ZF=0 → JB taken</text><text class="lbl" x="300" y="184">SF=1, OF=1, ZF=0 → JG taken</text></svg></div>
+  <figcaption><b>Figure 7.6:</b> <code>CMP 7Fh, 80h</code>: in the unsigned view 127 &lt; 128 (CF = 1, JB is taken); in the signed view 127 − (−128) = 255 does not fit in eight bits, so OF = 1, and since SF = OF, JG is taken.</figcaption>
+</figure>
+
+<p>In the operation 7Fh − 80h, the unsigned interpretation is 127 − 128; a borrow is taken and CF = 1. The signed interpretation is 127 − (−128) = +255. This value does not fit in the range −128…127, so OF = 1. The eight-bit result is FFh, and since its most significant bit is 1, SF = 1. SF alone would say “the result is negative, so AL is smaller”; that is wrong. The correct decision is made by reading SF and OF together.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-cmp-fb03" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 196" role="img" aria-label="Flags after CMP FBh, 03h" style="max-width:720px"><text class="lbl" x="20" y="22">AL</text><text class="txt mono" x="70" y="22">1111 1011</text><text class="txt mono" x="170" y="22">FBh</text><text class="lbl" x="300" y="22">unsigned 251 · signed -5</text><text class="lbl" x="20" y="50">BL</text><text class="txt mono" x="70" y="50">0000 0011</text><text class="txt mono" x="170" y="50">03h</text><text class="lbl" x="300" y="50">unsigned 3 · signed 3</text><path class="axis" d="M20 60 L230 60"/><text class="lbl" x="20" y="82">AL−BL</text><text class="txt mono" x="70" y="82">1111 1000</text><text class="txt mono" x="170" y="82">F8h</text><text class="lbl" x="300" y="82">the result is not stored, only the flags</text><rect class="box" x="20" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="53" y="120" text-anchor="middle">CF=0</text><rect class="box" x="96" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="129" y="120" text-anchor="middle">ZF=0</text><rect class="hot" x="172" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="205" y="120" text-anchor="middle">SF=1</text><rect class="box" x="248" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="281" y="120" text-anchor="middle">OF=0</text><rect class="box" x="324" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="357" y="120" text-anchor="middle">PF=0</text><rect class="box" x="400" y="100" width="66" height="30" rx="15"/><text class="txt mono" x="433" y="120" text-anchor="middle">AF=0</text><text class="txt" x="20" y="162">unsigned: AL > BL</text><text class="txt" x="300" y="162">signed: AL < BL</text><text class="lbl" x="20" y="184">CF=0, ZF=0 → JA taken</text><text class="lbl" x="300" y="184">SF=1, OF=0, ZF=0 → JL taken</text></svg></div>
+  <figcaption><b>Figure 7.7:</b> <code>CMP FBh, 03h</code>: FBh is 251 unsigned and −5 signed. In the unsigned view 251 &gt; 3 (CF = 0, JA is taken); in the signed view −5 &lt; 3 (SF ≠ OF, JL is taken). The same bits lead to different decisions.</figcaption>
+</figure>
+
+<p>In the operation FBh − 03h = F8h there is no borrow; CF = 0. In the unsigned interpretation 251 &gt; 3. In the signed interpretation −5 − 3 = −8. −8 fits in eight bits (F8h) and there is no overflow: OF = 0. The result is negative: SF = 1. Since SF ≠ OF, AL is smaller in the signed interpretation. The same CMP gives two opposite decisions depending on the type of the data. The processor cannot know which decision is the right one; the programmer says so by choosing the appropriate jump instruction.</p>
+
+<h3 id="s7-4-3"><span class="nt-num">7.4.3</span>Jumps for signed numbers</h3>
+
+<p>The jumps used for signed comparison are named after the English words for “greater” and “less”: <strong>G</strong>reater and <strong>L</strong>ess. These names are used on the assumption that the numbers are signed, in two's complement representation. Table 7.9 gives this family with its conditions.</p>
+
+<div class="nt-tablewrap" id="tab-isaretli">
+<table class="nt-table">
+  <caption>Table 7.9: Conditional jumps for signed numbers (after <code>CMP A, B</code>).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Meaning</th><th scope="col">Condition</th><th scope="col">Opposite</th></tr></thead>
+  <tbody>
+    <tr><td><code>JE</code>, <code>JZ</code></td><td>A = B</td><td>ZF = 1</td><td><code>JNE</code>, <code>JNZ</code></td></tr>
+    <tr><td><code>JNE</code>, <code>JNZ</code></td><td>A ≠ B</td><td>ZF = 0</td><td><code>JE</code>, <code>JZ</code></td></tr>
+    <tr><td><code>JG</code>, <code>JNLE</code></td><td>A &gt; B (greater)</td><td>ZF = 0 and SF = OF</td><td><code>JNG</code>, <code>JLE</code></td></tr>
+    <tr><td><code>JL</code>, <code>JNGE</code></td><td>A &lt; B (less)</td><td>SF ≠ OF</td><td><code>JNL</code>, <code>JGE</code></td></tr>
+    <tr><td><code>JGE</code>, <code>JNL</code></td><td>A ≥ B</td><td>SF = OF</td><td><code>JNGE</code>, <code>JL</code></td></tr>
+    <tr><td><code>JLE</code>, <code>JNG</code></td><td>A ≤ B</td><td>ZF = 1 or SF ≠ OF</td><td><code>JNLE</code>, <code>JG</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The conditions look confusing at a glance, but they all derive from one principle: in the signed interpretation, “A &lt; B” is given by SF ≠ OF, and the rest follows. A ≥ B is the negation of A &lt; B: SF = OF. A &gt; B means “A ≥ B and A ≠ B”: SF = OF and ZF = 0. A ≤ B is the negation of A &gt; B: ZF = 1 or SF ≠ OF. The synonyms are built with the same logic. JG is also written JNLE, meaning “not less or equal”.</p>
+
+<h3 id="s7-4-4"><span class="nt-num">7.4.4</span>Why SF = OF?</h3>
+
+<p>In the processor, <code>CMP A, B</code> is computed as A − B. If there is no overflow, the sign of the result is correct: if A &lt; B the difference is negative and SF = 1. If there is overflow (OF = 1), the difference did not fit in eight or sixteen bits. The sign bit of a result that does not fit comes out inverted. The reason is that signed numbers are arranged on a circle (Figure 7.8): a value that goes past one end of the range enters from the other end. Adding 1 to 127 gives −128; subtracting 1 from −128 gives 127.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-cember" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 96" role="img" aria-label="The signed byte range is −128 to 127; on overflow the value wraps to the other end and the sign bit comes out inverted." style="max-width:620px"><rect class="box" x="20" y="26" width="320" height="28" rx="3"/><text class="txt" x="180" y="45" text-anchor="middle" style="font-size:13px">negative: 80h … FFh</text><rect class="box" x="340" y="26" width="320" height="28" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="500" y="45" text-anchor="middle" style="font-size:13px">positive: 00h … 7Fh</text><text class="lbl" x="20" y="18" text-anchor="middle" style="font-size:12px">−128</text><text class="lbl" x="340" y="18" text-anchor="middle" style="font-size:12px">0</text><text class="lbl" x="660" y="18" text-anchor="middle" style="font-size:12px">127</text><path class="line" style="stroke-dasharray:4 3" d="M660 56 C 640 84, 40 84, 22 60"/><path class="line" d="M30.0 70.0 L25.9 63.8"/><path class="ah" d="M22.0 58.0 L29.1 61.7 L22.7 66.0 z"/><text class="lbl" x="340" y="90" text-anchor="middle" style="font-size:12px">127 + 1 → −128: at the end of the range the value wraps to the other end and the sign bit comes out inverted (OF = 1)</text></svg></div>
+  <figcaption><b>Figure 7.8:</b> The signed byte range is −128 to 127. On overflow the value wraps to the other end of the range and the sign bit comes out inverted (OF = 1).</figcaption>
+</figure>
+
+<p>The true sign is therefore the exclusive OR of SF and OF: true sign = SF XOR OF. With no overflow (OF = 0) the true sign is SF itself. With overflow (OF = 1) the true sign is the inverse of SF. When SF ≠ OF the XOR gives 1: the true difference is negative and A &lt; B. When SF = OF the XOR gives 0: the true difference is not negative and A ≥ B.</p>
+
+<div class="nt-box nt-box--teorem" id="teorem-sfof">
+  <span class="nt-box__title">Theorem 7.1 (Signed comparison)</span>
+  <p>After <code>CMP A, B</code>, if A and B are interpreted as signed numbers in two's complement representation, then A &lt; B ⇔ SF ≠ OF and A ≥ B ⇔ SF = OF.</p>
+  <p><em>Justification.</em> The true difference d = A − B lies in the range −255…+255 for eight bits. If d is in the range −128…127, the result is shown correctly, OF = 0, and SF = (d &lt; 0). If d &gt; 127, the result appears as d − 256, which is negative: SF = 1, OF = 1; the true difference is positive. If d &lt; −128, the result appears as d + 256, which is positive or zero: SF = 0, OF = 1; the true difference is negative. In all three cases (d &lt; 0) = SF XOR OF.</p>
+</div>
+
+<div class="nt-tablewrap" id="tab-sfof">
+<table class="nt-table">
+  <caption>Table 7.10: SF and OF together give the right decision (8 bits).</caption>
+  <thead><tr><th scope="col">A</th><th scope="col">B</th><th scope="col">A − B (8 bits)</th><th scope="col">True difference</th><th scope="col">SF</th><th scope="col">OF</th><th scope="col">Decision</th></tr></thead>
+  <tbody>
+    <tr><td>5</td><td>7</td><td>FEh (−2)</td><td>−2</td><td>1</td><td>0</td><td>SF ≠ OF → 5 &lt; 7</td></tr>
+    <tr><td>127 (7Fh)</td><td>−128 (80h)</td><td>FFh (−1)</td><td>+255, does not fit</td><td>1</td><td>1</td><td>SF = OF → 127 &gt; −128</td></tr>
+    <tr><td>−128 (80h)</td><td>1</td><td>7Fh (+127)</td><td>−129, does not fit</td><td>0</td><td>1</td><td>SF ≠ OF → −128 &lt; 1</td></tr>
+    <tr><td>−5 (FBh)</td><td>3</td><td>F8h (−8)</td><td>−8</td><td>1</td><td>0</td><td>SF ≠ OF → −5 &lt; 3</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The second and third rows of the table involve overflow. In both, SF alone would give the wrong answer: in the second row it would say “negative, A is smaller”, and in the third row “positive, A is greater”. Evaluated together with OF, the decision is correct. In hardware this is very cheap: the condition circuit of JL is a single XOR gate. For JLE, the output of this XOR is ORed with ZF.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Writing “jump if less” as <code>JS</code> after a signed comparison. JS looks only at SF and decides wrongly when there is overflow: after <code>MOV AL, 80h</code> / <code>CMP AL, 1</code>, SF = 0 and JS is not taken, although −128 &lt; 1. The correct instruction is <code>JL</code>; since SF ≠ OF (0 ≠ 1), it is taken.</p>
+</div>
+
+<h3 id="s7-4-5"><span class="nt-num">7.4.5</span>Jumps for unsigned numbers</h3>
+
+<p>The jumps used for unsigned comparison are named after the English words “above” and “below”: <strong>A</strong>bove and <strong>B</strong>elow. In the unsigned interpretation the decision is much simpler, because there is no notion of overflow. In the subtraction A − B, if A &lt; B a borrow is taken and CF = 1. So the “below” test is directly the carry flag: JB ≡ JC.</p>
+
+<div class="nt-tablewrap" id="tab-isaretsiz">
+<table class="nt-table">
+  <caption>Table 7.11: Conditional jumps for unsigned numbers (after <code>CMP A, B</code>).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Meaning</th><th scope="col">Condition</th><th scope="col">Opposite</th></tr></thead>
+  <tbody>
+    <tr><td><code>JE</code>, <code>JZ</code></td><td>A = B</td><td>ZF = 1</td><td><code>JNE</code>, <code>JNZ</code></td></tr>
+    <tr><td><code>JNE</code>, <code>JNZ</code></td><td>A ≠ B</td><td>ZF = 0</td><td><code>JE</code>, <code>JZ</code></td></tr>
+    <tr><td><code>JA</code>, <code>JNBE</code></td><td>A &gt; B (above)</td><td>CF = 0 and ZF = 0</td><td><code>JNA</code>, <code>JBE</code></td></tr>
+    <tr><td><code>JB</code>, <code>JNAE</code>, <code>JC</code></td><td>A &lt; B (below)</td><td>CF = 1</td><td><code>JNB</code>, <code>JAE</code>, <code>JNC</code></td></tr>
+    <tr><td><code>JAE</code>, <code>JNB</code>, <code>JNC</code></td><td>A ≥ B</td><td>CF = 0</td><td><code>JNAE</code>, <code>JB</code>, <code>JC</code></td></tr>
+    <tr><td><code>JBE</code>, <code>JNA</code></td><td>A ≤ B</td><td>CF = 1 or ZF = 1</td><td><code>JNBE</code>, <code>JA</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The condition of JA means “no borrow and the difference is not zero”; A is neither less than B nor equal to it. JBE is its opposite. JAE looks only at CF = 0; since no borrow is taken on equality either, “greater or equal” is satisfied automatically.</p>
+
+<h3 id="s7-4-6"><span class="nt-num">7.4.6</span>Above/Below or Greater/Less?</h3>
+
+<p>For each of the six comparison relations there are two instructions: one unsigned, one signed. For equality and inequality the two families use the same instruction, because equality means the bits are identical and does not depend on interpretation. Table 7.12 gives this mapping at a glance.</p>
+
+<div class="nt-tablewrap" id="tab-ab-gl">
+<table class="nt-table">
+  <caption>Table 7.12: Choosing a jump by relation and data type.</caption>
+  <thead><tr><th scope="col">Comparison</th><th scope="col">Unsigned (A/B)</th><th scope="col">Signed (G/L)</th></tr></thead>
+  <tbody>
+    <tr><td>A = B</td><td><code>JE</code> / <code>JZ</code></td><td><code>JE</code> / <code>JZ</code></td></tr>
+    <tr><td>A ≠ B</td><td><code>JNE</code> / <code>JNZ</code></td><td><code>JNE</code> / <code>JNZ</code></td></tr>
+    <tr><td>A &gt; B</td><td><code>JA</code> / <code>JNBE</code></td><td><code>JG</code> / <code>JNLE</code></td></tr>
+    <tr><td>A ≥ B</td><td><code>JAE</code> / <code>JNB</code></td><td><code>JGE</code> / <code>JNL</code></td></tr>
+    <tr><td>A &lt; B</td><td><code>JB</code> / <code>JNAE</code></td><td><code>JL</code> / <code>JNGE</code></td></tr>
+    <tr><td>A ≤ B</td><td><code>JBE</code> / <code>JNA</code></td><td><code>JLE</code> / <code>JNG</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The type of the data decides the choice. Addresses, counters, array indices, lengths, and ASCII codes are unsigned; use the A/B family with them. Values that can be negative, such as a temperature, the difference between two measurements, or a change of position, are signed; use the G/L family with them. An easy mnemonic: <strong>A</strong>bove / <strong>B</strong>elow is unsigned, <strong>G</strong>reater / <strong>L</strong>ess is signed. As long as the values stay in the range 0–127, the two families give the same result; the difference shows up only for values whose most significant bit is 1. That is why a wrong choice of family often goes unnoticed with small test data.</p>
+
+<h3 id="s7-4-7"><span class="nt-num">7.4.7</span>Code trace: same bits, JA and JG</h3>
+
+<p>The program below shows JA and JG making different decisions after the same CMP. Its second half also checks that JG works correctly in a comparison with overflow. The registers CL, CH, and DL serve as flags: if a jump is not taken, the corresponding register becomes 1.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AL, 0FBh    <span class="cm">; 251 or -5</span>
+<span class="kw">MOV</span>  BL, 03h
+<span class="kw">CMP</span>  AL, BL      <span class="cm">; FBh - 03h</span>
+<span class="kw">JA</span>   a1          <span class="cm">; unsigned: 251 &gt; 3 ?</span>
+<span class="kw">MOV</span>  CL, 1       <span class="cm">; if JA failed</span>
+a1:  <span class="kw">JG</span>  g1      <span class="cm">; signed: -5 &gt; 3 ?</span>
+<span class="kw">MOV</span>  CH, 1       <span class="cm">; JG not taken</span>
+g1:  <span class="kw">MOV</span> AL, 7Fh <span class="cm">; 127</span>
+<span class="kw">CMP</span>  AL, 80h     <span class="cm">; 127 - (-128)</span>
+<span class="kw">JG</span>   g2          <span class="cm">; SF = OF ?</span>
+<span class="kw">MOV</span>  DL, 1       <span class="cm">; if JG failed</span>
+g2:  <span class="kw">RET</span></code></pre>
+
+<p>Note the spelling <code>0FBh</code> in the source. A hexadecimal number that begins with a letter gets a 0 in front. If <code>FBh</code> were written, the assembler would take it for a name and report an error.</p>
+
+<div class="nt-tablewrap" id="tab-jajg-iz">
+<table class="nt-table">
+  <caption>Table 7.13: Trace of the JA and JG program (CX and DX are 0000h at the start).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">AL</th><th scope="col">CF ZF SF OF</th><th scope="col">Result</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>MOV AL, 0FBh</code></td><td><code>B0 FB</code></td><td>FBh</td><td>0 0 0 0</td><td>—</td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>MOV BL, 03h</code></td><td><code>B3 03</code></td><td>FBh</td><td>0 0 0 0</td><td>BL = 03h</td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>CMP AL, BL</code></td><td><code>3A C3</code></td><td>FBh</td><td>0 0 1 0</td><td>F8h, not stored</td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>JA a1</code></td><td><code>77 02</code></td><td>FBh</td><td>0 0 1 0</td><td>taken → 010Ah</td></tr>
+    <tr><td>5</td><td>010Ah</td><td><code>JG g1</code></td><td><code>7F 02</code></td><td>FBh</td><td>0 0 1 0</td><td>not taken → 010Ch</td></tr>
+    <tr><td>6</td><td>010Ch</td><td><code>MOV CH, 1</code></td><td><code>B5 01</code></td><td>FBh</td><td>0 0 1 0</td><td>CX = 0100h</td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>MOV AL, 7Fh</code></td><td><code>B0 7F</code></td><td>7Fh</td><td>0 0 1 0</td><td>—</td></tr>
+    <tr><td>8</td><td>0110h</td><td><code>CMP AL, 80h</code></td><td><code>3C 80</code></td><td>7Fh</td><td>1 0 1 1</td><td>FFh, not stored</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>JG g2</code></td><td><code>7F 02</code></td><td>7Fh</td><td>1 0 1 1</td><td>taken → 0116h</td></tr>
+    <tr><td>10</td><td>0116h</td><td><code>RET</code></td><td><code>C3</code></td><td>7Fh</td><td>1 0 1 1</td><td>IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the third step CMP computes FBh − 03h = F8h. There is no borrow (CF = 0), the result is not zero (ZF = 0), the most significant bit is 1 (SF = 1), and there is no overflow (OF = 0). In the fourth step <code>JA</code> finds the condition CF = 0 and ZF = 0 satisfied and jumps; in the unsigned interpretation 251 &gt; 3. The line <code>MOV CL, 1</code> is skipped and CL stays 0. In the fifth step <code>JG</code> looks at the same flags. ZF = 0, but SF = 1 and OF = 0; since SF ≠ OF, it is not taken. In the signed interpretation −5 &gt; 3 is false. In the sixth step CH becomes 1 and CX = 0100h. The same CMP has led to two different decisions.</p>
+
+<p>In the second half of the program AL is set to 7Fh = 127 and compared with 80h. 7Fh − 80h = FFh. In the unsigned interpretation 127 &lt; 128 and a borrow is taken: CF = 1. In the signed interpretation 127 − (−128) = 255 does not fit: OF = 1. The sign bit of the result is SF = 1. PF = 1, because FFh contains eight 1 bits. In the ninth step <code>JG</code> finds ZF = 0 and SF = OF (1 = 1) satisfied and jumps. 127 &gt; −128 is true. SF alone would have said “less”. DL stays 0. When the program ends, CL = 0, CH = 1, DL = 0: in the signed interpretation −5 is not greater than 3, while 127 is greater than −128.</p>
+
+<figure class="nt-fig" id="sekil-jajg" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 286 126" role="img" aria-label="Registers, flags, and the jump decision" style="max-width:286px;max-height:126px"><text class="lbl" x="35.0" y="14" text-anchor="middle" style="font-size:12px">AL</text><rect class="box" x="4" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="35.0" y="36.0" text-anchor="middle" style="font-size:14px">7Fh</text><text class="lbl" x="105.0" y="14" text-anchor="middle" style="font-size:12px">BL</text><rect class="box" x="74" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="105.0" y="36.0" text-anchor="middle" style="font-size:14px">03h</text><text class="lbl" x="175.0" y="14" text-anchor="middle" style="font-size:12px">CH</text><rect class="box" x="144" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="175.0" y="36.0" text-anchor="middle" style="font-size:14px">01h</text><text class="lbl" x="245.0" y="14" text-anchor="middle" style="font-size:12px">DL</text><rect class="box" x="214" y="18" width="62" height="26" rx="3"/><text class="txt mono" x="245.0" y="36.0" text-anchor="middle" style="font-size:14px">00h</text><text class="lbl" x="18.0" y="62" text-anchor="middle" style="font-size:11.5px">CF</text><rect class="box" x="4" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="18.0" y="83" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="52.0" y="62" text-anchor="middle" style="font-size:11.5px">ZF</text><rect class="box" x="38" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="52.0" y="83" text-anchor="middle" style="font-size:14px">0</text><text class="lbl" x="86.0" y="62" text-anchor="middle" style="font-size:11.5px">SF</text><rect class="box" x="72" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="86.0" y="83" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="120.0" y="62" text-anchor="middle" style="font-size:11.5px">OF</text><rect class="box" x="106" y="66" width="28" height="24" rx="3"/><text class="txt mono" x="120.0" y="83" text-anchor="middle" style="font-size:14px">1</text><text class="lbl" x="150" y="76" text-anchor="start" style="font-size:13px">AL = 127</text><text class="lbl" x="150" y="94" text-anchor="start" style="font-size:13px">signed 127</text><text class="txt" x="4" y="118" text-anchor="start" style="font-size:14px;fill:var(--ds-good)">JG → taken</text></svg></div>
+  <figcaption><b>Figure 7.9:</b> The ninth step of the JA and JG trace: after <code>CMP AL, 80h</code>, CF = 1, SF = 1, OF = 1. Since ZF = 0 and SF = OF, JG is taken.</figcaption>
+</figure>
+
+<h3 id="s7-4-8"><span class="nt-num">7.4.8</span>Code trace: CMP + JE and CMP + JA</h3>
+
+<p>In real programs there are two separate blocks for the two outcomes of a comparison. The two short fragments below are the simplest form of this pattern. The fragments contain no <code>RET</code>, because they are meant to be placed inside a program. Instead of operations, the blocks contain only comments.</p>
+
+<pre class="nt-code"><code><span class="kw">mov</span> ax, 5
+<span class="kw">mov</span> bx, 5
+<span class="kw">cmp</span> ax, bx
+<span class="kw">je</span>  equal_message
+<span class="kw">jmp</span> not_equal_message
+equal_message:          <span class="cm">; if equal</span>
+  <span class="kw">jmp</span> end_program
+not_equal_message:      <span class="cm">; if not equal</span>
+end_program:</code></pre>
+
+<p>When the assembler places this fragment from 0100h, <code>cmp ax, bx</code> stands at 0106h (<code>3B C3</code>), <code>je</code> at 0108h (<code>74 02</code>), <code>jmp not_equal_message</code> at 010Ah (<code>EB 02</code>), and <code>jmp end_program</code> at 010Ch (<code>EB 00</code>). The trace is short:</p>
+
+<ol>
+  <li><code>mov ax, 5</code> and <code>mov bx, 5</code>: AX = BX = 0005h.</li>
+  <li><code>cmp ax, bx</code>: 5 − 5 = 0 → ZF = 1, CF = 0, SF = 0, OF = 0. PF = 1 (00h has zero 1 bits, and zero is even). AX does not change.</li>
+  <li><code>je equal_message</code>: since ZF = 1 it jumps; IP = 010Ch.</li>
+  <li>The operations in the <code>equal_message</code> block are performed, and then <code>jmp end_program</code> jumps over the other block.</li>
+</ol>
+
+<p>The JMP in the last step is critical. In assembly, blocks are separated only by labels; nothing tells the processor that a block has ended. Without <code>jmp end_program</code>, once the processor finished the equal block it would fall through to the next line, the not-equal block, and both blocks would execute. In this example both blocks are empty, so <code>jmp end_program</code> goes to the address right after itself and its code is <code>EB 00</code>: the displacement is zero. When the blocks are filled, the displacement grows by the length of the block. If the numbers were not equal, <code>je</code> would not be taken, and <code>jmp not_equal_message</code> would carry the flow to the not-equal block.</p>
+
+<p>The second fragment builds the same pattern with the unsigned question “is it greater?”:</p>
+
+<pre class="nt-code"><code><span class="kw">mov</span> ax, 5
+<span class="kw">mov</span> bx, 7
+<span class="kw">cmp</span> ax, bx
+<span class="kw">ja</span>  jump_above
+<span class="kw">jmp</span> not_jump_above
+jump_above:             <span class="cm">; if ax is greater</span>
+  <span class="kw">jmp</span> end_program
+not_jump_above:         <span class="cm">; if ax is less/equal</span>
+end_program:</code></pre>
+
+<p>Here <code>cmp ax, bx</code> computes 5 − 7 = FFFEh, which is −2 in the signed interpretation. Since a borrow is taken, CF = 1; since the result is not zero, ZF = 0; since the most significant bit is 1, SF = 1. There is no overflow: OF = 0. In the low nibble 5 − 7 takes a borrow, so AF = 1. <code>ja</code> needs CF = 0 and ZF = 0; since CF = 1 it is not taken. <code>jmp not_jump_above</code> carries the flow to the “less or equal” block. Had <code>jg</code> been written instead of <code>ja</code> in the same code, the result would not change either: SF = 1, OF = 0, and since SF ≠ OF, JG would not be taken. Because both values are positive and small, the two families give the same answer.</p>
+
+<h3 id="s7-4-9"><span class="nt-num">7.4.9</span>Code trace: compare and print</h3>
+
+<p>The program below compares two numbers. If they are equal it prints <code>y</code> on the screen, otherwise <code>n</code>. It prints the character with the DOS <code>INT 21h</code> service: when AH = 02h, DOS displays the character in DL. The structure of the program matters: the two branches only put a different value into DL and then merge at the common <code>prt</code> label. The printing code is not written twice.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span>    100h
+<span class="kw">mov</span>    al, 25         <span class="cm">; al = 25</span>
+<span class="kw">mov</span>    bl, 10         <span class="cm">; bl = 10</span>
+<span class="kw">cmp</span>    al, bl         <span class="cm">; compare al - bl</span>
+<span class="kw">je</span>     equal          <span class="cm">; jump if al = bl (zf = 1)</span>
+<span class="kw">mov</span>    dl, <span class="str">'n'</span>        <span class="cm">; al &lt;&gt; bl: print 'n'</span>
+<span class="kw">jmp</span>    prt            <span class="cm">; go to the print line</span>
+equal:
+<span class="kw">mov</span>    dl, <span class="str">'y'</span>        <span class="cm">; al = bl: print 'y'</span>
+prt:
+<span class="kw">mov</span>    ah, 2          <span class="cm">; DOS: print char in DL</span>
+<span class="kw">int</span>    21h
+<span class="kw">ret</span>                   <span class="cm">; return to DOS</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-yaz-iz">
+<table class="nt-table">
+  <caption>Table 7.14: Trace of the compare-and-print program.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">AX</th><th scope="col">DL</th><th scope="col">ZF CF</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0100h</td><td><code>mov al, 25</code></td><td><code>B0 19</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>2</td><td>0102h</td><td><code>mov bl, 10</code></td><td><code>B3 0A</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>3</td><td>0104h</td><td><code>cmp al, bl</code></td><td><code>3A C3</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>4</td><td>0106h</td><td><code>je equal</code></td><td><code>74 04</code></td><td>0019h</td><td>00h</td><td>0 0</td><td></td></tr>
+    <tr><td>5</td><td>0108h</td><td><code>mov dl, 'n'</code></td><td><code>B2 6E</code></td><td>0019h</td><td>6Eh</td><td>0 0</td><td></td></tr>
+    <tr><td>6</td><td>010Ah</td><td><code>jmp prt</code></td><td><code>EB 02</code></td><td>0019h</td><td>6Eh</td><td>0 0</td><td></td></tr>
+    <tr><td>7</td><td>010Eh</td><td><code>mov ah, 2</code></td><td><code>B4 02</code></td><td>0219h</td><td>6Eh</td><td>0 0</td><td></td></tr>
+    <tr><td>8</td><td>0110h</td><td><code>int 21h</code></td><td><code>CD 21</code></td><td>026Eh</td><td>6Eh</td><td>0 0</td><td>n</td></tr>
+    <tr><td>9</td><td>0112h</td><td><code>ret</code></td><td><code>C3</code></td><td>026Eh</td><td>6Eh</td><td>0 0</td><td>n</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>AL = 25 = 19h and BL = 10 = 0Ah are loaded. <code>cmp al, bl</code> computes 25 − 10 = 15 = 0Fh; ZF = 0. AF = 1 because the low nibble takes a borrow in 9 − A, and PF = 1 because 0Fh contains four 1 bits. <code>je equal</code> is not taken. <code>mov dl, 'n'</code> puts the ASCII code of the character 'n', 6Eh, into DL. <code>jmp prt</code> skips the 'y' line; its displacement is 2, because the skipped <code>mov dl, 'y'</code> is two bytes. The two branches merge at the <code>prt</code> label.</p>
+
+<p><code>mov ah, 2</code> makes AH 02h; AX = 0219h. <code>int 21h</code> prints <code>n</code> on the screen. When returning from this service DOS also puts the character it printed into AL: AL = 6Eh, AX = 026Eh. The <code>ret</code> at the end of the program is required. Without it the processor would take the bytes after <code>int 21h</code> for instructions and keep executing them; those bytes are whatever happens to be in memory.</p>
+
+<p>In this program <code>mov dl, 'y'</code> is never executed, but it still occupies memory. If the numbers were equal (for example with <code>mov bl, 25</code>), <code>je equal</code> would be taken, DL would be 79h ('y'), and <code>jmp prt</code> would never be executed. In comparison blocks, one branch is always the one that falls through, and the other is the one reached by the jump.</p>
+
+<h2 class="nt-pb" id="s7-5"><span class="nt-num">7.5</span>Counterparts of high-level constructs</h2>
+
+<h3 id="s7-5-1"><span class="nt-num">7.5.1</span>The if/else pattern</h3>
+
+<p>The <code>if (condition) A else B</code> construct of a high-level language is built in assembly with two jumps. The first idea that comes to mind is to jump on the condition itself: if the condition is true, go to block A. But this reverses the order of the code; block B, which runs when the condition fails, has to be written right below the jump instruction. The tidier way is to jump on <strong>the opposite of the condition</strong>. If the condition fails, the jump skips over block A to block B. If the condition holds, no jump is made and the processor falls through into block A. This way the assembly code keeps the A–B order of the high-level code.</p>
+
+<pre class="nt-code"><code><span class="kw">if</span> (ax == bx) {
+    <span class="cm">; block A</span>
+} <span class="kw">else</span> {
+    <span class="cm">; block B</span>
+}</code></pre>
+
+<pre class="nt-code"><code>    <span class="kw">cmp</span>  ax, bx
+    <span class="kw">jne</span>  not_eq       <span class="cm">; the OPPOSITE test</span>
+    <span class="cm">; block A</span>
+    <span class="kw">jmp</span>  after
+not_eq:
+    <span class="cm">; block B</span>
+after:</code></pre>
+
+<p>The pattern has two parts. The first is the jump on the opposite of the condition: <code>JNE</code> for <code>==</code>, <code>JGE</code> or <code>JAE</code> for <code>&lt;</code>, <code>JLE</code> or <code>JBE</code> for <code>&gt;</code>. The second is the <code>jmp after</code> at the end of block A. If this jump is forgotten, the processor enters block B as well when block A ends. In an if construct with no else part the second jump is unnecessary; the opposite condition jumps straight to the end of the block.</p>
+
+<div class="nt-tablewrap" id="tab-ters">
+<table class="nt-table">
+  <caption>Table 7.15: If conditions and the opposite jumps used to skip a block.</caption>
+  <thead><tr><th scope="col">High-level condition</th><th scope="col">Jump on unsigned data</th><th scope="col">Jump on signed data</th></tr></thead>
+  <tbody>
+    <tr><td><code>a == b</code></td><td><code>JNE</code></td><td><code>JNE</code></td></tr>
+    <tr><td><code>a != b</code></td><td><code>JE</code></td><td><code>JE</code></td></tr>
+    <tr><td><code>a &lt; b</code></td><td><code>JAE</code></td><td><code>JGE</code></td></tr>
+    <tr><td><code>a &lt;= b</code></td><td><code>JA</code></td><td><code>JG</code></td></tr>
+    <tr><td><code>a &gt; b</code></td><td><code>JBE</code></td><td><code>JLE</code></td></tr>
+    <tr><td><code>a &gt;= b</code></td><td><code>JB</code></td><td><code>JL</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Compound conditions are built the same way. In an AND condition such as <code>if (a &gt;= -10 &amp;&amp; a &lt;= 10)</code>, each subcondition is tested with its own CMP and opposite jump. When one of the subconditions fails, execution jumps straight out of the block. In an OR condition, when one of the subconditions holds, execution jumps straight into the block. This is the machine-level counterpart of “short-circuit” evaluation in high-level languages: the rest of a condition whose outcome is already settled is never tested.</p>
+
+<h3 id="s7-5-2"><span class="nt-num">7.5.2</span>The while, do-while, and for patterns</h3>
+
+<p>A loop is a jump made backward. In the <code>while (condition) body</code> construct the condition is tested before the body; if the condition is false from the start, the body never runs. In the assembly counterpart a label is placed at the top of the loop, the condition is tested with the opposite jump, and the end of the body jumps back to the top:</p>
+
+<pre class="nt-code"><code><span class="kw">while</span> (cx &gt; 0) {     <span class="cm">; unsigned</span>
+    <span class="cm">; body</span>
+}</code></pre>
+
+<pre class="nt-code"><code>top:  <span class="kw">cmp</span>  cx, 0
+      <span class="kw">jbe</span>  done       <span class="cm">; cx &lt;= 0 → exit</span>
+      <span class="cm">; body</span>
+      <span class="kw">jmp</span>  top
+done:</code></pre>
+
+<p>In the <code>do { body } while (condition)</code> construct the condition is tested after the body; the body runs at least once. Its counterpart is shorter, because a single conditional jump does both the test and the return:</p>
+
+<pre class="nt-code"><code>top:  <span class="cm">; body</span>
+      <span class="kw">cmp</span>  cx, 0
+      <span class="kw">ja</span>   top        <span class="cm">; if true, back to the top</span></code></pre>
+
+<p>This second form executes one fewer jump per iteration. The while form contains a conditional jump (not taken, 4 cycles) and a JMP (15 cycles) in every iteration. The do-while form contains only a conditional jump (taken, 16 cycles). That is why compilers usually turn a while loop into the form “test once first, then loop as a do-while”.</p>
+
+<p>A counted loop such as <code>for (i = n; i &gt; 0; i--)</code> is most naturally written on the 8086 with CX and the <code>LOOP</code> instruction. LOOP does the decrementing of CX, the comparison with zero, and the jump back in a single instruction. If the counter counts upward (<code>for (i = 0; i &lt; n; i++)</code>), the counter is kept in another register. It is incremented with <code>INC</code> on each iteration and tested with <code>CMP</code> followed by <code>JB</code> or <code>JNE</code>.</p>
+
+<h3 id="s7-5-3"><span class="nt-num">7.5.3</span>Code trace: if/else and while</h3>
+
+<p>The program below uses the two patterns one after the other. First the construct <code>if (AX == BX) DX = 1; else DX = 2;</code> executes. Then, with CX = 2, the loop <code>while (CX &gt; 0) { DX += CX; CX--; }</code> runs.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  AX, 12
+<span class="kw">MOV</span>  BX, 30
+<span class="kw">CMP</span>  AX, BX
+<span class="kw">JNE</span>  not_eq      <span class="cm">; OPPOSITE test</span>
+<span class="kw">MOV</span>  DX, 1       <span class="cm">; block A: AX = BX</span>
+<span class="kw">JMP</span>  after
+not_eq: <span class="kw">MOV</span> DX, 2 <span class="cm">; block B: AX ≠ BX</span>
+after: <span class="kw">MOV</span> CX, 2  <span class="cm">; while (CX &gt; 0)</span>
+top: <span class="kw">CMP</span> CX, 0
+<span class="kw">JBE</span>  done         <span class="cm">; CX ≤ 0 → exit</span>
+<span class="kw">ADD</span>  DX, CX      <span class="cm">; body</span>
+<span class="kw">DEC</span>  CX
+<span class="kw">JMP</span>  top
+done: <span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-ifw-iz">
+<table class="nt-table">
+  <caption>Table 7.16: Trace of the if/else and while program (AX = 000Ch and BX = 001Eh throughout).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">CX</th><th scope="col">DX</th><th scope="col">ZF CF</th><th scope="col">Decision</th></tr></thead>
+  <tbody>
+    <tr><td>1–2</td><td>0100h</td><td><code>MOV AX, 12</code> / <code>MOV BX, 30</code></td><td><code>B8 0C 00</code> / <code>BB 1E 00</code></td><td>0000h</td><td>0000h</td><td>0 0</td><td>—</td></tr>
+    <tr><td>3</td><td>0106h</td><td><code>CMP AX, BX</code></td><td><code>3B C3</code></td><td>0000h</td><td>0000h</td><td>0 1</td><td>12 − 30: not equal, borrow</td></tr>
+    <tr><td>4</td><td>0108h</td><td><code>JNE not_eq</code></td><td><code>75 05</code></td><td>0000h</td><td>0000h</td><td>0 1</td><td>taken → 010Fh</td></tr>
+    <tr><td>5</td><td>010Fh</td><td><code>MOV DX, 2</code></td><td><code>BA 02 00</code></td><td>0000h</td><td>0002h</td><td>0 1</td><td>block B</td></tr>
+    <tr><td>6</td><td>0112h</td><td><code>MOV CX, 2</code></td><td><code>B9 02 00</code></td><td>0002h</td><td>0002h</td><td>0 1</td><td>—</td></tr>
+    <tr><td>7–8</td><td>0115h</td><td><code>CMP CX, 0</code> / <code>JBE done</code></td><td><code>83 F9 00</code> / <code>76 05</code></td><td>0002h</td><td>0002h</td><td>0 0</td><td>2 &gt; 0: not taken</td></tr>
+    <tr><td>9–10</td><td>011Ah</td><td><code>ADD DX, CX</code> / <code>DEC CX</code></td><td><code>03 D1</code> / <code>49</code></td><td>0001h</td><td>0004h</td><td>0 0</td><td>body, iteration 1</td></tr>
+    <tr><td>11–13</td><td>011Dh</td><td><code>JMP top</code> / <code>CMP</code> / <code>JBE</code></td><td><code>EB F6</code></td><td>0001h</td><td>0004h</td><td>0 0</td><td>1 &gt; 0: not taken</td></tr>
+    <tr><td>14–15</td><td>011Ah</td><td><code>ADD DX, CX</code> / <code>DEC CX</code></td><td>—</td><td>0000h</td><td>0005h</td><td>1 0</td><td>body, iteration 2</td></tr>
+    <tr><td>16–18</td><td>011Dh</td><td><code>JMP top</code> / <code>CMP</code> / <code>JBE</code></td><td>—</td><td>0000h</td><td>0005h</td><td>1 0</td><td>0 = 0: taken → 011Fh</td></tr>
+    <tr><td>19</td><td>011Fh</td><td><code>RET</code></td><td><code>C3</code></td><td>0000h</td><td>0005h</td><td>1 0</td><td>IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the third step <code>CMP AX, BX</code> computes 12 − 30 = −18; the 16-bit result is FFEEh. The result is not zero (ZF = 0), a borrow was taken (CF = 1), and the sign bit is 1 (SF = 1). In the fourth step <code>JNE not_eq</code> finds the opposite condition satisfied and jumps over block A. <code>MOV DX, 1</code> and <code>JMP after</code> are not executed. In the fifth step block B makes DX = 2. Block B is the last block and falls straight into the <code>after</code> label; no JMP is needed on this path.</p>
+
+<p>In the sixth step CX = 2 and the loop begins. <code>CMP CX, 0</code> computes 2 − 0 = 2: CF = 0, ZF = 0. <code>JBE done</code> needs CF = 1 or ZF = 1; it is not taken and the body is entered. The body makes DX = 2 + 2 = 4 and CX = 1. <code>JMP top</code> returns to the top and the condition is tested again: 1 &gt; 0, not taken. In the second iteration DX = 4 + 1 = 5 and CX = 0. In this iteration ZF = 1 because <code>DEC CX</code> made the result zero, but the decision is still made at the top. <code>CMP CX, 0</code> computes 0 − 0 = 0: ZF = 1, CF = 0. <code>JBE done</code> is taken. The result is DX = 5: the 2 from block B, plus 2, plus 1.</p>
+
+<p>The code of <code>CMP CX, 0</code> is <code>83 F9 00</code>. The opcode 83h compares a 16-bit operand with a sign-extended 8-bit constant, so the constant takes 1 byte instead of 2. The <code>JMP top</code> at the end of the loop is at 011Dh and is two bytes: displacement 0115h − 011Fh = −0Ah = F6h, code <code>EB F6</code>.</p>
+
+<p>This loop is a while loop; the condition is tested before the body. Had it started with CX = 0, the body would never have run. The LOOP instruction, in contrast, tests the condition after the body; this is the important difference between the two constructs.</p>
+
+<p>The first rows of Table 7.16 show CX = 0000h. The trace in the slides is made under the same assumption. In reality, when emu8086 loads a .COM program it puts the program's byte count into CX. This program is 32 bytes (0100h–011Fh), so in emu8086 the program starts with CX = 0020h. The result is not affected, because CX is written by <code>MOV CX, 2</code> before it is first read. The general rule is: never rely on initial register values; load every register with a value before using it.</p>
+
+<h3 id="s7-5-4"><span class="nt-num">7.5.4</span>Conditional jumps out of range</h3>
+
+<p>On the 8086, conditional jumps exist only in the short form: −128…+127 bytes relative to the next instruction. When one has to skip over a long if block or return to the top of a long loop, this range may not be enough (Figure 7.10).</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-menzil" style="--w:700px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 700 78" role="img" aria-label="A conditional jump reaches between −128 and +127 bytes around the next IP; a target 200 bytes away lies outside this window." style="max-width:640px"><path class="axis" d="M10 40 L690 40"/><rect class="box" x="200" y="28" width="256" height="24" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="328" y="45" text-anchor="middle" style="font-size:12.5px">Jcc range: −128 … +127</text><text class="lbl" x="328" y="18" text-anchor="middle" style="font-size:11.5px">next IP</text><path class="line" d="M328 22 L328 28"/><rect class="box-empty" x="600" y="28" width="80" height="24" rx="3"/><text class="txt mono" x="640" y="45" text-anchor="middle" style="font-size:12px;fill:var(--ds-bad)">far_away</text><text class="lbl" x="640" y="70" text-anchor="middle" style="font-size:11.5px">+200 bytes</text><text class="lbl" x="10" y="70" text-anchor="start" style="font-size:12px">near JMP: anywhere in the segment (±32 KB)</text></svg></div>
+  <figcaption><b>Figure 7.10:</b> A conditional jump reaches between −128 and +127 bytes around the next IP. A target 200 bytes away lies outside this window; a near JMP, however, goes anywhere within the segment.</figcaption>
+</figure>
+
+<p>The solution is to invert the condition, hop over the next instruction with a short jump, and reach the far target with a near JMP:</p>
+
+<pre class="nt-code"><code><span class="cm">; wrong: target too far</span>
+<span class="kw">cmp</span> al, 0
+<span class="kw">je</span>  far_away        <span class="cm">; out of range!</span>
+<span class="cm">; ... 200 bytes of code ...</span>
+far_away:</code></pre>
+
+<pre class="nt-code"><code><span class="cm">; right: opposite test + near JMP</span>
+<span class="kw">cmp</span> al, 0
+<span class="kw">jne</span> cont            <span class="cm">; opposite test, short</span>
+<span class="kw">jmp</span> far_away        <span class="cm">; near JMP (E9)</span>
+cont:
+<span class="cm">; ... 200 bytes of code ...</span>
+far_away:</code></pre>
+
+<p>In the second version <code>jne cont</code> jumps forward only 3 bytes and fits the short range with ease. If AL = 0, JNE is not taken and the processor falls into the near JMP, which reaches anywhere in the segment. If AL ≠ 0, JNE passes over the JMP to the <code>cont</code> label. The behavior is the same as in the first version; only the instruction pair is 5 bytes instead of 2.</p>
+
+<p>This transformation can be applied to any conditional jump, because every condition has an opposite, found by flipping the last bit of the opcode. Classic assemblers (MASM in 8086 mode, for instance) report a “relative jump out of range” error when they see an out-of-range Jcc and leave the transformation to the programmer. The emu8086 assembler, on the other hand, performs the same transformation itself and notes it with a warning. For example, a <code>je far_away</code> at 0102h with the target at 01CFh is encoded as <code>75 03 E9 C8 00</code>: <code>JNE +3</code> (hopping over the three bytes of the JMP) and <code>JMP 01CFh</code> (0107h + 00C8h = 01CFh). Whichever assembler is used, what happens at machine level is the same. The program is also 3 bytes longer than it looks in the source.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Trying to fix the range error by writing the synonym <code>JZ</code> in place of <code>JE</code>, or by writing <code>JE SHORT</code>. A synonym translates to the same machine code and has the same range. SHORT does not widen the range; it only forces the short form. A loop instruction such as <code>LOOPE</code> is no solution either: it too is 2 bytes with rel8, and it changes CX besides.</p>
+</div>
+
+<h2 class="nt-pb" id="s7-6"><span class="nt-num">7.6</span>Loop instructions</h2>
+
+<h3 id="s7-6-1"><span class="nt-num">7.6.1</span>The LOOP family</h3>
+
+<p>Counted loops are written so often that the 8086 offers separate instructions for them. All of these instructions use the <strong>CX</strong> register as the counter. That is why CX is called the count register. Table 7.17 summarizes the family.</p>
+
+<div class="nt-tablewrap" id="tab-loop">
+<table class="nt-table">
+  <caption>Table 7.17: Loop instructions (all 2 bytes: opcode + rel8).</caption>
+  <thead><tr><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">Operation and jump condition</th></tr></thead>
+  <tbody>
+    <tr><td><code>LOOP</code></td><td><code>E2</code></td><td>Decrement CX by 1; jump to the label if CX ≠ 0.</td></tr>
+    <tr><td><code>LOOPE</code></td><td><code>E1</code></td><td>Decrement CX by 1; jump if CX ≠ 0 and equal (ZF = 1).</td></tr>
+    <tr><td><code>LOOPZ</code></td><td><code>E1</code></td><td>Same as LOOPE: jump if CX ≠ 0 and ZF = 1.</td></tr>
+    <tr><td><code>LOOPNE</code></td><td><code>E0</code></td><td>Decrement CX by 1; jump if CX ≠ 0 and not equal (ZF = 0).</td></tr>
+    <tr><td><code>LOOPNZ</code></td><td><code>E0</code></td><td>Same as LOOPNE: jump if CX ≠ 0 and ZF = 0.</td></tr>
+    <tr><td><code>JCXZ</code></td><td><code>E3</code></td><td>Jump to the label if CX = 0 (CX is not decremented).</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The family has three common properties. First, the counter is always CX; no other register can be chosen. Second, the LOOP family <strong>does not change the flags</strong> when it decrements CX. Even when CX falls to zero, ZF is not raised. This is an important difference from the <code>DEC CX</code> instruction, which does the same job. Third, all of them are 2 bytes and use rel8; the loop body can reach back at most 128 bytes. If the body is longer, the loop is written with <code>DEC CX</code>, <code>JZ</code>, and a near <code>JMP</code>.</p>
+
+<figure class="nt-fig nt-fig--wide" id="sekil-loop-akis" style="--w:720px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 720 94" role="img" aria-label="The LOOP family first decrements CX by one; if CX is not zero (and, for LOOPE/LOOPNE, the ZF condition also holds) it jumps to the label, otherwise it moves on to the next instruction." style="max-width:640px"><rect class="box" x="10" y="20" width="130" height="30" rx="3"/><text class="txt mono" x="75" y="40" text-anchor="middle" style="font-size:13px">CX ← CX − 1</text><path class="line" d="M140.0 35.0 L173.0 35.0"/><path class="ah" d="M180.0 35.0 L173.0 38.9 L173.0 31.1 z"/><rect class="box" x="182" y="20" width="200" height="30" rx="3" style="fill:var(--ds-hot)"/><text class="txt" x="282" y="40" text-anchor="middle" style="font-size:13px">CX ≠ 0 (+ ZF condition)?</text><path class="line" d="M382.0 35.0 L423.0 35.0"/><path class="ah" d="M430.0 35.0 L423.0 38.9 L423.0 31.1 z"/><text class="lbl" x="406" y="28" text-anchor="middle" style="font-size:11.5px">yes</text><rect class="box" x="432" y="20" width="120" height="30" rx="3"/><text class="txt" x="492" y="40" text-anchor="middle" style="font-size:13px">jump to the label</text><path class="line" d="M282.0 50.0 L282.0 63.0"/><path class="ah" d="M282.0 70.0 L278.1 63.0 L285.9 63.0 z"/><text class="lbl" x="292" y="66" text-anchor="start" style="font-size:11.5px">no</text><text class="txt" x="282" y="86" text-anchor="middle" style="font-size:13px">next instruction</text><text class="lbl" x="600" y="40" text-anchor="start" style="font-size:12px">flags unchanged</text></svg></div>
+  <figcaption><b>Figure 7.11:</b> The LOOP family first decrements CX by one. If CX is not zero (and, for LOOPE/LOOPNE, the ZF condition also holds), it jumps to the label; otherwise it moves on to the next instruction. The flags do not change.</figcaption>
+</figure>
+
+<h3 id="s7-6-2"><span class="nt-num">7.6.2</span>How LOOP works</h3>
+
+<p>In <code>LOOP label</code> the order of operations matters: CX is decremented first, and <em>then</em> tested for zero. LOOP therefore builds a do-while loop. The body executes at least once before reaching LOOP. In a loop that starts with CX = n, the body runs exactly n times: the jump back is taken with CX at n − 1, n − 2, …, 1, and the loop is left at 0.</p>
+
+<pre class="nt-code"><code>      <span class="kw">mov</span>  cx, n
+label:
+      <span class="cm">; loop body</span>
+      <span class="kw">loop</span> label</code></pre>
+
+<p>In effect LOOP resembles the pair <code>DEC CX</code> and <code>JNZ label</code>, but it preserves the flags. LOOPE and LOOPNE keep the loop going only while one more condition is met. LOOPE (LOOPZ) jumps while CX ≠ 0 and ZF = 1; it continues as long as equal items are found and stops at the first difference. LOOPNE (LOOPNZ) jumps while CX ≠ 0 and ZF = 0; it continues as long as items are unequal and stops when the wanted value is found. These two instructions are designed for search loops of the form “at most n times, but earlier if the condition changes”. ZF is set by a CMP in the loop body.</p>
+
+<figure class="nt-fig" id="sekil-loop-sema" style="--w:360px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 300" role="img" aria-label="LOOP flowchart: the body, CX decremented by one; if CX is not zero return to the body, otherwise continue." style="max-width:360px"><defs><marker id="n7-33-l1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="90" y="6" width="190" height="34" rx="6"/><text class="txt mono" x="185" y="28" text-anchor="middle">mov cx, n</text><path class="line" d="M185 40 L185 60" marker-end="url(#n7-33-l1)"/><rect class="box" x="90" y="64" width="190" height="40" rx="6"/><text class="txt mono" x="185" y="82" text-anchor="middle">label:</text><text class="lbl" x="185" y="98" text-anchor="middle">loop body</text><path class="line" d="M185 104 L185 124" marker-end="url(#n7-33-l1)"/><rect class="hot" x="90" y="128" width="190" height="34" rx="6"/><text class="txt mono" x="185" y="150" text-anchor="middle">CX ← CX − 1</text><path class="line" d="M185 162 L185 180" marker-end="url(#n7-33-l1)"/><path class="box" d="M185 184 L265 220 L185 256 L105 220 Z"/><text class="txt mono" x="185" y="225" text-anchor="middle">CX ≠ 0 ?</text><path class="line" d="M105 220 L40 220 L40 84 L86 84" marker-end="url(#n7-33-l1)"/><text class="lbl" x="46" y="212">yes</text><path class="line" d="M185 256 L185 290" marker-end="url(#n7-33-l1)"/><text class="lbl" x="193" y="280">no → next instruction</text><text class="lbl" x="270" y="196">LOOPE: and ZF=1</text><text class="lbl" x="270" y="250">LOOPNE: and ZF=0</text></svg></div>
+  <figcaption><b>Figure 7.12:</b> LOOP flowchart: the body executes, CX is decremented by one, and if CX is not zero control returns to the body; if it is zero, execution continues with the next instruction. For LOOPE and LOOPNE the ZF condition is also required to go back.</figcaption>
+</figure>
+
+<p>This order has a trap. If the loop is entered with CX = 0, the body runs once, and then LOOP decrements CX. 0 − 1 = FFFFh. Since CX is not zero, the jump back is taken. The loop continues until CX falls to zero again, and the body runs 65,536 times in all. If the iteration count is computed at run time and can be zero, this case must be prevented specifically. The remedy is called JCXZ.</p>
+
+<div class="nt-box nt-box--tanim" id="tanim-dongu">
+  <span class="nt-box__title">Definition 7.6</span>
+  <p>A <strong>loop</strong> is the repetition of a group of instructions until a condition is met. In a <strong>counted loop</strong> the number of iterations is kept in a counter register; the LOOP family of the 8086 uses CX as the counter, decrements CX on every iteration, and leaves the loop when CX reaches zero.</p>
+</div>
+
+<h3 id="s7-6-3"><span class="nt-num">7.6.3</span>Code trace: LOOP</h3>
+
+<p>The simplest LOOP example is a loop with an empty body. The program shows only the effect of LOOP on CX.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> cx, 5      <span class="cm">; CX = repeat count</span>
+again:
+<span class="cm">; loop body</span>
+<span class="kw">loop</span> again     <span class="cm">; if CX ≠ 0 go to again</span>
+<span class="kw">jmp</span> quit       <span class="cm">; loop done: go to quit</span>
+quit:
+<span class="kw">ret</span></code></pre>
+
+<p><code>mov cx, 5</code> is three bytes at 0100h (<code>B9 05 00</code>). The <code>again</code> label points to 0103h. Since the body is empty, <code>loop again</code> is also at 0103h; its code is <code>E2 FE</code>. The displacement FEh = −2: the LOOP instruction jumps to itself. <code>jmp quit</code> is at 0105h and its code is <code>EB 00</code>, because <code>quit</code> is the next line anyway.</p>
+
+<div class="nt-tablewrap" id="tab-loop-iz">
+<table class="nt-table">
+  <caption>Table 7.18: Trace of the LOOP example.</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col">Instruction</th><th scope="col">CX (after)</th><th scope="col">Decision</th><th scope="col">IP (after)</th></tr></thead>
+  <tbody>
+    <tr><td>—</td><td><code>mov cx, 5</code></td><td>0005h</td><td>—</td><td>0103h</td></tr>
+    <tr><td>1</td><td><code>loop again</code></td><td>0004h</td><td>≠ 0, taken</td><td>0103h</td></tr>
+    <tr><td>2</td><td><code>loop again</code></td><td>0003h</td><td>≠ 0, taken</td><td>0103h</td></tr>
+    <tr><td>3</td><td><code>loop again</code></td><td>0002h</td><td>≠ 0, taken</td><td>0103h</td></tr>
+    <tr><td>4</td><td><code>loop again</code></td><td>0001h</td><td>≠ 0, taken</td><td>0103h</td></tr>
+    <tr><td>5</td><td><code>loop again</code></td><td>0000h</td><td>= 0, exits</td><td>0105h</td></tr>
+    <tr><td>—</td><td><code>jmp quit</code></td><td>0000h</td><td>—</td><td>0107h</td></tr>
+    <tr><td>—</td><td><code>ret</code></td><td>0000h</td><td>—</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The body (empty here) runs five times and LOOP is executed five times. The first four LOOPs jump and the fifth does not. The duration of the loop can be computed from Table 7.4: 4 × 17 + 5 = 73 clock cycles. When the program ends, CX = 0000h. The <code>jmp quit</code> after the loop is unnecessary but harmless; a jump with displacement 0 spends 15 cycles and flushes the queue.</p>
+
+<h3 id="s7-6-4"><span class="nt-num">7.6.4</span>Code trace: nested loops</h3>
+
+<p>Since the counter of the LOOP family is a single register, two nested LOOPs share the same CX. The moment the inner loop loads its own count into CX, the outer loop's counter is lost. The solution is to push the outer counter onto the stack before the inner loop and pop it back after the inner loop. The program below uses this method. The outer loop runs 5 times; in each outer iteration the screen gets a <code>1</code>, and then the inner loop prints five <code>2</code> characters. BX holds the total number of steps.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> bx, 0      <span class="cm">; total steps</span>
+<span class="kw">mov</span> cx, 5      <span class="cm">; outer counter</span>
+k1:
+ <span class="kw">add</span> bx, 1
+ <span class="kw">mov</span> al, <span class="str">'1'</span>
+ <span class="kw">mov</span> ah, 0eh
+ <span class="kw">int</span> 10h       <span class="cm">; print '1'</span>
+ <span class="kw">push</span> cx       <span class="cm">; save outer</span>
+ <span class="kw">mov</span> cx, 5     <span class="cm">; inner counter</span>
+k2:
+  <span class="kw">add</span> bx, 1
+  <span class="kw">mov</span> al, <span class="str">'2'</span>
+  <span class="kw">mov</span> ah, 0eh
+  <span class="kw">int</span> 10h      <span class="cm">; print '2'</span>
+  <span class="kw">loop</span> k2      <span class="cm">; inner loop</span>
+ <span class="kw">pop</span> cx        <span class="cm">; restore outer</span>
+<span class="kw">loop</span> k1        <span class="cm">; outer loop</span>
+<span class="kw">ret</span></code></pre>
+
+<p>The characters are printed with the BIOS <code>INT 10h</code> service. When AH = 0Eh, BIOS writes the character in AL at the cursor position and advances the cursor; this service is called teletype output. The service uses BH as the page number. Since BX does not exceed 256 in this program, BH is always 0 and the output goes to page 0.</p>
+
+<div class="nt-tablewrap" id="tab-icice-iz">
+<table class="nt-table">
+  <caption>Table 7.19: Trace of the nested loops (selected steps).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Instruction</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">SP</th><th scope="col">Stack</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td><code>mov bx, 0</code> / <code>mov cx, 5</code></td><td>0000h</td><td>0005h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td></td></tr>
+    <tr><td>outer 1</td><td><code>add bx, 1</code> … <code>int 10h</code></td><td>0001h</td><td>0005h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>1</td></tr>
+    <tr><td>outer 1</td><td><code>push cx</code></td><td>0001h</td><td>0005h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>1</td></tr>
+    <tr><td>inner 1</td><td><code>mov cx, 5</code> … <code>int 10h</code></td><td>0002h</td><td>0005h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>12</td></tr>
+    <tr><td>inner 1</td><td><code>loop k2</code></td><td>0002h</td><td>0004h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>12</td></tr>
+    <tr><td>inner 5</td><td><code>loop k2</code> (exits)</td><td>0006h</td><td>0000h</td><td>FFFCh</td><td>[FFFCh] = 0005h</td><td>122222</td></tr>
+    <tr><td>outer 1</td><td><code>pop cx</code></td><td>0006h</td><td>0005h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222</td></tr>
+    <tr><td>outer 1</td><td><code>loop k1</code></td><td>0006h</td><td>0004h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222</td></tr>
+    <tr><td>end of outer 2</td><td><code>loop k1</code></td><td>000Ch</td><td>0003h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×2</td></tr>
+    <tr><td>end of outer 3</td><td><code>loop k1</code></td><td>0012h</td><td>0002h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×3</td></tr>
+    <tr><td>end of outer 4</td><td><code>loop k1</code></td><td>0018h</td><td>0001h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×4</td></tr>
+    <tr><td>end of outer 5</td><td><code>loop k1</code> (exits)</td><td>001Eh</td><td>0000h</td><td>FFFEh</td><td>[FFFEh] = 0000h</td><td>122222 ×5</td></tr>
+    <tr><td>end</td><td><code>ret</code></td><td>001Eh</td><td>0000h</td><td>0000h</td><td>empty</td><td>122222 ×5</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>When the program starts, SP = FFFEh and the top of the stack holds the return address 0000h that DOS put there. In the first outer iteration BX = 1 and <code>1</code> is printed on the screen. AL = '1' = 31h and AH = 0Eh. <code>push cx</code> pushes the value of the outer counter, 5, onto the stack. SP decreases by two to FFFCh; [FFFCh] = 0005h. In little-endian order, FFFCh holds the byte 05h and FFFDh holds 00h.</p>
+
+<p>The inner loop sets CX to 5 again. The value of the outer counter now lives only on the stack. The inner loop runs five times, incrementing BX and printing a <code>2</code> on each pass. The LOOP of the fifth inner iteration brings CX to zero and leaves the loop. At this point BX = 6 and CX = 0. <code>pop cx</code> restores the 0005h on the stack into CX, and SP = FFFEh. <code>loop k1</code> makes CX 4 and returns to the top of the outer loop.</p>
+
+<p>Each outer iteration adds 1 + 5 = 6 to BX. After five iterations BX = 30 = 001Eh. The screen shows <code>122222</code> five times, 30 characters in all. The last LOOP brings CX to zero and the loop is left. Because the numbers of <code>push</code> and <code>pop</code> are equal, the stack is back in its initial state. <code>ret</code> takes the 0000h on top of the stack into IP, SP = 0000h, and the program ends.</p>
+
+<p>The inner loop's <code>loop k2</code> is at 011Ch and its code is <code>E2 F5</code>: next address 011Eh, target k2 = 0113h, displacement −0Bh = F5h. The outer loop's <code>loop k1</code> is at 011Fh and its code is <code>E2 E5</code>: next address 0121h, target k1 = 0106h, displacement −1Bh = E5h. The body of the outer loop is 27 bytes, still far from the rel8 limit (128).</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p>Forgetting the <code>push cx</code> / <code>pop cx</code> pair in a nested loop. When the inner loop ends, CX = 0. The outer loop's LOOP decrements this zero to FFFFh, and the outer loop runs tens of thousands of times instead of 5. Writing only one of the pair is even worse. The stack balance is broken, and the <code>ret</code> at the end of the program takes a wrong value for the return address.</p>
+</div>
+
+<h3 id="s7-6-5"><span class="nt-num">7.6.5</span>Code trace: searching with LOOPNE</h3>
+
+<p>LOOPNE is made to order for searching a value in an array. The loop ends in one of two cases: when the value is found (ZF = 1), or when all elements have been examined (CX = 0). The program below searches for the value 3 in a five-element array.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> cx, 5          <span class="cm">; element count</span>
+<span class="kw">mov</span> si, -1         <span class="cm">; first inc makes it 0</span>
+scan:
+<span class="kw">inc</span> si             <span class="cm">; next element</span>
+<span class="kw">cmp</span> arr[si], 3     <span class="cm">; is it 3?</span>
+<span class="kw">loopne</span> scan        <span class="cm">; go on if CX≠0, ZF=0</span>
+<span class="kw">jne</span> notfound       <span class="cm">; ZF=0 → not found</span>
+<span class="kw">mov</span> al, 1          <span class="cm">; found, position in SI</span>
+<span class="kw">ret</span>
+notfound:
+<span class="kw">mov</span> al, 0          <span class="cm">; not found</span>
+<span class="kw">ret</span>
+arr <span class="dir">db</span> 7, 1, 3, 9, 4</code></pre>
+
+<p>Initializing SI to −1 (FFFFh) is a subtlety. The first instruction of the loop is <code>inc si</code>, which makes SI 0. SI thus points at the index of the element being examined on every pass, and when the loop is left it carries the position of the element found. The instruction <code>cmp arr[si], 3</code> is 5 bytes (<code>80 BC 16 01 03</code>): opcode, ModR/M, the 16-bit address of the array (0116h), and the constant. Because the array is defined with DB, the comparison is byte-sized.</p>
+
+<div class="nt-tablewrap" id="tab-loopne-iz">
+<table class="nt-table">
+  <caption>Table 7.20: Trace of the search with LOOPNE (arr = 7, 1, 3, 9, 4; searching for 3).</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col">SI</th><th scope="col">arr[SI]</th><th scope="col">ZF CF SF after CMP</th><th scope="col">CX after LOOPNE</th><th scope="col">Decision</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0000h</td><td>7</td><td>0 0 0</td><td>0004h</td><td>CX ≠ 0, ZF = 0 → continue</td></tr>
+    <tr><td>2</td><td>0001h</td><td>1</td><td>0 1 1</td><td>0003h</td><td>CX ≠ 0, ZF = 0 → continue</td></tr>
+    <tr><td>3</td><td>0002h</td><td>3</td><td>1 0 0</td><td>0002h</td><td>ZF = 1 → exit</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-loopne" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 270 120" role="img" aria-label="Array and index" style="max-width:270px;max-height:120px"><defs><marker id="n7-42-a16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="35" y="55" text-anchor="middle">7</text><text class="lbl mono" x="35" y="22" text-anchor="middle">[0]</text><rect class="box" x="60" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="85" y="55" text-anchor="middle">1</text><text class="lbl mono" x="85" y="22" text-anchor="middle">[1]</text><rect class="hot" x="110" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="135" y="55" text-anchor="middle">3</text><text class="lbl mono" x="135" y="22" text-anchor="middle">[2]</text><rect class="box" x="160" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="185" y="55" text-anchor="middle">9</text><text class="lbl mono" x="185" y="22" text-anchor="middle">[3]</text><rect class="box" x="210" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="235" y="55" text-anchor="middle">4</text><text class="lbl mono" x="235" y="22" text-anchor="middle">[4]</text><path class="line" d="M135 100 L135 74" marker-end="url(#n7-42-a16)"/><text class="txt mono lnk" x="135" y="116" text-anchor="middle">SI</text></svg></div>
+  <figcaption><b>Figure 7.13:</b> In the third iteration SI = 2 and arr[2] = 3: the comparison sets ZF = 1, and LOOPNE leaves the loop.</figcaption>
+</figure>
+
+<p>In the first iteration <code>inc si</code> takes SI from FFFFh to 0000h. This increment gives a zero result and so sets ZF = 1, but the CMP that follows immediately sets the flags again. 7 − 3 = 4 is not zero: ZF = 0. LOOPNE makes CX 4; since CX ≠ 0 and ZF = 0, it continues the search. In the second iteration arr[1] = 1. For 1 − 3 = −2 (FEh) a borrow is taken; CF = 1 and SF = 1. ZF is 0 again and the loop continues.</p>
+
+<p>In the third iteration arr[2] = 3, and 3 − 3 = 0 sets ZF = 1. LOOPNE decrements CX again, to 2. CX is not zero, but since ZF = 1 the jump is not taken and the loop is left. Because LOOPNE does not change the flags, ZF = 1 is preserved. The <code>jne notfound</code> after the loop looks at exactly this flag. Since ZF = 1 it is not taken, and <code>mov al, 1</code> records the “found” result. SI = 2 is the position of the element found. The loop has ended after three iterations instead of five.</p>
+
+<p>It matters why ZF is tested after the loop. The loop can end for two reasons, and looking at CX does not tell them apart: if the value is found at the last element, CX falls to zero too. The result of the last comparison, on the other hand, sits in ZF, and LOOPNE does not disturb it. If the array did not contain 3, after five iterations CX = 0 and ZF = 0; <code>jne notfound</code> would be taken and AL would be 0. This structure is a direct benefit of the LOOP family preserving the flags.</p>
+
+<h3 id="s7-6-6"><span class="nt-num">7.6.6</span>JCXZ; LOOP mu, DEC–JNZ mi?</h3>
+
+<p>The <code>JCXZ label</code> instruction jumps if CX = 0; it neither decrements CX nor looks at the flags. Its main use is as protection against a zero-iteration loop. If the iteration count is computed at run time, a JCXZ is placed in front of the loop:</p>
+
+<pre class="nt-code"><code>      <span class="kw">mov</span>  cx, n      <span class="cm">; n known at run time</span>
+      <span class="kw">jcxz</span> skip       <span class="cm">; skip if CX = 0</span>
+again:
+      <span class="cm">; body</span>
+      <span class="kw">loop</span> again
+skip:</code></pre>
+
+<p>Without JCXZ, with CX = 0 the LOOP first makes CX FFFFh and the body runs 65,536 times. With JCXZ, the loop is jumped over in this case. The instruction tests whether CX is zero without another instruction having to look at CX; a <code>CMP CX, 0</code> that compares CX with zero would disturb the flags, while JCXZ does not.</p>
+
+<p>A counted loop can also be written with the <code>DEC</code> and <code>JNZ</code> pair instead of LOOP. The differences between the two forms are collected in Table 7.21.</p>
+
+<div class="nt-tablewrap" id="tab-loop-dec">
+<table class="nt-table">
+  <caption>Table 7.21: Comparison of LOOP and DEC CX + JNZ.</caption>
+  <thead><tr><th scope="col">Feature</th><th scope="col"><code>LOOP</code></th><th scope="col"><code>DEC CX</code> + <code>JNZ</code></th></tr></thead>
+  <tbody>
+    <tr><td>Size</td><td>2 bytes</td><td>1 + 2 = 3 bytes</td></tr>
+    <tr><td>Flags</td><td>unchanged</td><td>ZF, SF, OF, PF, AF change (CF is preserved)</td></tr>
+    <tr><td>Counter</td><td>CX only</td><td>any register</td></tr>
+    <tr><td>Extra condition</td><td>LOOPE / LOOPNE</td><td>a different Jcc can be chosen</td></tr>
+    <tr><td>Timing on the 8086 (taken / not taken)</td><td>17 / 5 cycles</td><td>2 + 16 = 18 / 2 + 4 = 6 cycles</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>On the 8086, LOOP is both shorter and slightly faster. In a ten-iteration loop, LOOP spends 9 × 17 + 5 = 158 cycles with nine jumps and one exit. The DEC–JNZ pair spends 10 × 2 + 9 × 16 + 4 = 168 cycles. On the other hand DEC–JNZ is more flexible: a register other than CX can serve as the counter. This matters in loops that use CX for something else (for example as a shift count or the counter of a string instruction). On later x86 processors the LOOP instruction became slow and compilers stopped using it; for the 8086, however, the situation is the opposite.</p>
+
+<p>The flag difference matters too. <code>DEC</code> sets the status flags other than CF according to the result. Information kept in CF throughout the loop (for example the carry of a multiword addition) is not affected by DEC. But information kept in ZF or SF is destroyed. LOOP touches no flag. In loops where the carry is carried from iteration to iteration, such as multiword addition, both forms preserve CF, so either can be used.</p>
+
+<h3 id="s7-6-7"><span class="nt-num">7.6.7</span>Code trace: JCXZ guard and DEC–JNZ</h3>
+
+<p>The program below contains two loops. The first loop is run with n = 0, and JCXZ guards it. The second loop runs with n = 3 in the DEC–JNZ form and uses BX as the counter. Before the second loop CF is set to 1; we observe that CF is preserved throughout the loop.</p>
+
+<pre class="nt-code"><code><span class="kw">MOV</span>  CX, 0       <span class="cm">; n = 0</span>
+<span class="kw">MOV</span>  AX, 0
+<span class="kw">JCXZ</span> skip         <span class="cm">; CX = 0 → skip</span>
+again: <span class="kw">INC</span> AX
+<span class="kw">LOOP</span> again
+skip: <span class="kw">MOV</span> BX, 3   <span class="cm">; n = 3, counter BX</span>
+<span class="kw">STC</span>              <span class="cm">; CF = 1</span>
+again2: <span class="kw">INC</span> AX
+<span class="kw">DEC</span>  BX          <span class="cm">; CF is kept</span>
+<span class="kw">JNZ</span>  again2
+<span class="kw">RET</span></code></pre>
+
+<div class="nt-tablewrap" id="tab-jcxz-iz">
+<table class="nt-table">
+  <caption>Table 7.22: Trace of the JCXZ and DEC–JNZ program.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Instruction</th><th scope="col">AX</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">ZF</th><th scope="col">CF</th><th scope="col">Decision</th></tr></thead>
+  <tbody>
+    <tr><td>1–2</td><td><code>MOV CX, 0</code> / <code>MOV AX, 0</code></td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>—</td></tr>
+    <tr><td>3</td><td><code>JCXZ skip</code> (<code>E3 03</code>)</td><td>0000h</td><td>0000h</td><td>0000h</td><td>0</td><td>0</td><td>CX = 0 → taken, 010Bh</td></tr>
+    <tr><td>4</td><td><code>MOV BX, 3</code></td><td>0000h</td><td>0003h</td><td>0000h</td><td>0</td><td>0</td><td>—</td></tr>
+    <tr><td>5</td><td><code>STC</code></td><td>0000h</td><td>0003h</td><td>0000h</td><td>0</td><td>1</td><td>—</td></tr>
+    <tr><td>6–8</td><td><code>INC AX</code> / <code>DEC BX</code> / <code>JNZ</code></td><td>0001h</td><td>0002h</td><td>0000h</td><td>0</td><td>1</td><td>taken (iteration 1)</td></tr>
+    <tr><td>9–11</td><td><code>INC AX</code> / <code>DEC BX</code> / <code>JNZ</code></td><td>0002h</td><td>0001h</td><td>0000h</td><td>0</td><td>1</td><td>taken (iteration 2)</td></tr>
+    <tr><td>12–14</td><td><code>INC AX</code> / <code>DEC BX</code> / <code>JNZ</code></td><td>0003h</td><td>0000h</td><td>0000h</td><td>1</td><td>1</td><td>not taken (iteration 3)</td></tr>
+    <tr><td>15</td><td><code>RET</code></td><td>0003h</td><td>0000h</td><td>0000h</td><td>1</td><td>1</td><td>IP = 0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the third step JCXZ sees that CX = 0 and jumps over the loop. <code>INC AX</code> and <code>LOOP again</code> are never executed; AX stays 0. Without the guard the body would run 65,536 times and AX would end up 0000h again (65,536 = 1 0000h does not fit in 16 bits). The result would look the same, but the processor would have gone around 65,536 times for nothing. Had the body modified a memory array instead of AX, the result would be a disaster.</p>
+
+<p>In the second loop the counter is BX; LOOP could not do this. <code>STC</code> sets CF to 1. In each iteration <code>INC AX</code> and <code>DEC BX</code> set the flags, but neither touches CF. In the first iteration BX = 2 and ZF = 0, and <code>JNZ</code> jumps back. In the second iteration BX = 1. In the third iteration <code>DEC BX</code> makes BX 0 and ZF = 1. <code>JNZ</code> is not taken and the loop ends. In the end AX = 3 and CF = 1 is preserved. When <code>INC AX</code> makes AX 3 in the third iteration, PF = 1 (0000 0011b contains two 1 bits); this is set again by DEC. LOOP does not change flags either, but it works only with CX.</p>
+
+<h2 class="nt-pb" id="s7-7"><span class="nt-num">7.7</span>Example programs</h2>
+
+<h3 id="s7-7-1"><span class="nt-num">7.7.1</span>Sum of array elements</h3>
+
+<p>Summing the elements of an array is the most typical use of a counted loop. The program below adds up a five-byte array and writes the result to the variable <code>m</code>. CX holds the element count, BX the index, and AL the sum.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">mov</span> cx, 5             <span class="cm">; element count</span>
+<span class="kw">mov</span> al, 0             <span class="cm">; sum (AL) = 0</span>
+<span class="kw">mov</span> bx, 0             <span class="cm">; BX = index</span>
+next:
+<span class="kw">add</span> al, vector[bx]    <span class="cm">; add element</span>
+<span class="kw">inc</span> bx                <span class="cm">; next element</span>
+<span class="kw">loop</span> next             <span class="cm">; until CX = 0</span>
+<span class="kw">mov</span> m, al             <span class="cm">; store in m</span>
+<span class="kw">ret</span>
+vector <span class="dir">db</span> 5, 4, 5, 2, 1
+m <span class="dir">db</span> 0</code></pre>
+
+<p>The data is defined after <code>ret</code>. Because the program ends with <code>ret</code>, the processor never reaches the data bytes and never mistakes them for instructions. When the assembler lays out the code, vector sits at 0113h and m at 0118h. The instruction <code>add al, vector[bx]</code> is 4 bytes (<code>02 87 13 01</code>): the ModR/M byte 87h selects the “[BX] + 16-bit displacement” form, and the displacement is the address of vector. <code>loop next</code> is at 010Dh; its code is <code>E2 F9</code> and the displacement is 0108h − 010Fh = −7.</p>
+
+<div class="nt-tablewrap" id="tab-toplam-iz">
+<table class="nt-table">
+  <caption>Table 7.23: Trace of the array sum (each row is the end of one iteration).</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col">Added</th><th scope="col">AL (decimal)</th><th scope="col">AL</th><th scope="col">BX</th><th scope="col">CX</th><th scope="col">LOOP</th></tr></thead>
+  <tbody>
+    <tr><td>start</td><td>—</td><td>0</td><td>00h</td><td>0000h</td><td>0005h</td><td>—</td></tr>
+    <tr><td>1</td><td>vector[0] = 5</td><td>5</td><td>05h</td><td>0001h</td><td>0004h</td><td>taken</td></tr>
+    <tr><td>2</td><td>vector[1] = 4</td><td>9</td><td>09h</td><td>0002h</td><td>0003h</td><td>taken</td></tr>
+    <tr><td>3</td><td>vector[2] = 5</td><td>14</td><td>0Eh</td><td>0003h</td><td>0002h</td><td>taken</td></tr>
+    <tr><td>4</td><td>vector[3] = 2</td><td>16</td><td>10h</td><td>0004h</td><td>0001h</td><td>taken</td></tr>
+    <tr><td>5</td><td>vector[4] = 1</td><td>17</td><td>11h</td><td>0005h</td><td>0000h</td><td>exits</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="nt-fig" id="sekil-toplam" style="--w:300px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 270 120" role="img" aria-label="Array and index" style="max-width:270px;max-height:120px"><defs><marker id="n7-65-a49" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="35" y="55" text-anchor="middle">5</text><text class="lbl mono" x="35" y="22" text-anchor="middle">[0]</text><rect class="box" x="60" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="85" y="55" text-anchor="middle">4</text><text class="lbl mono" x="85" y="22" text-anchor="middle">[1]</text><rect class="box" x="110" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="135" y="55" text-anchor="middle">5</text><text class="lbl mono" x="135" y="22" text-anchor="middle">[2]</text><rect class="box" x="160" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="185" y="55" text-anchor="middle">2</text><text class="lbl mono" x="185" y="22" text-anchor="middle">[3]</text><rect class="hot" x="210" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="235" y="55" text-anchor="middle">1</text><text class="lbl mono" x="235" y="22" text-anchor="middle">[4]</text><path class="line" d="M235 100 L235 74" marker-end="url(#n7-65-a49)"/><text class="txt mono lnk" x="235" y="116" text-anchor="middle">BX</text></svg></div>
+  <figcaption><b>Figure 7.14:</b> The last iteration of the array sum: with BX = 4, vector[4] = 1 is added and AL = 11h.</figcaption>
+</figure>
+
+<p>Three instructions execute in each iteration. <code>add al, vector[bx]</code> adds the element to AL; the effective address is 0113h + BX and the segment is DS. <code>inc bx</code> increments the index by one, because the elements are single bytes. For a word array the index would advance by two. <code>loop next</code> decrements CX and returns to the top if it is not zero. After the fifth iteration CX = 0 and the loop is left. <code>mov m, al</code> writes the result to address 0118h: m = 11h = 17 = 5 + 4 + 5 + 2 + 1.</p>
+
+<p>The ADD in the loop body sets the flags again on every iteration, but LOOP never reads or changes them. For example, in the fourth iteration the addition 0Eh + 02h = 10h produces a carry out of the low nibble and AF = 1. No instruction uses this information. The case where the sum does not fit in a byte is reported by CF. In this array the sum is 17, and CF is never 1 in any iteration. Had the elements been larger, AL could have overflowed; this case is examined in one of the exercises.</p>
+
+<h3 id="s7-7-2"><span class="nt-num">7.7.2</span>Printing Hello on the screen</h3>
+
+<p>The program below prints a string marked with a terminating 0 byte on the screen, character by character. The number of iterations is not known in advance; the loop ends when it meets the 0 byte. That is why CMP, JE, and JMP are used instead of LOOP. This structure is a while loop: the condition is tested at the start of every iteration.</p>
+
+<pre class="nt-code"><code><span class="dir">org</span>     100h
+<span class="kw">jmp</span>     start
+msg     <span class="dir">db</span> <span class="str">'Hello'</span>, 0
+start:
+<span class="kw">mov</span>     si, 0          <span class="cm">; source index = 0</span>
+next_char:
+<span class="kw">mov</span>     al, msg[si]    <span class="cm">; get the char</span>
+<span class="kw">cmp</span>     al, 0          <span class="cm">; compare with 0</span>
+<span class="kw">je</span>      stop           <span class="cm">; stop if 0</span>
+<span class="kw">mov</span>     ah, 0eh        <span class="cm">; teletype function</span>
+<span class="kw">int</span>     10h            <span class="cm">; print char in AL</span>
+<span class="kw">inc</span>     si             <span class="cm">; next character</span>
+<span class="kw">jmp</span>     next_char      <span class="cm">; loop back</span>
+stop:
+<span class="kw">ret</span></code></pre>
+
+<p>In this program the data sits among the code. msg, right behind the first instruction of the program, holds the bytes 48h 65h 6Ch 6Ch 6Fh 00h starting at 0102h. The first instruction, <code>jmp start</code> (<code>EB 06</code>), jumps over these six bytes to 0108h. Without the JMP the processor would decode the byte 48h at 0102h as an instruction. 48h is the code of <code>DEC AX</code>; the bytes that follow would also be decoded like other instructions, and what the program does would be unpredictable.</p>
+
+<div class="nt-tablewrap" id="tab-hello-iz">
+<table class="nt-table">
+  <caption>Table 7.24: Trace of the Hello program (each row is the end of one iteration).</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col">SI (at start)</th><th scope="col">AL = msg[SI]</th><th scope="col">ZF</th><th scope="col">je stop</th><th scope="col">Screen</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0000h</td><td>48h 'H'</td><td>0</td><td>not taken</td><td>H</td></tr>
+    <tr><td>2</td><td>0001h</td><td>65h 'e'</td><td>0</td><td>not taken</td><td>He</td></tr>
+    <tr><td>3</td><td>0002h</td><td>6Ch 'l'</td><td>0</td><td>not taken</td><td>Hel</td></tr>
+    <tr><td>4</td><td>0003h</td><td>6Ch 'l'</td><td>0</td><td>not taken</td><td>Hell</td></tr>
+    <tr><td>5</td><td>0004h</td><td>6Fh 'o'</td><td>0</td><td>not taken</td><td>Hello</td></tr>
+    <tr><td>6</td><td>0005h</td><td>00h</td><td>1</td><td>taken</td><td>Hello</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In each iteration <code>mov al, msg[si]</code> (<code>8A 84 02 01</code>) takes the next character into AL. <code>cmp al, 0</code> (<code>3C 00</code>) compares it with zero. If the character is not zero, ZF = 0 and <code>je stop</code> is not taken. With AH = 0Eh and <code>INT 10h</code> the character is printed on the screen. <code>inc si</code> increments the index and <code>jmp next_char</code> (<code>EB F1</code>) returns to the top. This JMP is at 0118h; the displacement is 010Bh − 011Ah = −0Fh = F1h.</p>
+
+<p>In the sixth iteration msg[5] = 0 is read. Since 0 − 0 = 0, ZF = 1 and <code>je stop</code> is taken. The screen shows <code>Hello</code> and SI = 5. <code>ret</code> ends the program. At the end of the program AX = 0E00h: AH keeps the 0Eh of the last iteration, and AL is the 00h read last.</p>
+
+<figure class="nt-fig" id="sekil-hello" style="--w:340px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 320 120" role="img" aria-label="Array and index" style="max-width:320px;max-height:120px"><defs><marker id="n7-79-a82" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="35" y="55" text-anchor="middle">'H'</text><text class="lbl mono" x="35" y="22" text-anchor="middle">48h</text><rect class="box" x="60" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="85" y="55" text-anchor="middle">'e'</text><text class="lbl mono" x="85" y="22" text-anchor="middle">65h</text><rect class="box" x="110" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="135" y="55" text-anchor="middle">'l'</text><text class="lbl mono" x="135" y="22" text-anchor="middle">6Ch</text><rect class="box" x="160" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="185" y="55" text-anchor="middle">'l'</text><text class="lbl mono" x="185" y="22" text-anchor="middle">6Ch</text><rect class="box" x="210" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="235" y="55" text-anchor="middle">'o'</text><text class="lbl mono" x="235" y="22" text-anchor="middle">6Fh</text><rect class="hot" x="260" y="30" width="50" height="38" rx="3"/><text class="txt mono" x="285" y="55" text-anchor="middle">0</text><text class="lbl mono" x="285" y="22" text-anchor="middle">00h</text><path class="line" d="M285 100 L285 74" marker-end="url(#n7-79-a82)"/><text class="txt mono lnk" x="285" y="116" text-anchor="middle">SI</text></svg></div>
+  <figcaption><b>Figure 7.15:</b> The Hello string in memory: six bytes, the last one 00h. With SI = 5, the 0 byte that is read ends the loop.</figcaption>
+</figure>
+
+<p>A string marked at the end with zero is called a <strong>null-terminated string</strong>. In this scheme the length is not stored separately; the string continues up to the 0 byte. The C language uses the same scheme. The DOS <code>INT 21h</code>/09h service, on the other hand, uses a different marker: the end of the string is the '$' character. What the two schemes have in common is that the loop ends by a condition, not by a counter.</p>
+
+<p>Each iteration of the program executes seven instructions, two of which are flow control instructions. A <code>je</code> not taken spends 4 clock cycles and a <code>jmp</code> taken spends 15. Had the loop been rewritten in do-while form (with the comparison and the conditional jump back at the end), each iteration would have one JMP fewer. For a short string the difference is negligible; for a very long text it makes up a significant part of the total time.</p>
+
+<h3 id="s7-7-3"><span class="nt-num">7.7.3</span>Palindrome check: the idea</h3>
+
+<p>A palindrome is a sequence that reads the same from the front and from the back: <code>123321</code>, <code>kayak</code>, <code>ey edip adanada pide ye</code> (if spaces are not counted). To tell whether a sequence is a palindrome, two pointers are used. DI points at the beginning of the sequence and SI at its end. At each step two characters are compared; then DI moves one forward and SI one back. If one of the pairs differs, the sequence is not a palindrome. If all the pairs match, it is a palindrome.</p>
+
+<p>Comparisons up to half the length are enough. In a six-character sequence there are 3 pairs: (1st, 6th), (2nd, 5th), (3rd, 4th). More comparisons would just test the same pairs again in reverse order. With an odd length the middle character has no partner and is not compared; in 5 characters 2 pairs are tested. Halving is done with <code>shr cx, 1</code>: a one-bit right shift divides an unsigned number by 2 and discards the remainder.</p>
+
+<figure class="nt-fig" id="sekil-pal" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 368 120" role="img" aria-label="the str array in memory; DI moves from the front, SI from the back" style="max-width:420px;max-height:130px"><defs><marker id="n7-82-p0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="hot" x="4" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="24" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="24" y="22" text-anchor="middle" style="font-size:10px">0102h</text><rect class="box" x="44" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="64" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="64" y="22" text-anchor="middle" style="font-size:10px">0103h</text><rect class="box" x="84" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="104" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="104" y="22" text-anchor="middle" style="font-size:10px">0104h</text><rect class="box" x="124" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="144" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="144" y="22" text-anchor="middle" style="font-size:10px">0105h</text><rect class="box" x="164" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="184" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="184" y="22" text-anchor="middle" style="font-size:10px">0106h</text><rect class="hot" x="204" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="224" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="224" y="22" text-anchor="middle" style="font-size:10px">0107h</text><rect class="box" x="244" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="264" y="55" text-anchor="middle">0Dh</text><text class="lbl mono" x="264" y="22" text-anchor="middle" style="font-size:10px">0108h</text><rect class="box" x="284" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="304" y="55" text-anchor="middle">0Ah</text><text class="lbl mono" x="304" y="22" text-anchor="middle" style="font-size:10px">0109h</text><rect class="box" x="324" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="344" y="55" text-anchor="middle">'$'</text><text class="lbl mono" x="344" y="22" text-anchor="middle" style="font-size:10px">010Ah</text><path class="line" d="M24 98 L24 74" marker-end="url(#n7-82-p0)"/><text class="txt mono lnk" x="24" y="114" text-anchor="middle">DI</text><path class="line" d="M224 98 L224 74" marker-end="url(#n7-82-p0)"/><text class="txt mono lnk" x="224" y="114" text-anchor="middle">SI</text><text class="lbl" x="248" y="90" style="font-size:11px">str_size = 6</text></svg></div>
+  <figcaption><b>Figure 7.16:</b> The <code>str</code> array starts at 0102h in memory; DI moves from the front and SI from the back. After the string come the line end (0Dh, 0Ah) and '$'.</figcaption>
+</figure>
+
+<p>In the program the length of the string is a constant: <code>str_size = $ - msg</code>. Here <code>$</code> is the assembler's location counter at that line, that is, the address right behind the string. The labels msg and str point to the same address; the difference is 6, the length of the string. The <code>=</code> directive defines a constant like EQU and takes no space in memory. If the string changes, the length updates by itself.</p>
+
+<p>The program prints the string itself and the result with the DOS <code>INT 21h</code>/09h service. This service prints the string at DS:DX on the screen up to the '$' character; the '$' is not printed. The bytes 0Dh and 0Ah after the string are the carriage return and line feed characters. The result message is thereby printed one line below. The addresses in the figure assume <code>org 100h</code> and the two-byte short <code>jmp start</code> (at 0100h): str starts at 0102h.</p>
+
+<h3 id="s7-7-4"><span class="nt-num">7.7.4</span>Palindrome: setup</h3>
+
+<pre class="nt-code"><code><span class="dir">org</span> 100h
+<span class="kw">jmp</span> start
+msg:
+str <span class="dir">db</span> <span class="str">'123321'</span>
+str_size = $ - msg     <span class="cm">; = 6</span>
+<span class="dir">db</span> 0Dh,0Ah,<span class="str">'$'</span>
+start:
+<span class="kw">mov</span> ah, 9              <span class="cm">; print up to '$'</span>
+<span class="kw">mov</span> dx, <span class="dir">offset</span> str
+<span class="kw">int</span> 21h
+<span class="kw">lea</span> di, str            <span class="cm">; DI = address of str</span>
+<span class="kw">mov</span> si, di
+<span class="kw">add</span> si, str_size       <span class="cm">; SI = last + 1</span>
+<span class="kw">dec</span> si                 <span class="cm">; SI = last char</span>
+<span class="kw">mov</span> cx, str_size
+<span class="kw">cmp</span> cx, 1              <span class="cm">; one character?</span>
+<span class="kw">je</span> is_palindrome       <span class="cm">; one char is a palindrome</span>
+<span class="kw">shr</span> cx, 1              <span class="cm">; CX = length / 2</span></code></pre>
+
+<p>The <code>jmp start</code> (<code>EB 09</code>) at the beginning of the program skips nine bytes of data (six characters, 0Dh, 0Ah, '$') and goes to 010Bh. <code>mov ah, 9</code> and <code>mov dx, offset str</code> prepare the DOS string output service: DX = 0102h. <code>int 21h</code> prints <code>123321</code> and the line end on the screen. DOS returns from this service with AL = 24h ('$'); AX = 0924h.</p>
+
+<p><code>lea di, str</code> loads into DI the address of str, 0102h. Here the effective address is a direct constant; emu8086 translates this instruction to the same 3-byte code as <code>mov di, offset str</code> (<code>BF 02 01</code>). <code>mov si, di</code> makes SI 0102h as well. <code>add si, str_size</code> adds 6: SI = 0108h. This is one past the last character of the string (the 0Dh byte). <code>dec si</code> brings SI to 0107h, the last character '1'. <code>mov cx, str_size</code> loads 6 into CX.</p>
+
+<p><code>cmp cx, 1</code> and <code>je is_palindrome</code> are a shortcut for a one-character string. A one-character string is always a palindrome, but the real reason is a different one. With length 1, <code>shr cx, 1</code> would make CX 0, and if the LOOP-based loop were entered with CX = 0, the comparison would run 65,536 times. Here CX = 6: 6 − 1 ≠ 0, ZF = 0, CF = 0; JE is not taken. <code>shr cx, 1</code> shifts CX from 0110b to 0011b: CX = 3. The bit shifted out is 0, so CF = 0.</p>
+
+<div class="nt-tablewrap" id="tab-pal1-iz">
+<table class="nt-table">
+  <caption>Table 7.25: Trace of the setup part of the palindrome program.</caption>
+  <thead><tr><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">Code</th><th scope="col">Result</th></tr></thead>
+  <tbody>
+    <tr><td>0100h</td><td><code>jmp start</code></td><td><code>EB 09</code></td><td>IP = 010Bh</td></tr>
+    <tr><td>010Bh</td><td><code>mov ah, 9</code></td><td><code>B4 09</code></td><td>AH = 09h</td></tr>
+    <tr><td>010Dh</td><td><code>mov dx, offset str</code></td><td><code>BA 02 01</code></td><td>DX = 0102h</td></tr>
+    <tr><td>0110h</td><td><code>int 21h</code></td><td><code>CD 21</code></td><td>screen: 123321 ↵; AL = 24h</td></tr>
+    <tr><td>0112h</td><td><code>lea di, str</code></td><td><code>BF 02 01</code></td><td>DI = 0102h</td></tr>
+    <tr><td>0115h</td><td><code>mov si, di</code></td><td><code>8B F7</code></td><td>SI = 0102h</td></tr>
+    <tr><td>0117h</td><td><code>add si, str_size</code></td><td><code>83 C6 06</code></td><td>SI = 0108h</td></tr>
+    <tr><td>011Ah</td><td><code>dec si</code></td><td><code>4E</code></td><td>SI = 0107h</td></tr>
+    <tr><td>011Bh</td><td><code>mov cx, str_size</code></td><td><code>B9 06 00</code></td><td>CX = 0006h</td></tr>
+    <tr><td>011Eh</td><td><code>cmp cx, 1</code></td><td><code>83 F9 01</code></td><td>ZF = 0, CF = 0</td></tr>
+    <tr><td>0121h</td><td><code>je is_palindrome</code></td><td><code>74 0E</code></td><td>not taken</td></tr>
+    <tr><td>0123h</td><td><code>shr cx, 1</code></td><td><code>D1 E9</code></td><td>CX = 0003h, CF = 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="s7-7-5"><span class="nt-num">7.7.5</span>Palindrome: the comparison loop</h3>
+
+<pre class="nt-code"><code>next_char:
+<span class="kw">mov</span> al, [di]          <span class="cm">; char at the start</span>
+<span class="kw">mov</span> bl, [si]          <span class="cm">; char at the end</span>
+<span class="kw">cmp</span> al, bl
+<span class="kw">jne</span> not_palindrome    <span class="cm">; differ: not one</span>
+<span class="kw">inc</span> di                <span class="cm">; start: one forward</span>
+<span class="kw">dec</span> si                <span class="cm">; end: one back</span>
+<span class="kw">loop</span> next_char
+is_palindrome:
+<span class="kw">mov</span> ah, 9             <span class="cm">; print "palindrome!"</span>
+<span class="kw">mov</span> dx, <span class="dir">offset</span> msg1
+<span class="kw">int</span> 21h
+<span class="kw">jmp</span> stop
+not_palindrome:
+<span class="kw">mov</span> ah, 9             <span class="cm">; "not palindrome!"</span>
+<span class="kw">mov</span> dx, <span class="dir">offset</span> msg2
+<span class="kw">int</span> 21h
+stop:
+<span class="kw">ret</span>
+msg1 <span class="dir">db</span> <span class="str">"palindrome!$"</span>
+msg2 <span class="dir">db</span> <span class="str">"not palindrome!$"</span></code></pre>
+
+<p>The loop starts at 0125h with the label <code>next_char</code>. In each iteration <code>mov al, [di]</code> reads the character at the start and <code>mov bl, [si]</code> the character at the end. <code>cmp al, bl</code> compares the two. If they differ, <code>jne not_palindrome</code> leaves the loop at once. If they are equal, <code>inc di</code> and <code>dec si</code> bring the pointers closer together; <code>loop next_char</code> decrements CX and returns to the top.</p>
+
+<div class="nt-tablewrap" id="tab-pal2-iz">
+<table class="nt-table">
+  <caption>Table 7.26: Trace of the palindrome comparison loop ('123321').</caption>
+  <thead><tr><th scope="col">Iteration</th><th scope="col">DI</th><th scope="col">SI</th><th scope="col">AL</th><th scope="col">BL</th><th scope="col">ZF after CMP</th><th scope="col">DI, SI, ZF after INC/DEC</th><th scope="col">CX after LOOP</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0102h</td><td>0107h</td><td>31h '1'</td><td>31h '1'</td><td>1</td><td>0103h, 0106h, 0</td><td>0002h</td></tr>
+    <tr><td>2</td><td>0103h</td><td>0106h</td><td>32h '2'</td><td>32h '2'</td><td>1</td><td>0104h, 0105h, 0</td><td>0001h</td></tr>
+    <tr><td>3</td><td>0104h</td><td>0105h</td><td>33h '3'</td><td>33h '3'</td><td>1</td><td>0105h, 0104h, 0</td><td>0000h</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In every iteration CMP finds equality and sets ZF = 1; JNE is not taken. The <code>inc di</code> and <code>dec si</code> that follow set the flags too. Their results are not zero, so ZF becomes 0 again. This does not affect the correctness of the loop, because the decision was made at the JNE right behind CMP. The decision to loop belongs to LOOP, and LOOP looks only at CX. After the third iteration CX = 0 and the loop is left: all three pairs matched. At this point DI = 0105h and SI = 0104h; the pointers have crossed each other.</p>
+
+<p>Leaving the loop, the processor falls through into the <code>is_palindrome</code> block. The DOS string output service is called with AH = 09h and DX = offset msg1. msg1 sits right after the code at 0142h, so DX = 0142h. <code>palindrome!</code> is printed on the screen and AL returns with 24h again. <code>jmp stop</code> (<code>EB 07</code>) jumps over the <code>not_palindrome</code> block, and <code>ret</code> ends the program.</p>
+
+<p>The data comes right after the <code>stop:</code> label. Without <code>ret</code>, the processor would take the bytes of <code>palindrome!$</code> for instructions and start executing them. The program is 94 bytes long (0100h–015Dh): msg1 takes 12 bytes and msg2 16.</p>
+
+<figure class="nt-fig" id="sekil-pal-son" style="--w:400px">
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 368 120" role="img" aria-label="the str array in memory; DI moves from the front, SI from the back" style="max-width:420px;max-height:130px"><defs><marker id="n7-101-p27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="4" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="24" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="24" y="22" text-anchor="middle" style="font-size:10px">0102h</text><rect class="box" x="44" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="64" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="64" y="22" text-anchor="middle" style="font-size:10px">0103h</text><rect class="hot" x="84" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="104" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="104" y="22" text-anchor="middle" style="font-size:10px">0104h</text><rect class="hot" x="124" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="144" y="55" text-anchor="middle">'3'</text><text class="lbl mono" x="144" y="22" text-anchor="middle" style="font-size:10px">0105h</text><rect class="box" x="164" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="184" y="55" text-anchor="middle">'2'</text><text class="lbl mono" x="184" y="22" text-anchor="middle" style="font-size:10px">0106h</text><rect class="box" x="204" y="30" width="40" height="38" rx="3"/><text class="txt mono" x="224" y="55" text-anchor="middle">'1'</text><text class="lbl mono" x="224" y="22" text-anchor="middle" style="font-size:10px">0107h</text><rect class="box" x="244" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="264" y="55" text-anchor="middle">0Dh</text><text class="lbl mono" x="264" y="22" text-anchor="middle" style="font-size:10px">0108h</text><rect class="box" x="284" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="304" y="55" text-anchor="middle">0Ah</text><text class="lbl mono" x="304" y="22" text-anchor="middle" style="font-size:10px">0109h</text><rect class="box" x="324" y="30" width="40" height="38" rx="3" style="opacity:.6"/><text class="txt mono" x="344" y="55" text-anchor="middle">'$'</text><text class="lbl mono" x="344" y="22" text-anchor="middle" style="font-size:10px">010Ah</text><path class="line" d="M104 98 L104 74" marker-end="url(#n7-101-p27)"/><text class="txt mono lnk" x="104" y="114" text-anchor="middle">DI</text><path class="line" d="M144 98 L144 74" marker-end="url(#n7-101-p27)"/><text class="txt mono lnk" x="144" y="114" text-anchor="middle">SI</text><text class="lbl" x="248" y="90" style="font-size:11px">str_size = 6</text></svg></div>
+  <figcaption><b>Figure 7.17:</b> The comparison in the third iteration: DI = 0104h and SI = 0105h point at the two middle '3' characters.</figcaption>
+</figure>
+
+<h3 id="s7-7-6"><span class="nt-num">7.7.6</span>Palindrome: different inputs</h3>
+
+<p>Seeing how the program behaves on different inputs is the best way to find out whether the conditions it contains are necessary. Table 7.27 compares five inputs.</p>
+
+<div class="nt-tablewrap" id="tab-pal-giris">
+<table class="nt-table">
+  <caption>Table 7.27: Behavior of the palindrome program on different inputs.</caption>
+  <thead><tr><th scope="col">str</th><th scope="col">Length</th><th scope="col">CX (after shr)</th><th scope="col">Comparisons</th><th scope="col">Output</th></tr></thead>
+  <tbody>
+    <tr><td><code>'123321'</code></td><td>6</td><td>3</td><td>1=1, 2=2, 3=3</td><td>palindrome!</td></tr>
+    <tr><td><code>'123421'</code></td><td>6</td><td>3</td><td>1=1, 2=2, 3≠4 → jne</td><td>not palindrome!</td></tr>
+    <tr><td><code>'12321'</code></td><td>5</td><td>2</td><td>1=1, 2=2 (the middle 3 is skipped)</td><td>palindrome!</td></tr>
+    <tr><td><code>'7'</code></td><td>1</td><td>—</td><td>cmp cx,1 → je is_palindrome</td><td>palindrome!</td></tr>
+    <tr><td><code>'ab'</code></td><td>2</td><td>1</td><td>a≠b → jne</td><td>not palindrome!</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In the second input, in the third iteration '3' is compared with '4'; ZF = 0 and <code>jne not_palindrome</code> leaves the loop. LOOP is never reached and CX stays at 1. In the third input the length is 5; <code>shr</code> divides 5 by 2 and discards the remainder 1 (CF = 1). Two pairs are compared, and the middle character is left alone. In the fourth input the <code>cmp cx, 1</code> check proves useful: with length 1, <code>shr cx, 1</code> would make CX 0 and the LOOP-based loop would run 65,536 times. Length 0 carries the same danger. For an empty string CX = 0, <code>cmp cx, 1</code> finds no equality, and <code>shr</code> makes 0 into 0 again. This case can be prevented with a <code>jcxz is_palindrome</code> before the loop.</p>
+
+<h2 class="nt-pb" id="s7-8"><span class="nt-num">7.8</span>Common mistakes</h2>
+
+<p>Most errors in flow control reduce to a few patterns. The list below collects these patterns and how to avoid them.</p>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>The wrong jump family.</strong> Using JA/JB on signed data or JG/JL on unsigned data. For AL = FBh and BL = 03h, JA is taken (251 &gt; 3) and JG is not (−5 &lt; 3). The error shows up only for values whose most significant bit is 1, and stays hidden with small test data. Remedy: decide the type of the data for each comparison and choose the family accordingly.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>The forgotten JMP.</strong> In the if/else pattern, if the <code>JMP after</code> at the end of block A is not written, the processor enters block B as well when block A ends. Blocks are separated by labels; a label is not a wall, only an address.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>A flag-changing instruction between CMP and the jump.</strong> In <code>CMP AL, BL</code> / <code>INC SI</code> / <code>JE equal</code>, the JE looks at the result of INC, not of CMP. If an instruction has to go in between, choose one that does not change flags (MOV, LEA, PUSH, POP), or move the CMP right in front of the jump.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>LOOP with CX = 0.</strong> LOOP decrements first and tests afterward. A loop entered with CX = 0 runs 65,536 times. Remedy: if the iteration count is determined at run time, put a <code>JCXZ</code> in front of the loop.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Not saving CX in a nested loop.</strong> The inner loop's <code>MOV CX, n</code> wipes out the outer counter. Remedy: <code>PUSH CX</code> before the inner loop and <code>POP CX</code> after it; or use another counter register with DEC–JNZ in the outer loop.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Executing data as code.</strong> If the data lies in front of the code, the <code>JMP start</code> is forgotten; if it lies behind the code, the final <code>RET</code> is forgotten. In both cases the processor takes data bytes for instructions. The character 'H' (48h) executes as <code>DEC AX</code>; the bytes that follow turn into random instructions.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Fixing an out-of-range Jcc with a synonym.</strong> Writing JZ instead of JE or adding SHORT does not change the range. The right solution is a short jump on the opposite condition plus a near JMP.</p>
+</div>
+
+<div class="nt-box nt-box--hata">
+  <span class="nt-box__title">Common mistake</span>
+  <p><strong>Changing the counter inside the loop body.</strong> An instruction that changes CX in the body of a LOOP-based loop (for example <code>DEC CX</code>) corrupts the iteration count. In a loop that starts with CX = 3 and has <code>DEC CX</code> in its body, CX decreases by two per iteration. After LOOP, CX passes through odd values: 1, FFFFh, FFFDh, … Since CX never sees zero after LOOP, the loop never ends.</p>
+</div>
+
+<h2 class="nt-pb" id="s7-9"><span class="nt-num">7.9</span>Exercises and solutions</h2>
+
+<p>The exercises from the slides and their solutions follow. The solutions are given with their intermediate steps.</p>
+
+<ol>
+  <li>
+    <p><strong>A JNE instruction at address 0120h is to jump to address 0100h. What is its machine code?</strong></p>
+    <p>The opcode of JNE is 75h and the instruction is 2 bytes. Next IP = 0122h. Displacement = 0100h − 0122h = −22h. Two's complement of −22h: 22h = 0010 0010b, inverted 1101 1101b, plus 1: 1101 1110b = DEh. The code is <code>75 DE</code>. Check: 0122h + FFDEh = 1 0100h → IP = 0100h.</p>
+  </li>
+  <li>
+    <p><strong>After <code>mov al, 80h</code> / <code>cmp al, 1</code>, are JA and JG taken?</strong></p>
+    <p>80h − 01h = 7Fh. There is no borrow (CF = 0) and the result is not zero (ZF = 0): JA is taken; in the unsigned interpretation 128 &gt; 1. In the signed interpretation −128 − 1 = −129 does not fit in eight bits: OF = 1. The sign bit of the result is 0: SF = 0. Since SF ≠ OF, JG is not taken; −128 &lt; 1. AF = 1 because 0 − 1 needs a borrow in the low nibble, and PF = 0 because 7Fh contains seven 1 bits.</p>
+  </li>
+  <li>
+    <p><strong>How many times does <code>mov cx, 0</code> / <code>d: loop d</code> iterate? How is it prevented?</strong></p>
+    <p>LOOP first decrements CX: 0 − 1 = FFFFh ≠ 0, so it jumps back. It jumps at every value of CX from FFFFh down to 1 and exits at 0. LOOP is executed 65,536 times in total. To prevent this, the case CX = 0 is skipped with <code>jcxz</code> before the loop.</p>
+  </li>
+  <li>
+    <p><strong>Code that sets BX = 1 if the unsigned number in AX is greater than 100, otherwise BX = 0.</strong></p>
+<pre class="nt-code"><code>    <span class="kw">mov</span>  bx, 0
+    <span class="kw">cmp</span>  ax, 100
+    <span class="kw">jbe</span>  done       <span class="cm">; skip if AX &lt;= 100 (unsigned)</span>
+    <span class="kw">mov</span>  bx, 1
+done:</code></pre>
+    <p>The opposite of the condition (≤) is taken from the unsigned family: JBE. Tried out, it gives BX = 0 for AX = 0, 99, and 100, and BX = 1 for AX = 101 and FFFFh (65,535). With JLE, FFFFh would count as signed −1 and BX would stay 0.</p>
+  </li>
+  <li>
+    <p><strong>In the array sum example, what would AL and CF be if the elements were 200 and 100? Propose a fix.</strong></p>
+    <p>200 + 100 = 300 = 12Ch. Only the low byte fits in AL: AL = 2Ch = 44. The ninth bit goes to CF: CF = 1 (carry). The result is wrong. The fix is to keep the sum in 16 bits. In the loop, <code>adc ah, 0</code> is added after <code>add al, vector[bx]</code>, and AX is cleared before the loop. ADC adds CF to AH along with 0; every carry moves into AH. With this fix AX = 012Ch = 300. Since LOOP does not change flags, it does not disturb the carry; but because ADD sets CF again on every iteration, ADC must stand right after ADD.</p>
+  </li>
+  <li>
+    <p><strong>What happens in the Hello example if the <code>jmp start</code> line is deleted?</strong></p>
+    <p>The program starts at 0100h, where the first byte of msg, 48h ('H'), now sits. The processor executes this byte as the instruction <code>DEC AX</code>. The bytes that follow, 65h, 6Ch, 6Ch, 6Fh, 00h, are also decoded and executed as instructions. The behavior of the program becomes unpredictable; Hello is not printed. The assembler does not catch this error, because the distinction between data and code exists only in the programmer's head.</p>
+  </li>
+</ol>
+
+<h2 class="nt-pb" id="s7-10"><span class="nt-num">7.10</span>Summary</h2>
+
+<ul>
+  <li><strong>IP and the queue</strong>: the processor executes instructions in order from CS:IP; IP grows by the instruction length after each instruction. The BIU fetches the next bytes ahead of time into the six-byte prefetch queue. A jump flushes the queue; that is why a jump that is taken needs 15–19 clock cycles.</li>
+  <li><strong>JMP</strong> is unconditional and does not change the flags. Its forms are short (EB rel8, −128…+127), near (E9 rel16, within the segment), far (EA ofs seg, CS:IP), and indirect (FF /4, register or memory).</li>
+  <li><strong>Displacement</strong> = target − (instruction address + instruction length). A negative displacement is stored in two's complement; the processor sign-extends it and adds it to IP.</li>
+  <li>A <strong>label</strong> takes no space in memory; the assembler turns it into an offset. It cannot start with a digit, cannot contain spaces, and cannot be an instruction or register name.</li>
+  <li><strong>Jcc</strong> looks at the flags and does not change them. On the 8086 all are 2 bytes (70h–7Fh + rel8); the last bit of the opcode inverts the condition. Synonyms assemble to the same code.</li>
+  <li><strong>CMP</strong> is a SUB that does not store its result; the Jcc that follows makes the decision.</li>
+  <li><strong>Unsigned</strong> comparison: JA, JAE, JB, JBE → CF and ZF. JB ≡ JC.</li>
+  <li><strong>Signed</strong> comparison: JG, JGE, JL, JLE → ZF, SF, and OF. A &lt; B ⇔ SF ≠ OF; because the sign bit comes out inverted on overflow, SF alone is not enough.</li>
+  <li><strong>if/else</strong>: jump over block A on the opposite condition, and at the end of block A jump over block B with a JMP. <strong>while</strong>: the condition is tested at the top, and a JMP at the end of the body returns to the top.</li>
+  <li><strong>Out-of-range Jcc</strong>: short jump on the opposite condition + near JMP. emu8086 makes this transformation itself.</li>
+  <li><strong>The LOOP family</strong>: CX decrements, flags are preserved; LOOPE/LOOPNE also look at ZF; JCXZ jumps if CX = 0. All are 2 bytes with rel8.</li>
+  <li><strong>Traps</strong>: LOOP with CX = 0 (65,536 iterations), not saving CX in a nested loop, a forgotten JMP, a flag-changing instruction between CMP and Jcc, executing data as code.</li>
+</ul>
+
+<h2 id="s7-11"><span class="nt-num">7.11</span>Key terms</h2>
+
+
+<ul class="nt-concepts">
+  <li>flow control</li>
+  <li>instruction pointer (IP)</li>
+  <li>prefetch queue</li>
+  <li>bus interface unit (BIU)</li>
+  <li>execution unit (EU)</li>
+  <li>jump</li>
+  <li>unconditional / conditional jump</li>
+  <li>short / near / far jump</li>
+  <li>jump displacement</li>
+  <li>relative addressing</li>
+  <li>label</li>
+  <li>offset</li>
+  <li>opcode</li>
+  <li>two's complement</li>
+  <li>sign extension</li>
+  <li>flag</li>
+  <li>zero flag (ZF)</li>
+  <li>carry flag (CF)</li>
+  <li>sign flag (SF)</li>
+  <li>overflow flag (OF)</li>
+  <li>parity flag (PF)</li>
+  <li>borrow</li>
+  <li>comparison (CMP)</li>
+  <li>signed / unsigned number</li>
+  <li>above / below (unsigned)</li>
+  <li>greater / less (signed)</li>
+  <li>loop</li>
+  <li>nested loop</li>
+  <li>count register</li>
+  <li>branch</li>
+  <li>stack</li>
+  <li>string</li>
+  <li>clock cycle</li>
+  <li>program segment prefix (PSP)</li>
+</ul>
+
+<h2 id="s7-12"><span class="nt-num">7.12</span>Test Yourself</h2>
+
+<ol class="nt-quiz">
+  <li>
+    <p>A short JMP at address 0150h jumps to 0140h. What is its machine code? Which form would be used if the instruction were at 0300h?</p>
+    <details><summary>Answer</summary>
+      <p>Next IP = 0152h; displacement 0140h − 0152h = −12h → EEh. Code <code>EB EE</code>. From 0300h the displacement would be −1C2h (−450) and would not fit the short range. The near form is chosen: next IP 0303h, displacement FE3Dh, code <code>E9 3D FE</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>With AX = 8000h and BX = 0001h, which flags does <code>CMP AX, BX</code> set? Are JB and JL taken?</p>
+    <details><summary>Answer</summary>
+      <p>8000h − 0001h = 7FFFh. CF = 0 (no borrow), ZF = 0, SF = 0 (the most significant bit of the result is 0), OF = 1 (signed −32,768 − 1 does not fit). JB is not taken: in the unsigned interpretation 32,768 &gt; 1. JL is taken: SF ≠ OF, and in the signed interpretation −32,768 &lt; 1.</p>
+    </details>
+  </li>
+  <li>
+    <p>The opcode of JL is 7Ch. What is the opcode of its opposite? What code is needed to make a JL at 0108h jump back to 0100h?</p>
+    <details><summary>Answer</summary>
+      <p>The last bit changes: 7Dh, that is JGE (JNL). Backward jump: next IP = 010Ah, displacement 0100h − 010Ah = −0Ah = F6h; code <code>7C F6</code>.</p>
+    </details>
+  </li>
+  <li>
+    <p>A <code>dec cx</code> has been left in the body of the loop below by mistake. What is AX when the program ends if it starts with CX = 4? What happens if it starts with CX = 3?</p>
+<pre class="nt-code"><code>    <span class="kw">mov</span>  cx, 4
+    <span class="kw">mov</span>  ax, 0
+d:  <span class="kw">inc</span>  ax
+    <span class="kw">dec</span>  cx
+    <span class="kw">loop</span> d</code></pre>
+    <details><summary>Answer</summary>
+      <p>CX = 4: in iteration 1, DEC gives 3 and LOOP 2 (taken); in iteration 2, DEC gives 1 and LOOP 0 (exits). AX = 2. CX = 3: in iteration 1, DEC gives 2 and LOOP 1 (taken); in iteration 2, DEC gives 0 and LOOP FFFFh (taken); after that CX always passes through odd values and is never 0 after LOOP. The loop is infinite.</p>
+    </details>
+  </li>
+  <li>
+    <p>How can code that sets BL = 1 if the signed number in AL is negative and BL = 0 otherwise be written with CMP and a single conditional jump? Which jump should be chosen?</p>
+    <details><summary>Answer</summary>
+<pre class="nt-code"><code>    <span class="kw">mov</span>  bl, 0
+    <span class="kw">cmp</span>  al, 0
+    <span class="kw">jge</span>  done       <span class="cm">; skip if AL &gt;= 0</span>
+    <span class="kw">mov</span>  bl, 1
+done:</code></pre>
+      <p>The opposite of the condition (AL ≥ 0) is taken from the signed family: JGE. For AL = 80h and FFh, BL = 1; for 00h, 05h, and 7Fh, BL = 0. Since a comparison with zero cannot overflow, <code>JNS</code> works correctly too.</p>
+    </details>
+  </li>
+  <li>
+    <p>A ten-iteration loop is written with LOOP and with DEC CX + JNZ. How many clock cycles does the loop control alone take on the 8086?</p>
+    <details><summary>Answer</summary>
+      <p>LOOP: 9 jumps taken × 17 + 1 exit × 5 = 158 cycles. DEC CX + JNZ: 10 × 2 (DEC) + 9 × 16 + 1 × 4 = 168 cycles. On the 8086, LOOP is both 1 byte shorter and 10 cycles faster.</p>
+    </details>
+  </li>
+  <li>
+    <p>The target of the <code>je far_away</code> instruction at 0102h is at 01CFh. How does emu8086 encode it? How many bytes in total?</p>
+    <details><summary>Answer</summary>
+      <p>The displacement 01CFh − 0104h = CBh = 203 &gt; 127; the short form is not enough. The condition is inverted: <code>75 03</code> (JNE; if the condition holds it hops over the three bytes of the JMP) and <code>E9 C8 00</code> (near JMP; next IP 0107h, 01CFh − 0107h = 00C8h). 5 bytes in total.</p>
+    </details>
+  </li>
+  <li>
+    <p>If the array in the LOOPNE search example were <code>7, 1, 8, 9, 3</code>, in how many iterations would the loop end? What are CX, ZF, and AL after the loop?</p>
+    <details><summary>Answer</summary>
+      <p>3 is the last element. In the fifth iteration CMP sets ZF = 1; LOOPNE takes CX from 1 to 0 and exits for both reasons. CX = 0 and ZF = 1. Since <code>jne notfound</code> looks at ZF, it is not taken and AL = 1, SI = 4. Had CX been checked, it would have been mistaken for “not found”.</p>
+    </details>
+  </li>
+</ol>
+
+<h2 id="s7-13"><span class="nt-num">7.13</span>Further reading</h2>
+
+<ul>
+  <li>B. B. Brey, <em>The Intel Microprocessors</em> (8th ed.), Chapter 6 (Program Control Instructions): the forms of JMP, conditional jumps, the LOOP family, and the assembly counterparts of high-level constructs; this is the closest source to this note.</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em> (1979): the instruction encoding tables and clock cycle counts are first-hand here; the operation of the prefetch queue is also described.</li>
+  <li>K. R. Irvine, <em>Assembly Language for x86 Processors</em> (7th ed.), Chapter 6 (Conditional Processing): CMP, signed and unsigned jumps, compound conditions, and loop examples.</li>
+  <li>emu8086 documentation, <em>8086 assembler tutorial for beginners</em>, Part 7 (Program Flow Control): the source of the examples in the slides; the out-of-range conditional jump trick is also explained here.</li>
+</ul>
+
+<h2 id="s7-14"><span class="nt-num">7.14</span>References</h2>
+
+<ol class="nt-refs">
+  <li>emu8086 documentation: <em>8086 Assembler Tutorial for Beginners</em> (Part 7: Program Flow Control).</li>
+  <li>Intel, <em>The 8086 Family User's Manual</em>, 1979: instruction set and encoding tables.</li>
+  <li>Barry B. Brey, <em>The Intel Microprocessors</em>, 8th ed., Pearson, 2009: Chapter 6, “Program Control Instructions”.</li>
+  <li>Kip R. Irvine, <em>Assembly Language for x86 Processors</em>, 7th ed., Pearson, 2014: conditional processing and loops.</li>
+</ol>
+
+<p class="nt-foot">Related pages: <a href="../slides/Chapter_07_Flow_Control.html">Chapter 7 slides</a> · © Sercan Külcü. All rights reserved.</p>
+</article>
+
+<script>
+(function () {
+  /* when printing, show the Test Yourself answers open; restore them afterwards */
+  var closed = [];
+  window.addEventListener("beforeprint", function () {
+    closed = Array.prototype.filter.call(document.querySelectorAll(".ds-notes details"), function (d) { return !d.open; });
+    closed.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    closed.forEach(function (d) { d.open = false; });
+    closed = [];
+  });
+})();
+</script>
