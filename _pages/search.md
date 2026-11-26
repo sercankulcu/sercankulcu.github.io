@@ -11,6 +11,8 @@ author_profile: false
 
 <div class="site-search">
 
+<p id="site-search-missing" class="site-search-status" hidden></p>
+
 <input
  id="site-search-input"
  class="site-search-input"
@@ -533,6 +535,17 @@ author_profile: false
 
       const params = new URLSearchParams(window.location.search);
       const initialQuery = params.get("q");
+      const missingFrom = params.get("from");
+      const missingElement = document.getElementById("site-search-missing");
+
+      if (missingFrom && missingElement) {
+        const code = document.createElement("code");
+        code.textContent = missingFrom;
+        missingElement.textContent = "The page ";
+        missingElement.appendChild(code);
+        missingElement.appendChild(document.createTextNode(" no longer exists. These are the closest matches on the site:"));
+        missingElement.hidden = false;
+      }
 
       if (initialQuery) {
         input.value = initialQuery;
