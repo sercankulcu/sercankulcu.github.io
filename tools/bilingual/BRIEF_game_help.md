@@ -20,6 +20,17 @@ Repo `C:\Users\Sercan\Documents\GitHub\sercankulcu.github.io` (Jekyll, GitHub Pa
 - Panel text in the page's language. Keep it compact (≈ 110–140 px high, scroll inside). It must not cover the board or push controls off screen at 1280×900 and on a phone width (≈ 380 px).
 - If the game has AI vs AI or a hint mode, the panel should work there too.
 
+## Board size (strict)
+While "Show move reasoning" is **off** the page must look exactly as before: same board size and position (the games are projected in class). If the panel needs room, put it in the side column, or shrink the board **only while the panel is on** (a class on the game root toggled by the checkbox, sizes conditional on it). Compare off-state screenshots/bounding boxes with the original.
+
+## Rule-based opponents (second group: Nim, Don't Say 21, Hex, Poker, Pişti, Hokm, Rock–Paper–Scissors)
+These computers do not search a game tree; they apply a rule, a heuristic or a probability estimate. Same four tabs and same panel idea, adapted:
+- **How the AI decides**: state the rule exactly as the code applies it, then say whether it is optimal, why (or why not), and what game-theory idea it illustrates (winning/losing positions and backward induction for Nim / Don't Say 21; heuristics vs. strategy-stealing for Hex; expected value, hand strength and bluffing for Poker; card counting / expected gain for Pişti and Hokm; mixed strategies, Nash equilibrium and exploiting a predictable opponent for Rock–Paper–Scissors). Worked example with real numbers from the code.
+- **Panel**: show the computation behind each computer decision — e.g. the nim-sum in binary and the move that makes it 0 (or "losing position, random move"); the target total mod 4; the candidate cells and their heuristic scores; the estimated hand strength / pot odds and the resulting fold/call/raise rule; each playable card with its score; the opponent-history counts or prediction and the chosen reply. Highlight the chosen option. If randomness is involved, say so ("random among …").
+- Related decks: Chapter 1 games → TR `Bolum_01_Karar_Kurami.html` / EN `Chapter_01_Decision_Theory.html`; Chapter 2 games → TR `Bolum_02_Oyunlar_ve_Temsiller.html` / EN `Chapter_02_Games_and_Representations.html` (and the Minimax deck where backward induction is used); Chapter 3 → TR `Bolum_03_Nash_Dengesi.html` / EN `Chapter_03_Nash_Equilibrium.html`.
+- Python: the course repos have `Chapter02/nim_xor.py` and `Chapter02/dont_say_21.py` (EN repo; TR repo `Bolum02/…`) — reuse their names; Chapter01/03 files (`value.py`, `bayes.py`, `mixed_2x2.py`, …) for style.
+- Card games: keep the cards and TL as they are. The panel must not spoil play: never show the human's hidden cards, and do not list the computer's hidden hand while the hand is in progress — show the computed quantities (hand-strength estimate, scores of the option types, the rule that fired) and the card actually played. Showing the full detail after the hand ends is fine.
+
 ## Page rules (strict — the live site breaks otherwise)
 - Inline `<script>`: **no `//` comments** (use `/* */`), never `{{` or `{%` anywhere in the file, no `:word:` patterns (jemoji). Run `node --check` on every inline script you touched (extract to a temp .js).
 - Do not touch the `ds-guard` block. Keep the front matter; don't rename files.
