@@ -1,0 +1,418 @@
+---
+layout: without-sidebar
+title: "String Pool"
+permalink: /files/java/slides/Chapter_03_String-Pool.html
+excerpt: "String literals shared in the pool, == versus equals, new String and intern, compile-time constants, immutable String creating new objects with +, and StringBuilder growing one buffer, line by line in memory."
+lang: en
+seo_title: "String Pool · Object-Oriented Programming with Java, Chapter 3"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/java-ile-nesne-yonelimli-programlama.jpg
+hreflang:
+  tr: /files/java/sunumlar/Bolum_03_String-Pool.html
+  en: /files/java/slides/Chapter_03_String-Pool.html
+resource: "Interactive simulation"
+course:
+  name: "Object-Oriented Programming with Java"
+  url: "/teaching/object-oriented-programming-with-java/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-sp, .jv-sp-dlg { --ds-accent:#a61b1b; }
+html[data-theme="dark"] .jv-sp, html[data-theme="dark"] .jv-sp-dlg { --ds-accent:#f07a7a; }
+.jv-sp .sp-wrap { display:grid; grid-template-rows:34px minmax(0,1fr) 80px; gap:8px; height:100%; }
+.jv-sp .bar { display:flex; align-items:center; gap:6px; min-width:0; }
+.jv-sp .bar select { width:214px; min-height:32px; font-size:13.5px; }
+.jv-sp .bar button { min-height:32px; padding:0 11px; font-size:13.5px; white-space:nowrap; }
+.jv-sp .bar #spPlay { width:84px; }
+.jv-sp .bar #spStep { width:80px; }
+.jv-sp .bar input[type="range"] { width:64px; }
+.jv-sp .bar .check { display:flex; align-items:center; gap:5px; margin-left:4px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.jv-sp .bar .score { margin-left:auto; color:var(--ds-muted); font-size:13px; font-weight:700; white-space:nowrap; }
+.jv-sp .bar .score b { color:var(--ds-text); }
+.jv-sp .mid { display:grid; grid-template-columns:376px minmax(0,1fr); gap:8px; min-height:0; }
+.jv-sp .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); overflow:hidden; }
+.jv-sp .cap { display:flex; justify-content:space-between; margin:0; padding:3px 8px 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:var(--ds-surface-strong); }
+.jv-sp .cap span:last-child { text-transform:none; letter-spacing:0; }
+.jv-sp .code { flex:1; min-height:0; margin:0; padding:3px 0; overflow:hidden; font:12px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.jv-sp .code li { margin:0; padding:0 4px 0 0; line-height:1.5; white-space:pre; counter-increment:ln; }
+.jv-sp .code li::before { content:counter(ln); display:inline-block; width:22px; margin-right:7px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.jv-sp .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.jv-sp .mem { flex:1; min-height:0; width:100%; display:block; }
+.jv-sp .mem text { font:12px ui-monospace, Consolas, monospace; fill:var(--ds-text); }
+.jv-sp .mem .lbl { font:800 12px system-ui, sans-serif; fill:var(--ds-muted); letter-spacing:.05em; }
+.jv-sp .mem .fr { fill:var(--ds-surface); stroke:var(--ds-accent); stroke-width:2; }
+.jv-sp .mem .fh { fill:var(--ds-hot); }
+.jv-sp .mem .pool { fill:color-mix(in srgb, var(--ds-good) 8%, var(--ds-bg)); stroke:var(--ds-good); stroke-width:1.5; stroke-dasharray:6 4; }
+.jv-sp .mem .poollbl { font:800 12px system-ui, sans-serif; fill:var(--ds-good); }
+.jv-sp .mem .ob { fill:var(--ds-node); stroke:var(--ds-link); stroke-width:1.5; }
+.jv-sp .mem .ob.new { stroke:var(--ds-accent); stroke-width:2.4; }
+.jv-sp .mem g.dead { opacity:.55; }
+.jv-sp .mem g.dead .ob { fill:var(--ds-bg); stroke:var(--ds-muted); stroke-dasharray:5 4; }
+.jv-sp .mem .cell { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1; }
+.jv-sp .mem .cell.used { fill:color-mix(in srgb, var(--ds-link) 22%, var(--ds-bg)); }
+.jv-sp .mem .sep { stroke:var(--ds-border); stroke-width:1; }
+.jv-sp .mem .hot { fill:var(--ds-accent); font-weight:700; }
+.jv-sp .mem .mut { fill:var(--ds-muted); }
+.jv-sp .mem .gc { font:700 12px system-ui, sans-serif; fill:var(--ds-bad); }
+.jv-sp .mem .dot { fill:var(--ds-link); }
+.jv-sp .mem .dot.h { fill:var(--ds-accent); }
+.jv-sp .mem .ar { fill:none; stroke:var(--ds-link); stroke-width:1.6; }
+.jv-sp .mem .ar.h { stroke:var(--ds-accent); stroke-width:2.4; }
+.jv-sp .mem .ah { fill:var(--ds-link); }
+.jv-sp .mem .ah.h { fill:var(--ds-accent); }
+.jv-sp .bot { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:8px; min-height:0; }
+.jv-sp .why { margin:0; padding:5px 10px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.33; }
+.jv-sp .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.jv-sp .qbtns button { min-height:24px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.jv-sp .out { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end; margin:0; padding:1px 8px 2px; overflow:hidden; background:var(--ds-surface); font:12px/1.25 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-all; }
+</style>
+
+<div class="jv-sp agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 3 · Simulation</p><h1>String Pool and StringBuilder</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="sp-help" aria-label="Help and instructions">?</button>
+    <a class="agt-oyun__back" href="Chapter_03_04_Strings.html">← Chapter 3</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="sp-wrap">
+      <div class="bar">
+        <select id="spProg" aria-label="Choose a program"></select>
+        <button type="button" id="spBack" aria-label="One step back">◀</button>
+        <button type="button" id="spStep" class="is-primary" aria-label="One step forward">Step ▶</button>
+        <button type="button" id="spPlay" aria-label="Play or pause">Play</button>
+        <button type="button" id="spReset" aria-label="Back to start">Reset</button>
+        <input type="range" id="spSpeed" min="1" max="5" value="3" aria-label="Playback speed" title="Speed">
+        <label class="check"><input type="checkbox" id="spQuiz"> Try it yourself</label>
+        <span class="score" aria-live="polite">Correct <b id="spOk">0</b> / <b id="spAll">0</b></span>
+      </div>
+      <div class="mid">
+        <div class="pane"><p class="cap"><span>Java code</span><span id="spNo"></span></p><ol class="code" id="spCode" aria-label="Java code"></ol></div>
+        <div class="pane"><p class="cap"><span>Memory</span><span id="spMemCap"></span></p><svg class="mem" id="spMem" viewBox="0 0 370 372" role="img" aria-label="Stack, heap and string pool"></svg></div>
+      </div>
+      <div class="bot">
+        <div class="why" id="spWhy" aria-live="polite"></div>
+        <div class="pane"><p class="cap"><span>Output (console)</span></p><div class="out" id="spOut" aria-label="Program output"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-sp-dlg" id="sp-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>String Pool and StringBuilder</h2>
+    <p><b>Purpose:</b> see how Java keeps strings in memory. <b>String literals</b> such as <code>"Java"</code> in the source code are kept in a special region of the heap, the <b>string pool</b>, and literals with the same content share one object. <code>String</code> is <b>immutable</b>: every "change" creates a new object. <code>StringBuilder</code>, on the other hand, modifies the same buffer in place.</p>
+    <h3>How to use it</h3>
+    <ol>
+      <li>Pick a program from the list; use <b>Step ▶</b> / <b>◀</b> (→ / ← on the keyboard), <b>Play</b>, <b>Reset</b>.</li>
+      <li>On the left is the <code>main</code> frame on the stack; on the right is the heap: the region with the green dashed outline is the string pool. A newly created object has a red outline; an unreachable object is faded and dashed (eligible for garbage collection).</li>
+      <li>While <b>Try it yourself</b> is on, you predict each <code>println</code> output in advance.</li>
+    </ol>
+    <h3>Reminders</h3>
+    <ul>
+      <li><code>==</code> checks whether two references point to <b>the same object</b>; <code>equals</code> compares the contents. Always compare strings with <code>equals</code>.</li>
+      <li><code>new String("Java")</code> creates a new object, independent of the literal in the pool. <code>s.intern()</code> returns its equivalent in the pool.</li>
+      <li>Expressions that can be computed at compile time (<code>"Ja" + "va"</code>, concatenation with a <code>final</code> variable) become a single literal and go to the pool; a <code>+</code> with a variable at run time creates a new object.</li>
+      <li>Methods such as <code>s.toUpperCase()</code> do not change <code>s</code>; to use the result you have to assign it: <code>s = s.toUpperCase();</code></li>
+      <li>A <code>StringBuilder</code> has a length (<code>length</code>) and a buffer size (<code>capacity</code>); for <code>new StringBuilder("Ja")</code> the capacity is 16 + 2 = 18. For concatenation in a loop, use <code>StringBuilder</code> instead of <code>String +</code>.</li>
+    </ul>
+    <p>The object numbers (#1, #2…) are for explanation only. Exactly when a literal is added to the pool depends on the JVM; here it is shown at the line where it is first used. All outputs were verified by compiling with <code>javac --release 8</code> and running on Java 8.</p>
+    <p>Related slides: <a href="Chapter_03_04_Strings.html">Chapter 3.4 · Strings</a> (Comparing with ==, The String Pool, Pool Step by Step, Immutability, StringBuilder).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. All rights reserved. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function R(id) { return { r: id }; }
+    function Tracer() {
+      var S = { v: [], heap: [], out: "" }, ev = [], pc = 0, hc = 0;
+      function obj(id) { for (var i = 0; i < S.heap.length; i++) if (S.heap[i].id === id) return S.heap[i]; }
+      var T = {
+        /* literal in the pool: if present, the same one is returned */
+        lit: function (s) { for (var i = 0; i < S.heap.length; i++) if (S.heap[i].pool && S.heap[i].val === s) return S.heap[i].id; var id = S.heap.length + 1; S.heap.push({ id: id, kind: "str", val: s, pool: true, slot: pc++ }); return id; },
+        str: function (s) { var id = S.heap.length + 1; S.heap.push({ id: id, kind: "str", val: s, pool: false, slot: hc++ }); return id; },
+        sb: function (s, cap) { var id = S.heap.length + 1; S.heap.push({ id: id, kind: "sb", val: s, cap: cap, pool: false, slot: hc }); hc += 6; return id; },
+        val: function (id) { return obj(id).val; },
+        setsb: function (id, s) { obj(id).val = s; },
+        set: function (name, val, type) { for (var i = 0; i < S.v.length; i++) if (S.v[i][1] === name) { S.v[i][2] = val; return; } S.v.push([type, name, val]); },
+        drop: function (name) { S.v = S.v.filter(function (v) { return v[1] !== name; }); },
+        get: function (name) { for (var i = 0; i < S.v.length; i++) if (S.v[i][1] === name) return S.v[i][2]; },
+        print: function (s) { S.out += s + "\n"; },
+        snap: function (line, why, x) { var e = JSON.parse(JSON.stringify(S)); e.line = line; e.why = why; for (var k in x || {}) e[k] = x[k]; ev.push(e); },
+        get events() { return ev; }, get out() { return S.out; }
+      };
+      return T;
+    }
+    function Q(text, right, alts) { var o = [String(right)]; alts.forEach(function (a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); }); return { text: text, opts: o, ans: 0 }; }
+    function wrap(body) { return ["public class Main {", "    public static void main(String[] args) {"].concat(body.map(function (l) { return "        " + l; }), ["    }", "}"]); }
+    function TF(b) { return b ? "true" : "false"; }
+    var PROGS = [
+      {
+        ad: "Literals, new String and intern",
+        code: wrap(["String a = \"Java\";", "String b = \"Java\";", "String c = new String(\"Java\");", "System.out.println(a == b);", "System.out.println(a == c);", "System.out.println(a.equals(c));", "String d = c.intern();", "System.out.println(a == d);"]),
+        run: function (T) {
+          T.snap(1, "main starts; there are no strings on the heap yet.");
+          var p = T.lit("Java"); T.set("a", R(p), "String");
+          T.snap(2, "\"Java\" is a string literal: it becomes a String object (#" + p + ") in the pool, and a points to it.", { hl: ["a"], nw: p });
+          T.set("b", R(T.lit("Java")), "String");
+          T.snap(3, "The same literal is reused: the pool already has \"Java\", so no new object is created. b points to #" + p + " too.", { hl: ["b"], q: Q("How many \"Java\" objects are in the pool?", 1, [2, 0]) });
+          var n = T.str("Java"); T.set("c", R(n), "String");
+          T.snap(4, "new String(\"Java\"): even though the content is the same, this is a brand-new object OUTSIDE the pool (#" + n + "). new always means a new object.", { hl: ["c"], nw: n });
+          T.print("true"); T.snap(5, "a == b → true: both references point to the SAME object (#" + p + ").", { hl: ["a", "b"], q: Q("What does a == b print?", "true", ["false"]), printed: true });
+          T.print("false"); T.snap(6, "a == c → false: the contents are the same but the objects differ (#" + p + " and #" + n + "). == compares references, not contents.", { hl: ["a", "c"], q: Q("What does a == c print?", "false", ["true"]), printed: true });
+          T.print("true"); T.snap(7, "a.equals(c) → true: equals compares the characters one by one. Always compare strings with equals.", { hl: ["a", "c"], q: Q("What does a.equals(c) print?", "true", ["false"]), printed: true });
+          T.set("d", R(p), "String");
+          T.snap(8, "c.intern(): if the pool has an object with the content \"Java\", it returns that one → #" + p + ". d now points to the pooled object.", { hl: ["d"], q: Q("Which object does d point to?", "#" + p + " (pool)", ["#" + n + " (new)", "a new object"]) });
+          T.print("true"); T.snap(9, "a == d → true: both are the same object in the pool.", { hl: ["a", "d"], q: Q("What does a == d print?", "true", ["false"]), printed: true });
+        }
+      },
+      {
+        ad: "Immutability: + and toUpperCase",
+        code: wrap(["String s = \"Ja\";", "String t = s;", "s = s + \"va\";", "System.out.println(t);", "System.out.println(s == \"Java\");", "s.toUpperCase();", "System.out.println(s);", "s = s.toUpperCase();", "System.out.println(s);"]),
+        run: function (T) {
+          T.snap(1, "main starts.");
+          var ja = T.lit("Ja"); T.set("s", R(ja), "String");
+          T.snap(2, "s points to the pooled literal \"Ja\" (#" + ja + ").", { hl: ["s"], nw: ja });
+          T.set("t", R(ja), "String");
+          T.snap(3, "t = s: the reference is copied; t points to #" + ja + " too.", { hl: ["t"] });
+          var va = T.lit("va"), j = T.str("Java"); T.set("s", R(j), "String");
+          T.snap(4, "s + \"va\": #" + ja + " does NOT change. At run time a new String (#" + j + ", \"Java\") is created, on the ordinary heap, not in the pool. s now points to it, while t still points to \"Ja\".", { hl: ["s"], nw: j });
+          T.print("Ja"); T.snap(5, "t points to \"Ja\": because String is immutable, what was done through s did not affect t.", { hl: ["t"], q: Q("What does System.out.println(t) print?", "Ja", ["Java"]), printed: true });
+          var lj = T.lit("Java");
+          T.print("false"); T.snap(6, "The literal \"Java\" enters the pool (#" + lj + "). s points to #" + j + ", which was created by +: different objects → false.", { hl: ["s"], nw: lj, q: Q("What does s == \"Java\" print?", "false", ["true"]), printed: true });
+          var up = T.str("JAVA");
+          T.snap(7, "s.toUpperCase() returns a new object (#" + up + ", \"JAVA\"), but the result is not assigned to any variable. The object becomes unreachable at once; s did not change.", { nw: up });
+          T.print("Java"); T.snap(8, "s is still \"Java\".", { hl: ["s"], q: Q("What does System.out.println(s) print?", "Java", ["JAVA", "Ja"]), printed: true });
+          var up2 = T.str("JAVA"); T.set("s", R(up2), "String");
+          T.snap(9, "s = s.toUpperCase(): this time the new object (#" + up2 + ") is assigned to s. No reference to the old #" + j + " is left.", { hl: ["s"], nw: up2 });
+          T.print("JAVA"); T.snap(10, "\"JAVA\" is printed. \"Changing\" a string really means creating a new object and pointing the reference at it.", { hl: ["s"], q: Q("What is printed?", "JAVA", ["Java"]), printed: true });
+        }
+      },
+      {
+        ad: "Compile-time constants",
+        code: wrap(["String a = \"Java\";", "String b = \"Ja\" + \"va\";", "String k = \"Ja\";", "String c = k + \"va\";", "final String f = \"Ja\";", "String d = f + \"va\";", "System.out.println(a == b);", "System.out.println(a == c);", "System.out.println(a == d);", "System.out.println(a == c.intern());"]),
+        run: function (T) {
+          T.snap(1, "main starts.");
+          var p = T.lit("Java"); T.set("a", R(p), "String");
+          T.snap(2, "a points to the pooled \"Java\" (#" + p + ").", { hl: ["a"], nw: p });
+          T.set("b", R(p), "String");
+          T.snap(3, "\"Ja\" + \"va\" joins two literals: the compiler turns it into the literal \"Java\" at compile time. There is no concatenation at run time; b is #" + p + " too.", { hl: ["b"], q: Q("Which object does b point to?", "#" + p + " (the pooled \"Java\")", ["a new object"]) });
+          var ja = T.lit("Ja"); T.set("k", R(ja), "String");
+          T.snap(4, "k points to the pooled \"Ja\" (#" + ja + "). k is a variable; for the compiler its value is not a constant.", { hl: ["k"], nw: ja });
+          T.lit("va"); var c = T.str("Java"); T.set("c", R(c), "String");
+          T.snap(5, "k + \"va\" is computed at run time → a new object (#" + c + "), outside the pool.", { hl: ["c"], nw: c });
+          T.set("f", R(ja), "String");
+          T.snap(6, "final String f = \"Ja\": a final variable initialized with a constant expression is a compile-time constant.", { hl: ["f"] });
+          T.set("d", R(p), "String");
+          T.snap(7, "f + \"va\" becomes \"Java\" at compile time → the pooled #" + p + ". No new object.", { hl: ["d"], q: Q("Which object does d point to?", "#" + p + " (the pooled \"Java\")", ["a new object"]) });
+          T.print("true"); T.snap(8, "a == b → true (the same pooled object).", { hl: ["a", "b"], q: Q("What does a == b print?", "true", ["false"]), printed: true });
+          T.print("false"); T.snap(9, "a == c → false: c was created at run time.", { hl: ["a", "c"], q: Q("What does a == c print?", "false", ["true"]), printed: true });
+          T.print("true"); T.snap(10, "a == d → true: d is a compile-time constant.", { hl: ["a", "d"], q: Q("What does a == d print?", "true", ["false"]), printed: true });
+          T.print("true"); T.snap(11, "c.intern() returns the pooled equivalent (#" + p + ") → true.", { hl: ["a", "c"], q: Q("What does a == c.intern() print?", "true", ["false"]), printed: true });
+        }
+      },
+      {
+        ad: "StringBuilder: the same buffer",
+        code: wrap(["StringBuilder sb = new StringBuilder(\"Ja\");", "StringBuilder r = sb;", "sb.append(\"va\");", "sb.append('!');", "System.out.println(r);", "String s = sb.toString();", "sb.reverse();", "System.out.println(sb);", "System.out.println(s);", "System.out.println(sb.capacity());"]),
+        run: function (T) {
+          T.snap(1, "main starts.");
+          T.lit("Ja"); var b = T.sb("Ja", 18); T.set("sb", R(b), "StringBuilder");
+          T.snap(2, "new StringBuilder(\"Ja\"): a mutable buffer (#" + b + ") on the heap. Capacity = 16 + 2 = 18 characters; 2 of them are used for now.", { hl: ["sb"], nw: b });
+          T.set("r", R(b), "StringBuilder");
+          T.snap(3, "r = sb: both point to the same StringBuilder object.", { hl: ["r"] });
+          T.lit("va"); T.setsb(b, "Java");
+          T.snap(4, "sb.append(\"va\"): NO new object is created; the characters are written into the empty cells of the same buffer. Length 4.", { hl: ["sb"], ch: b });
+          T.setsb(b, "Java!");
+          T.snap(5, "sb.append('!'): the same object again; length 5, capacity still 18.", { hl: ["sb"], ch: b });
+          T.print("Java!"); T.snap(6, "r points to the same object, so it sees the change: \"Java!\".", { hl: ["r"], q: Q("What does System.out.println(r) print?", "Java!", ["Ja", "Java"]), printed: true });
+          var s = T.str("Java!"); T.set("s", R(s), "String");
+          T.snap(7, "sb.toString(): a new, immutable String (#" + s + ") that is a copy of the buffer's current content.", { hl: ["s"], nw: s });
+          T.setsb(b, "!avaJ");
+          T.snap(8, "sb.reverse(): the buffer is reversed in place. s is a separate object, so it is not affected.", { hl: ["sb"], ch: b });
+          T.print("!avaJ"); T.snap(9, "\"!avaJ\" is printed.", { hl: ["sb"], q: Q("What does System.out.println(sb) print?", "!avaJ", ["Java!"]), printed: true });
+          T.print("Java!"); T.snap(10, "s is the copy made at the time of toString(): \"Java!\".", { hl: ["s"], q: Q("What does System.out.println(s) print?", "Java!", ["!avaJ"]), printed: true });
+          T.print("18"); T.snap(11, "capacity() → 18: the buffer is big enough for 5 characters, so it did not need to grow.", { hl: ["sb"], q: Q("What does sb.capacity() print?", 18, [5, 16]), printed: true });
+        }
+      },
+      {
+        ad: "String concatenation in a loop",
+        code: wrap(["String s = \"\";", "for (int i = 0; i < 3; i++) {", "    s = s + i;", "}", "System.out.println(s);"]),
+        run: function (T) {
+          T.snap(1, "main starts.");
+          var e = T.lit(""); T.set("s", R(e), "String");
+          T.snap(2, "s points to the empty string literal (\"\").", { hl: ["s"], nw: e });
+          var cur = "";
+          for (var i = 0; i < 3; i++) {
+            T.set("i", i, "int");
+            T.snap(3, (i ? "i++ → " + i + ". " : "i = 0. ") + i + " < 3 → true.", { hl: ["i"] });
+            cur += i; var n = T.str(cur); T.set("s", R(n), "String");
+            T.snap(4, "s + i: \"" + cur.slice(0, -1) + "\" does not change; a brand-new object (#" + n + ", \"" + cur + "\") is created." + (i ? " The previous intermediate result became garbage." : ""), { hl: ["s"], nw: n, q: i === 2 ? Q("How many new String objects were created during the loop?", 3, [1, 2]) : null });
+          }
+          T.set("i", 3, "int");
+          T.snap(3, "i++ → 3. 3 < 3 → false: the loop ends (i is defined only inside the loop).", { hl: ["i"] });
+          T.drop("i");
+          T.print("012"); T.snap(6, "\"012\" is printed. A new object every round: n rounds mean n intermediate objects and n copies. In long loops, StringBuilder avoids this waste with a single buffer.", { q: Q("What is printed?", "012", ["3", "0 1 2"]), printed: true });
+        }
+      }
+    ];
+    function trace(prog) {
+      var T = Tracer(); prog.run(T);
+      return { events: T.events, out: T.out, code: prog.code };
+    }
+    return { PROGS: PROGS, trace: trace, TF: TF };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-sp");
+  var RS = null, k = 0, timer = null, answered = {}, ok = 0, all = 0;
+  Core.PROGS.forEach(function (pr, i) { var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("spProg").appendChild(o); });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+  function load() {
+    stop();
+    RS = Core.trace(Core.PROGS[E("spProg").value]);
+    k = 0; answered = {};
+    RS.events.forEach(function (e) { if (e.q) { var o = e.q.opts.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.q.order = o; } });
+    E("spCode").innerHTML = RS.code.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+    draw();
+  }
+  function needQ() { var e = RS.events[k]; return E("spQuiz").checked && e.q && !answered[k]; }
+
+  /* ---- memory ---- */
+  var W = 370, H = 372, SX = 6, SW = 128, HX = 154, BW = 66, CG = 7, PY = 30, HY = 156;
+  function drawMem(e) {
+    var h = [], arrows = [], pos = {}, live = {}, hl = e.hl || [];
+    e.v.forEach(function (v) { if (v[2] && v[2].r) live[v[2].r] = true; });
+    h.push('<defs><marker id="spAh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>' +
+      '<marker id="spAhH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah h" d="M0,0 L10,5 L0,10 z"/></marker></defs>');
+    h.push('<text class="lbl" x="' + SX + '" y="14">STACK</text><text class="lbl" x="' + HX + '" y="14">HEAP</text>');
+    h.push('<rect class="pool" x="' + (HX - 4) + '" y="' + (PY - 10) + '" width="' + (W - HX) + '" height="' + (HY - PY - 4) + '" rx="9"/><text class="poollbl" x="' + (W - 8) + '" y="' + (PY + 4) + '" text-anchor="end">string pool</text>');
+    var ps = 0;
+    e.heap.forEach(function (o) {
+      var x, y, w, hh = 34, dead = !o.pool && !live[o.id];
+      if (o.pool) { x = HX + (o.slot % 3) * (BW + CG); y = PY + 12 + Math.floor(o.slot / 3) * 44; w = BW; }
+      else if (o.kind === "sb") { x = HX; y = HY + 6 + Math.floor(o.slot / 3) * 50; w = W - HX - 4; hh = 64; }
+      else { x = HX + (o.slot % 3) * (BW + CG); y = HY + 6 + Math.floor(o.slot / 3) * 50; w = BW; }
+      pos[o.id] = { x: x, y: y, h: hh };
+      var nw = e.nw === o.id || e.ch === o.id;
+      h.push('<g class="' + (dead ? "dead" : "") + '"><rect class="ob' + (nw ? " new" : "") + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + hh + '" rx="7"/>');
+      if (o.kind === "str") {
+        h.push('<text class="mut" x="' + (x + 5) + '" y="' + (y + 13) + '">#' + o.id + "</text><text x=\"" + (x + w / 2) + '" y="' + (y + 28) + '" text-anchor="middle" font-weight="700">' + esc('"' + o.val + '"') + "</text>");
+        if (dead) h.push('<text class="gc" x="' + x + '" y="' + (y + hh + 13) + '">garbage</text>');
+      } else {
+        h.push('<text class="mut" x="' + (x + 5) + '" y="' + (y + 13) + '">#' + o.id + ' StringBuilder</text>' +
+          '<text class="mut" x="' + (x + 7) + '" y="' + (y + 58) + '" style="font-family:system-ui,sans-serif">length ' + o.val.length + " · capacity " + o.cap + "</text>");
+        var cw = (w - 14) / o.cap;
+        for (var i = 0; i < o.cap; i++) {
+          var cx = x + 7 + i * cw;
+          h.push('<rect class="cell' + (i < o.val.length ? " used" : "") + '" x="' + cx + '" y="' + (y + 20) + '" width="' + cw + '" height="24"/>');
+          if (i < o.val.length) h.push('<text x="' + (cx + cw / 2) + '" y="' + (y + 36) + '" text-anchor="middle" font-weight="700">' + esc(o.val[i]) + "</text>");
+        }
+      }
+      h.push("</g>");
+    });
+    /* stack: the main frame at the bottom */
+    var rows = Math.max(1, e.v.length), fh = 21 + 20 * rows, y = H - 6 - fh;
+    h.push('<rect class="fr" x="' + SX + '" y="' + y + '" width="' + SW + '" height="' + fh + '" rx="7"/><rect class="fh" x="' + (SX + 1.5) + '" y="' + (y + 1.5) + '" width="' + (SW - 3) + '" height="18" rx="6"/><text x="' + (SX + 6) + '" y="' + (y + 14) + '" font-weight="700">main</text>');
+    if (!e.v.length) h.push('<text class="mut" x="' + (SX + 8) + '" y="' + (y + 35) + '" style="font-family:system-ui,sans-serif">(no locals)</text>');
+    e.v.forEach(function (v, j) {
+      var ry = y + 21 + j * 20, isH = hl.indexOf(v[1]) >= 0, t = v[0] === "StringBuilder" ? "SB" : v[0];
+      h.push('<text x="' + (SX + 6) + '" y="' + (ry + 14) + '"' + (isH ? ' class="hot"' : "") + '><tspan class="mut">' + esc(t) + "</tspan> " + esc(v[1]) + "</text>");
+      if (v[2] && v[2].r) { h.push('<circle class="dot' + (isH ? " h" : "") + '" cx="' + (SX + SW - 12) + '" cy="' + (ry + 10) + '" r="3.5"/>'); arrows.push({ sx: SX + SW - 12, sy: ry + 10, to: v[2].r, hot: isH }); }
+      else h.push('<text x="' + (SX + SW - 7) + '" y="' + (ry + 14) + '" text-anchor="end"' + (isH ? ' class="hot"' : "") + ">" + esc(v[2]) + "</text>");
+    });
+    arrows.forEach(function (a) {
+      var t = pos[a.to]; if (!t) return;
+      var tx = t.x - 1, ty = t.y + Math.min(17, t.h / 2);
+      h.push('<path class="ar' + (a.hot ? " h" : "") + '" d="M' + a.sx + "," + a.sy + " C" + (a.sx + 30) + "," + a.sy + " " + (tx - 30) + "," + ty + " " + tx + "," + ty + '" marker-end="url(#' + (a.hot ? "spAhH" : "spAh") + ')"/>');
+    });
+    E("spMem").innerHTML = h.join("");
+    var np = e.heap.filter(function (o) { return o.pool; }).length, nd = e.heap.filter(function (o) { return !o.pool && !live[o.id]; }).length;
+    E("spMemCap").textContent = np + " in pool · " + (e.heap.length - np) + " on heap" + (nd ? " (" + nd + " garbage)" : "");
+  }
+
+  function draw() {
+    var e = RS.events[k], q = needQ(), shown = q ? RS.events[k - 1] || e : e;
+    [].forEach.call(E("spCode").children, function (li, i) { li.classList.toggle("is-cur", i === e.line); });
+    drawMem(q && !e.printed ? shown : e);
+    if (q) E("spWhy").innerHTML = "<b>Predict:</b> " + esc(e.q.text) + '<div class="qbtns">' + e.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(e.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    else E("spWhy").innerHTML = (e.fb || "") + esc(e.why);
+    var out = q && e.printed ? shown.out : e.out;
+    E("spOut").innerHTML = out ? out.replace(/\n$/, "").split("\n").slice(-4).map(function (l) { return "<div>" + esc(l) + "</div>"; }).join("") : "";
+    E("spNo").textContent = "Step " + (k + 1) + " / " + RS.events.length;
+    E("spBack").disabled = k === 0;
+    E("spReset").disabled = k === 0;
+    E("spStep").disabled = q || k >= RS.events.length - 1;
+    E("spPlay").disabled = E("spStep").disabled && !timer;
+    E("spPlay").textContent = timer ? "Pause" : "Play";
+    if (q) { var b = E("spWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function go(d) { k = Math.max(0, Math.min(RS.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [2000, 1400, 950, 600, 300][E("spSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= RS.events.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= RS.events.length - 1) { stop(); draw(); return; }
+      go(1);
+      if (needQ()) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+  E("spWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = RS.events[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("spOk").textContent = ok; E("spAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Correct!</b> ' : '<b class="agt-oyun__bad">Wrong.</b> The answer: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    draw();
+    E("spStep").focus();
+  });
+  E("spProg").addEventListener("change", load);
+  E("spStep").addEventListener("click", function () { stop(); go(1); });
+  E("spBack").addEventListener("click", function () { stop(); go(-1); });
+  E("spReset").addEventListener("click", function () { stop(); k = 0; answered = {}; RS.events.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("spPlay").addEventListener("click", play);
+  E("spSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("spQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName) && ev.target.type !== "checkbox") return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  load();
+})();
+</script>
+<script src="deck/oyun.js"></script>

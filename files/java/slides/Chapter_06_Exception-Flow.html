@@ -1,0 +1,584 @@
+---
+layout: without-sidebar
+title: "Exception Flow"
+permalink: /files/java/slides/Chapter_06_Exception-Flow.html
+excerpt: "Shows step by step, in ready-made Java scenarios, how an exception propagates through the call stack, in what order try/catch/finally blocks run, checked and unchecked exceptions, and the closing order of try-with-resources; includes an output-prediction mode."
+lang: en
+seo_title: "Exception Flow · Object-Oriented Programming with Java, Chapter 6"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/java-ile-nesne-yonelimli-programlama.jpg
+hreflang:
+  tr: /files/java/sunumlar/Bolum_06_Exception-Flow.html
+  en: /files/java/slides/Chapter_06_Exception-Flow.html
+resource: "Interactive simulation"
+course:
+  name: "Object-Oriented Programming with Java"
+  url: "/teaching/object-oriented-programming-with-java/?lang=en"
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-ex, .jv-ex-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .jv-ex, html[data-theme="dark"] .jv-ex-dlg { --ds-accent:#f07a7a; }
+.jv-ex .grid { display:grid; grid-template-columns:158px minmax(0,1fr); gap:10px; height:100%; }
+.jv-ex .side { display:flex; flex-direction:column; gap:6px; min-height:0; padding:8px 9px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.jv-ex .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.jv-ex select { width:100%; min-height:30px; padding:0 4px; font-size:12.5px; }
+.jv-ex .btns { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.jv-ex .btns button { min-height:30px; padding:0 4px; font-size:13px; }
+.jv-ex .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.jv-ex .speed input { flex:1; min-width:0; }
+.jv-ex .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.jv-ex .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.jv-ex .score div { padding:2px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-ex .score b { display:block; color:var(--ds-text); font-size:16px; }
+.jv-ex .stepno { margin-top:auto; color:var(--ds-muted); font-size:12px; font-weight:700; text-align:center; }
+.jv-ex .main { display:grid; grid-template-rows:minmax(0,1fr) 132px; gap:6px; min-height:0; min-width:0; }
+.jv-ex .top { display:grid; grid-template-columns:minmax(0,1fr) 176px; gap:6px; min-height:0; }
+.jv-ex .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.jv-ex .pane > .cap { display:flex; align-items:center; gap:6px; margin:0; padding:2px 8px 1px; }
+.jv-ex .code { flex:1; min-height:0; margin:0; padding:1px 0; overflow:hidden; font:12px/14.5px ui-monospace, Consolas, monospace; font-variant-ligatures:none; list-style:none; counter-reset:ln; }
+.jv-ex .code li { margin:0; padding:0 6px 0 0; line-height:14.5px; white-space:pre; counter-increment:ln; }
+.jv-ex .code li::before { content:counter(ln); display:inline-block; width:20px; margin-right:6px; color:var(--ds-muted); text-align:right; }
+.jv-ex .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.jv-ex .code li.is-exc { background:color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.jv-ex .code li.is-done { color:var(--ds-muted); }
+.jv-ex .right { display:flex; flex-direction:column; gap:6px; min-height:0; }
+.jv-ex .stackp { flex:none; }
+.jv-ex .exbox { margin:2px 6px 4px; padding:2px 6px; border:1.5px dashed var(--ds-border); border-radius:8px; color:var(--ds-muted); font-size:12px; line-height:1.3; }
+.jv-ex .exbox.is-fly { border-style:solid; border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 14%, var(--ds-bg)); color:var(--ds-bad); font-weight:700; }
+.jv-ex .exbox.is-caught { border-style:solid; border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 12%, var(--ds-bg)); color:var(--ds-good); font-weight:700; }
+.jv-ex .stack { display:flex; flex-direction:column-reverse; gap:4px; padding:0 6px 6px; min-height:40px; }
+.jv-ex .frame { padding:2px 6px; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-bg); font:12px/1.3 ui-monospace, Consolas, monospace; }
+.jv-ex .frame b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.jv-ex .frame .meta { display:flex; justify-content:space-between; gap:4px; color:var(--ds-muted); font:12px system-ui, sans-serif; }
+.jv-ex .frame .blk { padding:0 5px; border-radius:6px; background:var(--ds-surface-strong); color:var(--ds-text); font-weight:700; }
+.jv-ex .frame .blk.b-catch { background:color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+.jv-ex .frame .blk.b-finally { background:color-mix(in srgb, var(--ds-link) 20%, var(--ds-bg)); }
+.jv-ex .frame.is-top { border-color:var(--ds-accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--ds-accent) 22%, transparent); }
+.jv-ex .frame.is-hit { border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 12%, var(--ds-bg)); }
+.jv-ex .frame.is-dying { border-style:dashed; border-color:var(--ds-bad); opacity:.75; }
+.jv-ex .frame.is-ret { border-style:dashed; }
+.jv-ex .none { color:var(--ds-muted); font-size:12px; text-align:center; }
+.jv-ex .why { flex:1; min-height:0; margin:0; padding:5px 8px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:12.5px; line-height:1.35; }
+.jv-ex .why code { font-size:12px; }
+.jv-ex .out { flex:1; min-height:0; margin:0; padding:1px 8px; overflow:hidden; background:var(--ds-bg); font:12px/15px ui-monospace, Consolas, monospace; font-variant-ligatures:none; white-space:pre-wrap; overflow-wrap:anywhere; }
+.jv-ex .out .e { color:var(--ds-bad); }
+.jv-ex .out .muted { color:var(--ds-muted); font-family:system-ui, sans-serif; }
+.jv-ex .gbtn { min-height:22px; padding:0 9px; border-radius:7px; font:700 12px system-ui, sans-serif; }
+.jv-ex .gbtn[aria-pressed="true"] { border-color:var(--ds-link); background:var(--ds-link); color:var(--ds-bg); }
+.jv-ex .gbtn.is-pick { margin-left:auto; border-color:var(--ds-accent); color:var(--ds-accent); }
+.jv-ex [hidden] { display:none !important; }
+</style>
+
+<div class="jv-ex agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 6 · Simulation</p><h1>Exception Flow</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ex-help" aria-label="About and how to use">?</button>
+    <a class="agt-oyun__back" href="Chapter_06_Exceptions.html">← Chapter 6</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="side">
+        <div>
+          <label class="cap" for="exScen">Scenario</label>
+          <select id="exScen"></select>
+        </div>
+        <div>
+          <label class="cap" for="exVar" id="exVarCap">Value</label>
+          <select id="exVar"></select>
+        </div>
+        <div class="btns">
+          <button type="button" id="exBack" aria-label="Step back">◀ Back</button>
+          <button type="button" id="exStep" class="is-primary" aria-label="Step forward">Step ▶</button>
+          <button type="button" id="exPlay" aria-label="Play or pause">Play</button>
+          <button type="button" id="exReset" aria-label="Back to start">Reset</button>
+        </div>
+        <label class="speed">Speed <input type="range" id="exSpeed" min="1" max="5" value="3" aria-label="Playback speed"></label>
+        <label class="check"><input type="checkbox" id="exGuess"> What is the output?</label>
+        <div class="score" aria-live="polite">
+          <div>Correct<b id="exOk">0</b></div>
+          <div>Questions<b id="exAll">0</b></div>
+        </div>
+        <div class="stepno" id="exNo"></div>
+      </aside>
+
+      <section class="main">
+        <div class="top">
+          <div class="pane"><span class="cap" id="exFile" style="text-transform:none;letter-spacing:0">Java code</span><ol class="code" id="exCode" aria-label="Java code"></ol></div>
+          <div class="right">
+            <div class="pane stackp"><span class="cap" id="exStCap">Call stack</span><div class="exbox" id="exBox"></div><div class="stack" id="exStack" aria-live="polite"></div></div>
+            <div class="why" id="exWhy" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="pane">
+          <span class="cap"><span id="exOutCap">Output (console)</span><span id="exG" hidden><button type="button" class="gbtn" data-g="0" aria-pressed="true">A</button> <button type="button" class="gbtn" data-g="1" aria-pressed="false">B</button> <button type="button" class="gbtn" data-g="2" aria-pressed="false">C</button></span><button type="button" class="gbtn is-pick" id="exPick" hidden>Choose this output</button></span>
+          <pre class="out" id="exOut" aria-label="Program output"></pre>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-ex-dlg" id="ex-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>Exception Flow</h2>
+    <p><b>Goal:</b> see which lines are skipped when an exception is thrown, which methods the exception passes through as it propagates along the <b>call stack</b>, and in what order the <code>try</code>, <code>catch</code> and <code>finally</code> blocks run.</p>
+    <h3>How to use it</h3>
+    <ol>
+      <li>Choose a scenario and a value or version on the left. <b>Step ▶</b> / <b>◀ Back</b> (keyboard → / ←), <b>Play</b>, <b>Reset</b>.</li>
+      <li>In the code in the middle the current line is highlighted; the red line is where the exception is thrown. On the right the stack grows from bottom to top; each frame shows which block (<code>try</code>, <code>catch</code>, <code>finally</code>) the method is in. A frame with a dashed outline is a method that is about to be thrown off the stack because of the exception.</li>
+      <li>With <b>What is the output?</b> on, you look at the candidates A, B and C before the program runs and choose the correct output.</li>
+    </ol>
+    <h3>Rules</h3>
+    <ul>
+      <li>When an exception is thrown, the remaining lines of that block do not run. The JVM searches from the inside out for the first <code>catch</code> block whose type matches; every method that has none is thrown off the stack.</li>
+      <li><code>finally</code> runs in every case: when the block ends normally, when it is left with <code>return</code>, and when an exception passes through uncaught.</li>
+      <li><code>catch</code> blocks are tried from top to bottom; a subclass must be written before its superclass, otherwise it is a compile error.</li>
+      <li><b>Checked</b> exceptions (such as <code>IOException</code>) must either be caught or declared with <code>throws</code>; the compiler enforces this. Subclasses of <code>RuntimeException</code> are <b>unchecked</b> exceptions.</li>
+      <li>An exception that is caught nowhere is caught by the JVM, which writes the stack trace to the standard error stream and terminates the program.</li>
+      <li><code>try</code>-with-resources closes the resources in the <b>reverse</b> of the order they were opened; closing happens before the <code>catch</code> and <code>finally</code> blocks.</li>
+    </ul>
+    <p>Every version of every scenario was compiled with <code>javac --release 8</code> and run on Java 8 and Java 21; the outputs shown, the stack trace line numbers and the compiler messages are taken from those runs.</p>
+    <p>Related slides: <a href="Chapter_06_Exceptions.html">Chapter 6 · Exceptions</a> (try-catch Flow, finally and return, try-with-resources, Checked Exceptions, Propagation).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. All rights reserved. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /* ---------- tracer: scenario scripts produce a list of steps ---------- */
+  function Tracer() {
+    var st = [], out = [], ev = [], ex = null, caught = null;
+    function top() { return st[st.length - 1]; }
+    function snap(line, why, x) {
+      var e = { line: line, why: why, out: out.slice(), ex: ex, caught: caught, frames: st.map(function (f) { return { n: f.n, b: f.b, ln: f.ln, info: f.info }; }) };
+      for (var k in x || {}) e[k] = x[k];
+      ev.push(e);
+    }
+    function mv(line) { if (top()) top().ln = line; }
+    return {
+      main: function (line, why) { st.push({ n: "main", b: "", ln: line, info: "" }); snap(line, why); },
+      call: function (n, info, line, why) { st.push({ n: n, b: "", ln: line, info: info }); snap(line, why, { push: true }); },
+      at: function (line, why, x) { mv(line); snap(line, why, x); },
+      blk: function (b, line, why) { mv(line); top().b = b; if (b !== "catch") caught = null; snap(line, why); },
+      out: function (line, text, why) { mv(line); out.push({ t: text }); snap(line, why); },
+      thr: function (type, msg, line, why) { mv(line); ex = { t: type, m: msg }; caught = null; snap(line, why, { hit: true }); },
+      leave: function (line, why) { mv(line); snap(line, why, { dying: true }); st.pop(); },
+      ret: function (line, val, why) { mv(line); snap(line, why, { ret: val }); st.pop(); },
+      ctch: function (line, why) { mv(line); caught = ex; ex = null; top().b = "catch"; snap(line, why); },
+      uncaught: function (lines, why) { ex = null; st.length = 0; lines.forEach(function (l) { out.push({ t: l, e: true }); }); snap(-1, why, { fin: true }); },
+      cerr: function (lines, errs, why) { lines.forEach(function (l) { out.push({ t: l, e: true }); }); snap(errs, why, { compile: true, fin: true }); },
+      end: function (line, why) { mv(line); snap(line, why); st.length = 0; snap(-1, "The program has ended.", { fin: true }); },
+      get events() { return ev; }
+    };
+  }
+  var TRACE = function (k) { return "\tat " + k; };
+
+  var SCEN = [
+    {
+      id: "yayilim", ad: "Propagation: c → b → main", file: "Propagation.java", vcap: "argument of b(x)", vars: ["0", "2"],
+      code: function (v) {
+        return ["public class Propagation {", "  static void c(int x) {", '    System.out.println("c started");', "    int y = 10 / x;", '    System.out.println("c finished");', "  }", "  static void b(int x) {", "    try { c(x); }", '    finally { System.out.println("b: finally"); }', '    System.out.println("b finished");', "  }", "  public static void main(String[] args) {", "    try { b(" + v + "); }", "    catch (ArithmeticException e) {", '      System.out.println("main: " + e.getMessage());', "    }", '    System.out.println("main finished");', "  }", "}"];
+      },
+      run: function (v, T) {
+        T.main(12, "The program starts in main: only main is on the stack.");
+        T.blk("try", 13, "main enters its try block and b(" + v + ") is called.");
+        T.call("b", "x = " + v, 7, "b's frame is added to the stack (x = " + v + ").");
+        T.blk("try", 8, "b also enters a try block and calls c(x). This try has no catch, only a finally.");
+        T.call("c", "x = " + v, 2, "c's frame is put on top. There is no try in c.");
+        T.out(3, "c started", "\"c started\" is printed.");
+        if (v === "0") {
+          T.thr("ArithmeticException", "/ by zero", 4, "10 / 0: an integer cannot be divided by zero. The JVM creates an ArithmeticException object and throws it; nothing after this line runs.");
+          T.leave(4, "c has no catch to handle it: the exception leaves c and c's frame is thrown off the stack. \"c finished\" is never printed.");
+          T.blk("finally", 9, "The exception has reached the try in b. There is no catch but there is a finally: finally runs even though an exception is on its way.");
+          T.out(9, "b: finally", "\"b: finally\" is printed.");
+          T.leave(9, "finally is done and the exception is still not caught: it leaves b as well. \"b finished\" is skipped.");
+          T.ctch(14, "The catch in main accepts the type ArithmeticException: the exception is caught here and the flow moves into the catch block.");
+          T.out(15, "main: / by zero", "e.getMessage() returns the exception's message: \"/ by zero\".");
+          T.blk("", 17, "After being caught, the program returns to its normal flow.");
+          T.out(17, "main finished", "\"main finished\" is printed.");
+          T.end(18, "main ends; the program terminates normally (exit code 0).");
+        } else {
+          T.at(4, "10 / 2 = 5: the division is fine, y = 5.");
+          T.out(5, "c finished", "\"c finished\" is printed.");
+          T.ret(6, undefined, "c ends normally and its frame is removed from the stack; b continues where it left off.");
+          T.blk("finally", 9, "The try block ended normally. finally runs even when there is no exception.");
+          T.out(9, "b: finally", "\"b: finally\" is printed.");
+          T.blk("", 10, "try-finally is done; execution moves to the next line.");
+          T.out(10, "b finished", "\"b finished\" is printed.");
+          T.ret(11, undefined, "b returns normally.");
+          T.at(14, "There was no exception, so the catch block in main is skipped.");
+          T.blk("", 17, "Execution moves past the try-catch.");
+          T.out(17, "main finished", "\"main finished\" is printed.");
+          T.end(18, "The program terminates normally.");
+        }
+      },
+      guess: function (v) {
+        return v === "0" ? [["c started", "b: finally", "main: / by zero", "main finished"], ["c started", "main: / by zero", "b: finally", "main finished"], ["c started", "main: / by zero", "main finished"]]
+          : [["c started", "c finished", "b: finally", "b finished", "main finished"], ["c started", "c finished", "b finished", "main finished"], ["c started", "c finished", "b finished", "b: finally", "main finished"]];
+      }
+    },
+    {
+      id: "finally", ad: "finally and return", file: "FinallyReturn.java", vcap: "argument of f(x)", vars: ["5", "0"],
+      code: function (v) {
+        return ["public class FinallyReturn {", "  static int f(int x) {", "    try {", '      System.out.println("try: x = " + x);', "      return 10 / x;", "    } catch (ArithmeticException e) {", '      System.out.println("catch: " + e.getMessage());', "      return -1;", "    } finally {", '      System.out.println("finally");', "    }", "  }", "  public static void main(String[] args) {", '    System.out.println("result: " + f(' + v + "));", "  }", "}"];
+      },
+      run: function (v, T) {
+        var x = +v;
+        T.main(13, "main starts.");
+        T.at(14, "The argument of println is evaluated first: \"result: \" + f(" + x + "). println has not run yet; f is called first.");
+        T.call("f", "x = " + x, 2, "f's frame is opened (x = " + x + ").");
+        T.blk("try", 3, "The try block is entered.");
+        T.out(4, "try: x = " + x, "\"try: x = " + x + "\" is printed.");
+        if (x !== 0) {
+          T.at(5, "return 10 / " + x + ": the return value " + 10 / x + " is prepared. But the method does not return at once: finally has to run first.", { pend: 10 / x });
+          T.blk("finally", 9, "The return is put on hold and finally runs.");
+          T.out(10, "finally", "\"finally\" is printed.");
+          T.ret(12, 10 / x, "finally is done; the pending return " + 10 / x + " is now completed and f's frame is removed.");
+          T.out(14, "result: " + 10 / x, "f(" + x + ") is replaced by " + 10 / x + "; the concatenated string is printed.");
+        } else {
+          T.thr("ArithmeticException", "/ by zero", 5, "10 / 0 → ArithmeticException. The return is never completed.");
+          T.ctch(6, "The catch of the same try catches this type; the flow moves into the catch block.");
+          T.out(7, "catch: / by zero", "\"catch: / by zero\" is printed.");
+          T.at(8, "return -1 is prepared; again finally has to run first.", { pend: -1 });
+          T.blk("finally", 9, "The return is put on hold and finally runs.");
+          T.out(10, "finally", "\"finally\" is printed.");
+          T.ret(12, -1, "finally is done; the pending return -1 is completed.");
+          T.out(14, "result: -1", "f(0) is replaced by -1; the concatenated string is printed.");
+        }
+        T.end(15, "The program terminates normally.");
+      },
+      guess: function (v) {
+        return v === "5" ? [["try: x = 5", "finally", "result: 2"], ["try: x = 5", "result: 2"], ["try: x = 5", "result: 2", "finally"]]
+          : [["try: x = 0", "catch: / by zero", "finally", "result: -1"], ["try: x = 0", "catch: / by zero", "result: -1"], ["try: x = 0", "finally", "catch: / by zero", "result: -1"]];
+      }
+    },
+    {
+      id: "catch", ad: "Which catch runs?", file: "WhichCatch.java", vcap: "string s · catch order", vars: ["\"2\" · subclass first", "\"4x2\" · subclass first", "\"7\" · subclass first", "\"4x2\" · superclass first"],
+      code: function (v) {
+        var s = v.split('"')[1], bad = v.indexOf("superclass") >= 0;
+        var nfe = ["    } catch (NumberFormatException e) {", '      System.out.println("not a number: " + s);'];
+        var rte = ["    } catch (RuntimeException e) {", "      String name = e.getClass().getSimpleName();", '      System.out.println("other: " + name);'];
+        return ["public class WhichCatch {", "  public static void main(String[] args) {", "    int[] arr = new int[3];", '    String s = "' + s + '";', "    try {", "      int n = Integer.parseInt(s);", "      arr[n] = 1;", '      System.out.println("written: " + n);'].concat(bad ? rte.concat(nfe) : nfe.concat(rte), ["    }", '    System.out.println("end");', "  }", "}"]);
+      },
+      run: function (v, T) {
+        var s = v.split('"')[1];
+        if (v.indexOf("superclass") >= 0) {
+          T.cerr(["WhichCatch.java:12: error: exception NumberFormatException has already been caught", "1 error"], [12], "Compile error: NumberFormatException is a subclass of RuntimeException. Since the first catch catches everything, the second catch can never be reached. The subclass must be written first.");
+          return;
+        }
+        T.main(2, "main starts.");
+        T.at(3, "An array with 3 elements: the valid indices are 0, 1, 2.");
+        T.at(4, "s = \"" + s + "\".");
+        T.blk("try", 5, "The try block is entered.");
+        if (s === "4x2") {
+          T.thr("NumberFormatException", 'For input string: "4x2"', 6, "When parseInt sees a character that is not a digit, it throws NumberFormatException; n is never assigned.");
+          T.ctch(9, "catch blocks are tried from top to bottom. The first one is NumberFormatException: the type matches.");
+          T.out(10, "not a number: 4x2", "\"not a number: 4x2\" is printed. The second catch is skipped.");
+        } else {
+          T.at(6, "parseInt(\"" + s + "\") → n = " + s + ".");
+          if (s === "2") {
+            T.at(7, "arr[2] = 1: a valid index.");
+            T.out(8, "written: 2", "\"written: 2\" is printed.");
+            T.at(9, "The try ended without an exception: no catch runs.");
+          } else {
+            T.thr("ArrayIndexOutOfBoundsException", "", 7, "arr[7]: the array's length is 3 → ArrayIndexOutOfBoundsException. Line 8 is skipped.");
+            T.at(9, "The first catch: NumberFormatException. This exception is not of that type → skipped.");
+            T.ctch(11, "The second catch: RuntimeException. ArrayIndexOutOfBoundsException is its subclass → match.");
+            T.at(12, "name = \"ArrayIndexOutOfBoundsException\" (the short name of the class).");
+            T.out(13, "other: ArrayIndexOutOfBoundsException", "The line is printed.");
+          }
+        }
+        T.blk("", 15, "Execution moves past the try-catch.");
+        T.out(15, "end", "\"end\" is printed.");
+        T.end(16, "The program terminates normally.");
+      },
+      guess: function (v) {
+        var C = "(compile error: the program does not run)";
+        if (v.indexOf("superclass") >= 0) return [[C], ["not a number: 4x2", "end"], ["other: NumberFormatException", "end"]];
+        var s = v.split('"')[1];
+        if (s === "2") return [["written: 2", "end"], ["written: 2"], ["other: ArrayIndexOutOfBoundsException", "end"]];
+        if (s === "4x2") return [["not a number: 4x2", "end"], ["other: NumberFormatException", "end"], ["not a number: 4x2", "other: NumberFormatException", "end"]];
+        return [["other: ArrayIndexOutOfBoundsException", "end"], ["written: 7", "end"], ["not a number: 7", "end"]];
+      }
+    },
+    {
+      id: "yakalanmayan", ad: "Uncaught exception", file: "Uncaught.java", vcap: "count", vars: ["0", "2"],
+      code: function (v) {
+        return ["public class Uncaught {", "  static int divide(int a, int b) {", "    return a / b;", "  }", "  static int average(int total, int count) {", "    try {", "      return divide(total, count);", "    } finally {", '      System.out.println("average: finally");', "    }", "  }", "  public static void main(String[] args) {", '    System.out.println("start");', "    System.out.println(average(10, " + v + "));", '    System.out.println("done");', "  }", "}"];
+      },
+      run: function (v, T) {
+        var a = +v;
+        T.main(12, "main starts.");
+        T.out(13, "start", "\"start\" is printed.");
+        T.at(14, "Before println runs, its argument is evaluated: average(10, " + a + ").");
+        T.call("average", "total = 10, count = " + a, 5, "average's frame is opened.");
+        T.blk("try", 6, "The try block is entered (no catch, but a finally).");
+        T.at(7, "divide(10, " + a + ") is called; its return value is awaited.");
+        T.call("divide", "a = 10, b = " + a, 2, "divide is on top. There are 3 frames on the stack.");
+        if (a === 0) {
+          T.thr("ArithmeticException", "/ by zero", 3, "10 / 0 → ArithmeticException.");
+          T.leave(3, "There is no try in divide: the exception leaves divide and the frame is thrown away.");
+          T.blk("finally", 8, "The try in average has no catch; finally still runs.");
+          T.out(9, "average: finally", "\"average: finally\" is printed.");
+          T.leave(9, "finally is done and the exception is not caught: it leaves average too.");
+          T.leave(14, "main has no catch either: the exception leaves main as well. \"done\" is never printed.");
+          T.uncaught(['Exception in thread "main" java.lang.ArithmeticException: / by zero', TRACE("Uncaught.divide(Uncaught.java:3)"), TRACE("Uncaught.average(Uncaught.java:7)"), TRACE("Uncaught.main(Uncaught.java:14)")],
+            "The JVM catches the exception, writes the stack trace to the standard error stream and terminates the program (exit code 1). The list shows the frames the exception passed through, from the inside out.");
+        } else {
+          T.ret(3, 10 / a, "10 / " + a + " = " + 10 / a + " is returned; divide's frame is removed.");
+          T.at(7, "return " + 10 / a + " is ready; but finally runs first.", { pend: 10 / a });
+          T.blk("finally", 8, "finally runs.");
+          T.out(9, "average: finally", "\"average: finally\" is printed.");
+          T.ret(11, 10 / a, "The pending return " + 10 / a + " is completed.");
+          T.out(14, String(10 / a), "println prints " + 10 / a + ".");
+          T.out(15, "done", "\"done\" is printed.");
+          T.end(16, "The program terminates normally.");
+        }
+      },
+      guess: function (v) {
+        var X = 'Exception in thread "main" java.lang.ArithmeticException: / by zero';
+        return v === "0" ? [["start", "average: finally", "!" + X], ["start", "!" + X], ["start", "average: finally", "!" + X, "done"]]
+          : [["start", "average: finally", "5", "done"], ["start", "5", "average: finally", "done"], ["start", "5", "done"]];
+      }
+    },
+    {
+      id: "checked", ad: "Checked exception", file: "Checked.java", vcap: "Version", vars: ["throws + try/catch", "no throws on read", "no try/catch in main", "main also declares throws"],
+      code: function (v) {
+        var i = this.vars.indexOf(v);
+        var head = ["import java.io.IOException;", "", "public class Checked {", "  static String read(String name)" + (i === 1 ? "" : " throws IOException") + " {", '    if (!name.endsWith(".txt"))', '      throw new IOException("unsupported: " + name);', '    return name + " read";', "  }"];
+        if (i <= 1) return head.concat(["  public static void main(String[] args) {", "    try {", '      System.out.println(read("note.txt"));', '      System.out.println(read("image.png"));', "    } catch (IOException e) {", '      System.out.println("error: " + e.getMessage());', "    }", '    System.out.println("end");', "  }", "}"]);
+        if (i === 2) return head.concat(["  public static void main(String[] args) {", '    System.out.println(read("note.txt"));', '    System.out.println(read("image.png"));', '    System.out.println("end");', "  }", "}"]);
+        return head.concat(["  public static void main(String[] args)", "      throws IOException {", '    System.out.println(read("note.txt"));', '    System.out.println(read("image.png"));', '    System.out.println("end");', "  }", "}"]);
+      },
+      run: function (v, T) {
+        var i = this.vars.indexOf(v);
+        if (i === 1) {
+          T.cerr(["Checked.java:6: error: unreported exception IOException; must be caught or declared to be thrown", "Checked.java:13: error: exception IOException is never thrown in body of corresponding try statement", "2 errors"], [6, 13],
+            "Compile error: IOException is a checked exception. read throws it but neither catches it nor declares it with throws. Since it is not declared, the catch in main is not valid either.");
+          return;
+        }
+        if (i === 2) {
+          T.cerr(["Checked.java:10: error: unreported exception IOException; must be caught or declared to be thrown", "Checked.java:11: error: unreported exception IOException; must be caught or declared to be thrown", "2 errors"], [10, 11],
+            "Compile error: read says throws IOException; main, which calls it, must either catch it (try/catch) or declare it with throws itself.");
+          return;
+        }
+        var L = i === 0 ? { m: 9, a: 11, b: 12 } : { m: 9, a: 11, b: 12 };
+        T.main(L.m, i === 0 ? "Compiled: read declares the exception with throws, and main has put the calls inside try/catch." : "Compiled: main also says throws IOException, leaving the responsibility to its own caller (the JVM).");
+        if (i === 0) T.blk("try", 10, "The try block is entered.");
+        T.at(L.a, "read(\"note.txt\") is called.");
+        T.call("read", 'name = "note.txt"', 4, "read's frame is opened.");
+        T.at(5, "\"note.txt\" ends with .txt: the condition is false.");
+        T.ret(7, '"note.txt read"', "The string is returned and the frame is removed.");
+        T.out(L.a, "note.txt read", "\"note.txt read\" is printed.");
+        T.at(L.b, "read(\"image.png\") is called.");
+        T.call("read", 'name = "image.png"', 4, "read is called again (a new frame).");
+        T.at(5, "\"image.png\" does not end with .txt: the condition is true.");
+        T.thr("IOException", "unsupported: image.png", 6, "IOException is thrown. This is a checked exception.");
+        T.leave(6, "read has no catch (it declared it with throws): the exception passes to the caller.");
+        if (i === 0) {
+          T.ctch(13, "The catch in main catches the IOException. The println on line 12 never ran.");
+          T.out(14, "error: unsupported: image.png", "The message is printed.");
+          T.blk("", 16, "Execution moves past the try-catch.");
+          T.out(16, "end", "\"end\" is printed.");
+          T.end(17, "The program terminates normally.");
+        } else {
+          T.leave(L.b, "main does not catch it, it only declares it: the exception leaves main as well. \"end\" is not printed.");
+          T.uncaught(['Exception in thread "main" java.io.IOException: unsupported: image.png', TRACE("Checked.read(Checked.java:6)"), TRACE("Checked.main(Checked.java:12)")], "The JVM writes the stack trace to the standard error stream; the program ends with exit code 1.");
+        }
+      },
+      guess: function (v) {
+        var i = this.vars.indexOf(v), C = "(compile error: the program does not run)", X = 'Exception in thread "main" java.io.IOException: unsupported: image.png', ok = ["note.txt read", "error: unsupported: image.png", "end"];
+        if (i === 0) return [ok, ["error: unsupported: image.png", "end"], ["note.txt read", "error: unsupported: image.png"]];
+        if (i === 3) return [["note.txt read", "!" + X], [C], ["note.txt read", "!" + X, "end"]];
+        return [[C], ok, ["note.txt read", "!" + X]];
+      }
+    },
+    {
+      id: "twr", ad: "try-with-resources", file: "Resources.java", vcap: "Body", vars: ["throws an exception", "ends normally"],
+      code: function (v) {
+        return ["public class Resources {", "  static class Resource implements AutoCloseable {", "    String name;", "    Resource(String name) {", "      this.name = name;", '      System.out.println(name + " opened");', "    }", "    public void close() {", '      System.out.println(name + " closed");', "    }", "  }", "  public static void main(String[] args) {", '    try (Resource a = new Resource("A");', '         Resource b = new Resource("B")) {', '      System.out.println("body");', v === "ends normally" ? '      System.out.println("work done");' : '      throw new IllegalStateException("error");', "    } catch (IllegalStateException e) {", '      System.out.println("catch: " + e.getMessage());', "    } finally {", '      System.out.println("finally");', "    }", "  }", "}"];
+      },
+      run: function (v, T) {
+        var th = v !== "ends normally";
+        T.main(12, "main starts.");
+        T.at(13, "The resources are opened from left to right: a first.");
+        T.call("Resource(\"A\")", "constructor", 4, "The constructor runs.");
+        T.out(6, "A opened", "\"A opened\" is printed.");
+        T.ret(7, undefined, "a is ready.");
+        T.at(14, "Then b.");
+        T.call("Resource(\"B\")", "constructor", 4, "The constructor runs.");
+        T.out(6, "B opened", "\"B opened\" is printed.");
+        T.ret(7, undefined, "b is ready. Both resources are open.");
+        T.blk("try", 15, "The body is entered.");
+        T.out(15, "body", "\"body\" is printed.");
+        if (th) T.thr("IllegalStateException", "error", 16, "The body throws an exception.");
+        else T.out(16, "work done", "\"work done\" is printed; the body ends normally.");
+        T.at(14, (th ? "BEFORE moving to catch," : "When leaving the body,") + " the resources are closed in the REVERSE of the order they were opened: b.close() first.");
+        T.call("b.close()", 'name = "B"', 8, "b is being closed.");
+        T.out(9, "B closed", "\"B closed\" is printed.");
+        T.ret(10, undefined, "Then a.close().");
+        T.call("a.close()", 'name = "A"', 8, "a is being closed.");
+        T.out(9, "A closed", "\"A closed\" is printed.");
+        T.ret(10, undefined, "Both resources are closed.");
+        if (th) {
+          T.ctch(17, "After the resources are closed, the exception reaches the catch.");
+          T.out(18, "catch: error", "\"catch: error\" is printed.");
+        } else T.at(17, "There is no exception: the catch is skipped.");
+        T.blk("finally", 19, "Finally, the finally block runs.");
+        T.out(20, "finally", "\"finally\" is printed.");
+        T.end(22, "The program terminates normally.");
+      },
+      guess: function (v) {
+        var a = ["A opened", "B opened", "body"];
+        return v !== "ends normally" ? [a.concat(["B closed", "A closed", "catch: error", "finally"]), a.concat(["A closed", "B closed", "catch: error", "finally"]), a.concat(["catch: error", "B closed", "A closed", "finally"])]
+          : [a.concat(["work done", "B closed", "A closed", "finally"]), a.concat(["work done", "A closed", "B closed", "finally"]), a.concat(["work done", "finally", "B closed", "A closed"])];
+      }
+    }
+  ];
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-ex");
+  var S = null, V = null, R = null, k = 0, timer = null, ok = 0, all = 0, G = null, gSel = 0, lastK = -1;
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  SCEN.forEach(function (s, i) { var o = document.createElement("option"); o.value = i; o.textContent = s.ad; E("exScen").appendChild(o); });
+
+  function pickScen() {
+    S = SCEN[E("exScen").value];
+    E("exVarCap").textContent = S.vcap;
+    E("exVar").innerHTML = S.vars.map(function (v, i) { return '<option value="' + i + '">' + esc(v) + "</option>"; }).join("");
+    E("exFile").textContent = S.file;
+    compute();
+  }
+  function compute() {
+    stop();
+    V = S.vars[E("exVar").value];
+    var T = Tracer(); S.run(V, T);
+    R = { ev: T.events, code: S.code(V) };
+    E("exCode").innerHTML = R.code.map(function (l) { return "<li>" + (l ? esc(l) : " ") + "</li>"; }).join("");
+    k = 0; lastK = -1;
+    setupGuess();
+    draw();
+  }
+  function setupGuess() {
+    G = null;
+    if (!E("exGuess").checked) return;
+    var c = S.guess(V), order = [0, 1, 2].sort(function () { return Math.random() - 0.5; });
+    G = { opts: order.map(function (i) { return c[i]; }), right: order.indexOf(0), done: false };
+    gSel = 0;
+  }
+  function outHtml(lines) {
+    var max = 8, sh = lines.slice(-max);
+    return sh.map(function (l) { return l.e ? '<span class="e">' + esc(l.t) + "</span>" : esc(l.t); }).join("\n");
+  }
+  function draw() {
+    var e = R.ev[k], gq = G && !G.done;
+    var errs = e.compile ? e.line : [];
+    [].forEach.call(E("exCode").children, function (li, i) {
+      var n = i + 1;
+      li.classList.toggle("is-cur", !gq && n === e.line && !e.hit);
+      li.classList.toggle("is-exc", !gq && ((n === e.line && e.hit) || errs.indexOf(n) >= 0));
+    });
+    var fr = e.frames, n = fr.length, h = "";
+    fr.forEach(function (f, i) {
+      var t = i === n - 1, cls = "frame" + (t ? " is-top" : "") + (t && e.hit ? " is-hit" : "") + (t && e.dying ? " is-dying" : "") + (t && "ret" in e ? " is-ret" : "");
+      var tail = t && "ret" in e ? (e.ret === undefined ? "returns" : "return " + e.ret) : t && "pend" in e ? "pending: " + e.pend : f.info;
+      h += '<div class="' + cls + '"><b>' + esc(f.n) + '</b><div class="meta"><span>line ' + f.ln + "</span>" + (f.b ? '<span class="blk b-' + f.b + '">' + f.b + "</span>" : "") + "</div>" + (tail ? '<div class="meta"><span>' + esc(tail) + "</span></div>" : "") + "</div>";
+    });
+    E("exStack").innerHTML = gq ? '<p class="none">waiting for a guess</p>' : (h || '<p class="none">' + (e.compile ? "program did not compile" : "stack empty") + "</p>");
+    E("exStCap").textContent = "Call stack · " + (gq ? 0 : n);
+    var box = E("exBox");
+    box.className = "exbox";
+    if (!gq && e.ex) { box.className += " is-fly"; box.textContent = "⚡ " + e.ex.t + (e.ex.m ? ": " + e.ex.m : ""); }
+    else if (!gq && e.caught) { box.className += " is-caught"; box.textContent = "✓ caught: " + e.caught.t; }
+    else box.textContent = "no exception in flight";
+    if (gq) {
+      E("exWhy").innerHTML = "<b>Predict:</b> What does this program print? The candidate outputs are in the tabs A, B and C.";
+      E("exG").hidden = false; E("exPick").hidden = false;
+      [].forEach.call(E("exG").children, function (b, i) { b.setAttribute("aria-pressed", String(i === gSel)); });
+      E("exOutCap").textContent = "Candidate";
+      E("exOut").innerHTML = G.opts[gSel].map(function (l) { return l[0] === "!" ? '<span class="e">' + esc(l.slice(1)) + "</span>" : l[0] === "(" ? '<span class="muted">' + esc(l) + "</span>" : esc(l); }).join("\n");
+    } else {
+      E("exWhy").innerHTML = (G && G.fb && k === 0 ? G.fb : "") + esc(e.why);
+      E("exG").hidden = true; E("exPick").hidden = true;
+      E("exOutCap").textContent = e.compile ? "Compiler (javac)" : "Output (console)";
+      E("exOut").innerHTML = outHtml(e.out);
+    }
+    E("exNo").textContent = "Step " + (k + 1) + " / " + R.ev.length;
+    lastK = k;
+    buttons();
+  }
+  function buttons() {
+    var gq = G && !G.done;
+    E("exBack").disabled = k === 0 || gq;
+    E("exReset").disabled = k === 0 && !timer;
+    E("exStep").disabled = gq || k >= R.ev.length - 1;
+    E("exPlay").disabled = gq || (k >= R.ev.length - 1 && !timer);
+    E("exPlay").textContent = timer ? "Pause" : "Play";
+  }
+  function go(d) { k = Math.max(0, Math.min(R.ev.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1900, 1300, 900, 550, 250][E("exSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(); return; }
+    if (k >= R.ev.length - 1) k = 0;
+    timer = setInterval(function () { if (k >= R.ev.length - 1) { stop(); buttons(); return; } go(1); }, delay());
+    buttons();
+  }
+
+  E("exG").addEventListener("click", function (ev) { var b = ev.target.closest("button[data-g]"); if (!b) return; gSel = +b.getAttribute("data-g"); draw(); });
+  E("exPick").addEventListener("click", function () {
+    if (!G || G.done) return;
+    var good = gSel === G.right;
+    all++; if (good) ok++;
+    E("exOk").textContent = ok; E("exAll").textContent = all;
+    G.done = true;
+    G.fb = good ? '<b class="agt-oyun__good">Correct!</b> ' : '<b class="agt-oyun__bad">Wrong.</b> The answer is ' + "ABC"[G.right] + ". ";
+    draw();
+    E("exStep").focus();
+  });
+  E("exScen").addEventListener("change", pickScen);
+  E("exVar").addEventListener("change", compute);
+  E("exStep").addEventListener("click", function () { stop(); go(1); });
+  E("exBack").addEventListener("click", function () { stop(); go(-1); });
+  E("exReset").addEventListener("click", function () { stop(); k = 0; draw(); });
+  E("exPlay").addEventListener("click", play);
+  E("exSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("exGuess").addEventListener("change", function () { compute(); });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (G && !G.done) return;
+    if (ev.key === "ArrowRight") { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  pickScen();
+})();
+</script>
+<script src="deck/oyun.js"></script>

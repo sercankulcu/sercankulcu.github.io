@@ -1,0 +1,525 @@
+---
+layout: without-sidebar
+title: "Method Call Stack"
+permalink: /files/computer/slides/Chapter_09_Method-Call-Stack.html
+excerpt: "Traces method calls step by step on the call stack: pass-by-value parameters, return values, local scope, overload resolution, the swap trap and nested calls."
+lang: en
+seo_title: "Method Call Stack · Computer Fundamentals and Introduction to Programming, Chapter 9"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/bilgisayar-ve-programlamaya-giris.jpg
+hreflang:
+  tr: /files/computer/sunumlar/Bolum_09_Method-Call-Stack.html
+  en: /files/computer/slides/Chapter_09_Method-Call-Stack.html
+resource: "Interactive simulation"
+course:
+  name: "Computer Fundamentals and Introduction to Programming"
+  url: "/teaching/computer-and-introduction-to-programming/?lang=en"
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cx-mc, .cx-mc-dlg { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] .cx-mc-dlg { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.cx-mc .mc-grid { display:grid; grid-template-columns:178px minmax(0,1fr); gap:10px; height:100%; }
+.cx-mc .card { min-width:0; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.cx-mc .side { display:flex; flex-direction:column; gap:7px; }
+.cx-mc .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.cx-mc select { width:100%; min-height:30px; font-size:13px; }
+.cx-mc .params { display:grid; grid-template-columns:1fr 70px; gap:4px 6px; align-items:center; font-size:13px; }
+.cx-mc .params input, .cx-mc .params select { width:100%; min-height:28px !important; padding:0 6px !important; font-size:13.5px !important; }
+.cx-mc .params .wide { grid-column:1 / -1; }
+.cx-mc .btns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-mc .btns button { min-height:31px; padding:0 6px; font-size:13.5px; }
+.cx-mc .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-mc .speed input { flex:1; min-width:0; }
+.cx-mc .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.cx-mc .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-mc .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-mc .score b { display:block; color:var(--ds-text); font-size:17px; }
+.cx-mc .stepno { margin-top:auto; color:var(--ds-muted); font-size:12px; font-weight:700; text-align:center; }
+.cx-mc .main { display:grid; grid-template-rows:minmax(0,1fr) auto 96px; gap:6px; min-height:0; min-width:0; }
+.cx-mc .top { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:6px; min-height:0; }
+.cx-mc .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.cx-mc .pane > .cap { margin:0; padding:3px 8px 1px; }
+.cx-mc .code { flex:1; min-height:0; margin:0; padding:2px 0; overflow:auto; font:12.5px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.cx-mc .code li { padding:0 8px 0 0; white-space:pre; counter-increment:ln; }
+.cx-mc .code li::before { content:counter(ln); display:inline-block; width:22px; margin-right:8px; color:var(--ds-muted); font-size:11px; text-align:right; }
+.cx-mc .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.cx-mc .code li.is-bad { background:color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.cx-mc .code li.is-def { color:var(--ds-link); }
+.cx-mc .stack { flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column-reverse; justify-content:flex-start; gap:5px; padding:4px 8px 8px; }
+.cx-mc .frame { flex:none; border:1.5px solid var(--ds-border); border-radius:9px; background:var(--ds-bg); font-size:12.5px; }
+.cx-mc .frame .fh { display:flex; justify-content:space-between; gap:6px; padding:2px 8px; border-bottom:1.5px solid var(--ds-border); background:var(--ds-surface-strong); border-radius:8px 8px 0 0; font:12px ui-monospace, Consolas, monospace; }
+.cx-mc .frame .fh b { color:var(--ds-text); }
+.cx-mc .frame .fh small { color:var(--ds-muted); font:11px system-ui, sans-serif; white-space:nowrap; }
+.cx-mc .frame .vs { padding:2px 8px 3px; font:12.5px/1.45 ui-monospace, Consolas, monospace; }
+.cx-mc .frame .vs div { display:grid; grid-template-columns:1fr auto auto; gap:8px; align-items:center; }
+.cx-mc .frame .vs .tag { color:var(--ds-muted); font:10.5px system-ui, sans-serif; }
+.cx-mc .frame .vs .none { color:var(--ds-muted); font:11.5px system-ui, sans-serif; }
+.cx-mc .frame .vs div.is-chg b { color:var(--ds-accent); }
+.cx-mc .frame.is-top { border-color:var(--ds-accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--ds-accent) 25%, transparent); }
+.cx-mc .frame.is-top .fh { background:var(--ds-hot); }
+.cx-mc .frame.is-new { animation:mc-in .35s ease-out; }
+.cx-mc .frame.is-ret { border-style:dashed; opacity:.85; }
+.cx-mc .frame .rb { margin:0 8px 4px; padding:1px 8px; border-radius:8px; background:color-mix(in srgb, var(--ds-good) 16%, var(--ds-bg)); color:var(--ds-good); font:700 12px ui-monospace, Consolas, monospace; text-align:center; }
+.cx-mc .cerr { padding:6px 8px; border:1.5px solid var(--ds-bad); border-radius:9px; background:color-mix(in srgb, var(--ds-bad) 14%, var(--ds-bg)); color:var(--ds-bad); font:12px ui-monospace, Consolas, monospace; }
+@keyframes mc-in { from { transform:translateY(-14px); opacity:0; } to { transform:none; opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .cx-mc .frame.is-new { animation:none; } }
+.cx-mc .why { margin:0; min-height:44px; padding:5px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.35; }
+.cx-mc .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.cx-mc .qbtns button { min-height:26px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.cx-mc .out { flex:1; min-height:0; margin:0; padding:4px 8px; overflow:auto; background:#1f2430; color:#e6edf3; font:13px/1.35 ui-monospace, Consolas, monospace; white-space:pre; }
+</style>
+
+<div class="cx-mc agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 9 · Simulation</p><h1>Method Call Stack</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="mc-help" aria-label="Help and usage">?</button>
+    <a class="agt-oyun__back" href="Chapter_09_Methods.html">← Chapter 9</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="mc-grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="mcProg">Program</label>
+          <select id="mcProg"></select>
+        </div>
+        <div>
+          <span class="cap">Arguments</span>
+          <div class="params" id="mcParams"></div>
+        </div>
+        <div class="btns">
+          <button type="button" id="mcBack" aria-label="Step back">◀ Back</button>
+          <button type="button" id="mcStep" class="is-primary" aria-label="Step forward">Step ▶</button>
+          <button type="button" id="mcPlay" aria-label="Play or pause">Play</button>
+          <button type="button" id="mcReset" aria-label="Back to start">Reset</button>
+        </div>
+        <label class="speed">Speed <input type="range" id="mcSpeed" min="1" max="5" value="3" aria-label="Playback speed"></label>
+        <label class="check"><input type="checkbox" id="mcQuiz"> Try it yourself</label>
+        <p class="agt-oyun__muted" style="margin:0;font-size:11.5px;line-height:1.3">When on, you predict the return values, the overload that is chosen and the output.</p>
+        <div class="score" aria-live="polite">
+          <div>Correct<b id="mcOk">0</b></div>
+          <div>Asked<b id="mcAll">0</b></div>
+        </div>
+        <div class="stepno" id="mcNo"></div>
+      </aside>
+
+      <section class="main">
+        <div class="top">
+          <div class="pane"><span class="cap">Java code</span><ol class="code" id="mcCode" aria-label="Java code"></ol></div>
+          <div class="pane"><span class="cap" id="mcStCap">Call stack</span><div class="stack" id="mcStack" aria-live="polite"></div></div>
+        </div>
+        <div class="why" id="mcWhy" aria-live="polite"></div>
+        <div class="pane"><span class="cap">Output (console)</span><pre class="out" id="mcOut" aria-label="Program output"></pre></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cx-mc-dlg" id="mc-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>Method Call Stack</h2>
+    <p><b>Purpose:</b> see what happens when a method is called: a new frame is pushed onto the <b>call stack</b>, the <b>values</b> of the arguments are copied into the parameters, and local variables live in that frame; with <code>return</code> a value goes back to the caller and the frame is popped.</p>
+    <h3>How to use it</h3>
+    <ol>
+      <li>Pick a program on the left and change the arguments.</li>
+      <li><b>Step ▶</b> / <b>◀ Back</b> (keyboard → / ←), <b>Play</b>, <b>Reset</b>. On the right the stack grows from bottom to top: <code>main</code> at the bottom, the method currently running at the top (highlighted). The header of each frame shows the return address (the line where the call was made).</li>
+      <li><b>Try it yourself</b>: predict the return value, the overloaded method the compiler will choose, and the output.</li>
+    </ol>
+    <h3>Reminders</h3>
+    <ul>
+      <li>Java passes primitive types <b>by value</b>: changing a method parameter does not change the caller's variable (increment, the swap trap).</li>
+      <li>Local variables are visible only in the block where they are declared; they disappear when the block ends.</li>
+      <li>In overloading, the compiler picks the signature at compile time by looking at the number and types of the arguments; two methods that differ only in return type are not allowed.</li>
+    </ul>
+    <p>The output of every program was checked against real Java (JDK 21) output for every argument combination.</p>
+    <p>Related slides: <a href="Chapter_09_Methods.html">Chapter 9 · Methods</a> (call stack, pass by value, the swap trap, method overloading, local scope, lcm).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. All rights reserved. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function Stop() {}
+    function Tracer() {
+      var fr = [], out = "", ev = [];
+      function top() { return fr[fr.length - 1]; }
+      function snap(line, why, x) {
+        var e = { line: line, why: why, out: out, frames: fr.map(function (f) { return { fn: f.fn, sig: f.sig, back: f.back, vars: f.vars.map(function (v) { return v.slice(); }) }; }) };
+        for (var k in x || {}) e[k] = x[k];
+        ev.push(e);
+        if (ev.length > 500) throw new Error("too long");
+      }
+      function find(f, n) { for (var i = 0; i < f.vars.length; i++) if (f.vars[i][0] === n) return i; return -1; }
+      var T = {
+        main: function (line, why) { fr.push({ fn: "main", sig: "main(String[] args)", back: "", vars: [] }); snap(line, why); },
+        call: function (fn, sig, names, vals, line, back, why, q) {
+          fr.push({ fn: fn, sig: sig, back: back, vars: names.map(function (n, i) { return [n, vals[i], "param"]; }) });
+          snap(line, why, { push: true, q: q });
+        },
+        set: function (n, v, line, why, tag, q) { var f = top(), i = find(f, n); if (i < 0) f.vars.push([n, v, tag || ""]); else f.vars[i][1] = v; snap(line, why, { chg: n, q: q }); },
+        setq: function (n, v, tag) { var f = top(), i = find(f, n); if (i < 0) f.vars.push([n, v, tag || ""]); else f.vars[i][1] = v; },
+        drop: function (n) { var f = top(), i = find(f, n); if (i >= 0) f.vars.splice(i, 1); },
+        ret: function (v, line, why, q) { snap(line, why, { ret: v, q: q }); fr.pop(); },
+        print: function (line, s, why, q) { out += s; snap(line, why, { q: q, printed: true }); },
+        step: function (line, why, q) { snap(line, why, { q: q }); },
+        error: function (line, msg, why) { snap(line, why, { cerr: msg }); throw new Stop(); },
+        get events() { return ev; }, get out() { return out; }
+      };
+      return T;
+    }
+    function opts(right, alts) {
+      var o = [String(right)];
+      function add(a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); }
+      alts.forEach(add);
+      if (typeof right === "number") { var d = 1; while (o.length < 3) { add(right + d); if (o.length < 3) add(right - d); d++; } }
+      return { opts: o, ans: 0 };
+    }
+    function Q(text, right, alts) { var o = opts(right, alts); o.text = text; return o; }
+
+    var PROGS = [
+      {
+        id: "add", ad: "add(a, b): call and return",
+        params: [{ k: "a", ad: "argument 1", min: -99, max: 99, v: 5 }, { k: "b", ad: "argument 2", min: -99, max: 99, v: 3 }],
+        code: function (p) { return ["static int add(int a, int b) {", "    int result = a + b;", "    return result;", "}", "public static void main(String[] args) {", "    int total = add(" + p.a + ", " + p.b + ");", "    System.out.println(total);", "}"]; },
+        run: function (p, T) {
+          var s = p.a + p.b;
+          T.main(4, "The program starts in main: the call stack holds only main's frame.");
+          T.step(5, "The right side of the assignment must be evaluated first: add(" + p.a + ", " + p.b + ") is called. main waits here.");
+          T.call("add", "add(int a, int b)", ["a", "b"], [p.a, p.b], 0, "main · line 6", "A new frame is pushed: the argument values " + p.a + " and " + p.b + " are copied into the parameters a and b.");
+          T.set("result", s, 1, "Local variable result = " + p.a + " + " + p.b + " = " + s + "; it lives only in add's frame.");
+          T.ret(s, 2, "return result: " + s + " is sent to the caller; add's frame is popped.", Q("Which value does add return?", s, [p.a * p.b, p.a, s + 1]));
+          T.set("total", s, 5, "The returned value replaces the call: total = " + s + ". a, b and result no longer exist.");
+          T.print(6, s + "\n", s + " is printed.");
+        }
+      },
+      {
+        id: "average", ad: "Nested call: average → add",
+        params: [{ k: "x", ad: "argument 1", min: -99, max: 99, v: 9 }, { k: "y", ad: "argument 2", min: -99, max: 99, v: 7 }],
+        code: function (p) { return ["static int add(int a, int b) {", "    return a + b;", "}", "static int average(int x, int y) {", "    int t = add(x, y);", "    return t / 2;", "}", "public static void main(String[] args) {", "    int o = average(" + p.x + ", " + p.y + ");", "    System.out.println(o);", "}"]; },
+        run: function (p, T) {
+          var t = p.x + p.y, o = (t / 2) | 0;
+          T.main(7, "main starts.");
+          T.call("average", "average(int x, int y)", ["x", "y"], [p.x, p.y], 3, "main · line 9", "main calls average(" + p.x + ", " + p.y + "): a new frame is placed on top of main, x = " + p.x + ", y = " + p.y + ".");
+          T.step(4, "average calls a method too: add(x, y) → the VALUES of x and y (" + p.x + ", " + p.y + ") are passed.");
+          T.call("add", "add(int a, int b)", ["a", "b"], [p.x, p.y], 0, "average · line 5", "add goes on top: 3 frames on the stack. Only the top one runs; the others wait at the line where they stopped.");
+          T.ret(t, 1, "return " + p.x + " + " + p.y + " = " + t + ": add's frame is popped (last in, first out).", Q("Which value does add return?", t, [t / 2 | 0, p.x]));
+          T.set("t", t, 4, t + " replaces the call: t = " + t + ". average resumes where it left off.");
+          T.ret(o, 5, "return t / 2 → " + t + " / 2 = " + o + " (integer division). average's frame is popped.", Q("Which value does average return?", o, [(t / 2).toFixed(1), t, o + 1]));
+          T.set("o", o, 8, "Back in main: o = " + o + ". x, y, t, a and b no longer exist.");
+          T.print(9, o + "\n", o + " is printed. Frames work like a stack: the last one opened is the first one closed.");
+        }
+      },
+      {
+        id: "increment", ad: "Pass by value: increment(number)",
+        params: [{ k: "number", ad: "number", min: -99, max: 99, v: 5 }, { k: "bicim", ad: "increment", type: "sel", opts: ["void (tries to change the value)", "returns int (the right way)"], v: "void (tries to change the value)" }],
+        code: function (p) {
+          var r = p.bicim[0] === "r";
+          return r ? ["static int increment(int x) {", "    x++;", "    return x;", "}", "public static void main(String[] args) {", "    int number = " + p.number + ";", "    number = increment(number);", "    System.out.println(number);", "}"]
+            : ["static void increment(int x) {", "    x++;", "}", "public static void main(String[] args) {", "    int number = " + p.number + ";", "    increment(number);", "    System.out.println(number);", "}"];
+        },
+        run: function (p, T) {
+          var r = p.bicim[0] === "r", m = r ? 4 : 3, s = p.number;
+          T.main(m, "main starts.");
+          T.set("number", s, m + 1, "In main, number = " + s + ": a box in main's frame.");
+          T.call("increment", "increment(int x)", ["x"], [s], 0, "main · line " + (m + 3), "increment(number): what is passed is not the variable itself but its VALUE (" + s + "). A separate box in the new frame: x = " + s + " (a copy).");
+          T.set("x", s + 1, 1, "x++ → x = " + (s + 1) + ". Only increment's box changed; number in main is still " + s + ".");
+          if (r) {
+            T.ret(s + 1, 2, "return x: " + (s + 1) + " is sent to the caller and the frame is popped.");
+            T.set("number", s + 1, m + 2, "The returned value is ASSIGNED to number: number = " + (s + 1) + ". This is the only way the change reaches main.");
+            T.print(m + 3, (s + 1) + "\n", (s + 1) + " is printed.", Q("What does println print?", s + 1, [s]));
+          } else {
+            T.ret(undefined, 2, "The method ends (void: returns no value); the frame and the x inside it (" + (s + 1) + ") are deleted.");
+            T.print(m + 3, s + "\n", s + " is printed: in Java, primitive types are passed BY VALUE; the method changed only the copy.", Q("What does println print?", s, [s + 1]));
+          }
+        }
+      },
+      {
+        id: "swap", ad: "The swap trap: swap(x, y)",
+        params: [{ k: "x", ad: "x", min: -99, max: 99, v: 3 }, { k: "y", ad: "y", min: -99, max: 99, v: 5 }],
+        code: function (p) { return ["static void swap(int a, int b) {", "    int t = a;", "    a = b;", "    b = t;", "}", "public static void main(String[] args) {", "    int x = " + p.x + ", y = " + p.y + ";", "    swap(x, y);", "    System.out.println(x + \" \" + y);", "}"]; },
+        run: function (p, T) {
+          T.main(5, "main starts.");
+          T.setq("x", p.x); T.set("y", p.y, 6, "In main, x = " + p.x + " and y = " + p.y + ": two separate boxes in main's frame.");
+          T.call("swap", "swap(int a, int b)", ["a", "b"], [p.x, p.y], 0, "main · line 8", "swap(x, y): the values (" + p.x + " and " + p.y + ") are copied. Two new boxes in swap's frame: a = " + p.x + ", b = " + p.y + ". They are not connected to x and y.");
+          T.set("t", p.x, 1, "t = a → t = " + p.x + ": the temporary box keeps the value of a.");
+          T.set("a", p.y, 2, "a = b → a = " + p.y + ". The old value of a now exists only in t.");
+          T.set("b", p.x, 3, "b = t → b = " + p.x + ". swap's copies were exchanged; x and y in main were never touched.");
+          T.ret(undefined, 4, "swap ends: its frame (a, b, t) is deleted. Only the copies were swapped.");
+          T.print(8, p.x + " " + p.y + "\n", p.x + " " + p.y + " is printed. For a real swap you must return the result or use an array.", Q("What does println print?", p.x + " " + p.y, [p.y + " " + p.x]));
+        }
+      },
+      {
+        id: "area", ad: "Overloading: area(...)",
+        params: [{ k: "c", ad: "call", type: "sel", opts: ["area(4)", "area(3, 5)", "area(7, 2)", "area(-6)", "area(2.5)"], v: "area(4)" }],
+        code: function (p) { return ["static int area(int side) {", "    return side * side;", "}", "static int area(int width, int height) {", "    return width * height;", "}", "public static void main(String[] args) {", "    System.out.println(" + p.c + ");", "}"]; },
+        run: function (p, T) {
+          var args = p.c.slice(5, -1).split(", ");
+          var Qs = Q("Which area method does the compiler choose?", args.length === 2 ? "area(int, int)" : args[0].indexOf(".") >= 0 ? "compile error" : "area(int)", ["area(int)", "area(int, int)", "compile error"]);
+          T.main(6, "main starts.");
+          if (args[0].indexOf(".") >= 0) {
+            T.step(7, "The compiler looks at the arguments: one double (" + args[0] + "). The single-parameter candidate is area(int); but double → int is not converted automatically (data would be lost).", Qs);
+            T.error(7, "error: incompatible types: possible lossy conversion from double to int", "No signature fits → compile error; the program never runs. Fix: area((int) 2.5), or a third overload area(double).");
+          }
+          if (args.length === 1) {
+            var k = +args[0];
+            T.step(7, "The compiler looks at the arguments: one int. There are two methods with the same name; the one whose parameter count and type match, area(int), is chosen. This decision is made at compile time.", Qs);
+            T.call("area", "area(int side)", ["side"], [k], 0, "main · line 8", "At run time area(int) is called: side = " + k + ".");
+            T.ret(k * k, 1, "return side * side → " + k + " * " + k + " = " + k * k + ".");
+            T.print(7, k * k + "\n", k * k + " is printed.");
+          } else {
+            var a = +args[0], b = +args[1];
+            T.step(7, "The compiler looks at the arguments: 2 ints → area(int, int) is chosen. Same name, different parameter list: overloading.", Qs);
+            T.call("area", "area(int width, int height)", ["width", "height"], [a, b], 3, "main · line 8", "area(int, int) is called: width = " + a + ", height = " + b + ".");
+            T.ret(a * b, 4, "return en * boy → " + a * b + ".");
+            T.print(7, a * b + "\n", a * b + " is printed.");
+          }
+        }
+      },
+      {
+        id: "show", ad: "Overloading: int / double / String",
+        params: [{ k: "c", ad: "argument", type: "sel", opts: ["7", "7.0", "\"7\"", "'A'", "7L", "3 + 0.5", "\"7\" + 1", "7 / 2"], v: "7" }],
+        code: function (p) { return ["static void show(int x) {", "    System.out.println(\"int: \" + x);", "}", "static void show(double x) {", "    System.out.println(\"double: \" + x);", "}", "static void show(String x) {", "    System.out.println(\"String: \" + x);", "}", "public static void main(String[] args) {", "    show(" + p.c + ");", "}"]; },
+        run: function (p, T) {
+          var D = {
+            "7": ["int", 7, "7 is an int constant: the exact match show(int) is chosen."],
+            "7.0": ["double", "7.0", "7.0 is a double constant: show(double) is chosen."],
+            "\"7\"": ["String", "7", "\"7\" is a string: show(String) is chosen. The 7 inside the quotes is not a number."],
+            "'A'": ["int", 65, "'A' is a char; there is no separate method for char. A char is widened to int automatically (the closest match) → show(int); x = 65 (the code of A)."],
+            "7L": ["double", "7.0", "7L is a long; long → int is not automatic (narrowing), long → double is widening → show(double)."],
+            "3 + 0.5": ["double", "3.5", "The expression is evaluated first: int + double → double 3.5 → show(double)."],
+            "\"7\" + 1": ["String", "71", "\"7\" + 1 is string concatenation → \"71\" → show(String)."],
+            "7 / 2": ["int", 3, "7 / 2 is integer division → 3 (int) → show(int)."]
+          }[p.c];
+          var line = { int: 0, double: 3, String: 6 }[D[0]];
+          T.main(9, "main starts.");
+          T.step(10, D[2] + " The choice is made at compile time, based on the argument's TYPE.", Q("Which show is chosen?", "show(" + D[0] + ")", ["show(int)", "show(double)", "show(String)"]));
+          T.call("show", "show(" + D[0] + " x)", ["x"], [D[0] === "String" ? "\"" + D[1] + "\"" : D[1]], line, "main · line 11", "show(" + D[0] + ") is called: x = " + (D[0] === "String" ? "\"" + D[1] + "\"" : D[1]) + ".");
+          T.print(line + 1, D[0] + ": " + D[1] + "\n", "\"" + D[0] + ": " + D[1] + "\" is printed." + (D[0] === "double" ? " double values are always printed with at least one decimal digit." : ""));
+          T.ret(undefined, line + 2, "A void method returns by itself at the closing brace.");
+          T.step(11, "main ends.");
+        }
+      },
+      {
+        id: "kapsam", ad: "Local scope: calculate(n)",
+        params: [{ k: "n", ad: "argument n", min: -20, max: 20, v: 3 }],
+        code: function (p) { return ["static int calculate(int n) {", "    int result = 0;", "    if (n > 0) {", "        int contribution = n * 2;", "        result += contribution;", "    }", "    return result;", "}", "public static void main(String[] args) {", "    System.out.println(calculate(" + p.n + "));", "}"]; },
+        run: function (p, T) {
+          var n = p.n, s = 0;
+          T.main(8, "main starts.");
+          T.step(9, "First calculate(" + n + ") is called, to supply println's argument.");
+          T.call("calculate", "calculate(int n)", ["n"], [n], 0, "main · line 10", "The method scope opens: parameter n = " + n + " (a parameter is a local variable too).");
+          T.set("result", 0, 1, "result is in the method scope: visible until the end of the method.");
+          if (n > 0) {
+            T.step(2, n + " > 0 → true: the if block is entered, a new inner scope opens.");
+            T.set("contribution", n * 2, 3, "contribution = " + n + " * 2 = " + n * 2 + ": exists only inside the if block.", "block");
+            s = n * 2;
+            T.set("result", s, 4, "The inner block can reach result in the outer scope: result = 0 + " + s + " = " + s + ".");
+            T.drop("contribution");
+            T.step(5, "The block closed: contribution is gone. Writing contribution here would be a compile error (cannot find symbol).");
+          } else T.step(2, n + " > 0 → false: the block is skipped; contribution is never created.");
+          T.ret(s, 6, "return " + s + ": the method scope closes too (n and result are deleted).", Q("What does calculate(" + n + ") return?", s, [n, 0, n * 2]));
+          T.print(9, s + "\n", "The returned " + s + " becomes println's argument and is printed.");
+        }
+      },
+      {
+        id: "erken", ad: "Early return: printPositive",
+        params: [{ k: "a", ad: "call 1", min: -99, max: 99, v: -3 }, { k: "b", ad: "call 2", min: -99, max: 99, v: 7 }],
+        code: function (p) { return ["static void printPositive(int number) {", "    if (number <= 0) return;", "    System.out.println(number);", "}", "public static void main(String[] args) {", "    printPositive(" + p.a + ");", "    printPositive(" + p.b + ");", "}"]; },
+        run: function (p, T) {
+          T.main(4, "main starts.");
+          [p.a, p.b].forEach(function (v, i) {
+            T.call("printPositive", "printPositive(int number)", ["number"], [v], 0, "main · line " + (6 + i), (i ? "A brand-new frame: number = " + v + " (the number of the previous call is long gone)." : "The frame is pushed: number = " + v + "."));
+            if (v <= 0) T.ret(undefined, 1, v + " <= 0 → true → return; the method ends at once, println is never reached.", Q("Does println run for " + v + "?", "no", ["yes"]));
+            else {
+              T.step(1, v + " <= 0 → false → no early return, carry on.", Q("Does println run for " + v + "?", "yes", ["no"]));
+              T.print(2, v + "\n", v + " is printed.");
+              T.ret(undefined, 3, "The closing brace was reached: a void method returns by itself here.");
+            }
+            if (!i) T.step(6, "main continues from the next line.");
+          });
+          T.step(7, "main ends.");
+        }
+      },
+      {
+        id: "lcm", ad: "lcm → gcd: a call from inside a method",
+        params: [{ k: "a", ad: "a", min: 1, max: 999, v: 12 }, { k: "b", ad: "b", min: 1, max: 999, v: 18 }],
+        code: function (p) { return ["static int gcd(int a, int b) {", "    while (b != 0) {", "        int r = a % b;", "        a = b;", "        b = r;", "    }", "    return a;", "}", "static int lcm(int a, int b) {", "    return a / gcd(a, b) * b;", "}", "public static void main(String[] args) {", "    System.out.println(lcm(" + p.a + ", " + p.b + "));", "}"]; },
+        run: function (p, T) {
+          T.main(11, "main starts.");
+          T.call("lcm", "lcm(int a, int b)", ["a", "b"], [p.a, p.b], 8, "main · line 13", "main calls lcm(" + p.a + ", " + p.b + "): a = " + p.a + ", b = " + p.b + ".");
+          T.call("gcd", "gcd(int a, int b)", ["a", "b"], [p.a, p.b], 0, "lcm · line 10", "To evaluate the expression, lcm calls gcd(a, b): 3 frames on the stack. Although the names are the same, gcd's a and b are separate boxes.");
+          var a = p.a, b = p.b, g;
+          while (true) {
+            T.step(1, "Condition: b != 0 → " + b + " != 0 → " + (b !== 0) + ".");
+            if (b === 0) break;
+            var r = a % b;
+            T.set("r", r, 2, "r = a % b = " + a + " % " + b + " = " + r + ".", "block");
+            T.set("a", b, 3, "a = b → a = " + b + "."); a = b;
+            T.set("b", r, 4, "b = r → b = " + r + ". (gcd does not change: gcd(" + a + ", " + r + "))"); b = r;
+            T.drop("r");
+          }
+          g = a;
+          T.ret(g, 6, "return " + g + ": gcd's frame is popped.", Q("What does gcd(" + p.a + ", " + p.b + ") return?", g, [p.a * p.b, Math.min(p.a, p.b), 1]));
+          var l = (p.a / g | 0) * p.b;
+          T.step(9, "The call is replaced by " + g + ": " + p.a + " / " + g + " * " + p.b + " = " + (p.a / g | 0) + " * " + p.b + " = " + l + ". Dividing first prevents a * b from overflowing.");
+          T.ret(l, 9, "return " + l + ": lcm's frame is popped.");
+          T.print(12, l + "\n", l + " is printed. The method shortened its job by calling another method: no duplicated code.", Q("What is printed?", l, [p.a * p.b, g]));
+        }
+      }
+    ];
+    function trace(prog, p) {
+      var T = Tracer();
+      try { prog.run(p, T); } catch (x) { if (!(x instanceof Stop)) throw x; }
+      return { events: T.events, out: T.out, code: prog.code(p) };
+    }
+    return { PROGS: PROGS, trace: trace };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".cx-mc");
+  var P = null, R = null, k = 0, timer = null, answered = {}, ok = 0, all = 0, lastK = -1;
+
+  Core.PROGS.forEach(function (pr, i) { var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("mcProg").appendChild(o); });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function buildParams() {
+    P = Core.PROGS[E("mcProg").value];
+    E("mcParams").innerHTML = P.params.map(function (q) {
+      if (q.type === "sel") return '<label class="wide" for="mcp_' + q.k + '">' + q.ad + '</label><select class="wide" id="mcp_' + q.k + '"' + (q.k === "c" ? ' style="font-family:ui-monospace,Consolas,monospace"' : "") + ">" + q.opts.map(function (o) { return "<option" + (o === q.v ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>";
+      return '<label for="mcp_' + q.k + '">' + q.ad + '</label><input type="number" id="mcp_' + q.k + '" min="' + q.min + '" max="' + q.max + '" step="1" value="' + q.v + '">';
+    }).join("");
+    P.params.forEach(function (q) { E("mcp_" + q.k).addEventListener("change", compute); });
+    compute();
+  }
+  function params() {
+    var p = {};
+    P.params.forEach(function (q) {
+      var el = E("mcp_" + q.k);
+      if (q.type === "sel") p[q.k] = el.value;
+      else { var v = parseInt(el.value, 10); if (isNaN(v)) v = q.v; v = Math.max(q.min, Math.min(q.max, v)); el.value = v; p[q.k] = v; }
+    });
+    return p;
+  }
+  function compute() {
+    stop();
+    R = Core.trace(P, params());
+    k = 0; answered = {}; lastK = -1;
+    E("mcCode").innerHTML = R.code.map(function (l) { return '<li class="' + (/^(static|public static)/.test(l) ? "is-def" : "") + '">' + esc(l) + "</li>"; }).join("");
+    shuffleQs();
+    draw();
+  }
+
+  function needQ() { var e = R.events[k]; return E("mcQuiz").checked && e.q && !answered[k]; }
+  function fv(v) { return v === undefined ? "" : esc(v); }
+
+  function draw() {
+    var e = R.events[k], q = needQ();
+    [].forEach.call(E("mcCode").children, function (li, i) {
+      li.classList.toggle("is-cur", i === e.line && !e.cerr);
+      li.classList.toggle("is-bad", i === e.line && !!e.cerr);
+    });
+    var cur = E("mcCode").children[e.line];
+    if (cur) { var box = E("mcCode"); if (cur.offsetTop < box.scrollTop || cur.offsetTop > box.scrollTop + box.clientHeight - 24) box.scrollTop = cur.offsetTop - 40; }
+    var n = e.frames.length, h = "";
+    e.frames.forEach(function (f, i) {
+      var top = i === n - 1, cls = "frame" + (top ? " is-top" : "") + (top && e.push && k > lastK ? " is-new" : "") + (top && "ret" in e ? " is-ret" : "");
+      h += '<div class="' + cls + '"><div class="fh"><b>' + esc(f.sig) + "</b>" + (f.back ? "<small>↩ " + esc(f.back) + "</small>" : "<small>bottom frame</small>") + '</div><div class="vs">' +
+        (f.vars.length ? f.vars.map(function (v) {
+          return '<div class="' + (top && v[0] === e.chg ? "is-chg" : "") + '"><span>' + esc(v[0]) + '</span><span class="tag">' + (v[2] === "param" ? "parameter" : v[2] === "block" ? "block" : "") + "</span><b>" + fv(v[1]) + "</b></div>";
+        }).join("") : '<span class="none">(no local variables)</span>') + "</div>" +
+        (top && "ret" in e ? '<div class="rb">' + (q ? "return ?" : e.ret === undefined ? "return (void) — no value" : "return " + esc(e.ret)) + "</div>" : "") + "</div>";
+    });
+    if (e.cerr) h = '<div class="cerr">' + esc(e.cerr) + "</div>" + h;
+    E("mcStack").innerHTML = h;
+    E("mcStCap").textContent = "Call stack · " + n + (n === 1 ? " frame" : " frames");
+    lastK = k;
+    if (q) {
+      E("mcWhy").innerHTML = "<b>Predict:</b> " + esc(e.q.text) + '<div class="qbtns">' + e.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(e.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    } else E("mcWhy").innerHTML = (e.fb || "") + esc(e.why);
+    var out = q && e.printed ? (R.events[k - 1] ? R.events[k - 1].out : "") : e.out;
+    E("mcOut").textContent = out;
+    E("mcOut").scrollTop = E("mcOut").scrollHeight;
+    E("mcNo").textContent = "Step " + (k + 1) + " / " + R.events.length;
+    buttons(q);
+    if (q) { var b = E("mcWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function buttons(q) {
+    E("mcBack").disabled = k === 0;
+    E("mcReset").disabled = k === 0;
+    E("mcStep").disabled = q || k >= R.events.length - 1;
+    E("mcPlay").disabled = E("mcStep").disabled && !timer;
+    E("mcPlay").textContent = timer ? "Pause" : "Play";
+  }
+  function go(d) { k = Math.max(0, Math.min(R.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1800, 1250, 850, 500, 220][E("mcSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(needQ()); return; }
+    if (k >= R.events.length - 1) { k = 0; lastK = -1; }
+    timer = setInterval(function () {
+      if (needQ() || k >= R.events.length - 1) { stop(); buttons(needQ()); return; }
+      go(1);
+      if (needQ()) { stop(); buttons(true); }
+    }, delay());
+    draw();
+  }
+  function shuffleQs() {
+    R.events.forEach(function (e) { if (e.q) { var o = e.q.opts.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.q.order = o; } });
+  }
+
+  E("mcWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = R.events[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("mcOk").textContent = ok; E("mcAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Correct!</b> ' : '<b class="agt-oyun__bad">Wrong.</b> Correct answer: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    lastK = k;
+    draw();
+    E("mcStep").focus();
+  });
+  E("mcProg").addEventListener("change", buildParams);
+  E("mcStep").addEventListener("click", function () { stop(); go(1); });
+  E("mcBack").addEventListener("click", function () { stop(); go(-1); });
+  E("mcReset").addEventListener("click", function () { stop(); k = 0; lastK = -1; answered = {}; R.events.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("mcPlay").addEventListener("click", play);
+  E("mcSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("mcQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  buildParams();
+})();
+</script>
+<script src="deck/oyun.js"></script>

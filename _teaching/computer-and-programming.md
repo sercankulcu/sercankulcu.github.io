@@ -164,17 +164,33 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 
 ---
 
+## Textbook
+
+[📕 Computer Fundamentals and Introduction to Programming — the course book (PDF, 23 MB)](https://sercankulcu.github.io/courses-pdfs/computer/Computer-Fundamentals-and-Introduction-to-Programming.pdf)
+
+---
+
+## Getting Started
+
+* [Important People in Computing and Programming (HTML)](/files/computer/Important_People.html)
+* [Prerequisites for Computer Fundamentals and Introduction to Programming (HTML)](/files/computer/Prerequisites.html)
+* [Course Map (HTML)](/files/computer/Course_Map.html)
+* [Dictionary of Terms (HTML)](/files/computer/Dictionary.html)
+
+---
+
 ## Part I: Computers and Information Technology
 
 ### Chapter 1: Computer Fundamentals and Computational Thinking
 
 A computer is a machine that solves problems by processing data according to precise instructions, and this chapter is taught in five decks. Basic Concepts explains how data is represented in bits and how the basic operating cycle of a computer works, while Computer Hardware surveys the processor, the memory hierarchy, storage, and input and output devices. Computers turns to architecture: two's complement, floating-point numbers, character encodings, logic gates and the fetch–decode–execute cycle. The Internet deck covers IP addresses, DNS, HTTP and HTTPS and safe use of the web, and the last deck introduces computation, the Turing machine and computational thinking.
 
-- **1.1 Basic Concepts** — [🖼️ Slides](/files/computer/slides/Chapter_01_01_Basic_Concepts.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_01_Basic_Concepts.pdf)
-- **1.2 Computer Hardware** — [🖼️ Slides](/files/computer/slides/Chapter_01_02_Computer_Hardware.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_02_Computer_Hardware.pdf)
-- **1.3 Computers** — [🖼️ Slides](/files/computer/slides/Chapter_01_03_Computers.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_03_Computers.pdf)
-- **1.4 The Internet** — [🖼️ Slides](/files/computer/slides/Chapter_01_04_The_Internet.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_04_The_Internet.pdf)
-- **1.5 Computation and Computational Thinking** — [🖼️ Slides](/files/computer/slides/Chapter_01_05_Computation_and_Computational_Thinking.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_05_Computation_and_Computational_Thinking.pdf)
+- **1.1 Basic Concepts** — [🖼️ Slides](/files/computer/slides/Chapter_01_01_Basic_Concepts.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_01_Basic_Concepts.pdf) · [📖 Notes](/files/computer/notes/Chapter_01_01_Basic_Concepts_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_01_01_Basic_Concepts_Study_Questions.html)
+- **1.2 Computer Hardware** — [🖼️ Slides](/files/computer/slides/Chapter_01_02_Computer_Hardware.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_02_Computer_Hardware.pdf) · [📖 Notes](/files/computer/notes/Chapter_01_02_Computer_Hardware_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_01_02_Computer_Hardware_Study_Questions.html)
+- **1.3 Computers** — [🖼️ Slides](/files/computer/slides/Chapter_01_03_Computers.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_03_Computers.pdf) · [📖 Notes](/files/computer/notes/Chapter_01_03_Computers_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_01_03_Computers_Study_Questions.html)
+- **1.4 The Internet** — [🖼️ Slides](/files/computer/slides/Chapter_01_04_The_Internet.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_04_The_Internet.pdf) · [📖 Notes](/files/computer/notes/Chapter_01_04_The_Internet_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_01_04_The_Internet_Study_Questions.html)
+- **1.5 Computation and Computational Thinking** — [🖼️ Slides](/files/computer/slides/Chapter_01_05_Computation_and_Computational_Thinking.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_01_05_Computation_and_Computational_Thinking.pdf) · [📖 Notes](/files/computer/notes/Chapter_01_05_Computation_and_Computational_Thinking_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_01_05_Computation_and_Computational_Thinking_Study_Questions.html)
+- 🕹️ **Simulators:** [Number Base Converter](/files/computer/slides/Chapter_01_Number-Base-Converter.html) · [Logic Gates](/files/computer/slides/Chapter_01_Logic-Gates.html) · [A Simple CPU: Fetch–Decode–Execute](/files/computer/slides/Chapter_01_Simple-CPU.html) · [The Journey of a Web Request](/files/computer/slides/Chapter_01_Packet-Journey.html) · [Turing Machine](/files/computer/slides/Chapter_01_Turing-Machine.html)
 
 ---
 
@@ -182,8 +198,9 @@ A computer is a machine that solves problems by processing data according to pre
 
 The operating system manages hardware resources and provides services to applications. The first deck starts with kinds of software and licensing models, then covers booting, the kernel and system calls, processes and threads, time sharing, memory management and virtual memory, file systems, device drivers and user permissions. The second deck is hands-on with Windows: the desktop, windows and file management, absolute and relative paths, settings, security and system maintenance.
 
-- **2.1 Software and Operating Systems** — [🖼️ Slides](/files/computer/slides/Chapter_02_01_Software_and_Operating_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_02_01_Software_and_Operating_Systems.pdf)
-- **2.2 The Windows Operating System** — [🖼️ Slides](/files/computer/slides/Chapter_02_02_The_Windows_Operating_System.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_02_02_The_Windows_Operating_System.pdf)
+- **2.1 Software and Operating Systems** — [🖼️ Slides](/files/computer/slides/Chapter_02_01_Software_and_Operating_Systems.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_02_01_Software_and_Operating_Systems.pdf) · [📖 Notes](/files/computer/notes/Chapter_02_01_Software_and_Operating_Systems_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_02_01_Software_and_Operating_Systems_Study_Questions.html)
+- **2.2 The Windows Operating System** — [🖼️ Slides](/files/computer/slides/Chapter_02_02_The_Windows_Operating_System.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_02_02_The_Windows_Operating_System.pdf) · [📖 Notes](/files/computer/notes/Chapter_02_02_The_Windows_Operating_System_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_02_02_The_Windows_Operating_System_Study_Questions.html)
+- 🕹️ **Simulators:** [CPU Scheduling](/files/computer/slides/Chapter_02_CPU-Scheduler.html)
 
 ---
 
@@ -191,9 +208,10 @@ The operating system manages hardware resources and provides services to applica
 
 Office applications make it easier to prepare documents, analyze data and present information. The Word deck covers styles, page layout, section breaks, tables of contents, bibliographies and mail merge. The Excel deck deals with cell references, formulas and functions, sorting and filtering, pivot tables and charts. The PowerPoint deck shows how to plan a presentation, use the slide master, design visuals, add transitions and animations, and deliver an effective talk.
 
-- **3.1 Microsoft Word** — [🖼️ Slides](/files/computer/slides/Chapter_03_01_Microsoft_Word.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_03_01_Microsoft_Word.pdf)
-- **3.2 Microsoft Excel** — [🖼️ Slides](/files/computer/slides/Chapter_03_02_Microsoft_Excel.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_03_02_Microsoft_Excel.pdf)
-- **3.3 Microsoft PowerPoint** — [🖼️ Slides](/files/computer/slides/Chapter_03_03_Microsoft_PowerPoint.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_03_03_Microsoft_PowerPoint.pdf)
+- **3.1 Microsoft Word** — [🖼️ Slides](/files/computer/slides/Chapter_03_01_Microsoft_Word.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_03_01_Microsoft_Word.pdf) · [📖 Notes](/files/computer/notes/Chapter_03_01_Microsoft_Word_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_03_01_Microsoft_Word_Study_Questions.html)
+- **3.2 Microsoft Excel** — [🖼️ Slides](/files/computer/slides/Chapter_03_02_Microsoft_Excel.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_03_02_Microsoft_Excel.pdf) · [📖 Notes](/files/computer/notes/Chapter_03_02_Microsoft_Excel_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_03_02_Microsoft_Excel_Study_Questions.html)
+- **3.3 Microsoft PowerPoint** — [🖼️ Slides](/files/computer/slides/Chapter_03_03_Microsoft_PowerPoint.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_03_03_Microsoft_PowerPoint.pdf) · [📖 Notes](/files/computer/notes/Chapter_03_03_Microsoft_PowerPoint_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_03_03_Microsoft_PowerPoint_Study_Questions.html)
+- 🕹️ **Simulators:** [Word Styles, Navigation Pane and Table of Contents](/files/computer/slides/Chapter_03_Word-Styles.html) · [Excel Cell References](/files/computer/slides/Chapter_03_Excel-References.html) · [PowerPoint Animation Timeline](/files/computer/slides/Chapter_03_PowerPoint-Animation.html)
 
 ---
 
@@ -203,9 +221,10 @@ Office applications make it easier to prepare documents, analyze data and presen
 
 Programming means turning the steps of a solution into instructions a computer can carry out. The Algorithms deck covers problem definition, pseudocode and the qualities of a good algorithm, works through examples such as factorial, Fibonacci and prime numbers, and traces linear and binary search as well as selection, bubble, insertion and merge sort. The Flowcharts deck shows sequential, conditional and repeated flow, along with counters and accumulators. Introduction to Programming presents programming languages, compilers and interpreters, programming paradigms, the software development process and debugging.
 
-- **4.1 Algorithms** — [🖼️ Slides](/files/computer/slides/Chapter_04_01_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_04_01_Algorithms.pdf)
-- **4.2 Flowcharts** — [🖼️ Slides](/files/computer/slides/Chapter_04_02_Flowcharts.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_04_02_Flowcharts.pdf)
-- **4.3 Introduction to Programming** — [🖼️ Slides](/files/computer/slides/Chapter_04_03_Introduction_to_Programming.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_04_03_Introduction_to_Programming.pdf)
+- **4.1 Algorithms** — [🖼️ Slides](/files/computer/slides/Chapter_04_01_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_04_01_Algorithms.pdf) · [📖 Notes](/files/computer/notes/Chapter_04_01_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_04_01_Algorithms_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter04/src)
+- **4.2 Flowcharts** — [🖼️ Slides](/files/computer/slides/Chapter_04_02_Flowcharts.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_04_02_Flowcharts.pdf) · [📖 Notes](/files/computer/notes/Chapter_04_02_Flowcharts_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_04_02_Flowcharts_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter04/src)
+- **4.3 Introduction to Programming** — [🖼️ Slides](/files/computer/slides/Chapter_04_03_Introduction_to_Programming.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_04_03_Introduction_to_Programming.pdf) · [📖 Notes](/files/computer/notes/Chapter_04_03_Introduction_to_Programming_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_04_03_Introduction_to_Programming_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter04/src)
+- 🕹️ **Simulators:** [Sorting Algorithm Visualizer](/files/computer/slides/Chapter_04_Sorting-Visualizer.html) · [Flowchart Runner](/files/computer/slides/Chapter_04_Flowchart-Runner.html)
 
 ---
 
@@ -213,7 +232,8 @@ Programming means turning the steps of a solution into instructions a computer c
 
 A Java program is written as plain-text source code, compiled to bytecode and run on the JVM. This chapter introduces the development tools, the structure of a Java source file, and how to compile and run a first program. It covers the main method, print, println and escape sequences, expressions, statements and blocks, comments, and the difference between compile-time, run-time and logic errors.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_05_Getting_Started_with_Java.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_05_Getting_Started_with_Java.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_05_Getting_Started_with_Java.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_05_Getting_Started_with_Java.pdf) · [📖 Notes](/files/computer/notes/Chapter_05_Getting_Started_with_Java_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_05_Getting_Started_with_Java_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter05/src)
+- 🕹️ **Simulators:** [Java Compile and Run](/files/computer/slides/Chapter_05_Java-Compile-Run.html)
 
 ---
 
@@ -223,7 +243,8 @@ A Java program is written as plain-text source code, compiled to bytecode and ru
 
 Variables hold the values a program uses and changes. The chapter covers Java's primitive types, declaration and assignment, overflow, type conversion, arithmetic, comparison and logical operators, operator precedence and short-circuit evaluation. Reading input with Scanner and producing formatted output with printf are shown through small examples.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_06_Variables_Data_Types_and_Operators.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_06_Variables_Data_Types_and_Operators.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_06_Variables_Data_Types_and_Operators.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_06_Variables_Data_Types_and_Operators.pdf) · [📖 Notes](/files/computer/notes/Chapter_06_Variables_Data_Types_and_Operators_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_06_Variables_Data_Types_and_Operators_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter06/src)
+- 🕹️ **Simulators:** [Java Expression Evaluator](/files/computer/slides/Chapter_06_Expression-Evaluator.html)
 
 ---
 
@@ -231,7 +252,8 @@ Variables hold the values a program uses and changes. The chapter covers Java's 
 
 Conditionals let a program choose between different actions. Through short examples, the chapter covers boolean conditions, if, else if and else, nested decisions and the dangling-else problem, logical operators and De Morgan's laws, the conditional operator, comparing Strings and the switch statement.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_07_Conditionals.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_07_Conditionals.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_07_Conditionals.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_07_Conditionals.pdf) · [📖 Notes](/files/computer/notes/Chapter_07_Conditionals_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_07_Conditionals_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter07/src)
+- 🕹️ **Simulators:** [Decision Tracer](/files/computer/slides/Chapter_07_Decision-Tracer.html)
 
 ---
 
@@ -239,7 +261,8 @@ Conditionals let a program choose between different actions. Through short examp
 
 Loops repeat a block of code while a condition holds or a fixed number of times. The chapter covers for, while and do-while loops, break and continue, counters and accumulators, off-by-one errors and loop invariants, and nested loops. Examples include counting digits, testing for primes, generating Fibonacci numbers and printing patterns.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_08_Loops.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_08_Loops.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_08_Loops.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_08_Loops.pdf) · [📖 Notes](/files/computer/notes/Chapter_08_Loops_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_08_Loops_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter08/src)
+- 🕹️ **Simulators:** [Loop Tracer](/files/computer/slides/Chapter_08_Loop-Tracer.html)
 
 ---
 
@@ -247,7 +270,8 @@ Loops repeat a block of code while a condition holds or a fixed number of times.
 
 Methods break a program into reusable operations. Using small examples, the chapter covers defining and calling methods, the call stack, pass-by-value parameters, return values, overloading, variable-length argument lists, scope and the principles of good method design.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_09_Methods.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_09_Methods.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_09_Methods.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_09_Methods.pdf) · [📖 Notes](/files/computer/notes/Chapter_09_Methods_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_09_Methods_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter09/src)
+- 🕹️ **Simulators:** [Method Call Stack](/files/computer/slides/Chapter_09_Method-Call-Stack.html)
 
 ---
 
@@ -255,7 +279,8 @@ Methods break a program into reusable operations. Using small examples, the chap
 
 An array stores a fixed number of values of the same type and gives indexed access to each element. The chapter covers creating and traversing arrays, basic operations such as sum, maximum and minimum, copying arrays and the Arrays utility class, and Java code for searching and sorting. Two-dimensional arrays, matrix operations and out-of-bounds errors complete the chapter.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_10_Arrays.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_10_Arrays.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_10_Arrays.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_10_Arrays.pdf) · [📖 Notes](/files/computer/notes/Chapter_10_Arrays_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_10_Arrays_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter10/src)
+- 🕹️ **Simulators:** [Array Lab](/files/computer/slides/Chapter_10_Array-Lab.html)
 
 ---
 
@@ -263,7 +288,8 @@ An array stores a fixed number of values of the same type and gives indexed acce
 
 Strings represent sequences of characters and are the basis of text processing. Through applications, the chapter covers creating Strings, immutability, indexing, the most common String methods, comparing contents and the pitfalls of locale-specific characters, the string pool, efficient concatenation with StringBuilder, and formatted output.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_11_Strings.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_11_Strings.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_11_Strings.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_11_Strings.pdf) · [📖 Notes](/files/computer/notes/Chapter_11_Strings_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_11_Strings_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter11/src)
+- 🕹️ **Simulators:** [String Lab](/files/computer/slides/Chapter_11_String-Lab.html)
 
 ---
 
@@ -271,6 +297,7 @@ Strings represent sequences of characters and are the basis of text processing. 
 
 A recursive method solves a problem by calling itself on a smaller input. The chapter covers base cases and recursive cases, how the call stack behaves, and how to trace recursive executions. Examples include factorial, the greatest common divisor, the Towers of Hanoi and binary search, followed by a comparison of recursion with iteration and an introduction to memoization.
 
-- [🖼️ Slides](/files/computer/slides/Chapter_12_Recursion.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_12_Recursion.pdf)
+- [🖼️ Slides](/files/computer/slides/Chapter_12_Recursion.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/computer/pdf/Chapter_12_Recursion.pdf) · [📖 Notes](/files/computer/notes/Chapter_12_Recursion_Lecture_Notes.html) · [📝 Questions](/files/computer/slides/Chapter_12_Recursion_Study_Questions.html) · [💻 Code (Java)](https://github.com/sercankulcu/computer-programming-java-en/tree/main/Chapter12/src)
+- 🕹️ **Simulators:** [Recursion Visualizer](/files/computer/slides/Chapter_12_Recursion-Visualizer.html)
 
 </div>

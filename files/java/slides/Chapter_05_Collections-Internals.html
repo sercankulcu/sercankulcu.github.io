@@ -1,0 +1,617 @@
+---
+layout: without-sidebar
+title: "Collections Internals"
+permalink: /files/java/slides/Chapter_05_Collections-Internals.html
+excerpt: "Shows step by step the inner array of ArrayList (capacity, growth, shifting on insert and remove) and the buckets of HashMap (hashCode, bucket index, collision chains, resizing); counts the cost of each operation and compares ArrayList, LinkedList, HashMap and TreeMap."
+lang: en
+seo_title: "Collections Internals · Object-Oriented Programming with Java, Chapter 5"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/java-ile-nesne-yonelimli-programlama.jpg
+hreflang:
+  tr: /files/java/sunumlar/Bolum_05_Collections-Internals.html
+  en: /files/java/slides/Chapter_05_Collections-Internals.html
+resource: "Interactive simulation"
+course:
+  name: "Object-Oriented Programming with Java"
+  url: "/teaching/object-oriented-programming-with-java/?lang=en"
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-ci, .jv-ci-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .jv-ci, html[data-theme="dark"] .jv-ci-dlg { --ds-accent:#f07a7a; }
+.jv-ci .grid { display:grid; grid-template-columns:186px minmax(0,1fr); gap:10px; height:100%; }
+.jv-ci .side { display:flex; flex-direction:column; gap:6px; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.jv-ci .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.jv-ci select { width:100%; min-height:30px; padding:0 6px; font-size:13px; }
+.jv-ci .tabs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px; }
+.jv-ci .tabs button { min-height:28px; padding:0 2px; font-size:12px; border-radius:8px; }
+.jv-ci .tabs button[aria-pressed="true"] { border-color:var(--ds-link); background:var(--ds-link); color:var(--ds-bg); }
+.jv-ci .row2 { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.jv-ci .row2 button, .jv-ci .ops button { min-height:29px; padding:0 4px; font:700 12.5px ui-monospace, Consolas, monospace; border-radius:9px; }
+.jv-ci .ops { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.jv-ci .inl { display:grid; grid-template-columns:auto 1fr; gap:4px 6px; align-items:center; font-size:13px; }
+.jv-ci .inl input { width:100%; min-height:28px !important; padding:0 6px !important; font-size:13px !important; }
+.jv-ci .ctl { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.jv-ci .ctl button { min-height:29px; padding:0 4px; font-size:13px; }
+.jv-ci .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.jv-ci .speed input { flex:1; min-width:0; }
+.jv-ci .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.jv-ci .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.jv-ci .score div { padding:2px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-ci .score b { display:block; color:var(--ds-text); font-size:16px; }
+.jv-ci .main { display:grid; grid-template-rows:auto minmax(0,1fr) auto auto; gap:6px; min-height:0; min-width:0; }
+.jv-ci .codeline { display:flex; align-items:center; gap:8px; min-height:32px; padding:3px 10px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); font:13px ui-monospace, Consolas, monospace; white-space:nowrap; overflow:hidden; }
+.jv-ci .codeline code { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; color:var(--ds-text); }
+.jv-ci .chip { flex:none; padding:1px 8px; border-radius:999px; background:var(--ds-surface-strong); color:var(--ds-muted); font:700 12px system-ui, sans-serif; }
+.jv-ci .chip b { color:var(--ds-text); }
+.jv-ci .viz { position:relative; min-height:0; overflow:hidden; padding:6px 8px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); }
+.jv-ci .arrcap { margin:2px 0 3px; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-ci .arr { display:grid; grid-template-columns:repeat(12, 42px); gap:3px 3px; }
+.jv-ci .cell { position:relative; height:44px; border:1.5px solid var(--ds-link); border-radius:6px; background:var(--ds-bg); text-align:center; }
+.jv-ci .cell .v { display:block; padding-top:3px; font:700 15px ui-monospace, Consolas, monospace; color:var(--ds-text); }
+.jv-ci .cell .i { position:absolute; left:0; right:0; bottom:1px; color:var(--ds-muted); font:12px ui-monospace, Consolas, monospace; }
+.jv-ci .cell.is-null { border-style:dashed; border-color:var(--ds-border); background:var(--ds-surface); }
+.jv-ci .cell.is-null .v { color:var(--ds-muted); font-weight:400; font-size:12px; padding-top:6px; }
+.jv-ci .cell.is-hot { border-color:var(--ds-accent); background:var(--ds-hot); box-shadow:0 0 0 2px color-mix(in srgb, var(--ds-accent) 30%, transparent); }
+.jv-ci .cell.is-move { border-color:var(--ds-link); background:var(--ds-node); }
+.jv-ci .cell.is-new { border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+.jv-ci .cell.is-del { border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 15%, var(--ds-bg)); }
+.jv-ci .old { opacity:.5; }
+.jv-ci .why { margin:0; min-height:46px; padding:4px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.35; }
+.jv-ci .why code { font-size:12.5px; }
+.jv-ci .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:3px; }
+.jv-ci .qbtns button { min-height:25px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.jv-ci .cost { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
+.jv-ci .cost div { padding:2px 6px; border:1.5px solid var(--ds-border); border-radius:9px; background:var(--ds-bg); color:var(--ds-muted); font-size:12px; font-weight:700; line-height:1.25; }
+.jv-ci .cost b { display:block; color:var(--ds-text); font:700 15px ui-monospace, Consolas, monospace; }
+/* HashMap */
+.jv-ci .hcalc { height:34px; margin:0 0 4px; overflow:hidden; font:12.5px/1.35 ui-monospace, Consolas, monospace; white-space:nowrap; }
+.jv-ci .hcalc b { color:var(--ds-accent); }
+.jv-ci .buckets { display:grid; grid-template-columns:1fr 1fr; grid-auto-flow:column; column-gap:10px; }
+.jv-ci .bk { display:flex; align-items:center; gap:3px; min-width:0; overflow:hidden; border-bottom:1px solid color-mix(in srgb, var(--ds-border) 45%, transparent); }
+.jv-ci .bk .bi { flex:none; width:24px; color:var(--ds-muted); font:12px ui-monospace, Consolas, monospace; text-align:right; padding-right:3px; }
+.jv-ci .bk.is-hot { background:var(--ds-hot); }
+.jv-ci .bk.is-split { background:color-mix(in srgb, var(--ds-good) 10%, transparent); }
+.jv-ci .nd { flex:none; padding:0 5px; border:1.5px solid var(--ds-link); border-radius:6px; background:var(--ds-bg); font:12px/1.15 ui-monospace, Consolas, monospace; white-space:nowrap; }
+.jv-ci .nd.is-cmp { border-color:var(--ds-accent); background:var(--ds-hot); }
+.jv-ci .nd.is-new { border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+.jv-ci .nd.is-del { border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 15%, var(--ds-bg)); text-decoration:line-through; }
+.jv-ci .nd.is-moved { border-color:var(--ds-good); }
+.jv-ci .ar { flex:none; color:var(--ds-muted); font-size:12px; }
+.jv-ci .more { flex:none; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-ci .kv { display:grid; grid-template-columns:1fr 54px; gap:4px; }
+.jv-ci .kv input { width:100%; min-height:28px !important; padding:0 6px !important; font:13px ui-monospace, Consolas, monospace !important; }
+/* comparison */
+.jv-ci table.cmp { width:100%; border-collapse:collapse; font-size:12.5px; }
+.jv-ci table.cmp th, .jv-ci table.cmp td { padding:3px 6px; border:1.5px solid var(--ds-border); vertical-align:middle; }
+.jv-ci table.cmp th { background:var(--ds-surface-strong); font-size:12.5px; text-align:left; }
+.jv-ci table.cmp td.na { color:var(--ds-muted); text-align:center; }
+.jv-ci table.cmp small { display:block; color:var(--ds-muted); font:12px system-ui, sans-serif; white-space:nowrap; }
+.jv-ci table.cmp th code { font-size:12.5px; }
+.jv-ci .bar { display:flex; align-items:center; gap:5px; font:700 12.5px ui-monospace, Consolas, monospace; white-space:nowrap; }
+.jv-ci .bar i { display:block; height:9px; min-width:2px; border-radius:3px; background:var(--ds-link); }
+.jv-ci .bar.is-bad i { background:var(--ds-accent); }
+.jv-ci [hidden] { display:none !important; }
+</style>
+
+<div class="jv-ci agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 5 · Simulation</p><h1>Collections Internals</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ci-help" aria-label="About and how to use">?</button>
+    <a class="agt-oyun__back" href="Chapter_05_Collections.html">← Chapter 5</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="side">
+        <div class="tabs" role="group" aria-label="Structure">
+          <button type="button" data-tab="al" aria-pressed="true">ArrayList</button>
+          <button type="button" data-tab="hm" aria-pressed="false">HashMap</button>
+          <button type="button" data-tab="cmp" aria-pressed="false">Compare</button>
+        </div>
+
+        <div data-pane="al">
+          <label class="cap" for="alNew">Creation</label>
+          <select id="alNew" style="font-family:ui-monospace,Consolas,monospace">
+            <option value="0">new ArrayList&lt;&gt;()</option>
+            <option value="4" selected>new ArrayList&lt;&gt;(4)</option>
+            <option value="2">new ArrayList&lt;&gt;(2)</option>
+          </select>
+          <div class="inl" style="margin-top:6px"><label for="alIdx">index i</label><input type="number" id="alIdx" min="0" max="27" value="1"></div>
+          <div class="ops" style="margin-top:6px">
+            <button type="button" id="alAdd" aria-label="Append at the end">add(e)</button>
+            <button type="button" id="alIns" aria-label="Insert at position i">add(i, e)</button>
+            <button type="button" id="alRem" aria-label="Remove the element at position i">remove(i)</button>
+            <button type="button" id="alGet" aria-label="Read the element at position i">get(i)</button>
+            <button type="button" id="alAdd5" aria-label="Append five elements" style="grid-column:1 / -1">5 × add(e)</button>
+          </div>
+        </div>
+
+        <div data-pane="hm" hidden>
+          <span class="cap">Key · value</span>
+          <div class="kv"><input id="hmKey" value="elma" maxlength="10" aria-label="Key (String)" spellcheck="false"><input type="number" id="hmVal" value="1" min="0" max="99" aria-label="Value"></div>
+          <div class="ops" style="margin-top:5px">
+            <button type="button" id="hmPut" aria-label="put(key, value)">put</button>
+            <button type="button" id="hmGet" aria-label="get(key)">get</button>
+            <button type="button" id="hmRem" aria-label="remove(key)" style="grid-column:1 / -1">remove</button>
+          </div>
+          <span class="cap" style="margin-top:5px">Ready-made keys</span>
+          <div class="row2">
+            <button type="button" id="hmFruit" aria-label="Add fruit names one after another" style="font-family:inherit">Fruits</button>
+            <button type="button" id="hmColl" aria-label="Add keys with the same hashCode" style="font-family:inherit">Collision</button>
+          </div>
+        </div>
+
+        <div data-pane="cmp" hidden>
+          <label class="cap" for="cmpN">Number of elements n</label>
+          <select id="cmpN"><option>10</option><option>100</option><option selected>1000</option><option value="100000">100,000</option></select>
+          <label class="cap" for="cmpPos" style="margin-top:6px">Position i</label>
+          <select id="cmpPos"><option value="0">start (i = 0)</option><option value="0.25">quarter</option><option value="0.5" selected>middle</option><option value="1">end</option></select>
+        </div>
+
+        <div data-pane="run" style="display:flex;flex-direction:column;gap:6px">
+          <div class="ctl">
+            <button type="button" id="ciStep" class="is-primary" aria-label="Advance one step">Step ▶</button>
+            <button type="button" id="ciEnd" aria-label="Skip to the end of the operation">To end ⏭</button>
+            <button type="button" id="ciReset" aria-label="Reset the structure" style="grid-column:1 / -1">Reset</button>
+          </div>
+          <label class="check"><input type="checkbox" id="ciAuto" checked> Play automatically</label>
+          <label class="speed">Speed <input type="range" id="ciSpeed" min="1" max="5" value="3" aria-label="Playback speed"></label>
+          <label class="check"><input type="checkbox" id="ciQuiz"> Test yourself</label>
+        </div>
+        <div class="score" aria-live="polite" id="ciScore">
+          <div>Correct<b id="ciOk">0</b></div>
+          <div>Questions<b id="ciAll">0</b></div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="codeline"><code id="ciCode">List&lt;String&gt; list = new ArrayList&lt;&gt;(4);</code><span class="chip" id="ciChip1"></span><span class="chip" id="ciChip2"></span></div>
+        <div class="viz" id="ciViz" aria-live="polite"></div>
+        <div class="why" id="ciWhy" aria-live="polite"></div>
+        <div class="cost" id="ciCost"></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-ci-dlg" id="ci-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>Collections Internals</h2>
+    <p><b>Goal:</b> see what the methods of <code>ArrayList</code> and <code>HashMap</code> do inside, and how many units of work they cost.</p>
+    <h3>ArrayList</h3>
+    <ul>
+      <li>The elements are kept in an internal <b>array</b>. <code>size()</code> is the number of filled cells; the <b>capacity</b> is the length of the array.</li>
+      <li>When the array is full, the new capacity becomes <code>old + old / 2</code> (about 1.5 times) and all elements are copied into the new array. <code>new ArrayList&lt;&gt;()</code> allocates the array with 10 cells on the first <code>add</code> call.</li>
+      <li><code>add(i, e)</code> and <code>remove(i)</code> shift the elements after i by one cell: O(n). <code>get(i)</code> and appending at the end are O(1); the occasional copy makes appending <b>amortized</b> O(1).</li>
+    </ul>
+    <h3>HashMap</h3>
+    <ul>
+      <li>The key's <code>hashCode()</code> is mixed with <code>h ^ (h &gt;&gt;&gt; 16)</code>; <code>&amp; (n − 1)</code> takes the last bits and gives the <b>bucket</b> number (n: number of buckets, a power of 2).</li>
+      <li>Entries that fall into the same bucket form a <b>chain</b> (linked list). A lookup compares the hashes first; <code>equals</code> is called only if the hashes are equal. <code>"Aa"</code> and <code>"BB"</code> have the same <code>hashCode()</code> (2112).</li>
+      <li>When the number of entries exceeds the <b>threshold</b> (number of buckets × 0.75), the number of buckets doubles; each entry either stays in the same bucket or moves to bucket <code>i + old n</code>.</li>
+      <li>When a chain grows beyond 8 entries, Java turns it into a tree (growing the table first if it is small); this simulator shows at most 8 entries per bucket and at most 24 in total.</li>
+    </ul>
+    <h3>How to use it</h3>
+    <ol>
+      <li>Choose a structure on the left and press an operation button. The operation plays step by step; if <b>Play automatically</b> is off, advance with <b>Step ▶</b> (keyboard →); <b>To end ⏭</b> finishes the operation.</li>
+      <li>The counters at the bottom show unit operations: shifts, copies, comparisons, re-placements.</li>
+      <li>With <b>Test yourself</b> on, you predict before the operation how many elements will shift, the new capacity or the bucket number.</li>
+      <li>The <b>Compare</b> tab puts the approximate step counts of typical operations side by side for a structure with n elements.</li>
+    </ol>
+    <p>The capacity arrays and bucket placement were checked against the internal fields of real Java 8 <code>ArrayList</code> and <code>HashMap</code> objects with the same keys.</p>
+    <p>Related slides: <a href="Chapter_05_Collections.html">Chapter 5 · Collections</a> (How Does an ArrayList Grow?, Inserting and Removing in the Middle, HashSet and Hashing, The HashMap Class).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. All rights reserved. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-ci");
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+  /* ---------- player: every operation produces a list of frames; frames are applied in order ---------- */
+  var tab = "al", queue = [], cur = null, timer = null, ok = 0, all = 0, pendingQ = null, tasks = [], inTask = false;
+  function delay() { return [1500, 1000, 650, 380, 160][E("ciSpeed").value - 1]; }
+  function busy() { return queue.length > 0 || !!pendingQ || tasks.length > 0; }
+  function F(why, code, apply) { return { why: why, code: code, apply: apply }; }
+  function push(frames) {
+    var was = queue.length;
+    queue = queue.concat(frames);
+    if (!was && !inTask) next(); else schedule();
+  }
+  function next() {
+    while (queue.length && queue[0].skip && queue[0].skip()) { var s = queue.shift(), keep = cur; cur = s; s.apply(); cur = keep; }
+    if (!queue.length) { schedule(); return; }
+    cur = queue.shift();
+    cur.fb = "";
+    if (cur.apply) cur.apply();
+    render();
+    schedule();
+  }
+  function schedule() {
+    clearTimeout(timer); timer = null;
+    if (queue.length && !pendingQ && E("ciAuto").checked) timer = setTimeout(next, delay());
+    buttons();
+  }
+  function finish() {
+    clearTimeout(timer);
+    do {
+      while (queue.length) { cur = queue.shift(); cur.fb = ""; if (cur.apply) cur.apply(); }
+      if (tasks.length) { inTask = true; tasks.shift()(); inTask = false; }
+    } while (queue.length || tasks.length);
+    render(); buttons();
+  }
+  /* presets (5 x add, fruits): each operation is scheduled when the frames of the previous one are done */
+  function enqueue(fn) { tasks.push(fn); buttons(); pump(); }
+  function pump() {
+    if (!tasks.length) { buttons(); return; }
+    if (queue.length || pendingQ) { setTimeout(pump, 60); return; }
+    var fn = tasks.shift();
+    inTask = true; fn(); inTask = false;
+    buttons();
+    if (tasks.length) setTimeout(pump, 60);
+  }
+  function buttons() {
+    var b = busy();
+    E("ciStep").disabled = !queue.length || !!pendingQ;
+    E("ciEnd").disabled = !queue.length || !!pendingQ;
+    ["alAdd", "alIns", "alRem", "alGet", "alAdd5", "hmPut", "hmGet", "hmRem", "hmFruit", "hmColl", "alNew"].forEach(function (id) { E(id).disabled = b; });
+  }
+  function ask(text, right, alts, then) {
+    var o = [String(right)];
+    alts.forEach(function (a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); });
+    pendingQ = { opts: o, then: then };
+    clearTimeout(timer);
+    E("ciWhy").innerHTML = "<b>Predict:</b> " + text + '<div class="qbtns">' + shuffle(o.map(function (_, i) { return i; })).map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(o[i]) + "</button>"; }).join("") + "</div>";
+    buttons();
+    var b = E("ciWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus();
+  }
+  E("ciWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !pendingQ) return;
+    var q = pendingQ, good = +b.getAttribute("data-a") === 0;
+    all++; if (good) ok++;
+    E("ciOk").textContent = ok; E("ciAll").textContent = all;
+    pendingQ = null;
+    var fb = good ? '<b class="agt-oyun__good">Correct!</b> ' : '<b class="agt-oyun__bad">Wrong.</b> The answer is: <code>' + esc(q.opts[0]) + "</code>. ";
+    q.then();
+    if (cur) { cur.fb = fb; render(); }
+    E("ciStep").focus();
+  });
+  function quizOn() { return E("ciQuiz").checked && !inTask; }
+  function msg(t, code) { queue = []; cur = { why: t, code: code, view: tab === "al" ? alView() : hmView() }; render(); buttons(); }
+
+  /* ================= ArrayList ================= */
+  var AL = { arr: [], cap: 0, size: 0, init: 4, next: 0, cost: null, last: 0 };
+  var NAMES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  function alNewCap(cap, need) {
+    if (AL.init === 0 && cap === 0) return Math.max(10, need);
+    var n = cap + (cap >> 1);
+    return n < need ? need : n;
+  }
+  function alCode() { return "List<String> list = new ArrayList<>(" + (AL.init || "") + ");"; }
+  function alReset() {
+    AL.init = +E("alNew").value; AL.cap = AL.init; AL.size = 0; AL.arr = []; AL.next = 0; AL.last = 0;
+    AL.cost = { shift: 0, copy: 0, write: 0, read: 0, adds: 0, addCost: 0 };
+    queue = []; tasks.length = 0; pendingQ = null;
+    cur = { why: AL.init ? "Empty list: there is an internal array of " + AL.init + " cells, size() = 0." : "Empty list: <code>new ArrayList&lt;&gt;()</code> does not allocate an array yet (capacity 0); the first add allocates 10 cells.", code: alCode(), view: alView() };
+    render(); buttons();
+  }
+  function alView(x) { var v = { arr: AL.arr.slice(), cap: AL.cap, size: AL.size, hi: {}, newArr: null }; for (var k in x || {}) v[k] = x[k]; return v; }
+  function spend(kind, n) { AL.cost[kind] += n; AL.last += n; }
+  function hiOf(pairs) { var h = {}; for (var i = 0; i < pairs.length; i += 2) h[pairs[i]] = pairs[i + 1]; return h; }
+  function range(a, b, c) { var h = {}; for (var i = a; i < b; i++) h[i] = c; return h; }
+  function exc(code, t) { msg('<b class="agt-oyun__bad">IndexOutOfBoundsException</b> is thrown. ' + t, code); }
+
+  function alOp(kind, i) {
+    var code, s = AL.size;
+    AL.last = 0;
+    if (kind === "add") i = s;
+    if (kind === "add" || kind === "ins") {
+      var e = NAMES[AL.next % 26];
+      code = kind === "add" ? 'list.add("' + e + '");' : "list.add(" + i + ', "' + e + '");';
+      if (s >= 28) { msg("In this simulator the list holds at most 28 elements. Use Reset to start over.", code); return; }
+      if (i < 0 || i > s) { exc(code, "add(i, e) needs 0 ≤ i ≤ size() (i = size() appends at the end). i = " + i + ", size() = " + s + "."); return; }
+      AL.next++;
+      var grow = s === AL.cap, oc = AL.cap, nc = grow ? alNewCap(oc, s + 1) : oc;
+      var plan = function () {
+        var f = [];
+        f.push(F(esc(code) + " called: size() = " + s + ", capacity = " + oc + (grow ? ": no room left." : ": there is a free cell."), code, function () { cur.view = alView(); }));
+        if (grow) {
+          f.push(F(oc === 0 ? "There is no array yet: the first add allocates an array of 10 cells." : "The array is full. New capacity = " + oc + " + " + oc + " / 2 = " + (oc + (oc >> 1)) + (oc + (oc >> 1) < s + 1 ? "; that is less than the " + (s + 1) + " cells needed, so " + nc + " is used." : "."), code, function () { cur.view = alView({ newArr: [], newCap: nc }); }));
+          if (s > 0) f.push(F("The " + s + " elements of the old array are copied into the new array (System.arraycopy): " + s + " units.", code, function () { spend("copy", s); cur.view = alView({ newArr: AL.arr.slice(), newCap: nc, newHi: range(0, s, "is-new") }); }));
+          f.push(F("The list now uses the new array; the old array is left to the garbage collector. Capacity = " + nc + ".", code, function () { AL.cap = nc; cur.view = alView(); }));
+        }
+        for (var j = s - 1; j >= i; j--) (function (j) {
+          f.push(F("Shift: [" + j + "] → [" + (j + 1) + "]; " + AL.arr[j] + " moves one cell right (starting from the end so nothing is overwritten).", code, function () { AL.arr[j + 1] = AL.arr[j]; spend("shift", 1); cur.view = alView({ hi: hiOf([j + 1, "is-move", j, "is-hot"]), size: s + 1 }); }));
+        })(j);
+        f.push(F('"' + e + '" is written to cell ' + i + ", size() = " + (s + 1) + ".", code, function () {
+          AL.arr[i] = e; AL.size = s + 1; spend("write", 1);
+          if (kind === "add") { AL.cost.adds++; AL.cost.addCost += AL.last; }
+          cur.view = alView({ hi: hiOf([i, "is-new"]) });
+          cur.why += " This operation: <b>" + AL.last + (AL.last === 1 ? " unit</b>" : " units</b>") + (s - i > 0 ? " (" + (s - i) + " shifts + 1 write)" : grow && s ? " (" + s + " copies + 1 write)" : "") + ".";
+        }));
+        push(f);
+      };
+      if (quizOn() && grow && oc > 0) ask("The array is full (capacity " + oc + "). What will the new capacity be?", nc, [oc * 2, oc + 1, nc + 1], plan);
+      else if (quizOn() && kind === "ins" && i < s) ask(esc(code) + " shifts how many elements?", s - i, [i, s - i + 1, s, Math.max(0, s - i - 1)], plan);
+      else plan();
+      return;
+    }
+    if (kind === "rem") {
+      code = "list.remove(" + i + ");";
+      if (i < 0 || i >= s) { exc(code, "remove(i) needs 0 ≤ i < size(). i = " + i + ", size() = " + s + "."); return; }
+      var plan2 = function () {
+        var f = [], gone = AL.arr[i];
+        f.push(F(esc(code) + ': "' + gone + '" will be removed; the ' + (s - 1 - i) + " elements behind it will each shift one cell left.", code, function () { cur.view = alView({ hi: hiOf([i, "is-del"]) }); }));
+        for (var j = i + 1; j < s; j++) (function (j) {
+          f.push(F("Shift: [" + j + "] → [" + (j - 1) + "]; " + AL.arr[j] + " moves one cell left.", code, function () { AL.arr[j - 1] = AL.arr[j]; spend("shift", 1); cur.view = alView({ hi: hiOf([j - 1, "is-move", j, "is-hot"]) }); }));
+        })(j);
+        f.push(F("The last cell is set to null (so the garbage collector can reclaim the old reference), size() = " + (s - 1) + '. remove returns the removed element: "' + gone + '".', code, function () {
+          AL.arr.length = s - 1; AL.size = s - 1; cur.view = alView();
+          cur.why += " This operation: <b>" + AL.last + (AL.last === 1 ? " unit</b>" : " units</b>") + " of shifting.";
+        }));
+        push(f);
+      };
+      if (quizOn()) ask(esc(code) + " shifts how many elements?", s - 1 - i, [i, s - i, s, Math.max(1, s - 2 - i)], plan2);
+      else plan2();
+      return;
+    }
+    code = "list.get(" + i + ");";
+    if (i < 0 || i >= s) { exc(code, "get(i) needs 0 ≤ i < size(). i = " + i + ", size() = " + s + ". Even if the capacity is larger, cells beyond size() do not belong to the list."); return; }
+    push([F(esc(code) + ' → "' + AL.arr[i] + '". The array goes straight to cell i: 1 unit, independent of n (O(1)).', code, function () { spend("read", 1); cur.view = alView({ hi: hiOf([i, "is-hot"]) }); })]);
+  }
+
+  function alRender(vw) {
+    var h = "";
+    function cells(arr, cap, size, hi) {
+      var s = '<div class="arr">';
+      for (var i = 0; i < cap; i++) {
+        var has = i < size && arr[i] !== undefined;
+        s += '<div class="cell' + (has ? "" : " is-null") + (hi && hi[i] ? " " + hi[i] : "") + '"><span class="v">' + (has ? esc(arr[i]) : "null") + '</span><span class="i">' + i + "</span></div>";
+      }
+      return s + "</div>";
+    }
+    if (vw.cap === 0 && !vw.newArr) h += '<p class="arrcap">internal array: not allocated yet (capacity 0)</p>';
+    else {
+      h += '<p class="arrcap">' + (vw.newArr ? "old array · capacity " + vw.cap : "internal array (elementData) · capacity " + vw.cap + " · size() " + vw.size) + "</p>";
+      h += '<div class="' + (vw.newArr ? "old" : "") + '">' + cells(vw.arr, vw.cap, vw.size, vw.hi) + "</div>";
+    }
+    if (vw.newArr) h += '<p class="arrcap" style="margin-top:6px">new array · capacity ' + vw.newCap + "</p>" + cells(vw.newArr, vw.newCap, vw.newArr.length, vw.newHi);
+    E("ciViz").innerHTML = h;
+    E("ciChip1").innerHTML = "size() <b>" + vw.size + "</b>";
+    E("ciChip2").innerHTML = "capacity <b>" + (vw.newCap || vw.cap) + "</b>";
+    var c = AL.cost;
+    E("ciCost").innerHTML = "<div>Shifts<b>" + c.shift + "</b></div><div>Copies<b>" + c.copy + "</b></div><div>Total units<b>" + (c.shift + c.copy + c.write + c.read) + "</b></div><div>Per add(e)<b>" + (c.adds ? (c.addCost / c.adds).toFixed(2) : "–") + "</b></div>";
+  }
+
+  /* ================= HashMap ================= */
+  var HM = { tab: null, n: 0, size: 0, cost: null };
+  function jhash(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0; return h; }
+  function spread(h) { return h ^ (h >>> 16); }
+  function bits(x, n) { var s = ""; for (var i = n - 1; i >= 0; i--) s += (x >>> i) & 1; return s; }
+  function hmClone() { return HM.tab ? HM.tab.map(function (c) { return c.map(function (e) { return { k: e.k, v: e.v, h: e.h }; }); }) : null; }
+  function hmView(x) { var v = { tab: hmClone(), n: HM.n, size: HM.size, hot: -1, hot2: -1, mark: {}, calc: "" }; for (var k in x || {}) v[k] = x[k]; return v; }
+  function hmCode() { return "Map<String, Integer> m = new HashMap<>();"; }
+  function hmReset(quiet) {
+    HM.tab = null; HM.n = 0; HM.size = 0; HM.cost = { hash: 0, cmp: 0, rehash: 0 };
+    if (quiet) return;
+    queue = []; tasks.length = 0; pendingQ = null;
+    cur = { why: "Empty HashMap: the bucket table is created with 16 buckets on the first put call (load factor 0.75 → threshold 12).", code: hmCode(), view: hmView() };
+    render(); buttons();
+  }
+  function has(k) { var r = false; if (HM.tab) HM.tab.forEach(function (c) { c.forEach(function (e) { if (e.k === k) r = true; }); }); return r; }
+  function calcStr(k, h, s, n) {
+    var b = Math.log2(n);
+    return '"' + esc(k) + '".hashCode() = ' + h + "<br>h ^ (h &gt;&gt;&gt; 16) = " + s + " = …" + bits(s, b + 2) + "₂ → &amp; " + (n - 1) + " → <b>bucket " + (s & (n - 1)) + "</b>";
+  }
+  function hmOp(kind, k, v) {
+    k = String(k);
+    var code = kind === "put" ? 'm.put("' + k + '", ' + v + ");" : kind === "get" ? 'm.get("' + k + '");' : 'm.remove("' + k + '");';
+    if (!k.length) { msg("The key cannot be empty (in this simulator).", code); return; }
+    var first = !HM.tab;
+    if (first && kind !== "put") { msg("There is no table yet: " + kind + " returns null.", code); return; }
+    var n = first ? 16 : HM.n, h = jhash(k), s = spread(h), idx = s & (n - 1);
+    var chain = first ? [] : HM.tab[idx], pos = -1;
+    for (var q = 0; q < chain.length; q++) if (chain[q].k === k) { pos = q; break; }
+    if (kind === "put" && pos < 0 && HM.size >= 24) { msg("This simulator shows at most 24 entries. Remove a key to make room, or use Reset.", code); return; }
+    if (kind === "put" && pos < 0 && chain.length >= 8) { msg("Bucket " + idx + " already holds 8 entries. At the 9th entry Java decides to turn this chain into a tree (or to grow the table first if it has fewer than 64 buckets); the simulator stops here.", code); return; }
+    var calc = calcStr(k, h, s, n);
+    var plan = function () {
+      var f = [];
+      if (first) f.push(F("First put: a table of 16 buckets is created. Threshold = 16 × 0.75 = 12.", code, function () { HM.tab = []; for (var i = 0; i < 16; i++) HM.tab.push([]); HM.n = 16; cur.view = hmView(); }));
+      f.push(F("The key's hashCode() is computed and the upper 16 bits are mixed into the lower ones; the last " + Math.log2(n) + " bits give the bucket number.", code, function () { HM.cost.hash++; cur.view = hmView({ calc: calc }); }));
+      f.push(F("Go straight to bucket " + idx + ". " + (chain.length ? "The chain has " + chain.length + (chain.length === 1 ? " entry." : " entries.") : "The bucket is empty."), code, function () { cur.view = hmView({ calc: calc, hot: idx }); }));
+      var stop = pos < 0 ? chain.length : pos + 1;
+      for (var j = 0; j < stop; j++) (function (j) {
+        var e = chain[j], same = e.h === s;
+        f.push(F('"' + esc(e.k) + '" compared: hash ' + (same ? "equal → equals is called → " + (e.k === k ? "true, key found." : "false (collision: different key, same hash).") : "different → equals is not called, move on to the next one."), code, function () { HM.cost.cmp++; var m = {}; m[idx + ":" + j] = "is-cmp"; cur.view = hmView({ calc: calc, hot: idx, mark: m }); }));
+      })(j);
+      if (kind === "put") {
+        if (pos >= 0) f.push(F("The key already exists: only the value changes (" + chain[pos].v + " → " + v + "); put returns the old value (" + chain[pos].v + "), size() does not change.", code, function () { HM.tab[idx][pos].v = v; var m = {}; m[idx + ":" + pos] = "is-new"; cur.view = hmView({ calc: calc, hot: idx, mark: m }); }));
+        else {
+          f.push(F("The key is not there: a new entry is added at the end of the chain, size() = " + (HM.size + 1) + "; put returns null.", code, function () { HM.tab[idx].push({ k: k, v: v, h: s }); HM.size++; var m = {}; m[idx + ":" + (HM.tab[idx].length - 1)] = "is-new"; cur.view = hmView({ calc: calc, hot: idx, mark: m }); }));
+          if (HM.size + 1 > n * 0.75) resizeFrames(f, n, code);
+        }
+      } else if (kind === "get") {
+        f.push(F(pos >= 0 ? "Found: get returns " + chain[pos].v + ". " + (pos + 1) + (pos === 0 ? " comparison" : " comparisons") + " were enough; the other buckets were never looked at." : "End of chain, the key is not there: get returns null.", code, function () { var m = {}; if (pos >= 0) m[idx + ":" + pos] = "is-new"; cur.view = hmView({ calc: calc, hot: idx, mark: m }); }));
+      } else if (pos >= 0) {
+        f.push(F("Found: the node is unlinked from the chain (the previous node is linked to the next one); remove returns " + chain[pos].v + ".", code, function () { var m = {}; m[idx + ":" + pos] = "is-del"; cur.view = hmView({ calc: calc, hot: idx, mark: m }); }));
+        f.push(F("Entry removed, size() = " + (HM.size - 1) + ".", code, function () { HM.tab[idx].splice(pos, 1); HM.size--; cur.view = hmView({ calc: calc, hot: idx }); }));
+      } else f.push(F("The key is not there: remove returns null, the table does not change.", code, function () { cur.view = hmView({ calc: calc, hot: idx }); }));
+      push(f);
+    };
+    if (quizOn() && !first) ask("Mixed hash = " + s + " (last bits …" + bits(s, Math.log2(n) + 2) + "₂), number of buckets " + n + ". Which bucket number?", idx, [s & (2 * n - 1), (s >>> 1) & (n - 1), (idx + 1) % n, (idx + n / 2) % n], plan);
+    else plan();
+  }
+  function resizeFrames(f, n, code) {
+    var nn = n * 2;
+    f.push(F("size() = " + (HM.size + 1) + " &gt; threshold " + n * 0.75 + ": the table grows to " + nn + " buckets, new threshold " + nn * 0.75 + ". Each chain is split in two, one after another.", code, function () {
+      var t = []; for (var i = 0; i < nn; i++) t.push(i < n ? HM.tab[i] : []); HM.tab = t; HM.n = nn; cur.view = hmView();
+    }));
+    for (var b = 0; b < n; b++) (function (b) {
+      var fr = F("Bucket " + b + ": entries with (hash &amp; " + n + ") == 0 stay in bucket " + b + ", the others move to bucket " + (b + n) + ". The bucket number now looks at one more bit of the hash.", code, function () {
+        var lo = [], hi = [], ch = HM.tab[b];
+        ch.forEach(function (e) { (e.h & n ? hi : lo).push(e); });
+        HM.tab[b] = lo; HM.tab[b + n] = hi; HM.cost.rehash += ch.length;
+        var m = {}; hi.forEach(function (_, j) { m[(b + n) + ":" + j] = "is-moved"; });
+        cur.view = hmView({ hot: b, hot2: b + n, mark: m });
+      });
+      fr.skip = function () { return !HM.tab[b].length; };
+      f.push(fr);
+    })(b);
+    f.push(F("Resizing is done: the entries are spread over " + nn + " buckets and the chains got shorter. Since this expensive step is rare, put stays O(1) on average.", code, function () { cur.view = hmView(); }));
+  }
+
+  function hmRender(vw) {
+    var h = '<p class="hcalc">' + (vw.calc || "&nbsp;") + "</p>";
+    if (!vw.tab) h += '<p class="arrcap">bucket table: not created yet</p>';
+    else {
+      var n = vw.n, cols = n > 16 ? 2 : 1, rows = n / cols, avail = E("ciViz").clientHeight - 54, rh = Math.max(16, Math.min(30, Math.floor(avail / rows)));
+      var colW = (E("ciViz").clientWidth - 20 - 10 * (cols - 1)) / cols - 30;
+      h += '<div class="buckets" style="grid-template-columns:repeat(' + cols + ',1fr);grid-template-rows:repeat(' + rows + "," + rh + 'px)">';
+      for (var i = 0; i < n; i++) {
+        var ch = vw.tab[i], used = 0, shown = 0;
+        h += '<div class="bk' + (i === vw.hot ? " is-hot" : i === vw.hot2 ? " is-split" : "") + '"><span class="bi">' + i + "</span>";
+        for (var j = 0; j < ch.length; j++) {
+          var t = ch[j].k + "=" + ch[j].v, w = t.length * 7.3 + 12 + (j ? 15 : 0);
+          if (used + w > colW - (j < ch.length - 1 ? 26 : 0)) break;
+          used += w; shown++;
+          if (j) h += '<span class="ar">→</span>';
+          h += '<span class="nd ' + (vw.mark[i + ":" + j] || "") + '">' + esc(t) + "</span>";
+        }
+        if (shown < ch.length) h += '<span class="more">+' + (ch.length - shown) + "</span>";
+        h += "</div>";
+      }
+      h += "</div>";
+    }
+    E("ciViz").innerHTML = h;
+    E("ciChip1").innerHTML = "size() <b>" + vw.size + "</b>";
+    E("ciChip2").innerHTML = "buckets <b>" + vw.n + "</b> · threshold <b>" + vw.n * 0.75 + "</b>";
+    var c = HM.cost;
+    E("ciCost").innerHTML = "<div>hashCode<b>" + c.hash + "</b></div><div>Comparisons<b>" + c.cmp + "</b></div><div>Re-placed<b>" + c.rehash + "</b></div><div>Longest chain<b>" + (vw.tab ? Math.max.apply(null, vw.tab.map(function (x) { return x.length; })) : 0) + "</b></div>";
+  }
+
+  /* ================= Comparison ================= */
+  function cmpRender() {
+    var n = +E("cmpN").value, p = +E("cmpPos").value, i = Math.min(n - 1, Math.round(p * (n - 1))), lg = Math.ceil(Math.log2(n + 1)), w = Math.min(i, n - 1 - i) + 1;
+    var rows = [
+      ["get(i)", "read element i", [1, "O(1)"], [w, "O(n)"], null, null],
+      ["add(i, e)", "insert at i", [n - i + 1, "O(n)"], [w, "O(n)"], null, null],
+      ["add(0, e)", "insert at front", [n + 1, "O(n)"], [1, "O(1)"], null, null],
+      ["add(e)", "append", [1, "O(1)*"], [1, "O(1)"], null, null],
+      ["contains(x)", "x at position i", [i + 1, "O(n)"], [i + 1, "O(n)"], null, null],
+      ["put / get", "by key", null, null, [1, "O(1)"], [lg, "O(log n)"]],
+      ["traversal", "key order", null, null, ["—", "unordered"], [n, "O(n) sorted"]]
+    ];
+    var mx = 1; rows.forEach(function (r) { for (var c = 2; c < 6; c++) if (r[c] && typeof r[c][0] === "number") mx = Math.max(mx, r[c][0]); });
+    var h = '<p class="arrcap">n = ' + fmt(n) + ", i = " + fmt(i) + " · approximate number of steps (shifts, node hops or comparisons)</p>";
+    h += '<table class="cmp"><thead><tr><th>Operation</th><th>ArrayList</th><th>LinkedList</th><th>HashMap</th><th>TreeMap</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      h += "<tr><th><code>" + r[0] + "</code><small>" + r[1] + "</small></th>";
+      for (var c = 2; c < 6; c++) {
+        if (!r[c]) { h += '<td class="na">–</td>'; continue; }
+        var val = r[c][0], num = typeof val === "number", bw = num ? Math.max(2, Math.round(34 * val / mx)) : 0;
+        h += '<td><div class="bar' + (num && val > 50 ? " is-bad" : "") + '">' + (num ? "<i style=\"width:" + bw + 'px"></i>' + fmt(val) : val) + "</div><small>" + r[c][1] + "</small></td>";
+      }
+      h += "</tr>";
+    });
+    E("ciViz").innerHTML = h + "</tbody></table>";
+    E("ciChip1").innerHTML = "n <b>" + fmt(n) + "</b>";
+    E("ciChip2").innerHTML = "i <b>" + fmt(i) + "</b>";
+    E("ciWhy").innerHTML = "ArrayList is an array: reading by index is one step, inserting in the middle shifts the elements behind it. LinkedList walks node by node from the nearer end to find the position. HashMap goes straight to the bucket; TreeMap makes about log₂ n comparisons in the tree and keeps the keys sorted. * amortized: now and then n elements are copied.";
+    E("ciCost").innerHTML = "";
+    E("ciCode").textContent = "// the same n elements, four structures: the cost of the same operation";
+  }
+
+  /* ---------- drawing ---------- */
+  function render() {
+    if (tab === "cmp") { cmpRender(); return; }
+    var c = cur || {};
+    E("ciCode").textContent = c.code || "";
+    if (!pendingQ) E("ciWhy").innerHTML = (c.fb || "") + (c.why || "");
+    if (tab === "al") alRender(c.view || alView()); else hmRender(c.view || hmView());
+  }
+
+  /* ---------- events ---------- */
+  function idx() { var v = parseInt(E("alIdx").value, 10); if (isNaN(v)) v = 0; v = Math.max(-1, Math.min(40, v)); E("alIdx").value = v; return v; }
+  E("alAdd").addEventListener("click", function () { alOp("add"); });
+  E("alIns").addEventListener("click", function () { alOp("ins", idx()); });
+  E("alRem").addEventListener("click", function () { alOp("rem", idx()); });
+  E("alGet").addEventListener("click", function () { alOp("get", idx()); });
+  E("alAdd5").addEventListener("click", function () { for (var t = 0; t < 5; t++) enqueue(function () { if (AL.size < 28) alOp("add"); }); });
+  E("alNew").addEventListener("change", alReset);
+  E("hmPut").addEventListener("click", function () { var v = parseInt(E("hmVal").value, 10); if (isNaN(v)) v = 0; hmOp("put", E("hmKey").value.trim(), v); E("hmVal").value = Math.min(99, v + 1); });
+  E("hmGet").addEventListener("click", function () { hmOp("get", E("hmKey").value.trim()); });
+  E("hmRem").addEventListener("click", function () { hmOp("remove", E("hmKey").value.trim()); });
+  var FRUIT = ["elma", "muz", "kiraz", "armut", "erik", "ayva", "nar", "incir", "kivi", "limon", "portakal", "mandalina", "üzüm"];
+  var COLL = ["Aa", "BB", "AaAa", "BBBB", "AaBB", "BBAa"];
+  function preset(list) {
+    list.forEach(function (k, j) { enqueue(function () { if (!has(k) && HM.size < 24) hmOp("put", k, j + 1); }); });
+  }
+  E("hmFruit").addEventListener("click", function () { preset(FRUIT); });
+  E("hmColl").addEventListener("click", function () { preset(COLL); });
+
+  E("ciStep").addEventListener("click", function () { clearTimeout(timer); next(); });
+  E("ciEnd").addEventListener("click", finish);
+  E("ciReset").addEventListener("click", function () { clearTimeout(timer); if (tab === "al") alReset(); else if (tab === "hm") hmReset(); });
+  E("ciAuto").addEventListener("change", schedule);
+  E("ciSpeed").addEventListener("change", schedule);
+  E("cmpN").addEventListener("change", render);
+  E("cmpPos").addEventListener("change", render);
+
+  var saved = { al: null, hm: null };
+  [].forEach.call(root.querySelectorAll(".tabs button"), function (b) {
+    b.addEventListener("click", function () {
+      var t = b.getAttribute("data-tab");
+      if (t === tab) return;
+      if (busy()) { pendingQ = null; finish(); }
+      if (tab !== "cmp") saved[tab] = cur;
+      tab = t;
+      [].forEach.call(root.querySelectorAll(".tabs button"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      [].forEach.call(root.querySelectorAll("[data-pane]"), function (p) { var d = p.getAttribute("data-pane"); p.hidden = d === "run" ? tab === "cmp" : d !== tab; });
+      E("ciScore").hidden = tab === "cmp";
+      if (tab === "al") cur = saved.al || { why: "", code: alCode(), view: alView() };
+      if (tab === "hm") cur = saved.hm || { why: "Empty HashMap: the bucket table is created with 16 buckets on the first put call (load factor 0.75 → threshold 12).", code: hmCode(), view: hmView() };
+      if (cur) cur.fb = "";
+      render(); buttons();
+    });
+  });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && queue.length && !pendingQ) { clearTimeout(timer); next(); ev.preventDefault(); }
+  });
+
+  hmReset(true);
+  alReset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

@@ -1,0 +1,462 @@
+---
+layout: without-sidebar
+title: "Flowchart Runner"
+permalink: /files/computer/slides/Chapter_04_Flowchart-Runner.html
+excerpt: "An interactive flowchart runner that executes examples step by step, showing the active box and arrow, the variables, the screen output, and a decision-prediction mode."
+lang: en
+seo_title: "Flowchart Runner · Computer Fundamentals and Introduction to Programming, Chapter 4"
+og_image: https://sercankulcu.github.io/courses-pdfs/covers/bilgisayar-ve-programlamaya-giris.jpg
+hreflang:
+  tr: /files/computer/sunumlar/Bolum_04_Flowchart-Runner.html
+  en: /files/computer/slides/Chapter_04_Flowchart-Runner.html
+resource: "Interactive simulation"
+course:
+  name: "Computer Fundamentals and Introduction to Programming"
+  url: "/teaching/computer-and-introduction-to-programming/?lang=en"
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.fc-sim.agt-oyun { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+#fc-help { --ds-accent:#b45309; }
+html[data-theme="dark"] #fc-help { --ds-accent:#f59e57; }
+
+.fc-sim .fc-layout { display: grid; grid-template-columns: 410px minmax(0, 1fr); gap: 12px; height: 100%; }
+.fc-sim .panel { min-width: 0; min-height: 0; padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.fc-sim .diagram { display: flex; align-items: center; justify-content: center; }
+.fc-sim .diagram svg { display: block; width: 100%; height: 100%; }
+.fc-sim svg .box { fill: var(--ds-bg); stroke: var(--ds-link); stroke-width: 1.8; }
+.fc-sim svg .box.on { fill: var(--ds-hot); stroke: var(--ds-accent); stroke-width: 3; }
+.fc-sim svg .box.seen { fill: var(--ds-surface-strong); }
+.fc-sim svg .txt { fill: var(--ds-text); font-size: 13.5px; font-family: system-ui, sans-serif; text-anchor: middle; }
+.fc-sim svg .line { fill: none; stroke: var(--ds-muted); stroke-width: 1.6; }
+.fc-sim svg .line.on { stroke: var(--ds-accent); stroke-width: 3; }
+.fc-sim svg .ah { fill: var(--ds-muted); }
+.fc-sim svg .ahon { fill: var(--ds-accent); }
+.fc-sim svg .lbl { fill: var(--ds-muted); font-size: 12px; font-weight: 700; font-family: system-ui, sans-serif; }
+.fc-sim svg .dot { fill: var(--ds-muted); }
+.fc-sim .side { display: flex; flex-direction: column; gap: 7px; }
+.fc-sim .cap { margin: 0; color: var(--ds-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.fc-sim select { width: 100%; min-height: 32px; font-size: 14px; }
+.fc-sim .inputs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.fc-sim .inputs label { display: flex; align-items: center; gap: 4px; font-family: ui-monospace, Consolas, monospace; font-size: 14px; font-weight: 700; }
+.fc-sim .inputs input { width: 64px; min-height: 30px; padding: 0 6px; font-size: 14px; }
+.fc-sim .inputs button { min-height: 30px; padding: 0 10px; font-size: 13.5px; }
+.fc-sim .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.fc-sim .ctl button { min-height: 32px; padding: 0 10px; font-size: 13.5px; }
+.fc-sim .ctl label { display: flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+.fc-sim .ctl input[type="range"] { width: 70px; }
+.fc-sim .pred { display: none; gap: 6px; }
+.fc-sim .pred.on { display: flex; }
+.fc-sim .pred button { border-color: var(--ds-accent); }
+.fc-sim .msg { min-height: 62px; margin: 0; padding: 6px 10px; border-radius: 10px; background: var(--ds-surface-strong); font-size: 14px; line-height: 1.4; }
+.fc-sim .msg.q { box-shadow: inset 0 0 0 2px var(--ds-accent); }
+.fc-sim .msg.bad { color: var(--ds-bad); font-weight: 700; }
+.fc-sim .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; min-height: 0; }
+.fc-sim .two > div { display: flex; flex-direction: column; gap: 3px; min-height: 0; }
+.fc-sim table { width: 100%; font-size: 14px; font-family: ui-monospace, Consolas, monospace; }
+.fc-sim th, .fc-sim td { padding: 3px 7px; text-align: left; }
+.fc-sim td.chg { background: var(--ds-hot); font-weight: 800; }
+.fc-sim .vars { flex: 1; min-height: 0; overflow: hidden; }
+.fc-sim .out { flex: 1; min-height: 0; margin: 0; padding: 5px 8px; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-surface); font-family: ui-monospace, Consolas, monospace; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+.fc-sim .out .new { color: var(--ds-accent); font-weight: 800; }
+.fc-sim .foot { display: flex; justify-content: space-between; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+</style>
+
+<div class="fc-sim agt-oyun agt-oyun--stage" lang="en">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Chapter 4 · Simulation</p><h1>Flowchart Runner</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="fc-help">?</button>
+    <a class="agt-oyun__back" href="Chapter_04_02_Flowcharts.html">← Chapter 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="fc-layout">
+      <section class="panel diagram"><svg id="fcSvg" role="img" aria-label="Flowchart"></svg></section>
+      <aside class="panel side">
+        <select id="fcEx" aria-label="Example flowchart">
+          <option value="max">Find the larger of two numbers</option>
+          <option value="sum">Sum from 1 to n</option>
+          <option value="fact">Factorial (n!)</option>
+          <option value="grade">Letter grade</option>
+          <option value="prime">Is it prime?</option>
+        </select>
+        <div class="inputs" id="fcInputs"></div>
+        <div class="ctl">
+          <button type="button" id="fcReset" aria-label="Back to the start">⏮</button>
+          <button type="button" id="fcBack" aria-label="One step back">◀ Back</button>
+          <button type="button" id="fcFwd" class="is-primary" aria-label="One step forward">Step ▶</button>
+          <button type="button" id="fcPlay" aria-label="Play">Play</button>
+          <label>Speed <input type="range" id="fcSpeed" min="1" max="5" value="3" aria-label="Playback speed"></label>
+        </div>
+        <div class="ctl">
+          <label><input type="checkbox" id="fcPredict"> Predict the decisions</label>
+          <span class="pred" id="fcPred"><button type="button" id="fcYes" aria-label="Prediction: Yes">Yes</button><button type="button" id="fcNo" aria-label="Prediction: No">No</button></span>
+        </div>
+        <p class="msg" id="fcMsg" aria-live="polite"></p>
+        <div class="two">
+          <div><p class="cap">Variables</p><div class="vars"><table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody id="fcVars"></tbody></table></div></div>
+          <div><p class="cap">Output (screen)</p><pre class="out" id="fcOut"></pre></div>
+        </div>
+        <div class="foot"><span id="fcStep"></span><span id="fcScore"></span></div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="fc-help">
+    <button type="button" class="agt-oyun__close">Close</button>
+    <h2>Flowchart runner</h2>
+    <p><b>Goal:</b> See how a computer “executes” a flowchart: which box runs, which arrow is followed, and how the variables and the screen output change.</p>
+    <table>
+      <tr><th>Symbol</th><th>Role</th></tr>
+      <tr><td>Oval</td><td>Start / End</td></tr>
+      <tr><td>Rectangle</td><td>Process (calculation, assignment)</td></tr>
+      <tr><td>Diamond</td><td>Decision: two exits, Yes / No</td></tr>
+      <tr><td>Parallelogram</td><td>Input / output (read, print)</td></tr>
+    </table>
+    <h3>How to use it</h3>
+    <ol>
+      <li>Pick an example and type the input values (Enter or <b>Apply</b>).</li>
+      <li>Use <b>Step ▶</b> to move to the next box; the followed arrow and the running box turn orange. <b>◀ Back</b> undoes one step, <b>Play</b> runs it automatically.</li>
+      <li>In the variable table the value that changed in that step is highlighted; <i>print</i> boxes add a line to the output area.</li>
+      <li>If <b>Predict the decisions</b> is ticked, the run stops at every decision box; predict whether the Yes or the No path will be taken.</li>
+    </ol>
+    <p>In the loop examples the arrow that goes back (repeat) asks the same decision again; without the process that changes the condition (i = i + 1) the loop would never end. In the sum from 1 to n, i is the counter and sum is the accumulator.</p>
+    <p>Related slides: <a href="Chapter_04_02_Flowcharts.html">Chapter 4.2 · Flowcharts</a> and <a href="Chapter_04_01_Algorithms.html">Chapter 4.1 · Algorithms</a> (prime number, factorial).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. All rights reserved. */
+(function () {
+  /* runs only at sercankulcu.github.io (and in local preview) (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+  var E = function (id) { return document.getElementById(id); };
+  function N(type, x, y, w, h, text, o) { o = o || {}; o.type = type; o.x = x; o.y = y; o.w = w; o.h = h; o.text = text; return o; }
+  function ED(f, t, d, lab, lx, ly, anchor) { return { f: f, t: t, d: d, lab: lab, lx: lx, ly: ly, anchor: anchor }; }
+  function yn(c) { return c ? "true → Yes" : "false → No"; }
+
+  /* the two loop examples (sum, factorial) share the same layout */
+  function loopChart(t) {
+    return {
+      vb: [420, 345], dots: [],
+      nodes: {
+        s: N("term", 160, 22, 110, 28, "Start", { next: "r" }),
+        r: N("io", 160, 70, 180, 32, "read n", { next: "p1", run: function (S) { S.set("n", S.inp.n); return "Input box: the user enters " + S.inp.n + " → n = " + S.inp.n + "."; } }),
+        p1: N("proc", 160, 122, 180, 30, t.init, { next: "d", run: t.initRun }),
+        d: N("dec", 160, 190, 150, 60, "i <= n ?", { yes: "p2", no: "o", test: function (v) { return v.i <= v.n; }, q: function (v) { return "i <= n ? (i = " + v.i + ", n = " + v.n + ")"; }, why: function (v, c) { return "Decision: " + v.i + " <= " + v.n + " → " + yn(c) + (c ? ", enter the loop body." : ", leave the loop."); } }),
+        p2: N("proc", 160, 256, 180, 30, t.body, { next: "p3", run: t.bodyRun }),
+        p3: N("proc", 160, 312, 180, 30, "i = i + 1", { next: "d", run: function (S) { var o = S.v.i; S.set("i", o + 1); return "i = " + o + " + 1 = " + (o + 1) + ". The arrow going back leads to the decision again."; } }),
+        o: N("io", 330, 256, 140, 32, t.out, { next: "e", run: t.outRun }),
+        e: N("term", 330, 312, 100, 28, "End")
+      },
+      edges: [
+        ED("s", "r", "M160 36 L160 54"), ED("r", "p1", "M160 86 L160 107"), ED("p1", "d", "M160 137 L160 160"),
+        ED("d", "p2", "M160 220 L160 241", "Yes", 168, 235, "start"), ED("p2", "p3", "M160 271 L160 297"),
+        ED("p3", "d", "M70 312 L24 312 L24 190 L85 190", "repeat", 30, 300, "start"),
+        ED("d", "o", "M235 190 L330 190 L330 240", "No", 245, 182, "start"), ED("o", "e", "M330 272 L330 298")
+      ],
+      start: "s"
+    };
+  }
+
+  var EX = {
+    max: {
+      inputs: [["a", 4, -999, 999], ["b", 9, -999, 999]],
+      vb: [420, 365], dots: [[210, 296]],
+      nodes: {
+        s: N("term", 210, 24, 110, 28, "Start", { next: "r" }),
+        r: N("io", 210, 76, 190, 32, "read a, b", { next: "d", run: function (S) { S.set("a", S.inp.a); S.set("b", S.inp.b); return "Input box: the user enters " + S.inp.a + " and " + S.inp.b + " → a = " + S.inp.a + ", b = " + S.inp.b + "."; } }),
+        d: N("dec", 210, 150, 160, 64, "a > b ?", { yes: "oa", no: "ob", test: function (v) { return v.a > v.b; }, q: function (v) { return "a > b ? (a = " + v.a + ", b = " + v.b + ")"; }, why: function (v, c) { return "Decision: " + v.a + " > " + v.b + " → " + yn(c) + ": that branch is followed."; } }),
+        oa: N("io", 90, 232, 120, 32, "print a", { next: "e", run: function (S) { S.print(S.v.a); return "Output box: " + S.v.a + " is printed on the screen. The box on the No branch never runs in this execution."; } }),
+        ob: N("io", 330, 232, 120, 32, "print b", { next: "e", run: function (S) { S.print(S.v.b); return "Output box: " + S.v.b + " is printed on the screen. The box on the Yes branch never runs in this execution."; } }),
+        e: N("term", 210, 344, 110, 28, "End")
+      },
+      edges: [
+        ED("s", "r", "M210 38 L210 60"), ED("r", "d", "M210 92 L210 118"),
+        ED("d", "oa", "M130 150 L90 150 L90 216", "Yes", 124, 142, "end"),
+        ED("d", "ob", "M290 150 L330 150 L330 216", "No", 296, 142, "start"),
+        ED("oa", "e", "M90 248 L90 296 L210 296 L210 330"), ED("ob", "e", "M330 248 L330 296 L210 296 L210 330")
+      ],
+      start: "s",
+      end: function (v) { return "The End box was reached. For equal numbers (a = b), a > b is false and b is printed; since both are the same value the result is still correct."; }
+    },
+    sum: (function () {
+      var c = loopChart({
+        init: "sum = 0, i = 1", body: "sum = sum + i", out: "print sum",
+        initRun: function (S) { S.set("sum", 0); S.set("i", 1); return "Process box: accumulator sum = 0, counter i = 1."; },
+        bodyRun: function (S) { var o = S.v.sum; S.set("sum", o + S.v.i); return "sum = " + o + " + " + S.v.i + " = " + (o + S.v.i) + "."; },
+        outRun: function (S) { S.print(S.v.sum); return "Output box: " + S.v.sum + " is printed on the screen."; }
+      });
+      c.inputs = [["n", 4, 0, 30]];
+      c.end = function (v) { return "End. The body ran " + v.n + " time(s); the result can also be checked with the formula n(n+1)/2 = " + (v.n * (v.n + 1) / 2) + "."; };
+      return c;
+    })(),
+    fact: (function () {
+      var c = loopChart({
+        init: "result = 1, i = 2", body: "result = result × i", out: "print result",
+        initRun: function (S) { S.set("result", 1n); S.set("i", 2); return "Process box: result = 1 (the identity element of multiplication), i = 2."; },
+        bodyRun: function (S) { var o = S.v.result, r = o * BigInt(S.v.i); S.set("result", r); return "result = " + o + " × " + S.v.i + " = " + r + "."; },
+        outRun: function (S) { S.print(S.v.result); return "Output box: " + S.v.n + "! = " + S.v.result + " is printed on the screen."; }
+      });
+      c.inputs = [["n", 5, 0, 20]];
+      c.end = function (v) { return "End. " + (v.n < 2 ? "Since n < 2 the loop never ran; 0! = 1! = 1." : "The body ran " + (v.n - 1) + " time(s) (i = 2…" + v.n + ")."); };
+      return c;
+    })(),
+    grade: {
+      inputs: [["score", 72, 0, 100]],
+      vb: [420, 462], dots: [[150, 408]],
+      nodes: {
+        s: N("term", 150, 22, 110, 28, "Start", { next: "r" }),
+        r: N("io", 150, 68, 180, 32, "read score", { next: "d1", run: function (S) { S.set("score", S.inp.score); return "Input box: the user enters " + S.inp.score + " → score = " + S.inp.score + "."; } }),
+        d1: gradeDec(85, "aa", "d2"), d2: gradeDec(70, "bb", "d3"), d3: gradeDec(60, "cc", "ff"),
+        aa: gradeOut(330, 130, "A"), bb: gradeOut(330, 212, "B"), cc: gradeOut(330, 294, "C"), ff: gradeOut(150, 368, "F"),
+        e: N("term", 150, 440, 100, 28, "End")
+      },
+      edges: [
+        ED("s", "r", "M150 36 L150 52"), ED("r", "d1", "M150 84 L150 102"),
+        ED("d1", "aa", "M230 130 L281 130", "Yes", 236, 122, "start"), ED("d1", "d2", "M150 158 L150 184", "No", 158, 176, "start"),
+        ED("d2", "bb", "M230 212 L281 212", "Yes", 236, 204, "start"), ED("d2", "d3", "M150 240 L150 266", "No", 158, 258, "start"),
+        ED("d3", "cc", "M230 294 L281 294", "Yes", 236, 286, "start"), ED("d3", "ff", "M150 322 L150 352", "No", 158, 342, "start"),
+        ED("aa", "e", "M379 130 L404 130 L404 408 L150 408 L150 426"), ED("bb", "e", "M379 212 L404 212 L404 408 L150 408 L150 426"),
+        ED("cc", "e", "M379 294 L404 294 L404 408 L150 408 L150 426"), ED("ff", "e", "M150 384 L150 426")
+      ],
+      start: "s",
+      end: function (v) { return "End. The conditions were tried from top to bottom; the branch of the first true condition ran and the later decisions were never asked."; }
+    },
+    prime: {
+      inputs: [["n", 29, 0, 10000]],
+      vb: [420, 472], dots: [[150, 432]],
+      nodes: {
+        s: N("term", 150, 20, 110, 28, "Start", { next: "r" }),
+        r: N("io", 150, 64, 170, 32, "read n", { next: "d0", run: function (S) { S.set("n", S.inp.n); return "Input box: the user enters " + S.inp.n + " → n = " + S.inp.n + "."; } }),
+        d0: N("dec", 150, 120, 124, 52, "n < 2 ?", { yes: "o1", no: "p1", test: function (v) { return v.n < 2; }, q: function (v) { return "n < 2 ? (n = " + v.n + ")"; }, why: function (v, c) { return "Decision: " + v.n + " < 2 → " + yn(c) + (c ? ": 0 and 1 are not prime." : ": go on to search for a divisor."); } }),
+        p1: N("proc", 150, 178, 120, 28, "i = 2", { next: "d1", run: function (S) { S.set("i", 2); return "Process box: the first candidate divisor, i = 2."; } }),
+        d1: N("dec", 150, 240, 150, 56, "i × i <= n ?", { yes: "d2", no: "o2", test: function (v) { return v.i * v.i <= v.n; }, q: function (v) { return "i × i <= n ? (i = " + v.i + ", n = " + v.n + ")"; }, why: function (v, c) { return "Decision: " + v.i + " × " + v.i + " = " + (v.i * v.i) + " <= " + v.n + " → " + yn(c) + (c ? ": i could be a divisor, try it." : ": i has now passed √n, so there is no need to keep searching."); } }),
+        d2: N("dec", 150, 320, 156, 56, "n % i == 0 ?", { yes: "o3", no: "p2", test: function (v) { return v.n % v.i === 0; }, q: function (v) { return "n % i == 0 ? (n = " + v.n + ", i = " + v.i + ")"; }, why: function (v, c) { return "Decision: " + v.n + " % " + v.i + " = " + (v.n % v.i) + " → " + yn(c) + (c ? ": " + v.i + " is a divisor, so n is not prime." : ": " + v.i + " is not a divisor, try the next candidate."); } }),
+        p2: N("proc", 150, 392, 120, 28, "i = i + 1", { next: "d1", run: function (S) { var o = S.v.i; S.set("i", o + 1); return "i = " + o + " + 1 = " + (o + 1) + ". The arrow going back leads to the decision again."; } }),
+        o1: primeOut(330, 120, "not prime"), o2: primeOut(330, 240, "prime"), o3: primeOut(330, 320, "not prime"),
+        e: N("term", 150, 452, 100, 28, "End")
+      },
+      edges: [
+        ED("s", "r", "M150 34 L150 48"), ED("r", "d0", "M150 80 L150 94"),
+        ED("d0", "o1", "M212 120 L271 120", "Yes", 218, 112, "start"), ED("d0", "p1", "M150 146 L150 164", "No", 158, 158, "start"),
+        ED("p1", "d1", "M150 192 L150 212"),
+        ED("d1", "d2", "M150 268 L150 292", "Yes", 158, 284, "start"), ED("d1", "o2", "M225 240 L271 240", "No", 229, 232, "start"),
+        ED("d2", "o3", "M228 320 L271 320", "Yes", 232, 312, "start"), ED("d2", "p2", "M150 348 L150 378", "No", 158, 366, "start"),
+        ED("p2", "d1", "M90 392 L24 392 L24 240 L75 240", "repeat", 30, 380, "start"),
+        ED("o1", "e", "M389 120 L408 120 L408 432 L150 432 L150 438"), ED("o2", "e", "M389 240 L408 240 L408 432 L150 432 L150 438"),
+        ED("o3", "e", "M389 320 L408 320 L408 432 L150 432 L150 438")
+      ],
+      start: "s",
+      end: function (v) {
+        if (v.n < 2) return "End. Since n < 2, no divisor was searched for.";
+        var kok = (Math.round(Math.sqrt(v.n) * 100) / 100).toString();
+        if (v.i * v.i <= v.n) return "End. " + v.i + " is a divisor: the search stopped right away (2…" + v.i + " tried).";
+        return "End. " + (v.i > 2 ? "2…" + (v.i - 1) + " were tried and none is a divisor" : "No candidate was tried (2 × 2 > " + v.n + ")") + "; testing up to the limit √" + v.n + " ≈ " + kok + " is enough.";
+      }
+    }
+  };
+  function gradeDec(t, yes, no) {
+    return N("dec", 150, { 85: 130, 70: 212, 60: 294 }[t], 160, 56, "score >= " + t + " ?", { yes: yes, no: no,
+      test: function (v) { return v.score >= t; }, q: function (v) { return "score >= " + t + " ? (score = " + v.score + ")"; },
+      why: function (v, c) { return "Decision: " + v.score + " >= " + t + " → " + yn(c) + "."; } });
+  }
+  function gradeOut(x, y, g) { return N("io", x, y, 110, 32, 'print "' + g + '"', { next: "e", run: function (S) { S.print(g); return "Output box: " + g + " is printed on the screen."; } }); }
+  function primeOut(x, y, s) { return N("io", x, y, 130, 32, 'print "' + s + '"', { next: "e", run: function (S) { S.print(s); return "Output box: \"" + s + "\" is printed on the screen."; } }); }
+
+  /* ---------- execution: all steps are generated in advance ---------- */
+  function execute(ex, inp) {
+    var F = [], v = {}, order = [], out = [], cur = ex.start, cond = null, changed = [];
+    var S = { v: v, inp: inp,
+      set: function (k, val) { if (order.indexOf(k) < 0) order.push(k); v[k] = val; changed.push(k); },
+      print: function (x) { out.push(String(x)); } };
+    function snap(o) {
+      o.vars = order.map(function (k) { return [k, String(v[k])]; });
+      o.changed = changed.slice(); o.out = out.slice();
+      F.push(o); changed = [];
+    }
+    snap({ node: cur, edge: -1, msg: "Execution starts at the Start box. There are no variables yet." });
+    for (var guard = 0; guard < 2000; guard++) {
+      var nd = ex.nodes[cur];
+      var nx = nd.type === "dec" ? (cond ? nd.yes : nd.no) : nd.next;
+      var ei = -1;
+      for (var i = 0; i < ex.edges.length; i++) if (ex.edges[i].f === cur && ex.edges[i].t === nx) { ei = i; break; }
+      cur = nx; nd = ex.nodes[cur];
+      if (nd.type === "dec") {
+        var q = nd.q(v);
+        cond = nd.test(v);
+        snap({ node: cur, edge: ei, msg: nd.why(v, cond), q: q, cond: cond });
+      } else if (nd.type === "term") {
+        snap({ node: cur, edge: ei, msg: ex.end(v), end: true });
+        return F;
+      } else {
+        var m = nd.run(S);
+        snap({ node: cur, edge: ei, msg: m });
+      }
+    }
+    return F;
+  }
+
+  /* ---------- drawing ---------- */
+  var exKey = "max", ex = EX.max, frames = [], pos = 0, timer = null, pending = false, answered = {}, score = { ok: 0, n: 0 }, seenNodes = {};
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function shape(id, nd) {
+    var x = nd.x, y = nd.y, w = nd.w / 2, h = nd.h / 2, s;
+    if (nd.type === "term") s = '<rect class="box" x="' + (x - w) + '" y="' + (y - h) + '" width="' + nd.w + '" height="' + nd.h + '" rx="' + h + '"/>';
+    else if (nd.type === "proc") s = '<rect class="box" x="' + (x - w) + '" y="' + (y - h) + '" width="' + nd.w + '" height="' + nd.h + '" rx="2"/>';
+    else if (nd.type === "io") s = '<polygon class="box" points="' + [(x - w + 12) + "," + (y - h), (x + w) + "," + (y - h), (x + w - 12) + "," + (y + h), (x - w) + "," + (y + h)].join(" ") + '"/>';
+    else s = '<polygon class="box" points="' + [x + "," + (y - h), (x + w) + "," + y, x + "," + (y + h), (x - w) + "," + y].join(" ") + '"/>';
+    return '<g data-n="' + id + '">' + s + '<text class="txt" x="' + x + '" y="' + (y + 5) + '">' + esc(nd.text) + '</text></g>';
+  }
+  function drawChart() {
+    var h = '<defs><marker id="fcA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker>' +
+      '<marker id="fcH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ahon" d="M0 0 L10 5 L0 10z"/></marker></defs>';
+    ex.edges.forEach(function (e, i) {
+      h += '<path class="line" data-e="' + i + '" d="' + e.d + '" marker-end="url(#fcA)"/>';
+    });
+    ex.edges.forEach(function (e) {
+      if (e.lab) h += '<text class="lbl" x="' + e.lx + '" y="' + e.ly + '" text-anchor="' + (e.anchor || "middle") + '">' + e.lab + '</text>';
+    });
+    (ex.dots || []).forEach(function (d) { h += '<circle class="dot" cx="' + d[0] + '" cy="' + d[1] + '" r="4"/>'; });
+    Object.keys(ex.nodes).forEach(function (id) { h += shape(id, ex.nodes[id]); });
+    var svg = E("fcSvg");
+    svg.setAttribute("viewBox", "0 0 " + ex.vb[0] + " " + ex.vb[1]);
+    svg.innerHTML = h;
+  }
+  function draw() {
+    var f = frames[pos], showQ = pending;
+    seenNodes = {};
+    for (var k = 0; k <= pos; k++) seenNodes[frames[k].node] = 1;
+    E("fcSvg").querySelectorAll("g[data-n]").forEach(function (g) {
+      var id = g.getAttribute("data-n"), b = g.querySelector(".box");
+      b.classList.toggle("on", id === f.node);
+      b.classList.toggle("seen", id !== f.node && !!seenNodes[id]);
+    });
+    E("fcSvg").querySelectorAll("path[data-e]").forEach(function (p) {
+      var on = +p.getAttribute("data-e") === f.edge;
+      p.classList.toggle("on", on);
+      p.setAttribute("marker-end", on ? "url(#fcH)" : "url(#fcA)");
+      if (on) p.parentNode.appendChild(p);
+    });
+    var m = E("fcMsg");
+    m.className = "msg" + (showQ ? " q" : "");
+    m.innerHTML = showQ ? "<b>Prediction:</b> " + esc(f.q) + " Yes or No?" : esc(f.msg);
+    E("fcVars").innerHTML = f.vars.length ? f.vars.map(function (r) {
+      var c = f.changed.indexOf(r[0]) >= 0 ? ' class="chg"' : "";
+      return "<tr><td" + c + ">" + esc(r[0]) + "</td><td" + c + ">" + esc(r[1]) + "</td></tr>";
+    }).join("") : '<tr><td colspan="2" style="color:var(--ds-muted)">(none yet)</td></tr>';
+    var prevLen = pos > 0 ? frames[pos - 1].out.length : 0;
+    var lines = f.out.slice(-9);
+    var off = f.out.length - lines.length;
+    E("fcOut").innerHTML = lines.map(function (l, i) { return (i + off >= prevLen ? '<span class="new">' + esc(l) + "</span>" : esc(l)); }).join("\n");
+    E("fcStep").textContent = "Step " + pos + " / " + (frames.length - 1);
+    E("fcScore").textContent = score.n ? "Predictions: " + score.ok + " / " + score.n : "";
+    E("fcPred").classList.toggle("on", showQ);
+    E("fcFwd").disabled = pending || pos >= frames.length - 1;
+    E("fcBack").disabled = pos === 0;
+    E("fcPlay").disabled = E("fcPredict").checked || pos >= frames.length - 1;
+    E("fcPlay").textContent = timer ? "Pause" : "Play";
+    E("fcPlay").setAttribute("aria-label", timer ? "Pause" : "Play");
+  }
+
+  /* ---------- input ---------- */
+  function buildInputs() {
+    E("fcInputs").innerHTML = ex.inputs.map(function (p) {
+      return '<label>' + p[0] + ' = <input type="number" data-k="' + p[0] + '" value="' + p[1] + '" min="' + p[2] + '" max="' + p[3] + '" step="1" aria-label="' + p[0] + ' input value (' + p[2] + '…' + p[3] + ')"></label>';
+    }).join("") + '<button type="button" id="fcApply">Apply</button>';
+    E("fcApply").addEventListener("click", restart);
+    E("fcInputs").querySelectorAll("input").forEach(function (i) {
+      i.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); restart(); } });
+    });
+  }
+  function readInputs() {
+    var inp = {}, bad = null;
+    ex.inputs.forEach(function (p) {
+      var el = E("fcInputs").querySelector('[data-k="' + p[0] + '"]'), v = Number(el.value);
+      if (el.value.trim() === "" || !Number.isInteger(v) || v < p[2] || v > p[3]) bad = bad || "Enter a whole number between " + p[2] + " and " + p[3] + " for " + p[0] + ".";
+      inp[p[0]] = v;
+    });
+    return bad ? { err: bad } : inp;
+  }
+  function restart() {
+    stop();
+    var inp = readInputs();
+    if (inp.err) { var m = E("fcMsg"); m.className = "msg bad"; m.textContent = inp.err; return; }
+    frames = execute(ex, inp);
+    pos = 0; pending = false; answered = {};
+    draw();
+  }
+  function selectEx() {
+    exKey = E("fcEx").value; ex = EX[exKey];
+    buildInputs(); drawChart(); restart();
+  }
+
+  /* ---------- playback ---------- */
+  function fwd() {
+    if (pending || pos >= frames.length - 1) return;
+    pos++;
+    if (E("fcPredict").checked && frames[pos].q && !answered[pos]) pending = true;
+    draw();
+  }
+  function back() { stop(); pending = false; if (pos > 0) pos--; draw(); }
+  function answer(g) {
+    if (!pending) return;
+    var f = frames[pos], ok = g === f.cond;
+    score.n++; if (ok) score.ok++;
+    answered[pos] = true; pending = false;
+    draw();
+    E("fcMsg").innerHTML = '<b style="color:var(--ds-' + (ok ? "good" : "bad") + ')">' + (ok ? "Correct prediction." : "Wrong prediction.") + "</b> " + esc(f.msg);
+    E("fcFwd").focus();
+  }
+  var DELAYS = [1600, 1100, 700, 400, 180];
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (pos >= frames.length - 1) return;
+    timer = setTimeout(tick, 0); draw();
+  }
+  function tick() {
+    if (pos >= frames.length - 1) { stop(); draw(); return; }
+    pos++; draw();
+    timer = setTimeout(tick, DELAYS[+E("fcSpeed").value - 1]);
+  }
+  function stop() { if (timer) clearTimeout(timer); timer = null; }
+
+  E("fcEx").addEventListener("change", selectEx);
+  E("fcFwd").addEventListener("click", fwd);
+  E("fcBack").addEventListener("click", back);
+  E("fcReset").addEventListener("click", function () { stop(); pos = 0; pending = false; draw(); });
+  E("fcPlay").addEventListener("click", play);
+  E("fcPredict").addEventListener("change", function () { stop(); if (!this.checked) pending = false; draw(); });
+  E("fcYes").addEventListener("click", function () { answer(true); });
+  E("fcNo").addEventListener("click", function () { answer(false); });
+
+  selectEx();
+})();
+</script>
+<script src="deck/oyun.js"></script>
