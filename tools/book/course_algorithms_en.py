@@ -41,7 +41,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Algorithms',
-    subtitle='',
+    subtitle='Design, Analysis and Implementation in Java',
     output='algorithms/Algorithms.pdf',              # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Algorithms course textbook: complexity, sorting, searching, graph and string algorithms',

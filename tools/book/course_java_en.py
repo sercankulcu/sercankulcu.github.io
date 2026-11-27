@@ -42,7 +42,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Object-Oriented Programming with Java',
-    subtitle='',
+    subtitle='From Basics to Applications',
     output='java/Object-Oriented-Programming-with-Java.pdf',     # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Object-Oriented Programming with Java course textbook: classes, inheritance, '

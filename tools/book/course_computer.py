@@ -30,7 +30,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='Bilgisayar ve Programlamaya Giriş',
-    subtitle='',
+    subtitle='İlk Adımlar',
     output='computer/Bilgisayar-ve-Programlamaya-Giris.pdf',   # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Bilgisayar ve Programlamaya Giriş ders kitabı: donanım, işletim sistemleri, '

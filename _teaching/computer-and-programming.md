@@ -24,7 +24,7 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 ## Ders Kitabı
 
-[📕 Bilgisayar ve Programlamaya Giriş (PDF, 24 MB)](https://sercankulcu.github.io/courses-pdfs/computer/Bilgisayar-ve-Programlamaya-Giris.pdf)
+[📕 Bilgisayar ve Programlamaya Giriş: İlk Adımlar (PDF, 24 MB)](https://sercankulcu.github.io/courses-pdfs/computer/Bilgisayar-ve-Programlamaya-Giris.pdf)
 
 ---
 
@@ -166,7 +166,7 @@ Dizgiler karakter dizilerini temsil eder ve metin işlemede kullanılır. Bölü
 
 ## Textbook
 
-[📕 Computer Fundamentals and Introduction to Programming — the course book (PDF, 23 MB)](https://sercankulcu.github.io/courses-pdfs/computer/Computer-Fundamentals-and-Introduction-to-Programming.pdf)
+[📕 Computer Fundamentals and Introduction to Programming: First Steps — the course book (PDF, 23 MB)](https://sercankulcu.github.io/courses-pdfs/computer/Computer-Fundamentals-and-Introduction-to-Programming.pdf)
 
 ---
 

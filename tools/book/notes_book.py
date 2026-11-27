@@ -566,7 +566,7 @@ def setup(g, **cfg):
     """Ders modulunun globals()'ina build.py'nin bekledigi adlari yazar."""
     c = _Course(**cfg)
     en = c.lang == 'en'
-    g.update(TITLE=c.title, LANG=c.lang, OUTPUT=c.output, FONT=FONT, META=c.meta,
+    g.update(TITLE=c.title, FULL_TITLE=c.title + (': ' + c.subtitle if c.subtitle else ''), LANG=c.lang, OUTPUT=c.output, FONT=FONT, META=c.meta,
              LABELS=LABELS_EN if en else LABELS, TOC_SECTIONS=True, BOOKMARK_SECTIONS=True,
              CSS_FILES=['book-front.css', os.path.join(c.dir, 'notlar', 'notlar.css')] + c.extra_css
                        + ['book_notes.css'] + (['book_notes_en.css'] if en else []),

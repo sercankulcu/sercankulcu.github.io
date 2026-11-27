@@ -40,7 +40,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Advanced Algorithms',
-    subtitle='',
+    subtitle='Techniques for Hard Problems',
     output='advanced_algorithms/Advanced-Algorithms.pdf',   # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Advanced Algorithms course textbook: divide and conquer, greedy algorithms, dynamic '

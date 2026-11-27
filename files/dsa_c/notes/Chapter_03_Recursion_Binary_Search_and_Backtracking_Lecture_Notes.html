@@ -147,7 +147,7 @@ course:
     <li><a href="#s3-10">3.10 The n-queens problem</a>
       <ol>
         <li><a href="#s3-10-1">3.10.1 The problem and the representation</a></li>
-        <li><a href="#s3-10-2">3.10.2 safe() and place()</a></li>
+        <li><a href="#s3-10-2">3.10.2 is_safe() and place()</a></li>
         <li><a href="#s3-10-3">3.10.3 Code trace: 4 queens</a></li>
         <li><a href="#s3-10-4">3.10.4 The gain from pruning</a></li>
       </ol>
@@ -182,7 +182,7 @@ course:
   <p><strong>Recursion</strong> is a function calling itself with a smaller input. A function that calls itself is called <strong>recursive</strong>. If a function calls itself directly, there is <strong>direct recursion</strong>: <code>fact</code> → <code>fact</code>. If a function calls another function, which at the end of the chain calls the first function again, there is <strong>indirect recursion</strong>: <code>A</code> → <code>B</code> → <code>A</code>.</p>
 </div>
 
-<p>A familiar example of indirect recursion is expression parsers. The function <code>expr()</code>, which parses an arithmetic expression, calls the function <code>term()</code> to read terms. When a new expression begins inside parentheses, <code>term()</code> calls <code>expr()</code> again. The two functions never call themselves directly, but the chain forms a closed cycle. When writing indirect recursion in C, the declaration (prototype) of the second function must be given before the first function; otherwise the compiler does not recognize a name it has not yet seen.</p>
+<p>Expression parsers are a familiar example of indirect recursion. The function <code>expr()</code>, which parses an arithmetic expression, calls the function <code>term()</code> to read terms. When a new expression begins inside parentheses, <code>term()</code> calls <code>expr()</code> again. The two functions never call themselves directly, but the chain forms a closed cycle. When writing indirect recursion in C, the declaration (prototype) of the second function must be given before the first function; otherwise the compiler does not recognize a name it has not yet seen.</p>
 
 <h3 id="s3-1-2"><span class="nt-num">3.1.2</span>Base case and recursive step</h3>
 
@@ -322,16 +322,16 @@ course:
 }
 
 <span class="cm">/* with a loop */</span>
-<span class="kw">long</span> fact_loop(<span class="kw">int</span> n) {
+<span class="kw">long</span> fact_iter(<span class="kw">int</span> n) {
   <span class="kw">long</span> f = 1;
   <span class="kw">while</span> (n &gt; 1)
     f *= n--;
   <span class="kw">return</span> f;
 }</code></pre>
 
-<p>The recursive version has shrunk to a single line. The conditional operator <code>?:</code> is the expression form of the <code>if–else</code> construct: if the condition is true it gives the value before the colon, otherwise the one after. The loop version uses an accumulating variable named <code>f</code>. The line <code>f *= n--;</code> does two things: first it multiplies <code>f</code> by <code>n</code>, then it decrements <code>n</code> by one. The postfix <code>--</code> operator uses the old value in the expression and decrements the variable afterwards. In the call <code>fact_loop(4)</code>, <code>f</code> becomes 4, 12, 24 in turn, and the loop stops when <span class="m">n = 1</span>.</p>
+<p>The recursive version has shrunk to a single line. The conditional operator <code>?:</code> is the expression form of the <code>if–else</code> construct: if the condition is true it gives the value before the colon, otherwise the one after. The loop version uses an accumulating variable named <code>f</code>. The line <code>f *= n--;</code> does two things: first it multiplies <code>f</code> by <code>n</code>, then it decrements <code>n</code> by one. The postfix <code>--</code> operator uses the old value in the expression and decrements the variable afterwards. In the call <code>fact_iter(4)</code>, <code>f</code> becomes 4, 12, 24 in turn, and the loop stops when <span class="m">n = 1</span>.</p>
 
-<p>In the loop version, changing the parameter <code>n</code> does not affect the caller. In C parameters are passed by value: the function works with a copy of the caller's variable. After the call <code>fact_loop(x)</code>, <code>x</code> remains unchanged.</p>
+<p>In the loop version, changing the parameter <code>n</code> does not affect the caller. In C parameters are passed by value: the function works with a copy of the caller's variable. After the call <code>fact_iter(x)</code>, <code>x</code> remains unchanged.</p>
 
 <h3 id="s3-3-2"><span class="nt-num">3.3.2</span>Comparison</h3>
 
@@ -416,7 +416,7 @@ course:
 
 <p>Since after a tail call there is no work waiting in the frame, there is no point in keeping the frame. Instead of opening a new frame, the compiler updates the parameters in the existing frame with the new values and <strong>jumps</strong> to the start of the function. This transformation is called tail call optimization. The result is the same machine code as the loop version, and the stack cost drops to <span class="m">O(1)</span>.</p>
 
-<p>The C standard does <strong>not guarantee</strong> this optimization. GCC and Clang often turn tail calls into jumps at the <code>-O2</code> level; in a build with optimization off (<code>-O0</code>), each call opens a new frame. It is therefore not right in C to rely on a tail recursion whose depth could be very large. Such a function is easy to turn into a loop by hand: the parameters become loop variables, new values are assigned to the parameters in place of the recursive call, and the base case becomes the exit condition of the loop. In this way <code>fact_tail</code> turns into <code>fact_loop</code>.</p>
+<p>The C standard does <strong>not guarantee</strong> this optimization. GCC and Clang often turn tail calls into jumps at the <code>-O2</code> level; in a build with optimization off (<code>-O0</code>), each call opens a new frame. It is therefore not right in C to rely on a tail recursion whose depth could be very large. Such a function is easy to turn into a loop by hand: the parameters become loop variables, new values are assigned to the parameters in place of the recursive call, and the base case becomes the exit condition of the loop. In this way <code>fact_tail</code> turns into <code>fact_iter</code>.</p>
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
@@ -672,23 +672,23 @@ course:
 
 <p>The first and third steps are an instance of the same problem with <span class="m">n − 1</span> disks; only the roles of the towers have changed. In these steps the largest disk sits at the bottom of either the source or the destination. In both cases, because it is larger than all the other disks, it blocks no move; one can act as if it were not there. The base case is a single disk and is solved with one move. The C code of the algorithm is this:</p>
 
-<pre class="nt-code"><code><span class="kw">void</span> hanoi(<span class="kw">int</span> n, <span class="kw">char</span> *src, <span class="kw">char</span> *aux,
-           <span class="kw">char</span> *dst) {
+<pre class="nt-code"><code><span class="kw">void</span> hanoi(<span class="kw">int</span> n, <span class="kw">char</span> *from, <span class="kw">char</span> *via,
+           <span class="kw">char</span> *to) {
   <span class="kw">if</span> (n == 1)
-    printf("%s -&gt; %s\n", src, dst);
+    printf("%s -&gt; %s\n", from, to);
   <span class="kw">else</span> {
-    hanoi(n - 1, src, dst, aux);
-    printf("%s -&gt; %s\n", src, dst);
-    hanoi(n - 1, aux, src, dst);
+    hanoi(n - 1, from, to, via);
+    printf("%s -&gt; %s\n", from, to);
+    hanoi(n - 1, via, from, to);
   }
 }
 <span class="cm">/* main: hanoi(3, "A", "B", "C"); */</span></code></pre>
 
-<p>The towers are represented by their names (strings of type <code>char *</code>). The code does not really move disks in memory; it only writes the moves to be made. <code>printf("%s -&gt; %s\n", src, dst)</code> reports that the topmost disk of the source tower is moved to the destination tower. If <span class="m">n = 1</span>, a single move is written. Otherwise the first recursive call <code>hanoi(n - 1, src, dst, aux)</code> is made. In this call one must note that the second and fourth arguments have swapped places: the destination of the <span class="m">n − 1</span> disks is the auxiliary tower of the original problem, and the helper tower is the original destination. Then the move of the largest disk is written. The second call <code>hanoi(n - 1, aux, src, dst)</code> moves the <span class="m">n − 1</span> disks from the auxiliary tower to the destination, using the source as the helper.</p>
+<p>The towers are represented by their names (strings of type <code>char *</code>). The code does not really move disks in memory; it only writes the moves to be made. <code>printf("%s -&gt; %s\n", from, to)</code> reports that the topmost disk of the source tower is moved to the destination tower. If <span class="m">n = 1</span>, a single move is written. Otherwise the first recursive call <code>hanoi(n - 1, from, to, via)</code> is made. In this call one must note that the third and fourth arguments have swapped places: the destination of the <span class="m">n − 1</span> disks is the auxiliary tower of the original problem, and the helper tower is the original destination. Then the move of the largest disk is written. The second call <code>hanoi(n - 1, via, from, to)</code> moves the <span class="m">n − 1</span> disks from the auxiliary tower to the destination, using the source as the helper.</p>
 
 <h3 id="s3-6-3"><span class="nt-num">3.6.3</span>Code trace: hanoi(3, "A", "B", "C")</h3>
 
-<p>In the problem with three disks, A is the source, B the auxiliary, and C the destination. The order of the calls and the moves written are given in <a href="#tab-hanoi-iz">Table 3.7</a>. The calls in the table have the form <code>hanoi(n, src, aux, dst)</code>.</p>
+<p>In the problem with three disks, A is the source, B the auxiliary, and C the destination. The order of the calls and the moves written are given in <a href="#tab-hanoi-iz">Table 3.7</a>. The calls in the table have the form <code>hanoi(n, from, via, to)</code>.</p>
 
 <div class="nt-tablewrap" id="tab-hanoi-iz">
 <table class="nt-table nt-table--wide">
@@ -723,7 +723,7 @@ course:
 
 <figure class="nt-fig nt-fig--wide" id="sekil-hanoi-agac" style="--w:680px">
   <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 680 170" role="img" aria-label="call tree of hanoi(3,1,2,3)"><g><line class="line" x1="340" y1="36" x2="175" y2="73" style="stroke-width:1.5"/></g><g><line class="line" x1="175" y1="101" x2="92.5" y2="138" style="stroke-width:1.5"/></g><g><line class="line" x1="175" y1="101" x2="257.5" y2="138" style="stroke-width:1.5"/></g><g><line class="line" x1="340" y1="36" x2="505" y2="73" style="stroke-width:1.5"/></g><g><line class="line" x1="505" y1="101" x2="422.5" y2="138" style="stroke-width:1.5"/></g><g><line class="line" x1="505" y1="101" x2="587.5" y2="138" style="stroke-width:1.5"/></g><g><rect class="box" x="298" y="8" width="84" height="28" rx="6"/><text class="txt mono" x="340" y="26.5" text-anchor="middle" style="font-size:13px">3,1,2,3</text></g><g><rect class="box" x="133" y="73" width="84" height="28" rx="6"/><text class="txt mono" x="175" y="91.5" text-anchor="middle" style="font-size:13px">2,1,3,2</text></g><g><rect class="box" x="50.5" y="138" width="84" height="28" rx="6"/><text class="txt mono" x="92.5" y="156.5" text-anchor="middle" style="font-size:13px">1,1,2,3</text></g><g><rect class="box" x="215.5" y="138" width="84" height="28" rx="6"/><text class="txt mono" x="257.5" y="156.5" text-anchor="middle" style="font-size:13px">1,3,1,2</text></g><g><rect class="box" x="463" y="73" width="84" height="28" rx="6"/><text class="txt mono" x="505" y="91.5" text-anchor="middle" style="font-size:13px">2,2,1,3</text></g><g><rect class="box" x="380.5" y="138" width="84" height="28" rx="6"/><text class="txt mono" x="422.5" y="156.5" text-anchor="middle" style="font-size:13px">1,2,3,1</text></g><g><rect class="box" x="545.5" y="138" width="84" height="28" rx="6"/><text class="txt mono" x="587.5" y="156.5" text-anchor="middle" style="font-size:13px">1,1,2,3</text></g></svg></div>
-  <figcaption><b>Figure 3.10:</b> The call tree of <code>hanoi(3, "1", "2", "3")</code>. Each box is the frame of a call: <code>n, src, aux, dst</code>.</figcaption>
+  <figcaption><b>Figure 3.10:</b> The call tree of <code>hanoi(3, "1", "2", "3")</code>. Each box is the frame of a call: <code>n, from, via, to</code>.</figcaption>
 </figure>
 
 <p>The tree carries the whole history of the call stack. At any moment the contents of the stack are the path from the root to the node currently running. For example, while the leftmost leaf (1, 1, 2, 3) is running, the stack contains the root (3, 1, 2, 3), its left child (2, 1, 3, 2), and the leaf itself. The length of the path is at most the height of the tree; this once more shows that the stack depth is <span class="m">n</span>.</p>
@@ -906,7 +906,7 @@ h(n) = 2·h(n−1) + 1
 
 <p>For <span class="m">n = 3</span> there are <span class="m">1 + 3 + 6 + 6 = 16</span> calls, for <span class="m">n = 4</span> there are <span class="m">1 + 4 + 12 + 24 + 24 = 65</span>. These numbers were also verified by a program, by adding a counter to the function. The last two terms of the sum are <span class="m">n!</span> and the earlier ones shrink quickly; the total is about <span class="m">e · n! ≈ 2.72 · n!</span>. The number of leaves is exactly <span class="m">n!</span>.</p>
 
-<p>What determines the time is the writing at the leaves. Each leaf writes <span class="m">n</span> characters; <span class="m">n!</span> leaves come to <span class="m">n · n!</span> characters in all. The work done at the internal nodes (swaps and loop checks) is constant per call and totals <span class="m">O(n!)</span>. The total time is <span class="m">Θ(n · n!)</span>. The permutation problem is sometimes briefly called <span class="m">O(n!)</span> in some sources; this notation describes the number of arrangements but overlooks the factor of <span class="m">n</span> for writing each arrangement. The stack cost equals the depth: <span class="m">n + 1</span> frames, that is, <span class="m">O(n)</span>.</p>
+<p>What determines the time is the writing at the leaves. Each leaf writes <span class="m">n</span> characters; <span class="m">n!</span> leaves come to <span class="m">n · n!</span> characters in all. The work done at the internal nodes (swaps and loop checks) is constant per call and totals <span class="m">O(n!)</span>. The total time is <span class="m">Θ(n · n!)</span>. Some sources briefly call the permutation problem <span class="m">O(n!)</span>; this notation describes the number of arrangements but overlooks the factor of <span class="m">n</span> for writing each arrangement. The stack cost equals the depth: <span class="m">n + 1</span> frames, that is, <span class="m">O(n)</span>.</p>
 
 <p>Factorial growth is even faster than exponential growth. At <span class="m">n = 10</span> there are <span class="m">10! = 3,628,800</span> arrangements and the number of characters to be written exceeds 36 million. At <span class="m">n = 20</span> the number of arrangements is <span class="m">2.4·10<sup>18</sup></span>; even a machine that produces a billion arrangements per second finishes this job in 77 years. A solution based on trying all arrangements in turn can therefore be used only for very small <span class="m">n</span>.</p>
 
@@ -931,15 +931,15 @@ h(n) = 2·h(n−1) + 1
 
 <p>All backtracking algorithms follow the same skeleton. The following pseudocode gives this skeleton:</p>
 
-<pre class="nt-code"><code>void backtrack(partial) {
+<pre class="nt-code"><code>void backtrack(partial_solution) {
   if (is_complete) { print; return; }
   for (each candidate choice)
-    if (valid) { choose; backtrack(...); undo; }
+    if (satisfies_rules) { choose; backtrack(...); undo_choice; }
 }</code></pre>
 
-<p>The function takes a partial solution. If the partial solution is complete, it is printed and the function returns; this is the base case. If it is not complete, every candidate choice that could extend the partial solution by one step is tried in turn. A choice that obeys the rules is added to the partial solution (<code>choose</code>), the function calls itself, and when the call returns the choice is undone (<code>undo</code>). For choices that do not obey the rules, the recursive call is never made; that is pruning.</p>
+<p>The function takes a partial solution. If the partial solution is complete, it is printed and the function returns; this is the base case. If it is not complete, every candidate choice that could extend the partial solution by one step is tried in turn. A choice that obeys the rules is added to the partial solution (<code>choose</code>), the function calls itself, and when the call returns the choice is undone (<code>undo_choice</code>). For choices that do not obey the rules, the recursive call is never made; that is pruning.</p>
 
-<p>The permutation code fits this pattern exactly. The partial solution is the fixed prefix. The candidate choices are the elements <code>list[i..n−1]</code>. Choosing is the first <code>SWAP</code> and undoing the choice is the second <code>SWAP</code>. In permutations every choice obeys the rules, so there is no pruning. In the n-queens problem, however, the <code>valid</code> test does real work and cuts most of the branches.</p>
+<p>The permutation code fits this pattern exactly. The partial solution is the fixed prefix. The candidate choices are the elements <code>list[i..n−1]</code>. Choosing is the first <code>SWAP</code> and undoing the choice is the second <code>SWAP</code>. In permutations every choice obeys the rules, so there is no pruning. In the n-queens problem, however, the <code>satisfies_rules</code> test does real work and cuts most of the branches.</p>
 
 <p>Backtracking is sometimes wrongly understood as "rewinding the scenario from the end to the beginning". The method does not build the solution from the end to the start. It builds the partial solution forward; when it hits a dead end, it undoes only the last choice and continues forward from the same point with another choice. The only thing gone back to is the last decision point.</p>
 
@@ -947,18 +947,18 @@ h(n) = 2·h(n−1) + 1
 
 <p>Printing all subsets of a set is the plainest backtracking example. A set of <span class="m">n</span> elements has <span class="m">2<sup>n</sup></span> subsets, because there are two options for each element: it is taken into the subset or it is not. The algorithm makes these decisions in turn:</p>
 
-<pre class="nt-code"><code><span class="kw">void</span> subsets(<span class="kw">char</span> *s, <span class="kw">int</span> n, <span class="kw">int</span> i,
+<pre class="nt-code"><code><span class="kw">void</span> subset(<span class="kw">char</span> *s, <span class="kw">int</span> n, <span class="kw">int</span> i,
              <span class="kw">int</span> pick[]) {
   <span class="kw">int</span> j;
-  <span class="kw">if</span> (i == n) {                  <span class="cm">/* decisions done */</span>
+  <span class="kw">if</span> (i == n) {                  <span class="cm">/* all decided */</span>
     printf("{");
     <span class="kw">for</span> (j = 0; j &lt; n; j++)
       <span class="kw">if</span> (pick[j]) printf("%c", s[j]);
     printf("}\n");
     <span class="kw">return</span>;
   }
-  pick[i] = 1; subsets(s, n, i + 1, pick);
-  pick[i] = 0; subsets(s, n, i + 1, pick);
+  pick[i] = 1; subset(s, n, i + 1, pick);
+  pick[i] = 0; subset(s, n, i + 1, pick);
 }</code></pre>
 
 <p><code>s</code> is the character array holding the elements, and <code>n</code> is the number of elements. The array <code>pick</code> holds the decisions: if <code>pick[j]</code> is 1, element <code>j</code> has been taken, and if 0 it has not. <code>i</code> shows for which element the next decision will be made. <code>i == n</code> is the base case: all decisions have been made and the elements for which <code>pick</code> is 1 are printed inside braces. If it is not the base case, two calls are made. First, with <code>pick[i] = 1</code>, element <code>i</code> is taken and the function is called for the remaining decisions. Then, with <code>pick[i] = 0</code>, the element is left out and the same call is repeated.</p>
@@ -967,7 +967,7 @@ h(n) = 2·h(n−1) + 1
 
 <div class="nt-tablewrap" id="tab-altkume">
 <table class="nt-table">
-  <caption>Table 3.10: Output of <code>subsets("abc", 3, 0, pick)</code> and the decisions.</caption>
+  <caption>Table 3.10: Output of <code>subset("abc", 3, 0, pick)</code> and the decisions.</caption>
   <thead><tr><th scope="col">No.</th><th scope="col">a</th><th scope="col">b</th><th scope="col">c</th><th scope="col"><code>pick</code></th><th scope="col">Printed</th></tr></thead>
   <tbody>
     <tr><td>1</td><td>take</td><td>take</td><td>take</td><td>[1, 1, 1]</td><td>{abc}</td></tr>
@@ -1022,62 +1022,62 @@ h(n) = 2·h(n−1) + 1
 <h3 id="s3-9-2"><span class="nt-num">3.9.2</span>The formula tree and postorder evaluation</h3>
 
 <p>The natural way to evaluate a formula in a program is to store it as a tree. In the tree of <a href="#sekil-sat-agac">Figure 3.14</a> each internal node is an operator. The ∧ and ∨ nodes have two children. The ¬ node has a single operand and it sits in the right child. The leaves are variables; the same variable may appear in several leaves. The definition of the tree in C and the evaluation function are as follows:</p>
-<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">enum</span> { NOT_N, AND_N, OR_N, TRUE_N, FALSE_N } logic;
-<span class="kw">typedef</span> <span class="kw">struct</span> tree_node *tree_ptr;
-<span class="kw">struct</span> tree_node {
-  tree_ptr left, right;
-  logic data;
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">enum</span> { L_NOT, L_AND, L_OR, L_TRUE, L_FALSE } logical;
+<span class="kw">typedef</span> <span class="kw">struct</span> node *tree_ptr;
+<span class="kw">struct</span> node {
+  tree_ptr left_child, right_child;
+  logical data;
   <span class="kw">short</span> value;
 };
 
-<span class="kw">void</span> post_eval(tree_ptr L) {
-  <span class="kw">if</span> (L) {
-    post_eval(L-&gt;left);
-    post_eval(L-&gt;right);
-    <span class="kw">switch</span> (L-&gt;data) {
-      <span class="kw">case</span> NOT_N: L-&gt;value = !L-&gt;right-&gt;value; <span class="kw">break</span>;
-      <span class="kw">case</span> AND_N: L-&gt;value = L-&gt;left-&gt;value
-                         &amp;&amp; L-&gt;right-&gt;value; <span class="kw">break</span>;
-      <span class="kw">case</span> OR_N:  L-&gt;value = L-&gt;left-&gt;value
-                         || L-&gt;right-&gt;value; <span class="kw">break</span>;
-      <span class="kw">case</span> TRUE_N:  L-&gt;value = 1; <span class="kw">break</span>;
-      <span class="kw">case</span> FALSE_N: L-&gt;value = 0; <span class="kw">break</span>;
+<span class="kw">void</span> post_order_eval(tree_ptr t) {
+  <span class="kw">if</span> (t) {
+    post_order_eval(t-&gt;left_child);
+    post_order_eval(t-&gt;right_child);
+    <span class="kw">switch</span> (t-&gt;data) {
+      <span class="kw">case</span> L_NOT: t-&gt;value = !t-&gt;right_child-&gt;value; <span class="kw">break</span>;
+      <span class="kw">case</span> L_AND: t-&gt;value = t-&gt;left_child-&gt;value
+                         &amp;&amp; t-&gt;right_child-&gt;value; <span class="kw">break</span>;
+      <span class="kw">case</span> L_OR:  t-&gt;value = t-&gt;left_child-&gt;value
+                         || t-&gt;right_child-&gt;value; <span class="kw">break</span>;
+      <span class="kw">case</span> L_TRUE:  t-&gt;value = 1; <span class="kw">break</span>;
+      <span class="kw">case</span> L_FALSE: t-&gt;value = 0; <span class="kw">break</span>;
     }
   }
 }</code></pre>
 
-<p>The first line defines an enumeration that names the node types. <code>NOT_N</code>, <code>AND_N</code>, and <code>OR_N</code> are the operator nodes. <code>TRUE_N</code> and <code>FALSE_N</code> are for the leaves: when an assignment is made, the type of each leaf becomes one of these two, according to the value of the variable in that assignment. The second line defines the name <code>tree_ptr</code> to mean "pointer to <code>struct tree_node</code>". The structure itself is in the third declaration: two child pointers, the type of the node (<code>data</code>), and the computed value of the node (<code>value</code>).</p>
+<p>The first line defines an enumeration that names the node types. <code>L_NOT</code>, <code>L_AND</code>, and <code>L_OR</code> are the operator nodes. <code>L_TRUE</code> and <code>L_FALSE</code> are for the leaves: when an assignment is made, the type of each leaf becomes one of these two, according to the value of the variable in that assignment. The second line defines the name <code>tree_ptr</code> to mean "pointer to <code>struct node</code>". The structure itself is in the third declaration: two child pointers, the type of the node (<code>data</code>), and the computed value of the node (<code>value</code>).</p>
 
-<p>Placing the <code>typedef</code> before the structure definition is valid in C. At this point <code>struct tree_node</code> is still an incomplete type, but to define a pointer to it one need not know the contents of the type. This lets the structure contain fields that point to nodes of its own type. A structure cannot have a field of its own type (the value itself, not a pointer); that would mean a structure of infinite size.</p>
+<p>Placing the <code>typedef</code> before the structure definition is valid in C. At this point <code>struct node</code> is still an incomplete type, but to define a pointer to it one need not know the contents of the type. This lets the structure contain fields that point to nodes of its own type. A structure cannot have a field of its own type (the value itself, not a pointer); that would mean a structure of infinite size.</p>
 
-<p>There are two details in the choice of names. English names such as <code>enum { not, and, or, true, false }</code> cause trouble. <code>true</code> and <code>false</code> are defined as macros in the C99 header <code>&lt;stdbool.h&gt;</code> and became keywords in C23; <code>not</code>, <code>and</code>, and <code>or</code> are macros standing in for operators in the header <code>&lt;iso646.h&gt;</code>. If one of these headers is included, the enumeration does not compile. The second detail is that a <code>typedef</code> with no name written at the end, such as <code>typedef struct tree_node {…};</code>, defines no name. The compiler accepts this line but issues a warning. The code above uses names that do not clash.</p>
+<p>There are two details in the choice of names. English names such as <code>enum { not, and, or, true, false }</code> cause trouble. <code>true</code> and <code>false</code> are defined as macros in the C99 header <code>&lt;stdbool.h&gt;</code> and became keywords in C23; <code>not</code>, <code>and</code>, and <code>or</code> are macros standing in for operators in the header <code>&lt;iso646.h&gt;</code>. If one of these headers is included, the enumeration does not compile. The second detail is that a <code>typedef</code> with no name written at the end, such as <code>typedef struct node {…};</code>, defines no name. The compiler accepts this line but issues a warning. The code above uses names that do not clash.</p>
 
 <p>The appearance of the node in memory is also worth examining. On a 64-bit system each of the two pointers takes 8 bytes and they make up the first 16 bytes of the structure. The field <code>data</code> (an <code>enum</code>, 4 bytes) starts at byte 16 and the field <code>value</code> (<code>short</code>, 2 bytes) at byte 20. The compiler adds 2 bytes of padding at the end of the structure and rounds the size up to 24 bytes, a multiple of 8. This padding ensures that in an array of structures every pointer sits at an address that is a multiple of 8. These numbers were measured with <code>sizeof</code> and <code>offsetof</code>; they may differ with another compiler or on a 32-bit system.</p>
 
 <p>The nodes of the tree are created at run time with <code>malloc</code>. The code in the slides does not show this part; for a complete program the following two helper functions suffice:</p>
 
-<pre class="nt-code"><code>tree_ptr new_node(logic v, tree_ptr l, tree_ptr r) {
+<pre class="nt-code"><code>tree_ptr new_node(logical v, tree_ptr l, tree_ptr r) {
   tree_ptr p = malloc(<span class="kw">sizeof</span> *p);
   <span class="kw">if</span> (p == <span class="kw">NULL</span>) {               <span class="cm">/* allocation failed */</span>
     fprintf(stderr, "out of memory\n");
     exit(EXIT_FAILURE);
   }
   p-&gt;data = v;
-  p-&gt;left = l;
-  p-&gt;right = r;
+  p-&gt;left_child = l;
+  p-&gt;right_child = r;
   p-&gt;value = 0;
   <span class="kw">return</span> p;
 }
 
 <span class="kw">void</span> tree_free(tree_ptr L) {     <span class="cm">/* postorder: children first */</span>
   <span class="kw">if</span> (L) {
-    tree_free(L-&gt;left);
-    tree_free(L-&gt;right);
+    tree_free(L-&gt;left_child);
+    tree_free(L-&gt;right_child);
     free(L);
   }
 }</code></pre>
 
-<p><code>new_node</code> asks for memory of the size of one node. The expression <code>sizeof *p</code> gives the size of the type <code>p</code> points to; since no type name is written, the expression stays correct even if the type of <code>p</code> changes. If <code>malloc</code> cannot allocate memory, it returns <code>NULL</code>. If <code>p-&gt;data</code> were written without checking this, the program would write through a null pointer and crash; that is why the return value is tested at once. <code>tree_free</code> gives back all the nodes of the tree. It deletes the two children first, then the node itself. The order matters: had the node been freed first, the field <code>L-&gt;left</code> would be read from freed memory, which is undefined behavior. If the program ends without the tree being deleted, the operating system reclaims the memory anyway, but in a long-running program, if a new tree is built for each assignment and not deleted, a <strong>memory leak</strong> results.</p>
+<p><code>new_node</code> asks for memory of the size of one node. The expression <code>sizeof *p</code> gives the size of the type <code>p</code> points to; since no type name is written, the expression stays correct even if the type of <code>p</code> changes. If <code>malloc</code> cannot allocate memory, it returns <code>NULL</code>. If <code>p-&gt;data</code> were written without checking this, the program would write through a null pointer and crash; that is why the return value is tested at once. <code>tree_free</code> gives back all the nodes of the tree. It deletes the two children first, then the node itself. The order matters: had the node been freed first, the field <code>L-&gt;left_child</code> would be read from freed memory, which is undefined behavior. If the program ends without the tree being deleted, the operating system reclaims the memory anyway, but in a long-running program, if a new tree is built for each assignment and not deleted, a <strong>memory leak</strong> results.</p>
 
 <p>The formula tree and the assignment are set up like this:</p>
 
@@ -1086,27 +1086,27 @@ h(n) = 2·h(n−1) + 1
 tree_ptr build_formula(<span class="kw">void</span>) {
   <span class="kw">int</span> k;
   <span class="kw">for</span> (k = 0; k &lt; 5; k++)
-    leaf[k] = new_node(FALSE_N, <span class="kw">NULL</span>, <span class="kw">NULL</span>);
+    leaf[k] = new_node(L_FALSE, <span class="kw">NULL</span>, <span class="kw">NULL</span>);
   <span class="cm">/* (x1 AND NOT x2) OR (NOT x1 AND x3) OR NOT x3 */</span>
-  <span class="kw">return</span> new_node(OR_N,
-           new_node(OR_N,
-             new_node(AND_N, leaf[0], new_node(NOT_N, <span class="kw">NULL</span>, leaf[1])),
-             new_node(AND_N, new_node(NOT_N, <span class="kw">NULL</span>, leaf[2]), leaf[3])),
-           new_node(NOT_N, <span class="kw">NULL</span>, leaf[4]));
+  <span class="kw">return</span> new_node(L_OR,
+           new_node(L_OR,
+             new_node(L_AND, leaf[0], new_node(L_NOT, <span class="kw">NULL</span>, leaf[1])),
+             new_node(L_AND, new_node(L_NOT, <span class="kw">NULL</span>, leaf[2]), leaf[3])),
+           new_node(L_NOT, <span class="kw">NULL</span>, leaf[4]));
 }
 
 <span class="kw">void</span> set_leaves(tree_ptr root, <span class="kw">int</span> x1, <span class="kw">int</span> x2, <span class="kw">int</span> x3) {
   (<span class="kw">void</span>)root;            <span class="cm">/* leaves are reached directly through leaf[] */</span>
-  leaf[0]-&gt;data = x1 ? TRUE_N : FALSE_N;
-  leaf[1]-&gt;data = x2 ? TRUE_N : FALSE_N;
-  leaf[2]-&gt;data = x1 ? TRUE_N : FALSE_N;
-  leaf[3]-&gt;data = x3 ? TRUE_N : FALSE_N;
-  leaf[4]-&gt;data = x3 ? TRUE_N : FALSE_N;
+  leaf[0]-&gt;data = x1 ? L_TRUE : L_FALSE;
+  leaf[1]-&gt;data = x2 ? L_TRUE : L_FALSE;
+  leaf[2]-&gt;data = x1 ? L_TRUE : L_FALSE;
+  leaf[3]-&gt;data = x3 ? L_TRUE : L_FALSE;
+  leaf[4]-&gt;data = x3 ? L_TRUE : L_FALSE;
 }</code></pre>
 
-<p>The five leaves are kept in the array <code>leaf</code>. While the tree is built, the addresses of these leaves are given as children to the appropriate operator nodes. <code>set_leaves</code> places an assignment into the tree: it makes the type of each leaf <code>TRUE_N</code> or <code>FALSE_N</code> according to the value of the variable it represents. The structure of the tree does not change; only the leaves change.</p>
+<p>The five leaves are kept in the array <code>leaf</code>. While the tree is built, the addresses of these leaves are given as children to the appropriate operator nodes. <code>set_leaves</code> places an assignment into the tree: it makes the type of each leaf <code>L_TRUE</code> or <code>L_FALSE</code> according to the value of the variable it represents. The structure of the tree does not change; only the leaves change.</p>
 
-<p><code>post_eval</code> computes the value of the tree with a <strong>postorder</strong> traversal: first the left subtree, then the right subtree, and the node itself last. This order is mandatory, because the value of an operator node depends on the values of its children and the children must be computed before it. The function starts with <code>if (L)</code>; for an empty subtree (<code>NULL</code>) it does nothing. This check stops the recursion both at the leaves and at the empty left child of a ¬ node. The <code>switch</code> statement computes the value according to the type of the node. The <code>NOT_N</code> node inverts the value of the right child. The <code>AND_N</code> and <code>OR_N</code> nodes combine the values of the two children with C's <code>&amp;&amp;</code> and <code>||</code> operators. The leaves take the value 1 or 0 according to their type.</p>
+<p><code>post_order_eval</code> computes the value of the tree with a <strong>postorder</strong> traversal: first the left subtree, then the right subtree, and the node itself last. This order is mandatory, because the value of an operator node depends on the values of its children and the children must be computed before it. The function starts with <code>if (t)</code>; for an empty subtree (<code>NULL</code>) it does nothing. This check stops the recursion both at the leaves and at the empty left child of a ¬ node. The <code>switch</code> statement computes the value according to the type of the node. The <code>L_NOT</code> node inverts the value of the right child. The <code>L_AND</code> and <code>L_OR</code> nodes combine the values of the two children with C's <code>&amp;&amp;</code> and <code>||</code> operators. The leaves take the value 1 or 0 according to their type.</p>
 
 <div class="nt-box nt-box--ornek" id="ornek-sat-111">
   <span class="nt-box__title">Example 3.2</span>
@@ -1135,7 +1135,7 @@ tree_ptr build_formula(<span class="kw">void</span>) {
   x2 = (m &gt;&gt; 1) &amp; 1;
   x3 = m &amp; 1;
   set_leaves(root, x1, x2, x3);
-  post_eval(root);
+  post_order_eval(root);
   <span class="kw">if</span> (root-&gt;value)
     printf("%d%d%d\n", x1, x2, x3);
 }</code></pre>
@@ -1197,13 +1197,13 @@ tree_ptr build_formula(<span class="kw">void</span>) {
 
 <p>In the brute force solution the queen of each row is put in one of <span class="m">n</span> columns and <span class="m">n<sup>n</sup></span> candidates result. For <span class="m">n = 8</span> this is <span class="m">8<sup>8</sup> = 16,777,216</span>, that is, about 16.8 million candidates. Applying the column rule from the start and trying only the permutations brings the number down to <span class="m">8! = 40,320</span>. Backtracking tries even fewer.</p>
 
-<h3 id="s3-10-2"><span class="nt-num">3.10.2</span>safe() and place()</h3>
+<h3 id="s3-10-2"><span class="nt-num">3.10.2</span>is_safe() and place()</h3>
 
 <p>The backtracking solution consists of two functions. The first tests whether a square conflicts with the queens in the previous rows:</p>
 
 <pre class="nt-code"><code><span class="kw">int</span> q[8];  <span class="cm">/* q[r]: column of the queen in row r */</span>
 
-<span class="kw">int</span> safe(<span class="kw">int</span> r, <span class="kw">int</span> c) {
+<span class="kw">int</span> is_safe(<span class="kw">int</span> r, <span class="kw">int</span> c) {
   <span class="kw">int</span> i;
   <span class="kw">for</span> (i = 0; i &lt; r; i++)
     <span class="kw">if</span> (q[i] == c || abs(q[i] - c) == r - i)
@@ -1211,7 +1211,7 @@ tree_ptr build_formula(<span class="kw">void</span>) {
   <span class="kw">return</span> 1;
 }</code></pre>
 
-<p>The array <code>q</code> is defined as global, so that both functions reach it without taking it as a parameter. The size of the array is 8, so the code works for <span class="m">n = 8</span> at most. <code>safe(r, c)</code> says whether a queen can be put in column <span class="m">c</span> of row <span class="m">r</span>. The loop looks only at rows <span class="m">0 … r − 1</span>, because there are no queens in the lower rows yet. For each earlier queen two conditions are tested: <code>q[i] == c</code> catches the same column and <code>abs(q[i] - c) == r - i</code> catches the same diagonal. If there is a conflict, the function returns 0 at once. If the loop ends without finding a conflict, the square is safe. The function <code>abs</code> is in the header <code>&lt;stdlib.h&gt;</code>; if this header is not included, the compiler gives a warning or an error for an undeclared function.</p>
+<p>The array <code>q</code> is defined as global, so that both functions reach it without taking it as a parameter. The size of the array is 8, so the code works for <span class="m">n = 8</span> at most. <code>is_safe(r, c)</code> says whether a queen can be put in column <span class="m">c</span> of row <span class="m">r</span>. The loop looks only at rows <span class="m">0 … r − 1</span>, because there are no queens in the lower rows yet. For each earlier queen two conditions are tested: <code>q[i] == c</code> catches the same column and <code>abs(q[i] - c) == r - i</code> catches the same diagonal. If there is a conflict, the function returns 0 at once. If the loop ends without finding a conflict, the square is safe. The function <code>abs</code> is in the header <code>&lt;stdlib.h&gt;</code>; if this header is not included, the compiler gives a warning or an error for an undeclared function.</p>
 
 <p>The second function places the queens row by row:</p>
 
@@ -1219,7 +1219,7 @@ tree_ptr build_formula(<span class="kw">void</span>) {
   <span class="kw">int</span> c;
   <span class="kw">if</span> (r == n) <span class="kw">return</span> 1;             <span class="cm">/* solution */</span>
   <span class="kw">for</span> (c = 0; c &lt; n; c++)
-    <span class="kw">if</span> (safe(r, c)) {
+    <span class="kw">if</span> (is_safe(r, c)) {
       q[r] = c;
       <span class="kw">if</span> (place(r + 1, n)) <span class="kw">return</span> 1;
     }
@@ -1228,7 +1228,7 @@ tree_ptr build_formula(<span class="kw">void</span>) {
 
 <p><code>place(r, n)</code> tries to place the remaining queens starting from row <span class="m">r</span>. It returns 1 if it succeeds and 0 if it fails. <code>r == n</code> is the base case: all rows have been filled and a solution has been found. If it is not the base case, the loop tries the columns from left to right. When a safe column is found, the queen is put there (<code>q[r] = c</code>) and the function calls itself for the next row. If the subcall returns 1, the solution is complete and the 1 is passed upward at once. If the subcall returns 0, this placement has reached a dead end; the loop continues with the next column. If no column works, the function returns 0 and the row above tries its next column.</p>
 
-<p>There is no explicit line in the code that undoes the choice. The reason is the representation: <code>q[r]</code> is overwritten at the next attempt, and <code>safe</code> looks only at rows smaller than <span class="m">r</span>. Values left over from a failed attempt are never read. The undoing is done implicitly, by <code>r</code> being kept in the frames on the stack.</p>
+<p>There is no explicit line in the code that undoes the choice. The reason is the representation: <code>q[r]</code> is overwritten at the next attempt, and <code>is_safe</code> looks only at rows smaller than <span class="m">r</span>. Values left over from a failed attempt are never read. The undoing is done implicitly, by <code>r</code> being kept in the frames on the stack.</p>
 
 <h3 id="s3-10-3"><span class="nt-num">3.10.3</span>Code trace: 4 queens</h3>
 
@@ -1269,12 +1269,12 @@ tree_ptr build_formula(<span class="kw">void</span>) {
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
-  <p>Writing the diagonal test in only one direction. The condition <code>q[i] - c == r - i</code> catches the diagonal going from upper right to lower left and misses the diagonal in the other direction. Taking the absolute value with <code>abs</code> covers both directions at once. Another mistake is to run the loop of <code>safe</code> up to <span class="m">i ≤ r</span>; in that case an old value in <code>q[r]</code> is read and correct squares may be rejected.</p>
+  <p>Writing the diagonal test in only one direction. The condition <code>q[i] - c == r - i</code> catches the diagonal going from upper right to lower left and misses the diagonal in the other direction. Taking the absolute value with <code>abs</code> covers both directions at once. Another mistake is to run the loop of <code>is_safe</code> up to <span class="m">i ≤ r</span>; in that case an old value in <code>q[r]</code> is read and correct squares may be rejected.</p>
 </div>
 
 <h3 id="s3-10-4"><span class="nt-num">3.10.4</span>The gain from pruning</h3>
 
-<p>An upper bound for the worst-case cost of backtracking is easily found. Because of the column rule, at most <span class="m">n − r</span> columns can be candidates in row <span class="m">r</span>; the columns of the earlier queens are closed. At the first level of the call tree there are at most <span class="m">n</span> nodes, at the second level at most <span class="m">n(n − 1)</span> nodes, and the number of leaves is at most <span class="m">n!</span>. The upper bound <span class="m">O(n!)</span> given for the cost comes from here; the <code>safe</code> checks made at each node add only a polynomial factor to this class. This is a rough bound: the diagonal rule prunes most of the tree early, and the real cost stays far below <span class="m">n!</span>. The stack cost equals the depth, <span class="m">O(n)</span>.</p>
+<p>An upper bound for the worst-case cost of backtracking is easily found. Because of the column rule, at most <span class="m">n − r</span> columns can be candidates in row <span class="m">r</span>; the columns of the earlier queens are closed. At the first level of the call tree there are at most <span class="m">n</span> nodes, at the second level at most <span class="m">n(n − 1)</span> nodes, and the number of leaves is at most <span class="m">n!</span>. The upper bound <span class="m">O(n!)</span> given for the cost comes from here; the <code>is_safe</code> checks made at each node add only a polynomial factor to this class. This is a rough bound: the diagonal rule prunes most of the tree early, and the real cost stays far below <span class="m">n!</span>. The stack cost equals the depth, <span class="m">O(n)</span>.</p>
 
 <div class="nt-tablewrap" id="tab-vezir-sayi">
 <table class="nt-table">
@@ -1482,7 +1482,7 @@ tree_ptr build_formula(<span class="kw">void</span>) {
     </details>
   </li>
   <li>
-    <p>How many lines does <code>subsets("abcd", 4, 0, pick)</code> print, and what is the fifth line? How many times is the function called in total?</p>
+    <p>How many lines does <code>subset("abcd", 4, 0, pick)</code> print, and what is the fifth line? How many times is the function called in total?</p>
     <details><summary>Answer</summary>
       <p><span class="m">2<sup>4</sup> = 16</span> lines are printed. The order goes {abcd}, {abc}, {abd}, {ab}, {acd}, …; the fifth line is {acd}. The call tree is a perfect binary tree with 5 levels: <span class="m">2<sup>5</sup> − 1 = 31</span> calls.</p>
     </details>

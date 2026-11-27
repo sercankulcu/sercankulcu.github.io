@@ -29,7 +29,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='Mikroişlemciler',
-    subtitle='',
+    subtitle='İşlemcinin İçinden',
     output='microprocessors/Mikroislemciler.pdf',   # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Mikroişlemciler ders kitabı: 8086 mimarisi, yazmaçlar, assembly, bellek erişimi, '

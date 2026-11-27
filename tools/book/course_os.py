@@ -44,7 +44,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='İşletim Sistemleri',
-    subtitle='',
+    subtitle='Kavramlar ve C ile Uygulama',
     output='os/Isletim-Sistemleri.pdf',             # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'İşletim Sistemleri ders kitabı: süreçler, iş parçacıkları, çizelgeleme, '

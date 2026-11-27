@@ -116,7 +116,7 @@ try:
 except Exception as e:
     print('  sayfa etiketleri atlandi:', e)
 
-meta = {'/Title': C.TITLE}
+meta = {'/Title': getattr(C, 'FULL_TITLE', C.TITLE)}
 meta.update(C.META)
 writer.add_metadata(meta)
 from pypdf.generic import NameObject, TextStringObject

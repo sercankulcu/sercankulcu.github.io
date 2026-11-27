@@ -40,7 +40,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Operating Systems',
-    subtitle='',
+    subtitle='Concepts and Practice in C',
     output='os/Operating-Systems.pdf',               # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Operating Systems course textbook: processes, threads, scheduling, synchronization, '

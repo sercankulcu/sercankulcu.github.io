@@ -401,14 +401,14 @@ course:
 
 <pre class="nt-code"><code><span class="kw">void</span> backtrack(State partial) {
   <span class="kw">if</span> (isSolution(partial)) {
-    save(partial);
+    record(partial);
     <span class="kw">return</span>;
   }
   <span class="kw">for</span> (Candidate c : candidates(partial)) {
     <span class="kw">if</span> (isValid(partial, c)) {
-      choose(partial, c);     <span class="cm">// choose</span>
+      add(partial, c);     <span class="cm">// choose</span>
       backtrack(partial);     <span class="cm">// explore</span>
-      unchoose(partial, c);   <span class="cm">// unchoose</span>
+      remove(partial, c);   <span class="cm">// undo</span>
     }
   }
 }</code></pre>
@@ -417,9 +417,9 @@ course:
 
 <ol>
   <li><strong>Goal test.</strong> <code>isSolution(partial)</code> checks whether the partial solution is complete. If it is, the solution is saved and the method returns. If a single solution is enough, the search can be stopped completely here.</li>
-  <li><strong>Choose.</strong> <code>candidates(partial)</code> gives the options for the next step. A valid candidate is added to the partial solution with <code>choose(partial, c)</code>.</li>
+  <li><strong>Choose.</strong> <code>candidates(partial)</code> gives the options for the next step. A valid candidate is added to the partial solution with <code>add(partial, c)</code>.</li>
   <li><strong>Explore.</strong> <code>backtrack(partial)</code> descends one level by recursion. This call traverses the entire subtree below the added candidate.</li>
-  <li><strong>Unchoose.</strong> When the call returns, <code>unchoose(partial, c)</code> removes the candidate from the partial solution. The state returns to what it was before the call, and the loop continues with the next candidate.</li>
+  <li><strong>Unchoose.</strong> When the call returns, <code>remove(partial, c)</code> removes the candidate from the partial solution. The state returns to what it was before the call, and the loop continues with the next candidate.</li>
 </ol>
 
 <p>Pruning happens inside <code>isValid</code>. For an invalid candidate the recursive call is never made. In this way the whole subtree below that candidate is skipped with a single <code>if</code>. The power of pruning comes from here: one check eliminates a subtree of possibly thousands of nodes.</p>
@@ -441,7 +441,7 @@ course:
     <span class="kw">if</span> (!used[a]) {                  <span class="cm">// valid</span>
       p[k] = a; used[a] = <span class="kw">true</span>;     <span class="cm">// choose</span>
       permute(p, used, k + 1);       <span class="cm">// explore</span>
-      used[a] = <span class="kw">false</span>;               <span class="cm">// unchoose</span>
+      used[a] = <span class="kw">false</span>;               <span class="cm">// undo</span>
     }
   }
 }</code></pre>
@@ -510,7 +510,7 @@ course:
     <span class="kw">if</span> (!used[v]) {
       used[v] = <span class="kw">true</span>; path.add(v);         <span class="cm">// choose</span>
       collect(path, used, n);               <span class="cm">// explore</span>
-      path.remove(path.size() - 1);         <span class="cm">// unchoose</span>
+      path.remove(path.size() - 1);         <span class="cm">// undo</span>
       used[v] = <span class="kw">false</span>;
     }
   }
@@ -1031,15 +1031,15 @@ course:
 
 <h3 id="s9-5-3"><span class="nt-num">4.5.3</span>Java code</h3>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> solve(<span class="kw">int</span>[][] b) {
+<pre class="nt-code"><code><span class="kw">boolean</span> solve(<span class="kw">int</span>[][] g) {
   <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; 9; r++)
     <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; 9; c++)
-      <span class="kw">if</span> (b[r][c] == 0) {
+      <span class="kw">if</span> (g[r][c] == 0) {
         <span class="kw">for</span> (<span class="kw">int</span> d = 1; d &lt;= 9; d++)
-          <span class="kw">if</span> (isValid(b, r, c, d)) {
-            b[r][c] = d;
-            <span class="kw">if</span> (solve(b)) <span class="kw">return</span> <span class="kw">true</span>;
-            b[r][c] = 0;   <span class="cm">// undo</span>
+          <span class="kw">if</span> (isValid(g, r, c, d)) {
+            g[r][c] = d;
+            <span class="kw">if</span> (solve(g)) <span class="kw">return</span> <span class="kw">true</span>;
+            g[r][c] = 0;   <span class="cm">// undo</span>
           }
         <span class="kw">return</span> <span class="kw">false</span>;  <span class="cm">// no digit fits</span>
       }
@@ -1050,21 +1050,21 @@ course:
 
 <p>There is a subtle point in the structure of the code. <code>return false</code> is <em>inside</em> the two loops, at the end of the block that handles the first empty cell. After handling the first empty cell, the method does not look at the remaining cells. If the first empty cell cannot be filled, there is no point in trying to fill the others. If the loops finish without finding any empty cell, the <code>return true</code> at the bottom runs: the grid is full.</p>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> isValid(<span class="kw">int</span>[][] b,
+<pre class="nt-code"><code><span class="kw">boolean</span> isValid(<span class="kw">int</span>[][] g,
     <span class="kw">int</span> r, <span class="kw">int</span> c, <span class="kw">int</span> d) {
   <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 9; i++)
-    <span class="kw">if</span> (b[r][i] == d || b[i][c] == d)
+    <span class="kw">if</span> (g[r][i] == d || g[i][c] == d)
       <span class="kw">return</span> <span class="kw">false</span>;
   <span class="kw">int</span> br = r / 3 * 3;
   <span class="kw">int</span> bc = c / 3 * 3;
   <span class="kw">for</span> (<span class="kw">int</span> i = br; i &lt; br + 3; i++)
     <span class="kw">for</span> (<span class="kw">int</span> j = bc; j &lt; bc + 3; j++)
-      <span class="kw">if</span> (b[i][j] == d)
+      <span class="kw">if</span> (g[i][j] == d)
         <span class="kw">return</span> <span class="kw">false</span>;
   <span class="kw">return</span> <span class="kw">true</span>;
 }</code></pre>
 
-<p><code>isValid</code> checks whether the digit <span class="m">d</span> can be written in cell <span class="m">(r, c)</span>. The first loop scans both the row (<code>b[r][i]</code>) and the column (<code>b[i][c]</code>) in a single pass. Then the cell's box is scanned. The top-left corner of the box is found with <code>br = r / 3 * 3</code> and <code>bc = c / 3 * 3</code>. Integer division rounds down; multiplying by 3 converts the box number back to an index. For cell (7, 4), <span class="m">7 / 3 = 2</span>, <span class="m">2 · 3 = 6</span>; <span class="m">4 / 3 = 1</span>, <span class="m">1 · 3 = 3</span>. The box covers rows 6–8 and columns 3–5. The method looks at no more than 27 cells, 18 for the row and column and 9 for the box; this is constant work.</p>
+<p><code>isValid</code> checks whether the digit <span class="m">d</span> can be written in cell <span class="m">(r, c)</span>. The first loop scans both the row (<code>g[r][i]</code>) and the column (<code>g[i][c]</code>) in a single pass. Then the cell's box is scanned. The top-left corner of the box is found with <code>br = r / 3 * 3</code> and <code>bc = c / 3 * 3</code>. Integer division rounds down; multiplying by 3 converts the box number back to an index. For cell (7, 4), <span class="m">7 / 3 = 2</span>, <span class="m">2 · 3 = 6</span>; <span class="m">4 / 3 = 1</span>, <span class="m">1 · 3 = 3</span>. The box covers rows 6–8 and columns 3–5. The method looks at no more than 27 cells, 18 for the row and column and 9 for the box; this is constant work.</p>
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
@@ -1115,22 +1115,22 @@ course:
 
 <p>The same puzzle can be solved with much less work. It is not compulsory to fill the first empty cell in row-by-row order. Which cell to fill first is a choice, and this choice determines the height of the search. The <strong>MRV</strong> (minimum remaining values) heuristic fills, at each step, the empty cell that has <em>the fewest candidates left</em>.</p>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> solveMRV(<span class="kw">int</span>[][] b) {
+<pre class="nt-code"><code><span class="kw">boolean</span> solveMRV(<span class="kw">int</span>[][] g) {
   <span class="kw">int</span> br = -1, bc = -1, fewest = 10;
   <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; 9; r++)
     <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; 9; c++)
-      <span class="kw">if</span> (b[r][c] == 0) {
+      <span class="kw">if</span> (g[r][c] == 0) {
         <span class="kw">int</span> cands = 0;
         <span class="kw">for</span> (<span class="kw">int</span> d = 1; d &lt;= 9; d++)
-          <span class="kw">if</span> (isValid(b, r, c, d)) cands++;
+          <span class="kw">if</span> (isValid(g, r, c, d)) cands++;
         <span class="kw">if</span> (cands &lt; fewest) { fewest = cands; br = r; bc = c; }
       }
   <span class="kw">if</span> (br &lt; 0) <span class="kw">return</span> <span class="kw">true</span>;              <span class="cm">// no empty cell</span>
   <span class="kw">for</span> (<span class="kw">int</span> d = 1; d &lt;= 9; d++)
-    <span class="kw">if</span> (isValid(b, br, bc, d)) {
-      b[br][bc] = d;
-      <span class="kw">if</span> (solveMRV(b)) <span class="kw">return</span> <span class="kw">true</span>;
-      b[br][bc] = 0;                    <span class="cm">// undo</span>
+    <span class="kw">if</span> (isValid(g, br, bc, d)) {
+      g[br][bc] = d;
+      <span class="kw">if</span> (solveMRV(g)) <span class="kw">return</span> <span class="kw">true</span>;
+      g[br][bc] = 0;                    <span class="cm">// undo</span>
     }
   <span class="kw">return</span> <span class="kw">false</span>;
 }</code></pre>
@@ -1212,24 +1212,24 @@ course:
 
 <h3 id="s9-6-3"><span class="nt-num">4.6.3</span>Java code and code trace</h3>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> colorGraph(<span class="kw">int</span> v) {
+<pre class="nt-code"><code><span class="kw">boolean</span> color(<span class="kw">int</span> v) {
   <span class="kw">if</span> (v == n) <span class="kw">return</span> <span class="kw">true</span>;          <span class="cm">// done</span>
   <span class="kw">for</span> (<span class="kw">int</span> c = 1; c &lt;= m; c++) {
-    <span class="kw">if</span> (canUse(v, c)) {
+    <span class="kw">if</span> (isSafe(v, c)) {
       colors[v] = c;                <span class="cm">// choose</span>
-      <span class="kw">if</span> (colorGraph(v + 1)) <span class="kw">return</span> <span class="kw">true</span>; <span class="cm">// explore</span>
-      colors[v] = 0;                <span class="cm">// unchoose</span>
+      <span class="kw">if</span> (color(v + 1)) <span class="kw">return</span> <span class="kw">true</span>; <span class="cm">// explore</span>
+      colors[v] = 0;                <span class="cm">// undo</span>
     }
   }
   <span class="kw">return</span> <span class="kw">false</span>;                     <span class="cm">// dead end</span>
 }
-<span class="cm">// canUse: true if v has no neighbor of color c</span></code></pre>
+<span class="cm">// isSafe: true if v has no neighbor with color c</span></code></pre>
 
-<p><code>colorGraph(v)</code> assumes that vertices 0 through <span class="m">v − 1</span> have been colored and continues coloring from vertex <span class="m">v</span>. If <code>v == n</code>, all the vertices have been colored. The loop tries the colors from 1 to <span class="m">m</span>. A suitable color is written to <code>colors[v]</code> and we move on to the next vertex. If the recursive call fails, the color is set back to 0; 0 means “uncolored.” If all the colors fail, <code>false</code> is returned.</p>
+<p><code>color(v)</code> assumes that vertices 0 through <span class="m">v − 1</span> have been colored and continues coloring from vertex <span class="m">v</span>. If <code>v == n</code>, all the vertices have been colored. The loop tries the colors from 1 to <span class="m">m</span>. A suitable color is written to <code>colors[v]</code> and we move on to the next vertex. If the recursive call fails, the color is set back to 0; 0 means “uncolored.” If all the colors fail, <code>false</code> is returned.</p>
 
-<p>The slides give the body of <code>canUse</code> only as a one-line description. A version written with an adjacency matrix is as follows:</p>
+<p>The slides give the body of <code>isSafe</code> only as a one-line description. A version written with an adjacency matrix is as follows:</p>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> canUse(<span class="kw">int</span> v, <span class="kw">int</span> c) {
+<pre class="nt-code"><code><span class="kw">boolean</span> isSafe(<span class="kw">int</span> v, <span class="kw">int</span> c) {
   <span class="kw">for</span> (<span class="kw">int</span> u = 0; u &lt; n; u++)
     <span class="kw">if</span> (adj[v][u] == 1 &amp;&amp; colors[u] == c)
       <span class="kw">return</span> <span class="kw">false</span>;   <span class="cm">// a neighbor has color c</span>
@@ -1242,24 +1242,24 @@ course:
 
 <figure class="nt-fig" id="sekil-boya5" style="--w:340px">
   <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 340 186" role="img" aria-label="Graph coloring: the vertex colors and the color array"><line class="t13-e" x1="50" y1="32" x2="160" y2="32"/><line class="t13-e" x1="50" y1="32" x2="105" y2="112"/><line class="t13-e" x1="160" y1="32" x2="105" y2="112"/><line class="t13-e" x1="160" y1="32" x2="220" y2="112"/><line class="t13-e" x1="280" y1="32" x2="220" y2="112"/><line class="t13-e" x1="105" y1="112" x2="220" y2="112"/><circle class="t13-c1" cx="50" cy="32" r="17"/><text class="txt" x="50" y="37" text-anchor="middle">0</text><circle class="t13-eh" cx="50" cy="32" r="23"/><circle class="t13-off" cx="160" cy="32" r="17"/><text class="txt" x="160" y="37" text-anchor="middle">1</text><circle class="t13-off" cx="280" cy="32" r="17"/><text class="txt" x="280" y="37" text-anchor="middle">2</text><circle class="t13-off" cx="105" cy="112" r="17"/><text class="txt" x="105" y="117" text-anchor="middle">3</text><circle class="t13-off" cx="220" cy="112" r="17"/><text class="txt" x="220" y="117" text-anchor="middle">4</text><text class="lbl" x="6" y="170" text-anchor="start">colors</text><text class="lbl" x="74" y="152" text-anchor="middle">0</text><rect class="t13-cur" x="52" y="156" width="44" height="24"/><text class="txt" x="74" y="173" text-anchor="middle">1</text><text class="lbl" x="118" y="152" text-anchor="middle">1</text><rect class="box" x="96" y="156" width="44" height="24"/><text class="txt" x="118" y="173" text-anchor="middle">0</text><text class="lbl" x="162" y="152" text-anchor="middle">2</text><rect class="box" x="140" y="156" width="44" height="24"/><text class="txt" x="162" y="173" text-anchor="middle">0</text><text class="lbl" x="206" y="152" text-anchor="middle">3</text><rect class="box" x="184" y="156" width="44" height="24"/><text class="txt" x="206" y="173" text-anchor="middle">0</text><text class="lbl" x="250" y="152" text-anchor="middle">4</text><rect class="box" x="228" y="156" width="44" height="24"/><text class="txt" x="250" y="173" text-anchor="middle">0</text></svg></div>
-  <figcaption><b>Figure 4.31:</b> <code>colorGraph(0)</code> begins. Vertex 0 has been given color 1; the other cells of the <code>colors</code> array are 0.</figcaption>
+  <figcaption><b>Figure 4.31:</b> <code>color(0)</code> begins. Vertex 0 has been given color 1; the other cells of the <code>colors</code> array are 0.</figcaption>
 </figure>
 
 <div class="nt-tablewrap" id="tab-boya5">
 <table class="nt-table">
-  <caption>Table 4.10: Trace of the call <code>colorGraph(0)</code> (five vertices, <span class="m">m = 3</span>).</caption>
+  <caption>Table 4.10: Trace of the call <code>color(0)</code> (five vertices, <span class="m">m = 3</span>).</caption>
   <thead><tr><th scope="col">Call</th><th scope="col">Colors tried</th><th scope="col">Result</th><th scope="col"><code>colors</code></th></tr></thead>
   <tbody>
-    <tr><td><code>colorGraph(0)</code></td><td>1 fits</td><td><code>colors[0] = 1</code></td><td>[1, 0, 0, 0, 0]</td></tr>
-    <tr><td><code>colorGraph(1)</code></td><td>1 (used by 0), 2 fits</td><td><code>colors[1] = 2</code></td><td>[1, 2, 0, 0, 0]</td></tr>
-    <tr><td><code>colorGraph(2)</code></td><td>1 fits</td><td><code>colors[2] = 1</code></td><td>[1, 2, 1, 0, 0]</td></tr>
-    <tr><td><code>colorGraph(3)</code></td><td>1 (used by 0), 2 (used by 1), 3 fits</td><td><code>colors[3] = 3</code></td><td>[1, 2, 1, 3, 0]</td></tr>
-    <tr><td><code>colorGraph(4)</code></td><td>1 (used by 2), 2 (used by 1), 3 (used by 3)</td><td>dead end, <code>false</code>; <code>colors[3] = 0</code></td><td>[1, 2, 1, 0, 0]</td></tr>
-    <tr><td><code>colorGraph(3)</code> resumes</td><td>no color left</td><td><code>false</code>; <code>colors[2] = 0</code></td><td>[1, 2, 0, 0, 0]</td></tr>
-    <tr><td><code>colorGraph(2)</code> resumes</td><td>2 fits</td><td><code>colors[2] = 2</code></td><td>[1, 2, 2, 0, 0]</td></tr>
-    <tr><td><code>colorGraph(3)</code></td><td>1, 2 are taken; 3 fits</td><td><code>colors[3] = 3</code></td><td>[1, 2, 2, 3, 0]</td></tr>
-    <tr><td><code>colorGraph(4)</code></td><td>1 fits</td><td><code>colors[4] = 1</code></td><td>[1, 2, 2, 3, 1]</td></tr>
-    <tr><td><code>colorGraph(5)</code></td><td>—</td><td><code>v == n</code>, <code>true</code></td><td>[1, 2, 2, 3, 1]</td></tr>
+    <tr><td><code>color(0)</code></td><td>1 fits</td><td><code>colors[0] = 1</code></td><td>[1, 0, 0, 0, 0]</td></tr>
+    <tr><td><code>color(1)</code></td><td>1 (used by 0), 2 fits</td><td><code>colors[1] = 2</code></td><td>[1, 2, 0, 0, 0]</td></tr>
+    <tr><td><code>color(2)</code></td><td>1 fits</td><td><code>colors[2] = 1</code></td><td>[1, 2, 1, 0, 0]</td></tr>
+    <tr><td><code>color(3)</code></td><td>1 (used by 0), 2 (used by 1), 3 fits</td><td><code>colors[3] = 3</code></td><td>[1, 2, 1, 3, 0]</td></tr>
+    <tr><td><code>color(4)</code></td><td>1 (used by 2), 2 (used by 1), 3 (used by 3)</td><td>dead end, <code>false</code>; <code>colors[3] = 0</code></td><td>[1, 2, 1, 0, 0]</td></tr>
+    <tr><td><code>color(3)</code> resumes</td><td>no color left</td><td><code>false</code>; <code>colors[2] = 0</code></td><td>[1, 2, 0, 0, 0]</td></tr>
+    <tr><td><code>color(2)</code> resumes</td><td>2 fits</td><td><code>colors[2] = 2</code></td><td>[1, 2, 2, 0, 0]</td></tr>
+    <tr><td><code>color(3)</code></td><td>1, 2 are taken; 3 fits</td><td><code>colors[3] = 3</code></td><td>[1, 2, 2, 3, 0]</td></tr>
+    <tr><td><code>color(4)</code></td><td>1 fits</td><td><code>colors[4] = 1</code></td><td>[1, 2, 2, 3, 1]</td></tr>
+    <tr><td><code>color(5)</code></td><td>—</td><td><code>v == n</code>, <code>true</code></td><td>[1, 2, 2, 3, 1]</td></tr>
   </tbody>
 </table>
 </div>
@@ -1271,7 +1271,7 @@ course:
   <figcaption><b>Figure 4.32:</b> <code>v = 5 = n</code>: all the vertices are colored; the valid 3-coloring is [1, 2, 2, 3, 1].</figcaption>
 </figure>
 
-<p>In terms of cost, in the worst case every vertex tries all <span class="m">m</span> colors. The tree has at most <span class="m">m<sup>n</sup></span> leaves. At each node <code>canUse</code> takes <span class="m">O(n)</span>. The total time is <span class="m">O(n · m<sup>n</sup>)</span>. Memory is <span class="m">O(n)</span> for the <code>colors</code> array and the call stack.</p>
+<p>In terms of cost, in the worst case every vertex tries all <span class="m">m</span> colors. The tree has at most <span class="m">m<sup>n</sup></span> leaves. At each node <code>isSafe</code> takes <span class="m">O(n)</span>. The total time is <span class="m">O(n · m<sup>n</sup>)</span>. Memory is <span class="m">O(n)</span> for the <code>colors</code> array and the call stack.</p>
 
 <p>The symmetry of the colors is a source of unnecessary work. If the names of the colors in a coloring are permuted, another valid coloring results: [1, 2, 2, 3, 1] and [2, 1, 1, 3, 2] give the same structure. So fixing the color of vertex 0 to 1 shrinks the search by roughly a factor of <span class="m">m</span>. When a dead end is found, it is pointless to try vertex 0 with another color; even with the color names changed, the same dead end is reached.</p>
 
@@ -1279,11 +1279,11 @@ course:
 
 <div class="nt-box nt-box--ornek" id="ornek-c5">
   <span class="nt-box__title">Example 4.7</span>
-  <p><strong>Question.</strong> We try to color the five-vertex cycle graph <span class="m">C<sub>5</sub></span> (edges 0–1, 1–2, 2–3, 3–4, 4–0) with <span class="m">m = 2</span> colors using <code>colorGraph(0)</code>. What does the search return? What is the minimum number of colors needed?</p>
-  <p><strong>Solution.</strong> Vertex 0 takes color 1. The neighbor of vertex 1, vertex 0, has color 1; it takes color 2. Vertex 2 takes color 1 and vertex 3 takes color 2. The neighbors of vertex 4 are 0 (color 1) and 3 (color 2). Both colors are taken; dead end. The backtracks do not change the outcome. With two colors on a cycle, the colors necessarily alternate: 1, 2, 1, 2, … Even if vertex 0 is tried with color 2, the sequence becomes 2, 1, 2, 1 and vertex 4 is again adjacent to both colors. The search traverses the whole tree and returns <code>false</code>. This result is a proof that there is no solution; the search is complete. With <span class="m">m = 3</span>, <code>colorGraph(0)</code> finds the coloring [1, 2, 1, 2, 3] on the first attempt. The chromatic number of <span class="m">C<sub>5</sub></span> is 3.</p>
+  <p><strong>Question.</strong> We try to color the five-vertex cycle graph <span class="m">C<sub>5</sub></span> (edges 0–1, 1–2, 2–3, 3–4, 4–0) with <span class="m">m = 2</span> colors using <code>color(0)</code>. What does the search return? What is the minimum number of colors needed?</p>
+  <p><strong>Solution.</strong> Vertex 0 takes color 1. Vertex 1 is adjacent to vertex 0, which has color 1, so it takes color 2. Vertex 2 takes color 1 and vertex 3 takes color 2. The neighbors of vertex 4 are 0 (color 1) and 3 (color 2). Both colors are taken; dead end. The backtracks do not change the outcome. With two colors on a cycle, the colors necessarily alternate: 1, 2, 1, 2, … Even if vertex 0 is tried with color 2, the sequence becomes 2, 1, 2, 1 and vertex 4 is again adjacent to both colors. The search traverses the whole tree and returns <code>false</code>. This result is a proof that there is no solution; the search is complete. With <span class="m">m = 3</span>, <code>color(0)</code> finds the coloring [1, 2, 1, 2, 3] on the first attempt. The chromatic number of <span class="m">C<sub>5</sub></span> is 3.</p>
 </div>
 
-<p>The example is a special case of a general rule. A cycle of odd length cannot be colored with two colors. Cycles of even length can be colored with two colors: the colors are distributed alternately and the last vertex ends up with a color different from the first. More generally, a graph is 2-colorable if and only if it contains no odd cycle, that is, if it is bipartite. To find the chromatic number of a graph, <code>colorGraph</code> can be run with increasing values of <span class="m">m</span>: 1, 2, 3, … The first <span class="m">m</span> that succeeds is the chromatic number. Note that every failed attempt traverses the whole tree; the most expensive step is usually the last failed attempt.</p>
+<p>The example is a special case of a general rule. A cycle of odd length cannot be colored with two colors. Cycles of even length can be colored with two colors: the colors are distributed alternately and the last vertex ends up with a color different from the first. More generally, a graph is 2-colorable if and only if it contains no odd cycle, that is, if it is bipartite. To find the chromatic number of a graph, <code>color</code> can be run with increasing values of <span class="m">m</span>: 1, 2, 3, … The first <span class="m">m</span> that succeeds is the chromatic number. Note that every failed attempt traverses the whole tree; the most expensive step is usually the last failed attempt.</p>
 
 <h2 class="nt-pb" id="s9-7"><span class="nt-num">4.7</span>Hamiltonian path</h2>
 
@@ -1330,31 +1330,31 @@ course:
 
 <h3 id="s9-7-2"><span class="nt-num">4.7.2</span>Java code</h3>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> find(<span class="kw">int</span>[][] g, <span class="kw">int</span>[] path, <span class="kw">int</span> pos) {
-  <span class="kw">if</span> (pos == g.length) <span class="kw">return</span> <span class="kw">true</span>;
-  <span class="kw">for</span> (<span class="kw">int</span> v = 0; v &lt; g.length; v++) {
-    <span class="kw">if</span> (canExtend(v, g, path, pos)) {
+<pre class="nt-code"><code><span class="kw">boolean</span> find(<span class="kw">int</span>[][] graph, <span class="kw">int</span>[] path, <span class="kw">int</span> pos) {
+  <span class="kw">if</span> (pos == graph.length) <span class="kw">return</span> <span class="kw">true</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> v = 0; v &lt; graph.length; v++) {
+    <span class="kw">if</span> (isSafe(v, graph, path, pos)) {
       path[pos] = v;
-      <span class="kw">if</span> (find(g, path, pos + 1)) <span class="kw">return</span> <span class="kw">true</span>;
+      <span class="kw">if</span> (find(graph, path, pos + 1)) <span class="kw">return</span> <span class="kw">true</span>;
       path[pos] = -1;     <span class="cm">// undo</span>
     }
   }
   <span class="kw">return</span> <span class="kw">false</span>;
 }
 
-<span class="kw">boolean</span> canExtend(<span class="kw">int</span> v, <span class="kw">int</span>[][] g,
+<span class="kw">boolean</span> isSafe(<span class="kw">int</span> v, <span class="kw">int</span>[][] graph,
                  <span class="kw">int</span>[] path, <span class="kw">int</span> pos) {
-  <span class="kw">if</span> (g[path[pos - 1]][v] == 0) <span class="kw">return</span> <span class="kw">false</span>;
+  <span class="kw">if</span> (graph[path[pos - 1]][v] == 0) <span class="kw">return</span> <span class="kw">false</span>;
   <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; pos; i++)
     <span class="kw">if</span> (path[i] == v) <span class="kw">return</span> <span class="kw">false</span>;
   <span class="kw">return</span> <span class="kw">true</span>;
 }</code></pre>
 
-<p><code>g</code> is the adjacency matrix; <code>g[u][v] == 1</code> means there is an edge between <span class="m">u</span> and <span class="m">v</span>. The calling code fills the <code>path</code> array with −1, sets <code>path[0] = 0</code>, and calls <code>find(g, path, 1)</code>. <code>pos == g.length</code> is the goal test: the path has <span class="m">n</span> vertices. The loop tries every vertex as a candidate. <code>canExtend</code> checks the two constraints. The first line checks whether the candidate is adjacent to the last vertex, that is, to <code>path[pos − 1]</code>. The loop scans whether the candidate is already on the path. The undo line is <code>path[pos] = -1</code>.</p>
+<p><code>graph</code> is the adjacency matrix; <code>graph[u][v] == 1</code> means there is an edge between <span class="m">u</span> and <span class="m">v</span>. The calling code fills the <code>path</code> array with −1, sets <code>path[0] = 0</code>, and calls <code>find(graph, path, 1)</code>. <code>pos == graph.length</code> is the goal test: the path has <span class="m">n</span> vertices. The loop tries every vertex as a candidate. <code>isSafe</code> checks the two constraints. The first line checks whether the candidate is adjacent to the last vertex, that is, to <code>path[pos − 1]</code>. The loop scans whether the candidate is already on the path. The undo line is <code>path[pos] = -1</code>.</p>
 
-<p>Here too the observation from the permutation code applies: the undo line is not essential for correctness. <code>canExtend</code> looks only at <code>path[0..pos − 1]</code>, and the old value in <code>path[pos]</code> is overwritten in the next attempt. Even so, writing −1 keeps the state clean and makes debugging easier.</p>
+<p>Here too the observation from the permutation code applies: the undo line is not essential for correctness. <code>isSafe</code> looks only at <code>path[0..pos − 1]</code>, and the old value in <code>path[pos]</code> is overwritten in the next attempt. Even so, writing −1 keeps the state clean and makes debugging easier.</p>
 
-<p>The cost analysis is similar to permutations. Each position of the path is one of the remaining vertices; in the worst case <span class="m">(n − 1)!</span> orders are tried. At each node, for <span class="m">n</span> candidates, <code>canExtend</code> takes <span class="m">O(n)</span>. The crude bound is <span class="m">O(n · n!)</span>. If membership in the path is kept in a <code>boolean</code> array, <code>canExtend</code> drops to <span class="m">O(1)</span>.</p>
+<p>The cost analysis is similar to permutations. Each position of the path is one of the remaining vertices; in the worst case <span class="m">(n − 1)!</span> orders are tried. At each node, for <span class="m">n</span> candidates, <code>isSafe</code> takes <span class="m">O(n)</span>. The crude bound is <span class="m">O(n · n!)</span>. If membership in the path is kept in a <code>boolean</code> array, <code>isSafe</code> drops to <span class="m">O(1)</span>.</p>
 
 <h3 id="s9-7-3"><span class="nt-num">4.7.3</span>Code trace: the second graph</h3>
 
@@ -1362,12 +1362,12 @@ course:
 
 <figure class="nt-fig" id="sekil-ham2-bas" style="--w:340px">
   <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 350 182" role="img" aria-label="Hamiltonian path: the path built in the graph and the path array"><line class="t13-eh" x1="40" y1="80" x2="140" y2="30"/><line class="t13-e" x1="40" y1="80" x2="140" y2="130"/><line class="t13-e" x1="140" y1="30" x2="140" y2="130"/><line class="t13-e" x1="140" y1="30" x2="250" y2="80"/><line class="t13-e" x1="140" y1="130" x2="250" y2="80"/><line class="t13-e" x1="140" y1="130" x2="250" y2="160"/><circle class="box" cx="40" cy="80" r="17"/><text class="txt" x="40" y="85" text-anchor="middle">0</text><text class="t13-ptr" x="59" y="66" text-anchor="start">#0</text><circle class="t13-cur" cx="140" cy="30" r="17"/><text class="txt" x="140" y="35" text-anchor="middle">1</text><text class="t13-ptr" x="159" y="16" text-anchor="start">#1</text><circle class="t13-off" cx="140" cy="130" r="17"/><text class="txt" x="140" y="135" text-anchor="middle">2</text><circle class="t13-off" cx="250" cy="80" r="17"/><text class="txt" x="250" y="85" text-anchor="middle">3</text><circle class="t13-off" cx="250" cy="160" r="17"/><text class="txt" x="250" y="165" text-anchor="middle">4</text><text class="lbl" x="300" y="22" text-anchor="start">path</text><rect class="box" x="300" y="28" width="40" height="26"/><text class="txt" x="320" y="46" text-anchor="middle">0</text><text class="lbl" x="294" y="46" text-anchor="end">0</text><rect class="box" x="300" y="58" width="40" height="26"/><text class="txt" x="320" y="76" text-anchor="middle">1</text><text class="lbl" x="294" y="76" text-anchor="end">1</text><rect class="box-empty" x="300" y="88" width="40" height="26"/><text class="txt" x="320" y="106" text-anchor="middle">-1</text><text class="lbl" x="294" y="106" text-anchor="end">2</text><rect class="box-empty" x="300" y="118" width="40" height="26"/><text class="txt" x="320" y="136" text-anchor="middle">-1</text><text class="lbl" x="294" y="136" text-anchor="end">3</text><rect class="box-empty" x="300" y="148" width="40" height="26"/><text class="txt" x="320" y="166" text-anchor="middle">-1</text><text class="lbl" x="294" y="166" text-anchor="end">4</text></svg></div>
-  <figcaption><b>Figure 4.36:</b> The second graph. <code>find(g, path, 1)</code> has been called with <code>path[0] = 0</code>; at position 1 the first vertex adjacent to 0, vertex 1, has been chosen.</figcaption>
+  <figcaption><b>Figure 4.36:</b> The second graph. <code>find(graph, path, 1)</code> has been called with <code>path[0] = 0</code>; at position 1 the first vertex adjacent to 0, vertex 1, has been chosen.</figcaption>
 </figure>
 
 <div class="nt-tablewrap" id="tab-ham2">
 <table class="nt-table">
-  <caption>Table 4.11: Trace of the call <code>find(g, path, 1)</code> (second graph).</caption>
+  <caption>Table 4.11: Trace of the call <code>find(graph, path, 1)</code> (second graph).</caption>
   <thead><tr><th scope="col">Position</th><th scope="col">Last vertex</th><th scope="col">Decision</th><th scope="col"><code>path</code></th></tr></thead>
   <tbody>
     <tr><td>1</td><td>0</td><td>0 is on the path; first suitable is 1</td><td>[0, 1, −1, −1, −1]</td></tr>
@@ -1396,13 +1396,13 @@ course:
 
 <p>To search for a Hamiltonian cycle, the only change in the code is in the goal test. When the path reaches <span class="m">n</span> vertices, we also check whether the last vertex is adjacent to the starting vertex.</p>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> cycle(<span class="kw">int</span>[][] g, <span class="kw">int</span>[] path, <span class="kw">int</span> pos) {
-  <span class="kw">if</span> (pos == g.length)
-    <span class="kw">return</span> g[path[pos - 1]][path[0]] == 1;   <span class="cm">// last adjacent to start?</span>
-  <span class="kw">for</span> (<span class="kw">int</span> v = 0; v &lt; g.length; v++) {
-    <span class="kw">if</span> (canExtend(v, g, path, pos)) {
+<pre class="nt-code"><code><span class="kw">boolean</span> cycle(<span class="kw">int</span>[][] graph, <span class="kw">int</span>[] path, <span class="kw">int</span> pos) {
+  <span class="kw">if</span> (pos == graph.length)
+    <span class="kw">return</span> graph[path[pos - 1]][path[0]] == 1;   <span class="cm">// last adjacent to start?</span>
+  <span class="kw">for</span> (<span class="kw">int</span> v = 0; v &lt; graph.length; v++) {
+    <span class="kw">if</span> (isSafe(v, graph, path, pos)) {
       path[pos] = v;
-      <span class="kw">if</span> (cycle(g, path, pos + 1)) <span class="kw">return</span> <span class="kw">true</span>;
+      <span class="kw">if</span> (cycle(graph, path, pos + 1)) <span class="kw">return</span> <span class="kw">true</span>;
       path[pos] = -1;     <span class="cm">// undo</span>
     }
   }
@@ -1444,19 +1444,19 @@ course:
 
 <h3 id="s9-8-2"><span class="nt-num">4.8.2</span>Java code</h3>
 
-<pre class="nt-code"><code><span class="kw">boolean</span> search(<span class="kw">char</span>[][] g, <span class="kw">String</span> word, <span class="kw">int</span> i,
-            <span class="kw">int</span> r, <span class="kw">int</span> c, <span class="kw">boolean</span>[][] seen) {
+<pre class="nt-code"><code><span class="kw">boolean</span> search(<span class="kw">char</span>[][] grid, <span class="kw">String</span> word, <span class="kw">int</span> i,
+            <span class="kw">int</span> r, <span class="kw">int</span> c, <span class="kw">boolean</span>[][] visited) {
   <span class="kw">if</span> (i == word.length()) <span class="kw">return</span> <span class="kw">true</span>;
-  <span class="kw">if</span> (r &lt; 0 || r &gt;= g.length || c &lt; 0
-      || c &gt;= g[0].length || seen[r][c]
-      || g[r][c] != word.charAt(i))
+  <span class="kw">if</span> (r &lt; 0 || r &gt;= grid.length || c &lt; 0
+      || c &gt;= grid[0].length || visited[r][c]
+      || grid[r][c] != word.charAt(i))
     <span class="kw">return</span> <span class="kw">false</span>;
-  seen[r][c] = <span class="kw">true</span>;
+  visited[r][c] = <span class="kw">true</span>;
   <span class="kw">for</span> (<span class="kw">int</span> d = 0; d &lt; 4; d++)
-    <span class="kw">if</span> (search(g, word, i + 1, r + dr[d],
-            c + dc[d], seen))
+    <span class="kw">if</span> (search(grid, word, i + 1, r + dr[d],
+            c + dc[d], visited))
       <span class="kw">return</span> <span class="kw">true</span>;
-  seen[r][c] = <span class="kw">false</span>;   <span class="cm">// undo</span>
+  visited[r][c] = <span class="kw">false</span>;   <span class="cm">// undo</span>
   <span class="kw">return</span> <span class="kw">false</span>;
 }</code></pre>
 
@@ -1467,11 +1467,11 @@ course:
 <pre class="nt-code"><code><span class="kw">int</span>[] dr = {-1, 1, 0, 0};   <span class="cm">// up, down, left, right</span>
 <span class="kw">int</span>[] dc = {0, 0, -1, 1};
 
-<span class="kw">boolean</span> exists(<span class="kw">char</span>[][] g, <span class="kw">String</span> word) {
-  <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; g.length; r++)
-    <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; g[0].length; c++) {
-      <span class="kw">boolean</span>[][] seen = <span class="kw">new</span> <span class="kw">boolean</span>[g.length][g[0].length];
-      <span class="kw">if</span> (search(g, word, 0, r, c, seen))
+<span class="kw">boolean</span> exists(<span class="kw">char</span>[][] grid, <span class="kw">String</span> word) {
+  <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; grid.length; r++)
+    <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; grid[0].length; c++) {
+      <span class="kw">boolean</span>[][] visited = <span class="kw">new</span> <span class="kw">boolean</span>[grid.length][grid[0].length];
+      <span class="kw">if</span> (search(grid, word, 0, r, c, visited))
         <span class="kw">return</span> <span class="kw">true</span>;
     }
   <span class="kw">return</span> <span class="kw">false</span>;
@@ -1503,7 +1503,7 @@ course:
   <li>word[1] = 'B' is sought. Up is outside the grid, down (1, 0) = 'S' ≠ 'B', left is outside the grid. The cell to the right, (0, 1) = 'B', matches and is marked.</li>
   <li>word[2] = 'C' is sought. Up is outside the grid, down (1, 1) = 'F' ≠ 'C', left (0, 0) is visited. The cell to the right, (0, 2) = 'C', matches and is marked.</li>
   <li>word[3] = 'B' is sought. Up is outside the grid, down (1, 2) = 'C' ≠ 'B', left (0, 1) is visited, right (0, 3) = 'E' ≠ 'B'. All four directions fail. The only B in the grid is at (0, 1), and it has been used on this path.</li>
-  <li>Undo for (0, 2): <code>seen[0][2] = false</code>, <code>false</code> is returned.</li>
+  <li>Undo for (0, 2): <code>visited[0][2] = false</code>, <code>false</code> is returned.</li>
   <li>The remaining directions of (0, 1) and (0, 0) fail as well. The marks of both are removed. <code>search(…, 0, 0, 0, …)</code> returns <code>false</code>.</li>
   <li>The outer loop tries the other cells. The only other cell starting with A is (2, 0); its neighbors are S, D, and outside the grid, and there is no B. “ABCB” is not in the grid.</li>
 </ol>
@@ -1513,7 +1513,7 @@ course:
   <figcaption><b>Figure 4.40:</b> Step 4: 'B' is sought from (0, 2). The crossed cells are the neighbors that were rejected; (0, 1), where the B is, has already been used on this path.</figcaption>
 </figure>
 
-<p>For the cost, let the length of the word be <span class="m">L</span> and the dimensions of the grid <span class="m">R × C</span>. Every cell is a starting point. After the first letter there are at most 3 new directions at each step, because the cell we came from is visited. So the number of paths traversed from one starting point is bounded by <span class="m">O(3<sup>L</sup>)</span> and the total time is <span class="m">O(R · C · 3<sup>L</sup>)</span>. Memory is <span class="m">O(R · C)</span> for the <code>seen</code> array and <span class="m">O(L)</span> for the stack. In practice, letter matching cuts the search very early; the search for “ABCB” marks only 4 cells.</p>
+<p>For the cost, let the length of the word be <span class="m">L</span> and the dimensions of the grid <span class="m">R × C</span>. Every cell is a starting point. After the first letter there are at most 3 new directions at each step, because the cell we came from is visited. So the number of paths traversed from one starting point is bounded by <span class="m">O(3<sup>L</sup>)</span> and the total time is <span class="m">O(R · C · 3<sup>L</sup>)</span>. Memory is <span class="m">O(R · C)</span> for the <code>visited</code> array and <span class="m">O(L)</span> for the stack. In practice, letter matching cuts the search very early; the search for “ABCB” marks only 4 cells.</p>
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
@@ -1528,37 +1528,37 @@ course:
 
 <pre class="nt-code"><code><span class="kw">int</span>[] a = {3, 5, 6, 7};
 <span class="kw">int</span> TARGET = 15;
-<span class="kw">boolean</span>[] chosen = <span class="kw">new</span> <span class="kw">boolean</span>[a.length];
+<span class="kw">boolean</span>[] taken = <span class="kw">new</span> <span class="kw">boolean</span>[a.length];
 
-<span class="kw">boolean</span> subset(<span class="kw">int</span> i, <span class="kw">int</span> sum) {
+<span class="kw">boolean</span> search(<span class="kw">int</span> i, <span class="kw">int</span> sum) {
   <span class="kw">if</span> (sum == TARGET) <span class="kw">return</span> <span class="kw">true</span>;
   <span class="kw">if</span> (i == a.length || sum &gt; TARGET) <span class="kw">return</span> <span class="kw">false</span>;   <span class="cm">// prune</span>
-  chosen[i] = <span class="kw">true</span>;                     <span class="cm">// take</span>
-  <span class="kw">if</span> (subset(i + 1, sum + a[i])) <span class="kw">return</span> <span class="kw">true</span>;
-  chosen[i] = <span class="kw">false</span>;                    <span class="cm">// skip</span>
-  <span class="kw">return</span> subset(i + 1, sum);
+  taken[i] = <span class="kw">true</span>;                     <span class="cm">// take</span>
+  <span class="kw">if</span> (search(i + 1, sum + a[i])) <span class="kw">return</span> <span class="kw">true</span>;
+  taken[i] = <span class="kw">false</span>;                    <span class="cm">// skip</span>
+  <span class="kw">return</span> search(i + 1, sum);
 }</code></pre>
 
-<p><code>subset(i, sum)</code> is called when the first <span class="m">i</span> items have been decided and the sum of those chosen is <code>sum</code>. If the target has been reached, <code>true</code> is returned. If no items are left or the sum has exceeded the target, <code>false</code> is returned. The second condition is the pruning: because the items are positive, once the sum has exceeded the target it can never decrease again. Then the two branches are tried in turn. First the <span class="m">i</span>-th item is taken; if this branch fails, the item is left out and the second branch is tried. In this code <code>sum</code>, which is part of the partial solution, is passed by value, so no undo is needed for it. Only the <code>chosen</code> array is undone.</p>
+<p><code>search(i, sum)</code> is called when the first <span class="m">i</span> items have been decided and the sum of those chosen is <code>sum</code>. If the target has been reached, <code>true</code> is returned. If no items are left or the sum has exceeded the target, <code>false</code> is returned. The second condition is the pruning: because the items are positive, once the sum has exceeded the target it can never decrease again. Then the two branches are tried in turn. First the <span class="m">i</span>-th item is taken; if this branch fails, the item is left out and the second branch is tried. In this code <code>sum</code>, which is part of the partial solution, is passed by value, so no undo is needed for it. Only the <code>taken</code> array is undone.</p>
 
 <div class="nt-tablewrap" id="tab-altkume">
 <table class="nt-table">
-  <caption>Table 4.13: The order of the calls of <code>subset(0, 0)</code> for <code>a = {3, 5, 6, 7}</code>, <code>TARGET = 15</code>.</caption>
+  <caption>Table 4.13: The order of the calls of <code>search(0, 0)</code> for <code>a = {3, 5, 6, 7}</code>, <code>TARGET = 15</code>.</caption>
   <thead><tr><th scope="col">#</th><th scope="col">Call</th><th scope="col">Meaning</th><th scope="col">Result</th></tr></thead>
   <tbody>
-    <tr><td>1</td><td><code>subset(0, 0)</code></td><td>root</td><td>descends into the branch that takes 3</td></tr>
-    <tr><td>2</td><td><code>subset(1, 3)</code></td><td>3 was taken</td><td>descends into the branch that takes 5</td></tr>
-    <tr><td>3</td><td><code>subset(2, 8)</code></td><td>5 was taken</td><td>descends into the branch that takes 6</td></tr>
-    <tr><td>4</td><td><code>subset(3, 14)</code></td><td>6 was taken</td><td>descends into the branch that takes 7</td></tr>
-    <tr><td>5</td><td><code>subset(4, 21)</code></td><td>7 was taken</td><td><span class="m">21 &gt; 15</span>: pruned, <code>false</code></td></tr>
-    <tr><td>6</td><td><code>subset(4, 14)</code></td><td>7 was not taken</td><td>no items left, 14 ≠ 15: <code>false</code></td></tr>
-    <tr><td>7</td><td><code>subset(3, 8)</code></td><td>6 was not taken</td><td>descends into the branch that takes 7</td></tr>
-    <tr><td>8</td><td><code>subset(4, 15)</code></td><td>7 was taken</td><td><code>sum == TARGET</code>: <code>true</code></td></tr>
+    <tr><td>1</td><td><code>search(0, 0)</code></td><td>root</td><td>descends into the branch that takes 3</td></tr>
+    <tr><td>2</td><td><code>search(1, 3)</code></td><td>3 was taken</td><td>descends into the branch that takes 5</td></tr>
+    <tr><td>3</td><td><code>search(2, 8)</code></td><td>5 was taken</td><td>descends into the branch that takes 6</td></tr>
+    <tr><td>4</td><td><code>search(3, 14)</code></td><td>6 was taken</td><td>descends into the branch that takes 7</td></tr>
+    <tr><td>5</td><td><code>search(4, 21)</code></td><td>7 was taken</td><td><span class="m">21 &gt; 15</span>: pruned, <code>false</code></td></tr>
+    <tr><td>6</td><td><code>search(4, 14)</code></td><td>7 was not taken</td><td>no items left, 14 ≠ 15: <code>false</code></td></tr>
+    <tr><td>7</td><td><code>search(3, 8)</code></td><td>6 was not taken</td><td>descends into the branch that takes 7</td></tr>
+    <tr><td>8</td><td><code>search(4, 15)</code></td><td>7 was taken</td><td><code>sum == TARGET</code>: <code>true</code></td></tr>
   </tbody>
 </table>
 </div>
 
-<p>The search ends in 8 calls and <code>chosen = [true, true, false, true]</code>: the subset found is {3, 5, 7}. The whole tree has <span class="m">2<sup>5</sup> − 1 = 31</span> nodes. Call 5 is where the pruning acts: the sum of 3, 5, 6, and 7 is 21, which exceeds the target.</p>
+<p>The search ends in 8 calls and <code>taken = [true, true, false, true]</code>: the subset found is {3, 5, 7}. The whole tree has <span class="m">2<sup>5</sup> − 1 = 31</span> nodes. Call 5 is where the pruning acts: the sum of 3, 5, 6, and 7 is 21, which exceeds the target.</p>
 
 <p>This pruning cuts only “excess” sums. A pruning in the opposite direction is also possible: if the target cannot be reached even by taking all the remaining items, the branch is cut. For this, <code>remaining[i]</code>, the sum of the items from the <span class="m">i</span>-th to the end (a suffix sum), is computed in advance, and the following line is added:</p>
 
@@ -1566,7 +1566,7 @@ course:
 
 <div class="nt-box nt-box--ornek" id="ornek-kalan">
   <span class="nt-box__title">Example 4.8</span>
-  <p><strong>Question.</strong> Let the target be 22 in the same set. How many calls does <code>subset(0, 0)</code> make without and with the remaining-sum pruning?</p>
+  <p><strong>Question.</strong> Let the target be 22 in the same set. How many calls does <code>search(0, 0)</code> make without and with the remaining-sum pruning?</p>
   <p><strong>Solution.</strong> The sum of the items is <span class="m">3 + 5 + 6 + 7 = 21</span>; no subset can reach 22. In the code without the extra pruning, no sum exceeds 22, so the “excess” pruning never fires. The search traverses all 31 nodes of the tree and returns <code>false</code>. With the remaining-sum pruning, in the first call <span class="m">0 + remaining[0] = 21 &lt; 22</span>. The search ends in a single call. When the target in the same set is 15, on the other hand, the search makes 8 calls in both versions; the pruning does not help in this example. The gain from pruning always depends on the input.</p>
 </div>
 
@@ -1673,7 +1673,7 @@ course:
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
-  <p><strong>Forgetting to undo.</strong> If <code>b[r][c] = 0</code> or <code>seen[r][c] = false</code> is not done on returning from the recursion, the old choice corrupts the later branches. In n-queens the board fills up with the queens of earlier attempts, and valid columns are wrongly rejected.</p>
+  <p><strong>Forgetting to undo.</strong> If <code>g[r][c] = 0</code> or <code>visited[r][c] = false</code> is not done on returning from the recursion, the old choice corrupts the later branches. In n-queens the board fills up with the queens of earlier attempts, and valid columns are wrongly rejected.</p>
 </div>
 
 <div class="nt-box nt-box--hata">
@@ -1727,7 +1727,7 @@ course:
   <li>reduction</li>
   <li>NP-hard</li>
   <li>NP-complete</li>
-  <li>N-queens problem</li>
+  <li>n-queens problem</li>
   <li>min-conflicts heuristic</li>
   <li>local search</li>
   <li>heuristic</li>
@@ -1780,13 +1780,13 @@ course:
     </details>
   </li>
   <li>
-    <p>The graph with edges 0–1, 1–2, 2–0, and 2–3 is colored with <code>colorGraph(0)</code> using <span class="m">m = 2</span> and <span class="m">m = 3</span> colors. What are the results?</p>
+    <p>The graph with edges 0–1, 1–2, 2–0, and 2–3 is colored with <code>color(0)</code> using <span class="m">m = 2</span> and <span class="m">m = 3</span> colors. What are the results?</p>
     <details><summary>Answer</summary>
       <p>Vertices 0, 1, 2 form a triangle; all three are adjacent to each other and two colors are not enough. For <span class="m">m = 2</span> the search traverses the whole tree and returns <code>false</code>. For <span class="m">m = 3</span> the first attempt finds [1, 2, 3, 1]: the only neighbor of vertex 3 is 2 (color 3), so color 1 is suitable.</p>
     </details>
   </li>
   <li>
-    <p>In a star graph with vertex 0 at the center and vertices 1, 2, and 3 connected only to the center, what does <code>find(g, path, 1)</code> return? Would another starting vertex change the result?</p>
+    <p>In a star graph with vertex 0 at the center and vertices 1, 2, and 3 connected only to the center, what does <code>find(graph, path, 1)</code> return? Would another starting vertex change the result?</p>
     <details><summary>Answer</summary>
       <p><code>false</code>. When we go from 0 to 1, vertex 1 has no neighbor that is not on the path; the same happens for 2 and 3. Changing the starting vertex does not help either: a path has at most two end vertices, but this graph has three vertices of degree 1. There is no Hamiltonian path.</p>
     </details>

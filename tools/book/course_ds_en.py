@@ -42,7 +42,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Data Structures',
-    subtitle='',
+    subtitle='Design and Analysis with Java',
     output='data_structures/Data-Structures.pdf',     # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Data Structures course textbook: algorithm analysis, arrays, recursion, linked '

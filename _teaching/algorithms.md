@@ -24,7 +24,7 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 ## Ders Kitabı
 
-[📕 Algoritmalar (PDF, 12 MB)](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf)
+[📕 Algoritmalar: Tasarım, Analiz ve Java ile Uygulama (PDF, 12 MB)](https://sercankulcu.github.io/courses-pdfs/algorithms/Algoritmalar.pdf)
 
 ---
 
@@ -154,7 +154,7 @@ Tasarım paradigmaları (böl ve fethet, açgözlü algoritmalar, dinamik progra
 
 ## Textbook
 
-[📕 Algorithms — the course book (PDF, 11 MB)](https://sercankulcu.github.io/courses-pdfs/algorithms/Algorithms.pdf)
+[📕 Algorithms: Design, Analysis and Implementation in Java — the course book (PDF, 11 MB)](https://sercankulcu.github.io/courses-pdfs/algorithms/Algorithms.pdf)
 
 ---
 
@@ -256,7 +256,7 @@ String algorithms underlie text search, data compression and the analysis of bio
 
 ### Chapter 10: Advanced String Algorithms
 
-The chapter opens with string sorting: lexicographic order and LSD and MSD radix sort. It goes on to regular expressions, finite-state machines and pattern-matching automata, and computes the Levenshtein edit distance with dynamic programming. Suffix arrays and the Burrows–Wheeler transform complete the chapter.
+The chapter opens with string sorting: lexicographic order and LSD and MSD radix sort. It goes on to regular expressions, finite state machines and pattern-matching automata, and computes the Levenshtein edit distance with dynamic programming. Suffix arrays and the Burrows–Wheeler transform complete the chapter.
 
 - [🖼️ Slides](/files/algorithms/slides/Chapter_10_Advanced_String_Algorithms.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/algorithms/pdf/Chapter_10_Advanced_String_Algorithms.pdf) · [📖 Notes](/files/algorithms/notes/Chapter_10_Advanced_String_Algorithms_Lecture_Notes.html) · [📝 Questions](/files/algorithms/slides/Chapter_10_Advanced_String_Algorithms_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/algorithms-java-en/tree/main/Chapter10/src)
 - 🕹️ **Simulators:** [String Sorting: LSD Radix Sort](/files/algorithms/slides/Chapter_10_String_Sorting.html) · [String Parsing with a Finite State Machine](/files/algorithms/slides/Chapter_10_String_Parsing.html) · [String Similarity: Levenshtein Distance](/files/algorithms/slides/Chapter_10_String_Similarity.html) · [String Transformation: Burrows–Wheeler Transform](/files/algorithms/slides/Chapter_10_String_Transformation.html)

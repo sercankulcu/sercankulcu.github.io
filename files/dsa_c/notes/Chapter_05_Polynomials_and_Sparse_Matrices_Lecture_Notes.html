@@ -2,7 +2,7 @@
 layout: without-sidebar
 title: "Chapter 5: Polynomials and Sparse Matrices — Lecture Notes"
 permalink: /files/dsa_c/notes/Chapter_05_Polynomials_and_Sparse_Matrices_Lecture_Notes.html
-excerpt: "Lecture notes for Chapter 5 of Data Structures and Algorithms with C: the polynomial abstract data type, coefficient-array and term-array representations, addition by merging with padd, multiplication on arrays, polynomial multiplication with linked lists (pmult_list), the triple representation of sparse matrices, transpose and fast_transpose, sparse matrix multiplication, CSR and linked sparse matrices; with C code, step-by-step traces and complexity analyses."
+excerpt: "Lecture notes for Chapter 5 of Data Structures and Algorithms with C: the polynomial abstract data type, coefficient-array and term-array representations, addition by merging with padd, multiplication on arrays, polynomial multiplication with linked lists (poly_mult), the triple representation of sparse matrices, transpose and fast_transpose, sparse matrix multiplication, CSR and linked sparse matrices; with C code, step-by-step traces and complexity analyses."
 lang: en
 seo_title: "Chapter 5: Polynomials and Sparse Matrices · DSA with C Lecture Notes"
 og_image: https://sercankulcu.github.io/courses-pdfs/covers/c-ile-veri-yapilari-ve-algoritmalar.jpg
@@ -112,8 +112,8 @@ course:
     <li><a href="#s5-5">5.5 Polynomials as linked lists</a>
       <ol>
         <li><a href="#s5-5-1">5.5.1 The node structure</a></li>
-        <li><a href="#s5-5-2">5.5.2 add_term() and delete_next()</a></li>
-        <li><a href="#s5-5-3">5.5.3 pmult_list() and place()</a></li>
+        <li><a href="#s5-5-2">5.5.2 new_term() and delete_next_term()</a></li>
+        <li><a href="#s5-5-3">5.5.3 poly_mult() and place_term()</a></li>
         <li><a href="#s5-5-4">5.5.4 Code trace: (x + 1)(x − 1)</a></li>
         <li><a href="#s5-5-5">5.5.5 Complexity and measurement</a></li>
         <li><a href="#s5-5-6">5.5.6 Other solutions to the problem</a></li>
@@ -332,18 +332,18 @@ polynomial P[MAX_TERMS]; <span class="cm">/* all polynomials live here */</span>
 
 <span class="kw">void</span> attach(<span class="kw">float</span> coef, <span class="kw">int</span> expon) {
   <span class="kw">if</span> (avail &gt;= MAX_TERMS) {
-    fprintf(stderr, "Array overflow!\n"); exit(1);
+    fprintf(stderr, "Too many terms!\n"); exit(1);
   }
   P[avail].coef = coef;
   P[avail++].expon = expon;
 }
-<span class="kw">#define</span> APPEND(k) attach(P[k].coef, P[k].expon)</code></pre>
+<span class="kw">#define</span> COPY(k) attach(P[k].coef, P[k].expon)</code></pre>
 
 <p><code>COMPARE(x, y)</code> yields <span class="m">−1</span> if <span class="m">x &lt; y</span>, 1 if <span class="m">x &gt; y</span>, and 0 if they are equal. It is written with two nested conditional operators. The macro parameters are parenthesized at every use because the preprocessor substitutes the macro as text. In a call like <code>COMPARE(a + 1, b)</code>, the parentheses keep operator precedence from grouping the expression the wrong way. The three-valued result is what lets <code>padd</code> be written with a <code>switch</code>.</p>
 
 <p><code>attach</code> writes a term to <code>P[avail]</code> and increments <code>avail</code>. Before writing it checks whether the array is full; if so, it prints a message to the standard error stream and terminates the program. Without this check it would write to <code>P[101]</code>. Writing outside the bounds of an array is undefined behavior in C: neighboring variables may be corrupted or the program may crash. The line <code>P[avail++].expon = expon;</code> uses the postfix increment operator: first the exponent of <code>P[avail]</code> is written, then <code>avail</code> is incremented.</p>
 
-<p>The macro <code>APPEND(k)</code> is shorthand for copying the term <code>P[k]</code> to the result unchanged. After preprocessing, <code>APPEND(sb)</code> becomes <code>attach(P[sb].coef, P[sb].expon)</code>.</p>
+<p>The macro <code>COPY(k)</code> is shorthand for copying the term <code>P[k]</code> to the result unchanged. After preprocessing, <code>COPY(sb)</code> becomes <code>attach(P[sb].coef, P[sb].expon)</code>.</p>
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
@@ -356,14 +356,14 @@ polynomial P[MAX_TERMS]; <span class="cm">/* all polynomials live here */</span>
   <span class="kw">float</span> c; *sd = avail;               <span class="cm">/* start of D */</span>
   <span class="kw">while</span> (sa &lt;= fa &amp;&amp; sb &lt;= fb)
     <span class="kw">switch</span> (COMPARE(P[sa].expon, P[sb].expon)) {
-    <span class="kw">case</span> -1: APPEND(sb); sb++; <span class="kw">break</span>;     <span class="cm">/* B larger */</span>
-    <span class="kw">case</span>  1: APPEND(sa); sa++; <span class="kw">break</span>;     <span class="cm">/* A larger */</span>
+    <span class="kw">case</span> -1: COPY(sb); sb++; <span class="kw">break</span>;     <span class="cm">/* B larger */</span>
+    <span class="kw">case</span>  1: COPY(sa); sa++; <span class="kw">break</span>;     <span class="cm">/* A larger */</span>
     <span class="kw">case</span>  0: c = P[sa].coef + P[sb].coef;
       <span class="kw">if</span> (c) attach(c, P[sa].expon); <span class="cm">/* 0: skip */</span>
       sa++; sb++;
     }
-  <span class="kw">for</span> (; sa &lt;= fa; sa++) APPEND(sa);   <span class="cm">/* rest of A */</span>
-  <span class="kw">for</span> (; sb &lt;= fb; sb++) APPEND(sb);   <span class="cm">/* rest of B */</span>
+  <span class="kw">for</span> (; sa &lt;= fa; sa++) COPY(sa);   <span class="cm">/* rest of A */</span>
+  <span class="kw">for</span> (; sb &lt;= fb; sb++) COPY(sb);   <span class="cm">/* rest of B */</span>
   *fd = avail - 1;
 }</code></pre>
 
@@ -397,9 +397,9 @@ polynomial P[MAX_TERMS]; <span class="cm">/* all polynomials live here */</span>
     <tr><td>0</td><td>0</td><td>3</td><td>—</td><td>—</td><td><code>*sd = 6</code></td><td>6</td></tr>
     <tr><td>1</td><td>0</td><td>3</td><td>3, 3</td><td>0</td><td><span class="m">c = 4 + 3 = 7</span>; <code>attach(7, 3)</code>: <code>P[6] = 7x³</code>; both advance</td><td>7</td></tr>
     <tr><td>2</td><td>1</td><td>4</td><td>2, 2</td><td>0</td><td><span class="m">c = 2 + (−2) = 0</span>; not appended; both advance</td><td>7</td></tr>
-    <tr><td>3</td><td>2</td><td>5</td><td>0, 1</td><td>−1</td><td><code>APPEND(5)</code>: <code>P[7] = 1x¹</code>; only <code>sb</code> advances</td><td>8</td></tr>
+    <tr><td>3</td><td>2</td><td>5</td><td>0, 1</td><td>−1</td><td><code>COPY(5)</code>: <code>P[7] = 1x¹</code>; only <code>sb</code> advances</td><td>8</td></tr>
     <tr><td>4</td><td>2</td><td>6</td><td>—</td><td>—</td><td><code>sb = 6 &gt; fb = 5</code>: the loop ends</td><td>8</td></tr>
-    <tr><td>5</td><td>3</td><td>6</td><td>—</td><td>—</td><td>rest of A: <code>APPEND(2)</code>: <code>P[8] = 5x⁰</code></td><td>9</td></tr>
+    <tr><td>5</td><td>3</td><td>6</td><td>—</td><td>—</td><td>rest of A: <code>COPY(2)</code>: <code>P[8] = 5x⁰</code></td><td>9</td></tr>
     <tr><td>6</td><td>3</td><td>6</td><td>—</td><td>—</td><td><code>*fd = 9 − 1 = 8</code></td><td>9</td></tr>
   </tbody>
 </table>
@@ -445,7 +445,7 @@ polynomial P[MAX_TERMS]; <span class="cm">/* all polynomials live here */</span>
 
 <h3 id="s5-3-6"><span class="nt-num">5.3.6</span>The price of the shared array</h3>
 
-<p>The shared array <code>P</code> is a simple memory manager: <code>avail</code> only moves forward. Every call to <code>padd</code> appends its result to the end of the array. The terms of a polynomial that was only needed as an intermediate result stay in the array, and their space is not reclaimed. In a long computation the array fills up with such leftovers and <code>attach</code> stops the program with the message “Array overflow!”, even though the live polynomials in the array may be small in total.</p>
+<p>The shared array <code>P</code> is a simple memory manager: <code>avail</code> only moves forward. Every call to <code>padd</code> appends its result to the end of the array. The terms of a polynomial that was only needed as an intermediate result stay in the array, and their space is not reclaimed. In a long computation the array fills up with such leftovers and <code>attach</code> stops the program with the message “Too many terms!”, even though the live polynomials in the array may be small in total.</p>
 
 <p>There are two solutions to this problem. The first is <strong>compaction</strong>. When the array is full, the polynomials still in use are shifted toward the start of the array and their start and end indices are updated. Compaction takes time proportional to the number of live terms and must be written carefully because it changes the indices of all polynomials. The second solution is to store the polynomial as a linked list. Each term sits in its own node; a node that is no longer needed is returned at once with <code>free</code>.</p>
 
@@ -519,34 +519,34 @@ polynomial P[MAX_TERMS]; <span class="cm">/* all polynomials live here */</span>
 
 <h3 id="s5-5-1"><span class="nt-num">5.5.1</span>The node structure</h3>
 
-<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> poly_node *poly_ptr;
+<pre class="nt-code"><code><span class="kw">typedef</span> <span class="kw">struct</span> poly_node *poly_pointer;
 <span class="kw">typedef</span> <span class="kw">struct</span> poly_node {
   <span class="kw">int</span> coef;
   <span class="kw">int</span> expon;
-  poly_ptr link;
+  poly_pointer link;
 } poly_node;</code></pre>
 
-<p>The first line defines a pointer type to <code>struct poly_node</code> under the name <code>poly_ptr</code>. This line comes before the definition of the structure. C allows this, because declaring a pointer to a structure does not require knowing its contents; it is enough to know that the name denotes a structure. The definition that follows gives the three fields of the node: <code>coef</code>, <code>expon</code>, and <code>link</code>, which holds the address of the next node in the list. Because the structure contains a field that points to itself, it is called a <strong>self-referential structure</strong>. In this representation the coefficients are integers.</p>
+<p>The first line defines a pointer type to <code>struct poly_node</code> under the name <code>poly_pointer</code>. This line comes before the definition of the structure. C allows this, because declaring a pointer to a structure does not require knowing its contents; it is enough to know that the name denotes a structure. The definition that follows gives the three fields of the node: <code>coef</code>, <code>expon</code>, and <code>link</code>, which holds the address of the next node in the list. Because the structure contains a field that points to itself, it is called a <strong>self-referential structure</strong>. In this representation the coefficients are integers.</p>
 
-<p>The list again keeps the terms in decreasing order of exponent and contains only nonzero terms. The address of the first node of the list is stored in a <code>poly_ptr</code> variable; the <code>link</code> field of the last node is <code>NULL</code>. <a href="#sekil-liste">Figure 5.5</a> shows the list of the polynomial <span class="m">a = 3x<sup>14</sup> + 2x<sup>8</sup> + 1</span>.</p>
+<p>The list again keeps the terms in decreasing order of exponent and contains only nonzero terms. The address of the first node of the list is stored in a <code>poly_pointer</code> variable; the <code>link</code> field of the last node is <code>NULL</code>. <a href="#sekil-liste">Figure 5.5</a> shows the list of the polynomial <span class="m">a = 3x<sup>14</sup> + 2x<sup>8</sup> + 1</span>.</p>
 
 <figure class="nt-fig" id="sekil-liste" style="--w:420px">
   <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 420 112" role="img" aria-label="Polynomial list: 3x^14, 2x^8, 1x^0"><defs><marker id="c5-d14-ah1-s09_00-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker></defs><text class="lbl" x="89" y="26" text-anchor="middle" style="font-size:10.5px">coef</text><text class="lbl" x="124" y="26" text-anchor="middle" style="font-size:10.5px">expon</text><text class="lbl" x="152" y="26" text-anchor="middle" style="font-size:10.5px">link</text><g><rect class="box" x="70" y="34" width="38" height="30"/><text class="txt mono" x="89" y="54" text-anchor="middle" style="font-size:13px">3</text><rect class="box" x="108" y="34" width="32" height="30"/><text class="txt mono" x="124" y="54" text-anchor="middle" style="font-size:13px">14</text><rect class="box-empty" x="140" y="34" width="24" height="30"/><circle class="ah" cx="152" cy="49" r="3.5"/></g><path class="line" d="M152 49 L192 49" marker-end="url(#c5-d14-ah1-s09_00-1)"/><g><rect class="box" x="194" y="34" width="38" height="30"/><text class="txt mono" x="213" y="54" text-anchor="middle" style="font-size:13px">2</text><rect class="box" x="232" y="34" width="32" height="30"/><text class="txt mono" x="248" y="54" text-anchor="middle" style="font-size:13px">8</text><rect class="box-empty" x="264" y="34" width="24" height="30"/><circle class="ah" cx="276" cy="49" r="3.5"/></g><path class="line" d="M276 49 L316 49" marker-end="url(#c5-d14-ah1-s09_00-1)"/><g><rect class="box" x="318" y="34" width="38" height="30"/><text class="txt mono" x="337" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box" x="356" y="34" width="32" height="30"/><text class="txt mono" x="372" y="54" text-anchor="middle" style="font-size:13px">0</text><rect class="box-empty" x="388" y="34" width="24" height="30"/><text class="lbl" x="400" y="53" text-anchor="middle">∅</text></g></svg></div>
   <figcaption><b>Figure 5.5:</b> The linked list of the polynomial <span class="m">a = 3x<sup>14</sup> + 2x<sup>8</sup> + 1</span>. Each node holds a coefficient, an exponent and the address of the next node; the link of the last node is <code>NULL</code> (∅).</figcaption>
 </figure>
 
-<p>On a 64-bit system a node occupies 16 bytes: 8 bytes for the two <code>int</code> fields and 8 bytes for the pointer. That is twice the space of the 8-byte term in the term array; this is the price of the link. In return, the nodes need not be contiguous in memory, and there is no limit of a shared array. The number of terms of a polynomial is limited only when the system's memory runs out.</p>
+<p>On a 64-bit system a node occupies 16 bytes: 8 bytes for the two <code>int</code> fields and 8 bytes for the pointer. That is twice the space of the 8-byte term in the term array; this is the price of the link. In return, the nodes need not be contiguous in memory, and there is no fixed limit from a shared array. The number of terms of a polynomial is limited only when the system's memory runs out.</p>
 
 <p>The list has two important advantages. First, insertion and deletion in the middle are done by changing just a few pointers, in <span class="m">O(1)</span> time; once the position has been found, of course. In an array, insertion in the middle would require shifting all following terms by one position. Second, addition is again a merge: one walks down the heads of both lists at once and applies the three cases of <code>padd</code> unchanged. Addition with linked lists also runs in <span class="m">O(n + m)</span> time. The only difference is that the result nodes are allocated with <code>malloc</code> and returned with <code>free</code> when the work is done.</p>
 
-<h3 id="s5-5-2"><span class="nt-num">5.5.2</span>add_term() and delete_next()</h3>
+<h3 id="s5-5-2"><span class="nt-num">5.5.2</span>new_term() and delete_next_term()</h3>
 
 <p>The multiplication code relies on two helpers. The first creates a new term node and, optionally, links it after a given node:</p>
 
 <pre class="nt-code"><code><span class="cm">/* create a term; if prev is given, link it after prev */</span>
-poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span> coef,
-                  poly_ptr prev) {
-  poly_ptr p = malloc(<span class="kw">sizeof</span> *p);
+poly_pointer new_term(<span class="kw">int</span> expon, <span class="kw">int</span> coef,
+                  poly_pointer prev) {
+  poly_pointer p = malloc(<span class="kw">sizeof</span> *p);
   <span class="kw">if</span> (!p) { printf("Out of memory!\n"); exit(1); }
   p-&gt;expon = expon;  p-&gt;coef = coef;
   <span class="kw">if</span> (prev) {              <span class="cm">/* in the middle or at the end */</span>
@@ -563,9 +563,9 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 <p>The second helper deletes the node after a given node:</p>
 
 <pre class="nt-code"><code><span class="cm">/* delete the node after prev */</span>
-<span class="kw">void</span> delete_next(
-        poly_ptr prev) {
-  poly_ptr victim =
+<span class="kw">void</span> delete_next_term(
+        poly_pointer prev) {
+  poly_pointer victim =
         prev-&gt;link;
   <span class="kw">if</span> (!victim) <span class="kw">return</span>;
   prev-&gt;link =
@@ -577,55 +577,55 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 
 <p>If there is no node to delete (<code>prev</code> is the last node), the function returns without doing anything. Note that the function cannot delete the first node: deletion is always done through the previous node. The multiplication code can live with this restriction, because the first term of the product list is never deleted.</p>
 
-<h3 id="s5-5-3"><span class="nt-num">5.5.3</span>pmult_list() and place()</h3>
+<h3 id="s5-5-3"><span class="nt-num">5.5.3</span>poly_mult() and place_term()</h3>
 
 <p>In the product of two polynomials, every term of <span class="m">A</span> is multiplied by every term of <span class="m">B</span>. Each product produced is put in its place in the sorted result list. If a term with the same exponent already exists, its coefficient is updated; if the updated coefficient becomes 0, the term is deleted. For readability, this body of the inner loop is moved into a separate function:</p>
 
-<pre class="nt-code"><code>poly_ptr place(poly_ptr r,
+<pre class="nt-code"><code>poly_pointer place_term(poly_pointer r,
                <span class="kw">int</span> expon, <span class="kw">int</span> coef) {
   <span class="kw">while</span> (r-&gt;link &amp;&amp; r-&gt;link-&gt;expon &gt; expon) r = r-&gt;link;
   <span class="kw">if</span> (!r-&gt;link || r-&gt;link-&gt;expon &lt; expon)
-    add_term(expon, coef, r);          <span class="cm">/* new exponent */</span>
+    new_term(expon, coef, r);          <span class="cm">/* new exponent */</span>
   <span class="kw">else</span> <span class="kw">if</span> ((r-&gt;link-&gt;coef += coef) == 0)
-    delete_next(r);                    <span class="cm">/* became 0 */</span>
+    delete_next_term(r);                    <span class="cm">/* became 0 */</span>
   <span class="kw">return</span> r;
 }</code></pre>
 
-<p><code>place</code> starts at node <code>r</code> and looks for the position of the new term. The assumption is that the exponent of <code>r</code> is larger than the exponent of the new term, that is, the new term will come somewhere after <code>r</code>. The <code>while</code> loop advances as long as the exponent of the next node is larger than the new exponent. When the loop ends, <code>r</code> is the last node that will come before the new term. Three cases remain:</p>
+<p><code>place_term</code> starts at node <code>r</code> and looks for the position of the new term. The assumption is that the exponent of <code>r</code> is larger than the exponent of the new term, that is, the new term will come somewhere after <code>r</code>. The <code>while</code> loop advances as long as the exponent of the next node is larger than the new exponent. When the loop ends, <code>r</code> is the last node that will come before the new term. Three cases remain:</p>
 
 <ul>
-  <li>If there is no node after <code>r</code> (<code>!r-&gt;link</code>), or the exponent of the next node is smaller than the new exponent, this exponent is not in the list. <code>add_term(expon, coef, r)</code> links the new node after <code>r</code>.</li>
+  <li>If there is no node after <code>r</code> (<code>!r-&gt;link</code>), or the exponent of the next node is smaller than the new exponent, this exponent is not in the list. <code>new_term(expon, coef, r)</code> links the new node after <code>r</code>.</li>
   <li>If the exponent of the next node equals the new exponent, <code>coef</code> is added to its coefficient. The expression <code>(r-&gt;link-&gt;coef += coef) == 0</code> first performs the addition and then compares the result with 0.</li>
-  <li>If the sum became 0, <code>delete_next(r)</code> deletes that node.</li>
+  <li>If the sum became 0, <code>delete_next_term(r)</code> deletes that node.</li>
 </ul>
 
 <p>The function returns <code>r</code>. This return value is the starting point of the next search. Since the terms of <span class="m">B</span> arrive in decreasing order, the products produced with the same <span class="m">p</span> are also in decreasing order. The next product comes after the position of the previous one in the list; there is no need to restart the search from the head of the list.</p>
 
 <p>The multiplication function itself is the following:</p>
 
-<pre class="nt-code"><code>poly_ptr pmult_list(poly_ptr p_head,
-                    poly_ptr q_head) {
-  poly_ptr p, q, r = <span class="kw">NULL</span>, anchor = <span class="kw">NULL</span>, r_head = <span class="kw">NULL</span>;
-  <span class="kw">for</span> (p = p_head; p; p = p-&gt;link) {
-    r = anchor;            <span class="cm">/* start the search here */</span>
-    <span class="kw">for</span> (q = q_head; q; q = q-&gt;link) {
+<pre class="nt-code"><code>poly_pointer poly_mult(poly_pointer pstart,
+                    poly_pointer qstart) {
+  poly_pointer p, q, r = <span class="kw">NULL</span>, start = <span class="kw">NULL</span>, rstart = <span class="kw">NULL</span>;
+  <span class="kw">for</span> (p = pstart; p; p = p-&gt;link) {
+    r = start;            <span class="cm">/* start the search here */</span>
+    <span class="kw">for</span> (q = qstart; q; q = q-&gt;link) {
       <span class="kw">int</span> expon = p-&gt;expon + q-&gt;expon;
       <span class="kw">int</span> coef = p-&gt;coef * q-&gt;coef;
-      <span class="kw">if</span> (r_head) r = place(r, expon, coef);
-      <span class="kw">else</span> r_head=r=anchor=add_term(expon, coef, <span class="kw">NULL</span>);
-      <span class="kw">if</span> (q == q_head) anchor = r;  <span class="cm">/* for the next p */</span>
+      <span class="kw">if</span> (rstart) r = place_term(r, expon, coef);
+      <span class="kw">else</span> rstart=r=start=new_term(expon, coef, <span class="kw">NULL</span>);
+      <span class="kw">if</span> (q == qstart) start = r;  <span class="cm">/* for the next p */</span>
     }
   }
-  <span class="kw">return</span> r_head;
+  <span class="kw">return</span> rstart;
 }</code></pre>
 
-<p><code>p_head</code> and <code>q_head</code> are the heads of the lists of the two polynomials. <code>r_head</code> holds the head of the result list; the function returns it at the end. <code>r</code> is the position that walks through the result list in the inner loop. <code>anchor</code> is the node where the search for the next <span class="m">p</span> will start.</p>
+<p><code>pstart</code> and <code>qstart</code> are the heads of the lists of the two polynomials. <code>rstart</code> holds the head of the result list; the function returns it at the end. <code>r</code> is the position that walks through the result list in the inner loop. <code>start</code> is the node where the search for the next <span class="m">p</span> will start.</p>
 
-<p>The variable <code>anchor</code> rests on an observation. The product of <span class="m">p</span> with the first term of <span class="m">B</span>, <code>q_head</code>, is the term with the largest exponent that <span class="m">p</span> can produce. The next term <span class="m">p'</span> has a smaller exponent than <span class="m">p</span>. All products of <span class="m">p'</span> have exponents smaller than the product of <span class="m">p</span> with <code>q_head</code> and cannot fall in front of it in the list. So the search for <span class="m">p'</span> can start from where the product <span class="m">p · q_head</span> was placed. In the code, this is done by saving in <code>anchor</code> the <code>r</code> that is returned when <code>q == q_head</code>. Each round of the outer loop starts with <code>r = anchor</code>.</p>
+<p>The variable <code>start</code> rests on an observation. The product of <span class="m">p</span> with the first term of <span class="m">B</span>, <code>qstart</code>, is the term with the largest exponent that <span class="m">p</span> can produce. The next term <span class="m">p'</span> has a smaller exponent than <span class="m">p</span>. All products of <span class="m">p'</span> have exponents smaller than the product of <span class="m">p</span> with <code>qstart</code> and cannot fall in front of it in the list. So the search for <span class="m">p'</span> can start from where the product <span class="m">p · qstart</span> was placed. In the code, this is done by saving in <code>start</code> the <code>r</code> that is returned when <code>q == qstart</code>. Each round of the outer loop starts with <code>r = start</code>.</p>
 
-<p>While the result list is empty (<code>r_head == NULL</code>), <code>place</code> cannot be called, because <code>r</code> is not a valid node. In this case the first product becomes a standalone node with <code>add_term(expon, coef, NULL)</code>, and <code>r_head</code>, <code>r</code> and <code>anchor</code> are all pointed at this node. In the chained assignment <code>r_head=r=anchor=…</code> the assignment operator works from right to left: first <code>anchor</code>, then <code>r</code>, and last <code>r_head</code> receives the value.</p>
+<p>While the result list is empty (<code>rstart == NULL</code>), <code>place_term</code> cannot be called, because <code>r</code> is not a valid node. In this case the first product becomes a standalone node with <code>new_term(expon, coef, NULL)</code>, and <code>rstart</code>, <code>r</code> and <code>start</code> are all pointed at this node. In the chained assignment <code>rstart=r=start=…</code> the assignment operator works from right to left: first <code>start</code>, then <code>r</code>, and last <code>rstart</code> receives the value.</p>
 
-<p>The first node of the list is the product of the first term of <span class="m">A</span> and the first term of <span class="m">B</span>. The exponent of this term is the largest of all products and it is obtained only once: no other pair of terms can give the same exponent. So the first node is never updated or deleted; the fact that <code>delete_next</code> cannot delete the first node causes no problem. For the same reason, the exponent of the node <code>r</code> at which a search starts is always larger than the exponent of the new term, and the assumption of <code>place</code> is preserved.</p>
+<p>The first node of the list is the product of the first term of <span class="m">A</span> and the first term of <span class="m">B</span>. The exponent of this term is the largest of all products and it is obtained only once: no other pair of terms can give the same exponent. So the first node is never updated or deleted; the fact that <code>delete_next_term</code> cannot delete the first node causes no problem. For the same reason, the exponent of the node <code>r</code> at which a search starts is always larger than the exponent of the new term, and the assumption of <code>place_term</code> is preserved.</p>
 
 <h3 id="s5-5-4"><span class="nt-num">5.5.4</span>Code trace: (x + 1)(x − 1)</h3>
 
@@ -633,34 +633,34 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 
 <div class="nt-tablewrap" id="tab-polcarp">
 <table class="nt-table nt-table--wide">
-  <caption>Table 5.4: Trace of <code>pmult_list(A, B)</code>, <span class="m">A = x + 1</span>, <span class="m">B = x − 1</span>.</caption>
-  <thead><tr><th scope="col">Step</th><th scope="col"><span class="m">p</span>, <span class="m">q</span></th><th scope="col"><code>expon</code>, <code>coef</code></th><th scope="col">Action</th><th scope="col">Result list</th><th scope="col"><code>r</code>, <code>anchor</code></th></tr></thead>
+  <caption>Table 5.4: Trace of <code>poly_mult(A, B)</code>, <span class="m">A = x + 1</span>, <span class="m">B = x − 1</span>.</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col"><span class="m">p</span>, <span class="m">q</span></th><th scope="col"><code>expon</code>, <code>coef</code></th><th scope="col">Action</th><th scope="col">Result list</th><th scope="col"><code>r</code>, <code>start</code></th></tr></thead>
   <tbody>
-    <tr><td>1</td><td><span class="m">x</span>, <span class="m">x</span></td><td>2, 1</td><td>list empty: <code>add_term(2, 1, NULL)</code>; <code>q == q_head</code> → <code>anchor = r</code></td><td><span class="m">x<sup>2</sup></span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
-    <tr><td>2</td><td><span class="m">x</span>, <span class="m">−1</span></td><td>1, −1</td><td><code>place</code>: no node after <code>r</code> → new node <span class="m">−x</span></td><td><span class="m">x<sup>2</sup> − x</span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
-    <tr><td>3</td><td><span class="m">1</span>, <span class="m">x</span></td><td>1, 1</td><td><code>r = anchor</code>; the next node has exponent 1 = 1 → coefficient <span class="m">−1 + 1 = 0</span> → <code>delete_next(r)</code>; <code>anchor = r</code></td><td><span class="m">x<sup>2</sup></span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
-    <tr><td>4</td><td><span class="m">1</span>, <span class="m">−1</span></td><td>0, −1</td><td><code>place</code>: no node after <code>r</code> → new node <span class="m">−1</span></td><td><span class="m">x<sup>2</sup> − 1</span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
+    <tr><td>1</td><td><span class="m">x</span>, <span class="m">x</span></td><td>2, 1</td><td>list empty: <code>new_term(2, 1, NULL)</code>; <code>q == qstart</code> → <code>start = r</code></td><td><span class="m">x<sup>2</sup></span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
+    <tr><td>2</td><td><span class="m">x</span>, <span class="m">−1</span></td><td>1, −1</td><td><code>place_term</code>: no node after <code>r</code> → new node <span class="m">−x</span></td><td><span class="m">x<sup>2</sup> − x</span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
+    <tr><td>3</td><td><span class="m">1</span>, <span class="m">x</span></td><td>1, 1</td><td><code>r = start</code>; the next node has exponent 1 = 1 → coefficient <span class="m">−1 + 1 = 0</span> → <code>delete_next_term(r)</code>; <code>start = r</code></td><td><span class="m">x<sup>2</sup></span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
+    <tr><td>4</td><td><span class="m">1</span>, <span class="m">−1</span></td><td>0, −1</td><td><code>place_term</code>: no node after <code>r</code> → new node <span class="m">−1</span></td><td><span class="m">x<sup>2</sup> − 1</span></td><td>&amp;(1, 2), &amp;(1, 2)</td></tr>
   </tbody>
 </table>
 </div>
 
-<p>In the first step the list is empty and the first node is created directly. In the second step <code>place</code> starts from <code>r = &amp;(1, 2)</code>. Since there is no next node, the loop never runs and the node <span class="m">−x</span> is attached after <span class="m">x<sup>2</sup></span> (<a href="#sekil-pc">Figure 5.6</a>a). The function returns not the new node but its predecessor; <code>r</code> is still <code>&amp;(1, 2)</code>.</p>
+<p>In the first step the list is empty and the first node is created directly. In the second step <code>place_term</code> starts from <code>r = &amp;(1, 2)</code>. Since there is no next node, the loop never runs and the node <span class="m">−x</span> is attached after <span class="m">x<sup>2</sup></span> (<a href="#sekil-pc">Figure 5.6</a>a). The function returns not the new node but its predecessor; <code>r</code> is still <code>&amp;(1, 2)</code>.</p>
 
-<p>The third step is the interesting moment of the multiplication. The outer loop moves on to <span class="m">p = 1</span> and starts with <code>r = anchor</code>. In this example <code>anchor</code> is the first node of the list; for longer polynomials the search can start from the middle of the list. The new product is <span class="m">1 · x = x</span>. The exponent of the next node, <span class="m">−x</span>, is also 1. The coefficients are added: <span class="m">−1 + 1 = 0</span>. Since the term has become zero, <code>delete_next(r)</code> removes it from the list and returns its memory (<a href="#sekil-pc">Figure 5.6</a>b). In the fourth step the constant term <span class="m">1 · (−1) = −1</span> is appended at the end of the list.</p>
+<p>The third step is the interesting moment of the multiplication. The outer loop moves on to <span class="m">p = 1</span> and starts with <code>r = start</code>. In this example <code>start</code> is the first node of the list; for longer polynomials the search can start from the middle of the list. The new product is <span class="m">1 · x = x</span>. The exponent of the next node, <span class="m">−x</span>, is also 1. The coefficients are added: <span class="m">−1 + 1 = 0</span>. Since the term has become zero, <code>delete_next_term(r)</code> removes it from the list and returns its memory (<a href="#sekil-pc">Figure 5.6</a>b). In the fourth step the constant term <span class="m">1 · (−1) = −1</span> is appended at the end of the list.</p>
 
 <figure class="nt-fig" id="sekil-pc" style="--w:450px">
-  <div class="nt-fig__row"><svg class="ds-svg" viewBox="0 0 450 112" role="img" aria-label="Polynomial list: 1x^2, -1x^1"><defs><marker id="c5-d14-ah2-s12_06-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker></defs><text class="lbl" x="89" y="26" text-anchor="middle" style="font-size:10.5px">coef</text><text class="lbl" x="124" y="26" text-anchor="middle" style="font-size:10.5px">expon</text><text class="lbl" x="152" y="26" text-anchor="middle" style="font-size:10.5px">link</text><g><rect class="box" x="70" y="34" width="38" height="30"/><text class="txt mono" x="89" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box" x="108" y="34" width="32" height="30"/><text class="txt mono" x="124" y="54" text-anchor="middle" style="font-size:13px">2</text><rect class="box-empty" x="140" y="34" width="24" height="30"/><circle class="ah" cx="152" cy="49" r="3.5"/></g><path class="line" d="M152 49 L192 49" marker-end="url(#c5-d14-ah2-s12_06-1)"/><g><rect class="box" x="194" y="34" width="38" height="30" style="fill:var(--ds-hot)"/><text class="txt mono" x="213" y="54" text-anchor="middle" style="font-size:13px">-1</text><rect class="box" x="232" y="34" width="32" height="30" style="fill:var(--ds-hot)"/><text class="txt mono" x="248" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box-empty" x="264" y="34" width="24" height="30"/><text class="lbl" x="276" y="53" text-anchor="middle">∅</text></g><text class="txt mono" x="105" y="84" text-anchor="middle" style="font-size:12.5px;fill:var(--ds-link)">▲ r, anchor</text><text class="lbl" x="440" y="104" text-anchor="end" style="font-size:12.5px">p: x   q: −1</text></svg> <svg class="ds-svg" viewBox="0 0 450 112" role="img" aria-label="Polynomial list: 1x^2"><text class="lbl" x="89" y="26" text-anchor="middle" style="font-size:10.5px">coef</text><text class="lbl" x="124" y="26" text-anchor="middle" style="font-size:10.5px">expon</text><text class="lbl" x="152" y="26" text-anchor="middle" style="font-size:10.5px">link</text><g><rect class="box" x="70" y="34" width="38" height="30"/><text class="txt mono" x="89" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box" x="108" y="34" width="32" height="30"/><text class="txt mono" x="124" y="54" text-anchor="middle" style="font-size:13px">2</text><rect class="box-empty" x="140" y="34" width="24" height="30"/><text class="lbl" x="152" y="53" text-anchor="middle">∅</text></g><text class="txt mono" x="105" y="84" text-anchor="middle" style="font-size:12.5px;fill:var(--ds-link)">▲ r, anchor</text><text class="lbl" x="440" y="104" text-anchor="end" style="font-size:12.5px">p: 1   q: x</text></svg></div>
-  <figcaption><b>Figure 5.6:</b> Two moments of <code>pmult_list</code>. (a) Step 2: the node <span class="m">−x</span> has been attached after <span class="m">x<sup>2</sup></span>. (b) Step 3: when <span class="m">+x</span> is added, the coefficient becomes 0 and the node is deleted; the list is again a single node.</figcaption>
+  <div class="nt-fig__row"><svg class="ds-svg" viewBox="0 0 450 112" role="img" aria-label="Polynomial list: 1x^2, -1x^1"><defs><marker id="c5-d14-ah2-s12_06-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker></defs><text class="lbl" x="89" y="26" text-anchor="middle" style="font-size:10.5px">coef</text><text class="lbl" x="124" y="26" text-anchor="middle" style="font-size:10.5px">expon</text><text class="lbl" x="152" y="26" text-anchor="middle" style="font-size:10.5px">link</text><g><rect class="box" x="70" y="34" width="38" height="30"/><text class="txt mono" x="89" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box" x="108" y="34" width="32" height="30"/><text class="txt mono" x="124" y="54" text-anchor="middle" style="font-size:13px">2</text><rect class="box-empty" x="140" y="34" width="24" height="30"/><circle class="ah" cx="152" cy="49" r="3.5"/></g><path class="line" d="M152 49 L192 49" marker-end="url(#c5-d14-ah2-s12_06-1)"/><g><rect class="box" x="194" y="34" width="38" height="30" style="fill:var(--ds-hot)"/><text class="txt mono" x="213" y="54" text-anchor="middle" style="font-size:13px">-1</text><rect class="box" x="232" y="34" width="32" height="30" style="fill:var(--ds-hot)"/><text class="txt mono" x="248" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box-empty" x="264" y="34" width="24" height="30"/><text class="lbl" x="276" y="53" text-anchor="middle">∅</text></g><text class="txt mono" x="105" y="84" text-anchor="middle" style="font-size:12.5px;fill:var(--ds-link)">▲ r, start</text><text class="lbl" x="440" y="104" text-anchor="end" style="font-size:12.5px">p: x   q: −1</text></svg> <svg class="ds-svg" viewBox="0 0 450 112" role="img" aria-label="Polynomial list: 1x^2"><text class="lbl" x="89" y="26" text-anchor="middle" style="font-size:10.5px">coef</text><text class="lbl" x="124" y="26" text-anchor="middle" style="font-size:10.5px">expon</text><text class="lbl" x="152" y="26" text-anchor="middle" style="font-size:10.5px">link</text><g><rect class="box" x="70" y="34" width="38" height="30"/><text class="txt mono" x="89" y="54" text-anchor="middle" style="font-size:13px">1</text><rect class="box" x="108" y="34" width="32" height="30"/><text class="txt mono" x="124" y="54" text-anchor="middle" style="font-size:13px">2</text><rect class="box-empty" x="140" y="34" width="24" height="30"/><text class="lbl" x="152" y="53" text-anchor="middle">∅</text></g><text class="txt mono" x="105" y="84" text-anchor="middle" style="font-size:12.5px;fill:var(--ds-link)">▲ r, start</text><text class="lbl" x="440" y="104" text-anchor="end" style="font-size:12.5px">p: 1   q: x</text></svg></div>
+  <figcaption><b>Figure 5.6:</b> Two moments of <code>poly_mult</code>. (a) Step 2: the node <span class="m">−x</span> has been attached after <span class="m">x<sup>2</sup></span>. (b) Step 3: when <span class="m">+x</span> is added, the coefficient becomes 0 and the node is deleted; the list is again a single node.</figcaption>
 </figure>
 
-<p>The result is <span class="m">x<sup>2</sup> − 1</span>. <span class="m">n · m = 4</span> products were made, and <span class="m">−x</span> and <span class="m">+x</span>, having the same exponent, were combined and deleted. The function returns <code>r_head</code>. When the program is done with the result, it must return all nodes of the list one by one with <code>free</code>; the same holds for the inputs. The test driver has a short loop that does this: the address of the next node is saved, the current node is freed, and the saved address is moved to.</p>
+<p>The result is <span class="m">x<sup>2</sup> − 1</span>. <span class="m">n · m = 4</span> products were made, and <span class="m">−x</span> and <span class="m">+x</span>, having the same exponent, were combined and deleted. The function returns <code>rstart</code>. When the program is done with the result, it must return all nodes of the list one by one with <code>free</code>; the same holds for the inputs. The test driver has a short loop that does this: the address of the next node is saved, the current node is freed, and the saved address is moved to.</p>
 
 <div class="nt-box nt-box--ornek" id="ornek-pc2">
   <span class="nt-box__title">Example 5.3</span>
   <p>Which term is deleted in the product <span class="m">(x<sup>2</sup> + 1)(x<sup>2</sup> − 1)</span>?</p>
   <ol class="nt-steps">
     <li><span class="m">p = x<sup>2</sup></span>: <span class="m">x<sup>2</sup> · x<sup>2</sup> = x<sup>4</sup></span> becomes the first node. <span class="m">x<sup>2</sup> · (−1) = −x<sup>2</sup></span> is attached after it. The list: <span class="m">x<sup>4</sup> − x<sup>2</sup></span>.</li>
-    <li><span class="m">p = 1</span>: the search starts from the node <code>anchor</code> = <span class="m">x<sup>4</sup></span>. <span class="m">1 · x<sup>2</sup> = +x<sup>2</sup></span>; a node with the same exponent exists and the coefficient becomes <span class="m">−1 + 1 = 0</span>. The <span class="m">x<sup>2</sup></span> term is deleted.</li>
+    <li><span class="m">p = 1</span>: the search starts from the node <code>start</code> = <span class="m">x<sup>4</sup></span>. <span class="m">1 · x<sup>2</sup> = +x<sup>2</sup></span>; a node with the same exponent exists and the coefficient becomes <span class="m">−1 + 1 = 0</span>. The <span class="m">x<sup>2</sup></span> term is deleted.</li>
     <li><span class="m">1 · (−1) = −1</span> is appended at the end.</li>
   </ol>
   <p>The result is <span class="m">x<sup>4</sup> − 1</span>. The program produces the same list.</p>
@@ -668,11 +668,11 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 
 <h3 id="s5-5-5"><span class="nt-num">5.5.5</span>Complexity and measurement</h3>
 
-<p>Let <span class="m">A</span> have <span class="m">n</span> terms and <span class="m">B</span> have <span class="m">m</span> terms. The number of products is exactly <span class="m">nm</span>. The work of each product itself is constant (one addition, one multiplication, at most one <code>malloc</code> or <code>free</code>). The real cost is the walk in the <code>while</code> loop of <code>place</code>.</p>
+<p>Let <span class="m">A</span> have <span class="m">n</span> terms and <span class="m">B</span> have <span class="m">m</span> terms. The number of products is exactly <span class="m">nm</span>. The work of each product itself is constant (one addition, one multiplication, at most one <code>malloc</code> or <code>free</code>). The real cost is the walk in the <code>while</code> loop of <code>place_term</code>.</p>
 
-<p>For one term <span class="m">p</span>, the inner loop starts at <code>anchor</code> and only moves forward in the list. <code>place</code> continues from where it left off on every call and never goes back. So the total walk for one <span class="m">p</span> cannot exceed the length of the list after <code>anchor</code>. The result list has at most <span class="m">nm</span> nodes. The cost of one <span class="m">p</span> is <span class="m">O(m + nm)</span>, and the cost of all <span class="m">p</span> is <span class="m">O(n<sup>2</sup>m)</span>. This bound is the same as that of <code>pmult</code>, but the linked list spends no extra memory on partial results: the result list has at most <span class="m">nm</span> nodes and nodes that become zero are returned at once.</p>
+<p>For one term <span class="m">p</span>, the inner loop starts at <code>start</code> and only moves forward in the list. <code>place_term</code> continues from where it left off on every call and never goes back. So the total walk for one <span class="m">p</span> cannot exceed the length of the list after <code>start</code>. The result list has at most <span class="m">nm</span> nodes. The cost of one <span class="m">p</span> is <span class="m">O(m + nm)</span>, and the cost of all <span class="m">p</span> is <span class="m">O(n<sup>2</sup>m)</span>. This bound is the same as that of <code>pmult</code>, but the linked list spends no extra memory on partial results: the result list has at most <span class="m">nm</span> nodes and nodes that become zero are returned at once.</p>
 
-<p>Whether the bound is actually reached depends on the exponents of the terms. To see this, a counter was added to the loop of <code>place</code> and two polynomials with <span class="m">n = m</span> terms were multiplied in two different arrangements. In both cases the result consists of <span class="m">nm</span> terms with distinct exponents:</p>
+<p>Whether the bound is actually reached depends on the exponents of the terms. To see this, a counter was added to the loop of <code>place_term</code> and two polynomials with <span class="m">n = m</span> terms were multiplied in two different arrangements. In both cases the result consists of <span class="m">nm</span> terms with distinct exponents:</p>
 
 <ul>
   <li><strong>Sparse A, dense B.</strong> The exponents of <span class="m">A</span> are <span class="m">(n − 1)m, …, m, 0</span>; those of <span class="m">B</span> are <span class="m">m − 1, …, 0</span>. The products of each <span class="m">p</span> form a block, and the block of the next <span class="m">p</span> comes entirely after it.</li>
@@ -681,7 +681,7 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 
 <div class="nt-tablewrap" id="tab-pc-olc">
 <table class="nt-table">
-  <caption>Table 5.5: Total number of steps of the <code>place</code> loop (<span class="m">n = m</span>, <span class="m">nm</span> terms in the result).</caption>
+  <caption>Table 5.5: Total number of steps of the <code>place_term</code> loop (<span class="m">n = m</span>, <span class="m">nm</span> terms in the result).</caption>
   <thead><tr><th scope="col"><span class="m">n = m</span></th><th scope="col">Sparse A, dense B</th><th scope="col">Dense A, sparse B</th><th scope="col"><span class="m">n<sup>2</sup>m / 2</span></th></tr></thead>
   <tbody>
     <tr><td>10</td><td>178</td><td>502</td><td>500</td></tr>
@@ -693,11 +693,11 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 </table>
 </div>
 
-<p>In the first arrangement the number of steps quadruples when <span class="m">n</span> doubles; it is about <span class="m">2nm</span>, that is, <span class="m">O(nm)</span>. Here <code>anchor</code> does its job: the search for each <span class="m">p</span> starts at the head of the previous block and the list is traversed only once. In the second arrangement the number of steps grows eightfold and is almost equal to <span class="m">n<sup>2</sup>m/2</span>. Because the terms each <span class="m">p</span> adds are scattered among the earlier terms, each <span class="m">p</span> walks over most of the list again. This shows that the bound <span class="m">O(n<sup>2</sup>m)</span> is actually reachable. The worst-case cost is <span class="m">Θ(n<sup>2</sup>m)</span>.</p>
+<p>In the first arrangement the number of steps quadruples when <span class="m">n</span> doubles; it is about <span class="m">2nm</span>, that is, <span class="m">O(nm)</span>. Here <code>start</code> does its job: the search for each <span class="m">p</span> starts at the head of the previous block and the list is traversed only once. In the second arrangement the number of steps grows eightfold and is almost equal to <span class="m">n<sup>2</sup>m/2</span>. Because the terms each <span class="m">p</span> adds are scattered among the earlier terms, each <span class="m">p</span> walks over most of the list again. This shows that the bound <span class="m">O(n<sup>2</sup>m)</span> is actually reachable. The worst-case cost is <span class="m">Θ(n<sup>2</sup>m)</span>.</p>
 
 <p>The practical lesson from the measurement is this: if <span class="m">n</span> and <span class="m">m</span> differ, the smaller polynomial should go in the outer loop. Since the square of the number of terms of the outer polynomial enters the cost, putting a 2-term polynomial outside is about fifty times cheaper than putting a 100-term one outside.</p>
 
-<p>The correctness of the code was tested as well. The <code>pmult_list</code> results for 20,000 randomly generated pairs of polynomials were compared with a brute-force product that accumulates the coefficients in an array. Every result list was found to have decreasing exponents, no zero coefficients, and to equal the brute-force result.</p>
+<p>The correctness of the code was tested as well. The <code>poly_mult</code> results for 20,000 randomly generated pairs of polynomials were compared with a brute-force product that accumulates the coefficients in an array. Every result list was found to have decreasing exponents, no zero coefficients, and to equal the brute-force result.</p>
 
 <div class="nt-box nt-box--hata">
   <span class="nt-box__title">Common mistake</span>
@@ -706,7 +706,7 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 
 <h3 id="s5-5-6"><span class="nt-num">5.5.6</span>Other solutions to the problem</h3>
 
-<p><code>pmult_list</code> is not the only way to multiply two polynomials. <a href="#tab-cozumler">Table 5.6</a> gives the methods listed in the slides together with their complexities. <span class="m">A</span> has <span class="m">n</span> terms and <span class="m">B</span> has <span class="m">m</span> terms.</p>
+<p><code>poly_mult</code> is not the only way to multiply two polynomials. <a href="#tab-cozumler">Table 5.6</a> gives the methods listed in the slides together with their complexities. <span class="m">A</span> has <span class="m">n</span> terms and <span class="m">B</span> has <span class="m">m</span> terms.</p>
 
 <div class="nt-tablewrap" id="tab-cozumler">
 <table class="nt-table nt-table--wide">
@@ -724,7 +724,7 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 </table>
 </div>
 
-<p>The first method writes the <span class="m">nm</span> products into an unsorted list, then sorts the list and combines neighboring equal exponents. If the sort is done with a simple quadratic algorithm, for example insertion sort, <span class="m">(nm)<sup>2</sup> = n<sup>2</sup>m<sup>2</sup></span> comparisons are needed. The second method scans the result from the start for every product; since the result can grow to <span class="m">nm</span> terms, this is again <span class="m">O(n<sup>2</sup>m<sup>2</sup>)</span>. The third method is the list version of <code>pmult</code>; <code>pmult_list</code> also comes down to this bound thanks to <code>anchor</code>.</p>
+<p>The first method writes the <span class="m">nm</span> products into an unsorted list, then sorts the list and combines neighboring equal exponents. If the sort is done with a simple quadratic algorithm, for example insertion sort, <span class="m">(nm)<sup>2</sup> = n<sup>2</sup>m<sup>2</sup></span> comparisons are needed. The second method scans the result from the start for every product; since the result can grow to <span class="m">nm</span> terms, this is again <span class="m">O(n<sup>2</sup>m<sup>2</sup>)</span>. The third method is the list version of <code>pmult</code>; <code>poly_mult</code> also comes down to this bound thanks to <code>start</code>.</p>
 
 <p>The fifth method resembles the merge phase of merge sort. <span class="m">n</span> lists are produced, each with <span class="m">m</span> terms. Then they are merged two at a time: <span class="m">n</span> lists drop to <span class="m">n/2</span>, <span class="m">n/2</span> lists drop to <span class="m">n/4</span>. At each level at most <span class="m">nm</span> terms are processed in total and there are <span class="m">⌈lg n⌉</span> levels. The total cost is <span class="m">O(nm lg n)</span>. Building the lists from the terms of the smaller polynomial puts the small number inside the logarithm.</p>
 
@@ -738,7 +738,7 @@ poly_ptr add_term(<span class="kw">int</span> expon, <span class="kw">int</span>
 
 <div class="nt-box nt-box--tanim" id="tanim-seyrek">
   <span class="nt-box__title">Definition 5.2</span>
-  <p>A <strong>sparse matrix</strong> is a matrix most of whose entries are zero. The nonzero entries are called <strong>nonzero entries</strong>. There is no exact threshold for calling a matrix sparse. In practice a matrix is considered sparse if the number of nonzero entries <span class="m">t</span> is a small fraction of the total number of entries, <span class="m">rows · cols</span>.</p>
+  <p>A <strong>sparse matrix</strong> is a matrix most of whose entries are zero. Its nonzero cells are the <strong>nonzero entries</strong>. There is no exact threshold for calling a matrix sparse. In practice a matrix is considered sparse if the number of nonzero entries <span class="m">t</span> is a small fraction of the total number of entries, <span class="m">rows · cols</span>.</p>
 </div>
 
 <p>Of the 36 cells of the <span class="m">6 × 6</span> matrix in <a href="#sekil-6x6">Figure 5.7</a>, only 8 are nonzero. Most of the sparse matrix examples in these notes are derived from this matrix. In C the matrix can be stored in a two-dimensional array, <code>int a[6][6]</code>. This array reserves 36 cells for 8 meaningful numbers. A <span class="m">1000 × 1000</span> matrix with only five nonzero entries in each row takes 4 MB with four-byte integers; the nonzero entries number only 5,000.</p>
@@ -1214,7 +1214,7 @@ term M[MAX_TERMS];</code></pre>
     <tr><td>Addition with coefficient arrays</td><td><span class="m">O(d)</span></td><td><span class="m">d</span>: degree; wasteful for sparse polynomials</td></tr>
     <tr><td><code>padd</code> (<span class="m">n</span>, <span class="m">m</span> terms)</td><td><span class="m">Θ(n + m)</span></td><td>sorted terms + merging</td></tr>
     <tr><td><code>pmult</code> (array, repeated <code>padd</code>)</td><td><span class="m">O(n<sup>2</sup>m)</span></td><td>smaller polynomial outside: <span class="m">O(min<sup>2</sup> · max)</span>; leftovers pile up</td></tr>
-    <tr><td><code>pmult_list</code> (linked list)</td><td><span class="m">O(n<sup>2</sup>m)</span> worst case</td><td>the search is shortened by <code>anchor</code>; depends on the arrangement in measurements</td></tr>
+    <tr><td><code>poly_mult</code> (linked list)</td><td><span class="m">O(n<sup>2</sup>m)</span> worst case</td><td>the search is shortened by <code>start</code>; depends on the arrangement in measurements</td></tr>
     <tr><td><code>transpose</code></td><td><span class="m">O(cols · terms)</span></td><td>on a full matrix <span class="m">O(cols<sup>2</sup> · rows)</span></td></tr>
     <tr><td><code>fast_transpose</code></td><td><span class="m">O(cols + terms)</span></td><td><span class="m">O(cols)</span> extra memory; counting sort</td></tr>
     <tr><td>Sparse product (<code>smult</code> / <code>mmult</code>)</td><td><span class="m">O(cols<sub>B</sub> · t<sub>A</sub> + rows<sub>A</sub> · t<sub>B</sub>)</span></td><td><span class="m">B<sup>T</sup></span> first</td></tr>
@@ -1231,7 +1231,7 @@ term M[MAX_TERMS];</code></pre>
 
 <ol>
   <li><strong>Keeping the terms unsorted but still writing <code>padd</code> with two pointers.</strong> Merging is correct only on sorted input. On unsorted input, two terms with the same exponent may never see each other and remain as two separate terms in the result.</li>
-  <li><strong>Appending a term whose sum is 0 to the result, or not deleting it from the list.</strong> The <code>if (c)</code> check in <code>padd</code> and the call to <code>delete_next</code> in <code>place</code> exist for this reason. The memory of a deleted node must be returned with <code>free</code>.</li>
+  <li><strong>Appending a term whose sum is 0 to the result, or not deleting it from the list.</strong> The <code>if (c)</code> check in <code>padd</code> and the call to <code>delete_next_term</code> in <code>place_term</code> exist for this reason. The memory of a deleted node must be returned with <code>free</code>.</li>
   <li><strong>Truncating a <code>float</code> coefficient with an <code>int</code> parameter in <code>attach</code>; not checking for overflow of <code>avail</code>.</strong> The truncation happens without a compiler warning. Without the overflow check, memory past the end of the array is corrupted.</li>
   <li><strong>Swapping only the <code>row</code> and <code>col</code> fields in the transpose and forgetting to sort; mistaking the header <code>M[0]</code> for a term.</strong> An unsorted transpose breaks operations that rely on order, such as multiplication. Loops must start at <code>1</code>.</li>
   <li><strong>Confusing prefix and postfix in <code>start_pos[M[i].col]++</code>.</strong> The postfix form uses the old value and then increments; with the prefix form every triple shifts by one position and the triple belonging to the last position is written outside the table.</li>
@@ -1246,7 +1246,7 @@ term M[MAX_TERMS];</code></pre>
   <li><strong>The representation matters.</strong> The coefficient array is simple and fast for dense, low-degree polynomials, but for sparse polynomials it spends memory and time on zeros. The term array stores only the nonzero terms, sorted from the largest exponent to the smallest.</li>
   <li><strong>Sortedness and merging.</strong> <code>padd</code> adds two sorted term arrays by walking through them with two pointers, in <span class="m">Θ(n + m)</span> time. A term whose sum is 0 is not written to the result. In the shared array <code>P</code> the space of leftovers is not reclaimed; compaction or a linked list is needed.</li>
   <li><strong>Multiplication on arrays.</strong> <code>pmult</code> multiplies by each term in turn and adds the result with <code>padd</code>: <span class="m">O(n<sup>2</sup>m)</span>. The smaller polynomial should go in the outer loop. Many polynomials are merged with a priority queue or two at a time.</li>
-  <li><strong>The linked list.</strong> It is flexible when the number of terms is unknown. <code>pmult_list</code> places the products in a sorted list, combines equal exponents, deletes terms that become zero and returns their memory. The variable <code>anchor</code> shortens the search; the worst case is still <span class="m">Θ(n<sup>2</sup>m)</span>.</li>
+  <li><strong>The linked list.</strong> It is flexible when the number of terms is unknown. <code>poly_mult</code> places the products in a sorted list, combines equal exponents, deletes terms that become zero and returns their memory. The variable <code>start</code> shortens the search; the worst case is still <span class="m">Θ(n<sup>2</sup>m)</span>.</li>
   <li><strong>Triples.</strong> A sparse matrix is stored as ⟨row, column, value⟩ triples with the header <code>M[0]</code>. The triples are in row order, then column order. The representation pays off when <span class="m">3(t + 1) &lt; rows · cols</span>, roughly when less than a third of the matrix is nonzero.</li>
   <li><strong>Transpose.</strong> Swapping the fields breaks the order. <code>transpose</code> scans column by column in <span class="m">O(cols · t)</span>; <code>fast_transpose</code> counts first and then places, in <span class="m">O(cols + t)</span> time. The fast transpose is counting sort with the column number as the key.</li>
   <li><strong>Multiplication.</strong> First <span class="m">B</span> is transposed; then each row of <span class="m">A</span> is merged and multiplied with each row of <span class="m">B<sup>T</sup></span>: <span class="m">O(cols<sub>B</sub> · t<sub>A</sub> + rows<sub>A</sub> · t<sub>B</sub>)</span>. There is no guarantee that the result stays sparse.</li>
@@ -1290,15 +1290,15 @@ term M[MAX_TERMS];</code></pre>
     </details>
   </li>
   <li>
-    <p>In the product <span class="m">(x<sup>2</sup> + x)(x − 1)</span>, which term does <code>pmult_list</code> delete? What is the result?</p>
+    <p>In the product <span class="m">(x<sup>2</sup> + x)(x − 1)</span>, which term does <code>poly_mult</code> delete? What is the result?</p>
     <details><summary>Answer</summary>
       <p>In the round <span class="m">p = x<sup>2</sup></span>, <span class="m">x<sup>3</sup></span> and <span class="m">−x<sup>2</sup></span> are added. In the round <span class="m">p = x</span>, <span class="m">x · x = +x<sup>2</sup></span> arrives; the coefficient becomes <span class="m">−1 + 1 = 0</span> and the <span class="m">x<sup>2</sup></span> node is deleted. The last product <span class="m">−x</span> is appended at the end. The result is <span class="m">x<sup>3</sup> − x</span>.</p>
     </details>
   </li>
   <li>
-    <p>Why is the first node of the result list in <code>pmult_list</code> never deleted? Which helper's restriction does this property make harmless?</p>
+    <p>Why is the first node of the result list in <code>poly_mult</code> never deleted? Which helper's restriction does this property make harmless?</p>
     <details><summary>Answer</summary>
-      <p>The first node is the product of the terms with the largest exponents of the two polynomials. Its exponent is larger than that of all other products and no other pair of terms can produce the same exponent; its coefficient is never updated and cannot become 0. <code>delete_next</code> can delete only the node after the given node, not the first node. Since the first node is never deleted, this restriction causes no problem.</p>
+      <p>The first node is the product of the terms with the largest exponents of the two polynomials. Its exponent is larger than that of all other products and no other pair of terms can produce the same exponent; its coefficient is never updated and cannot become 0. <code>delete_next_term</code> can delete only the node after the given node, not the first node. Since the first node is never deleted, this restriction causes no problem.</p>
     </details>
   </li>
   <li>

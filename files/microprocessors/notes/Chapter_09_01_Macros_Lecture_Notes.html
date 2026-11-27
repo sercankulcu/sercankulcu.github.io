@@ -448,11 +448,11 @@ DIFF <span class="kw">MACRO</span> p, q
   <caption>Table 9.1.5: Expansion of expression parameters and their value at assembly time.</caption>
   <thead><tr><th scope="col">Call</th><th scope="col">Expansion</th><th scope="col">Machine code</th><th scope="col">Result</th></tr></thead>
   <tbody>
-    <tr><td><code>ALAN 2+3, 4</code></td><td><code>MOV AX, 2+3*4</code></td><td><code>B8 0E 00</code></td><td>AX = 000Eh (14)</td></tr>
+    <tr><td><code>AREA 2+3, 4</code></td><td><code>MOV AX, 2+3*4</code></td><td><code>B8 0E 00</code></td><td>AX = 000Eh (14)</td></tr>
     <tr><td>corrected <code>AREA 2+3, 4</code></td><td><code>MOV AX, (2+3)*(4)</code></td><td><code>B8 14 00</code></td><td>AX = 0014h (20)</td></tr>
-    <tr><td><code>FARK 10, 4+1</code></td><td><code>MOV CX, 10-4+1</code></td><td><code>B9 07 00</code></td><td>CX = 0007h</td></tr>
+    <tr><td><code>DIFF 10, 4+1</code></td><td><code>MOV CX, 10-4+1</code></td><td><code>B9 07 00</code></td><td>CX = 0007h</td></tr>
     <tr><td>corrected <code>DIFF 10, 4+1</code></td><td><code>MOV CX, (10)-(4+1)</code></td><td><code>B9 05 00</code></td><td>CX = 0005h</td></tr>
-    <tr><td><code>ALAN BX, 2</code></td><td><code>MOV AX, BX*2</code></td><td>–</td><td>error: * works only on constants</td></tr>
+    <tr><td><code>AREA BX, 2</code></td><td><code>MOV AX, BX*2</code></td><td>–</td><td>error: * works only on constants</td></tr>
   </tbody>
 </table>
 </div>
@@ -525,7 +525,7 @@ PRINT_A <span class="kw">ENDP</span>
   <thead><tr><th scope="col">Criterion</th><th scope="col">Macro</th><th scope="col">Procedure</th></tr></thead>
   <tbody>
     <tr><td>When is it processed?</td><td>at assembly time (text substitution)</td><td>at run time (CALL/RET)</td></tr>
-    <tr><td>>Use</td><td><code>PUTC 'A'</code></td><td><code>CALL PRINT_A</code></td></tr>
+    <tr><td>Use</td><td><code>PUTC 'A'</code></td><td><code>CALL PRINT_A</code></td></tr>
     <tr><td>Code size</td><td>grows by the body at every use</td><td>body once + 3 bytes per call</td></tr>
     <tr><td>Speed</td><td>no CALL/RET and no stack access</td><td>CALL + RET time at every call</td></tr>
     <tr><td>Parameters</td><td>text after the name</td><td>register, memory or stack</td></tr>
@@ -836,9 +836,9 @@ label2:
 <p>When <code>LOCAL lp</code> is added to the DELAY macro, the error disappears:</p>
 
 <pre class="nt-code"><code>DELAY <span class="kw">MACRO</span>
-      <span class="kw">LOCAL</span> ilk
-ilk:  <span class="kw">DEC</span> CX
-      <span class="kw">JNZ</span> ilk
+      <span class="kw">LOCAL</span> lp
+lp:   <span class="kw">DEC</span> CX
+      <span class="kw">JNZ</span> lp
 <span class="kw">ENDM</span>
 
 <span class="kw">org</span> 100h
@@ -943,7 +943,7 @@ m2 <span class="kw">dw</span> ?</code></pre>
 
 <p>PUTC is a short macro that writes a single character to the screen. It is identical to the PUTC macro of the emu8086.inc library:</p>
 
-<pre class="nt-code"><code><span class="cm">; prints a character, advances the cursor</span>
+<pre class="nt-code"><code><span class="cm">; prints a char, moves the cursor</span>
 PUTC  <span class="kw">MACRO</span>  char
       <span class="kw">push</span>  ax
       <span class="kw">mov</span>   al, char
@@ -1177,7 +1177,7 @@ p_end: <span class="kw">MOV</span> r, AX
 <span class="kw">pop</span>  bx
 <span class="kw">ret</span>
 base <span class="kw">dw</span> 7
-expn<span class="kw">dw</span> 2
+expn <span class="kw">dw</span> 2
 res <span class="kw">dw</span> ?</code></pre>
 
 <p>The expansion is 26 bytes (up to 011Ah); the RET is at 011Ah, base at 011Bh, expn at 011Dh and res at 011Fh. The LOCAL names are ??0000 for p_loop and ??0001 for p_end.</p>
@@ -1352,28 +1352,28 @@ res <span class="kw">dw</span> ?</code></pre>
 <p>The most common use of repeat blocks is to generate tables at assembly time. This needs an assembler symbol whose value can be changed. A constant defined with <code>EQU</code> cannot be redefined. A symbol defined with <code>=</code>, however, can take a new value at every assignment. The block below generates the squares of the numbers from 0 to 7:</p>
 
 <pre class="nt-code"><code>n = 0
-squares <span class="kw">LABEL BYTE</span>
+sq <span class="kw">LABEL BYTE</span>
 <span class="kw">REPT</span> 8
     <span class="kw">DB</span> n*n
     n = n + 1
 <span class="kw">ENDM</span></code></pre>
 
-<p><code>squares LABEL BYTE</code> gives the current address a name of type byte but reserves no space. The body of REPT is expanded eight times. In each expansion <code>DB n*n</code> writes the square of the current n as one byte, and <code>n = n + 1</code> increments the symbol. As a result the bytes 0, 1, 4, 9, 16, 25, 36, 49 sit one after another in memory. n is not a variable; it has no place in memory. It is a number that lives only at assembly time, in the assembler's table. The same method generates tables such as masks, powers of 2 or precomputed sine values.</p>
+<p><code>sq LABEL BYTE</code> gives the current address a name of type byte but reserves no space. The body of REPT is expanded eight times. In each expansion <code>DB n*n</code> writes the square of the current n as one byte, and <code>n = n + 1</code> increments the symbol. As a result the bytes 0, 1, 4, 9, 16, 25, 36, 49 sit one after another in memory. n is not a variable; it has no place in memory. It is a number that lives only at assembly time, in the assembler's table. The same method generates tables such as masks, powers of 2 or precomputed sine values.</p>
 
 <h3 id="s9-1-9-2"><span class="nt-num">9.1.9.2</span>Code trace: a table of squares with REPT</h3>
 
 <p>The generated table can be used to find the square of a number without multiplying, with the XLAT instruction:</p>
 
 <pre class="nt-code"><code><span class="kw">org</span> 100h
-<span class="kw">lea</span>  bx, squares
+<span class="kw">lea</span>  bx, sq
 <span class="kw">mov</span>  al, 5
-<span class="kw">xlat</span>           <span class="cm">; AL = squares[5]</span>
+<span class="kw">xlat</span>           <span class="cm">; AL = sq[5]</span>
 <span class="kw">mov</span>  dl, al
 <span class="kw">mov</span>  al, 7
-<span class="kw">xlat</span>           <span class="cm">; AL = squares[7]</span>
+<span class="kw">xlat</span>           <span class="cm">; AL = sq[7]</span>
 <span class="kw">add</span>  al, dl
 <span class="kw">ret</span>
-squares <span class="kw">db</span> 0, 1, 4, 9, 16, 25, 36, 49   <span class="cm">; the bytes generated by the REPT block</span></code></pre>
+sq <span class="kw">db</span> 0, 1, 4, 9, 16, 25, 36, 49   <span class="cm">; the bytes generated by the REPT block</span></code></pre>
 
 <p><code>XLAT</code> (translate by table) uses AL as an index into the table that BX points to: AL ← DS:[BX + AL]. The address of the table must first be loaded into BX. The size of the code is 3 + 2 + 1 + 2 + 2 + 1 + 2 + 1 = 14 bytes; since LEA takes 3 bytes in emu8086, the table starts at 0100h + 0Eh = 010Eh.</p>
 
@@ -1382,7 +1382,7 @@ squares <span class="kw">db</span> 0, 1, 4, 9, 16, 25, 36, 49   <span class="cm"
   <caption>Table 9.1.19: Reading with XLAT from the table of squares generated by REPT; the table starts at 010Eh.</caption>
   <thead><tr><th scope="col">Step</th><th scope="col">Address</th><th scope="col">Instruction</th><th scope="col">BX</th><th scope="col">AL</th><th scope="col">DL</th><th scope="col">Explanation</th></tr></thead>
   <tbody>
-    <tr><td>1</td><td>0100h</td><td><code>lea bx, squares</code><br><small>main program</small></td><td>010Eh</td><td>00h</td><td>00h</td><td>BX ← 010Eh (offset of squares)</td></tr>
+    <tr><td>1</td><td>0100h</td><td><code>lea bx, sq</code><br><small>main program</small></td><td>010Eh</td><td>00h</td><td>00h</td><td>BX ← 010Eh (offset of sq)</td></tr>
     <tr><td>2</td><td>0103h</td><td><code>mov al, 5</code><br><small>main program</small></td><td>010Eh</td><td>05h</td><td>00h</td><td>the number to look up, and index 5</td></tr>
     <tr><td>3</td><td>0105h</td><td><code>xlat</code><br><small>main program</small></td><td>010Eh</td><td>19h</td><td>00h</td><td>AL ← [BX + AL] = [0113h] = 25</td></tr>
     <tr><td>4</td><td>0106h</td><td><code>mov dl, al</code><br><small>main program</small></td><td>010Eh</td><td>19h</td><td>19h</td><td>first result in DL</td></tr>
@@ -1396,8 +1396,8 @@ squares <span class="kw">db</span> 0, 1, 4, 9, 16, 25, 36, 49   <span class="cm"
 
 
 <figure class="nt-fig" id="sekil-xlat" style="--w:400px">
-  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="The squares table, BX, AL and DL after the step"><rect class="box" x="12" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="35" y="46" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl" x="35" y="22" text-anchor="middle" style="font-size:10px;">squares+0</text><rect class="box" x="58" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="81" y="46" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl" x="81" y="22" text-anchor="middle" style="font-size:10px;">squares+1</text><rect class="box" x="104" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="127" y="46" text-anchor="middle" style="font-size:14px;">4</text><text class="lbl" x="127" y="22" text-anchor="middle" style="font-size:10px;">squares+2</text><rect class="box" x="150" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="173" y="46" text-anchor="middle" style="font-size:14px;">9</text><text class="lbl" x="173" y="22" text-anchor="middle" style="font-size:10px;">squares+3</text><rect class="box" x="196" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="219" y="46" text-anchor="middle" style="font-size:14px;">16</text><text class="lbl" x="219" y="22" text-anchor="middle" style="font-size:10px;">squares+4</text><rect class="mt-hot" x="242" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="265" y="46" text-anchor="middle" style="font-size:14px;">25</text><text class="lbl" x="265" y="22" text-anchor="middle" style="font-size:10px;">squares+5</text><rect class="box" x="288" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="311" y="46" text-anchor="middle" style="font-size:14px;">36</text><text class="lbl" x="311" y="22" text-anchor="middle" style="font-size:10px;">squares+6</text><rect class="box" x="334" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="357" y="46" text-anchor="middle" style="font-size:14px;">49</text><text class="lbl" x="357" y="22" text-anchor="middle" style="font-size:10px;">squares+7</text><text class="lbl" x="49" y="85" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="12" y="90" width="74" height="30" rx="4"/><text class="mt-v" x="49" y="110" text-anchor="middle" style="font-size:14px;">010Eh</text><text class="lbl" x="124" y="85" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="94" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="124" y="110" text-anchor="middle" style="font-size:14px;">19h</text><text class="lbl" x="192" y="85" text-anchor="middle" style="font-size:11.5px;">DL</text><rect class="box" x="162" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="192" y="110" text-anchor="middle" style="font-size:14px;">00h</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">[BX + AL]</text></svg></div>
-  <figcaption><b>Figure 9.1.14:</b> The first XLAT: with index AL = 5, the 25 (19h) at address squares + 5 = 0113h is read.</figcaption>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 400 140" role="img" aria-label="The sq table, BX, AL and DL after the step"><rect class="box" x="12" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="35" y="46" text-anchor="middle" style="font-size:14px;">0</text><text class="lbl" x="35" y="22" text-anchor="middle" style="font-size:10px;">sq+0</text><rect class="box" x="58" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="81" y="46" text-anchor="middle" style="font-size:14px;">1</text><text class="lbl" x="81" y="22" text-anchor="middle" style="font-size:10px;">sq+1</text><rect class="box" x="104" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="127" y="46" text-anchor="middle" style="font-size:14px;">4</text><text class="lbl" x="127" y="22" text-anchor="middle" style="font-size:10px;">sq+2</text><rect class="box" x="150" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="173" y="46" text-anchor="middle" style="font-size:14px;">9</text><text class="lbl" x="173" y="22" text-anchor="middle" style="font-size:10px;">sq+3</text><rect class="box" x="196" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="219" y="46" text-anchor="middle" style="font-size:14px;">16</text><text class="lbl" x="219" y="22" text-anchor="middle" style="font-size:10px;">sq+4</text><rect class="mt-hot" x="242" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="265" y="46" text-anchor="middle" style="font-size:14px;">25</text><text class="lbl" x="265" y="22" text-anchor="middle" style="font-size:10px;">sq+5</text><rect class="box" x="288" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="311" y="46" text-anchor="middle" style="font-size:14px;">36</text><text class="lbl" x="311" y="22" text-anchor="middle" style="font-size:10px;">sq+6</text><rect class="box" x="334" y="26" width="46" height="30" rx="3"/><text class="mt-v" x="357" y="46" text-anchor="middle" style="font-size:14px;">49</text><text class="lbl" x="357" y="22" text-anchor="middle" style="font-size:10px;">sq+7</text><text class="lbl" x="49" y="85" text-anchor="middle" style="font-size:11.5px;">BX</text><rect class="box" x="12" y="90" width="74" height="30" rx="4"/><text class="mt-v" x="49" y="110" text-anchor="middle" style="font-size:14px;">010Eh</text><text class="lbl" x="124" y="85" text-anchor="middle" style="font-size:11.5px;">AL</text><rect class="mt-hot" x="94" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="124" y="110" text-anchor="middle" style="font-size:14px;">19h</text><text class="lbl" x="192" y="85" text-anchor="middle" style="font-size:11.5px;">DL</text><rect class="box" x="162" y="90" width="60" height="30" rx="4"/><text class="mt-v" x="192" y="110" text-anchor="middle" style="font-size:14px;">00h</text><text class="mt-a" x="392" y="110" text-anchor="end" style="font-size:12.5px;">[BX + AL]</text></svg></div>
+  <figcaption><b>Figure 9.1.14:</b> The first XLAT: with index AL = 5, the 25 (19h) at address sq + 5 = 0113h is read.</figcaption>
 </figure>
 
 <p>In <a href="#tab-kare">Table 9.1.19</a> the first XLAT reads the byte at address 010Eh + 5 = 0113h: 25 = 19h (<a href="#sekil-xlat">Figure 9.1.14</a>). This value is saved in DL. The second XLAT reads 49 = 31h from address 010Eh + 7 = 0115h. ADD AL, DL adds the two: 25 + 49 = 74 = 4Ah, that is, 5² + 7². No multiply instruction has run anywhere in the program.</p>

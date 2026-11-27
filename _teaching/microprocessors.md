@@ -24,7 +24,7 @@ Microprocessors execute instructions, process data, and coordinate the operation
 
 ## Ders Kitabı
 
-[📕 Mikroişlemciler (PDF, 16 MB)](https://sercankulcu.github.io/courses-pdfs/microprocessors/Mikroislemciler.pdf)
+[📕 Mikroişlemciler: İşlemcinin İçinden (PDF, 16 MB)](https://sercankulcu.github.io/courses-pdfs/microprocessors/Mikroislemciler.pdf)
 
 ---
 
@@ -163,7 +163,7 @@ Makrolar, tekrar eden bir kod parçasına ad verir; prosedürlerden farklı olar
 
 ## Textbook
 
-[📕 Microprocessors — the course book (PDF, 15 MB)](https://sercankulcu.github.io/courses-pdfs/microprocessors/Microprocessors.pdf)
+[📕 Microprocessors: Inside the Processor — the course book (PDF, 15 MB)](https://sercankulcu.github.io/courses-pdfs/microprocessors/Microprocessors.pdf)
 
 ---
 

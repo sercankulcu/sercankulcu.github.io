@@ -66,7 +66,7 @@ course:
       <tr><td>Leak</td><td>Allocated, never freed</td><td>Memory grows over hours; eventual failure</td></tr>
       <tr><td>Use after free</td><td>Access through a pointer after <code>free</code></td><td>Corrupt data, or a crash much later</td></tr>
       <tr><td>Double free</td><td><code>free</code> called twice on one block</td><td>Allocator abort, or heap corruption</td></tr>
-      <tr><td>Overrun</td><td>Read or write past the end of a block</td><td>A neighbouring value changes silently</td></tr>
+      <tr><td>Overrun</td><td>Read or write past the end of a block</td><td>A neighboring value changes silently</td></tr>
       <tr><td>Invalid free</td><td><code>free</code> on a stack or interior pointer</td><td>Immediate abort</td></tr>
     </tbody>
   </table>
@@ -113,7 +113,7 @@ printf("%d\n", node-&gt;value);       /* the block may already be reused */</cod
   </div>
 </div>
 
-  <p>The defence is a habit: <strong>set the pointer to <code>NULL</code> immediately after freeing</strong>. A later use then crashes instantly at the guilty line instead of corrupting something.</p>
+  <p>The defense is a habit: <strong>set the pointer to <code>NULL</code> immediately after freeing</strong>. A later use then crashes instantly at the guilty line instead of corrupting something.</p>
 
   <h3>Double free</h3>
 <pre><code>free(p);
@@ -126,7 +126,7 @@ free(p);                           /* corrupts the allocator's bookkeeping */</c
 <pre><code>int *a = malloc(10 * sizeof *a);
 a[10] = 0;                         /* one past the end */</code></pre>
 
-  <p>Identical in nature to week 12's array overflow, but on the heap the neighbour is usually the allocator's own metadata — the block header recording sizes and links. Corrupting it means the <em>next</em> unrelated <code>malloc</code> or <code>free</code> crashes, with a backtrace pointing at innocent code.</p>
+  <p>Identical in nature to week 12's array overflow, but on the heap the neighbor is usually the allocator's own metadata — the block header recording sizes and links. Corrupting it means the <em>next</em> unrelated <code>malloc</code> or <code>free</code> crashes, with a backtrace pointing at innocent code.</p>
 
   <h3>Invalid free</h3>
 <pre><code>int local = 5;
@@ -323,21 +323,21 @@ done
   <p><strong>BUG=1 — leak.</strong> The program finishes normally, then:</p>
 <pre><code>==1234==ERROR: LeakSanitizer: detected memory leaks
 Direct leak of 64 byte(s) in 1 object(s) allocated from:
-    #1 0x... in main bugs.c:76
+    #1 0x... in main bugs.c:68
 SUMMARY: AddressSanitizer: 64 byte(s) leaked in 1 allocation(s).</code></pre>
   <p>Note that the output appears only at exit and the exit status becomes non-zero — which is how a leak fails a build in week 35's continuous integration.</p>
 
-  <p><strong>BUG=2 — use after free.</strong> Three traces: used at line 82, freed at line 81, allocated at line 44. Without the sanitizer this program prints a value quite happily — often not even <code>10</code>, because the allocator stores its own bookkeeping in the first bytes of a freed block.</p>
+  <p><strong>BUG=2 — use after free.</strong> Three traces: used at line 76, freed at line 75, allocated at line 40. Without the sanitizer this program prints a value quite happily — often not even <code>10</code>, because the allocator stores its own bookkeeping in the first bytes of a freed block.</p>
 
   <p><strong>BUG=3 — double free.</strong> <code>attempting double-free on 0x...</code>, with the free site and the original allocation both named. Without the sanitizer, glibc prints <code>free(): double free detected in tcache 2</code> and aborts — useful, but with no indication of where.</p>
 
   <p><strong>BUG=4 — overrun.</strong> The most instructive one:</p>
 <pre><code>==1234==ERROR: AddressSanitizer: heap-buffer-overflow
 WRITE of size 4 at 0x602000000030 thread T0
-    #0 0x... in main bugs.c:95
+    #0 0x... in main bugs.c:88
 0x602000000030 is located 0 bytes to the right of 32-byte region
 allocated by thread T0 here:
-    #1 0x... in array_push bugs.c:44</code></pre>
+    #1 0x... in array_push bugs.c:40</code></pre>
   <p>"0 bytes to the right of a 32-byte region" is an off-by-one stated in the clearest possible terms. Compare with the unsanitized build, which prints <code>finished</code> and exits successfully while having corrupted the allocator's metadata.</p>
 
   <p><strong>BUG=5 — invalid free.</strong> <code>attempting free on address which was not malloc()-ed</code>, plus the allocation site of the real block.</p>
@@ -348,16 +348,16 @@ allocated by thread T0 here:
 valgrind --leak-check=full ./bug2_plain</code></pre>
 
 <pre><code>==9876== Invalid read of size 4
-==9876==    at 0x...: main (bugs.c:82)
+==9876==    at 0x...: main (bugs.c:76)
 ==9876==  Address 0x4a4b040 is 0 bytes inside a block of size 32 free'd
 ==9876==    at 0x...: free
-==9876==    by 0x...: main (bugs.c:81)
+==9876==    by 0x...: main (bugs.c:75)
 ==9876==  Block was alloc'd at
-==9876==    by 0x...: array_push (bugs.c:44)</code></pre>
+==9876==    by 0x...: array_push (bugs.c:40)</code></pre>
 
   <p>The same three facts in different words — and obtained without rebuilding with a special flag, which is what makes Valgrind valuable on binaries you did not compile.</p>
 
-  <h3>One Valgrind catches that AddressSanitizer does not</h3>
+  <h3>One bug that Valgrind catches and AddressSanitizer does not</h3>
 
 <pre><code>int *p = malloc(4 * sizeof *p);
 printf("%d\n", p[0]);          /* reading uninitialized heap memory */
@@ -409,7 +409,7 @@ free(p);</code></pre>
 
   <details>
     <summary>Why does a memory bug's symptom usually appear far from its cause?</summary>
-    <p>Because the damaging operation is legal at the machine level and produces no immediate failure. An overrun quietly modifies a neighbouring object or the allocator's metadata; a use-after-free reads a block that has not yet been reused. The failure surfaces only when something else touches the corrupted state, which can be much later and in unrelated code.</p>
+    <p>Because the damaging operation is legal at the machine level and produces no immediate failure. An overrun quietly modifies a neighboring object or the allocator's metadata; a use-after-free reads a block that has not yet been reused. The failure surfaces only when something else touches the corrupted state, which can be much later and in unrelated code.</p>
   </details>
 
   <details>

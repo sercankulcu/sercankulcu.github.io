@@ -53,7 +53,7 @@ course:
 <header class="nt-head">
   <p class="nt-kicker">Microprocessors · Lecture Notes</p>
   <h1>Chapter 8.1: The Stack</h1>
-  <p class="nt-lead">While a program runs, many values have to be set aside for a short time: the old value of a register, the return address of a procedure, the flags of an interrupted program, to name the first. For these jobs the 8086 uses a region of memory as the stack. The value put on the stack last is the first to be taken back. This note begins with the stack concept and the last-in, first-out discipline. It then explains how the stack is addressed through the SS and SP registers, why it grows downward, and which bus cycles the 8086 uses to reach it. Next it takes up, one by one, the effect of PUSH, POP, PUSHF, and POPF on registers, flags, and memory. Every example in the slides is traced step by step together with the registers and the stack: saving a value, swapping, rotating three registers, and reversing an array with the stack. The last section covers errors such as unbalanced PUSH and POP, stack overflow, and underflow, and the ways to guard against them.</p>
+  <p class="nt-lead">While a program runs, many values have to be set aside for a short time: the old value of a register, the return address of a procedure, the flags of an interrupted program, to name just a few. For these jobs the 8086 uses a region of memory as the stack. The value put on the stack last is the first to be taken back. This note begins with the stack concept and the last-in, first-out discipline. It then explains how the stack is addressed through the SS and SP registers, why it grows downward, and which bus cycles the 8086 uses to reach it. Next it takes up, one by one, the effect of PUSH, POP, PUSHF, and POPF on registers, flags, and memory. Every example in the slides is traced step by step together with the registers and the stack: saving a value, swapping, rotating three registers, and reversing an array with the stack. The last section covers errors such as unbalanced PUSH and POP, stack overflow, and underflow, and the ways to guard against them.</p>
   <ul class="nt-links" aria-label="Related links">
     <li><a href="../slides/Chapter_08_01_The_Stack.html">Slides</a></li>
     <li><a href="https://sercankulcu.github.io/courses-pdfs/microprocessors/pdf/Chapter_08_01_The_Stack.pdf">Slides PDF</a></li>
@@ -347,7 +347,7 @@ course:
 <span class="kw">PUSH</span> DS          <span class="cm">; value of DS onto the stack</span>
 <span class="kw">POP</span>  ES          <span class="cm">; ES ← DS</span></code></pre>
 
-<p>The advantage of copying through the stack is that it disturbs no general-purpose register. If the value of AX is to be preserved, the first way requires saving AX separately; the second does not. The idiom <code>PUSH CS</code> with <code>POP DS</code> is common in programs whose data sits in the code segment and at the start of interrupt routines. In emu8086, if DS is set to 1234h and these four instructions are run, ES = 1234h and DS = 0700h; SP returns to FFFEh.</p>
+<p>The advantage of copying through the stack is that it disturbs no general-purpose register. If the value of AX is to be preserved, the first way requires saving AX separately; the second does not. The idiom <code>PUSH CS</code> with <code>POP DS</code> is common in programs whose data sits in the code segment and at the start of interrupt routines. In emu8086, if DS is set to 1234h and these four instructions are run, both DS and ES become 0700h, the value of CS; SP returns to FFFEh.</p>
 
 <h3 id="s8-1-2-3"><span class="nt-num">8.1.2.3</span>How PUSH and POP work</h3>
 
@@ -588,7 +588,7 @@ course:
 <span class="kw">RET</span>
 <span class="dir">END</span></code></pre>
 
-<p>When emu8086 loads this program, CX shows 000Bh. This value is the byte count of the program: the two MOVs are 3 bytes each, the four stack instructions and RET one byte each, 3 + 3 + 1 + 1 + 1 + 1 + 1 = 11 bytes in all. After loading, emu8086 writes the size of the .COM program into CX; the DOS DEBUG program likewise writes the length of the file it loaded into BX:CX. This is a custom, not a rule. A program must not trust the initial value of CX and must load CX itself before using it. In the other traces of this note the initial value of CX is taken as 0000h; since the swap program does not use CX, the result does not change.</p>
+<p>When emu8086 loads this program, CX shows 000Bh. This value is the byte count of the program: the two MOVs are 3 bytes each, the four stack instructions and RET one byte each, 3 + 3 + 1 + 1 + 1 + 1 + 1 = 11 bytes in all. After loading, emu8086 writes the size of the .COM program into CX; the DOS DEBUG program likewise writes the length of the file it loaded into BX:CX. This is a convention, not a rule. A program must not trust the initial value of CX and must load CX itself before using it. In the other traces of this note the initial value of CX is taken as 0000h; since the swap program does not use CX, the result does not change.</p>
 
 <div class="nt-tablewrap" id="tab-iz4">
 <table class="nt-table">
@@ -986,7 +986,7 @@ again:  <span class="kw">PUSH</span> AX
         <span class="kw">LOOP</span> again
         <span class="kw">RET</span></code></pre>
 
-<p>The loop runs three iterations and pushes 0100h, 0101h, and 0102h onto the stack. SP = FFF8h. RET takes the 0102h on top of the stack and IP = 0102h. This address is inside the program but is not the start of an instruction: <code>MOV CX, 3</code> occupies 0100h–0102h and 0102h is its last byte. The processor takes the 00h byte for the start of a new instruction and begins executing a meaningless sequence. Instead of three iterations, a loop that starts with CX = 0 runs 65,536. In that case about 128 KB of values are pushed onto the stack. The 64 KB segment cannot hold that much: SP wraps around and the stack overwrites the code of the program.</p>
+<p>The loop runs three iterations and pushes 0100h, 0101h, and 0102h onto the stack. SP = FFF8h. RET takes the 0102h on top of the stack and IP = 0102h. This address is inside the program but is not the start of an instruction: <code>MOV CX, 3</code> occupies 0100h–0102h and 0102h is its last byte. The processor takes the 00h byte for the start of a new instruction and begins executing a meaningless sequence. A loop that starts with CX = 0 would run 65,536 times instead of three. In that case about 128 KB of values are pushed onto the stack. The 64 KB segment cannot hold that much: SP wraps around and the stack overwrites the code of the program.</p>
 
 <p><strong>Underflow</strong> is popping a value that was never pushed. If POP is done with SP = FFFEh, SP = 0000h; the 16-bit addition wraps. The value read is garbage or, in a .COM program, DOS's 0000h. The next PUSH takes SP down to FFFEh and overwrites DOS's word. The program then cannot terminate properly with RET, because the 0000h needed for the return has been overwritten.</p>
 

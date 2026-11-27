@@ -469,7 +469,7 @@ course:
 
 <p>The first way of writing a shuffle that comes to mind is this: swap each position with a random position of the array. The code looks short and innocent.</p>
 
-<pre class="nt-code"><code><span class="cm">// WRONG: for each i, pick from 0..n-1</span>
+<pre class="nt-code"><code><span class="cm">// BIASED: for each i, pick from 0..n-1</span>
 <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++) {
   <span class="kw">int</span> j = rng.nextInt(n);
   swap(a, i, j);
@@ -827,17 +827,17 @@ course:
 
 <p>The <strong>selection problem</strong> is to find the <span class="m">k</span>-th smallest element of an array. Questions such as the median, or the threshold of the ten smallest or largest elements, are examples of this problem. Sorting the array and reading position <span class="m">k</span> takes <span class="m">O(n log n)</span> time. But most of the sorting is unnecessary: only the place of a single element is asked for. The <strong>randomized selection</strong> (quickselect) algorithm uses the partitioning of quicksort, but each time descends only into the side where the sought element lies.</p>
 
-<pre class="nt-code"><code><span class="kw">static</span> <span class="kw">int</span> select(<span class="kw">int</span>[] a, <span class="kw">int</span> lo, <span class="kw">int</span> hi, <span class="kw">int</span> k) {
+<pre class="nt-code"><code><span class="kw">static</span> <span class="kw">int</span> select(<span class="kw">int</span>[] a, <span class="kw">int</span> lo, <span class="kw">int</span> hi, <span class="kw">int</span> s) {
   <span class="kw">if</span> (lo == hi) <span class="kw">return</span> a[lo];
   <span class="kw">int</span> p = partition(a, lo, hi);
-  <span class="kw">if</span> (k == p) <span class="kw">return</span> a[p];
-  <span class="kw">if</span> (k &lt; p) <span class="kw">return</span> select(a, lo, p - 1, k);
-  <span class="kw">return</span> select(a, p + 1, hi, k);
+  <span class="kw">if</span> (s == p) <span class="kw">return</span> a[p];
+  <span class="kw">if</span> (s &lt; p) <span class="kw">return</span> select(a, lo, p - 1, s);
+  <span class="kw">return</span> select(a, p + 1, hi, s);
 }</code></pre>
 
-<p><span class="m">k</span> is a 0-based rank: <span class="m">k = 0</span> is the smallest element and <span class="m">k = n − 1</span> the largest. The method first checks the base case. If a single element is left in the range (<span class="m">lo = hi</span>), it is the one sought. Otherwise the same randomized <code>partition</code> is called and the final position <span class="m">p</span> of the pivot is learned. The final position of the pivot is its position in the sorted array. If <span class="m">k = p</span>, the pivot is the one sought. If <span class="m">k &lt; p</span>, the sought element is to the left of the pivot; if <span class="m">k &gt; p</span>, it is to the right. Whichever side is descended into, <span class="m">k</span> does not change, because the indices are relative to the whole array. The other side is never examined again.</p>
+<p><code>s</code> is a 0-based rank: <span class="m">s = 0</span> is the smallest element and <span class="m">s = n − 1</span> the largest. The method first checks the base case. If a single element is left in the range (<span class="m">lo = hi</span>), it is the one sought. Otherwise the same randomized <code>partition</code> is called and the final position <span class="m">p</span> of the pivot is learned. The final position of the pivot is its position in the sorted array. If <span class="m">s = p</span>, the pivot is the one sought. If <span class="m">s &lt; p</span>, the sought element is to the left of the pivot; if <span class="m">s &gt; p</span>, it is to the right. Whichever side is descended into, <span class="m">s</span> does not change, because the indices are relative to the whole array. The other side is never examined again.</p>
 
-<p>This algorithm too is a Las Vegas algorithm. The result is always correct; what is random is only how many partitionings will be made. It also has a side effect: the method modifies the array in place. After it returns, <code>a[k]</code> is the sought element; those to its left are less than or equal to it and those to its right are greater.</p>
+<p>This algorithm too is a Las Vegas algorithm. The result is always correct; what is random is only how many partitionings will be made. It also has a side effect: the method modifies the array in place. After it returns, <code>a[s]</code> is the sought element; those to its left are less than or equal to it and those to its right are greater.</p>
 
 <h3 id="s12-6-2"><span class="nt-num">7.6.2</span>Code trace</h3>
 
@@ -1023,7 +1023,7 @@ course:
   <span class="kw">while</span> (d % 2 == 0) { d /= 2; s++; }
   <span class="kw">for</span> (<span class="kw">int</span> round = 0; round &lt; k; round++) {
     <span class="kw">long</span> a = 2 + rng.nextLong(n - 3); <span class="cm">// [2, n-2]</span>
-    <span class="kw">long</span> x = powMod(a, d, n);     <span class="cm">// a^d mod n</span>
+    <span class="kw">long</span> x = modPow(a, d, n);     <span class="cm">// a^d mod n</span>
     <span class="kw">if</span> (x == 1 || x == n - 1) <span class="kw">continue</span>;
     <span class="kw">boolean</span> witness = <span class="kw">true</span>;
     <span class="kw">for</span> (<span class="kw">int</span> r = 1; r &lt; s &amp;&amp; witness; r++) {
@@ -1037,7 +1037,7 @@ course:
 
 <p>The first two lines filter out small cases. If <span class="m">n &lt; 4</span>, only 2 and 3 are prime. Even numbers other than 2 are composite; 2 has already been caught in the first line. The next two lines bring <span class="m">n − 1</span> to the form <span class="m">2ˢ · d</span>: while <span class="m">d</span> is even it is halved and <span class="m">s</span> is counted. The main loop makes <span class="m">k</span> rounds. In each round the expression <code>2 + rng.nextLong(n - 3)</code> picks a uniform base from the range <span class="m">[2, n − 2]</span>; <code>nextLong(n - 3)</code> gives a value between 0 and <span class="m">n − 4</span>. (The bases 1 and <span class="m">n − 1</span> are useless because they pass the test for every number.)</p>
 
-<p><code>x = powMod(a, d, n)</code> is the first element of the sequence. If <span class="m">x</span> is 1 or <span class="m">n − 1</span>, this round is passed and <code>continue</code> goes to the next round. Otherwise <code>witness</code> is first set to <code>true</code>; the inner loop computes the remaining <span class="m">s − 1</span> elements of the sequence by successive squaring. If <span class="m">n − 1</span> appears, <code>witness = false</code> and the inner loop stops. If <code>witness</code> is still <code>true</code> when the inner loop ends, <span class="m">a</span> is a witness and the method returns <code>false</code>. This answer is certain. If all rounds are passed, the method returns <code>true</code>: the number is "probably prime".</p>
+<p><code>x = modPow(a, d, n)</code> is the first element of the sequence. If <span class="m">x</span> is 1 or <span class="m">n − 1</span>, this round is passed and <code>continue</code> goes to the next round. Otherwise <code>witness</code> is first set to <code>true</code>; the inner loop computes the remaining <span class="m">s − 1</span> elements of the sequence by successive squaring. If <span class="m">n − 1</span> appears, <code>witness = false</code> and the inner loop stops. If <code>witness</code> is still <code>true</code> when the inner loop ends, <span class="m">a</span> is a witness and the method returns <code>false</code>. This answer is certain. If all rounds are passed, the method returns <code>true</code>: the number is "probably prime".</p>
 
 <p>The code contains two details. First, the method <code>rng.nextLong(long bound)</code> was added in Java 17; it does not exist in older versions. Second, the product <code>x * x % n</code> is computed in the type <code>long</code>. Since <span class="m">x &lt; n</span>, the product is less than <span class="m">n²</span>. The largest value of <code>long</code> is about <span class="m">9.22 · 10¹⁸</span>; its square root is <span class="m">3,037,000,499</span>. The code is therefore safe only for <span class="m">n &lt; 3 · 10⁹</span>. For larger numbers <code>BigInteger.modPow</code> or directly <code>BigInteger.isProbablePrime</code> is used.</p>
 
@@ -1045,7 +1045,7 @@ course:
 
 <p>Computing <span class="m">a<sup>d</sup> mod n</span> by multiplying <span class="m">a</span> by itself <span class="m">d − 1</span> times is impossible for large <span class="m">d</span>. The <strong>square-and-multiply</strong> method uses the binary representation of the exponent. The exponent is written in binary; at each step the base is squared to reach the next power of two. If that bit of the exponent is 1, that power is included in the result.</p>
 
-<pre class="nt-code"><code><span class="kw">static</span> <span class="kw">long</span> powMod(<span class="kw">long</span> a, <span class="kw">long</span> d, <span class="kw">long</span> n) {
+<pre class="nt-code"><code><span class="kw">static</span> <span class="kw">long</span> modPow(<span class="kw">long</span> a, <span class="kw">long</span> d, <span class="kw">long</span> n) {
   <span class="kw">long</span> result = 1;
   a %= n;
   <span class="kw">while</span> (d &gt; 0) {
@@ -1061,7 +1061,7 @@ course:
 
 <div class="nt-tablewrap" id="tab-usmod">
 <table class="nt-table">
-  <caption>Table 7.17: Trace of <code>powMod(2, 35, 561)</code>. <span class="m">35 = 100011₂ = 32 + 2 + 1</span>.</caption>
+  <caption>Table 7.17: Trace of <code>modPow(2, 35, 561)</code>. <span class="m">35 = 100011₂ = 32 + 2 + 1</span>.</caption>
   <thead><tr><th scope="col">round</th><th scope="col">d</th><th scope="col">rightmost bit</th><th scope="col">result</th><th scope="col">a (after squaring)</th><th scope="col">note</th></tr></thead>
   <tbody>
     <tr><td>start</td><td>35</td><td>—</td><td>1</td><td>2</td><td><span class="m">a = 2¹</span></td></tr>
@@ -1092,7 +1092,7 @@ course:
     <tr><td>1</td><td><span class="m">d = n − 1</span>, <span class="m">s = 0</span></td><td>d = 560, s = 0</td></tr>
     <tr><td>2–5</td><td>while d is even, <span class="m">d /= 2</span>, <span class="m">s++</span></td><td>280/1, 140/2, 70/3, 35/4 → <span class="m">560 = 2⁴ · 35</span></td></tr>
     <tr><td>6</td><td>round 0: the base is drawn</td><td>a = 2</td></tr>
-    <tr><td>7</td><td><code>x = powMod(2, 35, 561)</code></td><td>x = 263; neither 1 nor 560 → <code>witness = true</code></td></tr>
+    <tr><td>7</td><td><code>x = modPow(2, 35, 561)</code></td><td>x = 263; neither 1 nor 560 → <code>witness = true</code></td></tr>
     <tr><td>8</td><td>r = 1: <span class="m">x = 263² mod 561</span></td><td>69,169 mod 561 = 166; not 560</td></tr>
     <tr><td>9</td><td>r = 2: <span class="m">x = 166² mod 561</span></td><td>27,556 mod 561 = 67; not 560</td></tr>
     <tr><td>10</td><td>r = 3: <span class="m">x = 67² mod 561</span></td><td>4,489 mod 561 = 1; not 560</td></tr>
@@ -1105,7 +1105,7 @@ course:
 
 <figure class="nt-fig" id="sekil-mr561" style="--w:330px">
   <div class="nt-fig__row"><svg class="ds-svg" viewBox="0 0 330 126" role="img" aria-label="Fast exponentiation: result 263, a 511"><text class="txt" x="6" y="18" text-anchor="start">d = 35 = 100011₂</text><rect class="a08t-dim" x="140" y="4" width="26" height="24" rx="3"/><text class="txt a08t-md" x="153" y="21" text-anchor="middle">1</text><text class="lbl a08t-sm" x="153" y="40" text-anchor="middle">32</text><rect class="a08t-dim" x="170" y="4" width="26" height="24" rx="3"/><text class="txt a08t-md" x="183" y="21" text-anchor="middle">0</text><text class="lbl a08t-sm" x="183" y="40" text-anchor="middle">16</text><rect class="a08t-dim" x="200" y="4" width="26" height="24" rx="3"/><text class="txt a08t-md" x="213" y="21" text-anchor="middle">0</text><text class="lbl a08t-sm" x="213" y="40" text-anchor="middle">8</text><rect class="a08t-dim" x="230" y="4" width="26" height="24" rx="3"/><text class="txt a08t-md" x="243" y="21" text-anchor="middle">0</text><text class="lbl a08t-sm" x="243" y="40" text-anchor="middle">4</text><rect class="a08t-dim" x="260" y="4" width="26" height="24" rx="3"/><text class="txt a08t-md" x="273" y="21" text-anchor="middle">1</text><text class="lbl a08t-sm" x="273" y="40" text-anchor="middle">2</text><rect class="a08t-dim" x="290" y="4" width="26" height="24" rx="3"/><text class="txt a08t-md" x="303" y="21" text-anchor="middle">1</text><text class="lbl a08t-sm" x="303" y="40" text-anchor="middle">1</text><text class="txt a08t-acc" x="6" y="70" text-anchor="start">result = 263</text><text class="txt" x="6" y="96" text-anchor="start">a = 511</text><text class="lbl a08t-sm" x="6" y="120" text-anchor="start">a becomes 2^1, 2^2, 2^4, 2^8 … (mod 561) in turn</text></svg> <svg class="ds-svg" viewBox="0 0 330 124" role="img" aria-label="Miller–Rabin sequence: [263, 166, 67, 1]"><text class="txt" x="6" y="20" text-anchor="start">n − 1 = 560 = 2<tspan dy="-7" style="font-size:11px">4</tspan><tspan dy="7"> · 35</tspan></text><text class="txt a08t-acc" x="230" y="20" text-anchor="start">a = 2</text><rect class="box" x="8" y="44" width="66" height="34" rx="4"/><text class="txt" x="41" y="66" text-anchor="middle">263</text><text class="lbl a08t-sm" x="41" y="94" text-anchor="middle">a^d</text><text class="lbl" x="81" y="66" text-anchor="middle">→</text><rect class="box" x="88" y="44" width="66" height="34" rx="4"/><text class="txt" x="121" y="66" text-anchor="middle">166</text><text class="lbl a08t-sm" x="121" y="94" text-anchor="middle">a^2d</text><text class="lbl" x="161" y="66" text-anchor="middle">→</text><rect class="box" x="168" y="44" width="66" height="34" rx="4"/><text class="txt" x="201" y="66" text-anchor="middle">67</text><text class="lbl a08t-sm" x="201" y="94" text-anchor="middle">a^4d</text><text class="lbl" x="241" y="66" text-anchor="middle">→</text><rect class="a08t-no" x="248" y="44" width="66" height="34" rx="4"/><text class="txt" x="281" y="66" text-anchor="middle">1</text><text class="lbl a08t-sm" x="281" y="94" text-anchor="middle">a^8d</text><text class="txt a08t-md a08t-bd" x="6" y="118" text-anchor="start">67² ≡ 1 but 67 ≠ ±1 → a = 2 is a witness: 561 is composite</text></svg></div>
-  <figcaption><b>Figure 7.14:</b> Left, <code>powMod(2, 35, 561)</code> finished: <span class="m">35 = 100011₂</span>, result 263. Right, the Miller–Rabin sequence for 561: 263 → 166 → 67 → 1; <span class="m">67² ≡ 1</span> but 67 is neither 1 nor −1; therefore 2 is a witness and 561 is composite.</figcaption>
+  <figcaption><b>Figure 7.14:</b> Left, <code>modPow(2, 35, 561)</code> finished: <span class="m">35 = 100011₂</span>, result 263. Right, the Miller–Rabin sequence for 561: 263 → 166 → 67 → 1; <span class="m">67² ≡ 1</span> but 67 is neither 1 nor −1; therefore 2 is a witness and 561 is composite.</figcaption>
 </figure>
 
 <h3 id="s12-8-6"><span class="nt-num">7.8.6</span>Examples and strong liars</h3>
@@ -1378,7 +1378,7 @@ course:
 <h2 class="nt-pb" id="s12-13"><span class="nt-num">7.13</span>Summary</h2>
 
 <ul>
-  <li>A randomized algorithm uses random bits in addition to its input. The running time and sometimes the output is a random variable. The expected time is taken, for every input, over the algorithm's own choices.</li>
+  <li>A randomized algorithm uses random bits in addition to its input. The running time, and sometimes the output, is a random variable. The expected time is taken, for every input, over the algorithm's own choices.</li>
   <li>The basic tools of the analysis are linearity of expectation, indicator variables, the geometric distribution (<span class="m">1/p</span> trials), independent repetition (<span class="m">qᵏ</span>), and Markov's inequality.</li>
   <li>A Las Vegas algorithm is always correct and its running time is random. A Monte Carlo algorithm has bounded running time and its answer is wrong with a small probability. A Monte Carlo algorithm with a verifiable answer is turned into Las Vegas by repetition; Las Vegas is turned into Monte Carlo by Markov's inequality.</li>
 </ul>
@@ -1474,7 +1474,7 @@ course:
     </details>
   </li>
   <li>
-    <p>In the call <code>powMod(3, 13, 17)</code>, what are <code>result</code> and <code>a</code> after each round? What is the return value?</p>
+    <p>In the call <code>modPow(3, 13, 17)</code>, what are <code>result</code> and <code>a</code> after each round? What is the return value?</p>
     <details><summary>Answer</summary>
       <p><span class="m">13 = 1101₂</span>. Bit 1: result = 3, a = 9. Bit 0: result = 3, a = 81 mod 17 = 13. Bit 1: result = 39 mod 17 = 5, a = 169 mod 17 = 16. Bit 1: result = 80 mod 17 = 12, a = 256 mod 17 = 1. The return value is 12: <span class="m">3¹³ mod 17 = 12</span>.</p>
     </details>

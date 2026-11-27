@@ -65,7 +65,7 @@
       var ones = 0; for (var t = v; t; t >>= 1) ones += t & 1;
       var cells = [
         [tx("onaltılık", "hex"), hexTxt(v)], [tx("işaretsiz", "unsigned"), String(v)], [tx("ikiye tümleyen", "two's complement"), String(s).replace("-", "−")], [tx("işaret-büyüklük", "sign-magnitude"), sm],
-        [tx("birler tümleyeni", "ones' complement"), oc], [tx("paketli BCD", "packed BCD"), bcd], [tx("Gray kodu", "Gray code"), pad(g.toString(2), 8)], [tx("PF (1 sayısı)", "PF (count of 1s)"), (ones % 2 ? "0" : "1") + " (" + ones + ")"]
+        [tx("birler tümleyeni", "one's complement"), oc], [tx("paketli BCD", "packed BCD"), bcd], [tx("Gray kodu", "Gray code"), pad(g.toString(2), 8)], [tx("PF (1 sayısı)", "PF (count of 1s)"), (ones % 2 ? "0" : "1") + " (" + ones + ")"]
       ];
       out.innerHTML = cells.map(function (c) { return "<div>" + c[0] + "<b>" + c[1] + "</b></div>"; }).join("");
       status.innerHTML = msg || tx("Bitlere tıkla ya da bir işlem seç.", "Click the bits or pick an operation.");
@@ -73,7 +73,7 @@
     demo.querySelectorAll("[data-op]").forEach(function (b) {
       b.addEventListener("click", function () {
         var op = b.dataset.op, old = v;
-        if (op === "not") { v = ~v & 0xFF; render(tx("<b>NOT</b>: tüm bitler terslendi (birler tümleyeni)", "<b>NOT</b>: every bit flipped (ones' complement)")); }
+        if (op === "not") { v = ~v & 0xFF; render(tx("<b>NOT</b>: tüm bitler terslendi (birler tümleyeni)", "<b>NOT</b>: every bit flipped (one's complement)")); }
         else if (op === "neg") { v = (256 - v) & 0xFF; render(tx("<b>NEG</b>: tersle + 1 → ", "<b>NEG</b>: invert + 1 → ") + hexTxt(old) + " → " + hexTxt(v) + (old === 0x80 ? tx(" (+128 8 bite sığmaz; −128'in negatifi yine −128!)", " (+128 does not fit in 8 bits; −(−128) is still −128!)") : "")); }
         else if (op === "inc") { v = (v + 1) & 0xFF; render("<b>+1</b>" + (old === 0xFF ? tx(" · FFh + 1 = 00h: elde (CF)", " · FFh + 1 = 00h: carry (CF)") : (old === 0x7F ? tx(" · +127 + 1 = −128: işaretli taşma (OF)", " · +127 + 1 = −128: signed overflow (OF)") : ""))); }
         else if (op === "shl") { v = (v << 1) & 0xFF; render(tx("<b>SHL</b>: sola kaydırma = ×2", "<b>SHL</b>: shift left = ×2") + ((old & 0x80) ? tx(" · dışarı atılan 1 CF'ye gider", " · the 1 shifted out goes to CF") : "")); }

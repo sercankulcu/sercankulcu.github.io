@@ -317,7 +317,7 @@ queue.add(root);
 
 <p>The loop stops when the queue is empty. At that moment <code>best</code> is the value of the optimal solution. The reason for this claim is simple. Every node has either been expanded or pruned. The solutions below pruned nodes cannot beat <code>best</code>, because the bound guarantees it. The solutions below expanded nodes have been examined one by one. So no solution better than <code>best</code> has been skipped.</p>
 
-<p>The code is written for maximization. In <strong>minimization</strong> the directions are reversed. The bound is a lower bound, <code>best</code> starts at <span class="m">+∞</span>, and a node with <span class="m">lower(c) ≥ best</span> is pruned. The traveling salesman and assignment problems are solved in this form.</p>
+<p>The code is written for maximization. In <strong>minimization</strong> the directions are reversed. The bound is a lower bound, <code>best</code> starts at <span class="m">+∞</span>, and a node with <span class="m">lb(c) ≥ best</span> is pruned. The traveling salesman and assignment problems are solved in this form.</p>
 
 <p>The skeleton stores only the value of the solution, not the solution itself. If we also want to know which items were taken or in what order the tour visits the cities, each node carries its own partial solution. A <code>boolean[]</code> array or a bit mask is enough for this. When <code>best</code> is updated, this information is copied as well.</p>
 
@@ -327,7 +327,7 @@ queue.add(root);
 
 <div class="nt-box nt-box--tanim" id="tanim-gecerli">
   <span class="nt-box__title">Definition 5.3</span>
-  <p>In a maximization problem, the bound of a node <span class="m">u</span> is <strong>valid</strong> if it is greater than or equal to the value of every feasible solution in the subtree of <span class="m">u</span>: <span class="m">bound(u) ≥ value(x)</span> for every <span class="m">x</span>. In minimization the condition is reversed: <span class="m">lower(u) ≤ value(x)</span>. A valid bound is also called an <strong>optimistic</strong> bound, because it assumes the branch looks better than it can actually be.</p>
+  <p>In a maximization problem, the bound of a node <span class="m">u</span> is <strong>valid</strong> if it is greater than or equal to the value of every feasible solution in the subtree of <span class="m">u</span>: <span class="m">bound(u) ≥ value(x)</span> for every <span class="m">x</span>. In minimization the condition is reversed: <span class="m">lb(u) ≤ value(x)</span>. A valid bound is also called an <strong>optimistic</strong> bound, because it assumes the branch looks better than it can actually be.</p>
 </div>
 
 <ul>
@@ -352,7 +352,7 @@ queue.add(root);
 
 <ol>
   <li><strong>Infeasibility.</strong> If the node violates a constraint, there is no valid solution below it. Examples: the weight has exceeded the capacity, a city has been visited a second time, the linear program has no solution.</li>
-  <li><strong>Bound.</strong> If <span class="m">bound(u) ≤ best</span> in maximization, or <span class="m">lower(u) ≥ best</span> in minimization, the solutions below cannot beat the best. The node is pruned even if it is feasible.</li>
+  <li><strong>Bound.</strong> If <span class="m">bound(u) ≤ best</span> in maximization, or <span class="m">lb(u) ≥ best</span> in minimization, the solutions below cannot beat the best. The node is pruned even if it is feasible.</li>
   <li><strong>Completeness.</strong> If the node is a complete solution (a leaf), or if the solution of the relaxation is already feasible, there is no need to branch. For example, in integer programming, if the solution of the linear program turns out to be integral, there is no better integer solution below that node. Its value is compared with <code>best</code> and the node is closed.</li>
 </ol>
 
@@ -528,15 +528,15 @@ queue.add(root);
 <pre class="nt-code"><code>double bound(Node u) {
   <span class="kw">if</span> (u.weight &gt; W) <span class="kw">return</span> 0;   <span class="cm">// infeasible</span>
   double result = u.profit;
-  <span class="kw">int</span> totalW = u.weight;
+  <span class="kw">int</span> totW = u.weight;
   <span class="kw">int</span> j = u.level + 1;
-  <span class="kw">while</span> (j &lt; n &amp;&amp; totalW + w[j] &lt;= W) {
-    totalW += w[j];
+  <span class="kw">while</span> (j &lt; n &amp;&amp; totW + w[j] &lt;= W) {
+    totW += w[j];
     result += p[j];
     j++;
   }
   <span class="kw">if</span> (j &lt; n)                <span class="cm">// fractional part</span>
-    result += (W - totalW) * (double) p[j] / w[j];
+    result += (W - totW) * (double) p[j] / w[j];
   <span class="kw">return</span> result;
 }</code></pre>
 
@@ -544,9 +544,9 @@ queue.add(root);
 
 <ul>
   <li><code>if (u.weight &gt; W) return 0;</code> catches an infeasible node. If the weight has exceeded the capacity, there is no feasible solution below the node; the bound of 0 keeps it out of the queue.</li>
-  <li><code>result</code> starts with the node's own profit and <code>totalW</code> with its own weight. <code>j</code> points to the first undecided item.</li>
+  <li><code>result</code> starts with the node's own profit and <code>totW</code> with its own weight. <code>j</code> points to the first undecided item.</li>
   <li>The <code>while</code> loop adds items whole as long as they fit. The condition has two parts: there must be an item left (<code>j &lt; n</code>) and item <span class="m">j</span> must fit completely into the remaining capacity.</li>
-  <li>When the loop ends, either no items are left or <code>j</code> is the first item that does not fit. In the second case a fractional profit of <code>(W - totalW) * (double) p[j] / w[j]</code> is added. The <code>(double)</code> cast prevents integer division.</li>
+  <li>When the loop ends, either no items are left or <code>j</code> is the first item that does not fit. In the second case a fractional profit of <code>(W - totW) * (double) p[j] / w[j]</code> is added. The <code>(double)</code> cast prevents integer division.</li>
 </ul>
 
 <p>For one node the function looks at no more than <span class="m">n</span> items; its time is <span class="m">O(n)</span>. It uses no extra memory. <a href="#tab-sinirkok">Table 5.5</a> is the trace of the call for the root.</p>
@@ -554,7 +554,7 @@ queue.add(root);
 <div class="nt-tablewrap" id="tab-sinirkok">
 <table class="nt-table">
   <caption>Table 5.5: Trace of <code>bound(root)</code> (<span class="m">W = 16</span>; root: level −1, profit 0, weight 0).</caption>
-  <thead><tr><th scope="col">Step</th><th scope="col">Test</th><th scope="col"><code>j</code></th><th scope="col"><code>totalW</code></th><th scope="col"><code>result</code></th></tr></thead>
+  <thead><tr><th scope="col">Step</th><th scope="col">Test</th><th scope="col"><code>j</code></th><th scope="col"><code>totW</code></th><th scope="col"><code>result</code></th></tr></thead>
   <tbody>
     <tr><td>Entry</td><td><span class="m">0 ≤ 16</span>: feasible</td><td>0</td><td>0</td><td>0</td></tr>
     <tr><td>Loop 1</td><td><span class="m">0 + w[0] = 2 ≤ 16</span>: item 1 fits whole</td><td>1</td><td>2</td><td>40</td></tr>
@@ -751,26 +751,26 @@ queue.add(root);
 
 <p>The tour always starts at city 0. Each node of the state-space tree is a <strong>partial path</strong> starting at 0. The root contains only 0. The children of a node are obtained by going from the last city of the path to a city not yet visited. Nodes at depth <span class="m">n − 1</span> contain all the cities; when we return from the last city to 0, the tour is complete.</p>
 
-<p>Because the problem is a minimization, each node needs a <strong>lower bound</strong>: no tour that completes that partial path can cost less than this value. The simplest lower bound rests on the following observation. To complete the tour, we must leave the current last city and each unvisited city exactly once. Each departure costs at least the cheapest edge of that city. Let the cost of the cheapest outgoing edge of city <span class="m">v</span> be <code>cheapest[v]</code>. These values are computed once before the search begins. The lower bound is:</p>
+<p>Because the problem is a minimization, each node needs a <strong>lower bound</strong>: no tour that completes that partial path can cost less than this value. The simplest lower bound rests on the following observation. To complete the tour, we must leave the current last city and each unvisited city exactly once. Each departure costs at least the cheapest edge of that city. Let the cost of the cheapest outgoing edge of city <span class="m">v</span> be <code>minOut[v]</code>. These values are computed once before the search begins. The lower bound is:</p>
 
-<p class="nt-math nt-math--c"><span class="m">lower(path) = cost(path) + cheapest[last city] + Σ<sub>v unvisited</sub> cheapest[v]</span></p>
+<p class="nt-math nt-math--c"><span class="m">lb(path) = cost(path) + minOut[last city] + Σ<sub>v unvisited</sub> minOut[v]</span></p>
 
 <p>This bound is a relaxation. In the original problem the outgoing edges must form a single tour. In the relaxation this condition is removed: each city leaves by its own cheapest edge, and whether the edges form a tour is not examined. Because of the removed constraint, the value of the relaxation cannot exceed the cost of any tour.</p>
 
 <div class="nt-box nt-box--teorem" id="teorem-tspalt">
   <span class="nt-box__title">Theorem 5.2 (The cheapest-outgoing-edge bound is valid)</span>
-  <p>For every partial path starting at 0, the cost of every tour that completes the path is greater than or equal to <span class="m">lower(path)</span>.</p>
+  <p>For every partial path starting at 0, the cost of every tour that completes the path is greater than or equal to <span class="m">lb(path)</span>.</p>
 </div>
 
 <div class="nt-proof">
-  <p>Any tour that completes the path contains the edges of the path unchanged; their sum is <span class="m">cost(path)</span>. In the rest of the tour, the last city is left once and every unvisited city is left once; there is no other departure. The edge leaving city <span class="m">v</span> costs at least <code>cheapest[v]</code>. Adding these inequalities, the cost of the tour is at least <span class="m">lower(path)</span>. <span class="nt-qed">∎</span></p>
+  <p>Any tour that completes the path contains the edges of the path unchanged; their sum is <span class="m">cost(path)</span>. In the rest of the tour, the last city is left once and every unvisited city is left once; there is no other departure. The edge leaving city <span class="m">v</span> costs at least <code>minOut[v]</code>. Adding these inequalities, the cost of the tour is at least <span class="m">lb(path)</span>. <span class="nt-qed">∎</span></p>
 </div>
 
-<p>The symmetric four-city matrix used in these notes is given in <a href="#tab-tsp4">Table 5.8</a>. The last column is the minimum of each row, that is, the array <code>cheapest</code>.</p>
+<p>The symmetric four-city matrix used in these notes is given in <a href="#tab-tsp4">Table 5.8</a>. The last column is the minimum of each row, that is, the array <code>minOut</code>.</p>
 
 <div class="nt-tablewrap" id="tab-tsp4">
 <table class="nt-table">
-  <caption>Table 5.8: The symmetric four-city distance matrix <span class="m">d</span> and <code>cheapest</code>.</caption>
+  <caption>Table 5.8: The symmetric four-city distance matrix <span class="m">d</span> and <code>minOut</code>.</caption>
   <thead><tr><th scope="col"></th><th scope="col">0</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">cheapest</th></tr></thead>
   <tbody>
     <tr><th scope="row">0</th><td>—</td><td>3</td><td>2</td><td>15</td><td>2</td></tr>
@@ -788,7 +788,7 @@ queue.add(root);
 
 <p>At the root the path is just 0 and its cost is 0. The last city is 0, and 1, 2, 3 are unvisited. The lower bound is <span class="m">0 + 2 + 3 + 2 + 5 = 12</span>. The four thick edges in <a href="#sekil-enucuz">Figure 5.10</a> do not form a tour: the edge 0-2 has been chosen twice and city 3 is never entered. This is why the value of the relaxation is smaller than a real tour.</p>
 
-<p>The bound for the path 0 → 1 is as follows. The cost of the path is <span class="m">d[0][1] = 3</span>. We will leave the last city, 1: <code>cheapest[1]</code> = 3. The unvisited cities are 2 and 3: <span class="m">2 + 5</span>. The total is <span class="m">3 + 3 + 7 = 13</span>. The bound is larger than that of the root; as decisions are made, the bound approaches the truth.</p>
+<p>The bound for the path 0 → 1 is as follows. The cost of the path is <span class="m">d[0][1] = 3</span>. We will leave the last city, 1: <code>minOut[1]</code> = 3. The unvisited cities are 2 and 3: <span class="m">2 + 5</span>. The total is <span class="m">3 + 3 + 7 = 13</span>. The bound is larger than that of the root; as decisions are made, the bound approaches the truth.</p>
 
 <h3 id="s10-4-2"><span class="nt-num">5.4.2</span>Code trace: tsp(0, 0, 1)</h3>
 
@@ -800,13 +800,13 @@ queue.add(root);
     <span class="kw">if</span> (tour &lt; best) best = tour;
     <span class="kw">return</span>;
   }
-  <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; n; c++) {
-    <span class="kw">if</span> (visited[c]) continue;
-    <span class="kw">int</span> next = cost + d[city][c];
-    visited[c] = <span class="kw">true</span>;
-    <span class="kw">if</span> (lowerBound(c, next) &lt; best) <span class="cm">// bound</span>
-      tsp(c, next, count + 1);
-    visited[c] = <span class="kw">false</span>;      <span class="cm">// unchoose</span>
+  <span class="kw">for</span> (<span class="kw">int</span> s = 0; s &lt; n; s++) {
+    <span class="kw">if</span> (visited[s]) continue;
+    <span class="kw">int</span> next = cost + d[city][s];
+    visited[s] = <span class="kw">true</span>;
+    <span class="kw">if</span> (lowerBound(s, next) &lt; best) <span class="cm">// bound</span>
+      tsp(s, next, count + 1);
+    visited[s] = <span class="kw">false</span>;      <span class="cm">// undo</span>
   }
 }</code></pre>
 
@@ -814,10 +814,10 @@ queue.add(root);
 
 <ul>
   <li><code>if (count == n)</code> is the base case. All the cities are on the path; we return from the last city to 0 and the tour is complete. If the tour is shorter than <code>best</code>, <code>best</code> is updated.</li>
-  <li>The <code>for</code> loop is the branching. Each unvisited city <code>c</code> is a child. Visited cities are skipped by <code>continue</code>; this is the infeasibility rule.</li>
-  <li><code>visited[c] = true;</code> adds the city to the path. The bound is computed after this marking, so that <code>lowerBound</code> sees city <code>c</code> as “visited” and counts it only as the last city.</li>
-  <li><code>if (lowerBound(c, next) &lt; best)</code> is the bound rule. If the lower bound is less than <code>best</code>, the branch is entered; otherwise it is pruned.</li>
-  <li><code>visited[c] = false;</code> is the undo. The path returns to its old state before the loop moves on to the next city.</li>
+  <li>The <code>for</code> loop is the branching. Each unvisited city <code>s</code> is a child. Visited cities are skipped by <code>continue</code>; this is the infeasibility rule.</li>
+  <li><code>visited[s] = true;</code> adds the city to the path. The bound is computed after this marking, so that <code>lowerBound</code> sees city <code>s</code> as “visited” and counts it only as the last city.</li>
+  <li><code>if (lowerBound(s, next) &lt; best)</code> is the bound rule. If the lower bound is less than <code>best</code>, the branch is entered; otherwise it is pruned.</li>
+  <li><code>visited[s] = false;</code> is the undo. The path returns to its old state before the loop moves on to the next city.</li>
 </ul>
 
 <p><a href="#tab-tspizleme">Table 5.9</a> gives all the steps of the search in order.</p>
@@ -825,7 +825,7 @@ queue.add(root);
 <div class="nt-tablewrap" id="tab-tspizleme">
 <table class="nt-table">
   <caption>Table 5.9: Trace of <code>tsp(0, 0, 1)</code>.</caption>
-  <thead><tr><th scope="col">Step</th><th scope="col">Edge</th><th scope="col"><code>next</code></th><th scope="col"><code>lower</code></th><th scope="col"><code>best</code></th><th scope="col">Decision</th></tr></thead>
+  <thead><tr><th scope="col">Step</th><th scope="col">Edge</th><th scope="col"><code>next</code></th><th scope="col"><code>lb</code></th><th scope="col"><code>best</code></th><th scope="col">Decision</th></tr></thead>
   <tbody>
     <tr><td>1</td><td>0 → 1</td><td><span class="m">0 + 3 = 3</span></td><td><span class="m">3 + 3 + 2 + 5 = 13</span></td><td>∞</td><td>branch</td></tr>
     <tr><td>2</td><td>1 → 2</td><td><span class="m">3 + 21 = 24</span></td><td><span class="m">24 + 2 + 5 = 31</span></td><td>∞</td><td>branch</td></tr>
@@ -851,48 +851,48 @@ queue.add(root);
 
 <p>The result is the shortest tour 0 → 1 → 3 → 2 → 0, of length <span class="m">3 + 5 + 8 + 2 = 18</span>. The full state-space tree has <span class="m">1 + 3 + 6 + 6 = 16</span> nodes. Branch and bound generated 10 nodes, counting the root, and called the method <code>tsp</code> 7 times. A search without pruning generates all 16 nodes and calls the method 16 times.</p>
 
-<p>The code does not store the best tour itself. To store it, an <code>int[] path</code> array is kept. In the loop, <code>path[count] = c</code> is written before entering the branch. In the base case, if the tour is shorter than <code>best</code>, it is copied with <code>bestPath = path.clone()</code>. The copy is necessary, because the <code>path</code> array keeps changing during the rest of the search.</p>
+<p>The code does not store the best tour itself. To store it, an <code>int[] path</code> array is kept. In the loop, <code>path[count] = s</code> is written before entering the branch. In the base case, if the tour is shorter than <code>best</code>, it is copied with <code>bestPath = path.clone()</code>. The copy is necessary, because the <code>path</code> array keeps changing during the rest of the search.</p>
 
 <h3 id="s10-4-3"><span class="nt-num">5.4.3</span>Code trace: lowerBound(3, 8)</h3>
 
 <p>The bound function is short:</p>
 
 <pre class="nt-code"><code><span class="kw">int</span> lowerBound(<span class="kw">int</span> last, <span class="kw">int</span> cost) {
-  <span class="kw">int</span> lower = cost + cheapest[last];
+  <span class="kw">int</span> lb = cost + minOut[last];
   <span class="kw">for</span> (<span class="kw">int</span> v = 0; v &lt; n; v++)
     <span class="kw">if</span> (!visited[v])       <span class="cm">// not yet visited</span>
-      lower += cheapest[v];
-  <span class="kw">return</span> lower;
+      lb += minOut[v];
+  <span class="kw">return</span> lb;
 }</code></pre>
 
-<p><code>lower</code> first adds the cost of the path and the cheapest departure from the last city. The loop goes through all the cities and adds the <code>cheapest</code> value of every unvisited city. A visited city is of two kinds. Either it is inside the path and its outgoing edge is already included in the cost, or it is the last city and its departure was added at the start. In neither case should it be added again. The function takes <span class="m">O(n)</span>.</p>
+<p><code>lb</code> first adds the cost of the path and the cheapest departure from the last city. The loop goes through all the cities and adds the <code>minOut</code> value of every unvisited city. A visited city is of two kinds. Either it is inside the path and its outgoing edge is already included in the cost, or it is the last city and its departure was added at the start. In neither case should it be added again. The function takes <span class="m">O(n)</span>.</p>
 
 <p>The call in step 5 of the <code>tsp</code> trace is <code>lowerBound(3, 8)</code>. The path is 0 → 1 → 3, its cost is <span class="m">3 + 5 = 8</span>, and <code>visited</code> = {0, 1, 3}.</p>
 
 <div class="nt-tablewrap" id="tab-altsinir">
 <table class="nt-table">
   <caption>Table 5.10: Trace of <code>lowerBound(3, 8)</code>.</caption>
-  <thead><tr><th scope="col">Step</th><th scope="col">Explanation</th><th scope="col"><code>lower</code></th></tr></thead>
+  <thead><tr><th scope="col">Step</th><th scope="col">Explanation</th><th scope="col"><code>lb</code></th></tr></thead>
   <tbody>
-    <tr><td>Start</td><td><span class="m">8 + </span><code>cheapest[3]</code><span class="m"> = 8 + 5</span>: the last city, 3, will be left once more</td><td>13</td></tr>
+    <tr><td>Start</td><td><span class="m">8 + </span><code>minOut[3]</code><span class="m"> = 8 + 5</span>: the last city, 3, will be left once more</td><td>13</td></tr>
     <tr><td><span class="m">v = 0</span></td><td>visited; its outgoing edge (0 → 1) is in the cost</td><td>13</td></tr>
     <tr><td><span class="m">v = 1</span></td><td>visited; its outgoing edge (1 → 3) is in the cost</td><td>13</td></tr>
-    <tr><td><span class="m">v = 2</span></td><td>not visited; it must be left by at least <code>cheapest[2]</code> = 2</td><td>15</td></tr>
+    <tr><td><span class="m">v = 2</span></td><td>not visited; it must be left by at least <code>minOut[2]</code> = 2</td><td>15</td></tr>
     <tr><td><span class="m">v = 3</span></td><td>visited; its departure was added at the start</td><td>15</td></tr>
   </tbody>
 </table>
 </div>
 
 <figure class="nt-fig" id="sekil-altsinir" style="--w:360px">
-  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 204" role="img" aria-label="TSP lower bound: path 0-1-3 and the cheapest outgoing edges of the cities"><line class="t14-eh" x1="46" y1="36" x2="206" y2="36"/><text class="t14-dim" x="126" y="29" text-anchor="middle">3</text><line class="t14-e" x1="46" y1="36" x2="46" y2="150"/><text class="t14-dim" x="38" y="97" text-anchor="end">2</text><line class="t14-e" x1="46" y1="36" x2="206" y2="150"/><text class="t14-dim" x="93.2" y="64.78" text-anchor="start">15</text><line class="t14-e" x1="206" y1="36" x2="46" y2="150"/><text class="t14-dim" x="166.8" y="64.78" text-anchor="start">21</text><line class="t14-eh" x1="206" y1="36" x2="206" y2="150"/><text class="t14-dim" x="198" y="97" text-anchor="end">5</text><line class="t14-e" x1="46" y1="150" x2="206" y2="150"/><text class="t14-dim" x="126" y="143" text-anchor="middle">8</text><circle class="box" cx="46" cy="36" r="16"/><text class="txt" x="46" y="41" text-anchor="middle">0</text><circle class="box" cx="206" cy="36" r="16"/><text class="txt" x="206" y="41" text-anchor="middle">1</text><circle class="t14-ok" cx="46" cy="150" r="16"/><text class="txt" x="46" y="155" text-anchor="middle">2</text><circle class="box" cx="206" cy="150" r="16"/><text class="txt" x="206" y="155" text-anchor="middle">3</text><text class="t14-acc" x="126" y="196" text-anchor="middle">path 0 → 1 → 3, cost 8</text><text class="lbl" x="262" y="22" text-anchor="middle">v</text><text class="lbl" x="298" y="22" text-anchor="middle">cheapest</text><text class="lbl" x="338" y="22" text-anchor="middle">vis.</text><rect class="box" x="250" y="30" width="104" height="26" rx="4"/><text class="txt" x="262" y="48" text-anchor="middle">0</text><text class="txt" x="298" y="48" text-anchor="middle">2</text><text class="txt" x="338" y="48" text-anchor="middle">✓</text><rect class="box" x="250" y="60" width="104" height="26" rx="4"/><text class="txt" x="262" y="78" text-anchor="middle">1</text><text class="txt" x="298" y="78" text-anchor="middle">3</text><text class="txt" x="338" y="78" text-anchor="middle">✓</text><rect class="t14-ok" x="250" y="90" width="104" height="26" rx="4"/><text class="txt" x="262" y="108" text-anchor="middle">2</text><text class="txt" x="298" y="108" text-anchor="middle">2</text><text class="txt" x="338" y="108" text-anchor="middle">—</text><rect class="box" x="250" y="120" width="104" height="26" rx="4"/><text class="txt" x="262" y="138" text-anchor="middle">3</text><text class="txt" x="298" y="138" text-anchor="middle">5</text><text class="txt" x="338" y="138" text-anchor="middle">✓</text></svg></div>
-  <figcaption><b>Figure 5.12:</b> <code>lowerBound(3, 8)</code>. The red edges are the path 0 → 1 → 3 (cost 8). The table on the right shows the <code>cheapest</code> value of each city and whether it is visited; only city 2 contributes to the bound.</figcaption>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 360 204" role="img" aria-label="TSP lower bound: path 0-1-3 and the cheapest outgoing edges of the cities"><line class="t14-eh" x1="46" y1="36" x2="206" y2="36"/><text class="t14-dim" x="126" y="29" text-anchor="middle">3</text><line class="t14-e" x1="46" y1="36" x2="46" y2="150"/><text class="t14-dim" x="38" y="97" text-anchor="end">2</text><line class="t14-e" x1="46" y1="36" x2="206" y2="150"/><text class="t14-dim" x="93.2" y="64.78" text-anchor="start">15</text><line class="t14-e" x1="206" y1="36" x2="46" y2="150"/><text class="t14-dim" x="166.8" y="64.78" text-anchor="start">21</text><line class="t14-eh" x1="206" y1="36" x2="206" y2="150"/><text class="t14-dim" x="198" y="97" text-anchor="end">5</text><line class="t14-e" x1="46" y1="150" x2="206" y2="150"/><text class="t14-dim" x="126" y="143" text-anchor="middle">8</text><circle class="box" cx="46" cy="36" r="16"/><text class="txt" x="46" y="41" text-anchor="middle">0</text><circle class="box" cx="206" cy="36" r="16"/><text class="txt" x="206" y="41" text-anchor="middle">1</text><circle class="t14-ok" cx="46" cy="150" r="16"/><text class="txt" x="46" y="155" text-anchor="middle">2</text><circle class="box" cx="206" cy="150" r="16"/><text class="txt" x="206" y="155" text-anchor="middle">3</text><text class="t14-acc" x="126" y="196" text-anchor="middle">path 0 → 1 → 3, cost 8</text><text class="lbl" x="262" y="22" text-anchor="middle">v</text><text class="lbl" x="298" y="22" text-anchor="middle">minOut</text><text class="lbl" x="338" y="22" text-anchor="middle">vis.</text><rect class="box" x="250" y="30" width="104" height="26" rx="4"/><text class="txt" x="262" y="48" text-anchor="middle">0</text><text class="txt" x="298" y="48" text-anchor="middle">2</text><text class="txt" x="338" y="48" text-anchor="middle">✓</text><rect class="box" x="250" y="60" width="104" height="26" rx="4"/><text class="txt" x="262" y="78" text-anchor="middle">1</text><text class="txt" x="298" y="78" text-anchor="middle">3</text><text class="txt" x="338" y="78" text-anchor="middle">✓</text><rect class="t14-ok" x="250" y="90" width="104" height="26" rx="4"/><text class="txt" x="262" y="108" text-anchor="middle">2</text><text class="txt" x="298" y="108" text-anchor="middle">2</text><text class="txt" x="338" y="108" text-anchor="middle">—</text><rect class="box" x="250" y="120" width="104" height="26" rx="4"/><text class="txt" x="262" y="138" text-anchor="middle">3</text><text class="txt" x="298" y="138" text-anchor="middle">5</text><text class="txt" x="338" y="138" text-anchor="middle">✓</text></svg></div>
+  <figcaption><b>Figure 5.12:</b> <code>lowerBound(3, 8)</code>. The red edges are the path 0 → 1 → 3 (cost 8). The table on the right shows the <code>minOut</code> value of each city and whether it is visited; only city 2 contributes to the bound.</figcaption>
 </figure>
 
 <p>The function returns 15. Every tour in this branch costs at least 15. The real tour is 0 → 1 → 3 → 2 → 0 and costs 18. During the search <code>best</code> is 47, so <span class="m">15 &lt; 47</span> holds and the branch is entered.</p>
 
 <div class="nt-box nt-box--ornek" id="ornek-031">
   <span class="nt-box__title">Example 5.3</span>
-  <p>What is the lower bound of the path 0 → 3 → 1 in the same matrix? The cost of the path is <span class="m">15 + 5 = 20</span>. The last city is 1: <code>cheapest[1]</code> = 3. The only unvisited city is 2: <code>cheapest[2]</code> = 2. The bound is <span class="m">20 + 3 + 2 = 25</span>. Because <span class="m">25 ≥ 18</span>, this path is pruned once the optimum has been found. The search never reaches this node anyway, because it already pruned 0 → 3 (bound 25) at the root.</p>
+  <p>What is the lower bound of the path 0 → 3 → 1 in the same matrix? The cost of the path is <span class="m">15 + 5 = 20</span>. The last city is 1: <code>minOut[1]</code> = 3. The only unvisited city is 2: <code>minOut[2]</code> = 2. The bound is <span class="m">20 + 3 + 2 = 25</span>. Because <span class="m">25 ≥ 18</span>, this path is pruned once the optimum has been found. The search never reaches this node anyway, because it already pruned 0 → 3 (bound 25) at the root.</p>
 </div>
 
 <h3 id="s10-4-4"><span class="nt-num">5.4.4</span>A tighter bound: the two shortest edges</h3>
@@ -913,7 +913,7 @@ queue.add(root);
 <p>The code that computes this bound at the root is:</p>
 
 <pre class="nt-code"><code>double twoEdgeBound() {
-  <span class="kw">int</span> total = 0;
+  <span class="kw">int</span> sum = 0;
   <span class="kw">for</span> (<span class="kw">int</span> v = 0; v &lt; n; v++) {
     <span class="kw">int</span> m1 = INF, m2 = INF;     <span class="cm">// two smallest</span>
     <span class="kw">for</span> (<span class="kw">int</span> u = 0; u &lt; n; u++) {
@@ -921,9 +921,9 @@ queue.add(root);
       <span class="kw">if</span> (d[v][u] &lt; m1) { m2 = m1; m1 = d[v][u]; }
       <span class="kw">else</span> <span class="kw">if</span> (d[v][u] &lt; m2) m2 = d[v][u];
     }
-    total += m1 + m2;
+    sum += m1 + m2;
   }
-  <span class="kw">return</span> total / 2.0;  <span class="cm">// each edge twice</span>
+  <span class="kw">return</span> sum / 2.0;  <span class="cm">// each edge twice</span>
 }</code></pre>
 
 <p>The outer loop goes through the cities. The inner loop finds, among the edges touching the city, the two smallest values, with <code>m1</code> ≤ <code>m2</code>. If a new edge is smaller than <code>m1</code>, the old <code>m1</code> moves to second place and the new edge becomes first. If it is smaller only than <code>m2</code>, it is written to second place. This is the update of a two-element “smallest values list.” Because the total counts every edge twice, the result is divided by 2.0; <code>double</code> division keeps the half if the total is odd. The time is <span class="m">O(n<sup>2</sup>)</span>.</p>
@@ -931,7 +931,7 @@ queue.add(root);
 <div class="nt-tablewrap" id="tab-ikikenar">
 <table class="nt-table">
   <caption>Table 5.11: Trace of <code>twoEdgeBound()</code>.</caption>
-  <thead><tr><th scope="col"><span class="m">v</span></th><th scope="col">Edges</th><th scope="col"><code>m1</code></th><th scope="col"><code>m2</code></th><th scope="col"><code>total</code></th></tr></thead>
+  <thead><tr><th scope="col"><span class="m">v</span></th><th scope="col">Edges</th><th scope="col"><code>m1</code></th><th scope="col"><code>m2</code></th><th scope="col"><code>sum</code></th></tr></thead>
   <tbody>
     <tr><td>0</td><td>3, 2, 15</td><td>2</td><td>3</td><td>5</td></tr>
     <tr><td>1</td><td>3, 21, 5</td><td>3</td><td>5</td><td>13</td></tr>
@@ -948,7 +948,7 @@ queue.add(root);
   <figcaption><b>Figure 5.13:</b> The two shortest edges of the last city, 3 (5 and 8), and the edges chosen by the four cities. The thick edges are 0-1, 1-3, 3-2, 2-0, and they form exactly the shortest tour. The total is 36, the bound is 18.</figcaption>
 </figure>
 
-<p>The result is striking: the bound is 18, equal to the length of the shortest tour. As <a href="#sekil-ikikenar">Figure 5.13</a> shows, the two edges chosen by each city together form a real tour. The solution of the relaxation has turned out to be feasible; that is why the bound is tight. Since at the root the bound equals the optimum, as soon as the first complete tour is found all the remaining branches are pruned by the condition <span class="m">lower ≥ best</span>. On partial paths the same idea is applied by fixing the edges on the path. One or both of the edges of a city on the path are already known. The shortest edges are sought only for those that are missing.</p>
+<p>The result is striking: the bound is 18, equal to the length of the shortest tour. As <a href="#sekil-ikikenar">Figure 5.13</a> shows, the two edges chosen by each city together form a real tour. The solution of the relaxation has turned out to be feasible; that is why the bound is tight. Since at the root the bound equals the optimum, as soon as the first complete tour is found all the remaining branches are pruned by the condition <span class="m">lb ≥ best</span>. On partial paths the same idea is applied by fixing the edges on the path. One or both of the edges of a city on the path are already known. The shortest edges are sought only for those that are missing.</p>
 
 <h3 id="s10-4-5"><span class="nt-num">5.4.5</span>The reduced cost matrix</h3>
 
@@ -957,20 +957,20 @@ queue.add(root);
 <p>The procedure is as follows. The diagonal is set to ∞; one cannot go from a city to itself. From each row the minimum of that row is subtracted. Then from each column the minimum of that column is subtracted. In the end every row and every column contains at least one 0. This matrix is called the <strong>reduced cost matrix</strong>.</p>
 
 <pre class="nt-code"><code><span class="kw">int</span> reduce(<span class="kw">int</span>[][] m) {
-  <span class="kw">int</span> total = 0;
+  <span class="kw">int</span> sum = 0;
   <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++) {       <span class="cm">// rows</span>
     <span class="kw">int</span> mn = rowMin(m, i);
     <span class="kw">if</span> (mn &gt; 0 &amp;&amp; mn &lt; INF) {
-      subtractRow(m, i, mn); total += mn;
+      subtractRow(m, i, mn); sum += mn;
     }
   }
   <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; n; j++) {       <span class="cm">// columns</span>
     <span class="kw">int</span> mn = colMin(m, j);
     <span class="kw">if</span> (mn &gt; 0 &amp;&amp; mn &lt; INF) {
-      subtractCol(m, j, mn); total += mn;
+      subtractCol(m, j, mn); sum += mn;
     }
   }
-  <span class="kw">return</span> total;
+  <span class="kw">return</span> sum;
 }</code></pre>
 
 <p><code>rowMin</code>, <code>subtractRow</code>, <code>colMin</code>, and <code>subtractCol</code> are simple helper methods. The subtraction is applied only to cells that are not ∞. The condition <code>mn &gt; 0</code> skips subtracting zero. The condition <code>mn &lt; INF</code> skips rows and columns that are entirely ∞; such rows arise during branching. The method modifies the matrix in place and returns the total subtracted. Both passes take <span class="m">O(n<sup>2</sup>)</span>.</p>
@@ -978,7 +978,7 @@ queue.add(root);
 <div class="nt-tablewrap" id="tab-indirge">
 <table class="nt-table">
   <caption>Table 5.12: Trace of <code>reduce()</code> (the four-city example).</caption>
-  <thead><tr><th scope="col">Step</th><th scope="col">Minimum</th><th scope="col">Result</th><th scope="col"><code>total</code></th></tr></thead>
+  <thead><tr><th scope="col">Step</th><th scope="col">Minimum</th><th scope="col">Result</th><th scope="col"><code>sum</code></th></tr></thead>
   <tbody>
     <tr><td>Row 0: ∞, 3, 2, 15</td><td>2</td><td>∞, 1, 0, 13</td><td>2</td></tr>
     <tr><td>Row 1: 3, ∞, 21, 5</td><td>3</td><td>0, ∞, 18, 2</td><td>5</td></tr>
@@ -990,7 +990,7 @@ queue.add(root);
 </table>
 </div>
 
-<p>When the row reduction is finished, the total is 12. This number is the same as the cheapest-outgoing-edge bound; the row minima are exactly the <code>cheapest</code> values. The column step adds new information. After the row reduction there is no 0 in column 3: not every city's cheapest departure goes to 3. Yet in a tour city 3 must be entered, and this entry costs at least 2. The column step brings the constraint “every city is entered once” into the bound as well and raises the bound to 14. <a href="#tab-indirgenmis">Table 5.13</a> is the final form of the reduced matrix.</p>
+<p>When the row reduction is finished, the total is 12. This number is the same as the cheapest-outgoing-edge bound; the row minima are exactly the <code>minOut</code> values. The column step adds new information. After the row reduction there is no 0 in column 3: not every city's cheapest departure goes to 3. Yet in a tour city 3 must be entered, and this entry costs at least 2. The column step brings the constraint “every city is entered once” into the bound as well and raises the bound to 14. <a href="#tab-indirgenmis">Table 5.13</a> is the final form of the reduced matrix.</p>
 
 <div class="nt-tablewrap" id="tab-indirgenmis">
 <table class="nt-table">
@@ -1036,14 +1036,14 @@ queue.add(root);
   <caption>Table 5.14: Tightness and cost of the three TSP lower bounds.</caption>
   <thead><tr><th scope="col">Bound</th><th scope="col">Cost per node</th><th scope="col">What it uses</th><th scope="col">Note</th></tr></thead>
   <tbody>
-    <tr><td>Cheapest outgoing edge</td><td><span class="m">O(n)</span> (<code>cheapest[]</code> is computed in advance)</td><td>one departure from each city</td><td>cheapest, loosest</td></tr>
+    <tr><td>Cheapest outgoing edge</td><td><span class="m">O(n)</span> (<code>minOut[]</code> is computed in advance)</td><td>one departure from each city</td><td>cheapest, loosest</td></tr>
     <tr><td>Reduced matrix</td><td><span class="m">O(n<sup>2</sup>)</span></td><td>one arrival + one departure for each city</td><td>valid for asymmetric problems too</td></tr>
     <tr><td>Two shortest edges</td><td><span class="m">O(n<sup>2</sup>)</span></td><td>the two edges touching each city</td><td>for the symmetric problem</td></tr>
   </tbody>
 </table>
 </div>
 
-<p>A tight bound prunes more but is more expensive at each node. The cheapest-outgoing-edge bound is computed in <span class="m">O(n)</span> thanks to the <code>cheapest</code> array. The other two look at the whole matrix at every node. The ranking does not have to be the same in every example. The reduced matrix bound and the two-shortest-edges bound use different information, and in another example their order can change. The cheapest-outgoing-edge bound, on the other hand, cannot be larger than either of them. The row step of the reduction alone gives it. In the two-edge bound, too, the average of a city's two edges is not smaller than its cheapest edge.</p>
+<p>A tight bound prunes more but is more expensive at each node. The cheapest-outgoing-edge bound is computed in <span class="m">O(n)</span> thanks to the <code>minOut</code> array. The other two look at the whole matrix at every node. The ranking does not have to be the same in every example. The reduced matrix bound and the two-shortest-edges bound use different information, and in another example their order can change. The cheapest-outgoing-edge bound, on the other hand, cannot be larger than either of them. The row step of the reduction alone gives it. In the two-edge bound, too, the average of a city's two edges is not smaller than its cheapest edge.</p>
 
 <p>For larger examples, even tighter bounds are used. The <strong>1-tree</strong> bound leaves one city out, builds a minimum spanning tree for the rest, and connects the outside city by its two shortest edges. Every tour is a 1-tree; so the smallest 1-tree is a valid lower bound. The linear programming relaxation is the basis of the software that today solves examples with thousands of cities exactly. Which bound to choose is decided by the balance between the number of nodes pruned and the work done per node.</p>
 
@@ -1095,9 +1095,9 @@ queue.add(root);
 
 <p>The lower bound rests on the following observation: every person who has not yet been given a job pays at least the smallest cost in their own row. This is a relaxation. The constraint “a single person per job” is removed; two people may choose the same cheap job. Because job clashes are ignored, the bound cannot rise above the true cost. To compute the bound quickly at every node, the suffix sums of the row minima are kept in advance:</p>
 
-<p class="nt-math nt-math--c"><span class="m">remainingMin[i] = Σ<sub>r ≥ i</sub> min<sub>j</sub> c[r][j]</span>, &nbsp; <span class="m">remainingMin[n] = 0</span></p>
+<p class="nt-math nt-math--c"><span class="m">restMin[i] = Σ<sub>r ≥ i</sub> min<sub>j</sub> c[r][j]</span>, &nbsp; <span class="m">restMin[n] = 0</span></p>
 
-<p>After person <span class="m">i</span> has been given a job, if the cost of the path is <code>next</code>, the lower bound of that node is <span class="m">next + remainingMin[i + 1]</span>. The computation takes <span class="m">O(1)</span>. If <span class="m">lower ≥ best</span>, the branch is cut.</p>
+<p>After person <span class="m">i</span> has been given a job, if the cost of the path is <code>next</code>, the lower bound of that node is <span class="m">next + restMin[i + 1]</span>. The computation takes <span class="m">O(1)</span>. If <span class="m">lb ≥ best</span>, the branch is cut.</p>
 
 <div class="nt-tablewrap" id="tab-atama">
 <table class="nt-table">
@@ -1111,7 +1111,7 @@ queue.add(root);
 </table>
 </div>
 
-<p>In the example the row minima are 4, 3, 2. The suffix sums are <span class="m">remainingMin = [9, 5, 2, 0]</span>. The lower bound of the root is 9: whichever assignment is made, the total cannot fall below 9.</p>
+<p>In the example the row minima are 4, 3, 2. The suffix sums are <span class="m">restMin = [9, 5, 2, 0]</span>. The lower bound of the root is 9: whichever assignment is made, the total cannot fall below 9.</p>
 
 <p>The assignment problem also has a polynomial-time algorithm: the <strong>Hungarian method</strong> solves the problem in <span class="m">O(n<sup>3</sup>)</span> time. So branch and bound is not needed for the pure assignment problem; it is used here to demonstrate the method. For variants with extra constraints the situation changes. For example, if some jobs cannot be given to the same person, or to two people who are tied to each other, the Hungarian method cannot be applied directly. For such problems branch and bound is truly needed. In branching, the result of the Hungarian method can also be used as a lower bound.</p>
 
@@ -1123,22 +1123,22 @@ queue.add(root);
     <span class="kw">return</span>;
   }
   <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; n; j++) {
-    <span class="kw">if</span> (used[j]) continue;
+    <span class="kw">if</span> (taken[j]) continue;
     <span class="kw">int</span> next = cost + c[i][j];
-    <span class="kw">if</span> (next + remainingMin[i + 1] &gt;= best)
+    <span class="kw">if</span> (next + restMin[i + 1] &gt;= best)
       continue;                     <span class="cm">// bound</span>
-    used[j] = <span class="kw">true</span>;
+    taken[j] = <span class="kw">true</span>;
     assign(i + 1, next);
-    used[j] = <span class="kw">false</span>;          <span class="cm">// unchoose</span>
+    taken[j] = <span class="kw">false</span>;          <span class="cm">// undo</span>
   }
 }</code></pre>
 
-<p>The structure of the method is the same as that of the <code>tsp</code> method. <code>i</code> is the next person and <code>cost</code> is the total of the assignments made so far. The <code>used</code> array marks the jobs already given; this is the infeasibility rule. The bound test is made before a job is added to the partial assignment. If the branch is cut, <code>used</code> never changes, so no undo is needed. In the base case <code>best</code> is updated with <code>Math.min</code>.</p>
+<p>The structure of the method is the same as that of the <code>tsp</code> method. <code>i</code> is the next person and <code>cost</code> is the total of the assignments made so far. The <code>taken</code> array marks the jobs already given; this is the infeasibility rule. The bound test is made before a job is added to the partial assignment. If the branch is cut, <code>taken</code> never changes, so no undo is needed. In the base case <code>best</code> is updated with <code>Math.min</code>.</p>
 
 <div class="nt-tablewrap" id="tab-ataizleme">
 <table class="nt-table">
-  <caption>Table 5.18: Trace of <code>assign(0, 0)</code> (<span class="m">remainingMin = [9, 5, 2, 0]</span>, with <code>best</code> = ∞ at the start).</caption>
-  <thead><tr><th scope="col">Step</th><th scope="col">Assignment</th><th scope="col"><code>next</code></th><th scope="col">lower</th><th scope="col"><code>best</code></th><th scope="col">Decision</th></tr></thead>
+  <caption>Table 5.18: Trace of <code>assign(0, 0)</code> (<span class="m">restMin = [9, 5, 2, 0]</span>, with <code>best</code> = ∞ at the start).</caption>
+  <thead><tr><th scope="col">Step</th><th scope="col">Assignment</th><th scope="col"><code>next</code></th><th scope="col">lb</th><th scope="col"><code>best</code></th><th scope="col">Decision</th></tr></thead>
   <tbody>
     <tr><td>1</td><td>p0 → job 0</td><td>5</td><td><span class="m">5 + 5 = 10</span></td><td>∞</td><td>branch</td></tr>
     <tr><td>2</td><td>p1 → job 1 (job 0 taken)</td><td>8</td><td><span class="m">8 + 2 = 10</span></td><td>∞</td><td>branch</td></tr>
@@ -1215,7 +1215,7 @@ queue.add(root);
 
 <ol class="nt-steps">
   <li><strong>Root.</strong> The LP optimum is (3, 1.5), <span class="m">Z = 21</span>. This value is an upper bound: no integer solution can exceed 21. <span class="m">y</span> is fractional; we branch on <span class="m">y</span>.</li>
-  <li><strong>Branch <span class="m">y ≤ 1</span>.</strong> In the new LP we press against the limit <span class="m">y = 1</span>. From <span class="m">6x + 4 ≤ 24</span> comes <span class="m">x ≤ 3.33</span>, and from <span class="m">x + 2 ≤ 6</span> comes <span class="m">x ≤ 4</span>. The LP optimum is (3.33, 1), <span class="m">Z = 20.67</span>. <span class="m">x</span> is fractional; the branches <span class="m">x ≤ 3</span> and <span class="m">x ≥ 4</span> are opened.</li>
+  <li><strong>Branch <span class="m">y ≤ 1</span>.</strong> In the new LP we substitute the limit <span class="m">y = 1</span>. From <span class="m">6x + 4 ≤ 24</span> comes <span class="m">x ≤ 3.33</span>, and from <span class="m">x + 2 ≤ 6</span> comes <span class="m">x ≤ 4</span>. The LP optimum is (3.33, 1), <span class="m">Z = 20.67</span>. <span class="m">x</span> is fractional; the branches <span class="m">x ≤ 3</span> and <span class="m">x ≥ 4</span> are opened.</li>
   <li><strong>Branch <span class="m">y ≤ 1, x ≤ 3</span>.</strong> The LP optimum is (3, 1), <span class="m">Z = 19</span>. The solution is integral: the first candidate, <code>best</code> = 19.</li>
   <li><strong>Branch <span class="m">y ≤ 1, x ≥ 4</span>.</strong> The constraint <span class="m">6 · 4 + 4y ≤ 24</span> forces <span class="m">y = 0</span>. The LP optimum is (4, 0), <span class="m">Z = 20</span>. It is integral and <span class="m">20 &gt; 19</span>: <code>best</code> = 20.</li>
   <li><strong>Branch <span class="m">y ≥ 2</span>.</strong> The constraint <span class="m">x + 2y ≤ 6</span> forces <span class="m">x ≤ 2</span>. The LP optimum is (2, 2), <span class="m">Z = 18</span>. Because <span class="m">18 ≤ 20</span>, the branch is pruned. Even if the LP solution of this branch were integral, it could not beat <code>best</code>.</li>
@@ -1233,7 +1233,7 @@ queue.add(root);
   <p>Branching wrongly on a fractional variable. For <span class="m">y = 2.6</span> the correct subproblems are <span class="m">y ≤ 2</span> and <span class="m">y ≥ 3</span>. Branching as <span class="m">y = 2</span> and <span class="m">y = 3</span> loses all the other values of <span class="m">y</span>. Branching as <span class="m">y ≤ 2.6</span> and <span class="m">y ≥ 2.6</span> leaves the existing LP solution in both subproblems and the search makes no progress. <span class="m">y ≤ 3</span> and <span class="m">y ≥ 2</span>, in turn, give two overlapping subproblems; the same points are searched twice.</p>
 </div>
 
-<p>A second example shows the completeness rule: maximize <span class="m">Z = 3x + 2y</span>; <span class="m">x + y ≤ 4</span>, <span class="m">x ≤ 3</span>, <span class="m">y ≤ 2</span>. Brute force tries all 12 points of the grid <span class="m">0 ≤ x ≤ 3</span>, <span class="m">0 ≤ y ≤ 2</span> and finds <span class="m">Z = 11</span> at the point (3, 1). The optimum of the LP relaxation is also (3, 1): the corner resting on the limit of <span class="m">x</span> (3) and the line <span class="m">x + y ≤ 4</span>. Because the solution is already integral, branch and bound ends at the root; a single LP has been solved.</p>
+<p>A second example shows the completeness rule: maximize <span class="m">Z = 3x + 2y</span>; <span class="m">x + y ≤ 4</span>, <span class="m">x ≤ 3</span>, <span class="m">y ≤ 2</span>. Brute force tries all 12 points of the grid <span class="m">0 ≤ x ≤ 3</span>, <span class="m">0 ≤ y ≤ 2</span> and finds <span class="m">Z = 11</span> at the point (3, 1). The optimum of the LP relaxation is also (3, 1): the corner where the limit <span class="m">x ≤ 3</span> meets the line <span class="m">x + y = 4</span>. Because the solution is already integral, branch and bound ends at the root; a single LP has been solved.</p>
 
 <p>Real software improves this basic scheme in several directions. The fractional variable to branch on is chosen intelligently. Extra constraints (cutting planes), which cut off the fractional solution without cutting off integer points, are added to the LP relaxation. This combination is called branch and cut. In addition, the LP of a subproblem is re-solved in a few steps starting from the solution of its parent.</p>
 
@@ -1260,15 +1260,15 @@ queue.add(root);
 <pre class="nt-code"><code><span class="kw">void</span> clique(List&lt;Integer&gt; K, <span class="kw">int</span> start) {
   <span class="kw">if</span> (K.size() &gt; best.size())
     best = <span class="kw">new</span> ArrayList&lt;&gt;(K);
-  List&lt;Integer&gt; cands = <span class="kw">new</span> ArrayList&lt;&gt;();
+  List&lt;Integer&gt; cand = <span class="kw">new</span> ArrayList&lt;&gt;();
   <span class="kw">for</span> (<span class="kw">int</span> v = start; v &lt; n; v++)
-    <span class="kw">if</span> (compatible(v, K)) cands.add(v);  <span class="cm">// adjacent to K</span>
-  <span class="kw">if</span> (K.size() + cands.size() &lt;= best.size())
+    <span class="kw">if</span> (adjToAll(v, K)) cand.add(v);  <span class="cm">// adjacent to K</span>
+  <span class="kw">if</span> (K.size() + cand.size() &lt;= best.size())
     <span class="kw">return</span>;                        <span class="cm">// bound</span>
-  <span class="kw">for</span> (<span class="kw">int</span> v : cands) {
+  <span class="kw">for</span> (<span class="kw">int</span> v : cand) {
     K.add(v);
     clique(K, v + 1);
-    K.remove(K.size() - 1);        <span class="cm">// unchoose</span>
+    K.remove(K.size() - 1);        <span class="cm">// undo</span>
   }
 }</code></pre>
 
@@ -1276,12 +1276,12 @@ queue.add(root);
 
 <ul>
   <li>The first two lines update <code>best</code>. A clique is a feasible solution at every moment; there is no need to descend to a leaf. <code>new ArrayList&lt;&gt;(K)</code> makes a copy, because <code>K</code> changes during the rest of the search.</li>
-  <li>The <code>for</code> loop collects the candidates. <code>compatible(v, K)</code> checks whether <span class="m">v</span> is adjacent to every vertex in <code>K</code>. The loop starts at <code>start</code>; smaller numbers have already been tried.</li>
-  <li><code>if (K.size() + cands.size() &lt;= best.size()) return;</code> is the bound rule.</li>
+  <li>The <code>for</code> loop collects the candidates. <code>adjToAll(v, K)</code> checks whether <span class="m">v</span> is adjacent to every vertex in <code>K</code>. The loop starts at <code>start</code>; smaller numbers have already been tried.</li>
+  <li><code>if (K.size() + cand.size() &lt;= best.size()) return;</code> is the bound rule.</li>
   <li>The last loop is the branching. Each candidate is added to <code>K</code> in turn, the search continues from <code>v + 1</code>, and the candidate is removed again.</li>
 </ul>
 
-<p>In one call the candidate list is built in <span class="m">O(n · |K|)</span> time; if adjacency is kept in a matrix, each <code>compatible</code> check is <span class="m">O(|K|)</span>. Without the bound line, the method is ordinary backtracking and traverses all the cliques.</p>
+<p>In one call the candidate list is built in <span class="m">O(n · |K|)</span> time; if adjacency is kept in a matrix, each <code>adjToAll</code> check is <span class="m">O(|K|)</span>. Without the bound line, the method is ordinary backtracking and traverses all the cliques.</p>
 
 <h3 id="s10-7-2"><span class="nt-num">5.7.2</span>Code trace: clique({}, 0)</h3>
 
@@ -1290,7 +1290,7 @@ queue.add(root);
 <div class="nt-tablewrap" id="tab-klik">
 <table class="nt-table">
   <caption>Table 5.20: Trace of <code>clique({}, 0)</code>.</caption>
-  <thead><tr><th scope="col">Call</th><th scope="col"><span class="m">K</span></th><th scope="col">Candidates</th><th scope="col"><span class="m">|K| + |cands|</span></th><th scope="col"><code>best</code></th><th scope="col">Decision</th></tr></thead>
+  <thead><tr><th scope="col">Call</th><th scope="col"><span class="m">K</span></th><th scope="col">Candidates</th><th scope="col"><span class="m">|K| + |cand|</span></th><th scope="col"><code>best</code></th><th scope="col">Decision</th></tr></thead>
   <tbody>
     <tr><td>1</td><td>{}</td><td>{0, 1, 2, 3, 4, 5}</td><td>0 + 6</td><td>{}</td><td>continue</td></tr>
     <tr><td>2</td><td>{0}</td><td>{1, 2, 3, 4}</td><td>1 + 4</td><td>{0}</td><td>continue</td></tr>
@@ -1310,21 +1310,21 @@ queue.add(root);
 <p>The first five calls dive deep, always adding the first candidate, and in call 6 reach the clique with five vertices. This is the largest clique of the graph. The bound of every branch opened afterward is at most 5, and all of them are pruned at once. For example, in call 8 <span class="m">K = {0, 1, 3}</span>; the only candidate is 4. In the best case a clique of four vertices is obtained, and this cannot exceed 5. The remaining candidates 1–5 at the root are also tried one by one, and all are cut in the same way. For example, when <span class="m">K = {3}</span>, the candidates are 4 and 5. 3, 4, 5 form a triangle, but the bound is <span class="m">1 + 2 = 3 ≤ 5</span>.</p>
 
 <figure class="nt-fig" id="sekil-klikizleme" style="--w:340px">
-  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 340 218" role="img" aria-label="Maximum clique search: K, the candidates, and the best clique"><g transform="translate(6,4) scale(0.92)"><line class="t14-eh" x1="50" y1="40" x2="180" y2="26"/><line class="t14-eh" x1="50" y1="40" x2="30" y2="150"/><line class="t14-e" x1="50" y1="40" x2="150" y2="160"/><line class="t14-eh" x1="50" y1="40" x2="250" y2="92"/><line class="t14-eh" x1="180" y1="26" x2="30" y2="150"/><line class="t14-e" x1="180" y1="26" x2="150" y2="160"/><line class="t14-eh" x1="180" y1="26" x2="250" y2="92"/><line class="t14-e" x1="30" y1="150" x2="150" y2="160"/><line class="t14-eh" x1="30" y1="150" x2="250" y2="92"/><line class="t14-e" x1="150" y1="160" x2="250" y2="92"/><line class="t14-e" x1="150" y1="160" x2="310" y2="190"/><line class="t14-e" x1="250" y1="92" x2="310" y2="190"/><circle class="t14-cur" cx="50" cy="40" r="16"/><text class="txt" x="50" y="45" text-anchor="middle">0</text><circle class="t14-eok" cx="50" cy="40" r="21"/><circle class="t14-cur" cx="180" cy="26" r="16"/><text class="txt" x="180" y="31" text-anchor="middle">1</text><circle class="t14-eok" cx="180" cy="26" r="21"/><circle class="t14-cur" cx="30" cy="150" r="16"/><text class="txt" x="30" y="155" text-anchor="middle">2</text><circle class="t14-eok" cx="30" cy="150" r="21"/><circle class="t14-off" cx="150" cy="160" r="16"/><text class="txt" x="150" y="165" text-anchor="middle">3</text><circle class="t14-eok" cx="150" cy="160" r="21"/><circle class="t14-cur" cx="250" cy="92" r="16"/><text class="txt" x="250" y="97" text-anchor="middle">4</text><circle class="t14-eok" cx="250" cy="92" r="21"/><circle class="t14-off" cx="310" cy="190" r="16"/><text class="txt" x="310" y="195" text-anchor="middle">5</text></g><text class="t14-bad" x="170" y="210" text-anchor="middle">|K| + |cands| = 4 + 0 = 4  ;  |best| = 5</text></svg></div>
-  <figcaption><b>Figure 5.19:</b> Call 7: <span class="m">K = {0, 1, 2, 4}</span> (orange), no candidates. The green rings show the best clique (5 vertices). <span class="m">|K| + |cands| = 4 + 0 ≤ 5</span>; the branch is pruned.</figcaption>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 340 218" role="img" aria-label="Maximum clique search: K, the candidates, and the best clique"><g transform="translate(6,4) scale(0.92)"><line class="t14-eh" x1="50" y1="40" x2="180" y2="26"/><line class="t14-eh" x1="50" y1="40" x2="30" y2="150"/><line class="t14-e" x1="50" y1="40" x2="150" y2="160"/><line class="t14-eh" x1="50" y1="40" x2="250" y2="92"/><line class="t14-eh" x1="180" y1="26" x2="30" y2="150"/><line class="t14-e" x1="180" y1="26" x2="150" y2="160"/><line class="t14-eh" x1="180" y1="26" x2="250" y2="92"/><line class="t14-e" x1="30" y1="150" x2="150" y2="160"/><line class="t14-eh" x1="30" y1="150" x2="250" y2="92"/><line class="t14-e" x1="150" y1="160" x2="250" y2="92"/><line class="t14-e" x1="150" y1="160" x2="310" y2="190"/><line class="t14-e" x1="250" y1="92" x2="310" y2="190"/><circle class="t14-cur" cx="50" cy="40" r="16"/><text class="txt" x="50" y="45" text-anchor="middle">0</text><circle class="t14-eok" cx="50" cy="40" r="21"/><circle class="t14-cur" cx="180" cy="26" r="16"/><text class="txt" x="180" y="31" text-anchor="middle">1</text><circle class="t14-eok" cx="180" cy="26" r="21"/><circle class="t14-cur" cx="30" cy="150" r="16"/><text class="txt" x="30" y="155" text-anchor="middle">2</text><circle class="t14-eok" cx="30" cy="150" r="21"/><circle class="t14-off" cx="150" cy="160" r="16"/><text class="txt" x="150" y="165" text-anchor="middle">3</text><circle class="t14-eok" cx="150" cy="160" r="21"/><circle class="t14-cur" cx="250" cy="92" r="16"/><text class="txt" x="250" y="97" text-anchor="middle">4</text><circle class="t14-eok" cx="250" cy="92" r="21"/><circle class="t14-off" cx="310" cy="190" r="16"/><text class="txt" x="310" y="195" text-anchor="middle">5</text></g><text class="t14-bad" x="170" y="210" text-anchor="middle">|K| + |cand| = 4 + 0 = 4  ;  |best| = 5</text></svg></div>
+  <figcaption><b>Figure 5.19:</b> Call 7: <span class="m">K = {0, 1, 2, 4}</span> (orange), no candidates. The green rings show the best clique (5 vertices). <span class="m">|K| + |cand| = 4 + 0 ≤ 5</span>; the branch is pruned.</figcaption>
 </figure>
 
 <p>The result is {0, 1, 2, 3, 4}. The bounded search makes 17 calls. When the bound line is deleted, the search traverses all the cliques and makes 36 calls. This number is the number of cliques in the graph, counting the empty set: <span class="m">2<sup>5</sup> = 32</span> cliques in the complete five-vertex part, plus four cliques containing vertex 5: {5}, {3, 5}, {4, 5}, {3, 4, 5}.</p>
 
 <h3 id="s10-7-3"><span class="nt-num">5.7.3</span>A tighter bound: coloring</h3>
 
-<p>The bound <span class="m">|K| + |cands|</span> assumes that every candidate can enter the clique. If there are non-adjacent pairs among the candidates, this assumption is very optimistic. A tighter bound comes from <strong>graph coloring</strong>. Every pair of vertices of a clique is adjacent; so all the vertices in a clique must receive different colors. If the candidates can be properly colored with <span class="m">k</span> colors, at most <span class="m">k</span> of the candidates can enter the same clique. The new bound is: if <span class="m">|K| + colors(cands) ≤ |best|</span>, the branch is pruned.</p>
+<p>The bound <span class="m">|K| + |cand|</span> assumes that every candidate can enter the clique. If there are non-adjacent pairs among the candidates, this assumption is very optimistic. A tighter bound comes from <strong>graph coloring</strong>. Every pair of vertices of a clique is adjacent; so all the vertices in a clique must receive different colors. If the candidates can be properly colored with <span class="m">k</span> colors, at most <span class="m">k</span> of the candidates can enter the same clique. The new bound is: if <span class="m">|K| + colors(cand) ≤ |best|</span>, the branch is pruned.</p>
 
-<p>Finding the minimum number of colors is also NP-hard. But the best coloring is not needed. Greedy coloring goes through the vertices in order and gives each vertex the smallest color not used among its neighbors. It takes <span class="m">O(cands<sup>2</sup>)</span>. It may use extra colors; this only loosens the bound, it does not invalidate it. The bound still cannot exceed <span class="m">|cands|</span>, because in the worst case each vertex gets its own color.</p>
+<p>Finding the minimum number of colors is also NP-hard. But the best coloring is not needed. Greedy coloring goes through the vertices in order and gives each vertex the smallest color not used among its neighbors. It takes <span class="m">O(cand<sup>2</sup>)</span>. It may use extra colors; this only loosens the bound, it does not invalidate it. The bound still cannot exceed <span class="m">|cand|</span>, because in the worst case each vertex gets its own color.</p>
 
 <figure class="nt-fig" id="sekil-renk" style="--w:300px">
-  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 300 136" role="img" aria-label="Ring of five candidates; greedy coloring uses 3 colors"><line class="t14-e" x1="80" y1="15" x2="132.308" y2="53.0041"/><line class="t14-e" x1="132.308" y1="53.0041" x2="112.328" y2="114.496"/><line class="t14-e" x1="112.328" y1="114.496" x2="47.6718" y2="114.496"/><line class="t14-e" x1="47.6718" y1="114.496" x2="27.6919" y2="53.0041"/><line class="t14-e" x1="27.6919" y1="53.0041" x2="80" y2="15"/><circle class="t14-c1" cx="80" cy="15" r="14"/><text class="txt" x="80" y="20" text-anchor="middle">0</text><circle class="t14-c2" cx="132.308" cy="53.0041" r="14"/><text class="txt" x="132.308" y="58.0041" text-anchor="middle">1</text><circle class="t14-c1" cx="112.328" cy="114.496" r="14"/><text class="txt" x="112.328" y="119.496" text-anchor="middle">2</text><circle class="t14-c2" cx="47.6718" cy="114.496" r="14"/><text class="txt" x="47.6718" y="119.496" text-anchor="middle">3</text><circle class="t14-c3" cx="27.6919" cy="53.0041" r="14"/><text class="txt" x="27.6919" y="58.0041" text-anchor="middle">4</text><text class="t14-dim" x="170" y="50" text-anchor="start">3 colors:</text><text class="t14-acc" x="170" y="72" text-anchor="start">{0, 2} {1, 3} {4}</text><text class="lbl" x="170" y="100" text-anchor="start">|cands| = 5</text><text class="t14-good" x="170" y="120" text-anchor="start">color bound = 3</text></svg></div>
-  <figcaption><b>Figure 5.20:</b> A ring of five candidates. Greedy coloring uses 3 colors: {0, 2}, {1, 3}, {4}. <span class="m">|cands| = 5</span>, the color bound is 3.</figcaption>
+  <div class="nt-fig__box"><svg class="ds-svg" viewBox="0 0 300 136" role="img" aria-label="Ring of five candidates; greedy coloring uses 3 colors"><line class="t14-e" x1="80" y1="15" x2="132.308" y2="53.0041"/><line class="t14-e" x1="132.308" y1="53.0041" x2="112.328" y2="114.496"/><line class="t14-e" x1="112.328" y1="114.496" x2="47.6718" y2="114.496"/><line class="t14-e" x1="47.6718" y1="114.496" x2="27.6919" y2="53.0041"/><line class="t14-e" x1="27.6919" y1="53.0041" x2="80" y2="15"/><circle class="t14-c1" cx="80" cy="15" r="14"/><text class="txt" x="80" y="20" text-anchor="middle">0</text><circle class="t14-c2" cx="132.308" cy="53.0041" r="14"/><text class="txt" x="132.308" y="58.0041" text-anchor="middle">1</text><circle class="t14-c1" cx="112.328" cy="114.496" r="14"/><text class="txt" x="112.328" y="119.496" text-anchor="middle">2</text><circle class="t14-c2" cx="47.6718" cy="114.496" r="14"/><text class="txt" x="47.6718" y="119.496" text-anchor="middle">3</text><circle class="t14-c3" cx="27.6919" cy="53.0041" r="14"/><text class="txt" x="27.6919" y="58.0041" text-anchor="middle">4</text><text class="t14-dim" x="170" y="50" text-anchor="start">3 colors:</text><text class="t14-acc" x="170" y="72" text-anchor="start">{0, 2} {1, 3} {4}</text><text class="lbl" x="170" y="100" text-anchor="start">|cand| = 5</text><text class="t14-good" x="170" y="120" text-anchor="start">color bound = 3</text></svg></div>
+  <figcaption><b>Figure 5.20:</b> A ring of five candidates. Greedy coloring uses 3 colors: {0, 2}, {1, 3}, {4}. <span class="m">|cand| = 5</span>, the color bound is 3.</figcaption>
 </figure>
 
 <p>In the example in <a href="#sekil-renk">Figure 5.20</a> the candidates form a ring of five vertices; <span class="m">K</span> is empty and <span class="m">|best| = 3</span>. The old bound gives <span class="m">0 + 5 = 5 &gt; 3</span> and the branch is opened. Greedy coloring gives vertex 0 color 1, vertex 1 color 2, vertex 2 color 1, and vertex 3 color 2. Vertex 4 is adjacent to both 3 and 0; it takes color 3. The color bound gives <span class="m">0 + 3 ≤ 3</span> and the branch is pruned. The largest clique in the ring has only 2 vertices anyway. Most of the fastest exact clique algorithms rest on this idea. Tomita's MCQ and MCS algorithms try the candidates in color order and prune with the color bound.</p>
@@ -1394,12 +1394,12 @@ queue.add(root);
 
 <ul>
   <li><strong>Using an invalid (pessimistic) bound.</strong> In the knapsack, adding up the profits of just the items that fit completely is not an upper bound; it is the value of a feasible solution. The branch containing the optimum can be pruned, and the algorithm returns a wrong result without raising any error.</li>
-  <li><strong>Mixing up the direction.</strong> In maximization a node is pruned when <span class="m">bound ≤ best</span>, in minimization when <span class="m">lower ≥ best</span>. Writing the reverse either misses the optimum or never prunes. Remember also that <code>best</code> must start at <span class="m">+∞</span> in minimization and at <span class="m">−∞</span> or 0 in maximization.</li>
+  <li><strong>Mixing up the direction.</strong> In maximization a node is pruned when <span class="m">bound ≤ best</span>, in minimization when <span class="m">lb ≥ best</span>. Writing the reverse either misses the optimum or never prunes. Remember also that <code>best</code> must start at <span class="m">+∞</span> in minimization and at <span class="m">−∞</span> or 0 in maximization.</li>
   <li><strong>Not testing again after leaving the queue.</strong> The node looked promising when it was added. If <code>best</code> grew while it waited, it is now unnecessary. In the knapsack example C and G are such nodes. Without the second test the result does not change, but unnecessary nodes are expanded.</li>
   <li><strong>Not sorting the items.</strong> The fractional bound may not be a valid upper bound if the items are not in decreasing order of the ratio <span class="m">p<sub>i</sub>/w<sub>i</sub></span>.</li>
   <li><strong>Updating <code>best</code> only at the leaves.</strong> In the knapsack and in clique, every feasible node is a solution. Updating early raises <code>best</code> quickly and brings more pruning.</li>
   <li><strong>Taking branch and bound to be the same as backtracking.</strong> Code with no bound test, for example an unpruned TSP search, is not branch and bound; it traverses the whole tree.</li>
-  <li><strong>Forgetting to undo.</strong> In recursive versions, if the line <code>visited[c] = false</code>, <code>used[j] = false</code>, or <code>K.remove(...)</code> is forgotten, later branches run with a wrong state and feasible solutions are lost.</li>
+  <li><strong>Forgetting to undo.</strong> In recursive versions, if the line <code>visited[s] = false</code>, <code>taken[j] = false</code>, or <code>K.remove(...)</code> is forgotten, later branches run with a wrong state and feasible solutions are lost.</li>
   <li><strong>Storing <code>best</code> without copying.</strong> In the clique search, writing <code>best = K</code> stores the list that keeps changing. When the search ends, <code>best</code> shows an empty list. A copy (<code>new ArrayList&lt;&gt;(K)</code>, <code>path.clone()</code>) is essential.</li>
 </ul>
 
@@ -1408,11 +1408,11 @@ queue.add(root);
 <ul>
   <li>Branch and bound traverses the solution space of an optimization problem as a state-space tree. The loop is: a live node is selected, its bound is tested again, the node is branched, the bounds of the children are computed, and the hopeless ones are pruned. <code>best</code> holds the value of the best complete solution found so far.</li>
   <li>The bound must be valid (optimistic), tight, and cheap. Validity is mandatory; tightness and cheapness determine efficiency. The bound is mostly built by relaxation. An upper bound is used in maximization and a lower bound in minimization.</li>
-  <li>A node is pruned for three reasons: infeasibility, an insufficient bound (<span class="m">bound ≤ best</span> or <span class="m">lower ≥ best</span>), and completeness (a leaf, or an LP solution that turns out integral). The bound rule is what separates branch and bound from backtracking.</li>
+  <li>A node is pruned for three reasons: infeasibility, an insufficient bound (<span class="m">bound ≤ best</span> or <span class="m">lb ≥ best</span>), and completeness (a leaf, or an LP solution that turns out integral). The bound rule is what separates branch and bound from backtracking.</li>
   <li>FIFO traverses breadth-first and uses a queue. LIFO traverses depth-first, uses a stack or recursion, and needs little memory. LC (best-first) selects the most promising node with a priority queue and usually generates the fewest nodes. All three find the same optimum.</li>
   <li>In the knapsack the fractional knapsack relaxation gives the upper bound. In the example <span class="m">bound(root) = 115</span> and the optimum is 90. Best-first generates 11 of the 31 nodes, FIFO and LIFO 13.</li>
   <li>In the traveling salesman problem, the cheapest-outgoing-edge bound adds to the cost of the path the cheapest departures of the last city and of the unvisited cities. With four cities 10 nodes are generated instead of 16. The reduced matrix (14) and the two shortest edges (18) are tighter but take <span class="m">O(n<sup>2</sup>)</span> per node.</li>
-  <li>In assignment the lower bound is the sum of the row minima of the remaining people. In integer programming the LP relaxation gives the upper bound, and a fractional variable is branched into two subproblems. In clique the bound <span class="m">|K| + |cands| ≤ |best|</span> is used; coloring gives a tighter bound.</li>
+  <li>In assignment the lower bound is the sum of the row minima of the remaining people. In integer programming the LP relaxation gives the upper bound, and a fractional variable is branched into two subproblems. In clique the bound <span class="m">|K| + |cand| ≤ |best|</span> is used; coloring gives a tighter bound.</li>
   <li>The method is exponential in the worst case. Its practical success depends on the quality of the bound. It is not used for problems that have a polynomial algorithm.</li>
   <li>Independent subproblems lead to divide and conquer, overlapping subproblems to dynamic programming, and a proven greedy choice to the greedy approach. For an exact result on an NP-hard problem, backtracking or branch and bound is used.</li>
 </ul>
@@ -1459,7 +1459,7 @@ queue.add(root);
   <li>
     <p>If the same example is solved with a FIFO queue, how many nodes are generated and how many are expanded? Where does the difference come from?</p>
     <details><summary>Answer</summary>
-      <p>FIFO generates 13 nodes and expands 6: A, B, C, D, E, and G. The result is again 80. FIFO expands C (bound 75) early, in level order; at that moment <code>best</code> is only 70 and C cannot be discarded. E is also expanded; its child 75/12 is not infeasible and raises <code>best</code> to 75. Best-first leaves C and E to the end; by then <code>best</code> is 80 and both are discarded.</p>
+      <p>FIFO generates 13 nodes and expands 6: A, B, C, D, E, and G. The result is again 80. FIFO expands C (bound 75) early, in level order; at that moment <code>best</code> is only 70 and C cannot be discarded. E is also expanded; its child 75/12 is feasible and raises <code>best</code> to 75. Best-first leaves C and E to the end; by then <code>best</code> is 80 and both are discarded.</p>
     </details>
   </li>
   <li>
@@ -1469,9 +1469,9 @@ queue.add(root);
     </details>
   </li>
   <li>
-    <p>For the assignment problem with cost matrix [[4, 7, 3], [2, 6, 1], [3, 9, 4]], what is <code>remainingMin</code>? What is the optimal assignment, and how many calls does <code>assign(0, 0)</code> make?</p>
+    <p>For the assignment problem with cost matrix [[4, 7, 3], [2, 6, 1], [3, 9, 4]], what is <code>restMin</code>? What is the optimal assignment, and how many calls does <code>assign(0, 0)</code> make?</p>
     <details><summary>Answer</summary>
-      <p>The row minima are 3, 1, 3: <span class="m">remainingMin = [7, 4, 3, 0]</span>; the lower bound of the root is 7. The search finds complete assignments of cost 14, 13, and 11 in turn. The optimum is p0 → job 1 (7), p1 → job 2 (1), p2 → job 0 (3), with a total of 11. The search makes 12 calls; a search without pruning makes 16. In this example the first branch (p0 → job 0) is bad, so pruning starts late.</p>
+      <p>The row minima are 3, 1, 3: <span class="m">restMin = [7, 4, 3, 0]</span>; the lower bound of the root is 7. The search finds complete assignments of cost 14, 13, and 11 in turn. The optimum is p0 → job 1 (7), p1 → job 2 (1), p2 → job 0 (3), with a total of 11. The search makes 12 calls; a search without pruning makes 16. In this example the first branch (p0 → job 0) is bad, so pruning starts late.</p>
     </details>
   </li>
   <li>
@@ -1483,7 +1483,7 @@ queue.add(root);
   <li>
     <p>What is the largest clique in the graph with edges 0–1, 0–2, 0–3, 1–2, 1–3, 2–3, 3–4, 3–5, 4–5? How many calls does the method <code>clique</code> make with and without the bound?</p>
     <details><summary>Answer</summary>
-      <p>The largest clique is {0, 1, 2, 3} (4 vertices). The bounded search makes 13 calls and the unbounded search 22. The number of unbounded calls is the number of cliques, counting the empty set: the 16 subsets of {0, 1, 2, 3} plus {4}, {5}, {3, 4}, {3, 5}, {4, 5}, {3, 4, 5}. In the bounded search, after {0, 1, 2, 3} has been found, for example the branch <span class="m">K = {3}</span>, cands = {4, 5} is cut by <span class="m">1 + 2 ≤ 4</span>.</p>
+      <p>The largest clique is {0, 1, 2, 3} (4 vertices). The bounded search makes 13 calls and the unbounded search 22. The number of unbounded calls is the number of cliques, counting the empty set: the 16 subsets of {0, 1, 2, 3} plus {4}, {5}, {3, 4}, {3, 5}, {4, 5}, {3, 4, 5}. In the bounded search, after {0, 1, 2, 3} has been found, for example the branch <span class="m">K = {3}</span>, cand = {4, 5} is cut by <span class="m">1 + 2 ≤ 4</span>.</p>
     </details>
   </li>
   <li>
@@ -1506,7 +1506,7 @@ queue.add(root);
   <li>E. Horowitz, S. Sahni, S. Rajasekaran, <em>Computer Algorithms</em> (2nd ed., 2008), chapter 8: treats LC search and the cost function <span class="m">ĉ = f + ĝ</span> in detail. The knapsack and traveling salesman applications of FIFO and LC branch and bound are given in language close to that of these notes.</li>
   <li>A. Levitin, <em>Introduction to the Design and Analysis of Algorithms</em> (3rd ed., 2012), section 12.2: presents branch and bound for assignment, knapsack, and traveling salesman with short, visual examples; it is suitable to read together with backtracking.</li>
   <li>J. D. C. Little, K. G. Murty, D. W. Sweeney, C. Karel, “An Algorithm for the Traveling Salesman Problem” (1963): the paper that first used the name “branch and bound” and introduced the reduced cost matrix method.</li>
-  <li>R. Carraghan, P. M. Pardalos, “An Exact Algorithm for the Maximum Clique Problem” (1990): the classic clique algorithm based on the <span class="m">|K| + |cands|</span> bound; the starting point of the later algorithms with a color bound.</li>
+  <li>R. Carraghan, P. M. Pardalos, “An Exact Algorithm for the Maximum Clique Problem” (1990): the classic clique algorithm based on the <span class="m">|K| + |cand|</span> bound; the starting point of the later algorithms with a color bound.</li>
 </ul>
 
 <h2 id="s10-15"><span class="nt-num">5.15</span>References</h2>

@@ -24,7 +24,7 @@ This course is the continuation of [Algorithms](/teaching/algorithms/). It studi
 
 ## Ders Kitabı
 
-[📕 İleri Algoritmalar (PDF, 9 MB)](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Ileri-Algoritmalar.pdf)
+[📕 İleri Algoritmalar: Zor Problemler İçin Teknikler (PDF, 9 MB)](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Ileri-Algoritmalar.pdf)
 
 ---
 
@@ -115,7 +115,7 @@ Rastgele algoritmalar, çalışma sırasında rastgele seçimler yaparak daha ya
 
 ### Bölüm 9: Paralel Algoritmalar
 
-Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalışma süresini kısaltmayı ve büyük veri kümelerini işlenebilir kılmayı amaçlar. Bölümde Flynn sınıflandırması, bellek mimarileri ve PRAM modeli ile hızlanma, verimlilik, maliyet, Amdahl yasası ve iş–derinlik ölçütleri tanıtılır. Paralel toplama ve önek toplamı (Hillis–Steele ve Blelloch), boru hattı ve boru hatlı ağaç, paralel birleştirme sıralaması, MapReduce ve veri paralelliğiyle matris çarpımı örnekleri işlenir. Yarış durumu, eş zamanlı çizge gezinme ve Java'daki paralellik araçları da ele alınır.
+Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalışma süresini kısaltmayı ve büyük veri kümelerini işlenebilir kılmayı amaçlar. Bölümde Flynn sınıflandırması, bellek mimarileri ve PRAM modeli ile hızlanma, verimlilik, maliyet, Amdahl yasası ve iş–derinlik ölçütleri tanıtılır. Paralel toplama ve önek toplamı (Hillis–Steele ve Blelloch), boru hattı ve boru hatlı ağaç, paralel birleştirme sıralaması, MapReduce ve veri paralelliğiyle matris çarpımı örnekleri işlenir. Yarış durumu, eşzamanlı çizge gezinme ve Java'daki paralellik araçları da ele alınır.
 
 - [🖼️ Sunum](/files/advanced_algorithms/sunumlar/Bolum_09_Paralel_Algoritmalar.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Bolum_09_Paralel_Algoritmalar.pdf) · [📖 Ders notu](/files/advanced_algorithms/notlar/Bolum_09_Paralel_Algoritmalar_Ders_Notu.html) · [📝 Sorular](/files/advanced_algorithms/sunumlar/Bolum_09_Paralel_Algoritmalar_Calisma_Sorulari.html) · [💻 Kod](https://github.com/sercankulcu/advanced-algorithms-java/tree/main/Bolum09/src)
 
@@ -127,7 +127,7 @@ Paralel algoritmalar, hesaplamayı birden çok işlem birimine bölerek çalış
 
 ## Textbook
 
-[📕 Advanced Algorithms — the course book (PDF, 8 MB)](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Advanced-Algorithms.pdf)
+[📕 Advanced Algorithms: Techniques for Hard Problems — the course book (PDF, 8 MB)](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/Advanced-Algorithms.pdf)
 
 ---
 
@@ -181,7 +181,7 @@ Backtracking extends a partial solution step by step and, as soon as a branch ca
 
 ### Chapter 5: Branch and Bound
 
-Branch and bound explores the state-space tree while computing a bound at every node, and prunes any branch that provably cannot contain the best solution. We discuss how to choose bounds and when to prune, compare FIFO, LIFO and least-cost (LC) search, and contrast the method with backtracking. The 0/1 knapsack is solved with the fractional relaxation and the travelling salesman problem with three progressively tighter lower bounds; the assignment problem, integer linear programming and maximum clique serve as further examples. We close by relating branch and bound to A* and comparing the design paradigms side by side.
+Branch and bound explores the state-space tree while computing a bound at every node, and prunes any branch that provably cannot contain the best solution. We discuss how to choose bounds and when to prune, compare FIFO, LIFO and least-cost (LC) search, and contrast the method with backtracking. The 0/1 knapsack is solved with the fractional relaxation and the traveling salesman problem with three progressively tighter lower bounds; the assignment problem, integer linear programming and maximum clique serve as further examples. We close by relating branch and bound to A* and comparing the design paradigms side by side.
 
 - [🖼️ Slides](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/advanced_algorithms/pdf/Chapter_05_Branch_and_Bound.pdf) · [📖 Notes](/files/advanced_algorithms/notes/Chapter_05_Branch_and_Bound_Lecture_Notes.html) · [📝 Questions](/files/advanced_algorithms/slides/Chapter_05_Branch_and_Bound_Study_Questions.html) · [💻 Code](https://github.com/sercankulcu/advanced-algorithms-java-en/tree/main/Chapter05/src)
 - 🕹️ **Simulators:** [Traveling Salesman Problem Simulator](/files/advanced_algorithms/slides/Chapter_05_TSP.html)

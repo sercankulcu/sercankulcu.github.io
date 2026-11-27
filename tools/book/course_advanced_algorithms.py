@@ -28,7 +28,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='İleri Algoritmalar',
-    subtitle='',
+    subtitle='Zor Problemler İçin Teknikler',
     output='advanced_algorithms/Ileri-Algoritmalar.pdf',   # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'İleri Algoritmalar ders kitabı: böl ve fethet, açgözlü algoritmalar, dinamik '

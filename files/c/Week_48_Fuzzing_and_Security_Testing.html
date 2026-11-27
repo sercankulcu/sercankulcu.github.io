@@ -172,7 +172,7 @@ xxd crash-a1b2c3d4 | head</code></pre>
 
 <pre><code>./fuzz_parser -minimize_crash=1 -runs=100000 crash-a1b2c3d4</code></pre>
 
-  <p>The minimizer repeatedly removes bytes while checking the crash still occurs — week 43's bisection applied to data rather than history. Four thousand bytes typically reduce to fewer than twenty, and the defect is usually obvious once they do.</p>
+  <p>The minimizer repeatedly removes bytes while checking the crash still occurs — week 43's bisection applied to data rather than history. Four thousand bytes typically reduce to a few dozen, and the defect is usually obvious once they do.</p>
 
   <p>Then make it a permanent test:</p>
 
@@ -197,7 +197,7 @@ xxd crash-a1b2c3d4 | head</code></pre>
   <p>The <em>trust boundary</em> is the central idea. Data crossing it must be validated exactly once, at the crossing, and everything inside may then assume it is well-formed. Validating repeatedly everywhere produces code where nobody is sure whether the check already happened.</p>
 
   <table>
-    <thead><tr><th>C-specific threat</th><th>Defence</th><th>Week</th></tr></thead>
+    <thead><tr><th>C-specific threat</th><th>Defense</th><th>Week</th></tr></thead>
     <tbody>
       <tr><td>Buffer overflow</td><td>Bounded copies, <code>snprintf</code>, ASan</td><td>14, 20</td></tr>
       <tr><td>Integer overflow in a size</td><td><code>calloc</code>, explicit range check</td><td>36</td></tr>
@@ -333,12 +333,14 @@ printf 'values = 4\n'                  &gt; corpus/values
   <p><strong>Within seconds — the name overflow.</strong></p>
 
 <pre><code>==12345==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602…
-WRITE of size 45 at 0x7ffd… thread T0
+WRITE of size 49 at 0x602… thread T0
     #0 0x… in strcpy
-    #1 0x… in config_parse parser.c:44
+    #1 0x… in config_parse parser.c:47
 
-0x602… is located 0 bytes after 56-byte region
-  'c' … 'name' (line 12) &lt;== overflows this variable
+0x602… is located 0 bytes after 56-byte region [0x602…,0x602…)
+allocated by thread T0 here:
+    #0 0x… in calloc
+    #1 0x… in config_parse parser.c:20
 artifact_written: crash-3f2a1b…</code></pre>
 
   <p><code>strcpy</code> into <code>char name[32]</code> with no bound — week 14's defect, found in the time it takes to generate a long line. It is a classic heap overflow: the next thing overwritten is the <code>values</code> pointer, which <code>config_free</code> then passes to <code>free</code>.</p>
@@ -361,7 +363,8 @@ xxd minimized-from-3f2a1b…</code></pre>
 
 <pre><code>00000000: 6e61 6d65 203d 2041 4141 4141 4141 4141  name = AAAAAAAAA
 00000010: 4141 4141 4141 4141 4141 4141 4141 4141  AAAAAAAAAAAAAAAA
-00000020: 4141 0a                                  AA.</code></pre>
+00000020: 4141 4141 4141 4141 4141 4141 4141 4141  AAAAAAAAAAAAAAAA
+00000030: 4141 4141 4141 41                        AAAAAAA</code></pre>
 
   <p>Fifty-five bytes, and the defect is unmistakable from the input alone.</p>
 
@@ -441,7 +444,7 @@ afl-fuzz -i corpus -o findings -- ./parser_afl</code></pre>
 
   <details>
     <summary>Why is fuzzing without sanitizers close to useless in C?</summary>
-    <p>Because a fuzzer can only observe crashes, hangs, and aborts, and most C memory bugs produce none of those — an overrun quietly corrupts a neighbour and the program finishes normally. Sanitizers turn those silent defects into immediate failures, so the fuzzer supplies the inputs and the sanitizer supplies the detection.</p>
+    <p>Because a fuzzer can only observe crashes, hangs, and aborts, and most C memory bugs produce none of those — an overrun quietly corrupts a neighbor and the program finishes normally. Sanitizers turn those silent defects into immediate failures, so the fuzzer supplies the inputs and the sanitizer supplies the detection.</p>
   </details>
 
   <details>

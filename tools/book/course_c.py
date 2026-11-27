@@ -5,6 +5,7 @@ import glob, html, io, os, re
 from common import SITE, strip_tags
 
 TITLE = 'Programming with C'
+FULL_TITLE = 'Programming with C: Procedural Thinking and Practice'
 LANG = 'en'
 OUTPUT = 'c/Programming-with-C.pdf'           # courses-pdfs/ altinda
 CSS_FILES = ['book-front.css', 'book.css']    # tools/book/ altinda
@@ -96,6 +97,7 @@ FRONT = '''
 <section class="bk-title">
   <p class="bk-kicker">A complete course</p>
   <h1>Programming with C</h1>
+  <p class="bk-sub">Procedural Thinking and Practice</p>
   <p class="bk-sub">Fifty-six weeks, from the first program to production code</p>
   <p class="bk-author">Sercan K&uuml;lc&uuml;</p>
   <p class="bk-aff">Giresun University &middot; Department of Computer Engineering</p>

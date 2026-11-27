@@ -30,7 +30,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='Java ile Nesne Yönelimli Programlama',
-    subtitle='',
+    subtitle='Temellerden Uygulamalara',
     output='java/Java-ile-Nesne-Yonelimli-Programlama.pdf',   # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Java ile Nesne Yönelimli Programlama ders kitabı: sınıflar, kalıtım, çok '

@@ -42,7 +42,7 @@ notes_book.setup(
     intro=[('Ders_Haritasi.html', 'harita')],
     glossary='Sozluk.html',
     title='Veri Yapıları',
-    subtitle='',
+    subtitle='Java ile Tasarım ve Çözümleme',
     output='data_structures/Veri-Yapilari.pdf',     # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Veri Yapıları ders kitabı: algoritma analizi, diziler, özyineleme, bağlı '

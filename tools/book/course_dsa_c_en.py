@@ -39,7 +39,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Data Structures and Algorithms with C',
-    subtitle='',
+    subtitle='Pointers, Memory and Efficiency',
     output='dsa_c/Data-Structures-and-Algorithms-with-C.pdf',   # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Data Structures and Algorithms with C course textbook: arrays, linked lists, stacks, '

@@ -24,7 +24,7 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ## Ders Kitabı
 
-[📕 Algoritmik Oyun Kuramı (PDF, 15 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf)
+[📕 Algoritmik Oyun Kuramı: Strateji, Denge ve Hesaplama (PDF, 15 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algoritmik-Oyun-Kurami.pdf)
 
 ---
 
@@ -101,7 +101,7 @@ Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde 
 Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getirir ve aralarındaki oyunun kurallarını koyar. İki taraflı pazarlar, ağ etkisi ve kritik kitle, iki taraflı fiyatlandırma, sponsorlu arama açık artırmaları (GSP ve VCG), bütçe kısıtlı çevrim içi tahsis, itibar sistemleri ve platformlar arası rekabet.
 
 - [🖼️ Sunum](/files/agt/sunumlar/Bolum_06_Cevrim_Ici_Platformlar.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_06_Cevrim_Ici_Platformlar.pdf) · [📖 Ders notu](/files/agt/notlar/Bolum_06_Cevrim_Ici_Platformlar_Ders_Notu.html) · [📝 Sorular](/files/agt/sunumlar/Bolum_06_Cevrim_Ici_Platformlar_Calisma_Sorulari.html) · [💻 Kod (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum06)
-- 🕹️ **Oyunlar ve simülatörler:** [İki Taraflı Platform Fiyatlama](/files/agt/sunumlar/Bolum_06_Two-Sided-Platform-Pricing.html) · [Sponsorlu Arama Açık Artırması](/files/agt/sunumlar/Bolum_06_Sponsored-Search-Ad-Auction-Game.html)
+- 🕹️ **Oyunlar ve simülatörler:** [İki Taraflı Platform Fiyatlandırması](/files/agt/sunumlar/Bolum_06_Two-Sided-Platform-Pricing.html) · [Sponsorlu Arama Açık Artırması](/files/agt/sunumlar/Bolum_06_Sponsored-Search-Ad-Auction-Game.html)
 
 ---
 
@@ -167,10 +167,10 @@ Gerçek insanlar rasyonel modelden sapar; gruplar da tek tek bireylerin karşıl
 
 ### Bölüm 13: Öğrenme ve Adaptasyon
 
-Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En iyi tepki dinamiği, kurgusal oyun, pişmanlık ve çarpımsal ağırlıklar, çok kollu haydut problemleri (ε-açgözlü ve UCB), replikatör dinamiği ve tekrarlı Mahkûmun İkilemi.
+Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En iyi tepki dinamiği, kurgusal oyun, pişmanlık ve çarpımsal ağırlıklar, çok kollu haydut problemleri (ε-açgözlü ve UCB), replikatör dinamiği ve tekrarlanan Mahkûmun İkilemi.
 
 - [🖼️ Sunum](/files/agt/sunumlar/Bolum_13_Ogrenme_ve_Adaptasyon.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/agt/pdf/Bolum_13_Ogrenme_ve_Adaptasyon.pdf) · [📖 Ders notu](/files/agt/notlar/Bolum_13_Ogrenme_ve_Adaptasyon_Ders_Notu.html) · [📝 Sorular](/files/agt/sunumlar/Bolum_13_Ogrenme_ve_Adaptasyon_Calisma_Sorulari.html) · [💻 Kod (Python)](https://github.com/sercankulcu/algorithmic-game-theory-python/tree/main/Bolum13)
-- 🕹️ **Oyunlar ve simülatörler:** [Çok Kollu Haydut Öğrenme Oyunu](/files/agt/sunumlar/Bolum_13_Multi-Armed-Bandit.html) · [Tekrarlı Mahkûmun İkilemi Turnuvası](/files/agt/sunumlar/Bolum_13_Repeated-Prisoners-Dilemma-Tournament.html) · [Replikatör Dinamiği ve Evrimsel Oyun Laboratuvarı](/files/agt/sunumlar/Bolum_13_Replicator-Dynamics.html)
+- 🕹️ **Oyunlar ve simülatörler:** [Çok Kollu Haydut Öğrenme Oyunu](/files/agt/sunumlar/Bolum_13_Multi-Armed-Bandit.html) · [Tekrarlanan Mahkûmun İkilemi Turnuvası](/files/agt/sunumlar/Bolum_13_Repeated-Prisoners-Dilemma-Tournament.html) · [Replikatör Dinamiği ve Evrimsel Oyun Laboratuvarı](/files/agt/sunumlar/Bolum_13_Replicator-Dynamics.html)
 
 ---
 
@@ -189,7 +189,7 @@ Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik da
 
 ## Textbook
 
-[📕 Algorithmic Game Theory — the course book (PDF, 14 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algorithmic-Game-Theory.pdf)
+[📕 Algorithmic Game Theory: Strategy, Equilibrium and Computation — the course book (PDF, 14 MB)](https://sercankulcu.github.io/courses-pdfs/agt/Algorithmic-Game-Theory.pdf)
 
 ---
 

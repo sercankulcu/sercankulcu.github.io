@@ -44,7 +44,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Microprocessors',
-    subtitle='',
+    subtitle='Inside the Processor',
     output='microprocessors/Microprocessors.pdf',     # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Microprocessors course textbook: 8086 architecture, registers, assembly, memory access, '

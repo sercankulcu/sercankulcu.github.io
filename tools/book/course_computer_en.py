@@ -42,7 +42,7 @@ notes_book.setup(
     intro=[('Course_Map.html', 'harita')],
     glossary='Dictionary.html',
     title='Computer Fundamentals and Introduction to Programming',
-    subtitle='',
+    subtitle='First Steps',
     output='computer/Computer-Fundamentals-and-Introduction-to-Programming.pdf',   # under courses-pdfs/
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Computer Fundamentals and Introduction to Programming course textbook: hardware, '

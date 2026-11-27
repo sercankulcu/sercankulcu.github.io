@@ -23,7 +23,7 @@ Data structures provide systematic ways to organize, store, and access data. Cho
 
 ## Ders Kitabı
 
-[📕 Veri Yapıları (PDF, 19 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf)
+[📕 Veri Yapıları: Java ile Tasarım ve Çözümleme (PDF, 19 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Veri-Yapilari.pdf)
 
 ---
 
@@ -48,7 +48,7 @@ Veri yapıları, verinin bellekte nasıl düzenleneceğini ve ona nasıl erişil
 
 ### Bölüm 2: Algoritma Analizi
 
-Algoritma analizi, çözümleri uygulamadan önce karşılaştırmayı sağlar. Deneysel ölçüm ve katlama deneyi çalışma süresinin pratikte nasıl büyüdüğünü gösterir; ilkel işlemleri saymak ise makineden bağımsız bir ölçü verir. Büyük O, Büyük Omega ve Büyük Teta üst, alt ve sıkı sınırları anlatır; en iyi, ortalama ve en kötü durum ayrı ayrı incelenir. Döngü kalıpları, doğrusal ve ikili arama ile önek ortalamaları kodun yapısının karmaşıklığı nasıl belirlediğini gösterir. Alan karmaşıklığı, doğruluk ve sağlamlık da bu bölümdedir.
+Algoritma analizi, çözümleri uygulamadan önce karşılaştırmayı sağlar. Deneysel ölçüm ve katlama deneyi çalışma süresinin pratikte nasıl büyüdüğünü gösterir; ilkel işlemleri saymak ise makineden bağımsız bir ölçü verir. Büyük O, büyük Omega ve büyük Teta üst, alt ve sıkı sınırları anlatır; en iyi, ortalama ve en kötü durum ayrı ayrı incelenir. Döngü kalıpları, doğrusal ve ikili arama ile önek ortalamaları kodun yapısının karmaşıklığı nasıl belirlediğini gösterir. Alan karmaşıklığı, doğruluk ve sağlamlık da bu bölümdedir.
 
 - [🖼️ Sunum](/files/data_structures/sunumlar/Bolum_02_Algoritma_Analizi.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_02_Algoritma_Analizi.pdf) · [📖 Ders notu](/files/data_structures/notlar/Bolum_02_Algoritma_Analizi_Ders_Notu.html) · [📝 Sorular](/files/data_structures/sunumlar/Bolum_02_Algoritma_Analizi_Calisma_Sorulari.html) · [💻 Kod](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum02/src)
 
@@ -132,7 +132,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 
 ### Bölüm 11: Öncelikli Kuyruklar ve Heap
 
-Öncelikli kuyruk, her seferinde en yüksek (ya da en düşük) öncelikli öğeyi çıkaran soyut veri tipidir. Sırasız ve sıralı listeyle gerçeklemenin maliyetleri karşılaştırıldıktan sonra ikili heap incelenir: max-heap'te her ebeveyn çocuklarından büyük ya da onlara eşittir. Dizi gösterimi, yukarı ve aşağı süzmeyle (up-heap, down-heap) ekleme ve silme, uyarlanabilir öncelikli kuyruk, O(n) sürede heap oluşturma ve heap sort bu bölümdedir. Java'nın PriorityQueue sınıfı, k'ıncı en büyük öğe ve öncelikli çizelgeleyici uygulama örnekleridir.
+Öncelikli kuyruk, her seferinde en yüksek (ya da en düşük) öncelikli öğeyi çıkaran soyut veri tipidir. Sırasız ve sıralı listeyle gerçeklemenin maliyetleri karşılaştırıldıktan sonra ikili heap incelenir: max-heap'te her ebeveyn çocuklarından büyük ya da onlara eşittir. Dizi gösterimi, yukarı ve aşağı süzmeyle (up-heap, down-heap) ekleme ve silme, uyarlanabilir öncelikli kuyruk, O(n) sürede heap oluşturma ve heap sort bu bölümdedir. Java'nın PriorityQueue sınıfı, k'inci en büyük öğe ve öncelikli çizelgeleyici uygulama örnekleridir.
 
 - [🖼️ Sunum](/files/data_structures/sunumlar/Bolum_11_Oncelikli_Kuyruklar_ve_Heap.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/data_structures/pdf/Bolum_11_Oncelikli_Kuyruklar_ve_Heap.pdf) · [📖 Ders notu](/files/data_structures/notlar/Bolum_11_Oncelikli_Kuyruklar_ve_Heap_Ders_Notu.html) · [📝 Sorular](/files/data_structures/sunumlar/Bolum_11_Oncelikli_Kuyruklar_ve_Heap_Calisma_Sorulari.html) · [💻 Kod](https://github.com/sercankulcu/data-structures-java/tree/main/Bolum11/src)
 - 🕹️ **Simülatörler:** [İkili Heap Simülatörü](/files/data_structures/sunumlar/Bolum_11_Ikili_Heap_Simulatoru.html) · [Öncelikli Kuyruk Simülatörü](/files/data_structures/sunumlar/Bolum_11_Oncelikli_Kuyruk_Simulatoru.html) · [Öncelikli Çizelgeleyici Simülatörü](/files/data_structures/sunumlar/Bolum_11_Oncelikli_Cizelgeleyici_Simulatoru.html)
@@ -174,7 +174,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 ## Textbook
 
-[📕 Data Structures — the course book (PDF, 17 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Data-Structures.pdf)
+[📕 Data Structures: Design and Analysis with Java — the course book (PDF, 17 MB)](https://sercankulcu.github.io/courses-pdfs/data_structures/Data-Structures.pdf)
 
 ---
 

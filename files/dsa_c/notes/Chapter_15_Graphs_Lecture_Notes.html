@@ -842,7 +842,7 @@ edge_ptr graph[MAX_V];</code></pre>
   <li><b>Line 8.</b> <code>graph[v]</code> points to the first item in the edge list of <span class="m">v</span>. The head of a vertex with no edges is <code>NULL</code>.</li>
 </ul>
 
-<p>If data must be attached to vertices (for example a city name), a separate vertex array is added to the structure, or a field such as <code>char label</code> to the item. On x86-64 this <code>edge</code> structure is 32 bytes with padding. In an adjacency list the same edge takes <span class="m">2 · 16 = 32</span> bytes with two items. The gain is not in memory but in the information living in a single place.</p>
+<p>If data must be attached to vertices (for example a city name), a separate vertex array is added to the structure, or a field such as <code>char data</code> to the item. On x86-64 this <code>edge</code> structure is 32 bytes with padding. In an adjacency list the same edge takes <span class="m">2 · 16 = 32</span> bytes with two items. The gain is not in memory but in the information living in a single place.</p>
 
 <p><a href="#tab-coklu">Table 15.12</a> gives the multilist of G1. The six edges are the items N0–N5.</p>
 
@@ -1200,30 +1200,30 @@ wnode_ptr wgraph[MAX_V];</code></pre>
     <span class="kw">int</span> vertex;
     queue_ptr link;
 } queue;
-<span class="kw">void</span> addq(queue_ptr *front,
-          queue_ptr *rear, <span class="kw">int</span> d)
+<span class="kw">void</span> addq(queue_ptr *f,
+          queue_ptr *r, <span class="kw">int</span> d)
 {
     queue_ptr p = malloc(<span class="kw">sizeof</span>(queue));
     <span class="kw">if</span> (p == <span class="kw">NULL</span>) exit(1);
     p-&gt;vertex = d;  p-&gt;link = <span class="kw">NULL</span>;
-    <span class="kw">if</span> (*front) (*rear)-&gt;link = p;  <span class="kw">else</span> *front = p;
-    *rear = p;
+    <span class="kw">if</span> (*f) (*r)-&gt;link = p;  <span class="kw">else</span> *f = p;
+    *r = p;
 }</code></pre>
 
-<p><code>addq</code> takes the addresses of both pointers so that it can change them (<code>queue_ptr *front</code>). This is the only way in C to change a pointer from inside a function. The link of the new item is <code>NULL</code>, because it goes to the end of the queue. If the queue is not empty, the link of the old last item points to the new item; if it is empty, the new item is also the front item. In both cases the rear points to the new item. The operation is <span class="m">O(1)</span>.</p>
+<p><code>addq</code> takes the addresses of both pointers so that it can change them (<code>queue_ptr *f</code>). This is the only way in C to change a pointer from inside a function. The link of the new item is <code>NULL</code>, because it goes to the end of the queue. If the queue is not empty, the link of the old last item points to the new item; if it is empty, the new item is also the front item. In both cases the rear points to the new item. The operation is <span class="m">O(1)</span>.</p>
 
-<pre class="nt-code"><code><span class="kw">int</span> deleteq(queue_ptr *front,
-            queue_ptr *rear)
+<pre class="nt-code"><code><span class="kw">int</span> deleteq(queue_ptr *f,
+            queue_ptr *r)
 {
-    queue_ptr p = *front;   <span class="cm">/* front != NULL */</span>
+    queue_ptr p = *f;   <span class="cm">/* f != NULL */</span>
     <span class="kw">int</span> d = p-&gt;vertex;
-    *front = p-&gt;link;
-    <span class="kw">if</span> (*front == <span class="kw">NULL</span>) *rear = <span class="kw">NULL</span>;
+    *f = p-&gt;link;
+    <span class="kw">if</span> (*f == <span class="kw">NULL</span>) *r = <span class="kw">NULL</span>;
     free(p);
     <span class="kw">return</span> d;
 }</code></pre>
 
-<p><code>deleteq</code> expects a nonempty queue; the comment states this precondition, and the BFS routine guarantees it with <code>while (front)</code>. The value of the front item is saved, the front pointer moves to the next one and the item is freed. When the queue becomes empty, the rear must also be set to <code>NULL</code>. If it is not, <code>rear</code> keeps pointing at the item that was just freed. The next <code>addq</code> sees <code>*front</code> as empty and behaves correctly, but in the meantime <code>rear</code> is a dangling pointer. That is why a prototype taking only the front pointer, such as <code>int deleteq(queue_ptr *)</code>, is not enough; the address of <code>rear</code> is passed as well. The operation is <span class="m">O(1)</span>.</p>
+<p><code>deleteq</code> expects a nonempty queue; the comment states this precondition, and the BFS routine guarantees it with <code>while (front)</code>. The value of the front item is saved, the front pointer moves to the next one and the item is freed. When the queue becomes empty, the rear must also be set to <code>NULL</code>. If it is not, <code>*r</code> keeps pointing at the item that was just freed. The next <code>addq</code> sees <code>*f</code> as empty and behaves correctly, but in the meantime <code>*r</code> is a dangling pointer. That is why a prototype taking only the front pointer, such as <code>int deleteq(queue_ptr *)</code>, is not enough; the address of <code>r</code> is passed as well. The operation is <span class="m">O(1)</span>.</p>
 
 <h3 id="s15-4-5"><span class="nt-num">15.4.5</span>Tracing BFS</h3>
 

@@ -35,7 +35,7 @@ notes_book.setup(
     folder='agt',
     course_page='algorithmic-game-theory.md',
     title='Algoritmik Oyun Kuramı',
-    subtitle='Oyunlar, denge, mekanizmalar ve hesaplama',
+    subtitle='Strateji, Denge ve Hesaplama',
     output='agt/Algoritmik-Oyun-Kurami.pdf',          # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Algoritmik Oyun Kuramı ders kitabı: oyunlar, denge, mekanizma tasarımı, '

@@ -37,7 +37,7 @@ notes_book.setup(
     folder='agt',
     course_page='algorithmic-game-theory.md',
     title='Algorithmic Game Theory',
-    subtitle='Games, equilibria, mechanisms and computation',
+    subtitle='Strategy, Equilibrium and Computation',
     output='agt/Algorithmic-Game-Theory.pdf',        # under courses-pdfs/
     glossary='Dictionary.html',
     meta={'/Author': 'Sercan Külcü',

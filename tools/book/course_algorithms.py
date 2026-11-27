@@ -33,7 +33,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='Algoritmalar',
-    subtitle='',
+    subtitle='Tasarım, Analiz ve Java ile Uygulama',
     output='algorithms/Algoritmalar.pdf',           # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'Algoritmalar ders kitabı: karmaşıklık, sıralama, arama, çizge ve dizgi algoritmaları',

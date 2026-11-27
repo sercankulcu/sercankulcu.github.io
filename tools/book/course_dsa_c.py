@@ -26,7 +26,7 @@ notes_book.setup(
     # dersin haritasi: icindekilerin en ustunde, Kisim I'den once
     intro=[('Ders_Haritasi.html', 'harita')],
     title='C ile Veri Yapıları ve Algoritmalar',
-    subtitle='',
+    subtitle='İşaretçiler, Bellek ve Verimlilik',
     output='dsa_c/C-ile-Veri-Yapilari-ve-Algoritmalar.pdf',   # courses-pdfs/ altinda
     meta={'/Author': 'Sercan Külcü',
           '/Subject': 'C ile Veri Yapıları ve Algoritmalar ders kitabı: diziler, bağlı listeler, yığın, '

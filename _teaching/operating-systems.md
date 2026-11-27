@@ -24,7 +24,7 @@ Operating systems are a fundamental part of modern computing. Operating systems 
 
 ## Ders Kitabı
 
-[📕 İşletim Sistemleri (PDF, 18 MB)](https://sercankulcu.github.io/courses-pdfs/os/Isletim-Sistemleri.pdf)
+[📕 İşletim Sistemleri: Kavramlar ve C ile Uygulama (PDF, 18 MB)](https://sercankulcu.github.io/courses-pdfs/os/Isletim-Sistemleri.pdf)
 
 ---
 
@@ -180,7 +180,7 @@ Linux, dersin kavramlarını gerçek bir sistemde bir arada gösterir. Bu bölü
 
 ## Textbook
 
-[📕 Operating Systems — the course book (PDF, 17 MB)](https://sercankulcu.github.io/courses-pdfs/os/Operating-Systems.pdf)
+[📕 Operating Systems: Concepts and Practice in C — the course book (PDF, 17 MB)](https://sercankulcu.github.io/courses-pdfs/os/Operating-Systems.pdf)
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Object Oriented Programming with Java"
+title: "Object-Oriented Programming with Java"
 lang_toggle: true
 collection: teaching
 type: "Undergraduate"
@@ -24,7 +24,7 @@ Java is one of the most popular programming languages, extensively used in vario
 
 ## Ders Kitabı
 
-[📕 Java ile Nesne Yönelimli Programlama (PDF, 30 MB)](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf)
+[📕 Java ile Nesne Yönelimli Programlama: Temellerden Uygulamalara (PDF, 30 MB)](https://sercankulcu.github.io/courses-pdfs/java/Java-ile-Nesne-Yonelimli-Programlama.pdf)
 
 ---
 
@@ -161,7 +161,7 @@ Veri tabanları, verinin kalıcı, tutarlı ve sorgulanabilir biçimde saklanmas
 
 ## Textbook
 
-[📕 Object-Oriented Programming with Java — the course book (PDF, 27 MB)](https://sercankulcu.github.io/courses-pdfs/java/Object-Oriented-Programming-with-Java.pdf)
+[📕 Object-Oriented Programming with Java: From Basics to Applications — the course book (PDF, 27 MB)](https://sercankulcu.github.io/courses-pdfs/java/Object-Oriented-Programming-with-Java.pdf)
 
 ---
 
