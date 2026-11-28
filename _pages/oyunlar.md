@@ -10,7 +10,7 @@ hreflang: {en: "/games/", tr: "/game/tr/"}
 ---
 
 
-<p class="apps-intro">Tarayıcıda oynanan 32 ücretsiz oyun: kelime oyunları, bulmacalar, bilgi yarışmaları ve arcade.
+<p class="apps-intro">Tarayıcıda oynanan 39 ücretsiz oyun: kelime oyunları, bulmacalar, bilgi yarışmaları ve arcade.
 İndirme ve üyelik gerekmez. <a href="/games/" hreflang="en" lang="en">English</a></p>
 
 <h2 class="apps-group">🎮 Arcade ve aksiyon</h2>
@@ -59,4 +59,11 @@ hreflang: {en: "/games/", tr: "/game/tr/"}
 <a class="app-card" href="/game/tr/dort-tas/"><span class="app-head"><span class="app-ico" aria-hidden="true">🔴</span>Dört Taş</span><span class="app-desc">Bir arkadaşına ya da üç seviyeli bilgisayara karşı Dört Taş oyna.</span></a>
 <a class="app-card" href="/game/tr/xox/"><span class="app-head"><span class="app-ico" aria-hidden="true">❌</span>XOX</span><span class="app-desc">Üç zorluk seviyeli bilgisayara karşı XOX oynayın.</span></a>
 <a class="app-card" href="/files/agt/sunumlar/Bolum_01_Backgammon.html"><span class="app-head"><span class="app-ico" aria-hidden="true">🎲</span>Tavla</span><span class="app-desc">Saldırgan, dengeli ya da savunmacı oynayan yapay zekâya karşı tavla oynayın ya da iki yapay zekâyı izleyin.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_02_Chess.html"><span class="app-head"><span class="app-ico" aria-hidden="true">♟️</span>Satranç</span><span class="app-desc">Üç arama derinliğinde minimaks yapay zekâya karşı satranç oyna; her hamlesini neden seçtiğini gör.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_02_Checkers.html"><span class="app-head"><span class="app-ico" aria-hidden="true">⛀</span>Dama</span><span class="app-desc">Üç düzeyli alfa-beta yapay zekâya karşı dama oyna; zorunlu alma ve dama taşı kuralları var.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_02_Othello.html"><span class="app-head"><span class="app-ico" aria-hidden="true">⚫</span>Othello</span><span class="app-desc">Basit ya da minimaks yapay zekâya karşı taş çevir, hamle puanlarını izle.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_02_Mangala.html"><span class="app-head"><span class="app-ico" aria-hidden="true">🥣</span>Mangala</span><span class="app-desc">Üç düzeyli yapay zekâya karşı mangala; taş alma ve ek hamle kurallarıyla.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_02_Hex.html"><span class="app-head"><span class="app-ico" aria-hidden="true">⬢</span>Hex</span><span class="app-desc">Tahtanın iki kenarını yapay zekâdan önce birleştir; berabere bitmeyen bir oyun.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_14_Age-of-Cotanak.html"><span class="app-head"><span class="app-ico" aria-hidden="true">⚔️</span>Age of Çotanak</span><span class="app-desc">Minimaks yapay zekâya karşı topraklarını genişlet, rakip hücreleri ele geçir.</span></a>
+<a class="app-card" href="/files/agt/sunumlar/Bolum_01_Pisti.html"><span class="app-head"><span class="app-ico" aria-hidden="true">🃏</span>Pişti</span><span class="app-desc">Üç farklı oyun tarzı olan botlara karşı pişti oyna.</span></a>
 </div>

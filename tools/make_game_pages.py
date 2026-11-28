@@ -49,8 +49,34 @@ GROUPS = [
 COURSE_GAMES = {
     'Casual': [('🎲', '/files/agt/sunumlar/Bolum_01_Backgammon.html', 'Backgammon',
                 'Play backgammon against an AI with an aggressive, balanced or defensive style, or watch two AIs play. Turkish interface.',
-                'Tavla', 'Saldırgan, dengeli ya da savunmacı oynayan yapay zekâya karşı tavla oynayın ya da iki yapay zekâyı izleyin.')],
+                'Tavla', 'Saldırgan, dengeli ya da savunmacı oynayan yapay zekâya karşı tavla oynayın ya da iki yapay zekâyı izleyin.'),
+               ('♟️', '/files/agt/sunumlar/Bolum_02_Chess.html', 'Chess',
+                'Play chess against a minimax AI at three search depths and see why it chooses each move.',
+                'Satranç', 'Üç arama derinliğinde minimaks yapay zekâya karşı satranç oyna; her hamlesini neden seçtiğini gör.'),
+               ('⛀', '/files/agt/sunumlar/Bolum_02_Checkers.html', 'Checkers',
+                'Play checkers against an alpha-beta AI at three levels, with forced captures and kings.',
+                'Dama', 'Üç düzeyli alfa-beta yapay zekâya karşı dama oyna; zorunlu alma ve dama taşı kuralları var.'),
+               ('⚫', '/files/agt/sunumlar/Bolum_02_Othello.html', 'Othello',
+                'Flip discs against a simple or a minimax AI and watch its move scores.',
+                'Othello', 'Basit ya da minimaks yapay zekâya karşı taş çevir, hamle puanlarını izle.'),
+               ('🥣', '/files/agt/sunumlar/Bolum_02_Mangala.html', 'Mangala',
+                'The Turkish pit-and-stones game against a three-level AI, with captures and extra turns.',
+                'Mangala', 'Üç düzeyli yapay zekâya karşı mangala; taş alma ve ek hamle kurallarıyla.'),
+               ('⬢', '/files/agt/sunumlar/Bolum_02_Hex.html', 'Hex',
+                'Connect your two sides of the board before the AI does; a game that never ends in a draw.',
+                'Hex', 'Tahtanın iki kenarını yapay zekâdan önce birleştir; berabere bitmeyen bir oyun.'),
+               ('⚔️', '/files/agt/sunumlar/Bolum_14_Age-of-Cotanak.html', 'Age of Çotanak',
+                'Expand your territory and capture enemy cells against a minimax AI.',
+                'Age of Çotanak', 'Minimaks yapay zekâya karşı topraklarını genişlet, rakip hücreleri ele geçir.'),
+               ('🃏', '/files/agt/sunumlar/Bolum_01_Pisti.html', 'Pişti',
+                'The Turkish card game Pişti against bots with three playing styles.',
+                'Pişti', 'Üç farklı oyun tarzı olan botlara karşı pişti oyna.')],
 }
+
+
+def en_course_url(url):
+    """English hub links the English twin of a Turkish course game page."""
+    return url.replace('/sunumlar/Bolum_', '/slides/Chapter_')
 
 # arama basligi: genel kalip yerine daha aranir bir ifade
 SEO = {
@@ -111,6 +137,7 @@ def build():
                                   path=page_file(name), managed=MANAGED)
             cards.append((name, A.card_html(title, excerpt, ico, accent, False, kicker=t['kicker'], l2=t['l2'], lang=lang)))
         for ico, url, title, desc, _tt, _td in COURSE_GAMES.get(genre, []):
+            url = en_course_url(url)
             n += 1
             items.append({'@type': 'ListItem', 'position': n, 'url': SITE + url, 'name': title})
             out.append('<a class="app-card" href="%s"><span class="app-head"><span class="app-ico" aria-hidden="true">'
