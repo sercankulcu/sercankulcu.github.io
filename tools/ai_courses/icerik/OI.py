@@ -54,7 +54,7 @@ ICERIK = dict(
     yanilgilar=[
         ('p = 0,03 ise hipotezin doğru olma olasılığı %97\'dir.', 'p değeri, sıfır hipotezi doğruysa bu kadar uç verinin görülme olasılığıdır; hipotezin olasılığı değildir.'),
         ('İlinti varsa neden-sonuç vardır.', 'Ortak bir neden ya da rastlantı da ilinti üretir; nedensellik için deney gerekir.'),
-        ('Test %99 doğruysa pozitif sonuç %99 hastalıktır.', 'Hastalık nadirse pozitiflerin çoğu yanlış alarm olabilir; Bayes kuralı taban oranını katar.'),
+        ('Test %99 doğruysa pozitif çıkan kişi %99 olasılıkla hastadır.', 'Hastalık nadirse pozitiflerin çoğu yanlış alarm olabilir; Bayes kuralı taban oranını katar.'),
         ('Çok veri varsa istatistiğe gerek kalmaz.', 'Büyük veride önemsiz farklar bile "anlamlı" çıkar; etki büyüklüğü ve yanlılık hâlâ sorulur.'),
     ],
     meslekler=['İstatistikçi', 'Veri bilimci', 'Makine öğrenmesi araştırmacısı', 'Biyoistatistikçi', 'Aktüer'],

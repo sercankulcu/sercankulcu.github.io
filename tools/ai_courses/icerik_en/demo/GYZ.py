@@ -80,7 +80,7 @@ DEMO = {
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     var mx = 0; tamW.forEach(function (w) { if (Math.abs(w) > mx) mx = Math.abs(w); });
     var X0 = 30, X1 = 384, YM = 62, YS = 40 / mx;
-    var b0 = mk("text", { x: 4, y: 12, "class": "lbl" }, "Weights (largest first): grey exact, blue " + bit + "-bit"); b0.style.fontSize = "11px"; svg.appendChild(b0);
+    var b0 = mk("text", { x: 4, y: 12, "class": "lbl" }, "Weights (largest first): gray exact, blue " + bit + "-bit"); b0.style.fontSize = "11px"; svg.appendChild(b0);
     svg.appendChild(mk("path", { d: "M" + X0 + " " + YM + " H" + X1, "class": "grid" }));
     var y0 = mk("text", { x: X0 - 4, y: YM + 4, "text-anchor": "end", "class": "lbl" }, "0"); y0.style.fontSize = "10px"; svg.appendChild(y0);
     sira.forEach(function (idx, i) {

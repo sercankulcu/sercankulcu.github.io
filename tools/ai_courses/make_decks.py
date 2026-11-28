@@ -679,7 +679,7 @@ def acilis():
     g = T('Giriş', 'Introduction')
     t = T('Bu Ders Ne Anlatır?', 'What Is This Guide About?')
     S.append(slide(t, g, head(g, t) + T('''
-          <p>Yapay zekâ ve veriyle ilgili <b>%d ders</b> her biri bir sunumla tanıtılır. Amaç bu dersleri öğretmek değil, <b>haritasını çıkarmaktır</b>: her ders hangi soruyu sorar, hangi araçları başka derslerle paylaşır, nerede ayrılır?</p>
+          <p>Yapay zekâ ve veriyle ilgili <b>%d dersin</b> her biri bir sunumla tanıtılır. Amaç bu dersleri öğretmek değil, <b>haritasını çıkarmaktır</b>: her ders hangi soruyu sorar, hangi araçları başka derslerle paylaşır, nerede ayrılır?</p>
           <div class="ds-deck__two">
             <div class="ds-deck__pc ds-deck__pc--pro"><h3>Bu derste var</h3><ul>
               <li>Her dersin temel sorusu ve kavramları</li><li>Kısa tarihçe ve tipik iş akışı</li>
@@ -692,7 +692,7 @@ def acilis():
           <div class="ds-deck__two">
             <div class="ds-deck__pc ds-deck__pc--pro"><h3>What you will find</h3><ul>
               <li>Each course's core question and concepts</li><li>A short history and a typical workflow</li>
-              <li>Prerequisites and neighbouring courses</li><li>Overlap and difference tables</li><li>Applications and tools</li></ul></div>
+              <li>Prerequisites and neighboring courses</li><li>Overlap and difference tables</li><li>Applications and tools</li></ul></div>
             <div class="ds-deck__pc ds-deck__pc--con"><h3>What you will not find</h3><ul>
               <li>Lecture notes or a textbook</li><li>Code examples or assignments</li><li>Derivations of formulas</li>
               <li>The full syllabus of any course</li></ul></div>
@@ -780,7 +780,7 @@ def acilis():
             <div class="ai-map-l">%s</div>
             <div class="ai-map-p" id="ai-map-p"><p class="ds-deck__muted">%s</p></div>
           </div>''' % (''.join(groups), T('Bir derse tıklayın: komşuları renklenir, ilişkileri burada listelenir.',
-                                          'Click a course: its neighbours light up and its relations are listed here.'))))
+                                          'Click a course: its neighbors light up and its relations are listed here.'))))
     # kisimlar arasi baglar
     say = {}
     for a, _, b, _ in D.ILISKILER:
@@ -815,7 +815,7 @@ def acilis():
                    head(hsec, T('Kavşak Dersler: En Çok Bağı Olanlar', 'Hub Courses: The Most Connected')) +
                    '\n          <table class="ds-deck__table ai-tbl"><tr><th>%s</th><th class="num">%s</th><th>%s</th></tr>%s</table>'
                    '\n          <div class="ds-deck__callout">%s</div>' % (
-                       T('Ders', 'Course'), T('Bağ', 'Links'), T('Bazı komşuları', 'Some neighbours'), rows, T(
+                       T('Ders', 'Course'), T('Bağ', 'Links'), T('Bazı komşuları', 'Some neighbors'), rows, T(
                            'Makine öğrenmesi ile matematik temeli (doğrusal cebir, olasılık, optimizasyon) haritanın kavşaklarıdır: başka derslerin çoğu bunlardan birine dayanır.',
                            'Machine learning and the mathematical foundations (linear algebra, probability, optimization) are the hubs of the map: most other courses rest on one of them.'))))
     ksec = T('Kullanım', 'How to Use')
@@ -917,7 +917,7 @@ ILGI = [
 
 SENARYO = [
     ('Bir hastanenin MR görüntülerinde tümörün sınırlarını otomatik çizmek.', ['TGI', 'BG', 'GI'],
-     'Bölütleme görüntü işleme ve görüden gelir; klinik veri, etiket azlığı ve sorumluluk bunu tıbbi görüntü işleme yapar.'),
+     'Bölütleme görüntü işleme ve bilgisayarlı görüden gelir; klinik veri, etiket azlığı ve sorumluluk bunu tıbbi görüntü işleme yapar.'),
     ('Bir e-ticaret sitesinde "bunu alanlar şunları da aldı" listesini kurmak.', ['BE', 'VM'],
      'Birliktelik kuralları veri madenciliğinden, kullanıcıya sıralı liste sunmak öneri sistemlerinden gelir.'),
     ('Bir fırının sıcaklığını "biraz sıcak", "çok sıcak" gibi kurallarla denetlemek.', ['BM'],
@@ -926,7 +926,7 @@ SENARYO = [
      'Etiket yok, yalnız ödül var: pekiştirmeli öğrenme. Fiziksel gövde ve algılayıcılar robotiğin konusu.'),
     ('Yüz bin algılayıcının saniyelik verisini saklayıp sorgulamak.', ['BV', 'ZS'],
      'Tek makineye sığmayan ve akan veri büyük veri sistemlerinin, zamana bağlı çözümlemesi zaman serisinin işidir.'),
-    ('Okul servisleri için toplam yolu en kısa rota planını bulmak.', ['EMO', 'OPT', 'YZ'],
+    ('Okul servisleri için toplam yolu en kısa olan rota planını bulmak.', ['EMO', 'OPT', 'YZ'],
      'Kombinatoryal bir optimizasyon problemi: kesin yöntemler optimizasyondan, büyük örneklerde iyi çözüm metasezgisellerden gelir.'),
     ('Bir kredi modelinin bazı başvuru gruplarına haksızlık edip etmediğini denetlemek.', ['AYE', 'VB'],
      'Adalet ölçütleri, açıklama ve hesap verebilirlik açıklanabilir YZ ve etiğin konusudur.'),
@@ -951,17 +951,17 @@ ILGI_EN = ['Images and video', 'Language and speech', 'Data and business', 'Robo
            'Mathematics and theory', 'Systems and hardware', 'Trust, society and health', 'Games and decision making']
 
 SENARYO_EN = [
-    ('Automatically outlining tumours in a hospital\'s MRI scans.',
+    ('Automatically outlining tumors in a hospital\'s MRI scans.',
      'Segmentation comes from image processing and computer vision; clinical data, scarce labels and accountability make it medical image processing.'),
     ('Building a "customers who bought this also bought" list for an online shop.',
      'Association rules come from data mining; presenting a ranked list to the user is the job of recommender systems.'),
     ('Controlling an oven\'s temperature with rules like "a bit hot" and "very hot".',
      'Linguistic rules without sharp boundaries, used for control, are the classic application of fuzzy logic.'),
-    ('A drone learning to stay level in the wind by trying.',
+    ('A drone learning to stay level in the wind by trial and error.',
      'No labels, only a reward: reinforcement learning. The physical body and its sensors are the business of robotics.'),
     ('Storing and querying per-second readings from a hundred thousand sensors.',
-     'Streaming data too large for one machine belongs to big data systems; analysing it over time is time series work.'),
-    ('Finding the shortest total route plan for school buses.',
+     'Streaming data too large for one machine belongs to big data systems; analyzing it over time is time series work.'),
+    ('Planning school bus routes with the shortest total distance.',
      'A combinatorial optimization problem: exact methods come from optimization, good solutions to large instances from metaheuristics.'),
     ('Auditing whether a credit model treats some groups of applicants unfairly.',
      'Fairness measures, explanations and accountability are the subject of explainable AI and ethics.'),
@@ -1081,7 +1081,7 @@ def kapanis(icerik):
           </div>''', '''
           <div class="ds-deck__grid ds-deck__grid--2 ai-cards">
             <div class="ds-deck__card"><strong>A common language</strong><p>Linear algebra, probability and optimization are shared by almost every course; with these in place, moving between courses is easy.</p></div>
-            <div class="ds-deck__card"><strong>The hub</strong><p>Machine learning sits at the centre of the map: the branches rest on it and the applications use it.</p></div>
+            <div class="ds-deck__card"><strong>The hub</strong><p>Machine learning sits at the center of the map: the branches rest on it and the applications use it.</p></div>
             <div class="ds-deck__card"><strong>The question decides</strong><p>Two courses may use the same algorithm; what separates them is the question they ask and how they measure success.</p></div>
             <div class="ds-deck__card"><strong>The field moves</strong><p>Separate courses today may merge tomorrow; understanding the kinds of relation lasts longer than memorizing the map.</p></div>
           </div>''')))
@@ -1159,7 +1159,7 @@ def sayfa_blogu(icerik):
            'Etkileşimli haritada bir derse tıklanınca komşuları ve ilişkileri görünür.',
            'This chapter sets out the purpose of the guide, how artificial intelligence, machine learning, neural networks and deep learning nest '
            'inside one another, the six parts that group the courses, the four kinds of relation between courses (subfield, builds on, shares methods, '
-           'application) and the criteria used to compare them. Clicking a course on the interactive map shows its neighbours and relations.'), '',
+           'application) and the criteria used to compare them. Clicking a course on the interactive map shows its neighbors and relations.'), '',
          lnk(dosya_no(1)), '', '---', '']
     for k_no, _ in D.KISIMLAR:
         L += ['## %s %s: %s' % (T('Kısım', 'Part'), rom[k_no - 1], kisim_adi(k_no)), '']
@@ -1189,7 +1189,7 @@ def ders_sayfasi(icerik_tr, icerik_en):
           if os.path.exists(os.path.join(REPO, 'images', 'teaching', 'teaching-ai-courses.webp')) else '') +
          'This course is a map of the courses around artificial intelligence and data. Each of its %d course presentations introduces one course: '
          'the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it '
-         'differs from its nearest neighbours, its applications and tools. An opening map and a closing comparison frame the series. '
+         'differs from its nearest neighbors, its applications and tools. An opening map and a closing comparison frame the series. '
          'There are no lecture notes, code examples or textbook: the aim is to help students see the field as a whole before choosing their electives.'
          % len(D.DERSLER), '', '']
     for dil, ic in ((False, icerik_tr), (True, icerik_en)):

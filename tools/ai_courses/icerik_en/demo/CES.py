@@ -114,6 +114,6 @@ DEMO = {
   });
   kur(); while (sira < gorev.length) ihale(); ciz();
 ''',
-    'not': ('The problem was solved not by one program but by <b>negotiating agents</b>: in the contract net a manager announces a task '
+    'not': ('The problem was solved not by one program but by <b>negotiating agents</b>: in the Contract Net protocol a manager announces a task '
             'and agents bid according to their own cost. Adding a robot does not break a central plan.'),
 }

@@ -10,7 +10,7 @@ DEMO = {
   <input type="range" min="0" max="24" step="1" value="8" aria-label="Week">
   <div class="ai-ctl"><button type="button" data-e="1">Retrain</button><button type="button" data-s="1">Reset</button></div>
   <div class="ai-out"></div>
-  <div class="ai-out" style="font-size:13px">PSI compares this week's distribution with the training data over ten bins. Above <b>0.2</b> counts as an alarm. Labels arrive late; PSI is computed at once.</div>
+  <div class="ai-out" style="font-size:13px">PSI compares this week's distribution with the training data over ten bins. Above <b>0.2</b> counts as an alarm. Labels arrive late; PSI is available immediately.</div>
 </div>''',
     'js': r'''
   var svg = root.querySelector("svg"), range = root.querySelector("input"), hEl = root.querySelector(".ai-h");

@@ -40,7 +40,7 @@ ICERIK = dict(
         ('EMO', 'Neuroevolution searches weights or architectures by evolution; this course learns weights by gradients and backpropagation.'),
     ],
     uygulamalar=[
-        ('Digit recognition', 'Handwritten digits on postcodes and checks.'),
+        ('Digit recognition', 'Handwritten digits on ZIP codes and checks.'),
         ('Tabular data', 'Classification tasks such as credit risk or churn.'),
         ('Function approximation', 'Learning nonlinear relations from measurements.'),
         ('Control', 'Simple robot and process controllers.'),

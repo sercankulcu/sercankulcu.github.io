@@ -125,5 +125,5 @@ DEMO = {
   hesapla();
 ''',
     'not': ('Data mining is <b>discovery</b>: frequent patterns are sought without asking a question first. A rule with lift near 1 '
-            'is empty (Bread is in everyone\'s basket anyway); a useful rule has lift clearly above 1.'),
+            'is empty (Bread is in almost every basket anyway); a useful rule has lift clearly above 1.'),
 }

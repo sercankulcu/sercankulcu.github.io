@@ -8,7 +8,7 @@ ICERIK = dict(
            '<b>akustik model</b> ve dil modeli birlikte en olası metni bulur.'),
     tarihce=[
         ('1952', 'Bell Laboratuvarları\'nın Audrey sistemi tek bir konuşmacının söylediği rakamları tanır.'),
-        ('1962', 'IBM Shoebox, on altı İngilizce sözcüğü ve rakamları tanıyarak tanıtılır.'),
+        ('1962', 'IBM Shoebox tanıtılır: on rakam dahil on altı İngilizce sözcüğü tanır.'),
         ('1970\'ler', 'DARPA destekli projelerde Carnegie Mellon\'ın Harpy sistemi yaklaşık bin sözcük tanır.'),
         ('1980\'ler', 'Saklı Markov modelleri (HMM) konuşma tanımanın standart yöntemi olur.'),
         ('2012', 'Derin sinir ağları akustik modellemede Gauss karışımlarının yerini almaya başlar.'),
@@ -90,7 +90,7 @@ ICERIK = dict(
     riskler=[
         ('Ses klonlama', 'Birkaç saniyelik kayıttan taklit edilen ses, dolandırıcılıkta ve sesle kimlik doğrulamayı aşmakta kullanılır.'),
         ('Sürekli dinleme', 'Uyandırma sözcüğü bekleyen cihazlar yanlışlıkla kayıt alabilir; ses ayrıca sağlık ve duygu bilgisi taşır.'),
-        ('Aksan ve ağız farkı', 'Hata oranı bazı aksan ve ağızlarda belirgin yüksektir; bu konuşanlar altyazı ve asistanlardan eşit yararlanamaz.'),
+        ('Aksan ve ağız farkı', 'Hata oranı bazı aksan ve ağızlarda belirgin yüksektir; bu kişiler altyazı ve asistanlardan eşit yararlanamaz.'),
         ('Uydurma döküm', 'Uçtan uca modeller sessizlikte ya da gürültüde hiç söylenmemiş cümleler yazabilir; tıbbi dökümde bu tehlikelidir.'),
     ],
 )

@@ -55,7 +55,7 @@ ICERIK = dict(
         ('Derin öğrenme 2012\'de icat edildi.', 'Fikirler onlarca yıllıktır; 2012\'deki sıçramayı büyük veri ve GPU getirdi.'),
         ('Katman sayısı arttıkça başarı artar.', 'Artık bağlantı ve normalizasyon olmadan çok derin ağlar eğitilemeyebilir.'),
     ],
-    meslekler=['Derin öğrenme mühendisi', 'Bilgisayarlı görü mühendisi', 'Araştırmacı', 'ML altyapı mühendisi', 'Uygulamalı bilimci'],
+    meslekler=['Derin öğrenme mühendisi', 'Bilgisayarlı görü mühendisi', 'Araştırmacı', 'MÖ altyapı mühendisi', 'Uygulamalı bilimci'],
     sonra=('Derin öğrenme bugün haritanın en çok kullanılan aracıdır: bilgisayarlı görü, doğal dil işleme, konuşma tanıma, '
            'üretken modeller ve derin pekiştirmeli öğrenme onun üzerine kurulur. Sistem tarafında GPU programlama, gömülü '
            'YZ ve MLOps bu modelleri hızlandırmayı ve üretime taşımayı öğretir.'),
@@ -91,7 +91,7 @@ ICERIK = dict(
     riskler=[
         ('Hesaplama ve enerji maliyeti', 'Büyük modelleri eğitmek binlerce GPU saati ve ciddi karbon salımı ister; bu araştırmayı birkaç büyük kurumun tekeline sokar.'),
         ('Düşmanca örnekler', 'Göze görünmeyen piksel değişikliği sınıflandırıcıyı yanıltır; dur levhasına yapıştırılan çıkartmalarla da bu gösterildi.'),
-        ('Web\'den toplanan veri', 'ImageNet gibi web\'den toplanan veriler izinsiz fotoğraflar ve kişileri aşağılayan etiketler içerebilir; ImageNet bunları sonradan ayıkladı.'),
+        ('Web\'den toplanan veri', 'ImageNet gibi web\'den toplanan veriler izinsiz fotoğraflar ve kişileri aşağılayan etiketler içerebilir; ImageNet bunların çoğunu sonradan ayıkladı.'),
         ('Sahte ilerleme', 'Test kümesine göre ayarlanan hiperparametreler ve tek tohumla raporlanan sonuçlar küçük farkları gerçek iyileşme gibi gösterir.'),
     ],
 )

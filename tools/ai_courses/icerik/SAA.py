@@ -37,7 +37,7 @@ ICERIK = dict(
     ayrisma=[
         ('VM', 'Veri madenciliği tablo halindeki kayıtlarda örüntü arar; bu ders kayıtlar arasındaki bağlantıların yapısını inceler.'),
         ('BE', 'Bilgi erişimi PageRank\'i sıralama sinyali olarak kullanır; bu ders merkeziliğin ağ hakkında ne söylediğini sorar.'),
-        ('DC', 'Doğrusal cebir komşuluk matrisinin özdeğerlerini hesaplatır; bu ders onları topluluk ve önem olarak yorumlar.'),
+        ('DC', 'Doğrusal cebir komşuluk matrisinin özdeğerlerini hesaplar; bu ders onları topluluk ve önem olarak yorumlar.'),
         ('CES', 'Çok etmenli sistemler etmenlerin nasıl karar verdiğini modeller; bu ders gözlenen ilişki ağını çözümler.'),
     ],
     uygulamalar=[
@@ -59,7 +59,7 @@ ICERIK = dict(
     ],
     meslekler=['Ağ bilimci', 'Veri bilimci', 'Sosyal medya analisti', 'Sahtekârlık analisti', 'Hesaplamalı sosyal bilimci'],
     sonra=('Bu dersten sonra çizge sinir ağlarıyla ağ üzerinde öğrenmeye, bilgi erişimiyle bağlantı temelli sıralamaya, '
-           'salgın bilimiyle yayılım modellerine geçilebilir. Hesaplamalı sosyal bilimler, bu dersin yöntemlerini '
+           'salgın bilimiyle yayılım modellerine geçilebilir. Hesaplamalı sosyal bilim, bu dersin yöntemlerini '
            'toplum sorularına uygulayan disiplinler arası bir alandır.'),
     kaynaklar=[
         'Wasserman ve Faust, <em>Social Network Analysis: Methods and Applications</em>, Cambridge University Press, 1994.',

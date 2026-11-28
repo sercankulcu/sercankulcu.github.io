@@ -90,8 +90,8 @@ ICERIK = dict(
         'writing short proofs',
     ],
     hazirlik=[
-        ('Can you solve a system of two equations in two unknowns by elimination?', 'Systems of equations from high school maths'),
-        ('Can you find the distance between two points in the plane?', 'Coordinate geometry from high school maths'),
+        ('Can you solve a system of two equations in two unknowns by elimination?', 'Systems of equations from high school math'),
+        ('Can you find the distance between two points in the plane?', 'Coordinate geometry from high school math'),
         ('Can you find an angle of a right triangle with sine and cosine?', 'High school trigonometry'),
         ('Can you multiply two Python lists element by element in a loop and sum them?', 'An intro programming course, then a short NumPy tutorial'),
     ],
@@ -99,6 +99,6 @@ ICERIK = dict(
         ('Ill-conditioning', 'With a large condition number, a tiny input error is magnified many times; the answer fills up with meaningless digits.'),
         ('The normal equations trap', 'Forming AᵀA for least squares squares the condition number; solving with QR or SVD is safer.'),
         ('Silent shape errors', 'NumPy broadcasting combines mismatched shapes without an error; the result is wrong but looks fine.'),
-        ('Misreading PCA', 'On unscaled features PCA favours the variable with the largest units; a component is not always a meaningful factor.'),
+        ('Misreading PCA', 'On unscaled features PCA favors the variable with the largest units; a component is not always a meaningful factor.'),
     ],
 )

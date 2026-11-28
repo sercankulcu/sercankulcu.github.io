@@ -21,7 +21,7 @@ ICERIK = dict(
         ('Denoising', 'Preserving quality in low-dose CT and in MRI.'),
         ('Segmentation', 'Outlining an organ, tumor or vessel.'),
         ('Registration', 'Aligning two images (before/after, CT/MRI).'),
-        ('Aided diagnosis (CAD)','The computer flags suspicious regions for the physician.'),
+        ('Computer-aided diagnosis (CAD)','The computer flags suspicious regions for the physician.'),
         ('Clinical evaluation', 'Sensitivity, specificity, Dice; comparison with physicians.'),
     ],
     akis=[('Image', 'CT, MRI,\nX-ray'), ('Preprocess', 'noise,\nnormalization'), ('Segment', 'organ,\nlesion'),

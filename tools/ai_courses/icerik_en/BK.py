@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 34 slides: Information Theory — entropy, mutual information, '
-             'compression, channel capacity, error-correcting codes, history, neighbours, overlaps.'),
-    gundem=['Entropy', 'Compression', 'Channel capacity', 'Error-correcting codes', 'Measures in ML', 'Neighbouring courses'],
+             'compression, channel capacity, error-correcting codes, history, neighbors, overlaps.'),
+    gundem=['Entropy', 'Compression', 'Channel capacity', 'Error-correcting codes', 'Measures in ML', 'Neighboring courses'],
     tanim=('Information theory measures the information in a message by probability: an unlikely event carries more '
            'information, and the average information is called <b>entropy</b>. The course derives the limits on how far '
            'data can be compressed and how fast it can be sent reliably over a noisy channel.'),
@@ -91,7 +91,7 @@ ICERIK = dict(
         'writing proofs with inequalities',
     ],
     hazirlik=[
-        ('Can you use the rules of logarithms and compute in base 2?', 'Logarithms from high school maths'),
+        ('Can you use the rules of logarithms and compute in base 2?', 'Logarithms from high school math'),
         ('Can you explain conditional probability and expected value?', '@OI'),
         ('Can you write a number in binary and tell how many bits it needs?', 'Number bases from discrete mathematics'),
         ('Can you write a greedy algorithm that uses a priority queue?', 'Greedy methods and heaps from an algorithms course'),

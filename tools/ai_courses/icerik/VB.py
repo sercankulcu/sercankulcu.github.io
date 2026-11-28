@@ -90,7 +90,7 @@ ICERIK = dict(
     riskler=[
         ('Nedensellik yanılgısı', 'Korelasyondan neden çıkarmak yanlış kararlara götürür: dondurma satışı ile boğulmalar birlikte artar, çünkü ikisi de yazın olur.'),
         ('p-hacking', 'Yeterince çok test yapılınca bir şey mutlaka "anlamlı" çıkar; hipotez veriye bakmadan önce belirlenmelidir.'),
-        ('Yeniden tanımlama', 'Adı silinmiş veride posta kodu, doğum tarihi ve cinsiyet çoğu kişiyi yeniden tanımlatmaya yeter.'),
+        ('Yeniden tanımlama', 'Adı silinmiş veride posta kodu, doğum tarihi ve cinsiyet çoğu kişinin kimliğini yeniden belirlemeye yeter.'),
         ('Yanıltıcı grafik', 'Kesik bir eksen ya da seçilmiş bir zaman aralığı, aynı veriyle ters bir hikâye anlatabilir.'),
     ],
 )

@@ -9,7 +9,7 @@ DEMO = {
   <div class="ai-ctl"><button type="button" data-a="bfs">Breadth-first (BFS)</button><button type="button" data-a="astar" class="is-on">A* search</button></div>
   <div class="ai-ctl"><button type="button" data-r="1">Reset shelves</button></div>
   <div class="ai-out"></div>
-  <div class="ai-out" style="font-size:13px">Blue cells are states the search examined, orange cells the path found. A* uses the remaining Manhattan distance to the goal as a <b>heuristic</b>, so it looks at fewer cells.</div>
+  <div class="ai-out" style="font-size:13px">Blue cells are states the search examined, orange cells the path found. A* uses the remaining Manhattan distance to the goal as a <b>heuristic</b>, so it usually looks at fewer cells.</div>
 </div>''',
     'js': r'''
   var W = 12, H = 8, S = 32, OX = 3, OY = 3;

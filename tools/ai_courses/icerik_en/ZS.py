@@ -58,7 +58,7 @@ ICERIK = dict(
     ],
     meslekler=['Forecasting analyst', 'Data scientist', 'Quantitative analyst', 'Demand planner', 'Energy data analyst'],
     sonra=('After this course you can move on to frequency analysis with signal processing, transformer-based forecasting '
-           'with deep learning, and multi-temporal satellite images with remote sensing. Econometrics and state space '
+           'with deep learning, and multitemporal satellite images with remote sensing. Econometrics and state space '
            'models are natural next steps too.'),
     kaynaklar=[
         'Hyndman and Athanasopoulos, <em>Forecasting: Principles and Practice</em>, 3rd ed., OTexts, 2021.',
@@ -97,6 +97,6 @@ ICERIK = dict(
         ('Leaking the future', 'A random split, or scaling with statistics of the whole series, carries future values into training; test scores become fake.'),
         ('Structural breaks', 'In the 2020 pandemic, demand and traffic series changed overnight; models that fit the past well were wrong for weeks.'),
         ('Forecasts without intervals', 'A single number suggests certainty; stock or energy decisions get made without knowing the uncertainty.'),
-        ('Forecasts that change behaviour', 'When everyone acts on the same price or demand forecast, the series moves; a forecast can fulfil or defeat itself.'),
+        ('Forecasts that change behavior', 'When everyone acts on the same price or demand forecast, the series moves; a forecast can fulfill or defeat itself.'),
     ],
 )

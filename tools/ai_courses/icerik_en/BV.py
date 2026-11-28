@@ -81,7 +81,7 @@ ICERIK = dict(
         'Data lakes, warehouses and workflow orchestration',
     ],
     beceriler=['writing distributed jobs in PySpark', 'writing Kafka producers and consumers', 'columnar storage with Parquet',
-               'data modelling in Cassandra or MongoDB', 'diagnosing a slow Spark job'],
+               'data modeling in Cassandra or MongoDB', 'diagnosing a slow Spark job'],
     hazirlik=[
         ('Can you explain the difference between a process and a thread?', 'An operating systems course: processes and concurrency'),
         ('Can you write an SQL query with JOIN and GROUP BY?', 'SQL and the relational model from a database course'),
@@ -91,7 +91,7 @@ ICERIK = dict(
     riskler=[
         ('Silent data loss', 'Misconfigured replication or Kafka records deleted when retention expires can destroy data without anyone noticing.'),
         ('Keep-everything habits', 'Collecting personal data because storage is cheap widens the breach surface; GDPR and similar laws require purpose limits.'),
-        ('Honouring the right to erasure', 'A person\'s data spreads into backups, replicas and derived tables; fully honouring a deletion request is hard.'),
+        ('Honoring the right to erasure', 'A person\'s data spreads into backups, replicas and derived tables; fully honoring a deletion request is hard.'),
         ('Cloud bills and energy', 'A cluster left running or an unnecessary full table scan means a large bill and wasted energy.'),
     ],
 )

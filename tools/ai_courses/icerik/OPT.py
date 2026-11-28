@@ -35,7 +35,7 @@ ICERIK = dict(
     ],
     ayrisma=[
         ('EMO', 'Evrimsel yöntemler türev kullanmadan arar; bu ders problemin yapısını (türev, konvekslik) kullanan yöntemleri öğretir.'),
-        ('YZ', 'YZ işe problemi etmen ve çevre olarak modellemekle başlar; optimizasyon matematiksel olarak kurulmuş problemi çözer.'),
+        ('YZ', 'YZ ise problemi etmen ve çevre olarak modellemekle başlar; optimizasyon matematiksel olarak kurulmuş problemi çözer.'),
         ('MO', 'MÖ eğitim kaybını küçültürken yeni veride başarıyı da ister; optimizasyon yalnız verilen amacı en iyi yapar.'),
         ('PO', 'Pekiştirmeli öğrenme ödülü deneme yanılmayla en büyükler; bu derste amaç fonksiyonu baştan açıkça yazılıdır.'),
     ],

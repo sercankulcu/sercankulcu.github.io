@@ -10,7 +10,7 @@ KONU = {
     ('MO', 'YZ'): 'an agent that learns from data; statistical generalization instead of search',
     ('YSA', 'MO'): 'parametric model, loss function, gradient descent',
     ('DO', 'YSA'): 'multilayer networks, backpropagation, activation functions',
-    ('YZ', 'OI'): 'reasoning under uncertainty, Bayes rule',
+    ('YZ', 'OI'): 'reasoning under uncertainty, Bayes\' rule',
     ('YZ', 'OPT'): 'state-space search, constraint satisfaction',
     ('MO', 'DC'): 'feature vectors, matrix multiplication, PCA',
     ('MO', 'OI'): 'generalization error, bias-variance, probabilistic models',

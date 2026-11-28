@@ -68,7 +68,7 @@ DEMO = {
     var gor = Math.min(adimGoster, T);
     var ad = mk("text", { x: 384, y: Y0 + 4 * DY + 4, "text-anchor": "end", "class": "lbl" }, "step " + gor + " / " + T);
     ad.style.fontSize = "12px"; ad.style.fontWeight = 700; svg.appendChild(ad);
-    var ad2 = mk("text", { x: 6, y: Y0 + 4 * DY + 4, "class": "lbl" }, "colour = thread");
+    var ad2 = mk("text", { x: 6, y: Y0 + 4 * DY + 4, "class": "lbl" }, "color = thread");
     ad2.style.fontSize = "10.5px"; svg.appendChild(ad2);
     var X0 = 40, X1 = 380, Y1 = 196, Y2 = 268, ust = Math.min(1 / s, 40) * 1.1;
     function lx(q) { return X0 + Math.log(q) / Math.log(1024) * (X1 - X0); }

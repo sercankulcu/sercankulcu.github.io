@@ -136,6 +136,6 @@ DEMO = {
   range.addEventListener("input", function () { pEl.textContent = (+range.value).toFixed(1).replace(".", ","); });
   ciz();
 ''',
-    'not': ('Derecede Mert gibi kalabalık çevreliler öne çıkar, ama gruplar arası köprü Deniz’dir (arasındalık). Haberi köprüden başlatmak '
+    'not': ('Derecede Mert gibi çok arkadaşı olanlar öne çıkar, ama gruplar arası köprü Deniz’dir (arasındalık). Haberi köprüden başlatmak '
             'onu birden çok topluluğa taşır; etkileyici seçimi böyle yapılır.'),
 }

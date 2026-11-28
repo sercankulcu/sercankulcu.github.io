@@ -7,7 +7,7 @@ ICERIK = dict(
            '(rendering) inceler. Bilgisayarlı görünün tersidir: görü görüntüden sahneyi çıkarır, grafik sahneden '
            'görüntüyü üretir.'),
     tarihce=[
-        ('1963', 'Sutherland\'ın Sketchpad\'i ekranda kalemle çizim yapmayı gösterir; etkileşimli grafiğin başlangıcı.'),
+        ('1963', 'Sutherland\'ın Sketchpad\'i ekranda ışık kalemiyle çizim yapmayı gösterir; etkileşimli grafiğin başlangıcı.'),
         ('1975', 'Phong yansıma modelini ve gölgelendirme yöntemini yayımlar; parlak yüzeyler gerçekçileşir.'),
         ('1980', 'Whitted ışın izlemeyle yansıma, kırılma ve gölgeyi tek bir yöntemde toplar.'),
         ('1986', 'Kajiya görüntüleme denklemini (rendering equation) yayımlar: fiziğe dayalı görüntülemenin temeli.'),
@@ -54,7 +54,7 @@ ICERIK = dict(
     yanilgilar=[
         ('Bilgisayar grafiği yalnızca oyun yapmaktır.', 'Film, mimari, tıp, benzetim ve bilimsel görselleme de grafiğin uygulamalarıdır.'),
         ('Işın izleme yeni bir buluştur.', 'Yöntem 1980\'den beri bilinir; yeni olan, onu gerçek zamanda çalıştıran donanımdır.'),
-        ('Grafik ile bilgisayarlı görü aynıdır.', 'Biri birbirinin tersidir; kamera modelini paylaşırlar ama yönleri zıttır.'),
+        ('Grafik ile bilgisayarlı görü aynıdır.', 'Her biri ötekinin tersidir; kamera modelini paylaşırlar ama yönleri zıttır.'),
         ('Gerçekçilik için daha çok üçgen yeter.', 'Işık, gölge ve malzeme çoğu zaman geometrinin ayrıntısından daha belirleyicidir.'),
     ],
     meslekler=['Grafik programcısı', 'Oyun motoru geliştiricisi', 'Teknik sanatçı', 'XR geliştiricisi', 'Görselleme mühendisi'],

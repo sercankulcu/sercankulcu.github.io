@@ -71,7 +71,7 @@ ICERIK = dict(
         'The normal distribution and discriminant functions',
         'Parameter estimation: maximum likelihood, Bayesian',
         'Nonparametric density estimation: Parzen windows',
-        'Nearest-neighbour rule and distance measures',
+        'Nearest-neighbor rule and distance measures',
         'Linear discriminants and the perceptron',
         'Support vector machines',
         'Feature extraction, selection, curse of dimensionality',

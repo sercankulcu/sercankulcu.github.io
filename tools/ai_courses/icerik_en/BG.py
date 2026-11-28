@@ -2,9 +2,9 @@
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 18 slides: Computer Vision — recognition, object detection, '
              'segmentation, camera geometry, how it differs from image processing.'),
-    gundem=['Meaning from images', 'Features', 'Recognition and detection', 'Cameras and 3D', 'Video and motion', 'Related courses'],
+    gundem=['Meaning from images', 'Features', 'Recognition and detection', 'Cameras and 3D', 'Video and motion', 'Neighboring courses'],
     tanim=('Computer vision studies how to <b>extract meaning</b> from an image or video: which objects are there, where they '
-           'are, what 3D structure the scene has. The input is an image but the output is not; it is a label, a box, a mask '
+           'are, what 3D structure the scene has. The input is an image, but the output is not an image: it is a label, a box, a mask '
            'or depth. Transforming the image is the job of image processing.'),
     tarihce=[
         ('1963', 'Larry Roberts\'s PhD thesis recovers 3D blocks from line drawings: the field\'s first work.'),
@@ -54,7 +54,7 @@ ICERIK = dict(
     araclar_not='Unlike image processing, vision needs <b>many labeled images</b>; in COCO the box and mask of every object were drawn by hand.',
     yanilgilar=[
         ('Computer vision is another name for image processing.', 'Image processing transforms the image; vision extracts meaning from it. Vision uses image processing as a first step.'),
-        ('Vision is a solved problem.', 'Networks still fail noticeably under lighting, weather or cameras that differ from the training data.'),
+        ('Vision is a solved problem.', 'Networks can still fail noticeably when the lighting, weather or camera differs from the training data.'),
         ('Vision is just deep learning.', 'Calibration, stereo, SLAM and 3D reconstruction rest largely on geometry.'),
         ('A model "sees" an object the way a human does.', 'Networks can over-rely on texture and context; a small pixel change can flip a decision.'),
     ],

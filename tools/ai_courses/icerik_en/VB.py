@@ -85,7 +85,7 @@ ICERIK = dict(
         ('Can you explain the mean, median, standard deviation and the normal distribution?', '@OI'),
         ('Can you read a table in Python or R and group it by a column?', 'An intro programming course, then a short pandas or dplyr tutorial'),
         ('Can you write a simple SQL query with SELECT, WHERE and GROUP BY?', 'The SQL part of a database course, or online SQL exercises'),
-        ('Can you tell when a chart is misleading?', 'Not required, the course teaches it; if curious, Tufte\'s book'),
+        ('Can you tell when a chart is misleading?', 'Not required; the course teaches it. If curious, see Tufte\'s book'),
     ],
     riskler=[
         ('Confusing correlation with causation', 'Reading causes into correlations leads to wrong decisions: ice cream sales and drownings rise together because both happen in summer.'),

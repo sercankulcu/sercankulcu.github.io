@@ -45,7 +45,7 @@ ICERIK = dict(
         ('Warehouse robots', 'Moving shelves and picking orders.'),
         ('Autonomous vehicles', 'Perception, localization and planning.'),
         ('Surgical robots', 'Making the surgeon\'s motion more precise.'),
-        ('Planetary exploration', 'Mars rovers, autonomous driving at a distance.'),
+        ('Planetary exploration', 'Mars rovers that drive autonomously, far from any operator.'),
         ('Home robots', 'Robot vacuums and lawn mowers.'),
     ],
     araclar=['ROS 2', 'Gazebo', 'MoveIt', 'OpenCV', 'Point Cloud Library', 'Webots'],
@@ -86,7 +86,7 @@ ICERIK = dict(
     hazirlik=[
         ('Can you move a 2D point into another frame with a rotation matrix?', '@DC'),
         ('Can you explain velocity, acceleration and torque with an example?', 'Mechanics from physics: Newton\'s laws and rotational motion'),
-        ('Can you explain what the mean and variance of a Gaussian mean?', '@OI'),
+        ('Can you explain what the mean and variance of a Gaussian tell you?', '@OI'),
         ('Can you write a class in C++ or Python and process sensor data in a loop?', 'An intro C course, then a short introduction to classes in Python'),
     ],
     riskler=[

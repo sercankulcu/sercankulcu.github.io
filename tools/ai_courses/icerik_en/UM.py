@@ -67,7 +67,7 @@ ICERIK = dict(
         'Ho, Jain and Abbeel, "Denoising Diffusion Probabilistic Models", <em>Advances in Neural Information Processing Systems</em> 33, 2020.',
     ],
     islenenler=[
-        'Generative modelling; likelihood and KL divergence',
+        'Generative modeling; likelihood and KL divergence',
         'Autoregressive models: PixelCNN, transformers',
         'Variational autoencoders (VAE) and the ELBO',
         'Normalizing flows',
@@ -78,7 +78,7 @@ ICERIK = dict(
         'Conditional generation, classifier-free guidance',
         'Large language models: pretraining and fine-tuning',
         'Multimodal models: text to image',
-        'Evaluation: FID, perplexity, human judgement',
+        'Evaluation: FID, perplexity, human judgment',
     ],
     beceriler=['training VAEs and GANs in PyTorch', 'using diffusion models with Diffusers', 'fine-tuning language models with Transformers',
                'measuring sample quality with FID', 'tracking and comparing training runs'],
@@ -92,6 +92,6 @@ ICERIK = dict(
         ('Deepfakes', "A person's face and voice are imitated without consent and used for fraud, blackmail and election disinformation."),
         ('Training data without consent', "Web-scraped datasets such as LAION-5B contain works without their owners' permission; copyright lawsuits are ongoing."),
         ('Model collapse', 'Models retrained on generated data lose the tails of the distribution over generations, and their outputs grow uniform.'),
-        ('The metric illusion', 'Metrics such as FID do not always agree with human judgement; a model tuned to the metric can look worse to the eye.'),
+        ('The metric illusion', 'Metrics such as FID do not always agree with human judgment; a model tuned to the metric can look worse to the eye.'),
     ],
 )

@@ -76,12 +76,12 @@ ICERIK = dict(
         'Inference by sampling: Gibbs, MCMC',
         'Variational inference',
         'Hidden Markov models: forward-backward, Viterbi',
-        'Conditional random fields and sequence labelling',
+        'Conditional random fields and sequence labeling',
         'Parameter learning: maximum likelihood, Bayesian',
         'Learning with missing data: the EM algorithm',
         'Structure learning and a first look at causality',
     ],
-    beceriler=['building Bayesian networks with pgmpy', 'sequence modelling with hmmlearn', 'Bayesian models in PyMC or Stan',
+    beceriler=['building Bayesian networks with pgmpy', 'sequence modeling with hmmlearn', 'Bayesian models in PyMC or Stan',
                'reading conditional independence off a graph', 'interpreting inference results'],
     hazirlik=[
         ("Can you compute a conditional probability with Bayes' rule?", '@OI'),
@@ -90,7 +90,7 @@ ICERIK = dict(
         ('Can you explain maximum likelihood estimation with an example?', '@MO'),
     ],
     riskler=[
-        ('Tables filled with guesses', 'Without data, probability tables are filled with expert guesses; a precise-looking 83 per cent hides how uncertain those guesses are.'),
+        ('Tables filled with guesses', 'Without data, probability tables are filled with expert guesses; a precise-looking 83 percent hides how uncertain those guesses are.'),
         ('False independence assumptions', 'Treating two dependent pieces of evidence as independent counts the same information twice and makes the model overconfident.'),
         ('Probability errors in court', "Mistaking the chance of the evidence for the chance of guilt (the prosecutor's fallacy) and ignoring base rates can convict the innocent."),
         ('Unconverged sampling', 'Stop an MCMC chain too early and the posterior is wrong; results cannot be trusted without reported convergence diagnostics.'),

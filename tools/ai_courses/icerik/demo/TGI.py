@@ -127,5 +127,5 @@ DEMO = {
   ciz();
 ''',
     'not': ('Tıbbi görüntüde bölütleme bir sayıya dönüşür: hacim, büyüme, tedaviye yanıt. Ders, yöntemi '
-            '<b>uzman işaretine</b> göre Dice ile ölçmeyi ve gürültüye karşı önişlemeyi öğretir.'),
+            '<b>uzman işaretine</b> göre Dice ile ölçmeyi ve gürültüye karşı ön işlemeyi öğretir.'),
 }

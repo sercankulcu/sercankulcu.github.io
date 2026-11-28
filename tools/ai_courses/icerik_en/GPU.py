@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 37 slides: GPU Programming and Parallel Computing — thread model, '
-             'memory hierarchy, parallel patterns, speedup, history, neighbours, overlaps.'),
-    gundem=['CPU and GPU', 'Thread model', 'Memory hierarchy', 'Parallel patterns', 'Measuring performance', 'Neighbouring courses'],
+             'memory hierarchy, parallel patterns, speedup, history, neighboring courses, overlaps.'),
+    gundem=['CPU and GPU', 'Thread model', 'Memory hierarchy', 'Parallel patterns', 'Measuring performance', 'Neighboring courses'],
     tanim=('GPU programming studies <b>data-parallel</b> computation, which applies the same operation to thousands of '
            'data elements at once. Using a model such as CUDA, the course teaches how to organize threads, use the memory '
            'hierarchy efficiently and measure speedup; this is also the hardware that makes deep learning practical.'),
@@ -18,7 +18,7 @@ ICERIK = dict(
         ('SIMT and warps', '32 threads execute the same instruction together.'),
         ('Thread organization', 'The grid, block and thread hierarchy.'),
         ('Memory hierarchy', 'Registers, shared memory, global memory.'),
-        ('Coalesced access', 'Neighbouring threads should access neighbouring addresses.'),
+        ('Coalesced access', 'Neighboring threads should access neighboring addresses.'),
         ('Synchronization', 'Barriers, atomic operations and race conditions.'),
         ('Amdahl\'s law', 'The sequential part caps the achievable speedup.'),
         ('Occupancy', 'Enough threads to keep the cores busy.'),
@@ -62,7 +62,7 @@ ICERIK = dict(
     meslekler=['GPU software engineer', 'High-performance computing (HPC) specialist', 'ML infrastructure engineer',
                'Game and graphics engine developer', 'Scientific computing researcher'],
     sonra=('GPU programming opens up the engine beneath deep learning and graphics. From here you can move to systems '
-           'topics such as distributed training, compilers and accelerator design, or to neighbouring courses in the guide '
+           'topics such as distributed training, compilers and accelerator design, or to neighboring courses in the guide '
            'such as big data systems and embedded AI.'),
     kaynaklar=[
         'Kirk, Hwu and El Hajj, <em>Programming Massively Parallel Processors</em>, 4th ed., Morgan Kaufmann, 2022.',

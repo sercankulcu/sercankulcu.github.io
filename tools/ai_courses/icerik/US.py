@@ -31,7 +31,7 @@ ICERIK = dict(
                 'arızayı bulur ve hangi kuralları kullandığını adım adım gösterir.'),
     onkosul_ek=[
         ('Ayrık Matematik', 'önerme ve yüklem mantığı, çıkarım kuralları', None),
-        ('Veri Yapıları', 'ağaç, çizge ve eşleme tabloları: kural ve olgu deposu', '/teaching/data-structures/'),
+        ('Veri Yapıları', 'ağaç, çizge ve karma tablolar: kural ve olgu deposu', '/teaching/data-structures/'),
         ('Java ile NYP', 'sınıf ve kalıtım: çerçeve temsiline ve Drools\'a köprü', '/teaching/object-oriented-programming-with-java/'),
     ],
     ayrisma=[
@@ -86,7 +86,7 @@ ICERIK = dict(
     hazirlik=[
         ('"Her insan ölümlüdür" gibi bir cümleyi yüklem mantığıyla yazabiliyor musun?', 'Ayrık matematikteki önerme ve yüklem mantığı'),
         ('Derinlik ve genişlik öncelikli aramayı bir örnekte yürütebiliyor musun?', '@YZ'),
-        ('Eşleme tablosu ve çizgeyi bir programda kullanabiliyor musun?', 'Veri Yapıları dersindeki eşleme tablosu ve çizge'),
+        ('Karma tabloyu ve çizgeyi bir programda kullanabiliyor musun?', 'Veri Yapıları dersindeki karma tablo ve çizge'),
         ('Sınıf, nesne ve kalıtımı bir örnekle açıklayabiliyor musun?', 'Java ile nesne yönelimli programlamaya giriş'),
     ],
     riskler=[

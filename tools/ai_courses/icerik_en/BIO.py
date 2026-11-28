@@ -67,14 +67,14 @@ ICERIK = dict(
         'Daugman, "How Iris Recognition Works", <em>IEEE Transactions on Circuits and Systems for Video Technology</em> 14(1), 2004.',
     ],
     islenenler=[
-        'Biometric systems: enrol, verify, identify',
+        'Biometric systems: enroll, verify, identify',
         'Measuring performance: FAR, FRR, ROC, DET, EER',
         'Fingerprints: preprocessing, minutiae, matching',
         'Face detection and alignment',
         'Face recognition: eigenfaces, LBP, deep embeddings',
         'Iris: segmentation, Daugman\'s code, Hamming distance',
         'Speaker verification from voice',
-        'Behavioural biometrics: signature, gait, keystrokes',
+        'Behavioral biometrics: signature, gait, keystrokes',
         'Multimodal biometrics and score fusion',
         'Presentation attacks and liveness detection',
         'Template protection and cancellable biometrics',
@@ -83,7 +83,7 @@ ICERIK = dict(
     beceriler=['face processing with OpenCV and dlib', 'extracting face embeddings with InsightFace', 'plotting DET curves and computing EER',
                'choosing a threshold by application risk', 'measuring performance per group'],
     hazirlik=[
-        ('Can you load an image, crop it and convert it to greyscale?', '@GI'),
+        ('Can you load an image, crop it and convert it to grayscale?', '@GI'),
         ('Can you explain a classifier\'s ROC curve and false positive rate?', '@OT'),
         ('Can you compute the cosine similarity between two vectors?', '@DC'),
         ('Can you process a folder of images with NumPy arrays in Python?', 'An intro programming course, then a short NumPy tutorial'),
@@ -91,7 +91,7 @@ ICERIK = dict(
     riskler=[
         ('Mass surveillance', 'Real-time face recognition in public spaces makes it possible to track everyone without asking; many countries restrict it by law.'),
         ('Arrests from false matches', 'In the US there are documented cases of innocent people being detained on the strength of a false face recognition match.'),
-        ('Function creep', 'Face or fingerprint data collected for door access can be reused for other purposes; GDPR and similar laws treat it as special data.'),
+        ('Function creep', 'Face or fingerprint data collected for door access can be reused for other purposes; GDPR and similar laws treat it as special-category data.'),
         ('Central template stores', 'Holding millions of templates in one place exposes everyone at once; the 2015 US OPM breach leaked 5.6 million fingerprints.'),
     ],
 )

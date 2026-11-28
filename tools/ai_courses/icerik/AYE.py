@@ -7,7 +7,7 @@ ICERIK = dict(
            'adil, güvenilir ve hesap verebilir olmasını inceler. Teknik soru "model neden bu kararı verdi?", etik soru '
            '"bu karar kime zarar verebilir ve sorumlusu kim?" sorusudur.'),
     tarihce=[
-        ('2016', 'ProPublica, COMPAS suç riski puanının siyahi sanıklar aleyhine yanlı olduğunu öne süren analizi yayımlar.'),
+        ('2016', 'ProPublica, COMPAS yeniden suç işleme riski puanının siyahi sanıklar aleyhine yanlı olduğunu öne süren analizi yayımlar.'),
         ('2016', 'Ribeiro, Singh ve Guestrin LIME yöntemini tanıtır: tek bir tahmini yerel, basit bir modelle açıklamak.'),
         ('2017', 'Lundberg ve Lee SHAP yöntemini yayımlar: oyun kuramındaki Shapley değerleriyle öznitelik katkısı.'),
         ('2018', 'AB Genel Veri Koruma Tüzüğü (GDPR) yürürlüğe girer; otomatik kararlara itiraz hakkı tanınır.'),
@@ -16,7 +16,7 @@ ICERIK = dict(
     ],
     kavramlar=[
         ('Kara kutu model', 'İç işleyişi insan tarafından izlenemeyen model.'),
-        ('Yorumlanabilirlik', 'Doğası gereği okunabilen model: karar ağacı, doğrusal.'),
+        ('Yorumlanabilirlik', 'Doğası gereği okunabilen model: karar ağacı, doğrusal model.'),
         ('Yerel açıklama', 'Tek bir tahmini açıklamak: LIME, SHAP değerleri.'),
         ('Genel açıklama', 'Modelin bütün davranışı: öznitelik önemi, PDP.'),
         ('Karşı olgusal', '"Gelirin şu kadar olsaydı kredi onaylanırdı."'),
@@ -28,7 +28,7 @@ ICERIK = dict(
           ('Modeli\naçıkla', 'SHAP, LIME,\nkarşı olgusal'), ('Adaleti\nölç', 'gruplar arası\nhata oranı'),
           ('Belgele ve\nizle', 'model kartı,\ndenetim')],
     akis_ornek=('<b>Örnek:</b> Bir bankanın kredi modeli başvuru reddeder. SHAP değerleri reddin en çok borç oranından '
-                'kaynaklandığını gösterir; gruplar arası karşılaştırma bazı semtlerde ret oranının belirgin yüksek olduğunu '
+                'kaynaklandığını gösterir; gruplar arası karşılaştırma bazı semtlerde ret oranının belirgin biçimde yüksek olduğunu '
                 'ortaya çıkarır. Ekip semti dolaylı yoldan temsil eden özniteliği çıkarır ve kararı model kartında belgeler.'),
     onkosul_ek=[
         ('Programlama', 'Python ile model eğitme ve sonuçları çözümleme', '/teaching/computer-and-introduction-to-programming/'),

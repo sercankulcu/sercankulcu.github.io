@@ -10,7 +10,7 @@ DEMO = {
   <input type="range" min="0" max="18" step="0.5" value="6" aria-label="Alarm threshold">
   <div class="ai-ctl"><button type="button" data-u="1">Attacker adapts</button></div>
   <div class="ai-out"></div>
-  <div class="ai-out" style="font-size:13px">The score is how surprising a login is compared with normal behaviour: failed attempts, hour, new device, foreign country. The model learned from normal logins only.</div>
+  <div class="ai-out" style="font-size:13px">The score is how surprising a login is compared with normal behavior: failed attempts, hour, new device, foreign country. The model learned from normal logins only.</div>
 </div>''',
     'js': r'''
   var svg = root.querySelector("svg"), range = root.querySelector("input"), eEl = root.querySelector(".ai-e");

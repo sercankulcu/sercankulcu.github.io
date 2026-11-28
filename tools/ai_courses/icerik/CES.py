@@ -24,7 +24,7 @@ ICERIK = dict(
         ('Nash dengesi', 'Hiçbir etmenin tek başına stratejisini değiştirmek istemediği durum.'),
         ('Ortaya çıkan davranış', 'Basit yerel kurallardan doğan küresel düzen.'),
     ],
-    akis=[('Algıla', 'ortam ve\nöteki etmenler'), ('Akıl yürüt', 'inanç,\nhedef'), ('İletiş', 'mesaj, teklif'),
+    akis=[('Algıla', 'ortam ve\nöteki etmenler'), ('Akıl yürüt', 'inanç,\nhedef'), ('Haberleş', 'mesaj, teklif'),
           ('Eşgüdümle', 'uzlaşma,\nihale'), ('Eyle', 'ortak sonuç')],
     akis_ornek=('<b>Örnek:</b> Bir depoda yüz robot siparişleri toplar. Yeni bir sipariş gelince her robot konumuna göre '
                 'teklif verir, en uygun teklif işi alır; robotlar yollarını birbirine bildirerek koridorda çarpışmadan '
@@ -36,7 +36,7 @@ ICERIK = dict(
     ],
     ayrisma=[
         ('YZ', 'YZ tek etmenin çevresine karşı en iyi kararını arar; bu ders öteki etmenlerin de karar verdiği ortamda ortak davranışı inceler.'),
-        ('PO', 'PÖ tek etmenin ödülle öğrenmesini inceler; bu ders öğrenme şart olmadan iletişim, uzlaşma ve eşgüdüm kurallarını da kapsar.'),
+        ('PO', 'PÖ tek etmenin ödülle öğrenmesini inceler; bu ders öğrenme olsun olmasın iletişim, uzlaşma ve eşgüdüm kurallarını da kapsar.'),
         ('ROB', 'Robotik tek bir makinenin algılama ve hareketini çözer; bu ders birçok robotun ya da yazılım etmeninin iş bölümünü ele alır.'),
         ('EMO', 'Sürü zekâsı algoritmaları sürüyü bir problemi çözmek için araç olarak kullanır; bu derste etmenlerin kendisi ve etkileşimi konudur.'),
     ],

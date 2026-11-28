@@ -69,7 +69,7 @@ ICERIK = dict(
         'Örüntü tanıma sistemi: algılama, öznitelik, karar',
         'Bayes karar kuramı, risk ve kayıp',
         'Normal dağılım ve ayırtaç fonksiyonları',
-        'Parametre kestirimi: en büyük olabilirlik, Bayes',
+        'Parametre kestirimi: en çok olabilirlik, Bayes',
         'Parametresiz yoğunluk kestirimi: Parzen',
         'En yakın komşu kuralı ve uzaklık ölçüleri',
         'Doğrusal ayırtaçlar ve algılayıcı',
@@ -90,7 +90,7 @@ ICERIK = dict(
     riskler=[
         ('Rızasız yüz tanıma', 'Yüz tanıma kişileri habersiz izlemeye yarar; Clearview AI internetten topladığı yüzler için birçok Avrupa ülkesinde cezalandırıldı.'),
         ('Gruplar arası hata farkı', 'Gender Shades çalışmasında ticari cinsiyet sınıflandırıcıları koyu tenli kadınlarda açık tenli erkeklerden çok daha sık yanıldı.'),
-        ('Eşit sayılan hatalar', 'Kanseri kaçırmak ile yanlış alarm aynı tartılırsa toplam hata düşük, sonuç tehlikeli olur; kayıp matrisi bilinçle seçilmeli.'),
+        ('Eşit sayılan hatalar', 'Kanseri kaçırmak ile yanlış alarm aynı tartılırsa toplam hata düşük, sonuç tehlikeli olur; kayıp matrisi bilinçli seçilmeli.'),
         ('Seçimde sızıntı', 'Öznitelikleri tüm veride seçip sonra çapraz doğrulama yapmak hatayı olduğundan çok düşük gösterir.'),
     ],
 )

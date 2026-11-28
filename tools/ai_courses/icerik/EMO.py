@@ -5,7 +5,7 @@ ICERIK = dict(
     gundem=['Popülasyon ve uygunluk', 'Genetik algoritma', 'Yerel arama', 'Sürü zekâsı', 'Çok amaçlı arama', 'Komşu dersler'],
     tanim=('Evrimsel ve metasezgisel optimizasyon, türevi olmayan ya da arama uzayı çok büyük problemlerde iyi bir '
            'çözümü <b>deneme, seçme ve değiştirme</b> döngüsüyle arar. Doğal seçilim, metal tavlama ya da karınca '
-           'kolonisi gibi süreçlerden esinlenen bu yöntemler en iyi çözümü garanti etmez, kısa sürede iyi bir çözüm verir.'),
+           'kolonisi gibi süreçlerden esinlenen bu yöntemler en iyi çözümü garanti etmez ama kısa sürede iyi bir çözüm verir.'),
     tarihce=[
         ('1975', 'Holland, genetik algoritmanın temelini atan "Adaptation in Natural and Artificial Systems"i yayımlar.'),
         ('1983', 'Kirkpatrick, Gelatt ve Vecchi benzetilmiş tavlamayı (simulated annealing) tanıtır.'),
@@ -35,7 +35,7 @@ ICERIK = dict(
     ],
     ayrisma=[
         ('OPT', 'Optimizasyon türev ve konvekslikle kanıtlanabilir en iyiye ulaşır; bu ders türevsiz, garantisiz ama geniş uygulanabilir aramayı öğretir.'),
-        ('YZ', 'YZ\'deki A* gibi aramalar durum uzayında hedefe giden yolu bulur; bu ders doğrudan iyi bir tam çözüm arar.'),
+        ('YZ', 'YZ\'deki A* gibi aramalar durum uzayında hedefe giden yolu bulur; bu ders doğrudan eksiksiz ve iyi bir çözüm arar.'),
         ('PO', 'PÖ ortamla etkileşerek durumdan eyleme bir politika öğrenir; bu ders tek bir amaç fonksiyonu için iyi çözüm arar.'),
         ('YSA', 'YSA ağırlıkları gradyanla eğitir; bu ders gradyan olmadan, örneğin ağ yapısını ya da hiperparametreleri evrimle arar.'),
     ],

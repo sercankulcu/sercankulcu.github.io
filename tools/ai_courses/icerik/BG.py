@@ -4,7 +4,7 @@ ICERIK = dict(
              'bölütleme, kamera geometrisi, görüntü işlemeden farkı, kısa tarihçe, komşu dersler, örtüşme ve ayrışma noktaları.'),
     gundem=['Görüntüden anlam', 'Öznitelikler', 'Tanıma ve nesne bulma', 'Kamera ve 3B', 'Video ve hareket', 'Komşu dersler'],
     tanim=('Bilgisayarlı görü, bir görüntüden ya da videodan <b>anlam çıkarmayı</b> inceler: hangi nesneler var, nerede, '
-           'sahne nasıl bir üç boyutlu yapıya sahip. Girdi görüntüdür ama çıktı görüntü değil; etiket, kutu, maske ya da '
+           'sahne nasıl bir üç boyutlu yapıya sahip. Girdi görüntüdür ama çıktı görüntü değildir: etiket, kutu, maske ya da '
            'derinliktir. Görüntüyü dönüştürmek görüntü işlemenin işidir.'),
     tarihce=[
         ('1963', 'Larry Roberts\'ın doktora tezi, çizgi çizimlerinden üç boyutlu blokları çıkarır: alanın ilk çalışması.'),

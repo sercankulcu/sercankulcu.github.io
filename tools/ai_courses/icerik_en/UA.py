@@ -72,7 +72,7 @@ ICERIK = dict(
         'Sensors, platforms and types of resolution',
         'Radiometric and atmospheric correction',
         'Geometric correction, coordinate systems, projections',
-        'Image enhancement and colour composites',
+        'Image enhancement and color composites',
         'Spectral indices: NDVI, NDWI',
         'Supervised and unsupervised land-cover classification',
         'Accuracy assessment and ground truth',
@@ -85,7 +85,7 @@ ICERIK = dict(
                'land-cover maps with accuracy tables', 'interpreting indices such as NDVI'],
     hazirlik=[
         ('Can you explain the visible and infrared parts of the electromagnetic spectrum?', 'Electromagnetic waves from high-school physics'),
-        ('Can you explain latitude/longitude versus projected (metre) coordinates?', 'A short introductory GIS tutorial with QGIS'),
+        ('Can you explain latitude/longitude versus projected (meter) coordinates?', 'A short introductory GIS tutorial with QGIS'),
         ('Can you apply a histogram and thresholding to an image?', '@GI'),
         ('Can you train a classifier and interpret its confusion matrix?', '@MO'),
     ],

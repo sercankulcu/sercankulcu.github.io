@@ -24,7 +24,7 @@ ICERIK = dict(
         ('Ön işleme', 'Eksik değer, gürültü, ayrıklaştırma, normalleştirme.'),
         ('Dizisel örüntü', 'Zaman sırasıyla tekrarlanan olay dizileri.'),
     ],
-    akis=[('Seç', 'ilgili veri,\nhedef kitle'), ('Ön işle', 'temizleme,\neksik değer'), ('Dönüştür', 'ayrıklaştırma,\nboyut azaltma'),
+    akis=[('Seç', 'hedef veri,\nilgili alanlar'), ('Ön işle', 'temizleme,\neksik değer'), ('Dönüştür', 'ayrıklaştırma,\nboyut azaltma'),
           ('Madencilik', 'kural, küme,\naykırılık'), ('Yorumla', 'ilginçlik,\nuzman görüşü')],
     akis_ornek=('<b>Örnek:</b> Bir market bir yılın kasa fişlerini seçer, iadeleri ve hatalı kayıtları ayıklar, her fişi '
                 'ürün kümesine dönüştürür, Apriori ile "makarna alan sos da alır" gibi kurallar bulur ve kaldıracı '
@@ -56,7 +56,7 @@ ICERIK = dict(
         ('Güçlü birliktelik neden-sonuçtur.', 'Birlikte görülmek birinin ötekine yol açtığını göstermez; ortak bir neden olabilir.'),
         ('Kümelemenin tek doğru sonucu vardır.', 'Sonucu küme sayısı, uzaklık ölçüsü ve ölçekleme belirler; farklı seçim, farklı küme.'),
     ],
-    meslekler=['Veri madenciliği uzmanı', 'Veri analisti', 'İş zekâsı uzmanı', 'Müşteri analitiği uzmanı', 'Dolandırıcılık analisti'],
+    meslekler=['Veri madenciliği uzmanı', 'Veri analisti', 'İş zekâsı uzmanı', 'Müşteri analitiği uzmanı', 'Sahtekârlık analisti'],
     sonra=('Veri madenciliği, veri kısmının keşif ayağıdır. Buradan kurallarla öneri sistemlerine, topluluk bulmayla '
            'sosyal ağ analizine, ölçeklenebilir madencilikle büyük veri sistemlerine ya da tahmine odaklanmak için '
            'makine öğrenmesine geçilebilir.'),
@@ -85,7 +85,7 @@ ICERIK = dict(
     hazirlik=[
         ('İki tabloyu bir SQL sorgusuyla birleştirip gruplayabiliyor musun?', 'Bir veritabanı dersindeki SQL: JOIN ve GROUP BY'),
         ('Koşullu olasılığı ve bağımsızlığı bir örnekle açıklayabiliyor musun?', '@OI'),
-        ('Karma tablosunun ne zaman ağaçtan iyi olduğunu açıklayabiliyor musun?', 'Veri Yapıları dersi: karma tabloları ve ağaçlar'),
+        ('Karma tablonun ne zaman ağaçtan iyi olduğunu açıklayabiliyor musun?', 'Veri Yapıları dersi: karma tabloları ve ağaçlar'),
         ('Python\'da bir CSV dosyasını okuyup eksik değerleri sayabiliyor musun?', 'Programlamaya giriş, ardından pandas\'a kısa bir giriş'),
     ],
     riskler=[

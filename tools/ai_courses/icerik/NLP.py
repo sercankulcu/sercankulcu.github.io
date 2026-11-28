@@ -70,7 +70,7 @@ ICERIK = dict(
         'Düzenli ifadeler, belirteçleme, normalleştirme',
         'Biçimbilim: kök bulma ve ek çözümleme',
         'n-gram dil modelleri ve yumuşatma',
-        'Naive Bayes ve lojistik regresyonla metin sınıflama',
+        'Naive Bayes ve lojistik regresyonla metin sınıflandırma',
         'Vektör anlambilimi: TF-IDF ve word2vec',
         'Sözcük türü etiketleme ve gizli Markov modelleri',
         'Varlık tanıma ve dizi etiketleme (CRF)',

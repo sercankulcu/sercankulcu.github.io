@@ -53,7 +53,7 @@ ICERIK = dict(
     veriler=['KDD Cup 1999 / NSL-KDD', 'CICIDS2017', 'UNSW-NB15', 'EMBER (zararlı yazılım)', 'Enron-Spam', 'PhishTank'],
     araclar_not='Eski veri setleri (KDD Cup 1999) hâlâ çok kullanılır ama bugünün trafiğini yansıtmaz; sonuçlar güncel veri setlerinde de sınanmalıdır.',
     yanilgilar=[
-        ('%99 doğruluk iyi bir saldırı tespitidir.', 'Saldırılar çok nadirse her şeye normal diyen model de %99 doğrudur; kesinlik ve yanlış alarm oranı bakılır.'),
+        ('%99 doğruluk iyi bir saldırı tespitidir.', 'Saldırılar çok nadirse her şeye normal diyen model de %99 doğrudur; kesinliğe ve yanlış alarm oranına bakılır.'),
         ('Model bir kez eğitilince saldırıları yakalar.', 'Saldırganlar yöntem değiştirir; model yeni örneklerle sürekli güncellenmelidir.'),
         ('YZ güvenlik analistinin yerini alır.', 'YZ uyarıları süzer ve önceliklendirir; karar ve soruşturma hâlâ insandadır.'),
         ('Derin ağlar saldırıya karşı dayanıklıdır.', 'Göze görünmeyen küçük değişiklikler (düşmanca örnekler) modelin kararını kolayca değiştirebilir.'),

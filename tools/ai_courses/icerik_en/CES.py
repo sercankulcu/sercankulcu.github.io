@@ -79,7 +79,7 @@ ICERIK = dict(
         'Social choice and voting',
         'Auctions and mechanism design',
         'Bargaining and negotiation protocols',
-        'Agent-based simulation and emergent behaviour',
+        'Agent-based simulation and emergent behavior',
         'Multi-agent reinforcement learning',
     ],
     beceriler=['writing agents and messaging in JADE', 'simulation with NetLogo or Mesa', 'learning agents in PettingZoo',
@@ -91,7 +91,7 @@ ICERIK = dict(
         ('Can you write an algorithm that finds the shortest path in a graph?', 'Graph algorithms from an algorithms course'),
     ],
     riskler=[
-        ('Unforeseen collective behaviour', 'Agents that each work correctly can together produce surprises: in the 2010 Flash Crash, automated trading sped up the fall.'),
+        ('Unforeseen collective behavior', 'Agents that each work correctly can together produce surprises: in the 2010 Flash Crash, automated trading sped up the fall.'),
         ('Collusion without talking', 'Pricing agents that learn can, without any agreement, learn to punish each other and settle on prices above the competitive level.'),
         ('Gaming the mechanism', 'An agent that finds a loophole in an auction or voting rule can bid or vote untruthfully and tilt the outcome its way.'),
         ('Mistaking simulation for reality', 'Results of agent-based epidemic or market simulations depend on the assumed rules and should not go straight into policy.'),

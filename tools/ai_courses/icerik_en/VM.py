@@ -3,7 +3,7 @@ ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 25 slides: Data Mining — the knowledge discovery process, '
              'association rules, clustering, outliers, history, neighboring courses and overlaps.'),
     gundem=['Knowledge discovery', 'Association rules', 'Clustering', 'Outliers', 'Interestingness measures', 'Neighboring courses'],
-    tanim=('Data mining studies how to <b>discover patterns</b> in large data collections that are previously unknown, '
+    tanim=('Data mining studies how to <b>discover patterns</b> in large data collections, patterns that are previously unknown, '
            'valid and useful. It uses the same algorithms as machine learning, but the goal is not prediction on new '
            'examples; it is finding rules, clusters and anomalies in the data itself.'),
     tarihce=[
@@ -24,7 +24,7 @@ ICERIK = dict(
         ('Preprocessing', 'Missing values, noise, discretization, normalization.'),
         ('Sequential pattern', 'Event sequences that recur in time order.'),
     ],
-    akis=[('Select', 'relevant data,\ntarget group'), ('Preprocess', 'cleaning,\nmissing data'), ('Transform', 'discretizing,\nreduction'),
+    akis=[('Select', 'target data,\nrelevant fields'), ('Preprocess', 'cleaning,\nmissing data'), ('Transform', 'discretizing,\nreduction'),
           ('Mine', 'rules, clusters,\nanomalies'), ('Interpret', 'interest,\nexpert review')],
     akis_ornek=('<b>Example:</b> A supermarket selects a year of receipts, removes returns and bad records, turns each '
                 'receipt into an itemset, finds rules such as "customers who buy pasta also buy sauce" with Apriori, '
@@ -92,6 +92,6 @@ ICERIK = dict(
         ('Inferring sensitive facts', 'Pregnancy, illness or money trouble can be inferred from a shopping basket, even if the person never shared it.'),
         ('Anonymous data is not anonymous', 'Netflix Prize data was linked to IMDb ratings to identify some users; the planned second contest was cancelled over it.'),
         ('Data dredging', 'Search for enough patterns and chance ones look significant; multiple comparison corrections and testing on fresh data are needed.'),
-        ('Discriminatory profiling', 'Customer segments built from postcodes or shopping patterns can indirectly give some groups different prices and service.'),
+        ('Discriminatory profiling', 'Customer segments built from ZIP codes or shopping patterns can indirectly give some groups different prices and service.'),
     ],
 )

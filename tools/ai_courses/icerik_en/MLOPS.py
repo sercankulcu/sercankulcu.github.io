@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 35 slides: Machine Learning Systems and MLOps — model lifecycle, '
-             'versioning, deployment, monitoring, history, neighbours, overlaps.'),
-    gundem=['Lifecycle', 'Versioning', 'Deployment', 'Monitoring and drift', 'Automation', 'Neighbouring courses'],
+             'versioning, deployment, monitoring, history, neighbors, overlaps.'),
+    gundem=['Lifecycle', 'Versioning', 'Deployment', 'Monitoring and drift', 'Automation', 'Neighboring courses'],
     tanim=('MLOps applies software engineering and DevOps practice to ML so that models reach production and run '
            'reliably there. The course covers versioning data, code and models together, automating the '
            '<b>pipeline</b>, deploying, and monitoring the model in production.'),
@@ -92,7 +92,7 @@ ICERIK = dict(
         ('Can you write a modular Python project that has unit tests?', 'Object-oriented programming, then a short pytest tutorial'),
     ],
     riskler=[
-        ('Silent decay', 'Without drift monitoring a model degrades with no errors; many demand forecasts lost their accuracy overnight in COVID-19.'),
+        ('Silent decay', 'Without drift monitoring a model degrades with no errors; many demand forecasts lost their accuracy overnight when COVID-19 hit.'),
         ('Training-serving skew', 'If a feature is computed differently in training and production, a model that tested well predicts wrongly live.'),
         ('Feedback loops', 'A model retrained on the outcomes of its own decisions, such as a recommender or credit model, amplifies its own bias.'),
         ('Untraceable versions', 'A model whose training data and code are unknown cannot be explained in a complaint or audit, nor rolled back.'),

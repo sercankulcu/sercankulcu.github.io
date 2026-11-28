@@ -77,6 +77,6 @@ DEMO = {
   inp.addEventListener("input", function () { qBtn.forEach(function (o) { o.classList.toggle("is-on", o.getAttribute("data-q") === inp.value); }); ciz(); });
   ciz();
 ''',
-    'not': ('IDF, neredeyse her makalede geçen “sipariş”, “kargo” gibi sözcüklerin ağırlığını düşürür; ayırt edici “hasarlı” öne çıkar. '
+    'not': ('IDF, birçok makalede geçen “sipariş”, “kargo” gibi sözcüklerin ağırlığını düşürür; ayırt edici “hasarlı” öne çıkar. '
             'TF düğmesiyle farkı görün. Kökü ilk dört harfle almak Türkçe ekleri basitçe yutar.'),
 }

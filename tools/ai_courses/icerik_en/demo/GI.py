@@ -10,7 +10,7 @@ DEMO = {
   <label>Threshold = <b class="ai-t">70</b></label>
   <input type="range" min="10" max="160" value="70" aria-label="Threshold">
   <div class="ai-out"></div>
-  <div class="ai-out" style="font-size:13px">Each step is a real 3×3 <b>convolution</b>. Blur and lower the threshold a little: noise edges drop and F1 rises.</div>
+  <div class="ai-out" style="font-size:13px">The blur and Sobel steps are real 3×3 <b>convolutions</b>. Blur and lower the threshold a little: noise edges drop and F1 rises.</div>
 </div>''',
     'js': r'''
   var svg = root.querySelector("svg"), out = root.querySelectorAll(".ai-out")[0];

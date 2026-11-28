@@ -8,7 +8,7 @@ ICERIK = dict(
            'the <b>acoustic model</b> and the language model together find the most likely text.'),
     tarihce=[
         ('1952', 'Bell Labs\' Audrey system recognizes digits spoken by a single speaker.'),
-        ('1962', 'IBM Shoebox is demonstrated, recognizing sixteen English words and the digits.'),
+        ('1962', 'IBM Shoebox is demonstrated, recognizing sixteen spoken English words, including the ten digits.'),
         ('1970s', 'In DARPA-funded projects, Carnegie Mellon\'s Harpy system recognizes about a thousand words.'),
         ('1980s', 'Hidden Markov models (HMMs) become the standard method of speech recognition.'),
         ('2012', 'Deep neural networks begin replacing Gaussian mixtures in acoustic modeling.'),
@@ -80,7 +80,7 @@ ICERIK = dict(
         'Speech synthesis (TTS)',
     ],
     beceriler=['extracting features with librosa', 'transcribing and fine-tuning with Whisper', 'training models with torchaudio',
-               'analysing speech in Praat', 'comparing systems by WER'],
+               'analyzing speech in Praat', 'comparing systems by WER'],
     hazirlik=[
         ('Can you explain how the Fourier transform splits a signal into frequencies?', '@SSI'),
         ("Can you use conditional probability and Bayes' rule?", '@OI'),

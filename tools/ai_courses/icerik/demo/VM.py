@@ -125,5 +125,5 @@ DEMO = {
   hesapla();
 ''',
     'not': ('Veri madenciliği <b>keşiftir</b>: soru sorulmadan veride sık tekrar eden kalıplar aranır. Kaldıraç 1 civarındaysa kural '
-            'boştur (Ekmek zaten herkesin sepetinde); işe yarayan kural kaldıracı 1’in belirgin üstünde olandır.'),
+            'boştur (Ekmek zaten neredeyse her sepette); işe yarayan kural kaldıracı 1’in belirgin üstünde olandır.'),
 }

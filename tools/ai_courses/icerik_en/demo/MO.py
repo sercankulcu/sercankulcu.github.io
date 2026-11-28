@@ -80,5 +80,5 @@ DEMO = {
   ciz();
 ''',
     'not': ('Nobody wrote the rule: the decision comes entirely from <b>examples</b>. With a small k the model memorizes noise, '
-            'with a large k it misses detail; the right k is chosen on held-out test data.'),
+            'with a large k it misses detail; the right k is chosen on held-out validation data.'),
 }

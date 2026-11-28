@@ -31,7 +31,7 @@ ICERIK = dict(
                 'değerlerini günceller; binlerce denemeden sonra kısa ve güvenli yol ortaya çıkar.'),
     onkosul_ek=[
         ('Algoritmalar', 'dinamik programlama ve çizgede en kısa yol', '/teaching/algorithms/'),
-        ('Programlama', 'Python ile simülasyon döngüleri ve diziler', '/teaching/computer-and-introduction-to-programming/'),
+        ('Programlama', 'Python ile benzetim döngüleri ve diziler', '/teaching/computer-and-introduction-to-programming/'),
     ],
     ayrisma=[
         ('MO', 'Denetimli öğrenmede her örneğin doğru yanıtı verilir; PÖ\'de yalnız gecikmeli bir ödül vardır ve veri etmenin kendi eylemleriyle toplanır.'),
@@ -50,11 +50,11 @@ ICERIK = dict(
     araclar=['Gymnasium', 'Stable-Baselines3', 'PyTorch', 'RLlib', 'MuJoCo', 'PettingZoo'],
     veri_baslik='Klasik ortamlar',
     veriler=['Izgara dünyası (gridworld)', 'Çok kollu haydut', 'CartPole', 'MountainCar', 'Atari oyunları (ALE)', 'MuJoCo denetim görevleri'],
-    araclar_not='PÖ\'de hazır veri seti yerine <b>ortam</b> verilir: etmen veriyi kendi eylemleriyle üretir, bu yüzden simülasyon dersin laboratuvarıdır.',
+    araclar_not='PÖ\'de hazır veri seti yerine <b>ortam</b> verilir: etmen veriyi kendi eylemleriyle üretir, bu yüzden benzetim dersin laboratuvarıdır.',
     yanilgilar=[
         ('PÖ denetimli öğrenmenin başka bir adıdır.', 'Doğru eylem hiç söylenmez; etmen yalnız ödülden ve kendi topladığı deneyimden öğrenir.'),
         ('Ödülü yazmak kolaydır.', 'Kötü tasarlanmış ödülü etmen beklenmedik kestirmelerle sömürür (reward hacking).'),
-        ('Simülasyonda öğrenen robot gerçekte de çalışır.', 'Simülasyon ile gerçek dünya arasındaki fark (sim-to-real) ayrıca ele alınmalıdır.'),
+        ('Benzetimde öğrenen robot gerçekte de çalışır.', 'Benzetim ile gerçek dünya arasındaki fark (sim-to-real) ayrıca ele alınmalıdır.'),
         ('PÖ yalnız oyunlar içindir.', 'Denetim, kaynak yönetimi ve dil modellerinin insan geri bildirimiyle eğitimi de PÖ kullanır.'),
     ],
     meslekler=['Pekiştirmeli öğrenme mühendisi', 'Robotik yazılım mühendisi', 'Oyun YZ geliştiricisi', 'Araştırmacı'],
@@ -87,7 +87,7 @@ ICERIK = dict(
         ('Beklenen değeri ve koşullu olasılığı hesaplayabiliyor musun?', '@OI'),
         ('Dinamik programlamayla bir en kısa yol problemini çözebiliyor musun?', 'Algoritmalar dersindeki dinamik programlama konusu'),
         ('Kayıp fonksiyonunu ve gradyan inişini açıklayabiliyor musun?', '@MO'),
-        ('Python\'da bir simülasyon döngüsü yazıp sonucu grafikle çizebiliyor musun?', 'Programlamaya giriş, ardından Matplotlib\'e kısa bir giriş'),
+        ('Python\'da bir benzetim döngüsü yazıp sonucu grafikle çizebiliyor musun?', 'Programlamaya giriş, ardından Matplotlib\'e kısa bir giriş'),
     ],
     riskler=[
         ('Ödül sömürüsü', 'OpenAI\'ın tekne yarışı etmeni yarışı bitirmek yerine aynı puan hedeflerini vurmak için durmadan daire çizdi.'),

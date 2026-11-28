@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 DEMO = {
     'baslik': 'Orman Kaybını Uydudan Ölçmek',
-    'problem': ('Aynı bölgenin iki tarihli uydu görüntüsünde kırmızı ve yakın kızılötesi (YKÖ) bantlar var. '
+    'problem': ('Aynı bölgenin iki tarihli uydu görüntüsünde kırmızı (K) ve yakın kızılötesi (YKÖ) bantlar var. '
                 'NDVI ile bitki örtüsünü bulun, eşiği kaydırın ve kaç hektar ormanın kaybolduğunu ölçün; bir piksele tıklayıp değerine bakın.'),
     'html': '''
 <svg viewBox="0 0 390 252" width="390" height="252" role="img" aria-label="İki tarihli uydu görüntüsü"></svg>

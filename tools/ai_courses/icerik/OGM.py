@@ -11,7 +11,7 @@ ICERIK = dict(
         ('1966', 'Baum ve Petrie saklı Markov modelinin (HMM) istatistiksel temelini yayımlar.'),
         ('1977', 'Dempster, Laird ve Rubin, eksik veriyle öğrenmek için EM algoritmasını yayımlar.'),
         ('1988', 'Pearl "Probabilistic Reasoning in Intelligent Systems" kitabıyla Bayes ağlarını YZ\'ye taşır.'),
-        ('1989', 'Rabiner\'in HMM eğitici makalesi konuşma tanımada standart başvuru olur.'),
+        ('1989', 'Rabiner\'in HMM öğretici makalesi konuşma tanımada standart başvuru olur.'),
         ('2001', 'Lafferty, McCallum ve Pereira dizi etiketleme için koşullu rastgele alanları (CRF) önerir.'),
     ],
     kavramlar=[
@@ -92,7 +92,7 @@ ICERIK = dict(
     riskler=[
         ('Tahminle doldurulan tablolar', 'Veri yoksa olasılık tabloları uzman tahminiyle dolar; yüzde 83 gibi kesin görünen sonuç bu tahminlerin belirsizliğini gizler.'),
         ('Yanlış bağımsızlık varsayımı', 'Gerçekte bağımlı iki kanıtı bağımsız saymak aynı bilgiyi iki kez sayar; model aşırı emin bir sonuca varır.'),
-        ('Mahkemede olasılık hatası', 'Kanıtın olasılığını suçluluğun olasılığı sanmak (savcı yanılgısı) ve taban oranı unutmak masum birini suçlu gösterebilir.'),
+        ('Mahkemede olasılık hatası', 'Kanıtın olasılığını suçluluğun olasılığı sanmak (savcı yanılgısı) ve taban oranını unutmak masum birini suçlu gösterebilir.'),
         ('Yakınsamamış örnekleme', 'MCMC zinciri erken durdurulursa sonsal dağılım yanlış çıkar; yakınsama tanıları raporlanmadan sonuç güvenilmez.'),
     ],
 )

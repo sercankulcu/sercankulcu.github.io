@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 36 slides: Embedded AI — resource limits, quantization, pruning, '
-             'distillation, efficient architectures, TinyML, history, neighbours, overlaps.'),
-    gundem=['Resource limits', 'Quantization', 'Pruning and distillation', 'Efficient architectures', 'Devices and accelerators', 'Neighbouring courses'],
+             'distillation, efficient architectures, TinyML, history, neighboring courses, overlaps.'),
+    gundem=['Resource limits', 'Quantization', 'Pruning and distillation', 'Efficient architectures', 'Devices and accelerators', 'Neighboring courses'],
     tanim=('Embedded AI studies running trained models on devices with limited memory, compute and energy, such as '
            'phones, cameras or microcontrollers. The course covers shrinking a model by <b>quantization</b>, pruning and '
            'distillation, moving it onto the device, and measuring latency and energy; the extreme form is called TinyML.'),

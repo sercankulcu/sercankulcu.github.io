@@ -84,5 +84,5 @@ DEMO = {
   ciz();
 ''',
     'not': ('Siber güvenlikte yapay zekâ <b>olağanı öğrenip sapmayı</b> yakalar; imzası bilinmeyen saldırıyı da görür. Ama karşıda '
-            'öğrenen bir rakip var: model ve özellikler sürekli güncellenmeli.'),
+            'öğrenen bir rakip var: model ve öznitelikler sürekli güncellenmeli.'),
 }

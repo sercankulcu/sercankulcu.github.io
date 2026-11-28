@@ -10,7 +10,7 @@ DEMO = {
   <label>Eşik = <b class="ai-t">70</b></label>
   <input type="range" min="10" max="160" value="70" aria-label="Eşik">
   <div class="ai-out"></div>
-  <div class="ai-out" style="font-size:13px">Her adım gerçek bir 3×3 <b>evrişim</b>. Bulanıklaştırıp eşiği biraz düşürün: gürültü kenarları azalır, F1 artar.</div>
+  <div class="ai-out" style="font-size:13px">Bulanıklaştırma ve Sobel adımları gerçek birer 3×3 <b>evrişim</b>. Bulanıklaştırıp eşiği biraz düşürün: gürültüden doğan sahte kenarlar azalır, F1 artar.</div>
 </div>''',
     'js': r'''
   var svg = root.querySelector("svg"), out = root.querySelectorAll(".ai-out")[0];

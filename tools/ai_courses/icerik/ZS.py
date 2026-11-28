@@ -7,7 +7,7 @@ ICERIK = dict(
            'eğilim, mevsimsellik ve gürültüye ayırmayı, <b>öz ilintiyi</b> modellemeyi ve geleceği belirsizliğiyle '
            'birlikte tahmin etmeyi öğretir.'),
     tarihce=[
-        ('1927', 'Yule, güneş lekesi sayılarını otoregresif (AR) bir modelle açıklar.'),
+        ('1927', 'Yule, güneş lekesi sayılarını özbağlanımlı (AR) bir modelle açıklar.'),
         ('1960', 'Kalman filtresi yayımlanır: gürültülü ölçümlerden gizli durumu adım adım kestirir.'),
         ('1970', 'Box ve Jenkins\'in kitabı ARIMA modellerini ve kurma yöntemini yerleştirir.'),
         ('1982', 'Engle, oynaklığın zamanla değiştiği ARCH modelini önerir.'),
@@ -19,7 +19,7 @@ ICERIK = dict(
         ('Durağanlık', 'Ortalama ve varyansın zamanla değişmemesi.'),
         ('Öz ilinti (ACF)', 'Serinin kendi geçmiş değerleriyle ilintisi.'),
         ('Fark alma', 'Eğilimi silip seriyi durağan yapmak.'),
-        ('ARIMA', 'Öz regresyon, fark alma ve hareketli ortalama birlikte.'),
+        ('ARIMA', 'Özbağlanım, fark alma ve hareketli ortalama birlikte.'),
         ('Üstel düzleştirme', 'Yakın geçmişe daha çok ağırlık veren tahmin.'),
         ('Tahmin aralığı', 'Tek sayı değil, belirsizliğiyle birlikte tahmin.'),
         ('Zamana göre bölme', 'Test hep eğitimden sonra gelir; karıştırılmaz.'),
@@ -96,7 +96,7 @@ ICERIK = dict(
     riskler=[
         ('Geleceğe sızan bilgi', 'Rastgele bölme ya da bütün seriyle yapılan ölçekleme gelecekteki değerleri eğitime taşır; sınamadaki başarı sahte çıkar.'),
         ('Yapısal kırılma', '2020 salgınında talep ve trafik serileri birden değişti; geçmişe iyi uyan modeller haftalarca yanlış tahmin verdi.'),
-        ('Aralıksız tahmin', 'Tek sayıyla verilen tahmin kesinlik izlenimi verir; stok ya da enerji kararı belirsizlik bilinmeden alınır.'),
+        ('Aralığı olmayan tahmin', 'Tek sayıyla verilen tahmin kesinlik izlenimi verir; stok ya da enerji kararı belirsizlik bilinmeden alınır.'),
         ('Davranışı değiştiren tahmin', 'Herkes aynı fiyat ya da talep tahminine göre davranınca seri değişir; tahmin kendini doğrulayabilir ya da bozabilir.'),
     ],
 )

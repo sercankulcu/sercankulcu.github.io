@@ -15,7 +15,7 @@ ICERIK = dict(
         ('1993', 'Jang, bulanık kuralları sinir ağı gibi eğiten ANFIS\'i yayımlar.'),
     ],
     kavramlar=[
-        ('Bulanık küme', 'Her ögenin 0 ile 1 arasında bir üyelik derecesi var.'),
+        ('Bulanık küme', 'Her ögenin 0 ile 1 arasında bir üyelik derecesi vardır.'),
         ('Üyelik fonksiyonu', 'Üçgen, yamuk, Gauss: değeri dereceye çevirir.'),
         ('Dilsel değişken', 'Değerleri sözcük olan değişken: düşük, orta, yüksek.'),
         ('Bulanık işlemler', 'VE için en küçük, VEYA için en büyük, DEĞİL için 1-µ.'),
@@ -38,7 +38,7 @@ ICERIK = dict(
         ('OI', 'Olasılık bir olayın olup olmayacağındaki belirsizliği ölçer; bu ders bir kavramın ne ölçüde geçerli olduğunu, yani belirsiz sınırı ölçer.'),
         ('US', 'Uzman sistemler kuralları çoğunlukla keskin mantıkla işletir; bu ders kuralların kısmen doğru olabildiği yaklaşık akıl yürütmeyi kurar.'),
         ('ROB', 'Robotik denetimin tamamını ele alır; bu ders bulanık denetleyiciyi model gerektirmeyen bir seçenek olarak öğretir.'),
-        ('YSA', 'YSA kuralları veriden ağırlık olarak öğrenir ve okunmaz; bulanık sistemin kuralları uzmandan gelir ve okunabilir.'),
+        ('YSA', 'YSA kuralları veriden ağırlık olarak öğrenir ve bunlar okunamaz; bulanık sistemin kuralları uzmandan gelir ve okunabilir.'),
     ],
     uygulamalar=[
         ('Ev aletleri', 'Çamaşır makinesi, klima, pirinç pişirici.'),
@@ -94,6 +94,6 @@ ICERIK = dict(
         ('Keyfî üyelik fonksiyonları', 'Üçgenin köşelerinin kimce, neye göre seçildiği çoğu zaman belgelenmez; başka biçimlerle aynı kurallar farklı karar verir.'),
         ('Kural patlaması', 'Girdi ve terim sayısı arttıkça kural sayısı üstel büyür; atlanan kombinasyonlarda denetleyici öngörülmeyen çıktı verir.'),
         ('Kanıtsız kararlılık', 'Deneme yanılmayla ayarlanan denetleyicinin kapalı döngüde kararlı kalacağı çoğu zaman kanıtlanmaz; fren gibi sistemlerde risklidir.'),
-        ('Sayısal kılıflı öznellik', 'Tıpta ya da kredide bulanık puan kesin bir ölçüm gibi sunulursa uzmanın önyargısı bilimsel görünen bir sayıya dönüşür.'),
+        ('Sayı kılığında öznellik', 'Tıpta ya da kredide bulanık puan kesin bir ölçüm gibi sunulursa uzmanın önyargısı bilimsel görünen bir sayıya dönüşür.'),
     ],
 )

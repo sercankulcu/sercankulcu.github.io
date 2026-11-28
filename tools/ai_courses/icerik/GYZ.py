@@ -45,7 +45,7 @@ ICERIK = dict(
         ('Giyilebilir cihazlar', 'Saatte düşme, adım ve kalp ritmi analizi.'),
         ('Kestirimci bakım', 'Motor titreşiminden arıza belirtisi yakalamak.'),
         ('Telefonda YZ', 'Fotoğraf iyileştirme, çevrimdışı çeviri.'),
-        ('Tarım ve çevre', 'Pille çalışan sensörlerde ses ve zararlı tespiti.'),
+        ('Tarım ve çevre', 'Pille çalışan sensörlerde ses ve zararlı böcek tespiti.'),
     ],
     araclar=['TensorFlow Lite', 'ONNX Runtime', 'ExecuTorch', 'Edge Impulse', 'CMSIS-NN', 'Arduino', 'NVIDIA Jetson'],
     veriler=['Speech Commands', 'Visual Wake Words', 'MNIST', 'CIFAR-10', 'ImageNet', 'MLPerf Tiny'],

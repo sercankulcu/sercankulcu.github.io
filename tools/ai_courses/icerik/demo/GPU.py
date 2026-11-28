@@ -8,8 +8,8 @@ DEMO = {
 <div class="ai-side">
   <label>İş parçacığı sayısı p = <b class="ai-p">4</b></label>
   <input type="range" class="ai-rp" min="0" max="4" step="1" value="2" aria-label="İş parçacığı sayısı">
-  <label>Programın seri kısmı = <b class="ai-s">%10</b></label>
-  <input type="range" class="ai-rs" min="1" max="50" step="1" value="10" aria-label="Seri kısım oranı">
+  <label>Programın sıralı kısmı = <b class="ai-s">%10</b></label>
+  <input type="range" class="ai-rs" min="1" max="50" step="1" value="10" aria-label="Sıralı kısım oranı">
   <div class="ai-ctl"><button type="button" data-o="1">Adım adım oynat</button></div>
   <div class="ai-out"></div>
 </div>''',
@@ -100,7 +100,7 @@ DEMO = {
     var simdi = 0;
     pl.duzey.forEach(function (d) { d.forEach(function (n) { if (n.a && n.adim === gor) simdi++; }); });
     out.innerHTML = (gor < T ? "Adım " + gor + ": <b>" + simdi + "</b> toplama aynı anda yapıldı.<br>" : "") + "16 sayı, <b>" + p + "</b> iş parçacığı: <b>" + T + " adım</b> (tek iş parçacığıyla 15). Hızlanma " + f(15 / T, 2) + "×." +
-      "<br>Amdahl: seri kısım %" + rs.value + " iken " + p + " çekirdek <b>" + f(hp, 2) + "×</b>; sonsuz çekirdekle bile en çok <b>" + f(1 / s, 1) + "×</b>.";
+      "<br>Amdahl: sıralı kısım %" + rs.value + " iken " + p + " çekirdek <b>" + f(hp, 2) + "×</b>; sonsuz sayıda çekirdekle bile en çok <b>" + f(1 / s, 1) + "×</b>.";
   }
   function dur() { if (timer) { clearInterval(timer); timer = null; } }
   rp.addEventListener("input", function () { dur(); adimGoster = 99; ciz(); });
@@ -113,5 +113,5 @@ DEMO = {
   ciz();
 ''',
     'not': ('Paralel programlama dersi, işi <b>bağımsız parçalara</b> bölmeyi öğretir: n sayının toplamı log n adımda biter. '
-            'Ama seri kalan küçük bir kısım bile hızlanmanın tavanını belirler.'),
+            'Ama sıralı kalan küçük bir kısım bile hızlanmanın tavanını belirler.'),
 }

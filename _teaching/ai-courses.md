@@ -11,7 +11,7 @@ course_language: [tr, en]
 ---
 
 ![ai and data courses](/images/teaching/teaching-ai-courses.webp){: .align-left width="200" height="150" style="float: left; margin-right: 10px;"} 
-This course is a map of the courses around artificial intelligence and data. Each of its 38 course presentations introduces one course: the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it differs from its nearest neighbours, its applications and tools. An opening map and a closing comparison frame the series. There are no lecture notes, code examples or textbook: the aim is to help students see the field as a whole before choosing their electives.
+This course is a map of the courses around artificial intelligence and data. Each of its 38 course presentations introduces one course: the question it asks, its core concepts, a typical workflow, its prerequisites, the courses it overlaps with and the points where it differs from its nearest neighbors, its applications and tools. An opening map and a closing comparison frame the series. There are no lecture notes, code examples or textbook: the aim is to help students see the field as a whole before choosing their electives.
 
 
 <div data-lt="tr" lang="tr" markdown="1">
@@ -84,7 +84,7 @@ Bu bölümde rehberin amacı, yapay zekâ, makine öğrenmesi, yapay sinir ağla
 
 ### Bölüm 10: Evrimsel ve Metasezgisel Optimizasyon
 
-*Türev yokken ya da arama uzayı çok büyükken iyi bir çözüm nasıl bulunur?* Evrimsel ve metasezgisel optimizasyon, türevi olmayan ya da arama uzayı çok büyük problemlerde iyi bir çözümü deneme, seçme ve değiştirme döngüsüyle arar. Doğal seçilim, metal tavlama ya da karınca kolonisi gibi süreçlerden esinlenen bu yöntemler en iyi çözümü garanti etmez, kısa sürede iyi bir çözüm verir.
+*Türev yokken ya da arama uzayı çok büyükken iyi bir çözüm nasıl bulunur?* Evrimsel ve metasezgisel optimizasyon, türevi olmayan ya da arama uzayı çok büyük problemlerde iyi bir çözümü deneme, seçme ve değiştirme döngüsüyle arar. Doğal seçilim, metal tavlama ya da karınca kolonisi gibi süreçlerden esinlenen bu yöntemler en iyi çözümü garanti etmez ama kısa sürede iyi bir çözüm verir.
 
 - [🖼️ Sunum](/files/ai_courses/sunumlar/Bolum_10_Evrimsel_ve_Metasezgisel_Optimizasyon.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/Bolum_10_Evrimsel_ve_Metasezgisel_Optimizasyon.pdf)
 
@@ -136,7 +136,7 @@ Bu bölümde rehberin amacı, yapay zekâ, makine öğrenmesi, yapay sinir ağla
 
 ### Bölüm 18: Bilgisayarlı Görü
 
-*Bilgisayar bir görüntüde ya da videoda ne olduğunu nasıl anlar?* Bilgisayarlı görü, bir görüntüden ya da videodan anlam çıkarmayı inceler: hangi nesneler var, nerede, sahne nasıl bir üç boyutlu yapıya sahip. Girdi görüntüdür ama çıktı görüntü değil; etiket, kutu, maske ya da derinliktir. Görüntüyü dönüştürmek görüntü işlemenin işidir.
+*Bilgisayar bir görüntüde ya da videoda ne olduğunu nasıl anlar?* Bilgisayarlı görü, bir görüntüden ya da videodan anlam çıkarmayı inceler: hangi nesneler var, nerede, sahne nasıl bir üç boyutlu yapıya sahip. Girdi görüntüdür ama çıktı görüntü değildir: etiket, kutu, maske ya da derinliktir. Görüntüyü dönüştürmek görüntü işlemenin işidir.
 
 - [🖼️ Sunum](/files/ai_courses/sunumlar/Bolum_18_Bilgisayarli_Goru.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/Bolum_18_Bilgisayarli_Goru.pdf)
 
@@ -298,7 +298,7 @@ Bütün dersler yaklaşım, girdi, çıktı, başarı ölçütü, matematik yük
 
 ### Chapter 1: Map of the Field
 
-This chapter sets out the purpose of the guide, how artificial intelligence, machine learning, neural networks and deep learning nest inside one another, the six parts that group the courses, the four kinds of relation between courses (subfield, builds on, shares methods, application) and the criteria used to compare them. Clicking a course on the interactive map shows its neighbours and relations.
+This chapter sets out the purpose of the guide, how artificial intelligence, machine learning, neural networks and deep learning nest inside one another, the six parts that group the courses, the four kinds of relation between courses (subfield, builds on, shares methods, application) and the criteria used to compare them. Clicking a course on the interactive map shows its neighbors and relations.
 
 - [🖼️ Slides](/files/ai_courses/slides/Chapter_01_Map_of_the_Field.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/Chapter_01_Map_of_the_Field.pdf)
 
@@ -412,7 +412,7 @@ This chapter sets out the purpose of the guide, how artificial intelligence, mac
 
 ### Chapter 18: Computer Vision
 
-*How does a computer understand what is in an image or a video?* Computer vision studies how to extract meaning from an image or video: which objects are there, where they are, what 3D structure the scene has. The input is an image but the output is not; it is a label, a box, a mask or depth. Transforming the image is the job of image processing.
+*How does a computer understand what is in an image or a video?* Computer vision studies how to extract meaning from an image or video: which objects are there, where they are, what 3D structure the scene has. The input is an image, but the output is not an image: it is a label, a box, a mask or depth. Transforming the image is the job of image processing.
 
 - [🖼️ Slides](/files/ai_courses/slides/Chapter_18_Computer_Vision.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/Chapter_18_Computer_Vision.pdf)
 
@@ -458,7 +458,7 @@ This chapter sets out the purpose of the guide, how artificial intelligence, mac
 
 ### Chapter 25: Data Mining
 
-*How are hidden, useful patterns found in large piles of data?* Data mining studies how to discover patterns in large data collections that are previously unknown, valid and useful. It uses the same algorithms as machine learning, but the goal is not prediction on new examples; it is finding rules, clusters and anomalies in the data itself.
+*How are hidden, useful patterns found in large piles of data?* Data mining studies how to discover patterns in large data collections, patterns that are previously unknown, valid and useful. It uses the same algorithms as machine learning, but the goal is not prediction on new examples; it is finding rules, clusters and anomalies in the data itself.
 
 - [🖼️ Slides](/files/ai_courses/slides/Chapter_25_Data_Mining.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/Chapter_25_Data_Mining.pdf)
 
@@ -550,7 +550,7 @@ This chapter sets out the purpose of the guide, how artificial intelligence, mac
 
 ### Chapter 39: Bioinformatics
 
-*How are biological sequences and molecular data analyzed computationally?* Bioinformatics analyses biological data such as DNA, RNA and protein sequences with algorithms and statistics. The course covers problems such as sequence alignment, genome assembly, gene expression analysis and protein structure prediction, using methods that cope with the size and noise of this data.
+*How are biological sequences and molecular data analyzed computationally?* Bioinformatics analyzes biological data such as DNA, RNA and protein sequences with algorithms and statistics. The course covers problems such as sequence alignment, genome assembly, gene expression analysis and protein structure prediction, using methods that cope with the size and noise of this data.
 
 - [🖼️ Slides](/files/ai_courses/slides/Chapter_39_Bioinformatics.html) · [📄 PDF](https://sercankulcu.github.io/courses-pdfs/ai_courses/pdf/Chapter_39_Bioinformatics.pdf)
 

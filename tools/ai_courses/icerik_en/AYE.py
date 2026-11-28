@@ -16,7 +16,7 @@ ICERIK = dict(
     ],
     kavramlar=[
         ('Black-box model', 'A model whose inner workings people cannot follow.'),
-        ('Interpretability', 'A model readable by design: decision tree, linear.'),
+        ('Interpretability', 'A model readable by design, such as a decision tree or a linear model.'),
         ('Local explanation', 'Explaining one prediction: LIME, SHAP values.'),
         ('Global explanation', 'The model\'s overall behavior: feature importance, PDP.'),
         ('Counterfactual', '"Had your income been this much, the loan would be approved."'),
@@ -81,7 +81,7 @@ ICERIK = dict(
         'Bias mitigation: pre-, in- and post-processing',
         'Privacy: anonymization and differential privacy',
         'Accountability: model cards, datasheets, audits',
-        'Regulation: GDPR and the EU AI Act',
+        'Regulation: GDPR, KVKK and the EU AI Act',
     ],
     beceriler=['explaining models with SHAP and LIME', 'measuring group fairness with Fairlearn',
                'generating counterfactual explanations', 'writing a model card', 'assessing the risks of a system'],

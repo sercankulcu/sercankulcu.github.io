@@ -82,7 +82,7 @@ ICERIK = dict(
         'Dynamic programming',
     ],
     beceriler=[
-        'modelling convex problems in CVXPY',
+        'modeling convex problems in CVXPY',
         'writing linear models with PuLP',
         'using scipy.optimize',
         'proving convexity',

@@ -74,7 +74,7 @@ ICERIK = dict(
         'Evaluating retrieval: precision, MAP, NDCG',
         'Link analysis: PageRank and HITS',
         'Learning to rank',
-        'Dense retrieval and approximate nearest neighbours',
+        'Dense retrieval and approximate nearest neighbors',
         'Content-based recommendation',
         'Collaborative filtering and matrix factorization',
         'Evaluating recommenders: offline metrics, A/B tests',
@@ -90,7 +90,7 @@ ICERIK = dict(
     riskler=[
         ('Filter bubbles', 'Always showing more of what a user liked narrows the range of views; polarization from news and video feeds is debated.'),
         ('Popularity bias', 'Popular items get recommended more, so they get clicked more; new and small producers stay invisible.'),
-        ('Query logs give people away', 'From search logs that AOL anonymized and released in 2006, journalists identified some of the users.'),
+        ('Query logs can identify people', 'From search logs that AOL anonymized and released in 2006, journalists identified some of the users.'),
         ('Ranking manipulation', 'Link farms, fake reviews and keyword stuffing distort rankings; the system must be designed against adversaries.'),
     ],
 )

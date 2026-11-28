@@ -60,7 +60,7 @@ ICERIK = dict(
     ],
     meslekler=['Haberleşme mühendisi', 'Sıkıştırma ve kodek geliştiricisi', 'Makine öğrenmesi araştırmacısı',
                'Kriptografi uzmanı', 'Veri depolama mühendisi'],
-    sonra=('Bilgi kuramı, matematik temelinin MÖ\'ye açılan kapısıdır: çapraz entropi, KL ıraksaması ve ortak bilgi '
+    sonra=('Bilgi kuramı, MÖ\'nün matematik temeline açılan kapıdır: çapraz entropi, KL ıraksaması ve ortak bilgi '
            'üretken modellerde, karar ağaçlarında ve temsil öğrenmede yeniden karşınıza çıkar. Haberleşme yönünde ise '
            'sayısal sinyal işleme ve kodlama kuramıyla devam edilir.'),
     kaynaklar=[

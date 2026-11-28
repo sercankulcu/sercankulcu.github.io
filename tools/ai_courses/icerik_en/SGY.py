@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 38 slides: AI in Cybersecurity — intrusion detection, malware, '
-             'imbalanced data, adversarial attacks, history, neighbours, overlaps.'),
-    gundem=['Intrusion detection', 'Malware', 'Imbalanced data', 'Adversarial attacks', 'Security of AI', 'Neighbouring courses'],
+             'imbalanced data, adversarial attacks, history, neighbors, overlaps.'),
+    gundem=['Intrusion detection', 'Malware', 'Imbalanced data', 'Adversarial attacks', 'Security of AI', 'Neighboring courses'],
     tanim=('AI in cybersecurity asks two questions together: how can machine learning catch intrusions, malware and '
            'phishing, and how can AI systems themselves be fooled? What sets the field apart is the <b>adversarial '
            'setting</b>: on the other side is an attacker trying to evade the model.'),
     tarihce=[
-        ('1987', 'Denning defines intrusion detection as a model that catches abnormal behaviour.'),
+        ('1987', 'Denning defines intrusion detection as a model that catches abnormal behavior.'),
         ('1999', 'The KDD Cup 1999 intrusion detection dataset is released; it serves as a benchmark for many years.'),
         ('2002', 'Paul Graham popularizes the Bayesian spam filter with "A Plan for Spam".'),
         ('2014', 'Szegedy et al. show adversarial examples: an invisible change fools a classifier.'),
@@ -16,7 +16,7 @@ ICERIK = dict(
     ],
     kavramlar=[
         ('Intrusion detection', 'Signature-based and anomaly-based approaches.'),
-        ('Malware', 'Classifying files by static or behavioural features.'),
+        ('Malware', 'Classifying files by static or behavioral features.'),
         ('Phishing detection', 'Telling fake emails, domains and web pages apart.'),
         ('Imbalanced data', 'Attacks are very rare next to normal traffic.'),
         ('False alarms', 'Precision, recall; analyst fatigue.'),
@@ -24,7 +24,7 @@ ICERIK = dict(
         ('Data poisoning', 'Slipping malicious samples into training data.'),
         ('Prompt injection', 'Hidden instructions that change a language model\'s goal.'),
     ],
-    akis=[('Collect', 'network flows,\nlogs'), ('Extract\nfeatures', 'bytes, flows,\nbehaviour'),
+    akis=[('Collect', 'network flows,\nlogs'), ('Extract\nfeatures', 'bytes, flows,\nbehavior'),
           ('Classify\nor score', 'ML model,\nanomaly'), ('Alert', 'analyst\nqueue'),
           ('Adapt', 'new attacks,\nretraining')],
     akis_ornek=('<b>Example:</b> An organization\'s gateway collects connection logs; features such as duration, byte count '
@@ -62,7 +62,7 @@ ICERIK = dict(
                'AI security specialist'],
     sonra=('This course opens in two directions: on the security side, network security, digital forensics and malware '
            'analysis; on the AI side, adversarial robustness, privacy-preserving learning and LLM security. '
-           'Explainable AI and AI Ethics is the natural neighbour on the second path.'),
+           'Explainable AI and AI Ethics is the natural neighbor on the second path.'),
     kaynaklar=[
         'Chio and Freeman, <em>Machine Learning and Security</em>, O\'Reilly, 2018.',
         'Denning, "An Intrusion-Detection Model", <em>IEEE Transactions on Software Engineering</em> 13(2), 1987.',
@@ -74,7 +74,7 @@ ICERIK = dict(
         'Feature extraction from network traffic and logs',
         'Signature- and anomaly-based intrusion detection',
         'Imbalanced data, false alarms and suitable metrics',
-        'Malware: static and behavioural analysis',
+        'Malware: static and behavioral analysis',
         'Phishing, spam and malicious URL detection',
         'Fraud and account takeover detection',
         'Concept drift and attacker adaptation',
@@ -93,7 +93,7 @@ ICERIK = dict(
     riskler=[
         ('Dual use', 'Techniques learned for detection can also produce malware that evades it, or convincing phishing emails.'),
         ('Unauthorized testing', 'Scanning another party\'s network without permission is a crime; experiments belong in an isolated lab, with written consent.'),
-        ('Employee surveillance', 'Insider threat detection watches employees\' email and behaviour; proportionality, GDPR and similar laws set limits.'),
+        ('Employee surveillance', 'Insider threat detection watches employees\' email and behavior; proportionality, GDPR and similar laws set limits.'),
         ('Automated response', 'Cutting a connection or locking an account on the model\'s word alone stops legitimate users on a false alarm.'),
     ],
 )

@@ -81,7 +81,7 @@ DEMO = {
     });
     var m = mae(f), ort = 0;
     for (var i = 0; i < h; i++) ort += seri[T0 + i] / h;
-    outs[0].innerHTML = adi[yon] + ", " + h + " ay ileri:<br>MAE = <b>" + f1(m) + "</b> bin kutu (ortalama satışın %" + f1(100 * m / ort) + "'i)";
+    outs[0].innerHTML = adi[yon] + ", " + h + " ay ileri:<br>MAE = <b>" + f1(m) + "</b> bin kutu (ortalama satışa oranı %" + f1(100 * m / ort) + ")";
     var sat = ["naif", "ho", "mn", "hw"].map(function (y) { return [y, mae(tahmin(y, h))]; });
     var en = sat.reduce(function (a, b) { return b[1] < a[1] ? b : a; });
     outs[1].innerHTML = "<table>" + sat.map(function (r) {

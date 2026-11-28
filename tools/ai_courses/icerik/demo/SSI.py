@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 DEMO = {
     'baslik': 'Gürültülü Nabzı Temizlemek',
-    'problem': ('Göğüse takılan EKG bandı 200 Hz ile örnekliyor; kayda şebekenin 50 Hz uğultusu ve kas gürültüsü karışmış. '
+    'problem': ('Göğse takılan EKG bandı 200 Hz ile örnekliyor; kayda şebekenin 50 Hz uğultusu ve kas gürültüsü karışmış. '
                 'Hareketli ortalamanın pencere boyunu değiştirin; sinyali hem zamanda hem frekansta izleyin.'),
     'html': '''
 <svg viewBox="0 0 390 284" width="390" height="284" role="img" aria-label="EKG sinyali ve genlik spektrumu"></svg>

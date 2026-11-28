@@ -75,7 +75,7 @@ ICERIK = dict(
         'Decision trees',
         'Ensembles: random forests, gradient boosting',
         'Support vector machines and kernels',
-        'k-nearest neighbours and naive Bayes',
+        'k-nearest neighbors and naive Bayes',
         'Clustering: k-means, hierarchical clustering',
         'Dimensionality reduction: PCA',
         'Feature engineering and model selection',

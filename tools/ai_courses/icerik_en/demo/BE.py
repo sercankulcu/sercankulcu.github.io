@@ -23,7 +23,7 @@ DEMO = {
     ["How do I cancel my order?", "An order can be cancelled on the My Orders page before it is shipped."],
     ["How do I return an item?", "You can return an item within 14 days; it ships free with the return code."],
     ["When is my money refunded?", "Once the return is approved, the money is refunded to your card within 3 to 7 business days."],
-    ["Paying in instalments", "Credit cards allow up to 6 monthly instalments; debit cards do not."],
+    ["Paying in installments", "Credit cards allow up to 6 monthly installments; debit cards do not."],
     ["I forgot my password", "Click Forgot password on the login page; a reset link is sent to your e-mail."],
     ["Where is my order?", "The tracking number is on the My Orders page; an order usually arrives in 2 days."],
     ["Can I change the billing address?", "The billing address of a placed order cannot be changed; fix it in account settings for new orders."],

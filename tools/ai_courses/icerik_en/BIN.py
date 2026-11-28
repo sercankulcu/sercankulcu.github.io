@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ICERIK = dict(
     excerpt=('Guide to AI and Data Courses, Chapter 39 slides: Bioinformatics — sequence alignment, genome assembly, '
-             'gene expression, protein structure, history, prerequisites, neighbours, overlaps.'),
-    gundem=['Biological data', 'Sequence alignment', 'Genome assembly', 'Gene expression', 'Protein structure', 'Neighbouring courses'],
-    tanim=('Bioinformatics analyses biological data such as DNA, RNA and protein sequences with algorithms and statistics. '
+             'gene expression, protein structure, history, prerequisites, neighbors, overlaps.'),
+    gundem=['Biological data', 'Sequence alignment', 'Genome assembly', 'Gene expression', 'Protein structure', 'Neighboring courses'],
+    tanim=('Bioinformatics analyzes biological data such as DNA, RNA and protein sequences with algorithms and statistics. '
            'The course covers problems such as <b>sequence alignment</b>, genome assembly, gene expression analysis and '
            'protein structure prediction, using methods that cope with the size and noise of this data.'),
     tarihce=[
@@ -25,7 +25,7 @@ ICERIK = dict(
         ('Multiple testing', 'Controlling the false discovery rate over thousands of genes.'),
     ],
     akis=[('Sequence', 'sequencing\nmachine'), ('Clean and\nassemble', 'QC, genome\nassembly'),
-          ('Align', 'to reference,\nto database'), ('Analyse', 'variants,\nexpression'), ('Interpret', 'biological\nfunction')],
+          ('Align', 'to reference,\nto database'), ('Analyze', 'variants,\nexpression'), ('Interpret', 'biological\nfunction')],
     akis_ornek=('<b>Example:</b> A bacterium taken from a patient is sequenced, the short reads are assembled into a genome, '
                 'and its genes are compared with known sequences in a database using BLAST. If antibiotic resistance genes '
                 'are found, the physician is told which drugs will not work.'),
@@ -38,13 +38,13 @@ ICERIK = dict(
         ('MO', 'ML develops general-purpose learning methods; this course applies them to sequence and expression data together with biological knowledge.'),
         ('VM', 'Data mining looks for patterns in any data; this course uses alignment and motif methods specific to DNA and protein sequences.'),
         ('OGM', 'Probabilistic graphical models are a general framework; this course uses hidden Markov models for gene finding and protein families.'),
-        ('TGI', 'Medical image processing analyses images of organs and tissue; this course analyses sequence and expression data at the molecular level.'),
+        ('TGI', 'Medical image processing analyzes images of organs and tissue; this course analyzes sequence and expression data at the molecular level.'),
     ],
     uygulamalar=[
         ('Personalized medicine', 'Choosing treatment by genetic variants.'),
         ('Outbreak tracking', 'Tracing spread through virus genomes.'),
         ('Drug discovery', 'Predicting target protein and molecule interactions.'),
-        ('Cancer genomics', 'Finding tumour-specific mutations.'),
+        ('Cancer genomics', 'Finding tumor-specific mutations.'),
         ('Agriculture', 'Breeding productive and resilient crop varieties.'),
         ('Evolution studies', 'Building species relationships from sequences.'),
     ],
@@ -61,7 +61,7 @@ ICERIK = dict(
                'AI researcher in drug discovery'],
     sonra=('Bioinformatics brings machine learning, data mining and probabilistic models together in one application '
            'area. After this course, computational genomics, structural biology and protein language models, or '
-           'neighbouring health courses such as medical image processing, are natural next steps.'),
+           'neighboring health courses such as medical image processing, are natural next steps.'),
     kaynaklar=[
         'Durbin, Eddy, Krogh and Mitchison, <em>Biological Sequence Analysis</em>, Cambridge University Press, 1998.',
         'Jones and Pevzner, <em>An Introduction to Bioinformatics Algorithms</em>, MIT Press, 2004.',

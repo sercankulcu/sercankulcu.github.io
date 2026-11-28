@@ -80,5 +80,5 @@ DEMO = {
   ciz();
 ''',
     'not': ('Kuralı kimse yazmadı: karar tamamen <b>örneklerden</b> geliyor. k küçükse model gürültüyü ezberler, çok büyükse '
-            'ayrıntıyı kaçırır; doğru k, ayrı tutulmuş test verisinde seçilir.'),
+            'ayrıntıyı kaçırır; doğru k, ayrı tutulmuş doğrulama verisinde seçilir.'),
 }

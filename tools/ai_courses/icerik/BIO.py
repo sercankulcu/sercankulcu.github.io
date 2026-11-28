@@ -52,12 +52,12 @@ ICERIK = dict(
     araclar_not='Biyometrik veri <b>kişisel veridir</b>: KVKK ve GDPR kapsamındadır; bazı yüz veri setleri bu yüzden yayından kaldırılmıştır.',
     yanilgilar=[
         ('Biyometrik sistemler hata yapmaz.', 'Her sistem yanlış kabul ve yanlış ret yapar; eşik bu iki hatadan birini seçer.'),
-        ('Biyometrik veri parola gibi değiştirilir.', 'Yüz ya da parmak izi değiştirilemez; sızan şablon kalıcı risktir, şablon koruma gerekir.'),
+        ('Biyometrik veri parola gibi değiştirilebilir.', 'Yüz ya da parmak izi değiştirilemez; sızan şablon kalıcı risktir, şablon koruma gerekir.'),
         ('Doğruluk herkes için aynıdır.', 'Başarım yaşa, ten rengine ve algılayıcıya göre değişebilir; değerlendirme gruplara ayrılarak yapılır.'),
-        ('Eşleşme varsa kişi oradadır.', 'Fotoğraf, maske ya da kayıt sesle sunum saldırısı yapılabilir; canlılık tespiti gerekir.'),
+        ('Eşleşme varsa kişi oradadır.', 'Fotoğraf, maske ya da kayıtlı sesle sunum saldırısı yapılabilir; canlılık tespiti gerekir.'),
     ],
     meslekler=['Biyometri mühendisi', 'Bilgisayarlı görü mühendisi', 'Kimlik ve erişim yönetimi uzmanı', 'Adli bilişim uzmanı'],
-    sonra=('Biyometri, örüntü tanıma ve görünün güvenlikle buluştuğu yerdir. Buradan derin yüz tanıma ve '
+    sonra=('Biyometri, örüntü tanıma ile bilgisayarlı görünün güvenlikle buluştuğu yerdir. Buradan derin yüz tanıma ve '
            'konuşmacı tanımaya, sahtecilik tespitiyle siber güvenliğe ya da adalet ve gizlilik sorularıyla '
            'açıklanabilir YZ ve etiğe geçilebilir.'),
     kaynaklar=[

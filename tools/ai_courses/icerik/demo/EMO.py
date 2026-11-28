@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 DEMO = {
     'baslik': 'Kargo Aracının Turunu Evrimleştir',
-    'problem': ('Kargo aracı depodan (D) çıkıp 11 adrese uğrayacak ve geri dönecek. Genetik algoritma 40 turluk bir nüfusu '
+    'problem': ('Kargo aracı depodan (D) çıkıp 11 adrese uğrayacak ve geri dönecek. Genetik algoritma 40 turluk bir popülasyonu '
                 'çaprazlama ve mutasyonla iyileştiriyor. Nesil ilerletin, mutasyon oranını değiştirip farkı görün.'),
     'html': '''
 <svg viewBox="0 0 390 290" width="390" height="290" role="img" aria-label="Teslimat noktaları ve en iyi tur"></svg>
@@ -10,7 +10,7 @@ DEMO = {
   <label>Mutasyon oranı = <b class="ai-m">%20</b></label>
   <input type="range" min="0" max="60" step="5" value="20" aria-label="Mutasyon oranı">
   <div class="ai-out"></div>
-  <div class="ai-out" style="font-size:13px">Mutasyonu %0 yapıp baştan başlatın: nüfus birbirine benzeyen turlarla dolar ve arama çoğu zaman <b>erken takılır</b>. Mutasyon çeşitliliği korur.</div>
+  <div class="ai-out" style="font-size:13px">Mutasyonu %0 yapıp baştan başlatın: popülasyon birbirine benzeyen turlarla dolar ve arama çoğu zaman <b>erken takılır</b>. Mutasyon çeşitliliği korur.</div>
 </div>''',
     'js': r'''
   var svg = root.querySelector("svg"), out = root.querySelector(".ai-out");
